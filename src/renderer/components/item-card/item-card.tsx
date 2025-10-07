@@ -1,19 +1,12 @@
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
-import {
-    Dispatch,
-    Fragment,
-    lazy,
-    memo,
-    MouseEvent,
-    ReactNode,
-    SetStateAction,
-    useState,
-} from 'react';
+import { Dispatch, Fragment, memo, ReactNode, SetStateAction, useState } from 'react';
 import { generatePath, Link } from 'react-router-dom';
 
 import styles from './item-card.module.css';
 
+import { ItemCardControls } from '/@/renderer/components/item-card/item-card-controls';
+import { ItemControls } from '/@/renderer/components/item-list/types';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Image } from '/@/shared/components/image/image';
 import { Separator } from '/@/shared/components/separator/separator';
@@ -28,12 +21,6 @@ import {
     Song,
 } from '/@/shared/types/domain-types';
 
-const ItemCardControls = lazy(() =>
-    import('/@/renderer/components/item-card/item-card-controls').then((module) => ({
-        default: module.ItemCardControls,
-    })),
-);
-
 type DataRow = {
     format: (data: Album | AlbumArtist | Artist | Playlist | Song) => ReactNode | string;
     id: string;
@@ -41,27 +28,20 @@ type DataRow = {
 };
 
 interface ItemCardProps {
+    controls: ItemControls;
     data: Album | AlbumArtist | Artist | Playlist | Song | undefined;
     isRound?: boolean;
     itemType: LibraryItem;
-    onClick?: (
-        e: MouseEvent<HTMLDivElement>,
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
-        itemType: LibraryItem,
-    ) => void;
-    onItemExpand?: () => void;
-    onItemSelect?: () => void;
+
     type?: 'compact' | 'default' | 'poster';
     withControls?: boolean;
 }
 
 export const ItemCard = ({
+    controls,
     data,
     isRound,
     itemType,
-    onClick,
-    onItemExpand,
-    onItemSelect,
     type = 'poster',
     withControls,
 }: ItemCardProps) => {
@@ -74,13 +54,11 @@ export const ItemCard = ({
         case 'compact':
             return (
                 <CompactItemCard
+                    controls={controls}
                     data={data}
                     imageUrl={imageUrl}
                     isRound={isRound}
                     itemType={itemType}
-                    onClick={onClick}
-                    onItemExpand={onItemExpand}
-                    onItemSelect={onItemSelect}
                     rows={rows}
                     setShowControls={setShowControls}
                     showControls={showControls}
@@ -90,13 +68,11 @@ export const ItemCard = ({
         case 'poster':
             return (
                 <PosterItemCard
+                    controls={controls}
                     data={data}
                     imageUrl={imageUrl}
                     isRound={isRound}
                     itemType={itemType}
-                    onClick={onClick}
-                    onItemExpand={onItemExpand}
-                    onItemSelect={onItemSelect}
                     rows={rows}
                     setShowControls={setShowControls}
                     showControls={showControls}
@@ -107,13 +83,11 @@ export const ItemCard = ({
         default:
             return (
                 <DefaultItemCard
+                    controls={controls}
                     data={data}
                     imageUrl={imageUrl}
                     isRound={isRound}
                     itemType={itemType}
-                    onClick={onClick}
-                    onItemExpand={onItemExpand}
-                    onItemSelect={onItemSelect}
                     rows={rows}
                     setShowControls={setShowControls}
                     showControls={showControls}
@@ -124,6 +98,7 @@ export const ItemCard = ({
 };
 
 export interface ItemCardDerivativeProps extends Omit<ItemCardProps, 'type'> {
+    controls: ItemControls;
     imageUrl: string | undefined;
     rows: DataRow[];
     setShowControls: Dispatch<SetStateAction<boolean>>;
@@ -131,13 +106,11 @@ export interface ItemCardDerivativeProps extends Omit<ItemCardProps, 'type'> {
 }
 
 const CompactItemCard = ({
+    controls,
     data,
     imageUrl,
     isRound,
     itemType,
-    onClick,
-    onItemExpand,
-    onItemSelect,
     rows,
     setShowControls,
     showControls,
@@ -148,7 +121,6 @@ const CompactItemCard = ({
             <div className={clsx(styles.container, styles.compact)}>
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onClick={(e) => onClick?.(e, data, itemType)}
                     onMouseEnter={() => withControls && setShowControls(true)}
                     onMouseLeave={() => withControls && setShowControls(false)}
                 >
@@ -157,7 +129,14 @@ const CompactItemCard = ({
                         src={imageUrl}
                     />
                     <AnimatePresence>
-                        {withControls && showControls && <ItemCardControls type="compact" />}
+                        {withControls && showControls && (
+                            <ItemCardControls
+                                controls={controls}
+                                item={data}
+                                itemType={itemType}
+                                type="compact"
+                            />
+                        )}
                     </AnimatePresence>
                     <div className={clsx(styles.detailContainer, styles.compact)}>
                         {rows.map((row) => (
@@ -186,13 +165,11 @@ const CompactItemCard = ({
 };
 
 const DefaultItemCard = ({
+    controls,
     data,
     imageUrl,
     isRound,
     itemType,
-    onClick,
-    onItemExpand,
-    onItemSelect,
     rows,
     setShowControls,
     showControls,
@@ -203,8 +180,6 @@ const DefaultItemCard = ({
             <div className={clsx(styles.container)}>
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onClick={(e) => onClick?.(e, data, itemType)}
-                    onDoubleClick={onItemExpand}
                     onMouseEnter={() => withControls && setShowControls(true)}
                     onMouseLeave={() => withControls && setShowControls(false)}
                 >
@@ -213,7 +188,14 @@ const DefaultItemCard = ({
                         src={imageUrl}
                     />
                     <AnimatePresence>
-                        {withControls && showControls && <ItemCardControls type="default" />}
+                        {withControls && showControls && (
+                            <ItemCardControls
+                                controls={controls}
+                                item={data}
+                                itemType={itemType}
+                                type="default"
+                            />
+                        )}
                     </AnimatePresence>
                 </div>
                 <div className={styles.detailContainer}>
@@ -242,13 +224,11 @@ const DefaultItemCard = ({
 };
 
 const PosterItemCard = ({
+    controls,
     data,
     imageUrl,
     isRound,
     itemType,
-    onClick,
-    onItemExpand,
-    onItemSelect,
     rows,
     setShowControls,
     showControls,
@@ -259,7 +239,7 @@ const PosterItemCard = ({
             <div className={clsx(styles.container, styles.poster)}>
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onClick={(e) => onClick?.(e, data, itemType)}
+                    onClick={(e) => controls?.onClick?.(data, itemType, e)}
                     onMouseEnter={() => withControls && setShowControls(true)}
                     onMouseLeave={() => withControls && setShowControls(false)}
                 >
@@ -268,7 +248,14 @@ const PosterItemCard = ({
                         src={imageUrl}
                     />
                     <AnimatePresence>
-                        {withControls && showControls && <ItemCardControls type="poster" />}
+                        {withControls && showControls && (
+                            <ItemCardControls
+                                controls={controls}
+                                item={data}
+                                itemType={itemType}
+                                type="poster"
+                            />
+                        )}
                     </AnimatePresence>
                 </div>
                 <div className={styles.detailContainer}>

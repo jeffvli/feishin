@@ -5,6 +5,7 @@ import { CellComponentProps } from 'react-window-v2';
 import styles from './item-table-list-column.module.css';
 
 import i18n from '/@/i18n/i18n';
+import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ActionsColumn } from '/@/renderer/components/item-list/item-table-list/columns/actions-column';
 import { AlbumArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-artists-column';
 import { CountColumn } from '/@/renderer/components/item-list/item-table-list/columns/count-column';
@@ -23,13 +24,13 @@ import { RatingColumn } from '/@/renderer/components/item-list/item-table-list/c
 import { RowIndexColumn } from '/@/renderer/components/item-list/item-table-list/columns/row-index-column';
 import { SizeColumn } from '/@/renderer/components/item-list/item-table-list/columns/size-column';
 import { TextColumn } from '/@/renderer/components/item-list/item-table-list/columns/text-column';
-import { CellProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
+import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
-import { TableColumn } from '/@/shared/types/types';
-import { createDoubleClickHandler } from '/@/shared/utils/double-click-handler';
+import { LibraryItem } from '/@/shared/types/domain-types';
+import { Play, TableColumn } from '/@/shared/types/types';
 
-export interface ItemTableListColumn extends CellComponentProps<CellProps> {}
+export interface ItemTableListColumn extends CellComponentProps<TableItemProps> {}
 
 export interface ItemTableListInnerColumn extends ItemTableListColumn {
     type: TableColumn;
@@ -159,18 +160,6 @@ export const TableColumnTextContainer = (
                     props.enableRowBorders && props.enableHeader && props.rowIndex > 0,
             })}
             data-row-index={isDataRow ? props.rowIndex : undefined}
-            onClick={createDoubleClickHandler<HTMLDivElement>({
-                onDoubleClick: (e) => {
-                    props.onItemDoubleClick?.(props.data[props.rowIndex], dataIndex, e);
-                },
-                onSingleClick: (e) => {
-                    props.onItemClick?.(props.data[props.rowIndex], dataIndex, e);
-                    props.handleExpand(e, props.data[props.rowIndex], props.itemType);
-                },
-            })}
-            onContextMenu={(e) => {
-                props.onItemContextMenu?.(props.data[props.rowIndex], dataIndex, e);
-            }}
             ref={containerRef}
             style={props.style}
         >
@@ -237,18 +226,6 @@ export const TableColumnContainer = (
                     props.enableRowBorders && props.enableHeader && props.rowIndex > 0,
             })}
             data-row-index={isDataRow ? props.rowIndex : undefined}
-            onClick={createDoubleClickHandler<HTMLDivElement>({
-                onDoubleClick: (e) => {
-                    props.onItemDoubleClick?.(props.data[props.rowIndex], dataIndex, e);
-                },
-                onSingleClick: (e) => {
-                    props.onItemClick?.(props.data[props.rowIndex], dataIndex, e);
-                    props.handleExpand(e, props.data[props.rowIndex], props.itemType);
-                },
-            })}
-            onContextMenu={(e) => {
-                props.onItemContextMenu?.(props.data[props.rowIndex], dataIndex, e);
-            }}
             ref={containerRef}
             style={props.style}
         >
@@ -283,8 +260,73 @@ export const TableColumnHeaderContainer = (
     );
 };
 
+const handleItemClick = (
+    item: unknown,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemClick', item, itemType, internalState);
+};
+
+const handleItemExpand = (
+    item: unknown,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemExpand', item, itemType, internalState);
+};
+
+const handleItemSelect = (
+    item: unknown,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemSelect', item, itemType, internalState);
+};
+
+const handleItemDoubleClick = (
+    item: unknown,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemDoubleClick', item, itemType, internalState);
+};
+
+const handleItemFavorite = (
+    item: unknown,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemFavorite', item, itemType, internalState);
+};
+
+const handleItemRating = (
+    item: unknown,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemRating', item, itemType, internalState);
+};
+
+const handleItemMore = (
+    item: unknown,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemMore', item, itemType, internalState);
+};
+
+const handleItemPlay = (
+    item: unknown,
+    itemType: LibraryItem,
+    playType: Play,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemPlay', item, itemType, playType, internalState);
+};
+
 const columnLabelMap: Record<TableColumn, ReactNode | string> = {
-    [TableColumn.ACTIONS]: '',
+    [TableColumn.ACTIONS]: <Icon fill="default" icon="ellipsisHorizontal" size="md" />,
     [TableColumn.ALBUM]: i18n.t('table.column.album', { postProcess: 'upperCase' }) as string,
     [TableColumn.ALBUM_ARTIST]: i18n.t('table.column.albumArtist', {
         postProcess: 'upperCase',
@@ -335,9 +377,7 @@ const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.TRACK_NUMBER]: i18n.t('table.column.trackNumber', {
         postProcess: 'upperCase',
     }) as string,
-    [TableColumn.USER_FAVORITE]: i18n.t('table.column.favorite', {
-        postProcess: 'upperCase',
-    }) as string,
+    [TableColumn.USER_FAVORITE]: <Icon fill="default" icon="favorite" size="md" />,
     [TableColumn.USER_RATING]: i18n.t('table.column.rating', {
         postProcess: 'upperCase',
     }) as string,

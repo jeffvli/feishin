@@ -138,17 +138,29 @@
     }
 
     svg {
-        fill: rgb(255 255 255);
         stroke: rgb(255 255 255);
     }
 }
 
-.secondary-button.favorite {
+.user-data {
+    position: absolute;
     top: 0;
     right: 0;
+}
+
+.rating {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: var(--theme-spacing-md);
 }
 
 .secondary-button.options {
     right: 0;
     bottom: 0;
+}
+
+.secondary-button.expand {
+    bottom: 0;
+    left: 0;
 }

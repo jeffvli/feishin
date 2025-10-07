@@ -4,7 +4,6 @@ import { AnimatePresence, motion, Variants } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import {
     CSSProperties,
-    MouseEvent,
     Ref,
     UIEvent,
     useCallback,
@@ -21,44 +20,40 @@ import styles from './item-grid-list.module.css';
 import { getDataRowsCount, ItemCard } from '/@/renderer/components/item-card/item-card';
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import {
+    ItemListItem,
     ItemListStateActions,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
+import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { LibraryItem } from '/@/shared/types/domain-types';
+import { Play } from '/@/shared/types/types';
+
+export interface GridItemProps {
+    columns: number;
+    data: any[];
+    enableExpansion?: boolean;
+    enableSelection?: boolean;
+    internalState: ItemListStateActions;
+    itemType: LibraryItem;
+}
 
 export interface ItemGridListProps {
     data: unknown[];
     enableExpansion?: boolean;
     enableSelection?: boolean;
-    initialTopMostItemIndex?:
-        | number
-        | {
-              align: 'center' | 'end' | 'start';
-              behavior: 'auto' | 'smooth';
-              index: number;
-              offset?: number;
-          };
+    initialTop?: {
+        behavior?: 'auto' | 'smooth';
+        to: number;
+        type: 'index' | 'offset';
+    };
     itemType: LibraryItem;
-    onEndReached?: (index: number) => void;
-    onItemClick?: (item: unknown, index: number) => void;
-    onItemContextMenu?: (item: unknown, index: number) => void;
-    onItemDoubleClick?: (item: unknown, index: number) => void;
+    onEndReached?: (index: number, handle: ItemListHandle) => void;
     onRangeChanged?: (range: { endIndex: number; startIndex: number }) => void;
     onScroll?: (e: UIEvent<HTMLDivElement>) => void;
-    onScrollEnd?: () => void;
-    onStartReached?: (index: number) => void;
+    onScrollEnd?: (offset: number, handle: ItemListHandle) => void;
+    onStartReached?: (index: number, handle: ItemListHandle) => void;
     ref: Ref<ListImperativeAPI>;
     totalItemCount?: number;
-}
-
-interface ItemContext {
-    enableExpansion?: boolean;
-    enableSelection?: boolean;
-    internalState: ItemListStateActions;
-    itemType: LibraryItem;
-    onItemClick?: (item: unknown, index: number) => void;
-    onItemContextMenu?: (item: unknown, index: number) => void;
-    onItemDoubleClick?: (item: unknown, index: number) => void;
 }
 
 const expandedAnimationVariants: Variants = {
@@ -79,15 +74,10 @@ export const ItemGridList = ({
     data,
     enableExpansion = false,
     enableSelection = false,
-    initialTopMostItemIndex = 0,
     itemType,
     onEndReached,
-    onItemClick,
-    onItemContextMenu,
-    onItemDoubleClick,
     onRangeChanged,
     onScroll,
-    onScrollEnd,
     onStartReached,
     totalItemCount = 0,
 }: ItemGridListProps) => {
@@ -132,19 +122,6 @@ export const ItemGridList = ({
     }, [itemGridRef, initialize]);
 
     const hasExpanded = internalState.hasExpanded();
-
-    const handleExpand = useCallback(
-        (_e: MouseEvent<HTMLDivElement>, item: unknown, itemType: LibraryItem) => {
-            if (item && typeof item === 'object' && 'id' in item && 'serverId' in item) {
-                internalState.toggleExpanded({
-                    id: item.id as string,
-                    itemType: itemType,
-                    serverId: item.serverId as string,
-                });
-            }
-        },
-        [internalState],
-    );
 
     const handleScroll = useCallback(
         (e: UIEvent<HTMLDivElement>) => {
@@ -218,14 +195,21 @@ export const ItemGridList = ({
                 const endRow = visibleRows.stopIndex;
 
                 if (startRow === 0) {
-                    onStartReached?.(startRow);
+                    onStartReached?.(startRow, itemGridRef.current ?? (undefined as any));
                 }
                 if (endRow >= totalRows) {
-                    onEndReached?.(endRow);
+                    onEndReached?.(endRow, itemGridRef.current ?? (undefined as any));
                 }
             }
         },
-        [onEndReached, onRangeChanged, onStartReached, totalItemCount, tableMeta?.columnCount],
+        [
+            onRangeChanged,
+            tableMeta?.columnCount,
+            onStartReached,
+            onEndReached,
+            totalItemCount,
+            itemGridRef,
+        ],
     );
 
     const elements = useMemo(() => {
@@ -253,6 +237,15 @@ export const ItemGridList = ({
             );
     }, [tableMeta, data]);
 
+    const itemProps: GridItemProps = {
+        columns: tableMeta?.columnCount || 0,
+        data: elements,
+        enableExpansion,
+        enableSelection,
+        internalState,
+        itemType,
+    };
+
     return (
         <motion.div
             animate={{
@@ -272,15 +265,10 @@ export const ItemGridList = ({
                 listRef={itemGridRef}
                 onRowsRendered={handleOnRowsRendered}
                 onScroll={handleScroll}
-                rowComponent={RowComponent}
+                rowComponent={ListComponent}
                 rowCount={tableMeta?.rowCount || 0}
                 rowHeight={tableMeta?.itemHeight || 0}
-                rowProps={{
-                    columns: tableMeta?.columnCount || 0,
-                    data: elements,
-                    handleExpand,
-                    itemType,
-                }}
+                rowProps={itemProps}
             />
             <AnimatePresence>
                 {hasExpanded && (
@@ -300,19 +288,16 @@ export const ItemGridList = ({
     );
 };
 
-function RowComponent({
+const ListComponent = ({
     columns,
     data,
-    handleExpand,
+    enableExpansion,
+    enableSelection,
     index,
+    internalState,
     itemType,
     style,
-}: RowComponentProps<{
-    columns: number;
-    data: any[];
-    handleExpand: (e: MouseEvent<HTMLDivElement>, item: unknown, itemType: LibraryItem) => void;
-    itemType: LibraryItem;
-}>) {
+}: RowComponentProps<GridItemProps>) => {
     return (
         <div className={styles.itemList} style={style}>
             {data[index].map((d) => (
@@ -322,14 +307,104 @@ function RowComponent({
                     style={{ '--columns': columns } as CSSProperties}
                 >
                     <ItemCard
+                        controls={{
+                            onClick: enableSelection
+                                ? (item, itemType) => {
+                                      return handleItemClick(item, itemType, internalState);
+                                  }
+                                : undefined,
+                            onDoubleClick: (item, itemType) => {
+                                return handleItemDoubleClick(item, itemType, internalState);
+                            },
+                            onFavorite: (item, itemType) => {
+                                return handleItemFavorite(item, itemType, internalState);
+                            },
+                            onItemExpand: enableExpansion
+                                ? (item, itemType) => {
+                                      return handleItemExpand(item, itemType, internalState);
+                                  }
+                                : undefined,
+                            onMore: (item, itemType) => {
+                                return handleItemMore(item, itemType, internalState);
+                            },
+                            onPlay: (item, itemType, playType) => {
+                                return handleItemPlay(item, itemType, playType, internalState);
+                            },
+                            onRating: (item, itemType) => {
+                                return handleItemRating(item, itemType, internalState);
+                            },
+                        }}
                         data={d.data}
                         itemType={itemType}
-                        onClick={(e, item, itemType) => handleExpand(e, item, itemType)}
-                        type="poster"
                         withControls
                     />
                 </div>
             ))}
         </div>
     );
-}
+};
+
+const handleItemClick = (
+    item: (ItemListItem & object) | undefined,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemClick', item, itemType, internalState);
+};
+
+const handleItemDoubleClick = (
+    item: (ItemListItem & object) | undefined,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemDoubleClick', item, itemType, internalState);
+};
+
+const handleItemExpand = (
+    item: (ItemListItem & object) | undefined,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    if (!item) {
+        return;
+    }
+
+    return internalState.toggleExpanded({
+        id: item.id,
+        itemType,
+        serverId: item.serverId,
+    });
+};
+
+const handleItemFavorite = (
+    item: (ItemListItem & object) | undefined,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemFavorite', item, itemType, internalState);
+};
+
+const handleItemRating = (
+    item: (ItemListItem & object) | undefined,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemRating', item, itemType, internalState);
+};
+
+const handleItemMore = (
+    item: (ItemListItem & object) | undefined,
+    itemType: LibraryItem,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemMore', item, itemType, internalState);
+};
+
+const handleItemPlay = (
+    item: (ItemListItem & object) | undefined,
+    itemType: LibraryItem,
+    playType: Play,
+    internalState: ItemListStateActions,
+) => {
+    console.log('handleItemPlay', item, itemType, playType, internalState);
+};

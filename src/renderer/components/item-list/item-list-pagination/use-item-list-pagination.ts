@@ -1,13 +1,9 @@
 import { useSearchParams } from 'react-router-dom';
 
-interface UseItemListPaginationProps {
-    initialPage?: number;
-}
-
-export const useItemListPagination = ({ initialPage }: UseItemListPaginationProps) => {
+export const useItemListPagination = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const currentPage = initialPage || Number(searchParams.get('currentPage')) || 0;
+    const currentPage = Number(searchParams.get('currentPage')) || 0;
 
     const onChange = (index: number) => {
         setSearchParams(

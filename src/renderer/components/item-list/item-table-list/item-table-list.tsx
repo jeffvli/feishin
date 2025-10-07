@@ -6,37 +6,27 @@ import { AnimatePresence, motion, Variants } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import {
     type JSXElementConstructor,
-    MouseEvent,
     Ref,
     useCallback,
     useEffect,
+    useImperativeHandle,
     useMemo,
     useRef,
     useState,
 } from 'react';
-import { type CellComponentProps, Grid, GridImperativeAPI, type GridProps } from 'react-window-v2';
+import { type CellComponentProps, Grid, type GridProps } from 'react-window-v2';
 
 import styles from './item-table-list.module.css';
 
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
-import { useItemListState } from '/@/renderer/components/item-list/helpers/item-list-state';
+import {
+    ItemListStateActions,
+    useItemListState,
+} from '/@/renderer/components/item-list/helpers/item-list-state';
 import { sortTableColumns } from '/@/renderer/components/item-list/helpers/sort-table-columns';
+import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { TableColumn } from '/@/shared/types/types';
-
-export interface CellProps {
-    columns: ItemTableListColumnConfig[];
-    data: unknown[];
-    enableHeader?: boolean;
-    enableRowBorders?: boolean;
-    enableRowHover?: boolean;
-    handleExpand: (e: MouseEvent<HTMLDivElement>, item: unknown, itemType: LibraryItem) => void;
-    itemType: LibraryItem;
-    onItemClick?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
-    onItemContextMenu?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
-    onItemDoubleClick?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
-    size?: 'compact' | 'default';
-}
 
 export interface ItemTableListColumnConfig {
     align: 'center' | 'end' | 'start';
@@ -45,8 +35,21 @@ export interface ItemTableListColumnConfig {
     width: number;
 }
 
+export interface TableItemProps {
+    columns: ItemTableListColumnConfig[];
+    data: unknown[];
+    enableExpansion?: boolean;
+    enableHeader?: boolean;
+    enableRowBorders?: boolean;
+    enableRowHover?: boolean;
+    enableSelection?: boolean;
+    internalState: ItemListStateActions;
+    itemType: LibraryItem;
+    size?: 'compact' | 'default';
+}
+
 interface ItemTableListProps {
-    CellComponent: JSXElementConstructor<CellComponentProps<CellProps>>;
+    CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
     columns: ItemTableListColumnConfig[];
     data: unknown[];
     enableExpansion?: boolean;
@@ -61,18 +64,17 @@ interface ItemTableListProps {
         type: 'index' | 'offset';
     };
     itemType: LibraryItem;
-    onCellsRendered?: GridProps<CellProps>['onCellsRendered'];
-    onEndReached?: (index: number) => void;
-    onItemClick?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
-    onItemContextMenu?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
-    onItemDoubleClick?: (item: unknown, index: number, event: MouseEvent<HTMLDivElement>) => void;
-    onRangeChanged?: (range: { endIndex: number; startIndex: number }) => void;
-    onScrollEnd?: (offset: number) => void;
-    onStartReached?: (index: number) => void;
-    ref?: Ref<GridImperativeAPI>;
-    rowHeight: ((index: number, cellProps: CellProps) => number) | number;
+    onCellsRendered?: GridProps<TableItemProps>['onCellsRendered'];
+    onEndReached?: (index: number, internalState: ItemListStateActions) => void;
+    onRangeChanged?: (
+        range: { endIndex: number; startIndex: number },
+        internalState: ItemListStateActions,
+    ) => void;
+    onScrollEnd?: (offset: number, internalState: ItemListStateActions) => void;
+    onStartReached?: (index: number, internalState: ItemListStateActions) => void;
+    ref?: Ref<ItemListHandle>;
+    rowHeight?: ((index: number, cellProps: TableItemProps) => number) | number;
     size?: 'compact' | 'default';
-    totalItemCount: number;
 }
 
 const expandedAnimationVariants: Variants = {
@@ -97,26 +99,24 @@ export const ItemTableList = ({
     enableHeader = true,
     enableRowBorders = false,
     enableRowHover = false,
+    enableSelection = false,
     headerHeight = 40,
     initialTop,
     itemType,
     onCellsRendered,
     onEndReached,
-    onItemClick,
-    onItemContextMenu,
-    onItemDoubleClick,
     onRangeChanged,
     onScrollEnd,
     onStartReached,
     ref,
     rowHeight,
     size = 'default',
-    totalItemCount,
 }: ItemTableListProps) => {
+    const totalItemCount = data.length;
     const sortedColumns = useMemo(() => sortTableColumns(columns), [columns]);
     const columnCount = sortedColumns.length;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const columnWidth = (index: number, _cellProps: CellProps) => sortedColumns[index].width;
+    const columnWidth = (index: number, _cellProps: TableItemProps) => sortedColumns[index].width;
     const pinnedLeftColumnCount = sortedColumns.filter((col) => col.pinned === 'left').length;
     const pinnedRightColumnCount = sortedColumns.filter((col) => col.pinned === 'right').length;
 
@@ -131,8 +131,53 @@ export const ItemTableList = ({
     const mergedRowRef = useMergedRef(rowRef, scrollContainerRef);
     const [showLeftShadow, setShowLeftShadow] = useState(false);
     const [showRightShadow, setShowRightShadow] = useState(false);
+    const handleRef = useRef<ItemListHandle | null>(null);
 
     const onScrollEndRef = useRef<ItemTableListProps['onScrollEnd']>(onScrollEnd);
+    useEffect(() => {
+        onScrollEndRef.current = onScrollEnd;
+    }, [onScrollEnd]);
+
+    const scrollToTableOffset = useCallback((offset: number) => {
+        const mainContainer = rowRef.current?.childNodes[0] as HTMLDivElement | undefined;
+        const pinnedLeftContainer = pinnedLeftColumnRef.current?.childNodes[0] as
+            | HTMLDivElement
+            | undefined;
+        const pinnedRightContainer = pinnedRightColumnRef.current?.childNodes[0] as
+            | HTMLDivElement
+            | undefined;
+
+        if (mainContainer) {
+            mainContainer.scrollTo({ behavior: 'instant', top: offset });
+        }
+        if (pinnedLeftContainer) {
+            pinnedLeftContainer.scrollTo({ behavior: 'instant', top: offset });
+        }
+        if (pinnedRightContainer) {
+            pinnedRightContainer.scrollTo({ behavior: 'instant', top: offset });
+        }
+    }, []);
+
+    const calculateScrollTopForIndex = useCallback(
+        (index: number) => {
+            const adjustedIndex = enableHeader ? Math.max(0, index - 1) : index;
+            let scrollTop = 0;
+            for (let i = 0; i < adjustedIndex; i++) {
+                const height = rowHeight as number;
+                scrollTop += height;
+            }
+            return scrollTop;
+        },
+        [enableHeader, rowHeight],
+    );
+
+    const scrollToTableIndex = useCallback(
+        (index: number) => {
+            const offset = calculateScrollTopForIndex(index);
+            scrollToTableOffset(offset);
+        },
+        [calculateScrollTopForIndex, scrollToTableOffset],
+    );
 
     const [initialize] = useOverlayScrollbars({
         defer: true,
@@ -232,7 +277,10 @@ export const ItemTableList = ({
                     scrollTimeouts.delete(element);
 
                     if (element === row && onScrollEndRef.current) {
-                        onScrollEndRef.current(row.scrollTop);
+                        onScrollEndRef.current(
+                            row.scrollTop,
+                            handleRef.current ?? (undefined as any),
+                        );
                     }
                 }, 150);
 
@@ -430,9 +478,11 @@ export const ItemTableList = ({
     }, [pinnedLeftColumnCount, pinnedRightColumnCount]);
 
     const getRowHeight = useCallback(
-        (index: number, cellProps: CellProps) => {
+        (index: number, cellProps: TableItemProps) => {
+            const height = size === 'compact' ? 40 : 68;
+
             const baseHeight =
-                typeof rowHeight === 'number' ? rowHeight : rowHeight(index, cellProps);
+                typeof rowHeight === 'number' ? rowHeight : rowHeight?.(index, cellProps) || height;
 
             // If enableHeader is true and this is the first sticky row, use fixed header height
             if (enableHeader && index === 0 && pinnedRowCount > 0) {
@@ -441,29 +491,12 @@ export const ItemTableList = ({
 
             return baseHeight;
         },
-        [enableHeader, headerHeight, rowHeight, pinnedRowCount],
+        [enableHeader, headerHeight, rowHeight, pinnedRowCount, size],
     );
 
     const internalState = useItemListState();
 
     const hasExpanded = internalState.hasExpanded();
-
-    const handleExpand = useCallback(
-        (_e: MouseEvent<HTMLDivElement>, item: unknown, itemType: LibraryItem) => {
-            if (!enableExpansion) {
-                return;
-            }
-
-            if (item && typeof item === 'object' && 'id' in item && 'serverId' in item) {
-                internalState.toggleExpanded({
-                    id: item.id as string,
-                    itemType: itemType,
-                    serverId: item.serverId as string,
-                });
-            }
-        },
-        [enableExpansion, internalState],
-    );
 
     const handleOnCellsRendered = useCallback(
         (cells: {
@@ -472,18 +505,21 @@ export const ItemTableList = ({
             rowStartIndex: number;
             rowStopIndex: number;
         }) => {
-            onRangeChanged?.({
-                endIndex: cells.rowStopIndex,
-                startIndex: cells.rowStartIndex,
-            });
+            onRangeChanged?.(
+                {
+                    endIndex: cells.rowStopIndex,
+                    startIndex: cells.rowStartIndex,
+                },
+                internalState,
+            );
 
             if (onStartReached || onEndReached) {
                 if (cells.rowStartIndex === 0) {
-                    onStartReached?.(0);
+                    onStartReached?.(0, handleRef.current ?? (undefined as any));
                 }
 
                 if (cells.rowStopIndex + 10 >= totalItemCount) {
-                    onEndReached?.(totalItemCount);
+                    onEndReached?.(totalItemCount, handleRef.current ?? (undefined as any));
                 }
             }
 
@@ -511,11 +547,12 @@ export const ItemTableList = ({
             pinnedLeftColumnCount,
             pinnedRowCount,
             totalItemCount,
+            internalState,
         ],
     );
 
     const PinnedRowCell = useCallback(
-        (cellProps: CellComponentProps & CellProps) => {
+        (cellProps: CellComponentProps & TableItemProps) => {
             return (
                 <CellComponent
                     {...cellProps}
@@ -527,14 +564,14 @@ export const ItemTableList = ({
     );
 
     const PinnedColumnCell = useCallback(
-        (cellProps: CellComponentProps & CellProps) => {
+        (cellProps: CellComponentProps & TableItemProps) => {
             return <CellComponent {...cellProps} rowIndex={cellProps.rowIndex + pinnedRowCount} />;
         },
         [pinnedRowCount, CellComponent],
     );
 
     const PinnedRightColumnCell = useCallback(
-        (cellProps: CellComponentProps & CellProps) => {
+        (cellProps: CellComponentProps & TableItemProps) => {
             return (
                 <CellComponent
                     {...cellProps}
@@ -547,7 +584,7 @@ export const ItemTableList = ({
     );
 
     const PinnedRightIntersectionCell = useCallback(
-        (cellProps: CellComponentProps & CellProps) => {
+        (cellProps: CellComponentProps & TableItemProps) => {
             return (
                 <CellComponent
                     {...cellProps}
@@ -559,7 +596,7 @@ export const ItemTableList = ({
     );
 
     const RowCell = useCallback(
-        (cellProps: CellComponentProps<CellProps>) => {
+        (cellProps: CellComponentProps<TableItemProps>) => {
             return (
                 <CellComponent
                     {...cellProps}
@@ -571,17 +608,16 @@ export const ItemTableList = ({
         [pinnedLeftColumnCount, pinnedRowCount, CellComponent],
     );
 
-    const cellProps = {
+    const itemProps: TableItemProps = {
         columns: sortedColumns,
         data,
+        enableExpansion,
         enableHeader,
         enableRowBorders,
         enableRowHover,
-        handleExpand,
+        enableSelection,
+        internalState,
         itemType,
-        onItemClick,
-        onItemContextMenu,
-        onItemDoubleClick,
         size,
     };
 
@@ -589,92 +625,41 @@ export const ItemTableList = ({
 
     useEffect(() => {
         if (!initialTop || isInitialScrollPositionSet.current) return;
+        isInitialScrollPositionSet.current = true;
 
-        const scrollToIndex = (index: number, behavior: 'auto' | 'smooth' = 'auto') => {
-            isInitialScrollPositionSet.current = true;
-            const adjustedIndex = enableHeader ? Math.max(0, index - 1) : index;
-
-            // Calculate scroll position based on row heights
-            const calculateScrollTop = (rowIndex: number) => {
-                let scrollTop = 0;
-                for (let i = 0; i < rowIndex; i++) {
-                    const height = rowHeight as number;
-                    scrollTop += height;
-                }
-                return scrollTop;
-            };
-
-            const scrollTop = calculateScrollTop(adjustedIndex);
-
-            // Get the scroll containers and scroll them directly
-            const mainContainer = rowRef.current?.childNodes[0] as HTMLDivElement;
-            const pinnedLeftContainer = pinnedLeftColumnRef.current
-                ?.childNodes[0] as HTMLDivElement;
-            const pinnedRightContainer = pinnedRightColumnRef.current
-                ?.childNodes[0] as HTMLDivElement;
-
-            if (initialTop.type === 'offset') {
-                if (mainContainer) {
-                    mainContainer.scrollTo({
-                        behavior,
-                        top: initialTop.to,
-                    });
-                }
-
-                if (pinnedLeftContainer) {
-                    pinnedLeftContainer.scrollTo({
-                        behavior,
-                        top: initialTop.to,
-                    });
-                }
-
-                if (pinnedRightContainer) {
-                    pinnedRightContainer.scrollTo({
-                        behavior,
-                        top: initialTop.to,
-                    });
-                }
-            } else {
-                if (mainContainer) {
-                    mainContainer.scrollTo({
-                        behavior,
-                        top: scrollTop,
-                    });
-                }
-
-                if (pinnedLeftContainer) {
-                    pinnedLeftContainer.scrollTo({
-                        behavior,
-                        top: scrollTop,
-                    });
-                }
-
-                if (pinnedRightContainer) {
-                    pinnedRightContainer.scrollTo({
-                        behavior,
-                        top: scrollTop,
-                    });
-                }
-            }
-        };
-
-        scrollToIndex(initialTop.to, initialTop.behavior);
-    }, [initialTop, enableHeader, pinnedLeftColumnCount, pinnedRightColumnCount, rowHeight]);
-
-    // Expose grid refs to parent component
-    useEffect(() => {
-        if (ref && typeof ref === 'object') {
-            // Create a simple API that exposes the main container
-            const combinedAPI: GridImperativeAPI = {
-                // We'll create a minimal API that can be extended later
-                // For now, we'll just expose the main container ref
-            } as GridImperativeAPI;
-
-            if ('current' in ref) {
-                (ref as React.MutableRefObject<GridImperativeAPI>).current = combinedAPI;
-            }
+        if (initialTop.type === 'offset') {
+            scrollToTableOffset(initialTop.to);
+        } else {
+            scrollToTableIndex(initialTop.to);
         }
-    }, [ref]);
+    }, [initialTop, scrollToTableIndex, scrollToTableOffset]);
+
+    const imperativeHandle: ItemListHandle = useMemo(() => {
+        return {
+            clearExpanded: () => {
+                internalState.clearExpanded();
+            },
+            clearSelected: () => {
+                internalState.clearSelected();
+            },
+            getItem: (index: number) => (enableHeader ? data[index + 1] : data[index]),
+            getItemCount: () => (enableHeader ? data.length - 1 : data.length),
+            getItems: () => data,
+            internalState,
+            scrollToIndex: (index: number) => {
+                scrollToTableIndex(enableHeader ? index + 1 : index);
+            },
+            scrollToOffset: (offset: number) => {
+                scrollToTableOffset(enableHeader ? offset + headerHeight : offset);
+            },
+        };
+    }, [data, enableHeader, headerHeight, internalState, scrollToTableIndex, scrollToTableOffset]);
+
+    useImperativeHandle(ref, () => imperativeHandle);
+
+    useEffect(() => {
+        handleRef.current = imperativeHandle;
+    }, [imperativeHandle]);
 
     return (
         <motion.div
@@ -694,7 +679,7 @@ export const ItemTableList = ({
                     className={styles.itemTablePinnedColumnsGridContainer}
                     style={{
                         minWidth: `${Array.from({ length: pinnedLeftColumnCount }, () => 0).reduce(
-                            (a, _, i) => a + columnWidth(i, cellProps),
+                            (a, _, i) => a + columnWidth(i, itemProps),
                             0,
                         )}px`,
                     }}
@@ -708,12 +693,12 @@ export const ItemTableList = ({
                                 minHeight: `${Array.from(
                                     { length: pinnedRowCount },
                                     () => 0,
-                                ).reduce((a, _, i) => a + getRowHeight(i, cellProps), 0)}px`,
+                                ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
                             }}
                         >
                             <Grid
                                 cellComponent={CellComponent as any}
-                                cellProps={cellProps}
+                                cellProps={itemProps}
                                 className={styles.noScrollbar}
                                 columnCount={pinnedLeftColumnCount}
                                 columnWidth={columnWidth}
@@ -730,7 +715,7 @@ export const ItemTableList = ({
                         >
                             <Grid
                                 cellComponent={PinnedColumnCell}
-                                cellProps={cellProps}
+                                cellProps={itemProps}
                                 className={clsx(styles.noScrollbar, styles.height100)}
                                 columnCount={pinnedLeftColumnCount}
                                 columnWidth={columnWidth}
@@ -755,13 +740,13 @@ export const ItemTableList = ({
                                     minHeight: `${Array.from(
                                         { length: pinnedRowCount },
                                         () => 0,
-                                    ).reduce((a, _, i) => a + getRowHeight(i, cellProps), 0)}px`,
+                                    ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
                                 } as React.CSSProperties
                             }
                         >
                             <Grid
                                 cellComponent={PinnedRowCell}
-                                cellProps={cellProps}
+                                cellProps={itemProps}
                                 className={styles.noScrollbar}
                                 columnCount={totalColumnCount}
                                 columnWidth={(index, cellProps) => {
@@ -776,7 +761,7 @@ export const ItemTableList = ({
                     <div className={styles.itemTableGridContainer} ref={mergedRowRef}>
                         <Grid
                             cellComponent={RowCell}
-                            cellProps={cellProps}
+                            cellProps={itemProps}
                             className={styles.height100}
                             columnCount={totalColumnCount}
                             columnWidth={(index, cellProps) => {
@@ -808,7 +793,7 @@ export const ItemTableList = ({
                                     a +
                                     columnWidth(
                                         i + pinnedLeftColumnCount + totalColumnCount,
-                                        cellProps,
+                                        itemProps,
                                     ),
                                 0,
                             )}px`,
@@ -823,12 +808,12 @@ export const ItemTableList = ({
                                     minHeight: `${Array.from(
                                         { length: pinnedRowCount },
                                         () => 0,
-                                    ).reduce((a, _, i) => a + getRowHeight(i, cellProps), 0)}px`,
+                                    ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
                                 }}
                             >
                                 <Grid
                                     cellComponent={PinnedRightIntersectionCell}
-                                    cellProps={cellProps}
+                                    cellProps={itemProps}
                                     className={styles.noScrollbar}
                                     columnCount={pinnedRightColumnCount}
                                     columnWidth={(index, cellProps) => {
@@ -851,7 +836,7 @@ export const ItemTableList = ({
                         >
                             <Grid
                                 cellComponent={PinnedRightColumnCell}
-                                cellProps={cellProps}
+                                cellProps={itemProps}
                                 className={clsx(styles.noScrollbar, styles.height100)}
                                 columnCount={pinnedRightColumnCount}
                                 columnWidth={(index, cellProps) => {

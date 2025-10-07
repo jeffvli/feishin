@@ -6,6 +6,7 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { getServerById } from '/@/renderer/store';
 
 export interface InfiniteListProps<TQuery> {
+    itemsPerPage?: number;
     query: Omit<TQuery, 'limit' | 'startIndex'>;
     serverId: string;
 }
