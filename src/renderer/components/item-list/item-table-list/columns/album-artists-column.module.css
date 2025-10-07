@@ -6,3 +6,12 @@
 .group a {
     cursor: pointer;
 }
+
+.artists-container {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    color: var(--theme-colors-foreground-muted);
+}

@@ -9,7 +9,6 @@ import {
     TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { AppRoute } from '/@/renderer/router/routes';
-import { Group } from '/@/shared/components/group/group';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
 import { RelatedAlbumArtist } from '/@/shared/types/domain-types';
@@ -32,7 +31,7 @@ const AlbumArtistsColumn = (props: ItemTableListInnerColumn) => {
     if (Array.isArray(row)) {
         return (
             <TableColumnContainer {...props}>
-                <Group className={styles.group} wrap="wrap">
+                <div className={styles.artistsContainer}>
                     {albumArtists.map((albumArtist, index) => (
                         <Text
                             component={Link}
@@ -43,10 +42,10 @@ const AlbumArtistsColumn = (props: ItemTableListInnerColumn) => {
                             to={albumArtist.path}
                         >
                             {albumArtist.name}
-                            {index < albumArtists.length - 1 && ','}
+                            {index < albumArtists.length - 1 && ', '}
                         </Text>
                     ))}
-                </Group>
+                </div>
             </TableColumnContainer>
         );
     }
