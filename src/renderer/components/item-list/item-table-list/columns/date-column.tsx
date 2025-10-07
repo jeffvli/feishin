@@ -4,6 +4,7 @@ import {
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { formatDateAbsolute, formatDateRelative } from '/@/renderer/utils/format';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 
 export const DateColumn = (props: ItemTableListInnerColumn) => {
     const row: string | undefined = (props.data as (any | undefined)[])[props.rowIndex]?.[
@@ -13,7 +14,9 @@ export const DateColumn = (props: ItemTableListInnerColumn) => {
     if (typeof row === 'string' && row) {
         return (
             <TableColumnTextContainer {...props}>
-                {formatDateAbsolute(row)}
+                <Tooltip label={row} multiline={false}>
+                    <span>{formatDateAbsolute(row)}</span>
+                </Tooltip>
             </TableColumnTextContainer>
         );
     }
@@ -33,7 +36,9 @@ export const RelativeDateColumn = (props: ItemTableListInnerColumn) => {
     if (typeof row === 'string') {
         return (
             <TableColumnTextContainer {...props}>
-                {formatDateRelative(row)}
+                <Tooltip label={row} multiline={false}>
+                    <span>{formatDateRelative(row)}</span>
+                </Tooltip>
             </TableColumnTextContainer>
         );
     }
