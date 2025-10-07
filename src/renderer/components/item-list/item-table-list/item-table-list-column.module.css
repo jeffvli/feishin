@@ -78,3 +78,18 @@
 .header-content.right {
     justify-content: flex-end;
 }
+
+.container :global(.hover-only),
+.container :global(.hover-only-flex) {
+    display: none;
+}
+
+.container.data-row:hover :global(.hover-only),
+.container.data-row.row-hovered :global(.hover-only) {
+    display: block;
+}
+
+.container.data-row:hover :global(.hover-only-flex),
+.container.data-row.row-hovered :global(.hover-only-flex) {
+    display: flex;
+}

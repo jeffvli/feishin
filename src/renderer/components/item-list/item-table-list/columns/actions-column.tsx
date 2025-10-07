@@ -2,7 +2,7 @@ import {
     ItemTableListInnerColumn,
     TableColumnContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
-import { Icon } from '/@/shared/components/icon/icon';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 
 export const ActionsColumn = (props: ItemTableListInnerColumn) => {
     const row: any = (props.data as (any | undefined)[])[props.rowIndex];
@@ -10,7 +10,15 @@ export const ActionsColumn = (props: ItemTableListInnerColumn) => {
     if (row !== undefined) {
         return (
             <TableColumnContainer {...props}>
-                <Icon icon="ellipsisHorizontal" size="sm" />
+                <ActionIcon
+                    className="hover-only"
+                    icon="ellipsisHorizontal"
+                    iconProps={{
+                        color: 'muted',
+                    }}
+                    size="lg"
+                    variant="transparent"
+                />
             </TableColumnContainer>
         );
     }

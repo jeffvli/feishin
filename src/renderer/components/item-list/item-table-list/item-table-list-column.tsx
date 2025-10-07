@@ -377,7 +377,7 @@ const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.TRACK_NUMBER]: i18n.t('table.column.trackNumber', {
         postProcess: 'upperCase',
     }) as string,
-    [TableColumn.USER_FAVORITE]: <Icon fill="default" icon="favorite" size="md" />,
+    [TableColumn.USER_FAVORITE]: <Icon icon="favorite" size="md" />,
     [TableColumn.USER_RATING]: i18n.t('table.column.rating', {
         postProcess: 'upperCase',
     }) as string,
