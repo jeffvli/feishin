@@ -1,4 +1,4 @@
-import { ItemTableListColumnConfig } from '/@/renderer/components/item-list/item-table-list/item-table-list';
+import { ItemTableListColumnConfig } from '/@/renderer/components/item-list/types';
 
 /**
  * Sorts table columns by their pinned position:

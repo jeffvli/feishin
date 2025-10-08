@@ -25,16 +25,8 @@ import {
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { sortTableColumns } from '/@/renderer/components/item-list/helpers/sort-table-columns';
-import { ItemListHandle } from '/@/renderer/components/item-list/types';
+import { ItemListHandle, ItemTableListColumnConfig } from '/@/renderer/components/item-list/types';
 import { LibraryItem } from '/@/shared/types/domain-types';
-import { TableColumn } from '/@/shared/types/types';
-
-export interface ItemTableListColumnConfig {
-    align: 'center' | 'end' | 'start';
-    id: TableColumn;
-    pinned: 'left' | 'right' | null;
-    width: number;
-}
 
 export interface TableItemProps {
     columns: ItemTableListColumnConfig[];
@@ -102,8 +94,71 @@ export const ItemTableList = ({
     const totalItemCount = data.length;
     const sortedColumns = useMemo(() => sortTableColumns(columns), [columns]);
     const columnCount = sortedColumns.length;
+
+    const [centerContainerWidth, setCenterContainerWidth] = useState(0);
+
+    useEffect(() => {
+        const el = rowRef.current;
+        if (!el) return;
+
+        const updateWidth = () => {
+            setCenterContainerWidth(el.clientWidth || 0);
+        };
+
+        updateWidth();
+
+        const resizeObserver = new ResizeObserver(() => {
+            updateWidth();
+        });
+
+        resizeObserver.observe(el);
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
+
+    // Compute distributed widths: unpinned columns with autoWidth will share any remaining space
+    const calculatedColumnWidths = useMemo(() => {
+        const baseWidths = sortedColumns.map((c) => c.width);
+        const distributed = baseWidths.slice();
+
+        // Identify unpinned columns and auto-width candidates
+        const unpinnedIndices: number[] = [];
+        const autoUnpinnedIndices: number[] = [];
+
+        sortedColumns.forEach((col, idx) => {
+            if (col.pinned === null) {
+                unpinnedIndices.push(idx);
+                if (col.autoWidth) {
+                    autoUnpinnedIndices.push(idx);
+                }
+            }
+        });
+
+        if (unpinnedIndices.length === 0 || autoUnpinnedIndices.length === 0) {
+            return distributed;
+        }
+
+        const unpinnedBaseTotal = unpinnedIndices.reduce((sum, idx) => sum + baseWidths[idx], 0);
+
+        // Distribute only when there is extra space within the center container
+        const extra = Math.max(0, centerContainerWidth - unpinnedBaseTotal);
+        if (extra <= 0) {
+            return distributed;
+        }
+
+        const extraPer = extra / autoUnpinnedIndices.length;
+        autoUnpinnedIndices.forEach((idx) => {
+            distributed[idx] = baseWidths[idx] + extraPer;
+        });
+
+        return distributed;
+    }, [sortedColumns, centerContainerWidth]);
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const columnWidth = (index: number, _cellProps: TableItemProps) => sortedColumns[index].width;
+    const columnWidth = (index: number, _cellProps: TableItemProps) =>
+        calculatedColumnWidths[index];
     const pinnedLeftColumnCount = sortedColumns.filter((col) => col.pinned === 'left').length;
     const pinnedRightColumnCount = sortedColumns.filter((col) => col.pinned === 'right').length;
 

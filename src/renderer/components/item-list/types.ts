@@ -9,7 +9,7 @@ import {
     Playlist,
     Song,
 } from '/@/shared/types/domain-types';
-import { Play } from '/@/shared/types/types';
+import { Play, TableColumn } from '/@/shared/types/types';
 
 export interface ItemControls {
     onClick?: (
@@ -65,4 +65,12 @@ export interface ItemListHandle {
     internalState: ItemListStateActions;
     scrollToIndex: (index: number, options?: { behavior?: 'auto' | 'smooth' }) => void;
     scrollToOffset: (offset: number, options?: { behavior?: 'auto' | 'smooth' }) => void;
+}
+
+export interface ItemTableListColumnConfig {
+    align: 'center' | 'end' | 'start';
+    autoWidth?: boolean;
+    id: TableColumn;
+    pinned: 'left' | 'right' | null;
+    width: number;
 }
