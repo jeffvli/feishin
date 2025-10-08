@@ -5,7 +5,7 @@ import { CellComponentProps } from 'react-window-v2';
 import styles from './item-table-list-column.module.css';
 
 import i18n from '/@/i18n/i18n';
-import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
+import { itemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import { ActionsColumn } from '/@/renderer/components/item-list/item-table-list/columns/actions-column';
 import { AlbumArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-artists-column';
 import { CountColumn } from '/@/renderer/components/item-list/item-table-list/columns/count-column';
@@ -25,14 +25,15 @@ import { RowIndexColumn } from '/@/renderer/components/item-list/item-table-list
 import { SizeColumn } from '/@/renderer/components/item-list/item-table-list/columns/size-column';
 import { TextColumn } from '/@/renderer/components/item-list/item-table-list/columns/text-column';
 import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
+import { ItemControls } from '/@/renderer/components/item-list/types';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
-import { LibraryItem } from '/@/shared/types/domain-types';
-import { Play, TableColumn } from '/@/shared/types/types';
+import { TableColumn } from '/@/shared/types/types';
 
 export interface ItemTableListColumn extends CellComponentProps<TableItemProps> {}
 
 export interface ItemTableListInnerColumn extends ItemTableListColumn {
+    controls: ItemControls;
     type: TableColumn;
 }
 
@@ -41,26 +42,49 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
 
     const isHeaderEnabled = !!props.enableHeader;
 
+    const controls: ItemControls = {
+        onClick: (item, itemType) =>
+            itemListControls.handleItemClick(item, itemType, props.internalState),
+        onDoubleClick: (item, itemType) =>
+            itemListControls.handleItemDoubleClick(item, itemType, props.internalState),
+        onFavorite: (item, itemType) =>
+            itemListControls.handleItemFavorite(item, itemType, props.internalState),
+        onItemExpand: (item, itemType) =>
+            itemListControls.handleItemExpand(item, itemType, props.internalState),
+        onMore: (item, itemType) =>
+            itemListControls.handleItemMore(item, itemType, props.internalState),
+        onPlay: (item, itemType, playType) =>
+            itemListControls.handleItemPlay(item, itemType, playType, props.internalState),
+        onRating: (item, itemType) =>
+            itemListControls.handleItemRating(item, itemType, props.internalState),
+    };
+
     if (isHeaderEnabled && props.rowIndex === 0) {
-        return <TableColumnHeaderContainer {...props} type={type}></TableColumnHeaderContainer>;
+        return (
+            <TableColumnHeaderContainer
+                {...props}
+                controls={controls}
+                type={type}
+            ></TableColumnHeaderContainer>
+        );
     }
 
     switch (type) {
         case TableColumn.ACTIONS:
         case TableColumn.SKIP:
-            return <ActionsColumn {...props} type={type} />;
+            return <ActionsColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.ALBUM_ARTIST:
-            return <AlbumArtistsColumn {...props} type={type} />;
+            return <AlbumArtistsColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.ALBUM_COUNT:
         case TableColumn.PLAY_COUNT:
         case TableColumn.SONG_COUNT:
-            return <CountColumn {...props} type={type} />;
+            return <CountColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.BIOGRAPHY:
         case TableColumn.COMMENT:
-            return <TextColumn {...props} type={type} />;
+            return <TextColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.BIT_RATE:
         case TableColumn.BPM:
@@ -68,41 +92,41 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
         case TableColumn.DISC_NUMBER:
         case TableColumn.TRACK_NUMBER:
         case TableColumn.YEAR:
-            return <NumericColumn {...props} type={type} />;
+            return <NumericColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.DATE_ADDED:
         case TableColumn.RELEASE_DATE:
-            return <DateColumn {...props} type={type} />;
+            return <DateColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.DURATION:
-            return <DurationColumn {...props} type={type} />;
+            return <DurationColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.GENRE:
-            return <GenreColumn {...props} type={type} />;
+            return <GenreColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.IMAGE:
-            return <ImageColumn {...props} type={type} />;
+            return <ImageColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.LAST_PLAYED:
-            return <RelativeDateColumn {...props} type={type} />;
+            return <RelativeDateColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.PATH:
-            return <PathColumn {...props} type={type} />;
+            return <PathColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.ROW_INDEX:
-            return <RowIndexColumn {...props} type={type} />;
+            return <RowIndexColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.SIZE:
-            return <SizeColumn {...props} type={type} />;
+            return <SizeColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.USER_FAVORITE:
-            return <FavoriteColumn {...props} type={type} />;
+            return <FavoriteColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.USER_RATING:
-            return <RatingColumn {...props} type={type} />;
+            return <RatingColumn {...props} controls={controls} type={type} />;
 
         default:
-            return <DefaultColumn {...props} type={type} />;
+            return <DefaultColumn {...props} controls={controls} type={type} />;
     }
 };
 
@@ -113,6 +137,7 @@ export const TableColumnTextContainer = (
         children: React.ReactNode;
         className?: string;
         containerClassName?: string;
+        controls: ItemControls;
         type: TableColumn;
     },
 ) => {
@@ -179,6 +204,7 @@ export const TableColumnContainer = (
         children: React.ReactNode;
         className?: string;
         containerClassName?: string;
+        controls: ItemControls;
         type: TableColumn;
     },
 ) => {
@@ -238,6 +264,7 @@ export const TableColumnHeaderContainer = (
     props: ItemTableListColumn & {
         className?: string;
         containerClassName?: string;
+        controls: ItemControls;
         type: TableColumn;
     },
 ) => {
@@ -258,71 +285,6 @@ export const TableColumnHeaderContainer = (
             </Text>
         </div>
     );
-};
-
-const handleItemClick = (
-    item: unknown,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemClick', item, itemType, internalState);
-};
-
-const handleItemExpand = (
-    item: unknown,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemExpand', item, itemType, internalState);
-};
-
-const handleItemSelect = (
-    item: unknown,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemSelect', item, itemType, internalState);
-};
-
-const handleItemDoubleClick = (
-    item: unknown,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemDoubleClick', item, itemType, internalState);
-};
-
-const handleItemFavorite = (
-    item: unknown,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemFavorite', item, itemType, internalState);
-};
-
-const handleItemRating = (
-    item: unknown,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemRating', item, itemType, internalState);
-};
-
-const handleItemMore = (
-    item: unknown,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemMore', item, itemType, internalState);
-};
-
-const handleItemPlay = (
-    item: unknown,
-    itemType: LibraryItem,
-    playType: Play,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemPlay', item, itemType, playType, internalState);
 };
 
 const columnLabelMap: Record<TableColumn, ReactNode | string> = {

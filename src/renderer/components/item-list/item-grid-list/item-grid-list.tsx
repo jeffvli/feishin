@@ -19,14 +19,13 @@ import styles from './item-grid-list.module.css';
 
 import { getDataRowsCount, ItemCard } from '/@/renderer/components/item-card/item-card';
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
+import { itemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
-    ItemListItem,
     ItemListStateActions,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { LibraryItem } from '/@/shared/types/domain-types';
-import { Play } from '/@/shared/types/types';
 
 export interface GridItemProps {
     columns: number;
@@ -277,7 +276,6 @@ export const ItemGridList = ({
                         className={styles.listExpandedContainer}
                         exit="hidden"
                         initial="hidden"
-                        style={{ height: '500px' }}
                         variants={expandedAnimationVariants}
                     >
                         <ExpandedListItem internalState={internalState} itemType={itemType} />
@@ -310,28 +308,57 @@ const ListComponent = ({
                         controls={{
                             onClick: enableSelection
                                 ? (item, itemType) => {
-                                      return handleItemClick(item, itemType, internalState);
+                                      return itemListControls.handleItemClick(
+                                          item,
+                                          itemType,
+                                          internalState,
+                                      );
                                   }
                                 : undefined,
                             onDoubleClick: (item, itemType) => {
-                                return handleItemDoubleClick(item, itemType, internalState);
+                                return itemListControls.handleItemDoubleClick(
+                                    item,
+                                    itemType,
+                                    internalState,
+                                );
                             },
                             onFavorite: (item, itemType) => {
-                                return handleItemFavorite(item, itemType, internalState);
+                                return itemListControls.handleItemFavorite(
+                                    item,
+                                    itemType,
+                                    internalState,
+                                );
                             },
                             onItemExpand: enableExpansion
                                 ? (item, itemType) => {
-                                      return handleItemExpand(item, itemType, internalState);
+                                      return itemListControls.handleItemExpand(
+                                          item,
+                                          itemType,
+                                          internalState,
+                                      );
                                   }
                                 : undefined,
                             onMore: (item, itemType) => {
-                                return handleItemMore(item, itemType, internalState);
+                                return itemListControls.handleItemMore(
+                                    item,
+                                    itemType,
+                                    internalState,
+                                );
                             },
                             onPlay: (item, itemType, playType) => {
-                                return handleItemPlay(item, itemType, playType, internalState);
+                                return itemListControls.handleItemPlay(
+                                    item,
+                                    itemType,
+                                    playType,
+                                    internalState,
+                                );
                             },
                             onRating: (item, itemType) => {
-                                return handleItemRating(item, itemType, internalState);
+                                return itemListControls.handleItemRating(
+                                    item,
+                                    itemType,
+                                    internalState,
+                                );
                             },
                         }}
                         data={d.data}
@@ -342,69 +369,4 @@ const ListComponent = ({
             ))}
         </div>
     );
-};
-
-const handleItemClick = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemClick', item, itemType, internalState);
-};
-
-const handleItemDoubleClick = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemDoubleClick', item, itemType, internalState);
-};
-
-const handleItemExpand = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    if (!item) {
-        return;
-    }
-
-    return internalState.toggleExpanded({
-        id: item.id,
-        itemType,
-        serverId: item.serverId,
-    });
-};
-
-const handleItemFavorite = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemFavorite', item, itemType, internalState);
-};
-
-const handleItemRating = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemRating', item, itemType, internalState);
-};
-
-const handleItemMore = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemMore', item, itemType, internalState);
-};
-
-const handleItemPlay = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    playType: Play,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemPlay', item, itemType, playType, internalState);
 };
