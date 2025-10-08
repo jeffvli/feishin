@@ -23,8 +23,3 @@
     padding: var(--theme-spacing-sm);
     overflow: hidden;
 }
-
-.list-expanded-container {
-    width: 100%;
-    height: 100%;
-}

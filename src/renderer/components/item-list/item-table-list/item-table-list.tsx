@@ -2,7 +2,7 @@
 
 import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
-import { AnimatePresence, motion, Variants } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import {
     type JSXElementConstructor,
@@ -18,6 +18,7 @@ import { type CellComponentProps, Grid, type GridProps } from 'react-window-v2';
 
 import styles from './item-table-list.module.css';
 
+import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded-list-container';
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import {
     ItemListStateActions,
@@ -76,20 +77,6 @@ interface ItemTableListProps {
     rowHeight?: ((index: number, cellProps: TableItemProps) => number) | number;
     size?: 'compact' | 'default';
 }
-
-const expandedAnimationVariants: Variants = {
-    hidden: {
-        height: 0,
-        minHeight: 0,
-    },
-    show: {
-        minHeight: '300px',
-        transition: {
-            duration: 0.3,
-            ease: 'easeInOut',
-        },
-    },
-};
 
 export const ItemTableList = ({
     CellComponent,
@@ -856,16 +843,9 @@ export const ItemTableList = ({
             </div>
             <AnimatePresence initial={false}>
                 {hasExpanded && (
-                    <motion.div
-                        animate="show"
-                        className={styles.listExpandedContainer}
-                        exit="hidden"
-                        initial="hidden"
-                        style={{ height: '500px' }}
-                        variants={expandedAnimationVariants}
-                    >
+                    <ExpandedListContainer>
                         <ExpandedListItem internalState={internalState} itemType={itemType} />
-                    </motion.div>
+                    </ExpandedListContainer>
                 )}
             </AnimatePresence>
         </motion.div>

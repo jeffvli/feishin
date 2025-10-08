@@ -15,6 +15,7 @@ import {
 } from 'react';
 import { List, ListImperativeAPI, RowComponentProps, useListRef } from 'react-window-v2';
 
+import { ExpandedListContainer } from '../expanded-list-container';
 import styles from './item-grid-list.module.css';
 
 import { getDataRowsCount, ItemCard } from '/@/renderer/components/item-card/item-card';
@@ -271,15 +272,9 @@ export const ItemGridList = ({
             />
             <AnimatePresence>
                 {hasExpanded && (
-                    <motion.div
-                        animate="show"
-                        className={styles.listExpandedContainer}
-                        exit="hidden"
-                        initial="hidden"
-                        variants={expandedAnimationVariants}
-                    >
+                    <ExpandedListContainer>
                         <ExpandedListItem internalState={internalState} itemType={itemType} />
-                    </motion.div>
+                    </ExpandedListContainer>
                 )}
             </AnimatePresence>
         </motion.div>
