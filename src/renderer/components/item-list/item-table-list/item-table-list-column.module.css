@@ -93,3 +93,12 @@
 .container.data-row.row-hovered :global(.hover-only-flex) {
     display: flex;
 }
+
+.container :global(.hide-on-hover) {
+    display: block;
+}
+
+.container.data-row:hover :global(.hide-on-hover),
+.container.data-row.row-hovered :global(.hide-on-hover) {
+    display: none;
+}
