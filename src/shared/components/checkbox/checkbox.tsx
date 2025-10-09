@@ -10,6 +10,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         return (
             <MantineCheckbox
                 classNames={{
+                    body: styles.body,
                     input: styles.input,
                     label: styles.label,
                     ...classNames,
