@@ -1,6 +1,7 @@
 import { useElementSize, useMergedRef } from '@mantine/hooks';
+import clsx from 'clsx';
 import { throttle } from 'lodash';
-import { AnimatePresence, motion, Variants } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import {
     CSSProperties,
@@ -33,6 +34,7 @@ export interface GridItemProps {
     data: any[];
     enableExpansion?: boolean;
     enableSelection?: boolean;
+    gap: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     internalState: ItemListStateActions;
     itemType: LibraryItem;
 }
@@ -41,11 +43,13 @@ export interface ItemGridListProps {
     data: unknown[];
     enableExpansion?: boolean;
     enableSelection?: boolean;
+    gap?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     initialTop?: {
         behavior?: 'auto' | 'smooth';
         to: number;
         type: 'index' | 'offset';
     };
+    itemsPerRow?: number;
     itemType: LibraryItem;
     onEndReached?: (index: number, handle: ItemListHandle) => void;
     onRangeChanged?: (range: { endIndex: number; startIndex: number }) => void;
@@ -53,33 +57,19 @@ export interface ItemGridListProps {
     onScrollEnd?: (offset: number, handle: ItemListHandle) => void;
     onStartReached?: (index: number, handle: ItemListHandle) => void;
     ref: Ref<ListImperativeAPI>;
-    totalItemCount?: number;
 }
-
-const expandedAnimationVariants: Variants = {
-    hidden: {
-        height: 0,
-        minHeight: 0,
-    },
-    show: {
-        minHeight: '300px',
-        transition: {
-            duration: 0.3,
-            ease: 'easeInOut',
-        },
-    },
-};
 
 export const ItemGridList = ({
     data,
-    enableExpansion = false,
-    enableSelection = false,
+    enableExpansion = true,
+    enableSelection = true,
+    gap = 'sm',
+    itemsPerRow,
     itemType,
     onEndReached,
     onRangeChanged,
     onScroll,
     onStartReached,
-    totalItemCount = 0,
 }: ItemGridListProps) => {
     const itemGridRef = useListRef(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -105,7 +95,6 @@ export const ItemGridList = ({
                 autoHideDelay: 500,
                 pointers: ['mouse', 'pen', 'touch'],
                 theme: 'feishin-os-scrollbar',
-                visibility: 'visible',
             },
         },
     });
@@ -141,29 +130,35 @@ export const ItemGridList = ({
         return throttle((width: number, dataLength: number, type: LibraryItem) => {
             const isSm = width >= 600;
             const isMd = width >= 768;
-            const isLg = width >= 1200;
-            const isXl = width >= 1500;
-            const is2xl = width >= 1920;
-            const is3xl = width >= 2560;
+            const isLg = width >= 960;
+            const isXl = width >= 1200;
+            const is2xl = width >= 1440;
+            const is3xl = width >= 1920;
+            const is4xl = width >= 2560;
 
-            let itemsPerRow = 2;
+            let dynamicItemsPerRow = 2;
 
-            if (is3xl) {
-                itemsPerRow = 12;
+            if (is4xl) {
+                dynamicItemsPerRow = 12;
+            } else if (is3xl) {
+                dynamicItemsPerRow = 10;
             } else if (is2xl) {
-                itemsPerRow = 10;
+                dynamicItemsPerRow = 8;
             } else if (isXl) {
-                itemsPerRow = 8;
+                dynamicItemsPerRow = 6;
             } else if (isLg) {
-                itemsPerRow = 6;
+                dynamicItemsPerRow = 5;
             } else if (isMd) {
-                itemsPerRow = 4;
+                dynamicItemsPerRow = 4;
             } else if (isSm) {
-                itemsPerRow = 3;
+                dynamicItemsPerRow = 3;
             } else {
-                itemsPerRow = 2;
+                dynamicItemsPerRow = 2;
             }
-            const widthPerItem = Number(width) / itemsPerRow;
+
+            const setItemsPerRow = itemsPerRow || dynamicItemsPerRow;
+
+            const widthPerItem = Number(width) / setItemsPerRow;
             const itemHeight = widthPerItem + getDataRowsCount(type) * 26;
 
             if (widthPerItem === 0) {
@@ -171,12 +166,12 @@ export const ItemGridList = ({
             }
 
             setTableMeta({
-                columnCount: itemsPerRow,
+                columnCount: setItemsPerRow,
                 itemHeight,
-                rowCount: Math.ceil(dataLength / itemsPerRow),
+                rowCount: Math.ceil(dataLength / setItemsPerRow),
             });
         }, 200);
-    }, []);
+    }, [itemsPerRow]);
 
     useLayoutEffect(() => {
         throttledSetTableMeta(containerWidth, data.length, itemType);
@@ -190,7 +185,7 @@ export const ItemGridList = ({
             });
 
             if (onStartReached || onEndReached) {
-                const totalRows = Math.ceil(totalItemCount / (tableMeta?.columnCount || 0));
+                const totalRows = Math.ceil(data.length / (tableMeta?.columnCount || 0));
                 const startRow = visibleRows.startIndex;
                 const endRow = visibleRows.stopIndex;
 
@@ -207,7 +202,7 @@ export const ItemGridList = ({
             tableMeta?.columnCount,
             onStartReached,
             onEndReached,
-            totalItemCount,
+            data.length,
             itemGridRef,
         ],
     );
@@ -242,23 +237,15 @@ export const ItemGridList = ({
         data: elements,
         enableExpansion,
         enableSelection,
+        gap,
         internalState,
         itemType,
     };
 
     return (
-        <motion.div
-            animate={{
-                height: '100%',
-                opacity: 1,
-                transition: {
-                    duration: 1,
-                    ease: 'backInOut',
-                },
-            }}
+        <div
             className={styles.itemGridContainer}
             data-overlayscrollbars-initialize=""
-            initial={{ opacity: 0 }}
             ref={mergedContainerRef}
         >
             <List
@@ -277,7 +264,7 @@ export const ItemGridList = ({
                     </ExpandedListContainer>
                 )}
             </AnimatePresence>
-        </motion.div>
+        </div>
     );
 };
 
@@ -286,6 +273,7 @@ const ListComponent = ({
     data,
     enableExpansion,
     enableSelection,
+    gap,
     index,
     internalState,
     itemType,
@@ -295,7 +283,7 @@ const ListComponent = ({
         <div className={styles.itemList} style={style}>
             {data[index].map((d) => (
                 <div
-                    className={styles.itemRow}
+                    className={clsx(styles.itemRow, styles[`gap-${gap}`])}
                     key={d.index}
                     style={{ '--columns': columns } as CSSProperties}
                 >

@@ -20,6 +20,25 @@
     width: 100%;
     max-width: calc(100% / var(--columns));
     height: 100%;
-    padding: var(--theme-spacing-sm);
     overflow: hidden;
+}
+
+.item-row.gap-xs {
+    padding: var(--theme-spacing-xs);
+}
+
+.item-row.gap-sm {
+    padding: var(--theme-spacing-sm);
+}
+
+.item-row.gap-md {
+    padding: var(--theme-spacing-md);
+}
+
+.item-row.gap-lg {
+    padding: var(--theme-spacing-lg);
+}
+
+.item-row.gap-xl {
+    padding: var(--theme-spacing-xl);
 }
