@@ -42,7 +42,7 @@ const containerProps = {
         animate: 'show',
         exit: 'hidden',
         initial: 'hidden',
-        variants: animationVariants.combine(animationVariants.zoomIn, animationVariants.fadeIn),
+        variants: animationVariants.combine(animationVariants.slideInUp, animationVariants.fadeIn),
     },
 };
 

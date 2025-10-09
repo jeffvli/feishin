@@ -32,7 +32,6 @@ interface ItemCardProps {
     data: Album | AlbumArtist | Artist | Playlist | Song | undefined;
     isRound?: boolean;
     itemType: LibraryItem;
-
     type?: 'compact' | 'default' | 'poster';
     withControls?: boolean;
 }
