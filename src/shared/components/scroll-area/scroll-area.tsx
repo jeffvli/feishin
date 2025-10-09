@@ -13,10 +13,20 @@ interface ScrollAreaProps extends React.ComponentPropsWithoutRef<'div'> {
     allowDragScroll?: boolean;
     debugScrollPosition?: boolean;
     scrollHideDelay?: number;
+    scrollX?: boolean;
+    scrollY?: boolean;
 }
 
 export const ScrollArea = forwardRef((props: ScrollAreaProps, ref: Ref<HTMLDivElement>) => {
-    const { allowDragScroll, children, className, scrollHideDelay, ...htmlProps } = props;
+    const {
+        allowDragScroll,
+        children,
+        className,
+        scrollHideDelay,
+        scrollX = false,
+        scrollY = true,
+        ...htmlProps
+    } = props;
 
     const containerRef = useRef(null);
     const [scroller, setScroller] = useState<HTMLElement | null | Window>(null);
@@ -24,7 +34,7 @@ export const ScrollArea = forwardRef((props: ScrollAreaProps, ref: Ref<HTMLDivEl
     const [initialize, osInstance] = useOverlayScrollbars({
         defer: false,
         options: {
-            overflow: { x: 'hidden', y: 'scroll' },
+            overflow: { x: scrollX ? 'scroll' : 'hidden', y: scrollY ? 'scroll' : 'hidden' },
             scrollbars: {
                 autoHide: 'leave',
                 autoHideDelay: scrollHideDelay || 500,
