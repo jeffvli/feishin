@@ -13,10 +13,12 @@ export interface PopoverProps extends MantinePopoverProps {}
 export const Popover = ({ children, ...props }: PopoverProps) => {
     return (
         <MantinePopover
+            arrowSize={10}
             classNames={{
                 dropdown: styles.dropdown,
             }}
             transitionProps={{ transition: 'fade' }}
+            withArrow
             withinPortal
             {...props}
         >

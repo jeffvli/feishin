@@ -6,7 +6,7 @@
     cursor: default;
 
     &:hover {
-        background: var(--theme-colors-background);
+        background: var(--theme-colors-surface);
     }
 }
 
@@ -18,7 +18,7 @@
     margin-right: var(--theme-spacing-md);
     margin-left: var(--theme-spacing-md);
     font-size: var(--theme-font-size-sm);
-    color: var(--theme-colors-surface-foreground);
+    color: var(--theme-colors-surfaceforeground);
 }
 
 .selected {
@@ -45,8 +45,8 @@
 
 .menu-dropdown {
     padding: var(--theme-spacing-xs);
-    color: var(--theme-colors-surface-foreground);
-    background: var(--theme-colors-surface);
+    color: var(--theme-colors-foreground);
+    background: var(--theme-colors-background);
     border: 1px solid var(--theme-colors-border);
     filter: drop-shadow(0 0 5px rgb(0 0 0 / 50%));
 }
