@@ -103,6 +103,10 @@ export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
 export const Button = createPolymorphicComponent<'button', ButtonProps>(_Button);
 
+export const ButtonGroup = MantineButton.Group;
+
+export const ButtonGroupSection = MantineButton.GroupSection;
+
 interface TimeoutButtonProps extends ButtonProps {
     timeoutProps: {
         callback: () => void;
