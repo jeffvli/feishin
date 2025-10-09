@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { memo, useMemo } from 'react';
 import { generatePath, Link } from 'react-router-dom';
 
@@ -31,7 +32,12 @@ const AlbumArtistsColumn = (props: ItemTableListInnerColumn) => {
     if (Array.isArray(row)) {
         return (
             <TableColumnContainer {...props}>
-                <div className={styles.artistsContainer}>
+                <div
+                    className={clsx(styles.artistsContainer, {
+                        [styles.compact]: props.size === 'compact',
+                        [styles.large]: props.size === 'large',
+                    })}
+                >
                     {albumArtists.map((albumArtist, index) => (
                         <Text
                             component={Link}

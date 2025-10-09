@@ -29,23 +29,25 @@ import { ItemListHandle, ItemTableListColumnConfig } from '/@/renderer/component
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 export interface TableItemProps {
+    cellPadding?: ItemTableListProps['cellPadding'];
     columns: ItemTableListColumnConfig[];
-    data: unknown[];
-    enableAlternateRowColors?: boolean;
-    enableExpansion?: boolean;
-    enableHeader?: boolean;
-    enableHorizontalBorders?: boolean;
-    enableRowHoverHighlight?: boolean;
-    enableSelection?: boolean;
-    enableVerticalBorders?: boolean;
+    data: ItemTableListProps['data'];
+    enableAlternateRowColors?: ItemTableListProps['enableAlternateRowColors'];
+    enableExpansion?: ItemTableListProps['enableExpansion'];
+    enableHeader?: ItemTableListProps['enableHeader'];
+    enableHorizontalBorders?: ItemTableListProps['enableHorizontalBorders'];
+    enableRowHoverHighlight?: ItemTableListProps['enableRowHoverHighlight'];
+    enableSelection?: ItemTableListProps['enableSelection'];
+    enableVerticalBorders?: ItemTableListProps['enableVerticalBorders'];
     getRowHeight: (index: number, cellProps: TableItemProps) => number;
     internalState: ItemListStateActions;
-    itemType: LibraryItem;
-    size?: 'compact' | 'default';
+    itemType: ItemTableListProps['itemType'];
+    size?: ItemTableListProps['size'];
 }
 
 interface ItemTableListProps {
     CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
+    cellPadding?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     columns: ItemTableListColumnConfig[];
     data: unknown[];
     enableAlternateRowColors?: boolean;
@@ -72,11 +74,12 @@ interface ItemTableListProps {
     onStartReached?: (index: number, internalState: ItemListStateActions) => void;
     ref?: Ref<ItemListHandle>;
     rowHeight?: ((index: number, cellProps: TableItemProps) => number) | number;
-    size?: 'compact' | 'default';
+    size?: 'compact' | 'default' | 'large';
 }
 
 export const ItemTableList = ({
     CellComponent,
+    cellPadding = 'sm',
     columns,
     data,
     enableAlternateRowColors = false,
@@ -99,8 +102,8 @@ export const ItemTableList = ({
     size = 'default',
 }: ItemTableListProps) => {
     const totalItemCount = data.length;
-    const sortedColumns = useMemo(() => parseTableColumns(columns), [columns]);
-    const columnCount = sortedColumns.length;
+    const parsedColumns = useMemo(() => parseTableColumns(columns), [columns]);
+    const columnCount = parsedColumns.length;
 
     const [centerContainerWidth, setCenterContainerWidth] = useState(0);
 
@@ -127,14 +130,14 @@ export const ItemTableList = ({
 
     // Compute distributed widths: unpinned columns with autoWidth will share any remaining space
     const calculatedColumnWidths = useMemo(() => {
-        const baseWidths = sortedColumns.map((c) => c.width);
+        const baseWidths = parsedColumns.map((c) => c.width);
         const distributed = baseWidths.slice();
 
         // Identify unpinned columns and auto-width candidates
         const unpinnedIndices: number[] = [];
         const autoUnpinnedIndices: number[] = [];
 
-        sortedColumns.forEach((col, idx) => {
+        parsedColumns.forEach((col, idx) => {
             if (col.pinned === null) {
                 unpinnedIndices.push(idx);
                 if (col.autoSize) {
@@ -161,13 +164,13 @@ export const ItemTableList = ({
         });
 
         return distributed;
-    }, [sortedColumns, centerContainerWidth]);
+    }, [parsedColumns, centerContainerWidth]);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const columnWidth = (index: number, _cellProps: TableItemProps) =>
         calculatedColumnWidths[index];
-    const pinnedLeftColumnCount = sortedColumns.filter((col) => col.pinned === 'left').length;
-    const pinnedRightColumnCount = sortedColumns.filter((col) => col.pinned === 'right').length;
+    const pinnedLeftColumnCount = parsedColumns.filter((col) => col.pinned === 'left').length;
+    const pinnedRightColumnCount = parsedColumns.filter((col) => col.pinned === 'right').length;
 
     const pinnedRowCount = enableHeader ? 1 : 0;
     const totalRowCount = totalItemCount - pinnedRowCount;
@@ -527,7 +530,7 @@ export const ItemTableList = ({
 
     const getRowHeight = useCallback(
         (index: number, cellProps: TableItemProps) => {
-            const height = size === 'compact' ? 40 : 64;
+            const height = size === 'compact' ? 40 : size === 'large' ? 88 : 64;
 
             const baseHeight =
                 typeof rowHeight === 'number' ? rowHeight : rowHeight?.(index, cellProps) || height;
@@ -657,7 +660,8 @@ export const ItemTableList = ({
     );
 
     const itemProps: TableItemProps = {
-        columns: sortedColumns,
+        cellPadding,
+        columns: parsedColumns,
         data,
         enableAlternateRowColors,
         enableExpansion,

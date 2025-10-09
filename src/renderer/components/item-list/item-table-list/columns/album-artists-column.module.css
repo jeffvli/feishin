@@ -11,7 +11,14 @@
     display: -webkit-box;
     overflow: hidden;
     -webkit-line-clamp: 2;
-    line-height: 1.4;
     -webkit-box-orient: vertical;
     color: var(--theme-colors-foreground-muted);
+}
+
+.artists-container.compact {
+    -webkit-line-clamp: 1;
+}
+
+.artists-container.large {
+    -webkit-line-clamp: 3;
 }

@@ -17,6 +17,7 @@ import {
 import { DefaultColumn } from '/@/renderer/components/item-list/item-table-list/columns/default-column';
 import { DurationColumn } from '/@/renderer/components/item-list/item-table-list/columns/duration-column';
 import { FavoriteColumn } from '/@/renderer/components/item-list/item-table-list/columns/favorite-column';
+import { GenreBadgeColumn } from '/@/renderer/components/item-list/item-table-list/columns/genre-badge-column';
 import { GenreColumn } from '/@/renderer/components/item-list/item-table-list/columns/genre-column';
 import { ImageColumn } from '/@/renderer/components/item-list/item-table-list/columns/image-column';
 import { NumericColumn } from '/@/renderer/components/item-list/item-table-list/columns/numeric-column';
@@ -109,6 +110,9 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
         case TableColumn.GENRE:
             return <GenreColumn {...props} controls={controls} type={type} />;
 
+        case TableColumn.GENRE_BADGE:
+            return <GenreBadgeColumn {...props} controls={controls} type={type} />;
+
         case TableColumn.IMAGE:
             return <ImageColumn {...props} controls={controls} type={type} />;
 
@@ -190,7 +194,13 @@ export const TableColumnTextContainer = (
                 [styles.center]: props.columns[props.columnIndex].align === 'center',
                 [styles.compact]: props.size === 'compact',
                 [styles.dataRow]: isDataRow,
+                [styles.large]: props.size === 'large',
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
+                [styles.paddingLg]: props.cellPadding === 'lg',
+                [styles.paddingMd]: props.cellPadding === 'md',
+                [styles.paddingSm]: props.cellPadding === 'sm',
+                [styles.paddingXl]: props.cellPadding === 'xl',
+                [styles.paddingXs]: props.cellPadding === 'xs',
                 [styles.right]: props.columns[props.columnIndex].align === 'end',
                 [styles.rowHoverHighlightEnabled]: isDataRow && props.enableRowHoverHighlight,
                 [styles.withHorizontalBorder]:
@@ -204,6 +214,7 @@ export const TableColumnTextContainer = (
             <Text
                 className={clsx(styles.content, props.className, {
                     [styles.compact]: props.size === 'compact',
+                    [styles.large]: props.size === 'large',
                 })}
                 isMuted={!NonMutedColumns.includes(props.type)}
                 isNoSelect
@@ -264,7 +275,13 @@ export const TableColumnContainer = (
                 [styles.center]: props.columns[props.columnIndex].align === 'center',
                 [styles.compact]: props.size === 'compact',
                 [styles.dataRow]: isDataRow,
+                [styles.large]: props.size === 'large',
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
+                [styles.paddingLg]: props.cellPadding === 'lg',
+                [styles.paddingMd]: props.cellPadding === 'md',
+                [styles.paddingSm]: props.cellPadding === 'sm',
+                [styles.paddingXl]: props.cellPadding === 'xl',
+                [styles.paddingXs]: props.cellPadding === 'xs',
                 [styles.right]: props.columns[props.columnIndex].align === 'end',
                 [styles.rowHoverHighlightEnabled]: isDataRow && props.enableRowHoverHighlight,
                 [styles.withHorizontalBorder]:
@@ -290,7 +307,13 @@ export const TableColumnHeaderContainer = (
 ) => {
     return (
         <div
-            className={clsx(styles.container, styles.headerContainer, props.containerClassName, {})}
+            className={clsx(styles.container, styles.headerContainer, props.containerClassName, {
+                [styles.paddingLg]: props.cellPadding === 'lg',
+                [styles.paddingMd]: props.cellPadding === 'md',
+                [styles.paddingSm]: props.cellPadding === 'sm',
+                [styles.paddingXl]: props.cellPadding === 'xl',
+                [styles.paddingXs]: props.cellPadding === 'xs',
+            })}
             style={props.style}
         >
             <Text
@@ -333,6 +356,9 @@ const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     }) as string,
     [TableColumn.DURATION]: <Icon icon="duration" size="md" />,
     [TableColumn.GENRE]: i18n.t('table.column.genre', { postProcess: 'upperCase' }) as string,
+    [TableColumn.GENRE_BADGE]: i18n.t('table.column.genre', {
+        postProcess: 'upperCase',
+    }) as string,
     [TableColumn.ID]: 'ID',
     [TableColumn.IMAGE]: '',
     [TableColumn.LAST_PLAYED]: i18n.t('table.column.lastPlayed', {

@@ -1,3 +1,7 @@
+import clsx from 'clsx';
+
+import styles from './text-column.module.css';
+
 import {
     ItemTableListInnerColumn,
     TableColumnTextContainer,
@@ -10,10 +14,17 @@ export const TextColumn = (props: ItemTableListInnerColumn) => {
     ];
 
     if (typeof row === 'string' && row) {
-        const maxLength = 100;
-        const displayText = row.length > maxLength ? `${row.slice(0, maxLength)}...` : row;
-
-        return <TableColumnTextContainer {...props}>{displayText}</TableColumnTextContainer>;
+        return (
+            <TableColumnTextContainer
+                className={clsx(styles.textContainer, {
+                    [styles.compact]: props.size === 'compact',
+                    [styles.large]: props.size === 'large',
+                })}
+                {...props}
+            >
+                {row}
+            </TableColumnTextContainer>
+        );
     }
 
     return (
