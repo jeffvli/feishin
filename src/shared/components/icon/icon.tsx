@@ -4,6 +4,9 @@ import { type ComponentType, forwardRef } from 'react';
 import { IconBaseProps } from 'react-icons';
 import { FaLastfmSquare } from 'react-icons/fa';
 import {
+    LuAlignCenter,
+    LuAlignLeft,
+    LuAlignRight,
     LuAppWindow,
     LuArrowDown,
     LuArrowDownToLine,
@@ -113,6 +116,9 @@ export type AppIconSelection = keyof typeof AppIcon;
 export const AppIcon = {
     add: LuPlus,
     album: LuDisc3,
+    alignCenter: LuAlignCenter,
+    alignLeft: LuAlignLeft,
+    alignRight: LuAlignRight,
     appWindow: LuAppWindow,
     arrowDown: LuArrowDown,
     arrowDownS: LuChevronDown,
