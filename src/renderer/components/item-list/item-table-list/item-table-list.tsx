@@ -2,7 +2,7 @@
 
 import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import {
     type JSXElementConstructor,
@@ -24,18 +24,21 @@ import {
     ItemListStateActions,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
-import { sortTableColumns } from '/@/renderer/components/item-list/helpers/sort-table-columns';
+import { parseTableColumns } from '/@/renderer/components/item-list/helpers/parse-table-columns';
 import { ItemListHandle, ItemTableListColumnConfig } from '/@/renderer/components/item-list/types';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 export interface TableItemProps {
     columns: ItemTableListColumnConfig[];
     data: unknown[];
+    enableAlternateRowColors?: boolean;
     enableExpansion?: boolean;
     enableHeader?: boolean;
-    enableRowBorders?: boolean;
-    enableRowHover?: boolean;
+    enableHorizontalBorders?: boolean;
+    enableRowHoverHighlight?: boolean;
     enableSelection?: boolean;
+    enableVerticalBorders?: boolean;
+    getRowHeight: (index: number, cellProps: TableItemProps) => number;
     internalState: ItemListStateActions;
     itemType: LibraryItem;
     size?: 'compact' | 'default';
@@ -45,11 +48,13 @@ interface ItemTableListProps {
     CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
     columns: ItemTableListColumnConfig[];
     data: unknown[];
+    enableAlternateRowColors?: boolean;
     enableExpansion?: boolean;
     enableHeader?: boolean;
-    enableRowBorders?: boolean;
-    enableRowHover?: boolean;
+    enableHorizontalBorders?: boolean;
+    enableRowHoverHighlight?: boolean;
     enableSelection?: boolean;
+    enableVerticalBorders?: boolean;
     headerHeight?: number;
     initialTop?: {
         behavior?: 'auto' | 'smooth';
@@ -74,11 +79,13 @@ export const ItemTableList = ({
     CellComponent,
     columns,
     data,
-    enableExpansion = false,
+    enableAlternateRowColors = false,
+    enableExpansion = true,
     enableHeader = true,
-    enableRowBorders = false,
-    enableRowHover = false,
-    enableSelection = false,
+    enableHorizontalBorders = false,
+    enableRowHoverHighlight = true,
+    enableSelection = true,
+    enableVerticalBorders = false,
     headerHeight = 40,
     initialTop,
     itemType,
@@ -92,7 +99,7 @@ export const ItemTableList = ({
     size = 'default',
 }: ItemTableListProps) => {
     const totalItemCount = data.length;
-    const sortedColumns = useMemo(() => sortTableColumns(columns), [columns]);
+    const sortedColumns = useMemo(() => parseTableColumns(columns), [columns]);
     const columnCount = sortedColumns.length;
 
     const [centerContainerWidth, setCenterContainerWidth] = useState(0);
@@ -130,7 +137,7 @@ export const ItemTableList = ({
         sortedColumns.forEach((col, idx) => {
             if (col.pinned === null) {
                 unpinnedIndices.push(idx);
-                if (col.autoWidth) {
+                if (col.autoSize) {
                     autoUnpinnedIndices.push(idx);
                 }
             }
@@ -238,7 +245,6 @@ export const ItemTableList = ({
                 autoHideDelay: 500,
                 pointers: ['mouse', 'pen', 'touch'],
                 theme: 'feishin-os-scrollbar',
-                visibility: 'visible',
             },
         },
     });
@@ -521,7 +527,7 @@ export const ItemTableList = ({
 
     const getRowHeight = useCallback(
         (index: number, cellProps: TableItemProps) => {
-            const height = size === 'compact' ? 40 : 68;
+            const height = size === 'compact' ? 40 : 64;
 
             const baseHeight =
                 typeof rowHeight === 'number' ? rowHeight : rowHeight?.(index, cellProps) || height;
@@ -653,11 +659,14 @@ export const ItemTableList = ({
     const itemProps: TableItemProps = {
         columns: sortedColumns,
         data,
+        enableAlternateRowColors,
         enableExpansion,
         enableHeader,
-        enableRowBorders,
-        enableRowHover,
+        enableHorizontalBorders,
+        enableRowHoverHighlight,
         enableSelection,
+        enableVerticalBorders,
+        getRowHeight,
         internalState,
         itemType,
         size,
@@ -704,18 +713,7 @@ export const ItemTableList = ({
     }, [imperativeHandle]);
 
     return (
-        <motion.div
-            animate={{
-                height: '100%',
-                opacity: 1,
-                transition: {
-                    duration: 1,
-                    ease: 'backInOut',
-                },
-            }}
-            className={styles.itemTableListContainer}
-            initial={{ opacity: 0 }}
-        >
+        <div className={styles.itemTableListContainer}>
             <div className={styles.itemTableContainer}>
                 <div
                     className={styles.itemTablePinnedColumnsGridContainer}
@@ -903,6 +901,6 @@ export const ItemTableList = ({
                     </ExpandedListContainer>
                 )}
             </AnimatePresence>
-        </motion.div>
+        </div>
     );
 };

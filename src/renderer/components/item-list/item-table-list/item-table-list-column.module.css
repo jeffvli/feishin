@@ -41,12 +41,30 @@
     padding: var(--theme-spacing-xs);
 }
 
-.container.with-row-border {
+.container.with-horizontal-border {
     border-bottom: 1px solid var(--theme-colors-border);
 }
 
-.container.data-row.row-hover-enabled:hover::before,
-.container.data-row.row-hover-enabled.row-hovered::before {
+.container.with-vertical-border {
+    border-right: 1px solid var(--theme-colors-border);
+}
+
+.container.alternate-row-even {
+    background-color: initial;
+}
+
+.container.alternate-row-odd {
+    @mixin dark {
+        background-color: darken(var(--theme-colors-background), 30%);
+    }
+
+    @mixin light {
+        background-color: darken(var(--theme-colors-background), 2%);
+    }
+}
+
+.container.data-row.row-hover-highlight-enabled:hover::before,
+.container.data-row.row-hover-highlight-enabled.row-hovered::before {
     position: absolute;
     top: 0;
     right: 0;

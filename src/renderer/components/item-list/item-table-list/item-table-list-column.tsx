@@ -154,7 +154,7 @@ export const TableColumnTextContainer = (
     const dataIndex = isDataRow ? props.rowIndex - 1 : props.rowIndex;
 
     useEffect(() => {
-        if (!isDataRow || !containerRef.current || !props.enableRowHover) return;
+        if (!isDataRow || !containerRef.current) return;
 
         const container = containerRef.current;
         const rowIndex = props.rowIndex;
@@ -178,19 +178,24 @@ export const TableColumnTextContainer = (
             container.removeEventListener('mouseenter', handleMouseEnter);
             container.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, [isDataRow, props.rowIndex, props.enableRowHover]);
+    }, [isDataRow, props.rowIndex, props.enableRowHoverHighlight]);
 
     return (
         <div
             className={clsx(styles.container, props.containerClassName, {
+                [styles.alternateRowEven]:
+                    props.enableAlternateRowColors && isDataRow && dataIndex % 2 === 0,
+                [styles.alternateRowOdd]:
+                    props.enableAlternateRowColors && isDataRow && dataIndex % 2 === 1,
                 [styles.center]: props.columns[props.columnIndex].align === 'center',
                 [styles.compact]: props.size === 'compact',
                 [styles.dataRow]: isDataRow,
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
                 [styles.right]: props.columns[props.columnIndex].align === 'end',
-                [styles.rowHoverEnabled]: isDataRow && props.enableRowHover,
-                [styles.withRowBorder]:
-                    props.enableRowBorders && props.enableHeader && props.rowIndex > 0,
+                [styles.rowHoverHighlightEnabled]: isDataRow && props.enableRowHoverHighlight,
+                [styles.withHorizontalBorder]:
+                    props.enableHorizontalBorders && props.enableHeader && props.rowIndex > 0,
+                [styles.withVerticalBorder]: props.enableVerticalBorders,
             })}
             data-row-index={isDataRow ? props.rowIndex : undefined}
             ref={containerRef}
@@ -223,7 +228,7 @@ export const TableColumnContainer = (
     const dataIndex = isDataRow ? props.rowIndex - 1 : props.rowIndex;
 
     useEffect(() => {
-        if (!isDataRow || !containerRef.current || !props.enableRowHover) return;
+        if (!isDataRow || !containerRef.current) return;
 
         const container = containerRef.current;
         const rowIndex = props.rowIndex;
@@ -247,19 +252,24 @@ export const TableColumnContainer = (
             container.removeEventListener('mouseenter', handleMouseEnter);
             container.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, [isDataRow, props.rowIndex, props.enableRowHover]);
+    }, [isDataRow, props.rowIndex, props.enableRowHoverHighlight]);
 
     return (
         <div
             className={clsx(styles.container, props.className, {
+                [styles.alternateRowEven]:
+                    props.enableAlternateRowColors && isDataRow && dataIndex % 2 === 0,
+                [styles.alternateRowOdd]:
+                    props.enableAlternateRowColors && isDataRow && dataIndex % 2 === 1,
                 [styles.center]: props.columns[props.columnIndex].align === 'center',
                 [styles.compact]: props.size === 'compact',
                 [styles.dataRow]: isDataRow,
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
                 [styles.right]: props.columns[props.columnIndex].align === 'end',
-                [styles.rowHoverEnabled]: isDataRow && props.enableRowHover,
-                [styles.withRowBorder]:
-                    props.enableRowBorders && props.enableHeader && props.rowIndex > 0,
+                [styles.rowHoverHighlightEnabled]: isDataRow && props.enableRowHoverHighlight,
+                [styles.withHorizontalBorder]:
+                    props.enableHorizontalBorders && props.enableHeader && props.rowIndex > 0,
+                [styles.withVerticalBorder]: props.enableVerticalBorders,
             })}
             data-row-index={isDataRow ? props.rowIndex : undefined}
             ref={containerRef}
