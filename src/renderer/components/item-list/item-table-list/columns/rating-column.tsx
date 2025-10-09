@@ -12,7 +12,11 @@ export const RatingColumn = (props: ItemTableListInnerColumn) => {
     if (typeof row === 'number' || row === null) {
         return (
             <TableColumnContainer {...props}>
-                <Rating className={row ? undefined : 'hover-only-flex'} value={row || 0} />
+                <Rating
+                    className={row ? undefined : 'hover-only-flex'}
+                    size="xs"
+                    value={row || 0}
+                />
             </TableColumnContainer>
         );
     }

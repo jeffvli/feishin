@@ -15,8 +15,9 @@ export const ActionsColumn = (props: ItemTableListInnerColumn) => {
                     icon="ellipsisHorizontal"
                     iconProps={{
                         color: 'muted',
-                        size: 'lg',
+                        size: 'md',
                     }}
+                    size="xs"
                     variant="subtle"
                 />
             </TableColumnContainer>

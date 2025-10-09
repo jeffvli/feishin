@@ -32,6 +32,11 @@
     line-height: 1.3;
 }
 
+.content.compact {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+}
+
 .container.compact {
     padding: var(--theme-spacing-xs);
 }

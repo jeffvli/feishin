@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { ReactNode, useEffect, useRef } from 'react';
+import React, { CSSProperties, ReactNode, useEffect, useRef } from 'react';
 import { CellComponentProps } from 'react-window-v2';
 
 import styles from './item-table-list-column.module.css';
@@ -8,6 +8,7 @@ import i18n from '/@/i18n/i18n';
 import { itemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import { ActionsColumn } from '/@/renderer/components/item-list/item-table-list/columns/actions-column';
 import { AlbumArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-artists-column';
+import { ArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/artists-column';
 import { CountColumn } from '/@/renderer/components/item-list/item-table-list/columns/count-column';
 import {
     DateColumn,
@@ -24,6 +25,7 @@ import { RatingColumn } from '/@/renderer/components/item-list/item-table-list/c
 import { RowIndexColumn } from '/@/renderer/components/item-list/item-table-list/columns/row-index-column';
 import { SizeColumn } from '/@/renderer/components/item-list/item-table-list/columns/size-column';
 import { TextColumn } from '/@/renderer/components/item-list/item-table-list/columns/text-column';
+import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-combined-column';
 import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemControls } from '/@/renderer/components/item-list/types';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -82,6 +84,9 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
         case TableColumn.SONG_COUNT:
             return <CountColumn {...props} controls={controls} type={type} />;
 
+        case TableColumn.ARTIST:
+            return <ArtistsColumn {...props} controls={controls} type={type} />;
+
         case TableColumn.BIOGRAPHY:
         case TableColumn.COMMENT:
             return <TextColumn {...props} controls={controls} type={type} />;
@@ -118,6 +123,9 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
 
         case TableColumn.SIZE:
             return <SizeColumn {...props} controls={controls} type={type} />;
+
+        case TableColumn.TITLE_COMBINED:
+            return <TitleCombinedColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.USER_FAVORITE:
             return <FavoriteColumn {...props} controls={controls} type={type} />;
@@ -189,7 +197,9 @@ export const TableColumnTextContainer = (
             style={props.style}
         >
             <Text
-                className={clsx(styles.content, props.className)}
+                className={clsx(styles.content, props.className, {
+                    [styles.compact]: props.size === 'compact',
+                })}
                 isMuted={!NonMutedColumns.includes(props.type)}
                 isNoSelect
             >
@@ -203,7 +213,7 @@ export const TableColumnContainer = (
     props: ItemTableListColumn & {
         children: React.ReactNode;
         className?: string;
-        containerClassName?: string;
+        containerStyle?: CSSProperties;
         controls: ItemControls;
         type: TableColumn;
     },
@@ -241,7 +251,7 @@ export const TableColumnContainer = (
 
     return (
         <div
-            className={clsx(styles.container, props.containerClassName, {
+            className={clsx(styles.container, props.className, {
                 [styles.center]: props.columns[props.columnIndex].align === 'center',
                 [styles.compact]: props.size === 'compact',
                 [styles.dataRow]: isDataRow,
@@ -253,7 +263,7 @@ export const TableColumnContainer = (
             })}
             data-row-index={isDataRow ? props.rowIndex : undefined}
             ref={containerRef}
-            style={props.style}
+            style={{ ...props.containerStyle, ...props.style }}
         >
             {props.children}
         </div>
@@ -333,7 +343,7 @@ const columnLabelMap: Record<TableColumn, ReactNode | string> = {
         postProcess: 'upperCase',
     }) as string,
     [TableColumn.TITLE]: i18n.t('table.column.title', { postProcess: 'upperCase' }) as string,
-    [TableColumn.TITLE_COMBINED]: i18n.t('table.column.titleCombined', {
+    [TableColumn.TITLE_COMBINED]: i18n.t('table.column.title', {
         postProcess: 'upperCase',
     }) as string,
     [TableColumn.TRACK_NUMBER]: i18n.t('table.column.trackNumber', {

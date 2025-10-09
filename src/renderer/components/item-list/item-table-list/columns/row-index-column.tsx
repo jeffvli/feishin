@@ -19,7 +19,7 @@ export const RowIndexColumn = (props: ItemTableListInnerColumn) => {
                 <ActionIcon
                     className={clsx(styles.expand, 'hover-only')}
                     icon="arrowDownS"
-                    iconProps={{ color: 'muted', size: 'xl' }}
+                    iconProps={{ color: 'muted', size: 'md' }}
                     onClick={(e) =>
                         controls.onItemExpand?.(
                             props.data[props.rowIndex] as any,
@@ -27,6 +27,7 @@ export const RowIndexColumn = (props: ItemTableListInnerColumn) => {
                             e,
                         )
                     }
+                    size="xs"
                     variant="subtle"
                 />
                 <Text className="hide-on-hover" isMuted>

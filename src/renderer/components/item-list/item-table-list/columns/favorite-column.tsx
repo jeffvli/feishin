@@ -18,8 +18,9 @@ export const FavoriteColumn = (props: ItemTableListInnerColumn) => {
                     iconProps={{
                         color: row ? 'primary' : 'muted',
                         fill: row ? 'primary' : undefined,
-                        size: 'lg',
+                        size: 'md',
                     }}
+                    size="xs"
                     variant="subtle"
                 />
             </TableColumnContainer>

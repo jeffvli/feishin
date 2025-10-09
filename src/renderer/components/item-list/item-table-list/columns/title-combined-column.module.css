@@ -1,0 +1,30 @@
+.title-combined {
+    display: grid;
+    grid-template-columns: calc(var(--row-height) - var(--theme-spacing-sm)) 1fr;
+    gap: var(--theme-spacing-sm);
+    align-items: center;
+    height: 100%;
+}
+
+.text-container {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    min-width: 0;
+}
+
+.title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.artists {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.875rem;
+    color: var(--theme-colors-foreground-muted);
+    white-space: nowrap;
+    user-select: none;
+}
