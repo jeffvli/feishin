@@ -1,0 +1,18 @@
+.group {
+    overflow: hidden;
+    border: 1px solid var(--theme-colors-border);
+    border-radius: var(--theme-radius-md);
+}
+
+.number-input {
+    width: 140px;
+}
+
+.item {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--theme-spacing-md);
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
