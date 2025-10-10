@@ -33,6 +33,8 @@ export enum LibraryItem {
     ARTIST = 'artist',
     GENRE = 'genre',
     PLAYLIST = 'playlist',
+    PLAYLIST_SONG = 'playlistSong',
+    QUEUE_SONG = 'queueSong',
     SONG = 'song',
 }
 
