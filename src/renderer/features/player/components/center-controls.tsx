@@ -13,19 +13,19 @@ import { openShuffleAllModal } from '/@/renderer/features/player/components/shuf
 import { useCenterControls } from '/@/renderer/features/player/hooks/use-center-controls';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import {
+    useAppStore,
+    useAppStoreActions,
     useCurrentPlayer,
     useCurrentSong,
     useCurrentStatus,
     useCurrentTime,
-    useRepeatStatus,
-    useSetCurrentTime,
-    useShuffleStatus,
-} from '/@/renderer/store';
-import {
     useHotkeySettings,
     usePlaybackType,
+    useRepeatStatus,
+    useSetCurrentTime,
     useSettingsStore,
-} from '/@/renderer/store/settings.store';
+    useShuffleStatus,
+} from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
@@ -51,6 +51,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const repeat = useRepeatStatus();
     const shuffle = useShuffleStatus();
     const { bindings } = useHotkeySettings();
+    const { showTimeRemaining } = useAppStore();
+    const { setShowTimeRemaining } = useAppStoreActions();
 
     const {
         handleNextTrack,
@@ -70,7 +72,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
     const currentTime = useCurrentTime();
     const currentPlayerRef = player === 1 ? player1 : player2;
-    const duration = formatDuration(songDuration * 1000 || 0);
+    const formattedDuration = formatDuration(songDuration * 1000 || 0);
+    const formattedTimeRemaining = formatDuration((currentTime - songDuration) * 1000 || 0);
     const formattedTime = formatDuration(currentTime * 1000 || 0);
 
     useEffect(() => {
@@ -293,9 +296,10 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         fw={600}
                         isMuted
                         isNoSelect
+                        onClick={() => setShowTimeRemaining(!showTimeRemaining)}
                         size="xs"
                     >
-                        {duration}
+                        {showTimeRemaining ? formattedTimeRemaining : formattedDuration}
                     </Text>
                 </div>
             </div>
