@@ -27,21 +27,27 @@ export const FavoriteColumn = (props: ItemTableListInnerColumn) => {
                         size: 'md',
                     }}
                     onClick={() => {
+                        if (!props.data?.[props.rowIndex]) {
+                            return;
+                        }
+
                         if (row) {
                             deleteFavorite.mutate({
                                 query: {
-                                    id: [(props.data as any)?.[props.rowIndex]?.id as string],
-                                    type: (props.data as any)?.[props.rowIndex]
-                                        ?.itemType as LibraryItem,
+                                    id: [(props.data as any)[props.rowIndex].id as string],
+                                    type: (props.data as any)[props.rowIndex]
+                                        .itemType as LibraryItem,
                                 },
+                                serverId: (props.data as any)[props.rowIndex].serverId as string,
                             });
                         } else {
                             createFavorite.mutate({
                                 query: {
-                                    id: [(props.data as any)?.[props.rowIndex]?.id as string],
-                                    type: (props.data as any)?.[props.rowIndex]
-                                        ?.itemType as LibraryItem,
+                                    id: [(props.data as any)[props.rowIndex].id as string],
+                                    type: (props.data as any)[props.rowIndex]
+                                        .itemType as LibraryItem,
                                 },
+                                serverId: (props.data as any)[props.rowIndex].serverId as string,
                             });
                         }
                     }}
