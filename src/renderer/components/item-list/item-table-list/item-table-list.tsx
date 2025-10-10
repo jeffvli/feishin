@@ -101,7 +101,7 @@ export const ItemTableList = ({
     rowHeight,
     size = 'default',
 }: ItemTableListProps) => {
-    const totalItemCount = data.length;
+    const totalItemCount = enableHeader ? data.length + 1 : data.length;
     const parsedColumns = useMemo(() => parseTableColumns(columns), [columns]);
     const columnCount = parsedColumns.length;
 
@@ -662,7 +662,7 @@ export const ItemTableList = ({
     const itemProps: TableItemProps = {
         cellPadding,
         columns: parsedColumns,
-        data,
+        data: enableHeader ? [null, ...data] : data,
         enableAlternateRowColors,
         enableExpansion,
         enableHeader,
@@ -697,18 +697,18 @@ export const ItemTableList = ({
             clearSelected: () => {
                 internalState.clearSelected();
             },
-            getItem: (index: number) => (enableHeader ? data[index + 1] : data[index]),
-            getItemCount: () => (enableHeader ? data.length - 1 : data.length),
+            getItem: (index: number) => (enableHeader ? data[index - 1] : data[index]),
+            getItemCount: () => (enableHeader ? data.length : data.length),
             getItems: () => data,
             internalState,
             scrollToIndex: (index: number) => {
                 scrollToTableIndex(enableHeader ? index + 1 : index);
             },
             scrollToOffset: (offset: number) => {
-                scrollToTableOffset(enableHeader ? offset + headerHeight : offset);
+                scrollToTableOffset(offset);
             },
         };
-    }, [data, enableHeader, headerHeight, internalState, scrollToTableIndex, scrollToTableOffset]);
+    }, [data, enableHeader, internalState, scrollToTableIndex, scrollToTableOffset]);
 
     useImperativeHandle(ref, () => imperativeHandle);
 
