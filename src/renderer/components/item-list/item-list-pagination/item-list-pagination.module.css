@@ -11,4 +11,5 @@
 .pagination-container {
     padding: var(--theme-spacing-sm) var(--theme-spacing-sm);
     overflow: hidden;
+    border-top: 1px solid var(--theme-colors-border);
 }
