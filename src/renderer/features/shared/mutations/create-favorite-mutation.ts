@@ -4,6 +4,7 @@ import isElectron from 'is-electron';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { useSetAlbumListItemDataById } from '/@/renderer/store';
 import { useFavoriteEvent } from '/@/renderer/store/event.store';
@@ -30,6 +31,22 @@ export const useCreateFavorite = (args: MutationHookArgs) => {
                 ...args,
                 apiClientProps: { serverId: args.apiClientProps.serverId },
             });
+        },
+        onError: (_error, variables) => {
+            eventEmitter.emit('USER_FAVORITE', {
+                favorite: false,
+                id: variables.query.id,
+                itemType: variables.query.type,
+            });
+        },
+        onMutate: (variables) => {
+            eventEmitter.emit('USER_FAVORITE', {
+                favorite: true,
+                id: variables.query.id,
+                itemType: variables.query.type,
+            });
+
+            return null;
         },
         onSuccess: (_data, variables) => {
             const { apiClientProps } = variables;

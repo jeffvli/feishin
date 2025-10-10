@@ -4,6 +4,7 @@ import isElectron from 'is-electron';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { useSetAlbumListItemDataById } from '/@/renderer/store';
 import { useRatingEvent } from '/@/renderer/store/event.store';
@@ -53,6 +54,12 @@ export const useSetRating = (args: MutationHookArgs) => {
             }
         },
         onMutate: (variables) => {
+            eventEmitter.emit('USER_RATING', {
+                id: variables.query.item.map((item) => item.id),
+                itemType: variables.query.item[0].itemType,
+                rating: variables.query.rating,
+            });
+
             const songIds: string[] = [];
             for (const item of variables.query.item) {
                 switch (item.itemType) {

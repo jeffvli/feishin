@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { memo, useMemo } from 'react';
+import { Fragment, memo, useMemo } from 'react';
 import { generatePath, Link } from 'react-router-dom';
 
 import styles from './album-artists-column.module.css';
@@ -39,17 +39,12 @@ const ArtistsColumn = (props: ItemTableListInnerColumn) => {
                     })}
                 >
                     {artists.map((artist, index) => (
-                        <Text
-                            component={Link}
-                            isLink
-                            isMuted
-                            isNoSelect
-                            key={artist.id}
-                            to={artist.path}
-                        >
-                            {artist.name}
+                        <Fragment key={artist.id}>
+                            <Text component={Link} isLink isMuted isNoSelect to={artist.path}>
+                                {artist.name}
+                            </Text>
                             {index < artists.length - 1 && ', '}
-                        </Text>
+                        </Fragment>
                     ))}
                 </div>
             </TableColumnContainer>

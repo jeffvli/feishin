@@ -30,7 +30,7 @@ export const RowIndexColumn = (props: ItemTableListInnerColumn) => {
                     size="xs"
                     variant="subtle"
                 />
-                <Text className="hide-on-hover" isMuted>
+                <Text className="hide-on-hover" isMuted isNoSelect>
                     {props.rowIndex}
                 </Text>
             </TableColumnContainer>

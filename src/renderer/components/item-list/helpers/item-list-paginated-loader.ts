@@ -1,17 +1,19 @@
-import { useQuery, useSuspenseQuery, UseSuspenseQueryOptions } from '@tanstack/react-query';
+import {
+    useQuery,
+    useQueryClient,
+    useSuspenseQuery,
+    UseSuspenseQueryOptions,
+} from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { eventEmitter } from '/@/renderer/events/event-emitter';
+import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { getServerById } from '/@/renderer/store';
-
-export interface PaginatedListProps<TQuery> {
-    initialPage?: number;
-    itemsPerPage?: number;
-    query: Omit<TQuery, 'limit' | 'startIndex'>;
-    serverId: string;
-}
 
 interface UseItemListPaginatedLoaderProps {
     currentPage: number;
+    eventKey?: string;
     itemsPerPage: number;
     listCountQuery: UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
     listQueryFn: (args: { apiClientProps: any; query: any }) => Promise<{ items: unknown[] }>;
@@ -25,12 +27,14 @@ function getInitialData(itemCount: number) {
 
 export const useItemListPaginatedLoader = ({
     currentPage,
+    eventKey,
     itemsPerPage = 100,
     listCountQuery,
     listQueryFn,
     query = {},
     serverId,
 }: UseItemListPaginatedLoaderProps) => {
+    const queryClient = useQueryClient();
     const { data: totalItemCount } = useSuspenseQuery<number, any, number, any>(listCountQuery);
 
     const pageCount = Math.ceil(totalItemCount / itemsPerPage);
@@ -38,13 +42,16 @@ export const useItemListPaginatedLoader = ({
     const fetchRange = getFetchRange(currentPage, itemsPerPage);
     const startIndex = fetchRange.startIndex;
 
-    const queryParams = {
-        limit: itemsPerPage,
-        startIndex: startIndex,
-        ...query,
-    };
+    const queryParams = useMemo(
+        () => ({
+            limit: itemsPerPage,
+            startIndex: startIndex,
+            ...query,
+        }),
+        [itemsPerPage, startIndex, query],
+    );
 
-    const { data } = useQuery({
+    const { data, refetch: queryRefetch } = useQuery({
         gcTime: 1000 * 15,
         placeholderData: getInitialData(itemsPerPage),
         queryFn: async ({ signal }) => {
@@ -58,6 +65,102 @@ export const useItemListPaginatedLoader = ({
         queryKey: queryKeys.albums.list(serverId, queryParams),
         staleTime: 1000 * 15,
     });
+
+    const refresh = useCallback(() => {
+        return queryRefetch();
+    }, [queryRefetch]);
+
+    const updateItems = useCallback(
+        (indexes: number[], value: object) => {
+            return queryClient.setQueryData(
+                queryKeys.albums.list(serverId, queryParams),
+                (prev: undefined | unknown[]) => {
+                    if (!prev) {
+                        return prev;
+                    }
+
+                    return prev.map((item: any, index) => {
+                        if (!item) {
+                            return item;
+                        }
+
+                        if (!indexes.includes(index)) {
+                            return item;
+                        }
+
+                        return {
+                            ...item,
+                            ...value,
+                        };
+                    });
+                },
+            );
+        },
+        [queryClient, queryParams, serverId],
+    );
+
+    useEffect(() => {
+        const handleRefresh = (payload: { key: string }) => {
+            if (!eventKey || eventKey !== payload.key) {
+                return;
+            }
+
+            return refresh();
+        };
+
+        const handleFavorite = (payload: UserFavoriteEventPayload) => {
+            if (!data) {
+                return;
+            }
+
+            const idToIndexMap = data
+                .filter(Boolean)
+                .reduce((acc: Record<string, number>, item: any, index: number) => {
+                    acc[item.id] = index;
+                    return acc;
+                }, {});
+
+            const dataIndexes = payload.id.map((id: string) => idToIndexMap[id]);
+
+            if (dataIndexes.length === 0) {
+                return;
+            }
+
+            return updateItems(dataIndexes, { userFavorite: payload.favorite });
+        };
+
+        const handleRating = (payload: UserRatingEventPayload) => {
+            if (!data) {
+                return;
+            }
+
+            const idToIndexMap = data.reduce(
+                (acc: Record<string, number>, item: any, index: number) => {
+                    acc[item.id] = index;
+                    return acc;
+                },
+                {},
+            );
+
+            const dataIndexes = payload.id.map((id: string) => idToIndexMap[id]);
+
+            if (dataIndexes.length === 0) {
+                return;
+            }
+
+            return updateItems(dataIndexes, { userRating: payload.rating });
+        };
+
+        eventEmitter.on('ITEM_LIST_REFRESH', handleRefresh);
+        eventEmitter.on('USER_FAVORITE', handleFavorite);
+        eventEmitter.on('USER_RATING', handleRating);
+
+        return () => {
+            eventEmitter.off('ITEM_LIST_REFRESH', handleRefresh);
+            eventEmitter.off('USER_FAVORITE', handleFavorite);
+            eventEmitter.off('USER_RATING', handleRating);
+        };
+    }, [data, eventKey, refresh, updateItems]);
 
     return { data, pageCount, totalItemCount };
 };

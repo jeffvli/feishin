@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { memo, useMemo } from 'react';
+import { Fragment, memo, useMemo } from 'react';
 import { generatePath, Link } from 'react-router-dom';
 
 import styles from './genre-column.module.css';
@@ -39,17 +39,12 @@ const GenreColumn = (props: ItemTableListInnerColumn) => {
                     })}
                 >
                     {genres.map((genre, index) => (
-                        <Text
-                            component={Link}
-                            isLink
-                            isMuted
-                            isNoSelect
-                            key={genre.id}
-                            to={genre.path}
-                        >
-                            {genre.name}
+                        <Fragment key={genre.id}>
+                            <Text component={Link} isLink isMuted isNoSelect to={genre.path}>
+                                {genre.name}
+                            </Text>
                             {index < genres.length - 1 && ', '}
-                        </Text>
+                        </Fragment>
                     ))}
                 </div>
             </TableColumnContainer>

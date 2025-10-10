@@ -1,17 +1,14 @@
 import { useQueryClient, useSuspenseQuery, UseSuspenseQueryOptions } from '@tanstack/react-query';
 import throttle from 'lodash/throttle';
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { eventEmitter } from '/@/renderer/events/event-emitter';
+import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { getServerById } from '/@/renderer/store';
 
-export interface InfiniteListProps<TQuery> {
-    itemsPerPage?: number;
-    query: Omit<TQuery, 'limit' | 'startIndex'>;
-    serverId: string;
-}
-
 interface UseItemListInfiniteLoaderProps {
+    eventKey: string;
     itemsPerPage: number;
     listCountQuery: UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
     listQueryFn: (args: { apiClientProps: any; query: any }) => Promise<{ items: unknown[] }>;
@@ -24,6 +21,7 @@ function getInitialData(itemCount: number) {
 }
 
 export const useItemListInfiniteLoader = ({
+    eventKey,
     itemsPerPage = 100,
     listCountQuery,
     listQueryFn,
@@ -31,6 +29,8 @@ export const useItemListInfiniteLoader = ({
     serverId,
 }: UseItemListInfiniteLoaderProps) => {
     const queryClient = useQueryClient();
+
+    const currentPageRef = useRef(0);
 
     const scrollStateRef = useRef<ScrollState>({
         direction: 'unknown',
@@ -55,6 +55,8 @@ export const useItemListInfiniteLoader = ({
             if (pagesLoaded.current[pageNumber]) {
                 return;
             }
+
+            currentPageRef.current = pageNumber;
 
             const queryParams = {
                 limit: fetchRange.limit,
@@ -84,7 +86,103 @@ export const useItemListInfiniteLoader = ({
         }, 500);
     }, [itemsPerPage, queryClient, serverId, listQueryFn, query]);
 
-    return { data, onRangeChanged };
+    const refresh = useCallback(
+        async (force?: boolean) => {
+            await queryClient.invalidateQueries();
+            pagesLoaded.current = {};
+
+            if (force) {
+                setData(getInitialData(totalItemCount));
+            }
+
+            await onRangeChanged({
+                endIndex: currentPageRef.current * itemsPerPage,
+                startIndex: currentPageRef.current * itemsPerPage,
+            });
+        },
+        [itemsPerPage, onRangeChanged, queryClient, totalItemCount],
+    );
+
+    const updateItems = useCallback((indexes: number[], value: object) => {
+        setData((prev: any[]) => {
+            return prev.map((item: any, index) => {
+                if (!item) {
+                    return item;
+                }
+
+                if (!indexes.includes(index)) {
+                    return item;
+                }
+
+                return {
+                    ...item,
+                    ...value,
+                };
+            });
+        });
+    }, []);
+
+    useEffect(() => {
+        const handleRefresh = (payload: { key: string }) => {
+            if (!eventKey || eventKey !== payload.key) {
+                return;
+            }
+
+            return refresh(true);
+        };
+
+        eventEmitter.on('ITEM_LIST_REFRESH', handleRefresh);
+
+        return () => {
+            eventEmitter.off('ITEM_LIST_REFRESH', handleRefresh);
+        };
+    }, [eventKey, refresh]);
+
+    useEffect(() => {
+        const handleFavorite = (payload: UserFavoriteEventPayload) => {
+            const idToIndexMap = data
+                .filter(Boolean)
+                .reduce((acc: Record<string, number>, item: any, index: number) => {
+                    acc[item.id] = index;
+                    return acc;
+                }, {});
+
+            const dataIndexes = payload.id.map((id: string) => idToIndexMap[id]);
+
+            if (dataIndexes.length === 0) {
+                return;
+            }
+
+            return updateItems(dataIndexes, { userFavorite: payload.favorite });
+        };
+
+        const handleRating = (payload: UserRatingEventPayload) => {
+            const idToIndexMap = data
+                .filter(Boolean)
+                .reduce((acc: Record<string, number>, item: any, index: number) => {
+                    acc[item.id] = index;
+                    return acc;
+                }, {});
+
+            const dataIndexes = payload.id.map((id: string) => idToIndexMap[id]);
+
+            if (dataIndexes.length === 0) {
+                return;
+            }
+
+            return updateItems(dataIndexes, { userRating: payload.rating });
+        };
+
+        eventEmitter.on('USER_FAVORITE', handleFavorite);
+        eventEmitter.on('USER_RATING', handleRating);
+
+        return () => {
+            eventEmitter.off('USER_FAVORITE', handleFavorite);
+            eventEmitter.off('USER_RATING', handleRating);
+        };
+    }, [data, eventKey, updateItems]);
+
+    return { data, onRangeChanged, refresh, updateItems };
 };
 
 export const parseListCountQuery = (query: any) => {
