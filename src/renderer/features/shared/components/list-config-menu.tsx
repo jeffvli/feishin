@@ -152,7 +152,7 @@ export const ListConfigTable = ({
                 {options.map((option) => (
                     <Table.Tr key={option.id}>
                         <Table.Th w="50%">{option.label}</Table.Th>
-                        <Table.Td>{option.component}</Table.Td>
+                        <Table.Td p={0}>{option.component}</Table.Td>
                     </Table.Tr>
                 ))}
             </Table.Tbody>

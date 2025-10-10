@@ -15,4 +15,12 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    padding: var(--theme-spacing-xs);
+    border-radius: var(--theme-radius-sm);
+    transition: outline 0.2s ease;
+}
+
+.item.matched {
+    outline: 2px solid var(--theme-colors-primary);
+    outline-offset: 2px;
 }

@@ -1,4 +1,6 @@
+import { useDebouncedState } from '@mantine/hooks';
 import clsx from 'clsx';
+import Fuse from 'fuse.js';
 import { motion } from 'motion/react';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,11 +16,14 @@ import { DataListProps, useSettingsStore, useSettingsStoreActions } from '/@/ren
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
+import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
+import { TextInput } from '/@/shared/components/text-input/text-input';
+import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { ItemListKey, ListPaginationType } from '/@/shared/types/types';
 
@@ -48,13 +53,13 @@ export const TableConfig = ({ extraOptions, listKey, tableColumnsData }: TableCo
                                 label: t('table.config.general.pagination_infinite', {
                                     postProcess: 'sentenceCase',
                                 }),
-                                value: 'infinite',
+                                value: ListPaginationType.INFINITE,
                             },
                             {
                                 label: t('table.config.general.pagination_paginate', {
                                     postProcess: 'sentenceCase',
                                 }),
-                                value: 'paginate',
+                                value: ListPaginationType.PAGINATED,
                             },
                         ]}
                         onChange={(value) =>
@@ -201,6 +206,7 @@ export const TableConfig = ({ extraOptions, listKey, tableColumnsData }: TableCo
     return (
         <>
             <ListConfigTable options={options} />
+            <Divider />
             <TableColumnConfig
                 data={tableColumnsData}
                 listKey={listKey}
@@ -378,10 +384,54 @@ const TableColumnConfig = ({
         [listKey, onChange],
     );
 
+    const [searchColumns, setSearchColumns] = useDebouncedState('', 300);
+
+    const fuse = useMemo(() => {
+        return new Fuse(value, {
+            getFn: (obj) => {
+                return labelMap[obj.id] || '';
+            },
+            includeMatches: true,
+            includeScore: true,
+            keys: ['id', 'label'],
+            threshold: 0.3,
+        });
+    }, [value, labelMap]);
+
+    const filteredColumns = useMemo(() => {
+        if (!searchColumns.trim()) {
+            return value.map((item) => ({ item, matches: null }));
+        }
+
+        const results = fuse.search(searchColumns);
+        const resultMap = new Map(results.map((result) => [result.item.id, result.matches]));
+
+        return value.map((item) => ({
+            item,
+            matches: resultMap.get(item.id) || null,
+        }));
+    }, [value, searchColumns, fuse]);
+
     return (
         <Stack gap="xs">
-            {value.map((item) => (
-                <motion.div className={styles.item} key={item.id} layout>
+            <Group justify="space-between" mb="md">
+                <Text size="sm">{t('common.tableColumns', { postProcess: 'sentenceCase' })}</Text>
+                <TextInput
+                    onChange={(e) => setSearchColumns(e.currentTarget.value)}
+                    placeholder={t('common.search', {
+                        postProcess: 'sentenceCase',
+                    })}
+                    size="xs"
+                />
+            </Group>
+            {filteredColumns.map(({ item, matches }) => (
+                <motion.div
+                    className={clsx(styles.item, {
+                        [styles.matched]: matches && matches.length > 0,
+                    })}
+                    key={item.id}
+                    layout
+                >
                     <Group wrap="nowrap">
                         <Checkbox
                             checked={item.isEnabled}
