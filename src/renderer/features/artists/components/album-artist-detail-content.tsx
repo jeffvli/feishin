@@ -401,6 +401,44 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                 value={detailQuery?.data?.userRating || 0}
                             />
                         )}
+                        {externalLinks && lastFM && (
+                            <ActionIcon
+                                component="a"
+                                href={`https://www.last.fm/music/${encodeURIComponent(
+                                    detailQuery?.data?.name || '',
+                                )}`}
+                                icon="brandLastfm"
+                                iconProps={{
+                                    fill: 'default',
+                                    size: 'lg',
+                                }}
+                                rel="noopener noreferrer"
+                                size="lg"
+                                target="_blank"
+                                tooltip={{
+                                    label: t('action.openIn.lastfm'),
+                                }}
+                                variant="transparent"
+                            />
+                        )}
+                        {externalLinks && mbzId && musicBrainz && (
+                            <ActionIcon
+                                component="a"
+                                href={`https://musicbrainz.org/artist/${mbzId}`}
+                                icon="brandMusicBrainz"
+                                iconProps={{
+                                    fill: 'default',
+                                    size: 'lg',
+                                }}
+                                rel="noopener noreferrer"
+                                size="lg"
+                                target="_blank"
+                                tooltip={{
+                                    label: t('action.openIn.musicbrainz'),
+                                }}
+                                variant="transparent"
+                            />
+                        )}
                         <ActionIcon
                             icon="ellipsisHorizontal"
                             onClick={(e) => {
@@ -447,48 +485,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                     {genre.name}
                                 </Button>
                             ))}
-                        </Group>
-                    </section>
-                ) : null}
-                {externalLinks && (lastFM || musicBrainz) ? (
-                    <section>
-                        <Group gap="sm">
-                            {lastFM && (
-                                <ActionIcon
-                                    component="a"
-                                    href={`https://www.last.fm/music/${encodeURIComponent(
-                                        detailQuery?.data?.name || '',
-                                    )}`}
-                                    icon="brandLastfm"
-                                    iconProps={{
-                                        fill: 'default',
-                                        size: 'xl',
-                                    }}
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                    tooltip={{
-                                        label: t('action.openIn.lastfm'),
-                                    }}
-                                    variant="subtle"
-                                />
-                            )}
-                            {mbzId && musicBrainz ? (
-                                <ActionIcon
-                                    component="a"
-                                    href={`https://musicbrainz.org/artist/${mbzId}`}
-                                    icon="brandMusicBrainz"
-                                    iconProps={{
-                                        fill: 'default',
-                                        size: 'xl',
-                                    }}
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                    tooltip={{
-                                        label: t('action.openIn.musicbrainz'),
-                                    }}
-                                    variant="subtle"
-                                />
-                            ) : null}
                         </Group>
                     </section>
                 ) : null}
