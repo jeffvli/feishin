@@ -449,22 +449,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             variant="transparent"
                         />
                     </Group>
-                    <Button
-                        component={Link}
-                        size="compact-md"
-                        to={artistDiscographyLink}
-                        variant="subtle"
-                    >
-                        {String(t('page.albumArtistDetail.viewDiscography')).toUpperCase()}
-                    </Button>
-                    <Button
-                        component={Link}
-                        size="compact-md"
-                        to={artistSongsLink}
-                        variant="subtle"
-                    >
-                        {String(t('page.albumArtistDetail.viewAllTracks')).toUpperCase()}
-                    </Button>
                 </Group>
                 {showGenres ? (
                     <section>
