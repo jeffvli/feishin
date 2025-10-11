@@ -27,7 +27,7 @@
         grid-template-columns: 175px minmax(0, 1fr);
 
         h1 {
-            height: 40px;
+            height: 45px;
         }
 
         .image {
@@ -45,7 +45,7 @@
         grid-template-columns: 200px minmax(0, 1fr);
 
         h1 {
-            height: 80px;
+            height: 60px;
         }
 
         .image {
@@ -63,7 +63,7 @@
         grid-template-columns: 225px minmax(0, 1fr);
 
         h1 {
-            height: 100px;
+            height: 65px;
         }
 
         .image {
