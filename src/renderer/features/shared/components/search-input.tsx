@@ -1,5 +1,5 @@
 import { useHotkeys } from '@mantine/hooks';
-import { ChangeEvent, KeyboardEvent, useRef } from 'react';
+import { ChangeEvent, KeyboardEvent, useRef, useState } from 'react';
 import { shallow } from 'zustand/shallow';
 
 import { useSettingsStore } from '/@/renderer/store';
@@ -35,14 +35,21 @@ export const SearchInput = ({ onChange, ...props }: SearchInputProps) => {
         }
     };
 
+    const [isFocused, setIsFocused] = useState(false);
+
+    const hasValue = props.value || ref.current?.value;
+
     return (
         <TextInput
             leftSection={<Icon icon="search" />}
+            maw="20dvw"
+            onBlur={() => setIsFocused(false)}
             onChange={onChange}
+            onFocus={() => setIsFocused(true)}
             onKeyDown={handleEscape}
             ref={ref}
             size="sm"
-            width={200}
+            width={isFocused || hasValue ? '200px' : '100px'}
             {...props}
             rightSection={
                 ref.current?.value ? (
