@@ -5,7 +5,7 @@
     grid-template-rows: 100%;
     grid-template-columns: 175px minmax(0, 1fr);
     gap: 1rem;
-    align-items: flex-end;
+    align-items: center;
     width: 100%;
     max-width: 100%;
     height: 30vh;
@@ -97,7 +97,7 @@
     z-index: 15;
     display: flex;
     grid-area: image;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
     height: 100%;
     filter: drop-shadow(0 0 8px rgb(0 0 0 / 50%));
@@ -108,7 +108,7 @@
     display: flex;
     flex-direction: column;
     grid-area: info;
-    justify-content: flex-end;
+    justify-content: center;
     width: 100%;
 }
 
