@@ -2,15 +2,18 @@ import { forwardRef, Fragment, Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
+import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
 import { LibraryHeader } from '/@/renderer/features/shared';
+import { useSongListCount } from '/@/renderer/features/songs/queries/song-list-count-query';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { formatDurationString } from '/@/renderer/utils';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { AlbumListSort, LibraryItem, SongListSort, SortOrder } from '/@/shared/types/domain-types';
 
 interface AlbumArtistDetailHeaderProps {
     background: {
@@ -34,31 +37,43 @@ export const AlbumArtistDetailHeader = forwardRef(
             serverId: server?.id,
         });
 
+        const favoriteSongsCountQuery = useSongListCount({
+            options: {
+                enabled: !!server?.id && !!routeId,
+            },
+            query: {
+                albumArtistIds: [routeId],
+                favorite: true,
+                sortBy: SongListSort.FAVORITED,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        });
+
+        const favoriteAlbumsQuery = useAlbumList({
+            options: {
+                enabled: !!server?.id && !!routeId,
+            },
+            query: {
+                artistIds: [routeId],
+                favorite: true,
+                sortBy: AlbumListSort.FAVORITED,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        });
+
         const albumCount = detailQuery?.data?.albumCount;
         const songCount = detailQuery?.data?.songCount;
         const duration = detailQuery?.data?.duration;
         const durationEnabled = duration !== null && duration !== undefined;
+        const favoriteSongsCount = favoriteSongsCountQuery?.data;
+        const favoriteAlbumsCount = favoriteAlbumsQuery?.data?.totalRecordCount;
 
-        const metadataItems = [
-            {
-                enabled: albumCount !== null && albumCount !== undefined,
-                id: 'albumCount',
-                secondary: false,
-                value: t('entity.albumWithCount', { count: albumCount || 0 }),
-            },
-            {
-                enabled: songCount !== null && songCount !== undefined,
-                id: 'songCount',
-                secondary: false,
-                value: t('entity.trackWithCount', { count: songCount || 0 }),
-            },
-            {
-                enabled: durationEnabled,
-                id: 'duration',
-                secondary: true,
-                value: durationEnabled && formatDurationString(duration),
-            },
-        ];
+        const hasFavoriteAlbums = favoriteAlbumsCount !== null && favoriteAlbumsCount !== undefined && favoriteAlbumsCount > 0;
+        const hasFavoriteSongs = favoriteSongsCount !== null && favoriteSongsCount !== undefined && favoriteSongsCount > 0;
 
         return (
             <LibraryHeader
@@ -69,15 +84,40 @@ export const AlbumArtistDetailHeader = forwardRef(
                 {...background}
             >
                 <Stack>
-                    <Group>
-                        {metadataItems
-                            .filter((i) => i.enabled)
-                            .map((item, index) => (
-                                <Fragment key={`item-${item.id}-${index}`}>
-                                    {index > 0 && <Text isNoSelect>•</Text>}
-                                    <Text isMuted={item.secondary}>{item.value}</Text>
-                                </Fragment>
-                            ))}
+                    <Group gap="sm">
+                        {albumCount !== null && albumCount !== undefined && (
+                            <Group gap="xs">
+                                <Text>{t('entity.releaseWithCount', { count: albumCount })}</Text>
+                                {hasFavoriteAlbums && (
+                                    <>
+                                        <Text>,</Text>
+                                        <Text>{favoriteAlbumsCount}</Text>
+                                        <Icon icon="favorite" size="sm" />
+                                    </>
+                                )}
+                            </Group>
+                        )}
+                        {(albumCount !== null && albumCount !== undefined) && (songCount !== null && songCount !== undefined) && (
+                            <Text isNoSelect>•</Text>
+                        )}
+                        {songCount !== null && songCount !== undefined && (
+                            <Group gap="xs">
+                                <Text>{t('entity.trackWithCount', { count: songCount })}</Text>
+                                {hasFavoriteSongs && (
+                                    <>
+                                        <Text>,</Text>
+                                        <Text>{favoriteSongsCount}</Text>
+                                        <Icon icon="favorite" size="sm" />
+                                    </>
+                                )}
+                            </Group>
+                        )}
+                        {durationEnabled && (
+                            <>
+                                <Text isNoSelect>•</Text>
+                                <Text isMuted>{formatDurationString(duration)}</Text>
+                            </>
+                        )}
                     </Group>
                 </Stack>
             </LibraryHeader>
