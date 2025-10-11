@@ -374,12 +374,13 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         <div className={styles.contentContainer} ref={cq.ref}>
             <LibraryBackgroundOverlay backgroundColor={background} />
             <div className={styles.detailContainer}>
-                <Group gap="md">
-                    <PlayButton
-                        disabled={albumCount === 0}
-                        onClick={() => handlePlay(playButtonBehavior)}
-                    />
-                    <Group gap="xs">
+                <Group gap="md" justify="space-between">
+                    <Group gap="md">
+                        <PlayButton
+                            disabled={albumCount === 0}
+                            onClick={() => handlePlay(playButtonBehavior)}
+                        />
+                        <Group gap="xs">
                         <ActionIcon
                             icon="favorite"
                             iconProps={{
@@ -449,24 +450,25 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             variant="transparent"
                         />
                     </Group>
-                </Group>
-                <Group gap="md">
-                    <Button
-                        component={Link}
-                        size="compact-md"
-                        to={artistDiscographyLink}
-                        variant="subtle"
-                    >
-                        {String(t('page.albumArtistDetail.viewDiscography')).toUpperCase()}
-                    </Button>
-                    <Button
-                        component={Link}
-                        size="compact-md"
-                        to={artistSongsLink}
-                        variant="subtle"
-                    >
-                        {String(t('page.albumArtistDetail.viewAllTracks')).toUpperCase()}
-                    </Button>
+                    </Group>
+                    <Group gap="md">
+                        <Button
+                            component={Link}
+                            size="compact-md"
+                            to={artistDiscographyLink}
+                            variant="subtle"
+                        >
+                            {String(t('page.albumArtistDetail.viewDiscography')).toUpperCase()}
+                        </Button>
+                        <Button
+                            component={Link}
+                            size="compact-md"
+                            to={artistSongsLink}
+                            variant="subtle"
+                        >
+                            {String(t('page.albumArtistDetail.viewAllTracks')).toUpperCase()}
+                        </Button>
+                    </Group>
                 </Group>
                 {showGenres ? (
                     <section>
