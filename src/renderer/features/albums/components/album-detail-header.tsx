@@ -4,6 +4,7 @@ import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
 import {
     useHandleGeneralContextMenu,
@@ -30,6 +31,7 @@ import { formatDurationString } from '/@/renderer/utils';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { Popover } from '/@/shared/components/popover/popover';
 import { Rating } from '/@/shared/components/rating/rating';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
@@ -280,24 +282,38 @@ export const AlbumDetailHeader = forwardRef(
                                 />
                             </Group>
                         </Group>
-                        {showGenres && (
-                            <Group gap="sm">
-                                {detailQuery?.data?.genres?.map((genre) => (
-                                    <Button
-                                        component={Link}
-                                        key={`genre-${genre.id}`}
-                                        radius="md"
-                                        size="compact-md"
-                                        to={generatePath(genreRoute, {
-                                            genreId: genre.id,
-                                        })}
-                                        variant="outline"
-                                    >
-                                        {genre.name}
-                                    </Button>
-                                ))}
-                            </Group>
-                        )}
+                        <Group gap="sm" justify="space-between">
+                            {showGenres && (
+                                <Group gap="sm">
+                                    {detailQuery?.data?.genres?.map((genre) => (
+                                        <Button
+                                            component={Link}
+                                            key={`genre-${genre.id}`}
+                                            radius="md"
+                                            size="compact-md"
+                                            to={generatePath(genreRoute, {
+                                                genreId: genre.id,
+                                            })}
+                                            variant="outline"
+                                        >
+                                            {genre.name}
+                                        </Button>
+                                    ))}
+                                </Group>
+                            )}
+                            <Popover position="bottom-end">
+                                <Popover.Target>
+                                    <ActionIcon
+                                        icon="settings"
+                                        size="lg"
+                                        variant="transparent"
+                                    />
+                                </Popover.Target>
+                                <Popover.Dropdown>
+                                    <TableConfigDropdown type="albumDetail" />
+                                </Popover.Dropdown>
+                            </Popover>
+                        </Group>
                     </Stack>
                 </LibraryHeader>
             </Stack>

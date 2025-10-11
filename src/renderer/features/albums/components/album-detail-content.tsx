@@ -12,7 +12,6 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel/grid-carousel';
 import {
     getColumnDefs,
-    TableConfigDropdown,
     VirtualTable,
 } from '/@/renderer/components/virtual-table';
 import { FullWidthDiscCell } from '/@/renderer/components/virtual-table/cells/full-width-disc-cell';
@@ -37,9 +36,7 @@ import {
     useTableSettings,
 } from '/@/renderer/store/settings.store';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
-import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
-import { Popover } from '/@/shared/components/popover/popover';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import {
@@ -272,22 +269,6 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
         <div className={styles.contentContainer} ref={cq.ref}>
             <LibraryBackgroundOverlay backgroundColor={background} />
             <div className={styles.detailContainer}>
-                <section>
-                    <Group gap="sm" justify="flex-end">
-                        <Popover position="bottom-end">
-                            <Popover.Target>
-                                <ActionIcon
-                                    icon="settings"
-                                    size="lg"
-                                    variant="transparent"
-                                />
-                            </Popover.Target>
-                            <Popover.Dropdown>
-                                <TableConfigDropdown type="albumDetail" />
-                            </Popover.Dropdown>
-                        </Popover>
-                    </Group>
-                </section>
                 {comment && (
                     <section>
                         <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
