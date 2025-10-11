@@ -1,8 +1,8 @@
-import { useLocalStorage } from '@mantine/hooks';
 import { parseAsString, useQueryState } from 'nuqs';
 
 import { OrderToggleButton } from '/@/renderer/features/shared/components/order-toggle-button';
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
+import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 

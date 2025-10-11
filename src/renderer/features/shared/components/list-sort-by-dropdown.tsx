@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@mantine/hooks';
 import { parseAsString, useQueryState } from 'nuqs';
 
 import i18n from '/@/i18n/i18n';
@@ -6,6 +5,7 @@ import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
 import { useCurrentServer } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 

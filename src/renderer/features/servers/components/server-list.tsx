@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@mantine/hooks';
 import { openContextModal } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { ChangeEvent } from 'react';
@@ -19,6 +18,7 @@ import { ContextModalVars } from '/@/shared/components/modal/modal';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
 import { Text } from '/@/shared/components/text/text';
+import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { ServerType } from '/@/shared/types/domain-types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;

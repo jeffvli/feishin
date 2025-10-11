@@ -1,4 +1,3 @@
-import { useLocalStorage } from '@mantine/hooks';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -10,6 +9,7 @@ import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
+import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 
 export function IsUpdatedDialog() {
     const { version } = packageJson;
