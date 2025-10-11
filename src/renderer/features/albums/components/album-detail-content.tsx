@@ -21,20 +21,12 @@ import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/ho
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import {
-    useHandleGeneralContextMenu,
     useHandleTableContextMenu,
 } from '/@/renderer/features/context-menu';
 import {
-    ALBUM_CONTEXT_MENU_ITEMS,
     SONG_CONTEXT_MENU_ITEMS,
 } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import {
-    PlayButton,
-    useCreateFavorite,
-    useDeleteFavorite,
-    useSetRating,
-} from '/@/renderer/features/shared';
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { useAppFocus, useContainerQuery } from '/@/renderer/hooks';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
@@ -42,7 +34,6 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useCurrentSong, useCurrentStatus } from '/@/renderer/store';
 import {
     PersistedTableColumn,
-    useGeneralSettings,
     usePlayButtonBehavior,
     useSettingsStoreActions,
     useTableSettings,
@@ -52,7 +43,6 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Popover } from '/@/shared/components/popover/popover';
-import { Rating } from '/@/shared/components/rating/rating';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import {
@@ -60,10 +50,8 @@ import {
     AlbumListSort,
     LibraryItem,
     QueueSong,
-    ServerType,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { Play } from '/@/shared/types/types';
 
 const isFullWidthRow = (node: RowNode) => {
     return node.id?.startsWith('disc-');
@@ -86,7 +74,6 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
     const status = useCurrentStatus();
     const isFocused = useAppFocus();
     const currentSong = useCurrentSong();
-    const { externalLinks, lastFM, musicBrainz } = useGeneralSettings();
     const genreRoute = useGenreRoute();
 
     const columnDefs = useMemo(
@@ -237,13 +224,6 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
     ];
     const playButtonBehavior = usePlayButtonBehavior();
 
-    const handlePlay = async (playType?: Play) => {
-        handlePlayQueueAdd?.({
-            byData: detailQuery?.data?.songs,
-            playType: playType || playButtonBehavior,
-        });
-    };
-
     const onCellContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
 
     const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
@@ -262,54 +242,8 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
         });
     };
 
-    const createFavoriteMutation = useCreateFavorite({});
-    const deleteFavoriteMutation = useDeleteFavorite({});
-
-    const handleFavorite = () => {
-        if (!detailQuery?.data) return;
-
-        if (detailQuery.data.userFavorite) {
-            deleteFavoriteMutation.mutate({
-                query: {
-                    id: [detailQuery.data.id],
-                    type: LibraryItem.ALBUM,
-                },
-                serverId: detailQuery.data.serverId,
-            });
-        } else {
-            createFavoriteMutation.mutate({
-                query: {
-                    id: [detailQuery.data.id],
-                    type: LibraryItem.ALBUM,
-                },
-                serverId: detailQuery.data.serverId,
-            });
-        }
-    };
-
-    const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
-
-    const updateRatingMutation = useSetRating({});
-
-    const handleUpdateRating = (rating: number) => {
-        if (!detailQuery?.data) return;
-
-        updateRatingMutation.mutate({
-            query: {
-                item: [detailQuery.data],
-                rating,
-            },
-            serverId: detailQuery.data.serverId,
-        });
-    };
-
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
     const comment = detailQuery?.data?.comment;
-
-    const handleGeneralContextMenu = useHandleGeneralContextMenu(
-        LibraryItem.ALBUM,
-        ALBUM_CONTEXT_MENU_ITEMS,
-    );
 
     const onColumnMoved = useCallback(() => {
         const { columnApi } = tableRef?.current || {};
@@ -339,99 +273,16 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
 
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
-    const mbzId = detailQuery?.data?.mbzId;
-
     return (
         <div className={styles.contentContainer} ref={cq.ref}>
             <LibraryBackgroundOverlay backgroundColor={background} />
             <div className={styles.detailContainer}>
                 <section>
-                    <Group gap="sm" justify="space-between">
-                        <Group>
-                            <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
-                            <Group gap="xs">
-                                <ActionIcon
-                                    icon="favorite"
-                                    iconProps={{
-                                        fill: detailQuery?.data?.userFavorite
-                                            ? 'primary'
-                                            : undefined,
-                                    }}
-                                    loading={
-                                        createFavoriteMutation.isLoading ||
-                                        deleteFavoriteMutation.isLoading
-                                    }
-                                    onClick={handleFavorite}
-                                    size="lg"
-                                    variant="transparent"
-                                />
-                                {showRating && (
-                                    <Rating
-                                        onChange={handleUpdateRating}
-                                        readOnly={
-                                            detailQuery?.isFetching ||
-                                            updateRatingMutation.isLoading
-                                        }
-                                        value={detailQuery?.data?.userRating || 0}
-                                    />
-                                )}
-                                {externalLinks && lastFM && (
-                                    <ActionIcon
-                                        component="a"
-                                        href={`https://www.last.fm/music/${encodeURIComponent(
-                                            detailQuery?.data?.albumArtist || '',
-                                        )}/${encodeURIComponent(detailQuery.data?.name || '')}`}
-                                        icon="brandLastfm"
-                                        iconProps={{
-                                            fill: 'default',
-                                            size: 'lg',
-                                        }}
-                                        rel="noopener noreferrer"
-                                        size="lg"
-                                        target="_blank"
-                                        tooltip={{
-                                            label: t('action.openIn.lastfm'),
-                                        }}
-                                        variant="transparent"
-                                    />
-                                )}
-                                {externalLinks && mbzId && musicBrainz && (
-                                    <ActionIcon
-                                        component="a"
-                                        href={`https://musicbrainz.org/release/${mbzId}`}
-                                        icon="brandMusicBrainz"
-                                        iconProps={{
-                                            fill: 'default',
-                                            size: 'lg',
-                                        }}
-                                        rel="noopener noreferrer"
-                                        size="lg"
-                                        target="_blank"
-                                        tooltip={{
-                                            label: t('action.openIn.musicbrainz'),
-                                        }}
-                                        variant="transparent"
-                                    />
-                                )}
-                                <ActionIcon
-                                    icon="ellipsisHorizontal"
-                                    onClick={(e) => {
-                                        if (!detailQuery?.data) return;
-                                        handleGeneralContextMenu(e, [detailQuery.data!]);
-                                    }}
-                                    size="lg"
-                                    variant="transparent"
-                                />
-                            </Group>
-                        </Group>
+                    <Group gap="sm" justify="flex-end">
                         <Popover position="bottom-end">
                             <Popover.Target>
                                 <ActionIcon
                                     icon="settings"
-                                    onClick={(e) => {
-                                        if (!detailQuery?.data) return;
-                                        handleGeneralContextMenu(e, [detailQuery.data!]);
-                                    }}
                                     size="lg"
                                     variant="transparent"
                                 />
