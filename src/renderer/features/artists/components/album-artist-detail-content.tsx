@@ -63,10 +63,10 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         const enabled: { [key in ArtistItem]?: boolean } = {};
         const order: { [key in ArtistItem]?: number } = {};
 
-        for (const [idx, item] of artistItems.entries()) {
+        artistItems.forEach((item, idx) => {
             enabled[item.id] = !item.disabled;
             order[item.id] = idx + 1;
-        }
+        });
 
         return [enabled, order];
     }, [artistItems]);

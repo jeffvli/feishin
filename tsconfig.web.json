@@ -13,6 +13,8 @@
   "compilerOptions": {
     "composite": true,
     "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
       "/@/renderer/*": [

@@ -1,4 +1,4 @@
-import { forwardRef, Fragment, Ref } from 'react';
+import { forwardRef, Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
@@ -81,6 +81,7 @@ export const AlbumArtistDetailHeader = forwardRef(
                 sortBy: AlbumListSort.FAVORITED,
                 sortOrder: SortOrder.DESC,
                 startIndex: 0,
+                limit: 1,
             },
             serverId: server?.id,
         });
