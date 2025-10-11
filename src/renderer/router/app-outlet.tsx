@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { NuqsAdapter } from 'nuqs/adapters/react-router/v6';
 import { useEffect, useMemo } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -55,5 +56,9 @@ export const AppOutlet = () => {
         return <Navigate replace to={AppRoute.ACTION_REQUIRED} />;
     }
 
-    return <Outlet />;
+    return (
+        <NuqsAdapter>
+            <Outlet />
+        </NuqsAdapter>
+    );
 };
