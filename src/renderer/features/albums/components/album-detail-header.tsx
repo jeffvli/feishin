@@ -20,6 +20,7 @@ import {
     useSetRating,
 } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
+import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { useSongChange } from '/@/renderer/hooks/use-song-change';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -27,6 +28,7 @@ import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString } from '/@/renderer/utils';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Rating } from '/@/shared/components/rating/rating';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -52,6 +54,7 @@ export const AlbumDetailHeader = forwardRef(
         const { externalLinks, lastFM, musicBrainz } = useGeneralSettings();
         const playButtonBehavior = usePlayButtonBehavior();
         const handlePlayQueueAdd = usePlayQueueAdd();
+        const genreRoute = useGenreRoute();
 
         const songIds = useMemo(() => {
             return new Set(detailQuery.data?.songs?.map((song) => song.id));
@@ -137,6 +140,7 @@ export const AlbumDetailHeader = forwardRef(
         );
 
         const mbzId = detailQuery?.data?.mbzId;
+        const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
 
         const metadataItems = [
             {
@@ -276,6 +280,24 @@ export const AlbumDetailHeader = forwardRef(
                                 />
                             </Group>
                         </Group>
+                        {showGenres && (
+                            <Group gap="sm">
+                                {detailQuery?.data?.genres?.map((genre) => (
+                                    <Button
+                                        component={Link}
+                                        key={`genre-${genre.id}`}
+                                        radius="md"
+                                        size="compact-md"
+                                        to={generatePath(genreRoute, {
+                                            genreId: genre.id,
+                                        })}
+                                        variant="outline"
+                                    >
+                                        {genre.name}
+                                    </Button>
+                                ))}
+                            </Group>
+                        )}
                     </Stack>
                 </LibraryHeader>
             </Stack>

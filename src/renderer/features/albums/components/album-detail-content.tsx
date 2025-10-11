@@ -5,7 +5,6 @@ import { useSetState } from '@mantine/hooks';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
 
 import styles from './album-detail-content.module.css';
 
@@ -29,7 +28,6 @@ import {
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { useAppFocus, useContainerQuery } from '/@/renderer/hooks';
-import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useCurrentSong, useCurrentStatus } from '/@/renderer/store';
 import {
@@ -40,7 +38,6 @@ import {
 } from '/@/renderer/store/settings.store';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
-import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Popover } from '/@/shared/components/popover/popover';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
@@ -74,7 +71,6 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
     const status = useCurrentStatus();
     const isFocused = useAppFocus();
     const currentSong = useCurrentSong();
-    const genreRoute = useGenreRoute();
 
     const columnDefs = useMemo(
         () => getColumnDefs(tableConfig.columns, false, 'albumDetail'),
@@ -242,7 +238,6 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
         });
     };
 
-    const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
     const comment = detailQuery?.data?.comment;
 
     const onColumnMoved = useCallback(() => {
@@ -293,26 +288,6 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
                         </Popover>
                     </Group>
                 </section>
-                {showGenres && (
-                    <section>
-                        <Group gap="sm">
-                            {detailQuery?.data?.genres?.map((genre) => (
-                                <Button
-                                    component={Link}
-                                    key={`genre-${genre.id}`}
-                                    radius="md"
-                                    size="compact-md"
-                                    to={generatePath(genreRoute, {
-                                        genreId: genre.id,
-                                    })}
-                                    variant="outline"
-                                >
-                                    {genre.name}
-                                </Button>
-                            ))}
-                        </Group>
-                    </section>
-                )}
                 {comment && (
                     <section>
                         <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
