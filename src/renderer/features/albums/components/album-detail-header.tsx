@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
-import { LibraryHeader, useSetRating } from '/@/renderer/features/shared';
+import { LibraryHeader } from '/@/renderer/features/shared';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useSongChange } from '/@/renderer/hooks/use-song-change';
 import { queryClient } from '/@/renderer/lib/react-query';
@@ -13,10 +13,9 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { formatDateAbsoluteUTC, formatDurationString } from '/@/renderer/utils';
 import { Group } from '/@/shared/components/group/group';
-import { Rating } from '/@/shared/components/rating/rating';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
-import { AlbumDetailResponse, LibraryItem, ServerType } from '/@/shared/types/domain-types';
+import { AlbumDetailResponse, LibraryItem } from '/@/shared/types/domain-types';
 
 interface AlbumDetailHeaderProps {
     background: {
@@ -33,8 +32,6 @@ export const AlbumDetailHeader = forwardRef(
         const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
         const cq = useContainerQuery();
         const { t } = useTranslation();
-
-        const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
 
         const originalDifferentFromRelease =
             detailQuery.data?.originalDate &&
@@ -108,20 +105,6 @@ export const AlbumDetailHeader = forwardRef(
             });
         }
 
-        const updateRatingMutation = useSetRating({});
-
-        const handleUpdateRating = (rating: number) => {
-            if (!detailQuery?.data) return;
-
-            updateRatingMutation.mutate({
-                query: {
-                    item: [detailQuery.data],
-                    rating,
-                },
-                serverId: detailQuery.data.serverId,
-            });
-        };
-
         return (
             <Stack ref={cq.ref}>
                 <LibraryHeader
@@ -139,19 +122,6 @@ export const AlbumDetailHeader = forwardRef(
                                     <Text>{item.value}</Text>
                                 </Fragment>
                             ))}
-                            {showRating && (
-                                <>
-                                    <Text isNoSelect>•</Text>
-                                    <Rating
-                                        onChange={handleUpdateRating}
-                                        readOnly={
-                                            detailQuery?.isFetching ||
-                                            updateRatingMutation.isLoading
-                                        }
-                                        value={detailQuery?.data?.userRating || 0}
-                                    />
-                                </>
-                            )}
                         </Group>
                         <Group
                             gap="md"

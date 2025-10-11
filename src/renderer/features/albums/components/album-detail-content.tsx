@@ -29,7 +29,12 @@ import {
     SONG_CONTEXT_MENU_ITEMS,
 } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { PlayButton, useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import {
+    PlayButton,
+    useCreateFavorite,
+    useDeleteFavorite,
+    useSetRating,
+} from '/@/renderer/features/shared';
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { useAppFocus, useContainerQuery } from '/@/renderer/hooks';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
@@ -47,6 +52,7 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Popover } from '/@/shared/components/popover/popover';
+import { Rating } from '/@/shared/components/rating/rating';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import {
@@ -54,6 +60,7 @@ import {
     AlbumListSort,
     LibraryItem,
     QueueSong,
+    ServerType,
     SortOrder,
 } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
@@ -280,6 +287,22 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
         }
     };
 
+    const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
+
+    const updateRatingMutation = useSetRating({});
+
+    const handleUpdateRating = (rating: number) => {
+        if (!detailQuery?.data) return;
+
+        updateRatingMutation.mutate({
+            query: {
+                item: [detailQuery.data],
+                rating,
+            },
+            serverId: detailQuery.data.serverId,
+        });
+    };
+
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
     const comment = detailQuery?.data?.comment;
 
@@ -342,6 +365,16 @@ export const AlbumDetailContent = ({ background, tableRef }: AlbumDetailContentP
                                     size="lg"
                                     variant="transparent"
                                 />
+                                {showRating && (
+                                    <Rating
+                                        onChange={handleUpdateRating}
+                                        readOnly={
+                                            detailQuery?.isFetching ||
+                                            updateRatingMutation.isLoading
+                                        }
+                                        value={detailQuery?.data?.userRating || 0}
+                                    />
+                                )}
                                 <ActionIcon
                                     icon="ellipsisHorizontal"
                                     onClick={(e) => {
