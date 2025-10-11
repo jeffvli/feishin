@@ -56,6 +56,11 @@ export interface ItemListComponentProps<TQuery> {
     serverId: string;
 }
 
+export interface ItemListGridComponentProps<TQuery> extends ItemListComponentProps<TQuery> {
+    gap?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
+    itemsPerRow?: number;
+}
+
 export interface ItemListHandle {
     clearExpanded: () => void;
     clearSelected: () => void;
@@ -67,10 +72,20 @@ export interface ItemListHandle {
     scrollToOffset: (offset: number, options?: { behavior?: 'auto' | 'smooth' }) => void;
 }
 
+export interface ItemListTableComponentProps<TQuery> extends ItemListComponentProps<TQuery> {
+    columns: ItemTableListColumnConfig[];
+    enableAlternateRowColors?: boolean;
+    enableHorizontalBorders?: boolean;
+    enableRowHoverHighlight?: boolean;
+    enableVerticalBorders?: boolean;
+    size?: 'compact' | 'default';
+}
+
 export interface ItemTableListColumnConfig {
     align: 'center' | 'end' | 'start';
-    autoWidth?: boolean;
+    autoSize?: boolean;
     id: TableColumn;
+    isEnabled: boolean;
     pinned: 'left' | 'right' | null;
     width: number;
 }
