@@ -19,3 +19,10 @@ export const PLAY_TYPES = [
         play: Play.NEXT,
     },
 ];
+
+export const FILTER_KEYS = {
+    CURRENT_PAGE: 'currentPage',
+    SCROLL_OFFSET: 'scrollOffset',
+    SORT_BY: 'sortBy',
+    SORT_ORDER: 'sortOrder',
+};
