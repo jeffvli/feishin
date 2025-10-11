@@ -178,7 +178,7 @@ export const AlbumDetailHeader = forwardRef(
                     {...background}
                 >
                     <Stack gap="sm">
-                        <Group gap="sm">
+                        <Group gap="sm" style={{ marginBottom: '10px' }}>
                             {detailQuery?.data?.albumArtists.map((artist, index) => (
                                 <Fragment key={`artist-${artist.id}`}>
                                     {index > 0 && <Text isNoSelect>•</Text>}
