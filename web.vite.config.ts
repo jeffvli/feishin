@@ -54,7 +54,6 @@ export default defineConfig({
                 // The PWA will not be shown during development
                 enabled: false,
             },
-            filename: 'assets/sw.js',
             injectRegister: 'inline',
             manifest: {
                 background_color: '#FFDCB5',
@@ -62,33 +61,33 @@ export default defineConfig({
                 icons: [
                     {
                         sizes: '32x32',
-                        src: '32x32.png',
+                        src: 'assets/32x32.png',
                         type: 'image/png',
                     },
                     {
                         sizes: '64x64',
-                        src: '64x64.png',
+                        src: 'assets/64x64.png',
                         type: 'image/png',
                     },
                     {
                         sizes: '128x128',
-                        src: '128x128.png',
+                        src: 'assets/128x128.png',
                         type: 'image/png',
                     },
                     {
                         sizes: '256x256',
-                        src: '256x256.png',
+                        src: 'assets/256x256.png',
                         type: 'image/png',
                     },
                     {
                         purpose: 'any',
                         sizes: '512x512',
-                        src: '512x512.png',
+                        src: 'assets/512x512.png',
                         type: 'image/png',
                     },
                     {
                         sizes: '1024x1024',
-                        src: '1024x1024.png',
+                        src: 'assets/1024x1024.png',
                         type: 'image/png',
                     },
                 ],
@@ -99,7 +98,7 @@ export default defineConfig({
                         form_factor: 'wide',
                         label: 'Full screen player showing music player and lyrics',
                         sizes: '1440x900',
-                        src: 'preview_full_screen_player.png',
+                        src: 'assets/preview_full_screen_player.png',
                         type: 'image/png',
                     },
                 ],
@@ -107,10 +106,8 @@ export default defineConfig({
                 start_url: '/',
                 theme_color: '#1E003D',
             },
-            manifestFilename: 'assets/manifest.webmanifest',
             outDir: path.resolve(__dirname, './out/web/'),
             registerType: 'autoUpdate',
-            scope: '/assets/',
             workbox: {
                 maximumFileSizeToCacheInBytes: 1000000 * 5, // 5 MB
             },
