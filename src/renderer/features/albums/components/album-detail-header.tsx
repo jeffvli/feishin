@@ -114,30 +114,14 @@ export const AlbumDetailHeader = forwardRef(
                     title={detailQuery?.data?.name || ''}
                     {...background}
                 >
-                    <Stack gap="sm">
-                        <Group gap="sm">
-                            {metadataItems.map((item, index) => (
-                                <Fragment key={`item-${item.id}-${index}`}>
-                                    {index > 0 && <Text isNoSelect>•</Text>}
-                                    <Text>{item.value}</Text>
-                                </Fragment>
-                            ))}
-                        </Group>
-                        <Group
-                            gap="md"
-                            mah="4rem"
-                            style={{
-                                overflow: 'hidden',
-                                WebkitBoxOrient: 'vertical',
-                                WebkitLineClamp: 2,
-                            }}
-                        >
-                            {detailQuery?.data?.albumArtists.map((artist) => (
+                    <Group gap="sm">
+                        {detailQuery?.data?.albumArtists.map((artist, index) => (
+                            <Fragment key={`artist-${artist.id}`}>
+                                {index > 0 && <Text isNoSelect>•</Text>}
                                 <Text
                                     component={Link}
                                     fw={600}
                                     isLink
-                                    key={`artist-${artist.id}`}
                                     to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                         albumArtistId: artist.id,
                                     })}
@@ -145,9 +129,18 @@ export const AlbumDetailHeader = forwardRef(
                                 >
                                     {artist.name}
                                 </Text>
-                            ))}
-                        </Group>
-                    </Stack>
+                            </Fragment>
+                        ))}
+                        {detailQuery?.data?.albumArtists && detailQuery.data.albumArtists.length > 0 && (
+                            <Text isNoSelect>•</Text>
+                        )}
+                        {metadataItems.map((item, index) => (
+                            <Fragment key={`item-${item.id}-${index}`}>
+                                {index > 0 && <Text isNoSelect>•</Text>}
+                                <Text>{item.value}</Text>
+                            </Fragment>
+                        ))}
+                    </Group>
                 </LibraryHeader>
             </Stack>
         );
