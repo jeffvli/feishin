@@ -13,13 +13,30 @@ import {
 } from '/@/shared/types/domain-types';
 import { ServerFeatures } from '/@/shared/types/features-types';
 
+export enum ItemListKey {
+    ALBUM = LibraryItem.ALBUM,
+    ALBUM_ARTIST = LibraryItem.ALBUM_ARTIST,
+    ALBUM_DETAIL = 'albumDetail',
+    ARTIST = LibraryItem.ARTIST,
+    FULL_SCREEN = 'fullScreen',
+    GENRE = LibraryItem.GENRE,
+    NOW_PLAYING = 'nowPlaying',
+    PLAYLIST = LibraryItem.PLAYLIST,
+    QUEUE_SONG = LibraryItem.QUEUE_SONG,
+    SIDE_DRAWER_QUEUE = 'sideDrawerQueue',
+    SIDE_QUEUE = 'sideQueue',
+    SONG = LibraryItem.SONG,
+}
+
 export enum ListDisplayType {
-    CARD = 'card',
     GRID = 'poster',
-    GRID_PAGINATED = 'posterPaginated',
     LIST = 'list',
     TABLE = 'table',
-    TABLE_PAGINATED = 'paginatedTable',
+}
+
+export enum ListPaginationType {
+    INFINITE = 'infinite',
+    PAGINATED = 'paginated',
 }
 
 export enum Platform {
@@ -47,25 +64,17 @@ export type CardRow<T> = {
     route?: CardRoute;
 };
 
-export type RouteSlug = {
-    idProperty: string;
-    slugProperty: string;
-};
-
-export type TablePagination = {
+export type ListPagination = {
     currentPage: number;
     itemsPerPage: number;
     totalItems: number;
     totalPages: number;
 };
 
-export type TableType =
-    | 'albumDetail'
-    | 'fullScreen'
-    | 'nowPlaying'
-    | 'sideDrawerQueue'
-    | 'sideQueue'
-    | 'songs';
+export type RouteSlug = {
+    idProperty: string;
+    slugProperty: string;
+};
 
 export const toServerType = (value?: string): null | ServerType => {
     switch (value?.toLowerCase()) {
@@ -146,7 +155,7 @@ export enum TableColumn {
     ALBUM = 'album',
     ALBUM_ARTIST = 'albumArtists',
     ALBUM_COUNT = 'albumCount',
-    ARTIST = 'artist',
+    ARTIST = 'artists',
     BIOGRAPHY = 'biography',
     BIT_RATE = 'bitRate',
     BPM = 'bpm',
@@ -157,6 +166,7 @@ export enum TableColumn {
     DISC_NUMBER = 'discNumber',
     DURATION = 'duration',
     GENRE = 'genres',
+    GENRE_BADGE = 'genreBadge',
     ID = 'id',
     IMAGE = 'imageUrl',
     LAST_PLAYED = 'lastPlayedAt',
