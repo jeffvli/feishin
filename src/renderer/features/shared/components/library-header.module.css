@@ -11,7 +11,7 @@
     height: 30vh;
     min-height: 340px;
     max-height: 500px;
-    padding: 5rem 2rem 2rem;
+    padding: 5rem 2rem 5rem;
 
     :global(.item-image-placeholder) {
         width: 175px !important;
