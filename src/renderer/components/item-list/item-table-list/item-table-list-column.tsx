@@ -26,6 +26,7 @@ import { RatingColumn } from '/@/renderer/components/item-list/item-table-list/c
 import { RowIndexColumn } from '/@/renderer/components/item-list/item-table-list/columns/row-index-column';
 import { SizeColumn } from '/@/renderer/components/item-list/item-table-list/columns/size-column';
 import { TextColumn } from '/@/renderer/components/item-list/item-table-list/columns/text-column';
+import { TitleColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-column';
 import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-combined-column';
 import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemControls } from '/@/renderer/components/item-list/types';
@@ -127,6 +128,9 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
 
         case TableColumn.SIZE:
             return <SizeColumn {...props} controls={controls} type={type} />;
+
+        case TableColumn.TITLE:
+            return <TitleColumn {...props} controls={controls} type={type} />;
 
         case TableColumn.TITLE_COMBINED:
             return <TitleCombinedColumn {...props} controls={controls} type={type} />;

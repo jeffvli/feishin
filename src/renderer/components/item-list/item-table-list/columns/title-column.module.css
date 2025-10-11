@@ -1,0 +1,14 @@
+.name-container {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.name-container.compact {
+    -webkit-line-clamp: 1;
+}
+
+.name-container.large {
+    -webkit-line-clamp: 3;
+}

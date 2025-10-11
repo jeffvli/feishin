@@ -3,6 +3,7 @@ import { generatePath, Link } from 'react-router-dom';
 
 import styles from './title-combined-column.module.css';
 
+import { getTitlePath } from '/@/renderer/components/item-list/helpers/get-title-path';
 import {
     ItemTableListInnerColumn,
     TableColumnContainer,
@@ -31,6 +32,15 @@ export const TitleCombinedColumn = (props: ItemTableListInnerColumn) => {
 
     if (row && 'name' in row && 'imageUrl' in row && 'artists' in row) {
         const rowHeight = props.getRowHeight(props.rowIndex, props);
+        const path = getTitlePath(props.itemType, (props.data[props.rowIndex] as any).id as string);
+
+        const titleLinkProps = path
+            ? {
+                  component: Link,
+                  isLink: true,
+                  to: path,
+              }
+            : {};
 
         return (
             <TableColumnContainer
@@ -40,7 +50,7 @@ export const TitleCombinedColumn = (props: ItemTableListInnerColumn) => {
             >
                 <Image containerClassName={styles.image} src={row.imageUrl as string} />
                 <div className={styles['text-container']}>
-                    <Text className={styles.title} isNoSelect>
+                    <Text className={styles.title} isNoSelect {...titleLinkProps}>
                         {row.name as string}
                     </Text>
                     <div className={styles.artists}>
