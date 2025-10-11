@@ -207,7 +207,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                 loading: recentAlbumsQuery?.isLoading || recentAlbumsQuery.isFetching,
                 order: itemOrder.recentAlbums,
                 title: (
-                    <Group align="flex-end">
+                    <Group align="center" justify="space-between" style={{ flex: 1 }}>
                         <TextTitle fw={700} order={2}>
                             {t('page.albumArtistDetail.recentReleases', {
                                 postProcess: 'sentenceCase',
@@ -487,29 +487,27 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         <Grid.Col order={itemOrder.topSongs} span={12}>
                             <section>
                                 <Group justify="space-between" wrap="nowrap">
-                                    <Group align="flex-end" wrap="nowrap">
-                                        <TextTitle fw={700} order={2}>
-                                            {t('page.albumArtistDetail.topSongs', {
-                                                postProcess: 'sentenceCase',
-                                            })}
-                                        </TextTitle>
-                                        <Button
-                                            component={Link}
-                                            size="compact-md"
-                                            to={generatePath(
-                                                AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_TOP_SONGS,
-                                                {
-                                                    albumArtistId: routeId,
-                                                },
-                                            )}
-                                            uppercase
-                                            variant="subtle"
-                                        >
-                                            {t('page.albumArtistDetail.viewAll', {
-                                                postProcess: 'sentenceCase',
-                                            })}
-                                        </Button>
-                                    </Group>
+                                    <TextTitle fw={700} order={2}>
+                                        {t('page.albumArtistDetail.topSongs', {
+                                            postProcess: 'sentenceCase',
+                                        })}
+                                    </TextTitle>
+                                    <Button
+                                        component={Link}
+                                        size="compact-md"
+                                        to={generatePath(
+                                            AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_TOP_SONGS,
+                                            {
+                                                albumArtistId: routeId,
+                                            },
+                                        )}
+                                        uppercase
+                                        variant="subtle"
+                                    >
+                                        {t('page.albumArtistDetail.viewAll', {
+                                            postProcess: 'sentenceCase',
+                                        })}
+                                    </Button>
                                 </Group>
                                 <VirtualTable
                                     autoFitColumns
