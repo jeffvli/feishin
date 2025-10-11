@@ -1,6 +1,11 @@
-import { useQueryClient, useSuspenseQuery, UseSuspenseQueryOptions } from '@tanstack/react-query';
+import {
+    useQuery,
+    useQueryClient,
+    useSuspenseQuery,
+    UseSuspenseQueryOptions,
+} from '@tanstack/react-query';
 import throttle from 'lodash/throttle';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
@@ -42,7 +47,24 @@ export const useItemListInfiniteLoader = ({
 
     const pagesLoaded = useRef<Record<string, boolean>>({});
 
-    const [data, setData] = useState<unknown[]>(getInitialData(totalItemCount));
+    // Reset the loaded pages when the query changes
+    useEffect(() => {
+        pagesLoaded.current = {};
+    }, [query]);
+
+    const dataQueryKey = useMemo(
+        () => [serverId, 'item-list-infinite-loader', query],
+        [serverId, query],
+    );
+
+    const { data } = useQuery<unknown[]>({
+        enabled: false,
+        initialData: getInitialData(totalItemCount),
+        queryFn: () => {
+            return getInitialData(totalItemCount);
+        },
+        queryKey: dataQueryKey,
+    });
 
     const onRangeChanged = useMemo(() => {
         return throttle(async (range: { endIndex: number; startIndex: number }) => {
@@ -78,13 +100,13 @@ export const useItemListInfiniteLoader = ({
                 staleTime: 1000 * 15,
             });
 
-            setData((oldData: any) => {
+            queryClient.setQueryData(dataQueryKey, (oldData: unknown[]) => {
                 return [...oldData.slice(0, startIndex), ...result, ...oldData.slice(endIndex)];
             });
 
             pagesLoaded.current[pageNumber] = true;
         }, 500);
-    }, [itemsPerPage, queryClient, serverId, listQueryFn, query]);
+    }, [itemsPerPage, query, queryClient, serverId, dataQueryKey, listQueryFn]);
 
     const refresh = useCallback(
         async (force?: boolean) => {
@@ -92,7 +114,7 @@ export const useItemListInfiniteLoader = ({
             pagesLoaded.current = {};
 
             if (force) {
-                setData(getInitialData(totalItemCount));
+                await queryClient.setQueryData(dataQueryKey, getInitialData(totalItemCount));
             }
 
             await onRangeChanged({
@@ -100,27 +122,30 @@ export const useItemListInfiniteLoader = ({
                 startIndex: currentPageRef.current * itemsPerPage,
             });
         },
-        [itemsPerPage, onRangeChanged, queryClient, totalItemCount],
+        [itemsPerPage, onRangeChanged, queryClient, totalItemCount, dataQueryKey],
     );
 
-    const updateItems = useCallback((indexes: number[], value: object) => {
-        setData((prev: any[]) => {
-            return prev.map((item: any, index) => {
-                if (!item) {
-                    return item;
-                }
+    const updateItems = useCallback(
+        (indexes: number[], value: object) => {
+            queryClient.setQueryData(dataQueryKey, (prev: unknown[]) => {
+                return prev.map((item: any, index) => {
+                    if (!item) {
+                        return item;
+                    }
 
-                if (!indexes.includes(index)) {
-                    return item;
-                }
+                    if (!indexes.includes(index)) {
+                        return item;
+                    }
 
-                return {
-                    ...item,
-                    ...value,
-                };
+                    return {
+                        ...item,
+                        ...value,
+                    };
+                });
             });
-        });
-    }, []);
+        },
+        [queryClient, dataQueryKey],
+    );
 
     useEffect(() => {
         const handleRefresh = (payload: { key: string }) => {
