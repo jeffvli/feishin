@@ -20,7 +20,12 @@ import {
     SONG_CONTEXT_MENU_ITEMS,
 } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { PlayButton, useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import {
+    PlayButton,
+    useCreateFavorite,
+    useDeleteFavorite,
+    useSetRating,
+} from '/@/renderer/features/shared';
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
@@ -32,6 +37,7 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Grid } from '/@/shared/components/grid/grid';
 import { Group } from '/@/shared/components/group/group';
+import { Rating } from '/@/shared/components/rating/rating';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
@@ -318,6 +324,22 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         }
     };
 
+    const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
+
+    const updateRatingMutation = useSetRating({});
+
+    const handleUpdateRating = (rating: number) => {
+        if (!detailQuery?.data) return;
+
+        updateRatingMutation.mutate({
+            query: {
+                item: [detailQuery.data],
+                rating,
+            },
+            serverId: detailQuery.data.serverId,
+        });
+    };
+
     const albumCount = detailQuery?.data?.albumCount;
     const artistContextItems =
         (albumCount ?? 1) > 0
@@ -370,6 +392,15 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             size="lg"
                             variant="transparent"
                         />
+                        {showRating && (
+                            <Rating
+                                onChange={handleUpdateRating}
+                                readOnly={
+                                    detailQuery?.isFetching || updateRatingMutation.isLoading
+                                }
+                                value={detailQuery?.data?.userRating || 0}
+                            />
+                        )}
                         <ActionIcon
                             icon="ellipsisHorizontal"
                             onClick={(e) => {
