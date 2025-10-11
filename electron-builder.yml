@@ -17,6 +17,8 @@ win:
         - nsis
     icon: assets/icons/icon.png
 nsis:
+    allowToChangeInstallationDirectory: true
+    oneClick: false
     shortcutName: ${productName}
     uninstallDisplayName: ${productName}
     createDesktopShortcut: always
@@ -47,3 +49,4 @@ publish:
     provider: github
     owner: jeffvli
     repo: feishin
+generateUpdatesFilesForAllChannels: true

@@ -44,6 +44,10 @@ export default class AppUpdater {
         log.transports.file.level = 'info';
         autoUpdater.logger = autoUpdaterLogInterface;
         autoUpdater.checkForUpdatesAndNotify();
+
+        if (store.get('release_channel') === 'beta') {
+            autoUpdater.channel = 'beta';
+        }
     }
 }
 

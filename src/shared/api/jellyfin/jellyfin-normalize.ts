@@ -127,12 +127,18 @@ const getPlaylistCoverArtUrl = (args: { baseUrl: string; item: JFPlaylist; size:
 
 type AlbumOrSong = z.infer<typeof jfType._response.album> | z.infer<typeof jfType._response.song>;
 
+const KEYS_TO_OMIT = new Set(['AlbumArtist', 'Artist']);
+
 const getPeople = (item: AlbumOrSong): null | Record<string, RelatedArtist[]> => {
     if (item.People) {
         const participants: Record<string, RelatedArtist[]> = {};
 
         for (const person of item.People) {
             const key = person.Type || '';
+            if (KEYS_TO_OMIT.has(key)) {
+                continue;
+            }
+
             const item: RelatedArtist = {
                 // for other roles, we just want to display this and not filter.
                 // filtering (and links) would require a separate field, PersonIds

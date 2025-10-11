@@ -186,7 +186,10 @@ const PlaylistDetailSongListRoute = () => {
         }
     }, [playlistSongs.data?.items, page?.table.id, playlistId]);
 
-    const itemCount = playlistSongs.data?.totalRecordCount ? filterSortedSongs.length : undefined;
+    const itemCount =
+        typeof playlistSongs.data?.totalRecordCount === 'number'
+            ? filterSortedSongs.length
+            : undefined;
 
     const handlePlay = (play: Play) => {
         handlePlayQueueAdd?.({

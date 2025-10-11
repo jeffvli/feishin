@@ -167,7 +167,8 @@
         "vite": "^6.3.6",
         "vite-plugin-conditional-import": "^0.1.7",
         "vite-plugin-dynamic-import": "^1.6.0",
-        "vite-plugin-ejs": "^1.7.0"
+        "vite-plugin-ejs": "^1.7.0",
+        "vite-plugin-pwa": "^1.0.3"
     },
     "pnpm": {
         "onlyBuiltDependencies": [

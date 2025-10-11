@@ -6,6 +6,7 @@ import {
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { useSettingsStoreActions, useWindowSettings } from '/@/renderer/store';
+import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
@@ -17,6 +18,46 @@ export const UpdateSettings = () => {
     const { setSettings } = useSettingsStoreActions();
 
     const updateOptions: SettingOption[] = [
+        {
+            control: (
+                <Select
+                    data={[
+                        {
+                            label: t('setting.releaseChannel', {
+                                context: 'optionLatest',
+                                postProcess: 'titleCase',
+                            }),
+                            value: 'latest',
+                        },
+                        {
+                            label: t('setting.releaseChannel', {
+                                context: 'optionBeta',
+                                postProcess: 'titleCase',
+                            }),
+                            value: 'beta',
+                        },
+                    ]}
+                    defaultValue={'latest'}
+                    onChange={(value) => {
+                        if (!value) return;
+                        localSettings?.set('release_channel', value);
+                        setSettings({
+                            window: {
+                                ...settings,
+                                releaseChannel: value as 'beta' | 'latest',
+                            },
+                        });
+                    }}
+                    value={settings.releaseChannel}
+                />
+            ),
+            description: t('setting.releaseChannel', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.releaseChannel', { postProcess: 'sentenceCase' }),
+        },
         {
             control: (
                 <Switch

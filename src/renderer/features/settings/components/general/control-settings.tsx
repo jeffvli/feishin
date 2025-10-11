@@ -548,8 +548,56 @@ export const ControlSettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: false,
+            isHidden: !settings.albumBackground,
             title: t('setting.albumBackgroundBlur', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.artistBackground', { postProcess: 'sentenceCase' })}
+                    defaultChecked={settings.artistBackground}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                artistBackground: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.artistBackground', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.artistBackground', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Slider
+                    defaultValue={settings.artistBackgroundBlur}
+                    label={(e) => `${e} rem`}
+                    max={6}
+                    min={0}
+                    onChangeEnd={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                artistBackgroundBlur: e,
+                            },
+                        });
+                    }}
+                    step={0.5}
+                    w={100}
+                />
+            ),
+            description: t('setting.artistBackgroundBlur', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !settings.artistBackground,
+            title: t('setting.artistBackgroundBlur', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
