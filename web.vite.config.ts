@@ -11,15 +11,17 @@ export default defineConfig({
         outDir: path.resolve(__dirname, './out/web'),
         rollupOptions: {
             input: {
-                "32x32": normalizePath(path.resolve(__dirname, './assets/icons/32x32.png')),
-                "64x64": normalizePath(path.resolve(__dirname, './assets/icons/64x64.png')),
-                "128x128": normalizePath(path.resolve(__dirname, './assets/icons/128x128.png')),
-                "256x256": normalizePath(path.resolve(__dirname, './assets/icons/256x256.png')),
-                "512x512": normalizePath(path.resolve(__dirname, './assets/icons/512x512.png')),
-                "1024x1024": normalizePath(path.resolve(__dirname, './assets/icons/1024x1024.png')),
-                "preview_full_screen_player": normalizePath(path.resolve(__dirname, './media/preview_full_screen_player.png')),
+                '32x32': normalizePath(path.resolve(__dirname, './assets/icons/32x32.png')),
+                '64x64': normalizePath(path.resolve(__dirname, './assets/icons/64x64.png')),
+                '128x128': normalizePath(path.resolve(__dirname, './assets/icons/128x128.png')),
+                '256x256': normalizePath(path.resolve(__dirname, './assets/icons/256x256.png')),
+                '512x512': normalizePath(path.resolve(__dirname, './assets/icons/512x512.png')),
+                '1024x1024': normalizePath(path.resolve(__dirname, './assets/icons/1024x1024.png')),
                 favicon: normalizePath(path.resolve(__dirname, './assets/icons/favicon.ico')),
                 index: normalizePath(path.resolve(__dirname, './src/renderer/index.html')),
+                preview_full_screen_player: normalizePath(
+                    path.resolve(__dirname, './media/preview_full_screen_player.png'),
+                ),
             },
             output: {
                 assetFileNames: 'assets/[name].[ext]',
@@ -48,68 +50,69 @@ export default defineConfig({
             web: true,
         }),
         VitePWA({
-            registerType: 'autoUpdate',
-            scope: "/",
             devOptions: {
                 // The PWA will not be shown during development
                 enabled: false,
             },
-            workbox: {
-                maximumFileSizeToCacheInBytes: 1000000 * 5 // 5 MB
-            },
-            outDir: path.resolve(__dirname, "./out/web/assets"),
-            injectRegister: "inline",
-            manifestFilename: "assets/manifest.webmanifest",
+            filename: 'assets/sw.js',
+            injectRegister: 'inline',
             manifest: {
-                name: 'Feishin',
-                short_name: 'Feishin',
-                start_url: '/',
                 background_color: '#FFDCB5',
-                theme_color: '#1E003D',
+                display: 'standalone',
                 icons: [
                     {
-                        src: '32x32.png',
                         sizes: '32x32',
+                        src: '32x32.png',
                         type: 'image/png',
                     },
                     {
-                        src: '64x64.png',
                         sizes: '64x64',
+                        src: '64x64.png',
                         type: 'image/png',
                     },
                     {
-                        src: '128x128.png',
                         sizes: '128x128',
+                        src: '128x128.png',
                         type: 'image/png',
                     },
                     {
-                        src: '256x256.png',
                         sizes: '256x256',
+                        src: '256x256.png',
                         type: 'image/png',
                     },
                     {
-                        src: '512x512.png',
+                        purpose: 'any',
                         sizes: '512x512',
+                        src: '512x512.png',
                         type: 'image/png',
-                        purpose: "any"
                     },
                     {
-                        src: '1024x1024.png',
                         sizes: '1024x1024',
+                        src: '1024x1024.png',
                         type: 'image/png',
                     },
                 ],
-                display: 'standalone',
+                name: 'Feishin',
                 orientation: 'portrait',
                 screenshots: [
                     {
-                        src: 'preview_full_screen_player.png',
-                        sizes: '1440x900',
-                        type: 'image/png',
                         form_factor: 'wide',
                         label: 'Full screen player showing music player and lyrics',
+                        sizes: '1440x900',
+                        src: 'preview_full_screen_player.png',
+                        type: 'image/png',
                     },
                 ],
+                short_name: 'Feishin',
+                start_url: '/',
+                theme_color: '#1E003D',
+            },
+            manifestFilename: 'assets/manifest.webmanifest',
+            outDir: path.resolve(__dirname, './out/web/'),
+            registerType: 'autoUpdate',
+            scope: '/assets/',
+            workbox: {
+                maximumFileSizeToCacheInBytes: 1000000 * 5, // 5 MB
             },
         }),
     ],
