@@ -7,6 +7,7 @@ import {
 import { useCallback, useEffect, useMemo } from 'react';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { getServerById } from '/@/renderer/store';
@@ -36,6 +37,16 @@ export const useItemListPaginatedLoader = ({
 }: UseItemListPaginatedLoaderProps) => {
     const queryClient = useQueryClient();
     const { data: totalItemCount } = useSuspenseQuery<number, any, number, any>(listCountQuery);
+
+    const { setItemCount } = useListContext();
+
+    useEffect(() => {
+        if (!totalItemCount || !setItemCount) {
+            return;
+        }
+
+        setItemCount(totalItemCount);
+    }, [setItemCount, totalItemCount]);
 
     const pageCount = Math.ceil(totalItemCount / itemsPerPage);
 
