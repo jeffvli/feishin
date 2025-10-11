@@ -96,7 +96,7 @@ export const LibraryHeader = forwardRef(
                 {title && (
                     <div className={styles.metadataSection}>
                         <h1 className={styles.title}>
-                            <AutoTextSize maxFontSizePx={80} mode="box">
+                            <AutoTextSize maxFontSizePx={50} mode="box">
                                 {title}
                             </AutoTextSize>
                         </h1>
