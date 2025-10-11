@@ -4,7 +4,7 @@ import { RowDoubleClickedEvent, RowHeightParams, RowNode } from '@ag-grid-commun
 import { useSetState } from '@mantine/hooks';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import styles from './album-detail-content.module.css';
 
@@ -36,7 +36,6 @@ import {
     useTableSettings,
 } from '/@/renderer/store/settings.store';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
-import { Group } from '/@/shared/components/group/group';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import {

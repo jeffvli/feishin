@@ -166,7 +166,7 @@ export const AlbumDetailHeader = forwardRef(
                     count: detailQuery?.data?.playCount as number,
                 }),
             },
-        ];
+        ].filter((item) => item.value !== undefined && item.value !== null && item.value !== '');
 
         return (
             <Stack ref={cq.ref}>
@@ -244,6 +244,7 @@ export const AlbumDetailHeader = forwardRef(
                                             fill: 'default',
                                             size: 'lg',
                                         }}
+                                        aria-label="Open in Last.fm"
                                         rel="noopener noreferrer"
                                         size="lg"
                                         target="_blank"
@@ -262,6 +263,7 @@ export const AlbumDetailHeader = forwardRef(
                                             fill: 'default',
                                             size: 'lg',
                                         }}
+                                        aria-label="Open in MusicBrainz"
                                         rel="noopener noreferrer"
                                         size="lg"
                                         target="_blank"

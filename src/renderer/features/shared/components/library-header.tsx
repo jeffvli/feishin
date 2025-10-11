@@ -63,7 +63,12 @@ export const LibraryHeader = forwardRef(
         }, [imageUrl, isImageError]);
 
         return (
-            <div className={styles.libraryHeader} ref={ref}>
+            <div
+                className={styles.libraryHeader}
+                data-library-item-route={item.route}
+                data-library-item-type={item.type}
+                ref={ref}
+            >
                 <div
                     className={styles.background}
                     style={{ background, filter: `blur(${blur ?? 0}rem)` }}
