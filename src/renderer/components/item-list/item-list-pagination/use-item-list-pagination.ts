@@ -1,18 +1,13 @@
-import { useSearchParams } from 'react-router-dom';
+import { parseAsInteger, useQueryState } from 'nuqs';
 
 export const useItemListPagination = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
-
-    const currentPage = Number(searchParams.get('currentPage')) || 0;
+    const [currentPage, setCurrentPage] = useQueryState(
+        'currentPage',
+        parseAsInteger.withDefault(0),
+    );
 
     const onChange = (index: number) => {
-        setSearchParams(
-            (params) => {
-                params.set('currentPage', String(index));
-                return params;
-            },
-            { replace: true },
-        );
+        setCurrentPage(index);
     };
 
     return { currentPage, onChange };
