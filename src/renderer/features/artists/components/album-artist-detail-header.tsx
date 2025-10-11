@@ -4,16 +4,33 @@ import { useParams } from 'react-router';
 
 import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-query';
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
-import { LibraryHeader } from '/@/renderer/features/shared';
+import {
+    useHandleGeneralContextMenu,
+} from '/@/renderer/features/context-menu';
+import {
+    ARTIST_CONTEXT_MENU_ITEMS,
+} from '/@/renderer/features/context-menu/context-menu-items';
+import { usePlayQueueAdd } from '/@/renderer/features/player';
+import {
+    LibraryHeader,
+    PlayButton,
+    useCreateFavorite,
+    useDeleteFavorite,
+    useSetRating,
+} from '/@/renderer/features/shared';
 import { useSongListCount } from '/@/renderer/features/songs/queries/song-list-count-query';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString } from '/@/renderer/utils';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
+import { Rating } from '/@/shared/components/rating/rating';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
-import { AlbumListSort, LibraryItem, SongListSort, SortOrder } from '/@/shared/types/domain-types';
+import { AlbumListSort, LibraryItem, ServerType, SongListSort, SortOrder } from '/@/shared/types/domain-types';
+import { Play } from '/@/shared/types/types';
 
 interface AlbumArtistDetailHeaderProps {
     background: {
@@ -32,6 +49,9 @@ export const AlbumArtistDetailHeader = forwardRef(
         const routeId = (artistId || albumArtistId) as string;
         const server = useCurrentServer();
         const { t } = useTranslation();
+        const { externalLinks, lastFM, musicBrainz } = useGeneralSettings();
+        const playButtonBehavior = usePlayButtonBehavior();
+        const handlePlayQueueAdd = usePlayQueueAdd();
         const detailQuery = useAlbumArtistDetail({
             query: { id: routeId },
             serverId: server?.id,
@@ -74,6 +94,69 @@ export const AlbumArtistDetailHeader = forwardRef(
 
         const hasFavoriteAlbums = favoriteAlbumsCount !== null && favoriteAlbumsCount !== undefined && favoriteAlbumsCount > 0;
         const hasFavoriteSongs = favoriteSongsCount !== null && favoriteSongsCount !== undefined && favoriteSongsCount > 0;
+
+        const handlePlay = async (playType?: Play) => {
+            handlePlayQueueAdd?.({
+                byItemType: {
+                    id: [routeId],
+                    type: LibraryItem.ALBUM_ARTIST,
+                },
+                playType: playType || playButtonBehavior,
+            });
+        };
+
+        const createFavoriteMutation = useCreateFavorite({});
+        const deleteFavoriteMutation = useDeleteFavorite({});
+
+        const handleFavorite = () => {
+            if (!detailQuery?.data) return;
+
+            if (detailQuery.data.userFavorite) {
+                deleteFavoriteMutation.mutate({
+                    query: {
+                        id: [detailQuery.data.id],
+                        type: LibraryItem.ALBUM_ARTIST,
+                    },
+                    serverId: detailQuery.data.serverId,
+                });
+            } else {
+                createFavoriteMutation.mutate({
+                    query: {
+                        id: [detailQuery.data.id],
+                        type: LibraryItem.ALBUM_ARTIST,
+                    },
+                    serverId: detailQuery.data.serverId,
+                });
+            }
+        };
+
+        const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
+
+        const updateRatingMutation = useSetRating({});
+
+        const handleUpdateRating = (rating: number) => {
+            if (!detailQuery?.data) return;
+
+            updateRatingMutation.mutate({
+                query: {
+                    item: [detailQuery.data],
+                    rating,
+                },
+                serverId: detailQuery.data.serverId,
+            });
+        };
+
+        const artistContextItems =
+            (albumCount ?? 1) > 0
+                ? ARTIST_CONTEXT_MENU_ITEMS
+                : ARTIST_CONTEXT_MENU_ITEMS.filter((item) => !item.id.toLowerCase().includes('play'));
+
+        const handleGeneralContextMenu = useHandleGeneralContextMenu(
+            LibraryItem.ALBUM_ARTIST,
+            artistContextItems,
+        );
+
+        const mbzId = detailQuery?.data?.mbz;
 
         return (
             <LibraryHeader
@@ -118,6 +201,82 @@ export const AlbumArtistDetailHeader = forwardRef(
                                 <Text isMuted>{formatDurationString(duration)}</Text>
                             </>
                         )}
+                    </Group>
+                    <Group gap="md">
+                        <PlayButton
+                            disabled={albumCount === 0}
+                            onClick={() => handlePlay(playButtonBehavior)}
+                        />
+                        <Group gap="xs">
+                            <ActionIcon
+                                icon="favorite"
+                                iconProps={{
+                                    fill: detailQuery?.data?.userFavorite ? 'primary' : undefined,
+                                }}
+                                loading={
+                                    createFavoriteMutation.isLoading || deleteFavoriteMutation.isLoading
+                                }
+                                onClick={handleFavorite}
+                                size="lg"
+                                variant="transparent"
+                            />
+                            {showRating && (
+                                <Rating
+                                    onChange={handleUpdateRating}
+                                    readOnly={
+                                        detailQuery?.isFetching || updateRatingMutation.isLoading
+                                    }
+                                    value={detailQuery?.data?.userRating || 0}
+                                />
+                            )}
+                            {externalLinks && lastFM && (
+                                <ActionIcon
+                                    component="a"
+                                    href={`https://www.last.fm/music/${encodeURIComponent(
+                                        detailQuery?.data?.name || '',
+                                    )}`}
+                                    icon="brandLastfm"
+                                    iconProps={{
+                                        fill: 'default',
+                                        size: 'lg',
+                                    }}
+                                    rel="noopener noreferrer"
+                                    size="lg"
+                                    target="_blank"
+                                    tooltip={{
+                                        label: t('action.openIn.lastfm'),
+                                    }}
+                                    variant="transparent"
+                                />
+                            )}
+                            {externalLinks && mbzId && musicBrainz && (
+                                <ActionIcon
+                                    component="a"
+                                    href={`https://musicbrainz.org/artist/${mbzId}`}
+                                    icon="brandMusicBrainz"
+                                    iconProps={{
+                                        fill: 'default',
+                                        size: 'lg',
+                                    }}
+                                    rel="noopener noreferrer"
+                                    size="lg"
+                                    target="_blank"
+                                    tooltip={{
+                                        label: t('action.openIn.musicbrainz'),
+                                    }}
+                                    variant="transparent"
+                                />
+                            )}
+                            <ActionIcon
+                                icon="ellipsisHorizontal"
+                                onClick={(e) => {
+                                    if (!detailQuery?.data) return;
+                                    handleGeneralContextMenu(e, [detailQuery.data!]);
+                                }}
+                                size="lg"
+                                variant="transparent"
+                            />
+                        </Group>
                     </Group>
                 </Stack>
             </LibraryHeader>

@@ -12,20 +12,12 @@ import { useAlbumList } from '/@/renderer/features/albums/queries/album-list-que
 import { useAlbumArtistDetail } from '/@/renderer/features/artists/queries/album-artist-detail-query';
 import { useTopSongsList } from '/@/renderer/features/artists/queries/top-songs-list-query';
 import {
-    useHandleGeneralContextMenu,
     useHandleTableContextMenu,
 } from '/@/renderer/features/context-menu';
 import {
-    ARTIST_CONTEXT_MENU_ITEMS,
     SONG_CONTEXT_MENU_ITEMS,
 } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
-import {
-    PlayButton,
-    useCreateFavorite,
-    useDeleteFavorite,
-    useSetRating,
-} from '/@/renderer/features/shared';
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
@@ -33,11 +25,9 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { ArtistItem, useCurrentServer } from '/@/renderer/store';
 import { useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { sanitize } from '/@/renderer/utils/sanitize';
-import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Grid } from '/@/shared/components/grid/grid';
 import { Group } from '/@/shared/components/group/group';
-import { Rating } from '/@/shared/components/rating/rating';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
@@ -58,7 +48,7 @@ interface AlbumArtistDetailContentProps {
 
 export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailContentProps) => {
     const { t } = useTranslation();
-    const { artistItems, externalLinks, lastFM, musicBrainz } = useGeneralSettings();
+    const { artistItems } = useGeneralSettings();
     const { albumArtistId, artistId } = useParams() as {
         albumArtistId?: string;
         artistId?: string;
@@ -299,58 +289,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         });
     };
 
-    const createFavoriteMutation = useCreateFavorite({});
-    const deleteFavoriteMutation = useDeleteFavorite({});
-
-    const handleFavorite = () => {
-        if (!detailQuery?.data) return;
-
-        if (detailQuery.data.userFavorite) {
-            deleteFavoriteMutation.mutate({
-                query: {
-                    id: [detailQuery.data.id],
-                    type: LibraryItem.ALBUM_ARTIST,
-                },
-                serverId: detailQuery.data.serverId,
-            });
-        } else {
-            createFavoriteMutation.mutate({
-                query: {
-                    id: [detailQuery.data.id],
-                    type: LibraryItem.ALBUM_ARTIST,
-                },
-                serverId: detailQuery.data.serverId,
-            });
-        }
-    };
-
-    const showRating = detailQuery?.data?.serverType === ServerType.NAVIDROME;
-
-    const updateRatingMutation = useSetRating({});
-
-    const handleUpdateRating = (rating: number) => {
-        if (!detailQuery?.data) return;
-
-        updateRatingMutation.mutate({
-            query: {
-                item: [detailQuery.data],
-                rating,
-            },
-            serverId: detailQuery.data.serverId,
-        });
-    };
-
-    const albumCount = detailQuery?.data?.albumCount;
-    const artistContextItems =
-        (albumCount ?? 1) > 0
-            ? ARTIST_CONTEXT_MENU_ITEMS
-            : ARTIST_CONTEXT_MENU_ITEMS.filter((item) => !item.id.toLowerCase().includes('play'));
-
-    const handleGeneralContextMenu = useHandleGeneralContextMenu(
-        LibraryItem.ALBUM_ARTIST,
-        artistContextItems,
-    );
-
     const topSongs = topSongsQuery?.data?.items?.slice(0, 10);
 
     const biography = useMemo(() => {
@@ -362,7 +300,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
 
     const showTopSongs = topSongsQuery?.data?.items?.length && enabledItem.topSongs;
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
-    const mbzId = detailQuery?.data?.mbz;
 
     const isLoading =
         detailQuery?.isLoading ||
@@ -374,82 +311,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         <div className={styles.contentContainer} ref={cq.ref}>
             <LibraryBackgroundOverlay backgroundColor={background} />
             <div className={styles.detailContainer}>
-                <Group gap="md">
-                    <PlayButton
-                        disabled={albumCount === 0}
-                        onClick={() => handlePlay(playButtonBehavior)}
-                    />
-                    <Group gap="xs">
-                        <ActionIcon
-                            icon="favorite"
-                            iconProps={{
-                                fill: detailQuery?.data?.userFavorite ? 'primary' : undefined,
-                            }}
-                            loading={
-                                createFavoriteMutation.isLoading || deleteFavoriteMutation.isLoading
-                            }
-                            onClick={handleFavorite}
-                            size="lg"
-                            variant="transparent"
-                        />
-                        {showRating && (
-                            <Rating
-                                onChange={handleUpdateRating}
-                                readOnly={
-                                    detailQuery?.isFetching || updateRatingMutation.isLoading
-                                }
-                                value={detailQuery?.data?.userRating || 0}
-                            />
-                        )}
-                        {externalLinks && lastFM && (
-                            <ActionIcon
-                                component="a"
-                                href={`https://www.last.fm/music/${encodeURIComponent(
-                                    detailQuery?.data?.name || '',
-                                )}`}
-                                icon="brandLastfm"
-                                iconProps={{
-                                    fill: 'default',
-                                    size: 'lg',
-                                }}
-                                rel="noopener noreferrer"
-                                size="lg"
-                                target="_blank"
-                                tooltip={{
-                                    label: t('action.openIn.lastfm'),
-                                }}
-                                variant="transparent"
-                            />
-                        )}
-                        {externalLinks && mbzId && musicBrainz && (
-                            <ActionIcon
-                                component="a"
-                                href={`https://musicbrainz.org/artist/${mbzId}`}
-                                icon="brandMusicBrainz"
-                                iconProps={{
-                                    fill: 'default',
-                                    size: 'lg',
-                                }}
-                                rel="noopener noreferrer"
-                                size="lg"
-                                target="_blank"
-                                tooltip={{
-                                    label: t('action.openIn.musicbrainz'),
-                                }}
-                                variant="transparent"
-                            />
-                        )}
-                        <ActionIcon
-                            icon="ellipsisHorizontal"
-                            onClick={(e) => {
-                                if (!detailQuery?.data) return;
-                                handleGeneralContextMenu(e, [detailQuery.data!]);
-                            }}
-                            size="lg"
-                            variant="transparent"
-                        />
-                    </Group>
-                </Group>
                 {showGenres ? (
                     <section>
                         <Group gap="sm">
