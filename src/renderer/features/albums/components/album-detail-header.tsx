@@ -11,7 +11,7 @@ import { useSongChange } from '/@/renderer/hooks/use-song-change';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import { formatDateAbsoluteUTC, formatDurationString } from '/@/renderer/utils';
+import { formatDurationString } from '/@/renderer/utils';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
@@ -32,14 +32,6 @@ export const AlbumDetailHeader = forwardRef(
         const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
         const cq = useContainerQuery();
         const { t } = useTranslation();
-
-        const originalDifferentFromRelease =
-            detailQuery.data?.originalDate &&
-            detailQuery.data.originalDate !== detailQuery.data.releaseDate;
-
-        const releasePrefix = originalDifferentFromRelease
-            ? t('page.albumDetail.released', { postProcess: 'sentenceCase' })
-            : '♫';
 
         const songIds = useMemo(() => {
             return new Set(detailQuery.data?.songs?.map((song) => song.id));
@@ -73,10 +65,8 @@ export const AlbumDetailHeader = forwardRef(
 
         const metadataItems = [
             {
-                id: 'releaseDate',
-                value:
-                    detailQuery?.data?.releaseDate &&
-                    `${releasePrefix} ${formatDateAbsoluteUTC(detailQuery?.data?.releaseDate)}`,
+                id: 'releaseYear',
+                value: detailQuery?.data?.releaseYear,
             },
             {
                 id: 'songCount',
@@ -96,14 +86,6 @@ export const AlbumDetailHeader = forwardRef(
                 }),
             },
         ];
-
-        if (originalDifferentFromRelease) {
-            const formatted = `♫ ${formatDateAbsoluteUTC(detailQuery!.data!.originalDate)}`;
-            metadataItems.splice(0, 0, {
-                id: 'originalDate',
-                value: formatted,
-            });
-        }
 
         return (
             <Stack ref={cq.ref}>
