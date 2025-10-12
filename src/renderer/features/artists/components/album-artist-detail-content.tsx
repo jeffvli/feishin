@@ -35,6 +35,7 @@ import { Grid } from '/@/shared/components/grid/grid';
 import { Group } from '/@/shared/components/group/group';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
 import {
     Album,
