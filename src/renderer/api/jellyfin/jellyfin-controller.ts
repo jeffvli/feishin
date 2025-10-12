@@ -542,10 +542,6 @@ export const JellyfinController: ControllerEndpoint = {
             query: {
                 Fields: 'Genres, DateCreated, MediaSources, UserData, ParentId, People, Tags',
                 IncludeItemTypes: 'Audio',
-                Limit: query.limit,
-                SortBy: query.sortBy ? songListSortMap.jellyfin[query.sortBy] : undefined,
-                SortOrder: query.sortOrder ? sortOrderMap.jellyfin[query.sortOrder] : undefined,
-                StartIndex: query.startIndex,
                 UserId: apiClientProps.server?.userId,
             },
         });
@@ -556,7 +552,7 @@ export const JellyfinController: ControllerEndpoint = {
 
         return {
             items: res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server, '')),
-            startIndex: query.startIndex,
+            startIndex: 0,
             totalRecordCount: res.body.TotalRecordCount,
         };
     },
@@ -631,30 +627,34 @@ export const JellyfinController: ControllerEndpoint = {
     getSimilarSongs: async (args) => {
         const { apiClientProps, query } = args;
 
-        // Prefer getSimilarSongs, where possible. Fallback to InstantMix
-        // where no similar songs were found.
-        const res = await jfApiClient(apiClientProps).getSimilarSongs({
-            params: {
-                itemId: query.songId,
-            },
-            query: {
-                Fields: 'Genres, DateCreated, MediaSources, ParentId',
-                Limit: query.count,
-                UserId: apiClientProps.server?.userId || undefined,
-            },
-        });
+        if (apiClientProps.server?.preferInstantMix !== true) {
+            // Prefer getSimilarSongs, where possible, and not overridden.
+            // InstantMix can be overridden by plugins, so this may be preferred by the user.
+            // Otherwise, similarSongs may have a better output than InstantMix, if sufficient
+            // data exists from the server.
+            const res = await jfApiClient(apiClientProps).getSimilarSongs({
+                params: {
+                    itemId: query.songId,
+                },
+                query: {
+                    Fields: 'Genres, DateCreated, MediaSources, ParentId',
+                    Limit: query.count,
+                    UserId: apiClientProps.server?.userId || undefined,
+                },
+            });
 
-        if (res.status === 200 && res.body.Items.length) {
-            const results = res.body.Items.reduce<Song[]>((acc, song) => {
-                if (song.Id !== query.songId) {
-                    acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+            if (res.status === 200 && res.body.Items.length) {
+                const results = res.body.Items.reduce<Song[]>((acc, song) => {
+                    if (song.Id !== query.songId) {
+                        acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+                    }
+
+                    return acc;
+                }, []);
+
+                if (results.length > 0) {
+                    return results;
                 }
-
-                return acc;
-            }, []);
-
-            if (results.length > 0) {
-                return results;
             }
         }
 

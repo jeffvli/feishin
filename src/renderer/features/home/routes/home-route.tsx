@@ -1,8 +1,6 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { queryKeys } from '/@/renderer/api/query-keys';
 import { FeatureCarousel } from '/@/renderer/components/feature-carousel/feature-carousel';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel/grid-carousel';
 import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
@@ -32,12 +30,16 @@ import {
 } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
 
+const BASE_QUERY_ARGS = {
+    limit: 15,
+    sortOrder: SortOrder.DESC,
+    startIndex: 0,
+};
+
 const HomeRoute = () => {
     const { t } = useTranslation();
-    const queryClient = useQueryClient();
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const server = useCurrentServer();
-    const itemsPerPage = 15;
     const { windowBarStyle } = useWindowSettings();
     const { homeFeature, homeItems } = useGeneralSettings();
 
@@ -56,59 +58,66 @@ const HomeRoute = () => {
         serverId: server?.id,
     });
 
+    const isJellyfin = server?.type === ServerType.JELLYFIN;
+
     const featureItemsWithImage = useMemo(() => {
         return feature.data?.items?.filter((item) => item.imageUrl) ?? [];
     }, [feature.data?.items]);
 
+    const queriesEnabled = useMemo(() => {
+        return homeItems.reduce(
+            (previous: Record<HomeItem, boolean>, current) => ({
+                ...previous,
+                [current.id]: !current.disabled,
+            }),
+            {} as Record<HomeItem, boolean>,
+        );
+    }, [homeItems]);
+
     const random = useAlbumList({
         options: {
+            enabled: queriesEnabled[HomeItem.RANDOM],
             staleTime: 1000 * 60 * 5,
         },
         query: {
-            limit: itemsPerPage,
+            ...BASE_QUERY_ARGS,
             sortBy: AlbumListSort.RANDOM,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
         },
         serverId: server?.id,
     });
 
     const recentlyPlayed = useRecentlyPlayed({
         options: {
+            enabled: queriesEnabled[HomeItem.RECENTLY_PLAYED] && !isJellyfin,
             staleTime: 0,
         },
         query: {
-            limit: itemsPerPage,
+            ...BASE_QUERY_ARGS,
             sortBy: AlbumListSort.RECENTLY_PLAYED,
-            sortOrder: SortOrder.DESC,
-            startIndex: 0,
         },
         serverId: server?.id,
     });
 
     const recentlyAdded = useAlbumList({
         options: {
+            enabled: queriesEnabled[HomeItem.RECENTLY_ADDED],
             staleTime: 1000 * 60 * 5,
         },
         query: {
-            limit: itemsPerPage,
+            ...BASE_QUERY_ARGS,
             sortBy: AlbumListSort.RECENTLY_ADDED,
-            sortOrder: SortOrder.DESC,
-            startIndex: 0,
         },
         serverId: server?.id,
     });
 
     const mostPlayedAlbums = useAlbumList({
         options: {
-            enabled: server?.type === ServerType.SUBSONIC || server?.type === ServerType.NAVIDROME,
+            enabled: !isJellyfin && queriesEnabled[HomeItem.MOST_PLAYED],
             staleTime: 1000 * 60 * 5,
         },
         query: {
-            limit: itemsPerPage,
+            ...BASE_QUERY_ARGS,
             sortBy: AlbumListSort.PLAY_COUNT,
-            sortOrder: SortOrder.DESC,
-            startIndex: 0,
         },
         serverId: server?.id,
     });
@@ -116,27 +125,38 @@ const HomeRoute = () => {
     const mostPlayedSongs = useSongList(
         {
             options: {
-                enabled: server?.type === ServerType.JELLYFIN,
+                enabled: isJellyfin && queriesEnabled[HomeItem.MOST_PLAYED],
                 staleTime: 1000 * 60 * 5,
             },
             query: {
-                limit: itemsPerPage,
+                ...BASE_QUERY_ARGS,
                 sortBy: SongListSort.PLAY_COUNT,
-                sortOrder: SortOrder.DESC,
-                startIndex: 0,
             },
             serverId: server?.id,
         },
         300,
     );
 
+    const recentlyReleased = useAlbumList({
+        options: {
+            enabled: queriesEnabled[HomeItem.RECENTLY_RELEASED],
+            staleTime: 1000 * 60 * 5,
+        },
+        query: {
+            ...BASE_QUERY_ARGS,
+            sortBy: AlbumListSort.RELEASE_DATE,
+        },
+        serverId: server?.id,
+    });
+
     const isLoading =
-        random.isLoading ||
-        recentlyPlayed.isLoading ||
-        recentlyAdded.isLoading ||
-        (server?.type === ServerType.JELLYFIN && mostPlayedSongs.isLoading) ||
-        ((server?.type === ServerType.SUBSONIC || server?.type === ServerType.NAVIDROME) &&
-            mostPlayedAlbums.isLoading);
+        (random.isLoading && queriesEnabled[HomeItem.RANDOM]) ||
+        (recentlyPlayed.isLoading && queriesEnabled[HomeItem.RECENTLY_PLAYED] && !isJellyfin) ||
+        (recentlyAdded.isLoading && queriesEnabled[HomeItem.RECENTLY_ADDED]) ||
+        (recentlyReleased.isLoading && queriesEnabled[HomeItem.RECENTLY_RELEASED]) ||
+        (((isJellyfin && mostPlayedSongs.isLoading) ||
+            (!isJellyfin && mostPlayedAlbums.isLoading)) &&
+            queriesEnabled[HomeItem.MOST_PLAYED]);
 
     if (isLoading) {
         return <Spinner container />;
@@ -144,47 +164,34 @@ const HomeRoute = () => {
 
     const carousels = {
         [HomeItem.MOST_PLAYED]: {
-            data:
-                server?.type === ServerType.JELLYFIN
-                    ? mostPlayedSongs?.data?.items
-                    : mostPlayedAlbums?.data?.items,
-            itemType: server?.type === ServerType.JELLYFIN ? LibraryItem.SONG : LibraryItem.ALBUM,
-            pagination: {
-                itemsPerPage,
-            },
-            sortBy:
-                server?.type === ServerType.JELLYFIN
-                    ? SongListSort.PLAY_COUNT
-                    : AlbumListSort.PLAY_COUNT,
-            sortOrder: SortOrder.DESC,
+            data: isJellyfin ? mostPlayedSongs?.data?.items : mostPlayedAlbums?.data?.items,
+            itemType: isJellyfin ? LibraryItem.SONG : LibraryItem.ALBUM,
+            query: isJellyfin ? mostPlayedSongs : mostPlayedAlbums,
             title: t('page.home.mostPlayed', { postProcess: 'sentenceCase' }),
         },
         [HomeItem.RANDOM]: {
             data: random?.data?.items,
             itemType: LibraryItem.ALBUM,
-            sortBy: AlbumListSort.RANDOM,
-            sortOrder: SortOrder.ASC,
+            query: random,
             title: t('page.home.explore', { postProcess: 'sentenceCase' }),
         },
         [HomeItem.RECENTLY_ADDED]: {
             data: recentlyAdded?.data?.items,
             itemType: LibraryItem.ALBUM,
-            pagination: {
-                itemsPerPage,
-            },
-            sortBy: AlbumListSort.RECENTLY_ADDED,
-            sortOrder: SortOrder.DESC,
+            query: recentlyAdded,
             title: t('page.home.newlyAdded', { postProcess: 'sentenceCase' }),
         },
         [HomeItem.RECENTLY_PLAYED]: {
             data: recentlyPlayed?.data?.items,
             itemType: LibraryItem.ALBUM,
-            pagination: {
-                itemsPerPage,
-            },
-            sortBy: AlbumListSort.RECENTLY_PLAYED,
-            sortOrder: SortOrder.DESC,
+            query: recentlyPlayed,
             title: t('page.home.recentlyPlayed', { postProcess: 'sentenceCase' }),
+        },
+        [HomeItem.RECENTLY_RELEASED]: {
+            data: recentlyReleased?.data?.items,
+            itemType: LibraryItem.ALBUM,
+            query: recentlyReleased,
+            title: t('page.home.recentlyReleased', { postProcess: 'sentenceCase' }),
         },
     };
 
@@ -193,7 +200,7 @@ const HomeRoute = () => {
             if (item.disabled) {
                 return false;
             }
-            if (server?.type === ServerType.JELLYFIN && item.id === HomeItem.RECENTLY_PLAYED) {
+            if (isJellyfin && item.id === HomeItem.RECENTLY_PLAYED) {
                 return false;
             }
 
@@ -203,36 +210,6 @@ const HomeRoute = () => {
             ...carousels[item.id],
             uniqueId: item.id,
         }));
-
-    const invalidateCarouselQuery = (carousel: {
-        itemType: LibraryItem;
-        sortBy: AlbumListSort | SongListSort;
-        sortOrder: SortOrder;
-    }) => {
-        if (carousel.itemType === LibraryItem.ALBUM) {
-            queryClient.invalidateQueries({
-                exact: false,
-                queryKey: queryKeys.albums.list(server?.id, {
-                    limit: itemsPerPage,
-                    sortBy: carousel.sortBy,
-                    sortOrder: carousel.sortOrder,
-                    startIndex: 0,
-                }),
-            });
-        }
-
-        if (carousel.itemType === LibraryItem.SONG) {
-            queryClient.invalidateQueries({
-                exact: false,
-                queryKey: queryKeys.songs.list(server?.id, {
-                    limit: itemsPerPage,
-                    sortBy: carousel.sortBy,
-                    sortOrder: carousel.sortOrder,
-                    startIndex: 0,
-                }),
-            });
-        }
-    };
 
     return (
         <AnimatedPage>
@@ -266,7 +243,7 @@ const HomeRoute = () => {
                                         slugs: [
                                             {
                                                 idProperty:
-                                                    server?.type === ServerType.JELLYFIN &&
+                                                    isJellyfin &&
                                                     carousel.itemType === LibraryItem.SONG
                                                         ? 'albumId'
                                                         : 'id',
@@ -297,8 +274,7 @@ const HomeRoute = () => {
                                 slugs: [
                                     {
                                         idProperty:
-                                            server?.type === ServerType.JELLYFIN &&
-                                            carousel.itemType === LibraryItem.SONG
+                                            isJellyfin && carousel.itemType === LibraryItem.SONG
                                                 ? 'albumId'
                                                 : 'id',
                                         slugProperty: 'albumId',
@@ -310,7 +286,7 @@ const HomeRoute = () => {
                                     <Group>
                                         <TextTitle order={3}>{carousel.title}</TextTitle>
                                         <ActionIcon
-                                            onClick={() => invalidateCarouselQuery(carousel)}
+                                            onClick={() => carousel.query.refetch()}
                                             variant="transparent"
                                         >
                                             <Icon icon="refresh" />

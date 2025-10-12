@@ -3,8 +3,8 @@
         "editPlaylist": "编辑$t(entity.playlist_one)",
         "moveToTop": "移至顶部",
         "clearQueue": "清空播放队列",
-        "addToFavorites": "添加到$t(entity.favorite_other)",
-        "addToPlaylist": "添加到$t(entity.playlist_one)",
+        "addToFavorites": "添加到 $t(entity.favorite_other)",
+        "addToPlaylist": "添加到 $t(entity.playlist_one)",
         "createPlaylist": "创建$t(entity.playlist_one)",
         "removeFromPlaylist": "从$t(entity.playlist_one)移除",
         "viewPlaylists": "查看$t(entity.playlist_other)",
@@ -127,13 +127,13 @@
         "playlist_other": "播放列表",
         "artist_other": "艺术家",
         "folderWithCount_other": "{{count}} 个文件夹",
-        "track_other": "乐曲",
+        "track_other": "曲目",
         "favorite_other": "收藏",
         "artistWithCount_other": "{{count}} 位艺术家",
         "folder_other": "文件夹",
         "smartPlaylist": "智能$t(entity.playlist_one)",
         "genreWithCount_other": "{{count}} 种流派",
-        "trackWithCount_other": "{{count}} 首乐曲",
+        "trackWithCount_other": "{{count}} 首曲目",
         "play_other": "{{count}} 次播放",
         "song_other": "歌曲"
     },
@@ -167,7 +167,7 @@
         "skip_forward": "向前跳过",
         "playbackSpeed": "播放速度",
         "pause": "暂停",
-        "playSimilarSongs": "播放类似的曲目",
+        "playSimilarSongs": "播放类似的歌曲",
         "viewQueue": "查看播放队列"
     },
     "setting": {
@@ -205,7 +205,7 @@
         "enableRemote_description": "启用远程控制服务器，以允许其他设备控制此应用",
         "remotePort_description": "设置远程服务器端口",
         "hotkey_skipBackward": "向后跳过",
-        "replayGainMode_description": "根据乐曲元数据中存储的{{ReplayGain}}值调整音量增益",
+        "replayGainMode_description": "根据文件元数据中存储的 {{ReplayGain}} 值调整音量增益",
         "volumeWheelStep_description": "在音量滑块上滚动鼠标滚轮时要更改的音量大小",
         "theme_description": "设置应用的主题",
         "hotkey_playbackPause": "暂停",
@@ -290,7 +290,7 @@
         "playbackStyle_optionNormal": "正常",
         "windowBarStyle": "窗口顶栏风格",
         "floatingQueueArea": "显示浮动队列悬停区域",
-        "replayGainFallback_description": "乐曲没有{{ReplayGain}}标签时应用的增益（以分贝为单位）",
+        "replayGainFallback_description": "如果文件没有 {{ReplayGain}} 标签，则在数据库中应用增益",
         "hotkey_toggleRepeat": "切换循环",
         "lyricOffset_description": "将歌词偏移指定的毫秒数",
         "sidebarConfiguration_description": "选择侧边栏包含的项目与顺序",
@@ -464,7 +464,7 @@
         "albumArtist": "$t(entity.albumArtist_one)",
         "releaseYear": "发布年份",
         "biography": "个人简介",
-        "songCount": "曲目数量",
+        "songCount": "歌曲数量",
         "random": "随机",
         "lastPlayed": "上次播放过",
         "toYear": "从年份",
@@ -599,7 +599,7 @@
         "trackList": {
             "title": "$t(entity.track_other)",
             "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
-            "artistTracks": "{{artist}}的曲目"
+            "artistTracks": "{{artist}} 的曲目"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"

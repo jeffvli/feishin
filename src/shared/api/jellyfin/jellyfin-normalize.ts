@@ -88,7 +88,10 @@ const getSongCoverArtUrl = (args: {
             `/${args.item.Id}` +
             '/Images/Primary' +
             `?width=${size}` +
-            '&quality=96'
+            '&quality=96' +
+            // Invalidate the cache if the image chances. This appears to be
+            // how Jellyfin Web does it as well
+            `&tag=${args.item.ImageTags.Primary}`
         );
     }
 
@@ -124,12 +127,18 @@ const getPlaylistCoverArtUrl = (args: { baseUrl: string; item: JFPlaylist; size:
 
 type AlbumOrSong = z.infer<typeof jfType._response.album> | z.infer<typeof jfType._response.song>;
 
+const KEYS_TO_OMIT = new Set(['AlbumArtist', 'Artist']);
+
 const getPeople = (item: AlbumOrSong): null | Record<string, RelatedArtist[]> => {
     if (item.People) {
         const participants: Record<string, RelatedArtist[]> = {};
 
         for (const person of item.People) {
             const key = person.Type || '';
+            if (KEYS_TO_OMIT.has(key)) {
+                continue;
+            }
+
             const item: RelatedArtist = {
                 // for other roles, we just want to display this and not filter.
                 // filtering (and links) would require a separate field, PersonIds
@@ -258,6 +267,8 @@ const normalizeSong = (
         itemType: LibraryItem.SONG,
         lastPlayedAt: null,
         lyrics: null,
+        mbzRecordingId: null,
+        mbzTrackId: item.ProviderIds?.MusicBrainzTrack || null,
         name: item.Name,
         participants: getPeople(item),
         path,

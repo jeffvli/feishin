@@ -3,9 +3,7 @@ import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
 import { NDSongListSort } from '/@/shared/api/navidrome.types';
 import { ndNormalize } from '/@/shared/api/navidrome/navidrome-normalize';
-import { ndType } from '/@/shared/api/navidrome/navidrome-types';
 import { ssNormalize } from '/@/shared/api/subsonic/subsonic-normalize';
-import { SubsonicExtensions } from '/@/shared/api/subsonic/subsonic-types';
 import { getFeatures, hasFeature, VersionInfo } from '/@/shared/api/utils';
 import {
     albumArtistListSortMap,
@@ -22,10 +20,11 @@ import {
     sortOrderMap,
     userListSortMap,
 } from '/@/shared/types/domain-types';
-import { ServerFeature, ServerFeatures } from '/@/shared/types/features-types';
+import { ServerFeature } from '/@/shared/types/features-types';
 
 const VERSION_INFO: VersionInfo = [
-    ['0.55.0', { [ServerFeature.BFR]: [1] }],
+    ['0.56.0', { [ServerFeature.TRACK_ALBUM_ARTIST_SEARCH]: [1] }],
+    ['0.55.0', { [ServerFeature.BFR]: [1], [ServerFeature.TAGS]: [1] }],
     ['0.49.3', { [ServerFeature.SHARING_ALBUM_SONG]: [1] }],
     ['0.48.0', { [ServerFeature.PLAYLISTS_SMART]: [1] }],
 ];
@@ -55,6 +54,9 @@ const excludeMissing = (server: null | ServerListItem) => {
 
     return undefined;
 };
+
+const getArtistSongKey = (server: null | ServerListItem) =>
+    hasFeature(server, ServerFeature.TRACK_ALBUM_ARTIST_SEARCH) ? 'artists_id' : 'album_artist_id';
 
 export const NavidromeController: ControllerEndpoint = {
     addToPlaylist: async (args) => {
@@ -269,6 +271,10 @@ export const NavidromeController: ControllerEndpoint = {
     getAlbumList: async (args) => {
         const { apiClientProps, query } = args;
 
+        const genres = hasFeature(apiClientProps.server, ServerFeature.BFR)
+            ? query.genres
+            : query.genres?.[0];
+
         const res = await ndApiClient(apiClientProps).getAlbumList({
             query: {
                 _end: query.startIndex + (query.limit || 0),
@@ -277,7 +283,7 @@ export const NavidromeController: ControllerEndpoint = {
                 _start: query.startIndex,
                 artist_id: query.artistIds?.[0],
                 compilation: query.compilation,
-                genre_id: query.genres?.[0],
+                genre_id: genres,
                 name: query.searchTerm,
                 ...query._custom?.navidrome,
                 starred: query.favorite,
@@ -430,12 +436,9 @@ export const NavidromeController: ControllerEndpoint = {
                 id: query.id,
             },
             query: {
-                _end: query.startIndex + (query.limit || -1),
-                _order: query.sortOrder ? sortOrderMap.navidrome[query.sortOrder] : 'ASC',
-                _sort: query.sortBy
-                    ? songListSortMap.navidrome[query.sortBy]
-                    : ndType._enum.songList.ID,
-                _start: query.startIndex,
+                _end: -1,
+                _order: 'ASC',
+                _start: 0,
                 ...excludeMissing(apiClientProps.server),
             },
         });
@@ -446,7 +449,7 @@ export const NavidromeController: ControllerEndpoint = {
 
         return {
             items: res.body.data.map((item) => ndNormalize.song(item, apiClientProps.server)),
-            startIndex: query?.startIndex || 0,
+            startIndex: 0,
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
     },
@@ -467,38 +470,20 @@ export const NavidromeController: ControllerEndpoint = {
             ping.body.serverVersion = '0.55.0';
         }
 
-        const navidromeFeatures: Record<string, number[]> = getFeatures(
-            VERSION_INFO,
-            ping.body.serverVersion!,
-        );
+        const navidromeFeatures = getFeatures(VERSION_INFO, ping.body.serverVersion!);
+        const subsonicArgs = await SubsonicController.getServerInfo(args);
 
-        if (ping.body.openSubsonic) {
-            const res = await ssApiClient(apiClientProps).getServerInfo();
-
-            if (res.status !== 200) {
-                throw new Error('Failed to get server extensions');
-            }
-
-            // The type here isn't necessarily an array (even though it's supposed to be). This is
-            // an implementation detail of Navidrome 0.50. Do a type check to make sure it's actually
-            // an array, and not an empty object.
-            if (Array.isArray(res.body.openSubsonicExtensions)) {
-                for (const extension of res.body.openSubsonicExtensions) {
-                    navidromeFeatures[extension.name] = extension.versions;
-                }
-            }
-        }
-
-        const features: ServerFeatures = {
-            bfr: navidromeFeatures[ServerFeature.BFR],
-            lyricsMultipleStructured: navidromeFeatures[SubsonicExtensions.SONG_LYRICS],
-            playlistsSmart: navidromeFeatures[ServerFeature.PLAYLISTS_SMART],
+        const features = {
+            ...navidromeFeatures,
+            ...subsonicArgs.features,
             publicPlaylist: [1],
-            sharingAlbumSong: navidromeFeatures[ServerFeature.SHARING_ALBUM_SONG],
-            tags: navidromeFeatures[ServerFeature.BFR],
         };
 
-        return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion! };
+        return {
+            features,
+            id: apiClientProps.server?.id,
+            version: ping.body.serverVersion!,
+        };
     },
     getSimilarSongs: async (args) => {
         const { apiClientProps, query } = args;
@@ -535,7 +520,7 @@ export const NavidromeController: ControllerEndpoint = {
                 _order: 'ASC',
                 _sort: NDSongListSort.RANDOM,
                 _start: 0,
-                album_artist_id: query.albumArtistIds,
+                [getArtistSongKey(apiClientProps.server)]: query.albumArtistIds,
                 ...excludeMissing(apiClientProps.server),
             },
         });
@@ -576,10 +561,9 @@ export const NavidromeController: ControllerEndpoint = {
                 _order: sortOrderMap.navidrome[query.sortOrder],
                 _sort: songListSortMap.navidrome[query.sortBy],
                 _start: query.startIndex,
-                album_artist_id: query.albumArtistIds,
                 album_id: query.albumIds,
-                artist_id: query.artistIds,
                 genre_id: query.genreIds,
+                [getArtistSongKey(apiClientProps.server)]: query.artistIds ?? query.albumArtistIds,
                 starred: query.favorite,
                 title: query.searchTerm,
                 ...query._custom?.navidrome,

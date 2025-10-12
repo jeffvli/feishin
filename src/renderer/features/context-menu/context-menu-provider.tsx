@@ -103,19 +103,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     const { t } = useTranslation();
     const [opened, setOpened] = useState(false);
 
-    const [contextMenuRef, setContextMenuRef] = useState<HTMLDivElement | null>(null);
-    const [ratingsRef, setRatingsRef] = useState<HTMLDivElement | null>(null);
-    const [rating, setRating] = useState<number>(0);
-
-    useEffect(() => {
-        setRating(0);
-    }, [opened]);
-
-    const clickOutsideRef = useClickOutside(
-        () => setOpened(false),
-        ['mousedown', 'touchstart'],
-        [contextMenuRef, ratingsRef],
-    );
+    const clickOutsideRef = useClickOutside(() => setOpened(false), ['mousedown', 'touchstart']);
 
     const viewport = useViewportSize();
     const server = useCurrentServer();
@@ -131,6 +119,24 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         xPos: 0,
         yPos: 0,
     });
+
+    const [rating, setRating] = useState<number>(0);
+
+    useEffect(() => {
+        if (opened && ctx.data.length > 0) {
+            if (ctx.data.length === 1) {
+                setRating(ctx.data[0].userRating ?? 0);
+            } else {
+                const firstRating = ctx.data[0].userRating ?? 0;
+                const allSameRating = ctx.data.every(
+                    (item) => (item.userRating ?? 0) === firstRating,
+                );
+                setRating(allSameRating ? firstRating : 0);
+            }
+        } else {
+            setRating(0);
+        }
+    }, [ctx.data, opened]);
 
     const handlePlayQueueAdd = usePlayQueueAdd();
     const navigate = useNavigate();
@@ -535,7 +541,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                         });
                     },
                     onSuccess: () => {
-                        ctx.context?.tableRef?.current?.api?.refreshInfiniteCache();
                         closeAllModals();
                     },
                 },
@@ -552,7 +557,6 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         });
     }, [
         ctx.context?.playlistId,
-        ctx.context?.tableRef,
         ctx.data,
         ctx.dataNodes,
         removeFromPlaylistMutation,
@@ -882,7 +886,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 leftIcon: <Icon icon="star" />,
                 onClick: () => {},
                 rightIcon: (
-                    <Group ref={setRatingsRef as any}>
+                    <Group>
                         <Rating
                             onChange={(e) => {
                                 handleUpdateRating(e);
@@ -950,7 +954,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 <AnimatePresence>
                     {opened && (
                         <ContextMenu minWidth={125} ref={mergedRef} xPos={ctx.xPos} yPos={ctx.yPos}>
-                            <Stack gap={0} ref={setContextMenuRef}>
+                            <Stack gap={0}>
                                 <Stack gap={0} onClick={closeContextMenu}>
                                     {ctx.menuItems?.map((item) => {
                                         return (

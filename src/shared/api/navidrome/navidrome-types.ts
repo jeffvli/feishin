@@ -80,6 +80,7 @@ const stats = z.object({
 const albumArtist = z.object({
     albumCount: z.number(),
     biography: z.string(),
+    createdAt: z.string().optional(),
     externalInfoUpdatedAt: z.string(),
     externalUrl: z.string(),
     fullText: z.string(),
@@ -99,6 +100,7 @@ const albumArtist = z.object({
     starred: z.boolean(),
     starredAt: z.string(),
     stats: z.record(z.string(), stats).optional(),
+    updatedAt: z.string().optional(),
 });
 
 const albumArtistList = z.array(albumArtist);
@@ -167,7 +169,8 @@ const albumListParameters = paginationParameters.extend({
     album_id: z.string().optional(),
     artist_id: z.string().optional(),
     compilation: z.boolean().optional(),
-    genre_id: z.string().optional(),
+    // in older versions, this was a single string. post BFR, you can repeat it multiple times
+    genre_id: z.union([z.string(), z.string().array()]).optional(),
     has_rating: z.boolean().optional(),
     id: z.string().optional(),
     name: z.string().optional(),
@@ -211,7 +214,7 @@ const song = z.object({
     mbzAlbumArtistId: z.string().optional(),
     mbzAlbumId: z.string().optional(),
     mbzArtistId: z.string().optional(),
-    mbzTrackId: z.string().optional(),
+    mbzReleaseTrackId: z.string().optional(),
     mediumImageUrl: z.string().optional(),
     orderAlbumArtistName: z.string(),
     orderAlbumName: z.string(),
@@ -249,6 +252,7 @@ const songListParameters = paginationParameters.extend({
     album_artist_id: z.array(z.string()).optional(),
     album_id: z.array(z.string()).optional(),
     artist_id: z.array(z.string()).optional(),
+    artists_id: z.array(z.string()).optional(),
     genre_id: z.array(z.string()).optional(),
     path: z.string().optional(),
     starred: z.boolean().optional(),

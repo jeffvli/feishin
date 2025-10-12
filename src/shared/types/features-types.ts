@@ -8,6 +8,7 @@ export enum ServerFeature {
     PUBLIC_PLAYLIST = 'publicPlaylist',
     SHARING_ALBUM_SONG = 'sharingAlbumSong',
     TAGS = 'tags',
+    TRACK_ALBUM_ARTIST_SEARCH = 'trackAlbumArtistSearch',
 }
 
 export type ServerFeatures = Partial<Record<ServerFeature, number[]>>;

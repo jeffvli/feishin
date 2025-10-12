@@ -75,7 +75,9 @@
             "download": "descarregar",
             "showDetails": "informació",
             "numberSelected": "{{count}} seleccionat",
-            "shareItem": "comparteix l'element"
+            "shareItem": "comparteix l'element",
+            "goToAlbumArtist": "Ves a $t(entity.albumArtist_one)",
+            "goToAlbum": "ves a $t(entity.album_one)"
         },
         "genreList": {
             "title": "$t(entity.genre_other)",
@@ -641,7 +643,10 @@
         "discordDisplayType": "tipus de pantalla d'activitat de {{discord}}",
         "discordDisplayType_description": "canvia què escolteu al vostre estat",
         "discordDisplayType_songname": "nom de la cançó",
-        "discordDisplayType_artistname": "nom de l'artista"
+        "discordDisplayType_artistname": "nom de l'artista",
+        "hotkey_navigateHome": "ves a l'inici",
+        "preventSleepOnPlayback": "evitar entrar en repòs durant la reproducció",
+        "preventSleepOnPlayback_description": "evita que la pantalla s'adormi mentre la música es reprodueix"
     },
     "table": {
         "column": {

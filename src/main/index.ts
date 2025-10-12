@@ -23,6 +23,7 @@ import { access, constants, readFile, writeFile } from 'fs';
 import path, { join } from 'path';
 import { deflate, inflate } from 'zlib';
 
+import packageJson from '../../package.json';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
@@ -43,6 +44,32 @@ export default class AppUpdater {
     constructor() {
         log.transports.file.level = 'info';
         autoUpdater.logger = autoUpdaterLogInterface;
+
+        const isBetaVersion = packageJson.version.includes('-beta');
+        const releaseChannel = store.get('release_channel');
+        const isNotConfigured = !releaseChannel;
+
+        console.log('Release channel: ', releaseChannel);
+        console.log('Is beta version: ', isBetaVersion);
+
+        if (isNotConfigured) {
+            console.log(
+                'Release channel not configured, setting to ',
+                isBetaVersion ? 'beta' : 'latest',
+            );
+            store.set('release_channel', isBetaVersion ? 'beta' : 'latest');
+        }
+
+        if (releaseChannel === 'beta') {
+            autoUpdater.channel = 'beta';
+            autoUpdater.allowPrerelease = true;
+            autoUpdater.disableDifferentialDownload = true;
+        } else if (releaseChannel === 'latest') {
+            autoUpdater.channel = 'latest';
+            autoUpdater.allowDowngrade = true;
+            autoUpdater.allowPrerelease = false;
+        }
+
         autoUpdater.checkForUpdatesAndNotify();
     }
 }
@@ -489,7 +516,10 @@ async function createWindow(first = true): Promise<void> {
 
     const menuBuilder = new MenuBuilder(mainWindow);
     menuBuilder.buildMenu();
-    Menu.setApplicationMenu(null);
+
+    if (process.platform !== 'darwin') {
+        Menu.setApplicationMenu(null);
+    }
 
     // Open URLs in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {

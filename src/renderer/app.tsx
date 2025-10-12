@@ -190,7 +190,16 @@ export const App = () => {
 
     return (
         <MantineProvider defaultColorScheme={mode as 'dark' | 'light'} theme={theme}>
-            <Notifications containerWidth="300px" position="bottom-center" zIndex={50000} />
+            <Notifications
+                containerWidth="300px"
+                position="bottom-center"
+                styles={{
+                    root: {
+                        marginBottom: 90,
+                    },
+                }}
+                zIndex={50000}
+            />
             <PlayQueueHandlerContext.Provider value={providerValue}>
                 <WebAudioContext.Provider value={webAudioProvider}>
                     <AppRouter />

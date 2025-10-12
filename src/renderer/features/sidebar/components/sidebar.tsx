@@ -1,11 +1,13 @@
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'motion/react';
-import { CSSProperties, useMemo } from 'react';
+import { CSSProperties, MouseEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
 import styles from './sidebar.module.css';
 
+import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
@@ -31,6 +33,7 @@ import { Group } from '/@/shared/components/group/group';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
 
 export const Sidebar = () => {
@@ -39,7 +42,7 @@ export const Sidebar = () => {
     const sidebar = useSidebarStore();
     const { setSideBar } = useAppStoreActions();
     const { sidebarPlaylistList } = useGeneralSettings();
-    const imageUrl = useCurrentSong()?.imageUrl;
+    const currentSong = useCurrentSong();
 
     const translatedSidebarItemMap = useMemo(
         () => ({
@@ -56,17 +59,32 @@ export const Sidebar = () => {
         }),
         [t],
     );
-    const upsizedImageUrl = imageUrl
+    const upsizedImageUrl = currentSong?.imageUrl
         ?.replace(/size=\d+/, 'size=450')
         .replace(/width=\d+/, 'width=450')
         .replace(/height=\d+/, 'height=450');
 
     const showImage = sidebar.image;
+    const isSongDefined = Boolean(currentSong?.id);
 
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
     const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
     const expandFullScreenPlayer = () => {
         setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
+    };
+
+    const handleGeneralContextMenu = useHandleGeneralContextMenu(
+        LibraryItem.SONG,
+        SONG_CONTEXT_MENU_ITEMS,
+    );
+
+    const handleToggleContextMenu = (e: MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isSongDefined && !isFullScreenPlayerExpanded) {
+            handleGeneralContextMenu(e, [currentSong!]);
+        }
     };
 
     const { sidebarItems } = useGeneralSettings();
@@ -167,6 +185,7 @@ export const Sidebar = () => {
                         initial={{ opacity: 0, y: 200 }}
                         key="sidebar-image"
                         onClick={expandFullScreenPlayer}
+                        onContextMenu={handleToggleContextMenu}
                         role="button"
                         style={
                             {

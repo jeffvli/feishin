@@ -36,7 +36,9 @@ export const hasFeature = (server: null | ServerListItem, feature: ServerFeature
     return (server.features[feature]?.length || 0) > 0;
 };
 
-export type VersionInfo = ReadonlyArray<[string, Record<string, readonly number[]>]>;
+export type VersionInfo = ReadonlyArray<
+    [string, Partial<Record<ServerFeature, readonly number[]>>]
+>;
 
 /**
  * Returns the available server features given the version string.
@@ -61,9 +63,9 @@ export type VersionInfo = ReadonlyArray<[string, Record<string, readonly number[
 export const getFeatures = (
     versionInfo: VersionInfo,
     version: string,
-): Record<string, number[]> => {
+): Partial<Record<ServerFeature, number[]>> => {
     const cleanVersion = semverCoerce(version);
-    const features: Record<string, number[]> = {};
+    const features: Partial<Record<ServerFeature, number[]>> = {};
     let matched = cleanVersion === null;
 
     for (const [version, supportedFeatures] of versionInfo) {

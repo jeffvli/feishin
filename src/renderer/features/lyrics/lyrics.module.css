@@ -24,7 +24,9 @@
     position: relative;
     display: flex;
     width: 100%;
+    min-width: 0;
     height: 100%;
+    overflow: hidden;
 
     &:hover {
         .actions-container {
