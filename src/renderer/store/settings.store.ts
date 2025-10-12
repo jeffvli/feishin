@@ -96,6 +96,7 @@ export enum HomeItem {
     RANDOM = 'random',
     RECENTLY_ADDED = 'recentlyAdded',
     RECENTLY_PLAYED = 'recentlyPlayed',
+    RECENTLY_RELEASED = 'recentlyReleased',
 }
 
 export type SortableItem<T> = {
@@ -164,6 +165,13 @@ export enum DiscordDisplayType {
     SONG_NAME = 'song',
 }
 
+export enum DiscordLinkType {
+    LAST_FM = 'last_fm',
+    MBZ = 'musicbrainz',
+    MBZ_LAST_FM = 'musicbrainz_last_fm',
+    NONE = 'none',
+}
+
 export enum GenreTarget {
     ALBUM = 'album',
     TRACK = 'track',
@@ -208,6 +216,7 @@ export interface SettingsState {
         clientId: string;
         displayType: DiscordDisplayType;
         enabled: boolean;
+        linkType: DiscordLinkType;
         showAsListening: boolean;
         showPaused: boolean;
         showServerImage: boolean;
@@ -223,6 +232,8 @@ export interface SettingsState {
         albumArtRes?: null | number;
         albumBackground: boolean;
         albumBackgroundBlur: number;
+        artistBackground: boolean;
+        artistBackgroundBlur: number;
         artistItems: SortableItem<ArtistItem>[];
         buttonSize: number;
         disabledContextMenu: { [k in ContextMenuItemType]?: boolean };
@@ -324,6 +335,7 @@ export interface SettingsState {
         exitToTray: boolean;
         minimizeToTray: boolean;
         preventSleepOnPlayback: boolean;
+        releaseChannel: 'beta' | 'latest';
         startMinimized: boolean;
         tray: boolean;
         windowBarStyle: Platform;
@@ -366,6 +378,7 @@ const initialState: SettingsState = {
         clientId: '1165957668758900787',
         displayType: DiscordDisplayType.FEISHIN,
         enabled: false,
+        linkType: DiscordLinkType.NONE,
         showAsListening: false,
         showPaused: true,
         showServerImage: false,
@@ -381,6 +394,8 @@ const initialState: SettingsState = {
         albumArtRes: undefined,
         albumBackground: false,
         albumBackgroundBlur: 6,
+        artistBackground: false,
+        artistBackgroundBlur: 6,
         artistItems,
         buttonSize: 15,
         disabledContextMenu: {},
@@ -671,6 +686,7 @@ const initialState: SettingsState = {
         exitToTray: false,
         minimizeToTray: false,
         preventSleepOnPlayback: false,
+        releaseChannel: 'latest',
         startMinimized: false,
         tray: true,
         windowBarStyle: platformDefaultWindowBarStyle,

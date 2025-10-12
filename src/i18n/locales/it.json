@@ -114,12 +114,14 @@
         "codec": "codec",
         "mbid": "MusicBrainz ID",
         "preview": "anteprima",
-        "reload": "ricarica",
+        "reload": "aggiorna",
         "share": "condividi",
         "tags": "tags",
         "trackGain": "normalizzazione (gain) del brano",
         "trackPeak": "picco di volume del brano",
-        "translation": "traduzione"
+        "translation": "traduzione",
+        "bitDepth": "bit depth (profondità di bit)",
+        "sampleRate": "sample rate (frequenza di campionamento)"
     },
     "player": {
         "repeat_all": "ripeti coda",
@@ -231,7 +233,7 @@
         "hotkey_toggleShuffle": "attiva/disattiva mescolamento",
         "theme": "tema",
         "playbackStyle_description": "selezione lo stile di riproduzione da usare per il player audio",
-        "discordRichPresence_description": "abilita lo status del playback nello stato attività di {{discord}}. Le chiavi immagine sono: {{icon}}, {{playing}} e {{paused}}",
+        "discordRichPresence_description": "abilita lo stato di riproduzione nello stato attività di {{discord}}. Le chiavi immagine sono: {{icon}}, {{playing}} e {{paused}}",
         "mpvExecutablePath": "percorso eseguibile mpv",
         "audioDevice": "device audio",
         "hotkey_rate2": "voto 2 stelle",
@@ -266,7 +268,7 @@
         "customFontPath": "percorso font personalizzato",
         "followLyric": "segui testo corrente",
         "crossfadeDuration": "durata dissolvenza",
-        "discordIdleStatus": "visualizza lo stato attività in stato inattivo",
+        "discordIdleStatus": "mostra lo stato attività di Discord quando non stai riproducendo",
         "audioPlayer": "player audio",
         "hotkey_zoomOut": "rimpicciolisci layout",
         "hotkey_rate0": "rimuovi voto",
@@ -331,12 +333,12 @@
         "customCssNotice": "Attenzione: sebbene ci sia una certa sanitizzazione (vengono bloccati url() e content:), l’uso di CSS personalizzati può comunque comportare dei rischi modificando l’interfaccia.",
         "customCss": "css personalizzato",
         "customCss_description": "contenuto CSS personalizzato. Nota: le proprietà content e gli URL remoti non sono consentiti. Di seguito è mostrata un’anteprima del tuo contenuto. Sono presenti anche altri campi non impostati da te a causa della sanitizzazione.",
-        "discordPausedStatus": "mostra rich presence di Discord quando la riproduzione è in pausa",
+        "discordPausedStatus": "mostra lo stato attività di Discord quando la riproduzione è in pausa",
         "discordPausedStatus_description": "quando abilitato, verrà mostrato lo stato del lettore in standby/pausa (nessun brano in riproduzione)",
         "discordListening": "mostra stato come in ascolto",
         "discordListening_description": "mostra lo stato come in ascolto invece che in riproduzione",
         "discordServeImage": "recupera le immagini di {{discord}} dal server",
-        "discordServeImage_description": "condividi la copertina per la rich presence di {{discord}} direttamente dal server, disponibile solo per Jellyfin e Navidrome",
+        "discordServeImage_description": "condividi la copertina per lo stato attività di {{discord}} direttamente dal server, disponibile solo per Jellyfin e Navidrome",
         "doubleClickBehavior": "aggiungi alla coda tutte le tracce cercate, con un doppio clic",
         "doubleClickBehavior_description": "se attivato, tutte le tracce corrispondenti alla ricerca verranno aggiunte alla coda. altrimenti, verrà aggiunta alla coda solo la traccia selezionata",
         "externalLinks": "mostra link esterni",
@@ -393,7 +395,16 @@
         "webAudio_description": "usa audio web. abilita funzionalità avanzate come ReplayGain. disabilita se riscontri problemi",
         "preservePitch": "mantieni tono (pitch)",
         "preservePitch_description": "mantiene il tono (pitch) durante la modifica della velocità di riproduzione",
-        "volumeWidth_description": "larghezza del cursore del volume"
+        "volumeWidth_description": "larghezza del cursore del volume",
+        "discordDisplayType_description": "modifica cosa stai ascoltando nel tuo stato",
+        "discordDisplayType_songname": "titolo traccia",
+        "discordDisplayType_artistname": "nome artisti",
+        "hotkey_navigateHome": "vai alla schermata iniziale",
+        "notify": "abilita notifiche delle tracce",
+        "notify_description": "mostra una notifica quando cambia la traccia riprodotta",
+        "preventSleepOnPlayback": "non sospendere in riproduzione",
+        "preventSleepOnPlayback_description": "non sospendere il sistema quando la riproduzione è attiva",
+        "discordDisplayType": "stile dello stato su {{discord}}"
     },
     "error": {
         "remotePortWarning": "riavvia il server per applicare la nuova porta",
@@ -418,7 +429,8 @@
         "badAlbum": "stai visualizzando questa pagina perché questa canzone non fa parte di un album. probabilmente vedi questo messaggio perché hai una canzone posizionata direttamente nella cartella principale della tua libreria musicale. jellyfin raggruppa le tracce solo se si trovano all’interno di una cartella.",
         "badValue": "opzione non valida \"{{value}}\". valore inesistente",
         "networkError": "si è verificato un errore di rete",
-        "openError": "impossibile aprire il file"
+        "openError": "impossibile aprire il file",
+        "notificationDenied": "i permessi per le notifiche non sono stati concessi. questa configurazione non ha effetto"
     },
     "filter": {
         "mostPlayed": "più riprodotti",
@@ -513,7 +525,9 @@
             "openBrowserDevtools": "apri devtools browser",
             "quit": "$t(common.quit)",
             "goBack": "torna indietro",
-            "goForward": "vai avanti"
+            "goForward": "vai avanti",
+            "privateModeOff": "disabilita modalità privata",
+            "privateModeOn": "abilita modalità privata"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -537,7 +551,9 @@
             "playSimilarSongs": "$t(player.playSimilarSongs)",
             "playShuffled": "$t(player.shuffle)",
             "shareItem": "condividi elemento",
-            "showDetails": "mostra info"
+            "showDetails": "mostra info",
+            "goToAlbum": "vai a $t(entity.album_one)",
+            "goToAlbumArtist": "vai a $t(entity.albumArtist_one)"
         },
         "home": {
             "mostPlayed": "più riprodotti",
@@ -674,6 +690,11 @@
             "success": "link di condivisione copiato negli appunti (o clicca qui per aprirlo)",
             "expireInvalid": "la scadenza deve essere nel futuro",
             "createFailed": "condivisione fallita (è abilitata la condivisione?)"
+        },
+        "privateMode": {
+            "enabled": "la modalità privata è abilitata: lo stato di riproduzione viene ora nascosto alle integrazioni esterne",
+            "disabled": "la modalità privata è disabilitata: lo stato di riproduzione è ora visibile alle integrazioni esterne abilitate",
+            "title": "modalità privata"
         }
     },
     "table": {

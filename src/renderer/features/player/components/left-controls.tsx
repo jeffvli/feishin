@@ -24,6 +24,7 @@ import { Image } from '/@/shared/components/image/image';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
+import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 export const LeftControls = () => {
@@ -46,6 +47,11 @@ export const LeftControls = () => {
     );
 
     const handleToggleFullScreenPlayer = (e?: KeyboardEvent | MouseEvent<HTMLDivElement>) => {
+        // don't toggle if right click
+        if (e && 'button' in e && e.button === 2) {
+            return;
+        }
+
         e?.stopPropagation();
         setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
     };
@@ -53,6 +59,15 @@ export const LeftControls = () => {
     const handleToggleSidebarImage = (e?: MouseEvent<HTMLButtonElement>) => {
         e?.stopPropagation();
         setSideBar({ image: true });
+    };
+
+    const handleToggleContextMenu = (e: MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (isSongDefined && !isFullScreenPlayerExpanded) {
+            handleGeneralContextMenu(e, [currentSong!]);
+        }
     };
 
     const stopPropagation = (e?: MouseEvent) => e?.stopPropagation();
@@ -79,6 +94,7 @@ export const LeftControls = () => {
                                 initial={{ opacity: 0, x: -50 }}
                                 key="playerbar-image"
                                 onClick={handleToggleFullScreenPlayer}
+                                onContextMenu={handleToggleContextMenu}
                                 role="button"
                                 transition={{ duration: 0.2, ease: 'easeIn' }}
                             >
@@ -89,7 +105,10 @@ export const LeftControls = () => {
                                     openDelay={500}
                                 >
                                     <Image
-                                        className={styles.playerbarImage}
+                                        className={clsx(
+                                            styles.playerbarImage,
+                                            PlaybackSelectors.playerCoverArt,
+                                        )}
                                         loading="eager"
                                         src={currentSong?.imageUrl ?? ''}
                                     />
@@ -124,9 +143,11 @@ export const LeftControls = () => {
                     <div className={styles.lineItem} onClick={stopPropagation}>
                         <Group align="center" gap="xs" wrap="nowrap">
                             <Text
+                                className={PlaybackSelectors.songTitle}
                                 component={Link}
                                 fw={500}
                                 isLink
+                                onContextMenu={handleToggleContextMenu} // Ajout du clic droit
                                 overflow="hidden"
                                 to={AppRoute.NOW_PLAYING}
                             >
@@ -148,7 +169,11 @@ export const LeftControls = () => {
                         </Group>
                     </div>
                     <div
-                        className={clsx(styles.lineItem, styles.secondary)}
+                        className={clsx(
+                            styles.lineItem,
+                            styles.secondary,
+                            PlaybackSelectors.songArtist,
+                        )}
                         onClick={stopPropagation}
                     >
                         {artists?.map((artist, index) => (
@@ -174,7 +199,11 @@ export const LeftControls = () => {
                         ))}
                     </div>
                     <div
-                        className={clsx(styles.lineItem, styles.secondary)}
+                        className={clsx(
+                            styles.lineItem,
+                            styles.secondary,
+                            PlaybackSelectors.songAlbum,
+                        )}
                         onClick={stopPropagation}
                     >
                         <Text

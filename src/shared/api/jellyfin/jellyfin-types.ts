@@ -393,6 +393,12 @@ const participant = z.object({
     Type: z.string().optional(),
 });
 
+const providerIds = z.object({
+    MusicBrainzAlbum: z.string().optional(),
+    MusicBrainzArtist: z.string().optional(),
+    MusicBrainzTrack: z.string().optional(),
+});
+
 const songDetailParameters = baseParameters;
 
 const song = z.object({
@@ -425,17 +431,13 @@ const song = z.object({
     PlaylistItemId: z.string().optional(),
     PremiereDate: z.string().optional(),
     ProductionYear: z.number(),
+    ProviderIds: providerIds.optional(),
     RunTimeTicks: z.number(),
     ServerId: z.string(),
     SortName: z.string(),
     Tags: z.string().array().optional(),
     Type: z.string(),
     UserData: userData.optional(),
-});
-
-const providerIds = z.object({
-    MusicBrainzAlbum: z.string().optional(),
-    MusicBrainzArtist: z.string().optional(),
 });
 
 const albumArtist = z.object({

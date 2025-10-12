@@ -5,6 +5,7 @@
     grid-template-areas: 'sidebar . right-sidebar';
     grid-template-rows: 1fr;
     gap: 0;
+    background: var(--theme-colors-background);
 }
 
 .main-content-container.shell {

@@ -1,0 +1,332 @@
+name: Publish Beta (Manual)
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: 'Semantic version number (e.g., 1.0.0) - beta suffix will be added automatically'
+                required: false
+                type: string
+
+jobs:
+    prepare:
+        runs-on: ubuntu-latest
+        outputs:
+            version: ${{ steps.version.outputs.version }}
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v1
+
+            - name: Install Node and PNPM
+              uses: pnpm/action-setup@v4.1.0
+              with:
+                  version: 9
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Validate and set version with beta suffix
+              id: version
+              shell: pwsh
+              run: |
+                  $inputVersion = "${{ github.event.inputs.version }}"
+                  Write-Host "Input version: $inputVersion"
+
+                  if ($inputVersion -eq "" -or $inputVersion -eq "null") {
+                      # No input version provided, auto-increment patch version
+                      Write-Host "No version provided, auto-incrementing patch version..."
+
+                      # Get current version from package.json
+                      $currentVersion = (Get-Content package.json | ConvertFrom-Json).version
+                      Write-Host "Current version: $currentVersion"
+
+                      # Remove any existing suffix (like -beta) to get clean semantic version
+                      $cleanVersion = $currentVersion -replace '-.*$', ''
+
+                      # Extract major, minor, patch components
+                      $versionParts = $cleanVersion.Split('.')
+                      if ($versionParts.Length -ne 3) {
+                          Write-Error "Current version format is invalid: $cleanVersion"
+                          exit 1
+                      }
+
+                      $major = [int]$versionParts[0]
+                      $minor = [int]$versionParts[1]
+                      $patch = [int]$versionParts[2]
+
+                      # Increment patch version
+                      $newPatch = $patch + 1
+                      $inputVersion = "$major.$minor.$newPatch"
+                      Write-Host "Auto-generated version: $inputVersion"
+                  } else {
+                      # Validate semantic version format (major.minor.patch)
+                      $versionPattern = '^\d+\.\d+\.\d+$'
+                      if ($inputVersion -notmatch $versionPattern) {
+                          Write-Error "Invalid version format. Expected semantic version (e.g., 1.0.0), got: $inputVersion"
+                          exit 1
+                      }
+                  }
+
+                  # Add beta suffix
+                  $versionWithBeta = "$inputVersion-beta"
+                  Write-Host "Setting version to: $versionWithBeta"
+
+                  # Update package.json
+                  $packageJson = Get-Content package.json | ConvertFrom-Json
+                  $packageJson.version = $versionWithBeta
+                  $packageJson | ConvertTo-Json -Depth 10 | Set-Content package.json
+
+                  Write-Host "Updated package.json version to: $versionWithBeta"
+
+                  # Set output for other jobs
+                  echo "version=$versionWithBeta" >> $env:GITHUB_OUTPUT
+
+            - name: Delete existing releases and tags
+              shell: pwsh
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  # Get the version that was set in the previous step
+                  $versionWithBeta = "${{ steps.version.outputs.version }}"
+                  Write-Host "Checking for existing releases with tag: $versionWithBeta"
+
+                  # Find and delete any releases with isPrerelease "true"
+                  Write-Host "Deleting existing prereleases..."
+                  Write-Host "Searching for releases with isPrerelease 'true'..."
+
+                  $betaReleases = gh release list --limit 100 --json tagName,isPrerelease,name | ConvertFrom-Json | Where-Object { $_.isPrerelease -eq $true }
+
+                  if ($betaReleases) {
+                      Write-Host "Found $($betaReleases.Count) release(s) with isPrerelease 'true':"
+                      foreach ($release in $betaReleases) {
+                          Write-Host "  - Tag: $($release.tagName), Title: $($release.name)"
+                          gh release delete $release.tagName --yes --cleanup-tag
+                          Write-Host "  Deleted release with tag: $($release.tagName)"
+                      }
+                  } else {
+                      Write-Host "No releases found with isPrerelease 'true'"
+                  }
+
+    publish:
+        needs: prepare
+        runs-on: ${{ matrix.os }}
+
+        strategy:
+            matrix:
+                os: [windows-latest, macos-latest, ubuntu-latest]
+
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v1
+
+            - name: Install Node and PNPM
+              uses: pnpm/action-setup@v4.1.0
+              with:
+                  version: 9
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Set version from prepare job
+              shell: pwsh
+              run: |
+                  $versionWithBeta = "${{ needs.prepare.outputs.version }}"
+                  Write-Host "Setting version from prepare job: $versionWithBeta"
+
+                  # Update package.json with the version from prepare job
+                  $packageJson = Get-Content package.json | ConvertFrom-Json
+                  $packageJson.version = $versionWithBeta
+                  $packageJson | ConvertTo-Json -Depth 10 | Set-Content package.json
+
+                  Write-Host "Updated package.json version to: $versionWithBeta"
+
+            - name: Build and Publish releases (Windows)
+              if: matrix.os == 'windows-latest'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:win:beta
+                  on_retry_command: pnpm cache delete
+
+            - name: Build and Publish releases (macOS)
+              if: matrix.os == 'macos-latest'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:mac:beta
+                  on_retry_command: pnpm cache delete
+
+            - name: Build and Publish releases (Linux)
+              if: matrix.os == 'ubuntu-latest'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:linux:beta
+                  on_retry_command: pnpm cache delete
+
+            - name: Build and Publish releases (Linux ARM64)
+              if: matrix.os == 'ubuntu-latest'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:linux-arm64:beta
+                  on_retry_command: pnpm cache delete
+
+    edit-release:
+        needs: [prepare, publish]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v1
+
+            - name: Edit release with commits and title
+              shell: pwsh
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  # Get the version from the prepare job
+                  $versionWithBeta = "${{ needs.prepare.outputs.version }}"
+                  $tagVersion = "v" + $versionWithBeta
+                  Write-Host "Editing release for tag: $tagVersion"
+
+                  # Check if release exists
+                  $releaseExists = gh release view $tagVersion 2>$null
+                  if ($LASTEXITCODE -eq 0) {
+                      Write-Host "Found release with tag $tagVersion"
+
+                      # Get current release notes
+
+                      # Find the latest non-prerelease tag
+                      Write-Host "Finding latest non-prerelease tag..."
+                      $latestNonPrerelease = gh release list --limit 100 --json tagName,isPrerelease | ConvertFrom-Json | Where-Object { $_.isPrerelease -eq $false -and $_.tagName -ne $tagVersion } | Select-Object -First 1
+
+                        if ($latestNonPrerelease) {
+                            $latestTag = $latestNonPrerelease.tagName
+                            Write-Host "Latest non-prerelease tag: $latestTag"
+
+                            # Get commits between latest non-prerelease and current HEAD
+                            Write-Host "Getting commits between $latestTag and HEAD..."
+
+                            # Use proper git range syntax and handle PowerShell string interpolation
+                            $gitRange = "$latestTag..HEAD"
+                            Write-Host "Git range: $gitRange"
+
+                            # Get commits using proper git command with datetime
+                            $commits = git log --oneline --pretty=format:"%ad|%s|%h" --date=short $gitRange
+
+                            # Check if commits exist
+                            if ($commits -and $commits.Trim() -ne "") {
+                                Write-Host "Found commits:"
+                                Write-Host $commits
+
+                                # Group commits by date
+                                $groupedCommits = @{}
+                                foreach ($line in $commits) {
+                                    if ($line.Trim() -ne "") {
+                                        $parts = $line.Split('|')
+                                        $date = $parts[0]
+                                        $message = $parts[1]
+                                        $hash = $parts[2]
+
+                                        if (-not $groupedCommits.ContainsKey($date)) {
+                                            $groupedCommits[$date] = @()
+                                        }
+                                        $groupedCommits[$date] += "- $message ($hash)"
+                                    }
+                                }
+
+                                # Build formatted release notes grouped by date
+                                $commitNotes = "## Changes since $latestTag`n`n"
+                                $sortedDates = $groupedCommits.Keys | Sort-Object -Descending
+                                foreach ($date in $sortedDates) {
+                                    $commitNotes += "### $date`n"
+                                    foreach ($commit in $groupedCommits[$date]) {
+                                        $commitNotes += "$commit`n"
+                                    }
+                                    $commitNotes += "`n"
+                                }
+
+                                $releaseNotes = $commitNotes
+                            } else {
+                                Write-Host "No commits found between $latestTag and HEAD"
+                                Write-Host "Trying alternative approach..."
+
+                                # Alternative: get commits since the tag (not range) with datetime
+                                $commits = git log --oneline --pretty=format:"%ad|%s|%h" --date=short $latestTag.. --not $latestTag
+
+                                if ($commits -and $commits.Trim() -ne "") {
+                                    Write-Host "Found commits with alternative method:"
+                                    Write-Host $commits
+
+                                    # Group commits by date
+                                    $groupedCommits = @{}
+                                    foreach ($line in $commits) {
+                                        if ($line.Trim() -ne "") {
+                                            $parts = $line.Split('|')
+                                            $date = $parts[0]
+                                            $message = $parts[1]
+                                            $hash = $parts[2]
+
+                                            if (-not $groupedCommits.ContainsKey($date)) {
+                                                $groupedCommits[$date] = @()
+                                            }
+                                            $groupedCommits[$date] += "- $message ($hash)"
+                                        }
+                                    }
+
+                                    # Build formatted release notes grouped by date
+                                    $commitNotes = "## Changes since $latestTag`n`n"
+                                    $sortedDates = $groupedCommits.Keys | Sort-Object -Descending
+                                    foreach ($date in $sortedDates) {
+                                        $commitNotes += "### $date`n"
+                                        foreach ($commit in $groupedCommits[$date]) {
+                                            $commitNotes += "$commit`n"
+                                        }
+                                        $commitNotes += "`n"
+                                    }
+
+                                    $releaseNotes = $commitNotes
+                                } else {
+                                    Write-Host "Still no commits found, using basic release notes"
+                                    $releaseNotes = "## Beta Release`n`nThis is a beta release."
+                                }
+                            }
+                        } else {
+                            Write-Host "No non-prerelease tags found, using basic release notes"
+                            $releaseNotes = "## Beta Release`n`nThis is a beta release."
+                        }
+
+                      # Update the release with new title and notes
+                      Write-Host "Updating release with title 'Beta' and new notes..."
+                      gh release edit $tagVersion --title "Beta" --notes "$releaseNotes"
+                      Write-Host "Successfully updated release title to 'Beta' and added commit notes"
+                  } else {
+                      Write-Host "No release found with tag $tagVersion"
+                  }
+            - name: Set release as prerelease
+              shell: pwsh
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh release edit $tagVersion --prerelease
+                  Write-Host "Successfully set release as prerelease"

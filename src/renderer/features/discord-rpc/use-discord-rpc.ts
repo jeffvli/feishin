@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { controller } from '/@/renderer/api/controller';
 import {
     DiscordDisplayType,
+    DiscordLinkType,
     getServerById,
     useAppStore,
     useDiscordSettings,
@@ -77,6 +78,34 @@ export const useDiscordRpc = () => {
                     type: discordSettings.showAsListening ? 2 : 0,
                 };
 
+                if (
+                    (discordSettings.linkType == DiscordLinkType.LAST_FM ||
+                        discordSettings.linkType == DiscordLinkType.MBZ_LAST_FM) &&
+                    song?.artistName
+                ) {
+                    activity.stateUrl =
+                        'https://www.last.fm/music/' + encodeURIComponent(song.artists[0].name);
+                    activity.detailsUrl =
+                        'https://www.last.fm/music/' +
+                        encodeURIComponent(song.albumArtists[0].name) +
+                        '/' +
+                        encodeURIComponent(song.album || '_') +
+                        '/' +
+                        encodeURIComponent(song.name);
+                }
+
+                if (
+                    discordSettings.linkType == DiscordLinkType.MBZ ||
+                    discordSettings.linkType == DiscordLinkType.MBZ_LAST_FM
+                ) {
+                    if (song?.mbzTrackId) {
+                        activity.detailsUrl = 'https://musicbrainz.org/track/' + song.mbzTrackId;
+                    } else if (song?.mbzRecordingId) {
+                        activity.detailsUrl =
+                            'https://musicbrainz.org/recording/' + song.mbzRecordingId;
+                    }
+                }
+
                 if ((current[2] as PlayerStatus) === PlayerStatus.PLAYING) {
                     if (start && end) {
                         activity.startTimestamp = start;
@@ -145,6 +174,7 @@ export const useDiscordRpc = () => {
             generalSettings.lastfmApiKey,
             discordSettings.clientId,
             discordSettings.displayType,
+            discordSettings.linkType,
             lastUniqueId,
         ],
     );

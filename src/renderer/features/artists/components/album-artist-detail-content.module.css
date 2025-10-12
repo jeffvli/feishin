@@ -9,8 +9,4 @@
     gap: var(--theme-spacing-lg);
     padding: 1rem 2rem 5rem;
     overflow: hidden;
-
-    :global(.ag-theme-alpine-dark) {
-        --ag-header-background-color: rgb(0 0 0 / 0%) !important;
-    }
 }

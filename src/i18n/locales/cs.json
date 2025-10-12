@@ -277,7 +277,10 @@
         "discordDisplayType": "typ zobrazení stavu {{discord}}",
         "discordDisplayType_description": "změní, co posloucháte, ve vašem stavu",
         "discordDisplayType_songname": "název skladby",
-        "discordDisplayType_artistname": "jména umělců"
+        "discordDisplayType_artistname": "jména umělců",
+        "hotkey_navigateHome": "přejít domů",
+        "preventSleepOnPlayback": "zabránit uspání při přehrávání",
+        "preventSleepOnPlayback_description": "zabránit uspání displeje během přehrávání hudby"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -625,7 +628,9 @@
             "playSimilarSongs": "$t(player.playSimilarSongs)",
             "download": "stáhnout",
             "playShuffled": "$t(player.shuffle)",
-            "moveToNext": "$t(action.moveToNext)"
+            "moveToNext": "$t(action.moveToNext)",
+            "goToAlbum": "přejít na $t(entity.album_one)",
+            "goToAlbumArtist": "přejít na $t(entity.albumArtist_one)"
         },
         "home": {
             "mostPlayed": "nejpřehrávanější",

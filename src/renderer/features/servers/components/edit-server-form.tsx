@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
-import { queryKeys } from '/@/renderer/api/query-keys';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useAuthStoreActions } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
@@ -49,7 +48,8 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
             legacyAuth: false,
             name: server?.name,
             password: password || '',
-            savePassword: server.savePassword || false,
+            preferInstantMix: server.preferInstantMix,
+            savePassword: server.savePassword,
             type: server?.type,
             url: server?.url,
             username: server?.username,
@@ -86,16 +86,27 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 });
             }
 
-            const serverItem = {
+            const serverItem: ServerListItem = {
                 credential: data.credential,
+                id: server.id,
                 name: values.name,
-                ndCredential: data.ndCredential,
-                savePassword: values.savePassword,
                 type: values.type,
                 url: values.url,
                 userId: data.userId,
                 username: data.username,
             };
+
+            if (values.preferInstantMix !== undefined) {
+                serverItem.preferInstantMix = values.preferInstantMix;
+            }
+
+            if (values.savePassword !== undefined) {
+                serverItem.savePassword = values.savePassword;
+            }
+
+            if (data.ndCredential !== undefined) {
+                serverItem.ndCredential = data.ndCredential;
+            }
 
             updateServer(server.id, serverItem);
             toast.success({
@@ -118,7 +129,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 }
             }
 
-            queryClient.invalidateQueries({ queryKey: queryKeys.server.root(server.id) });
+            queryClient.removeQueries();
         } catch (err: any) {
             setIsLoading(false);
             return toast.error({ message: err?.message });
@@ -185,6 +196,21 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                             postProcess: 'titleCase',
                         })}
                         {...form.getInputProps('legacyAuth', {
+                            type: 'checkbox',
+                        })}
+                    />
+                )}
+                {form.values.type === ServerType.JELLYFIN && (
+                    <Checkbox
+                        description={t('form.addServer.input', {
+                            context: 'preferInstantMixDescription',
+                            postProcess: 'sentenceCase',
+                        })}
+                        label={t('form.addServer.input', {
+                            context: 'preferInstantMix',
+                            postProcess: 'titleCase',
+                        })}
+                        {...form.getInputProps('preferInstantMix', {
                             type: 'checkbox',
                         })}
                     />

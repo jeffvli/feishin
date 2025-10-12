@@ -2,12 +2,21 @@ import debounce from 'lodash/debounce';
 import { ChangeEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { SelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
+import {
+    MultiSelectWithInvalidData,
+    SelectWithInvalidData,
+} from '/@/renderer/components/select-with-invalid-data';
 import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
 import { useGenreList } from '/@/renderer/features/genres';
 import { useTagList } from '/@/renderer/features/tag/queries/use-tag-list';
-import { AlbumListFilter, useListStoreActions, useListStoreByKey } from '/@/renderer/store';
+import {
+    AlbumListFilter,
+    getServerById,
+    useListStoreActions,
+    useListStoreByKey,
+} from '/@/renderer/store';
 import { NDSongQueryFields } from '/@/shared/api/navidrome.types';
+import { hasFeature } from '/@/shared/api/utils';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
@@ -23,6 +32,7 @@ import {
     LibraryItem,
     SortOrder,
 } from '/@/shared/types/domain-types';
+import { ServerFeature } from '/@/shared/types/features-types';
 
 interface NavidromeAlbumFiltersProps {
     customFilters?: Partial<AlbumListFilter>;
@@ -42,6 +52,7 @@ export const NavidromeAlbumFilters = ({
     const { t } = useTranslation();
     const { filter } = useListStoreByKey<AlbumListQuery>({ key: pageKey });
     const { setFilter } = useListStoreActions();
+    const server = getServerById(serverId);
 
     const genreListQuery = useGenreList({
         options: {
@@ -64,12 +75,14 @@ export const NavidromeAlbumFilters = ({
         }));
     }, [genreListQuery.data]);
 
-    const handleGenresFilter = debounce((e: null | string) => {
+    const hasBrf = hasFeature(server, ServerFeature.BFR);
+
+    const handleGenresFilter = debounce((e: null | string[]) => {
         const updatedFilters = setFilter({
             customFilters,
             data: {
                 _custom: filter._custom,
-                genres: e ? [e] : undefined,
+                genres: e ? e : undefined,
             },
             itemType: LibraryItem.ALBUM,
             key: pageKey,
@@ -269,15 +282,29 @@ export const NavidromeAlbumFilters = ({
                     min={0}
                     onChange={(e) => handleYearFilter(e)}
                 />
-                <SelectWithInvalidData
-                    clearable
-                    data={genreList}
-                    defaultValue={filter.genres && filter.genres[0]}
-                    label={t('entity.genre', { count: 1, postProcess: 'titleCase' })}
-                    onChange={handleGenresFilter}
-                    searchable
-                />
+                {!hasBrf && (
+                    <SelectWithInvalidData
+                        clearable
+                        data={genreList}
+                        defaultValue={filter.genres && filter.genres[0]}
+                        label={t('entity.genre', { count: 1, postProcess: 'titleCase' })}
+                        onChange={(value) => handleGenresFilter(value !== null ? [value] : null)}
+                        searchable
+                    />
+                )}
             </Group>
+            {hasBrf && (
+                <Group grow>
+                    <MultiSelectWithInvalidData
+                        clearable
+                        data={genreList}
+                        defaultValue={filter.genres}
+                        label={t('entity.genre', { count: 2, postProcess: 'sentenceCase' })}
+                        onChange={handleGenresFilter}
+                        searchable
+                    />
+                </Group>
+            )}
             <Group grow>
                 <SelectWithInvalidData
                     clearable

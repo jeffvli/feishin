@@ -5,25 +5,27 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { PlaylistDetailSongListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header-filters';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
 import { useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { formatDurationString } from '/@/renderer/utils';
 import { Badge } from '/@/shared/components/badge/badge';
 import { SpinnerIcon } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
-import { LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface PlaylistDetailHeaderProps {
+    handlePlay: (playType: Play) => void;
+
     handleToggleShowQueryBuilder: () => void;
     itemCount?: number;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
 export const PlaylistDetailSongListHeader = ({
+    handlePlay,
     handleToggleShowQueryBuilder,
     itemCount,
     tableRef,
@@ -32,19 +34,12 @@ export const PlaylistDetailSongListHeader = ({
     const { playlistId } = useParams() as { playlistId: string };
     const server = useCurrentServer();
     const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
-    const handlePlayQueueAdd = usePlayQueueAdd();
-
-    const handlePlay = async (playType: Play) => {
-        handlePlayQueueAdd?.({
-            byItemType: { id: [playlistId], type: LibraryItem.PLAYLIST },
-            playType,
-        });
-    };
 
     const playButtonBehavior = usePlayButtonBehavior();
 
     if (detailQuery.isLoading) return null;
     const isSmartPlaylist = detailQuery?.data?.rules;
+    const playlistDuration = detailQuery?.data?.duration;
 
     return (
         <Stack gap={0}>
@@ -52,6 +47,7 @@ export const PlaylistDetailSongListHeader = ({
                 <LibraryHeaderBar>
                     <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
                     <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
+                    {!!playlistDuration && <Badge>{formatDurationString(playlistDuration)}</Badge>}
                     <Badge>
                         {itemCount === null || itemCount === undefined ? (
                             <SpinnerIcon />
@@ -64,6 +60,7 @@ export const PlaylistDetailSongListHeader = ({
             </PageHeader>
             <FilterBar>
                 <PlaylistDetailSongListHeaderFilters
+                    handlePlay={handlePlay}
                     handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
                     tableRef={tableRef}
                 />

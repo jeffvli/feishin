@@ -243,7 +243,7 @@
             "artists": "$t(entity.artist_other)",
             "albumArtists": "$t(entity.albumArtist_other)",
             "shared": "partagé $t(entity.playlist_other)",
-            "myLibrary": "ma bibliothèque"
+            "myLibrary": "Bibliothèque"
         },
         "fullscreenPlayer": {
             "config": {
@@ -331,7 +331,9 @@
             "showDetails": "obtenir des informations",
             "download": "télécharger",
             "playShuffled": "$t(player.shuffle)",
-            "moveToNext": "$t(action.moveToNext)"
+            "moveToNext": "$t(action.moveToNext)",
+            "goToAlbumArtist": "aller à l'$t(entity.albumArtist_one)",
+            "goToAlbum": "aller à l'$t(entity.album_one)"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
@@ -499,7 +501,7 @@
         "sidebarCollapsedNavigation_description": "affiche ou cache la navigation dans la barre latérale réduite",
         "sidebarConfiguration": "configuration de la barre latérale",
         "sidebarConfiguration_description": "sélectionnez les éléments et l'ordre dans lequel ils seront affichés dans la barre latérale",
-        "sidebarPlaylistList": "liste de listes de lecture de la barre latérale",
+        "sidebarPlaylistList": "liste des listes de lecture de la barre latérale",
         "sidebarCollapsedNavigation": "navigation de la barre latéral (réduite)",
         "skipDuration": "durée de l'avance rapide",
         "sidePlayQueueStyle_optionAttached": "attaché",
@@ -546,7 +548,7 @@
         "clearQueryCache": "vide le cache de feishin",
         "clearCache": "vider le cache navigateur",
         "buttonSize_description": "la taille des boutons de la barre de lecture",
-        "clearQueryCache_description": "un 'soft clear' de Feishin. Cela actualisera les liste de lecture, les métadonnées des titres, et réinitialisera les paroles enregistrées. Les paramètres, identifiants du serveur et images mises en cache seront conservés",
+        "clearQueryCache_description": "un 'soft clear' de Feishin. cela actualisera les liste de lecture, les métadonnées des titres, et réinitialisera les paroles enregistrées. les paramètres, identifiants du serveur et images mises en cache seront conservés",
         "clearCache_description": "un 'hard clear' de feishin. en plus de vider le cache de feishin, vide le cache du navigateur (images sauvegardées et autres ressources). les identifiants serveurs et paramètres sont conservés",
         "buttonSize": "taille des boutons du lecteur",
         "clearCacheSuccess": "le cache a été vidé",
@@ -627,7 +629,10 @@
         "discordDisplayType": "type d'affichage du status {{discord}}",
         "discordDisplayType_description": "change ce que vous écoutez dans votre statut",
         "discordDisplayType_songname": "nom du morceau",
-        "discordDisplayType_artistname": "nom(s) d’artiste"
+        "discordDisplayType_artistname": "nom(s) d’artiste",
+        "hotkey_navigateHome": "aller à l'accueil",
+        "preventSleepOnPlayback_description": "Empêche la mise en veille du lecteur lorsque la musique est en cours de lecture",
+        "preventSleepOnPlayback": "Empêche la mise en veille lors de la lecture"
     },
     "form": {
         "deletePlaylist": {

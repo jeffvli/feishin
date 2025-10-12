@@ -1,6 +1,7 @@
 import { electronAPI } from '@electron-toolkit/preload';
 import { contextBridge } from 'electron';
 
+import { autodiscover } from './autodiscover';
 import { browser } from './browser';
 import { discordRpc } from './discord-rpc';
 import { ipc } from './ipc';
@@ -13,6 +14,7 @@ import { utils } from './utils';
 
 // Custom APIs for renderer
 const api = {
+    autodiscover,
     browser,
     discordRpc,
     ipc,

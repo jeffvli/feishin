@@ -286,6 +286,11 @@
         "updateServer": {
             "success": "sunucu başarıyla güncellendi",
             "title": "sunucuyu güncelle"
+        },
+        "privateMode": {
+            "enabled": "gizli mod etkinleştirildi, oynatma durumu artık harici eklentilerden gizlendi",
+            "disabled": "gizli mod devre dışı bırakıldı, oynatma durumu artık etkinleştirilmiş harici eklentiler tarafından görülebilir",
+            "title": "gizli mod"
         }
     },
     "page": {
@@ -322,7 +327,9 @@
             "addFavorite": "$t(action.addToFavorites)",
             "playShuffled": "$t(player.shuffle)",
             "shareItem": "öğeyi paylaş",
-            "showDetails": "bilgi al"
+            "showDetails": "bilgi al",
+            "goToAlbum": "$t(entity.album_one) sayfasına git",
+            "goToAlbumArtist": "$t(entity.albumArtist_one) sayfasına git"
         },
         "manageServers": {
             "url": "URL",
@@ -436,7 +443,9 @@
             "quit": "$t(common.quit)",
             "selectServer": "sunucu seç",
             "settings": "$t(common.setting_other)",
-            "version": "{{version}} sürümü"
+            "version": "{{version}} sürümü",
+            "privateModeOff": "gizli modu kapat",
+            "privateModeOn": "gizli modu aç"
         }
     },
     "player": {
@@ -713,7 +722,14 @@
         "themeLight": "tema (açık)",
         "themeLight_description": "uygulama için kullanılacak açık temayı ayarlar",
         "transcodeNote": "1 (web) - 2 (mpv) şarkıdan sonra etkili olur",
-        "transcode": "kod dönüştürmeyi etkinleştir"
+        "transcode": "kod dönüştürmeyi etkinleştir",
+        "discordDisplayType": "{{discord}} varlık gösterge türü",
+        "discordDisplayType_description": "durumunuzda dinlediğiniz şarkı olarak değiştirir",
+        "discordDisplayType_songname": "şarkı ismi",
+        "discordDisplayType_artistname": "Sanatçı adı(ları)",
+        "hotkey_navigateHome": "ana sayfaya git",
+        "preventSleepOnPlayback": "oynatma sırasında uykuyu önle",
+        "preventSleepOnPlayback_description": "müzik çalarken ekranın uyku moduna geçmesini önle"
     },
     "table": {
         "column": {

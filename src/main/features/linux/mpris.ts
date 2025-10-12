@@ -107,6 +107,10 @@ mprisPlayer.on('seek', (event: number) => {
     });
 });
 
+mprisPlayer.on('raise', () => {
+    getMainWindow()?.show();
+});
+
 ipcMain.on('update-position', (_event, arg: number) => {
     mprisPlayer.getPosition = () => arg * 1e6;
 });

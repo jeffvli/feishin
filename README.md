@@ -157,14 +157,18 @@ This project is built off of [electron-vite](https://github.com/alex8088/electro
 - `pnpm run build:remote` - Build the remote app (remote)
 - `pnpm run build:web` - Build the standalone web app (renderer)
 - `pnpm run package` - Package the project
-- `pnpm run package:dev` - Package the project for development
-- `pnpm run package:linux` - Package the project for Linux
-- `pnpm run package:mac` - Package the project for Mac
-- `pnpm run package:win` - Package the project for Windows
+- `pnpm run package:dev` - Package the project for development locally
+- `pnpm run package:linux` - Package the project for Linux locally
+- `pnpm run package:mac` - Package the project for Mac locally
+- `pnpm run package:win` - Package the project for Windows locally
 - `pnpm run publish:linux` - Publish the project for Linux
+- `pnpm run publish:linux:beta` - Publish the project for Linux (beta channel)
 - `pnpm run publish:linux-arm64` - Publish the project for Linux ARM64
+- `pnpm run publish:linux-arm64:beta` - Publish the project for Linux ARM64 (beta channel)
 - `pnpm run publish:mac` - Publish the project for Mac
+- `pnpm run publish:mac:beta` - Publish the project for Mac (beta channel)
 - `pnpm run publish:win` - Publish the project for Windows
+- `pnpm run publish:win:beta` - Publish the project for Windows (beta channel)
 - `pnpm run typecheck` - Type check the project
 - `pnpm run typecheck:node` - Type check the project with tsconfig.node.json
 - `pnpm run typecheck:web` - Type check the project with tsconfig.web.json

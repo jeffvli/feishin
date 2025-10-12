@@ -28,6 +28,7 @@ import {
 } from '/@/renderer/store/settings.store';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
+import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
 import { PlaybackType, PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
 interface CenterControlsProps {
@@ -112,7 +113,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
 
     return (
         <>
-            <div className={styles.controlsContainer}>
+            <div className={styles.controlsContainer} style={{ zIndex: 50001 }}>
                 <div className={styles.buttonsContainer}>
                     <PlayerButton
                         icon={<Icon fill="default" icon="mediaStop" size={buttonSize - 2} />}
@@ -253,7 +254,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             </div>
             <div className={styles.sliderContainer}>
                 <div className={styles.sliderValueWrapper}>
-                    <Text fw={600} isMuted isNoSelect size="xs">
+                    <Text
+                        className={PlaybackSelectors.elapsedTime}
+                        fw={600}
+                        isMuted
+                        isNoSelect
+                        size="xs"
+                    >
                         {formattedTime}
                     </Text>
                 </div>
@@ -281,7 +288,13 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                     />
                 </div>
                 <div className={styles.sliderValueWrapper}>
-                    <Text fw={600} isMuted isNoSelect size="xs">
+                    <Text
+                        className={PlaybackSelectors.totalDuration}
+                        fw={600}
+                        isMuted
+                        isNoSelect
+                        size="xs"
+                    >
                         {duration}
                     </Text>
                 </div>

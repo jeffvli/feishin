@@ -1,7 +1,7 @@
 import { HotkeyItem, useHotkeys } from '@mantine/hooks';
 import clsx from 'clsx';
 import isElectron from 'is-electron';
-import { lazy } from 'react';
+import { lazy, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import styles from './default-layout.module.css';
@@ -11,7 +11,12 @@ import { CommandPalette } from '/@/renderer/features/search/components/command-p
 import { MainContent } from '/@/renderer/layouts/default-layout/main-content';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCommandPalette } from '/@/renderer/store';
+import {
+    useAppStore,
+    useCommandPalette,
+    useCurrentStatus,
+    useQueueStatus,
+} from '/@/renderer/store';
 import {
     useGeneralSettings,
     useHotkeySettings,
@@ -19,7 +24,7 @@ import {
     useSettingsStoreActions,
     useWindowSettings,
 } from '/@/renderer/store/settings.store';
-import { Platform, PlaybackType } from '/@/shared/types/types';
+import { Platform, PlaybackType, PlayerStatus } from '/@/shared/types/types';
 
 if (!isElectron()) {
     useSettingsStore.getState().actions.setSettings({
@@ -48,6 +53,9 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
     const localSettings = isElectron() ? window.api.localSettings : null;
     const settings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
+    const playerStatus = useCurrentStatus();
+    const { currentSong, index, length } = useQueueStatus();
+    const { privateMode } = useAppStore();
 
     const updateZoom = (increase: number) => {
         const newVal = settings.zoomFactor + increase;
@@ -75,6 +83,19 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
         ...(isElectron() ? zoomHotkeys : []),
     ]);
 
+    const title = useMemo(() => {
+        const statusString = playerStatus === PlayerStatus.PAUSED ? '(Paused) ' : '';
+        const queueString = length ? `(${index + 1} / ${length}) ` : '';
+        const privateModeString = privateMode ? '(Private mode)' : '';
+        const title = `${
+            length
+                ? `${statusString}${queueString}${currentSong?.name}${currentSong?.artistName ? ` — ${currentSong?.artistName} — Feishin` : ''}`
+                : 'Feishin'
+        }${privateMode ? ` ${privateModeString}` : ''}`;
+        document.title = title;
+        return title;
+    }, [currentSong?.artistName, currentSong?.name, index, length, playerStatus, privateMode]);
+
     return (
         <ContextMenuProvider>
             <div
@@ -84,7 +105,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
                 })}
                 id="default-layout"
             >
-                {windowBarStyle !== Platform.WEB && <WindowBar />}
+                {windowBarStyle !== Platform.WEB && <WindowBar title={title} />}
                 <MainContent shell={shell} />
                 <PlayerBar />
             </div>

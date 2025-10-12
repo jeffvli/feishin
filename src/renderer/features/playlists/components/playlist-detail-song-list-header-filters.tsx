@@ -1,29 +1,26 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
-import { IDatasource } from '@ag-grid-community/core';
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { MouseEvent, MutableRefObject, useCallback } from 'react';
+import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
 import i18n from '/@/i18n/i18n';
-import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { openUpdatePlaylistModal } from '/@/renderer/features/playlists/components/update-playlist-form';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
 import { OrderToggleButton } from '/@/renderer/features/shared';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { MoreButton } from '/@/renderer/features/shared/components/more-button';
+import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     PersistedTableColumn,
-    SongListFilter,
     useCurrentServer,
     usePlaylistDetailStore,
     useSetPlaylistDetailFilters,
@@ -40,13 +37,7 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { ConfirmModal } from '/@/shared/components/modal/modal';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
-import {
-    LibraryItem,
-    PlaylistSongListQuery,
-    ServerType,
-    SongListSort,
-    SortOrder,
-} from '/@/shared/types/domain-types';
+import { ServerType, SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ListDisplayType, Play } from '/@/shared/types/types';
 
 const FILTERS = {
@@ -155,7 +146,7 @@ const FILTERS = {
         },
         {
             defaultOrder: SortOrder.ASC,
-            name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
+            name: i18n.t('filter.genre', { postProcess: 'titleCase' }),
             value: SongListSort.GENRE,
         },
         {
@@ -242,11 +233,6 @@ const FILTERS = {
         },
         {
             defaultOrder: SortOrder.DESC,
-            name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
-            value: SongListSort.RECENTLY_PLAYED,
-        },
-        {
-            defaultOrder: SortOrder.DESC,
             name: i18n.t('filter.releaseYear', { postProcess: 'titleCase' }),
             value: SongListSort.YEAR,
         },
@@ -254,11 +240,13 @@ const FILTERS = {
 };
 
 interface PlaylistDetailSongListHeaderFiltersProps {
+    handlePlay: (playType: Play) => void;
     handleToggleShowQueryBuilder: () => void;
     tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
 export const PlaylistDetailSongListHeaderFilters = ({
+    handlePlay,
     handleToggleShowQueryBuilder,
     tableRef,
 }: PlaylistDetailSongListHeaderFiltersProps) => {
@@ -270,15 +258,12 @@ export const PlaylistDetailSongListHeaderFilters = ({
     const setPage = useSetPlaylistStore();
     const setFilter = useSetPlaylistDetailFilters();
     const page = usePlaylistDetailStore();
-    const filters: Partial<PlaylistSongListQuery> = {
-        sortBy: page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID,
-        sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
-    };
+    const searchTerm = page?.table.id[playlistId]?.filter?.searchTerm;
+    const sortBy = page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID;
+    const sortOrder = page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC;
 
     const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
     const isSmartPlaylist = detailQuery.data?.rules;
-
-    const handlePlayQueueAdd = usePlayQueueAdd();
 
     const cq = useContainerQuery();
 
@@ -287,8 +272,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
 
     const sortByLabel =
         (server?.type &&
-            FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === filters.sortBy)
-                ?.name) ||
+            FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === sortBy)?.name) ||
         'Unknown';
 
     const handleItemSize = (e: number) => {
@@ -297,93 +281,48 @@ export const PlaylistDetailSongListHeaderFilters = ({
 
     const debouncedHandleItemSize = debounce(handleItemSize, 20);
 
-    const handleFilterChange = useCallback(
-        async (filters: SongListFilter) => {
-            if (server?.type !== ServerType.SUBSONIC) {
-                const dataSource: IDatasource = {
-                    getRows: async (params) => {
-                        const limit = params.endRow - params.startRow;
-                        const startIndex = params.startRow;
+    const handleFilterChange = useCallback(async () => {
+        tableRef.current?.api.redrawRows();
+        tableRef.current?.api.ensureIndexVisible(0, 'top');
 
-                        const queryKey = queryKeys.playlists.songList(
-                            server?.id || '',
-                            playlistId,
-                            {
-                                id: playlistId,
-                                limit,
-                                startIndex,
-                                ...filters,
-                            },
-                        );
-
-                        const songsRes = await queryClient.fetchQuery(
-                            queryKey,
-                            async ({ signal }) =>
-                                api.controller.getPlaylistSongList({
-                                    apiClientProps: {
-                                        server,
-                                        signal,
-                                    },
-                                    query: {
-                                        id: playlistId,
-                                        limit,
-                                        startIndex,
-                                        ...filters,
-                                    },
-                                }),
-                            { cacheTime: 1000 * 60 * 1 },
-                        );
-
-                        params.successCallback(
-                            songsRes?.items || [],
-                            songsRes?.totalRecordCount || 0,
-                        );
-                    },
-                    rowCount: undefined,
-                };
-                tableRef.current?.api.setDatasource(dataSource);
-                tableRef.current?.api.purgeInfiniteCache();
-                tableRef.current?.api.ensureIndexVisible(0, 'top');
-            } else {
-                tableRef.current?.api.redrawRows();
-                tableRef.current?.api.ensureIndexVisible(0, 'top');
-            }
-
-            if (page.display === ListDisplayType.TABLE_PAGINATED) {
-                setPagination({ data: { currentPage: 0 } });
-            }
-        },
-        [tableRef, page.display, server, playlistId, queryClient, setPagination],
-    );
+        if (page.display === ListDisplayType.TABLE_PAGINATED) {
+            setPagination({ data: { currentPage: 0 } });
+        }
+    }, [tableRef, page.display, setPagination]);
 
     const handleRefresh = () => {
-        queryClient.invalidateQueries(queryKeys.albums.list(server?.id || ''));
-        handleFilterChange({ ...page?.table.id[playlistId].filter, ...filters });
+        queryClient.invalidateQueries(queryKeys.playlists.songList(server?.id || '', playlistId));
+        handleFilterChange();
     };
 
     const handleSetSortBy = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
             if (!e.currentTarget?.value || !server?.type) return;
 
-            const sortOrder = FILTERS[server.type as keyof typeof FILTERS].find(
+            const newSortOrder = FILTERS[server.type as keyof typeof FILTERS].find(
                 (f) => f.value === e.currentTarget.value,
             )?.defaultOrder;
 
-            const updatedFilters = setFilter(playlistId, {
+            setFilter(playlistId, {
                 sortBy: e.currentTarget.value as SongListSort,
-                sortOrder: sortOrder || SortOrder.ASC,
+                sortOrder: newSortOrder || SortOrder.ASC,
             });
 
-            handleFilterChange(updatedFilters);
+            handleFilterChange();
         },
         [handleFilterChange, playlistId, server?.type, setFilter],
     );
 
     const handleToggleSortOrder = useCallback(() => {
-        const newSortOrder = filters.sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
-        const updatedFilters = setFilter(playlistId, { sortOrder: newSortOrder });
-        handleFilterChange(updatedFilters);
-    }, [filters.sortOrder, handleFilterChange, playlistId, setFilter]);
+        const newSortOrder = sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
+        setFilter(playlistId, { sortOrder: newSortOrder });
+        handleFilterChange();
+    }, [sortOrder, handleFilterChange, playlistId, setFilter]);
+
+    const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
+        setFilter(playlistId, { searchTerm: e.target.value });
+        handleFilterChange();
+    }, 500);
 
     const handleSetViewType = useCallback(
         (displayType: ListDisplayType) => {
@@ -426,13 +365,6 @@ export const PlaylistDetailSongListHeaderFilters = ({
         if (autoFitColumns) {
             tableRef.current?.api.sizeColumnsToFit();
         }
-    };
-
-    const handlePlay = async (playType: Play) => {
-        handlePlayQueueAdd?.({
-            byItemType: { id: [playlistId], type: LibraryItem.PLAYLIST },
-            playType,
-        });
     };
 
     const deletePlaylistMutation = useDeletePlaylist({});
@@ -484,7 +416,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                     <DropdownMenu.Dropdown>
                         {FILTERS[server?.type as keyof typeof FILTERS].map((filter) => (
                             <DropdownMenu.Item
-                                isSelected={filter.value === filters.sortBy}
+                                isSelected={filter.value === sortBy}
                                 key={`filter-${filter.name}`}
                                 onClick={handleSetSortBy}
                                 value={filter.value}
@@ -498,7 +430,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 <Divider orientation="vertical" />
                 <OrderToggleButton
                     onToggle={handleToggleSortOrder}
-                    sortOrder={filters.sortOrder || SortOrder.ASC}
+                    sortOrder={sortOrder || SortOrder.ASC}
                 />
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
@@ -560,6 +492,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                         )}
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
+                <SearchInput defaultValue={searchTerm} onChange={handleSearch} />
             </Group>
             <Group>
                 <ListConfigMenu

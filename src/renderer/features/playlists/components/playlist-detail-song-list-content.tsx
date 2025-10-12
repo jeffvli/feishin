@@ -2,7 +2,6 @@ import type {
     BodyScrollEvent,
     ColDef,
     GridReadyEvent,
-    IDatasource,
     PaginationChangedEvent,
     RowDoubleClickedEvent,
     RowDragEvent,
@@ -27,7 +26,6 @@ import {
 } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
-import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
 import { useAppFocus } from '/@/renderer/hooks';
 import {
     useCurrentServer,
@@ -42,13 +40,15 @@ import { PersistedTableColumn, usePlayButtonBehavior } from '/@/renderer/store/s
 import { toast } from '/@/shared/components/toast/toast';
 import {
     LibraryItem,
-    PlaylistSongListQuery,
+    PlaylistSongListQueryClientSide,
     QueueSong,
+    ServerType,
     Song,
+    SongListResponse,
     SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { ListDisplayType, ServerType } from '/@/shared/types/types';
+import { ListDisplayType } from '/@/shared/types/types';
 
 interface PlaylistDetailContentProps {
     songs?: Song[];
@@ -63,7 +63,7 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
     const currentSong = useCurrentSong();
     const server = useCurrentServer();
     const page = usePlaylistDetailStore();
-    const filters: Partial<PlaylistSongListQuery> = useMemo(() => {
+    const filters: PlaylistSongListQueryClientSide = useMemo(() => {
         return {
             sortBy: page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID,
             sortOrder: page?.table.id[playlistId]?.filter?.sortOrder || SortOrder.ASC,
@@ -88,20 +88,6 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
 
     const isPaginationEnabled = page.display === ListDisplayType.TABLE_PAGINATED;
 
-    const iSClientSide = server?.type === ServerType.SUBSONIC;
-
-    const checkPlaylistList = usePlaylistSongList({
-        options: {
-            enabled: !iSClientSide,
-        },
-        query: {
-            id: playlistId,
-            limit: 1,
-            startIndex: 0,
-        },
-        serverId: server?.id,
-    });
-
     const columnDefs: ColDef[] = useMemo(
         () => getColumnDefs(page.table.columns, false, 'generic'),
         [page.table.columns],
@@ -109,51 +95,9 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
 
     const onGridReady = useCallback(
         (params: GridReadyEvent) => {
-            if (!iSClientSide) {
-                const dataSource: IDatasource = {
-                    getRows: async (params) => {
-                        const limit = params.endRow - params.startRow;
-                        const startIndex = params.startRow;
-
-                        const query: PlaylistSongListQuery = {
-                            id: playlistId,
-                            limit,
-                            startIndex,
-                            ...filters,
-                        };
-
-                        const queryKey = queryKeys.playlists.songList(
-                            server?.id || '',
-                            playlistId,
-                            query,
-                        );
-
-                        if (!server) return;
-
-                        const songsRes = await queryClient.fetchQuery(
-                            queryKey,
-                            async ({ signal }) =>
-                                api.controller.getPlaylistSongList({
-                                    apiClientProps: {
-                                        server,
-                                        signal,
-                                    },
-                                    query,
-                                }),
-                        );
-
-                        params.successCallback(
-                            songsRes?.items || [],
-                            songsRes?.totalRecordCount || 0,
-                        );
-                    },
-                    rowCount: undefined,
-                };
-                params.api.setDatasource(dataSource);
-            }
             params.api?.ensureIndexVisible(pagination.scrollOffset, 'top');
         },
-        [filters, iSClientSide, pagination.scrollOffset, playlistId, queryClient, server],
+        [pagination.scrollOffset],
     );
 
     const handleDragEnd = useCallback(
@@ -175,12 +119,32 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
                         },
                     });
 
-                    setTimeout(() => {
-                        queryClient.invalidateQueries({
-                            queryKey: queryKeys.playlists.songList(server?.id || '', playlistId),
-                        });
-                        e.api.refreshInfiniteCache();
-                    }, 200);
+                    queryClient.setQueryData<SongListResponse>(
+                        queryKeys.playlists.songList(server?.id || '', playlistId),
+                        (previous) => {
+                            if (previous?.items) {
+                                const from = e.node.rowIndex!;
+                                const to = e.overIndex;
+
+                                const item = previous.items[from];
+                                const remaining = previous.items.toSpliced(from, 1);
+                                remaining.splice(to, 0, item);
+
+                                return {
+                                    error: previous.error,
+                                    items: remaining,
+                                    startIndex: previous.startIndex,
+                                    totalRecordCount: previous.totalRecordCount,
+                                };
+                            }
+
+                            return previous;
+                        },
+                    );
+
+                    // Nodes have to be redrawn, otherwise the row indexes will be wrong
+                    // Maybe it's possible to only redraw necessary rows to not be as expensive?
+                    tableRef.current?.api.redrawRows();
                 } catch (error) {
                     toast.error({
                         message: (error as Error).message,
@@ -189,7 +153,7 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
                 }
             }
         },
-        [playlistId, queryClient, server],
+        [playlistId, queryClient, server, tableRef],
     );
 
     const handleGridSizeChange = () => {
@@ -286,7 +250,9 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
     const { rowClassRules } = useCurrentSongRowStyles({ tableRef });
 
     const canDrag =
-        filters.sortBy === SongListSort.ID && !detailQuery?.data?.rules && !iSClientSide;
+        filters.sortBy === SongListSort.ID &&
+        !detailQuery?.data?.rules &&
+        server?.type !== ServerType.SUBSONIC;
 
     return (
         <>
@@ -303,9 +269,6 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
                         status,
                     }}
                     getRowId={(data) => data.data.uniqueId}
-                    infiniteInitialRowCount={
-                        iSClientSide ? undefined : checkPlaylistList.data?.totalRecordCount || 100
-                    }
                     // https://github.com/ag-grid/ag-grid/issues/5284
                     // Key is used to force remount of table when display, rowHeight, or server changes
                     key={`table-${page.display}-${page.table.rowHeight}-${server?.id}`}
@@ -326,7 +289,7 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
                     rowData={songs}
                     rowDragEntireRow={canDrag}
                     rowHeight={page.table.rowHeight || 40}
-                    rowModelType={iSClientSide ? 'clientSide' : 'infinite'}
+                    rowModelType="clientSide"
                     shouldUpdateSong
                 />
             </VirtualGridAutoSizerContainer>

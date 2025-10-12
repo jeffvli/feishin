@@ -30,9 +30,6 @@ export const useAddToPlaylist = (args: MutationHookArgs) => {
             queryClient.invalidateQueries(queryKeys.playlists.list(serverId), { exact: false });
             queryClient.invalidateQueries(queryKeys.playlists.detail(serverId, variables.query.id));
             queryClient.invalidateQueries(
-                queryKeys.playlists.detailSongList(serverId, variables.query.id),
-            );
-            queryClient.invalidateQueries(
                 queryKeys.playlists.songList(serverId, variables.query.id),
             );
         },

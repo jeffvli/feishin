@@ -30,6 +30,7 @@ const getCoverArtUrl = (args: {
     coverArtId: string;
     credential: string | undefined;
     size: number;
+    updated: string;
 }) => {
     const size = args.size ? args.size : 250;
 
@@ -43,7 +44,10 @@ const getCoverArtUrl = (args: {
         `&${args.credential}` +
         '&v=1.13.0' +
         '&c=Feishin' +
-        `&size=${size}`
+        `&size=${size}` +
+        // A dummy variable to invalidate the cached image if the item is updated
+        // This is adapted from how Navidrome web does it
+        `&_=${args.updated}`
     );
 };
 
@@ -140,6 +144,7 @@ const normalizeSong = (
         coverArtId: id,
         credential: server?.credential,
         size: imageSize || 100,
+        updated: item.updatedAt,
     });
 
     const imagePlaceholderUrl = null;
@@ -175,6 +180,8 @@ const normalizeSong = (
         itemType: LibraryItem.SONG,
         lastPlayedAt: normalizePlayDate(item),
         lyrics: item.lyrics ? item.lyrics : null,
+        mbzRecordingId: item.mbzReleaseTrackId || null,
+        mbzTrackId: item.mbzReleaseTrackId || null,
         name: item.title,
         // Thankfully, Windows is merciful and allows a mix of separators. So, we can use the
         // POSIX separator here instead
@@ -216,6 +223,7 @@ const normalizeAlbum = (
         coverArtId: item.coverArtId || item.id,
         credential: server?.credential,
         size: imageSize || 300,
+        updated: item.updatedAt,
     });
 
     const imagePlaceholderUrl = null;
@@ -282,6 +290,7 @@ const normalizeAlbumArtist = (
             coverArtId: `ar-${item.id}`,
             credential: server?.credential,
             size: 300,
+            updated: item.updatedAt || '',
         });
     }
 
@@ -344,6 +353,7 @@ const normalizePlaylist = (
         coverArtId: item.id,
         credential: server?.credential,
         size: imageSize || 300,
+        updated: item.updatedAt,
     });
 
     const imagePlaceholderUrl = null;
