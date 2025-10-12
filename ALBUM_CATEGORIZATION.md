@@ -108,7 +108,8 @@ Two new sections have been added to the artist detail page:
 
 #### Running Tests:
 ```bash
-npm test album-categorization
+pnpm i
+pnpm test:album-categorization
 ```
 
 ### 7. Future Enhancements

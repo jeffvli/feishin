@@ -55,7 +55,10 @@
         "start": "electron-vite preview",
         "typecheck": "pnpm run typecheck:node && pnpm run typecheck:web",
         "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
-        "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false"
+        "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
+        "test": "vitest run",
+        "test:ui": "vitest",
+        "test:album-categorization": "vitest run src/renderer/utils/__tests__/album-categorization.test.ts"
     },
     "dependencies": {
         "@ag-grid-community/client-side-row-model": "^28.2.1",
@@ -159,6 +162,7 @@
         "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-react-refresh": "^0.4.19",
         "i18next-parser": "^9.0.2",
+        "jsdom": "^27.0.0",
         "postcss-preset-mantine": "^1.17.0",
         "prettier": "^3.5.3",
         "prettier-plugin-packagejson": "^2.5.14",
@@ -172,7 +176,8 @@
         "vite-plugin-conditional-import": "^0.1.7",
         "vite-plugin-dynamic-import": "^1.6.0",
         "vite-plugin-ejs": "^1.7.0",
-        "vite-plugin-pwa": "^1.0.3"
+        "vite-plugin-pwa": "^1.0.3",
+        "vitest": "^2.1.8"
     },
     "pnpm": {
         "onlyBuiltDependencies": [
