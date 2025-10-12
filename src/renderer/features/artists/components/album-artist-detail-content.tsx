@@ -254,7 +254,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                     title: (
                         <Group align="flex-end" gap="xs">
                             <TextTitle fw={700} order={2}>
-                                {t('page.albumArtistDetail.albums', { postProcess: 'sentenceCase' })}
+                                {t('page.albumArtistDetail.albumsAndEps')}
                             </TextTitle>
                             {analysisMethod === 'song-analysis' && (
                                 <Text size="xs" c="dimmed" title="Categorized using song analysis">

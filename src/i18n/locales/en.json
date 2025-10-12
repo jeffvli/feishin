@@ -300,7 +300,8 @@
     "page": {
         "albumArtistDetail": {
             "about": "About {{artist}}",
-            "albums": "albums",
+      "albums": "albums",
+      "albumsAndEps": "Albums and EPs",
             "appearsOn": "appears on",
             "recentReleases": "recent releases",
             "relatedArtists": "related $t(entity.artist_other)",
