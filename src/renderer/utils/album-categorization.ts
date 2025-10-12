@@ -95,13 +95,7 @@ export function categorizeAlbumsHybrid(
         const albumSongs = songsFromBatchQuery?.[album.id];
         const hasSongAnalysis = !!albumSongs;
 
-        // Debug logging for all albums (can be disabled in production)
-        console.log(`🎵 DEBUG: Hybrid categorization for "${album.name}"`, {
-            albumId: album.id,
-            albumSongsCount: albumSongs?.length || 0,
-            hasSongAnalysis,
-            songsFromBatchQuery: !!songsFromBatchQuery,
-        });
+        // Debug logging disabled in production
 
         if (hasSongAnalysis) {
             songAnalysisCount++;
@@ -215,23 +209,14 @@ export function isSingle(album: Album): boolean {
 function categorizeAlbumWithUniqueCount(album: Album, uniqueSongCount: number): AlbumCategory {
     const durationSeconds = album.duration ?? 0;
 
-    // Debug logging for troubleshooting
-    console.log(`🎵 DEBUG: Categorizing "${album.name}"`, {
-        durationMinutes: Math.round(durationSeconds / 60),
-        durationSeconds,
-        maxEPSongs: CATEGORIZATION_THRESHOLDS.MAX_EP_UNIQUE_SONGS,
-        maxSingleSongs: CATEGORIZATION_THRESHOLDS.MAX_SINGLE_UNIQUE_SONGS,
-        minLPDuration: CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS,
-        songCount: album.songCount,
-        uniqueSongCount,
-    });
+    // Debug logging disabled in production
 
     // Singles: 1-3 unique songs
     if (
         uniqueSongCount > 0 &&
         uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_SINGLE_UNIQUE_SONGS
     ) {
-        console.log(`🎵 DEBUG: "${album.name}" categorized as SINGLE`);
+        // Debug logging disabled in production
         return AlbumCategory.SINGLE;
     }
 
@@ -240,12 +225,12 @@ function categorizeAlbumWithUniqueCount(album: Album, uniqueSongCount: number): 
         uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_EP_UNIQUE_SONGS &&
         durationSeconds < CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS
     ) {
-        console.log(`🎵 DEBUG: "${album.name}" categorized as EP`);
+        // Debug logging disabled in production
         return AlbumCategory.EP;
     }
 
     // LPs: 8+ unique songs OR 30+ minutes
-    console.log(`🎵 DEBUG: "${album.name}" categorized as LP`);
+    // Debug logging disabled in production
     return AlbumCategory.LP;
 }
 
@@ -284,20 +269,12 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
     // Use songs from batch query if available (performance optimization)
     const songsToAnalyze = songsFromQuery || album.songs;
 
-    // Debug logging for all albums
-    console.log(`🎵 DEBUG: Analyzing "${album.name}"`, {
-        albumSongCount: album.songCount,
-        hasAlbumSongs: !!album.songs,
-        hasSongsFromQuery: !!songsFromQuery,
-        songsToAnalyzeLength: songsToAnalyze?.length || 0,
-    });
+    // Debug logging disabled in production
 
     if (!songsToAnalyze || songsToAnalyze.length === 0) {
         // Enhanced fallback: Try to infer from album name and songCount
         const estimatedCount = estimateUniqueSongsFromMetadata(album);
-        console.log(
-            `🎵 DEBUG: Using metadata estimation for "${album.name}": ${estimatedCount} unique songs`,
-        );
+        // Debug logging disabled in production
         return estimatedCount;
     }
 
@@ -330,20 +307,12 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
         }
     }
 
-    console.log(`🎵 DEBUG: Song analysis for "${album.name}":`, {
-        allSongNames: songsToAnalyze.map((s) => s.name),
-        skippedSongs,
-        totalSongs: songsToAnalyze.length,
-        uniqueSongNames: Array.from(baseSongNames),
-        uniqueSongs: baseSongNames.size,
-    });
+    // Debug logging disabled in production
 
     // Safeguard: if all tracks were skipped as instrumentals on a very small release,
     // treat it as a single unique song to avoid false LP categorization.
     if (baseSongNames.size === 0 && songsToAnalyze.length > 0 && songsToAnalyze.length <= 3) {
-        console.log(
-            `🎵 DEBUG: Safeguard applied for "${album.name}": counting as 1 unique song (all tracks looked instrumental and release has <=3 tracks)`,
-        );
+        // Debug logging disabled in production
         return 1;
     }
 
