@@ -709,6 +709,8 @@
         "clearCacheSuccess": "Cache erfolgreich geleert",
         "contextMenu": "Kontextmenü-Einstellungen (Rechtsklick)",
         "customCssEnable_description": "ermöglicht das Schreiben benutzerdefinierten CSS.",
-        "doubleClickBehavior": "bei Doppelklick alle gesuchten Tracks zur Warteschlange hinzufügen"
+        "doubleClickBehavior": "bei Doppelklick alle gesuchten Tracks zur Warteschlange hinzufügen",
+        "mediaSession" : "aktiviere Medien-Sitzung API",
+        "mediaSession_description": "Aktiviert die Windows Media Session-Integration, die Mediensteuerungen und Metadaten im Systemlautstärke-Overlay und auf dem Sperrbildschirm anzeigt (nur Windows)"
     }
 }

@@ -712,6 +712,8 @@
         "transcodeBitrate_description": "selects the bitrate to transcode. 0 means let the server pick",
         "transcodeFormat": "format to transcode",
         "transcodeFormat_description": "selects the format to transcode. leave empty to let the server decide",
+        "mediaSession": "enable media session",
+        "mediaSession_description": "Enables Windows Media Session integration, displaying media controls and metadata in the system volume overlay and lock screen (Windows only)",
         "translationApiProvider": "translation api provider",
         "translationApiProvider_description": "api provider for translation",
         "translationApiKey": "translation api key",

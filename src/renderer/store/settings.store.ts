@@ -195,6 +195,7 @@ export interface SettingsSlice extends SettingsState {
         setTranscodingConfig: (config: TranscodingConfig) => void;
         toggleContextMenuItem: (item: ContextMenuItemType) => void;
         toggleSidebarCollapseShare: () => void;
+        toggleMediaSession: () => void;
     };
 }
 
@@ -301,6 +302,7 @@ export interface SettingsState {
         transcode: TranscodingConfig;
         type: PlaybackType;
         webAudio: boolean;
+        mediaSession: boolean;
     };
     remote: {
         enabled: boolean;
@@ -501,6 +503,7 @@ const initialState: SettingsState = {
         },
         type: PlaybackType.WEB,
         webAudio: true,
+        mediaSession: false,
     },
     remote: {
         enabled: false,
@@ -739,7 +742,12 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     toggleSidebarCollapseShare: () => {
                         set((state) => {
                             state.general.sidebarCollapseShared =
-                                !state.general.sidebarCollapseShared;
+                            !state.general.sidebarCollapseShared;
+                        });
+                    },
+                    toggleMediaSession: () => {
+                        set((state) => {
+                            state.playback.mediaSession = !state.playback.mediaSession;
                         });
                     },
                 },

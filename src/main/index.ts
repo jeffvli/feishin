@@ -518,8 +518,10 @@ async function createWindow(first = true): Promise<void> {
     }
 }
 
-if (process.platform !== 'win32') {
-  app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling');
+const enableWindowsMediaSession = store.get('mediaSession', false) as boolean;
+const shouldDisableMediaFeatures = process.platform !== 'win32' || !enableWindowsMediaSession;
+if(shouldDisableMediaFeatures){
+    app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');
 }
 
 // https://github.com/electron/electron/issues/46538#issuecomment-2808806722

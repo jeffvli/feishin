@@ -8,6 +8,7 @@ import { TranscodeSettings } from '/@/renderer/features/settings/components/play
 import { useSettingsStore } from '/@/renderer/store';
 import { Stack } from '/@/shared/components/stack/stack';
 import { PlaybackType } from '/@/shared/types/types';
+import { MediaSessionSettings } from '/@/renderer/features/settings/components/playback/media-session-settings';
 
 const MpvSettings = lazy(() =>
     import('/@/renderer/features/settings/components/playback/mpv-settings').then((module) => {
@@ -31,6 +32,7 @@ export const PlaybackTab = () => {
             <AudioSettings hasFancyAudio={hasFancyAudio} />
             <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
             <TranscodeSettings />
+            <MediaSessionSettings />
             <ScrobbleSettings />
             <LyricSettings />
         </Stack>
