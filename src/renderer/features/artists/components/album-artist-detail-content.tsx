@@ -233,14 +233,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                 postProcess: 'sentenceCase',
                             })}
                         </TextTitle>
-                        <Button
-                            component={Link}
-                            size="compact-md"
-                            to={artistDiscographyLink}
-                            variant="subtle"
-                        >
-                            {String(t('page.albumArtistDetail.viewDiscography')).toUpperCase()}
-                        </Button>
                     </Group>
                 ),
                 uniqueId: 'recentReleases',
@@ -263,6 +255,9 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             )}
                         </Group>
                     ),
+                    // Place "View discography" button in the right slot next to arrows
+                    // via grid-carousel Title's rightSlot using title.children
+                    // We pass children through title on the carousel props below
                     uniqueId: 'albums',
                 },
                 {
@@ -629,6 +624,18 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                             }}
                                             title={{
                                                 label: carousel.title,
+                                                children:
+                                                    carousel.uniqueId === 'albums' ? (
+                                                        <Button
+                                                            component={Link}
+                                                            size="compact-md"
+                                                            to={artistDiscographyLink}
+                                                            uppercase
+                                                            variant="subtle"
+                                                        >
+                                                            {t('page.albumArtistDetail.viewDiscography')}
+                                                        </Button>
+                                                    ) : undefined,
                                             }}
                                             uniqueId={carousel.uniqueId}
                                         />

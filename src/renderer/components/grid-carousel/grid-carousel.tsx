@@ -48,13 +48,14 @@ interface TitleProps {
     handleNext?: () => void;
     handlePrev?: () => void;
     label?: ReactNode | string;
+    rightSlot?: ReactNode;
     pagination: {
         hasNextPage: boolean;
         hasPreviousPage: boolean;
     };
 }
 
-const Title = ({ handleNext, handlePrev, label, pagination }: TitleProps) => {
+const Title = ({ handleNext, handlePrev, label, rightSlot, pagination }: TitleProps) => {
     return (
         <Group justify="space-between">
             {isValidElement(label) ? (
@@ -66,6 +67,7 @@ const Title = ({ handleNext, handlePrev, label, pagination }: TitleProps) => {
             )}
 
             <Group gap="sm">
+                {rightSlot}
                 <Button
                     disabled={!pagination.hasPreviousPage}
                     onClick={handlePrev}
@@ -284,6 +286,7 @@ export const SwiperGridCarousel = ({
                     handleNext={handleNext}
                     handlePrev={handlePrev}
                     pagination={pagination}
+                    rightSlot={title?.children}
                 />
             ) : null}
             <Swiper
