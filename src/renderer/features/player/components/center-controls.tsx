@@ -263,6 +263,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         isMuted
                         isNoSelect
                         size="xs"
+                        style={{ userSelect: 'none' }}
                     >
                         {formattedTime}
                     </Text>
@@ -297,7 +298,9 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         isMuted
                         isNoSelect
                         onClick={() => setShowTimeRemaining(!showTimeRemaining)}
+                        role="button"
                         size="xs"
+                        style={{ cursor: 'pointer', userSelect: 'none' }}
                     >
                         {showTimeRemaining ? formattedTimeRemaining : formattedDuration}
                     </Text>
