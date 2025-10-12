@@ -23,7 +23,7 @@ interface LibraryHeaderProps {
 
 export const LibraryHeader = forwardRef(
     (
-        { background, blur, children, imageUrl, title }: LibraryHeaderProps,
+        { background, blur, children, imageUrl, item, title }: LibraryHeaderProps,
         ref: Ref<HTMLDivElement>,
     ) => {
         const [isImageError, setIsImageError] = useState<boolean | null>(false);
