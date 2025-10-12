@@ -46,12 +46,28 @@ const CATEGORIZATION_THRESHOLDS = {
 export function categorizeAlbum(album: Album): AlbumCategory {
     const uniqueSongCount = countUniqueSongs(album);
     const durationSeconds = album.duration ?? 0;
+    const hasSongs = Array.isArray(album.songs) && album.songs.length > 0;
+    const songCount = album.songCount ?? 0;
+    const nameIncludesAlbum = /\balbum\b/i.test(album.name || '');
 
     // Singles: 1-3 unique songs
     if (
         uniqueSongCount > 0 &&
         uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_SINGLE_UNIQUE_SONGS
     ) {
+        // If we don't have song titles to analyze and this looks like a generic album entry
+        // (name contains "album") with 4-7 tracks under 30 minutes, prefer EP over SINGLE.
+        // This helps the common case while still allowing special cases (e.g., known singles)
+        // without the word "album" in the title to remain SINGLE.
+        if (
+            !hasSongs &&
+            nameIncludesAlbum &&
+            songCount >= 4 &&
+            songCount <= CATEGORIZATION_THRESHOLDS.MAX_EP_UNIQUE_SONGS &&
+            durationSeconds < CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS
+        ) {
+            return AlbumCategory.EP;
+        }
         return AlbumCategory.SINGLE;
     }
 
@@ -206,12 +222,24 @@ export function isSingle(album: Album): boolean {
  */
 function categorizeAlbumWithUniqueCount(album: Album, uniqueSongCount: number): AlbumCategory {
     const durationSeconds = album.duration ?? 0;
+    const hasSongs = Array.isArray(album.songs) && album.songs.length > 0;
+    const songCount = album.songCount ?? 0;
+    const nameIncludesAlbum = /\balbum\b/i.test(album.name || '');
 
     // Singles: 1-3 unique songs
     if (
         uniqueSongCount > 0 &&
         uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_SINGLE_UNIQUE_SONGS
     ) {
+        if (
+            !hasSongs &&
+            nameIncludesAlbum &&
+            songCount >= 4 &&
+            songCount <= CATEGORIZATION_THRESHOLDS.MAX_EP_UNIQUE_SONGS &&
+            durationSeconds < CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS
+        ) {
+            return AlbumCategory.EP;
+        }
         return AlbumCategory.SINGLE;
     }
 
@@ -304,28 +332,46 @@ function estimateUniqueSongsFromMetadata(album: Album): number {
     const songCount = album.songCount ?? 0;
     const albumName = album.name?.toLowerCase() ?? '';
 
-    // For very small releases (1-3 songs), assume they're singles
-    if (songCount <= 3) {
-        // Most 1-3 track releases are singles, even with variations
-        return Math.max(1, songCount);
+    // For very small releases (1-3 tracks), treat as 1 unique song by default.
+    // This aligns with expectations that 2-3 track releases are usually a single with variations.
+    if (songCount > 0 && songCount <= 3) {
+        return 1;
     }
 
-    // If album name suggests it's a single/EP (contains "single" or "ep")
-    if (albumName.includes('single') || albumName.includes('ep')) {
-        // For singles/EPs, assume fewer unique songs
+    // Handle cases where songCount is missing or zero
+    if (songCount <= 0) {
+        const durationSeconds = album.duration ?? 0;
+        // If the duration is album-length (>= 30 minutes), bias toward LP
+        if (durationSeconds >= CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS) {
+            return 8; // force LP categorization by unique-song rule
+        }
+        // Otherwise, choose a safe EP-ish default
+        return 4;
+    }
+
+    // If album name explicitly indicates single/EP, cap at 3 unique songs
+    const isLabeledSingle = /\bsingle\b/i.test(albumName);
+    const isLabeledEP = /\bep\b/i.test(albumName);
+    if (isLabeledSingle || isLabeledEP) {
         return Math.min(songCount, 3);
     }
 
-    // Heuristic: If track count is 4-6, likely a single/EP with variations
-    if (songCount <= 6) {
-        // Common patterns for singles with multiple versions:
-        // 4 tracks: likely 1-2 unique songs + variations
-        // 5-6 tracks: likely 2-3 unique songs + variations
-        return Math.max(1, Math.floor(songCount * 0.5));
+    // Heuristics for 4-7 track releases without song-level data
+    if (songCount === 4) {
+        // Estimate 2 unique songs for generic 4-track releases without song titles
+        return 2;
     }
 
-    // For larger releases, assume more unique content
-    // Use a conservative estimate: assume 60-80% are unique songs
-    const estimatedUniqueRatio = songCount <= 10 ? 0.7 : 0.8;
-    return Math.max(1, Math.floor(songCount * estimatedUniqueRatio));
+    if (songCount === 5 || songCount === 6) {
+        // Bias toward EP: assume around 4 unique songs
+        return 4;
+    }
+
+    if (songCount === 7) {
+        // Upper bound for EP unique songs
+        return 7;
+    }
+
+    // For 8+ tracks, assume each track is a unique song
+    return Math.max(8, songCount);
 }
