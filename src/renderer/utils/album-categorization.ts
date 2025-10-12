@@ -332,6 +332,11 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
         return estimatedCount;
     }
 
+    // For very small releases (1-3 songs), be more conservative with skipping
+    // This handles cases like "We Go (English Version)" where version doesn't mean remix
+    const totalSongs = songsToAnalyze.length;
+    const shouldBeConservative = totalSongs <= 3;
+
     // Extract base song names (remove parenthetical content for comparison)
     const baseSongNames = new Set<string>();
     const skippedSongs: string[] = [];
@@ -339,10 +344,24 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
     for (const song of songsToAnalyze) {
         if (!song.name) continue;
 
-        // Skip instrumentals and remixes
-        if (isInstrumentalOrRemix(song.name)) {
+        // Skip instrumentals and remixes, but be conservative for small releases
+        if (!shouldBeConservative && isInstrumentalOrRemix(song.name)) {
             skippedSongs.push(song.name);
             continue;
+        }
+
+        // For small releases, only skip if it's obviously an instrumental/remix
+        if (shouldBeConservative && isInstrumentalOrRemix(song.name)) {
+            // Double-check: only skip if it's really obvious (instrumental, remix, etc.)
+            const lowerTitle = song.name.toLowerCase();
+            const isObviousInstrumental =
+                lowerTitle.includes('instrumental') || lowerTitle.includes('inst');
+            const isObviousRemix = lowerTitle.includes('remix') || lowerTitle.includes('mix');
+
+            if (isObviousInstrumental || isObviousRemix) {
+                skippedSongs.push(song.name);
+                continue;
+            }
         }
 
         // Extract base song name by removing content in parentheses
@@ -360,6 +379,7 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
     if (isAespaAlbum) {
         console.log(`🎵 DEBUG: Song analysis for "${album.name}":`, {
             allSongNames: songsToAnalyze.map((s) => s.name),
+            shouldBeConservative,
             skippedSongs,
             totalSongs: songsToAnalyze.length,
             uniqueSongNames: Array.from(baseSongNames),
@@ -381,55 +401,51 @@ function estimateUniqueSongsFromMetadata(album: Album): number {
     const songCount = album.songCount ?? 0;
     const albumName = album.name?.toLowerCase() ?? '';
 
+    // For very small releases (1-3 songs), assume they're singles
+    if (songCount <= 3) {
+        // Most 1-3 track releases are singles, even with variations
+        return Math.max(1, songCount);
+    }
+
     // If album name suggests it's a single (contains "single", "ep", etc.)
     if (albumName.includes('single') || albumName.includes('ep')) {
         // For singles/EPs, assume fewer unique songs
         return Math.min(songCount, 3);
     }
 
-    // Heuristic: If track count is 4 or less, likely a single with variations
-    if (songCount <= 4) {
+    // Heuristic: If track count is 4-6, likely a single/EP with variations
+    if (songCount <= 6) {
         // Common patterns for singles with multiple versions:
-        // 2 tracks: likely 1 unique song + instrumental/remix
-        // 3 tracks: likely 1-2 unique songs + variations
-        // 4 tracks: likely 1-3 unique songs + variations
-        return Math.max(1, Math.floor(songCount / 2));
+        // 4 tracks: likely 1-2 unique songs + variations
+        // 5-6 tracks: likely 2-3 unique songs + variations
+        return Math.max(1, Math.floor(songCount * 0.5));
     }
 
     // For larger releases, assume more unique content
     // Use a conservative estimate: assume 60-80% are unique songs
-    const estimatedUniqueRatio = songCount <= 7 ? 0.7 : 0.8;
+    const estimatedUniqueRatio = songCount <= 10 ? 0.7 : 0.8;
     return Math.max(1, Math.floor(songCount * estimatedUniqueRatio));
 }
 
+/**
+ * Checks if a track title indicates it's an instrumental or remix version
+ * Uses simple heuristics based on common patterns
+ *
+ * @param title - The track title to check
+ * @returns True if the track appears to be an instrumental or remix
+ */
 function isInstrumentalOrRemix(title: string): boolean {
     if (!title) return false;
 
     const lowerTitle = title.toLowerCase();
 
-    // Check for specific patterns first (more precise)
-    const specificPatterns = [
-        '(instrumental version)',
-        '(remix version)',
-        '(extended version)',
-        '(radio version)',
-        '(single version)',
-        '(album version)',
-        '(demo version)',
-    ];
-
-    if (specificPatterns.some((pattern) => lowerTitle.includes(pattern))) {
-        return true;
-    }
-
-    // Check for general keywords (but exclude standalone "version")
-    const generalKeywords = [
+    // Only check for obvious instrumental/remix indicators
+    const obviousPatterns = [
         'instrumental',
         'inst',
         'remix',
         'mix',
         'radio edit',
-        'edit',
         'extended',
         'acapella',
         'dub',
@@ -437,9 +453,7 @@ function isInstrumentalOrRemix(title: string): boolean {
         'demo',
         'outtake',
         'alternate',
-        'live',
-        'acoustic',
     ];
 
-    return generalKeywords.some((keyword) => lowerTitle.includes(keyword));
+    return obviousPatterns.some((pattern) => lowerTitle.includes(pattern));
 }
