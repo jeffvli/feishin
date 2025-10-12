@@ -28,29 +28,6 @@ const CATEGORIZATION_THRESHOLDS = {
 } as const;
 
 /**
- * Keywords that indicate instrumental or remix versions
- * Used to identify tracks that shouldn't count as unique songs
- */
-const INSTRUMENTAL_REMIX_KEYWORDS = [
-    'instrumental',
-    'inst',
-    'remix',
-    'mix',
-    'version',
-    'radio edit',
-    'edit',
-    'extended',
-    'acapella',
-    'dub',
-    'club mix',
-    'demo',
-    'outtake',
-    'alternate',
-    'live',
-    'acoustic',
-] as const;
-
-/**
  * Categorizes an album as Single, EP, or LP based on unique song count and duration
  * Enhanced logic that treats releases with instrumentals/remixes as singles
  *
@@ -117,6 +94,18 @@ export function categorizeAlbumsHybrid(
     const categorizedAlbums = albums.map((album) => {
         const albumSongs = songsFromBatchQuery?.[album.id];
         const hasSongAnalysis = !!albumSongs;
+        const isAespaAlbum =
+            album.name?.toLowerCase().includes('we go') ||
+            album.name?.toLowerCase().includes('aespa');
+
+        if (isAespaAlbum) {
+            console.log(`🎵 DEBUG: Hybrid categorization for "${album.name}"`, {
+                albumId: album.id,
+                albumSongsCount: albumSongs?.length || 0,
+                hasSongAnalysis,
+                songsFromBatchQuery: !!songsFromBatchQuery,
+            });
+        }
 
         if (hasSongAnalysis) {
             songAnalysisCount++;
@@ -230,11 +219,33 @@ export function isSingle(album: Album): boolean {
 function categorizeAlbumWithUniqueCount(album: Album, uniqueSongCount: number): AlbumCategory {
     const durationSeconds = album.duration ?? 0;
 
+    // Debug logging for troubleshooting
+    if (
+        album.name?.toLowerCase().includes('we go') ||
+        album.name?.toLowerCase().includes('aespa')
+    ) {
+        console.log(`🎵 DEBUG: Categorizing "${album.name}"`, {
+            durationMinutes: Math.round(durationSeconds / 60),
+            durationSeconds,
+            maxEPSongs: CATEGORIZATION_THRESHOLDS.MAX_EP_UNIQUE_SONGS,
+            maxSingleSongs: CATEGORIZATION_THRESHOLDS.MAX_SINGLE_UNIQUE_SONGS,
+            minLPDuration: CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS,
+            songCount: album.songCount,
+            uniqueSongCount,
+        });
+    }
+
     // Singles: 1-3 unique songs
     if (
         uniqueSongCount > 0 &&
         uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_SINGLE_UNIQUE_SONGS
     ) {
+        if (
+            album.name?.toLowerCase().includes('we go') ||
+            album.name?.toLowerCase().includes('aespa')
+        ) {
+            console.log(`🎵 DEBUG: "${album.name}" categorized as SINGLE`);
+        }
         return AlbumCategory.SINGLE;
     }
 
@@ -243,10 +254,22 @@ function categorizeAlbumWithUniqueCount(album: Album, uniqueSongCount: number): 
         uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_EP_UNIQUE_SONGS &&
         durationSeconds < CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS
     ) {
+        if (
+            album.name?.toLowerCase().includes('we go') ||
+            album.name?.toLowerCase().includes('aespa')
+        ) {
+            console.log(`🎵 DEBUG: "${album.name}" categorized as EP`);
+        }
         return AlbumCategory.EP;
     }
 
     // LPs: 8+ unique songs OR 30+ minutes
+    if (
+        album.name?.toLowerCase().includes('we go') ||
+        album.name?.toLowerCase().includes('aespa')
+    ) {
+        console.log(`🎵 DEBUG: "${album.name}" categorized as LP`);
+    }
     return AlbumCategory.LP;
 }
 
@@ -285,19 +308,42 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
     // Use songs from batch query if available (performance optimization)
     const songsToAnalyze = songsFromQuery || album.songs;
 
+    // Debug logging for aespa albums
+    const isAespaAlbum =
+        album.name?.toLowerCase().includes('we go') || album.name?.toLowerCase().includes('aespa');
+
+    if (isAespaAlbum) {
+        console.log(`🎵 DEBUG: Analyzing "${album.name}"`, {
+            albumSongCount: album.songCount,
+            hasAlbumSongs: !!album.songs,
+            hasSongsFromQuery: !!songsFromQuery,
+            songsToAnalyzeLength: songsToAnalyze?.length || 0,
+        });
+    }
+
     if (!songsToAnalyze || songsToAnalyze.length === 0) {
         // Enhanced fallback: Try to infer from album name and songCount
-        return estimateUniqueSongsFromMetadata(album);
+        const estimatedCount = estimateUniqueSongsFromMetadata(album);
+        if (isAespaAlbum) {
+            console.log(
+                `🎵 DEBUG: Using metadata estimation for "${album.name}": ${estimatedCount} unique songs`,
+            );
+        }
+        return estimatedCount;
     }
 
     // Extract base song names (remove parenthetical content for comparison)
     const baseSongNames = new Set<string>();
+    const skippedSongs: string[] = [];
 
     for (const song of songsToAnalyze) {
         if (!song.name) continue;
 
         // Skip instrumentals and remixes
-        if (isInstrumentalOrRemix(song.name)) continue;
+        if (isInstrumentalOrRemix(song.name)) {
+            skippedSongs.push(song.name);
+            continue;
+        }
 
         // Extract base song name by removing content in parentheses
         // e.g., "Song Name (feat. Artist)" -> "Song Name"
@@ -309,6 +355,16 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
         if (baseName) {
             baseSongNames.add(baseName);
         }
+    }
+
+    if (isAespaAlbum) {
+        console.log(`🎵 DEBUG: Song analysis for "${album.name}":`, {
+            allSongNames: songsToAnalyze.map((s) => s.name),
+            skippedSongs,
+            totalSongs: songsToAnalyze.length,
+            uniqueSongNames: Array.from(baseSongNames),
+            uniqueSongs: baseSongNames.size,
+        });
     }
 
     return baseSongNames.size;
@@ -350,5 +406,40 @@ function isInstrumentalOrRemix(title: string): boolean {
     if (!title) return false;
 
     const lowerTitle = title.toLowerCase();
-    return INSTRUMENTAL_REMIX_KEYWORDS.some((keyword) => lowerTitle.includes(keyword));
+
+    // Check for specific patterns first (more precise)
+    const specificPatterns = [
+        '(instrumental version)',
+        '(remix version)',
+        '(extended version)',
+        '(radio version)',
+        '(single version)',
+        '(album version)',
+        '(demo version)',
+    ];
+
+    if (specificPatterns.some((pattern) => lowerTitle.includes(pattern))) {
+        return true;
+    }
+
+    // Check for general keywords (but exclude standalone "version")
+    const generalKeywords = [
+        'instrumental',
+        'inst',
+        'remix',
+        'mix',
+        'radio edit',
+        'edit',
+        'extended',
+        'acapella',
+        'dub',
+        'club mix',
+        'demo',
+        'outtake',
+        'alternate',
+        'live',
+        'acoustic',
+    ];
+
+    return generalKeywords.some((keyword) => lowerTitle.includes(keyword));
 }
