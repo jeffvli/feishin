@@ -99,7 +99,7 @@
     grid-area: image;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    height: auto;
     filter: drop-shadow(0 0 8px rgb(0 0 0 / 50%));
 }
 
