@@ -202,8 +202,8 @@ export interface SettingsSlice extends SettingsState {
         setTable: (type: TableType, data: DataTableProps) => void;
         setTranscodingConfig: (config: TranscodingConfig) => void;
         toggleContextMenuItem: (item: ContextMenuItemType) => void;
-        toggleSidebarCollapseShare: () => void;
         toggleMediaSession: () => void;
+        toggleSidebarCollapseShare: () => void;
     };
 }
 
@@ -299,6 +299,7 @@ export interface SettingsState {
         audioDeviceId?: null | string;
         crossfadeDuration: number;
         crossfadeStyle: CrossfadeStyle;
+        mediaSession: boolean;
         mpvExtraParameters: string[];
         mpvProperties: MpvSettings;
         muted: boolean;
@@ -313,7 +314,6 @@ export interface SettingsState {
         transcode: TranscodingConfig;
         type: PlaybackType;
         webAudio: boolean;
-        mediaSession: boolean;
     };
     remote: {
         enabled: boolean;
@@ -493,6 +493,7 @@ const initialState: SettingsState = {
         audioDeviceId: undefined,
         crossfadeDuration: 5,
         crossfadeStyle: CrossfadeStyle.EQUALPOWER,
+        mediaSession: false,
         mpvExtraParameters: [],
         mpvProperties: {
             audioExclusiveMode: 'no',
@@ -518,7 +519,6 @@ const initialState: SettingsState = {
         },
         type: PlaybackType.WEB,
         webAudio: true,
-        mediaSession: false,
     },
     remote: {
         enabled: false,
@@ -755,15 +755,15 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                                 !state.general.disabledContextMenu[item];
                         });
                     },
-                    toggleSidebarCollapseShare: () => {
-                        set((state) => {
-                            state.general.sidebarCollapseShared =
-                            !state.general.sidebarCollapseShared;
-                        });
-                    },
                     toggleMediaSession: () => {
                         set((state) => {
                             state.playback.mediaSession = !state.playback.mediaSession;
+                        });
+                    },
+                    toggleSidebarCollapseShare: () => {
+                        set((state) => {
+                            state.general.sidebarCollapseShared =
+                                !state.general.sidebarCollapseShared;
                         });
                     },
                 },

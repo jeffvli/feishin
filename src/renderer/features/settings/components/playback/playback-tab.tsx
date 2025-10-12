@@ -3,12 +3,12 @@ import { lazy, Suspense, useMemo } from 'react';
 
 import { AudioSettings } from '/@/renderer/features/settings/components/playback/audio-settings';
 import { LyricSettings } from '/@/renderer/features/settings/components/playback/lyric-settings';
+import { MediaSessionSettings } from '/@/renderer/features/settings/components/playback/media-session-settings';
 import { ScrobbleSettings } from '/@/renderer/features/settings/components/playback/scrobble-settings';
 import { TranscodeSettings } from '/@/renderer/features/settings/components/playback/transcode-settings';
 import { useSettingsStore } from '/@/renderer/store';
 import { Stack } from '/@/shared/components/stack/stack';
 import { PlaybackType } from '/@/shared/types/types';
-import { MediaSessionSettings } from '/@/renderer/features/settings/components/playback/media-session-settings';
 
 const MpvSettings = lazy(() =>
     import('/@/renderer/features/settings/components/playback/mpv-settings').then((module) => {
