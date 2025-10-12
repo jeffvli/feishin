@@ -6,12 +6,8 @@ import { Link } from 'react-router-dom';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
-import {
-    useHandleGeneralContextMenu,
-} from '/@/renderer/features/context-menu';
-import {
-    ALBUM_CONTEXT_MENU_ITEMS,
-} from '/@/renderer/features/context-menu/context-menu-items';
+import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu';
+import { ALBUM_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { usePlayQueueAdd } from '/@/renderer/features/player';
 import {
     LibraryHeader,
@@ -142,7 +138,9 @@ export const AlbumDetailHeader = forwardRef(
         );
 
         const mbzId = detailQuery?.data?.mbzId;
-        const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
+        const showGenres = detailQuery?.data?.genres
+            ? detailQuery?.data?.genres.length !== 0
+            : false;
 
         const metadataItems = [
             {
@@ -195,9 +193,10 @@ export const AlbumDetailHeader = forwardRef(
                                     </Text>
                                 </Fragment>
                             ))}
-                            {detailQuery?.data?.albumArtists && detailQuery.data.albumArtists.length > 0 && (
-                                <Text isNoSelect>•</Text>
-                            )}
+                            {detailQuery?.data?.albumArtists &&
+                                detailQuery.data.albumArtists.length > 0 && (
+                                    <Text isNoSelect>•</Text>
+                                )}
                             {metadataItems.map((item, index) => (
                                 <Fragment key={`item-${item.id}-${index}`}>
                                     {index > 0 && <Text isNoSelect>•</Text>}
@@ -235,6 +234,7 @@ export const AlbumDetailHeader = forwardRef(
                                 )}
                                 {externalLinks && lastFM && (
                                     <ActionIcon
+                                        aria-label={t('action.openIn.lastfm')}
                                         component="a"
                                         href={`https://www.last.fm/music/${encodeURIComponent(
                                             detailQuery?.data?.albumArtist || '',
@@ -244,7 +244,6 @@ export const AlbumDetailHeader = forwardRef(
                                             fill: 'default',
                                             size: 'lg',
                                         }}
-                                        aria-label="Open in Last.fm"
                                         rel="noopener noreferrer"
                                         size="lg"
                                         target="_blank"
@@ -256,6 +255,7 @@ export const AlbumDetailHeader = forwardRef(
                                 )}
                                 {externalLinks && mbzId && musicBrainz && (
                                     <ActionIcon
+                                        aria-label={t('action.openIn.musicbrainz')}
                                         component="a"
                                         href={`https://musicbrainz.org/release/${mbzId}`}
                                         icon="brandMusicBrainz"
@@ -263,7 +263,6 @@ export const AlbumDetailHeader = forwardRef(
                                             fill: 'default',
                                             size: 'lg',
                                         }}
-                                        aria-label="Open in MusicBrainz"
                                         rel="noopener noreferrer"
                                         size="lg"
                                         target="_blank"
@@ -305,11 +304,7 @@ export const AlbumDetailHeader = forwardRef(
                             )}
                             <Popover position="bottom-end">
                                 <Popover.Target>
-                                    <ActionIcon
-                                        icon="settings"
-                                        size="lg"
-                                        variant="transparent"
-                                    />
+                                    <ActionIcon icon="settings" size="lg" variant="transparent" />
                                 </Popover.Target>
                                 <Popover.Dropdown>
                                     <TableConfigDropdown type="albumDetail" />
