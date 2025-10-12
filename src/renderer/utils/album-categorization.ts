@@ -92,6 +92,66 @@ export function categorizeAlbum(album: Album): AlbumCategory {
 }
 
 /**
+ * Hybrid categorization that uses song analysis when available
+ * Falls back to metadata estimation for performance
+ *
+ * @param albums - Array of albums to categorize
+ * @param songsFromBatchQuery - Optional songs from batch query (grouped by album)
+ * @returns Object with categorized albums
+ */
+export function categorizeAlbumsHybrid(
+    albums: Album[] | undefined,
+    songsFromBatchQuery?: Record<string, any[]>,
+): {
+    albums: Album[];
+    analysisMethod: 'metadata-estimation' | 'mixed' | 'song-analysis';
+    singles: Album[];
+} {
+    if (!albums) {
+        return { albums: [], analysisMethod: 'metadata-estimation', singles: [] };
+    }
+
+    let songAnalysisCount = 0;
+    let metadataEstimationCount = 0;
+
+    const categorizedAlbums = albums.map((album) => {
+        const albumSongs = songsFromBatchQuery?.[album.id];
+        const hasSongAnalysis = !!albumSongs;
+
+        if (hasSongAnalysis) {
+            songAnalysisCount++;
+        } else {
+            metadataEstimationCount++;
+        }
+
+        const uniqueSongCount = countUniqueSongs(album, albumSongs);
+        const category = categorizeAlbumWithUniqueCount(album, uniqueSongCount);
+
+        return { album, category };
+    });
+
+    const albumsCategory = categorizedAlbums
+        .filter(({ category }) => category === AlbumCategory.EP || category === AlbumCategory.LP)
+        .map(({ album }) => album);
+
+    const singles = categorizedAlbums
+        .filter(({ category }) => category === AlbumCategory.SINGLE)
+        .map(({ album }) => album);
+
+    // Determine analysis method used
+    let analysisMethod: 'metadata-estimation' | 'mixed' | 'song-analysis';
+    if (songAnalysisCount === albums.length) {
+        analysisMethod = 'song-analysis';
+    } else if (metadataEstimationCount === albums.length) {
+        analysisMethod = 'metadata-estimation';
+    } else {
+        analysisMethod = 'mixed';
+    }
+
+    return { albums: albumsCategory, analysisMethod, singles };
+}
+
+/**
  * Filters albums into EPs and LPs (4+ tracks)
  *
  * @param albums - Array of albums to filter
@@ -145,29 +205,49 @@ export function filterSingles(albums: Album[] | undefined): Album[] {
  * console.log(`Album has ${uniqueCount} unique songs`);
  * ```
  */
+
 export function getUniqueSongCount(album: Album): number {
     return countUniqueSongs(album);
 }
 
-/**
- * Checks if an album is an EP or LP (4+ tracks)
- *
- * @param album - The album to check
- * @returns True if the album is an EP or LP
- */
 export function isAlbum(album: Album): boolean {
     const category = categorizeAlbum(album);
     return category === AlbumCategory.EP || category === AlbumCategory.LP;
 }
 
-/**
- * Checks if an album is a single (1-3 tracks)
- *
- * @param album - The album to check
- * @returns True if the album is a single
- */
 export function isSingle(album: Album): boolean {
     return categorizeAlbum(album) === AlbumCategory.SINGLE;
+}
+
+/**
+ * Categorizes an album with a pre-calculated unique song count
+ * Used internally by hybrid categorization for performance optimization
+ *
+ * @param album - The album to categorize
+ * @param uniqueSongCount - Pre-calculated unique song count
+ * @returns The album category
+ */
+function categorizeAlbumWithUniqueCount(album: Album, uniqueSongCount: number): AlbumCategory {
+    const durationSeconds = album.duration ?? 0;
+
+    // Singles: 1-3 unique songs
+    if (
+        uniqueSongCount > 0 &&
+        uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_SINGLE_UNIQUE_SONGS
+    ) {
+        return AlbumCategory.SINGLE;
+    }
+
+    // EPs: 4-7 unique songs AND under 30 minutes
+    if (
+        uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_EP_UNIQUE_SONGS &&
+        durationSeconds < CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS
+    ) {
+        return AlbumCategory.EP;
+    }
+
+    // LPs: 8+ unique songs OR 30+ minutes
+    return AlbumCategory.LP;
 }
 
 /**
@@ -185,9 +265,10 @@ export function isSingle(album: Album): boolean {
  */
 /**
  * Counts unique songs in an album, excluding instrumentals and remixes
- * Enhanced to work with album metadata even when songs array is not available
+ * Enhanced with hybrid approach: uses song analysis when available, falls back to metadata estimation
  *
  * @param album - The album to analyze
+ * @param songsFromQuery - Optional songs array from batch query (for performance optimization)
  * @returns Number of unique songs (excluding instrumentals/remixes)
  *
  * @example
@@ -200,8 +281,11 @@ export function isSingle(album: Album): boolean {
  * const uniqueCount = countUniqueSongs(album); // 2
  * ```
  */
-function countUniqueSongs(album: Album): number {
-    if (!album.songs || album.songs.length === 0) {
+function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
+    // Use songs from batch query if available (performance optimization)
+    const songsToAnalyze = songsFromQuery || album.songs;
+
+    if (!songsToAnalyze || songsToAnalyze.length === 0) {
         // Enhanced fallback: Try to infer from album name and songCount
         return estimateUniqueSongsFromMetadata(album);
     }
@@ -209,7 +293,7 @@ function countUniqueSongs(album: Album): number {
     // Extract base song names (remove parenthetical content for comparison)
     const baseSongNames = new Set<string>();
 
-    for (const song of album.songs) {
+    for (const song of songsToAnalyze) {
         if (!song.name) continue;
 
         // Skip instrumentals and remixes

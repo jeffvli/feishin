@@ -27,7 +27,7 @@ import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { AppRoute } from '/@/renderer/router/routes';
 import { ArtistItem, useCurrentServer } from '/@/renderer/store';
 import { useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { filterAlbums, filterSingles } from '/@/renderer/utils';
+import { useHybridAlbumCategorization } from '/@/renderer/hooks/use-hybrid-album-categorization';
 import { sanitize } from '/@/renderer/utils/sanitize';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
@@ -144,17 +144,13 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         serverId: server?.id,
     });
 
-    // Client-side categorization: Singles (1-3 tracks)
-    const singles = useMemo(
-        () => filterSingles(allAlbumsQuery?.data?.items),
-        [allAlbumsQuery?.data?.items],
-    );
+    // Hybrid categorization with smart caching and lazy loading
+    const categorization = useHybridAlbumCategorization({
+        albums: allAlbumsQuery?.data?.items,
+        serverId: server?.id || '',
+    });
 
-    // Client-side categorization: Albums (EPs and LPs, 4+ tracks)
-    const albums = useMemo(
-        () => filterAlbums(allAlbumsQuery?.data?.items),
-        [allAlbumsQuery?.data?.items],
-    );
+    const { singles, albums, analysisMethod, isLoading: isCategorizing } = categorization;
 
     const topSongsQuery = useTopSongsList({
         options: {
@@ -248,32 +244,46 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                 ),
                 uniqueId: 'recentReleases',
             },
-            {
-                data: albums?.slice(0, 15),
-                isHidden: !albums?.length,
-                itemType: LibraryItem.ALBUM,
-                loading: allAlbumsQuery?.isLoading || allAlbumsQuery.isFetching,
-                order: 3, // Albums (EPs/LPs)
-                title: (
-                    <TextTitle fw={700} order={2}>
-                        {t('page.albumArtistDetail.albums', { postProcess: 'sentenceCase' })}
-                    </TextTitle>
-                ),
-                uniqueId: 'albums',
-            },
-            {
-                data: singles?.slice(0, 15),
-                isHidden: !singles?.length,
-                itemType: LibraryItem.ALBUM,
-                loading: allAlbumsQuery?.isLoading || allAlbumsQuery.isFetching,
-                order: 4, // Singles
-                title: (
-                    <TextTitle fw={700} order={2}>
-                        {t('page.albumArtistDetail.singles', { postProcess: 'sentenceCase' })}
-                    </TextTitle>
-                ),
-                uniqueId: 'singles',
-            },
+                {
+                    data: albums?.slice(0, 15),
+                    isHidden: !albums?.length,
+                    itemType: LibraryItem.ALBUM,
+                    loading: allAlbumsQuery?.isLoading || allAlbumsQuery.isFetching || isCategorizing,
+                    order: 3, // Albums (EPs/LPs)
+                    title: (
+                        <Group align="flex-end" gap="xs">
+                            <TextTitle fw={700} order={2}>
+                                {t('page.albumArtistDetail.albums', { postProcess: 'sentenceCase' })}
+                            </TextTitle>
+                            {analysisMethod === 'song-analysis' && (
+                                <Text size="xs" c="dimmed" title="Categorized using song analysis">
+                                    🎵
+                                </Text>
+                            )}
+                        </Group>
+                    ),
+                    uniqueId: 'albums',
+                },
+                {
+                    data: singles?.slice(0, 15),
+                    isHidden: !singles?.length,
+                    itemType: LibraryItem.ALBUM,
+                    loading: allAlbumsQuery?.isLoading || allAlbumsQuery.isFetching || isCategorizing,
+                    order: 4, // Singles
+                    title: (
+                        <Group align="flex-end" gap="xs">
+                            <TextTitle fw={700} order={2}>
+                                {t('page.albumArtistDetail.singles', { postProcess: 'sentenceCase' })}
+                            </TextTitle>
+                            {analysisMethod === 'song-analysis' && (
+                                <Text size="xs" c="dimmed" title="Categorized using song analysis">
+                                    🎵
+                                </Text>
+                            )}
+                        </Group>
+                    ),
+                    uniqueId: 'singles',
+                },
             {
                 data: detailQuery?.data?.similarArtists || [],
                 isHidden: !detailQuery?.data?.similarArtists || !enabledItem.similarArtists,
@@ -309,6 +319,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         albums,
         allAlbumsQuery?.isFetching,
         allAlbumsQuery?.isLoading,
+        analysisMethod,
         artistDiscographyLink,
         compilationAlbumsQuery?.data?.items,
         compilationAlbumsQuery.isFetching,
@@ -317,6 +328,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         enabledItem.compilations,
         enabledItem.recentAlbums,
         enabledItem.similarArtists,
+        isCategorizing,
         itemOrder.compilations,
         itemOrder.recentAlbums,
         itemOrder.similarArtists,
