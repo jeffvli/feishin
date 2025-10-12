@@ -27,6 +27,7 @@ import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { AppRoute } from '/@/renderer/router/routes';
 import { ArtistItem, useCurrentServer } from '/@/renderer/store';
 import { useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { filterAlbums, filterSingles } from '/@/renderer/utils';
 import { sanitize } from '/@/renderer/utils/sanitize';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
@@ -127,6 +128,34 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         serverId: server?.id,
     });
 
+    // Fetch all non-compilation albums for categorization into Singles and Albums (EPs/LPs)
+    const allAlbumsQuery = useAlbumList({
+        options: {
+            enabled: true,
+        },
+        query: {
+            artistIds: [routeId],
+            compilation: false,
+            limit: 100, // Fetch more albums for proper categorization
+            sortBy: AlbumListSort.RELEASE_DATE,
+            sortOrder: SortOrder.DESC,
+            startIndex: 0,
+        },
+        serverId: server?.id,
+    });
+
+    // Client-side categorization: Singles (1-3 tracks)
+    const singles = useMemo(
+        () => filterSingles(allAlbumsQuery?.data?.items),
+        [allAlbumsQuery?.data?.items],
+    );
+
+    // Client-side categorization: Albums (EPs and LPs, 4+ tracks)
+    const albums = useMemo(
+        () => filterAlbums(allAlbumsQuery?.data?.items),
+        [allAlbumsQuery?.data?.items],
+    );
+
     const topSongsQuery = useTopSongsList({
         options: {
             enabled: !!detailQuery?.data?.name && enabledItem.topSongs,
@@ -220,6 +249,32 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                 uniqueId: 'recentReleases',
             },
             {
+                data: albums?.slice(0, 15),
+                isHidden: !albums?.length,
+                itemType: LibraryItem.ALBUM,
+                loading: allAlbumsQuery?.isLoading || allAlbumsQuery.isFetching,
+                order: itemOrder.recentAlbums + 0.1, // Place right after recent releases
+                title: (
+                    <TextTitle fw={700} order={2}>
+                        {t('page.albumArtistDetail.albums', { postProcess: 'sentenceCase' })}
+                    </TextTitle>
+                ),
+                uniqueId: 'albums',
+            },
+            {
+                data: singles?.slice(0, 15),
+                isHidden: !singles?.length,
+                itemType: LibraryItem.ALBUM,
+                loading: allAlbumsQuery?.isLoading || allAlbumsQuery.isFetching,
+                order: itemOrder.recentAlbums + 0.2, // Place after albums
+                title: (
+                    <TextTitle fw={700} order={2}>
+                        {t('page.albumArtistDetail.singles', { postProcess: 'sentenceCase' })}
+                    </TextTitle>
+                ),
+                uniqueId: 'singles',
+            },
+            {
                 data: compilationAlbumsQuery?.data?.items,
                 isHidden:
                     !compilationAlbumsQuery?.data?.items?.length ||
@@ -251,6 +306,9 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
             },
         ];
     }, [
+        albums,
+        allAlbumsQuery?.isFetching,
+        allAlbumsQuery?.isLoading,
         artistDiscographyLink,
         compilationAlbumsQuery?.data?.items,
         compilationAlbumsQuery.isFetching,
@@ -266,6 +324,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         recentAlbumsQuery.isFetching,
         recentAlbumsQuery?.isLoading,
         server?.type,
+        singles,
         t,
     ]);
 

@@ -1,3 +1,4 @@
+export * from './album-categorization';
 export * from './constrain-sidebar-width';
 export * from './format';
 export * from './get-header-color';

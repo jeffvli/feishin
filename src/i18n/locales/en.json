@@ -300,14 +300,16 @@
     "page": {
         "albumArtistDetail": {
             "about": "About {{artist}}",
+            "albums": "albums",
             "appearsOn": "appears on",
             "recentReleases": "recent releases",
-            "viewDiscography": "view discography",
             "relatedArtists": "related $t(entity.artist_other)",
+            "singles": "singles",
             "topSongs": "top songs",
             "topSongsFrom": "top songs from {{title}}",
             "viewAll": "view all",
-            "viewAllTracks": "view all $t(entity.track_other)"
+            "viewAllTracks": "view all $t(entity.track_other)",
+            "viewDiscography": "view discography"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
