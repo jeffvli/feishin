@@ -94,18 +94,14 @@ export function categorizeAlbumsHybrid(
     const categorizedAlbums = albums.map((album) => {
         const albumSongs = songsFromBatchQuery?.[album.id];
         const hasSongAnalysis = !!albumSongs;
-        const isAespaAlbum =
-            album.name?.toLowerCase().includes('we go') ||
-            album.name?.toLowerCase().includes('aespa');
 
-        if (isAespaAlbum) {
-            console.log(`🎵 DEBUG: Hybrid categorization for "${album.name}"`, {
-                albumId: album.id,
-                albumSongsCount: albumSongs?.length || 0,
-                hasSongAnalysis,
-                songsFromBatchQuery: !!songsFromBatchQuery,
-            });
-        }
+        // Debug logging for all albums (can be disabled in production)
+        console.log(`🎵 DEBUG: Hybrid categorization for "${album.name}"`, {
+            albumId: album.id,
+            albumSongsCount: albumSongs?.length || 0,
+            hasSongAnalysis,
+            songsFromBatchQuery: !!songsFromBatchQuery,
+        });
 
         if (hasSongAnalysis) {
             songAnalysisCount++;
@@ -220,32 +216,22 @@ function categorizeAlbumWithUniqueCount(album: Album, uniqueSongCount: number): 
     const durationSeconds = album.duration ?? 0;
 
     // Debug logging for troubleshooting
-    if (
-        album.name?.toLowerCase().includes('we go') ||
-        album.name?.toLowerCase().includes('aespa')
-    ) {
-        console.log(`🎵 DEBUG: Categorizing "${album.name}"`, {
-            durationMinutes: Math.round(durationSeconds / 60),
-            durationSeconds,
-            maxEPSongs: CATEGORIZATION_THRESHOLDS.MAX_EP_UNIQUE_SONGS,
-            maxSingleSongs: CATEGORIZATION_THRESHOLDS.MAX_SINGLE_UNIQUE_SONGS,
-            minLPDuration: CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS,
-            songCount: album.songCount,
-            uniqueSongCount,
-        });
-    }
+    console.log(`🎵 DEBUG: Categorizing "${album.name}"`, {
+        durationMinutes: Math.round(durationSeconds / 60),
+        durationSeconds,
+        maxEPSongs: CATEGORIZATION_THRESHOLDS.MAX_EP_UNIQUE_SONGS,
+        maxSingleSongs: CATEGORIZATION_THRESHOLDS.MAX_SINGLE_UNIQUE_SONGS,
+        minLPDuration: CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS,
+        songCount: album.songCount,
+        uniqueSongCount,
+    });
 
     // Singles: 1-3 unique songs
     if (
         uniqueSongCount > 0 &&
         uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_SINGLE_UNIQUE_SONGS
     ) {
-        if (
-            album.name?.toLowerCase().includes('we go') ||
-            album.name?.toLowerCase().includes('aespa')
-        ) {
-            console.log(`🎵 DEBUG: "${album.name}" categorized as SINGLE`);
-        }
+        console.log(`🎵 DEBUG: "${album.name}" categorized as SINGLE`);
         return AlbumCategory.SINGLE;
     }
 
@@ -254,22 +240,12 @@ function categorizeAlbumWithUniqueCount(album: Album, uniqueSongCount: number): 
         uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_EP_UNIQUE_SONGS &&
         durationSeconds < CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS
     ) {
-        if (
-            album.name?.toLowerCase().includes('we go') ||
-            album.name?.toLowerCase().includes('aespa')
-        ) {
-            console.log(`🎵 DEBUG: "${album.name}" categorized as EP`);
-        }
+        console.log(`🎵 DEBUG: "${album.name}" categorized as EP`);
         return AlbumCategory.EP;
     }
 
     // LPs: 8+ unique songs OR 30+ minutes
-    if (
-        album.name?.toLowerCase().includes('we go') ||
-        album.name?.toLowerCase().includes('aespa')
-    ) {
-        console.log(`🎵 DEBUG: "${album.name}" categorized as LP`);
-    }
+    console.log(`🎵 DEBUG: "${album.name}" categorized as LP`);
     return AlbumCategory.LP;
 }
 
@@ -308,64 +284,42 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
     // Use songs from batch query if available (performance optimization)
     const songsToAnalyze = songsFromQuery || album.songs;
 
-    // Debug logging for aespa albums
-    const isAespaAlbum =
-        album.name?.toLowerCase().includes('we go') || album.name?.toLowerCase().includes('aespa');
-
-    if (isAespaAlbum) {
-        console.log(`🎵 DEBUG: Analyzing "${album.name}"`, {
-            albumSongCount: album.songCount,
-            hasAlbumSongs: !!album.songs,
-            hasSongsFromQuery: !!songsFromQuery,
-            songsToAnalyzeLength: songsToAnalyze?.length || 0,
-        });
-    }
+    // Debug logging for all albums
+    console.log(`🎵 DEBUG: Analyzing "${album.name}"`, {
+        albumSongCount: album.songCount,
+        hasAlbumSongs: !!album.songs,
+        hasSongsFromQuery: !!songsFromQuery,
+        songsToAnalyzeLength: songsToAnalyze?.length || 0,
+    });
 
     if (!songsToAnalyze || songsToAnalyze.length === 0) {
         // Enhanced fallback: Try to infer from album name and songCount
         const estimatedCount = estimateUniqueSongsFromMetadata(album);
-        if (isAespaAlbum) {
-            console.log(
-                `🎵 DEBUG: Using metadata estimation for "${album.name}": ${estimatedCount} unique songs`,
-            );
-        }
+        console.log(
+            `🎵 DEBUG: Using metadata estimation for "${album.name}": ${estimatedCount} unique songs`,
+        );
         return estimatedCount;
     }
 
-    // For very small releases (1-3 songs), be more conservative with skipping
-    // This handles cases like "We Go (English Version)" where version doesn't mean remix
-    const totalSongs = songsToAnalyze.length;
-    const shouldBeConservative = totalSongs <= 3;
-
-    // Extract base song names (remove parenthetical content for comparison)
+    // NEW APPROACH: Only skip obvious instrumentals, not remixes
+    // Most songs with "remix" in the title are legitimate songs that should be counted
     const baseSongNames = new Set<string>();
     const skippedSongs: string[] = [];
 
     for (const song of songsToAnalyze) {
         if (!song.name) continue;
 
-        // Skip instrumentals and remixes, but be conservative for small releases
-        if (!shouldBeConservative && isInstrumentalOrRemix(song.name)) {
+        // Only skip if it's clearly an instrumental (no vocals)
+        const lowerTitle = song.name.toLowerCase();
+        const isInstrumental = lowerTitle.includes('instrumental') || lowerTitle.includes('inst');
+
+        if (isInstrumental) {
             skippedSongs.push(song.name);
             continue;
         }
 
-        // For small releases, only skip if it's obviously an instrumental/remix
-        if (shouldBeConservative && isInstrumentalOrRemix(song.name)) {
-            // Double-check: only skip if it's really obvious (instrumental, remix, etc.)
-            const lowerTitle = song.name.toLowerCase();
-            const isObviousInstrumental =
-                lowerTitle.includes('instrumental') || lowerTitle.includes('inst');
-            const isObviousRemix = lowerTitle.includes('remix') || lowerTitle.includes('mix');
-
-            if (isObviousInstrumental || isObviousRemix) {
-                skippedSongs.push(song.name);
-                continue;
-            }
-        }
-
         // Extract base song name by removing content in parentheses
-        // e.g., "Song Name (feat. Artist)" -> "Song Name"
+        // e.g., "Zero (J.I.D Remix)" -> "Zero"
         const baseName = song.name
             .replace(/\s*\([^)]*\)\s*$/g, '')
             .trim()
@@ -376,16 +330,13 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
         }
     }
 
-    if (isAespaAlbum) {
-        console.log(`🎵 DEBUG: Song analysis for "${album.name}":`, {
-            allSongNames: songsToAnalyze.map((s) => s.name),
-            shouldBeConservative,
-            skippedSongs,
-            totalSongs: songsToAnalyze.length,
-            uniqueSongNames: Array.from(baseSongNames),
-            uniqueSongs: baseSongNames.size,
-        });
-    }
+    console.log(`🎵 DEBUG: Song analysis for "${album.name}":`, {
+        allSongNames: songsToAnalyze.map((s) => s.name),
+        skippedSongs,
+        totalSongs: songsToAnalyze.length,
+        uniqueSongNames: Array.from(baseSongNames),
+        uniqueSongs: baseSongNames.size,
+    });
 
     return baseSongNames.size;
 }
@@ -425,35 +376,4 @@ function estimateUniqueSongsFromMetadata(album: Album): number {
     // Use a conservative estimate: assume 60-80% are unique songs
     const estimatedUniqueRatio = songCount <= 10 ? 0.7 : 0.8;
     return Math.max(1, Math.floor(songCount * estimatedUniqueRatio));
-}
-
-/**
- * Checks if a track title indicates it's an instrumental or remix version
- * Uses simple heuristics based on common patterns
- *
- * @param title - The track title to check
- * @returns True if the track appears to be an instrumental or remix
- */
-function isInstrumentalOrRemix(title: string): boolean {
-    if (!title) return false;
-
-    const lowerTitle = title.toLowerCase();
-
-    // Only check for obvious instrumental/remix indicators
-    const obviousPatterns = [
-        'instrumental',
-        'inst',
-        'remix',
-        'mix',
-        'radio edit',
-        'extended',
-        'acapella',
-        'dub',
-        'club mix',
-        'demo',
-        'outtake',
-        'alternate',
-    ];
-
-    return obviousPatterns.some((pattern) => lowerTitle.includes(pattern));
 }
