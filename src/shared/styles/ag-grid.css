@@ -3,7 +3,7 @@
     top: 65px;
     z-index: 15;
     padding: 0 2rem;
-    margin: 0 -2rem;
+    margin: 0;
     box-shadow: 0 -1px 0 0 #181818;
     transition: position 0.2s ease-in-out;
 }
