@@ -338,6 +338,15 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
         uniqueSongs: baseSongNames.size,
     });
 
+    // Safeguard: if all tracks were skipped as instrumentals on a very small release,
+    // treat it as a single unique song to avoid false LP categorization.
+    if (baseSongNames.size === 0 && songsToAnalyze.length > 0 && songsToAnalyze.length <= 3) {
+        console.log(
+            `🎵 DEBUG: Safeguard applied for "${album.name}": counting as 1 unique song (all tracks looked instrumental and release has <=3 tracks)`,
+        );
+        return 1;
+    }
+
     return baseSongNames.size;
 }
 
