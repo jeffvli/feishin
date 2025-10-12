@@ -228,7 +228,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                 isHidden: !recentAlbumsQuery?.data?.items?.length || !enabledItem.recentAlbums,
                 itemType: LibraryItem.ALBUM,
                 loading: recentAlbumsQuery?.isLoading || recentAlbumsQuery.isFetching,
-                order: itemOrder.recentAlbums,
+                order: 2, // Recent releases
                 title: (
                     <Group align="flex-end">
                         <TextTitle fw={700} order={2}>
@@ -253,7 +253,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                 isHidden: !albums?.length,
                 itemType: LibraryItem.ALBUM,
                 loading: allAlbumsQuery?.isLoading || allAlbumsQuery.isFetching,
-                order: itemOrder.recentAlbums + 0.1, // Place right after recent releases
+                order: 3, // Albums (EPs/LPs)
                 title: (
                     <TextTitle fw={700} order={2}>
                         {t('page.albumArtistDetail.albums', { postProcess: 'sentenceCase' })}
@@ -266,13 +266,27 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                 isHidden: !singles?.length,
                 itemType: LibraryItem.ALBUM,
                 loading: allAlbumsQuery?.isLoading || allAlbumsQuery.isFetching,
-                order: itemOrder.recentAlbums + 0.2, // Place after albums
+                order: 4, // Singles
                 title: (
                     <TextTitle fw={700} order={2}>
                         {t('page.albumArtistDetail.singles', { postProcess: 'sentenceCase' })}
                     </TextTitle>
                 ),
                 uniqueId: 'singles',
+            },
+            {
+                data: detailQuery?.data?.similarArtists || [],
+                isHidden: !detailQuery?.data?.similarArtists || !enabledItem.similarArtists,
+                itemType: LibraryItem.ALBUM_ARTIST,
+                order: 6, // Related artists
+                title: (
+                    <TextTitle fw={700} order={2}>
+                        {t('page.albumArtistDetail.relatedArtists', {
+                            postProcess: 'sentenceCase',
+                        })}
+                    </TextTitle>
+                ),
+                uniqueId: 'similarArtists',
             },
             {
                 data: compilationAlbumsQuery?.data?.items,
@@ -282,27 +296,13 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                     server?.type === ServerType.SUBSONIC,
                 itemType: LibraryItem.ALBUM,
                 loading: compilationAlbumsQuery?.isLoading || compilationAlbumsQuery.isFetching,
-                order: itemOrder.compilations,
+                order: itemOrder.compilations, // Keep user setting for compilations
                 title: (
                     <TextTitle fw={700} order={2}>
                         {t('page.albumArtistDetail.appearsOn', { postProcess: 'sentenceCase' })}
                     </TextTitle>
                 ),
                 uniqueId: 'compilationAlbums',
-            },
-            {
-                data: detailQuery?.data?.similarArtists || [],
-                isHidden: !detailQuery?.data?.similarArtists || !enabledItem.similarArtists,
-                itemType: LibraryItem.ALBUM_ARTIST,
-                order: itemOrder.similarArtists,
-                title: (
-                    <TextTitle fw={700} order={2}>
-                        {t('page.albumArtistDetail.relatedArtists', {
-                            postProcess: 'sentenceCase',
-                        })}
-                    </TextTitle>
-                ),
-                uniqueId: 'similarArtists',
             },
         ];
     }, [
@@ -522,7 +522,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                 ) : null}
                 <Grid gutter="xl">
                     {biography ? (
-                        <Grid.Col order={itemOrder.biography} span={12}>
+                        <Grid.Col order={1} span={12}>
                             <section style={{ maxWidth: '1280px' }}>
                                 <TextTitle fw={700} order={2}>
                                     {t('page.albumArtistDetail.about', {
@@ -534,7 +534,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                         </Grid.Col>
                     ) : null}
                     {showTopSongs ? (
-                        <Grid.Col order={itemOrder.topSongs} span={12}>
+                        <Grid.Col order={5} span={12}>
                             <section>
                                 <Group justify="space-between" wrap="nowrap">
                                     <Group align="flex-end" wrap="nowrap">
