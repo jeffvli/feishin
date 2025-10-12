@@ -8,39 +8,24 @@ This feature implements client-side categorization of albums into **Singles** an
 
 ### 1. Categorization Logic (`src/renderer/utils/album-categorization.ts`)
 
-The categorization follows music industry standards:
+The categorization follows music industry standards, using a unique-song approach:
 
-#### **Singles** (1-3 tracks)
-- Any release with 1 to 3 tracks
-- Typically promotional releases or standalone songs
+#### Singles (1–3 unique songs)
+- Instrumentals are ignored; alternate versions are consolidated
 
-#### **EPs** (Extended Play)
-- 4-7 tracks AND under 30 minutes duration
-- Medium-length releases between singles and full albums
+#### EPs (Extended Play)
+- 4–7 unique songs AND under 30 minutes (unique count takes precedence)
 
-#### **LPs** (Long Play / Full Albums)
-- 8+ tracks OR 30+ minutes duration
-- Full-length studio albums
+#### LPs (Long Play / Full Albums)
+- 8+ unique songs OR 30+ minutes
 
-#### Algorithm
-```typescript
-function categorizeAlbum(album: Album): AlbumCategory {
-  const trackCount = album.songCount ?? 0;
-  const durationSeconds = album.duration ?? 0;
-
-  // Singles: 1-3 tracks
-  if (trackCount > 0 && trackCount <= 3) {
-    return AlbumCategory.SINGLE;
-  }
-
-  // EPs: 4-7 tracks and under 30 minutes
-  if (trackCount <= 7 && durationSeconds < 1800) {
-    return AlbumCategory.EP;
-  }
-
-  // LPs: Everything else
-  return AlbumCategory.LP;
-}
+#### Algorithm (overview)
+```ts
+categorizeAlbum(album):
+  unique = countUniqueSongs(album)
+  if 1 <= unique <= 3 -> SINGLE
+  if unique <= 7 and duration < 1800 -> EP
+  else -> LP
 ```
 
 ### 2. User Interface Changes
@@ -165,11 +150,11 @@ New keys added to `src/i18n/locales/en.json`:
 #### Adjustable Parameters:
 
 **In `album-categorization.ts`**:
-```typescript
+```ts
 const CATEGORIZATION_THRESHOLDS = {
-  MAX_SINGLE_TRACKS: 3,        // Tracks <= this = Single
-  MAX_EP_TRACKS: 7,             // Tracks <= this (and <30min) = EP
-  MIN_LP_DURATION_SECONDS: 1800, // Duration >= this = LP
+  MAX_SINGLE_UNIQUE_SONGS: 3,
+  MAX_EP_UNIQUE_SONGS: 7,
+  MIN_LP_DURATION_SECONDS: 1800,
 } as const;
 ```
 

@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
-import { useAlbumAnalysis } from '/@/renderer/services/album-analysis-service';
+import { AlbumAnalysisService, useAlbumAnalysis } from '/@/renderer/services/album-analysis-service';
 import { categorizeAlbumsHybrid } from '/@/renderer/utils/album-categorization';
-import { Album, ServerType } from '/@/shared/types/domain-types';
+import { Album, ServerType, Song } from '/@/shared/types/domain-types';
 
 interface UseHybridAlbumCategorizationArgs {
     albums: Album[] | undefined;
@@ -44,9 +44,9 @@ export const useHybridAlbumCategorization = ({
 
     // Group songs by album ID for efficient lookup
     const songsByAlbumId = useMemo(() => {
-        if (!songsQuery?.data?.items) return {};
+        if (!songsQuery?.data?.items) return {} as Record<string, Song[]>;
 
-        const grouped: Record<string, any[]> = {};
+        const grouped: Record<string, Song[]> = {};
         for (const song of songsQuery.data.items) {
             if (song.albumId) {
                 if (!grouped[song.albumId]) {
@@ -66,16 +66,7 @@ export const useHybridAlbumCategorization = ({
     // Determine if lazy loading should be used
     const shouldUseLazyLoading = useMemo(() => {
         if (!serverType || !shouldAnalyze) return false;
-        
-        // Use lazy loading for large collections
-        const lazyLoadingThresholds = {
-            [ServerType.NAVIDROME]: 30,
-            [ServerType.JELLYFIN]: 20,
-            [ServerType.SUBSONIC]: 15,
-        };
-        
-        const threshold = lazyLoadingThresholds[serverType] || 15;
-        return albumCount > threshold;
+        return AlbumAnalysisService.shouldUseLazyLoading(serverType, albumCount);
     }, [serverType, shouldAnalyze, albumCount]);
 
     return {

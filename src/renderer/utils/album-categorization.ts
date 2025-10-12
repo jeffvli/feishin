@@ -1,4 +1,4 @@
-import { Album } from '/@/shared/types/domain-types';
+import { Album, Song } from '/@/shared/types/domain-types';
 
 /**
  * Album categorization based on track count and duration
@@ -16,8 +16,8 @@ export enum AlbumCategory {
 
 /**
  * Thresholds for album categorization
- * These follow industry-standard definitions with enhanced logic:
- * - Single: 1-3 unique songs (ignoring instrumentals/remixes)
+ * These follow common industry definitions using unique-song logic:
+ * - Single: 1-3 unique songs (instrumentals are ignored; alternate versions consolidated)
  * - EP: 4-7 unique songs AND under 30 minutes (unique songs take precedence over duration)
  * - LP: 8+ unique songs OR 30+ minutes
  */
@@ -78,7 +78,7 @@ export function categorizeAlbum(album: Album): AlbumCategory {
  */
 export function categorizeAlbumsHybrid(
     albums: Album[] | undefined,
-    songsFromBatchQuery?: Record<string, any[]>,
+    songsFromBatchQuery?: Record<string, Song[]>,
 ): {
     albums: Album[];
     analysisMethod: 'metadata-estimation' | 'mixed' | 'song-analysis';
@@ -94,8 +94,6 @@ export function categorizeAlbumsHybrid(
     const categorizedAlbums = albums.map((album) => {
         const albumSongs = songsFromBatchQuery?.[album.id];
         const hasSongAnalysis = !!albumSongs;
-
-        // Debug logging disabled in production
 
         if (hasSongAnalysis) {
             songAnalysisCount++;
@@ -209,14 +207,11 @@ export function isSingle(album: Album): boolean {
 function categorizeAlbumWithUniqueCount(album: Album, uniqueSongCount: number): AlbumCategory {
     const durationSeconds = album.duration ?? 0;
 
-    // Debug logging disabled in production
-
     // Singles: 1-3 unique songs
     if (
         uniqueSongCount > 0 &&
         uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_SINGLE_UNIQUE_SONGS
     ) {
-        // Debug logging disabled in production
         return AlbumCategory.SINGLE;
     }
 
@@ -225,31 +220,16 @@ function categorizeAlbumWithUniqueCount(album: Album, uniqueSongCount: number): 
         uniqueSongCount <= CATEGORIZATION_THRESHOLDS.MAX_EP_UNIQUE_SONGS &&
         durationSeconds < CATEGORIZATION_THRESHOLDS.MIN_LP_DURATION_SECONDS
     ) {
-        // Debug logging disabled in production
         return AlbumCategory.EP;
     }
 
     // LPs: 8+ unique songs OR 30+ minutes
-    // Debug logging disabled in production
     return AlbumCategory.LP;
 }
 
 /**
- * Checks if a track title indicates it's an instrumental or remix version
- *
- * @param title - The track title to check
- * @returns True if the track appears to be an instrumental or remix
- *
- * @example
- * ```ts
- * isInstrumentalOrRemix("Song Name (Instrumental)"); // true
- * isInstrumentalOrRemix("Song Name (Remix)"); // true
- * isInstrumentalOrRemix("Original Song"); // false
- * ```
- */
-/**
- * Counts unique songs in an album, excluding instrumentals and remixes
- * Enhanced with hybrid approach: uses song analysis when available, falls back to metadata estimation
+ * Counts unique songs in an album, excluding instrumentals and consolidating alternate versions
+ * Uses a hybrid approach: song-level analysis when available, otherwise metadata estimation
  *
  * @param album - The album to analyze
  * @param songsFromQuery - Optional songs array from batch query (for performance optimization)
@@ -265,21 +245,18 @@ function categorizeAlbumWithUniqueCount(album: Album, uniqueSongCount: number): 
  * const uniqueCount = countUniqueSongs(album); // 2
  * ```
  */
-function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
+function countUniqueSongs(album: Album, songsFromQuery?: Song[]): number {
     // Use songs from batch query if available (performance optimization)
     const songsToAnalyze = songsFromQuery || album.songs;
-
-    // Debug logging disabled in production
 
     if (!songsToAnalyze || songsToAnalyze.length === 0) {
         // Enhanced fallback: Try to infer from album name and songCount
         const estimatedCount = estimateUniqueSongsFromMetadata(album);
-        // Debug logging disabled in production
         return estimatedCount;
     }
 
-    // NEW APPROACH: Only skip obvious instrumentals, not remixes
-    // Most songs with "remix" in the title are legitimate songs that should be counted
+    // Consolidate alternate versions: strip trailing parenthetical (Remix, Edit, Version, etc.)
+    // Skip obvious instrumentals (Instrumental/Inst)
     const baseSongNames = new Set<string>();
     const skippedSongs: string[] = [];
 
@@ -288,14 +265,14 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
 
         // Only skip if it's clearly an instrumental (no vocals)
         const lowerTitle = song.name.toLowerCase();
-        const isInstrumental = lowerTitle.includes('instrumental') || lowerTitle.includes('inst');
+        const isInstrumental = /\b(inst(ru?mental)?)\b/i.test(lowerTitle);
 
         if (isInstrumental) {
             skippedSongs.push(song.name);
             continue;
         }
 
-        // Extract base song name by removing content in parentheses
+        // Extract base song name by removing a trailing parenthetical
         // e.g., "Zero (J.I.D Remix)" -> "Zero"
         const baseName = song.name
             .replace(/\s*\([^)]*\)\s*$/g, '')
@@ -307,12 +284,9 @@ function countUniqueSongs(album: Album, songsFromQuery?: any[]): number {
         }
     }
 
-    // Debug logging disabled in production
-
     // Safeguard: if all tracks were skipped as instrumentals on a very small release,
     // treat it as a single unique song to avoid false LP categorization.
     if (baseSongNames.size === 0 && songsToAnalyze.length > 0 && songsToAnalyze.length <= 3) {
-        // Debug logging disabled in production
         return 1;
     }
 
@@ -336,7 +310,7 @@ function estimateUniqueSongsFromMetadata(album: Album): number {
         return Math.max(1, songCount);
     }
 
-    // If album name suggests it's a single (contains "single", "ep", etc.)
+    // If album name suggests it's a single/EP (contains "single" or "ep")
     if (albumName.includes('single') || albumName.includes('ep')) {
         // For singles/EPs, assume fewer unique songs
         return Math.min(songCount, 3);
