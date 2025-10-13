@@ -1,6 +1,7 @@
 import { useElementSize, useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
-import { throttle } from 'lodash';
+import debounce from 'lodash/debounce';
+import throttle from 'lodash/throttle';
 import { AnimatePresence } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import {
@@ -9,12 +10,13 @@ import {
     UIEvent,
     useCallback,
     useEffect,
+    useImperativeHandle,
     useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
-import { List, ListImperativeAPI, RowComponentProps, useListRef } from 'react-window-v2';
+import { List, RowComponentProps, useListRef } from 'react-window-v2';
 
 import { ExpandedListContainer } from '../expanded-list-container';
 import styles from './item-grid-list.module.css';
@@ -56,7 +58,7 @@ export interface ItemGridListProps {
     onScroll?: (e: UIEvent<HTMLDivElement>) => void;
     onScrollEnd?: (offset: number, handle: ItemListHandle) => void;
     onStartReached?: (index: number, handle: ItemListHandle) => void;
-    ref: Ref<ListImperativeAPI>;
+    ref?: Ref<ItemListHandle>;
 }
 
 export const ItemGridList = ({
@@ -64,12 +66,15 @@ export const ItemGridList = ({
     enableExpansion = true,
     enableSelection = true,
     gap = 'sm',
+    initialTop,
     itemsPerRow,
     itemType,
     onEndReached,
     onRangeChanged,
     onScroll,
+    onScrollEnd,
     onStartReached,
+    ref,
 }: ItemGridListProps) => {
     const itemGridRef = useListRef(null);
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
@@ -110,14 +115,39 @@ export const ItemGridList = ({
         }
     }, [itemGridRef, initialize]);
 
+    const isInitialScrollPositionSet = useRef<boolean>(false);
+
     const hasExpanded = internalState.hasExpanded();
+
+    const handleOnScrollEnd = useCallback(
+        (scrollTop: number, handle: ItemListHandle) => {
+            onScrollEnd?.(scrollTop, handle);
+        },
+        [onScrollEnd],
+    );
+
+    const debouncedOnScrollEnd = debounce(handleOnScrollEnd, 150);
 
     const handleScroll = useCallback(
         (e: UIEvent<HTMLDivElement>) => {
             onScroll?.(e);
+            debouncedOnScrollEnd(
+                e.currentTarget.scrollTop,
+                itemGridRef.current ?? (undefined as any),
+            );
         },
-        [onScroll],
+        [onScroll, debouncedOnScrollEnd, itemGridRef],
     );
+
+    const scrollToGridOffset = useCallback((offset: number) => {
+        const scrollContainer = scrollContainerRef.current?.firstElementChild as
+            | HTMLElement
+            | undefined;
+
+        if (scrollContainer) {
+            scrollContainer.scrollTo({ behavior: 'instant', top: offset });
+        }
+    }, []);
 
     const [tableMeta, setTableMeta] = useState<null | {
         columnCount: number;
@@ -241,6 +271,47 @@ export const ItemGridList = ({
         internalState,
         itemType,
     };
+
+    useEffect(() => {
+        if (!initialTop || isInitialScrollPositionSet.current || !tableMeta?.itemHeight) return;
+        isInitialScrollPositionSet.current = true;
+
+        if (initialTop.type === 'offset') {
+            scrollToGridOffset(initialTop.to);
+        } else {
+            itemGridRef.current?.scrollToRow({
+                behavior: initialTop.behavior,
+                index: initialTop.to,
+            });
+        }
+    }, [initialTop, itemGridRef, scrollToGridOffset, tableMeta?.itemHeight]);
+
+    const imperativeHandle: ItemListHandle = useMemo(() => {
+        return {
+            clearExpanded: () => {
+                internalState.clearExpanded();
+            },
+            clearSelected: () => {
+                internalState.clearSelected();
+            },
+            getItem: (index: number) => data[index],
+            getItemCount: () => data.length,
+            getItems: () => data,
+            internalState,
+            scrollToIndex: (index: number) => {
+                itemGridRef.current?.scrollToRow({
+                    align: 'smart',
+                    behavior: 'auto',
+                    index: Math.floor(index / (tableMeta?.columnCount || 1)),
+                });
+            },
+            scrollToOffset: (offset: number) => {
+                scrollToGridOffset(offset);
+            },
+        };
+    }, [data, internalState, scrollToGridOffset, tableMeta?.columnCount, itemGridRef]);
+
+    useImperativeHandle(ref, () => imperativeHandle);
 
     return (
         <div

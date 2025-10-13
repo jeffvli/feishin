@@ -53,6 +53,7 @@ export interface ItemControls {
 export interface ItemListComponentProps<TQuery> {
     itemsPerPage?: number;
     query: Omit<TQuery, 'limit' | 'startIndex'>;
+    saveScrollOffset?: boolean;
     serverId: string;
 }
 
