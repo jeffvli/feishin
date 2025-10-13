@@ -1,0 +1,21 @@
+name: Publish release to WinGet
+on:
+  release:
+    types: [released]
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Specific tag name"
+        required: false
+        type: string
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - uses: vedantmgoyal9/winget-releaser@main
+        with:
+          identifier: jeffvli.Feishin
+          installers-regex: 'Feishin-*-win-x64\.exe'
+          token: ${{ secrets.WINGET_ACC_TOKEN }}
+          
