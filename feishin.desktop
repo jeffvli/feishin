@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Feishin
-Comment=An Electron-based music streaming app
-Exec=/home/username/.applications/Feishin-linux-x86_64.AppImage
-Icon=/home/username/.applications/Feishin-linux-x86_64.png
-Terminal=false
-Type=Application
-Categories=AudioVideo;Audio;Music;Player;
-StartupNotify=true
