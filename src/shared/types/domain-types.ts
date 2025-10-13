@@ -2,7 +2,6 @@ import { Omit } from 'lodash';
 import orderBy from 'lodash/orderBy';
 import reverse from 'lodash/reverse';
 import shuffle from 'lodash/shuffle';
-import { z } from 'zod';
 
 import {
     JFAlbumArtistListSort,
@@ -12,7 +11,6 @@ import {
     JFPlaylistListSort,
     JFSongListSort,
     JFSortOrder,
-    jfType,
 } from '/@/shared/api/jellyfin/jellyfin-types';
 import {
     NDAlbumArtistListSort,
@@ -21,7 +19,6 @@ import {
     NDPlaylistListSort,
     NDSongListSort,
     NDSortOrder,
-    ndType,
     NDUserListSort,
 } from '/@/shared/api/navidrome/navidrome-types';
 import { ServerFeatures } from '/@/shared/types/features-types';
@@ -428,11 +425,8 @@ export type AlbumListArgs = BaseEndpointArgs & { query: AlbumListQuery };
 
 export type AlbumListCountArgs = BaseEndpointArgs & { query: ListCountQuery<AlbumListQuery> };
 
-export interface AlbumListQuery extends BaseQuery<AlbumListSort> {
-    _custom?: {
-        jellyfin?: Partial<z.infer<typeof jfType._parameters.albumList>>;
-        navidrome?: Partial<z.infer<typeof ndType._parameters.albumList>>;
-    };
+export interface AlbumListQuery extends AlbumListNavidromeQuery, BaseQuery<AlbumListSort> {
+    _custom?: Record<string, any>;
     artistIds?: string[];
     compilation?: boolean;
     favorite?: boolean;
@@ -449,6 +443,11 @@ export interface AlbumListQuery extends BaseQuery<AlbumListSort> {
 export type AlbumListResponse = BasePaginatedResponse<Album[]>;
 
 export type ListCountQuery<TQuery> = Omit<TQuery, 'limit' | 'startIndex'>;
+
+interface AlbumListNavidromeQuery {
+    hasRating?: boolean;
+    isRecentlyPlayed?: boolean;
+}
 
 type AlbumListSortMap = {
     jellyfin: Record<AlbumListSort, JFAlbumListSort | undefined>;
@@ -553,10 +552,7 @@ export type SongListArgs = BaseEndpointArgs & { query: SongListQuery };
 export type SongListCountArgs = BaseEndpointArgs & { query: ListCountQuery<SongListQuery> };
 
 export interface SongListQuery extends BaseQuery<SongListSort> {
-    _custom?: {
-        jellyfin?: Partial<z.infer<typeof jfType._parameters.songList>>;
-        navidrome?: Partial<z.infer<typeof ndType._parameters.songList>>;
-    };
+    _custom?: Record<string, any>;
     albumArtistIds?: string[];
     albumIds?: string[];
     artistIds?: string[];
@@ -668,10 +664,7 @@ export type AlbumArtistListCountArgs = BaseEndpointArgs & {
 };
 
 export interface AlbumArtistListQuery extends BaseQuery<AlbumArtistListSort> {
-    _custom?: {
-        jellyfin?: Partial<z.infer<typeof jfType._parameters.albumArtistList>>;
-        navidrome?: Partial<z.infer<typeof ndType._parameters.albumArtistList>>;
-    };
+    _custom?: Record<string, any>;
     limit?: number;
     musicFolderId?: string;
     searchTerm?: string;
@@ -763,10 +756,7 @@ export type ArtistListArgs = BaseEndpointArgs & { query: ArtistListQuery };
 export type ArtistListCountArgs = BaseEndpointArgs & { query: ListCountQuery<ArtistListQuery> };
 
 export interface ArtistListQuery extends BaseQuery<ArtistListSort> {
-    _custom?: {
-        jellyfin?: Partial<z.infer<typeof jfType._parameters.albumArtistList>>;
-        navidrome?: Partial<z.infer<typeof ndType._parameters.albumArtistList>>;
-    };
+    _custom?: Record<string, any>;
     limit?: number;
     musicFolderId?: string;
     role?: string;
@@ -855,14 +845,7 @@ export type AddToPlaylistResponse = null | undefined;
 export type CreatePlaylistArgs = BaseEndpointArgs & { body: CreatePlaylistBody };
 
 export type CreatePlaylistBody = {
-    _custom?: {
-        navidrome?: {
-            owner?: string;
-            ownerId?: string;
-            rules?: Record<string, any>;
-            sync?: boolean;
-        };
-    };
+    _custom?: Record<string, any>;
     comment?: string;
     name: string;
     public?: boolean;
@@ -895,10 +878,7 @@ export type PlaylistListArgs = BaseEndpointArgs & { query: PlaylistListQuery };
 export type PlaylistListCountArgs = BaseEndpointArgs & { query: ListCountQuery<PlaylistListQuery> };
 
 export interface PlaylistListQuery extends BaseQuery<PlaylistListSort> {
-    _custom?: {
-        jellyfin?: Partial<z.infer<typeof jfType._parameters.playlistList>>;
-        navidrome?: Partial<z.infer<typeof ndType._parameters.playlistList>>;
-    };
+    _custom?: Record<string, any>;
     limit?: number;
     searchTerm?: string;
     startIndex: number;
@@ -948,14 +928,7 @@ export type UpdatePlaylistArgs = BaseEndpointArgs & {
 };
 
 export type UpdatePlaylistBody = {
-    _custom?: {
-        navidrome?: {
-            owner?: string;
-            ownerId?: string;
-            rules?: Record<string, any>;
-            sync?: boolean;
-        };
-    };
+    _custom?: Record<string, any>;
     comment?: string;
     genres?: Genre[];
     name: string;
@@ -1043,11 +1016,7 @@ export type PlaylistSongListResponse = BasePaginatedResponse<Song[]>;
 export type UserListArgs = BaseEndpointArgs & { query: UserListQuery };
 
 export interface UserListQuery extends BaseQuery<UserListSort> {
-    _custom?: {
-        navidrome?: {
-            owner_id?: string;
-        };
-    };
+    _custom?: Record<string, any>;
     limit?: number;
     searchTerm?: string;
     startIndex: number;
@@ -1514,7 +1483,7 @@ export const sortAlbumList = (albums: Album[], sortBy: AlbumListSort, sortOrder:
     return results;
 };
 
-export const sortSongList = (songs: QueueSong[], sortBy: SongListSort, sortOrder: SortOrder) => {
+export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: SortOrder) => {
     let results = songs;
 
     const order = sortOrder === SortOrder.ASC ? 'asc' : 'desc';

@@ -326,7 +326,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                 SortBy: albumListSortMap.jellyfin[query.sortBy] || 'SortName',
                 SortOrder: sortOrderMap.jellyfin[query.sortOrder],
                 StartIndex: query.startIndex,
-                ...query._custom?.jellyfin,
+                ...query._custom,
                 Years: yearsFilter,
             },
         });
@@ -748,7 +748,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                         SortBy: songListSortMap.jellyfin[query.sortBy] || 'Album,SortName',
                         SortOrder: sortOrderMap.jellyfin[query.sortOrder],
                         StartIndex: query.startIndex,
-                        ...query._custom?.jellyfin,
+                        ...query._custom,
                         Years: yearsFilter,
                     },
                 });
@@ -783,7 +783,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                     SortBy: songListSortMap.jellyfin[query.sortBy] || 'Album,SortName',
                     SortOrder: sortOrderMap.jellyfin[query.sortOrder],
                     StartIndex: query.startIndex,
-                    ...query._custom?.jellyfin,
+                    ...query._custom,
                     Years: yearsFilter,
                 },
             });

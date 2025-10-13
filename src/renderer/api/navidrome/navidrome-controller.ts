@@ -111,8 +111,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 comment: body.comment,
                 name: body.name,
                 public: body.public,
-                rules: body._custom?.navidrome?.rules,
-                sync: body._custom?.navidrome?.sync,
+                ...body._custom,
             },
         });
 
@@ -191,7 +190,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 _sort: albumArtistListSortMap.navidrome[query.sortBy],
                 _start: query.startIndex,
                 name: query.searchTerm,
-                ...query._custom?.navidrome,
+                ...query._custom,
                 role: hasFeature(apiClientProps.server, ServerFeature.BFR) ? 'albumartist' : '',
                 ...excludeMissing(apiClientProps.server),
             },
@@ -289,7 +288,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 compilation: query.compilation,
                 genre_id: genres,
                 name: query.searchTerm,
-                ...query._custom?.navidrome,
+                ...query._custom,
                 starred: query.favorite,
                 ...excludeMissing(apiClientProps.server),
             },
@@ -320,7 +319,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 _sort: albumArtistListSortMap.navidrome[query.sortBy],
                 _start: query.startIndex,
                 name: query.searchTerm,
-                ...query._custom?.navidrome,
+                ...query._custom,
                 role: query.role || undefined,
                 ...excludeMissing(apiClientProps.server),
             },
@@ -395,7 +394,7 @@ export const NavidromeController: InternalControllerEndpoint = {
     },
     getPlaylistList: async (args) => {
         const { apiClientProps, query } = args;
-        const customQuery = query._custom?.navidrome;
+        const customQuery = query._custom;
 
         // Smart playlists only became available in 0.48.0. Do not filter for previous versions
         if (
@@ -570,7 +569,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 [getArtistSongKey(apiClientProps.server)]: query.artistIds ?? query.albumArtistIds,
                 starred: query.favorite,
                 title: query.searchTerm,
-                ...query._custom?.navidrome,
+                ...query._custom,
                 ...excludeMissing(apiClientProps.server),
             },
         });
@@ -643,7 +642,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 _order: sortOrderMap.navidrome[query.sortOrder],
                 _sort: userListSortMap.navidrome[query.sortBy],
                 _start: query.startIndex,
-                ...query._custom?.navidrome,
+                ...query._custom,
             },
         });
 
@@ -724,8 +723,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 comment: body.comment || '',
                 name: body.name,
                 public: body?.public || false,
-                rules: body._custom?.navidrome?.rules ? body._custom.navidrome.rules : undefined,
-                sync: body._custom?.navidrome?.sync || undefined,
+                ...body._custom,
             },
             params: {
                 id: query.id,
