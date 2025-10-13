@@ -8,8 +8,9 @@ import {
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { Switch } from '/@/shared/components/switch/switch';
 
-const isWindows = window.api.utils.isWindows();
+const isWindows = isElectron() ? window.api.utils.isWindows() : null;
 const isDesktop = isElectron();
+const ipc = isElectron() ? window.api.ipc : null;
 
 export const MediaSessionSettings = () => {
     const { t } = useTranslation();
@@ -19,7 +20,7 @@ export const MediaSessionSettings = () => {
     function handleMediaSessionChange() {
         const current = mediaSession;
         toggleMediaSession();
-        window.api.ipc.send('settings-set', { property: 'mediaSession', value: !current });
+        ipc?.send('settings-set', { property: 'mediaSession', value: !current });
     }
 
     const mediaSessionOptions: SettingOption[] = [
@@ -35,7 +36,7 @@ export const MediaSessionSettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: isDesktop && !isWindows,
+            isHidden: !isWindows || !isDesktop,
             note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
             title: t('setting.mediaSession', { postProcess: 'sentenceCase' }),
         },

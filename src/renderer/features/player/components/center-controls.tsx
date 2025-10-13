@@ -39,17 +39,21 @@ interface CenterControlsProps {
 export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
-
+    const [isSeeking, setIsSeeking] = useState(false);
     const currentSong = useCurrentSong();
     const skip = useSettingsStore((state) => state.general.skipButtons);
     const buttonSize = useSettingsStore((state) => state.general.buttonSize);
-
+    const playbackType = usePlaybackType();
     const player1 = playersRef?.current?.player1;
     const player2 = playersRef?.current?.player2;
     const status = useCurrentStatus();
+    const player = useCurrentPlayer();
+    const setCurrentTime = useSetCurrentTime();
     const repeat = useRepeatStatus();
     const shuffle = useShuffleStatus();
     const { bindings } = useHotkeySettings();
+    const { showTimeRemaining } = useAppStore();
+    const { setShowTimeRemaining } = useAppStoreActions();
 
     const {
         handleNextTrack,
@@ -65,6 +69,32 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
         handleToggleShuffle,
     } = useCenterControls({ playersRef });
     const handlePlayQueueAdd = usePlayQueueAdd();
+
+    const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
+    const currentTime = useCurrentTime();
+    const currentPlayerRef = player === 1 ? player1 : player2;
+    const formattedDuration = formatDuration(songDuration * 1000 || 0);
+    const formattedTimeRemaining = formatDuration((currentTime - songDuration) * 1000 || 0);
+    const formattedTime = formatDuration(currentTime * 1000 || 0);
+
+    useEffect(() => {
+        let interval: ReturnType<typeof setInterval>;
+
+        if (status === PlayerStatus.PLAYING && !isSeeking) {
+            if (!isElectron() || playbackType === PlaybackType.WEB) {
+                // Update twice a second for slightly better performance
+                interval = setInterval(() => {
+                    if (currentPlayerRef) {
+                        setCurrentTime(currentPlayerRef.getCurrentTime());
+                    }
+                }, 500);
+            }
+        }
+
+        return () => clearInterval(interval);
+    }, [currentPlayerRef, isSeeking, setCurrentTime, playbackType, status]);
+
+    const [seekValue, setSeekValue] = useState(0);
 
     useHotkeys([
         [bindings.playPause.isGlobal ? '' : bindings.playPause.hotkey, handlePlayPause],
@@ -237,110 +267,57 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                     />
                 </div>
             </div>
-            <PlayerSeekSlider
-                handleSeekSlider={handleSeekSlider}
-                player1={player1}
-                player2={player2}
-            />
+            <div className={styles.sliderContainer}>
+                <div className={styles.sliderValueWrapper}>
+                    <Text
+                        className={PlaybackSelectors.elapsedTime}
+                        fw={600}
+                        isMuted
+                        isNoSelect
+                        size="xs"
+                        style={{ userSelect: 'none' }}
+                    >
+                        {formattedTime}
+                    </Text>
+                </div>
+                <div className={styles.sliderWrapper}>
+                    <PlayerbarSlider
+                        label={(value) => formatDuration(value * 1000)}
+                        max={songDuration}
+                        min={0}
+                        onChange={(e) => {
+                            setIsSeeking(true);
+                            setSeekValue(e);
+                        }}
+                        onChangeEnd={(e) => {
+                            // There is a timing bug in Mantine in which the onChangeEnd
+                            // event fires before onChange. Add a small delay to force
+                            // onChangeEnd to happen after onCHange
+                            setTimeout(() => {
+                                handleSeekSlider(e);
+                                setIsSeeking(false);
+                            }, 50);
+                        }}
+                        size={6}
+                        value={!isSeeking ? currentTime : seekValue}
+                        w="100%"
+                    />
+                </div>
+                <div className={styles.sliderValueWrapper}>
+                    <Text
+                        className={PlaybackSelectors.totalDuration}
+                        fw={600}
+                        isMuted
+                        isNoSelect
+                        onClick={() => setShowTimeRemaining(!showTimeRemaining)}
+                        role="button"
+                        size="xs"
+                        style={{ cursor: 'pointer', userSelect: 'none' }}
+                    >
+                        {showTimeRemaining ? formattedTimeRemaining : formattedDuration}
+                    </Text>
+                </div>
+            </div>
         </>
-    );
-};
-
-const PlayerSeekSlider = ({
-    handleSeekSlider,
-    player1,
-    player2,
-}: {
-    handleSeekSlider: (e: any | number) => void;
-    player1: any;
-    player2: any;
-}) => {
-    const player = useCurrentPlayer();
-    const playbackType = usePlaybackType();
-    const setCurrentTime = useSetCurrentTime();
-    const status = useCurrentStatus();
-
-    const currentSong = useCurrentSong();
-    const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
-    const currentTime = useCurrentTime();
-    const currentPlayerRef = player === 1 ? player1 : player2;
-    const [isSeeking, setIsSeeking] = useState(false);
-
-    useEffect(() => {
-        let interval: ReturnType<typeof setInterval>;
-
-        if (status === PlayerStatus.PLAYING && !isSeeking) {
-            if (!isElectron() || playbackType === PlaybackType.WEB) {
-                // Update twice a second for slightly better performance
-                interval = setInterval(() => {
-                    if (currentPlayerRef) {
-                        setCurrentTime(currentPlayerRef.getCurrentTime());
-                    }
-                }, 500);
-            }
-        }
-
-        return () => clearInterval(interval);
-    }, [currentPlayerRef, isSeeking, setCurrentTime, playbackType, status]);
-
-    const { showTimeRemaining } = useAppStore();
-    const { setShowTimeRemaining } = useAppStoreActions();
-    const formattedDuration = formatDuration(songDuration * 1000 || 0);
-    const formattedTimeRemaining = formatDuration((currentTime - songDuration) * 1000 || 0);
-    const formattedTime = formatDuration(currentTime * 1000 || 0);
-    const [seekValue, setSeekValue] = useState(0);
-
-    return (
-        <div className={styles.sliderContainer}>
-            <div className={styles.sliderValueWrapper}>
-                <Text
-                    className={PlaybackSelectors.elapsedTime}
-                    fw={600}
-                    isMuted
-                    isNoSelect
-                    size="xs"
-                    style={{ userSelect: 'none' }}
-                >
-                    {formattedTime}
-                </Text>
-            </div>
-            <div className={styles.sliderWrapper}>
-                <PlayerbarSlider
-                    label={(value) => formatDuration(value * 1000)}
-                    max={songDuration}
-                    min={0}
-                    onChange={(e) => {
-                        setIsSeeking(true);
-                        setSeekValue(e);
-                    }}
-                    onChangeEnd={(e) => {
-                        // There is a timing bug in Mantine in which the onChangeEnd
-                        // event fires before onChange. Add a small delay to force
-                        // onChangeEnd to happen after onCHange
-                        setTimeout(() => {
-                            handleSeekSlider(e);
-                            setIsSeeking(false);
-                        }, 50);
-                    }}
-                    size={6}
-                    value={!isSeeking ? currentTime : seekValue}
-                    w="100%"
-                />
-            </div>
-            <div className={styles.sliderValueWrapper}>
-                <Text
-                    className={PlaybackSelectors.totalDuration}
-                    fw={600}
-                    isMuted
-                    isNoSelect
-                    onClick={() => setShowTimeRemaining(!showTimeRemaining)}
-                    role="button"
-                    size="xs"
-                    style={{ cursor: 'pointer', userSelect: 'none' }}
-                >
-                    {showTimeRemaining ? formattedTimeRemaining : formattedDuration}
-                </Text>
-            </div>
-        </div>
     );
 };
