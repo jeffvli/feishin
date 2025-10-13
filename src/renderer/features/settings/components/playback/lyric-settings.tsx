@@ -214,6 +214,28 @@ export const LyricSettings = () => {
             isHidden: !isElectron(),
             title: t('setting.translationApiKey', { postProcess: 'sentenceCase' }),
         },
+        {
+            control: (
+                <Switch
+                    aria-label="Enable auto translation"
+                    defaultChecked={settings.enableAutoTranslation}
+                    onChange={(e) => {
+                        setSettings({
+                            lyrics: {
+                                ...settings,
+                                enableAutoTranslation: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.enableAutoTranslation', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.enableAutoTranslation', { postProcess: 'sentenceCase' }),
+        },
     ];
 
     return <SettingsSection divider={false} options={lyricOptions} />;

@@ -735,6 +735,8 @@
         "translationApiKey_description": "api key for translation (Support global service endpoint only)",
         "translationTargetLanguage": "translation target language",
         "translationTargetLanguage_description": "target language for translation",
+        "enableAutoTranslation": "enable auto translation",
+        "enableAutoTranslation_description": "enable translation automatically when lyrics are loaded",
         "trayEnabled": "show tray",
         "trayEnabled_description": "show/hide tray icon/menu. if disabled, also disables minimize/exit to tray",
         "useSystemTheme": "use system theme",
