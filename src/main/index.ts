@@ -505,7 +505,7 @@ async function createWindow(first = true): Promise<void> {
     });
 
     if (isWindows()) {
-        app.setAppUserModelId(process.execPath);
+        app.setAppUserModelId('org.jeffvli.feishin');
     }
 
     if (isMacOS()) {
