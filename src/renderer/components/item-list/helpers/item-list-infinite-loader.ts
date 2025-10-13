@@ -12,10 +12,12 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { getServerById } from '/@/renderer/store';
+import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface UseItemListInfiniteLoaderProps {
     eventKey: string;
     itemsPerPage: number;
+    itemType: LibraryItem;
     listCountQuery: UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
     listQueryFn: (args: { apiClientProps: any; query: any }) => Promise<{ items: unknown[] }>;
     query: Record<string, any>;
@@ -29,6 +31,7 @@ function getInitialData(itemCount: number) {
 export const useItemListInfiniteLoader = ({
     eventKey,
     itemsPerPage = 100,
+    itemType,
     listCountQuery,
     listQueryFn,
     query = {},
@@ -64,8 +67,8 @@ export const useItemListInfiniteLoader = ({
     }, [query]);
 
     const dataQueryKey = useMemo(
-        () => [serverId, 'item-list-infinite-loader', query],
-        [serverId, query],
+        () => [serverId, 'item-list-infinite-loader', itemType, query],
+        [serverId, itemType, query],
     );
 
     const { data } = useQuery<unknown[]>({
