@@ -12,6 +12,7 @@ import {
     useGeneralSettings,
     usePlayerStore,
 } from '/@/renderer/store';
+import { sentenceCase } from '/@/renderer/utils';
 import { QueueSong, ServerType } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
@@ -65,13 +66,13 @@ export const useDiscordRpc = () => {
                 };
 
                 const activity: SetActivity = {
-                    details: song?.name.padEnd(2, ' ') || 'Idle',
+                    details: (song?.name && song.name.padEnd(2, ' ')) || 'Idle',
                     instance: false,
                     largeImageKey: undefined,
-                    largeImageText: song?.album || 'Unknown album',
+                    largeImageText: (song?.album && song.album.padEnd(2, ' ')) || 'Unknown album',
                     smallImageKey: undefined,
-                    smallImageText: current[2] as string,
-                    state: artists || 'Unknown artist',
+                    smallImageText: sentenceCase(current[2] as string),
+                    state: (artists && artists.padEnd(2, ' ')) || 'Unknown artist',
                     statusDisplayType: statusDisplayMap[discordSettings.displayType],
                     // I would love to use the actual type as opposed to hardcoding to 2,
                     // but manually installing the discord-types package appears to break things
