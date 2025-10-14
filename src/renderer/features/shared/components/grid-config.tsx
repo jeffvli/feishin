@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ListConfigTable } from '/@/renderer/features/shared/components/list-config-menu';
 import {
     DataGridProps,
-    DataListProps,
+    ItemListSettings,
     useSettingsStore,
     useSettingsStoreActions,
 } from '/@/renderer/store';
@@ -28,8 +28,8 @@ type GridConfigProps = {
 export const GridConfig = ({ extraOptions, listKey }: GridConfigProps) => {
     const { t } = useTranslation();
 
-    const list = useSettingsStore((state) => state.lists[listKey]) as DataListProps;
-    const grid = useSettingsStore((state) => state.lists[listKey].grid) as DataGridProps;
+    const list = useSettingsStore((state) => state.lists[listKey]) as ItemListSettings;
+    const grid = list.grid as DataGridProps;
     const { setList } = useSettingsStoreActions();
 
     const options = useMemo(() => {
@@ -182,6 +182,7 @@ export const GridConfig = ({ extraOptions, listKey }: GridConfigProps) => {
                                     grid: { itemsPerRowEnabled: e.target.checked },
                                 })
                             }
+                            pr="md"
                             size="xs"
                         />
                     </Group>
@@ -192,9 +193,5 @@ export const GridConfig = ({ extraOptions, listKey }: GridConfigProps) => {
         ];
     }, [list, t, grid, extraOptions, setList, listKey]);
 
-    return (
-        <>
-            <ListConfigTable options={options} />
-        </>
-    );
+    return <ListConfigTable options={options} />;
 };

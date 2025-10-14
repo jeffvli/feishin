@@ -1,3 +1,5 @@
+import z from 'zod';
+
 import i18n from '/@/i18n/i18n';
 import { Play } from '/@/shared/types/types';
 
@@ -20,9 +22,35 @@ export const PLAY_TYPES = [
     },
 ];
 
-export const FILTER_KEYS = {
+export const customFiltersSchema = z.record(z.string(), z.any());
+
+enum AlbumFilterKeys {
+    _CUSTOM = '_custom',
+    ARTIST_IDS = 'artistIds',
+    COMPILATION = 'compilation',
+    FAVORITE = 'favorite',
+    GENRE_ID = 'genreId',
+    GENRES = 'genres',
+    HAS_RATING = 'hasRating',
+    MAX_YEAR = 'maxYear',
+    MIN_YEAR = 'minYear',
+    RECENTLY_PLAYED = 'recentlyPlayed',
+}
+
+enum SharedFilterKeys {
+    MUSIC_FOLDER_ID = 'musicFolderId',
+    SEARCH_TERM = 'searchTerm',
+    SORT_BY = 'sortBy',
+    SORT_ORDER = 'sortOrder',
+}
+
+const PaginationFilterKeys = {
     CURRENT_PAGE: 'currentPage',
     SCROLL_OFFSET: 'scrollOffset',
-    SORT_BY: 'sortBy',
-    SORT_ORDER: 'sortOrder',
+};
+
+export const FILTER_KEYS = {
+    ALBUM: AlbumFilterKeys,
+    PAGINATION: PaginationFilterKeys,
+    SHARED: SharedFilterKeys,
 };

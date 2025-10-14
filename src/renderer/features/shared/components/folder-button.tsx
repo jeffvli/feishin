@@ -13,7 +13,7 @@ export const FolderButton = ({ isActive, ...props }: FolderButtonProps) => {
         <ActionIcon
             icon="folder"
             iconProps={{
-                fill: isActive ? 'primary' : undefined,
+                color: isActive ? 'primary' : undefined,
                 size: 'lg',
                 ...props.iconProps,
             }}

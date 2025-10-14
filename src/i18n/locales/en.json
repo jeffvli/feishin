@@ -127,7 +127,8 @@
         "year": "year",
         "yes": "yes",
         "explicit": "explicit",
-        "clean": "clean"
+        "clean": "clean",
+        "tableColumns": "table columns"
     },
     "entity": {
         "album_one": "album",
@@ -826,13 +827,33 @@
         "config": {
             "general": {
                 "autoFitColumns": "auto fit columns",
+                "autosize": "autosize",
+                "moveUp": "move up",
+                "moveDown": "move down",
+                "pinToLeft": "pin to left",
+                "pinToRight": "pin to right",
+                "alignLeft": "align left",
+                "alignCenter": "align center",
+                "alignRight": "align right",
                 "followCurrentSong": "follow current song",
                 "displayType": "display type",
                 "gap": "$t(common.gap)",
                 "itemGap": "item gap (px)",
                 "itemSize": "item size (px)",
+                "itemsPerRow": "items per row",
                 "size": "$t(common.size)",
-                "tableColumns": "table columns"
+                "size_default": "default",
+                "size_compact": "compact",
+                "size_large": "large",
+                "tableColumns": "table columns",
+                "pagination": "pagination",
+                "pagination_itemsPerPage": "items per page",
+                "pagination_infinite": "infinite",
+                "pagination_paginate": "paginated",
+                "alternateRowColors": "alternate row colors",
+                "horizontalBorders": "horizontal borders",
+                "rowHoverHighlight": "row hover highlight",
+                "verticalBorders": "vertical borders"
             },
             "label": {
                 "actions": "$t(common.action_other)",
@@ -849,6 +870,8 @@
                 "duration": "$t(common.duration)",
                 "favorite": "$t(common.favorite)",
                 "genre": "$t(entity.genre_one)",
+                "genreBadge": "$t(entity.genre_one) (badges)",
+                "image": "image",
                 "lastPlayed": "last played",
                 "note": "$t(common.note)",
                 "owner": "$t(common.owner)",
@@ -865,10 +888,8 @@
                 "year": "$t(common.year)"
             },
             "view": {
-                "card": "card",
                 "grid": "grid",
                 "list": "list",
-                "poster": "poster",
                 "table": "table"
             }
         }

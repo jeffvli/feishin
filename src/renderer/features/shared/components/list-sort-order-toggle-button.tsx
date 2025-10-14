@@ -1,7 +1,7 @@
-import { parseAsString, useQueryState } from 'nuqs';
-
 import { OrderToggleButton } from '/@/renderer/features/shared/components/order-toggle-button';
+import { useSortOrderFilter } from '/@/renderer/features/shared/hooks/use-sort-order-filter';
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
+import { useCurrentServer } from '/@/renderer/store';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
@@ -11,15 +11,14 @@ interface ListSortOrderToggleButtonProps {
 }
 
 export const ListSortOrderToggleButton = ({ listKey }: ListSortOrderToggleButtonProps) => {
+    const server = useCurrentServer();
+
     const [persisted, setPersisted] = useLocalStorage({
         defaultValue: SortOrder.ASC,
-        key: getPersistenceKey(listKey),
+        key: getPersistenceKey(server.id, listKey),
     });
 
-    const [sortOrder, setSortOrder] = useQueryState(
-        FILTER_KEYS.SORT_ORDER,
-        parseAsString.withDefault(persisted || SortOrder.ASC),
-    );
+    const { sortOrder, setSortOrder } = useSortOrderFilter(persisted || SortOrder.ASC);
 
     const handleToggleSortOrder = () => {
         const newSortOrder = sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
@@ -32,6 +31,6 @@ export const ListSortOrderToggleButton = ({ listKey }: ListSortOrderToggleButton
     );
 };
 
-const getPersistenceKey = (listKey: ItemListKey) => {
-    return `item_list_${listKey}-${FILTER_KEYS.SORT_ORDER}`;
+const getPersistenceKey = (serverId: string, listKey: ItemListKey) => {
+    return `${serverId}-list-${listKey}-${FILTER_KEYS.SHARED.SORT_ORDER}`;
 };

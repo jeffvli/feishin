@@ -12,7 +12,7 @@ import {
     ListConfigBooleanControl,
     ListConfigTable,
 } from '/@/renderer/features/shared/components/list-config-menu';
-import { DataListProps, useSettingsStore, useSettingsStoreActions } from '/@/renderer/store';
+import { ItemListSettings, useSettingsStore, useSettingsStoreActions } from '/@/renderer/store';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
@@ -40,7 +40,7 @@ interface TableConfigProps {
 export const TableConfig = ({ extraOptions, listKey, tableColumnsData }: TableConfigProps) => {
     const { t } = useTranslation();
 
-    const list = useSettingsStore((state) => state.lists[listKey]) as DataListProps;
+    const list = useSettingsStore((state) => state.lists[listKey]) as ItemListSettings;
     const { setList } = useSettingsStoreActions();
 
     const options = useMemo(() => {
