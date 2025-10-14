@@ -74,7 +74,7 @@ export const NavidromeSongFilters = ({
         }));
     }, [genreListQuery.data]);
 
-    const hasBrf = hasFeature(server, ServerFeature.BFR);
+    const hasBFR = hasFeature(server, ServerFeature.BFR);
 
     const handleGenresFilter = debounce((e: null | string[]) => {
         const updatedFilters = setFilter({
@@ -166,7 +166,7 @@ export const NavidromeSongFilters = ({
                     value={filter._custom?.navidrome?.year}
                     width={50}
                 />
-                {!isGenrePage && !hasBrf && (
+                {!isGenrePage && !hasBFR && (
                     <SelectWithInvalidData
                         clearable
                         data={genreList}
@@ -178,7 +178,7 @@ export const NavidromeSongFilters = ({
                     />
                 )}
             </Group>
-            {!isGenrePage && hasBrf && (
+            {!isGenrePage && hasBFR && (
                 <Group grow>
                     <MultiSelectWithInvalidData
                         clearable
