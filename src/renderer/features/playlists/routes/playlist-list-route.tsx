@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
 
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { ListContext } from '/@/renderer/context/list-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { PlaylistListContent } from '/@/renderer/features/playlists/components/playlist-list-content';
@@ -14,7 +13,7 @@ import { useCurrentServer, useListStoreByKey } from '/@/renderer/store';
 import { PlaylistListSort, PlaylistSongListQuery, SortOrder } from '/@/shared/types/domain-types';
 
 const PlaylistListRoute = () => {
-    const gridRef = useRef<null | VirtualInfiniteGridRef>(null);
+    const gridRef = useRef<null>(null);
     const tableRef = useRef<AgGridReactType | null>(null);
     const server = useCurrentServer();
     const { playlistId } = useParams();
@@ -53,7 +52,7 @@ const PlaylistListRoute = () => {
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
                 <PlaylistListHeader gridRef={gridRef} itemCount={itemCount} tableRef={tableRef} />
-                <PlaylistListContent gridRef={gridRef} itemCount={itemCount} tableRef={tableRef} />
+                {/* <PlaylistListContent gridRef={gridRef} itemCount={itemCount} tableRef={tableRef} /> */}
             </ListContext.Provider>
         </AnimatedPage>
     );

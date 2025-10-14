@@ -4,7 +4,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required/components/error-fallback';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
@@ -59,27 +58,25 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
         <Spinner container size={25} />
     ) : (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <VirtualGridAutoSizerContainer>
-                <VirtualTable
-                    autoFitColumns={tableConfig.autoFit}
-                    columnDefs={columnDefs}
-                    context={{
-                        count,
-                        itemType: LibraryItem.SONG,
-                        onCellContextMenu,
-                        song,
-                    }}
-                    deselectOnClickOutside={fullScreen}
-                    getRowId={(data) => data.data.uniqueId}
-                    onCellContextMenu={onCellContextMenu}
-                    onCellDoubleClicked={handleRowDoubleClick}
-                    ref={tableRef}
-                    rowBuffer={50}
-                    rowData={songQuery.data ?? []}
-                    rowHeight={tableConfig.rowHeight || 40}
-                    shouldUpdateSong
-                />
-            </VirtualGridAutoSizerContainer>
+            <VirtualTable
+                autoFitColumns={tableConfig.autoFit}
+                columnDefs={columnDefs}
+                context={{
+                    count,
+                    itemType: LibraryItem.SONG,
+                    onCellContextMenu,
+                    song,
+                }}
+                deselectOnClickOutside={fullScreen}
+                getRowId={(data) => data.data.uniqueId}
+                onCellContextMenu={onCellContextMenu}
+                onCellDoubleClicked={handleRowDoubleClick}
+                ref={tableRef}
+                rowBuffer={50}
+                rowData={songQuery.data ?? []}
+                rowHeight={tableConfig.rowHeight || 40}
+                shouldUpdateSong
+            />
         </ErrorBoundary>
     );
 };

@@ -4,7 +4,6 @@ import { generatePath, Link } from 'react-router-dom';
 import styles from './poster-card.module.css';
 
 import { CardRows } from '/@/renderer/components/card/card-rows';
-import { GridCardControls } from '/@/renderer/components/virtual-grid/grid-card/grid-card-controls';
 import { Image } from '/@/shared/components/image/image';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -57,12 +56,12 @@ export const PosterCard = ({
             >
                 <Link className={styles.imageContainer} to={path}>
                     <Image className={styles.image} src={data?.imageUrl} />
-                    <GridCardControls
+                    {/* <GridCardControls
                         handleFavorite={controls.handleFavorite}
                         isHovered={isHovered}
                         itemData={data}
                         itemType={controls.itemType}
-                    />
+                    /> */}
                 </Link>
                 <div className={styles.detailContainer}>
                     <CardRows data={data} rows={controls.cardRows} />

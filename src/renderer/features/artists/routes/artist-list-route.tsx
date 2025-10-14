@@ -3,7 +3,6 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { ListContext } from '/@/renderer/context/list-context';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { ArtistListContent } from '/@/renderer/features/artists/components/artist-list-content';
@@ -14,7 +13,7 @@ import { useListFilterByKey } from '/@/renderer/store/list.store';
 import { ArtistListQuery, LibraryItem } from '/@/shared/types/domain-types';
 
 const ArtistListRoute = () => {
-    const gridRef = useRef<null | VirtualInfiniteGridRef>(null);
+    const gridRef = useRef<null>(null);
     const tableRef = useRef<AgGridReactType | null>(null);
     const pageKey = LibraryItem.ARTIST;
     const server = useCurrentServer();
@@ -45,7 +44,7 @@ const ArtistListRoute = () => {
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
                 <ArtistListHeader gridRef={gridRef} itemCount={itemCount} tableRef={tableRef} />
-                <ArtistListContent gridRef={gridRef} itemCount={itemCount} tableRef={tableRef} />
+                {/* <ArtistListContent gridRef={gridRef} itemCount={itemCount} tableRef={tableRef} /> */}
             </ListContext.Provider>
         </AnimatedPage>
     );

@@ -6,7 +6,6 @@ import { useParams } from 'react-router';
 
 import { ListContext } from '/@/renderer/context/list-context';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
-import { AlbumArtistDetailTopSongsListContent } from '/@/renderer/features/artists/components/album-artist-detail-top-songs-list-content';
 import { AlbumArtistDetailTopSongsListHeader } from '/@/renderer/features/artists/components/album-artist-detail-top-songs-list-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { useCurrentServer } from '/@/renderer/store/auth.store';
@@ -54,10 +53,10 @@ const AlbumArtistDetailTopSongsListRoute = () => {
                     itemCount={itemCount}
                     title={detailQuery?.data?.name || 'Unknown'}
                 />
-                <AlbumArtistDetailTopSongsListContent
+                {/* <AlbumArtistDetailTopSongsListContent
                     data={topSongsQuery?.data?.items || []}
                     tableRef={tableRef}
-                />
+                /> */}
             </ListContext.Provider>
         </AnimatedPage>
     );

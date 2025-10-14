@@ -14,7 +14,7 @@ import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Pagination } from '/@/shared/components/pagination/pagination';
 import { Popover } from '/@/shared/components/popover/popover';
 import { Text } from '/@/shared/components/text/text';
-import { TablePagination as TablePaginationType } from '/@/shared/types/types';
+import { ListPagination as TablePaginationType } from '/@/shared/types/types';
 
 interface TablePaginationProps {
     pageKey: ListKey;

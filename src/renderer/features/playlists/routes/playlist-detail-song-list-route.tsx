@@ -9,7 +9,6 @@ import { generatePath, useNavigate, useParams } from 'react-router';
 
 import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
-import { PlaylistDetailSongListContent } from '/@/renderer/features/playlists/components/playlist-detail-song-list-content';
 import { PlaylistDetailSongListHeader } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header';
 import { PlaylistQueryBuilder } from '/@/renderer/features/playlists/components/playlist-query-builder';
 import { SaveAsPlaylistForm } from '/@/renderer/features/playlists/components/save-as-playlist-form';
@@ -228,7 +227,7 @@ const PlaylistDetailSongListRoute = () => {
                     </Box>
                 </motion.div>
             )}
-            <PlaylistDetailSongListContent songs={filterSortedSongs} tableRef={tableRef} />
+            {/* <PlaylistDetailSongListContent songs={filterSortedSongs} tableRef={tableRef} /> */}
         </AnimatedPage>
     );
 };

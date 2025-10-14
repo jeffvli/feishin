@@ -12,7 +12,7 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
 import { Popover } from '/@/shared/components/popover/popover';
 import { Song } from '/@/shared/types/domain-types';
-import { TableType } from '/@/shared/types/types';
+import { ItemListKey } from '/@/shared/types/types';
 
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 
@@ -20,7 +20,7 @@ interface PlayQueueListOptionsProps {
     handleSearch: (value: string) => void;
     searchTerm?: string;
     tableRef: MutableRefObject<null | { grid: AgGridReactType<Song> }>;
-    type: TableType;
+    type: ItemListKey;
 }
 
 export const PlayQueueListControls = ({

@@ -30,7 +30,7 @@ import {
     LibraryItem,
     ServerListItem,
 } from '/@/shared/types/domain-types';
-import { ListDisplayType, TablePagination } from '/@/shared/types/types';
+import { ListDisplayType, ListPagination } from '/@/shared/types/types';
 
 export type AgGridFetchFn<TResponse, TFilter> = (
     args: { filter: TFilter; limit: number; startIndex: number },
@@ -227,7 +227,7 @@ export const useVirtualTable = <TFilter extends BaseQuery<any>>({
     );
 
     const setParamsTablePagination = useCallback(
-        (args: { data: Partial<TablePagination>; key: ListKey }) => {
+        (args: { data: Partial<ListPagination>; key: ListKey }) => {
             const { data } = args;
 
             setSearchParams(

@@ -6,7 +6,7 @@ import { PlaylistListFilter, SongListFilter } from '/@/renderer/store/list.store
 import { DataTableProps } from '/@/renderer/store/settings.store';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
 import { PlaylistListSort, SortOrder } from '/@/shared/types/domain-types';
-import { ListDisplayType, TableColumn, TablePagination } from '/@/shared/types/types';
+import { ListDisplayType, TableColumn, ListPagination } from '/@/shared/types/types';
 
 export interface PlaylistSlice extends PlaylistState {
     actions: {
@@ -17,11 +17,11 @@ export interface PlaylistSlice extends PlaylistState {
         setGrid: (args: { data: Partial<ListGridProps> }) => void;
         setStore: (data: Partial<PlaylistSlice>) => void;
         setTable: (data: Partial<TableProps>) => void;
-        setTablePagination: (args: { data: Partial<TablePagination> }) => void;
+        setTablePagination: (args: { data: Partial<ListPagination> }) => void;
     };
 }
 
-type DetailPaginationProps = TablePagination & {
+type DetailPaginationProps = ListPagination & {
     scrollOffset: number;
 };
 
@@ -54,7 +54,7 @@ interface PlaylistState {
 }
 
 type TableProps = DataTableProps & {
-    pagination: TablePagination;
+    pagination: ListPagination;
     scrollOffset: number;
 };
 

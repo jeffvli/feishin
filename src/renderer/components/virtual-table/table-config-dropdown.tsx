@@ -8,12 +8,16 @@ import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
 import { Option } from '/@/shared/components/option/option';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Switch } from '/@/shared/components/switch/switch';
-import { TableColumn, TableType } from '/@/shared/types/types';
+import { ItemListKey, TableColumn } from '/@/shared/types/types';
 
 export const SONG_TABLE_COLUMNS = [
     {
         label: i18n.t('table.config.label.rowIndex', { postProcess: 'titleCase' }),
         value: TableColumn.ROW_INDEX,
+    },
+    {
+        label: i18n.t('table.config.label.image', { postProcess: 'titleCase' }),
+        value: TableColumn.IMAGE,
     },
     {
         label: i18n.t('table.config.label.title', { postProcess: 'titleCase' }),
@@ -42,6 +46,10 @@ export const SONG_TABLE_COLUMNS = [
     {
         label: i18n.t('table.config.label.genre', { postProcess: 'titleCase' }),
         value: TableColumn.GENRE,
+    },
+    {
+        label: i18n.t('table.config.label.genreBadge', { postProcess: 'titleCase' }),
+        value: TableColumn.GENRE_BADGE,
     },
     {
         label: i18n.t('table.config.label.year', { postProcess: 'titleCase' }),
@@ -120,6 +128,10 @@ export const ALBUM_TABLE_COLUMNS = [
         value: TableColumn.ROW_INDEX,
     },
     {
+        label: i18n.t('table.config.label.image', { postProcess: 'titleCase' }),
+        value: TableColumn.IMAGE,
+    },
+    {
         label: i18n.t('table.config.label.title', { postProcess: 'titleCase' }),
         value: TableColumn.TITLE,
     },
@@ -146,6 +158,10 @@ export const ALBUM_TABLE_COLUMNS = [
     {
         label: i18n.t('table.config.label.genre', { postProcess: 'titleCase' }),
         value: TableColumn.GENRE,
+    },
+    {
+        label: i18n.t('table.config.label.genreBadge', { postProcess: 'titleCase' }),
+        value: TableColumn.GENRE_BADGE,
     },
     {
         label: i18n.t('table.config.label.year', { postProcess: 'titleCase' }),
@@ -242,6 +258,10 @@ export const PLAYLIST_TABLE_COLUMNS = [
         value: TableColumn.ROW_INDEX,
     },
     {
+        label: i18n.t('table.config.label.image', { postProcess: 'titleCase' }),
+        value: TableColumn.IMAGE,
+    },
+    {
         label: i18n.t('table.config.label.title', { postProcess: 'titleCase' }),
         value: TableColumn.TITLE,
     },
@@ -284,23 +304,23 @@ export const GENRE_TABLE_COLUMNS = [
 
 interface TableConfigDropdownProps {
     // tableRef?: MutableRefObject<AgGridReactType<any> | null>;
-    type: TableType;
+    type: ItemListKey;
 }
 
 export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
     const { t } = useTranslation();
     const { setSettings } = useSettingsStoreActions();
-    const tableConfig = useSettingsStore((state) => state.tables);
+    const tableConfig = useSettingsStore((state) => state.lists);
 
     const handleAddOrRemoveColumns = (values: string[]) => {
         const existingColumns = tableConfig[type].columns;
 
         if (values.length === 0) {
             setSettings({
-                tables: {
-                    ...useSettingsStore.getState().tables,
+                lists: {
+                    ...useSettingsStore.getState().lists,
                     [type]: {
-                        ...useSettingsStore.getState().tables[type],
+                        ...useSettingsStore.getState().lists[type],
                         columns: [],
                     },
                 },
@@ -312,10 +332,10 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
         if (values.length > existingColumns.length) {
             const newColumn = { column: values[values.length - 1] };
             setSettings({
-                tables: {
-                    ...useSettingsStore.getState().tables,
+                lists: {
+                    ...useSettingsStore.getState().lists,
                     [type]: {
-                        ...useSettingsStore.getState().tables[type],
+                        ...useSettingsStore.getState().lists[type],
                         columns: [...existingColumns, newColumn],
                     },
                 },
@@ -328,10 +348,10 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
             const newColumns = existingColumns.filter((column) => !removed.includes(column));
 
             setSettings({
-                tables: {
-                    ...useSettingsStore.getState().tables,
+                lists: {
+                    ...useSettingsStore.getState().lists,
                     [type]: {
-                        ...useSettingsStore.getState().tables[type],
+                        ...useSettingsStore.getState().lists[type],
                         columns: newColumns,
                     },
                 },
@@ -341,10 +361,10 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
 
     const handleUpdateRowHeight = (value: number) => {
         setSettings({
-            tables: {
-                ...useSettingsStore.getState().tables,
+            lists: {
+                ...useSettingsStore.getState().lists,
                 [type]: {
-                    ...useSettingsStore.getState().tables[type],
+                    ...useSettingsStore.getState().lists[type],
                     rowHeight: value,
                 },
             },
@@ -353,10 +373,10 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
 
     const handleUpdateAutoFit = (e: ChangeEvent<HTMLInputElement>) => {
         setSettings({
-            tables: {
-                ...useSettingsStore.getState().tables,
+            lists: {
+                ...useSettingsStore.getState().lists,
                 [type]: {
-                    ...useSettingsStore.getState().tables[type],
+                    ...useSettingsStore.getState().lists[type],
                     autoFit: e.currentTarget.checked,
                 },
             },
@@ -365,10 +385,10 @@ export const TableConfigDropdown = ({ type }: TableConfigDropdownProps) => {
 
     const handleUpdateFollow = (e: ChangeEvent<HTMLInputElement>) => {
         setSettings({
-            tables: {
-                ...useSettingsStore.getState().tables,
+            lists: {
+                ...useSettingsStore.getState().lists,
                 [type]: {
-                    ...useSettingsStore.getState().tables[type],
+                    ...useSettingsStore.getState().lists[type],
                     followCurrentSong: e.currentTarget.checked,
                 },
             },

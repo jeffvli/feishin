@@ -5,7 +5,7 @@ import { createWithEqualityFn } from 'zustand/traditional';
 import { DataTableProps } from '/@/renderer/store/settings.store';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
 import { AlbumArtistListArgs, AlbumArtistListSort, SortOrder } from '/@/shared/types/domain-types';
-import { ListDisplayType, TableColumn, TablePagination } from '/@/shared/types/types';
+import { ListDisplayType, ListPagination, TableColumn } from '/@/shared/types/types';
 
 export type AlbumArtistListFilter = Omit<AlbumArtistListArgs['query'], 'limit' | 'startIndex'>;
 
@@ -33,7 +33,7 @@ type ListProps<T> = {
 };
 
 type TableProps = DataTableProps & {
-    pagination: TablePagination;
+    pagination: ListPagination;
     scrollOffset: number;
 };
 

@@ -8,7 +8,6 @@ import debounce from 'lodash/debounce';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required/components/error-fallback';
 import { QUEUE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
@@ -21,18 +20,16 @@ import {
     usePlayerStatus,
 } from '/@/renderer/store';
 import {
-    PersistedTableColumn,
     useSettingsStore,
     useSettingsStoreActions,
     useTableSettings,
 } from '/@/renderer/store/settings.store';
 import { searchSongs } from '/@/renderer/utils/search-songs';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
-import { TableType } from '/@/shared/types/types';
+import { ItemListKey } from '/@/shared/types/types';
 
 type QueueProps = {
-    searchTerm?: string;
-    type: TableType;
+    type: ItemListKey;
 };
 
 export const PlayQueue = forwardRef(({ searchTerm, type }: QueueProps, ref: Ref<any>) => {
@@ -138,7 +135,7 @@ export const PlayQueue = forwardRef(({ searchTerm, type }: QueueProps, ref: Ref<
         const columnsOrder = columnApi?.getAllGridColumns();
         if (!columnsOrder) return;
 
-        const columnsInSettings = useSettingsStore.getState().tables[type].columns;
+        const columnsInSettings = useSettingsStore.getState().lists[type].columns;
 
         const updatedColumns: PersistedTableColumn[] = [];
         for (const column of columnsOrder) {
@@ -149,7 +146,7 @@ export const PlayQueue = forwardRef(({ searchTerm, type }: QueueProps, ref: Ref<
             if (columnInSettings) {
                 updatedColumns.push({
                     ...columnInSettings,
-                    ...(!useSettingsStore.getState().tables[type].autoFit && {
+                    ...(!useSettingsStore.getState().lists[type].autoFit && {
                         width: column.getActualWidth(),
                     }),
                 });
@@ -157,10 +154,10 @@ export const PlayQueue = forwardRef(({ searchTerm, type }: QueueProps, ref: Ref<
         }
 
         setSettings({
-            tables: {
-                ...useSettingsStore.getState().tables,
+            lists: {
+                ...useSettingsStore.getState().lists,
                 [type]: {
-                    ...useSettingsStore.getState().tables[type],
+                    ...useSettingsStore.getState().lists[type],
                     columns: updatedColumns,
                 },
             },

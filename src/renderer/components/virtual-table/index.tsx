@@ -50,7 +50,7 @@ import {
 import {
     PlayerStatus,
     TableColumn,
-    TablePagination as TablePaginationType,
+    ListPagination as TablePaginationType,
 } from '/@/shared/types/types';
 
 export * from './hooks/use-click-outside-deselect';

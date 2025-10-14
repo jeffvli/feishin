@@ -5,8 +5,6 @@ import { MutableRefObject } from 'react';
 import { generatePath, useNavigate } from 'react-router';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
-import { VirtualTable } from '/@/renderer/components/virtual-table';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
 import { useVirtualTable } from '/@/renderer/components/virtual-table/hooks/use-virtual-table';
 import {
@@ -91,22 +89,5 @@ export const SearchContent = ({ tableRef }: SearchContentProps) => {
         tableRef,
     });
 
-    return (
-        <VirtualGridAutoSizerContainer>
-            <VirtualTable
-                {...tableProps}
-                context={{
-                    itemType,
-                    query: searchParams.get('query'),
-                }}
-                getRowId={(data) => data.data.id}
-                infiniteInitialRowCount={25}
-                key={`table-${itemType}-${tableProps.rowHeight}-${server?.id}`}
-                onRowDoubleClicked={handleRowDoubleClick}
-                ref={tableRef}
-                rowClassRules={rowClassRules}
-                shouldUpdateSong={itemType === LibraryItem.SONG}
-            />
-        </VirtualGridAutoSizerContainer>
-    );
+    return null;
 };

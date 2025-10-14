@@ -3,7 +3,9 @@ import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
-import { DataTableProps, PersistedTableColumn } from '/@/renderer/store/settings.store';
+import { ItemTableListColumnConfig } from '/@/renderer/components/item-list/types';
+import { ListDeterministicArgs } from '/@/renderer/store';
+import { DataTableProps } from '/@/renderer/store/settings.store';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
 import {
     AlbumArtistListArgs,
@@ -20,7 +22,7 @@ import {
     SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { ListDisplayType, TableColumn, TablePagination } from '/@/shared/types/types';
+import { ListDisplayType, ListPagination, TableColumn } from '/@/shared/types/types';
 
 export const generatePageKey = (page: string, id?: string) => {
     return id ? `${page}_${id}` : page;
@@ -35,13 +37,14 @@ export type ListGridProps = {
     itemGap?: number;
     itemSize?: number;
     itemsPerRow?: number;
-    scrollOffset?: number;
 };
 
 export type ListItemProps<TFilter = any> = {
     display: ListDisplayType;
     filter: TFilter;
-    grid?: ListGridProps;
+    grid: ListGridProps;
+    itemsPerPage: number;
+    pagination: ListPagination;
     table: ListTableProps;
 };
 
@@ -67,9 +70,11 @@ export interface ListSlice extends ListState {
         setGrid: (args: ListDeterministicArgs & { data: Partial<ListGridProps> }) => void;
         setStore: (data: Partial<ListSlice>) => void;
         setTable: (args: ListDeterministicArgs & { data: Partial<ListTableProps> }) => void;
-        setTableColumns: (args: ListDeterministicArgs & { data: PersistedTableColumn[] }) => void;
+        setTableColumns: (
+            args: ListDeterministicArgs & { data: ItemTableListColumnConfig[] },
+        ) => void;
         setTablePagination: (
-            args: ListDeterministicArgs & { data: Partial<TablePagination> },
+            args: ListDeterministicArgs & { data: Partial<ListPagination> },
         ) => void;
     };
 }
@@ -90,10 +95,7 @@ export interface ListState {
     };
 }
 
-export type ListTableProps = DataTableProps & {
-    pagination: TablePagination;
-    scrollOffset: number;
-};
+export type ListTableProps = DataTableProps;
 
 export type PlaylistListFilter = Omit<PlaylistListArgs['query'], 'limit' | 'startIndex'>;
 
