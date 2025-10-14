@@ -4,10 +4,11 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { MultiSelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
+import { useAlbumListFilters } from '/@/renderer/features/albums/hooks/use-album-list-filters';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
-import { AlbumListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
+import { AlbumListFilter } from '/@/renderer/store';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
@@ -17,7 +18,6 @@ import { Text } from '/@/shared/components/text/text';
 import { YesNoSelect } from '/@/shared/components/yes-no-select/yes-no-select';
 import {
     AlbumArtistListSort,
-    AlbumListQuery,
     GenreListSort,
     LibraryItem,
     SortOrder,
@@ -27,30 +27,31 @@ interface JellyfinAlbumFiltersProps {
     customFilters?: Partial<AlbumListFilter>;
     disableArtistFilter?: boolean;
     onFilterChange: (filters: AlbumListFilter) => void;
-    pageKey: string;
     serverId: string;
 }
 
 export const JellyfinAlbumFilters = ({
-    customFilters,
     disableArtistFilter,
-    onFilterChange,
-    pageKey,
     serverId,
 }: JellyfinAlbumFiltersProps) => {
     const { t } = useTranslation();
-    const filter = useListFilterByKey<AlbumListQuery>({ key: pageKey });
-    const { setFilter } = useListStoreActions();
+
+    const {
+        query,
+        setAlbumArtist,
+        setAlbumCompilation,
+        setAlbumFavorite,
+        setAlbumGenre,
+        setCustom,
+        setMaxAlbumYear,
+        setMinAlbumYear,
+    } = useAlbumListFilters();
 
     // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
     const genreListQuery = useQuery(
         genresQueries.list({
-            options: {
-                gcTime: 1000 * 60 * 2,
-                staleTime: 1000 * 60 * 1,
-            },
             query: {
-                musicFolderId: filter?.musicFolderId,
+                musicFolderId: query.musicFolderId,
                 sortBy: GenreListSort.NAME,
                 sortOrder: SortOrder.ASC,
                 startIndex: 0,
@@ -74,106 +75,57 @@ export const JellyfinAlbumFilters = ({
                 staleTime: 1000 * 60 * 1,
             },
             query: {
-                folder: filter?.musicFolderId,
+                folder: query.musicFolderId,
                 type: LibraryItem.ALBUM,
             },
             serverId,
         }),
     );
 
-    const selectedTags = useMemo(() => {
-        return filter?._custom?.jellyfin?.Tags?.split('|');
-    }, [filter?._custom?.jellyfin?.Tags]);
-
     const yesNoFilter = useMemo(() => {
         const filters = [
             {
                 label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
-                onChange: (favorite?: boolean) => {
-                    const updatedFilters = setFilter({
-                        customFilters,
-                        data: {
-                            _custom: filter?._custom,
-                            favorite,
-                        },
-                        itemType: LibraryItem.ALBUM,
-                        key: pageKey,
-                    }) as AlbumListFilter;
-                    onFilterChange(updatedFilters);
+                onChange: (favoriteValue?: boolean) => {
+                    setAlbumFavorite(favoriteValue ?? null);
                 },
-                value: filter?.favorite,
+                value: query.favorite,
             },
         ];
 
-        if (customFilters?.artistIds) {
+        if (query.artistIds?.length) {
             filters.push({
                 label: t('filter.isCompilation', { postProcess: 'sentenceCase' }),
-                onChange: (compilation?: boolean) => {
-                    const updatedFilters = setFilter({
-                        customFilters,
-                        data: {
-                            _custom: filter._custom,
-                            compilation,
-                        },
-                        itemType: LibraryItem.ALBUM,
-                        key: pageKey,
-                    }) as AlbumListFilter;
-                    onFilterChange(updatedFilters);
+                onChange: (compilationValue?: boolean) => {
+                    setAlbumCompilation(compilationValue ?? null);
                 },
-                value: filter.compilation,
+                value: query.compilation,
             });
         }
         return filters;
     }, [
-        customFilters,
-        filter._custom,
-        filter.compilation,
-        filter?.favorite,
-        onFilterChange,
-        pageKey,
-        setFilter,
         t,
+        query.favorite,
+        query.artistIds?.length,
+        query.compilation,
+        setAlbumFavorite,
+        setAlbumCompilation,
     ]);
 
     const handleMinYearFilter = debounce((e: number | string) => {
         if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
-        const updatedFilters = setFilter({
-            customFilters,
-            data: {
-                _custom: filter?._custom,
-                minYear: e === '' ? undefined : (e as number),
-            },
-            itemType: LibraryItem.ALBUM,
-            key: pageKey,
-        }) as AlbumListFilter;
-        onFilterChange(updatedFilters);
+        const year = e === '' ? undefined : (e as number);
+        setMinAlbumYear(year ?? null);
     }, 500);
 
     const handleMaxYearFilter = debounce((e: number | string) => {
         if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
-        const updatedFilters = setFilter({
-            customFilters,
-            data: {
-                _custom: filter?._custom,
-                maxYear: e === '' ? undefined : (e as number),
-            },
-            itemType: LibraryItem.ALBUM,
-            key: pageKey,
-        }) as AlbumListFilter;
-        onFilterChange(updatedFilters);
+        const year = e === '' ? undefined : (e as number);
+        setMaxAlbumYear(year ?? null);
     }, 500);
 
     const handleGenresFilter = debounce((e: string[] | undefined) => {
-        const updatedFilters = setFilter({
-            customFilters,
-            data: {
-                _custom: filter?._custom,
-                genres: e,
-            },
-            itemType: LibraryItem.ALBUM,
-            key: pageKey,
-        }) as AlbumListFilter;
-        onFilterChange(updatedFilters);
+        setAlbumGenre(e ?? null);
     }, 250);
 
     const albumArtistListQuery = useQuery(
@@ -201,70 +153,54 @@ export const JellyfinAlbumFilters = ({
     }, [albumArtistListQuery?.data?.items]);
 
     const handleAlbumArtistFilter = (e: null | string[]) => {
-        const updatedFilters = setFilter({
-            customFilters,
-            data: {
-                _custom: filter?._custom,
-                artistIds: e?.length ? e : undefined,
-            },
-            itemType: LibraryItem.ALBUM,
-            key: pageKey,
-        }) as AlbumListFilter;
-        onFilterChange(updatedFilters);
+        setAlbumArtist(e ?? null);
     };
 
     const handleTagFilter = debounce((e: string[] | undefined) => {
-        const updatedFilters = setFilter({
-            customFilters,
-            data: {
-                _custom: {
-                    ...filter?._custom,
-                    jellyfin: {
-                        ...filter?._custom?.jellyfin,
-                        Tags: e?.join('|') || undefined,
-                    },
-                },
-            },
-            itemType: LibraryItem.SONG,
-            key: pageKey,
-        }) as AlbumListFilter;
-        onFilterChange(updatedFilters);
+        setCustom((prev) => ({
+            ...prev,
+            [e?.join('|') || '']: e?.join('|') || undefined,
+        }));
     }, 250);
 
     return (
         <Stack p="0.8rem">
             {yesNoFilter.map((filter) => (
-                <Group justify="space-between" key={`nd-filter-${filter.label}`}>
+                <Group justify="space-between" key={`jf-filter-${filter.label}`}>
                     <Text>{filter.label}</Text>
-                    <YesNoSelect onChange={filter.onChange} size="xs" value={filter.value} />
+                    <YesNoSelect
+                        onChange={filter.onChange}
+                        size="xs"
+                        value={filter.value ?? undefined}
+                    />
                 </Group>
             ))}
             <Divider my="0.5rem" />
             <Group grow>
                 <NumberInput
-                    defaultValue={filter?.minYear}
+                    defaultValue={query.minYear ?? undefined}
                     hideControls={false}
                     label={t('filter.fromYear', { postProcess: 'sentenceCase' })}
                     max={2300}
                     min={1700}
                     onChange={(e) => handleMinYearFilter(e)}
-                    required={!!filter?.maxYear}
+                    required={!!query.minYear}
                 />
                 <NumberInput
-                    defaultValue={filter?.maxYear}
+                    defaultValue={query.maxYear ?? undefined}
                     hideControls={false}
                     label={t('filter.toYear', { postProcess: 'sentenceCase' })}
                     max={2300}
                     min={1700}
                     onChange={(e) => handleMaxYearFilter(e)}
-                    required={!!filter?.minYear}
+                    required={!!query.minYear}
                 />
             </Group>
             <Group grow>
                 <MultiSelectWithInvalidData
                     clearable
                     data={genreList}
-                    defaultValue={filter.genres}
+                    defaultValue={query.genres ?? undefined}
                     label={t('entity.genre', { count: 2, postProcess: 'sentenceCase' })}
                     onChange={handleGenresFilter}
                     searchable
@@ -275,7 +211,7 @@ export const JellyfinAlbumFilters = ({
                 <MultiSelectWithInvalidData
                     clearable
                     data={selectableAlbumArtists}
-                    defaultValue={filter?.artistIds}
+                    defaultValue={query.artistIds ?? undefined}
                     disabled={disableArtistFilter}
                     label={t('entity.artist', { count: 2, postProcess: 'sentenceCase' })}
                     limit={300}
@@ -290,7 +226,9 @@ export const JellyfinAlbumFilters = ({
                     <MultiSelectWithInvalidData
                         clearable
                         data={tagsQuery.data.boolTags}
-                        defaultValue={selectedTags}
+                        defaultValue={
+                            query._custom?.[tagsQuery.data.boolTags.join('|')] ?? undefined
+                        }
                         label={t('common.tags', { postProcess: 'sentenceCase' })}
                         onChange={handleTagFilter}
                         searchable

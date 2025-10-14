@@ -1,42 +1,128 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import { lazy, Suspense } from 'react';
 
-import { lazy, MutableRefObject, Suspense } from 'react';
-
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
-import { useListContext } from '/@/renderer/context/list-context';
-import { useListStoreByKey } from '/@/renderer/store';
+import { useAlbumListFilters } from '/@/renderer/features/albums/hooks/use-album-list-filters';
+import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
-import { ListDisplayType } from '/@/shared/types/types';
+import { ItemListKey, ListDisplayType, ListPaginationType } from '/@/shared/types/types';
 
-const AlbumListGridView = lazy(() =>
-    import('/@/renderer/features/albums/components/album-list-grid-view').then((module) => ({
-        default: module.AlbumListGridView,
+const AlbumListInfiniteGrid = lazy(() =>
+    import('/@/renderer/features/albums/components/album-list-infinite-grid').then((module) => ({
+        default: module.AlbumListInfiniteGrid,
     })),
 );
 
-const AlbumListTableView = lazy(() =>
-    import('/@/renderer/features/albums/components/album-list-table-view').then((module) => ({
-        default: module.AlbumListTableView,
+const AlbumListPaginatedGrid = lazy(() =>
+    import('/@/renderer/features/albums/components/album-list-paginated-grid').then((module) => ({
+        default: module.AlbumListPaginatedGrid,
     })),
 );
 
-interface AlbumListContentProps {
-    gridRef: MutableRefObject<null | VirtualInfiniteGridRef>;
-    itemCount?: number;
-    tableRef: MutableRefObject<AgGridReactType | null>;
-}
+const AlbumListInfiniteTable = lazy(() =>
+    import('/@/renderer/features/albums/components/album-list-infinite-table').then((module) => ({
+        default: module.AlbumListInfiniteTable,
+    })),
+);
 
-export const AlbumListContent = ({ gridRef, itemCount, tableRef }: AlbumListContentProps) => {
-    const { pageKey } = useListContext();
-    const { display } = useListStoreByKey({ key: pageKey });
+const AlbumListPaginatedTable = lazy(() =>
+    import('/@/renderer/features/albums/components/album-list-paginated-table').then((module) => ({
+        default: module.AlbumListPaginatedTable,
+    })),
+);
+
+export const AlbumListContent = () => {
+    const { display, grid, itemsPerPage, pagination, table } = useListSettings(ItemListKey.ALBUM);
 
     return (
         <Suspense fallback={<Spinner container />}>
-            {display === ListDisplayType.CARD || display === ListDisplayType.GRID ? (
-                <AlbumListGridView gridRef={gridRef} itemCount={itemCount} />
-            ) : (
-                <AlbumListTableView itemCount={itemCount} tableRef={tableRef} />
-            )}
+            <AlbumListView
+                display={display}
+                grid={grid}
+                itemsPerPage={itemsPerPage}
+                pagination={pagination}
+                table={table}
+            />
         </Suspense>
     );
+};
+
+export const AlbumListView = ({
+    display,
+    grid,
+    itemsPerPage,
+    pagination,
+    table,
+}: ItemListSettings) => {
+    const server = useCurrentServer();
+
+    const filters = useAlbumListFilters();
+    const query = filters.query;
+
+    switch (display) {
+        case ListDisplayType.GRID: {
+            switch (pagination) {
+                case ListPaginationType.INFINITE: {
+                    return (
+                        <AlbumListInfiniteGrid
+                            gap={grid.itemGap}
+                            itemsPerPage={itemsPerPage}
+                            itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
+                            query={query}
+                            serverId={server.id}
+                        />
+                    );
+                }
+                case ListPaginationType.PAGINATED: {
+                    return (
+                        <AlbumListPaginatedGrid
+                            gap={grid.itemGap}
+                            itemsPerPage={itemsPerPage}
+                            itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
+                            query={query}
+                            serverId={server.id}
+                        />
+                    );
+                }
+                default:
+                    return null;
+            }
+        }
+        case ListDisplayType.TABLE: {
+            switch (pagination) {
+                case ListPaginationType.INFINITE: {
+                    return (
+                        <AlbumListInfiniteTable
+                            columns={table.columns}
+                            enableAlternateRowColors={table.enableAlternateRowColors}
+                            enableHorizontalBorders={table.enableHorizontalBorders}
+                            enableRowHoverHighlight={table.enableRowHoverHighlight}
+                            enableVerticalBorders={table.enableVerticalBorders}
+                            itemsPerPage={itemsPerPage}
+                            query={query}
+                            serverId={server.id}
+                            size={table.size}
+                        />
+                    );
+                }
+                case ListPaginationType.PAGINATED: {
+                    return (
+                        <AlbumListPaginatedTable
+                            columns={table.columns}
+                            enableAlternateRowColors={table.enableAlternateRowColors}
+                            enableHorizontalBorders={table.enableHorizontalBorders}
+                            enableRowHoverHighlight={table.enableRowHoverHighlight}
+                            enableVerticalBorders={table.enableVerticalBorders}
+                            itemsPerPage={itemsPerPage}
+                            query={query}
+                            serverId={server.id}
+                            size={table.size}
+                        />
+                    );
+                }
+                default:
+                    return null;
+            }
+        }
+    }
+
+    return null;
 };

@@ -4,8 +4,9 @@ import { forwardRef } from 'react';
 import { api } from '/@/renderer/api';
 import { useItemListInfiniteLoader } from '/@/renderer/components/item-list/helpers/item-list-infinite-loader';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
-import { ItemGridList } from '/@/renderer/components/item-list/item-grid-list/item-grid-list';
-import { ItemListGridComponentProps } from '/@/renderer/components/item-list/types';
+import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
+import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
+import { ItemListTableComponentProps } from '/@/renderer/components/item-list/types';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import {
     AlbumListQuery,
@@ -14,20 +15,25 @@ import {
     SortOrder,
 } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
-interface AlbumListInfiniteGridProps extends ItemListGridComponentProps<AlbumListQuery> {}
 
-export const AlbumListInfiniteGrid = forwardRef<any, AlbumListInfiniteGridProps>(
+interface AlbumListInfiniteTableProps extends ItemListTableComponentProps<AlbumListQuery> {}
+
+export const AlbumListInfiniteTable = forwardRef<any, AlbumListInfiniteTableProps>(
     (
         {
-            gap = 'md',
+            columns,
+            enableAlternateRowColors = false,
+            enableHorizontalBorders = false,
+            enableRowHoverHighlight = true,
+            enableVerticalBorders = false,
             itemsPerPage = 100,
-            itemsPerRow,
             query = {
                 sortBy: AlbumListSort.NAME,
                 sortOrder: SortOrder.ASC,
             },
             saveScrollOffset = true,
             serverId,
+            size = 'default',
         },
         ref,
     ) => {
@@ -53,18 +59,23 @@ export const AlbumListInfiniteGrid = forwardRef<any, AlbumListInfiniteGridProps>
         });
 
         return (
-            <ItemGridList
+            <ItemTableList
+                CellComponent={ItemTableListColumn}
+                columns={columns}
                 data={data}
-                gap={gap}
+                enableAlternateRowColors={enableAlternateRowColors}
+                enableHorizontalBorders={enableHorizontalBorders}
+                enableRowHoverHighlight={enableRowHoverHighlight}
+                enableVerticalBorders={enableVerticalBorders}
                 initialTop={{
                     to: scrollOffset ?? 0,
                     type: 'offset',
                 }}
-                itemsPerRow={itemsPerRow}
                 itemType={LibraryItem.ALBUM}
                 onRangeChanged={onRangeChanged}
                 onScrollEnd={handleOnScrollEnd}
                 ref={ref}
+                size={size}
             />
         );
     },

@@ -4,10 +4,11 @@ import { forwardRef } from 'react';
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
-import { ItemGridList } from '/@/renderer/components/item-list/item-grid-list/item-grid-list';
 import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
 import { useItemListPagination } from '/@/renderer/components/item-list/item-list-pagination/use-item-list-pagination';
-import { ItemListGridComponentProps } from '/@/renderer/components/item-list/types';
+import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
+import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
+import { ItemListTableComponentProps } from '/@/renderer/components/item-list/types';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import {
     AlbumListQuery,
@@ -16,12 +17,16 @@ import {
     SortOrder,
 } from '/@/shared/types/domain-types';
 
-interface AlbumListPaginatedGridProps extends ItemListGridComponentProps<AlbumListQuery> {}
+interface AlbumListPaginatedTableProps extends ItemListTableComponentProps<AlbumListQuery> {}
 
-export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProps>(
+export const AlbumListPaginatedTable = forwardRef<any, AlbumListPaginatedTableProps>(
     (
         {
-            gap = 'md',
+            columns,
+            enableAlternateRowColors = false,
+            enableHorizontalBorders = false,
+            enableRowHoverHighlight = true,
+            enableVerticalBorders = false,
             itemsPerPage = 100,
             query = {
                 sortBy: AlbumListSort.NAME,
@@ -29,6 +34,7 @@ export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProp
             },
             saveScrollOffset = true,
             serverId,
+            size = 'default',
         },
         ref,
     ) => {
@@ -62,9 +68,14 @@ export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProp
                 pageCount={pageCount}
                 totalItemCount={totalItemCount}
             >
-                <ItemGridList
+                <ItemTableList
+                    CellComponent={ItemTableListColumn}
+                    columns={columns}
                     data={data || []}
-                    gap={gap}
+                    enableAlternateRowColors={enableAlternateRowColors}
+                    enableHorizontalBorders={enableHorizontalBorders}
+                    enableRowHoverHighlight={enableRowHoverHighlight}
+                    enableVerticalBorders={enableVerticalBorders}
                     initialTop={{
                         to: scrollOffset ?? 0,
                         type: 'offset',
@@ -72,6 +83,7 @@ export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProp
                     itemType={LibraryItem.ALBUM}
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
+                    size={size}
                 />
             </ItemListWithPagination>
         );
