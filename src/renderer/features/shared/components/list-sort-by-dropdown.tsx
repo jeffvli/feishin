@@ -1,9 +1,8 @@
 import i18n from '/@/i18n/i18n';
-import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
+import { useSortByFilter } from '/@/renderer/features/shared/hooks/use-sort-by-filter';
 import { useCurrentServer } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
-import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import {
     AlbumListSort,
     LibraryItem,
@@ -12,7 +11,6 @@ import {
     SortOrder,
 } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
-import { useSortByFilter } from '/@/renderer/features/shared/hooks/use-sort-by-filter';
 
 interface ListSortByDropdownProps {
     defaultSortByValue: string;
@@ -31,19 +29,13 @@ export const ListSortByDropdown = ({
 }: ListSortByDropdownProps) => {
     const server = useCurrentServer();
 
-    const [persisted, setPersisted] = useLocalStorage({
-        defaultValue: defaultSortByValue,
-        key: getPersistenceKey(server.id, listKey),
-    });
-
-    const { sortBy, setSortBy } = useSortByFilter(persisted || defaultSortByValue);
+    const { setSortBy, sortBy } = useSortByFilter(defaultSortByValue, listKey);
 
     const sortByLabel =
         (itemType && FILTERS[itemType][server.type].find((f) => f.value === sortBy)?.name) || '—';
 
     const handleSortByChange = (sortBy: string) => {
         setSortBy(sortBy);
-        setPersisted(sortBy);
         onChange?.(sortBy);
     };
 
@@ -368,8 +360,4 @@ const SONG_LIST_FILTERS: Partial<
 const FILTERS: Partial<Record<LibraryItem, any>> = {
     [LibraryItem.ALBUM]: ALBUM_LIST_FILTERS,
     [LibraryItem.SONG]: SONG_LIST_FILTERS,
-};
-
-const getPersistenceKey = (serverId: string, listKey: ItemListKey) => {
-    return `${serverId}-list-${listKey}-${FILTER_KEYS.SHARED.SORT_BY}`;
 };

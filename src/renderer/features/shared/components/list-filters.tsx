@@ -30,7 +30,11 @@ export const ListFilters = ({ isActive, itemType }: ListFiltersProps) => {
     return (
         <>
             <FilterButton isActive={isActive} onClick={handlers.toggle} />
-            <Modal handlers={handlers} opened={isOpen} title={t('common.filters')}>
+            <Modal
+                handlers={handlers}
+                opened={isOpen}
+                title={t('common.filters', { postProcess: 'sentenceCase' })}
+            >
                 <FilterComponent />
             </Modal>
         </>

@@ -54,8 +54,7 @@ export const AlbumListView = ({
 }: ItemListSettings) => {
     const server = useCurrentServer();
 
-    const filters = useAlbumListFilters();
-    const query = filters.query;
+    const { query } = useAlbumListFilters();
 
     switch (display) {
         case ListDisplayType.GRID: {

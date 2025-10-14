@@ -12,19 +12,20 @@ import { useSearchTermFilter } from '/@/renderer/features/shared/hooks/use-searc
 import { useSortByFilter } from '/@/renderer/features/shared/hooks/use-sort-by-filter';
 import { useSortOrderFilter } from '/@/renderer/features/shared/hooks/use-sort-order-filter';
 import { customFiltersSchema, FILTER_KEYS } from '/@/renderer/features/shared/utils';
-import { AlbumListSort, SortOrder } from '/@/shared/types/domain-types';
+import { AlbumListSort } from '/@/shared/types/domain-types';
+import { ItemListKey } from '/@/shared/types/types';
 
 export const useAlbumListFilters = () => {
-    const { sortBy } = useSortByFilter<AlbumListSort>(AlbumListSort.NAME);
+    const { sortBy } = useSortByFilter<AlbumListSort>(null, ItemListKey.ALBUM);
 
-    const { sortOrder } = useSortOrderFilter(SortOrder.ASC);
+    const { sortOrder } = useSortOrderFilter(null, ItemListKey.ALBUM);
 
-    const { musicFolderId } = useMusicFolderIdFilter('');
+    const { musicFolderId } = useMusicFolderIdFilter(null, ItemListKey.ALBUM);
 
     const { searchTerm, setSearchTerm } = useSearchTermFilter('');
 
-    const [albumGenre, setAlbumGenre] = useQueryState(
-        FILTER_KEYS.ALBUM.GENRES,
+    const [genreId, setGenreId] = useQueryState(
+        FILTER_KEYS.ALBUM.GENRE_ID,
         parseAsArrayOf(parseAsString),
     );
 
@@ -33,32 +34,20 @@ export const useAlbumListFilters = () => {
         parseAsArrayOf(parseAsString),
     );
 
-    const [minAlbumYear, setMinAlbumYear] = useQueryState(
-        FILTER_KEYS.ALBUM.MIN_YEAR,
-        parseAsInteger,
-    );
+    const [minYear, setMinYear] = useQueryState(FILTER_KEYS.ALBUM.MIN_YEAR, parseAsInteger);
 
-    const [maxAlbumYear, setMaxAlbumYear] = useQueryState(
-        FILTER_KEYS.ALBUM.MAX_YEAR,
-        parseAsInteger,
-    );
+    const [maxYear, setMaxYear] = useQueryState(FILTER_KEYS.ALBUM.MAX_YEAR, parseAsInteger);
 
-    const [albumFavorite, setAlbumFavorite] = useQueryState(
-        FILTER_KEYS.ALBUM.FAVORITE,
-        parseAsBoolean,
-    );
+    const [favorite, setFavorite] = useQueryState(FILTER_KEYS.ALBUM.FAVORITE, parseAsBoolean);
 
-    const [albumCompilation, setAlbumCompilation] = useQueryState(
+    const [compilation, setCompilation] = useQueryState(
         FILTER_KEYS.ALBUM.COMPILATION,
         parseAsBoolean,
     );
 
-    const [albumHasRating, setAlbumHasRating] = useQueryState(
-        FILTER_KEYS.ALBUM.HAS_RATING,
-        parseAsBoolean,
-    );
+    const [hasRating, setHasRating] = useQueryState(FILTER_KEYS.ALBUM.HAS_RATING, parseAsBoolean);
 
-    const [albumRecentlyPlayed, setAlbumRecentlyPlayed] = useQueryState(
+    const [recentlyPlayed, setRecentlyPlayed] = useQueryState(
         FILTER_KEYS.ALBUM.RECENTLY_PLAYED,
         parseAsBoolean,
     );
@@ -71,13 +60,13 @@ export const useAlbumListFilters = () => {
     const query = {
         [FILTER_KEYS.ALBUM._CUSTOM]: custom ?? undefined,
         [FILTER_KEYS.ALBUM.ARTIST_IDS]: albumArtist ?? undefined,
-        [FILTER_KEYS.ALBUM.COMPILATION]: albumCompilation ?? undefined,
-        [FILTER_KEYS.ALBUM.FAVORITE]: albumFavorite ?? undefined,
-        [FILTER_KEYS.ALBUM.GENRES]: albumGenre ?? undefined,
-        [FILTER_KEYS.ALBUM.HAS_RATING]: albumHasRating ?? undefined,
-        [FILTER_KEYS.ALBUM.MAX_YEAR]: maxAlbumYear ?? undefined,
-        [FILTER_KEYS.ALBUM.MIN_YEAR]: minAlbumYear ?? undefined,
-        [FILTER_KEYS.ALBUM.RECENTLY_PLAYED]: albumRecentlyPlayed ?? undefined,
+        [FILTER_KEYS.ALBUM.COMPILATION]: compilation ?? undefined,
+        [FILTER_KEYS.ALBUM.FAVORITE]: favorite ?? undefined,
+        [FILTER_KEYS.ALBUM.GENRE_ID]: genreId ?? undefined,
+        [FILTER_KEYS.ALBUM.HAS_RATING]: hasRating ?? undefined,
+        [FILTER_KEYS.ALBUM.MAX_YEAR]: maxYear ?? undefined,
+        [FILTER_KEYS.ALBUM.MIN_YEAR]: minYear ?? undefined,
+        [FILTER_KEYS.ALBUM.RECENTLY_PLAYED]: recentlyPlayed ?? undefined,
         [FILTER_KEYS.SHARED.MUSIC_FOLDER_ID]: musicFolderId ?? undefined,
         [FILTER_KEYS.SHARED.SEARCH_TERM]: searchTerm ?? undefined,
         [FILTER_KEYS.SHARED.SORT_BY]: sortBy ?? undefined,
@@ -87,14 +76,14 @@ export const useAlbumListFilters = () => {
     return {
         query,
         setAlbumArtist,
-        setAlbumCompilation,
-        setAlbumFavorite,
-        setAlbumGenre,
-        setAlbumHasRating,
-        setAlbumRecentlyPlayed,
+        setCompilation,
         setCustom,
-        setMaxAlbumYear,
-        setMinAlbumYear,
+        setFavorite,
+        setGenreId,
+        setHasRating,
+        setMaxYear,
+        setMinYear,
+        setRecentlyPlayed,
         setSearchTerm,
     };
 };

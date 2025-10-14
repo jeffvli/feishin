@@ -42,14 +42,14 @@ export const NavidromeAlbumFilters = ({ disableArtistFilter }: NavidromeAlbumFil
     const {
         query,
         setAlbumArtist,
-        setAlbumCompilation,
-        setAlbumFavorite,
-        setAlbumGenre,
-        setAlbumHasRating,
-        setAlbumRecentlyPlayed,
+        setCompilation,
         setCustom,
-        setMaxAlbumYear,
-        setMinAlbumYear,
+        setFavorite,
+        setGenreId,
+        setHasRating,
+        setMaxYear,
+        setMinYear,
+        setRecentlyPlayed,
     } = useAlbumListFilters();
 
     const genreListQuery = useQuery(
@@ -92,14 +92,14 @@ export const NavidromeAlbumFilters = ({ disableArtistFilter }: NavidromeAlbumFil
         {
             label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
             onChange: (favorite?: boolean) => {
-                setAlbumFavorite(favorite ?? null);
+                setFavorite(favorite ?? null);
             },
             value: query.favorite,
         },
         {
             label: t('filter.isCompilation', { postProcess: 'sentenceCase' }),
             onChange: (compilation?: boolean) => {
-                setAlbumCompilation(compilation ?? null);
+                setCompilation(compilation ?? null);
             },
             value: query.compilation,
         },
@@ -110,7 +110,7 @@ export const NavidromeAlbumFilters = ({ disableArtistFilter }: NavidromeAlbumFil
             label: t('filter.isRated', { postProcess: 'sentenceCase' }),
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const hasRating = e.currentTarget.checked ? true : undefined;
-                setAlbumHasRating(hasRating ?? null);
+                setHasRating(hasRating ?? null);
             },
             value: query.hasRating,
         },
@@ -118,7 +118,7 @@ export const NavidromeAlbumFilters = ({ disableArtistFilter }: NavidromeAlbumFil
             label: t('filter.isRecentlyPlayed', { postProcess: 'sentenceCase' }),
             onChange: (e: ChangeEvent<HTMLInputElement>) => {
                 const recentlyPlayed = e.currentTarget.checked ? true : undefined;
-                setAlbumRecentlyPlayed(recentlyPlayed ?? null);
+                setRecentlyPlayed(recentlyPlayed ?? null);
             },
             value: query.recentlyPlayed,
         },
@@ -126,8 +126,8 @@ export const NavidromeAlbumFilters = ({ disableArtistFilter }: NavidromeAlbumFil
 
     const handleYearFilter = debounce((e: number | string) => {
         const year = e === '' ? undefined : (e as number);
-        setMinAlbumYear(year ?? null);
-        setMaxAlbumYear(year ?? null);
+        setMinYear(year ?? null);
+        setMaxYear(year ?? null);
     }, 500);
 
     const albumArtistListQuery = useQuery(
@@ -194,9 +194,9 @@ export const NavidromeAlbumFilters = ({ disableArtistFilter }: NavidromeAlbumFil
                 <SelectWithInvalidData
                     clearable
                     data={genreList}
-                    defaultValue={query.genres ? query.genres[0] : undefined}
+                    defaultValue={query.genreId ? query.genreId[0] : undefined}
                     label={t('entity.genre', { count: 1, postProcess: 'titleCase' })}
-                    onChange={(e) => (e ? setAlbumGenre([e]) : undefined)}
+                    onChange={(e) => (e ? setGenreId([e]) : undefined)}
                     searchable
                 />
             </Group>

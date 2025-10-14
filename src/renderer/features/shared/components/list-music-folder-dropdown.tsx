@@ -2,12 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { FolderButton } from '/@/renderer/features/shared/components/folder-button';
-import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
+import { useMusicFolderIdFilter } from '/@/renderer/features/shared/hooks/use-music-folder-id-filter';
 import { useCurrentServer } from '/@/renderer/store';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
-import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { ItemListKey } from '/@/shared/types/types';
-import { useMusicFolderIdFilter } from '/@/renderer/features/shared/hooks/use-music-folder-id-filter';
 
 interface ListMusicFolderDropdownProps {
     listKey: ItemListKey;
@@ -19,22 +17,15 @@ export const ListMusicFolderDropdown = ({ listKey }: ListMusicFolderDropdownProp
         sharedQueries.musicFolders({ query: null, serverId: server.id }),
     );
 
-    const [persisted, setPersisted] = useLocalStorage({
-        defaultValue: '',
-        key: getPersistenceKey(server.id, listKey),
-    });
-
-    const { musicFolderId, setMusicFolderId } = useMusicFolderIdFilter(persisted);
+    const { musicFolderId, setMusicFolderId } = useMusicFolderIdFilter('', listKey);
 
     const handleSetMusicFolder = (e: string) => {
         if (e === musicFolderId) {
             setMusicFolderId('');
-            setPersisted('');
             return;
         }
 
         setMusicFolderId(e);
-        setPersisted(e);
     };
 
     return (
@@ -56,8 +47,4 @@ export const ListMusicFolderDropdown = ({ listKey }: ListMusicFolderDropdownProp
             </DropdownMenu.Dropdown>
         </DropdownMenu>
     );
-};
-
-const getPersistenceKey = (serverId: string, listKey: ItemListKey) => {
-    return `${serverId}-list-${listKey}-${FILTER_KEYS.SHARED.MUSIC_FOLDER_ID}`;
 };
