@@ -7,6 +7,12 @@ import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import i18n from '/@/i18n/i18n';
+import {
+    ALBUM_TABLE_COLUMNS,
+    PLAYLIST_SONG_TABLE_COLUMNS,
+    SONG_TABLE_COLUMNS,
+} from '/@/renderer/components/item-list/item-table-list/default-columns';
+import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table/table-config-dropdown';
 import { ContextMenuItemType } from '/@/renderer/features/context-menu/events';
 import { AppRoute } from '/@/renderer/router/routes';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
@@ -18,13 +24,19 @@ import { LibraryItem, LyricSource } from '/@/shared/types/domain-types';
 import {
     CrossfadeStyle,
     FontType,
+    ItemListKey,
+    ListDisplayType,
+    ListPaginationType,
     Platform,
     Play,
     PlayerStyle,
     PlayerType,
     TableColumn,
-    TableType,
 } from '/@/shared/types/types';
+
+type DeepPartial<T> = {
+    [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
 
 const HomeItemSchema = z.enum([
     'mostPlayed',
@@ -100,17 +112,34 @@ const SortableItemSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
         id: itemSchema,
     });
 
-const PersistedTableColumnSchema = z.object({
-    column: z.nativeEnum(TableColumn),
-    extraProps: z.record(z.any()).optional(),
+const ItemTableListColumnConfigSchema = z.object({
+    align: z.enum(['center', 'end', 'start']),
+    autoSize: z.boolean().optional(),
+    id: z.nativeEnum(TableColumn),
+    isEnabled: z.boolean(),
+    pinned: z.union([z.literal('left'), z.literal('right'), z.literal(null)]),
     width: z.number(),
 });
 
-const DataTablePropsSchema = z.object({
-    autoFit: z.boolean(),
-    columns: z.array(PersistedTableColumnSchema),
-    followCurrentSong: z.boolean().optional(),
-    rowHeight: z.number(),
+const ItemTableListPropsSchema = z.object({
+    columns: z.array(ItemTableListColumnConfigSchema),
+    enableAlternateRowColors: z.boolean(),
+    enableHorizontalBorders: z.boolean(),
+    enableRowHoverHighlight: z.boolean(),
+    enableVerticalBorders: z.boolean(),
+    size: z.enum(['compact', 'default']),
+});
+
+const ItemListConfigSchema = z.object({
+    display: z.nativeEnum(ListDisplayType),
+    grid: z.object({
+        itemGap: z.enum(['lg', 'md', 'sm', 'xl', 'xs']),
+        itemsPerRow: z.number(),
+        itemsPerRowEnabled: z.boolean(),
+    }),
+    itemsPerPage: z.number(),
+    pagination: z.nativeEnum(ListPaginationType),
+    table: ItemTableListPropsSchema,
 });
 
 const TranscodingConfigSchema = z.object({
@@ -270,15 +299,6 @@ const RemoteSettingsSchema = z.object({
     username: z.string(),
 });
 
-const TablesSettingsSchema = z.object({
-    albumDetail: DataTablePropsSchema,
-    fullScreen: DataTablePropsSchema,
-    nowPlaying: DataTablePropsSchema,
-    sideDrawerQueue: DataTablePropsSchema,
-    sideQueue: DataTablePropsSchema,
-    songs: DataTablePropsSchema,
-});
-
 const WindowSettingsSchema = z.object({
     disableAutoUpdate: z.boolean(),
     exitToTray: z.boolean(),
@@ -299,6 +319,7 @@ export const ValidationSettingsStateSchema = z.object({
     font: FontSettingsSchema,
     general: GeneralSettingsSchema,
     hotkeys: HotkeysSettingsSchema,
+    lists: z.record(z.nativeEnum(ItemListKey), ItemListConfigSchema),
     lyrics: LyricsSettingsSchema,
     playback: PlaybackSettingsSchema,
     remote: RemoteSettingsSchema,
@@ -315,9 +336,7 @@ export const ValidationSettingsStateSchema = z.object({
 /**
  * This schema is merged below to create the full SettingsSchema but not used during import validation
  */
-export const NonValidatedSettingsStateSchema = z.object({
-    tables: TablesSettingsSchema,
-});
+export const NonValidatedSettingsStateSchema = z.object({});
 
 export const SettingsStateSchema = ValidationSettingsStateSchema.merge(
     NonValidatedSettingsStateSchema,
@@ -394,9 +413,20 @@ export enum HomeItem {
     RECENTLY_RELEASED = 'recentlyReleased',
 }
 
-export type DataTableProps = z.infer<typeof DataTablePropsSchema>;
+export type DataGridProps = {
+    itemGap: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
+    itemsPerRow: number;
+    itemsPerRowEnabled: boolean;
+};
 
-export type PersistedTableColumn = z.infer<typeof PersistedTableColumnSchema>;
+export type DataTableProps = z.infer<typeof ItemTableListPropsSchema>;
+export type ItemListSettings = {
+    display: ListDisplayType;
+    grid: DataGridProps;
+    itemsPerPage: number;
+    pagination: ListPaginationType;
+    table: DataTableProps;
+};
 
 export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
     actions: {
@@ -405,9 +435,10 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
         setArtistItems: (item: SortableItem<ArtistItem>[]) => void;
         setGenreBehavior: (target: GenreTarget) => void;
         setHomeItems: (item: SortableItem<HomeItem>[]) => void;
+        setList: (type: ItemListKey, data: DeepPartial<ItemListSettings>) => void;
         setSettings: (data: Partial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
-        setTable: (type: TableType, data: DataTableProps) => void;
+        setTable: (type: ItemListKey, data: DataTableProps) => void;
         setTranscodingConfig: (config: TranscodingConfig) => void;
         toggleContextMenuItem: (item: ContextMenuItemType) => void;
         toggleMediaSession: () => void;
@@ -608,6 +639,240 @@ const initialState: SettingsState = {
         },
         globalMediaHotkeys: false,
     },
+    lists: {
+        [LibraryItem.ALBUM]: {
+            display: ListDisplayType.TABLE,
+            grid: {
+                itemGap: 'md',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                columns: ALBUM_TABLE_COLUMNS.map((column) => ({
+                    align: column.align,
+                    autoSize: column.autoSize,
+                    id: column.value,
+                    isEnabled: column.isEnabled,
+                    pinned: column.pinned,
+                    width: column.width,
+                })),
+                enableAlternateRowColors: true,
+                enableHorizontalBorders: true,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'default',
+            },
+        },
+        [LibraryItem.ALBUM_ARTIST]: {
+            display: ListDisplayType.TABLE,
+            grid: {
+                itemGap: 'md',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                columns: ALBUMARTIST_TABLE_COLUMNS.map((column) => ({
+                    align: 'start' as const,
+                    autoSize: false,
+                    id: column.value,
+                    isEnabled: true,
+                    pinned: null,
+                    width: 200,
+                })),
+                enableAlternateRowColors: true,
+                enableHorizontalBorders: true,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'default',
+            },
+        },
+        [LibraryItem.ARTIST]: {
+            display: ListDisplayType.TABLE,
+            grid: {
+                itemGap: 'md',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                columns: ALBUMARTIST_TABLE_COLUMNS.map((column) => ({
+                    align: 'start' as const,
+                    autoSize: false,
+                    id: column.value,
+                    isEnabled: true,
+                    pinned: null,
+                    width: 200,
+                })),
+                enableAlternateRowColors: true,
+                enableHorizontalBorders: true,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'default',
+            },
+        },
+        [LibraryItem.PLAYLIST]: {
+            display: ListDisplayType.TABLE,
+            grid: {
+                itemGap: 'md',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                columns: [
+                    {
+                        align: 'center',
+                        autoSize: false,
+                        id: TableColumn.ROW_INDEX,
+                        isEnabled: true,
+                        pinned: 'left',
+                        width: 80,
+                    },
+                    {
+                        align: 'center',
+                        autoSize: false,
+                        id: TableColumn.IMAGE,
+                        isEnabled: true,
+                        pinned: 'left',
+                        width: 70,
+                    },
+                    {
+                        align: 'start',
+                        autoSize: false,
+                        id: TableColumn.TITLE,
+                        isEnabled: true,
+                        pinned: 'left',
+                        width: 300,
+                    },
+                    {
+                        align: 'start',
+                        autoSize: false,
+                        id: TableColumn.TITLE_COMBINED,
+                        isEnabled: false,
+                        pinned: 'left',
+                        width: 300,
+                    },
+                    {
+                        align: 'center',
+                        autoSize: false,
+                        id: TableColumn.DURATION,
+                        isEnabled: true,
+                        pinned: null,
+                        width: 100,
+                    },
+                    {
+                        align: 'center',
+                        autoSize: false,
+                        id: TableColumn.OWNER,
+                        isEnabled: true,
+                        pinned: null,
+                        width: 150,
+                    },
+                    {
+                        align: 'center',
+                        autoSize: false,
+                        id: TableColumn.SONG_COUNT,
+                        isEnabled: true,
+                        pinned: null,
+                        width: 100,
+                    },
+                    {
+                        align: 'center',
+                        id: TableColumn.ACTIONS,
+                        isEnabled: true,
+                        pinned: 'right',
+                        width: 60,
+                    },
+                ],
+                enableAlternateRowColors: true,
+                enableHorizontalBorders: true,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'default',
+            },
+        },
+        [LibraryItem.PLAYLIST_SONG]: {
+            display: ListDisplayType.TABLE,
+            grid: {
+                itemGap: 'md',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                columns: PLAYLIST_SONG_TABLE_COLUMNS.map((column) => ({
+                    align: column.align,
+                    autoSize: column.autoSize,
+                    id: column.value,
+                    isEnabled: column.isEnabled,
+                    pinned: column.pinned,
+                    width: column.width,
+                })),
+                enableAlternateRowColors: true,
+                enableHorizontalBorders: true,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'default',
+            },
+        },
+        [LibraryItem.QUEUE_SONG]: {
+            display: ListDisplayType.TABLE,
+            grid: {
+                itemGap: 'md',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                columns: SONG_TABLE_COLUMNS.map((column) => ({
+                    align: column.align,
+                    autoSize: column.autoSize,
+                    id: column.value,
+                    isEnabled: column.isEnabled,
+                    pinned: column.pinned,
+                    width: column.width,
+                })),
+                enableAlternateRowColors: true,
+                enableHorizontalBorders: true,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'default',
+            },
+        },
+        [LibraryItem.SONG]: {
+            display: ListDisplayType.TABLE,
+            grid: {
+                itemGap: 'md',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                columns: SONG_TABLE_COLUMNS.map((column) => ({
+                    align: column.align,
+                    autoSize: column.autoSize,
+                    id: column.value,
+                    isEnabled: column.isEnabled,
+                    pinned: column.pinned,
+                    width: column.width,
+                })),
+                enableAlternateRowColors: true,
+                enableHorizontalBorders: true,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'default',
+            },
+        },
+    },
     lyrics: {
         alignment: 'center',
         delayMs: 0,
@@ -665,160 +930,6 @@ const initialState: SettingsState = {
         username: 'feishin',
     },
     tab: 'general',
-    tables: {
-        albumDetail: {
-            autoFit: true,
-            columns: [
-                {
-                    column: TableColumn.TRACK_NUMBER,
-                    width: 50,
-                },
-                {
-                    column: TableColumn.TITLE_COMBINED,
-                    width: 500,
-                },
-                {
-                    column: TableColumn.DURATION,
-                    width: 100,
-                },
-                {
-                    column: TableColumn.PLAY_COUNT,
-                    width: 100,
-                },
-                {
-                    column: TableColumn.LAST_PLAYED,
-                    width: 100,
-                },
-                {
-                    column: TableColumn.USER_FAVORITE,
-                    width: 100,
-                },
-            ],
-            rowHeight: 60,
-        },
-        fullScreen: {
-            autoFit: true,
-            columns: [
-                {
-                    column: TableColumn.ROW_INDEX,
-                    width: 80,
-                },
-                {
-                    column: TableColumn.TITLE_COMBINED,
-                    width: 500,
-                },
-                {
-                    column: TableColumn.DURATION,
-                    width: 100,
-                },
-                {
-                    column: TableColumn.USER_FAVORITE,
-                    width: 100,
-                },
-            ],
-            followCurrentSong: true,
-            rowHeight: 60,
-        },
-        nowPlaying: {
-            autoFit: true,
-            columns: [
-                {
-                    column: TableColumn.ROW_INDEX,
-                    width: 80,
-                },
-                {
-                    column: TableColumn.TITLE,
-                    width: 500,
-                },
-                {
-                    column: TableColumn.DURATION,
-                    width: 100,
-                },
-                {
-                    column: TableColumn.ALBUM,
-                    width: 100,
-                },
-                {
-                    column: TableColumn.ALBUM_ARTIST,
-                    width: 100,
-                },
-                {
-                    column: TableColumn.GENRE,
-                    width: 100,
-                },
-                {
-                    column: TableColumn.YEAR,
-                    width: 100,
-                },
-            ],
-            followCurrentSong: true,
-            rowHeight: 30,
-        },
-        sideDrawerQueue: {
-            autoFit: true,
-            columns: [
-                {
-                    column: TableColumn.TITLE_COMBINED,
-                    width: 500,
-                },
-                {
-                    column: TableColumn.DURATION,
-                    width: 100,
-                },
-            ],
-            followCurrentSong: true,
-            rowHeight: 60,
-        },
-        sideQueue: {
-            autoFit: true,
-            columns: [
-                {
-                    column: TableColumn.ROW_INDEX,
-                    width: 50,
-                },
-                {
-                    column: TableColumn.TITLE_COMBINED,
-                    width: 500,
-                },
-                {
-                    column: TableColumn.DURATION,
-                    width: 100,
-                },
-            ],
-            followCurrentSong: true,
-            rowHeight: 60,
-        },
-        songs: {
-            autoFit: true,
-            columns: [
-                {
-                    column: TableColumn.ROW_INDEX,
-                    width: 50,
-                },
-                {
-                    column: TableColumn.TITLE_COMBINED,
-                    width: 500,
-                },
-                {
-                    column: TableColumn.DURATION,
-                    width: 100,
-                },
-                {
-                    column: TableColumn.ALBUM,
-                    width: 300,
-                },
-                {
-                    column: TableColumn.ARTIST,
-                    width: 100,
-                },
-                {
-                    column: TableColumn.YEAR,
-                    width: 100,
-                },
-            ],
-            rowHeight: 60,
-        },
-    },
     window: {
         disableAutoUpdate: false,
         exitToTray: false,
@@ -869,6 +980,25 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                             state.general.homeItems = items;
                         });
                     },
+                    setList: (type: ItemListKey, data: DeepPartial<ItemListSettings>) => {
+                        set((state) => {
+                            const listState = state.lists[type];
+
+                            if (listState && data.table) {
+                                Object.assign(listState.table, data.table);
+                                delete data.table;
+                            }
+
+                            if (listState && data.grid) {
+                                Object.assign(listState.grid, data.grid);
+                                delete data.grid;
+                            }
+
+                            if (listState) {
+                                Object.assign(listState, data);
+                            }
+                        });
+                    },
                     setSettings: (data) => {
                         set({ ...get(), ...data });
                     },
@@ -877,9 +1007,12 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                             state.general.sidebarItems = items;
                         });
                     },
-                    setTable: (type: TableType, data: DataTableProps) => {
+                    setTable: (type: ItemListKey, data: DataTableProps) => {
                         set((state) => {
-                            state.tables[type] = data;
+                            const listState = state.lists[type];
+                            if (listState) {
+                                listState.table = data;
+                            }
                         });
                     },
                     setTranscodingConfig: (config) => {
@@ -945,6 +1078,8 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
 
                     state.window.windowBarStyle = Platform.LINUX;
+
+                    return state;
                 }
 
                 return persistedState;
@@ -959,8 +1094,8 @@ export const useSettingsStoreActions = () => useSettingsStore((state) => state.a
 
 export const usePlaybackSettings = () => useSettingsStore((state) => state.playback, shallow);
 
-export const useTableSettings = (type: TableType) =>
-    useSettingsStore((state) => state.tables[type]);
+export const useTableSettings = (type: ItemListKey) =>
+    useSettingsStore((state) => state.lists[type as keyof typeof state.lists]);
 
 export const useGeneralSettings = () => useSettingsStore((state) => state.general, shallow);
 
@@ -1003,3 +1138,6 @@ export const useSettingsForExport = (): SettingsState & { version: number } =>
 
 export const migrateSettings = (settings: SettingsState, settingsVersion: number): SettingsState =>
     useSettingsStore.persist.getOptions().migrate!(settings, settingsVersion) as SettingsState;
+
+export const useListSettings = (type: ItemListKey) =>
+    useSettingsStore((state) => state.lists[type as keyof typeof state.lists], shallow);
