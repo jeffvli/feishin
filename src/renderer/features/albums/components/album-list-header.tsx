@@ -5,7 +5,7 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { AlbumListHeaderFilters } from '/@/renderer/features/albums/components/album-list-header-filters';
 import { FilterBar } from '/@/renderer/features/shared/components/filter-bar';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
-import { SearchInput } from '/@/renderer/features/shared/components/search-input';
+import { ListSearchInput } from '/@/renderer/features/shared/components/list-search-input';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
 
@@ -30,7 +30,7 @@ export const AlbumListHeader = ({ title }: AlbumListHeaderProps) => {
                     </LibraryHeaderBar.Badge>
                 </LibraryHeaderBar>
                 <Group>
-                    <SearchInput />
+                    <ListSearchInput />
                 </Group>
             </PageHeader>
             <FilterBar>

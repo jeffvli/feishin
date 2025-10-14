@@ -1,4 +1,4 @@
-import { useDebouncedValue } from '@mantine/hooks';
+import { useDebouncedCallback } from '@mantine/hooks';
 import { parseAsString, useQueryState } from 'nuqs';
 
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
@@ -9,11 +9,10 @@ export const useSearchTermFilter = (defaultValue?: string) => {
         defaultValue ? parseAsString.withDefault(defaultValue) : parseAsString,
     );
 
-    const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 300);
+    const debouncedSetSearchTerm = useDebouncedCallback(setSearchTerm, 300);
 
     return {
-        [FILTER_KEYS.SHARED.SEARCH_TERM]: debouncedSearchTerm ?? undefined,
-        rawSearchTerm: searchTerm ?? undefined,
-        setSearchTerm,
+        [FILTER_KEYS.SHARED.SEARCH_TERM]: searchTerm ?? undefined,
+        setSearchTerm: debouncedSetSearchTerm,
     };
 };
