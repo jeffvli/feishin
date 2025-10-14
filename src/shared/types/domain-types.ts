@@ -563,7 +563,6 @@ export interface SongListQuery extends BaseQuery<SongListSort> {
     maxYear?: number;
     minYear?: number;
     musicFolderId?: string;
-    role?: string;
     searchTerm?: string;
     startIndex: number;
 }

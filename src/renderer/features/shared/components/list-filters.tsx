@@ -6,7 +6,7 @@ import { SubsonicAlbumFilters } from '/@/renderer/features/albums/components/sub
 import { FilterButton } from '/@/renderer/features/shared/components/filter-button';
 import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jellyfin-song-filters';
 import { NavidromeSongFilters } from '/@/renderer/features/songs/components/navidrome-song-filters';
-import { SubsonicSongFilters } from '/@/renderer/features/songs/components/subsonic-song-filter';
+import { SubsonicSongFilters } from '/@/renderer/features/songs/components/subsonic-song-filters';
 import { useCurrentServer } from '/@/renderer/store';
 import { Modal } from '/@/shared/components/modal/modal';
 import { useDisclosure } from '/@/shared/hooks/use-disclosure';
