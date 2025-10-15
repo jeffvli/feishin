@@ -45,6 +45,18 @@ const HomeRoute = () => {
     const { windowBarStyle } = useWindowSettings();
     const { homeFeature, homeItems } = useGeneralSettings();
 
+    const itemsPerPage = 10;
+
+    const queriesEnabled = useMemo(() => {
+        return homeItems.reduce(
+            (previous: Record<HomeItem, boolean>, current) => ({
+                ...previous,
+                [current.id]: !current.disabled,
+            }),
+            {} as Record<HomeItem, boolean>,
+        );
+    }, [homeItems]);
+
     const feature = useQuery(
         albumQueries.list({
             options: {
