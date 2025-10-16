@@ -32,12 +32,10 @@ export const ExportImportSettingsModal = () => {
 
     const onItemSelected = useCallback((itemContents: string) => {
         const settingsFile = JSON.parse(itemContents) as VersionedSettings;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Version needs to be omitted from the settings object
         const { version, ...settings } = settingsFile;
-
         const parsedResult = settings as SettingsState;
-        const migratedSettings = migrateSettings(parsedResult, version);
-
-        setSettingsFile(migratedSettings);
+        setSettingsFile(parsedResult);
         setCurrentScreen(SCREENS.DIFF_VISUALS);
     }, []);
 
@@ -54,7 +52,9 @@ export const ExportImportSettingsModal = () => {
             }
 
             const content = JSON.parse(itemContents);
-            const validationRes = ValidationSettingsStateSchema.safeParse(content);
+
+            const migratedSettings = migrateSettings(content, content?.version || 0);
+            const validationRes = ValidationSettingsStateSchema.safeParse(migratedSettings);
 
             if (!validationRes.success) {
                 const error = validationRes.error as ZodError;

@@ -908,8 +908,9 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
         {
             merge: mergeOverridingColumns,
             migrate(persistedState, version) {
+                const state = persistedState as SettingsSlice;
+
                 if (version === 8) {
-                    const state = persistedState as SettingsSlice;
                     state.general.sidebarItems = state.general.sidebarItems.filter(
                         (item) => item.id !== 'Folders',
                     );
@@ -921,10 +922,29 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     });
                 }
 
+                if (version <= 9) {
+                    if (!state.window.releaseChannel) {
+                        state.window.releaseChannel = initialState.window.releaseChannel;
+                    }
+
+                    if (!state.playback.mediaSession) {
+                        state.playback.mediaSession = initialState.playback.mediaSession;
+                    }
+
+                    if (!state.general.artistBackgroundBlur) {
+                        state.general.artistBackgroundBlur =
+                            initialState.general.artistBackgroundBlur;
+                    }
+
+                    if (!state.general.artistBackground) {
+                        state.general.artistBackground = initialState.general.artistBackground;
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 9,
+            version: 10,
         },
     ),
 );
