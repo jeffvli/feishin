@@ -6,9 +6,9 @@ import { DiffVisualiser } from '/@/renderer/components/settings-diff-visualiser/
 import {
     migrateSettings,
     type SettingsState,
-    SettingsStateSchema,
     useSettingsForExport,
     useSettingsStoreActions,
+    ValidationSettingsStateSchema,
     VersionedSettings,
 } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
@@ -23,6 +23,7 @@ enum SCREENS {
 }
 
 export const ExportImportSettingsModal = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Version needs to be omitted from the settings object
     const { version, ...settings } = useSettingsForExport();
     const { setSettings } = useSettingsStoreActions();
 
@@ -33,7 +34,7 @@ export const ExportImportSettingsModal = () => {
         const settingsFile = JSON.parse(itemContents) as VersionedSettings;
         const { version, ...settings } = settingsFile;
 
-        const parsedResult = SettingsStateSchema.parse(settings);
+        const parsedResult = settings as SettingsState;
         const migratedSettings = migrateSettings(parsedResult, version);
 
         setSettingsFile(migratedSettings);
@@ -44,6 +45,7 @@ export const ExportImportSettingsModal = () => {
         (itemContents: string): { error?: string; isValid: boolean } => {
             try {
                 JSON.parse(itemContents);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars -- "err" is not useful and the catch cannot be empty
             } catch (err) {
                 return {
                     error: t('setting.exportImportSettings_notValidJSON'),
@@ -52,7 +54,7 @@ export const ExportImportSettingsModal = () => {
             }
 
             const content = JSON.parse(itemContents);
-            const validationRes = SettingsStateSchema.safeParse(content);
+            const validationRes = ValidationSettingsStateSchema.safeParse(content);
 
             if (!validationRes.success) {
                 const error = validationRes.error as ZodError;

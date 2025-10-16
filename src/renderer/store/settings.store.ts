@@ -287,7 +287,10 @@ const WindowSettingsSchema = z.object({
     windowBarStyle: z.nativeEnum(Platform),
 });
 
-export const SettingsStateSchema = z.object({
+/**
+ * This schema is used for validation of the imported settings json
+ */
+export const ValidationSettingsStateSchema = z.object({
     css: CssSettingsSchema,
     discord: DiscordSettingsSchema,
     font: FontSettingsSchema,
@@ -303,9 +306,19 @@ export const SettingsStateSchema = z.object({
         z.literal('window'),
         z.string(),
     ]),
-    tables: TablesSettingsSchema,
     window: WindowSettingsSchema,
 });
+
+/**
+ * This schema is merged below to create the full SettingsSchema but not used during import validation
+ */
+export const NonValidatedSettingsStateSchema = z.object({
+    tables: TablesSettingsSchema,
+});
+
+export const SettingsStateSchema = ValidationSettingsStateSchema.merge(
+    NonValidatedSettingsStateSchema,
+);
 
 export enum ArtistItem {
     BIOGRAPHY = 'biography',
@@ -960,6 +973,7 @@ const getSettingsStoreVersion = () => useSettingsStore.persist.getOptions().vers
 
 export const useSettingsForExport = (): SettingsState & { version: number } =>
     useSettingsStore((state) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- actions needs to be omitted from the export as it contains store functions
         const { actions, ...otherSettings } = state;
         return {
             ...otherSettings,
