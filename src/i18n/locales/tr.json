@@ -233,13 +233,15 @@
             "ignoreCors": "cors'u $t(common.restartRequired) görmezden gel",
             "ignoreSsl": "ssl bağlantısını görmezden gel $t(common.restartRequired)",
             "input_legacyAuthentication": "eski kimlik doğrulamayı etkinleştir",
-            "input_name": "sucunu ismi",
+            "input_name": "sunucu ismi",
             "input_password": "şifre",
             "input_savePassword": "şifreyi kaydet",
             "input_url": "URL",
             "input_username": "kullanıcı ismi",
             "success": "sunucu başarıyla eklendi",
-            "title": "sunucu ekle"
+            "title": "sunucu ekle",
+            "input_preferInstantMix": "anında mix tercih et",
+            "input_preferInstantMixDescription": "sadece benzer şarkılari bulmak icin anında mix kullan. Bu davranışı değiştiren eklentilere sahipseniz faydalı"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist_other)",

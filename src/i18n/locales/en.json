@@ -734,6 +734,8 @@
         "themeLight_description": "sets the light theme to use for the application",
         "themeLight": "theme (light)",
         "transcode_description": "enables transcoding to different formats",
+        "mediaSession_description": "Enables Windows Media Session integration, displaying media controls and metadata in the system volume overlay and lock screen (Windows only)",
+        "mediaSession": "enable media session",
         "transcode": "enable transcoding",
         "transcodeBitrate_description": "selects the bitrate to transcode. 0 means let the server pick",
         "transcodeBitrate": "bitrate to transcode",

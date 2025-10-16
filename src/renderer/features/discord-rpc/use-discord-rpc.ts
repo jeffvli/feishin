@@ -12,10 +12,12 @@ import {
     useGeneralSettings,
     usePlayerStore,
 } from '/@/renderer/store';
+import { sentenceCase } from '/@/renderer/utils';
 import { QueueSong, ServerType } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
 const discordRpc = isElectron() ? window.api.discordRpc : null;
+type ActivityState = [QueueSong | undefined, number, PlayerStatus];
 
 export const useDiscordRpc = () => {
     const discordSettings = useDiscordSettings();
@@ -24,19 +26,17 @@ export const useDiscordRpc = () => {
     const [lastUniqueId, setlastUniqueId] = useState('');
 
     const setActivity = useCallback(
-        async (
-            current: (number | PlayerStatus | QueueSong | undefined)[],
-            previous: (number | PlayerStatus | QueueSong | undefined)[],
-        ) => {
+        async (current: ActivityState, previous: ActivityState) => {
             if (
                 !current[0] || // No track
                 current[1] === 0 || // Start of track
                 (current[2] === 'paused' && !discordSettings.showPaused) // Track paused with show paused setting disabled
-            )
+            ) {
                 return discordRpc?.clearActivity();
+            }
 
             // Handle change detection
-            const song = current[0] as QueueSong;
+            const song = current[0];
             const trackChanged = lastUniqueId !== song.uniqueId;
 
             /*
@@ -47,13 +47,15 @@ export const useDiscordRpc = () => {
             */
             if (
                 previous[1] === 0 ||
-                Math.abs((current[1] as number) - (previous[1] as number)) > 1.2 ||
+                Math.abs(current[1] - previous[1]) > 1.2 ||
                 trackChanged ||
                 current[2] !== previous[2]
             ) {
-                if (trackChanged) setlastUniqueId(song.uniqueId);
+                if (trackChanged) {
+                    setlastUniqueId(song.uniqueId);
+                }
 
-                const start = Math.round(Date.now() - (current[1] as number) * 1000);
+                const start = Math.round(Date.now() - current[1] * 1000);
                 const end = Math.round(start + song.duration);
 
                 const artists = song?.artists.map((artist) => artist.name).join(', ');
@@ -65,13 +67,13 @@ export const useDiscordRpc = () => {
                 };
 
                 const activity: SetActivity = {
-                    details: song?.name.padEnd(2, ' ') || 'Idle',
+                    details: (song?.name && song.name.padEnd(2, ' ')) || 'Idle',
                     instance: false,
                     largeImageKey: undefined,
-                    largeImageText: song?.album || 'Unknown album',
+                    largeImageText: (song?.album && song.album.padEnd(2, ' ')) || 'Unknown album',
                     smallImageKey: undefined,
-                    smallImageText: current[2] as string,
-                    state: artists || 'Unknown artist',
+                    smallImageText: sentenceCase(current[2]),
+                    state: (artists && artists.padEnd(2, ' ')) || 'Unknown artist',
                     statusDisplayType: statusDisplayMap[discordSettings.displayType],
                     // I would love to use the actual type as opposed to hardcoding to 2,
                     // but manually installing the discord-types package appears to break things
@@ -106,7 +108,7 @@ export const useDiscordRpc = () => {
                     }
                 }
 
-                if ((current[2] as PlayerStatus) === PlayerStatus.PLAYING) {
+                if (current[2] === PlayerStatus.PLAYING) {
                     if (start && end) {
                         activity.startTimestamp = start;
                         activity.endTimestamp = end;
@@ -162,7 +164,9 @@ export const useDiscordRpc = () => {
 
                 // Initialize if needed
                 const isConnected = await discordRpc?.isConnected();
-                if (!isConnected) await discordRpc?.initialize(discordSettings.clientId);
+                if (!isConnected) {
+                    await discordRpc?.initialize(discordSettings.clientId);
+                }
 
                 discordRpc?.setActivity(activity);
             }
@@ -180,7 +184,9 @@ export const useDiscordRpc = () => {
     );
 
     useEffect(() => {
-        if (!discordSettings.enabled || privateMode) return discordRpc?.quit();
+        if (!discordSettings.enabled || privateMode) {
+            return discordRpc?.quit();
+        }
 
         return () => {
             discordRpc?.quit();
@@ -188,9 +194,15 @@ export const useDiscordRpc = () => {
     }, [discordSettings.clientId, privateMode, discordSettings.enabled]);
 
     useEffect(() => {
-        if (!discordSettings.enabled || privateMode) return;
+        if (!discordSettings.enabled || privateMode) {
+            return;
+        }
         const unsubSongChange = usePlayerStore.subscribe(
-            (state) => [state.current.song, state.current.time, state.current.status],
+            (state): ActivityState => [
+                state.current.song,
+                state.current.time,
+                state.current.status,
+            ],
             setActivity,
         );
         return () => {

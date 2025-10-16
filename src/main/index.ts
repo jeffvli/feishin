@@ -23,6 +23,7 @@ import { access, constants, readFile, writeFile } from 'fs';
 import path, { join } from 'path';
 import { deflate, inflate } from 'zlib';
 
+import packageJson from '../../package.json';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
@@ -43,11 +44,33 @@ export default class AppUpdater {
     constructor() {
         log.transports.file.level = 'info';
         autoUpdater.logger = autoUpdaterLogInterface;
-        autoUpdater.checkForUpdatesAndNotify();
 
-        if (store.get('release_channel') === 'beta') {
-            autoUpdater.channel = 'beta';
+        const isBetaVersion = packageJson.version.includes('-beta');
+        const releaseChannel = store.get('release_channel');
+        const isNotConfigured = !releaseChannel;
+
+        console.log('Release channel: ', releaseChannel);
+        console.log('Is beta version: ', isBetaVersion);
+
+        if (isNotConfigured) {
+            console.log(
+                'Release channel not configured, setting to ',
+                isBetaVersion ? 'beta' : 'latest',
+            );
+            store.set('release_channel', isBetaVersion ? 'beta' : 'latest');
         }
+
+        if (releaseChannel === 'beta') {
+            autoUpdater.channel = 'beta';
+            autoUpdater.allowPrerelease = true;
+            autoUpdater.disableDifferentialDownload = true;
+        } else if (releaseChannel === 'latest') {
+            autoUpdater.channel = 'latest';
+            autoUpdater.allowDowngrade = true;
+            autoUpdater.allowPrerelease = false;
+        }
+
+        autoUpdater.checkForUpdatesAndNotify();
     }
 }
 
@@ -525,7 +548,14 @@ async function createWindow(first = true): Promise<void> {
     }
 }
 
-app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling,MediaSessionService');
+const enableWindowsMediaSession = store.get('mediaSession', false) as boolean;
+const shouldDisableMediaFeatures = process.platform !== 'win32' || !enableWindowsMediaSession;
+if (shouldDisableMediaFeatures) {
+    app.commandLine.appendSwitch(
+        'disable-features',
+        'HardwareMediaKeyHandling,MediaSessionService',
+    );
+}
 
 // https://github.com/electron/electron/issues/46538#issuecomment-2808806722
 app.commandLine.appendSwitch('gtk-version', '3');

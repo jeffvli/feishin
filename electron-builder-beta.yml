@@ -54,5 +54,5 @@ publish:
     provider: github
     owner: jeffvli
     repo: feishin
-    channel: latest
+    channel: beta
     releaseType: draft

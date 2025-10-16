@@ -2,11 +2,13 @@ import { PostProcessorModule, StringMap, TOptions } from 'i18next';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import ar from './locales/ar.json';
 import ca from './locales/ca.json';
 import cs from './locales/cs.json';
 import de from './locales/de.json';
 import en from './locales/en.json';
 import es from './locales/es.json';
+import eu from './locales/eu.json';
 import fa from './locales/fa.json';
 import fi from './locales/fi.json';
 import fr from './locales/fr.json';
@@ -30,11 +32,13 @@ import zhHans from './locales/zh-Hans.json';
 import zhHant from './locales/zh-Hant.json';
 
 const resources = {
+    ar: { translation: ar },
     ca: { translation: ca },
     cs: { translation: cs },
     de: { translation: de },
     en: { translation: en },
     es: { translation: es },
+    eu: { translation: eu },
     fa: { translation: fa },
     fi: { translation: fi },
     fr: { translation: fr },
@@ -64,6 +68,10 @@ export const languages = [
         value: 'en',
     },
     {
+        label: 'العربية',
+        value: 'ar',
+    },
+    {
         label: 'Català',
         value: 'ca',
     },
@@ -72,12 +80,16 @@ export const languages = [
         value: 'cs',
     },
     {
+        label: 'Deutsch',
+        value: 'de',
+    },
+    {
         label: 'Español',
         value: 'es',
     },
     {
-        label: 'Deutsch',
-        value: 'de',
+        label: 'Basque',
+        value: 'eu',
     },
     {
         label: 'Français',

@@ -3,6 +3,7 @@ import { lazy, Suspense, useMemo } from 'react';
 
 import { AudioSettings } from '/@/renderer/features/settings/components/playback/audio-settings';
 import { LyricSettings } from '/@/renderer/features/settings/components/playback/lyric-settings';
+import { MediaSessionSettings } from '/@/renderer/features/settings/components/playback/media-session-settings';
 import { ScrobbleSettings } from '/@/renderer/features/settings/components/playback/scrobble-settings';
 import { TranscodeSettings } from '/@/renderer/features/settings/components/playback/transcode-settings';
 import { useSettingsStore } from '/@/renderer/store';
@@ -31,6 +32,7 @@ export const PlaybackTab = () => {
             <AudioSettings hasFancyAudio={hasFancyAudio} />
             <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
             <TranscodeSettings />
+            <MediaSessionSettings />
             <ScrobbleSettings />
             <LyricSettings />
         </Stack>

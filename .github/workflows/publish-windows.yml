@@ -31,6 +31,5 @@ jobs:
                   max_attempts: 3
                   retry_on: error
                   command: |
-                      pnpm run package:win
                       pnpm run publish:win
                   on_retry_command: pnpm cache delete

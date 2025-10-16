@@ -234,7 +234,8 @@
         },
         "editPlaylist": {
             "title": "Bearbeite $t(entity.playlist_one)",
-            "success": "$t(entity.playlist_one) erfolgreich aktualisiert"
+            "success": "$t(entity.playlist_one) erfolgreich aktualisiert",
+            "publicJellyfinNote": "Jellyfin legt aus irgendwelchen Gründen nicht offen ob eine Playlist öffentlich ist oder nicht. Wenn du möchtest, dass sie öffentlich bleibt, wähle bitte diese Option aus"
         },
         "lyricSearch": {
             "title": "Songtext Suche",
@@ -246,7 +247,13 @@
             "setExpiration": "Ablaufdatum setzen",
             "expireInvalid": "Ablaufdatum muss in der Zukunft liegen",
             "allowDownloading": "Herunterladen zulassen",
-            "success": "Link in die Zwischenablage kopiert (oder hier klicken um zu öffnen)"
+            "success": "Link in die Zwischenablage kopiert (oder hier klicken um zu öffnen)",
+            "createFailed": "Fehler beim Teilen (Ist Teilen aktiviert?)"
+        },
+        "privateMode": {
+            "enabled": "Privatmodus aktiviert, Wiedergabe-Status wird externen Quellen nicht preisgegeben",
+            "disabled": "Privatmodus deaktiviert, Wiedergabe-Status wird externen Quellen preisgegeben",
+            "title": "Privatmodus"
         }
     },
     "entity": {
@@ -386,14 +393,17 @@
             "goBack": "Gehe zurück",
             "goForward": "Gehe vorwärts",
             "settings": "$t(common.setting_other)",
-            "quit": "$t(common.quit)"
+            "quit": "$t(common.quit)",
+            "privateModeOff": "Privatmodus deaktivieren",
+            "privateModeOn": "Privatmodus aktivieren"
         },
         "home": {
             "mostPlayed": "Meistgespielt",
             "newlyAdded": "Neu hinzugefügte Veröffentlichungen",
             "explore": "Entdecke deine Bibliothek",
             "recentlyPlayed": "Kürzlich gespielt",
-            "title": "$t(common.home)"
+            "title": "$t(common.home)",
+            "recentlyReleased": "kürzlich veröffentlicht"
         },
         "albumDetail": {
             "moreFromArtist": "Mehr von diesem $t(entity.artist_one)",
@@ -428,7 +438,9 @@
             "playShuffled": "$t(player.shuffle)",
             "download": "Download",
             "playSimilarSongs": "$t(player.playSimilarSongs)",
-            "moveToNext": "$t(action.moveToNext)"
+            "moveToNext": "$t(action.moveToNext)",
+            "shareItem": "teilen",
+            "showDetails": "Informationen"
         },
         "sidebar": {
             "nowPlaying": "läuft gerade",
@@ -481,7 +493,8 @@
             "viewAllTracks": "Alle $t(entity.track_other) ansehen",
             "topSongsFrom": "Toplieder von {{title}}",
             "viewAll": "Alles ansehen",
-            "topSongs": "Toplieder"
+            "topSongs": "Toplieder",
+            "relatedArtists": "ähnliche $t(entity.artist_other)"
         },
         "manageServers": {
             "title": "Servers verwalten",
@@ -709,6 +722,7 @@
         "clearCacheSuccess": "Cache erfolgreich geleert",
         "contextMenu": "Kontextmenü-Einstellungen (Rechtsklick)",
         "customCssEnable_description": "ermöglicht das Schreiben benutzerdefinierten CSS.",
-        "doubleClickBehavior": "bei Doppelklick alle gesuchten Tracks zur Warteschlange hinzufügen"
+        "doubleClickBehavior": "bei Doppelklick alle gesuchten Tracks zur Warteschlange hinzufügen",
+        "artistBackground": "Künstler Hintergrundbild"
     }
 }

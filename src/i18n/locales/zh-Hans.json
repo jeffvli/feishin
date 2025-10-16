@@ -399,7 +399,7 @@
         "lastfmApiKey": "{{lastfm}} API 密钥",
         "lastfmApiKey_description": "{{lastfm}} 的 API 密钥。封面艺术图所需",
         "discordServeImage": "从服务器提供 {{discord}} 图像",
-        "discordServeImage_description": "分享 {{discord}} 封面艺术图，来自 rich presence 服务器，仅适用于 jellyfin 和 navidrome",
+        "discordServeImage_description": "从服务器本身分享 {{discord}} rich presence 的封面艺术，仅适用于 jellyfin 和 navidrome。 {{discord}} 使用机器人来获取图像，因此您的服务器必须可通过公共互联网访问。",
         "musicbrainz": "显示 musicbrainz 链接",
         "musicbrainz_description": "在 mbid 的艺术家/专辑页面上显示 musicbrainz 的链接",
         "lastfm": "显示 last.fm 链接",
@@ -418,7 +418,19 @@
         "discordDisplayType_artistname": "艺术家名称",
         "hotkey_navigateHome": "导航到主页",
         "preventSleepOnPlayback": "防止播放时进入睡眠状态",
-        "preventSleepOnPlayback_description": "播放音乐时防止显示器进入睡眠状态"
+        "preventSleepOnPlayback_description": "播放音乐时防止显示器进入睡眠状态",
+        "discordLinkType": "{{discord}} 状态链接",
+        "discordLinkType_description": "在 {{discord}} 的歌曲和艺术家字段中添加 {{lastfm}} 或 {{musicbrainz}} 的外部链接。{{musicbrainz}} 最准确，但需要标签，且不提供艺术家链接，而 {{lastfm}} 则始终提供链接。无需额外的网络请求",
+        "discordLinkType_none": "$t(common.none)",
+        "discordLinkType_mbz_lastfm": "{{musicbrainz}} 和 {{lastfm}} 后备",
+        "artistBackground": "艺术家背景图片",
+        "artistBackground_description": "为包含艺术家作品的艺术家页面添加背景图片",
+        "artistBackgroundBlur": "艺术家背景图像模糊尺寸",
+        "artistBackgroundBlur_description": "调整应用于艺术家背景图像的模糊程度",
+        "releaseChannel_optionLatest": "stable",
+        "releaseChannel_optionBeta": "beta",
+        "releaseChannel": "发布渠道",
+        "releaseChannel_description": "选择稳定版本或测试版以进行自动更新"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
@@ -548,7 +560,8 @@
             "newlyAdded": "最近添加的发布",
             "explore": "从库中搜索",
             "recentlyPlayed": "最近播放",
-            "title": "$t(common.home)"
+            "title": "$t(common.home)",
+            "recentlyReleased": "最近发布"
         },
         "albumDetail": {
             "moreFromArtist": "更多该$t(entity.artist_one)作品",
@@ -662,7 +675,9 @@
             "ignoreSsl": "忽略 ssl $t(common.restartRequired)",
             "ignoreCors": "忽略 cors $t(common.restartRequired)",
             "error_savePassword": "保存密码时出现错误",
-            "input_url": "url"
+            "input_url": "url",
+            "input_preferInstantMixDescription": "仅使用即时混音来获取类似的歌曲。如果您有修改此行为的插件，则很有用",
+            "input_preferInstantMix": "首选即时混音"
         },
         "addToPlaylist": {
             "success": "添加$t(entity.trackWithCount, {\"count\": {{message}} })到$t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",

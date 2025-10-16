@@ -83,9 +83,9 @@ export const AlbumDetailHeader = forwardRef(
             },
             {
                 id: 'songCount',
-                value: `${detailQuery?.data?.songCount} ${t('entity.track_other', {
+                value: t('entity.trackWithCount', {
                     count: detailQuery?.data?.songCount as number,
-                })}`,
+                }),
             },
             {
                 id: 'duration',

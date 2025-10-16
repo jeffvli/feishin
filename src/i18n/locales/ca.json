@@ -22,7 +22,7 @@
             "appearsOn": "apareix a",
             "recentReleases": "Llançaments recents",
             "viewDiscography": "Mosta la discografia",
-            "topSongs": "millos cançons",
+            "topSongs": "millors cançons",
             "topSongsFrom": "les millors cançons de {{title}}",
             "viewAll": "mostra-ho tot"
         },
@@ -89,7 +89,8 @@
             "explore": "explora la teva biblioteca",
             "newlyAdded": "afegits recentment",
             "mostPlayed": "els més reproduïts",
-            "recentlyPlayed": "reproduït recentment"
+            "recentlyPlayed": "reproduït recentment",
+            "recentlyReleased": "estrenat fa poc"
         },
         "playlistList": {
             "title": "$t(entity.playlist_other)"
@@ -349,7 +350,9 @@
             "input_savePassword": "desa la contrasenya",
             "input_url": "url",
             "success": "servidor afegit correctament",
-            "title": "afegeix un servidor"
+            "title": "afegeix un servidor",
+            "input_preferInstantMix": "prefereix el mix instantani",
+            "input_preferInstantMixDescription": "utilitza només el mix instantani per obtenir cançons similars. útil si teniu complements que modifiquin aquest comportament"
         },
         "shareItem": {
             "description": "descripció",
@@ -480,7 +483,7 @@
         "discordRichPresence": "estat d'activitat de {{discord}}",
         "discordRichPresence_description": "activa l'estat de reproducció a l'activitat de {{discord}}. Les tecles d'imatge són: {{icon}}, {{playing}} i {{paused}}",
         "discordServeImage": "serveix imatges de {{discord}} des del servidor",
-        "discordServeImage_description": "comparteix la caràtula per l'estat d'activitat de {{discord}} des del servidor; només disponible per jellyfin i navidrome",
+        "discordServeImage_description": "comparteix la caràtula per l'estat d'activitat de {{discord}} des del servidor; només disponible per jellyfin i navidrome. {{discord}} fa ser un bot per trobar les imatges, de manera que el vostre servidor ha de ser visible per l'internet públic.",
         "discordUpdateInterval": "interval d'actualització de l'estat d'activitat de {{discord}}",
         "doubleClickBehavior": "posa en cua totes les pistes cercades en fer doble clic",
         "doubleClickBehavior_description": "si està actiu, totes les pistes coincidents en una cerca de pistes es posaran a la cua. altrament, només la que seleccioneu s'afegirà a la cua",
@@ -646,7 +649,21 @@
         "discordDisplayType_artistname": "nom de l'artista",
         "hotkey_navigateHome": "ves a l'inici",
         "preventSleepOnPlayback": "evitar entrar en repòs durant la reproducció",
-        "preventSleepOnPlayback_description": "evita que la pantalla s'adormi mentre la música es reprodueix"
+        "preventSleepOnPlayback_description": "evita que la pantalla s'adormi mentre la música es reprodueix",
+        "discordLinkType": "enllaços d'estat de {{discord}}",
+        "discordLinkType_description": "afegeix enllaços externs a {{lastfm}} o {{musicbrainz}} als camps de cançó i artista a l'estat d'activitat de {{discord}}. {{musicbrainz}} és el més precís, però requereix etiquetes i no proporciona enllaços d'artista, mentre que {{lastfm}} hauria de propocionar un enllaç sempre. no fa sol·licituds de xarxa addicionals",
+        "discordLinkType_none": "$t(common.none)",
+        "discordLinkType_mbz_lastfm": "{{musicbrainz}} amb {{lastfm}} com a alternativa",
+        "artistBackground": "imatge de fons de l'artista",
+        "artistBackground_description": "afegeix una imatge de fons per les pàgines d'artista amb l'art de l'artista",
+        "artistBackgroundBlur": "mida del desenfocament de la imatge de fons de l'artista",
+        "artistBackgroundBlur_description": "ajusta la quantitat de desenfocament aplicat a la imatge de fons de l'artista",
+        "releaseChannel_optionLatest": "estable",
+        "releaseChannel_optionBeta": "beta",
+        "releaseChannel": "canal de versions",
+        "releaseChannel_description": "tria entre versions estables i versions beta per les actualitzacions automàtiques",
+        "mediaSession": "activa Media Session",
+        "mediaSession_description": "Activa la integració amb Windows Media Session per mostrar els controls multimèdia i les metadades a l'indicador de volum del sistema i la pantalla de bloqueig (només per Windows)"
     },
     "table": {
         "column": {

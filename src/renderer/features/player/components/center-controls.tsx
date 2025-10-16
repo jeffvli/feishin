@@ -11,21 +11,22 @@ import { PlayButton, PlayerButton } from '/@/renderer/features/player/components
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { openShuffleAllModal } from '/@/renderer/features/player/components/shuffle-all-modal';
 import { useCenterControls } from '/@/renderer/features/player/hooks/use-center-controls';
+import { useMediaSession } from '/@/renderer/features/player/hooks/use-media-session';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import {
+    useAppStore,
+    useAppStoreActions,
     useCurrentPlayer,
     useCurrentSong,
     useCurrentStatus,
     useCurrentTime,
-    useRepeatStatus,
-    useSetCurrentTime,
-    useShuffleStatus,
-} from '/@/renderer/store';
-import {
     useHotkeySettings,
     usePlaybackType,
+    useRepeatStatus,
+    useSetCurrentTime,
     useSettingsStore,
-} from '/@/renderer/store/settings.store';
+    useShuffleStatus,
+} from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
@@ -51,6 +52,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const repeat = useRepeatStatus();
     const shuffle = useShuffleStatus();
     const { bindings } = useHotkeySettings();
+    const { showTimeRemaining } = useAppStore();
+    const { setShowTimeRemaining } = useAppStoreActions();
 
     const {
         handleNextTrack,
@@ -70,7 +73,8 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
     const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
     const currentTime = useCurrentTime();
     const currentPlayerRef = player === 1 ? player1 : player2;
-    const duration = formatDuration(songDuration * 1000 || 0);
+    const formattedDuration = formatDuration(songDuration * 1000 || 0);
+    const formattedTimeRemaining = formatDuration((currentTime - songDuration) * 1000 || 0);
     const formattedTime = formatDuration(currentTime * 1000 || 0);
 
     useEffect(() => {
@@ -110,6 +114,17 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
             () => handleSkipForward(skip?.skipForwardSeconds || 5),
         ],
     ]);
+
+    useMediaSession({
+        handleNextTrack,
+        handlePause,
+        handlePlay,
+        handlePrevTrack,
+        handleSeekSlider,
+        handleSkipBackward,
+        handleSkipForward,
+        handleStop,
+    });
 
     return (
         <>
@@ -260,6 +275,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         isMuted
                         isNoSelect
                         size="xs"
+                        style={{ userSelect: 'none' }}
                     >
                         {formattedTime}
                     </Text>
@@ -293,9 +309,12 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
                         fw={600}
                         isMuted
                         isNoSelect
+                        onClick={() => setShowTimeRemaining(!showTimeRemaining)}
+                        role="button"
                         size="xs"
+                        style={{ cursor: 'pointer', userSelect: 'none' }}
                     >
-                        {duration}
+                        {showTimeRemaining ? formattedTimeRemaining : formattedDuration}
                     </Text>
                 </div>
             </div>

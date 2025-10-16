@@ -28,7 +28,13 @@ import {
     TableType,
 } from '/@/shared/types/types';
 
-const HomeItemSchema = z.enum(['mostPlayed', 'random', 'recentlyAdded', 'recentlyPlayed']);
+const HomeItemSchema = z.enum([
+    'mostPlayed',
+    'random',
+    'recentlyAdded',
+    'recentlyPlayed',
+    'recentlyReleased',
+]);
 
 const ArtistItemSchema = z.enum([
     'biography',
@@ -242,6 +248,7 @@ const PlaybackSettingsSchema = z.object({
     audioDeviceId: z.string().nullable().optional(),
     crossfadeDuration: z.number(),
     crossfadeStyle: z.nativeEnum(CrossfadeStyle),
+    mediaSession: z.boolean(),
     mpvExtraParameters: z.array(z.string()),
     mpvProperties: MpvSettingsSchema,
     muted: z.boolean(),
@@ -368,6 +375,7 @@ export enum HomeItem {
     RANDOM = 'random',
     RECENTLY_ADDED = 'recentlyAdded',
     RECENTLY_PLAYED = 'recentlyPlayed',
+    RECENTLY_RELEASED = 'recentlyReleased',
 }
 
 export type DataTableProps = z.infer<typeof DataTablePropsSchema>;
@@ -386,6 +394,7 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
         setTable: (type: TableType, data: DataTableProps) => void;
         setTranscodingConfig: (config: TranscodingConfig) => void;
         toggleContextMenuItem: (item: ContextMenuItemType) => void;
+        toggleMediaSession: () => void;
         toggleSidebarCollapseShare: () => void;
     };
 }
@@ -605,6 +614,7 @@ const initialState: SettingsState = {
         audioDeviceId: undefined,
         crossfadeDuration: 5,
         crossfadeStyle: CrossfadeStyle.EQUALPOWER,
+        mediaSession: false,
         mpvExtraParameters: [],
         mpvProperties: {
             audioExclusiveMode: 'no',
@@ -864,6 +874,11 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                         set((state) => {
                             state.general.disabledContextMenu[item] =
                                 !state.general.disabledContextMenu[item];
+                        });
+                    },
+                    toggleMediaSession: () => {
+                        set((state) => {
+                            state.playback.mediaSession = !state.playback.mediaSession;
                         });
                     },
                     toggleSidebarCollapseShare: () => {

@@ -142,7 +142,9 @@
             "playSimilarSongs": "$t(player.playSimilarSongs)",
             "playShuffled": "$t(player.shuffle)",
             "shareItem": "分享項目",
-            "showDetails": "取得資訊"
+            "showDetails": "取得資訊",
+            "goToAlbum": "前往 $t(entity.album_one)",
+            "goToAlbumArtist": "前往 $t(entity.albumArtist_one)"
         },
         "globalSearch": {
             "title": "指令",
@@ -157,7 +159,8 @@
             "recentlyPlayed": "最近播放",
             "title": "$t(common.home)",
             "mostPlayed": "最多播放",
-            "newlyAdded": "最近新增的發行"
+            "newlyAdded": "最近新增的發行",
+            "recentlyReleased": "最近發佈"
         },
         "appMenu": {
             "openBrowserDevtools": "打開瀏覽器開發者工具",
@@ -169,7 +172,9 @@
             "selectServer": "選擇伺服器",
             "settings": "$t(common.setting_other)",
             "version": "版本 {{version}}",
-            "manageServers": "管理伺服器"
+            "manageServers": "管理伺服器",
+            "privateModeOff": "關閉私人模式",
+            "privateModeOn": "開啟私人模式"
         },
         "fullscreenPlayer": {
             "config": {
@@ -489,7 +494,7 @@
         "discordListening": "將狀態設為\"正在聽\"",
         "discordListening_description": "將狀態顯示為\"正在聽\"而不是\"正在玩\"",
         "discordServeImage": "從伺服器提供{{discord}}圖片",
-        "discordServeImage_description": "從伺服器本身為 {{discord}} rich presence 分享封面圖片，只在jellyfin和navidrome可用",
+        "discordServeImage_description": "從伺服器本身分享 {{discord}} Rich Presence的封面圖片，僅支援 Jellyfin 與 Navidrome。{{discord}} 會透過機器人擷取圖片，因此您的伺服器必須能從公開網路連線。",
         "doubleClickBehavior": "雙擊時將所有搜尋到的曲目加入佇列",
         "doubleClickBehavior_description": "如果為 true，則歌曲搜尋中所有符合的歌曲都會被加入佇列。否則，只有被點擊的歌曲才會被加入佇列",
         "externalLinks": "顯示外部連結",
@@ -544,7 +549,27 @@
         "webAudio": "使用網頁音訊",
         "webAudio_description": "使用網頁音訊。這將啟用重播增益等進階功能。如果您遇到其他問題，請停用",
         "preservePitch": "保持音高",
-        "preservePitch_description": "修改播放速度時保留音調"
+        "preservePitch_description": "修改播放速度時保留音調",
+        "artistBackground": "藝人背景圖片",
+        "artistBackground_description": "為藝人頁面新增含藝人圖片的背景圖像",
+        "artistBackgroundBlur": "藝人背景圖片模糊程度",
+        "artistBackgroundBlur_description": "調整套用至藝人背景圖片的模糊程度",
+        "releaseChannel_optionLatest": "穩定版",
+        "releaseChannel_optionBeta": "測試版",
+        "releaseChannel_description": "選擇自動更新時要使用穩定版本或是測試版本",
+        "discordDisplayType": "{{discord}} presence 顯示類型",
+        "discordDisplayType_description": "變更您在狀態中正在聆聽的內容",
+        "discordDisplayType_songname": "歌曲名稱",
+        "discordDisplayType_artistname": "藝人名稱",
+        "discordLinkType": "{{discord}} presence 連結",
+        "discordLinkType_description": "在 {{discord}} Rich Presence中，為歌曲和藝人欄位新增 {{lastfm}} 或 {{musicbrainz}} 的外部連結。{{musicbrainz}} 的準確度最高，但需要標籤且不提供藝人連結；而 {{lastfm}} 通常都能提供連結。此功能不會產生額外的網路請求",
+        "discordLinkType_none": "$t(common.none)",
+        "discordLinkType_mbz_lastfm": "{{musicbrainz}} 並以 {{lastfm}} 備用",
+        "hotkey_navigateHome": "導航至首頁",
+        "preventSleepOnPlayback": "防止播放時進入睡眠狀態",
+        "preventSleepOnPlayback_description": "在音樂播放時防止螢幕進入睡眠狀態",
+        "mediaSession": "啟用Media Session",
+        "mediaSession_description": "啟用 Windows Media Session 整合功能，於系統音量Overlay和鎖定畫面中顯示媒體資料與控制面板（僅限 Windows）"
     },
     "table": {
         "config": {
@@ -723,7 +748,9 @@
             "title": "新增伺服器",
             "error_savePassword": "儲存密碼時出現錯誤",
             "ignoreCors": "忽略 cors $t(common.restartRequired)",
-            "ignoreSsl": "忽略 ssl $t(common.restartRequired)"
+            "ignoreSsl": "忽略 ssl $t(common.restartRequired)",
+            "input_preferInstantMix": "偏好即時混音",
+            "input_preferInstantMixDescription": "僅使用即時混音功能來獲取相似歌曲。若您擁有能修改此行為的外掛，此功能將相當實用"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist_other)",
@@ -770,6 +797,11 @@
             "success": "分享連結已複製到剪貼簿（或點擊此處開啟）",
             "expireInvalid": "到期日必須是未來",
             "createFailed": "無法建立分享（分享是否啟用？）"
+        },
+        "privateMode": {
+            "enabled": "已啟用私人模式，播放狀態將對外部整合隱藏",
+            "disabled": "已停用私人模式，播放狀態現對已啟用的外部整合可見",
+            "title": "私人模式"
         }
     }
 }

@@ -259,7 +259,7 @@
         "lastfmApiKey_description": "la clave API para {{lastfm}}. Requerida para la portada",
         "lastfmApiKey": "Clave API para {{lastfm}}",
         "discordServeImage": "Servir imágenes de {{discord}} desde el servidor",
-        "discordServeImage_description": "Comparte el arte de la portada para el estado de actividad de {{discord}} desde el propio servidor, solo disponible para Jellyfin y Navidrome",
+        "discordServeImage_description": "Comparte el arte de la portada para el estado de actividad de {{discord}} desde el propio servidor, solo disponible para Jellyfin y Navidrome. {{discord}} usa un bot para obtener las imágenes, por lo que tu servidor debe ser alcanzable desde el Internet público.",
         "lastfm": "Mostrar enlaces de last.fm",
         "lastfm_description": "Muestra enlaces a last.fm en las páginas de artistas/álbumes",
         "musicbrainz": "Mostrar enlaces de MusicBrainz",
@@ -280,7 +280,19 @@
         "discordDisplayType": "Tipo de pantalla de actividad de {{discord}}",
         "hotkey_navigateHome": "Navegar a inicio",
         "preventSleepOnPlayback": "Evitar entrar en reposo durante la reproducción",
-        "preventSleepOnPlayback_description": "Evita que la pantalla entre en reposo mientras se está reproduciendo música"
+        "preventSleepOnPlayback_description": "Evita que la pantalla entre en reposo mientras se está reproduciendo música",
+        "discordLinkType": "Enlaces de estado de {{discord}}",
+        "discordLinkType_none": "$t(common.none)",
+        "discordLinkType_mbz_lastfm": "{{musicbrainz}} con {{lastfm}} como alternativa",
+        "discordLinkType_description": "Añade enlaces externos a {{lastfm}} o {{musicbrainz}} a la canción y campos del artista en el estado de actividad de {{discord}} . {{musicbrainz}} es el más preciso pero requiere etiquetas y no proporciona enlaces del artista mientras que {{lastfm}} debería siempre proporcionar un enlace. No realiza peticiones de red adicionales",
+        "artistBackground": "imagen de fondo del artista",
+        "artistBackgroundBlur": "tamaño de desenfoque de imagen de fondo del artista",
+        "artistBackgroundBlur_description": "ajusta la cantidad de desenfoque aplicado a la imagen de fondo del artista",
+        "releaseChannel_optionLatest": "Estable",
+        "releaseChannel_optionBeta": "Beta",
+        "releaseChannel": "Canal de lanzamiento",
+        "releaseChannel_description": "Elige entre lanzamientos estables o beta para las actualizaciones automáticas",
+        "artistBackground_description": "Añade una imagen de fondo para las páginas de artista que contienen el arte del artista"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -313,7 +325,7 @@
         "bpm": "lpm",
         "refresh": "actualizar",
         "unknown": "desconocido",
-        "areYouSure": "estás seguro?",
+        "areYouSure": "seguro?",
         "edit": "editar",
         "favorite": "favorito",
         "left": "izquierda",
@@ -478,7 +490,7 @@
     },
     "page": {
         "sidebar": {
-            "nowPlaying": "en reproducción",
+            "nowPlaying": "reproduciendo",
             "playlists": "$t(entity.playlist_other)",
             "search": "$t(common.search)",
             "tracks": "$t(entity.track_other)",
@@ -503,8 +515,8 @@
             "quit": "$t(common.quit)",
             "goBack": "retroceder",
             "goForward": "avanzar",
-            "privateModeOff": "Apagar modo privado",
-            "privateModeOn": "Encender modo privado"
+            "privateModeOff": "Desactivar modo privado",
+            "privateModeOn": "Activar modo privado"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -537,7 +549,8 @@
             "newlyAdded": "nuevos lanzamientos añadidos",
             "title": "$t(common.home)",
             "explore": "explora desde tu biblioteca",
-            "recentlyPlayed": "reproducidos recientemente"
+            "recentlyPlayed": "reproducidos recientemente",
+            "recentlyReleased": "Lanzado recientemente"
         },
         "fullscreenPlayer": {
             "upNext": "siguiente",
@@ -656,7 +669,9 @@
             "input_savePassword": "guardar contraseña",
             "ignoreSsl": "ignorar ssl ($t(common.restartRequired))",
             "ignoreCors": "ignorar cors ($t(common.restartRequired))",
-            "error_savePassword": "un error ocurrió cuando se intentó guardar la contraseña"
+            "error_savePassword": "un error ocurrió cuando se intentó guardar la contraseña",
+            "input_preferInstantMix": "Preferir mix instantáneo",
+            "input_preferInstantMixDescription": "Usa solo el mix instantáneo para obtener canciones similares. Útil si tienes complementos que modifican este comportamiento"
         },
         "addToPlaylist": {
             "success": "añadido $t(entity.trackWithCount, {\"count\": {{message}} }) a $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",

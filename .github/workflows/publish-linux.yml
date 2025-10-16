@@ -31,7 +31,6 @@ jobs:
                   max_attempts: 3
                   retry_on: error
                   command: |
-                      pnpm run package:linux
                       pnpm run publish:linux
                   on_retry_command: pnpm cache delete
 
@@ -44,6 +43,5 @@ jobs:
                   max_attempts: 3
                   retry_on: error
                   command: |
-                      pnpm run package:linux-arm64
                       pnpm run publish:linux-arm64
                   on_retry_command: pnpm cache delete

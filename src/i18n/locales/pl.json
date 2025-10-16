@@ -200,7 +200,8 @@
         "badAlbum": "ta strona jest wyświetlana, ponieważ ten utwór nie jest częścią albumu. najprawdopodobniej ten problem występuje, jeśli utwór znajduje się w nadrzędnym folderze plików z muzyką. jellyfin grupuje utwory tylko wtedy, gdy znajdują się one w folderze.",
         "networkError": "wystąpił błąd sieciowy",
         "openError": "nie można otworzyć pliku",
-        "badValue": "niewłaściwa opcja \"{{value}}\". ta wartość już nie istnieje"
+        "badValue": "niewłaściwa opcja \"{{value}}\". ta wartość już nie istnieje",
+        "notificationDenied": "odmówiono uprawnień dla powiadomień. to ustawienie nie będzie miało efektu"
     },
     "filter": {
         "mostPlayed": "najczęściej odtwarzane",
@@ -305,6 +306,11 @@
             "success": "link do udostępniania skopiowany do schowka (lub kliknij tutaj, aby otworzyć)",
             "createFailed": "nie udało się utworzyć linku do udostępniania (czy udostępnianie jest włączone?)",
             "expireInvalid": "ustawiony czas wygaśnięcia musi być w przyszłości"
+        },
+        "privateMode": {
+            "enabled": "tryb prywatny włączony, status odtwarzania jest ukryty przed usługami zewnętrznymi",
+            "disabled": "tryb prywatny wyłączony, status odtwarzania jest widoczny dla usług zewnętrznych",
+            "title": "tryb prywatny"
         }
     },
     "page": {
@@ -341,7 +347,9 @@
             "openBrowserDevtools": "otwórz narzędzia deweloperskie przeglądarki",
             "quit": "$t(common.quit)",
             "goBack": "do tyłu",
-            "goForward": "do przodu"
+            "goForward": "do przodu",
+            "privateModeOff": "wyłącz tryb prywatny",
+            "privateModeOn": "włącz tryb prywatny"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -365,7 +373,9 @@
             "download": "pobierz",
             "playShuffled": "$t(player.shuffle)",
             "playSimilarSongs": "$t(player.playSimilarSongs)",
-            "moveToNext": "$t(action.moveToNext)"
+            "moveToNext": "$t(action.moveToNext)",
+            "goToAlbum": "przejdź do $t(entity.album_one)",
+            "goToAlbumArtist": "przejdź do $t(entity.albumArtist_one)"
         },
         "albumDetail": {
             "moreFromArtist": "więcej od $t(entity.artist_one)",
@@ -724,7 +734,10 @@
         "lastfm_description": "pokazuj linki do last.fm na stronach artystów/albumów",
         "notify": "włącz powiadomienia o piosenkach",
         "musicbrainz": "pokazuj linki do musicbrainz",
-        "musicbrainz_description": "pokazuj linki do musicbrainz na stronach artystów/albumów, gdzie istnieje mbid"
+        "musicbrainz_description": "pokazuj linki do musicbrainz na stronach artystów/albumów, gdzie istnieje mbid",
+        "discordPausedStatus": "pokaż status podczas pauzy",
+        "discordServeImage": "wysyłaj obrazy dla {{discord}} z serwera",
+        "discordServeImage_description": "pokazuj okładki w statusie {{discord}} prosto z serwera, dostępne tylko dla jellyfin i navidrome"
     },
     "table": {
         "config": {

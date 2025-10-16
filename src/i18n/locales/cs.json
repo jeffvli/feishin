@@ -280,7 +280,15 @@
         "discordDisplayType_artistname": "jména umělců",
         "hotkey_navigateHome": "přejít domů",
         "preventSleepOnPlayback": "zabránit uspání při přehrávání",
-        "preventSleepOnPlayback_description": "zabránit uspání displeje během přehrávání hudby"
+        "preventSleepOnPlayback_description": "zabránit uspání displeje během přehrávání hudby",
+        "discordLinkType": "odkazy ve stavu na službě {{discord}}",
+        "discordLinkType_description": "přidá externí odkazy na {{lastfm}} nebo {{musicbrainz}} do polí skladby a umělce ve stavu na službě {{discord}}. {{musicbrainz}} je nejpřesnější, ale vyžaduje značky a neposkytuje odkazy na umělce, zatímco {{lastfm}} by mělo vždy poskytnout odkaz. neprovádí žádné další síťové požadavky",
+        "discordLinkType_none": "$t(common.none)",
+        "discordLinkType_mbz_lastfm": "{{musicbrainz}} se zálohou na {{lastfm}}",
+        "artistBackground": "obrázek umělce na pozadí",
+        "artistBackground_description": "přidá obrázek na pozadí u stránek umělců",
+        "artistBackgroundBlur": "velikost rozostření obrázku umělce na pozadí",
+        "artistBackgroundBlur_description": "upraví velikost rozostření použitého na obrázek umělce na pozadí"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -637,7 +645,8 @@
             "newlyAdded": "nově přidáno",
             "title": "$t(common.home)",
             "explore": "procházet z vaší knihovny",
-            "recentlyPlayed": "nedávno přehráno"
+            "recentlyPlayed": "nedávno přehráno",
+            "recentlyReleased": "nedávno vydáno"
         },
         "albumDetail": {
             "moreFromArtist": "více od tohoto umělce",
@@ -733,7 +742,9 @@
             "input_savePassword": "uložit heslo",
             "ignoreSsl": "ignorovat SSL $t(common.restartRequired)",
             "ignoreCors": "ignorovat CORS $t(common.restartRequired)",
-            "error_savePassword": "při ukládání hesla se vyskytla chyba"
+            "error_savePassword": "při ukládání hesla se vyskytla chyba",
+            "input_preferInstantMix": "preferovat instantní mix",
+            "input_preferInstantMixDescription": "pro získání podobných skladeb použít pouze instantní mix. užitečné, pokud máte doplňky, které upravují toto chování"
         },
         "addToPlaylist": {
             "success": "přidáno $t(entity.trackWithCount, {\"count\": {{message}} }) do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",

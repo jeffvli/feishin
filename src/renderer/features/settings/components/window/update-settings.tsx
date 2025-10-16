@@ -10,7 +10,6 @@ import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
-const utils = isElectron() ? window.api.utils : null;
 
 export const UpdateSettings = () => {
     const { t } = useTranslation();
@@ -37,7 +36,9 @@ export const UpdateSettings = () => {
                             value: 'beta',
                         },
                     ]}
-                    defaultValue={'latest'}
+                    defaultValue={
+                        (localSettings?.get('release_channel') as string | undefined) || 'latest'
+                    }
                     onChange={(value) => {
                         if (!value) return;
                         localSettings?.set('release_channel', value);
@@ -48,7 +49,6 @@ export const UpdateSettings = () => {
                             },
                         });
                     }}
-                    value={settings.releaseChannel}
                 />
             ),
             description: t('setting.releaseChannel', {
@@ -85,5 +85,5 @@ export const UpdateSettings = () => {
         },
     ];
 
-    return <SettingsSection divider={utils?.isLinux()} options={updateOptions} />;
+    return <SettingsSection divider={true} options={updateOptions} />;
 };

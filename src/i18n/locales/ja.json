@@ -209,7 +209,11 @@
         "moveToBottom": "末尾に移動",
         "setRating": "評価",
         "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist) エディタの切り替え",
-        "removeFromFavorites": "$t(entity.favorite_other) から削除"
+        "removeFromFavorites": "$t(entity.favorite_other) から削除",
+        "openIn": {
+            "lastfm": "Last.fmで開く",
+            "musicbrainz": "MusicBrainzで開く"
+        }
     },
     "common": {
         "backward": "戻る",

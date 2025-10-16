@@ -404,7 +404,11 @@
         "notify_description": "mostra una notifica quando cambia la traccia riprodotta",
         "preventSleepOnPlayback": "non sospendere in riproduzione",
         "preventSleepOnPlayback_description": "non sospendere il sistema quando la riproduzione è attiva",
-        "discordDisplayType": "stile dello stato su {{discord}}"
+        "discordDisplayType": "stile dello stato su {{discord}}",
+        "discordLinkType": "link di attività {{discord}}",
+        "discordLinkType_description": "aggiunge collegamenti esterni a {{lastfm}} o {{musicbrainz}} ai campi del brano e dell'artista nell'attività {{discord}}. {{musicbrainz}} è il più accurato, ma richiede tag e non fornisce collegamenti dell'artista mentre {{lastfm}} dovrebbe sempre fornire un link. non rende richieste di rete extra",
+        "discordLinkType_none": "$t(common.none)",
+        "discordLinkType_mbz_lastfm": "{{musicbrainz}} con {{lastfm}} fallback"
     },
     "error": {
         "remotePortWarning": "riavvia il server per applicare la nuova porta",
@@ -560,7 +564,8 @@
             "newlyAdded": "nuovi rilasci aggiunti",
             "title": "$t(common.home)",
             "explore": "esplora dalla tua libreria",
-            "recentlyPlayed": "riprodotti recentemente"
+            "recentlyPlayed": "riprodotti recentemente",
+            "recentlyReleased": "appena pubblicato"
         },
         "albumDetail": {
             "moreFromArtist": "di più da questo $t(entity.artist_one)",
@@ -656,7 +661,9 @@
             "input_savePassword": "salva password",
             "ignoreSsl": "ignora ssl ($t(common.restartRequired))",
             "ignoreCors": "ignora cors ($t(common.restartRequired))",
-            "error_savePassword": "si è verificato un errore quando si è provato a salvare la password"
+            "error_savePassword": "si è verificato un errore quando si è provato a salvare la password",
+            "input_preferInstantMix": "preferisci mix istantaneo",
+            "input_preferInstantMixDescription": "usa solo mix istantaneo per ottenere canzoni simili. utile se si dispone di plugin che modificano questo comportamento"
         },
         "addToPlaylist": {
             "success": "aggiunto $t(entity.trackWithCount, {\"count\": {{message}} }) a $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
