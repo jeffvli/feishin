@@ -204,16 +204,10 @@ async function getSongId(
         return null;
     }
 
-    const artistNormalized = hit.artist_names.replace(/\u00A0/g, ' ').trim();
-    const fullTitleNormalized = hit.full_title
-        .replace(/\u00A0/g, ' ')
-        .replace(`by ${artistNormalized}`, '')
-        .trim();
-
     return {
-        artist: artistNormalized,
+        artist: hit.artist_names,
         id: hit.url,
-        name: fullTitleNormalized,
+        name: hit.title,
         source: LyricSource.GENIUS,
     };
 }
