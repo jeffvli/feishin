@@ -612,6 +612,7 @@ const initialState: SettingsState = {
     lyrics: {
         alignment: 'center',
         delayMs: 0,
+        enableAutoTranslation: false,
         enableNeteaseTranslation: false,
         fetch: false,
         follow: true,
