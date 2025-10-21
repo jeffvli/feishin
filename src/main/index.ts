@@ -549,7 +549,7 @@ async function createWindow(first = true): Promise<void> {
 }
 
 const enableWindowsMediaSession = store.get('mediaSession', false) as boolean;
-const shouldDisableMediaFeatures = process.platform !== 'win32' || !enableWindowsMediaSession;
+const shouldDisableMediaFeatures = !isWindows() || !enableWindowsMediaSession;
 if (shouldDisableMediaFeatures) {
     app.commandLine.appendSwitch(
         'disable-features',

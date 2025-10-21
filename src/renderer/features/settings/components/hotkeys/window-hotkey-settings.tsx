@@ -5,22 +5,24 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { useHotkeySettings, useSettingsStoreActions } from '/@/renderer/store';
+import { useHotkeySettings, usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store';
 import { Switch } from '/@/shared/components/switch/switch';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
+const isWindows = isElectron() ? window.api.utils.isWindows() : false;
 
 export const WindowHotkeySettings = () => {
     const { t } = useTranslation();
     const settings = useHotkeySettings();
     const { setSettings } = useSettingsStoreActions();
+    const { mediaSession: enableWindowsMediaSession } = usePlaybackSettings();
 
     const options: SettingOption[] = [
         {
             control: (
                 <Switch
                     defaultChecked={settings.globalMediaHotkeys}
-                    disabled={!isElectron()}
+                    disabled={!isElectron() || (enableWindowsMediaSession && isWindows)}
                     onChange={(e) => {
                         setSettings({
                             hotkeys: {
@@ -42,7 +44,7 @@ export const WindowHotkeySettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: !isElectron(),
+            isHidden: !isElectron() || (enableWindowsMediaSession && isWindows),
             title: t('setting.globalMediaHotkeys', { postProcess: 'sentenceCase' }),
         },
     ];
