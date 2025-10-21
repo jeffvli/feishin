@@ -32,8 +32,12 @@ import { FullLyricsMetadata, LyricSource, LyricsOverride } from '/@/shared/types
 
 export const Lyrics = () => {
     const currentSong = useCurrentSong();
-    const { translationApiKey, translationApiProvider, translationTargetLanguage } =
-        useLyricsSettings();
+    const {
+        enableAutoTranslation,
+        translationApiKey,
+        translationApiProvider,
+        translationTargetLanguage,
+    } = useLyricsSettings();
     const { t } = useTranslation();
     const [index, setIndex] = useState(0);
     const [translatedLyrics, setTranslatedLyrics] = useState<null | string>(null);
@@ -52,7 +56,7 @@ export const Lyrics = () => {
     const [lyrics, synced] = useMemo(() => {
         if (Array.isArray(data)) {
             if (data.length > 0) {
-                const selectedLyric = data[Math.min(index, data.length)];
+                const selectedLyric = data[Math.min(index, data.length - 1)];
                 return [selectedLyric, selectedLyric.synced];
             }
         } else if (data?.lyrics) {
@@ -89,11 +93,7 @@ export const Lyrics = () => {
         );
     }, [currentSong?.id, currentSong?.serverId]);
 
-    const handleOnTranslateLyric = useCallback(async () => {
-        if (translatedLyrics) {
-            setShowTranslation(!showTranslation);
-            return;
-        }
+    const fetchTranslation = useCallback(async () => {
         if (!lyrics) return;
         const originalLyrics = Array.isArray(lyrics.lyrics)
             ? lyrics.lyrics.map(([, line]) => line).join('\n')
@@ -106,14 +106,15 @@ export const Lyrics = () => {
         );
         setTranslatedLyrics(TranslatedText);
         setShowTranslation(true);
-    }, [
-        translatedLyrics,
-        lyrics,
-        translationApiKey,
-        translationApiProvider,
-        translationTargetLanguage,
-        showTranslation,
-    ]);
+    }, [lyrics, translationApiKey, translationApiProvider, translationTargetLanguage]);
+
+    const handleOnTranslateLyric = useCallback(async () => {
+        if (translatedLyrics) {
+            setShowTranslation(!showTranslation);
+            return;
+        }
+        await fetchTranslation();
+    }, [translatedLyrics, showTranslation, fetchTranslation]);
 
     const { isInitialLoading: isOverrideLoading } = useSongLyricsByRemoteId({
         options: {
@@ -133,6 +134,8 @@ export const Lyrics = () => {
             () => {
                 setOverride(undefined);
                 setIndex(0);
+                setShowTranslation(false);
+                setTranslatedLyrics(null);
             },
             { equalityFn: (a, b) => a?.id === b?.id },
         );
@@ -141,6 +144,12 @@ export const Lyrics = () => {
             unsubSongChange();
         };
     }, []);
+
+    useEffect(() => {
+        if (lyrics && !translatedLyrics && enableAutoTranslation) {
+            fetchTranslation();
+        }
+    }, [lyrics, translatedLyrics, enableAutoTranslation, fetchTranslation]);
 
     const languages = useMemo(() => {
         if (Array.isArray(data)) {
