@@ -214,7 +214,11 @@ const HotkeyBindingSchema = z.object({
 });
 
 const HotkeysSettingsSchema = z.object({
-    bindings: z.record(BindingActionsSchema, HotkeyBindingSchema),
+    bindings: z
+        .record(BindingActionsSchema, HotkeyBindingSchema)
+        .refine((obj): obj is Required<typeof obj> =>
+            BindingActionsSchema.options.every((key) => obj[key] != null),
+        ),
     globalMediaHotkeys: z.boolean(),
 });
 
