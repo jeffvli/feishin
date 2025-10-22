@@ -116,6 +116,9 @@ importers:
       fast-average-color:
         specifier: ^9.3.0
         version: 9.5.0
+      fast-xml-parser:
+        specifier: ^5.3.0
+        version: 5.3.0
       format-duration:
         specifier: ^2.0.0
         version: 2.0.0
@@ -223,7 +226,7 @@ importers:
         version: 3.25.23
       zustand:
         specifier: ^5.0.5
-        version: 5.0.5(@types/react@18.3.23)(immer@9.0.21)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0))
+        version: 5.0.8(@types/react@18.3.23)(immer@9.0.21)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0))
     devDependencies:
       '@electron-toolkit/eslint-config-prettier':
         specifier: ^3.0.0
@@ -266,7 +269,7 @@ importers:
         version: 8.18.1
       '@vitejs/plugin-react':
         specifier: ^4.3.4
-        version: 4.5.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2))
+        version: 4.5.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1))
       concurrently:
         specifier: ^7.1.0
         version: 7.6.0
@@ -284,7 +287,7 @@ importers:
         version: 3.2.1
       electron-vite:
         specifier: ^3.1.0
-        version: 3.1.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2))
+        version: 3.1.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1))
       eslint:
         specifier: ^9.24.0
         version: 9.27.0
@@ -308,7 +311,7 @@ importers:
         version: 9.3.0
       postcss-preset-mantine:
         specifier: ^1.17.0
-        version: 1.17.0(postcss@8.5.6)
+        version: 1.17.0(postcss@8.5.3)
       prettier:
         specifier: ^3.5.3
         version: 3.5.3
@@ -335,7 +338,7 @@ importers:
         version: 5.8.3
       vite:
         specifier: ^6.3.6
-        version: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2)
+        version: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1)
       vite-plugin-conditional-import:
         specifier: ^0.1.7
         version: 0.1.7
@@ -344,10 +347,10 @@ importers:
         version: 1.6.0
       vite-plugin-ejs:
         specifier: ^1.7.0
-        version: 1.7.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2))
+        version: 1.7.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1))
       vite-plugin-pwa:
         specifier: ^1.0.3
-        version: 1.0.3(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
+        version: 1.0.3(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
 
 packages:
 
@@ -3042,6 +3045,10 @@ packages:
   fast-uri@3.0.6:
     resolution: {integrity: sha512-Atfo14OibSv5wAp4VWNsFYE1AchQRTv9cBGWET4pZWHzYshFSS9NQI6I57rdKn9croWVMbYFbLhJ+yJvmZIIHw==}
 
+  fast-xml-parser@5.3.0:
+    resolution: {integrity: sha512-gkWGshjYcQCF+6qtlrqBqELqNqnt4CxruY6UVAWWnqb3DQ6qaNFEIKqzYep1XzHLM/QtrHVCxyPOtTk4LTQ7Aw==}
+    hasBin: true
+
   fastest-levenshtein@1.0.16:
     resolution: {integrity: sha512-eRnCtTTtGZFpQCwhJiUOuxPQWRXVKYDn0b2PeHfXL6/Zi53SLAzAHfVhVWK2AryC/WH05kGfxhFIPvTF0SXQzg==}
     engines: {node: '>= 4.9.1'}
@@ -5094,6 +5101,9 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
+  strnum@2.1.1:
+    resolution: {integrity: sha512-7ZvoFTiCnGxBtDqJ//Cu6fWtZtc7Y3x+QOirG15wztbdngGSkht27o2pyGWrVy0b4WAy3jbKmnoK6g5VlVNUUw==}
+
   stylelint-config-css-modules@4.4.0:
     resolution: {integrity: sha512-J93MtxPjRzs/TjwbJ5y9SQy4iIqULXwL1CF1yx2tQCJfS/VZUcDAmoGOwqlLbhHXSQtZO5XQiA75NVWUR3KDCQ==}
     peerDependencies:
@@ -5705,6 +5715,11 @@ packages:
   yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
 
+  yaml@2.8.1:
+    resolution: {integrity: sha512-lcYcMxX2PO9XMGvAJkJ3OsNMw+/7FKes7/hgerGUYWIoWu5j/+YQqcZr5JnPZWzOsEBgMbSbiSTn/dv/69Mkpw==}
+    engines: {node: '>= 14.6'}
+    hasBin: true
+
   yargs-parser@21.1.1:
     resolution: {integrity: sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==}
     engines: {node: '>=12'}
@@ -5723,8 +5738,8 @@ packages:
   zod@3.25.23:
     resolution: {integrity: sha512-Od2bdMosahjSrSgJtakrwjMDb1zM1A3VIHCPGveZt/3/wlrTWBya2lmEh2OYe4OIu8mPTmmr0gnLHIWQXdtWBg==}
 
-  zustand@5.0.5:
-    resolution: {integrity: sha512-mILtRfKW9xM47hqxGIxCv12gXusoY/xTSHBYApXozR0HmQv299whhBeeAcRy+KrPPybzosvJBCOmVjq6x12fCg==}
+  zustand@5.0.8:
+    resolution: {integrity: sha512-gyPKpIaxY9XcO2vSMrLbiER7QMAMGOQZVRdJ6Zi782jkbzZygq5GI9nG8g+sMgitRtndwaBSl7uiqC49o1SSiw==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
       '@types/react': '>=18.0.0'
@@ -5892,7 +5907,7 @@ snapshots:
   '@babel/helper-member-expression-to-functions@7.27.1':
     dependencies:
       '@babel/traverse': 7.28.4
-      '@babel/types': 7.27.1
+      '@babel/types': 7.28.4
     transitivePeerDependencies:
       - supports-color
 
@@ -5914,7 +5929,7 @@ snapshots:
 
   '@babel/helper-optimise-call-expression@7.27.1':
     dependencies:
-      '@babel/types': 7.27.1
+      '@babel/types': 7.28.4
 
   '@babel/helper-plugin-utils@7.27.1': {}
 
@@ -5923,7 +5938,7 @@ snapshots:
       '@babel/core': 7.27.1
       '@babel/helper-annotate-as-pure': 7.27.3
       '@babel/helper-wrap-function': 7.28.3
-      '@babel/traverse': 7.27.1
+      '@babel/traverse': 7.28.4
     transitivePeerDependencies:
       - supports-color
 
@@ -5938,8 +5953,8 @@ snapshots:
 
   '@babel/helper-skip-transparent-expression-wrappers@7.27.1':
     dependencies:
-      '@babel/traverse': 7.27.1
-      '@babel/types': 7.27.1
+      '@babel/traverse': 7.28.4
+      '@babel/types': 7.28.4
     transitivePeerDependencies:
       - supports-color
 
@@ -5974,7 +5989,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.27.1
       '@babel/helper-plugin-utils': 7.27.1
-      '@babel/traverse': 7.27.1
+      '@babel/traverse': 7.28.4
     transitivePeerDependencies:
       - supports-color
 
@@ -6153,7 +6168,7 @@ snapshots:
       '@babel/core': 7.27.1
       '@babel/helper-compilation-targets': 7.27.2
       '@babel/helper-plugin-utils': 7.27.1
-      '@babel/traverse': 7.27.1
+      '@babel/traverse': 7.28.4
     transitivePeerDependencies:
       - supports-color
 
@@ -6199,7 +6214,7 @@ snapshots:
       '@babel/helper-module-transforms': 7.27.1(@babel/core@7.27.1)
       '@babel/helper-plugin-utils': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
-      '@babel/traverse': 7.27.1
+      '@babel/traverse': 7.28.4
     transitivePeerDependencies:
       - supports-color
 
@@ -6448,7 +6463,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.27.1
       '@babel/helper-plugin-utils': 7.27.1
-      '@babel/types': 7.27.1
+      '@babel/types': 7.28.4
       esutils: 2.0.3
 
   '@babel/runtime@7.27.1': {}
@@ -7552,7 +7567,7 @@ snapshots:
       '@typescript-eslint/types': 8.32.1
       eslint-visitor-keys: 4.2.0
 
-  '@vitejs/plugin-react@4.5.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2))':
+  '@vitejs/plugin-react@4.5.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1))':
     dependencies:
       '@babel/core': 7.27.1
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.27.1)
@@ -7560,7 +7575,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.9
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2)
+      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -8504,7 +8519,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron-vite@3.1.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2)):
+  electron-vite@3.1.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1)):
     dependencies:
       '@babel/core': 7.27.1
       '@babel/plugin-transform-arrow-functions': 7.27.1(@babel/core@7.27.1)
@@ -8512,7 +8527,7 @@ snapshots:
       esbuild: 0.25.4
       magic-string: 0.30.17
       picocolors: 1.1.1
-      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2)
+      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -8906,6 +8921,10 @@ snapshots:
   fast-levenshtein@2.0.6: {}
 
   fast-uri@3.0.6: {}
+
+  fast-xml-parser@5.3.0:
+    dependencies:
+      strnum: 2.1.1
 
   fastest-levenshtein@1.0.16: {}
 
@@ -10142,32 +10161,32 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postcss-js@4.0.1(postcss@8.5.6):
+  postcss-js@4.0.1(postcss@8.5.3):
     dependencies:
       camelcase-css: 2.0.1
-      postcss: 8.5.6
+      postcss: 8.5.3
 
   postcss-media-query-parser@0.2.3:
     optional: true
 
-  postcss-mixins@9.0.4(postcss@8.5.6):
+  postcss-mixins@9.0.4(postcss@8.5.3):
     dependencies:
       fast-glob: 3.3.3
-      postcss: 8.5.6
-      postcss-js: 4.0.1(postcss@8.5.6)
-      postcss-simple-vars: 7.0.1(postcss@8.5.6)
-      sugarss: 4.0.1(postcss@8.5.6)
+      postcss: 8.5.3
+      postcss-js: 4.0.1(postcss@8.5.3)
+      postcss-simple-vars: 7.0.1(postcss@8.5.3)
+      sugarss: 4.0.1(postcss@8.5.3)
 
-  postcss-nested@6.2.0(postcss@8.5.6):
+  postcss-nested@6.2.0(postcss@8.5.3):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.3
       postcss-selector-parser: 6.1.2
 
-  postcss-preset-mantine@1.17.0(postcss@8.5.6):
+  postcss-preset-mantine@1.17.0(postcss@8.5.3):
     dependencies:
-      postcss: 8.5.6
-      postcss-mixins: 9.0.4(postcss@8.5.6)
-      postcss-nested: 6.2.0(postcss@8.5.6)
+      postcss: 8.5.3
+      postcss-mixins: 9.0.4(postcss@8.5.3)
+      postcss-nested: 6.2.0(postcss@8.5.3)
 
   postcss-resolve-nested-selector@0.1.6: {}
 
@@ -10185,9 +10204,9 @@ snapshots:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
 
-  postcss-simple-vars@7.0.1(postcss@8.5.6):
+  postcss-simple-vars@7.0.1(postcss@8.5.3):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.3
 
   postcss-sorting@8.0.2(postcss@8.5.6):
     dependencies:
@@ -10991,6 +11010,8 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
+  strnum@2.1.1: {}
+
   stylelint-config-css-modules@4.4.0(stylelint@16.20.0(typescript@5.8.3)):
     dependencies:
       stylelint: 16.20.0(typescript@5.8.3)
@@ -11074,9 +11095,9 @@ snapshots:
       - supports-color
       - typescript
 
-  sugarss@4.0.1(postcss@8.5.6):
+  sugarss@4.0.1(postcss@8.5.3):
     dependencies:
-      postcss: 8.5.6
+      postcss: 8.5.3
 
   sumchecker@3.0.1:
     dependencies:
@@ -11451,23 +11472,23 @@ snapshots:
       fast-glob: 3.3.3
       magic-string: 0.30.17
 
-  vite-plugin-ejs@1.7.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2)):
+  vite-plugin-ejs@1.7.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1)):
     dependencies:
       ejs: 3.1.10
-      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2)
+      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1)
 
-  vite-plugin-pwa@1.0.3(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0):
+  vite-plugin-pwa@1.0.3(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0):
     dependencies:
       debug: 4.4.3
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.15
-      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2)
+      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1)
       workbox-build: 7.3.0(@types/babel__core@7.20.5)
       workbox-window: 7.3.0
     transitivePeerDependencies:
       - supports-color
 
-  vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.6))(terser@5.39.2):
+  vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.9
       fdir: 6.5.0(picomatch@4.0.3)
@@ -11479,8 +11500,9 @@ snapshots:
       '@types/node': 22.15.32
       fsevents: 2.3.3
       sass-embedded: 1.89.0
-      sugarss: 4.0.1(postcss@8.5.6)
+      sugarss: 4.0.1(postcss@8.5.3)
       terser: 5.39.2
+      yaml: 2.8.1
 
   void-elements@3.1.0: {}
 
@@ -11715,6 +11737,9 @@ snapshots:
 
   yallist@4.0.0: {}
 
+  yaml@2.8.1:
+    optional: true
+
   yargs-parser@21.1.1: {}
 
   yargs@17.7.2:
@@ -11736,7 +11761,7 @@ snapshots:
 
   zod@3.25.23: {}
 
-  zustand@5.0.5(@types/react@18.3.23)(immer@9.0.21)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0)):
+  zustand@5.0.8(@types/react@18.3.23)(immer@9.0.21)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0)):
     optionalDependencies:
       '@types/react': 18.3.23
       immer: 9.0.21
