@@ -7,6 +7,7 @@ import {
 } from '/@/renderer/features/settings/components/settings-section';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { Switch } from '/@/shared/components/switch/switch';
+import { PlaybackType } from '/@/shared/types/types';
 
 const isWindows = isElectron() ? window.api.utils.isWindows() : null;
 const isDesktop = isElectron();
@@ -14,7 +15,7 @@ const ipc = isElectron() ? window.api.ipc : null;
 
 export const MediaSessionSettings = () => {
     const { t } = useTranslation();
-    const { mediaSession } = usePlaybackSettings();
+    const { mediaSession, type: playbackType } = usePlaybackSettings();
     const { toggleMediaSession } = useSettingsStoreActions();
 
     function handleMediaSessionChange() {
@@ -36,7 +37,7 @@ export const MediaSessionSettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: !isWindows || !isDesktop,
+            isHidden: !isWindows || !isDesktop || playbackType !== PlaybackType.WEB,
             note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
             title: t('setting.mediaSession', { postProcess: 'sentenceCase' }),
         },
