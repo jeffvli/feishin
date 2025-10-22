@@ -26,7 +26,7 @@ export const enableMediaKeys = (window: BrowserWindow | null) => {
     }
 
     const enableWindowsMediaSession = store.get('mediaSession', false) as boolean;
-    const playbackType = store.get('playback.type', PlaybackType.WEB) as PlaybackType;
+    const playbackType = store.get('playbackType', PlaybackType.WEB) as PlaybackType;
 
     if (!enableWindowsMediaSession || !isWindows() || playbackType !== PlaybackType.WEB) {
         globalShortcut.register('MediaStop', () => {

@@ -549,7 +549,7 @@ async function createWindow(first = true): Promise<void> {
 }
 
 const enableWindowsMediaSession = store.get('mediaSession', false) as boolean;
-const playbackType = store.get('playback.type', PlaybackType.WEB) as PlaybackType;
+const playbackType = store.get('playbackType', PlaybackType.WEB) as PlaybackType;
 const shouldDisableMediaFeatures =
     !isWindows() || !enableWindowsMediaSession || playbackType !== PlaybackType.WEB;
 if (shouldDisableMediaFeatures) {
