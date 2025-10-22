@@ -250,7 +250,7 @@ async function createWindow(first = true): Promise<void> {
         await installExtensions().catch(console.log);
     }
 
-    const nativeFrame = store.get('window_window_bar_style') === 'linux';
+    const nativeFrame = store.get('window_window_bar_style', 'linux') === 'linux';
     store.set('window_has_frame', nativeFrame);
 
     const nativeFrameConfig: Record<string, BrowserWindowConstructorOptions> = {
@@ -505,7 +505,7 @@ async function createWindow(first = true): Promise<void> {
     });
 
     if (isWindows()) {
-        app.setAppUserModelId(process.execPath);
+        app.setAppUserModelId('org.jeffvli.feishin');
     }
 
     if (isMacOS()) {
@@ -549,7 +549,7 @@ async function createWindow(first = true): Promise<void> {
 }
 
 const enableWindowsMediaSession = store.get('mediaSession', false) as boolean;
-const shouldDisableMediaFeatures = process.platform !== 'win32' || !enableWindowsMediaSession;
+const shouldDisableMediaFeatures = !isWindows() || !enableWindowsMediaSession;
 if (shouldDisableMediaFeatures) {
     app.commandLine.appendSwitch(
         'disable-features',

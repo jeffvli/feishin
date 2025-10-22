@@ -161,7 +161,7 @@
         "apiRouteError": "kan ikke behandle forespørselen",
         "mpvRequired": "MPV er påkrevd",
         "authenticationFailed": "autentisering feilet",
-        "badAlbum": "du ser denne siden fordi sangen ikke er med i et album. Mest sannsynlig opplever du dette problemet fordi du har en sang helt øverst i musikkmappen. Jellyfin grupperer kun spor som ligger i en mappe.",
+        "badAlbum": "du ser denne siden fordi sangen ikke er med i et album. Mest sannsynlig opplever du dette problemet fordi du har en sang helt øverst i musikkmappen. Jellyfin grupperer kun spor som ligger i en mappe",
         "endpointNotImplementedError": "endepunkt {{endpoint}} er ikke implementert for {{serverType}}",
         "credentialsRequired": "innloggingsdetaljer er påkrevd",
         "genericError": "en feil har oppstått",

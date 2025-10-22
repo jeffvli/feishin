@@ -1,0 +1,75 @@
+name: Publish (Manual)
+
+on: workflow_dispatch
+
+jobs:
+    publish:
+        runs-on: ${{ matrix.os }}
+
+        strategy:
+            matrix:
+                os: [windows-latest, macos-latest, ubuntu-latest]
+
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v1
+
+            - name: Install Node and PNPM
+              uses: pnpm/action-setup@v4.1.0
+              with:
+                  version: 9
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Build and Publish releases (Windows)
+              if: matrix.os == 'windows-latest'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:win
+                  on_retry_command: pnpm cache delete
+
+            - name: Build and Publish releases (macOS)
+              if: matrix.os == 'macos-latest'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:mac
+                  on_retry_command: pnpm cache delete
+
+            - name: Build and Publish releases (Linux)
+              if: matrix.os == 'ubuntu-latest'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:linux
+                  on_retry_command: pnpm cache delete
+
+            - name: Build and Publish releases (Linux ARM64)
+              if: matrix.os == 'ubuntu-latest'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:linux-arm64
+                  on_retry_command: pnpm cache delete

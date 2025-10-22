@@ -163,7 +163,7 @@
         "remotePortWarning": "indítsd újra a szervert az új PORT használatához",
         "genericError": "hiba történt",
         "endpointNotImplementedError": "a(z) {{endpoint}} végpont nincs implementálva a következőhöz: {{serverType}}",
-        "badAlbum": "azért látod ezt az oldalt mert ez a zeneszám nem része egy albumnak. ez általában akkor történik amikor egy szám a zenekönyvtárad gyökerébe kerül. a Jellyfin csak mappákba rendezett számokat csoportosít.",
+        "badAlbum": "azért látod ezt az oldalt mert ez a zeneszám nem része egy albumnak. ez általában akkor történik amikor egy szám a zenekönyvtárad gyökerébe kerül. a Jellyfin csak mappákba rendezett számokat csoportosít",
         "loginRateError": "túl sok bejelentkezési kísérlet, kérlek próbáld újra pár másodperc múlva",
         "mpvRequired": "MPV szükséges",
         "invalidServer": "érvénytelen szerver",

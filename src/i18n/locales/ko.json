@@ -138,7 +138,7 @@
         "remotePortWarning": "새로 설정한 포트를 적용하기 위해 서버를 재실행 해 주세요",
         "audioDeviceFetchError": "오디오 장치를 불러올 수 없습니다",
         "authenticationFailed": "인증 실패",
-        "badAlbum": "이 곡은 앨범의 일부가 아니기 때문에 표시되는 것입니다. 음악 폴더의 최상위에 곡이 있는 경우 이런 문제가 발생할 가능성이 높습니다. Jellyfin은 폴더 내 그룹만 추적합니다.",
+        "badAlbum": "이 곡은 앨범의 일부가 아니기 때문에 표시되는 것입니다. 음악 폴더의 최상위에 곡이 있는 경우 이런 문제가 발생할 가능성이 높습니다. Jellyfin은 폴더 내 그룹만 추적합니다",
         "credentialsRequired": "인증서가 필요함",
         "endpointNotImplementedError": "엔드포인트 {{endpoint}} 는 {{serverType}} 에 대해 구현되지 않았습니다",
         "genericError": "에러가 발생했습니다",
@@ -245,7 +245,7 @@
             "serverDetails": "서버 세부설정",
             "editServerDetailsTooltip": "서버 세부설정 편집하기",
             "url": "URL",
-            "username": "username",
+            "username": "유저 이름",
             "removeServer": "서버 제거하기"
         },
         "fullscreenPlayer": {

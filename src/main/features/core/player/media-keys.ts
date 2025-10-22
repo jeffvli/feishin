@@ -1,6 +1,6 @@
 import { BrowserWindow, globalShortcut, systemPreferences } from 'electron';
 
-import { isMacOS } from '../../../utils';
+import { isMacOS, isWindows } from '../../../utils';
 import { store } from '../settings';
 
 export const enableMediaKeys = (window: BrowserWindow | null) => {
@@ -23,21 +23,24 @@ export const enableMediaKeys = (window: BrowserWindow | null) => {
         }
     }
 
-    globalShortcut.register('MediaStop', () => {
-        window?.webContents.send('renderer-player-stop');
-    });
+    const enableWindowsMediaSession = store.get('mediaSession', false) as boolean;
+    if (!(enableWindowsMediaSession && isWindows())) {
+        globalShortcut.register('MediaStop', () => {
+            window?.webContents.send('renderer-player-stop');
+        });
 
-    globalShortcut.register('MediaPlayPause', () => {
-        window?.webContents.send('renderer-player-play-pause');
-    });
+        globalShortcut.register('MediaPlayPause', () => {
+            window?.webContents.send('renderer-player-play-pause');
+        });
 
-    globalShortcut.register('MediaNextTrack', () => {
-        window?.webContents.send('renderer-player-next');
-    });
+        globalShortcut.register('MediaNextTrack', () => {
+            window?.webContents.send('renderer-player-next');
+        });
 
-    globalShortcut.register('MediaPreviousTrack', () => {
-        window?.webContents.send('renderer-player-previous');
-    });
+        globalShortcut.register('MediaPreviousTrack', () => {
+            window?.webContents.send('renderer-player-previous');
+        });
+    }
 };
 
 export const disableMediaKeys = () => {

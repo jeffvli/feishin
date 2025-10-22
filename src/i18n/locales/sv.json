@@ -260,7 +260,7 @@
             "removeFromQueue": "$t(action.removeFromQueue)"
         },
         "albumDetail": {
-            "moreFromArtist": "mer från $t(entity.genre_one)",
+            "moreFromArtist": "mer från $t(entity.artist_one)",
             "moreFromGeneric": "mer från {{item}}"
         },
         "albumArtistList": {

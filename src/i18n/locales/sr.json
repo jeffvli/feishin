@@ -135,7 +135,7 @@
         "savePlayQueue": "sačuvaj listu za reprodukciju",
         "minimumScrobbleSeconds_description": "minimalno trajanje pesme u sekundama koje mora biti reprodukovano pre nego što se zabeleži",
         "skipPlaylistPage_description": "kada idete na plejlistu, idi na stranicu sa pesmama plejliste umesto na podrazumevanu stranicu",
-        "fontType_description": "ugrađeni font bira jedan od fontova koje pruža Feishin. sistemski font vam omogućava da izaberete bilo koji font koji nudi vaš operativni sistem. prilagođeni vam omogućava da koristite svoj font",
+        "fontType_description": "ugrađeni font bira jedan od fontova koje pruža feishin. sistemski font vam omogućava da izaberete bilo koji font koji nudi vaš operativni sistem. prilagođeni vam omogućava da koristite svoj font",
         "playButtonBehavior": "ponašanje dugmeta za reprodukciju",
         "volumeWheelStep": "korak točkića za glasnoću",
         "sidebarPlaylistList_description": "prikaži ili sakrij listu plejlista na bočnoj traci",
@@ -502,7 +502,7 @@
             "recentlyPlayed": "nedavno puštane pesme"
         },
         "albumDetail": {
-            "moreFromArtist": "još od ovog $t(entity.genre_one)",
+            "moreFromArtist": "još od ovog $t(entity.artist_one)",
             "moreFromGeneric": "još od {{item}}"
         },
         "setting": {

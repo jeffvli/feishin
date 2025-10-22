@@ -7,7 +7,7 @@
         "addToFavorites": "добавить в $t(entity.favorite_other)",
         "addToPlaylist": "добавить в $t(entity.playlist_one)",
         "createPlaylist": "создать $t(entity.playlist_one)",
-        "removeFromPlaylist": "удалить из $t(entity.playlist_few)",
+        "removeFromPlaylist": "удалить из $t(entity.playlist_one)",
         "viewPlaylists": "показать $t(entity.playlist_other)",
         "refresh": "$t(common.refresh)",
         "deletePlaylist": "удалить $t(entity.playlist_one)",
@@ -16,7 +16,7 @@
         "moveToBottom": "вниз",
         "setRating": "оценить",
         "toggleSmartPlaylistEditor": "вкл./откл. редактор $t(entity.smartPlaylist)",
-        "removeFromFavorites": "удалить из $t(entity.favorite_few)",
+        "removeFromFavorites": "удалить из $t(entity.favorite_other)",
         "openIn": {
             "lastfm": "открыть на Last.fm",
             "musicbrainz": "открыть на MusicBrainz"
@@ -135,8 +135,8 @@
         "playlist_many": "плейлистов",
         "play": "{{count}} прослушиваний",
         "play_one": "{{count}} прослушивание",
-        "play_few": "",
-        "play_many": "",
+        "play_few": "{{count}} прослушивание",
+        "play_many": "{{count}} прослушивание",
         "artist_one": "автор",
         "artist_few": "автора",
         "artist_many": "исполнителей",
@@ -150,8 +150,8 @@
         "track_few": "трека",
         "track_many": "треков",
         "song_one": "песня",
-        "song_few": "{{count}} песни",
-        "song_many": "{{count}} песен",
+        "song_few": "песни",
+        "song_many": "песен",
         "albumArtistCount_one": "{{count}} автор альбома",
         "albumArtistCount_few": "{{count}} автора альбома",
         "albumArtistCount_many": "{{count}} авторов альбома",
@@ -271,7 +271,7 @@
         "invalidServer": "недействительный сервер",
         "loginRateError": "превышено максимальное количество попыток входа, пожалуйста, попробуйте ещё раз через несколько секунд",
         "openError": "не удалось открыть файл",
-        "badAlbum": "вы видите эту страницу из-за того, что эта песня не входит в альбом. скорее всего, вы видите эту ошибку, так как песня находится в корневой директории папки с музыкой. jellyfin группирует треки только по папкам.",
+        "badAlbum": "вы видите эту страницу из-за того, что эта песня не входит в альбом. скорее всего, вы видите эту ошибку, так как песня находится в корневой директории папки с музыкой. Jellyfin группирует треки только по папкам",
         "networkError": "возникла ошибка сети"
     },
     "filter": {
@@ -305,7 +305,7 @@
         "note": "заметка",
         "name": "название",
         "releaseDate": "дата выхода",
-        "albumCount": "количество $t(entity.album_many)",
+        "albumCount": "количество $t(entity.album_other)",
         "path": "путь",
         "isRecentlyPlayed": "недавно проигрывался",
         "releaseYear": "год выхода",
@@ -453,8 +453,8 @@
         },
         "genreList": {
             "title": "$t(entity.genre_other)",
-            "showAlbums": "показать $t(entity.genre_one) $t(entity.album_many)",
-            "showTracks": "показать $t(entity.genre_one) $t(entity.track_many)"
+            "showAlbums": "показать $t(entity.genre_one) $t(entity.album_other)",
+            "showTracks": "показать $t(entity.genre_one) $t(entity.track_other)"
         },
         "trackList": {
             "title": "$t(entity.track_other)",
@@ -484,7 +484,7 @@
             "viewAll": "посмотреть всё",
             "appearsOn": "появляется в",
             "viewDiscography": "посмотреть дискографию",
-            "relatedArtists": "похож на $t(entity.artist_many)",
+            "relatedArtists": "похож на $t(entity.artist_other)",
             "viewAllTracks": "посмотреть все $t(entity.track_other)",
             "recentReleases": "недавние релизы",
             "about": "О {{artist}}",
@@ -500,7 +500,7 @@
         "deletePlaylist": {
             "title": "удалить $t(entity.playlist_one)",
             "success": "$t(entity.playlist_one) успешно удалён",
-            "input_confirm": "напишите название $t(entity.playlist_few) для подтверждения"
+            "input_confirm": "напишите название $t(entity.playlist_one) для подтверждения"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
@@ -565,7 +565,7 @@
         "applicationHotkeys": "горячие клавиши приложения",
         "crossfadeStyle_description": "выберите вид эффекта crossfade для аудиоплеера",
         "customCssEnable": "использовать кастомные css",
-        "customCssEnable_description": "разрешить использование кастомных css.",
+        "customCssEnable_description": "разрешить использование кастомных css",
         "enableRemote_description": "включает сервер удалённого управления для управления воспроизведением с помощью других устройств",
         "fontType_optionSystem": "системный",
         "mpvExecutablePath_description": "укажите папку, в которой находится исполняющий файл аудиоплеера MPV. если оставить пустым, будет использоваться путь по умолчанию",
@@ -734,7 +734,7 @@
         "remoteUsername_description": "задает имя пользователя для сервера удалённого управления. если имя пользователя и пароль пусты, аутентификация будет отключена",
         "scrobble": "скробблинг",
         "replayGainPreamp_description": "настройка усиления предусилителя, применяемого к значениям {{ReplayGain}}",
-        "passwordStore_description": "какое хранилище паролей/секретов использовать. измените это значение, если у вас есть проблемы с хранением паролей.",
+        "passwordStore_description": "какое хранилище паролей/секретов использовать. измените это значение, если у вас есть проблемы с хранением паролей",
         "lyricFetch": "получать тексты треков из интернета",
         "sampleRate": "частота дискретизации",
         "scrobble_description": "скробблинг треков на вашем медиасервере",
@@ -758,8 +758,10 @@
         "applicationHotkeys_description": "настройка горячих клавиш приложения. поставьте галочку, чтобы сделать горячую клавишу глобальной (только для ПК)",
         "artistConfiguration": "конфигурация страницы альбомов исполнителей",
         "artistConfiguration_description": "позволяет настроить видимость и порядок элементов на странице альбомов исполнителей",
-        "fontType_description": "встроенный позволяет выбрать один из шрифтов, предоставляемых Feishin. системный позволяет выбрать любой шрифт, предоставляемый вашей операционной системой. пользовательский позволяет выбрать свой собственный шрифт",
+        "fontType_description": "встроенный позволяет выбрать один из шрифтов, предоставляемых feishin. системный позволяет выбрать любой шрифт, предоставляемый вашей операционной системой. пользовательский позволяет выбрать свой собственный шрифт",
         "discordRichPresence_description": "включить статус воспроизведения в статус профиля в {{discord}}. Ключи изображений: {{icon}}, {{playing}} и {{paused}}",
-        "lyricOffset": "синхронизация текста треков (мс)"
+        "lyricOffset": "синхронизация текста треков (мс)",
+        "audioExclusiveMode": "эксклюзивный режим аудио",
+        "audioExclusiveMode_description": "включить режим эксклюзивного вывода. В этом режиме система обычно блокируется, и только mpv сможет выводить звук"
     }
 }

@@ -25,9 +25,11 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Validate and set version with beta suffix
+            - name: Validate and set version with incrementing beta suffix
               id: version
               shell: pwsh
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
                   $inputVersion = "${{ github.event.inputs.version }}"
                   Write-Host "Input version: $inputVersion"
@@ -67,8 +69,34 @@ jobs:
                       }
                   }
 
-                  # Add beta suffix
-                  $versionWithBeta = "$inputVersion-beta"
+                  # Check for existing beta releases with the same base version
+                  Write-Host "Checking for existing beta releases with base version: $inputVersion"
+                  $existingReleases = gh release list --limit 100 --json tagName,isPrerelease | ConvertFrom-Json | Where-Object { $_.isPrerelease -eq $true }
+
+                  $maxBetaNumber = 0
+
+                  foreach ($release in $existingReleases) {
+                      $tagName = $release.tagName
+                      Write-Host "Checking tag: $tagName"
+
+                      # Extract beta number from tag name (format: v1.0.0-beta.1)
+                      if ($tagName -match "v$([regex]::Escape($inputVersion))-beta\.(\d+)$") {
+                          $betaNumber = [int]$matches[1]
+                          Write-Host "Found beta release with number: $betaNumber"
+
+                          if ($betaNumber -gt $maxBetaNumber) {
+                              $maxBetaNumber = $betaNumber
+                          }
+                      }
+                  }
+
+                  # Calculate next beta number
+                  $nextBetaNumber = $maxBetaNumber + 1
+                  Write-Host "Next beta number: $nextBetaNumber"
+
+                  # Create beta suffix with incrementing number
+                  $betaSuffix = "beta.$nextBetaNumber"
+                  $versionWithBeta = "$inputVersion-$betaSuffix"
                   Write-Host "Setting version to: $versionWithBeta"
 
                   # Update package.json
@@ -80,32 +108,6 @@ jobs:
 
                   # Set output for other jobs
                   echo "version=$versionWithBeta" >> $env:GITHUB_OUTPUT
-
-            - name: Delete existing releases and tags
-              shell: pwsh
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  # Get the version that was set in the previous step
-                  $versionWithBeta = "${{ steps.version.outputs.version }}"
-                  Write-Host "Checking for existing releases with tag: $versionWithBeta"
-
-                  # Find and delete any releases with isPrerelease "true"
-                  Write-Host "Deleting existing prereleases..."
-                  Write-Host "Searching for releases with isPrerelease 'true'..."
-
-                  $betaReleases = gh release list --limit 100 --json tagName,isPrerelease,name | ConvertFrom-Json | Where-Object { $_.isPrerelease -eq $true }
-
-                  if ($betaReleases) {
-                      Write-Host "Found $($betaReleases.Count) release(s) with isPrerelease 'true':"
-                      foreach ($release in $betaReleases) {
-                          Write-Host "  - Tag: $($release.tagName), Title: $($release.name)"
-                          gh release delete $release.tagName --yes --cleanup-tag
-                          Write-Host "  Deleted release with tag: $($release.tagName)"
-                      }
-                  } else {
-                      Write-Host "No releases found with isPrerelease 'true'"
-                  }
 
     publish:
         needs: prepare
@@ -328,5 +330,48 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  gh release edit $tagVersion --prerelease
+                  # Get the version from the prepare job
+                  $versionWithBeta = "${{ needs.prepare.outputs.version }}"
+                  $tagVersion = "v" + $versionWithBeta
+                  Write-Host "Setting release as prerelease for tag: $tagVersion"
+                  gh release edit $tagVersion --prerelease --draft=false
                   Write-Host "Successfully set release as prerelease"
+
+    cleanup:
+        needs: [prepare, publish, edit-release]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v1
+
+            - name: Delete existing prereleases
+              shell: pwsh
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  # Get the current version that was just created
+                  $versionWithBeta = "${{ needs.prepare.outputs.version }}"
+                  Write-Host "Current release version: $versionWithBeta"
+
+                  # Find and delete any old prereleases (excluding the current one)
+                  Write-Host "Deleting old prereleases..."
+                  Write-Host "Searching for releases with isPrerelease 'true'..."
+
+                  $betaReleases = gh release list --limit 100 --json tagName,isPrerelease,name | ConvertFrom-Json | Where-Object { $_.isPrerelease -eq $true }
+
+                  if ($betaReleases) {
+                      Write-Host "Found $($betaReleases.Count) release(s) with isPrerelease 'true':"
+                      foreach ($release in $betaReleases) {
+                          $tagName = $release.tagName
+                          # Skip the current release
+                          if ($tagName -ne "v$versionWithBeta") {
+                              Write-Host "  - Tag: $tagName, Title: $($release.name)"
+                              gh release delete $tagName --yes --cleanup-tag
+                              Write-Host "  Deleted release with tag: $tagName"
+                          } else {
+                              Write-Host "  - Skipping current release: $tagName"
+                          }
+                      }
+                  } else {
+                      Write-Host "No releases found with isPrerelease 'true'"
+                  }

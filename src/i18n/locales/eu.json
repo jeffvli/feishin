@@ -117,7 +117,8 @@
         "trackGain": "pista irabazpena",
         "comingSoon": "laster…",
         "trackPeak": "pistaren gailurra",
-        "albumPeak": "albumaren gailurra"
+        "albumPeak": "albumaren gailurra",
+        "gap": "hutsunea"
     },
     "player": {
         "repeat": "errepikatu",
@@ -149,7 +150,8 @@
         "skip_back": "saltatu atzeraka",
         "skip_forward": "saltatu aurreraka",
         "toggleFullscreenPlayer": "txandakatu pantaila osoko erreproduzitzailea",
-        "viewQueue": "ikusi ilara"
+        "viewQueue": "ikusi ilara",
+        "playbackFetchCancel": "honek denbora pixka bat behar du... itxi jakinarazpena bertan behera uzteko"
     },
     "table": {
         "config": {
@@ -191,7 +193,7 @@
                 "titleCombined": "$t(common.title) (batuta)",
                 "releaseDate": "argitalpen data",
                 "playCount": "erreprodukzio kopurua",
-                "lastPlayed": "azken aldiz entzundakoa",
+                "lastPlayed": "azken aldiz entzunda",
                 "discNumber": "disko zenbakia",
                 "dateAdded": "gehitze data"
             }
@@ -281,9 +283,9 @@
         "serverNotSelectedError": "ez da zerbitzaririk hautatu",
         "serverRequired": "zerbitzaria beharrezkoa da",
         "sessionExpiredError": "zure saioa iraungi da",
-        "badAlbum": "Orrialde hau ikusten ari zara abesti hau album batekoa ez delako. Ziurrenik arazo hau ikusten ari zara zure musika karpetaren goiko mailan abesti bat baduzu. Jellyfinek abestiak karpeta batean badaude taldekatzen ditu bakarrik.",
+        "badAlbum": "Orrialde hau ikusten ari zara abesti hau album batekoa ez delako. Ziurrenik arazo hau ikusten ari zara zure musika karpetaren goiko mailan abesti bat baduzu. Jellyfinek abestiak karpeta batean badaude taldekatzen ditu bakarrik",
         "loginRateError": "Saioa hasteko saiakera gehiegi egin dira, saiatu berriro segundo batzuk barru",
-        "notificationDenied": "Jakinarazpenetarako baimenak ukatu dira. Ezarpen honek ez du eraginik.",
+        "notificationDenied": "jakinarazpenetarako baimenak ukatu dira. Ezarpen honek ez du eraginik",
         "systemFontError": "errore bat gertatu da sistemaren letra-tipoak lortzen saiatzean"
     },
     "filter": {
@@ -348,7 +350,7 @@
         "clearCacheSuccess": "katxea behar bezala garbitu da",
         "contextMenu": "testuinguru-menuaren konfigurazioa (klik eskuineko botoiarekin)",
         "customCssEnable": "gaitu css pertsonalizatua",
-        "customCssEnable_description": "css pertsonalizatua idazteko aukera eman.",
+        "customCssEnable_description": "css pertsonalizatua idazteko aukera eman",
         "customCss": "css pertsonalizatua",
         "customFontPath": "letra-tipo pertsonalizatuaren bidea",
         "customFontPath_description": "aplikazioan erabiliko den letra-tipo pertsonalizatuaren bidea ezartzen du",
@@ -384,7 +386,7 @@
         "hotkey_zoomOut": "txikiagotu",
         "language_description": "aplikazioaren hizkuntza ezartzen du ($t(common.restartRequired))",
         "lastfm": "erakutsi last.fm estekak",
-        "lastfm_description": "erakutsi last.fm-rako estekak artista/album orrialdeetan",
+        "lastfm_description": "erakutsi Last.fm-rako estekak artista/album orrialdeetan",
         "lastfmApiKey": "{{lastfm}} API gakoa",
         "lastfmApiKey_description": "{{lastfm}}-ren API gakoa. Azaleko arterako beharrezkoa.",
         "lyricFetch": "eskuratu letrak internetetik",
@@ -411,7 +413,7 @@
         "discordRichPresence": "{{discord}} jarduera-egoera",
         "discordRichPresence_description": "gaitu erreprodukzioa egoera {{discord}}-en jarduera-egoeran. Irudi gakoak hauek dira: {{icon}}, {{playing}}, eta {{paused}}",
         "discordServeImage": "zerbitzatu {{discord}} irudiak zerbitzaritik",
-        "discordServeImage_description": "partekatu {{discord}} jarduera-egoerarentzako azala artea zerbitzaritik bertatik, Jellyfin eta Navidrome-rentzat bakarrik eskuragarri. {{discord}}-(e)k bot bat erabiltzen du irudiak eskuratzeko, beraz, zure zerbitzaria internet publikotik eskuragarri egon behar da.",
+        "discordServeImage_description": "partekatu {{discord}} jarduera-egoerarentzako azala artea zerbitzaritik bertatik, Jellyfin eta Navidrome-rentzat bakarrik eskuragarri. {{discord}}-(e)k bot bat erabiltzen du irudiak eskuratzeko, beraz, zure zerbitzaria internet publikotik eskuragarri egon behar da",
         "discordUpdateInterval": "{{discord}} jarduera-egoera eguneraketa tartea",
         "discordLinkType_none": "$t(common.none)",
         "albumBackground": "albumaren atzeko planoaren irudia",
@@ -443,7 +445,7 @@
         "discordDisplayType": "{{discord}} jarduera-pantailaren mota",
         "discordDisplayType_description": "zure egoeran entzuten ari zarena aldatzen du",
         "discordLinkType": "{{discord}} egoera estekak",
-        "fontType_description": "barneko letra-tipoa Feishinek eskaintzen dituen letra-tipoetako bat aukeratzen du. sistemaren letra-tipoa zure sistema eragileak eskaintzen duen edozein letra-tipo hautatzeko aukera ematen dizu. pertsonalizatua zure letra-tipoa eskaintzeko aukera ematen dizu",
+        "fontType_description": "barneko letra-tipoa feishinek eskaintzen dituen letra-tipoetako bat aukeratzen du. sistemaren letra-tipoa zure sistema eragileak eskaintzen duen edozein letra-tipo hautatzeko aukera ematen dizu. pertsonalizatua zure letra-tipoa eskaintzeko aukera ematen dizu",
         "genreBehavior": "genero orriaren portaera lehenetsia",
         "homeConfiguration_description": "konfiguratu zein elementu erakusten diren hasierako orrian eta zein ordenatan",
         "homeFeature": "etxeko karrusela nabarmendua",
@@ -475,7 +477,62 @@
         "theme_description": "aplikaziorako erabiliko den gaia ezartzen du",
         "externalLinks": "kanpoko estekak erakutsi",
         "externalLinks_description": "kanpoko estekak (Last.fm, MusicBrainz) artista/album orrietan erakustea gaitzen du",
-        "exitToTray": "irten erretilura"
+        "exitToTray": "irten erretilura",
+        "playButtonBehavior_optionAddLast": "$t(player.addLast)",
+        "replayGainMode": "{{ReplayGain}} modua",
+        "sidebarConfiguration": "alboko barraren konfigurazioa",
+        "skipDuration": "saltoaren iraupena",
+        "savePlayQueue": "gorde erreprodukzio ilara",
+        "playbackStyle_optionCrossFade": "crossfade-a",
+        "applicationHotkeys": "aplikazioaren laster-teklak",
+        "applicationHotkeys_description": "konfiguratu aplikazioaren laster-teklak. txandakatu kontrol-laukia laster-tekla orokor bezala ezartzeko (mahaigainerako soilik)",
+        "artistBackground_description": "artistaren artelanak dituzten artista-orrietarako atzeko planoko irudi bat gehitzen du",
+        "discordLinkType_mbz_lastfm": "{{musicbrainz}} {{lastfm}} alternatiba gisa erabiliz",
+        "globalMediaHotkeys": "laster-tekla multimedia globalak",
+        "globalMediaHotkeys_description": "gaitu edo desgaitu zure sistemaren laster-tekla multimedien erabilera erreprodukzioa kontrolatzeko",
+        "accentColor_description": "aplikazioaren azentu-kolorea ezartzen du",
+        "accentColor": "azentu-kolorea",
+        "clearCache_description": "feishinen 'garbiketa gogorra'. feishinen katxea garbitzeaz gain, hustu nabigatzailearen katxea (gordetako irudiak eta bestelako aktiboak). zerbitzari-kredentzialak eta ezarpenak gorde egiten dira",
+        "clearQueryCache_description": "feishinen 'garbiketa ahula'. honek erreprodukzio-zerrendak eta pisten metadatuak freskatuko ditu eta gordetako letrak berrezarriko ditu. ezarpenak, zerbitzari-kredentzialak eta katxetutako irudiak gorde egiten dira",
+        "doubleClickBehavior": "jarri ilaran bilatutako pista guztiak klik bikoitza egitean",
+        "exitToTray_description": "irten aplikaziotik sistemaren erretilura",
+        "followLyric_description": "mugitu letra uneko erreprodukzio-posiziora",
+        "preferLocalLyrics": "nahiago izan letra lokalak",
+        "preferLocalLyrics_description": "nahiago izan letra lokalak urrunekoak baino eskuragarri daudenean",
+        "hotkey_browserBack": "nabigatzailean atzeraka",
+        "hotkey_browserForward": "nabigatzailean aurreraka",
+        "imageAspectRatio": "erabili jatorrizko azaleko artearen aspektu-erlazioa",
+        "lyricFetchProvider": "letrak eskuratzeko hornitzaileak",
+        "lyricFetchProvider_description": "aukeratu letrak eskuratzeko hornitzaileak. hornitzaileen ordena kontsultatuko diren ordena da",
+        "minimizeToTray": "minimizatu erretilura",
+        "minimizeToTray_description": "minimizatu aplikazioa sistemaren erretilura",
+        "minimumScrobblePercentage": "scrobble iraupen minimoa (ehunekoa)",
+        "minimumScrobblePercentage_description": "erreproduzitu behar den abestiaren gutxieneko ehunekoa scrobble egin aurretik",
+        "minimumScrobbleSeconds": "gutxieneko scrobble-a (segundoak)",
+        "minimumScrobbleSeconds_description": "erreproduzitu behar den abestiaren gutxieneko iraupena segundotan scrobble egin aurretik",
+        "mpvExecutablePath": "mpv exekutagarriaren bidea",
+        "mpvExecutablePath_description": "ezartzen du mpv exekutagarriaren bidea. hutsik uzten bada, bide lehenetsia erabiliko da",
+        "mpvExtraParameters": "mpv parametroak",
+        "mpvExtraParameters_help": "lerro bakoitzeko bat",
+        "musicbrainz": "erakutsi MusicBrainz estekak",
+        "musicbrainz_description": "erakutsi MusicbBrainz-erako estekak artista/album orrietan, MusicBrainz ID existitzen den lekuetan",
+        "neteaseTranslation": "Gaitu NetEase itzulpenak",
+        "neteaseTranslation_description": "Gaituta dagoenean, NetEase-tik itzulitako letrak eskuratu eta bistaratzen ditu, eskuragarri badaude",
+        "playbackStyle": "erreprodukzio estiloa",
+        "playbackStyle_description": "aukeratu audio erreproduzitzailearentzat erabiliko den erreprodukzio estiloa",
+        "playButtonBehavior": "erreprodukzio botoiaren portaera",
+        "playButtonBehavior_description": "ezartzen du erreprodukzio botoiaren portaera lehenetsia abestiak ilaran gehitzean",
+        "playerAlbumArtResolution": "erreproduzitzailearen albumaren arte-azalaren erresoluzioa",
+        "gaplessAudio": "hutsune gabeko audioa",
+        "gaplessAudio_description": "ezartzen du hutsunik gabeko audio ezarpena mpv-rako",
+        "genreBehavior_description": "genero batean klik egiteak abestien edo albumen zerrendan lehenespenez irekitzen den zehazten du",
+        "passwordStore": "pasahitzak/biltegi sekretua",
+        "playerbarOpenDrawer": "txandakatu erreproduzitzailearen barra pantaila osora",
+        "playerbarOpenDrawer_description": "aukera ematen du erreproduzitzailearen barran klik egiteak pantaila osoko erreproduzitzailea irekitzeko",
+        "customCssNotice": "Abisua: garbiketa batzuk dauden arren (url() eta content: debekatuz), css pertsonalizatua erabiltzeak arriskuak sor ditzake interfazea aldatuz gero",
+        "customCss_description": "css eduki pertsonalizatua. Oharra: edukia eta urruneko URLak debekatutako propietateak dira. Zure edukiaren aurrebista erakusten da behean. Ezarri ez dituzun eremu gehigarriak daude garbiketa dela eta",
+        "enableRemote": "gaitu urruneko kontrol zerbitzaria",
+        "enableRemote_description": "urruneko kontrol zerbitzariari beste gailu batzuei aplikazioa kontrolatzeko aukera ematen dio"
     },
     "form": {
         "addServer": {
@@ -489,7 +546,9 @@
             "ignoreCors": "alde batera utzi cors $t(common.restartRequired)",
             "ignoreSsl": "alde batera utzi ssl $t(common.restartRequired)",
             "input_legacyAuthentication": "gaitu zaharkitutako autentifikazioa",
-            "success": "zerbitzaria behar bezala gehitu da"
+            "success": "zerbitzaria behar bezala gehitu da",
+            "input_preferInstantMix": "nahiago izan berehalako nahasketa",
+            "input_preferInstantMixDescription": "erabili berehalako nahasketa soilik antzeko abestiak lortzeko. erabilgarria portaera hau aldatzen duten pluginak badituzu"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist_other)",
@@ -602,7 +661,7 @@
             "numberSelected": "{{count}} hautatuta",
             "shareItem": "partekatu elementua",
             "goToAlbum": "joan $t(entity.album_one)-(e)ra",
-            "goToAlbumArtist": "joan $t(entity.albumArtist_one)-(e)ra",
+            "goToAlbumArtist": "joan albumera",
             "showDetails": "informazioa lortu"
         },
         "fullscreenPlayer": {
@@ -618,7 +677,9 @@
                 "lyricAlignment": "letraren lerrokatzea",
                 "showLyricMatch": "erakutsi letren bat-etortzea",
                 "showLyricProvider": "erakutsi letra hornitzailea",
-                "lyricOffset": "letra-desplazamendua (ms)"
+                "lyricOffset": "letra-desplazamendua (ms)",
+                "lyricGap": "letra hutsunea",
+                "useImageAspectRatio": "erabili irudiaren aspektu-erlazioa"
             },
             "lyrics": "letrak",
             "related": "erlazionatuta",
@@ -628,7 +689,7 @@
         },
         "genreList": {
             "title": "$t(entity.genre_other)",
-            "showAlbums": "erakutsi $t(entity.album_other) $t(entity.album_other)",
+            "showAlbums": "erakutsi $t(entity.genre_one) $t(entity.album_other)",
             "showTracks": "erakutsi $t(entity.genre_one) $t(entity.track_other)"
         },
         "globalSearch": {
@@ -654,7 +715,8 @@
             "advanced": "aurreratua",
             "generalTab": "orokorra",
             "playbackTab": "erreprodukzioa",
-            "windowTab": "leihoa"
+            "windowTab": "leihoa",
+            "hotkeysTab": "laster-teklak"
         },
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist_other)",

@@ -4,11 +4,7 @@ on: [push, pull_request]
 
 jobs:
     lint:
-        runs-on: ${{ matrix.os }}
-
-        strategy:
-            matrix:
-                os: [macos-latest, windows-latest, ubuntu-latest]
+        runs-on: ubuntu-latest
 
         steps:
             - name: Check out Git repository

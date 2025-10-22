@@ -179,7 +179,7 @@
         "apiRouteError": "não é possível encaminhar a solicitação",
         "audioDeviceFetchError": "ocorreu um erro ao tentar obter dispositivos de áudio",
         "authenticationFailed": "falha na autenticação",
-        "badAlbum": "está a ver este erro por que está música não é parte de algum album. um motivo comum para si estar a ver este erro é se a sua música estiver na raiz da sua pasta de músicas. o jellyfin apenas agrupa as músicas se elas estiveram na mesma pasta.",
+        "badAlbum": "está a ver este erro por que está música não é parte de algum album. um motivo comum para si estar a ver este erro é se a sua música estiver na raiz da sua pasta de músicas. o Jellyfin apenas agrupa as músicas se elas estiveram na mesma pasta",
         "badValue": "opção inválida \"{{value}}\". este valor não existe no momento",
         "credentialsRequired": "credenciais necessárias",
         "endpointNotImplementedError": "endpoint {{endpoint}} não está implementado para {{serverType}}",
@@ -321,7 +321,7 @@
         },
         "albumDetail": {
             "moreFromArtist": "mais deste $t(entity.artist_one)",
-            "moreFromGeneric": "mais que {{elemento}}",
+            "moreFromGeneric": "mais que {{item}}",
             "released": "lançado"
         },
         "albumList": {
@@ -519,8 +519,8 @@
         "crossfadeStyle": "estilo do crossfade",
         "crossfadeStyle_description": "seleciona qual estilo de crossfade usado no player de áudio",
         "customCssEnable": "ativar css customizado",
-        "customCssEnable_description": "permite escrever css customizado.",
-        "customCssNotice": "Aviso: apesar de existir alguma higienização (url() e content: não são permitidas), o uso de CSS personalizado ainda pode representar riscos ao alterar a interface.",
+        "customCssEnable_description": "permite escrever css customizado",
+        "customCssNotice": "Aviso: apesar de existir alguma higienização (url() e content: não são permitidas), o uso de css personalizado ainda pode representar riscos ao alterar a interface",
         "customCss": "css customizado",
         "disableAutomaticUpdates": "desativar atualizações automáticas",
         "disableLibraryUpdateOnStartup": "desativar a verificação de novas versões na inicialização",

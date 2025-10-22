@@ -135,7 +135,7 @@
         "savePlayQueue": "再生キューを保存",
         "minimumScrobbleSeconds_description": "Scrobbleされるために必要な最短の再生時間(秒)",
         "skipPlaylistPage_description": "プレイリストに移動するときに、デフォルトページではなくプレイリストの曲リストページに移動します",
-        "fontType_description": "組み込みフォントの場合、Feishin が提供するフォントから1つを選択します。 システムフォントの場合、OSにインストール済みの任意のフォントを選択できます。 カスタムフォントの場合、フォントファイルを自身で選択できます",
+        "fontType_description": "組み込みフォントの場合、feishin が提供するフォントから1つを選択します。 システムフォントの場合、OSにインストール済みの任意のフォントを選択できます。 カスタムフォントの場合、フォントファイルを自身で選択できます",
         "playButtonBehavior": "再生ボタンの動作",
         "volumeWheelStep": "音量ホイールステップ",
         "sidebarPlaylistList_description": "サイドバーでプレイリストのリストを表示/非表示にします",
@@ -213,7 +213,8 @@
         "openIn": {
             "lastfm": "Last.fmで開く",
             "musicbrainz": "MusicBrainzで開く"
-        }
+        },
+        "moveToNext": "次"
     },
     "common": {
         "backward": "戻る",
