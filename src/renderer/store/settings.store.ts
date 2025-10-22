@@ -774,6 +774,7 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
         {
             merge: mergeOverridingColumns,
             migrate(persistedState, version) {
+                console.log('migrate: ', version);
                 if (version === 8) {
                     const state = persistedState as SettingsSlice;
                     state.general.sidebarItems = state.general.sidebarItems.filter(
@@ -787,10 +788,15 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     });
                 }
 
+                if (version <= 9) {
+                    const state = persistedState as SettingsSlice;
+                    state.window.windowBarStyle = Platform.LINUX;
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 9,
+            version: 10,
         },
     ),
 );
