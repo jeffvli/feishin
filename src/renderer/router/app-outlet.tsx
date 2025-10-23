@@ -1,7 +1,7 @@
 import isElectron from 'is-electron';
 import { NuqsAdapter } from 'nuqs/adapters/react-router/v6';
 import { useEffect, useMemo } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router';
 
 import { useServerAuthenticated } from '/@/renderer/hooks/use-server-authenticated';
 import { AppRoute } from '/@/renderer/router/routes';

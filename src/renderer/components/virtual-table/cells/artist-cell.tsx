@@ -3,7 +3,7 @@ import type { ICellRendererParams } from '@ag-grid-community/core';
 
 import React from 'react';
 import { generatePath } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
 import { AppRoute } from '/@/renderer/router/routes';

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { motion } from 'motion/react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router';
 
 import styles from './collapsed-sidebar.module.css';
 

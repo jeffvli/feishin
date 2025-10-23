@@ -1,6 +1,6 @@
 import { AnimatePresence } from 'motion/react';
 import { MouseEvent, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import styles from './item-detail.module.css';
 

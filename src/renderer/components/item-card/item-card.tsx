@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
 import { Dispatch, Fragment, memo, ReactNode, SetStateAction, useState } from 'react';
-import { generatePath, Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router';
 
 import styles from './item-card.module.css';
 

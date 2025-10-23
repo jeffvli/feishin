@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import styles from './title-column.module.css';
 

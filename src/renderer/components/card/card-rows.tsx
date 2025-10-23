@@ -3,7 +3,7 @@ import formatDuration from 'format-duration';
 import React from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import styles from './card-rows.module.css';
 

@@ -3,7 +3,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import debounce from 'lodash/debounce';
 import { ChangeEvent, MutableRefObject } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, Link, useParams, useSearchParams } from 'react-router-dom';
+import { generatePath, Link, useParams, useSearchParams } from 'react-router';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { FilterBar } from '/@/renderer/features/shared/components/filter-bar';

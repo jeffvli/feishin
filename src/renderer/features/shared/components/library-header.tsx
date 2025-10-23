@@ -3,7 +3,7 @@ import { AutoTextSize } from 'auto-text-size';
 import clsx from 'clsx';
 import { forwardRef, ReactNode, Ref, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import styles from './library-header.module.css';
 

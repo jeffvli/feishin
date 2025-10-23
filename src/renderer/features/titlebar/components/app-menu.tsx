@@ -2,7 +2,7 @@ import { closeAllModals, openModal } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import packageJson from '../../../../../package.json';
 

@@ -2,7 +2,7 @@ import type { ICellRendererParams } from '@ag-grid-community/core';
 
 import React, { useMemo } from 'react';
 import { generatePath } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import styles from './combined-title-cell.module.css';
 

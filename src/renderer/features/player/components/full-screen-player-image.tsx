@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { AnimatePresence, HTMLMotionProps, motion, Variants } from 'motion/react';
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import styles from './full-screen-player-image.module.css';
 

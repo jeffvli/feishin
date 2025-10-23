@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { TFunction, useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { SongPath } from '/@/renderer/features/item-details/components/song-path';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';

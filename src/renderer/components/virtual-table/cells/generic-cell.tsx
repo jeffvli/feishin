@@ -1,7 +1,7 @@
 import type { ICellRendererParams } from '@ag-grid-community/core';
 
 import clsx from 'clsx';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import styles from './generic-cell.module.css';
 

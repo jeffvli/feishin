@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Fragment, memo, useMemo } from 'react';
-import { generatePath, Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router';
 
 import styles from './genre-column.module.css';
 

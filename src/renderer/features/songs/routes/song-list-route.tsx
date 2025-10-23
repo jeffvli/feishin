@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router';
 
 import { ListContext } from '/@/renderer/context/list-context';
 import { genresQueries } from '/@/renderer/features/genres/api/genres-api';

@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { generatePath, Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router';
 
 import styles from './genre-badge-column.module.css';
 

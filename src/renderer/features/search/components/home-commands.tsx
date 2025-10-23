@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid/non-secure';
 import { Dispatch, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router';
-import { createSearchParams } from 'react-router-dom';
+import { createSearchParams } from 'react-router';
 
 import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';

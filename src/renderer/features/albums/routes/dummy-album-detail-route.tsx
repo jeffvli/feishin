@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import styles from './dummy-album-detail-route.module.css';
 

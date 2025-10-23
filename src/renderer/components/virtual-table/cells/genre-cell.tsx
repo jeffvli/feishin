@@ -2,7 +2,7 @@ import type { AlbumArtist, Artist } from '/@/shared/types/domain-types';
 import type { ICellRendererParams } from '@ag-grid-community/core';
 
 import React from 'react';
-import { generatePath, Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router';
 
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';

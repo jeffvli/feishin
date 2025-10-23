@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { forwardRef, Ref, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';

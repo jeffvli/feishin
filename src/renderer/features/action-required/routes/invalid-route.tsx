@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';

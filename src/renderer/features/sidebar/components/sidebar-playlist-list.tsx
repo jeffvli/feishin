@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { MouseEvent, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import styles from './sidebar-playlist-list.module.css';
 

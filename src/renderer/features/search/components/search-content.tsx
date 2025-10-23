@@ -3,7 +3,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 import { RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { MutableRefObject } from 'react';
 import { generatePath, useNavigate } from 'react-router';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router';
 
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
 import { useVirtualTable } from '/@/renderer/components/virtual-table/hooks/use-virtual-table';

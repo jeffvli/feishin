@@ -14,7 +14,7 @@ import debounce from 'lodash/debounce';
 import orderBy from 'lodash/orderBy';
 import { MutableRefObject, useCallback, useMemo } from 'react';
 import { generatePath, useNavigate } from 'react-router';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 
 import { api } from '/@/renderer/api';
 import { queryKeys, QueryPagination } from '/@/renderer/api/query-keys';

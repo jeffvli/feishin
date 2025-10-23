@@ -1,5 +1,5 @@
 import { CSSProperties, useMemo } from 'react';
-import { generatePath, Link } from 'react-router-dom';
+import { generatePath, Link } from 'react-router';
 
 import styles from './title-combined-column.module.css';
 
