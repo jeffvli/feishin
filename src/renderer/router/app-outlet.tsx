@@ -1,5 +1,5 @@
+import { NuqsAdapter } from '@offlegacy/nuqs-hash-router';
 import isElectron from 'is-electron';
-import { NuqsAdapter } from 'nuqs/adapters/react-router/v6';
 import { useEffect, useMemo } from 'react';
 import { Navigate, Outlet } from 'react-router';
 

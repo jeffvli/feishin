@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { HashRouter, Route, Routes } from 'react-router';
 
 import { AppRoute } from './routes';
 
@@ -69,7 +69,7 @@ const RouteErrorBoundary = lazy(
 
 export const AppRouter = () => {
     const router = (
-        <BrowserRouter>
+        <HashRouter>
             <ModalsProvider
                 modals={{
                     addToPlaylist: AddToPlaylistContextModal,
@@ -206,7 +206,7 @@ export const AppRouter = () => {
                     </Route>
                 </Routes>
             </ModalsProvider>
-        </BrowserRouter>
+        </HashRouter>
     );
 
     return <Suspense fallback={<></>}>{router}</Suspense>;
