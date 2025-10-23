@@ -580,13 +580,8 @@
         "followLyric_description": "scroll the lyric to the current playing position",
         "followLyric": "follow current lyric",
         "font_description": "sets the font to use for the application",
-<<<<<<< HEAD
         "font": "font",
         "fontType_description": "built-in font selects one of the fonts provided by Feishin. system font allows you to select any font provided by your operating system. custom allows you to provide your own font",
-=======
-        "fontType": "font type",
-        "fontType_description": "built-in font selects one of the fonts provided by feishin. system font allows you to select any font provided by your operating system. custom allows you to provide your own font",
->>>>>>> upstream/development
         "fontType_optionBuiltIn": "built-in font",
         "fontType_optionCustom": "custom font",
         "fontType_optionSystem": "system font",
