@@ -59,15 +59,27 @@ For media keys to work, you will be prompted to allow Feishin to be a Trusted Ac
 
 #### Linux Notes
 
-If you're using a Linux device, a `.desktop` file is recommended for easy launching of Feishin.
+We provide a small install script to download the latest `.AppImage`, make it executable, and also download the icons required by Desktop Environments. Finally, it generates a `.desktop` file to add Feishin to your Application Launcher.
 
-Download the [latest release (AppImage)](https://github.com/jeffvli/feishin/releases) and [application icon](https://github.com/jeffvli/feishin/blob/development/resources/icon.png?raw=true) to your `~/applications/` folder. This folder may need to be created if it does not already exist.
+Simply run the installer like this:
+```sh
+dir=/your/application/directory
+curl 'https://raw.githubusercontent.com/jeffvli/feishin/refs/heads/development/install-feishin-appimage' | sh -s -- "$dir"
+```
 
-Rename the icon to `Feishin-linux-x86_64.png`.
+The script also has an option to add launch arguments to run Feishin in native Wayland mode. Note that this is experimental in Electron and therefore not officially supported. If you want to use it, run this instead:
+```sh
+dir=/your/application/directory
+curl 'https://raw.githubusercontent.com/jeffvli/feishin/refs/heads/development/install-feishin-appimage' | sh -s -- "$dir" wayland-native
+```
 
-Save the [example desktop file](https://raw.githubusercontent.com/jeffvli/feishin/refs/heads/development/feishin.desktop) as `~/.local/share/applications/feishin.desktop`.
+It also provides a simple uninstall routine, removing the downloaded files:
+```sh
+dir=/your/application/directory
+curl 'https://raw.githubusercontent.com/jeffvli/feishin/refs/heads/development/install-feishin-appimage' | sh -s -- "$dir" remove
+```
 
-You will now see Feishin show up in your menu. The properties in the example desktop file may need to be modified to match your system.
+The entry should show up in your Application Launcher immediately. If it does not, simply log out, wait 10 seconds, and log back in. Your Desktop Environment may alternatively provide a way to reload entries.
 
 ### Web and Docker
 
