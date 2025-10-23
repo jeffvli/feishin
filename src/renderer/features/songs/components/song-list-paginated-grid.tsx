@@ -52,7 +52,13 @@ export const SongListPaginatedGrid = forwardRef<any, SongListPaginatedGridProps>
                 pageCount={pageCount}
                 totalItemCount={totalItemCount}
             >
-                <ItemGridList data={data || []} gap={gap} itemType={LibraryItem.SONG} ref={ref} />
+                <ItemGridList
+                    currentPage={currentPage}
+                    data={data || []}
+                    gap={gap}
+                    itemType={LibraryItem.SONG}
+                    ref={ref}
+                />
             </ItemListWithPagination>
         );
     },

@@ -64,6 +64,7 @@ export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProp
                 totalItemCount={totalItemCount}
             >
                 <ItemGridList
+                    currentPage={currentPage}
                     data={data || []}
                     gap={gap}
                     initialTop={{

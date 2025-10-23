@@ -403,6 +403,7 @@ interface ItemTableListProps {
     CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
     cellPadding?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     columns: ItemTableListColumnConfig[];
+    currentPage?: number;
     data: unknown[];
     enableAlternateRowColors?: boolean;
     enableExpansion?: boolean;
@@ -435,6 +436,7 @@ export const ItemTableList = ({
     CellComponent,
     cellPadding = 'sm',
     columns,
+    currentPage,
     data,
     enableAlternateRowColors = false,
     enableExpansion = true,
@@ -1078,6 +1080,13 @@ export const ItemTableList = ({
             scrollToTableIndex(initialTop.to);
         }
     }, [initialTop, scrollToTableIndex, scrollToTableOffset]);
+
+    // Scroll to top when currentPage changes
+    useEffect(() => {
+        if (currentPage !== undefined) {
+            scrollToTableOffset(0);
+        }
+    }, [currentPage, scrollToTableOffset]);
 
     const imperativeHandle: ItemListHandle = useMemo(() => {
         return {

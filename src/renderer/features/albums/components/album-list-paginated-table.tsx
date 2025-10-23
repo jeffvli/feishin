@@ -73,6 +73,7 @@ export const AlbumListPaginatedTable = forwardRef<any, AlbumListPaginatedTablePr
                 <ItemTableList
                     CellComponent={ItemTableListColumn}
                     columns={columns}
+                    currentPage={currentPage}
                     data={data || []}
                     enableAlternateRowColors={enableAlternateRowColors}
                     enableHorizontalBorders={enableHorizontalBorders}

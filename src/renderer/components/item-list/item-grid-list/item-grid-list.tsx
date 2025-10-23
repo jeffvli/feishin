@@ -179,6 +179,7 @@ export interface GridItemProps {
 }
 
 export interface ItemGridListProps {
+    currentPage?: number;
     data: unknown[];
     enableExpansion?: boolean;
     enableSelection?: boolean;
@@ -199,6 +200,7 @@ export interface ItemGridListProps {
 }
 
 export const ItemGridList = ({
+    currentPage,
     data,
     enableExpansion = true,
     enableSelection = true,
@@ -331,8 +333,23 @@ export const ItemGridList = ({
         ],
     );
 
+    // Scroll to top when currentPage changes
+    useEffect(() => {
+        if (currentPage !== undefined && tableMeta?.itemHeight) {
+            scrollToGridOffset(0);
+        }
+    }, [currentPage, scrollToGridOffset, tableMeta?.itemHeight]);
+
     useEffect(() => {
         if (!initialTop || isInitialScrollPositionSet.current || !tableMeta?.itemHeight) return;
+
+        // Only set initial scroll position if we haven't done it yet AND we're not on a page change
+        // This prevents the initial scroll position from being restored on every page change
+        if (currentPage !== undefined && currentPage > 0) {
+            isInitialScrollPositionSet.current = true;
+            return;
+        }
+
         isInitialScrollPositionSet.current = true;
 
         if (initialTop.type === 'offset') {
@@ -343,7 +360,7 @@ export const ItemGridList = ({
                 index: initialTop.to,
             });
         }
-    }, [initialTop, itemGridRef, scrollToGridOffset, tableMeta?.itemHeight]);
+    }, [initialTop, itemGridRef, scrollToGridOffset, tableMeta?.itemHeight, currentPage]);
 
     const imperativeHandle: ItemListHandle = useMemo(() => {
         return {

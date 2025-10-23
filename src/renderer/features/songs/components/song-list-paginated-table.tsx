@@ -68,6 +68,7 @@ export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProp
                 <ItemTableList
                     CellComponent={ItemTableListColumn}
                     columns={columns}
+                    currentPage={currentPage}
                     data={data || []}
                     enableAlternateRowColors={enableAlternateRowColors}
                     enableHorizontalBorders={enableHorizontalBorders}
