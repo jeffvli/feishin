@@ -13,12 +13,17 @@ export const ArtistSettings = () => {
     const { artistItems } = useGeneralSettings();
     const { setArtistItems } = useSettingsStoreActions();
 
+    const mappedArtistItems = artistItems.map((item) => ({
+        ...item,
+        id: item.id as ArtistItem,
+    }));
+
     return (
         <DraggableItems
             description="setting.artistConfiguration"
             itemLabels={ARTIST_ITEMS}
             setItems={setArtistItems}
-            settings={artistItems}
+            settings={mappedArtistItems}
             title="setting.artistConfiguration"
         />
     );
