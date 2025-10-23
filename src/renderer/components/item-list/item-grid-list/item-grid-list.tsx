@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { AnimatePresence } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
-import {
+import React, {
     CSSProperties,
     Ref,
     UIEvent,
@@ -30,6 +30,143 @@ import {
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { LibraryItem } from '/@/shared/types/domain-types';
+
+interface VirtualizedGridListProps {
+    data: unknown[];
+    enableExpansion: boolean;
+    enableSelection: boolean;
+    gap: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
+    internalState: ItemListStateActions;
+    itemGridRef: React.RefObject<any>;
+    itemType: LibraryItem;
+    onRowsRendered: (visibleRows: { startIndex: number; stopIndex: number }) => void;
+    onScroll: (e: UIEvent<HTMLDivElement>) => void;
+    tableMeta: null | {
+        columnCount: number;
+        itemHeight: number;
+        rowCount: number;
+    };
+}
+
+const VirtualizedGridList = React.memo(
+    ({
+        data,
+        enableExpansion,
+        enableSelection,
+        gap,
+        internalState,
+        itemGridRef,
+        itemType,
+        onRowsRendered,
+        onScroll,
+        tableMeta,
+    }: VirtualizedGridListProps) => {
+        const elements = useMemo(() => {
+            if (!tableMeta) {
+                return [];
+            }
+
+            return data
+                .map((d, i) => {
+                    return {
+                        data: d,
+                        index: i,
+                    };
+                })
+                .reduce(
+                    (acc, d) => {
+                        if (d.index % (tableMeta?.columnCount || 0) === 0) {
+                            acc.push([]);
+                        }
+                        const prev = acc[acc.length - 1];
+                        prev.push(d);
+                        return acc;
+                    },
+                    [] as { data: any; index: number }[][],
+                );
+        }, [tableMeta, data]);
+
+        const itemProps: GridItemProps = {
+            columns: tableMeta?.columnCount || 0,
+            data: elements,
+            enableExpansion,
+            enableSelection,
+            gap,
+            internalState,
+            itemType,
+        };
+
+        return (
+            <List
+                listRef={itemGridRef}
+                onRowsRendered={onRowsRendered}
+                onScroll={onScroll}
+                rowComponent={ListComponent}
+                rowCount={tableMeta?.rowCount || 0}
+                rowHeight={tableMeta?.itemHeight || 0}
+                rowProps={itemProps}
+            />
+        );
+    },
+);
+
+VirtualizedGridList.displayName = 'VirtualizedGridList';
+
+// Throttled function moved outside component for better performance
+const createThrottledSetTableMeta = (itemsPerRow?: number) => {
+    return throttle(
+        (
+            width: number,
+            dataLength: number,
+            type: LibraryItem,
+            setTableMeta: (meta: any) => void,
+        ) => {
+            const isSm = width >= 600;
+            const isMd = width >= 768;
+            const isLg = width >= 960;
+            const isXl = width >= 1200;
+            const is2xl = width >= 1440;
+            const is3xl = width >= 1920;
+            const is4xl = width >= 2560;
+
+            let dynamicItemsPerRow = 2;
+
+            if (is4xl) {
+                dynamicItemsPerRow = 12;
+            } else if (is3xl) {
+                dynamicItemsPerRow = 10;
+            } else if (is2xl) {
+                dynamicItemsPerRow = 8;
+            } else if (isXl) {
+                dynamicItemsPerRow = 6;
+            } else if (isLg) {
+                dynamicItemsPerRow = 5;
+            } else if (isMd) {
+                dynamicItemsPerRow = 4;
+            } else if (isSm) {
+                dynamicItemsPerRow = 3;
+            } else {
+                dynamicItemsPerRow = 2;
+            }
+
+            const setItemsPerRow = itemsPerRow || dynamicItemsPerRow;
+
+            const widthPerItem = Number(width) / setItemsPerRow;
+            const itemHeight = widthPerItem + getDataRowsCount(type) * 26;
+
+            if (widthPerItem === 0) {
+                return;
+            }
+
+            setTableMeta({
+                columnCount: setItemsPerRow,
+                itemHeight,
+                rowCount: Math.ceil(dataLength / setItemsPerRow),
+            });
+        },
+        200,
+    );
+};
 
 export interface GridItemProps {
     columns: number;
@@ -155,56 +292,13 @@ export const ItemGridList = ({
         rowCount: number;
     }>(null);
 
-    // Throttled function to update table meta
+    // Use throttled function created outside component for better performance
     const throttledSetTableMeta = useMemo(() => {
-        return throttle((width: number, dataLength: number, type: LibraryItem) => {
-            const isSm = width >= 600;
-            const isMd = width >= 768;
-            const isLg = width >= 960;
-            const isXl = width >= 1200;
-            const is2xl = width >= 1440;
-            const is3xl = width >= 1920;
-            const is4xl = width >= 2560;
-
-            let dynamicItemsPerRow = 2;
-
-            if (is4xl) {
-                dynamicItemsPerRow = 12;
-            } else if (is3xl) {
-                dynamicItemsPerRow = 10;
-            } else if (is2xl) {
-                dynamicItemsPerRow = 8;
-            } else if (isXl) {
-                dynamicItemsPerRow = 6;
-            } else if (isLg) {
-                dynamicItemsPerRow = 5;
-            } else if (isMd) {
-                dynamicItemsPerRow = 4;
-            } else if (isSm) {
-                dynamicItemsPerRow = 3;
-            } else {
-                dynamicItemsPerRow = 2;
-            }
-
-            const setItemsPerRow = itemsPerRow || dynamicItemsPerRow;
-
-            const widthPerItem = Number(width) / setItemsPerRow;
-            const itemHeight = widthPerItem + getDataRowsCount(type) * 26;
-
-            if (widthPerItem === 0) {
-                return;
-            }
-
-            setTableMeta({
-                columnCount: setItemsPerRow,
-                itemHeight,
-                rowCount: Math.ceil(dataLength / setItemsPerRow),
-            });
-        }, 200);
+        return createThrottledSetTableMeta(itemsPerRow);
     }, [itemsPerRow]);
 
     useLayoutEffect(() => {
-        throttledSetTableMeta(containerWidth, data.length, itemType);
+        throttledSetTableMeta(containerWidth, data.length, itemType, setTableMeta);
     }, [containerWidth, data.length, itemType, throttledSetTableMeta]);
 
     const handleOnRowsRendered = useCallback(
@@ -236,41 +330,6 @@ export const ItemGridList = ({
             itemGridRef,
         ],
     );
-
-    const elements = useMemo(() => {
-        if (!tableMeta) {
-            return [];
-        }
-
-        return data
-            .map((d, i) => {
-                return {
-                    data: d,
-                    index: i,
-                };
-            })
-            .reduce(
-                (acc, d) => {
-                    if (d.index % (tableMeta?.columnCount || 0) === 0) {
-                        acc.push([]);
-                    }
-                    const prev = acc[acc.length - 1];
-                    prev.push(d);
-                    return acc;
-                },
-                [] as { data: any; index: number }[][],
-            );
-    }, [tableMeta, data]);
-
-    const itemProps: GridItemProps = {
-        columns: tableMeta?.columnCount || 0,
-        data: elements,
-        enableExpansion,
-        enableSelection,
-        gap,
-        internalState,
-        itemType,
-    };
 
     useEffect(() => {
         if (!initialTop || isInitialScrollPositionSet.current || !tableMeta?.itemHeight) return;
@@ -319,14 +378,17 @@ export const ItemGridList = ({
             data-overlayscrollbars-initialize=""
             ref={mergedContainerRef}
         >
-            <List
-                listRef={itemGridRef}
+            <VirtualizedGridList
+                data={data}
+                enableExpansion={enableExpansion}
+                enableSelection={enableSelection}
+                gap={gap}
+                internalState={internalState}
+                itemGridRef={itemGridRef}
+                itemType={itemType}
                 onRowsRendered={handleOnRowsRendered}
                 onScroll={handleScroll}
-                rowComponent={ListComponent}
-                rowCount={tableMeta?.rowCount || 0}
-                rowHeight={tableMeta?.itemHeight || 0}
-                rowProps={itemProps}
+                tableMeta={tableMeta}
             />
             <AnimatePresence>
                 {hasExpanded && (

@@ -4,7 +4,7 @@ import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
-import {
+import React, {
     type JSXElementConstructor,
     Ref,
     useCallback,
@@ -27,6 +27,354 @@ import {
 import { parseTableColumns } from '/@/renderer/components/item-list/helpers/parse-table-columns';
 import { ItemListHandle, ItemTableListColumnConfig } from '/@/renderer/components/item-list/types';
 import { LibraryItem } from '/@/shared/types/domain-types';
+
+interface VirtualizedTableGridProps {
+    calculatedColumnWidths: number[];
+    CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
+    cellPadding: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
+    data: unknown[];
+    enableAlternateRowColors: boolean;
+    enableExpansion: boolean;
+    enableHeader: boolean;
+    enableHorizontalBorders: boolean;
+    enableRowHoverHighlight: boolean;
+    enableSelection: boolean;
+    enableVerticalBorders: boolean;
+    getRowHeight: (index: number, cellProps: TableItemProps) => number;
+    headerHeight: number;
+    internalState: ItemListStateActions;
+    itemType: LibraryItem;
+    mergedRowRef: React.Ref<HTMLDivElement>;
+    onCellsRendered?: GridProps<TableItemProps>['onCellsRendered'];
+    parsedColumns: ReturnType<typeof parseTableColumns>;
+    pinnedLeftColumnCount: number;
+    pinnedLeftColumnRef: React.RefObject<HTMLDivElement>;
+    pinnedRightColumnCount: number;
+    pinnedRightColumnRef: React.RefObject<HTMLDivElement>;
+    pinnedRowCount: number;
+    pinnedRowRef: React.RefObject<HTMLDivElement>;
+    showLeftShadow: boolean;
+    showRightShadow: boolean;
+    size: 'compact' | 'default' | 'large';
+    totalColumnCount: number;
+    totalRowCount: number;
+}
+
+const VirtualizedTableGrid = React.memo(
+    ({
+        calculatedColumnWidths,
+        CellComponent,
+        cellPadding,
+        data,
+        enableAlternateRowColors,
+        enableExpansion,
+        enableHeader,
+        enableHorizontalBorders,
+        enableRowHoverHighlight,
+        enableSelection,
+        enableVerticalBorders,
+        getRowHeight,
+        headerHeight,
+        internalState,
+        itemType,
+        mergedRowRef,
+        onCellsRendered,
+        parsedColumns,
+        pinnedLeftColumnCount,
+        pinnedLeftColumnRef,
+        pinnedRightColumnCount,
+        pinnedRightColumnRef,
+        pinnedRowCount,
+        pinnedRowRef,
+        showLeftShadow,
+        showRightShadow,
+        size,
+        totalColumnCount,
+        totalRowCount,
+    }: VirtualizedTableGridProps) => {
+        const columnWidth = useCallback(
+            (index: number) => calculatedColumnWidths[index],
+            [calculatedColumnWidths],
+        );
+
+        const itemProps: TableItemProps = useMemo(
+            () => ({
+                cellPadding,
+                columns: parsedColumns,
+                data: enableHeader ? [null, ...data] : data,
+                enableAlternateRowColors,
+                enableExpansion,
+                enableHeader,
+                enableHorizontalBorders,
+                enableRowHoverHighlight,
+                enableSelection,
+                enableVerticalBorders,
+                getRowHeight,
+                internalState,
+                itemType,
+                size,
+            }),
+            [
+                cellPadding,
+                parsedColumns,
+                enableHeader,
+                data,
+                enableAlternateRowColors,
+                enableExpansion,
+                enableHorizontalBorders,
+                enableRowHoverHighlight,
+                enableSelection,
+                enableVerticalBorders,
+                getRowHeight,
+                internalState,
+                itemType,
+                size,
+            ],
+        );
+
+        const PinnedRowCell = useCallback(
+            (cellProps: CellComponentProps & TableItemProps) => {
+                return (
+                    <CellComponent
+                        {...cellProps}
+                        columnIndex={cellProps.columnIndex + pinnedLeftColumnCount}
+                    />
+                );
+            },
+            [pinnedLeftColumnCount, CellComponent],
+        );
+
+        const PinnedColumnCell = useCallback(
+            (cellProps: CellComponentProps & TableItemProps) => {
+                return (
+                    <CellComponent {...cellProps} rowIndex={cellProps.rowIndex + pinnedRowCount} />
+                );
+            },
+            [pinnedRowCount, CellComponent],
+        );
+
+        const PinnedRightColumnCell = useCallback(
+            (cellProps: CellComponentProps & TableItemProps) => {
+                return (
+                    <CellComponent
+                        {...cellProps}
+                        columnIndex={
+                            cellProps.columnIndex + pinnedLeftColumnCount + totalColumnCount
+                        }
+                        rowIndex={cellProps.rowIndex + pinnedRowCount}
+                    />
+                );
+            },
+            [pinnedLeftColumnCount, pinnedRowCount, totalColumnCount, CellComponent],
+        );
+
+        const PinnedRightIntersectionCell = useCallback(
+            (cellProps: CellComponentProps & TableItemProps) => {
+                return (
+                    <CellComponent
+                        {...cellProps}
+                        columnIndex={
+                            cellProps.columnIndex + pinnedLeftColumnCount + totalColumnCount
+                        }
+                    />
+                );
+            },
+            [pinnedLeftColumnCount, totalColumnCount, CellComponent],
+        );
+
+        const RowCell = useCallback(
+            (cellProps: CellComponentProps<TableItemProps>) => {
+                return (
+                    <CellComponent
+                        {...cellProps}
+                        columnIndex={cellProps.columnIndex + pinnedLeftColumnCount}
+                        rowIndex={cellProps.rowIndex + pinnedRowCount}
+                    />
+                );
+            },
+            [pinnedLeftColumnCount, pinnedRowCount, CellComponent],
+        );
+
+        return (
+            <div className={styles.itemTableContainer}>
+                <div
+                    className={styles.itemTablePinnedColumnsGridContainer}
+                    style={{
+                        minWidth: `${Array.from({ length: pinnedLeftColumnCount }, () => 0).reduce(
+                            (a, _, i) => a + columnWidth(i),
+                            0,
+                        )}px`,
+                    }}
+                >
+                    {!!(pinnedLeftColumnCount || pinnedRowCount) && (
+                        <div
+                            className={clsx(styles.itemTablePinnedIntersectionGridContainer, {
+                                [styles.withHeader]: enableHeader,
+                            })}
+                            style={{
+                                minHeight: `${Array.from(
+                                    { length: pinnedRowCount },
+                                    () => 0,
+                                ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
+                            }}
+                        >
+                            <Grid
+                                cellComponent={CellComponent as any}
+                                cellProps={itemProps}
+                                className={styles.noScrollbar}
+                                columnCount={pinnedLeftColumnCount}
+                                columnWidth={columnWidth}
+                                rowCount={pinnedRowCount}
+                                rowHeight={getRowHeight}
+                            />
+                            {enableHeader && <div className={styles.itemTablePinnedHeaderShadow} />}
+                        </div>
+                    )}
+                    {!!pinnedLeftColumnCount && (
+                        <div
+                            className={styles.itemTablePinnedColumnsContainer}
+                            ref={pinnedLeftColumnRef}
+                        >
+                            <Grid
+                                cellComponent={PinnedColumnCell}
+                                cellProps={itemProps}
+                                className={clsx(styles.noScrollbar, styles.height100)}
+                                columnCount={pinnedLeftColumnCount}
+                                columnWidth={columnWidth}
+                                rowCount={totalRowCount}
+                                rowHeight={(index, cellProps) => {
+                                    return getRowHeight(index + pinnedRowCount, cellProps);
+                                }}
+                            />
+                        </div>
+                    )}
+                </div>
+                <div className={styles.itemTablePinnedRowsContainer}>
+                    {!!pinnedRowCount && (
+                        <div
+                            className={clsx(styles.itemTablePinnedRowsGridContainer, {
+                                [styles.withHeader]: enableHeader,
+                            })}
+                            ref={pinnedRowRef}
+                            style={
+                                {
+                                    '--header-height': `${headerHeight}px`,
+                                    minHeight: `${Array.from(
+                                        { length: pinnedRowCount },
+                                        () => 0,
+                                    ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
+                                } as React.CSSProperties
+                            }
+                        >
+                            <Grid
+                                cellComponent={PinnedRowCell}
+                                cellProps={itemProps}
+                                className={styles.noScrollbar}
+                                columnCount={totalColumnCount}
+                                columnWidth={(index) => {
+                                    return columnWidth(index + pinnedLeftColumnCount);
+                                }}
+                                rowCount={Array.from({ length: pinnedRowCount }, () => 0).length}
+                                rowHeight={getRowHeight}
+                            />
+                            {enableHeader && <div className={styles.itemTablePinnedHeaderShadow} />}
+                        </div>
+                    )}
+                    <div className={styles.itemTableGridContainer} ref={mergedRowRef}>
+                        <Grid
+                            cellComponent={RowCell}
+                            cellProps={itemProps}
+                            className={styles.height100}
+                            columnCount={totalColumnCount}
+                            columnWidth={(index) => {
+                                return columnWidth(index + pinnedLeftColumnCount);
+                            }}
+                            onCellsRendered={onCellsRendered}
+                            rowCount={totalRowCount}
+                            rowHeight={(index, cellProps) => {
+                                return getRowHeight(index + pinnedRowCount, cellProps);
+                            }}
+                        />
+                        {pinnedLeftColumnCount > 0 && showLeftShadow && (
+                            <div className={styles.itemTableLeftScrollShadow} />
+                        )}
+                        {pinnedRightColumnCount > 0 && showRightShadow && (
+                            <div className={styles.itemTableRightScrollShadow} />
+                        )}
+                    </div>
+                </div>
+                {!!pinnedRightColumnCount && (
+                    <div
+                        className={styles.itemTablePinnedColumnsGridContainer}
+                        style={{
+                            minWidth: `${Array.from(
+                                { length: pinnedRightColumnCount },
+                                () => 0,
+                            ).reduce(
+                                (a, _, i) =>
+                                    a + columnWidth(i + pinnedLeftColumnCount + totalColumnCount),
+                                0,
+                            )}px`,
+                        }}
+                    >
+                        {!!(pinnedRightColumnCount || pinnedRowCount) && (
+                            <div
+                                className={clsx(styles.itemTablePinnedIntersectionGridContainer, {
+                                    [styles.withHeader]: enableHeader,
+                                })}
+                                style={{
+                                    minHeight: `${Array.from(
+                                        { length: pinnedRowCount },
+                                        () => 0,
+                                    ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
+                                }}
+                            >
+                                <Grid
+                                    cellComponent={PinnedRightIntersectionCell}
+                                    cellProps={itemProps}
+                                    className={styles.noScrollbar}
+                                    columnCount={pinnedRightColumnCount}
+                                    columnWidth={(index) => {
+                                        return columnWidth(
+                                            index + pinnedLeftColumnCount + totalColumnCount,
+                                        );
+                                    }}
+                                    rowCount={pinnedRowCount}
+                                    rowHeight={getRowHeight}
+                                />
+                                {enableHeader && (
+                                    <div className={styles.itemTablePinnedHeaderShadow} />
+                                )}
+                            </div>
+                        )}
+                        <div
+                            className={styles.itemTablePinnedRightColumnsContainer}
+                            ref={pinnedRightColumnRef}
+                        >
+                            <Grid
+                                cellComponent={PinnedRightColumnCell}
+                                cellProps={itemProps}
+                                className={clsx(styles.noScrollbar, styles.height100)}
+                                columnCount={pinnedRightColumnCount}
+                                columnWidth={(index) => {
+                                    return columnWidth(
+                                        index + pinnedLeftColumnCount + totalColumnCount,
+                                    );
+                                }}
+                                rowCount={totalRowCount}
+                                rowHeight={(index, cellProps) => {
+                                    return getRowHeight(index + pinnedRowCount, cellProps);
+                                }}
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    },
+);
+
+VirtualizedTableGrid.displayName = 'VirtualizedTableGrid';
 
 export interface TableItemProps {
     cellPadding?: ItemTableListProps['cellPadding'];
@@ -166,9 +514,6 @@ export const ItemTableList = ({
         return distributed;
     }, [parsedColumns, centerContainerWidth]);
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const columnWidth = (index: number, _cellProps: TableItemProps) =>
-        calculatedColumnWidths[index];
     const pinnedLeftColumnCount = parsedColumns.filter((col) => col.pinned === 'left').length;
     const pinnedRightColumnCount = parsedColumns.filter((col) => col.pinned === 'right').length;
 
@@ -602,80 +947,6 @@ export const ItemTableList = ({
         ],
     );
 
-    const PinnedRowCell = useCallback(
-        (cellProps: CellComponentProps & TableItemProps) => {
-            return (
-                <CellComponent
-                    {...cellProps}
-                    columnIndex={cellProps.columnIndex + pinnedLeftColumnCount}
-                />
-            );
-        },
-        [pinnedLeftColumnCount, CellComponent],
-    );
-
-    const PinnedColumnCell = useCallback(
-        (cellProps: CellComponentProps & TableItemProps) => {
-            return <CellComponent {...cellProps} rowIndex={cellProps.rowIndex + pinnedRowCount} />;
-        },
-        [pinnedRowCount, CellComponent],
-    );
-
-    const PinnedRightColumnCell = useCallback(
-        (cellProps: CellComponentProps & TableItemProps) => {
-            return (
-                <CellComponent
-                    {...cellProps}
-                    columnIndex={cellProps.columnIndex + pinnedLeftColumnCount + totalColumnCount}
-                    rowIndex={cellProps.rowIndex + pinnedRowCount}
-                />
-            );
-        },
-        [pinnedLeftColumnCount, pinnedRowCount, totalColumnCount, CellComponent],
-    );
-
-    const PinnedRightIntersectionCell = useCallback(
-        (cellProps: CellComponentProps & TableItemProps) => {
-            return (
-                <CellComponent
-                    {...cellProps}
-                    columnIndex={cellProps.columnIndex + pinnedLeftColumnCount + totalColumnCount}
-                />
-            );
-        },
-        [pinnedLeftColumnCount, totalColumnCount, CellComponent],
-    );
-
-    const RowCell = useCallback(
-        (cellProps: CellComponentProps<TableItemProps>) => {
-            return (
-                <CellComponent
-                    {...cellProps}
-                    columnIndex={cellProps.columnIndex + pinnedLeftColumnCount}
-                    rowIndex={cellProps.rowIndex + pinnedRowCount}
-                />
-            );
-        },
-        [pinnedLeftColumnCount, pinnedRowCount, CellComponent],
-    );
-
-    const itemProps: TableItemProps = {
-        cellPadding,
-        columns: parsedColumns,
-        data: enableHeader ? [null, ...data] : data,
-        enableAlternateRowColors,
-        enableExpansion,
-        enableHeader,
-        enableHorizontalBorders,
-        enableRowHoverHighlight,
-        enableSelection,
-        enableVerticalBorders,
-        getRowHeight,
-        internalState,
-        itemType,
-        size,
-    };
-
     const isInitialScrollPositionSet = useRef<boolean>(false);
 
     useEffect(() => {
@@ -718,186 +989,37 @@ export const ItemTableList = ({
 
     return (
         <div className={styles.itemTableListContainer}>
-            <div className={styles.itemTableContainer}>
-                <div
-                    className={styles.itemTablePinnedColumnsGridContainer}
-                    style={{
-                        minWidth: `${Array.from({ length: pinnedLeftColumnCount }, () => 0).reduce(
-                            (a, _, i) => a + columnWidth(i, itemProps),
-                            0,
-                        )}px`,
-                    }}
-                >
-                    {!!(pinnedLeftColumnCount || pinnedRowCount) && (
-                        <div
-                            className={clsx(styles.itemTablePinnedIntersectionGridContainer, {
-                                [styles.withHeader]: enableHeader,
-                            })}
-                            style={{
-                                minHeight: `${Array.from(
-                                    { length: pinnedRowCount },
-                                    () => 0,
-                                ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
-                            }}
-                        >
-                            <Grid
-                                cellComponent={CellComponent as any}
-                                cellProps={itemProps}
-                                className={styles.noScrollbar}
-                                columnCount={pinnedLeftColumnCount}
-                                columnWidth={columnWidth}
-                                rowCount={pinnedRowCount}
-                                rowHeight={getRowHeight}
-                            />
-                            {enableHeader && <div className={styles.itemTablePinnedHeaderShadow} />}
-                        </div>
-                    )}
-                    {!!pinnedLeftColumnCount && (
-                        <div
-                            className={styles.itemTablePinnedColumnsContainer}
-                            ref={pinnedLeftColumnRef}
-                        >
-                            <Grid
-                                cellComponent={PinnedColumnCell}
-                                cellProps={itemProps}
-                                className={clsx(styles.noScrollbar, styles.height100)}
-                                columnCount={pinnedLeftColumnCount}
-                                columnWidth={columnWidth}
-                                rowCount={totalRowCount}
-                                rowHeight={(index, cellProps) => {
-                                    return getRowHeight(index + pinnedRowCount, cellProps);
-                                }}
-                            />
-                        </div>
-                    )}
-                </div>
-                <div className={styles.itemTablePinnedRowsContainer}>
-                    {!!pinnedRowCount && (
-                        <div
-                            className={clsx(styles.itemTablePinnedRowsGridContainer, {
-                                [styles.withHeader]: enableHeader,
-                            })}
-                            ref={pinnedRowRef}
-                            style={
-                                {
-                                    '--header-height': `${headerHeight}px`,
-                                    minHeight: `${Array.from(
-                                        { length: pinnedRowCount },
-                                        () => 0,
-                                    ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
-                                } as React.CSSProperties
-                            }
-                        >
-                            <Grid
-                                cellComponent={PinnedRowCell}
-                                cellProps={itemProps}
-                                className={styles.noScrollbar}
-                                columnCount={totalColumnCount}
-                                columnWidth={(index, cellProps) => {
-                                    return columnWidth(index + pinnedLeftColumnCount, cellProps);
-                                }}
-                                rowCount={Array.from({ length: pinnedRowCount }, () => 0).length}
-                                rowHeight={getRowHeight}
-                            />
-                            {enableHeader && <div className={styles.itemTablePinnedHeaderShadow} />}
-                        </div>
-                    )}
-                    <div className={styles.itemTableGridContainer} ref={mergedRowRef}>
-                        <Grid
-                            cellComponent={RowCell}
-                            cellProps={itemProps}
-                            className={styles.height100}
-                            columnCount={totalColumnCount}
-                            columnWidth={(index, cellProps) => {
-                                return columnWidth(index + pinnedLeftColumnCount, cellProps);
-                            }}
-                            onCellsRendered={handleOnCellsRendered}
-                            rowCount={totalRowCount}
-                            rowHeight={(index, cellProps) => {
-                                return getRowHeight(index + pinnedRowCount, cellProps);
-                            }}
-                        />
-                        {pinnedLeftColumnCount > 0 && showLeftShadow && (
-                            <div className={styles.itemTableLeftScrollShadow} />
-                        )}
-                        {pinnedRightColumnCount > 0 && showRightShadow && (
-                            <div className={styles.itemTableRightScrollShadow} />
-                        )}
-                    </div>
-                </div>
-                {!!pinnedRightColumnCount && (
-                    <div
-                        className={styles.itemTablePinnedColumnsGridContainer}
-                        style={{
-                            minWidth: `${Array.from(
-                                { length: pinnedRightColumnCount },
-                                () => 0,
-                            ).reduce(
-                                (a, _, i) =>
-                                    a +
-                                    columnWidth(
-                                        i + pinnedLeftColumnCount + totalColumnCount,
-                                        itemProps,
-                                    ),
-                                0,
-                            )}px`,
-                        }}
-                    >
-                        {!!(pinnedRightColumnCount || pinnedRowCount) && (
-                            <div
-                                className={clsx(styles.itemTablePinnedIntersectionGridContainer, {
-                                    [styles.withHeader]: enableHeader,
-                                })}
-                                style={{
-                                    minHeight: `${Array.from(
-                                        { length: pinnedRowCount },
-                                        () => 0,
-                                    ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
-                                }}
-                            >
-                                <Grid
-                                    cellComponent={PinnedRightIntersectionCell}
-                                    cellProps={itemProps}
-                                    className={styles.noScrollbar}
-                                    columnCount={pinnedRightColumnCount}
-                                    columnWidth={(index, cellProps) => {
-                                        return columnWidth(
-                                            index + pinnedLeftColumnCount + totalColumnCount,
-                                            cellProps,
-                                        );
-                                    }}
-                                    rowCount={pinnedRowCount}
-                                    rowHeight={getRowHeight}
-                                />
-                                {enableHeader && (
-                                    <div className={styles.itemTablePinnedHeaderShadow} />
-                                )}
-                            </div>
-                        )}
-                        <div
-                            className={styles.itemTablePinnedRightColumnsContainer}
-                            ref={pinnedRightColumnRef}
-                        >
-                            <Grid
-                                cellComponent={PinnedRightColumnCell}
-                                cellProps={itemProps}
-                                className={clsx(styles.noScrollbar, styles.height100)}
-                                columnCount={pinnedRightColumnCount}
-                                columnWidth={(index, cellProps) => {
-                                    return columnWidth(
-                                        index + pinnedLeftColumnCount + totalColumnCount,
-                                        cellProps,
-                                    );
-                                }}
-                                rowCount={totalRowCount}
-                                rowHeight={(index, cellProps) => {
-                                    return getRowHeight(index + pinnedRowCount, cellProps);
-                                }}
-                            />
-                        </div>
-                    </div>
-                )}
-            </div>
+            <VirtualizedTableGrid
+                calculatedColumnWidths={calculatedColumnWidths}
+                CellComponent={CellComponent}
+                cellPadding={cellPadding}
+                data={data}
+                enableAlternateRowColors={enableAlternateRowColors}
+                enableExpansion={enableExpansion}
+                enableHeader={enableHeader}
+                enableHorizontalBorders={enableHorizontalBorders}
+                enableRowHoverHighlight={enableRowHoverHighlight}
+                enableSelection={enableSelection}
+                enableVerticalBorders={enableVerticalBorders}
+                getRowHeight={getRowHeight}
+                headerHeight={headerHeight}
+                internalState={internalState}
+                itemType={itemType}
+                mergedRowRef={mergedRowRef}
+                onCellsRendered={handleOnCellsRendered}
+                parsedColumns={parsedColumns}
+                pinnedLeftColumnCount={pinnedLeftColumnCount}
+                pinnedLeftColumnRef={pinnedLeftColumnRef}
+                pinnedRightColumnCount={pinnedRightColumnCount}
+                pinnedRightColumnRef={pinnedRightColumnRef}
+                pinnedRowCount={pinnedRowCount}
+                pinnedRowRef={pinnedRowRef}
+                showLeftShadow={showLeftShadow}
+                showRightShadow={showRightShadow}
+                size={size}
+                totalColumnCount={totalColumnCount}
+                totalRowCount={totalRowCount}
+            />
             <AnimatePresence initial={false}>
                 {hasExpanded && (
                     <ExpandedListContainer>
