@@ -45,6 +45,7 @@ export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProp
         const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
             currentPage,
             itemsPerPage,
+            itemType: LibraryItem.SONG,
             listCountQuery,
             listQueryFn,
             query,

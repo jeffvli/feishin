@@ -14,6 +14,25 @@ import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/ev
 import { getServerById } from '/@/renderer/store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
+const getQueryKeyName = (itemType: LibraryItem): string => {
+    switch (itemType) {
+        case LibraryItem.ALBUM:
+            return 'albums';
+        case LibraryItem.ALBUM_ARTIST:
+            return 'albumArtists';
+        case LibraryItem.ARTIST:
+            return 'artists';
+        case LibraryItem.GENRE:
+            return 'genres';
+        case LibraryItem.PLAYLIST:
+            return 'playlists';
+        case LibraryItem.SONG:
+            return 'songs';
+        default:
+            return 'albums';
+    }
+};
+
 interface UseItemListInfiniteLoaderProps {
     eventKey: string;
     itemsPerPage: number;
@@ -110,7 +129,7 @@ export const useItemListInfiniteLoader = ({
 
                     return result.items;
                 },
-                queryKey: queryKeys.albums.list(serverId, queryParams),
+                queryKey: queryKeys[getQueryKeyName(itemType)].list(serverId, queryParams),
                 staleTime: 1000 * 15,
             });
 
@@ -120,7 +139,7 @@ export const useItemListInfiniteLoader = ({
 
             pagesLoaded.current[pageNumber] = true;
         }, 500);
-    }, [itemsPerPage, query, queryClient, serverId, dataQueryKey, listQueryFn]);
+    }, [itemsPerPage, query, queryClient, serverId, dataQueryKey, listQueryFn, itemType]);
 
     const refresh = useCallback(
         async (force?: boolean) => {

@@ -44,6 +44,7 @@ export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProp
         const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
             currentPage,
             itemsPerPage,
+            itemType: LibraryItem.ALBUM,
             listCountQuery,
             listQueryFn,
             query,

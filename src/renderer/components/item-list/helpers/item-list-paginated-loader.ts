@@ -11,11 +11,32 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { getServerById } from '/@/renderer/store';
+import { LibraryItem } from '/@/shared/types/domain-types';
+
+const getQueryKeyName = (itemType: LibraryItem): string => {
+    switch (itemType) {
+        case LibraryItem.ALBUM:
+            return 'albums';
+        case LibraryItem.ALBUM_ARTIST:
+            return 'albumArtists';
+        case LibraryItem.ARTIST:
+            return 'artists';
+        case LibraryItem.GENRE:
+            return 'genres';
+        case LibraryItem.PLAYLIST:
+            return 'playlists';
+        case LibraryItem.SONG:
+            return 'songs';
+        default:
+            return 'albums'; // fallback
+    }
+};
 
 interface UseItemListPaginatedLoaderProps {
     currentPage: number;
     eventKey?: string;
     itemsPerPage: number;
+    itemType: LibraryItem;
     listCountQuery: UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
     listQueryFn: (args: { apiClientProps: any; query: any }) => Promise<{ items: unknown[] }>;
     query: Record<string, any>;
@@ -30,6 +51,7 @@ export const useItemListPaginatedLoader = ({
     currentPage,
     eventKey,
     itemsPerPage = 100,
+    itemType,
     listCountQuery,
     listQueryFn,
     query = {},
@@ -73,7 +95,7 @@ export const useItemListPaginatedLoader = ({
 
             return result.items;
         },
-        queryKey: queryKeys.albums.list(serverId, queryParams),
+        queryKey: queryKeys[getQueryKeyName(itemType)].list(serverId, queryParams),
         staleTime: 1000 * 15,
     });
 
@@ -84,7 +106,7 @@ export const useItemListPaginatedLoader = ({
     const updateItems = useCallback(
         (indexes: number[], value: object) => {
             return queryClient.setQueryData(
-                queryKeys.albums.list(serverId, queryParams),
+                queryKeys[getQueryKeyName(itemType)].list(serverId, queryParams),
                 (prev: undefined | unknown[]) => {
                     if (!prev) {
                         return prev;
@@ -107,7 +129,7 @@ export const useItemListPaginatedLoader = ({
                 },
             );
         },
-        [queryClient, queryParams, serverId],
+        [queryClient, queryParams, serverId, itemType],
     );
 
     useEffect(() => {
