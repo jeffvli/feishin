@@ -21,6 +21,7 @@ import styles from './item-table-list.module.css';
 import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded-list-container';
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import {
+    ItemListItem,
     ItemListStateActions,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
@@ -46,6 +47,7 @@ interface VirtualizedTableGridProps {
     itemType: LibraryItem;
     mergedRowRef: React.Ref<HTMLDivElement>;
     onCellsRendered?: GridProps<TableItemProps>['onCellsRendered'];
+    onRowClick?: (item: any, event: React.MouseEvent<HTMLDivElement>) => void;
     parsedColumns: ReturnType<typeof parseTableColumns>;
     pinnedLeftColumnCount: number;
     pinnedLeftColumnRef: React.RefObject<HTMLDivElement>;
@@ -79,6 +81,7 @@ const VirtualizedTableGrid = React.memo(
         itemType,
         mergedRowRef,
         onCellsRendered,
+        onRowClick,
         parsedColumns,
         pinnedLeftColumnCount,
         pinnedLeftColumnRef,
@@ -112,6 +115,7 @@ const VirtualizedTableGrid = React.memo(
                 getRowHeight,
                 internalState,
                 itemType,
+                onRowClick,
                 size,
             }),
             [
@@ -128,6 +132,7 @@ const VirtualizedTableGrid = React.memo(
                 getRowHeight,
                 internalState,
                 itemType,
+                onRowClick,
                 size,
             ],
         );
@@ -390,6 +395,7 @@ export interface TableItemProps {
     getRowHeight: (index: number, cellProps: TableItemProps) => number;
     internalState: ItemListStateActions;
     itemType: ItemTableListProps['itemType'];
+    onRowClick?: (item: any, event: React.MouseEvent<HTMLDivElement>) => void;
     size?: ItemTableListProps['size'];
 }
 
@@ -894,6 +900,119 @@ export const ItemTableList = ({
 
     const hasExpanded = internalState.hasExpanded();
 
+    const handleRowClick = useCallback(
+        (item: any, event: React.MouseEvent<HTMLDivElement>) => {
+            if (!enableSelection || !item) {
+                return;
+            }
+
+            const itemListItem: ItemListItem = {
+                id: item.id,
+                itemType,
+                serverId: item.serverId,
+            };
+
+            // Check if ctrl/cmd key is held for multi-selection
+            if (event.ctrlKey || event.metaKey) {
+                const isCurrentlySelected = internalState.isSelected(item.id);
+
+                if (isCurrentlySelected) {
+                    // Remove this item from selection
+                    const currentSelected = internalState.getSelected();
+                    const filteredSelected = currentSelected.filter(
+                        (selectedItem) => selectedItem.id !== item.id,
+                    );
+                    internalState.setSelected(filteredSelected);
+                } else {
+                    // Add this item to selection
+                    const currentSelected = internalState.getSelected();
+                    const newSelected = [...currentSelected, itemListItem];
+                    internalState.setSelected(newSelected);
+                }
+            }
+            // Check if shift key is held for range selection
+            else if (event.shiftKey) {
+                const selectedItems = internalState.getSelected();
+                const lastSelectedItem = selectedItems[selectedItems.length - 1];
+
+                if (lastSelectedItem) {
+                    // Find the indices of the last selected item and current item
+                    const lastIndex = data.findIndex(
+                        (d) =>
+                            d && typeof d === 'object' && 'id' in d && d.id === lastSelectedItem.id,
+                    );
+                    const currentIndex = data.findIndex(
+                        (d) => d && typeof d === 'object' && 'id' in d && d.id === item.id,
+                    );
+
+                    if (lastIndex !== -1 && currentIndex !== -1) {
+                        // Create range selection
+                        const startIndex = Math.min(lastIndex, currentIndex);
+                        const endIndex = Math.max(lastIndex, currentIndex);
+
+                        const rangeItems: ItemListItem[] = [];
+                        for (let i = startIndex; i <= endIndex; i++) {
+                            const rangeItem = data[i];
+                            if (
+                                rangeItem &&
+                                typeof rangeItem === 'object' &&
+                                'id' in rangeItem &&
+                                'serverId' in rangeItem
+                            ) {
+                                rangeItems.push({
+                                    id: (rangeItem as any).id,
+                                    itemType,
+                                    serverId: (rangeItem as any).serverId,
+                                });
+                            }
+                        }
+
+                        // Toggle selection for the range
+                        const isCurrentlySelected = internalState.isSelected(item.id);
+
+                        if (isCurrentlySelected) {
+                            // Deselect the range
+                            const currentSelected = internalState.getSelected();
+                            const filteredSelected = currentSelected.filter(
+                                (selectedItem) =>
+                                    !rangeItems.some(
+                                        (rangeItem) => rangeItem.id === selectedItem.id,
+                                    ),
+                            );
+                            internalState.setSelected(filteredSelected);
+                        } else {
+                            // Select the range
+                            const currentSelected = internalState.getSelected();
+                            const newSelected = [...currentSelected];
+                            rangeItems.forEach((rangeItem) => {
+                                if (!newSelected.some((selected) => selected.id === rangeItem.id)) {
+                                    newSelected.push(rangeItem);
+                                }
+                            });
+                            internalState.setSelected(newSelected);
+                        }
+                    }
+                } else {
+                    // No previous selection, just toggle this item
+                    internalState.toggleSelected(itemListItem);
+                }
+            } else {
+                // Regular click - deselect all others and select only this item
+                // If this item is already the only selected item, deselect it
+                const selectedItems = internalState.getSelected();
+                const isOnlySelected =
+                    selectedItems.length === 1 && selectedItems[0].id === item.id;
+
+                if (isOnlySelected) {
+                    internalState.clearSelected();
+                } else {
+                    internalState.setSelected([itemListItem]);
+                }
+            }
+        },
+        [data, enableSelection, internalState, itemType],
+    );
+
     const handleOnCellsRendered = useCallback(
         (cells: {
             columnStartIndex: number;
@@ -1007,6 +1126,7 @@ export const ItemTableList = ({
                 itemType={itemType}
                 mergedRowRef={mergedRowRef}
                 onCellsRendered={handleOnCellsRendered}
+                onRowClick={handleRowClick}
                 parsedColumns={parsedColumns}
                 pinnedLeftColumnCount={pinnedLeftColumnCount}
                 pinnedLeftColumnRef={pinnedLeftColumnRef}

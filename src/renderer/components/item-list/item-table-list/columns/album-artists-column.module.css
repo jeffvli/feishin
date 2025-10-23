@@ -13,6 +13,7 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     color: var(--theme-colors-foreground-muted);
+    user-select: none;
 }
 
 .artists-container.compact {

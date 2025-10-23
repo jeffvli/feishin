@@ -3,8 +3,8 @@
     overflow: hidden;
     -webkit-line-clamp: 2;
     color: var(--theme-colors-foreground-muted);
-    user-select: none;
     -webkit-box-orient: vertical;
+    user-select: none;
 }
 
 .genres-container.compact {

@@ -1,3 +1,5 @@
+import { MouseEvent } from 'react';
+
 import {
     ItemListItem,
     ItemListStateActions,
@@ -10,7 +12,26 @@ const handleItemClick = (
     itemType: LibraryItem,
     internalState: ItemListStateActions,
 ) => {
-    console.log('handleItemClick', item, itemType, internalState);
+    if (!item) {
+        return;
+    }
+
+    const itemListItem: ItemListItem = {
+        id: item.id,
+        itemType,
+        serverId: item.serverId,
+    };
+
+    // Regular click - deselect all others and select only this item
+    // If this item is already the only selected item, deselect it
+    const selectedItems = internalState.getSelected();
+    const isOnlySelected = selectedItems.length === 1 && selectedItems[0].id === item.id;
+
+    if (isOnlySelected) {
+        internalState.clearSelected();
+    } else {
+        internalState.setSelected([itemListItem]);
+    }
 };
 
 const handleItemDoubleClick = (

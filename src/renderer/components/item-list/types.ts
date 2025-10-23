@@ -78,6 +78,7 @@ export interface ItemListTableComponentProps<TQuery> extends ItemListComponentPr
     enableAlternateRowColors?: boolean;
     enableHorizontalBorders?: boolean;
     enableRowHoverHighlight?: boolean;
+    enableSelection?: boolean;
     enableVerticalBorders?: boolean;
     size?: 'compact' | 'default';
 }

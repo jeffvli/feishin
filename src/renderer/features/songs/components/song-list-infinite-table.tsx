@@ -20,6 +20,7 @@ export const SongListInfiniteTable = forwardRef<any, SongListInfiniteTableProps>
             enableAlternateRowColors = false,
             enableHorizontalBorders = false,
             enableRowHoverHighlight = true,
+            enableSelection = true,
             enableVerticalBorders = false,
             itemsPerPage = 100,
             query = {
@@ -61,6 +62,7 @@ export const SongListInfiniteTable = forwardRef<any, SongListInfiniteTableProps>
                 enableAlternateRowColors={enableAlternateRowColors}
                 enableHorizontalBorders={enableHorizontalBorders}
                 enableRowHoverHighlight={enableRowHoverHighlight}
+                enableSelection={enableSelection}
                 enableVerticalBorders={enableVerticalBorders}
                 initialTop={{
                     to: scrollOffset ?? 0,

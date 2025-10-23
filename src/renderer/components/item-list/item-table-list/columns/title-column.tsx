@@ -36,6 +36,7 @@ export const TitleColumn = (props: ItemTableListInnerColumn) => {
                         [styles.large]: props.size === 'large',
                         [styles.nameContainer]: true,
                     })}
+                    isNoSelect
                     {...titleLinkProps}
                 >
                     {row}

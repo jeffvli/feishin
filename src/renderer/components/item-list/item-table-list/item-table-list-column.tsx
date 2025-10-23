@@ -47,8 +47,13 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
     const isHeaderEnabled = !!props.enableHeader;
 
     const controls: ItemControls = {
-        onClick: (item, itemType) =>
-            itemListControls.handleItemClick(item, itemType, props.internalState),
+        onClick: (item, itemType, event) => {
+            if (props.onRowClick && item) {
+                props.onRowClick(item, event);
+            } else {
+                itemListControls.handleItemClick(item, itemType, props.internalState);
+            }
+        },
         onDoubleClick: (item, itemType) =>
             itemListControls.handleItemDoubleClick(item, itemType, props.internalState),
         onFavorite: (item, itemType) =>
@@ -158,8 +163,13 @@ export const TableColumnTextContainer = (
     },
 ) => {
     const containerRef = useRef<HTMLDivElement>(null);
-    const isDataRow = props.enableHeader && props.rowIndex > 0;
-    const dataIndex = isDataRow ? props.rowIndex - 1 : props.rowIndex;
+    const isDataRow = props.enableHeader ? props.rowIndex > 0 : true;
+    const dataIndex = props.enableHeader ? props.rowIndex - 1 : props.rowIndex;
+    const item = isDataRow ? props.data[props.rowIndex] : null;
+    const isSelected =
+        item && typeof item === 'object' && 'id' in item
+            ? props.internalState.isSelected((item as any).id)
+            : false;
 
     useEffect(() => {
         if (!isDataRow || !containerRef.current) return;
@@ -188,6 +198,22 @@ export const TableColumnTextContainer = (
         };
     }, [isDataRow, props.rowIndex, props.enableRowHoverHighlight]);
 
+    const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        // Don't trigger row selection if clicking on interactive elements
+        const target = event.target as HTMLElement;
+        const isInteractiveElement = target.closest(
+            'button, a, input, select, textarea, [role="button"]',
+        );
+
+        if (isInteractiveElement) {
+            return;
+        }
+
+        if (isDataRow && item && props.enableSelection) {
+            props.controls.onClick?.(item as any, props.itemType, event);
+        }
+    };
+
     return (
         <div
             className={clsx(styles.container, props.containerClassName, {
@@ -207,11 +233,13 @@ export const TableColumnTextContainer = (
                 [styles.paddingXs]: props.cellPadding === 'xs',
                 [styles.right]: props.columns[props.columnIndex].align === 'end',
                 [styles.rowHoverHighlightEnabled]: isDataRow && props.enableRowHoverHighlight,
+                [styles.rowSelected]: isDataRow && isSelected,
                 [styles.withHorizontalBorder]:
                     props.enableHorizontalBorders && props.enableHeader && props.rowIndex > 0,
                 [styles.withVerticalBorder]: props.enableVerticalBorders,
             })}
             data-row-index={isDataRow ? props.rowIndex : undefined}
+            onClick={handleCellClick}
             ref={containerRef}
             style={props.style}
         >
@@ -239,8 +267,13 @@ export const TableColumnContainer = (
     },
 ) => {
     const containerRef = useRef<HTMLDivElement>(null);
-    const isDataRow = props.enableHeader && props.rowIndex > 0;
-    const dataIndex = isDataRow ? props.rowIndex - 1 : props.rowIndex;
+    const isDataRow = props.enableHeader ? props.rowIndex > 0 : true;
+    const dataIndex = props.enableHeader ? props.rowIndex - 1 : props.rowIndex;
+    const item = isDataRow ? props.data[props.rowIndex] : null;
+    const isSelected =
+        item && typeof item === 'object' && 'id' in item
+            ? props.internalState.isSelected((item as any).id)
+            : false;
 
     useEffect(() => {
         if (!isDataRow || !containerRef.current) return;
@@ -269,6 +302,22 @@ export const TableColumnContainer = (
         };
     }, [isDataRow, props.rowIndex, props.enableRowHoverHighlight]);
 
+    const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        // Don't trigger row selection if clicking on interactive elements
+        const target = event.target as HTMLElement;
+        const isInteractiveElement = target.closest(
+            'button, a, input, select, textarea, [role="button"]',
+        );
+
+        if (isInteractiveElement) {
+            return;
+        }
+
+        if (isDataRow && item && props.enableSelection) {
+            props.controls.onClick?.(item as any, props.itemType, event);
+        }
+    };
+
     return (
         <div
             className={clsx(styles.container, props.className, {
@@ -288,11 +337,13 @@ export const TableColumnContainer = (
                 [styles.paddingXs]: props.cellPadding === 'xs',
                 [styles.right]: props.columns[props.columnIndex].align === 'end',
                 [styles.rowHoverHighlightEnabled]: isDataRow && props.enableRowHoverHighlight,
+                [styles.rowSelected]: isDataRow && isSelected,
                 [styles.withHorizontalBorder]:
                     props.enableHorizontalBorders && props.enableHeader && props.rowIndex > 0,
                 [styles.withVerticalBorder]: props.enableVerticalBorders,
             })}
             data-row-index={isDataRow ? props.rowIndex : undefined}
+            onClick={handleCellClick}
             ref={containerRef}
             style={{ ...props.containerStyle, ...props.style }}
         >

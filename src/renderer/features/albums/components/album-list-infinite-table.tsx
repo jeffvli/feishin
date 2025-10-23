@@ -25,6 +25,7 @@ export const AlbumListInfiniteTable = forwardRef<any, AlbumListInfiniteTableProp
             enableAlternateRowColors = false,
             enableHorizontalBorders = false,
             enableRowHoverHighlight = true,
+            enableSelection = true,
             enableVerticalBorders = false,
             itemsPerPage = 100,
             query = {
@@ -66,6 +67,7 @@ export const AlbumListInfiniteTable = forwardRef<any, AlbumListInfiniteTableProp
                 enableAlternateRowColors={enableAlternateRowColors}
                 enableHorizontalBorders={enableHorizontalBorders}
                 enableRowHoverHighlight={enableRowHoverHighlight}
+                enableSelection={enableSelection}
                 enableVerticalBorders={enableVerticalBorders}
                 initialTop={{
                     to: scrollOffset ?? 0,

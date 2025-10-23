@@ -21,6 +21,7 @@ export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProp
             enableAlternateRowColors = false,
             enableHorizontalBorders = false,
             enableRowHoverHighlight = true,
+            enableSelection = true,
             enableVerticalBorders = false,
             itemsPerPage = 100,
             query = {
@@ -71,6 +72,7 @@ export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProp
                     enableAlternateRowColors={enableAlternateRowColors}
                     enableHorizontalBorders={enableHorizontalBorders}
                     enableRowHoverHighlight={enableRowHoverHighlight}
+                    enableSelection={enableSelection}
                     enableVerticalBorders={enableVerticalBorders}
                     initialTop={{
                         to: scrollOffset ?? 0,
