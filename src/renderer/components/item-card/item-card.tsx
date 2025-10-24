@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
-import { Dispatch, Fragment, memo, ReactNode, SetStateAction, useState } from 'react';
+import { Fragment, memo, ReactNode, useState } from 'react';
 import { generatePath, Link } from 'react-router';
 
 import styles from './item-card.module.css';
@@ -44,8 +44,6 @@ export const ItemCard = ({
     type = 'poster',
     withControls,
 }: ItemCardProps) => {
-    const [showControls, setShowControls] = useState(false);
-
     const imageUrl = getImageUrl(data);
     const rows = getDataRows(itemType);
 
@@ -59,8 +57,6 @@ export const ItemCard = ({
                     isRound={isRound}
                     itemType={itemType}
                     rows={rows}
-                    setShowControls={setShowControls}
-                    showControls={showControls}
                     withControls={withControls}
                 />
             );
@@ -73,8 +69,6 @@ export const ItemCard = ({
                     isRound={isRound}
                     itemType={itemType}
                     rows={rows}
-                    setShowControls={setShowControls}
-                    showControls={showControls}
                     withControls={withControls}
                 />
             );
@@ -88,8 +82,6 @@ export const ItemCard = ({
                     isRound={isRound}
                     itemType={itemType}
                     rows={rows}
-                    setShowControls={setShowControls}
-                    showControls={showControls}
                     withControls={withControls}
                 />
             );
@@ -100,8 +92,6 @@ export interface ItemCardDerivativeProps extends Omit<ItemCardProps, 'type'> {
     controls: ItemControls;
     imageUrl: string | undefined;
     rows: DataRow[];
-    setShowControls: Dispatch<SetStateAction<boolean>>;
-    showControls: boolean;
 }
 
 const CompactItemCard = ({
@@ -111,10 +101,10 @@ const CompactItemCard = ({
     isRound,
     itemType,
     rows,
-    setShowControls,
-    showControls,
     withControls,
 }: ItemCardDerivativeProps) => {
+    const [showControls, setShowControls] = useState(false);
+
     if (data) {
         return (
             <div className={clsx(styles.container, styles.compact)}>
@@ -170,10 +160,10 @@ const DefaultItemCard = ({
     isRound,
     itemType,
     rows,
-    setShowControls,
-    showControls,
     withControls,
 }: ItemCardDerivativeProps) => {
+    const [showControls, setShowControls] = useState(false);
+
     if (data) {
         return (
             <div className={clsx(styles.container)}>
@@ -229,10 +219,10 @@ const PosterItemCard = ({
     isRound,
     itemType,
     rows,
-    setShowControls,
-    showControls,
     withControls,
 }: ItemCardDerivativeProps) => {
+    const [showControls, setShowControls] = useState(false);
+
     if (data) {
         return (
             <div className={clsx(styles.container, styles.poster)}>
@@ -246,16 +236,14 @@ const PosterItemCard = ({
                         className={clsx(styles.image, { [styles.isRound]: isRound })}
                         src={imageUrl}
                     />
-                    <AnimatePresence>
-                        {withControls && showControls && (
-                            <ItemCardControls
-                                controls={controls}
-                                item={data}
-                                itemType={itemType}
-                                type="poster"
-                            />
-                        )}
-                    </AnimatePresence>
+                    {withControls && showControls && (
+                        <ItemCardControls
+                            controls={controls}
+                            item={data}
+                            itemType={itemType}
+                            type="poster"
+                        />
+                    )}
                 </div>
                 <div className={styles.detailContainer}>
                     {rows.map((row) => (
@@ -273,7 +261,9 @@ const PosterItemCard = ({
             </div>
             <div className={styles.detailContainer}>
                 {rows.map((row) => (
-                    <ItemCardRow data={undefined} key={row.id} row={row} type="poster" />
+                    <div className={styles.row} key={row.id}>
+                        &nbsp;
+                    </div>
                 ))}
             </div>
         </div>

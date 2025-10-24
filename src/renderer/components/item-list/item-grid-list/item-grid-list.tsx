@@ -6,6 +6,8 @@ import { AnimatePresence } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import React, {
     CSSProperties,
+    memo,
+    ReactNode,
     Ref,
     UIEvent,
     useCallback,
@@ -28,7 +30,7 @@ import {
     ItemListStateActions,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
-import { ItemListHandle } from '/@/renderer/components/item-list/types';
+import { ItemControls, ItemListHandle } from '/@/renderer/components/item-list/types';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface VirtualizedGridListProps {
@@ -61,40 +63,69 @@ const VirtualizedGridList = React.memo(
         onScroll,
         tableMeta,
     }: VirtualizedGridListProps) => {
-        const elements = useMemo(() => {
-            if (!tableMeta) {
-                return [];
-            }
-
-            return data
-                .map((d, i) => {
-                    return {
-                        data: d,
-                        index: i,
-                    };
-                })
-                .reduce(
-                    (acc, d) => {
-                        if (d.index % (tableMeta?.columnCount || 0) === 0) {
-                            acc.push([]);
-                        }
-                        const prev = acc[acc.length - 1];
-                        prev.push(d);
-                        return acc;
+        const itemProps: GridItemProps = useMemo(() => {
+            return {
+                columns: tableMeta?.columnCount || 0,
+                controls: {
+                    onClick: enableSelection
+                        ? (item, itemType) => {
+                              return itemListControls.handleItemClick(
+                                  item,
+                                  itemType,
+                                  internalState,
+                              );
+                          }
+                        : undefined,
+                    onDoubleClick: (item, itemType) => {
+                        return itemListControls.handleItemDoubleClick(
+                            item,
+                            itemType,
+                            internalState,
+                        );
                     },
-                    [] as { data: any; index: number }[][],
-                );
-        }, [tableMeta, data]);
-
-        const itemProps: GridItemProps = {
-            columns: tableMeta?.columnCount || 0,
-            data: elements,
+                    onFavorite: (item, itemType) => {
+                        return itemListControls.handleItemFavorite(item, itemType, internalState);
+                    },
+                    onItemExpand: enableExpansion
+                        ? (item, itemType) => {
+                              return itemListControls.handleItemExpand(
+                                  item,
+                                  itemType,
+                                  internalState,
+                              );
+                          }
+                        : undefined,
+                    onMore: (item, itemType) => {
+                        return itemListControls.handleItemMore(item, itemType, internalState);
+                    },
+                    onPlay: (item, itemType, playType) => {
+                        return itemListControls.handleItemPlay(
+                            item,
+                            itemType,
+                            playType,
+                            internalState,
+                        );
+                    },
+                    onRating: (item, itemType) => {
+                        return itemListControls.handleItemRating(item, itemType, internalState);
+                    },
+                },
+                data,
+                enableExpansion,
+                enableSelection,
+                gap,
+                internalState,
+                itemType,
+            };
+        }, [
+            data,
+            tableMeta?.columnCount,
             enableExpansion,
             enableSelection,
             gap,
             internalState,
             itemType,
-        };
+        ]);
 
         return (
             <List
@@ -112,7 +143,6 @@ const VirtualizedGridList = React.memo(
 
 VirtualizedGridList.displayName = 'VirtualizedGridList';
 
-// Throttled function moved outside component for better performance
 const createThrottledSetTableMeta = (itemsPerRow?: number) => {
     return throttle(
         (
@@ -170,6 +200,7 @@ const createThrottledSetTableMeta = (itemsPerRow?: number) => {
 
 export interface GridItemProps {
     columns: number;
+    controls: ItemControls;
     data: any[];
     enableExpansion?: boolean;
     enableSelection?: boolean;
@@ -427,88 +458,45 @@ export const ItemGridList = ({
     );
 };
 
-const ListComponent = ({
-    columns,
-    data,
-    enableExpansion,
-    enableSelection,
-    gap,
-    index,
-    internalState,
-    itemType,
-    style,
-}: RowComponentProps<GridItemProps>) => {
-    return (
-        <div className={styles.itemList} style={style}>
-            {data[index].map((d) => (
+const ListComponent = memo(
+    ({
+        columns,
+        controls,
+        data,
+        gap,
+        index,
+        itemType,
+        style,
+    }: RowComponentProps<GridItemProps>) => {
+        const items: ReactNode[] = [];
+        const itemCount = data.length;
+        const startIndex = index * columns;
+        const stopIndex = Math.min(itemCount - 1, startIndex + columns - 1);
+
+        const columnCountInRow = stopIndex - startIndex + 1;
+
+        let columnCountToAdd = 0;
+
+        if (columnCountInRow !== columns) {
+            columnCountToAdd = columns - columnCountInRow;
+        }
+
+        for (let i = startIndex; i <= stopIndex + columnCountToAdd; i += 1) {
+            items.push(
                 <div
                     className={clsx(styles.itemRow, styles[`gap-${gap}`])}
-                    key={d.index}
+                    key={`card-${i}-${index}`}
                     style={{ '--columns': columns } as CSSProperties}
                 >
-                    <ItemCard
-                        controls={{
-                            onClick: enableSelection
-                                ? (item, itemType) => {
-                                      return itemListControls.handleItemClick(
-                                          item,
-                                          itemType,
-                                          internalState,
-                                      );
-                                  }
-                                : undefined,
-                            onDoubleClick: (item, itemType) => {
-                                return itemListControls.handleItemDoubleClick(
-                                    item,
-                                    itemType,
-                                    internalState,
-                                );
-                            },
-                            onFavorite: (item, itemType) => {
-                                return itemListControls.handleItemFavorite(
-                                    item,
-                                    itemType,
-                                    internalState,
-                                );
-                            },
-                            onItemExpand: enableExpansion
-                                ? (item, itemType) => {
-                                      return itemListControls.handleItemExpand(
-                                          item,
-                                          itemType,
-                                          internalState,
-                                      );
-                                  }
-                                : undefined,
-                            onMore: (item, itemType) => {
-                                return itemListControls.handleItemMore(
-                                    item,
-                                    itemType,
-                                    internalState,
-                                );
-                            },
-                            onPlay: (item, itemType, playType) => {
-                                return itemListControls.handleItemPlay(
-                                    item,
-                                    itemType,
-                                    playType,
-                                    internalState,
-                                );
-                            },
-                            onRating: (item, itemType) => {
-                                return itemListControls.handleItemRating(
-                                    item,
-                                    itemType,
-                                    internalState,
-                                );
-                            },
-                        }}
-                        data={d.data}
-                        itemType={itemType}
-                        withControls
-                    />
-                </div>
-            ))}
-        </div>
-    );
-};
+                    <ItemCard controls={controls} data={data[i]} itemType={itemType} withControls />
+                </div>,
+            );
+        }
+
+        return (
+            <div className={styles.itemList} style={style}>
+                {items}
+            </div>
+        );
+    },
+);
