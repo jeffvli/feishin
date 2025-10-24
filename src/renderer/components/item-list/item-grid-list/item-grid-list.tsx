@@ -265,7 +265,16 @@ export const ItemGridList = ({
         [onScrollEnd],
     );
 
-    const debouncedOnScrollEnd = debounce(handleOnScrollEnd, 150);
+    const debouncedOnScrollEnd = useMemo(
+        () => debounce(handleOnScrollEnd, 150),
+        [handleOnScrollEnd],
+    );
+
+    useEffect(() => {
+        return () => {
+            debouncedOnScrollEnd.cancel();
+        };
+    }, [debouncedOnScrollEnd]);
 
     const handleScroll = useCallback(
         (e: UIEvent<HTMLDivElement>) => {
