@@ -2,8 +2,10 @@
 <component type="desktop-application">
   <id>org.jeffvli.feishin</id>
   <name>Feishin</name>
-  <summary>Jellyfin, Navidrome, and OpenSubsonic Compatable Music Player</summary>
+  <summary>Jellyfin, Navidrome, and OpenSubsonic Compatible Music Player</summary>
+  <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-only</project_license>
+  <content_rating type="oars-1.1"/>
   <description>
     <p>A modern, cross-platform music player for Jellyfin, Navidrome, and OpenSubsonic servers.</p>
     <p>Features</p>
@@ -26,12 +28,15 @@
   <url type="homepage">https://github.com/jeffvli/feishin</url>
   <screenshots>
     <screenshot type="default">
+      <caption>The main menu</caption>
       <image type="source">https://raw.githubusercontent.com/jeffvli/feishin/development/media/preview_home.png</image>
     </screenshot>
     <screenshot>
+      <caption>Browsing an album</caption>
       <image type="source">https://raw.githubusercontent.com/jeffvli/feishin/development/media/preview_album_detail.png</image>
     </screenshot>
     <screenshot>
+      <caption>Smart playlist creation</caption>
       <image type="source">https://raw.githubusercontent.com/jeffvli/feishin/development/media/preview_smart_playlist.png</image>
     </screenshot>
   </screenshots>
@@ -86,5 +91,4 @@
     <release date="2022-12-30" type="development" version="0.0.1-alpha2"></release>
     <release date="2022-11-21" type="development" version="0.0.1-alpha1"></release>
   </releases>
-  <content_rating type="oars-1.1"></content_rating>
 </component>
