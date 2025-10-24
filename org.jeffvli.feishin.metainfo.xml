@@ -40,6 +40,12 @@
       <image type="source">https://raw.githubusercontent.com/jeffvli/feishin/development/media/preview_smart_playlist.png</image>
     </screenshot>
   </screenshots>
+  <categories>
+    <category>AudioVideo</category>
+    <category>Audio</category>
+    <category>Player</category>
+    <category>Music</category>
+  </categories>
   <releases>
     <release date="2025-10-13" type="stable" version="0.21.2"></release>
     <release date="2025-10-13" type="stable" version="0.21.1"></release>
