@@ -295,6 +295,10 @@ async function createWindow(first = true): Promise<void> {
         ...(nativeFrame && isWindows() && nativeFrameConfig.windows),
     });
 
+    if (process.platform === 'win32') {
+        app.setAppUserModelId(app.name);
+    }
+
     // From https://github.com/electron/electron/issues/526#issuecomment-1663959513
     const bounds = store.get('bounds') as Rectangle | undefined;
     if (bounds) {
