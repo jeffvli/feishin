@@ -268,6 +268,7 @@ export const useScrobble = () => {
                 }
             } else {
                 const isLastTrackInQueue = usePlayerStore.getState().actions.checkIsLastTrack();
+                const isFisrtTrackInQueue = usePlayerStore.getState().actions.checkIsFirstTrack();
                 const previousTimeSec = previous[1];
 
                 // If not already scrobbled, send a 'submission' scrobble if conditions are met
@@ -275,8 +276,12 @@ export const useScrobble = () => {
                     scrobbleAtDurationMs: (scrobbleSettings?.scrobbleAtDuration ?? 0) * 1000,
                     scrobbleAtPercentage: scrobbleSettings?.scrobbleAtPercentage,
                     // If scrobbling the last song in the queue, use the previous time instead of the current time since otherwise time value will be 0
+                    // Note that if the queue has one item (both first and last), use the elapsed time, as this will otherwise result
+                    // in duplicate scrobbles in tandem with handleScrobbleFromSongChange
                     songCompletedDurationMs:
-                        (isLastTrackInQueue ? previousTimeSec : currentTimeSec) * 1000,
+                        (isLastTrackInQueue && !isFisrtTrackInQueue
+                            ? previousTimeSec
+                            : currentTimeSec) * 1000,
                     songDurationMs: currentSong.duration,
                 });
 
