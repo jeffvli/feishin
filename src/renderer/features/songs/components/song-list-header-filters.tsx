@@ -135,6 +135,11 @@ const FILTERS = {
         },
         {
             defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.explicitStatus', { postProcess: 'titleCase' }),
+            value: SongListSort.EXPLICIT_STATUS,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
             name: i18n.t('filter.isFavorited', { postProcess: 'titleCase' }),
             value: SongListSort.FAVORITED,
         },

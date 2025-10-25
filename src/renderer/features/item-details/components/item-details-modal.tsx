@@ -128,6 +128,11 @@ const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
     },
     { key: 'releaseYear', label: 'filter.releaseYear' },
     { key: 'songCount', label: 'filter.songCount' },
+    {
+        label: 'filter.explicitStatus',
+        render: (album) =>
+            album.explicitStatus === 1 ? 'Explicit' : album.explicitStatus === 2 ? 'Clean' : null,
+    },
     { label: 'filter.isCompilation', render: (album) => BoolField(album.isCompilation || false) },
     {
         key: 'size',
@@ -266,6 +271,11 @@ const SongPropertyMapping: ItemDetailRow<Song>[] = [
     { key: 'discNumber', label: 'common.disc' },
     { key: 'trackNumber', label: 'common.trackNumber' },
     { key: 'releaseYear', label: 'filter.releaseYear' },
+    {
+        label: 'filter.explicitStatus',
+        render: (song) =>
+            song.explicitStatus === 1 ? 'Explicit' : song.explicitStatus === 2 ? 'Clean' : null,
+    },
     { label: 'entity.genre_other', render: FormatGenre },
     {
         label: 'common.duration',

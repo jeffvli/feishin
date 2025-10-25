@@ -104,6 +104,11 @@ const FILTERS = {
         },
         {
             defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.explicitStatus', { postProcess: 'titleCase' }),
+            value: AlbumListSort.EXPLICIT_STATUS,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
             name: i18n.t('filter.mostPlayed', { postProcess: 'titleCase' }),
             value: AlbumListSort.PLAY_COUNT,
         },

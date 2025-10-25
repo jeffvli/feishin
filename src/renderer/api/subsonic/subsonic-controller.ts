@@ -34,6 +34,7 @@ const ALBUM_LIST_SORT_MAPPING: Record<AlbumListSort, AlbumListSortType | undefin
     [AlbumListSort.COMMUNITY_RATING]: undefined,
     [AlbumListSort.CRITIC_RATING]: undefined,
     [AlbumListSort.DURATION]: undefined,
+    [AlbumListSort.EXPLICIT_STATUS]: undefined,
     [AlbumListSort.FAVORITED]: AlbumListSortType.STARRED,
     [AlbumListSort.NAME]: AlbumListSortType.ALPHABETICAL_BY_NAME,
     [AlbumListSort.PLAY_COUNT]: AlbumListSortType.FREQUENT,

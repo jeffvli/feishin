@@ -24,6 +24,7 @@
         }
     },
     "common": {
+        "explicitStatus": "explicit status",
         "action_one": "action",
         "action_other": "actions",
         "add": "add",
@@ -227,7 +228,8 @@
         "songCount": "song count",
         "title": "title",
         "toYear": "to year",
-        "trackNumber": "track"
+        "trackNumber": "track",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "form": {
         "addServer": {
