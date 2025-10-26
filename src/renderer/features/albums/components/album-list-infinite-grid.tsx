@@ -56,15 +56,11 @@ export const AlbumListInfiniteGrid = forwardRef<any, AlbumListInfiniteGridProps>
             <ItemGridList
                 data={data}
                 gap={gap}
-                initialTop={{
-                    to: scrollOffset ?? 0,
-                    type: 'offset',
-                }}
+                initialTop={scrollOffset ?? 0}
                 itemsPerRow={itemsPerRow}
                 itemType={LibraryItem.ALBUM}
                 onRangeChanged={onRangeChanged}
                 onScrollEnd={handleOnScrollEnd}
-                ref={ref}
             />
         );
     },

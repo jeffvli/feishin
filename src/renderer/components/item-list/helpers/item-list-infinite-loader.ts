@@ -4,7 +4,6 @@ import {
     useSuspenseQuery,
     UseSuspenseQueryOptions,
 } from '@tanstack/react-query';
-import throttle from 'lodash/throttle';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -35,35 +34,39 @@ const getQueryKeyName = (itemType: LibraryItem): string => {
 
 interface UseItemListInfiniteLoaderProps {
     eventKey: string;
+    fetchThreshold?: number;
     itemsPerPage: number;
     itemType: LibraryItem;
     listCountQuery: UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
     listQueryFn: (args: { apiClientProps: any; query: any }) => Promise<{ items: unknown[] }>;
+    maxPagesToFetch?: number;
     query: Record<string, any>;
     serverId: string;
 }
 
 function getInitialData(itemCount: number) {
-    return Array.from({ length: itemCount }, () => undefined);
+    return {
+        data: Array.from({ length: itemCount }, () => undefined),
+        pagesLoaded: {},
+    };
 }
 
 export const useItemListInfiniteLoader = ({
     eventKey,
+    fetchThreshold = 0.75,
     itemsPerPage = 100,
     itemType,
     listCountQuery,
     listQueryFn,
+    maxPagesToFetch = 2,
     query = {},
     serverId,
 }: UseItemListInfiniteLoaderProps) => {
     const queryClient = useQueryClient();
 
-    const currentPageRef = useRef(0);
-
     const scrollStateRef = useRef<ScrollState>({
         direction: 'unknown',
-        lastRange: null,
-        lastScrollTime: 0,
+        lastStartIndex: null,
     });
 
     const { data: totalItemCount } = useSuspenseQuery<number, any, number, any>(listCountQuery);
@@ -78,19 +81,23 @@ export const useItemListInfiniteLoader = ({
         setItemCount(totalItemCount);
     }, [setItemCount, totalItemCount]);
 
-    const pagesLoaded = useRef<Record<string, boolean>>({});
-
-    // Reset the loaded pages when the query changes
-    useEffect(() => {
-        pagesLoaded.current = {};
-    }, [query]);
-
     const dataQueryKey = useMemo(
         () => [serverId, 'item-list-infinite-loader', itemType, query],
         [serverId, itemType, query],
     );
 
-    const { data } = useQuery<unknown[]>({
+    // Reset the loaded pages when the query changes
+    useEffect(() => {
+        queryClient.setQueryData(dataQueryKey, (oldData: any) => {
+            if (!oldData) return oldData;
+            return {
+                ...oldData,
+                pagesLoaded: {},
+            };
+        });
+    }, [query, queryClient, dataQueryKey]);
+
+    const { data } = useQuery<{ data: unknown[]; pagesLoaded: Record<string, boolean> }>({
         enabled: false,
         initialData: getInitialData(totalItemCount),
         queryFn: () => {
@@ -100,82 +107,135 @@ export const useItemListInfiniteLoader = ({
     });
 
     const onRangeChanged = useMemo(() => {
-        return throttle(async (range: { endIndex: number; startIndex: number }) => {
-            const fetchRange = getFetchRange(range, scrollStateRef, itemsPerPage);
-            const startIndex = fetchRange.startIndex;
-            const endIndex = fetchRange.startIndex + fetchRange.limit;
+        return async (range: { startIndex: number; stopIndex: number }) => {
+            const fetchRange = getFetchRange(
+                range,
+                scrollStateRef,
+                itemsPerPage,
+                maxPagesToFetch,
+                fetchThreshold,
+            );
 
-            const pageNumber = Math.floor(startIndex / itemsPerPage);
+            // Filter out pages that are already loaded
+            const pagesToFetch = fetchRange.pagesToFetch.filter(
+                (pageNumber) => !data.pagesLoaded[pageNumber],
+            );
 
-            if (pagesLoaded.current[pageNumber]) {
+            if (pagesToFetch.length === 0) {
                 return;
             }
 
-            currentPageRef.current = pageNumber;
+            // Create fetch promises for all pages
+            const fetchPromises = pagesToFetch.map(async (pageNumber) => {
+                const startIndex = pageNumber * itemsPerPage;
+                const queryParams = {
+                    limit: itemsPerPage,
+                    startIndex,
+                    ...query,
+                };
 
-            const queryParams = {
-                limit: fetchRange.limit,
-                startIndex: fetchRange.startIndex,
-                ...query,
-            };
+                const result = await queryClient.ensureQueryData({
+                    gcTime: 1000 * 15,
+                    queryFn: async ({ signal }) => {
+                        const result = await listQueryFn({
+                            apiClientProps: { server: getServerById(serverId), signal },
+                            query: queryParams,
+                        });
 
-            const result = await queryClient.ensureQueryData({
-                gcTime: 1000 * 15,
-                queryFn: async ({ signal }) => {
-                    const result = await listQueryFn({
-                        apiClientProps: { server: getServerById(serverId), signal },
-                        query: queryParams,
+                        return result.items;
+                    },
+                    queryKey: queryKeys[getQueryKeyName(itemType)].list(serverId, queryParams),
+                    staleTime: 1000 * 15,
+                });
+
+                return {
+                    data: result,
+                    endIndex: startIndex + itemsPerPage,
+                    pageNumber,
+                    startIndex,
+                };
+            });
+
+            // Wait for all pages to be fetched
+            const pageResults = await Promise.all(fetchPromises);
+
+            // Update the query data with all fetched pages
+            queryClient.setQueryData(
+                dataQueryKey,
+                (oldData: { data: unknown[]; pagesLoaded: Record<string, boolean> }) => {
+                    let newData = [...oldData.data];
+                    const newPagesLoaded = { ...oldData.pagesLoaded };
+
+                    // Update data for each fetched page
+                    pageResults.forEach(({ data: pageData, endIndex, pageNumber, startIndex }) => {
+                        newData = [
+                            ...newData.slice(0, startIndex),
+                            ...pageData,
+                            ...newData.slice(endIndex),
+                        ];
+                        newPagesLoaded[pageNumber] = true;
                     });
 
-                    return result.items;
+                    return {
+                        data: newData,
+                        pagesLoaded: newPagesLoaded,
+                    };
                 },
-                queryKey: queryKeys[getQueryKeyName(itemType)].list(serverId, queryParams),
-                staleTime: 1000 * 15,
-            });
-
-            queryClient.setQueryData(dataQueryKey, (oldData: unknown[]) => {
-                return [...oldData.slice(0, startIndex), ...result, ...oldData.slice(endIndex)];
-            });
-
-            pagesLoaded.current[pageNumber] = true;
-        }, 500);
-    }, [itemsPerPage, query, queryClient, serverId, dataQueryKey, listQueryFn, itemType]);
+            );
+        };
+    }, [
+        itemsPerPage,
+        query,
+        queryClient,
+        serverId,
+        dataQueryKey,
+        listQueryFn,
+        itemType,
+        data,
+        maxPagesToFetch,
+        fetchThreshold,
+    ]);
 
     const refresh = useCallback(
         async (force?: boolean) => {
             await queryClient.invalidateQueries();
-            pagesLoaded.current = {};
 
             if (force) {
                 await queryClient.setQueryData(dataQueryKey, getInitialData(totalItemCount));
             }
 
-            await onRangeChanged({
-                endIndex: currentPageRef.current * itemsPerPage,
-                startIndex: currentPageRef.current * itemsPerPage,
-            });
+            // await onRangeChanged({
+            //     endIndex: currentPageRef.current * itemsPerPage,
+            //     startIndex: currentPageRef.current * itemsPerPage,
+            // });
         },
-        [itemsPerPage, onRangeChanged, queryClient, totalItemCount, dataQueryKey],
+        [queryClient, totalItemCount, dataQueryKey],
     );
 
     const updateItems = useCallback(
         (indexes: number[], value: object) => {
-            queryClient.setQueryData(dataQueryKey, (prev: unknown[]) => {
-                return prev.map((item: any, index) => {
-                    if (!item) {
-                        return item;
-                    }
-
-                    if (!indexes.includes(index)) {
-                        return item;
-                    }
-
+            queryClient.setQueryData(
+                dataQueryKey,
+                (prev: { data: unknown[]; pagesLoaded: Record<string, boolean> }) => {
                     return {
-                        ...item,
-                        ...value,
+                        ...prev,
+                        data: prev.data.map((item: any, index) => {
+                            if (!item) {
+                                return item;
+                            }
+
+                            if (!indexes.includes(index)) {
+                                return item;
+                            }
+
+                            return {
+                                ...item,
+                                ...value,
+                            };
+                        }),
                     };
-                });
-            });
+                },
+            );
         },
         [queryClient, dataQueryKey],
     );
@@ -198,7 +258,7 @@ export const useItemListInfiniteLoader = ({
 
     useEffect(() => {
         const handleFavorite = (payload: UserFavoriteEventPayload) => {
-            const idToIndexMap = data
+            const idToIndexMap = data.data
                 .filter(Boolean)
                 .reduce((acc: Record<string, number>, item: any, index: number) => {
                     acc[item.id] = index;
@@ -215,7 +275,7 @@ export const useItemListInfiniteLoader = ({
         };
 
         const handleRating = (payload: UserRatingEventPayload) => {
-            const idToIndexMap = data
+            const idToIndexMap = data.data
                 .filter(Boolean)
                 .reduce((acc: Record<string, number>, item: any, index: number) => {
                     acc[item.id] = index;
@@ -240,7 +300,7 @@ export const useItemListInfiniteLoader = ({
         };
     }, [data, eventKey, updateItems]);
 
-    return { data, onRangeChanged, refresh, updateItems };
+    return { data: data.data, onRangeChanged, refresh, updateItems };
 };
 
 export const parseListCountQuery = (query: any) => {
@@ -253,46 +313,79 @@ export const parseListCountQuery = (query: any) => {
 
 interface ScrollState {
     direction: 'down' | 'unknown' | 'up';
-    lastRange: null | { endIndex: number; startIndex: number };
-    lastScrollTime: number;
+    lastStartIndex: null | number;
 }
 
 const getFetchRange = (
-    range: { endIndex: number; startIndex: number },
+    range: { startIndex: number; stopIndex: number },
     scrollState: React.MutableRefObject<ScrollState>,
     itemsPerPage: number,
+    maxPagesToFetch: number,
+    fetchThreshold: number,
 ) => {
-    const currentTime = Date.now();
-    const { lastRange } = scrollState.current;
+    const { lastStartIndex } = scrollState.current;
 
     // Determine scroll direction
-    let newDirection: 'down' | 'unknown' | 'up' = 'unknown';
-    if (lastRange) {
-        if (range.startIndex < lastRange.startIndex) {
+    let newDirection: 'down' | 'unknown' | 'up' = scrollState.current.direction;
+    if (lastStartIndex !== null) {
+        if (range.startIndex < lastStartIndex) {
             newDirection = 'up';
-        } else if (range.startIndex > lastRange.startIndex) {
+        } else if (range.startIndex > lastStartIndex) {
             newDirection = 'down';
         }
     }
 
     scrollState.current = {
         direction: newDirection,
-        lastRange: { ...range },
-        lastScrollTime: currentTime,
+        lastStartIndex: range.startIndex,
     };
 
-    let pageIndex = 0;
+    // Calculate threshold distance
+    const thresholdDistance = Math.floor(itemsPerPage * fetchThreshold);
+
+    // Determine which pages to fetch based on scroll direction and threshold
+    let pagesToFetch: number[] = [];
+
     if (newDirection === 'down') {
-        pageIndex = Math.floor(range.endIndex / itemsPerPage);
+        const currentPage = Math.floor(range.stopIndex / itemsPerPage);
+        const distanceFromNextPage = (currentPage + 1) * itemsPerPage - range.stopIndex;
+
+        // Always include the current page if it's not loaded
+        pagesToFetch.push(currentPage);
+
+        // If we're close to the next page boundary, fetch additional upcoming pages
+        if (distanceFromNextPage <= thresholdDistance && maxPagesToFetch > 1) {
+            for (let i = 1; i < maxPagesToFetch; i++) {
+                pagesToFetch.push(currentPage + i);
+            }
+        }
     } else if (newDirection === 'up') {
-        pageIndex = Math.floor(range.startIndex / itemsPerPage);
+        const currentPage = Math.floor(range.startIndex / itemsPerPage);
+        const distanceFromPrevPage = range.startIndex - currentPage * itemsPerPage;
+
+        // Always include the current page if it's not loaded
+        pagesToFetch.push(currentPage);
+
+        // If we're close to the previous page boundary, fetch additional previous pages
+        if (distanceFromPrevPage <= thresholdDistance && maxPagesToFetch > 1) {
+            for (let i = 1; i < maxPagesToFetch; i++) {
+                pagesToFetch.push(currentPage - i);
+            }
+        }
     } else {
-        pageIndex = Math.floor(range.endIndex / itemsPerPage);
+        // Unknown direction - fetch current page and next pages
+        const currentPage = Math.floor(range.stopIndex / itemsPerPage);
+        for (let i = 0; i < maxPagesToFetch; i++) {
+            pagesToFetch.push(currentPage + i);
+        }
     }
+
+    // Filter out negative page numbers
+    pagesToFetch = pagesToFetch.filter((page) => page >= 0);
 
     return {
         direction: newDirection,
-        limit: itemsPerPage,
-        startIndex: pageIndex * itemsPerPage,
+        pagesToFetch,
+        thresholdDistance,
     };
 };

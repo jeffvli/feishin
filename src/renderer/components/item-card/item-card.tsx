@@ -106,12 +106,29 @@ const CompactItemCard = ({
     const [showControls, setShowControls] = useState(false);
 
     if (data) {
+        const handleMouseEnter = () => {
+            if (withControls) {
+                setShowControls(true);
+            }
+        };
+
+        const handleMouseLeave = () => {
+            if (withControls) {
+                setShowControls(false);
+            }
+        };
+
+        const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+            controls?.onClick?.(data, itemType, e);
+        };
+
         return (
             <div className={clsx(styles.container, styles.compact)}>
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onMouseEnter={() => withControls && setShowControls(true)}
-                    onMouseLeave={() => withControls && setShowControls(false)}
+                    onClick={handleClick}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                 >
                     <Image
                         className={clsx(styles.image, { [styles.isRound]: isRound })}
@@ -140,7 +157,7 @@ const CompactItemCard = ({
     return (
         <div className={clsx(styles.container, styles.compact)}>
             <div className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}>
-                <Skeleton className={styles.image} />
+                <Skeleton className={styles.image} enableAnimation />
                 <div className={clsx(styles.detailContainer, styles.compact)}>
                     {rows.map((row) => (
                         <div className={styles.row} key={row.id}>
@@ -165,12 +182,29 @@ const DefaultItemCard = ({
     const [showControls, setShowControls] = useState(false);
 
     if (data) {
+        const handleMouseEnter = () => {
+            if (withControls) {
+                setShowControls(true);
+            }
+        };
+
+        const handleMouseLeave = () => {
+            if (withControls) {
+                setShowControls(false);
+            }
+        };
+
+        const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+            controls?.onClick?.(data, itemType, e);
+        };
+
         return (
             <div className={clsx(styles.container)}>
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onMouseEnter={() => withControls && setShowControls(true)}
-                    onMouseLeave={() => withControls && setShowControls(false)}
+                    onClick={handleClick}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                 >
                     <Image
                         className={clsx(styles.image, { [styles.isRound]: isRound })}
@@ -199,7 +233,7 @@ const DefaultItemCard = ({
     return (
         <div className={clsx(styles.container)}>
             <div className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}>
-                <Skeleton className={styles.image} />
+                <Skeleton className={styles.image} enableAnimation />
             </div>
             <div className={styles.detailContainer}>
                 {rows.map((row) => (
@@ -224,19 +258,35 @@ const PosterItemCard = ({
     const [showControls, setShowControls] = useState(false);
 
     if (data) {
+        const handleMouseEnter = () => {
+            if (withControls) {
+                setShowControls(true);
+            }
+        };
+
+        const handleMouseLeave = () => {
+            if (withControls) {
+                setShowControls(false);
+            }
+        };
+
+        const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+            controls?.onClick?.(data, itemType, e);
+        };
+
         return (
             <div className={clsx(styles.container, styles.poster)}>
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onClick={(e) => controls?.onClick?.(data, itemType, e)}
-                    onMouseEnter={() => withControls && setShowControls(true)}
-                    onMouseLeave={() => withControls && setShowControls(false)}
+                    onClick={handleClick}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
                 >
                     <Image
                         className={clsx(styles.image, { [styles.isRound]: isRound })}
                         src={imageUrl}
                     />
-                    {withControls && showControls && (
+                    {withControls && showControls && data && (
                         <ItemCardControls
                             controls={controls}
                             item={data}
@@ -245,11 +295,13 @@ const PosterItemCard = ({
                         />
                     )}
                 </div>
-                <div className={styles.detailContainer}>
-                    {rows.map((row) => (
-                        <ItemCardRow data={data!} key={row.id} row={row} type="poster" />
-                    ))}
-                </div>
+                {data && (
+                    <div className={styles.detailContainer}>
+                        {rows.map((row) => (
+                            <ItemCardRow data={data} key={row.id} row={row} type="poster" />
+                        ))}
+                    </div>
+                )}
             </div>
         );
     }
@@ -257,7 +309,10 @@ const PosterItemCard = ({
     return (
         <div className={clsx(styles.container, styles.poster)}>
             <div className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}>
-                <Skeleton className={clsx(styles.image, { [styles.isRound]: isRound })} />
+                <Skeleton
+                    className={clsx(styles.image, { [styles.isRound]: isRound })}
+                    enableAnimation
+                />
             </div>
             <div className={styles.detailContainer}>
                 {rows.map((row) => (

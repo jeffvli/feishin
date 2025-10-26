@@ -1,4 +1,4 @@
-import { useCallback, useReducer } from 'react';
+import { useCallback, useMemo, useReducer } from 'react';
 
 import { itemGridSelectors } from '/@/renderer/components/item-list/helpers/item-list-reducer-utils';
 import { LibraryItem } from '/@/shared/types/domain-types';
@@ -242,22 +242,42 @@ export const useItemListState = (): ItemListStateActions => {
         return itemGridSelectors.hasAnySelected(state);
     }, [state]);
 
-    return {
-        clearAll,
-        clearExpanded,
-        clearSelected,
-        getExpanded,
-        getExpandedIds,
-        getSelected,
-        getSelectedIds,
-        getVersion,
-        hasExpanded,
-        hasSelected,
-        isExpanded,
-        isSelected,
-        setExpanded,
-        setSelected,
-        toggleExpanded,
-        toggleSelected,
-    };
+    return useMemo(
+        () => ({
+            clearAll,
+            clearExpanded,
+            clearSelected,
+            getExpanded,
+            getExpandedIds,
+            getSelected,
+            getSelectedIds,
+            getVersion,
+            hasExpanded,
+            hasSelected,
+            isExpanded,
+            isSelected,
+            setExpanded,
+            setSelected,
+            toggleExpanded,
+            toggleSelected,
+        }),
+        [
+            clearAll,
+            clearExpanded,
+            clearSelected,
+            getExpanded,
+            getExpandedIds,
+            getSelected,
+            getSelectedIds,
+            getVersion,
+            hasExpanded,
+            hasSelected,
+            isExpanded,
+            isSelected,
+            setExpanded,
+            setSelected,
+            toggleExpanded,
+            toggleSelected,
+        ],
+    );
 };

@@ -8,17 +8,21 @@ import React, {
     CSSProperties,
     memo,
     ReactNode,
-    Ref,
-    UIEvent,
+    RefObject,
     useCallback,
     useEffect,
-    useImperativeHandle,
     useLayoutEffect,
     useMemo,
     useRef,
     useState,
 } from 'react';
-import { List, RowComponentProps, useListRef } from 'react-window-v2';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import {
+    FixedSizeList,
+    ListChildComponentProps,
+    ListOnItemsRenderedProps,
+    ListOnScrollProps,
+} from 'react-window';
 
 import { ExpandedListContainer } from '../expanded-list-container';
 import styles from './item-grid-list.module.css';
@@ -38,11 +42,14 @@ interface VirtualizedGridListProps {
     enableExpansion: boolean;
     enableSelection: boolean;
     gap: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
+    initialTop?: ItemGridListProps['initialTop'];
     internalState: ItemListStateActions;
-    itemGridRef: React.RefObject<any>;
     itemType: LibraryItem;
-    onRowsRendered: (visibleRows: { startIndex: number; stopIndex: number }) => void;
-    onScroll: (e: UIEvent<HTMLDivElement>) => void;
+    onRangeChanged?: ItemGridListProps['onRangeChanged'];
+    onScroll?: ItemGridListProps['onScroll'];
+    onScrollEnd?: ItemGridListProps['onScrollEnd'];
+    outerRef: RefObject<any>;
+    ref: RefObject<FixedSizeList<GridItemProps>>;
     tableMeta: null | {
         columnCount: number;
         itemHeight: number;
@@ -56,14 +63,17 @@ const VirtualizedGridList = React.memo(
         enableExpansion,
         enableSelection,
         gap,
+        initialTop,
         internalState,
-        itemGridRef,
         itemType,
-        onRowsRendered,
+        onRangeChanged,
         onScroll,
+        onScrollEnd,
+        outerRef,
+        ref,
         tableMeta,
     }: VirtualizedGridListProps) => {
-        const itemProps: GridItemProps = useMemo(() => {
+        const itemData: GridItemProps = useMemo(() => {
             return {
                 columns: tableMeta?.columnCount || 0,
                 controls: {
@@ -116,27 +126,71 @@ const VirtualizedGridList = React.memo(
                 gap,
                 internalState,
                 itemType,
+                tableMeta,
             };
-        }, [
-            data,
-            tableMeta?.columnCount,
-            enableExpansion,
-            enableSelection,
-            gap,
-            internalState,
-            itemType,
-        ]);
+        }, [enableSelection, enableExpansion, internalState, tableMeta, data, itemType, gap]);
+
+        const handleOnRangeChanged = useCallback(
+            ({ visibleStartIndex, visibleStopIndex }: ListOnItemsRenderedProps) => {
+                onRangeChanged?.({
+                    startIndex: visibleStartIndex * (tableMeta?.columnCount || 0),
+                    stopIndex: visibleStopIndex * (tableMeta?.columnCount || 0),
+                });
+            },
+            [tableMeta?.columnCount, onRangeChanged],
+        );
+
+        const debouncedOnScrollEnd = useMemo(
+            () =>
+                onScrollEnd
+                    ? debounce((scrollOffset: number, direction: 'down' | 'up') => {
+                          onScrollEnd(scrollOffset, direction);
+                      }, 100)
+                    : undefined,
+            [onScrollEnd],
+        );
+
+        useEffect(() => {
+            return () => {
+                debouncedOnScrollEnd?.cancel();
+            };
+        }, [debouncedOnScrollEnd]);
+
+        const handleOnScroll = useCallback(
+            ({ scrollDirection, scrollOffset }: ListOnScrollProps) => {
+                onScroll?.(scrollOffset, scrollDirection === 'forward' ? 'down' : 'up');
+                debouncedOnScrollEnd?.(scrollOffset, scrollDirection === 'forward' ? 'down' : 'up');
+            },
+            [onScroll, debouncedOnScrollEnd],
+        );
+
+        if (!tableMeta) {
+            return null;
+        }
 
         return (
-            <List
-                listRef={itemGridRef}
-                onRowsRendered={onRowsRendered}
-                onScroll={onScroll}
-                rowComponent={ListComponent}
-                rowCount={tableMeta?.rowCount || 0}
-                rowHeight={tableMeta?.itemHeight || 0}
-                rowProps={itemProps}
-            />
+            <div className={styles.autoSizerContainer}>
+                <AutoSizer>
+                    {({ height, width }) => {
+                        return (
+                            <FixedSizeList
+                                height={height}
+                                initialScrollOffset={initialTop || 0}
+                                itemCount={itemData.tableMeta?.rowCount || 0}
+                                itemData={itemData}
+                                itemSize={itemData.tableMeta?.itemHeight || 0}
+                                onItemsRendered={handleOnRangeChanged}
+                                onScroll={handleOnScroll}
+                                outerRef={outerRef}
+                                ref={ref}
+                                width={width}
+                            >
+                                {ListComponent}
+                            </FixedSizeList>
+                        );
+                    }}
+                </AutoSizer>
+            </div>
         );
     },
 );
@@ -207,6 +261,11 @@ export interface GridItemProps {
     gap: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     internalState: ItemListStateActions;
     itemType: LibraryItem;
+    tableMeta: null | {
+        columnCount: number;
+        itemHeight: number;
+        rowCount: number;
+    };
 }
 
 export interface ItemGridListProps {
@@ -215,23 +274,16 @@ export interface ItemGridListProps {
     enableExpansion?: boolean;
     enableSelection?: boolean;
     gap?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
-    initialTop?: {
-        behavior?: 'auto' | 'smooth';
-        to: number;
-        type: 'index' | 'offset';
-    };
+    initialTop?: number;
     itemsPerRow?: number;
     itemType: LibraryItem;
-    onEndReached?: (index: number, handle: ItemListHandle) => void;
-    onRangeChanged?: (range: { endIndex: number; startIndex: number }) => void;
-    onScroll?: (e: UIEvent<HTMLDivElement>) => void;
-    onScrollEnd?: (offset: number, handle: ItemListHandle) => void;
-    onStartReached?: (index: number, handle: ItemListHandle) => void;
-    ref?: Ref<ItemListHandle>;
+    onRangeChanged?: (range: { startIndex: number; stopIndex: number }) => void;
+    onScroll?: (offset: number, direction: 'down' | 'up') => void;
+    onScrollEnd?: (offset: number, direction: 'down' | 'up') => void;
+    ref?: RefObject<ItemListHandle>;
 }
 
 export const ItemGridList = ({
-    currentPage,
     data,
     enableExpansion = true,
     enableSelection = true,
@@ -239,17 +291,16 @@ export const ItemGridList = ({
     initialTop,
     itemsPerRow,
     itemType,
-    onEndReached,
     onRangeChanged,
     onScroll,
     onScrollEnd,
-    onStartReached,
     ref,
 }: ItemGridListProps) => {
-    const itemGridRef = useListRef(null);
-    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+    const rootRef = useRef(null);
+    const outerRef = useRef(null);
+    const listRef = useRef<FixedSizeList<GridItemProps>>(null);
     const { ref: containerRef, width: containerWidth } = useElementSize();
-    const mergedContainerRef = useMergedRef(containerRef, scrollContainerRef);
+    const mergedContainerRef = useMergedRef(containerRef, rootRef);
 
     const internalState = useItemListState();
 
@@ -275,58 +326,20 @@ export const ItemGridList = ({
     });
 
     useEffect(() => {
-        const { current: root } = scrollContainerRef;
+        const { current: root } = rootRef;
+        const { current: outer } = outerRef;
 
-        if (root) {
+        if (root && outer) {
             initialize({
-                elements: { viewport: root.firstElementChild as HTMLElement },
+                elements: {
+                    viewport: outer,
+                },
                 target: root,
             });
         }
-    }, [itemGridRef, initialize]);
-
-    const isInitialScrollPositionSet = useRef<boolean>(false);
+    }, [initialize]);
 
     const hasExpanded = internalState.hasExpanded();
-
-    const handleOnScrollEnd = useCallback(
-        (scrollTop: number, handle: ItemListHandle) => {
-            onScrollEnd?.(scrollTop, handle);
-        },
-        [onScrollEnd],
-    );
-
-    const debouncedOnScrollEnd = useMemo(
-        () => debounce(handleOnScrollEnd, 150),
-        [handleOnScrollEnd],
-    );
-
-    useEffect(() => {
-        return () => {
-            debouncedOnScrollEnd.cancel();
-        };
-    }, [debouncedOnScrollEnd]);
-
-    const handleScroll = useCallback(
-        (e: UIEvent<HTMLDivElement>) => {
-            onScroll?.(e);
-            debouncedOnScrollEnd(
-                e.currentTarget.scrollTop,
-                itemGridRef.current ?? (undefined as any),
-            );
-        },
-        [onScroll, debouncedOnScrollEnd, itemGridRef],
-    );
-
-    const scrollToGridOffset = useCallback((offset: number) => {
-        const scrollContainer = scrollContainerRef.current?.firstElementChild as
-            | HTMLElement
-            | undefined;
-
-        if (scrollContainer) {
-            scrollContainer.scrollTo({ behavior: 'instant', top: offset });
-        }
-    }, []);
 
     const [tableMeta, setTableMeta] = useState<null | {
         columnCount: number;
@@ -334,7 +347,6 @@ export const ItemGridList = ({
         rowCount: number;
     }>(null);
 
-    // Use throttled function created outside component for better performance
     const throttledSetTableMeta = useMemo(() => {
         return createThrottledSetTableMeta(itemsPerRow);
     }, [itemsPerRow]);
@@ -342,92 +354,6 @@ export const ItemGridList = ({
     useLayoutEffect(() => {
         throttledSetTableMeta(containerWidth, data.length, itemType, setTableMeta);
     }, [containerWidth, data.length, itemType, throttledSetTableMeta]);
-
-    const handleOnRowsRendered = useCallback(
-        (visibleRows: { startIndex: number; stopIndex: number }) => {
-            onRangeChanged?.({
-                endIndex: visibleRows.stopIndex * (tableMeta?.columnCount || 0),
-                startIndex: visibleRows.startIndex * (tableMeta?.columnCount || 0),
-            });
-
-            if (onStartReached || onEndReached) {
-                const totalRows = Math.ceil(data.length / (tableMeta?.columnCount || 0));
-                const startRow = visibleRows.startIndex;
-                const endRow = visibleRows.stopIndex;
-
-                if (startRow === 0) {
-                    onStartReached?.(startRow, itemGridRef.current ?? (undefined as any));
-                }
-                if (endRow >= totalRows) {
-                    onEndReached?.(endRow, itemGridRef.current ?? (undefined as any));
-                }
-            }
-        },
-        [
-            onRangeChanged,
-            tableMeta?.columnCount,
-            onStartReached,
-            onEndReached,
-            data.length,
-            itemGridRef,
-        ],
-    );
-
-    // Scroll to top when currentPage changes
-    useEffect(() => {
-        if (currentPage !== undefined && tableMeta?.itemHeight) {
-            scrollToGridOffset(0);
-        }
-    }, [currentPage, scrollToGridOffset, tableMeta?.itemHeight]);
-
-    useEffect(() => {
-        if (!initialTop || isInitialScrollPositionSet.current || !tableMeta?.itemHeight) return;
-
-        // Only set initial scroll position if we haven't done it yet AND we're not on a page change
-        // This prevents the initial scroll position from being restored on every page change
-        if (currentPage !== undefined && currentPage > 0) {
-            isInitialScrollPositionSet.current = true;
-            return;
-        }
-
-        isInitialScrollPositionSet.current = true;
-
-        if (initialTop.type === 'offset') {
-            scrollToGridOffset(initialTop.to);
-        } else {
-            itemGridRef.current?.scrollToRow({
-                behavior: initialTop.behavior,
-                index: initialTop.to,
-            });
-        }
-    }, [initialTop, itemGridRef, scrollToGridOffset, tableMeta?.itemHeight, currentPage]);
-
-    const imperativeHandle: ItemListHandle = useMemo(() => {
-        return {
-            clearExpanded: () => {
-                internalState.clearExpanded();
-            },
-            clearSelected: () => {
-                internalState.clearSelected();
-            },
-            getItem: (index: number) => data[index],
-            getItemCount: () => data.length,
-            getItems: () => data,
-            internalState,
-            scrollToIndex: (index: number) => {
-                itemGridRef.current?.scrollToRow({
-                    align: 'smart',
-                    behavior: 'auto',
-                    index: Math.floor(index / (tableMeta?.columnCount || 1)),
-                });
-            },
-            scrollToOffset: (offset: number) => {
-                scrollToGridOffset(offset);
-            },
-        };
-    }, [data, internalState, scrollToGridOffset, tableMeta?.columnCount, itemGridRef]);
-
-    useImperativeHandle(ref, () => imperativeHandle);
 
     return (
         <div
@@ -440,11 +366,14 @@ export const ItemGridList = ({
                 enableExpansion={enableExpansion}
                 enableSelection={enableSelection}
                 gap={gap}
+                initialTop={initialTop}
                 internalState={internalState}
-                itemGridRef={itemGridRef}
                 itemType={itemType}
-                onRowsRendered={handleOnRowsRendered}
-                onScroll={handleScroll}
+                onRangeChanged={onRangeChanged}
+                onScroll={onScroll ?? (() => {})}
+                onScrollEnd={onScrollEnd ?? (() => {})}
+                outerRef={outerRef}
+                ref={listRef}
                 tableMeta={tableMeta}
             />
             <AnimatePresence>
@@ -458,45 +387,38 @@ export const ItemGridList = ({
     );
 };
 
-const ListComponent = memo(
-    ({
-        columns,
-        controls,
-        data,
-        gap,
-        index,
-        itemType,
-        style,
-    }: RowComponentProps<GridItemProps>) => {
-        const items: ReactNode[] = [];
-        const itemCount = data.length;
-        const startIndex = index * columns;
-        const stopIndex = Math.min(itemCount - 1, startIndex + columns - 1);
+const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
+    const { index, style } = props;
+    const { columns, controls, data, gap, itemType } = props.data;
 
-        const columnCountInRow = stopIndex - startIndex + 1;
+    const items: ReactNode[] = [];
+    const itemCount = data.length;
+    const startIndex = index * columns;
+    const stopIndex = Math.min(itemCount - 1, startIndex + columns - 1);
 
-        let columnCountToAdd = 0;
+    const columnCountInRow = stopIndex - startIndex + 1;
 
-        if (columnCountInRow !== columns) {
-            columnCountToAdd = columns - columnCountInRow;
-        }
+    let columnCountToAdd = 0;
 
-        for (let i = startIndex; i <= stopIndex + columnCountToAdd; i += 1) {
-            items.push(
-                <div
-                    className={clsx(styles.itemRow, styles[`gap-${gap}`])}
-                    key={`card-${i}-${index}`}
-                    style={{ '--columns': columns } as CSSProperties}
-                >
-                    <ItemCard controls={controls} data={data[i]} itemType={itemType} withControls />
-                </div>,
-            );
-        }
+    if (columnCountInRow !== columns) {
+        columnCountToAdd = columns - columnCountInRow;
+    }
 
-        return (
-            <div className={styles.itemList} style={style}>
-                {items}
-            </div>
+    for (let i = startIndex; i <= stopIndex + columnCountToAdd; i += 1) {
+        items.push(
+            <div
+                className={clsx(styles.itemRow, styles[`gap-${gap}`])}
+                key={`card-${i}-${index}`}
+                style={{ '--columns': columns } as CSSProperties}
+            >
+                <ItemCard controls={controls} data={data[i]} itemType={itemType} withControls />
+            </div>,
         );
-    },
-);
+    }
+
+    return (
+        <div className={styles.itemList} style={style}>
+            {items}
+        </div>
+    );
+});

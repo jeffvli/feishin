@@ -57,7 +57,7 @@ export const ItemCardControls = ({
             <PlayButton
                 onClick={(e) => {
                     e.stopPropagation();
-                    controls.onPlay?.(item, itemType, Play.NOW, e);
+                    controls?.onPlay?.(item, itemType, Play.NOW, e);
                 }}
             />
             <SecondaryPlayButton
@@ -65,7 +65,7 @@ export const ItemCardControls = ({
                 icon="mediaPlayNext"
                 onClick={(e) => {
                     e.stopPropagation();
-                    controls.onPlay?.(item, itemType, Play.NEXT, e);
+                    controls?.onPlay?.(item, itemType, Play.NEXT, e);
                 }}
             />
             <SecondaryPlayButton
@@ -73,7 +73,7 @@ export const ItemCardControls = ({
                 icon="mediaPlayLast"
                 onClick={(e) => {
                     e.stopPropagation();
-                    controls.onPlay?.(item, itemType, Play.LAST, e);
+                    controls?.onPlay?.(item, itemType, Play.LAST, e);
                 }}
             />
             <SecondaryButton
@@ -81,7 +81,7 @@ export const ItemCardControls = ({
                 icon="favorite"
                 onClick={(e) => {
                     e.stopPropagation();
-                    controls.onFavorite?.(item, itemType, e);
+                    controls?.onFavorite?.(item, itemType, e);
                 }}
             />
             <Rating className={styles.rating} size="xs" />
@@ -90,16 +90,16 @@ export const ItemCardControls = ({
                 icon="ellipsisHorizontal"
                 onClick={(e) => {
                     e.stopPropagation();
-                    controls.onMore?.(item, itemType, e);
+                    controls?.onMore?.(item, itemType, e);
                 }}
             />
-            {controls.onItemExpand && (
+            {controls?.onItemExpand && (
                 <SecondaryButton
                     className={styles.expand}
                     icon="arrowDownS"
                     onClick={(e) => {
                         e.stopPropagation();
-                        controls.onItemExpand?.(item, itemType, e);
+                        controls?.onItemExpand?.(item, itemType, e);
                     }}
                 />
             )}
