@@ -85,6 +85,9 @@ export const SongListGridView = ({ gridRef, itemCount }: SongListGridViewProps) 
             case SongListSort.DURATION:
                 rows.push(SONG_CARD_ROWS.duration);
                 break;
+            case SongListSort.EXPLICIT_STATUS:
+                rows.push(SONG_CARD_ROWS.explicitStatus);
+                break;
             case SongListSort.FAVORITED:
                 break;
             case SongListSort.NAME:

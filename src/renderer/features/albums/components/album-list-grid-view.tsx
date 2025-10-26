@@ -58,6 +58,10 @@ export const AlbumListGridView = ({ gridRef, itemCount }: any) => {
                 rows.push(ALBUM_CARD_ROWS.albumArtists);
                 rows.push(ALBUM_CARD_ROWS.duration);
                 break;
+            case AlbumListSort.EXPLICIT_STATUS:
+                rows.push(ALBUM_CARD_ROWS.albumArtists);
+                rows.push(ALBUM_CARD_ROWS.explicitStatus);
+                break;
             case AlbumListSort.FAVORITED:
                 rows.push(ALBUM_CARD_ROWS.albumArtists);
                 rows.push(ALBUM_CARD_ROWS.releaseYear);

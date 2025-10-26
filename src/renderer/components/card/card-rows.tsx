@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import formatDuration from 'format-duration';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router';
 import { Link } from 'react-router-dom';
 
@@ -9,7 +10,14 @@ import styles from './card-rows.module.css';
 import { AppRoute } from '/@/renderer/router/routes';
 import { formatDateAbsolute, formatDateRelative, formatRating } from '/@/renderer/utils/format';
 import { Text } from '/@/shared/components/text/text';
-import { Album, AlbumArtist, Artist, Playlist, Song } from '/@/shared/types/domain-types';
+import {
+    Album,
+    AlbumArtist,
+    Artist,
+    ExplicitStatus,
+    Playlist,
+    Song,
+} from '/@/shared/types/domain-types';
 import { CardRow } from '/@/shared/types/types';
 
 interface CardRowsProps {
@@ -18,6 +26,8 @@ interface CardRowsProps {
 }
 
 export const CardRows = ({ data, rows }: CardRowsProps) => {
+    const { t } = useTranslation();
+
     return (
         <>
             {rows.map((row, index: number) => {
@@ -66,7 +76,7 @@ export const CardRows = ({ data, rows }: CardRowsProps) => {
                                     >
                                         {row.arrayProperty &&
                                             (row.format
-                                                ? row.format(item)
+                                                ? row.format(item, t)
                                                 : item[row.arrayProperty])}
                                     </Text>
                                 </React.Fragment>
@@ -92,7 +102,9 @@ export const CardRows = ({ data, rows }: CardRowsProps) => {
                                     size={index > 0 ? 'sm' : 'md'}
                                 >
                                     {row.arrayProperty &&
-                                        (row.format ? row.format(item) : item[row.arrayProperty])}
+                                        (row.format
+                                            ? row.format(item, t)
+                                            : item[row.arrayProperty])}
                                 </Text>
                             ))}
                         </div>
@@ -123,7 +135,7 @@ export const CardRows = ({ data, rows }: CardRowsProps) => {
                                     }, {}),
                                 )}
                             >
-                                {data && (row.format ? row.format(data) : data[row.property])}
+                                {data && (row.format ? row.format(data, t) : data[row.property])}
                             </Text>
                         ) : (
                             <Text
@@ -132,7 +144,7 @@ export const CardRows = ({ data, rows }: CardRowsProps) => {
                                 overflow="hidden"
                                 size={index > 0 ? 'sm' : 'md'}
                             >
-                                {data && (row.format ? row.format(data) : data[row.property])}
+                                {data && (row.format ? row.format(data, t) : data[row.property])}
                             </Text>
                         )}
                     </div>
@@ -166,6 +178,15 @@ export const ALBUM_CARD_ROWS: { [key: string]: CardRow<Album> } = {
     duration: {
         format: (album) => (album.duration === null ? null : formatDuration(album.duration)),
         property: 'duration',
+    },
+    explicitStatus: {
+        format: (album, t) =>
+            album.explicitStatus === ExplicitStatus.EXPLICIT
+                ? t('common.explicit', { postProcess: 'sentenceCase' })
+                : album.explicitStatus === ExplicitStatus.CLEAN
+                  ? t('common.clean', { postProcess: 'sentenceCase' })
+                  : null,
+        property: 'explicitStatus',
     },
     lastPlayedAt: {
         format: (album) => formatDateRelative(album.lastPlayedAt),
@@ -227,6 +248,15 @@ export const SONG_CARD_ROWS: { [key: string]: CardRow<Song> } = {
     duration: {
         format: (song) => (song.duration === null ? null : formatDuration(song.duration)),
         property: 'duration',
+    },
+    explicitStatus: {
+        format: (song, t) =>
+            song.explicitStatus === ExplicitStatus.EXPLICIT
+                ? t('common.explicit', { postProcess: 'sentenceCase' })
+                : song.explicitStatus === ExplicitStatus.CLEAN
+                  ? t('common.clean', { postProcess: 'sentenceCase' })
+                  : null,
+        property: 'explicitStatus',
     },
     lastPlayedAt: {
         format: (song) => formatDateRelative(song.lastPlayedAt),
