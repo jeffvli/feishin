@@ -283,6 +283,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
     const handleCrossfade1 = useCallback(
         (e: AudioPlayerProgress) => {
             return crossfadeHandler({
+                currentGain: player1ReplayGain,
                 currentPlayer,
                 currentPlayerRef: player1Ref,
                 currentTime: e.playedSeconds,
@@ -290,12 +291,11 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                 fadeDuration: crossfadeDuration,
                 fadeType: crossfadeStyle,
                 isTransitioning,
+                nextGain: player2ReplayGain,
                 nextPlayerRef: player2Ref,
                 player: 1,
                 setIsTransitioning,
                 volume,
-                currentGain: player1ReplayGain,
-                nextGain: player2ReplayGain,
             });
         },
         [
@@ -312,6 +312,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
     const handleCrossfade2 = useCallback(
         (e: AudioPlayerProgress) => {
             return crossfadeHandler({
+                currentGain: player2ReplayGain,
                 currentPlayer,
                 currentPlayerRef: player2Ref,
                 currentTime: e.playedSeconds,
@@ -319,12 +320,11 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                 fadeDuration: crossfadeDuration,
                 fadeType: crossfadeStyle,
                 isTransitioning,
+                nextGain: player1ReplayGain,
                 nextPlayerRef: player1Ref,
                 player: 2,
                 setIsTransitioning,
                 volume,
-                currentGain: player2ReplayGain,
-                nextGain: player1ReplayGain,
             });
         },
         [
@@ -421,22 +421,13 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                 });
             });
         }
-    }, [
-        currentPlayer,
-        player1ReplayGain,
-        player2ReplayGain,
-        status,
-        volume,
-    ]);
+    }, [currentPlayer, player1ReplayGain, player2ReplayGain, status, volume]);
 
     useEffect(() => {
         if (isTransitioning) return;
 
         applyBaseVolumes();
-    }, [
-        applyBaseVolumes,
-        isTransitioning,
-    ]);
+    }, [applyBaseVolumes, isTransitioning]);
 
     const handlePlayer1Start = useCallback(
         async (player: ReactPlayer) => {

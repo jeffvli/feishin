@@ -33,6 +33,7 @@ export const gaplessHandler = (args: {
 };
 
 export const crossfadeHandler = (args: {
+    currentGain?: number;
     currentPlayer: 1 | 2;
     currentPlayerRef: any;
     currentTime: number;
@@ -40,14 +41,14 @@ export const crossfadeHandler = (args: {
     fadeDuration: number;
     fadeType: CrossfadeStyle;
     isTransitioning: boolean;
+    nextGain?: number;
     nextPlayerRef: any;
     player: 1 | 2;
     setIsTransitioning: Dispatch<boolean>;
     volume: number;
-    currentGain?: number;
-    nextGain?: number;
 }) => {
     const {
+        currentGain = 1,
         currentPlayer,
         currentPlayerRef,
         currentTime,
@@ -55,12 +56,11 @@ export const crossfadeHandler = (args: {
         fadeDuration,
         fadeType,
         isTransitioning,
+        nextGain = 1,
         nextPlayerRef,
         player,
         setIsTransitioning,
         volume,
-        currentGain = 1,
-        nextGain = 1,
     } = args;
 
     if (!isTransitioning || currentPlayer !== player) {
@@ -154,9 +154,7 @@ export const crossfadeHandler = (args: {
             : 0;
 
     const nextPlayerVolume =
-        nextPlayerVolumeCalculation <= 0
-            ? 0
-            : Math.min(nextPlayerVolumeCalculation, maxNextVolume);
+        nextPlayerVolumeCalculation <= 0 ? 0 : Math.min(nextPlayerVolumeCalculation, maxNextVolume);
 
     const currentInternal = currentPlayerRef.current?.getInternalPlayer?.();
     const nextInternal = nextPlayerRef.current?.getInternalPlayer?.();
