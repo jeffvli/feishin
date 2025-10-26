@@ -180,6 +180,15 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
         ],
     );
 
+    const player1ReplayGain = useMemo(
+        () => (player1 ? calculateReplayGain(player1) : 1),
+        [calculateReplayGain, player1],
+    );
+    const player2ReplayGain = useMemo(
+        () => (player2 ? calculateReplayGain(player2) : 1),
+        [calculateReplayGain, player2],
+    );
+
     useEffect(() => {
         if (shouldUseWebAudio && 'AudioContext' in window) {
             let context: AudioContext;
@@ -285,9 +294,19 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                 player: 1,
                 setIsTransitioning,
                 volume,
+                currentGain: player1ReplayGain,
+                nextGain: player2ReplayGain,
             });
         },
-        [crossfadeDuration, crossfadeStyle, currentPlayer, isTransitioning, volume],
+        [
+            crossfadeDuration,
+            crossfadeStyle,
+            currentPlayer,
+            isTransitioning,
+            player1ReplayGain,
+            player2ReplayGain,
+            volume,
+        ],
     );
 
     const handleCrossfade2 = useCallback(
@@ -304,9 +323,19 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                 player: 2,
                 setIsTransitioning,
                 volume,
+                currentGain: player2ReplayGain,
+                nextGain: player1ReplayGain,
             });
         },
-        [crossfadeDuration, crossfadeStyle, currentPlayer, isTransitioning, volume],
+        [
+            crossfadeDuration,
+            crossfadeStyle,
+            currentPlayer,
+            isTransitioning,
+            player1ReplayGain,
+            player2ReplayGain,
+            volume,
+        ],
     );
 
     const handleGapless1 = useCallback(
@@ -359,32 +388,34 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
     useEffect(() => {
         if (!webAudio) return;
 
-        const sources = [player1Source ? player1 : null, player2Source ? player2 : null];
-        const current = sources[currentPlayer - 1];
+        const now = webAudio.context.currentTime;
+        webAudio.gain.gain.cancelScheduledValues(now);
+        webAudio.gain.gain.setValueAtTime(Math.max(0, volume), now);
+    }, [volume, webAudio]);
 
-        // Set the current replaygain
-        if (current) {
-            const newVolume = calculateReplayGain(current) * volume;
-            webAudio.gain.gain.setValueAtTime(Math.max(0, newVolume), 0);
+    useEffect(() => {
+        if (isTransitioning) return;
+
+        const player1Internal = player1Ref.current?.getInternalPlayer();
+        const player2Internal = player2Ref.current?.getInternalPlayer();
+
+        if (player1Internal) {
+            const isActive = currentPlayer === 1 && status === PlayerStatus.PLAYING;
+            const targetVolume = isActive ? volume * player1ReplayGain : 0;
+            player1Internal.volume = Math.min(Math.max(targetVolume, 0), 1);
         }
 
-        // Set the next track replaygain right before the end of this track
-        // Attempt to prevent pop-in for web audio.
-        const next = sources[3 - currentPlayer];
-        if (next && current) {
-            const newVolume = calculateReplayGain(next) * volume;
-            webAudio.gain.gain.setValueAtTime(
-                Math.max(0, newVolume),
-                Math.max(0, (current.duration - 1) / 1000),
-            );
+        if (player2Internal) {
+            const isActive = currentPlayer === 2 && status === PlayerStatus.PLAYING;
+            const targetVolume = isActive ? volume * player2ReplayGain : 0;
+            player2Internal.volume = Math.min(Math.max(targetVolume, 0), 1);
         }
     }, [
-        calculateReplayGain,
         currentPlayer,
-        player1,
-        player1Source,
-        player2,
-        player2Source,
+        isTransitioning,
+        player1ReplayGain,
+        player2ReplayGain,
+        status,
         volume,
         webAudio,
     ]);
