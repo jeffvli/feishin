@@ -129,6 +129,11 @@ export const sortOrderMap: SortOrderMap = {
     },
 };
 
+export enum ExplicitStatus {
+    CLEAN = 'CLEAN',
+    EXPLICIT = 'EXPLICIT',
+}
+
 export enum ExternalSource {
     LASTFM = 'LASTFM',
     MUSICBRAINZ = 'MUSICBRAINZ',
@@ -160,7 +165,7 @@ export type Album = {
     comment: null | string;
     createdAt: string;
     duration: null | number;
-    explicitStatus: null | number;
+    explicitStatus: ExplicitStatus | null;
     genres: Genre[];
     id: string;
     imagePlaceholderUrl: null | string;
@@ -333,7 +338,7 @@ export type Song = {
     discNumber: number;
     discSubtitle: null | string;
     duration: number;
-    explicitStatus: null | number;
+    explicitStatus: ExplicitStatus | null;
     gain: GainInfo | null;
     genres: Genre[];
     id: string;

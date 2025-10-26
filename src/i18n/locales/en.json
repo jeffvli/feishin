@@ -121,7 +121,9 @@
         "unknown": "unknown",
         "version": "version",
         "year": "year",
-        "yes": "yes"
+        "yes": "yes",
+        "explicit": "explicit",
+        "clean": "clean"
     },
     "entity": {
         "album_one": "album",
