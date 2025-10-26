@@ -393,31 +393,49 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
         webAudio.gain.gain.setValueAtTime(Math.max(0, volume), now);
     }, [volume, webAudio]);
 
-    useEffect(() => {
-        if (isTransitioning) return;
+    const applyBaseVolumes = useCallback(() => {
+        const setVolumes = () => {
+            const player1Internal = player1Ref.current?.getInternalPlayer();
+            const player2Internal = player2Ref.current?.getInternalPlayer();
 
-        const player1Internal = player1Ref.current?.getInternalPlayer();
-        const player2Internal = player2Ref.current?.getInternalPlayer();
+            if (player1Internal) {
+                const isActive = currentPlayer === 1 && status === PlayerStatus.PLAYING;
+                const targetVolume = isActive ? volume * player1ReplayGain : 0;
+                player1Internal.volume = Math.min(Math.max(targetVolume, 0), 1);
+            }
 
-        if (player1Internal) {
-            const isActive = currentPlayer === 1 && status === PlayerStatus.PLAYING;
-            const targetVolume = isActive ? volume * player1ReplayGain : 0;
-            player1Internal.volume = Math.min(Math.max(targetVolume, 0), 1);
-        }
+            if (player2Internal) {
+                const isActive = currentPlayer === 2 && status === PlayerStatus.PLAYING;
+                const targetVolume = isActive ? volume * player2ReplayGain : 0;
+                player2Internal.volume = Math.min(Math.max(targetVolume, 0), 1);
+            }
+        };
 
-        if (player2Internal) {
-            const isActive = currentPlayer === 2 && status === PlayerStatus.PLAYING;
-            const targetVolume = isActive ? volume * player2ReplayGain : 0;
-            player2Internal.volume = Math.min(Math.max(targetVolume, 0), 1);
+        setVolumes();
+
+        if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => {
+                setVolumes();
+                requestAnimationFrame(() => {
+                    setVolumes();
+                });
+            });
         }
     }, [
         currentPlayer,
-        isTransitioning,
         player1ReplayGain,
         player2ReplayGain,
         status,
         volume,
-        webAudio,
+    ]);
+
+    useEffect(() => {
+        if (isTransitioning) return;
+
+        applyBaseVolumes();
+    }, [
+        applyBaseVolumes,
+        isTransitioning,
     ]);
 
     const handlePlayer1Start = useCallback(
@@ -482,6 +500,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                     playbackStyle === PlaybackStyle.GAPLESS ? handleGapless1 : handleCrossfade1
                 }
                 onReady={handlePlayer1Start}
+                onSeek={applyBaseVolumes}
                 playbackRate={playbackSpeed}
                 playing={currentPlayer === 1 && status === PlayerStatus.PLAYING}
                 progressInterval={isTransitioning ? 10 : 250}
@@ -502,6 +521,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                     playbackStyle === PlaybackStyle.GAPLESS ? handleGapless2 : handleCrossfade2
                 }
                 onReady={handlePlayer2Start}
+                onSeek={applyBaseVolumes}
                 playbackRate={playbackSpeed}
                 playing={currentPlayer === 2 && status === PlayerStatus.PLAYING}
                 progressInterval={isTransitioning ? 10 : 250}
