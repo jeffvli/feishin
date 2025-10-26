@@ -295,7 +295,6 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                 nextPlayerRef: player2Ref,
                 player: 1,
                 setIsTransitioning,
-                volume,
             });
         },
         [
@@ -305,7 +304,6 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
             isTransitioning,
             player1ReplayGain,
             player2ReplayGain,
-            volume,
         ],
     );
 
@@ -324,7 +322,6 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                 nextPlayerRef: player1Ref,
                 player: 2,
                 setIsTransitioning,
-                volume,
             });
         },
         [
@@ -334,7 +331,6 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
             isTransitioning,
             player1ReplayGain,
             player2ReplayGain,
-            volume,
         ],
     );
 
@@ -400,13 +396,21 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
 
             if (player1Internal) {
                 const isActive = currentPlayer === 1 && status === PlayerStatus.PLAYING;
-                const targetVolume = isActive ? volume * player1ReplayGain : 0;
+                const targetVolume = isActive
+                    ? webAudio
+                        ? player1ReplayGain
+                        : volume * player1ReplayGain
+                    : 0;
                 player1Internal.volume = Math.min(Math.max(targetVolume, 0), 1);
             }
 
             if (player2Internal) {
                 const isActive = currentPlayer === 2 && status === PlayerStatus.PLAYING;
-                const targetVolume = isActive ? volume * player2ReplayGain : 0;
+                const targetVolume = isActive
+                    ? webAudio
+                        ? player2ReplayGain
+                        : volume * player2ReplayGain
+                    : 0;
                 player2Internal.volume = Math.min(Math.max(targetVolume, 0), 1);
             }
         };
@@ -421,7 +425,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>((props, 
                 });
             });
         }
-    }, [currentPlayer, player1ReplayGain, player2ReplayGain, status, volume]);
+    }, [currentPlayer, player1ReplayGain, player2ReplayGain, status, volume, webAudio]);
 
     useEffect(() => {
         if (isTransitioning) return;

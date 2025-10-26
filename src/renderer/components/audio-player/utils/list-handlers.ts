@@ -45,7 +45,6 @@ export const crossfadeHandler = (args: {
     nextPlayerRef: any;
     player: 1 | 2;
     setIsTransitioning: Dispatch<boolean>;
-    volume: number;
 }) => {
     const {
         currentGain = 1,
@@ -60,7 +59,6 @@ export const crossfadeHandler = (args: {
         nextPlayerRef,
         player,
         setIsTransitioning,
-        volume,
     } = args;
 
     if (!isTransitioning || currentPlayer !== player) {
@@ -72,7 +70,7 @@ export const crossfadeHandler = (args: {
             const nextInternal = nextPlayerRef.current?.getInternalPlayer?.();
 
             if (currentInternal) {
-                const baseVolume = Math.min(Math.max(volume * currentGain, 0), 1);
+                const baseVolume = Math.min(Math.max(currentGain, 0), 1);
                 currentInternal.volume = baseVolume;
             }
 
@@ -100,53 +98,48 @@ export const crossfadeHandler = (args: {
         case 'dipped':
             // https://math.stackexchange.com/a/4622
             percentageOfFadeLeft = timeLeft / fadeDuration;
-            currentPlayerVolumeCalculation = percentageOfFadeLeft ** 2 * volume * currentGain;
-            nextPlayerVolumeCalculation = (percentageOfFadeLeft - 1) ** 2 * volume * nextGain;
+            currentPlayerVolumeCalculation = percentageOfFadeLeft ** 2 * currentGain;
+            nextPlayerVolumeCalculation = (percentageOfFadeLeft - 1) ** 2 * nextGain;
             break;
         case 'equalPower':
             // https://dsp.stackexchange.com/a/14755
             percentageOfFadeLeft = (timeLeft / fadeDuration) * 2;
-            currentPlayerVolumeCalculation =
-                Math.sqrt(0.5 * percentageOfFadeLeft) * volume * currentGain;
-            nextPlayerVolumeCalculation =
-                Math.sqrt(0.5 * (2 - percentageOfFadeLeft)) * volume * nextGain;
+            currentPlayerVolumeCalculation = Math.sqrt(0.5 * percentageOfFadeLeft) * currentGain;
+            nextPlayerVolumeCalculation = Math.sqrt(0.5 * (2 - percentageOfFadeLeft)) * nextGain;
             break;
         case fadeType.match(/constantPower.*/)?.input:
             // https://math.stackexchange.com/a/26159
-            n =
-                fadeType === 'constantPower'
-                    ? 0
-                    : fadeType === 'constantPowerSlowFade'
-                      ? 1
-                      : fadeType === 'constantPowerSlowCut'
-                        ? 3
-                        : 10;
+            if (fadeType === 'constantPower') {
+                n = 0;
+            } else if (fadeType === 'constantPowerSlowFade') {
+                n = 1;
+            } else if (fadeType === 'constantPowerSlowCut') {
+                n = 3;
+            } else {
+                n = 10;
+            }
 
             percentageOfFadeLeft = timeLeft / fadeDuration;
             currentPlayerVolumeCalculation =
                 Math.cos((Math.PI / 4) * ((2 * percentageOfFadeLeft - 1) ** (2 * n + 1) - 1)) *
-                volume *
                 currentGain;
             nextPlayerVolumeCalculation =
                 Math.cos((Math.PI / 4) * ((2 * percentageOfFadeLeft - 1) ** (2 * n + 1) + 1)) *
-                volume *
                 nextGain;
             break;
         case 'linear':
-            currentPlayerVolumeCalculation = (timeLeft / fadeDuration) * volume * currentGain;
-            nextPlayerVolumeCalculation =
-                ((fadeDuration - timeLeft) / fadeDuration) * volume * nextGain;
+            currentPlayerVolumeCalculation = (timeLeft / fadeDuration) * currentGain;
+            nextPlayerVolumeCalculation = ((fadeDuration - timeLeft) / fadeDuration) * nextGain;
             break;
 
         default:
-            currentPlayerVolumeCalculation = (timeLeft / fadeDuration) * volume * currentGain;
-            nextPlayerVolumeCalculation =
-                ((fadeDuration - timeLeft) / fadeDuration) * volume * nextGain;
+            currentPlayerVolumeCalculation = (timeLeft / fadeDuration) * currentGain;
+            nextPlayerVolumeCalculation = ((fadeDuration - timeLeft) / fadeDuration) * nextGain;
             break;
     }
 
-    const maxCurrentVolume = Math.min(Math.max(volume * currentGain, 0), 1);
-    const maxNextVolume = Math.min(Math.max(volume * nextGain, 0), 1);
+    const maxCurrentVolume = Math.min(Math.max(currentGain, 0), 1);
+    const maxNextVolume = Math.min(Math.max(nextGain, 0), 1);
 
     const currentPlayerVolume =
         currentPlayerVolumeCalculation >= 0
