@@ -15,7 +15,7 @@ if [ "$arch" = "aarch64" ]; then
 fi
 
 if [ ! -d "${dir}" ]; then
-	echo "${dir}} is not a directory or does not exist. Please provide an existing directory."
+	echo "${dir} is not a directory or does not exist. Please provide an existing directory."
 	exit 1
 fi
 
@@ -30,7 +30,7 @@ if [ "${arg}" = "remove" ]; then
 		"${localShareIcons}"/64x64/apps/org.jeffvli.feishin.png \
 		"${localShareIcons}"/32x32/apps/org.jeffvli.feishin.png \
 		"${localShare}"/applications/org.jeffvli.feishin.desktop \
-		"${dir}./Feishin-linux-${arch}.AppImage"
+		"${dir}/Feishin-linux-${arch}.AppImage"
 	exit 0
 fi
 
