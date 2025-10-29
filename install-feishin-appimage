@@ -1,17 +1,33 @@
 #!/bin/sh
 
-dir=$1
-arg=$2
-arch=$(uname -m)
+set -eu
 
-if [ "$arch" != "x86_64" ] && [ "$arch" != "aarch64" ]; then
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 <installation-directory> <option>"
+    echo "Options:"
+    echo "  wayland-native   Enable native Wayland support"
+    echo "  remove           Remove Feishin AppImage and desktop entries"
+    exit 1
+fi
+
+dir="$(readlink -f "${1}")"
+arg="${2:-""}"
+arch="$(uname -m)"
+
+if [ "$arg" != "wayland-native" ] && [ "$arg" != "remove" ] && [ "$arg" != "" ]; then
+    echo "Invalid option: $arg"
+    echo "Valid options are: wayland-native, remove"
+    exit 1
+fi
+
+if [ "${arch}" != "x86_64" ] && [ "${arch}" != "aarch64" ]; then
 	echo "CPU architecture not recognised (not x86_64 or aarch64). Aborting."
 	exit 1
 fi
 
 # workaround if we're not renaming the artifact
-if [ "$arch" = "aarch64" ]; then
-	arch='arm64'
+if [ "${arch}" = "aarch64" ]; then
+	arch="arm64"
 fi
 
 if [ ! -d "${dir}" ]; then
@@ -19,56 +35,45 @@ if [ ! -d "${dir}" ]; then
 	exit 1
 fi
 
-localShare="$HOME/.local/share"
+localShare="${XDG_DATA_HOME:-$HOME/.local/share}"
 localShareIcons="${localShare}/icons/hicolor"
 
 if [ "${arg}" = "remove" ]; then
 	rm -v \
-		"${localShareIcons}"/512x512/apps/org.jeffvli.feishin.png \
-		"${localShareIcons}"/256x256/apps/org.jeffvli.feishin.png \
-		"${localShareIcons}"/128x128/apps/org.jeffvli.feishin.png \
-		"${localShareIcons}"/64x64/apps/org.jeffvli.feishin.png \
-		"${localShareIcons}"/32x32/apps/org.jeffvli.feishin.png \
-		"${localShare}"/applications/org.jeffvli.feishin.desktop \
+		"${localShareIcons}/512x512/apps/org.jeffvli.feishin.png" \
+		"${localShareIcons}/256x256/apps/org.jeffvli.feishin.png" \
+		"${localShareIcons}/128x128/apps/org.jeffvli.feishin.png" \
+		"${localShareIcons}/64x64/apps/org.jeffvli.feishin.png" \
+		"${localShareIcons}/32x32/apps/org.jeffvli.feishin.png" \
+		"${localShare}/applications/org.jeffvli.feishin.desktop" \
 		"${dir}/Feishin-linux-${arch}.AppImage"
 	exit 0
 fi
 
-curl -L --create-dirs --write-out '%{filename_effective}\n' \
+curl --fail -L --create-dirs --write-out '%{filename_effective}\n' \
 	-o "${dir}/Feishin-linux-${arch}.AppImage" "https://github.com/jeffvli/feishin/releases/latest/download/Feishin-linux-${arch}.AppImage" \
-	-o "${localShareIcons}"/512x512/apps/org.jeffvli.feishin.png 'https://github.com/jeffvli/feishin/blob/development/assets/icons/512x512.png?raw=true' \
-	-o "${localShareIcons}"/256x256/apps/org.jeffvli.feishin.png 'https://github.com/jeffvli/feishin/blob/development/assets/icons/256x256.png?raw=true' \
-	-o "${localShareIcons}"/128x128/apps/org.jeffvli.feishin.png 'https://github.com/jeffvli/feishin/blob/development/assets/icons/128x128.png?raw=true' \
-	-o "${localShareIcons}"/64x64/apps/org.jeffvli.feishin.png 'https://github.com/jeffvli/feishin/blob/development/assets/icons/64x64.png?raw=true' \
-	-o "${localShareIcons}"/32x32/apps/org.jeffvli.feishin.png 'https://github.com/jeffvli/feishin/blob/development/assets/icons/32x32.png?raw=true'
+	-o "${localShareIcons}/512x512/apps/org.jeffvli.feishin.png" 'https://github.com/jeffvli/feishin/blob/development/assets/icons/512x512.png?raw=true' \
+	-o "${localShareIcons}/256x256/apps/org.jeffvli.feishin.png" 'https://github.com/jeffvli/feishin/blob/development/assets/icons/256x256.png?raw=true' \
+	-o "${localShareIcons}/128x128/apps/org.jeffvli.feishin.png" 'https://github.com/jeffvli/feishin/blob/development/assets/icons/128x128.png?raw=true' \
+	-o "${localShareIcons}/64x64/apps/org.jeffvli.feishin.png" 'https://github.com/jeffvli/feishin/blob/development/assets/icons/64x64.png?raw=true' \
+	-o "${localShareIcons}/32x32/apps/org.jeffvli.feishin.png" 'https://github.com/jeffvli/feishin/blob/development/assets/icons/32x32.png?raw=true'
 chmod -v u+x "${dir}/Feishin-linux-${arch}.AppImage"
 
-waylandFlags=''
+waylandFlags=""
 if [ "${arg}" = "wayland-native" ]; then
-	waylandFlags=' --enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto'
+	waylandFlags="--enable-features=UseOzonePlatform,WaylandWindowDecorations --ozone-platform-hint=auto"
 fi
 
 # this is for Debian-based kernels and ALT respectively
 # https://unix.stackexchange.com/a/303214/145722
-sandboxFlag=''
+sandboxFlag=""
 if [ "$(sysctl kernel.unprivileged_userns_clone 2>/dev/null)" = "0" ] \
 	|| [ "$(sysctl kernel.userns_restrict 2>/dev/null)" = "1" ]; then
-	sandboxFlag=' --no-sandbox'
+	sandboxFlag="--no-sandbox"
 fi
 
-mkdir -pv "${localShare}"/applications
-cat > "${localShare}"/applications/org.jeffvli.feishin.desktop << EOL
-[Desktop Entry]
-Name=Feishin
-GenericName=Music player
-Exec=${dir}/Feishin-linux-${arch}.AppImage${sandboxFlag}${waylandFlags}
-TryExec=${dir}/Feishin-linux-${arch}.AppImage
-Terminal=false
-Type=Application
-Icon=org.jeffvli.feishin
-StartupWMClass=feishin
-SingleMainWindow=true
-Categories=AudioVideo;Audio;Player;Music;
-Keywords=Navidrome;Jellyfin;Subsonic;OpenSubsonic
-Comment=A player for your self-hosted music server
-EOL
+mkdir -pv "${localShare}/applications"
+
+export FEISHIN_DESKTOP_EXECUTABLE="${dir}/Feishin-linux-${arch}.AppImage"
+export FEISHIN_DESKTOP_ARGS="${sandboxFlag} ${waylandFlags}"
+curl --fail https://raw.githubusercontent.com/jeffvli/feishin/refs/heads/development/feishin.desktop.tmpl | envsubst > "${localShare}/applications/org.jeffvli.feishin.desktop"
