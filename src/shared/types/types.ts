@@ -1,5 +1,6 @@
 import { AppRoute } from '@ts-rest/core';
 import { ReactNode } from 'react';
+import { TFunction } from 'react-i18next';
 import { Song } from 'src/main/features/core/lyrics/netease';
 
 import {
@@ -40,7 +41,7 @@ export type CardRoute = {
 
 export type CardRow<T> = {
     arrayProperty?: string;
-    format?: (value: T) => ReactNode;
+    format?: (value: T, t: TFunction) => ReactNode;
     property: keyof T;
     route?: CardRoute;
 };

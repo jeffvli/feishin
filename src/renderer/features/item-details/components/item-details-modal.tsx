@@ -16,6 +16,7 @@ import { Separator } from '/@/shared/components/separator/separator';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Table } from '/@/shared/components/table/table';
 import { Text } from '/@/shared/components/text/text';
+import { ExplicitStatus } from '/@/shared/types/domain-types';
 import {
     Album,
     AlbumArtist,
@@ -34,14 +35,14 @@ type ItemDetailRow<T> = {
     key?: keyof T;
     label: string;
     postprocess?: string[];
-    render?: (item: T) => ReactNode;
+    render?: (item: T, t: TFunction) => ReactNode;
 };
 
 const handleRow = <T extends AnyLibraryItem>(t: TFunction, item: T, rule: ItemDetailRow<T>) => {
     let value: ReactNode;
 
     if (rule.render) {
-        value = rule.render(item);
+        value = rule.render(item, t);
     } else {
         const prop = item[rule.key!];
         value = prop !== undefined && prop !== null ? String(prop) : null;
@@ -128,6 +129,15 @@ const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
     },
     { key: 'releaseYear', label: 'filter.releaseYear' },
     { key: 'songCount', label: 'filter.songCount' },
+    {
+        label: 'filter.explicitStatus',
+        render: (album, t) =>
+            album.explicitStatus === ExplicitStatus.EXPLICIT
+                ? t('common.explicit', { postProcess: 'sentenceCase' })
+                : album.explicitStatus === ExplicitStatus.CLEAN
+                  ? t('common.clean', { postProcess: 'sentenceCase' })
+                  : null,
+    },
     { label: 'filter.isCompilation', render: (album) => BoolField(album.isCompilation || false) },
     {
         key: 'size',
@@ -266,6 +276,15 @@ const SongPropertyMapping: ItemDetailRow<Song>[] = [
     { key: 'discNumber', label: 'common.disc' },
     { key: 'trackNumber', label: 'common.trackNumber' },
     { key: 'releaseYear', label: 'filter.releaseYear' },
+    {
+        label: 'filter.explicitStatus',
+        render: (song, t) =>
+            song.explicitStatus === ExplicitStatus.EXPLICIT
+                ? t('common.explicit', { postProcess: 'sentenceCase' })
+                : song.explicitStatus === ExplicitStatus.CLEAN
+                  ? t('common.clean', { postProcess: 'sentenceCase' })
+                  : null,
+    },
     { label: 'entity.genre_other', render: FormatGenre },
     {
         label: 'common.duration',

@@ -1,6 +1,6 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { PlayQueueListControls } from './play-queue-list-controls';
 
@@ -13,15 +13,21 @@ import { Platform } from '/@/shared/types/types';
 
 export const SidebarPlayQueue = () => {
     const queueRef = useRef<null | { grid: AgGridReactType<Song> }>(null);
+    const [search, setSearch] = useState<string | undefined>(undefined);
     const { windowBarStyle } = useWindowSettings();
 
     const isWeb = windowBarStyle === Platform.WEB;
     return (
         <VirtualGridContainer>
             <Box display={!isWeb ? 'flex' : undefined} h="65px">
-                <PlayQueueListControls tableRef={queueRef} type="sideQueue" />
+                <PlayQueueListControls
+                    handleSearch={setSearch}
+                    searchTerm={search}
+                    tableRef={queueRef}
+                    type="sideQueue"
+                />
             </Box>
-            <PlayQueue ref={queueRef} type="sideQueue" />
+            <PlayQueue ref={queueRef} searchTerm={search} type="sideQueue" />
         </VirtualGridContainer>
     );
 };

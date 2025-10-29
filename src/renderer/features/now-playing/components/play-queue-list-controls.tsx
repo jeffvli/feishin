@@ -1,11 +1,12 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-import type { MutableRefObject } from 'react';
 
 import isElectron from 'is-electron';
+import { type MutableRefObject, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
+import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { usePlayerControls, useQueueControls } from '/@/renderer/store';
 import { usePlayerStore, useSetCurrentTime } from '/@/renderer/store/player.store';
 import { usePlaybackType } from '/@/renderer/store/settings.store';
@@ -19,11 +20,18 @@ import { PlaybackType, TableType } from '/@/shared/types/types';
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 
 interface PlayQueueListOptionsProps {
+    handleSearch: (value: string) => void;
+    searchTerm?: string;
     tableRef: MutableRefObject<null | { grid: AgGridReactType<Song> }>;
     type: TableType;
 }
 
-export const PlayQueueListControls = ({ tableRef, type }: PlayQueueListOptionsProps) => {
+export const PlayQueueListControls = ({
+    handleSearch,
+    searchTerm,
+    tableRef,
+    type,
+}: PlayQueueListOptionsProps) => {
     const { t } = useTranslation();
     const {
         clearQueue,
@@ -119,6 +127,16 @@ export const PlayQueueListControls = ({ tableRef, type }: PlayQueueListOptionsPr
         }
     };
 
+    const handleSearchTerm = useCallback(
+        (term: string) => {
+            handleSearch(term);
+            tableRef.current?.grid.api.redrawRows();
+        },
+        [handleSearch, tableRef],
+    );
+
+    const hasSearch = !!searchTerm;
+
     return (
         <Group
             justify="space-between"
@@ -136,6 +154,7 @@ export const PlayQueueListControls = ({ tableRef, type }: PlayQueueListOptionsPr
                     variant="subtle"
                 />
                 <ActionIcon
+                    disabled={hasSearch}
                     icon="mediaPlayNext"
                     iconProps={{ size: 'lg' }}
                     onClick={handleMoveToNext}
@@ -143,6 +162,7 @@ export const PlayQueueListControls = ({ tableRef, type }: PlayQueueListOptionsPr
                     variant="subtle"
                 />
                 <ActionIcon
+                    disabled={hasSearch}
                     icon="arrowDownToLine"
                     iconProps={{ size: 'lg' }}
                     onClick={handleMoveToBottom}
@@ -150,6 +170,7 @@ export const PlayQueueListControls = ({ tableRef, type }: PlayQueueListOptionsPr
                     variant="subtle"
                 />
                 <ActionIcon
+                    disabled={hasSearch}
                     icon="arrowUpToLine"
                     iconProps={{ size: 'lg' }}
                     onClick={handleMoveToTop}
@@ -171,6 +192,10 @@ export const PlayQueueListControls = ({ tableRef, type }: PlayQueueListOptionsPr
                     onClick={handleClearQueue}
                     tooltip={{ label: t('action.clearQueue', { postProcess: 'sentenceCase' }) }}
                     variant="subtle"
+                />
+                <SearchInput
+                    onChange={(e) => handleSearchTerm(e.target.value)}
+                    value={searchTerm}
                 />
             </Group>
             <Group>

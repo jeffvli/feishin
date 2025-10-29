@@ -134,6 +134,7 @@ const album = z.object({
     coverArtPath: z.string().optional(), // Removed after v0.48.0
     createdAt: z.string(),
     duration: z.number().optional(),
+    explicitStatus: z.string().optional(),
     fullText: z.string(),
     genre: z.string(),
     genres: z.array(genre).nullable(),
@@ -200,6 +201,7 @@ const song = z.object({
     discSubtitle: z.string().optional(),
     duration: z.number(),
     embedArtPath: z.string().optional(),
+    explicitStatus: z.string().optional(),
     externalInfoUpdatedAt: z.string().optional(),
     externalUrl: z.string().optional(),
     fullText: z.string(),

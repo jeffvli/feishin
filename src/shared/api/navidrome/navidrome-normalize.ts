@@ -7,6 +7,7 @@ import { ssType } from '/@/shared/api/subsonic/subsonic-types';
 import {
     Album,
     AlbumArtist,
+    ExplicitStatus,
     Genre,
     LibraryItem,
     Playlist,
@@ -164,6 +165,12 @@ const normalizeSong = (
         discNumber: item.discNumber,
         discSubtitle: item.discSubtitle ? item.discSubtitle : null,
         duration: item.duration * 1000,
+        explicitStatus:
+            item.explicitStatus === 'e'
+                ? ExplicitStatus.EXPLICIT
+                : item.explicitStatus === 'c'
+                  ? ExplicitStatus.CLEAN
+                  : null,
         gain:
             item.rgAlbumGain || item.rgTrackGain
                 ? { album: item.rgAlbumGain, track: item.rgTrackGain }
@@ -237,6 +244,12 @@ const normalizeAlbum = (
         comment: item.comment || null,
         createdAt: item.createdAt.split('T')[0],
         duration: item.duration !== undefined ? item.duration * 1000 : null,
+        explicitStatus:
+            item.explicitStatus === 'e'
+                ? ExplicitStatus.EXPLICIT
+                : item.explicitStatus === 'c'
+                  ? ExplicitStatus.CLEAN
+                  : null,
         genres: (item.genres || []).map((genre) => ({
             id: genre.id,
             imageUrl: null,

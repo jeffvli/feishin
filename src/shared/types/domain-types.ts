@@ -129,6 +129,11 @@ export const sortOrderMap: SortOrderMap = {
     },
 };
 
+export enum ExplicitStatus {
+    CLEAN = 'CLEAN',
+    EXPLICIT = 'EXPLICIT',
+}
+
 export enum ExternalSource {
     LASTFM = 'LASTFM',
     MUSICBRAINZ = 'MUSICBRAINZ',
@@ -160,6 +165,7 @@ export type Album = {
     comment: null | string;
     createdAt: string;
     duration: null | number;
+    explicitStatus: ExplicitStatus | null;
     genres: Genre[];
     id: string;
     imagePlaceholderUrl: null | string;
@@ -332,6 +338,7 @@ export type Song = {
     discNumber: number;
     discSubtitle: null | string;
     duration: number;
+    explicitStatus: ExplicitStatus | null;
     gain: GainInfo | null;
     genres: Genre[];
     id: string;
@@ -394,6 +401,7 @@ export enum AlbumListSort {
     COMMUNITY_RATING = 'communityRating',
     CRITIC_RATING = 'criticRating',
     DURATION = 'duration',
+    EXPLICIT_STATUS = 'explicitStatus',
     FAVORITED = 'favorited',
     NAME = 'name',
     PLAY_COUNT = 'playCount',
@@ -441,6 +449,7 @@ export const albumListSortMap: AlbumListSortMap = {
         communityRating: JFAlbumListSort.COMMUNITY_RATING,
         criticRating: JFAlbumListSort.CRITIC_RATING,
         duration: undefined,
+        explicitStatus: undefined,
         favorited: undefined,
         name: JFAlbumListSort.NAME,
         playCount: JFAlbumListSort.PLAY_COUNT,
@@ -458,6 +467,7 @@ export const albumListSortMap: AlbumListSortMap = {
         communityRating: undefined,
         criticRating: undefined,
         duration: NDAlbumListSort.DURATION,
+        explicitStatus: NDAlbumListSort.EXPLICIT_STATUS,
         favorited: NDAlbumListSort.STARRED,
         name: NDAlbumListSort.NAME,
         playCount: NDAlbumListSort.PLAY_COUNT,
@@ -476,6 +486,7 @@ export const albumListSortMap: AlbumListSortMap = {
         communityRating: undefined,
         criticRating: undefined,
         duration: undefined,
+        explicitStatus: undefined,
         favorited: undefined,
         name: undefined,
         playCount: undefined,
@@ -497,6 +508,7 @@ export enum SongListSort {
     CHANNELS = 'channels',
     COMMENT = 'comment',
     DURATION = 'duration',
+    EXPLICIT_STATUS = 'explicitStatus',
     FAVORITED = 'favorited',
     GENRE = 'genre',
     ID = 'id',
@@ -562,6 +574,7 @@ export const songListSortMap: SongListSortMap = {
         channels: undefined,
         comment: undefined,
         duration: JFSongListSort.DURATION,
+        explicitStatus: undefined,
         favorited: undefined,
         genre: undefined,
         id: undefined,
@@ -582,6 +595,7 @@ export const songListSortMap: SongListSortMap = {
         channels: NDSongListSort.CHANNELS,
         comment: NDSongListSort.COMMENT,
         duration: NDSongListSort.DURATION,
+        explicitStatus: NDSongListSort.EXPLICIT_STATUS,
         favorited: NDSongListSort.FAVORITED,
         genre: NDSongListSort.GENRE,
         id: NDSongListSort.ID,
@@ -602,6 +616,7 @@ export const songListSortMap: SongListSortMap = {
         channels: undefined,
         comment: undefined,
         duration: undefined,
+        explicitStatus: undefined,
         favorited: undefined,
         genre: undefined,
         id: undefined,

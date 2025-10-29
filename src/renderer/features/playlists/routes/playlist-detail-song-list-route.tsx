@@ -1,7 +1,6 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { closeAllModals, openModal } from '@mantine/modals';
-import Fuse from 'fuse.js';
 import { motion } from 'motion/react';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +18,7 @@ import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/play
 import { AnimatedPage } from '/@/renderer/features/shared';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, usePlaylistDetailStore } from '/@/renderer/store';
+import { searchSongs } from '/@/renderer/utils/search-songs';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Box } from '/@/shared/components/box/box';
 import { Group } from '/@/shared/components/group/group';
@@ -162,20 +162,7 @@ const PlaylistDetailSongListRoute = () => {
             const searchTerm = page?.table.id[playlistId]?.filter?.searchTerm;
 
             if (searchTerm) {
-                const fuse = new Fuse(items, {
-                    fieldNormWeight: 1,
-                    ignoreLocation: true,
-                    keys: [
-                        'name',
-                        'album',
-                        {
-                            getFn: (song) => song.artists.map((artist) => artist.name),
-                            name: 'artist',
-                        },
-                    ],
-                    threshold: 0,
-                });
-                items = fuse.search(searchTerm).map((item) => item.item);
+                items = searchSongs(items, searchTerm);
             }
 
             const sortBy = page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID;

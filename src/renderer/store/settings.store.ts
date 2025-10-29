@@ -1,8 +1,8 @@
 import type { ContextMenuItemType } from '/@/renderer/features/context-menu';
 
-import { ColDef } from '@ag-grid-community/core';
 import isElectron from 'is-electron';
 import { generatePath } from 'react-router';
+import { z } from 'zod';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
@@ -12,7 +12,9 @@ import i18n from '/@/i18n/i18n';
 import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayerStore } from '/@/renderer/store/player.store';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
+import { FontValueSchema } from '/@/renderer/types/fonts';
 import { randomString } from '/@/renderer/utils';
+import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { AppTheme } from '/@/shared/themes/app-theme-types';
 import { LibraryItem, LyricSource } from '/@/shared/types/domain-types';
 import {
@@ -26,12 +28,408 @@ import {
     TableType,
 } from '/@/shared/types/types';
 
-export type SidebarItemType = {
+const HomeItemSchema = z.enum([
+    'mostPlayed',
+    'random',
+    'recentlyAdded',
+    'recentlyPlayed',
+    'recentlyReleased',
+]);
+
+const ArtistItemSchema = z.enum([
+    'biography',
+    'compilations',
+    'recentAlbums',
+    'similarArtists',
+    'topSongs',
+]);
+
+const BindingActionsSchema = z.enum([
+    'browserBack',
+    'browserForward',
+    'favoriteCurrentAdd',
+    'favoriteCurrentRemove',
+    'favoriteCurrentToggle',
+    'favoritePreviousAdd',
+    'favoritePreviousRemove',
+    'favoritePreviousToggle',
+    'globalSearch',
+    'localSearch',
+    'volumeMute',
+    'navigateHome',
+    'next',
+    'pause',
+    'play',
+    'playPause',
+    'previous',
+    'rate0',
+    'rate1',
+    'rate2',
+    'rate3',
+    'rate4',
+    'rate5',
+    'toggleShuffle',
+    'skipBackward',
+    'skipForward',
+    'stop',
+    'toggleFullscreenPlayer',
+    'toggleQueue',
+    'toggleRepeat',
+    'volumeDown',
+    'volumeUp',
+    'zoomIn',
+    'zoomOut',
+]);
+
+const DiscordDisplayTypeSchema = z.enum(['artist', 'feishin', 'song']);
+
+const DiscordLinkTypeSchema = z.enum(['last_fm', 'musicbrainz', 'musicbrainz_last_fm', 'none']);
+
+const GenreTargetSchema = z.enum(['album', 'track']);
+
+const SideQueueTypeSchema = z.enum(['sideDrawerQueue', 'sideQueue']);
+
+const SidebarItemTypeSchema = z.object({
+    disabled: z.boolean(),
+    id: z.string(),
+    label: z.string(),
+    route: z.union([z.nativeEnum(AppRoute), z.string()]),
+});
+
+const SortableItemSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
+    z.object({
+        disabled: z.boolean(),
+        id: itemSchema,
+    });
+
+const PersistedTableColumnSchema = z.object({
+    column: z.nativeEnum(TableColumn),
+    extraProps: z.record(z.any()).optional(),
+    width: z.number(),
+});
+
+const DataTablePropsSchema = z.object({
+    autoFit: z.boolean(),
+    columns: z.array(PersistedTableColumnSchema),
+    followCurrentSong: z.boolean().optional(),
+    rowHeight: z.number(),
+});
+
+const TranscodingConfigSchema = z.object({
+    bitrate: z.number().optional(),
+    enabled: z.boolean(),
+    format: z.string().optional(),
+});
+
+const MpvSettingsSchema = z.object({
+    audioExclusiveMode: z.enum(['no', 'yes']),
+    audioFormat: z.enum(['float', 's16', 's32']).optional(),
+    audioSampleRateHz: z.number().optional(),
+    gaplessAudio: z.enum(['no', 'weak', 'yes']),
+    replayGainClip: z.boolean(),
+    replayGainFallbackDB: z.number().optional(),
+    replayGainMode: z.enum(['album', 'no', 'track']),
+    replayGainPreampDB: z.number().optional(),
+});
+
+const CssSettingsSchema = z.object({
+    content: z.string().transform((val) => sanitizeCss(`<style>${val}`)),
+    enabled: z.boolean(),
+});
+
+const DiscordSettingsSchema = z.object({
+    clientId: z.string(),
+    displayType: DiscordDisplayTypeSchema,
+    enabled: z.boolean(),
+    linkType: DiscordLinkTypeSchema,
+    showAsListening: z.boolean(),
+    showPaused: z.boolean(),
+    showServerImage: z.boolean(),
+});
+
+const FontSettingsSchema = z.object({
+    builtIn: FontValueSchema,
+    custom: z.string().nullable(),
+    system: z.string().nullable(),
+    type: z.nativeEnum(FontType),
+});
+
+const SkipButtonsSchema = z.object({
+    enabled: z.boolean(),
+    skipBackwardSeconds: z.number(),
+    skipForwardSeconds: z.number(),
+});
+
+const GeneralSettingsSchema = z.object({
+    accent: z
+        .string()
+        .refine(
+            (val) => /^rgb\(\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*,\s*([0-9]{1,3})\s*\)$/.test(val),
+            {
+                message: 'Accent must be a valid rgb() color string',
+            },
+        ),
+    albumArtRes: z.number().nullable().optional(),
+    albumBackground: z.boolean(),
+    albumBackgroundBlur: z.number(),
+    artistBackground: z.boolean(),
+    artistBackgroundBlur: z.number(),
+    artistItems: z.array(SortableItemSchema(ArtistItemSchema)),
+    buttonSize: z.number(),
+    disabledContextMenu: z.record(z.boolean()),
+    doubleClickQueueAll: z.boolean(),
+    externalLinks: z.boolean(),
+    followSystemTheme: z.boolean(),
+    genreTarget: GenreTargetSchema,
+    homeFeature: z.boolean(),
+    homeItems: z.array(SortableItemSchema(HomeItemSchema)),
+    language: z.string(),
+    lastFM: z.boolean(),
+    lastfmApiKey: z.string(),
+    musicBrainz: z.boolean(),
+    nativeAspectRatio: z.boolean(),
+    passwordStore: z.string().optional(),
+    playButtonBehavior: z.nativeEnum(Play),
+    playerbarOpenDrawer: z.boolean(),
+    resume: z.boolean(),
+    showQueueDrawerButton: z.boolean(),
+    sidebarCollapsedNavigation: z.boolean(),
+    sidebarCollapseShared: z.boolean(),
+    sidebarItems: z.array(SidebarItemTypeSchema),
+    sidebarPlaylistList: z.boolean(),
+    sideQueueType: SideQueueTypeSchema,
+    skipButtons: SkipButtonsSchema,
+    theme: z.nativeEnum(AppTheme),
+    themeDark: z.nativeEnum(AppTheme),
+    themeLight: z.nativeEnum(AppTheme),
+    volumeWheelStep: z.number(),
+    volumeWidth: z.number(),
+    zoomFactor: z.number(),
+});
+
+const HotkeyBindingSchema = z.object({
+    allowGlobal: z.boolean(),
+    hotkey: z.string(),
+    isGlobal: z.boolean(),
+});
+
+const HotkeysSettingsSchema = z.object({
+    bindings: z
+        .record(BindingActionsSchema, HotkeyBindingSchema)
+        .refine((obj): obj is Required<typeof obj> =>
+            BindingActionsSchema.options.every((key) => obj[key] != null),
+        ),
+    globalMediaHotkeys: z.boolean(),
+});
+
+const LyricsSettingsSchema = z.object({
+    alignment: z.enum(['center', 'left', 'right']),
+    delayMs: z.number(),
+    enableNeteaseTranslation: z.boolean(),
+    fetch: z.boolean(),
+    follow: z.boolean(),
+    fontSize: z.number(),
+    fontSizeUnsync: z.number(),
+    gap: z.number(),
+    gapUnsync: z.number(),
+    preferLocalLyrics: z.boolean(),
+    showMatch: z.boolean(),
+    showProvider: z.boolean(),
+    sources: z.array(z.nativeEnum(LyricSource)),
+    translationApiKey: z.string(),
+    translationApiProvider: z.string().nullable(),
+    translationTargetLanguage: z.string().nullable(),
+});
+
+const ScrobbleSettingsSchema = z.object({
+    enabled: z.boolean(),
+    notify: z.boolean(),
+    scrobbleAtDuration: z.number(),
+    scrobbleAtPercentage: z.number(),
+});
+
+const PlaybackSettingsSchema = z.object({
+    audioDeviceId: z.string().nullable().optional(),
+    crossfadeDuration: z.number(),
+    crossfadeStyle: z.nativeEnum(CrossfadeStyle),
+    mediaSession: z.boolean(),
+    mpvExtraParameters: z.array(z.string()),
+    mpvProperties: MpvSettingsSchema,
+    muted: z.boolean(),
+    preservePitch: z.boolean(),
+    scrobble: ScrobbleSettingsSchema,
+    style: z.nativeEnum(PlaybackStyle),
+    transcode: TranscodingConfigSchema,
+    type: z.nativeEnum(PlaybackType),
+    webAudio: z.boolean(),
+});
+
+const RemoteSettingsSchema = z.object({
+    enabled: z.boolean(),
+    password: z.string(),
+    port: z.number(),
+    username: z.string(),
+});
+
+const TablesSettingsSchema = z.object({
+    albumDetail: DataTablePropsSchema,
+    fullScreen: DataTablePropsSchema,
+    nowPlaying: DataTablePropsSchema,
+    sideDrawerQueue: DataTablePropsSchema,
+    sideQueue: DataTablePropsSchema,
+    songs: DataTablePropsSchema,
+});
+
+const WindowSettingsSchema = z.object({
+    disableAutoUpdate: z.boolean(),
+    exitToTray: z.boolean(),
+    minimizeToTray: z.boolean(),
+    preventSleepOnPlayback: z.boolean(),
+    releaseChannel: z.enum(['beta', 'latest']),
+    startMinimized: z.boolean(),
+    tray: z.boolean(),
+    windowBarStyle: z.nativeEnum(Platform),
+});
+
+/**
+ * This schema is used for validation of the imported settings json
+ */
+export const ValidationSettingsStateSchema = z.object({
+    css: CssSettingsSchema,
+    discord: DiscordSettingsSchema,
+    font: FontSettingsSchema,
+    general: GeneralSettingsSchema,
+    hotkeys: HotkeysSettingsSchema,
+    lyrics: LyricsSettingsSchema,
+    playback: PlaybackSettingsSchema,
+    remote: RemoteSettingsSchema,
+    tab: z.union([
+        z.literal('general'),
+        z.literal('hotkeys'),
+        z.literal('playback'),
+        z.literal('window'),
+        z.string(),
+    ]),
+    window: WindowSettingsSchema,
+});
+
+/**
+ * This schema is merged below to create the full SettingsSchema but not used during import validation
+ */
+export const NonValidatedSettingsStateSchema = z.object({
+    tables: TablesSettingsSchema,
+});
+
+export const SettingsStateSchema = ValidationSettingsStateSchema.merge(
+    NonValidatedSettingsStateSchema,
+);
+
+export enum ArtistItem {
+    BIOGRAPHY = 'biography',
+    COMPILATIONS = 'compilations',
+    RECENT_ALBUMS = 'recentAlbums',
+    SIMILAR_ARTISTS = 'similarArtists',
+    TOP_SONGS = 'topSongs',
+}
+
+export enum BindingActions {
+    BROWSER_BACK = 'browserBack',
+    BROWSER_FORWARD = 'browserForward',
+    FAVORITE_CURRENT_ADD = 'favoriteCurrentAdd',
+    FAVORITE_CURRENT_REMOVE = 'favoriteCurrentRemove',
+    FAVORITE_CURRENT_TOGGLE = 'favoriteCurrentToggle',
+    FAVORITE_PREVIOUS_ADD = 'favoritePreviousAdd',
+    FAVORITE_PREVIOUS_REMOVE = 'favoritePreviousRemove',
+    FAVORITE_PREVIOUS_TOGGLE = 'favoritePreviousToggle',
+    GLOBAL_SEARCH = 'globalSearch',
+    LOCAL_SEARCH = 'localSearch',
+    MUTE = 'volumeMute',
+    NAVIGATE_HOME = 'navigateHome',
+    NEXT = 'next',
+    PAUSE = 'pause',
+    PLAY = 'play',
+    PLAY_PAUSE = 'playPause',
+    PREVIOUS = 'previous',
+    RATE_0 = 'rate0',
+    RATE_1 = 'rate1',
+    RATE_2 = 'rate2',
+    RATE_3 = 'rate3',
+    RATE_4 = 'rate4',
+    RATE_5 = 'rate5',
+    SHUFFLE = 'toggleShuffle',
+    SKIP_BACKWARD = 'skipBackward',
+    SKIP_FORWARD = 'skipForward',
+    STOP = 'stop',
+    TOGGLE_FULLSCREEN_PLAYER = 'toggleFullscreenPlayer',
+    TOGGLE_QUEUE = 'toggleQueue',
+    TOGGLE_REPEAT = 'toggleRepeat',
+    VOLUME_DOWN = 'volumeDown',
+    VOLUME_UP = 'volumeUp',
+    ZOOM_IN = 'zoomIn',
+    ZOOM_OUT = 'zoomOut',
+}
+
+export enum DiscordDisplayType {
+    ARTIST_NAME = 'artist',
+    FEISHIN = 'feishin',
+    SONG_NAME = 'song',
+}
+
+export enum DiscordLinkType {
+    LAST_FM = 'last_fm',
+    MBZ = 'musicbrainz',
+    MBZ_LAST_FM = 'musicbrainz_last_fm',
+    NONE = 'none',
+}
+
+export enum GenreTarget {
+    ALBUM = 'album',
+    TRACK = 'track',
+}
+
+export enum HomeItem {
+    MOST_PLAYED = 'mostPlayed',
+    RANDOM = 'random',
+    RECENTLY_ADDED = 'recentlyAdded',
+    RECENTLY_PLAYED = 'recentlyPlayed',
+    RECENTLY_RELEASED = 'recentlyReleased',
+}
+
+export type DataTableProps = z.infer<typeof DataTablePropsSchema>;
+
+export type PersistedTableColumn = z.infer<typeof PersistedTableColumnSchema>;
+
+export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
+    actions: {
+        reset: () => void;
+        resetSampleRate: () => void;
+        setArtistItems: (item: SortableItem<ArtistItem>[]) => void;
+        setGenreBehavior: (target: GenreTarget) => void;
+        setHomeItems: (item: SortableItem<HomeItem>[]) => void;
+        setSettings: (data: Partial<SettingsState>) => void;
+        setSidebarItems: (items: SidebarItemType[]) => void;
+        setTable: (type: TableType, data: DataTableProps) => void;
+        setTranscodingConfig: (config: TranscodingConfig) => void;
+        toggleContextMenuItem: (item: ContextMenuItemType) => void;
+        toggleMediaSession: () => void;
+        toggleSidebarCollapseShare: () => void;
+    };
+}
+
+export interface SettingsState extends z.infer<typeof SettingsStateSchema> {}
+
+export type SidebarItemType = z.infer<typeof SidebarItemTypeSchema>;
+
+export type SideQueueType = z.infer<typeof SideQueueTypeSchema>;
+
+export type SortableItem<T> = {
     disabled: boolean;
-    id: string;
-    label: string;
-    route: AppRoute | string;
+    id: T;
 };
+
+export type TranscodingConfig = z.infer<typeof TranscodingConfigSchema>;
+
+export type VersionedSettings = SettingsState & { version: number };
 
 export const sidebarItems: SidebarItemType[] = [
     {
@@ -91,275 +489,15 @@ export const sidebarItems: SidebarItemType[] = [
     },
 ];
 
-export enum HomeItem {
-    MOST_PLAYED = 'mostPlayed',
-    RANDOM = 'random',
-    RECENTLY_ADDED = 'recentlyAdded',
-    RECENTLY_PLAYED = 'recentlyPlayed',
-    RECENTLY_RELEASED = 'recentlyReleased',
-}
-
-export type SortableItem<T> = {
-    disabled: boolean;
-    id: T;
-};
-
 const homeItems = Object.values(HomeItem).map((item) => ({
     disabled: false,
     id: item,
 }));
 
-export enum ArtistItem {
-    BIOGRAPHY = 'biography',
-    COMPILATIONS = 'compilations',
-    RECENT_ALBUMS = 'recentAlbums',
-    SIMILAR_ARTISTS = 'similarArtists',
-    TOP_SONGS = 'topSongs',
-}
-
 const artistItems = Object.values(ArtistItem).map((item) => ({
     disabled: false,
     id: item,
 }));
-
-export enum BindingActions {
-    BROWSER_BACK = 'browserBack',
-    BROWSER_FORWARD = 'browserForward',
-    FAVORITE_CURRENT_ADD = 'favoriteCurrentAdd',
-    FAVORITE_CURRENT_REMOVE = 'favoriteCurrentRemove',
-    FAVORITE_CURRENT_TOGGLE = 'favoriteCurrentToggle',
-    FAVORITE_PREVIOUS_ADD = 'favoritePreviousAdd',
-    FAVORITE_PREVIOUS_REMOVE = 'favoritePreviousRemove',
-    FAVORITE_PREVIOUS_TOGGLE = 'favoritePreviousToggle',
-    GLOBAL_SEARCH = 'globalSearch',
-    LOCAL_SEARCH = 'localSearch',
-    MUTE = 'volumeMute',
-    NAVIGATE_HOME = 'navigateHome',
-    NEXT = 'next',
-    PAUSE = 'pause',
-    PLAY = 'play',
-    PLAY_PAUSE = 'playPause',
-    PREVIOUS = 'previous',
-    RATE_0 = 'rate0',
-    RATE_1 = 'rate1',
-    RATE_2 = 'rate2',
-    RATE_3 = 'rate3',
-    RATE_4 = 'rate4',
-    RATE_5 = 'rate5',
-    SHUFFLE = 'toggleShuffle',
-    SKIP_BACKWARD = 'skipBackward',
-    SKIP_FORWARD = 'skipForward',
-    STOP = 'stop',
-    TOGGLE_FULLSCREEN_PLAYER = 'toggleFullscreenPlayer',
-    TOGGLE_QUEUE = 'toggleQueue',
-    TOGGLE_REPEAT = 'toggleRepeat',
-    VOLUME_DOWN = 'volumeDown',
-    VOLUME_UP = 'volumeUp',
-    ZOOM_IN = 'zoomIn',
-    ZOOM_OUT = 'zoomOut',
-}
-
-export enum DiscordDisplayType {
-    ARTIST_NAME = 'artist',
-    FEISHIN = 'feishin',
-    SONG_NAME = 'song',
-}
-
-export enum DiscordLinkType {
-    LAST_FM = 'last_fm',
-    MBZ = 'musicbrainz',
-    MBZ_LAST_FM = 'musicbrainz_last_fm',
-    NONE = 'none',
-}
-
-export enum GenreTarget {
-    ALBUM = 'album',
-    TRACK = 'track',
-}
-
-export type DataTableProps = {
-    autoFit: boolean;
-    columns: PersistedTableColumn[];
-    followCurrentSong?: boolean;
-    rowHeight: number;
-};
-
-export type PersistedTableColumn = {
-    column: TableColumn;
-    extraProps?: Partial<ColDef>;
-    width: number;
-};
-
-export interface SettingsSlice extends SettingsState {
-    actions: {
-        reset: () => void;
-        resetSampleRate: () => void;
-        setArtistItems: (item: SortableItem<ArtistItem>[]) => void;
-        setGenreBehavior: (target: GenreTarget) => void;
-        setHomeItems: (item: SortableItem<HomeItem>[]) => void;
-        setSettings: (data: Partial<SettingsState>) => void;
-        setSidebarItems: (items: SidebarItemType[]) => void;
-        setTable: (type: TableType, data: DataTableProps) => void;
-        setTranscodingConfig: (config: TranscodingConfig) => void;
-        toggleContextMenuItem: (item: ContextMenuItemType) => void;
-        toggleMediaSession: () => void;
-        toggleSidebarCollapseShare: () => void;
-    };
-}
-
-export interface SettingsState {
-    css: {
-        content: string;
-        enabled: boolean;
-    };
-    discord: {
-        clientId: string;
-        displayType: DiscordDisplayType;
-        enabled: boolean;
-        linkType: DiscordLinkType;
-        showAsListening: boolean;
-        showPaused: boolean;
-        showServerImage: boolean;
-    };
-    font: {
-        builtIn: string;
-        custom: null | string;
-        system: null | string;
-        type: FontType;
-    };
-    general: {
-        accent: string;
-        albumArtRes?: null | number;
-        albumBackground: boolean;
-        albumBackgroundBlur: number;
-        artistBackground: boolean;
-        artistBackgroundBlur: number;
-        artistItems: SortableItem<ArtistItem>[];
-        buttonSize: number;
-        disabledContextMenu: { [k in ContextMenuItemType]?: boolean };
-        doubleClickQueueAll: boolean;
-        externalLinks: boolean;
-        followSystemTheme: boolean;
-        genreTarget: GenreTarget;
-        homeFeature: boolean;
-        homeItems: SortableItem<HomeItem>[];
-        language: string;
-        lastFM: boolean;
-        lastfmApiKey: string;
-        musicBrainz: boolean;
-        nativeAspectRatio: boolean;
-        passwordStore?: string;
-        playButtonBehavior: Play;
-        playerbarOpenDrawer: boolean;
-        resume: boolean;
-        showQueueDrawerButton: boolean;
-        sidebarCollapsedNavigation: boolean;
-        sidebarCollapseShared: boolean;
-        sidebarItems: SidebarItemType[];
-        sidebarPlaylistList: boolean;
-        sideQueueType: SideQueueType;
-        skipButtons: {
-            enabled: boolean;
-            skipBackwardSeconds: number;
-            skipForwardSeconds: number;
-        };
-        theme: AppTheme;
-        themeDark: AppTheme;
-        themeLight: AppTheme;
-        volumeWheelStep: number;
-        volumeWidth: number;
-        zoomFactor: number;
-    };
-    hotkeys: {
-        bindings: Record<
-            BindingActions,
-            { allowGlobal: boolean; hotkey: string; isGlobal: boolean }
-        >;
-        globalMediaHotkeys: boolean;
-    };
-    lyrics: {
-        alignment: 'center' | 'left' | 'right';
-        delayMs: number;
-        enableNeteaseTranslation: boolean;
-        fetch: boolean;
-        follow: boolean;
-        fontSize: number;
-        fontSizeUnsync: number;
-        gap: number;
-        gapUnsync: number;
-        preferLocalLyrics: boolean;
-        showMatch: boolean;
-        showProvider: boolean;
-        sources: LyricSource[];
-        translationApiKey: string;
-        translationApiProvider: null | string;
-        translationTargetLanguage: null | string;
-    };
-    playback: {
-        audioDeviceId?: null | string;
-        crossfadeDuration: number;
-        crossfadeStyle: CrossfadeStyle;
-        mediaSession: boolean;
-        mpvExtraParameters: string[];
-        mpvProperties: MpvSettings;
-        muted: boolean;
-        preservePitch: boolean;
-        scrobble: {
-            enabled: boolean;
-            notify: boolean;
-            scrobbleAtDuration: number;
-            scrobbleAtPercentage: number;
-        };
-        style: PlaybackStyle;
-        transcode: TranscodingConfig;
-        type: PlaybackType;
-        webAudio: boolean;
-    };
-    remote: {
-        enabled: boolean;
-        password: string;
-        port: number;
-        username: string;
-    };
-    tab: 'general' | 'hotkeys' | 'playback' | 'window' | string;
-    tables: {
-        albumDetail: DataTableProps;
-        fullScreen: DataTableProps;
-        nowPlaying: DataTableProps;
-        sideDrawerQueue: DataTableProps;
-        sideQueue: DataTableProps;
-        songs: DataTableProps;
-    };
-    window: {
-        disableAutoUpdate: boolean;
-        exitToTray: boolean;
-        minimizeToTray: boolean;
-        preventSleepOnPlayback: boolean;
-        releaseChannel: 'beta' | 'latest';
-        startMinimized: boolean;
-        tray: boolean;
-        windowBarStyle: Platform;
-    };
-}
-
-export type SideQueueType = 'sideDrawerQueue' | 'sideQueue';
-
-export type TranscodingConfig = {
-    bitrate?: number;
-    enabled: boolean;
-    format?: string;
-};
-
-type MpvSettings = {
-    audioExclusiveMode: 'no' | 'yes';
-    audioFormat?: 'float' | 's16' | 's32';
-    audioSampleRateHz?: number;
-    gaplessAudio: 'no' | 'weak' | 'yes';
-    replayGainClip: boolean;
-    replayGainFallbackDB?: number;
-    replayGainMode: 'album' | 'no' | 'track';
-    replayGainPreampDB?: number;
-};
 
 // Determines the default/initial windowBarStyle value based on the current platform.
 const getPlatformDefaultWindowBarStyle = (): Platform => {
@@ -774,9 +912,10 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
         {
             merge: mergeOverridingColumns,
             migrate(persistedState, version) {
+                const state = persistedState as SettingsSlice;
                 console.log('migrate: ', version);
+
                 if (version === 8) {
-                    const state = persistedState as SettingsSlice;
                     state.general.sidebarItems = state.general.sidebarItems.filter(
                         (item) => item.id !== 'Folders',
                     );
@@ -789,7 +928,23 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                 }
 
                 if (version <= 9) {
-                    const state = persistedState as SettingsSlice;
+                    if (!state.window.releaseChannel) {
+                        state.window.releaseChannel = initialState.window.releaseChannel;
+                    }
+
+                    if (!state.playback.mediaSession) {
+                        state.playback.mediaSession = initialState.playback.mediaSession;
+                    }
+
+                    if (!state.general.artistBackgroundBlur) {
+                        state.general.artistBackgroundBlur =
+                            initialState.general.artistBackgroundBlur;
+                    }
+
+                    if (!state.general.artistBackground) {
+                        state.general.artistBackground = initialState.general.artistBackground;
+                    }
+
                     state.window.windowBarStyle = Platform.LINUX;
                 }
 
@@ -840,3 +995,18 @@ export const useFontSettings = () => useSettingsStore((state) => state.font, sha
 export const useDiscordSettings = () => useSettingsStore((state) => state.discord, shallow);
 
 export const useCssSettings = () => useSettingsStore((state) => state.css, shallow);
+
+const getSettingsStoreVersion = () => useSettingsStore.persist.getOptions().version!;
+
+export const useSettingsForExport = (): SettingsState & { version: number } =>
+    useSettingsStore((state) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars -- actions needs to be omitted from the export as it contains store functions
+        const { actions, ...otherSettings } = state;
+        return {
+            ...otherSettings,
+            version: getSettingsStoreVersion(),
+        };
+    });
+
+export const migrateSettings = (settings: SettingsState, settingsVersion: number): SettingsState =>
+    useSettingsStore.persist.getOptions().migrate!(settings, settingsVersion) as SettingsState;

@@ -14,6 +14,7 @@ import {
     useGeneralSettings,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
+import { type Font, FONT_OPTIONS } from '/@/renderer/types/fonts';
 import { FileInput } from '/@/shared/components/file-input/file-input';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Select } from '/@/shared/components/select/select';
@@ -24,23 +25,6 @@ const localSettings = isElectron() ? window.api.localSettings : null;
 const ipc = isElectron() ? window.api.ipc : null;
 // Electron 32+ removed file.path, use this which is exposed in preload to get real path
 const webUtils = isElectron() ? window.electron.webUtils : null;
-
-type Font = {
-    label: string;
-    value: string;
-};
-
-const FONT_OPTIONS: Font[] = [
-    { label: 'Archivo', value: 'Archivo' },
-    { label: 'Fredoka', value: 'Fredoka' },
-    { label: 'Inter', value: 'Inter' },
-    { label: 'League Spartan', value: 'League Spartan' },
-    { label: 'Lexend', value: 'Lexend' },
-    { label: 'Poppins', value: 'Poppins' },
-    { label: 'Raleway', value: 'Raleway' },
-    { label: 'Sora', value: 'Sora' },
-    { label: 'Work Sans', value: 'Work Sans' },
-];
 
 const FONT_TYPES: Font[] = [
     {
