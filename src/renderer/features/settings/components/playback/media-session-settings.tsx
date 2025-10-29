@@ -30,6 +30,7 @@ export const MediaSessionSettings = () => {
                 <Switch
                     aria-label="Toggle media Session"
                     defaultChecked={mediaSession}
+                    disabled={!isWindows || !isDesktop || playbackType !== PlaybackType.WEB}
                     onChange={handleMediaSessionChange}
                 />
             ),
@@ -37,7 +38,7 @@ export const MediaSessionSettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: !isWindows || !isDesktop || playbackType !== PlaybackType.WEB,
+            isHidden: !isWindows || !isDesktop,
             note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
             title: t('setting.mediaSession', { postProcess: 'sentenceCase' }),
         },

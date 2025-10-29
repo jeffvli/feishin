@@ -50,9 +50,7 @@ export const WindowHotkeySettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden:
-                !isElectron() ||
-                (enableWindowsMediaSession && isWindows && playbackType === PlaybackType.WEB),
+            isHidden: !isElectron(),
             title: t('setting.globalMediaHotkeys', { postProcess: 'sentenceCase' }),
         },
     ];
