@@ -1,3 +1,4 @@
+import json from '@eslint/json';
 import eslintConfigPrettier from '@electron-toolkit/eslint-config-prettier';
 import tseslint from '@electron-toolkit/eslint-config-ts';
 import perfectionist from 'eslint-plugin-perfectionist';
@@ -8,9 +9,6 @@ import eslintPluginReactRefresh from 'eslint-plugin-react-refresh';
 export default tseslint.config(
     { ignores: ['**/node_modules', '**/dist', '**/out'] },
     tseslint.configs.recommended,
-    perfectionist.configs['recommended-natural'],
-    eslintPluginReact.configs.flat.recommended,
-    eslintPluginReact.configs.flat['jsx-runtime'],
     {
         settings: {
             react: {
@@ -20,6 +18,9 @@ export default tseslint.config(
     },
     {
         files: ['**/*.{ts,tsx}'],
+        ...perfectionist.configs['recommended-natural'],
+        ...eslintPluginReact.configs.flat['jsx-runtime'],
+        ...eslintPluginReact.configs.flat.recommended,
         plugins: {
             'react-hooks': eslintPluginReactHooks,
             'react-refresh': eslintPluginReactRefresh,
@@ -50,4 +51,16 @@ export default tseslint.config(
         },
     },
     eslintConfigPrettier,
+    {
+        plugins: {
+            json,
+        },
+        files: ['**/*.json'],
+        ignores: ['.stylelintrc.json'],
+        language: 'json/json',
+        rules: {
+            'json/no-duplicate-keys': 'error',
+            'no-irregular-whitespace': 'off',
+        },
+    },
 );

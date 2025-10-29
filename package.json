@@ -135,6 +135,7 @@
         "@electron-toolkit/eslint-config-prettier": "^3.0.0",
         "@electron-toolkit/eslint-config-ts": "^3.0.0",
         "@electron-toolkit/tsconfig": "^1.0.1",
+        "@eslint/json": "^0.13.2",
         "@types/electron-localshortcut": "^3.1.0",
         "@types/lodash": "^4.17.18",
         "@types/md5": "^2.3.5",
