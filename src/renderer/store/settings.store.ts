@@ -225,6 +225,7 @@ const HotkeysSettingsSchema = z.object({
 const LyricsSettingsSchema = z.object({
     alignment: z.enum(['center', 'left', 'right']),
     delayMs: z.number(),
+    enableAutoTranslation: z.boolean(),
     enableNeteaseTranslation: z.boolean(),
     fetch: z.boolean(),
     follow: z.boolean(),
