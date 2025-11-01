@@ -3,7 +3,6 @@ import styles from './image-column.module.css';
 import {
     ItemTableListInnerColumn,
     TableColumnContainer,
-    TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { Image } from '/@/shared/components/image/image';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
@@ -15,9 +14,9 @@ export const ImageColumn = (props: ItemTableListInnerColumn) => {
 
     if (typeof row === 'string') {
         return (
-            <TableColumnTextContainer {...props}>
+            <TableColumnContainer {...props}>
                 <Image src={row} />
-            </TableColumnTextContainer>
+            </TableColumnContainer>
         );
     }
 
