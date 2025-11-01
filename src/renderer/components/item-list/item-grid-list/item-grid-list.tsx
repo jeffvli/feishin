@@ -130,16 +130,6 @@ const VirtualizedGridList = React.memo(
             };
         }, [enableSelection, enableExpansion, internalState, tableMeta, data, itemType, gap]);
 
-        const handleOnRangeChanged = useCallback(
-            ({ visibleStartIndex, visibleStopIndex }: ListOnItemsRenderedProps) => {
-                onRangeChanged?.({
-                    startIndex: visibleStartIndex * (tableMeta?.columnCount || 0),
-                    stopIndex: visibleStopIndex * (tableMeta?.columnCount || 0),
-                });
-            },
-            [tableMeta?.columnCount, onRangeChanged],
-        );
-
         const debouncedOnScrollEnd = useMemo(
             () =>
                 onScrollEnd
@@ -164,6 +154,15 @@ const VirtualizedGridList = React.memo(
             [onScroll, debouncedOnScrollEnd],
         );
 
+        const debouncedOnItemsRendered = useMemo(() => {
+            return debounce((items: ListOnItemsRenderedProps) => {
+                onRangeChanged?.({
+                    startIndex: items.visibleStartIndex * (tableMeta?.columnCount || 0),
+                    stopIndex: items.visibleStopIndex * (tableMeta?.columnCount || 0),
+                });
+            }, 50);
+        }, [onRangeChanged, tableMeta?.columnCount]);
+
         if (!tableMeta) {
             return null;
         }
@@ -179,7 +178,7 @@ const VirtualizedGridList = React.memo(
                                 itemCount={itemData.tableMeta?.rowCount || 0}
                                 itemData={itemData}
                                 itemSize={itemData.tableMeta?.itemHeight || 0}
-                                onItemsRendered={handleOnRangeChanged}
+                                onItemsRendered={debouncedOnItemsRendered}
                                 onScroll={handleOnScroll}
                                 outerRef={outerRef}
                                 ref={ref}
