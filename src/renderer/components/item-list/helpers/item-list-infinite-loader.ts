@@ -53,7 +53,7 @@ function getInitialData(itemCount: number) {
 
 export const useItemListInfiniteLoader = ({
     eventKey,
-    fetchThreshold = 0.75,
+    fetchThreshold = 0.2,
     itemsPerPage = 100,
     itemType,
     listCountQuery,
@@ -346,42 +346,86 @@ const getFetchRange = (
     // Determine which pages to fetch based on scroll direction and threshold
     let pagesToFetch: number[] = [];
 
+    // Calculate page boundaries for the range
+    const startPage = Math.floor(range.startIndex / itemsPerPage);
+    const stopPage = Math.floor(range.stopIndex / itemsPerPage);
+
+    // Distance from startIndex to the start of its page
+    const distanceFromStartPageTop = range.startIndex - startPage * itemsPerPage;
+
+    // Distance from stopIndex to the end of its page (next page boundary)
+    const distanceFromStopPageBottom = (stopPage + 1) * itemsPerPage - range.stopIndex;
+
     if (newDirection === 'down') {
-        const currentPage = Math.floor(range.stopIndex / itemsPerPage);
-        const distanceFromNextPage = (currentPage + 1) * itemsPerPage - range.stopIndex;
+        // Always include pages in the visible range
+        for (let page = startPage; page <= stopPage; page++) {
+            pagesToFetch.push(page);
+        }
 
-        // Always include the current page if it's not loaded
-        pagesToFetch.push(currentPage);
-
-        // If we're close to the next page boundary, fetch additional upcoming pages
-        if (distanceFromNextPage <= thresholdDistance && maxPagesToFetch > 1) {
+        // If we're close to the next page boundary below, fetch additional upcoming pages
+        if (distanceFromStopPageBottom <= thresholdDistance && maxPagesToFetch > 1) {
             for (let i = 1; i < maxPagesToFetch; i++) {
-                pagesToFetch.push(currentPage + i);
+                pagesToFetch.push(stopPage + i);
+            }
+        }
+
+        // If we're close to a page boundary above, fetch additional previous pages
+        if (distanceFromStartPageTop <= thresholdDistance && maxPagesToFetch > 1) {
+            for (let i = 1; i < maxPagesToFetch; i++) {
+                const prevPage = startPage - i;
+                if (prevPage >= 0) {
+                    pagesToFetch.push(prevPage);
+                }
             }
         }
     } else if (newDirection === 'up') {
-        const currentPage = Math.floor(range.startIndex / itemsPerPage);
-        const distanceFromPrevPage = range.startIndex - currentPage * itemsPerPage;
+        // Always include pages in the visible range
+        for (let page = startPage; page <= stopPage; page++) {
+            pagesToFetch.push(page);
+        }
 
-        // Always include the current page if it's not loaded
-        pagesToFetch.push(currentPage);
-
-        // If we're close to the previous page boundary, fetch additional previous pages
-        if (distanceFromPrevPage <= thresholdDistance && maxPagesToFetch > 1) {
+        // If we're close to the previous page boundary above, fetch additional previous pages
+        if (distanceFromStartPageTop <= thresholdDistance && maxPagesToFetch > 1) {
             for (let i = 1; i < maxPagesToFetch; i++) {
-                pagesToFetch.push(currentPage - i);
+                const prevPage = startPage - i;
+                if (prevPage >= 0) {
+                    pagesToFetch.push(prevPage);
+                }
+            }
+        }
+
+        // If we're close to a page boundary below, fetch additional upcoming pages
+        if (distanceFromStopPageBottom <= thresholdDistance && maxPagesToFetch > 1) {
+            for (let i = 1; i < maxPagesToFetch; i++) {
+                pagesToFetch.push(stopPage + i);
             }
         }
     } else {
-        // Unknown direction - fetch current page and next pages
-        const currentPage = Math.floor(range.stopIndex / itemsPerPage);
-        for (let i = 0; i < maxPagesToFetch; i++) {
-            pagesToFetch.push(currentPage + i);
+        // Unknown direction - fetch pages in the visible range and nearby pages
+        for (let page = startPage; page <= stopPage; page++) {
+            pagesToFetch.push(page);
+        }
+
+        // Fetch additional pages above if close to boundary
+        if (distanceFromStartPageTop <= thresholdDistance && maxPagesToFetch > 1) {
+            for (let i = 1; i < maxPagesToFetch; i++) {
+                const prevPage = startPage - i;
+                if (prevPage >= 0) {
+                    pagesToFetch.push(prevPage);
+                }
+            }
+        }
+
+        // Fetch additional pages below if close to boundary
+        if (distanceFromStopPageBottom <= thresholdDistance && maxPagesToFetch > 1) {
+            for (let i = 1; i < maxPagesToFetch; i++) {
+                pagesToFetch.push(stopPage + i);
+            }
         }
     }
 
-    // Filter out negative page numbers
-    pagesToFetch = pagesToFetch.filter((page) => page >= 0);
+    // Remove duplicates and filter out negative page numbers
+    pagesToFetch = [...new Set(pagesToFetch)].filter((page) => page >= 0).sort((a, b) => a - b);
 
     return {
         direction: newDirection,
