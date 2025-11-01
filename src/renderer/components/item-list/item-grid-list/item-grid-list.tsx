@@ -404,15 +404,19 @@ const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
     }
 
     for (let i = startIndex; i <= stopIndex + columnCountToAdd; i += 1) {
-        items.push(
-            <div
-                className={clsx(styles.itemRow, styles[`gap-${gap}`])}
-                key={`card-${i}-${index}`}
-                style={{ '--columns': columns } as CSSProperties}
-            >
-                <ItemCard controls={controls} data={data[i]} itemType={itemType} withControls />
-            </div>,
-        );
+        if (i < data.length) {
+            items.push(
+                <div
+                    className={clsx(styles.itemRow, styles[`gap-${gap}`])}
+                    key={`card-${i}-${index}`}
+                    style={{ '--columns': columns } as CSSProperties}
+                >
+                    <ItemCard controls={controls} data={data[i]} itemType={itemType} withControls />
+                </div>,
+            );
+        } else {
+            items.push(null);
+        }
     }
 
     return (
