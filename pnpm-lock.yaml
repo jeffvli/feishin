@@ -278,7 +278,7 @@ importers:
         version: 8.18.1
       '@vitejs/plugin-react':
         specifier: ^4.3.4
-        version: 4.5.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2))
+        version: 4.5.0(vite@6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1))
       concurrently:
         specifier: ^7.1.0
         version: 7.6.0
@@ -296,7 +296,7 @@ importers:
         version: 3.2.1
       electron-vite:
         specifier: ^3.1.0
-        version: 3.1.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2))
+        version: 3.1.0(vite@6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1))
       eslint:
         specifier: ^9.24.0
         version: 9.27.0
@@ -346,8 +346,8 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       vite:
-        specifier: ^6.3.6
-        version: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)
+        specifier: ^6.4.1
+        version: 6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1)
       vite-plugin-conditional-import:
         specifier: ^0.1.7
         version: 0.1.7
@@ -356,10 +356,10 @@ importers:
         version: 1.6.0
       vite-plugin-ejs:
         specifier: ^1.7.0
-        version: 1.7.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2))
+        version: 1.7.0(vite@6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1))
       vite-plugin-pwa:
         specifier: ^1.0.3
-        version: 1.0.3(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
+        version: 1.0.3(vite@6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
 
 packages:
 
@@ -1307,10 +1307,10 @@ packages:
     cpu: [arm64]
     os: [openbsd]
 
-  '@esbuild/openbsd-arm64@0.25.9':
-    resolution: {integrity: sha512-YaFBlPGeDasft5IIM+CQAhJAqS3St3nJzDEgsgFixcfZeyGPCd6eJBWzke5piZuZ7CtL656eOSYKk4Ls2C0FRQ==}
+  '@esbuild/openbsd-x64@0.25.11':
+    resolution: {integrity: sha512-CN+7c++kkbrckTOz5hrehxWN7uIhFFlmS/hqziSFVWpAzpWrQoAG4chH+nN3Be+Kzv/uuo7zhX716x3Sn2Jduw==}
     engines: {node: '>=18'}
-    cpu: [arm64]
+    cpu: [x64]
     os: [openbsd]
 
   '@esbuild/openbsd-x64@0.25.4':
@@ -5972,8 +5972,8 @@ snapshots:
 
   '@babel/helper-member-expression-to-functions@7.28.5':
     dependencies:
-      '@babel/traverse': 7.28.4
-      '@babel/types': 7.28.4
+      '@babel/traverse': 7.28.5
+      '@babel/types': 7.28.5
     transitivePeerDependencies:
       - supports-color
 
@@ -6004,7 +6004,7 @@ snapshots:
 
   '@babel/helper-optimise-call-expression@7.27.1':
     dependencies:
-      '@babel/types': 7.28.4
+      '@babel/types': 7.28.5
 
   '@babel/helper-plugin-utils@7.27.1': {}
 
@@ -6013,7 +6013,7 @@ snapshots:
       '@babel/core': 7.27.1
       '@babel/helper-annotate-as-pure': 7.27.3
       '@babel/helper-wrap-function': 7.28.3
-      '@babel/traverse': 7.28.4
+      '@babel/traverse': 7.28.5
     transitivePeerDependencies:
       - supports-color
 
@@ -6028,8 +6028,8 @@ snapshots:
 
   '@babel/helper-skip-transparent-expression-wrappers@7.27.1':
     dependencies:
-      '@babel/traverse': 7.28.4
-      '@babel/types': 7.28.4
+      '@babel/traverse': 7.28.5
+      '@babel/types': 7.28.5
     transitivePeerDependencies:
       - supports-color
 
@@ -6066,7 +6066,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.27.1
       '@babel/helper-plugin-utils': 7.27.1
-      '@babel/traverse': 7.28.4
+      '@babel/traverse': 7.28.5
     transitivePeerDependencies:
       - supports-color
 
@@ -6245,7 +6245,7 @@ snapshots:
       '@babel/core': 7.27.1
       '@babel/helper-compilation-targets': 7.27.2
       '@babel/helper-plugin-utils': 7.27.1
-      '@babel/traverse': 7.28.4
+      '@babel/traverse': 7.28.5
     transitivePeerDependencies:
       - supports-color
 
@@ -6290,8 +6290,8 @@ snapshots:
       '@babel/core': 7.27.1
       '@babel/helper-module-transforms': 7.28.3(@babel/core@7.27.1)
       '@babel/helper-plugin-utils': 7.27.1
-      '@babel/helper-validator-identifier': 7.27.1
-      '@babel/traverse': 7.28.4
+      '@babel/helper-validator-identifier': 7.28.5
+      '@babel/traverse': 7.28.5
     transitivePeerDependencies:
       - supports-color
 
@@ -6540,7 +6540,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.27.1
       '@babel/helper-plugin-utils': 7.27.1
-      '@babel/types': 7.28.4
+      '@babel/types': 7.28.5
       esutils: 2.0.3
 
   '@babel/runtime@7.27.1': {}
@@ -7645,7 +7645,7 @@ snapshots:
       '@typescript-eslint/types': 8.32.1
       eslint-visitor-keys: 4.2.0
 
-  '@vitejs/plugin-react@4.5.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2))':
+  '@vitejs/plugin-react@4.5.0(vite@6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1))':
     dependencies:
       '@babel/core': 7.27.1
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.27.1)
@@ -7653,7 +7653,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.9
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)
+      vite: 6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -8597,7 +8597,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron-vite@3.1.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)):
+  electron-vite@3.1.0(vite@6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1)):
     dependencies:
       '@babel/core': 7.27.1
       '@babel/plugin-transform-arrow-functions': 7.27.1(@babel/core@7.27.1)
@@ -8605,7 +8605,7 @@ snapshots:
       esbuild: 0.25.4
       magic-string: 0.30.17
       picocolors: 1.1.1
-      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)
+      vite: 6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -11575,23 +11575,23 @@ snapshots:
       fast-glob: 3.3.3
       magic-string: 0.30.17
 
-  vite-plugin-ejs@1.7.0(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)):
+  vite-plugin-ejs@1.7.0(vite@6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1)):
     dependencies:
       ejs: 3.1.10
-      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)
+      vite: 6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1)
 
-  vite-plugin-pwa@1.0.3(vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0):
+  vite-plugin-pwa@1.0.3(vite@6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0):
     dependencies:
       debug: 4.4.3
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.15
-      vite: 6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2)
+      vite: 6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1)
       workbox-build: 7.3.0(@types/babel__core@7.20.5)
       workbox-window: 7.3.0
     transitivePeerDependencies:
       - supports-color
 
-  vite@6.3.6(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.2):
+  vite@6.4.1(@types/node@22.15.32)(sass-embedded@1.89.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.44.0)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.11
       fdir: 6.5.0(picomatch@4.0.3)
@@ -11604,7 +11604,8 @@ snapshots:
       fsevents: 2.3.3
       sass-embedded: 1.89.0
       sugarss: 4.0.1(postcss@8.5.3)
-      terser: 5.39.2
+      terser: 5.44.0
+      yaml: 2.8.1
 
   void-elements@3.1.0: {}
 
