@@ -5,13 +5,13 @@ import styles from './title-combined-column.module.css';
 
 import { getTitlePath } from '/@/renderer/components/item-list/helpers/get-title-path';
 import {
+    ColumnNullFallback,
+    ColumnSkeletonVariable,
     ItemTableListInnerColumn,
     TableColumnContainer,
-    TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Image } from '/@/shared/components/image/image';
-import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
 import { RelatedAlbumArtist } from '/@/shared/types/domain-types';
 
@@ -68,9 +68,9 @@ export const TitleCombinedColumn = (props: ItemTableListInnerColumn) => {
         );
     }
 
-    return (
-        <TableColumnTextContainer {...props}>
-            <Skeleton />
-        </TableColumnTextContainer>
-    );
+    if (row === null) {
+        return <ColumnNullFallback {...props} />;
+    }
+
+    return <ColumnSkeletonVariable {...props} />;
 };

@@ -1,9 +1,10 @@
 import {
+    ColumnNullFallback,
+    ColumnSkeletonFixed,
     ItemTableListInnerColumn,
     TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { formatDateAbsolute, formatDateRelative } from '/@/renderer/utils/format';
-import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 
 export const DateColumn = (props: ItemTableListInnerColumn) => {
@@ -21,11 +22,11 @@ export const DateColumn = (props: ItemTableListInnerColumn) => {
         );
     }
 
-    return (
-        <TableColumnTextContainer {...props}>
-            <Skeleton />
-        </TableColumnTextContainer>
-    );
+    if (row === null) {
+        return <ColumnNullFallback {...props} />;
+    }
+
+    return <ColumnSkeletonFixed {...props} />;
 };
 
 export const RelativeDateColumn = (props: ItemTableListInnerColumn) => {
@@ -44,12 +45,8 @@ export const RelativeDateColumn = (props: ItemTableListInnerColumn) => {
     }
 
     if (row === null) {
-        return <TableColumnTextContainer {...props}>&nbsp;</TableColumnTextContainer>;
+        return <ColumnNullFallback {...props} />;
     }
 
-    return (
-        <TableColumnTextContainer {...props}>
-            <Skeleton />
-        </TableColumnTextContainer>
-    );
+    return <ColumnSkeletonFixed {...props} />;
 };

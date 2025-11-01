@@ -4,14 +4,14 @@ import { generatePath, Link } from 'react-router';
 import styles from './genre-badge-column.module.css';
 
 import {
+    ColumnNullFallback,
+    ColumnSkeletonVariable,
     ItemTableListInnerColumn,
     TableColumnContainer,
-    TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Group } from '/@/shared/components/group/group';
-import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Genre } from '/@/shared/types/domain-types';
 import { stringToColor } from '/@/shared/utils/string-to-color';
 
@@ -53,11 +53,11 @@ const GenreBadgeColumn = (props: ItemTableListInnerColumn) => {
         );
     }
 
-    return (
-        <TableColumnTextContainer {...props}>
-            <Skeleton />
-        </TableColumnTextContainer>
-    );
+    if (row === null) {
+        return <ColumnNullFallback {...props} />;
+    }
+
+    return <ColumnSkeletonVariable {...props} />;
 };
 
 export const GenreColumnMemo = memo(GenreBadgeColumn);

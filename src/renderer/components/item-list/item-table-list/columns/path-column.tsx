@@ -1,8 +1,9 @@
 import {
+    ColumnNullFallback,
+    ColumnSkeletonVariable,
     ItemTableListInnerColumn,
     TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
-import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 
 export const PathColumn = (props: ItemTableListInnerColumn) => {
     const row: string | undefined = (props.data as (any | undefined)[])[props.rowIndex]?.[
@@ -16,9 +17,9 @@ export const PathColumn = (props: ItemTableListInnerColumn) => {
         return <TableColumnTextContainer {...props}>{displayPath}</TableColumnTextContainer>;
     }
 
-    return (
-        <TableColumnTextContainer {...props}>
-            <Skeleton />
-        </TableColumnTextContainer>
-    );
+    if (row === null) {
+        return <ColumnNullFallback {...props} />;
+    }
+
+    return <ColumnSkeletonVariable {...props} />;
 };

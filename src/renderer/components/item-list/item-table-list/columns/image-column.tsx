@@ -23,7 +23,7 @@ export const ImageColumn = (props: ItemTableListInnerColumn) => {
 
     return (
         <TableColumnContainer {...props}>
-            <Skeleton containerClassName={styles.skeleton} />
+            <Skeleton containerClassName={styles.skeleton} enableAnimation />
         </TableColumnContainer>
     );
 };

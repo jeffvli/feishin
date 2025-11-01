@@ -1,8 +1,9 @@
 import {
+    ColumnNullFallback,
+    ColumnSkeletonFixed,
     ItemTableListInnerColumn,
     TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
-import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 
 export const DefaultColumn = (props: ItemTableListInnerColumn) => {
     const row: any | undefined = (props.data as (any | undefined)[])[props.rowIndex]?.[
@@ -13,13 +14,9 @@ export const DefaultColumn = (props: ItemTableListInnerColumn) => {
         return <TableColumnTextContainer {...props}>{row}</TableColumnTextContainer>;
     }
 
-    if (typeof row === 'undefined') {
-        return (
-            <TableColumnTextContainer {...props}>
-                <Skeleton />
-            </TableColumnTextContainer>
-        );
+    if (row === null) {
+        return <ColumnNullFallback {...props} />;
     }
 
-    return <TableColumnTextContainer {...props}>&nbsp;</TableColumnTextContainer>;
+    return <ColumnSkeletonFixed {...props} />;
 };

@@ -31,6 +31,7 @@ import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table
 import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemControls } from '/@/renderer/components/item-list/types';
 import { Icon } from '/@/shared/components/icon/icon';
+import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
 import { TableColumn } from '/@/shared/types/types';
 
@@ -445,4 +446,24 @@ const columnLabelMap: Record<TableColumn, ReactNode | string> = {
         postProcess: 'upperCase',
     }) as string,
     [TableColumn.YEAR]: i18n.t('table.column.releaseYear', { postProcess: 'upperCase' }) as string,
+};
+
+export const ColumnNullFallback = (props: ItemTableListInnerColumn) => {
+    return <TableColumnTextContainer {...props}>&nbsp;</TableColumnTextContainer>;
+};
+
+export const ColumnSkeletonVariable = (props: ItemTableListInnerColumn) => {
+    return (
+        <TableColumnContainer {...props}>
+            <Skeleton height="1rem" width={`${props.rowIndex % 2 === 0 ? '80%' : '60%'}`} />
+        </TableColumnContainer>
+    );
+};
+
+export const ColumnSkeletonFixed = (props: ItemTableListInnerColumn) => {
+    return (
+        <TableColumnContainer {...props}>
+            <Skeleton height="1rem" width="80%" />
+        </TableColumnContainer>
+    );
 };

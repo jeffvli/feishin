@@ -5,12 +5,12 @@ import { generatePath, Link } from 'react-router';
 import styles from './album-artists-column.module.css';
 
 import {
+    ColumnNullFallback,
+    ColumnSkeletonVariable,
     ItemTableListInnerColumn,
     TableColumnContainer,
-    TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { AppRoute } from '/@/renderer/router/routes';
-import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
 import { RelatedAlbumArtist } from '/@/shared/types/domain-types';
 
@@ -51,11 +51,11 @@ const ArtistsColumn = (props: ItemTableListInnerColumn) => {
         );
     }
 
-    return (
-        <TableColumnTextContainer {...props}>
-            <Skeleton />
-        </TableColumnTextContainer>
-    );
+    if (row === null) {
+        return <ColumnNullFallback {...props} />;
+    }
+
+    return <ColumnSkeletonVariable {...props} />;
 };
 
 export const ArtistsColumnMemo = memo(ArtistsColumn);
