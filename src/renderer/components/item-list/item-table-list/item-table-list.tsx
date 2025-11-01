@@ -2,6 +2,7 @@
 
 import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
+import debounce from 'lodash/debounce';
 import { AnimatePresence } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import React, {
@@ -14,7 +15,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { type CellComponentProps, Grid, type GridProps } from 'react-window-v2';
+import { type CellComponentProps, Grid } from 'react-window-v2';
 
 import styles from './item-table-list.module.css';
 
@@ -46,7 +47,7 @@ interface VirtualizedTableGridProps {
     internalState: ItemListStateActions;
     itemType: LibraryItem;
     mergedRowRef: React.Ref<HTMLDivElement>;
-    onCellsRendered?: GridProps<TableItemProps>['onCellsRendered'];
+    onRangeChanged?: ItemTableListProps['onRangeChanged'];
     onRowClick?: (item: any, event: React.MouseEvent<HTMLDivElement>) => void;
     parsedColumns: ReturnType<typeof parseTableColumns>;
     pinnedLeftColumnCount: number;
@@ -80,7 +81,7 @@ const VirtualizedTableGrid = React.memo(
         internalState,
         itemType,
         mergedRowRef,
-        onCellsRendered,
+        onRangeChanged,
         onRowClick,
         parsedColumns,
         pinnedLeftColumnCount,
@@ -200,6 +201,23 @@ const VirtualizedTableGrid = React.memo(
             [pinnedLeftColumnCount, pinnedRowCount, CellComponent],
         );
 
+        const debouncedOnCellsRendered = useMemo(() => {
+            return debounce(
+                (items: {
+                    columnStartIndex: number;
+                    columnStopIndex: number;
+                    rowStartIndex: number;
+                    rowStopIndex: number;
+                }) => {
+                    onRangeChanged?.({
+                        startIndex: items.rowStartIndex,
+                        stopIndex: items.rowStopIndex,
+                    });
+                },
+                45,
+            );
+        }, [onRangeChanged]);
+
         return (
             <div className={styles.itemTableContainer}>
                 <div
@@ -294,7 +312,7 @@ const VirtualizedTableGrid = React.memo(
                             columnWidth={(index) => {
                                 return columnWidth(index + pinnedLeftColumnCount);
                             }}
-                            onCellsRendered={onCellsRendered}
+                            onCellsRendered={debouncedOnCellsRendered}
                             rowCount={totalRowCount}
                             rowHeight={(index, cellProps) => {
                                 return getRowHeight(index + pinnedRowCount, cellProps);
@@ -419,14 +437,8 @@ interface ItemTableListProps {
         type: 'index' | 'offset';
     };
     itemType: LibraryItem;
-    onCellsRendered?: GridProps<TableItemProps>['onCellsRendered'];
-    onEndReached?: (index: number, internalState: ItemListStateActions) => void;
-    onRangeChanged?: (
-        range: { endIndex: number; startIndex: number },
-        internalState: ItemListStateActions,
-    ) => void;
+    onRangeChanged?: (range: { startIndex: number; stopIndex: number }) => void;
     onScrollEnd?: (offset: number, internalState: ItemListStateActions) => void;
-    onStartReached?: (index: number, internalState: ItemListStateActions) => void;
     ref?: Ref<ItemListHandle>;
     rowHeight?: ((index: number, cellProps: TableItemProps) => number) | number;
     size?: 'compact' | 'default' | 'large';
@@ -448,11 +460,8 @@ export const ItemTableList = ({
     headerHeight = 40,
     initialTop,
     itemType,
-    onCellsRendered,
-    onEndReached,
     onRangeChanged,
     onScrollEnd,
-    onStartReached,
     ref,
     rowHeight,
     size = 'default',
@@ -950,10 +959,10 @@ export const ItemTableList = ({
                     if (lastIndex !== -1 && currentIndex !== -1) {
                         // Create range selection
                         const startIndex = Math.min(lastIndex, currentIndex);
-                        const endIndex = Math.max(lastIndex, currentIndex);
+                        const stopIndex = Math.max(lastIndex, currentIndex);
 
                         const rangeItems: ItemListItem[] = [];
-                        for (let i = startIndex; i <= endIndex; i++) {
+                        for (let i = startIndex; i <= stopIndex; i++) {
                             const rangeItem = data[i];
                             if (
                                 rangeItem &&
@@ -1013,59 +1022,6 @@ export const ItemTableList = ({
             }
         },
         [data, enableSelection, internalState, itemType],
-    );
-
-    const handleOnCellsRendered = useCallback(
-        (cells: {
-            columnStartIndex: number;
-            columnStopIndex: number;
-            rowStartIndex: number;
-            rowStopIndex: number;
-        }) => {
-            onRangeChanged?.(
-                {
-                    endIndex: cells.rowStopIndex,
-                    startIndex: cells.rowStartIndex,
-                },
-                internalState,
-            );
-
-            if (onStartReached || onEndReached) {
-                if (cells.rowStartIndex === 0) {
-                    onStartReached?.(0, handleRef.current ?? (undefined as any));
-                }
-
-                if (cells.rowStopIndex + 10 >= totalItemCount) {
-                    onEndReached?.(totalItemCount, handleRef.current ?? (undefined as any));
-                }
-            }
-
-            if (onCellsRendered) {
-                return ({ columnStartIndex, columnStopIndex, rowStartIndex, rowStopIndex }) => {
-                    return onCellsRendered!(
-                        {
-                            columnStartIndex: columnStartIndex + pinnedLeftColumnCount,
-                            columnStopIndex: columnStopIndex + pinnedLeftColumnCount,
-                            rowStartIndex: rowStartIndex + pinnedRowCount,
-                            rowStopIndex: rowStopIndex + pinnedRowCount,
-                        },
-                        cells,
-                    );
-                };
-            }
-
-            return undefined;
-        },
-        [
-            onCellsRendered,
-            onEndReached,
-            onRangeChanged,
-            onStartReached,
-            pinnedLeftColumnCount,
-            pinnedRowCount,
-            totalItemCount,
-            internalState,
-        ],
     );
 
     const isInitialScrollPositionSet = useRef<boolean>(false);
@@ -1134,7 +1090,7 @@ export const ItemTableList = ({
                 internalState={internalState}
                 itemType={itemType}
                 mergedRowRef={mergedRowRef}
-                onCellsRendered={handleOnCellsRendered}
+                onRangeChanged={onRangeChanged}
                 onRowClick={handleRowClick}
                 parsedColumns={parsedColumns}
                 pinnedLeftColumnCount={pinnedLeftColumnCount}
