@@ -157,7 +157,7 @@ const CompactItemCard = ({
     return (
         <div className={clsx(styles.container, styles.compact)}>
             <div className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}>
-                <Skeleton className={styles.image} enableAnimation />
+                <Skeleton className={styles.image} />
                 <div className={clsx(styles.detailContainer, styles.compact)}>
                     {rows.map((row) => (
                         <div className={styles.row} key={row.id}>
@@ -233,7 +233,7 @@ const DefaultItemCard = ({
     return (
         <div className={clsx(styles.container)}>
             <div className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}>
-                <Skeleton className={styles.image} enableAnimation />
+                <Skeleton className={styles.image} />
             </div>
             <div className={styles.detailContainer}>
                 {rows.map((row) => (
@@ -309,10 +309,7 @@ const PosterItemCard = ({
     return (
         <div className={clsx(styles.container, styles.poster)}>
             <div className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}>
-                <Skeleton
-                    className={clsx(styles.image, { [styles.isRound]: isRound })}
-                    enableAnimation
-                />
+                <Skeleton className={clsx(styles.image, { [styles.isRound]: isRound })} />
             </div>
             <div className={styles.detailContainer}>
                 {rows.map((row) => (
