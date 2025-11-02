@@ -9,7 +9,7 @@ import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/
 import { Switch } from '/@/shared/components/switch/switch';
 import { PlaybackType } from '/@/shared/types/types';
 
-const isWindows = isElectron() ? window.api.utils.isWindows() : null;
+const isLinux = isElectron() ? window.api.utils.isLinux() : null;
 const isDesktop = isElectron();
 const ipc = isElectron() ? window.api.ipc : null;
 
@@ -30,7 +30,7 @@ export const MediaSessionSettings = () => {
                 <Switch
                     aria-label="Toggle media Session"
                     defaultChecked={mediaSession}
-                    disabled={!isWindows || !isDesktop || playbackType !== PlaybackType.WEB}
+                    disabled={isLinux || !isDesktop || playbackType !== PlaybackType.WEB}
                     onChange={handleMediaSessionChange}
                 />
             ),
@@ -38,7 +38,7 @@ export const MediaSessionSettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: !isWindows || !isDesktop,
+            isHidden: isLinux || !isDesktop,
             note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
             title: t('setting.mediaSession', { postProcess: 'sentenceCase' }),
         },

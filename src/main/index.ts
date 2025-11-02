@@ -551,7 +551,7 @@ async function createWindow(first = true): Promise<void> {
 const enableWindowsMediaSession = store.get('mediaSession', false) as boolean;
 const playbackType = store.get('playbackType', PlaybackType.WEB) as PlaybackType;
 const shouldDisableMediaFeatures =
-    !isWindows() || !enableWindowsMediaSession || playbackType !== PlaybackType.WEB;
+    isLinux() || !enableWindowsMediaSession || playbackType !== PlaybackType.WEB;
 if (shouldDisableMediaFeatures) {
     app.commandLine.appendSwitch(
         'disable-features',
