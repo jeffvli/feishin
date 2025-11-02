@@ -1,6 +1,5 @@
 import clsx from 'clsx';
-import { MotionConfigProps } from 'motion/react';
-import { ForwardedRef, forwardRef, type ImgHTMLAttributes } from 'react';
+import { ForwardedRef, forwardRef, HTMLAttributes, type ImgHTMLAttributes, ReactNode } from 'react';
 import { Img } from 'react-image';
 
 import styles from './image.module.css';
@@ -9,9 +8,8 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { useInViewport } from '/@/shared/hooks/use-in-viewport';
 
-interface ImageContainerProps extends MotionConfigProps {
-    children: React.ReactNode;
-    className?: string;
+interface ImageContainerProps extends HTMLAttributes<HTMLDivElement> {
+    children: ReactNode;
     enableAnimation?: boolean;
 }
 
@@ -44,6 +42,7 @@ export function Image({
     includeLoader = true,
     includeUnloader = true,
     src,
+    ...props
 }: ImageProps) {
     const { inViewport, ref } = useInViewport();
 
@@ -78,6 +77,7 @@ export function Image({
                         </ImageContainer>
                     ) : null
                 }
+                {...props}
             />
         );
     }
