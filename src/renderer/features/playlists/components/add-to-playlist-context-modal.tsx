@@ -1,6 +1,7 @@
-import { useForm } from '@mantine/form';
+import { Pill } from '@mantine/core';
+import { useSelection } from '@mantine/hooks';
 import { closeModal, ContextModalProps } from '@mantine/modals';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '/@/renderer/api';
@@ -11,10 +12,15 @@ import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServer } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
+import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
-import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
+import { Icon } from '/@/shared/components/icon/icon';
+import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
+import { Table } from '/@/shared/components/table/table';
+import { TextInput } from '/@/shared/components/text-input/text-input';
+import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import {
     PlaylistListSort,
@@ -36,7 +42,9 @@ export const AddToPlaylistContextModal = ({
     const { albumId, artistId, genreId, songId } = innerProps;
     const server = useCurrentServer();
     const [isLoading, setIsLoading] = useState(false);
-    const [isDropdownOpened, setIsDropdownOpened] = useState(true);
+    const [skipDuplicates, setSkipDuplicates] = useState(true);
+    const [search, setSearch] = useState<string>();
+    const [newPlaylists, setNewPlaylists] = useState<string[]>([]);
 
     const addToPlaylistMutation = useAddToPlaylist({});
 
@@ -54,61 +62,77 @@ export const AddToPlaylistContextModal = ({
         serverId: server?.id,
     });
 
-    const playlistSelect = useMemo(() => {
-        return (
-            playlistList.data?.items?.map((playlist) => ({
-                label: playlist.name,
-                value: playlist.id,
-            })) || []
-        );
+    const [playlistIds, playlistSelect, playlistMap] = useMemo(() => {
+        const ids = new Array<string>();
+        const existingPlaylists = new Array<{ label: string; value: string }>();
+        const playlistMap = new Map<string, string>();
+
+        for (const playlist of playlistList.data?.items ?? []) {
+            ids.push(playlist.id);
+            existingPlaylists.push({ label: playlist.name, value: playlist.id });
+            playlistMap.set(playlist.id, playlist.name);
+        }
+
+        return [ids, existingPlaylists, playlistMap];
     }, [playlistList.data]);
 
-    const form = useForm({
-        initialValues: {
-            playlistId: [],
-            skipDuplicates: true,
-        },
+    const [selection, handlers] = useSelection({
+        data: playlistIds,
     });
 
-    const getSongsByAlbum = async (albumId: string) => {
-        const query: SongListQuery = {
-            albumIds: [albumId],
-            sortBy: SongListSort.ALBUM,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        };
+    const filteredItems = useMemo(() => {
+        if (search) {
+            return playlistSelect.filter((item) =>
+                item.label.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
+            );
+        }
 
-        const queryKey = queryKeys.songs.list(server?.id || '', query);
+        return playlistSelect;
+    }, [playlistSelect, search]);
 
-        const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
-            if (!server) throw new Error('No server');
-            return api.controller.getSongList({ apiClientProps: { server, signal }, query });
-        });
+    const getSongsByAlbum = useCallback(
+        async (albumId: string) => {
+            const query: SongListQuery = {
+                albumIds: [albumId],
+                sortBy: SongListSort.ALBUM,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            };
 
-        return songsRes;
-    };
+            const queryKey = queryKeys.songs.list(server?.id || '', query);
 
-    const getSongsByArtist = async (artistId: string) => {
-        const query: SongListQuery = {
-            artistIds: [artistId],
-            sortBy: SongListSort.ARTIST,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        };
+            const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
+                if (!server) throw new Error('No server');
+                return api.controller.getSongList({ apiClientProps: { server, signal }, query });
+            });
 
-        const queryKey = queryKeys.songs.list(server?.id || '', query);
+            return songsRes;
+        },
+        [server],
+    );
 
-        const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
-            if (!server) throw new Error('No server');
-            return api.controller.getSongList({ apiClientProps: { server, signal }, query });
-        });
+    const getSongsByArtist = useCallback(
+        async (artistId: string) => {
+            const query: SongListQuery = {
+                artistIds: [artistId],
+                sortBy: SongListSort.ARTIST,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            };
 
-        return songsRes;
-    };
+            const queryKey = queryKeys.songs.list(server?.id || '', query);
 
-    const isSubmitDisabled = form.values.playlistId.length === 0 || addToPlaylistMutation.isLoading;
+            const songsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
+                if (!server) throw new Error('No server');
+                return api.controller.getSongList({ apiClientProps: { server, signal }, query });
+            });
 
-    const handleSubmit = form.onSubmit(async (values) => {
+            return songsRes;
+        },
+        [server],
+    );
+
+    const handleSubmit = useCallback(async () => {
         setIsLoading(true);
         const allSongIds: string[] = [];
         let totalUniquesAdded = 0;
@@ -141,10 +165,35 @@ export const AddToPlaylistContextModal = ({
             allSongIds.push(...songId);
         }
 
-        for (const playlistId of values.playlistId) {
+        const playlistIds = [...selection];
+
+        if (newPlaylists) {
+            for (const playlist of newPlaylists) {
+                try {
+                    const response = await api.controller.createPlaylist({
+                        apiClientProps: { server },
+                        body: {
+                            name: playlist,
+                            public: false,
+                        },
+                    });
+
+                    if (response?.id) {
+                        playlistIds.push(response?.id);
+                    }
+                } catch (error: any) {
+                    toast.error({
+                        message: `[${playlist}] ${error?.message}`,
+                        title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                    });
+                }
+            }
+        }
+
+        for (const playlistId of playlistIds) {
             const uniqueSongIds: string[] = [];
 
-            if (values.skipDuplicates) {
+            if (skipDuplicates) {
                 const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId);
 
                 const playlistSongsRes = await queryClient.fetchQuery(queryKey, ({ signal }) => {
@@ -173,11 +222,11 @@ export const AddToPlaylistContextModal = ({
                 totalUniquesAdded += uniqueSongIds.length;
             }
 
-            if (values.skipDuplicates ? uniqueSongIds.length > 0 : allSongIds.length > 0) {
+            if (skipDuplicates ? uniqueSongIds.length > 0 : allSongIds.length > 0) {
                 if (!server) return null;
                 addToPlaylistMutation.mutate(
                     {
-                        body: { songId: values.skipDuplicates ? uniqueSongIds : allSongIds },
+                        body: { songId: skipDuplicates ? uniqueSongIds : allSongIds },
                         query: { id: playlistId },
                         serverId: server?.id,
                     },
@@ -197,73 +246,158 @@ export const AddToPlaylistContextModal = ({
         }
 
         const addMessage =
-            values.skipDuplicates &&
-            allSongIds.length * values.playlistId.length !== totalUniquesAdded
-                ? Math.floor(totalUniquesAdded / values.playlistId.length)
+            skipDuplicates && allSongIds.length * playlistIds.length !== totalUniquesAdded
+                ? Math.floor(totalUniquesAdded / playlistIds.length)
                 : allSongIds.length;
 
         setIsLoading(false);
         toast.success({
             message: t('form.addToPlaylist.success', {
                 message: addMessage,
-                numOfPlaylists: values.playlistId.length,
+                numOfPlaylists: playlistIds.length,
                 postProcess: 'sentenceCase',
             }),
         });
         closeModal(id);
         return null;
-    });
+    }, [
+        addToPlaylistMutation,
+        albumId,
+        artistId,
+        genreId,
+        getSongsByAlbum,
+        getSongsByArtist,
+        id,
+        newPlaylists,
+        playlistSelect,
+        selection,
+        server,
+        skipDuplicates,
+        songId,
+        t,
+    ]);
 
     return (
         <div style={{ padding: '1rem' }}>
-            <form onSubmit={handleSubmit}>
-                <Stack>
-                    <MultiSelect
-                        clearable
-                        data={playlistSelect}
-                        disabled={playlistList.isLoading}
-                        dropdownOpened={isDropdownOpened}
-                        label={t('form.addToPlaylist.input', {
-                            context: 'playlists',
-                            postProcess: 'titleCase',
-                        })}
-                        searchable
+            <Stack>
+                <TextInput
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder={t('form.addToPlaylist.searchOrCreate', {
+                        postProcess: 'sentenceCase',
+                    })}
+                    size="lg"
+                    value={search}
+                />
+                <ScrollArea style={{ height: '150px' }}>
+                    <Table highlightOnHover>
+                        <Table.Tbody>
+                            {filteredItems.map((item) => (
+                                <Table.Tr
+                                    key={item.value}
+                                    onClick={() => {
+                                        handlers.toggle(item.value);
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <Table.Td w={10}>
+                                        <Checkbox
+                                            checked={selection.includes(item.value)}
+                                            onChange={(event) => {
+                                                if (event.target.checked) {
+                                                    handlers.select(item.value);
+                                                } else {
+                                                    handlers.deselect(item.value);
+                                                }
+                                                event.preventDefault();
+                                            }}
+                                        />
+                                    </Table.Td>
+                                    <Table.Td>
+                                        <Text p={5} size="lg">
+                                            {item.label}
+                                        </Text>
+                                    </Table.Td>
+                                </Table.Tr>
+                            ))}
+                            {search && (
+                                <Table.Tr
+                                    onClick={() => {
+                                        setNewPlaylists((playlists) => playlists.concat(search));
+                                        setSearch('');
+                                    }}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <Table.Td w={10}>
+                                        <Icon icon="add" />
+                                    </Table.Td>
+                                    <Table.Td>
+                                        <Text p={5} size="lg">
+                                            Create {search}
+                                        </Text>
+                                    </Table.Td>
+                                </Table.Tr>
+                            )}
+                        </Table.Tbody>
+                    </Table>
+                </ScrollArea>
+                <Pill.Group>
+                    {selection.map((item) => (
+                        <Pill
+                            key={item}
+                            onRemove={() => handlers.deselect(item)}
+                            size="lg"
+                            withRemoveButton
+                        >
+                            {playlistMap.get(item)}
+                        </Pill>
+                    ))}
+                    {newPlaylists.map((item, idx) => (
+                        <Pill
+                            key={idx}
+                            onRemove={() =>
+                                setNewPlaylists((playlists) =>
+                                    playlists.filter((_, existingIdx) => idx !== existingIdx),
+                                )
+                            }
+                            size="lg"
+                            withRemoveButton
+                        >
+                            {item}
+                        </Pill>
+                    ))}
+                </Pill.Group>
+                <Switch
+                    checked={skipDuplicates}
+                    label={t('form.addToPlaylist.input', {
+                        context: 'skipDuplicates',
+                        postProcess: 'titleCase',
+                    })}
+                    onChange={(e) => setSkipDuplicates(e.currentTarget.checked)}
+                />
+                <Group justify="flex-end">
+                    <Button
+                        disabled={addToPlaylistMutation.isLoading}
+                        onClick={() => closeModal(id)}
                         size="md"
-                        {...form.getInputProps('playlistId')}
-                        onChange={(e) => {
-                            setIsDropdownOpened(false);
-                            form.getInputProps('playlistId').onChange(e);
-                        }}
-                        onClick={() => setIsDropdownOpened(true)}
-                    />
-                    <Switch
-                        label={t('form.addToPlaylist.input', {
-                            context: 'skipDuplicates',
-                            postProcess: 'titleCase',
-                        })}
-                        {...form.getInputProps('skipDuplicates', { type: 'checkbox' })}
-                    />
-                    <Group justify="flex-end">
-                        <Button
-                            disabled={addToPlaylistMutation.isLoading}
-                            onClick={() => closeModal(id)}
-                            size="md"
-                            variant="subtle"
-                        >
-                            {t('common.cancel', { postProcess: 'titleCase' })}
-                        </Button>
-                        <Button
-                            disabled={isSubmitDisabled}
-                            loading={isLoading}
-                            size="md"
-                            type="submit"
-                            variant="filled"
-                        >
-                            {t('common.add', { postProcess: 'titleCase' })}
-                        </Button>
-                    </Group>
-                </Stack>
-            </form>
+                        variant="subtle"
+                    >
+                        {t('common.cancel', { postProcess: 'titleCase' })}
+                    </Button>
+                    <Button
+                        disabled={
+                            addToPlaylistMutation.isLoading ||
+                            (selection.length === 0 && newPlaylists.length === 0)
+                        }
+                        loading={isLoading}
+                        onClick={() => handleSubmit()}
+                        size="md"
+                        type="submit"
+                        variant="filled"
+                    >
+                        {t('common.add', { postProcess: 'titleCase' })}
+                    </Button>
+                </Group>
+            </Stack>
         </div>
     );
 };

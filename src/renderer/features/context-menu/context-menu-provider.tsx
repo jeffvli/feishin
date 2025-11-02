@@ -504,7 +504,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 songId: songId.length > 0 ? songId : undefined,
             },
             modal: 'addToPlaylist',
-            size: 'md',
+            size: 'lg',
             title: t('page.contextMenu.addToPlaylist', { postProcess: 'sentenceCase' }),
         });
     }, [ctx.data, ctx.dataNodes, t]);
