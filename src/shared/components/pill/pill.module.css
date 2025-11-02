@@ -1,3 +1,7 @@
+.root {
+  user-select: auto;
+}
+
 .label {
   font-family: var(--theme-content-font-family);
 }

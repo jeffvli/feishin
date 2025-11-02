@@ -340,7 +340,9 @@ const normalizeAlbum = (
         originalDate: null,
         participants: getPeople(item),
         playCount: item.UserData?.PlayCount || 0,
+        recordLabels: [],
         releaseDate: item.PremiereDate?.split('T')[0] || null,
+        releaseTypes: [],
         releaseYear: item.ProductionYear || null,
         serverId: server?.id || '',
         serverType: ServerType.JELLYFIN,
@@ -352,6 +354,7 @@ const normalizeAlbum = (
         updatedAt: item?.DateLastMediaAdded || item.DateCreated,
         userFavorite: item.UserData?.IsFavorite || false,
         userRating: null,
+        version: null,
     };
 };
 

@@ -272,7 +272,9 @@ const normalizeAlbum = (
         originalDate: null,
         participants: getParticipants(item),
         playCount: null,
+        recordLabels: item.recordLabels?.map((item) => item.name) || [],
         releaseDate: item.year ? new Date(Date.UTC(item.year, 0, 1)).toISOString() : null,
+        releaseTypes: item.releaseTypes || [],
         releaseYear: item.year ? Number(item.year) : null,
         serverId: server?.id || 'unknown',
         serverType: ServerType.SUBSONIC,
@@ -287,6 +289,7 @@ const normalizeAlbum = (
         updatedAt: item.created,
         userFavorite: item.starred || false,
         userRating: item.userRating || null,
+        version: item.version || null,
     };
 };
 

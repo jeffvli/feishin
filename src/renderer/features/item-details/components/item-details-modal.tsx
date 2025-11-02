@@ -122,6 +122,7 @@ const BoolField = (key: boolean) =>
 const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
     { key: 'name', label: 'common.title' },
     { label: 'entity.albumArtist_one', render: (item) => formatArtists(item.albumArtists) },
+    { label: 'common.releaseType', render: (item) => item.releaseTypes.join(SEPARATOR_STRING) },
     { label: 'entity.genre_other', render: FormatGenre },
     {
         label: 'common.duration',
@@ -174,6 +175,8 @@ const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
             ) : null,
     },
     { key: 'id', label: 'filter.id' },
+    { key: 'version', label: 'common.version' },
+    { label: 'common.recordLabel', render: (item) => item.recordLabels.join(SEPARATOR_STRING) },
 ];
 
 const AlbumArtistPropertyMapping: ItemDetailRow<AlbumArtist>[] = [

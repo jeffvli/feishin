@@ -117,6 +117,10 @@ const song = z.object({
     year: z.number().optional(),
 });
 
+const recordLabel = z.object({
+    name: z.string(),
+});
+
 const album = z.object({
     album: z.string(),
     artist: z.string(),
@@ -135,11 +139,14 @@ const album = z.object({
     isVideo: z.boolean(),
     name: z.string(),
     parent: z.string(),
+    recordLabels: z.array(recordLabel).optional(),
+    releaseTypes: z.array(z.string()).optional(),
     song: z.array(song),
     songCount: z.number(),
     starred: z.boolean().optional(),
     title: z.string(),
     userRating: z.number().optional(),
+    version: z.string().optional(),
     year: z.number().optional(),
 });
 
