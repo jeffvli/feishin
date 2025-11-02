@@ -115,7 +115,10 @@
         "viewReleaseNotes": "查看发行说明",
         "newVersion": "已安装新版本 ({{version}})",
         "bitDepth": "位深度",
-        "sampleRate": "采样率"
+        "sampleRate": "采样率",
+        "explicitStatus": "显式状态",
+        "clean": "清除",
+        "explicit": "显式"
     },
     "entity": {
         "albumArtist_other": "专辑艺术家",
@@ -173,7 +176,6 @@
     "setting": {
         "crossfadeStyle_description": "选择用于音频播放器的淡入淡出风格",
         "hotkey_favoriteCurrentSong": "收藏$t(common.currentSong)",
-        "crossfadeStyle": "淡入淡出风格",
         "audioExclusiveMode_description": "启用独占输出模式。在此模式下，系统通常被锁定为只有 mpv 能够输出音频",
         "disableLibraryUpdateOnStartup": "禁用启动时查询新版本",
         "gaplessAudio": "无缝音频",
@@ -255,7 +257,6 @@
         "language_description": "设置应用的语言（$t(common.restartRequired)）",
         "playbackStyle_optionCrossFade": "淡入淡出",
         "hotkey_rate3": "评为 3 星",
-        "mpvExtraParameters": "mpv 参数",
         "replayGainMode_optionTrack": "$t(entity.track_one)",
         "themeLight_description": "应用将使用浅色主题",
         "hotkey_toggleFullScreenPlayer": "全屏播放",
@@ -266,7 +267,6 @@
         "hotkey_rate5": "评为 5 星",
         "hotkey_playbackPrevious": "上一首",
         "showSkipButtons_description": "在播放条显示或隐藏播放按钮",
-        "language": "语言",
         "playbackStyle": "播放风格",
         "hotkey_toggleShuffle": "切换随机",
         "theme": "主题",
@@ -332,7 +332,6 @@
         "accentColor_description": "设置应用的强调色",
         "replayGainPreamp_description": "调整应用在{{ReplayGain}}值上的前置放大增益",
         "discordIdleStatus": "显示 rich presence 闲置状态",
-        "discordRichPresence": "{{discord}} rich presence",
         "clearCache": "清除浏览器缓存",
         "buttonSize": "播放器栏按钮大小",
         "buttonSize_description": "播放器栏按钮大小",
@@ -370,8 +369,6 @@
         "contextMenu": "上下文菜单（右键单击）配置",
         "customCssEnable": "启用自定义 css",
         "customCssNotice": "警告：虽然预设了一些安全限制（不允许 url() 和 content:），但使用自定义 css 仍然会因更改界面而带来风险",
-        "transcodeNote": "1（web）-2（mpv）首歌曲后生效",
-        "transcode": "启用转码",
         "transcode_description": "可以转码为不同的格式",
         "transcodeBitrate": "转码比特率",
         "albumBackground": "专辑背景图片",
@@ -410,8 +407,6 @@
         "discordPausedStatus_description": "启用后将在播放器暂停时显示状态",
         "preservePitch": "保持音高",
         "preservePitch_description": "在调整播放速度时保持音高",
-        "notify": "启用歌曲通知",
-        "notify_description": "更改当前歌曲时显示通知",
         "discordDisplayType": "{{discord}} 存在显示类型",
         "discordDisplayType_description": "改变您在状态中收听的内容",
         "discordDisplayType_songname": "歌曲名称",
@@ -427,12 +422,22 @@
         "artistBackground_description": "为包含艺术家作品的艺术家页面添加背景图片",
         "artistBackgroundBlur": "艺术家背景图像模糊尺寸",
         "artistBackgroundBlur_description": "调整应用于艺术家背景图像的模糊程度",
-        "releaseChannel_optionLatest": "稳定版",
+        "releaseChannel_optionLatest": "最新的",
         "releaseChannel_optionBeta": "测试版",
         "releaseChannel": "发布通道",
         "releaseChannel_description": "选择稳定版本或测试版以进行自动更新",
         "mediaSession": "启用媒体会话",
-        "mediaSession_description": "启用 Windows 媒体会话集成，在系统音量覆盖和锁定屏幕中显示媒体控件和元数据（仅限 Windows）"
+        "mediaSession_description": "启用 Windows 媒体会话集成，在系统音量覆盖和锁定屏幕中显示媒体控件和元数据（仅限 Windows）",
+        "exportImportSettings_control_description": "通过 JSON 导出和导入设置",
+        "exportImportSettings_control_exportText": "导出设置",
+        "exportImportSettings_control_importText": "导入设置",
+        "exportImportSettings_control_title": "导入/导出设置",
+        "exportImportSettings_destructiveWarning": "导入设置会破坏现有设置，请在点击下方“导入”按钮前仔细阅读以上内容！",
+        "exportImportSettings_importBtn": "导入设置",
+        "exportImportSettings_importModalTitle": "导入 Feishin 设置",
+        "exportImportSettings_importSuccess": "设置已成功导入！",
+        "exportImportSettings_notValidJSON": "传递的文件不是有效的 JSON 文件",
+        "exportImportSettings_offendingKeyError": "\"{{offendingKey}}\" 不正确 - {{reason}}"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
@@ -502,7 +507,8 @@
         "id": "id",
         "disc": "碟片",
         "duration": "时长",
-        "album": "$t(entity.album_one)"
+        "album": "$t(entity.album_one)",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "page": {
         "sidebar": {
@@ -804,5 +810,10 @@
             "size": "$t(common.size)",
             "codec": "$t(common.codec)"
         }
+    },
+    "dragDropZone": {
+        "error_oneFileOnly": "请仅选择 1 个文件",
+        "error_readingFile": "读取文件时出现问题：{{errorMessage}}",
+        "mainText": "将文件拖放到这里"
     }
 }

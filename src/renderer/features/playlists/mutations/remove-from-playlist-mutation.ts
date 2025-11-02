@@ -26,11 +26,15 @@ export const useRemoveFromPlaylist = (options?: MutationOptions) => {
 
             if (!serverId) return;
 
-            queryClient.invalidateQueries(queryKeys.playlists.list(serverId), { exact: false });
-            queryClient.invalidateQueries(queryKeys.playlists.detail(serverId, variables.query.id));
-            queryClient.invalidateQueries(
-                queryKeys.playlists.songList(serverId, variables.query.id),
-            );
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.playlists.list(serverId),
+            });
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.playlists.detail(serverId, variables.query.id),
+            });
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.playlists.songList(serverId, variables.query.id),
+            });
         },
         ...options,
     });

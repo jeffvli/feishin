@@ -15,6 +15,8 @@ import { Switch } from '/@/shared/components/switch/switch';
 import { toast } from '/@/shared/components/toast/toast';
 import { CrossfadeStyle, PlaybackStyle, PlaybackType, PlayerStatus } from '/@/shared/types/types';
 
+const ipc = isElectron() ? window.api.ipc : null;
+
 const getAudioDevice = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
     return (devices || []).filter((dev: MediaDeviceInfo) => dev.kind === 'audiooutput');
@@ -62,6 +64,7 @@ export const AudioSettings = ({ hasFancyAudio }: { hasFancyAudio: boolean }) => 
                     disabled={status === PlayerStatus.PLAYING}
                     onChange={(e) => {
                         setSettings({ playback: { ...settings, type: e as PlaybackType } });
+                        ipc?.send('settings-set', { property: 'playbackType', value: e });
                         if (isElectron() && e === PlaybackType.LOCAL) {
                             const queueData = usePlayerStore.getState().actions.getPlayerData();
                             setQueue(queueData);

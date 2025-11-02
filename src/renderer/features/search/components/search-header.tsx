@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { generatePath, Link, useParams, useSearchParams } from 'react-router-dom';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
-import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
+import { FilterBar } from '/@/renderer/features/shared/components/filter-bar';
+import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';

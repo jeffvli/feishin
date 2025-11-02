@@ -1,13 +1,14 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
+import { useQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { ListContext } from '/@/renderer/context/list-context';
+import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
 import { GenreListContent } from '/@/renderer/features/genres/components/genre-list-content';
 import { GenreListHeader } from '/@/renderer/features/genres/components/genre-list-header';
-import { useGenreList } from '/@/renderer/features/genres/queries/genre-list-query';
-import { AnimatedPage } from '/@/renderer/features/shared';
+import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { useCurrentServer } from '/@/renderer/store';
 import { useListStoreByKey } from '/@/renderer/store/list.store';
 import { GenreListQuery } from '/@/shared/types/domain-types';
@@ -19,14 +20,16 @@ const GenreListRoute = () => {
     const pageKey = 'genre';
     const { filter } = useListStoreByKey<GenreListQuery>({ key: pageKey });
 
-    const itemCountCheck = useGenreList({
-        query: {
-            ...filter,
-            limit: 1,
-            startIndex: 0,
-        },
-        serverId: server?.id,
-    });
+    const itemCountCheck = useQuery(
+        genresQueries.list({
+            query: {
+                ...filter,
+                limit: 1,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        }),
+    );
 
     const itemCount =
         itemCountCheck.data?.totalRecordCount === null

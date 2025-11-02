@@ -253,7 +253,10 @@
         "setting": "configuració",
         "trackGain": "guany de pista",
         "trackPeak": "pic de pista",
-        "gap": "espera"
+        "gap": "espera",
+        "explicitStatus": "estat explícit",
+        "explicit": "explícit",
+        "clean": "net"
     },
     "entity": {
         "album_one": "àlbum",
@@ -440,8 +443,6 @@
         "discordUpdateInterval_description": "el temps en segons entre cada actualització (mínim 15 segons)",
         "enableRemote": "activar el servidor de control remot",
         "enableRemote_description": "el servidor de control remot permet que altres dispositius controlin l'aplicació",
-        "notify": "activa les notificacions de cançons",
-        "transcode": "activa la transcodificació",
         "transcode_description": "permet la transcodificació a diferents formats",
         "albumBackground": "imatge de fons de l'àlbum",
         "albumBackground_description": "afegeix una imatge de fons per les pàgines d'àlbum amb caràtula",
@@ -463,7 +464,6 @@
         "contextMenu_description": "us permet amagar els elements que es mostren al menú quan fas clic dret sobre un element. els elements no seleccionats estaran amagats",
         "crossfadeDuration": "duracció de la fosa encadenada",
         "crossfadeDuration_description": "estableix la duració de l'efecte de fosa encadenada",
-        "crossfadeStyle": "estil de fosa encadenada",
         "crossfadeStyle_description": "selecciona l'estil de fosa encadenada que s'utilitzarà pel reproductor d'àudio",
         "customCssEnable": "activa el css personalitzat",
         "customCssEnable_description": "permet escriure CSS personalitzat",
@@ -480,7 +480,6 @@
         "discordIdleStatus_description": "si està activat, s'actualitzarà l'estat mentre el reproductor estigui inactiu",
         "discordListening": "mosta l'estat com escoltant",
         "discordListening_description": "mosta l'estat com escoltant en comptes de jugant",
-        "discordRichPresence": "estat d'activitat de {{discord}}",
         "discordRichPresence_description": "activa l'estat de reproducció a l'activitat de {{discord}}. Les tecles d'imatge són: {{icon}}, {{playing}} i {{paused}}",
         "discordServeImage": "serveix imatges de {{discord}} des del servidor",
         "discordServeImage_description": "comparteix la caràtula per l'estat d'activitat de {{discord}} des del servidor; només disponible per Jellyfin i Navidrome. {{discord}} fa ser un bot per trobar les imatges, de manera que el vostre servidor ha de ser visible per l'internet públic",
@@ -542,7 +541,6 @@
         "hotkey_zoomOut": "redueix",
         "imageAspectRatio": "utilitza la relació d'aspecte predeterminada de la caràtula",
         "imageAspectRatio_description": "si està activat, la caràtula es mostrarà amb la relació d'aspecte predeterminada. per caràtules que no siguin 1:1, l'espai restant estarà buit",
-        "language": "llengua",
         "lastfm": "mostra els enllaços last.fm",
         "lastfm_description": "mosta enllaços a Last.fm a les pàgines d'artista/àlbum",
         "lastfmApiKey": "clau d'API per {{lastfm}}",
@@ -553,7 +551,6 @@
         "lyricFetchProvider_description": "selecciona els proveïdors de lletres. l'ordre en què apareixen és l'ordre en què es consultaran",
         "lyricOffset": "desfasament de la lletra (ms)",
         "lyricOffset_description": "desplaça la lletra els mil·lisegons especificats",
-        "notify_description": "mostra notificacions en canvia la cançó actual",
         "minimizeToTray": "minimitza a la safata",
         "minimizeToTray_description": "minimitza l'aplicació a la safata del sistema",
         "minimumScrobblePercentage": "duració mínima de l'scrobble (percentatge)",
@@ -562,7 +559,6 @@
         "minimumScrobbleSeconds_description": "la duració mínima en segons durant la qual cal reproduir la cançó abans d'activar l'scrobble",
         "mpvExecutablePath": "ruta de l'executable de l'mpv",
         "mpvExecutablePath_description": "estableix la ruta de l'executable de l'mpv. si el deixeu buit, s'utilitzarà la ruta predeterminada",
-        "mpvExtraParameters": "paràmetres de l'mpv",
         "mpvExtraParameters_help": "un per línia",
         "musicbrainz": "mostra els enllaços de MusicBrainz",
         "musicbrainz_description": "mostra enllaços a les pàgines d'artista/àlbum a MusicBrainz si hi ha MusicBrainz ID",
@@ -611,7 +607,6 @@
         "theme_description": "estableix el tema visual per l'aplicació",
         "themeDark_description": "estableix el tema fosc per l'aplicació",
         "themeLight_description": "estableix el tema clar per l'aplicació",
-        "transcodeNote": "tindrà efecte després d'1 (web) o 2 (mpv) cançons",
         "transcodeBitrate": "taxa de bits per transcodificar",
         "transcodeBitrate_description": "selecciona la taxa de bits per transcodificar. 0 significa deixar que el servidor triï",
         "transcodeFormat": "format per transcodificar",
@@ -784,7 +779,8 @@
         "isRecentlyPlayed": "s'ha reproduït fa poc",
         "lastPlayed": "última reproducció",
         "path": "ruta",
-        "songCount": "nombre de cançons"
+        "songCount": "nombre de cançons",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "player": {
         "muted": "silenciat",

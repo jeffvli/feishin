@@ -5,8 +5,9 @@ import { ChangeEvent, MutableRefObject, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
-import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
+import { FilterBar } from '/@/renderer/features/shared/components/filter-bar';
+import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { SongListHeaderFilters } from '/@/renderer/features/songs/components/song-list-header-filters';
 import { useContainerQuery } from '/@/renderer/hooks';

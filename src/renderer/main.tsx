@@ -31,7 +31,6 @@ createRoot(document.getElementById('root')!).render(
         persistOptions={{
             buster: 'feishin',
             dehydrateOptions: {
-                dehydrateQueries: true,
                 shouldDehydrateQuery: (query) => {
                     const isSuccess = query.state.status === 'success';
                     const isLyricsQueryKey =
@@ -45,7 +44,7 @@ createRoot(document.getElementById('root')!).render(
             hydrateOptions: {
                 defaultOptions: {
                     queries: {
-                        cacheTime: Infinity,
+                        gcTime: Infinity,
                     },
                 },
             },

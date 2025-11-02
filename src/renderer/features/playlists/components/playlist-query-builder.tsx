@@ -1,5 +1,6 @@
 import { useForm } from '@mantine/form';
 import { openModal } from '@mantine/modals';
+import { useQuery } from '@tanstack/react-query';
 import clone from 'lodash/clone';
 import get from 'lodash/get';
 import setWith from 'lodash/setWith';
@@ -8,7 +9,7 @@ import { forwardRef, Ref, useImperativeHandle, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { QueryBuilder } from '/@/renderer/components/query-builder';
-import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
+import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import {
     convertNDQueryToQueryGroup,
     convertQueryGroupToNDQuery,
@@ -108,10 +109,12 @@ export const PlaylistQueryBuilder = forwardRef(
             query ? convertNDQueryToQueryGroup(query) : DEFAULT_QUERY,
         );
 
-        const { data: playlists } = usePlaylistList({
-            query: { sortBy: PlaylistListSort.NAME, sortOrder: SortOrder.ASC, startIndex: 0 },
-            serverId: server?.id,
-        });
+        const { data: playlists } = useQuery(
+            playlistsQueries.list({
+                query: { sortBy: PlaylistListSort.NAME, sortOrder: SortOrder.ASC, startIndex: 0 },
+                serverId: server?.id,
+            }),
+        );
 
         const playlistData = useMemo(() => {
             if (!playlists) return [];

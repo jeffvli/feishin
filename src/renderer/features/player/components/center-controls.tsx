@@ -128,7 +128,7 @@ export const CenterControls = ({ playersRef }: CenterControlsProps) => {
 
     return (
         <>
-            <div className={styles.controlsContainer} style={{ zIndex: 50001 }}>
+            <div className={styles.controlsContainer}>
                 <div className={styles.buttonsContainer}>
                     <PlayerButton
                         icon={<Icon fill="default" icon="mediaStop" size={buttonSize - 2} />}

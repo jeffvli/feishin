@@ -7,7 +7,7 @@ import { MutableRefObject, useCallback, useMemo } from 'react';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { BasePaginatedResponse, LibraryItem, ServerListItem } from '/@/shared/types/domain-types';
 
 export interface UseHandleListFilterChangeProps {

@@ -24,11 +24,14 @@ export const useDeletePlaylist = (args: MutationHookArgs) => {
             return api.controller.deletePlaylist({ ...args, apiClientProps: { server } });
         },
         onMutate: () => {
-            queryClient.cancelQueries(queryKeys.playlists.list(server?.id || ''));
+            queryClient.cancelQueries({ queryKey: queryKeys.playlists.list(server?.id || '') });
             return null;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries(queryKeys.playlists.list(server?.id || ''));
+            queryClient.invalidateQueries({
+                exact: false,
+                queryKey: queryKeys.playlists.list(server?.id || ''),
+            });
         },
         ...options,
     });

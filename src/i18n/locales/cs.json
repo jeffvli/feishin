@@ -59,7 +59,6 @@
         "replayGainPreamp": "před-zesílení {{ReplayGain}} (dB)",
         "hotkey_favoriteCurrentSong": "oblíbit $t(common.currentSong)",
         "sampleRate": "vzorkovací frekvence",
-        "crossfadeStyle": "způsob prolnutí",
         "sidePlayQueueStyle_optionAttached": "připojené",
         "sidebarConfiguration": "nastavení postranního panelu",
         "sampleRate_description": "vyberte výstupní vzorkovací frekvenci k použití, když je vybraná vzorkovací frekvence jiná, než ta u aktuálního média. hodnota nižší než 8000 použije výchozí frekvenci",
@@ -107,7 +106,6 @@
         "playbackStyle_optionCrossFade": "křížové prolnutí",
         "hotkey_rate3": "hodnocení 3 hvězdami",
         "font": "písmo",
-        "mpvExtraParameters": "parametry mpv",
         "replayGainMode_optionTrack": "$t(entity.track_one)",
         "themeLight_description": "nastavit použití světlého motivu v aplikaci",
         "hotkey_toggleFullScreenPlayer": "přepnutí přehrávače na celou obrazovku",
@@ -119,7 +117,6 @@
         "hotkey_playbackPrevious": "předchozí skladba",
         "showSkipButtons_description": "zobrazit nebo skrýt tlačítka k přeskočení na liště přehrávače",
         "crossfadeDuration_description": "nastavte trvání efektu prolnutí",
-        "language": "jazyk",
         "playbackStyle": "způsob přehrávání",
         "hotkey_toggleShuffle": "přepnutí náhodného přehrávání",
         "theme": "motiv",
@@ -137,7 +134,7 @@
         "savePlayQueue": "uložit frontu přehrávání",
         "minimumScrobbleSeconds_description": "minimální doba v sekundách, která musí být přehrána před scrobblováním skladby",
         "skipPlaylistPage_description": "při navigaci na playlist přejít na stránku seznamu skladeb v playlistu namísto výchozí stránky",
-        "fontType_description": "vestavěné písmo vybere jedno z písem poskytovaných programem feishin. systémové písmo vám umožní vybrat si jakékoli písmo poskytované vaším operačním systémem. vlastní vám umožňuje použít vaše vlastní písmo",
+        "fontType_description": "vestavěné písmo vybere jedno z písem poskytovaných programem Feishin. systémové písmo vám umožní vybrat si jakékoli písmo poskytované vaším operačním systémem. vlastní vám umožňuje použít vaše vlastní písmo",
         "playButtonBehavior": "chování tlačítka přehrávání",
         "volumeWheelStep": "krok kolečka hlasitosti",
         "sidebarPlaylistList_description": "zobrazit nebo skrýt seznam playlistů v postranním panelu",
@@ -189,7 +186,6 @@
         "minimumScrobbleSeconds": "minimální scrobblování (v sekundách)",
         "hotkey_playbackStop": "zastavení",
         "windowBarStyle_description": "vyberte styl záhlaví okna",
-        "discordRichPresence": "{{discord}} rich presence",
         "font_description": "nastavení písma použitého v aplikaci",
         "savePlayQueue_description": "uložit frontu přehrávání, když je aplikace zavřena a obnovit ji při otevření aplikace",
         "useSystemTheme": "použít systémový motiv",
@@ -232,8 +228,6 @@
         "customCss": "vlastní CSS",
         "webAudio": "použít webový zvuk",
         "webAudio_description": "použít webový zvuk. tím povolíte pokročilé funkce jako replaygain. zakažte, pokud se objeví problémy",
-        "transcodeNote": "projeví se po 1 (web) - 2 (mpv) skladbách",
-        "transcode": "povolit překódování",
         "transcode_description": "zapnout překódování do různých formátů",
         "transcodeFormat_description": "vybere formát k překódování. pokud chcete nechat rozhodnout server, ponechte prázdné",
         "transcodeFormat": "formát k překódování",
@@ -272,8 +266,6 @@
         "discordPausedStatus_description": "pokud je povoleno, bude při pozastavení přehrávače zobrazen stav",
         "preservePitch": "zachovat výšku",
         "preservePitch_description": "zachová výšku při úpravě rychlosti přehrávání",
-        "notify": "povolit oznámení o skladbách",
-        "notify_description": "zobrazit oznámení při změně aktuální skladby",
         "discordDisplayType": "typ zobrazení stavu {{discord}}",
         "discordDisplayType_description": "změní, co posloucháte, ve vašem stavu",
         "discordDisplayType_songname": "název skladby",
@@ -289,12 +281,22 @@
         "artistBackground_description": "přidá obrázek na pozadí u stránek umělců",
         "artistBackgroundBlur": "velikost rozostření obrázku umělce na pozadí",
         "artistBackgroundBlur_description": "upraví velikost rozostření použitého na obrázek umělce na pozadí",
-        "releaseChannel_optionLatest": "stabilní",
+        "releaseChannel_optionLatest": "nejnovější",
         "releaseChannel_optionBeta": "beta",
         "releaseChannel": "kanál vydání",
         "releaseChannel_description": "vyberte si mezi stabilními vydáními nebo beta vydáními pro automatické aktualizace",
         "mediaSession": "povolit relaci médií",
-        "mediaSession_description": "povolí integraci do služby Windows Media Session, což zobrazí ovládání a metadata médií v překrytí systémové hlasitosti a na zamykací obrazovce (pouze Windows)"
+        "mediaSession_description": "povolí integraci do služby Windows Media Session, což zobrazí ovládání a metadata médií v překrytí systémové hlasitosti a na zamykací obrazovce (pouze Windows)",
+        "exportImportSettings_control_description": "Exportovat a importovat nastavení pomocí souboru JSON",
+        "exportImportSettings_control_exportText": "Exportovat nastavení",
+        "exportImportSettings_control_importText": "Importovat nastavení",
+        "exportImportSettings_control_title": "Importovat / exportovat nastavení",
+        "exportImportSettings_destructiveWarning": "Importování nastavení je destruktivní, přečtěte si prosím informace výše, než kliknete na tlačítko „Importovat“!",
+        "exportImportSettings_importBtn": "Importovat nastavení",
+        "exportImportSettings_importModalTitle": "Importovat nastavení Feishin",
+        "exportImportSettings_importSuccess": "Nastavení byla úspěšně importována!",
+        "exportImportSettings_notValidJSON": "Poskytnutý soubor není platným souborem JSON",
+        "exportImportSettings_offendingKeyError": "Řetězec „{{offendingKey}}“ je nesprávný – {{reason}}"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -418,7 +420,10 @@
         "viewReleaseNotes": "zobrazit seznam změn",
         "newVersion": "byla nainstalována nová verze ({{version}})",
         "bitDepth": "bitová hloubka",
-        "sampleRate": "vzorkovací frekvence"
+        "sampleRate": "vzorkovací frekvence",
+        "explicitStatus": "stav explicitivity",
+        "explicit": "explicitní",
+        "clean": "čisté"
     },
     "table": {
         "config": {
@@ -565,7 +570,8 @@
         "fromYear": "z roku",
         "criticRating": "hodnocení kritiků",
         "album": "$t(entity.album_one)",
-        "trackNumber": "skladba"
+        "trackNumber": "skladba",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "page": {
         "sidebar": {
@@ -844,5 +850,10 @@
         "song_one": "píseň",
         "song_few": "písničky",
         "song_other": "písní"
+    },
+    "dragDropZone": {
+        "error_oneFileOnly": "Vyberte prosím pouze 1 soubor",
+        "error_readingFile": "Během čtení souboru došlo k chybě: {{errorMessage}}",
+        "mainText": "Přesuňte soubor sem"
     }
 }

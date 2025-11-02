@@ -52,7 +52,7 @@ export const SidebarSettings = () => {
                     onChange={handleSetSidebarCollapsedNavigation}
                 />
             ),
-            description: t('setting.sidebarPlaylistList', {
+            description: t('setting.sidebarCollapsedNavigation', {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),

@@ -1,7 +1,7 @@
 appId: org.jeffvli.feishin
 productName: Feishin
 artifactName: ${productName}-${version}-${os}-${arch}.${ext}
-electronVersion: 35.1.5
+electronVersion: 38.5.0
 directories:
     buildResources: assets
 files:

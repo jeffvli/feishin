@@ -8,7 +8,7 @@ import type {
 } from '@ag-grid-community/core';
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { AnimatePresence } from 'motion/react';
 import { MutableRefObject, useCallback, useMemo } from 'react';
@@ -16,16 +16,16 @@ import { useParams } from 'react-router';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
 import { getColumnDefs, TablePagination, VirtualTable } from '/@/renderer/components/virtual-table';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
-import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
 import {
     PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
     SMART_PLAYLIST_SONG_CONTEXT_MENU_ITEMS,
 } from '/@/renderer/features/context-menu/context-menu-items';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
+import { useHandleTableContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { useAppFocus } from '/@/renderer/hooks';
 import {
     useCurrentServer,
@@ -70,7 +70,9 @@ export const PlaylistDetailSongListContent = ({ songs, tableRef }: PlaylistDetai
         };
     }, [page?.table.id, playlistId]);
 
-    const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
+    const detailQuery = useQuery(
+        playlistsQueries.detail({ query: { id: playlistId }, serverId: server?.id }),
+    );
 
     const p = usePlaylistDetailTablePagination(playlistId);
     const pagination = {

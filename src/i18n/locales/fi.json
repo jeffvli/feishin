@@ -301,7 +301,6 @@
         "clearQueryCache": "tyhjennä feishinin välimuisti",
         "crossfadeDuration_description": "aseta ristihäivytystehosteen kesto",
         "applicationHotkeys_description": "aseta sovelluksen pikanäppäimet. vaihda valintaruutua asettaaksesi valinta globaaliksi pikanäppäimeksi (vain työpöydällä)",
-        "crossfadeStyle": "ristihäivytyksen tyyli",
         "crossfadeStyle_description": "valitse soittimessa käytettävän ristihäivytyksen tyyli",
         "contextMenu_description": "mahdollistaa sinun piilottaa asiat, jotka näytetään valikossa klikatessasi objektia hiiren väärällä painikkella. poistetut valinnat piilotetaan",
         "customCssEnable_description": "mahdollista oman css:n kirjoittaminen",
@@ -364,7 +363,6 @@
         "discordIdleStatus_description": "kun käytössä, päivitä tila kun soitin on käyttämättömänä",
         "doubleClickBehavior": "lisää kaikki haetut kappaleet soittojonoon tuplaklikkauksella",
         "discordUpdateInterval_description": "päivitysväli sekunnteina (vähintään 15 sekunttia)",
-        "discordRichPresence": "{{discord}} rich presence",
         "discordRichPresence_description": "ota toiston tila käyttöön {{discord}}n rich presence-toiminnossa. Kuvakkeiden avaimet ovat {{icon}}, {{playing}} ja {{paused}}",
         "discordUpdateInterval": "{{discord}} rich presencen päivitysväli",
         "enableRemote": "aktivoi etäohjauspalvelin",
@@ -399,7 +397,6 @@
         "globalMediaHotkeys_description": "ota käyttöön tai poista käytöstä järjestelmän median pikanäppäinten käyttö toiston hallintaa",
         "hotkey_toggleCurrentSongFavorite": "vaihda $t(common.currentSong) suosikkiasetus",
         "imageAspectRatio": "käytä alkuperäistä kansikuvan kuvasuhdetta",
-        "language": "kieli",
         "lyricOffset_description": "siirrä sanoituksia valitun ajan millisekuntteina",
         "minimizeToTray": "pienennä ilmaisinalueelle",
         "gaplessAudio_description": "asettaa tauottoman toiston asetukset mpv:hen",
@@ -408,7 +405,6 @@
         "lyricFetch_description": "hae sanoitukset eri lähteistä internetissä",
         "lyricFetchProvider": "lähteet sanoituksia varten",
         "lyricOffset": "sanotuksien siirto (ms)",
-        "mpvExtraParameters": "mpv:n parametrit",
         "followLyric": "seuraa lyriikoita",
         "followLyric_description": "vieritä lyriikat tämänhetkiseen paikkaan",
         "hotkey_toggleQueue": "vaihda jono",
@@ -432,7 +428,6 @@
         "replayGainMode_optionNone": "$t(common.none)",
         "replayGainMode_optionTrack": "$t(entity.track_one)",
         "themeDark": "teema (tumma)",
-        "transcodeNote": "tulee voimaan 1 (web) - 2 (mpv) kappaleen jälkeen",
         "translationApiKey_description": "API-avain käännöstä varten (tukee vain globaalia palvelun palvelupistettä)",
         "playbackStyle_description": "valitse toiston tyyli, jota käytetään soittimessa",
         "transcode_description": "ottaa transkoodaksen käyttöön eri formaateille",
@@ -500,7 +495,6 @@
         "theme_description": "asettaa ohjelmassa käytettävän teeman",
         "themeLight": "teema (vaalea)",
         "themeLight_description": "asettaa vaalean teeman käytettäväksi sovelluksessa",
-        "transcode": "ota transkoodaus käyttöön",
         "transcodeBitrate_description": "valitsee transkoodattavan bittinopeuden. 0 tarkoittaa palvelimen valintaa",
         "transcodeFormat": "transkoodattava formaatti",
         "translationApiProvider_description": "palveluntarjoajan API käännöstä varten",
@@ -527,9 +521,7 @@
         "discordPausedStatus": "näytä rich presence tauotettuna",
         "discordPausedStatus_description": "ollessak käytössä, status näyttää milloin soitin on tautotettuna",
         "preservePitch": "säilytä sävelkorkeus",
-        "preservePitch_description": "säilytä sävelkorkeus toistonopeutta muokatessa",
-        "notify": "käytä kappaleen ilmoituksia",
-        "notify_description": "näytä limoituksia, kun vaihdetaan nykyistä kappaletta"
+        "preservePitch_description": "säilytä sävelkorkeus toistonopeutta muokatessa"
     },
     "page": {
         "itemDetail": {

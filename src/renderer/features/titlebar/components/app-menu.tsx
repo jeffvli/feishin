@@ -6,8 +6,8 @@ import { Link } from 'react-router-dom';
 
 import packageJson from '../../../../../package.json';
 
-import { ServerList } from '/@/renderer/features/servers';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
+import { ServerList } from '/@/renderer/features/servers/components/server-list';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useAppStore,

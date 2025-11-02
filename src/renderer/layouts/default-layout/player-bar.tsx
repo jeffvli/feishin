@@ -2,7 +2,7 @@ import clsx from 'clsx';
 
 import styles from './player-bar.module.css';
 
-import { Playerbar } from '/@/renderer/features/player';
+import { Playerbar } from '/@/renderer/features/player/components/playerbar';
 import { useGeneralSettings } from '/@/renderer/store/settings.store';
 
 export const PlayerBar = () => {

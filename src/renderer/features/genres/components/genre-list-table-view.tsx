@@ -4,7 +4,7 @@ import { RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { MutableRefObject, useCallback } from 'react';
 import { generatePath, useNavigate } from 'react-router';
 
-import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
 import { VirtualTable } from '/@/renderer/components/virtual-table';
 import { useVirtualTable } from '/@/renderer/components/virtual-table/hooks/use-virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';

@@ -7,13 +7,13 @@ import { ListOnScrollProps } from 'react-window';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { SONG_CARD_ROWS } from '/@/renderer/components/card/card-rows';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
 import {
-    VirtualGridAutoSizerContainer,
     VirtualInfiniteGrid,
     VirtualInfiniteGridRef,
-} from '/@/renderer/components/virtual-grid';
+} from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { useListContext } from '/@/renderer/context/list-context';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { useHandleFavorite } from '/@/renderer/features/shared/hooks/use-handle-favorite';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useListStoreActions, useListStoreByKey } from '/@/renderer/store';
@@ -26,7 +26,6 @@ import {
     SongListSort,
 } from '/@/shared/types/domain-types';
 import { CardRow, ListDisplayType } from '/@/shared/types/types';
-
 interface SongListGridViewProps {
     gridRef: MutableRefObject<null | VirtualInfiniteGridRef>;
     itemCount?: number;
@@ -85,6 +84,9 @@ export const SongListGridView = ({ gridRef, itemCount }: SongListGridViewProps) 
             case SongListSort.DURATION:
                 rows.push(SONG_CARD_ROWS.duration);
                 break;
+            case SongListSort.EXPLICIT_STATUS:
+                rows.push(SONG_CARD_ROWS.explicitStatus);
+                break;
             case SongListSort.FAVORITED:
                 break;
             case SongListSort.NAME:
@@ -138,12 +140,13 @@ export const SongListGridView = ({ gridRef, itemCount }: SongListGridViewProps) 
 
         const queryKey = queryKeys.songs.list(server?.id || '', query, id);
 
-        const queriesFromCache: [QueryKey, SongListResponse][] = queryClient.getQueriesData({
-            exact: false,
-            fetchStatus: 'idle',
-            queryKey,
-            stale: false,
-        });
+        const queriesFromCache: [QueryKey, SongListResponse | undefined][] =
+            queryClient.getQueriesData({
+                exact: false,
+                fetchStatus: 'idle',
+                queryKey,
+                stale: false,
+            });
 
         const itemData: Song[] = [];
 
@@ -182,15 +185,17 @@ export const SongListGridView = ({ gridRef, itemCount }: SongListGridViewProps) 
 
             const queryKey = queryKeys.songs.list(server?.id || '', query, id);
 
-            const songs = await queryClient.fetchQuery(queryKey, async ({ signal }) =>
-                controller.getSongList({
-                    apiClientProps: {
-                        server,
-                        signal,
-                    },
-                    query,
-                }),
-            );
+            const songs = await queryClient.fetchQuery({
+                queryFn: async ({ signal }) =>
+                    controller.getSongList({
+                        apiClientProps: {
+                            server,
+                            signal,
+                        },
+                        query,
+                    }),
+                queryKey,
+            });
 
             return songs;
         },

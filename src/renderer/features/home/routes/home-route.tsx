@@ -1,13 +1,15 @@
+import { useQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FeatureCarousel } from '/@/renderer/components/feature-carousel/feature-carousel';
 import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel/grid-carousel';
 import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
-import { useAlbumList } from '/@/renderer/features/albums';
-import { useRecentlyPlayed } from '/@/renderer/features/home/queries/recently-played-query';
-import { AnimatedPage, LibraryHeaderBar } from '/@/renderer/features/shared';
-import { useSongList } from '/@/renderer/features/songs';
+import { albumQueries } from '/@/renderer/features/albums/api/album-api';
+import { homeQueries } from '/@/renderer/features/home/api/home-api';
+import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
+import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     HomeItem,
@@ -43,20 +45,22 @@ const HomeRoute = () => {
     const { windowBarStyle } = useWindowSettings();
     const { homeFeature, homeItems } = useGeneralSettings();
 
-    const feature = useAlbumList({
-        options: {
-            cacheTime: 1000 * 60,
-            enabled: homeFeature,
-            staleTime: 1000 * 60,
-        },
-        query: {
-            limit: 20,
-            sortBy: AlbumListSort.RANDOM,
-            sortOrder: SortOrder.DESC,
-            startIndex: 0,
-        },
-        serverId: server?.id,
-    });
+    const feature = useQuery(
+        albumQueries.list({
+            options: {
+                enabled: homeFeature,
+                gcTime: 1000 * 60,
+                staleTime: 1000 * 60,
+            },
+            query: {
+                limit: 20,
+                sortBy: AlbumListSort.RANDOM,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        }),
+    );
 
     const isJellyfin = server?.type === ServerType.JELLYFIN;
 
@@ -74,80 +78,100 @@ const HomeRoute = () => {
         );
     }, [homeItems]);
 
-    const random = useAlbumList({
-        options: {
-            enabled: queriesEnabled[HomeItem.RANDOM],
-            staleTime: 1000 * 60 * 5,
-        },
-        query: {
-            ...BASE_QUERY_ARGS,
-            sortBy: AlbumListSort.RANDOM,
-        },
-        serverId: server?.id,
-    });
-
-    const recentlyPlayed = useRecentlyPlayed({
-        options: {
-            enabled: queriesEnabled[HomeItem.RECENTLY_PLAYED] && !isJellyfin,
-            staleTime: 0,
-        },
-        query: {
-            ...BASE_QUERY_ARGS,
-            sortBy: AlbumListSort.RECENTLY_PLAYED,
-        },
-        serverId: server?.id,
-    });
-
-    const recentlyAdded = useAlbumList({
-        options: {
-            enabled: queriesEnabled[HomeItem.RECENTLY_ADDED],
-            staleTime: 1000 * 60 * 5,
-        },
-        query: {
-            ...BASE_QUERY_ARGS,
-            sortBy: AlbumListSort.RECENTLY_ADDED,
-        },
-        serverId: server?.id,
-    });
-
-    const mostPlayedAlbums = useAlbumList({
-        options: {
-            enabled: !isJellyfin && queriesEnabled[HomeItem.MOST_PLAYED],
-            staleTime: 1000 * 60 * 5,
-        },
-        query: {
-            ...BASE_QUERY_ARGS,
-            sortBy: AlbumListSort.PLAY_COUNT,
-        },
-        serverId: server?.id,
-    });
-
-    const mostPlayedSongs = useSongList(
-        {
+    const random = useQuery(
+        albumQueries.list({
             options: {
-                enabled: isJellyfin && queriesEnabled[HomeItem.MOST_PLAYED],
                 staleTime: 1000 * 60 * 5,
             },
             query: {
                 ...BASE_QUERY_ARGS,
-                sortBy: SongListSort.PLAY_COUNT,
+                sortBy: AlbumListSort.RANDOM,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
             },
             serverId: server?.id,
-        },
-        300,
+        }),
     );
 
-    const recentlyReleased = useAlbumList({
-        options: {
-            enabled: queriesEnabled[HomeItem.RECENTLY_RELEASED],
-            staleTime: 1000 * 60 * 5,
-        },
-        query: {
-            ...BASE_QUERY_ARGS,
-            sortBy: AlbumListSort.RELEASE_DATE,
-        },
-        serverId: server?.id,
-    });
+    const recentlyPlayed = useQuery(
+        homeQueries.recentlyPlayed({
+            options: {
+                staleTime: 0,
+            },
+            query: {
+                ...BASE_QUERY_ARGS,
+                sortBy: AlbumListSort.RECENTLY_PLAYED,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        }),
+    );
+
+    const recentlyAdded = useQuery(
+        albumQueries.list({
+            options: {
+                staleTime: 1000 * 60 * 5,
+            },
+            query: {
+                ...BASE_QUERY_ARGS,
+                sortBy: AlbumListSort.RECENTLY_ADDED,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        }),
+    );
+
+    const mostPlayedAlbums = useQuery(
+        albumQueries.list({
+            options: {
+                enabled:
+                    server?.type === ServerType.SUBSONIC || server?.type === ServerType.NAVIDROME,
+                staleTime: 1000 * 60 * 5,
+            },
+            query: {
+                ...BASE_QUERY_ARGS,
+                sortBy: AlbumListSort.PLAY_COUNT,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        }),
+    );
+
+    const mostPlayedSongs = useQuery(
+        songsQueries.list(
+            {
+                options: {
+                    enabled: server?.type === ServerType.JELLYFIN,
+                    staleTime: 1000 * 60 * 5,
+                },
+                query: {
+                    ...BASE_QUERY_ARGS,
+                    sortBy: SongListSort.PLAY_COUNT,
+                    sortOrder: SortOrder.DESC,
+                    startIndex: 0,
+                },
+                serverId: server?.id,
+            },
+            300,
+        ),
+    );
+
+    const recentlyReleased = useQuery(
+        albumQueries.list({
+            options: {
+                enabled: queriesEnabled[HomeItem.RECENTLY_RELEASED],
+                staleTime: 1000 * 60 * 5,
+            },
+            query: {
+                ...BASE_QUERY_ARGS,
+                sortBy: AlbumListSort.RELEASE_DATE,
+            },
+            serverId: server?.id,
+        }),
+    );
 
     const isLoading =
         (random.isLoading && queriesEnabled[HomeItem.RANDOM]) ||

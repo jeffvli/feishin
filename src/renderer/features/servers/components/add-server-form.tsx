@@ -11,9 +11,9 @@ import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { useAuthStoreActions } from '/@/renderer/store';
-import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
+import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { Paper } from '/@/shared/components/paper/paper';
 import { PasswordInput } from '/@/shared/components/password-input/password-input';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
@@ -298,20 +298,18 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             })}
                         />
                     )}
-                    <Group grow justify="flex-end">
+                    <Group justify="flex-end">
                         {onCancel && (
-                            <Button onClick={onCancel} variant="subtle">
-                                {t('common.cancel', { postProcess: 'titleCase' })}
-                            </Button>
+                            <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
                         )}
-                        <Button
+                        <ModalButton
                             disabled={isSubmitDisabled}
                             loading={isLoading}
                             type="submit"
                             variant="filled"
                         >
-                            {t('common.add', { postProcess: 'titleCase' })}
-                        </Button>
+                            {t('common.add')}
+                        </ModalButton>
                     </Group>
                 </Stack>
             </form>

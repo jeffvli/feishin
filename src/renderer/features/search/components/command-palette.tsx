@@ -1,16 +1,17 @@
 import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
+import { useQuery } from '@tanstack/react-query';
 import { Fragment, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router';
 
-import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { searchQueries } from '/@/renderer/features/search/api/search-api';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
 import { CommandItemSelectable } from '/@/renderer/features/search/components/command-item-selectable';
 import { GoToCommands } from '/@/renderer/features/search/components/go-to-commands';
 import { HomeCommands } from '/@/renderer/features/search/components/home-commands';
 import { LibraryCommandItem } from '/@/renderer/features/search/components/library-command-item';
 import { ServerCommands } from '/@/renderer/features/search/components/server-commands';
-import { useSearch } from '/@/renderer/features/search/queries/search-query';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
@@ -48,19 +49,21 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
         });
     }, []);
 
-    const { data, isLoading } = useSearch({
-        options: { enabled: isHome && debouncedQuery !== '' && query !== '' },
-        query: {
-            albumArtistLimit: 4,
-            albumArtistStartIndex: 0,
-            albumLimit: 4,
-            albumStartIndex: 0,
-            query: debouncedQuery,
-            songLimit: 4,
-            songStartIndex: 0,
-        },
-        serverId: server?.id,
-    });
+    const { data, isLoading } = useQuery(
+        searchQueries.search({
+            options: { enabled: isHome && debouncedQuery !== '' && query !== '' },
+            query: {
+                albumArtistLimit: 4,
+                albumArtistStartIndex: 0,
+                albumLimit: 4,
+                albumStartIndex: 0,
+                query: debouncedQuery,
+                songLimit: 4,
+                songStartIndex: 0,
+            },
+            serverId: server?.id,
+        }),
+    );
 
     const showAlbumGroup = isHome && Boolean(query && data && data?.albums?.length > 0);
     const showArtistGroup = isHome && Boolean(query && data && data?.albumArtists?.length > 0);

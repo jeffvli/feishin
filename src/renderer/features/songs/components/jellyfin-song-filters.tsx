@@ -1,10 +1,11 @@
+import { useQuery } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { MultiSelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
-import { useGenreList } from '/@/renderer/features/genres';
-import { useTagList } from '/@/renderer/features/tag/queries/use-tag-list';
+import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
+import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -18,7 +19,7 @@ interface JellyfinSongFiltersProps {
     customFilters?: Partial<SongListFilter>;
     onFilterChange: (filters: SongListFilter) => void;
     pageKey: string;
-    serverId?: string;
+    serverId: string;
 }
 
 export const JellyfinSongFilters = ({
@@ -35,15 +36,17 @@ export const JellyfinSongFilters = ({
 
     // Despite the fact that getTags returns genres, it only returns genre names.
     // We prefer using IDs, hence the double query
-    const genreListQuery = useGenreList({
-        query: {
-            musicFolderId: filter?.musicFolderId,
-            sortBy: GenreListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId,
-    });
+    const genreListQuery = useQuery(
+        genresQueries.list({
+            query: {
+                musicFolderId: filter?.musicFolderId,
+                sortBy: GenreListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
 
     const genreList = useMemo(() => {
         if (!genreListQuery?.data) return [];
@@ -53,13 +56,15 @@ export const JellyfinSongFilters = ({
         }));
     }, [genreListQuery.data]);
 
-    const tagsQuery = useTagList({
-        query: {
-            folder: filter?.musicFolderId,
-            type: LibraryItem.SONG,
-        },
-        serverId,
-    });
+    const tagsQuery = useQuery(
+        sharedQueries.tags({
+            query: {
+                folder: filter?.musicFolderId,
+                type: LibraryItem.SONG,
+            },
+            serverId,
+        }),
+    );
 
     const selectedGenres = useMemo(() => {
         return filter?._custom?.jellyfin?.GenreIds?.split(',');

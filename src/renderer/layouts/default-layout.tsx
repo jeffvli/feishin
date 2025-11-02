@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router';
 
 import styles from './default-layout.module.css';
 
-import { ContextMenuProvider } from '/@/renderer/features/context-menu';
+import { ContextMenuProvider } from '/@/renderer/features/context-menu/context-menu-provider';
 import { CommandPalette } from '/@/renderer/features/search/components/command-palette';
 import { MainContent } from '/@/renderer/layouts/default-layout/main-content';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';

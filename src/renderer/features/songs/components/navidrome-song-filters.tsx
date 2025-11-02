@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,8 +7,8 @@ import {
     MultiSelectWithInvalidData,
     SelectWithInvalidData,
 } from '/@/renderer/components/select-with-invalid-data';
-import { useGenreList } from '/@/renderer/features/genres';
-import { useTagList } from '/@/renderer/features/tag/queries/use-tag-list';
+import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
+import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import {
     getServerById,
     SongListFilter,
@@ -29,7 +30,7 @@ interface NavidromeSongFiltersProps {
     customFilters?: Partial<SongListFilter>;
     onFilterChange: (filters: SongListFilter) => void;
     pageKey: string;
-    serverId?: string;
+    serverId: string;
 }
 
 export const NavidromeSongFilters = ({
@@ -45,21 +46,25 @@ export const NavidromeSongFilters = ({
 
     const isGenrePage = customFilters?.genreIds !== undefined;
 
-    const genreListQuery = useGenreList({
-        query: {
-            sortBy: GenreListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId,
-    });
+    const genreListQuery = useQuery(
+        genresQueries.list({
+            query: {
+                sortBy: GenreListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
 
-    const tagsQuery = useTagList({
-        query: {
-            type: LibraryItem.SONG,
-        },
-        serverId,
-    });
+    const tagsQuery = useQuery(
+        sharedQueries.tags({
+            query: {
+                type: LibraryItem.SONG,
+            },
+            serverId,
+        }),
+    );
 
     const genreList = useMemo(() => {
         if (!genreListQuery?.data) return [];

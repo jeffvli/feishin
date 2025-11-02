@@ -20,7 +20,8 @@
             "lastfm": "Last.fm에서 보기"
         },
         "viewPlaylists": "$t(entity.playlist_other) 보기",
-        "setRating": "평점 지정"
+        "setRating": "평점 지정",
+        "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist) 편집기 펼치기"
     },
     "common": {
         "translation": "번역",
@@ -100,7 +101,21 @@
         "home": "홈",
         "no": "아니오",
         "none": "없음",
-        "rating": "평점"
+        "rating": "평점",
+        "action_other": "동작",
+        "newVersion": "새로운 버전이 설치되었습니다. {{version}}",
+        "viewReleaseNotes": "릴리스노트 보기",
+        "albumGain": "앨범 게인",
+        "albumPeak": "앨범 피크",
+        "bitDepth": "비트 심도",
+        "filters": "필터",
+        "noResultsFromQuery": "쿼리 결과가 없습니다",
+        "note": "노트",
+        "ok": "OK",
+        "owner": "소유자",
+        "sampleRate": "샘플레이트",
+        "tags": "태그",
+        "additionalParticipants": "추가 참여자"
     },
     "entity": {
         "albumWithCount_other": "{{count}} 앨범",
@@ -143,7 +158,10 @@
         "endpointNotImplementedError": "엔드포인트 {{endpoint}} 는 {{serverType}} 에 대해 구현되지 않았습니다",
         "genericError": "에러가 발생했습니다",
         "invalidServer": "잘못된 서버",
-        "localFontAccessDenied": "로컬 글꼴에 접근 거부되었습니다"
+        "localFontAccessDenied": "로컬 글꼴에 접근 거부되었습니다",
+        "apiRouteError": "요청 보내기 실패",
+        "badValue": "옵션이 없습니다 {{value}}. 이 값은 더이상 존재하지 않습니다",
+        "notificationDenied": "알림에 대한 권한이 거부되었습니다. 이 설정은 변경되지 않습니다"
     },
     "filter": {
         "title": "곡명",
@@ -170,7 +188,25 @@
         "biography": "바이오그래피",
         "channels": "$t(common.channel_other)",
         "duration": "길이",
-        "bpm": "bpm"
+        "bpm": "bpm",
+        "albumCount": "$t(entity.album_other) 앨범수",
+        "comment": "코멘트",
+        "favorited": "즐겨찾기",
+        "fromYear": "시작 년도",
+        "genre": "$t(entity.genre_one)",
+        "id": "아이디",
+        "isCompilation": "편집앨범 여부",
+        "isFavorited": "즐겨찾기 여부",
+        "isPublic": "공유 여부",
+        "isRated": "평가 여부",
+        "note": "노트",
+        "owner": "$t(common.owner)",
+        "rating": "평가",
+        "releaseYear": "발매연도",
+        "songCount": "곡 갯수",
+        "toYear": "년도까지",
+        "trackNumber": "트랙",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "form": {
         "addServer": {
@@ -184,12 +220,15 @@
             "ignoreCors": "CORS 무시 ($t(common.restartRequired))",
             "ignoreSsl": "SSL 무시 ($t(common.restartRequired))",
             "input_legacyAuthentication": "레거시 인증 사용",
-            "input_username": "유저 이름"
+            "input_username": "유저 이름",
+            "input_preferInstantMix": "즉석 믹스 선호",
+            "input_preferInstantMixDescription": "비슷한 곳을 찾기 위해 즉석 믹스를 사용합니다. 이 명령을 수정하기 위한 플러그인을 설치한 경우 유용합니다"
         },
         "addToPlaylist": {
             "input_skipDuplicates": "중복 건너뛰기",
             "title": "$t(entity.playlist_one) 에 추가",
-            "input_playlists": "$t(entity.playlist_other)"
+            "input_playlists": "$t(entity.playlist_other)",
+            "success": "$t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })에 $t(entity.trackWithCount, {\"count\": {{message}} })가 추가되었습니다"
         },
         "lyricSearch": {
             "title": "가사 검색",
@@ -198,7 +237,8 @@
         },
         "queryEditor": {
             "input_optionMatchAll": "모두 일치",
-            "input_optionMatchAny": "무엇이든 일치"
+            "input_optionMatchAny": "무엇이든 일치",
+            "title": "쿼리 편집기"
         },
         "editPlaylist": {
             "title": "$t(entity.playlist_one) 편집",
@@ -229,6 +269,11 @@
             "input_confirm": "확인을 위해 $t(entity.playlist_one)의 이름을 적어주세요",
             "success": "$t(entity.playlist_one)가 삭제되었습니다",
             "title": "$t(entity.playlist_one) 삭제"
+        },
+        "privateMode": {
+            "enabled": "프라이빗 모드가 활성화되었습니다. 재생상태가 외부 서비스에 지금부터 노출되지 않습니다",
+            "disabled": "프라이빗 모드가 비활성화되었습니다. 재생상태가 외부서비스에서 지금부터 표시됩니다",
+            "title": "프라이빗 모드"
         }
     },
     "page": {
@@ -238,7 +283,11 @@
             "goForward": "앞으로",
             "manageServers": "서버 설정하기",
             "openBrowserDevtools": "브라우저 개발자 도구 열기",
-            "version": "버전 {{version}}"
+            "version": "버전 {{version}}",
+            "collapseSidebar": "사이드바 줄이기",
+            "expandSidebar": "사이드바 확장",
+            "privateModeOff": "프라이빗 모드 끄기",
+            "privateModeOn": "프라이빗 모드 켜기"
         },
         "manageServers": {
             "title": "서버 설정하기",
@@ -254,20 +303,94 @@
                 "lyricAlignment": "가사 정렬",
                 "useImageAspectRatio": "이미지 종횡비 사용",
                 "synchronized": "동기화",
-                "unsynchronized": "비동기화"
+                "unsynchronized": "비동기화",
+                "dynamicBackground": "동적 배경",
+                "dynamicImageBlur": "흐린 이미지 수준",
+                "dynamicIsImage": "배경이미지 켜기",
+                "followCurrentLyric": "가사 따라가기",
+                "lyricOffset": "가사 옵셋(1/1000초)",
+                "lyricGap": "가사 간격",
+                "lyricSize": "가사 크기",
+                "showLyricMatch": "가사 일치 표시",
+                "showLyricProvider": "가사 제공자 표시"
             },
-            "lyrics": "가사"
+            "lyrics": "가사",
+            "related": "관련",
+            "upNext": "이전 다음",
+            "visualizer": "비주얼라이저",
+            "noLyrics": "가사 없음"
         },
         "contextMenu": {
             "download": "다운로드",
-            "numberSelected": "{{count}}개 선택됨"
+            "numberSelected": "{{count}}개 선택됨",
+            "shareItem": "공유",
+            "goToAlbum": "$t(entity.album_one)으로 이동",
+            "goToAlbumArtist": "$t(entity.albumArtist_one)으로 이동",
+            "showDetails": "추가정보"
         },
         "albumArtistDetail": {
             "about": "{{artist}}에 대해",
             "viewDiscography": "디스코그래피 보기",
             "appearsOn": "참여 앨범",
             "recentReleases": "최근 앨범",
-            "relatedArtists": "연관 $t(entity.artist_other)"
+            "relatedArtists": "연관 $t(entity.artist_other)",
+            "topSongs": "최고의 곡들",
+            "topSongsFrom": "{{title}}이 포함된 최고의 곡들",
+            "viewAll": "전부 보이기",
+            "viewAllTracks": "$t(entity.track_other) 전부 보이기"
+        },
+        "albumArtistList": {
+            "title": "$t(entity.albumArtist_other)"
+        },
+        "albumDetail": {
+            "moreFromArtist": "$t(entity.artist_one) 더 보기",
+            "moreFromGeneric": "{{item}} 더 보기",
+            "released": "발매"
+        },
+        "albumList": {
+            "artistAlbums": "{{artist}}의 앨범"
+        },
+        "genreList": {
+            "showAlbums": "$t(entity.genre_one) $t(entity.album_other) 표시",
+            "showTracks": "$t(entity.genre_one) $t(entity.track_other) 표시"
+        },
+        "globalSearch": {
+            "commands": {
+                "goToPage": "페이지로 이동",
+                "searchFor": "{{query}} 찾기",
+                "serverCommands": "서버 명령"
+            },
+            "title": "명령"
+        },
+        "home": {
+            "explore": "라이브러리 탐색",
+            "mostPlayed": "자주 플레이된 곡",
+            "newlyAdded": "최근에 추가된 곡",
+            "recentlyPlayed": "최근에 플레이된 곡",
+            "recentlyReleased": "최근에 발매된 곡"
+        },
+        "itemDetail": {
+            "copyPath": "클립보드에 경로를 복사",
+            "copiedPath": "경로 복사 성공",
+            "openFile": "이 노래를 파일관리자에서 표시"
+        },
+        "playlist": {
+            "reorder": "ID로 정렬한 경우에만 순서변경이 가능합니다"
+        },
+        "setting": {
+            "advanced": "고급",
+            "generalTab": "일반",
+            "hotkeysTab": "단축키",
+            "playbackTab": "재생",
+            "windowTab": "윈도우"
+        },
+        "sidebar": {
+            "myLibrary": "내 라이브러리",
+            "nowPlaying": "재생중",
+            "shared": "공유 $t(entity.playlist_other)"
+        },
+        "trackList": {
+            "artistTracks": "{{artist}}의 음악"
         }
     },
     "table": {
@@ -282,5 +405,44 @@
                 "table": "표"
             }
         }
+    },
+    "player": {
+        "addLast": "마지막에 추가",
+        "addNext": "바로 다음에 추가",
+        "favorite": "즐겨찾기",
+        "mute": "음소거",
+        "muted": "음소거됨",
+        "next": "다음",
+        "play": "재생",
+        "playbackFetchCancel": "좀 시간이 걸립니다... 취소하시려면 이 알림을 닫아주세요",
+        "playbackFetchInProgress": "곡 불러오는 중…",
+        "playbackFetchNoResults": "곡이 없습니다",
+        "playbackSpeed": "재생 속도",
+        "playRandom": "랜덤 재생",
+        "playSimilarSongs": "비슷한 곡 재생",
+        "previous": "이전",
+        "queue_clear": "재생 대기열 지우기",
+        "queue_moveToBottom": "선택한 곡을 가장 위로 이동",
+        "queue_moveToTop": "선택한 곡을 가장 아래로 이동",
+        "queue_remove": "선택한 항목 삭제",
+        "repeat": "반복",
+        "repeat_all": "모두 반복하기",
+        "repeat_off": "반복 비활성화됨",
+        "shuffle": "무작위 재생",
+        "shuffle_off": "무작위 재생 비활성화됨",
+        "skip": "건너뛰기",
+        "skip_back": "이전으로 건너뛰기",
+        "skip_forward": "다음으로 건너뛰기",
+        "stop": "중지",
+        "toggleFullscreenPlayer": "전체화면으로 전환",
+        "unfavorite": "즐겨찾기 취소",
+        "pause": "멈춤",
+        "viewQueue": "대기열 보기"
+    },
+    "setting": {
+        "accentColor_description": "앱의 강조색상 설정",
+        "accentColor": "강조색상",
+        "albumBackground_description": "앨범아트가 있는 경우 앨범화면에 배경이미지 추가",
+        "albumBackground": "앨범 배경이미지"
     }
 }

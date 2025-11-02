@@ -58,7 +58,6 @@
         "replayGainPreamp": "preamplificador (dB) de {{ReplayGain}}",
         "hotkey_favoriteCurrentSong": "$t(common.currentSong) favorita",
         "sampleRate": "ratio de muestreo",
-        "crossfadeStyle": "estilo de crossfade",
         "sidePlayQueueStyle_optionAttached": "acoplada",
         "sidebarConfiguration": "configuración de la barra lateral",
         "sampleRate_description": "selecciona el ratio de muestreo de salida a ser usado si la frecuencia de muestreo seleccionada es diferente de la del medio actual. un valor inferior a 8000 usará la frecuencia predeterminada",
@@ -104,7 +103,6 @@
         "playbackStyle_optionCrossFade": "crossfade",
         "hotkey_rate3": "calificar con 3 estrellas",
         "font": "fuente",
-        "mpvExtraParameters": "parámetros de mpv",
         "replayGainMode_optionTrack": "$t(entity.track_one)",
         "themeLight_description": "establece el tema claro a usar por la aplicación",
         "hotkey_toggleFullScreenPlayer": "cambia el reproductor a pantalla completa",
@@ -115,7 +113,6 @@
         "hotkey_playbackPrevious": "pista anterior",
         "showSkipButtons_description": "muestra o esconde los botones de saltar en la barra del reproductor",
         "crossfadeDuration_description": "establece la duración del efecto de crossfade",
-        "language": "idioma",
         "playbackStyle": "estilo de reproducción",
         "hotkey_toggleShuffle": "alterna aleatorio",
         "theme": "tema",
@@ -132,7 +129,7 @@
         "showSkipButton_description": "muestra o esconde los botones de saltar en la barra del reproductor",
         "savePlayQueue": "guardar cola de reproducción",
         "minimumScrobbleSeconds_description": "la duración mínima en segundos de la canción que debe ser reproducida antes de hacer scrobble",
-        "fontType_description": "fuente incorporada selecciona una de las fuentes proporcionadas por feishin. fuente del sistema te permite seleccionar cualquier fuente proporcionada por tu sistema operativo. personalizada te permite proporcionar tu propia fuente",
+        "fontType_description": "Fuente incorporada selecciona una de las fuentes proporcionadas por Feishin. Fuente del sistema te permite seleccionar cualquier fuente proporcionada por tu sistema operativo. Personalizada te permite proporcionar tu propia fuente",
         "playButtonBehavior": "comportamiento del botón de reproducción",
         "sidebarPlaylistList_description": "muestra o esconde las listas de reproducción en la barra lateral",
         "sidePlayQueueStyle_description": "establece el estilo de la cola de reproducción lateral",
@@ -177,7 +174,6 @@
         "gaplessAudio_optionWeak": "débil (recomendado)",
         "minimumScrobbleSeconds": "mínimo scrobble (segundos)",
         "hotkey_playbackStop": "parar",
-        "discordRichPresence": "estado de actividad de {{discord}}",
         "font_description": "establece la fuente a usar por la aplicación",
         "savePlayQueue_description": "guarda la cola de reproducción cuando se cierra la aplicación y la restaura cuando se abre",
         "useSystemTheme": "usar tema del sistema",
@@ -232,11 +228,9 @@
         "customCss_description": "Content CSS personalizado. Nota: content y urls remotas son propiedades rechazadas. Una vista previa de tu content se muestra debajo. Las entradas adicionales que no estableciste están presentes debido a la sanitización",
         "webAudio": "usar audio web",
         "webAudio_description": "Utilizar audio web. Esto habilita funciones avanzadas como Replaygain. Desactiva esta opción si tienes problemas",
-        "transcode": "activar la transcodificación",
         "transcode_description": "permite la transcodificación a distintos formatos",
         "transcodeBitrate": "tasa de bits a transcodificar",
         "transcodeBitrate_description": "selecciona el bitrate a transcodificar. 0 significa dejar que el servidor elija",
-        "transcodeNote": "tendrá efecto después de 1 (web) - 2 (mpv) canciones",
         "transcodeFormat": "formato a transcodificar",
         "transcodeFormat_description": "selecciona el formato a transcodificar. dejar vacío para que el servidor decida",
         "albumBackground": "imagen de fondo del álbum",
@@ -272,8 +266,6 @@
         "discordPausedStatus_description": "Cuando está activado, el estado mostrará cuando el reproductor esté en pausa",
         "preservePitch": "Mantener el tono",
         "preservePitch_description": "Mantiene el tono cuando se modifica la velocidad de reproducción",
-        "notify": "Activar notificaciones de canciones",
-        "notify_description": "Muestra notificaciones cuando se cambia la canción actual",
         "discordDisplayType_songname": "Nombre de la canción",
         "discordDisplayType_artistname": "Nombre(s) del artista(s)",
         "discordDisplayType_description": "Cambia qué estás escuchando en tu estado",
@@ -288,13 +280,23 @@
         "artistBackground": "imagen de fondo del artista",
         "artistBackgroundBlur": "tamaño de desenfoque de imagen de fondo del artista",
         "artistBackgroundBlur_description": "ajusta la cantidad de desenfoque aplicado a la imagen de fondo del artista",
-        "releaseChannel_optionLatest": "Estable",
+        "releaseChannel_optionLatest": "Última versión",
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel": "Canal de lanzamiento",
         "releaseChannel_description": "Elige entre lanzamientos estables o beta para las actualizaciones automáticas",
         "artistBackground_description": "Añade una imagen de fondo para las páginas de artista que contienen el arte del artista",
         "mediaSession": "Activar sesión de medios",
-        "mediaSession_description": "Activa la integración de la sesión de medios de Windows, mostrando los controles de medios y los metadatos en la superposición del volumen del sistema y en la pantalla de bloqueo (solo en Windows)"
+        "mediaSession_description": "Activa la integración de la sesión de medios de Windows, mostrando los controles de medios y los metadatos en la superposición del volumen del sistema y en la pantalla de bloqueo (solo en Windows)",
+        "exportImportSettings_control_description": "Exporta e importa la configuración a través de JSON",
+        "exportImportSettings_control_exportText": "Exportar configuración",
+        "exportImportSettings_control_importText": "Importar configuración",
+        "exportImportSettings_control_title": "Importar / Exportar configuración",
+        "exportImportSettings_destructiveWarning": "Importar la configuración es perjudicial, ¡por favor revisa lo de arriba antes de hacer clic en \"Importar\" abajo!",
+        "exportImportSettings_importBtn": "Importar configuración",
+        "exportImportSettings_importModalTitle": "Importar configuración de Feishin",
+        "exportImportSettings_importSuccess": "¡La configuración ha sido importada con éxito!",
+        "exportImportSettings_notValidJSON": "El archivo suministrado no es un JSON válido",
+        "exportImportSettings_offendingKeyError": "\"{{offendingKey}}\" es incorrecto - {{reason}}"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -418,7 +420,10 @@
         "newVersion": "Una nueva versión ha sido instalada ({{version}})",
         "viewReleaseNotes": "Ver notas de lanzamiento",
         "bitDepth": "Profundidad de bit",
-        "sampleRate": "Frecuencia de muestreo"
+        "sampleRate": "Frecuencia de muestreo",
+        "explicitStatus": "Estado explícito",
+        "explicit": "Explícito",
+        "clean": "Limpio"
     },
     "error": {
         "remotePortWarning": "reiniciar el servidor para aplicar el nuevo puerto",
@@ -488,7 +493,8 @@
         "songCount": "número de canción",
         "isPublic": "es público",
         "album": "$t(entity.album_one)",
-        "albumCount": "Contar $t(entity.album_other)"
+        "albumCount": "Contar $t(entity.album_other)",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "page": {
         "sidebar": {
@@ -844,5 +850,10 @@
         "song_one": "canción",
         "song_many": "canciones",
         "song_other": "canciones"
+    },
+    "dragDropZone": {
+        "error_oneFileOnly": "Por favor selecciona un solo archivo",
+        "error_readingFile": "Ha habido un problema leyendo el archivo: {{errorMessage}}",
+        "mainText": "Arrastra un archivo aquí"
     }
 }

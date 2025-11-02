@@ -30,11 +30,13 @@ import {
     useContextMenuEvents,
 } from '/@/renderer/features/context-menu/events';
 import { ItemDetailsModal } from '/@/renderer/features/item-details/components/item-details-modal';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
-import { useDeletePlaylist } from '/@/renderer/features/playlists';
+import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
 import { useRemoveFromPlaylist } from '/@/renderer/features/playlists/mutations/remove-from-playlist-mutation';
-import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
+import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
+import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
+import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     getServerById,
@@ -504,7 +506,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
                 songId: songId.length > 0 ? songId : undefined,
             },
             modal: 'addToPlaylist',
-            size: 'md',
+            size: 'lg',
             title: t('page.contextMenu.addToPlaylist', { postProcess: 'sentenceCase' }),
         });
     }, [ctx.data, ctx.dataNodes, t]);
@@ -549,7 +551,7 @@ export const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
 
         openModal({
             children: (
-                <ConfirmModal loading={removeFromPlaylistMutation.isLoading} onConfirm={confirm}>
+                <ConfirmModal loading={removeFromPlaylistMutation.isPending} onConfirm={confirm}>
                     {t('common.areYouSure', { postProcess: 'sentenceCase' })}
                 </ConfirmModal>
             ),

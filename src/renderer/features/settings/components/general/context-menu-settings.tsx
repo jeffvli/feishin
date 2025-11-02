@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
     CONFIGURABLE_CONTEXT_MENU_ITEMS,
     CONTEXT_MENU_ITEM_MAPPING,
-} from '/@/renderer/features/context-menu';
+} from '/@/renderer/features/context-menu/events';
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';

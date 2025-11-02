@@ -13,12 +13,17 @@ export const HomeSettings = () => {
     const { homeItems } = useGeneralSettings();
     const { setHomeItems } = useSettingsStoreActions();
 
+    const mappedHomeItems = homeItems.map((item) => ({
+        ...item,
+        id: item.id as HomeItem,
+    }));
+
     return (
         <DraggableItems
             description="setting.homeConfiguration"
             itemLabels={HOME_ITEMS}
             setItems={setHomeItems}
-            settings={homeItems}
+            settings={mappedHomeItems}
             title="setting.homeConfiguration"
         />
     );

@@ -1,11 +1,12 @@
+import { useQuery } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { MultiSelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
-import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
-import { useGenreList } from '/@/renderer/features/genres';
-import { useTagList } from '/@/renderer/features/tag/queries/use-tag-list';
+import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
+import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
+import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { AlbumListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -27,7 +28,7 @@ interface JellyfinAlbumFiltersProps {
     disableArtistFilter?: boolean;
     onFilterChange: (filters: AlbumListFilter) => void;
     pageKey: string;
-    serverId?: string;
+    serverId: string;
 }
 
 export const JellyfinAlbumFilters = ({
@@ -42,19 +43,21 @@ export const JellyfinAlbumFilters = ({
     const { setFilter } = useListStoreActions();
 
     // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
-    const genreListQuery = useGenreList({
-        options: {
-            cacheTime: 1000 * 60 * 2,
-            staleTime: 1000 * 60 * 1,
-        },
-        query: {
-            musicFolderId: filter?.musicFolderId,
-            sortBy: GenreListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId,
-    });
+    const genreListQuery = useQuery(
+        genresQueries.list({
+            options: {
+                gcTime: 1000 * 60 * 2,
+                staleTime: 1000 * 60 * 1,
+            },
+            query: {
+                musicFolderId: filter?.musicFolderId,
+                sortBy: GenreListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
 
     const genreList = useMemo(() => {
         if (!genreListQuery?.data) return [];
@@ -64,17 +67,19 @@ export const JellyfinAlbumFilters = ({
         }));
     }, [genreListQuery.data]);
 
-    const tagsQuery = useTagList({
-        options: {
-            cacheTime: 1000 * 60 * 2,
-            staleTime: 1000 * 60 * 1,
-        },
-        query: {
-            folder: filter?.musicFolderId,
-            type: LibraryItem.ALBUM,
-        },
-        serverId,
-    });
+    const tagsQuery = useQuery(
+        sharedQueries.tags({
+            options: {
+                gcTime: 1000 * 60 * 2,
+                staleTime: 1000 * 60 * 1,
+            },
+            query: {
+                folder: filter?.musicFolderId,
+                type: LibraryItem.ALBUM,
+            },
+            serverId,
+        }),
+    );
 
     const selectedTags = useMemo(() => {
         return filter?._custom?.jellyfin?.Tags?.split('|');
@@ -171,18 +176,20 @@ export const JellyfinAlbumFilters = ({
         onFilterChange(updatedFilters);
     }, 250);
 
-    const albumArtistListQuery = useAlbumArtistList({
-        options: {
-            cacheTime: 1000 * 60 * 2,
-            staleTime: 1000 * 60 * 1,
-        },
-        query: {
-            sortBy: AlbumArtistListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId,
-    });
+    const albumArtistListQuery = useQuery(
+        artistsQueries.albumArtistList({
+            options: {
+                gcTime: 1000 * 60 * 2,
+                staleTime: 1000 * 60 * 1,
+            },
+            query: {
+                sortBy: AlbumArtistListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
 
     const selectableAlbumArtists = useMemo(() => {
         if (!albumArtistListQuery?.data?.items) return [];

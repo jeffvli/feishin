@@ -4,8 +4,9 @@ import { useLocation } from 'react-router';
 
 import styles from './right-sidebar.module.css';
 
-import { DrawerPlayQueue, SidebarPlayQueue } from '/@/renderer/features/now-playing';
-import { ResizeHandle } from '/@/renderer/features/shared';
+import { DrawerPlayQueue } from '/@/renderer/features/now-playing/components/drawer-play-queue';
+import { SidebarPlayQueue } from '/@/renderer/features/now-playing/components/sidebar-play-queue';
+import { ResizeHandle } from '/@/renderer/features/shared/components/resize-handle';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useGeneralSettings, useSidebarStore, useWindowSettings } from '/@/renderer/store';
 import { Platform } from '/@/shared/types/types';

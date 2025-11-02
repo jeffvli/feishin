@@ -27,11 +27,16 @@ export const useAddToPlaylist = (args: MutationHookArgs) => {
 
             if (!serverId) return;
 
-            queryClient.invalidateQueries(queryKeys.playlists.list(serverId), { exact: false });
-            queryClient.invalidateQueries(queryKeys.playlists.detail(serverId, variables.query.id));
-            queryClient.invalidateQueries(
-                queryKeys.playlists.songList(serverId, variables.query.id),
-            );
+            queryClient.invalidateQueries({
+                exact: false,
+                queryKey: queryKeys.playlists.list(serverId),
+            });
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.playlists.detail(serverId, variables.query.id),
+            });
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.playlists.songList(serverId, variables.query.id),
+            });
         },
         ...options,
     });

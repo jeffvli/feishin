@@ -8,16 +8,14 @@ import styles from './dummy-album-detail-route.module.css';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu';
 import { SONG_ALBUM_PAGE } from '/@/renderer/features/context-menu/context-menu-items';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
-import {
-    AnimatedPage,
-    LibraryHeader,
-    PlayButton,
-    useCreateFavorite,
-    useDeleteFavorite,
-} from '/@/renderer/features/shared';
+import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryHeader } from '/@/renderer/features/shared/components/library-header';
+import { PlayButton } from '/@/renderer/features/shared/components/play-button';
+import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
+import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useContainerQuery, useFastAverageColor } from '/@/renderer/hooks';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -183,8 +181,8 @@ const DummyAlbumDetailRoute = () => {
                                     fill: detailQuery?.data?.userFavorite ? 'primary' : undefined,
                                 }}
                                 loading={
-                                    createFavoriteMutation.isLoading ||
-                                    deleteFavoriteMutation.isLoading
+                                    createFavoriteMutation.isPending ||
+                                    deleteFavoriteMutation.isPending
                                 }
                                 onClick={handleFavorite}
                                 variant="subtle"

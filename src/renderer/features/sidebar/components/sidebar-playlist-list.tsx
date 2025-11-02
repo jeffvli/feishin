@@ -1,4 +1,5 @@
 import { closeAllModals, openModal } from '@mantine/modals';
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { MouseEvent, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,8 +8,9 @@ import { Link } from 'react-router-dom';
 
 import styles from './sidebar-playlist-list.module.css';
 
-import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { CreatePlaylistForm, usePlaylistList } from '/@/renderer/features/playlists';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
+import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
@@ -142,14 +144,16 @@ export const SidebarPlaylistList = () => {
     const { t } = useTranslation();
     const server = useCurrentServer();
 
-    const playlistsQuery = usePlaylistList({
-        query: {
-            sortBy: PlaylistListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId: server?.id,
-    });
+    const playlistsQuery = useQuery(
+        playlistsQueries.list({
+            query: {
+                sortBy: PlaylistListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        }),
+    );
 
     const handlePlayPlaylist = useCallback(
         (id: string, playType: Play) => {
@@ -258,14 +262,16 @@ export const SidebarSharedPlaylistList = () => {
     const { t } = useTranslation();
     const server = useCurrentServer();
 
-    const playlistsQuery = usePlaylistList({
-        query: {
-            sortBy: PlaylistListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId: server?.id,
-    });
+    const playlistsQuery = useQuery(
+        playlistsQueries.list({
+            query: {
+                sortBy: PlaylistListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        }),
+    );
 
     const handlePlayPlaylist = useCallback(
         (id: string, playType: Play) => {

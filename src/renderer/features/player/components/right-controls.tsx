@@ -5,7 +5,9 @@ import { useTranslation } from 'react-i18next';
 
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { useRightControls } from '/@/renderer/features/player/hooks/use-right-controls';
-import { useCreateFavorite, useDeleteFavorite, useSetRating } from '/@/renderer/features/shared';
+import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
+import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
+import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import {
     useAppStoreActions,
     useCurrentServer,

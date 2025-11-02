@@ -94,7 +94,7 @@ export const ShuffleAllModal = ({
 
     const handlePlay = async (playType: Play) => {
         const res = await queryClient.fetchQuery({
-            cacheTime: 0,
+            gcTime: 0,
             queryFn: ({ signal }) =>
                 api.controller.getRandomSongList({
                     apiClientProps: {
@@ -253,7 +253,7 @@ export const openShuffleAllModal = async (
     const server = useAuthStore.getState().currentServer;
 
     const genres = await props.queryClient.fetchQuery({
-        cacheTime: 1000 * 60 * 60 * 4,
+        gcTime: 1000 * 60 * 5,
         queryFn: ({ signal }) =>
             api.controller.getGenreList({
                 apiClientProps: {
@@ -267,11 +267,11 @@ export const openShuffleAllModal = async (
                 },
             }),
         queryKey: queryKeys.genres.list(server?.id),
-        staleTime: 1000 * 60 * 5,
+        staleTime: 1000 * 60 * 60 * 4,
     });
 
     const musicFolders = await props.queryClient.fetchQuery({
-        cacheTime: 1000 * 60 * 60 * 4,
+        gcTime: 1000 * 60 * 5,
         queryFn: ({ signal }) =>
             api.controller.getMusicFolderList({
                 apiClientProps: {
@@ -280,7 +280,7 @@ export const openShuffleAllModal = async (
                 },
             }),
         queryKey: queryKeys.musicFolders.list(server?.id),
-        staleTime: 1000 * 60 * 5,
+        staleTime: 1000 * 60 * 60 * 4,
     });
 
     openModal({

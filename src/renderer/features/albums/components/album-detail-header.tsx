@@ -1,11 +1,13 @@
+import { useQuery } from '@tanstack/react-query';
 import { forwardRef, Fragment, Ref, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { useAlbumDetail } from '/@/renderer/features/albums/queries/album-detail-query';
-import { LibraryHeader, useSetRating } from '/@/renderer/features/shared';
+import { albumQueries } from '/@/renderer/features/albums/api/album-api';
+import { LibraryHeader } from '/@/renderer/features/shared/components/library-header';
+import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useSongChange } from '/@/renderer/hooks/use-song-change';
 import { queryClient } from '/@/renderer/lib/react-query';
@@ -30,7 +32,9 @@ export const AlbumDetailHeader = forwardRef(
     ({ background }: AlbumDetailHeaderProps, ref: Ref<HTMLDivElement>) => {
         const { albumId } = useParams() as { albumId: string };
         const server = useCurrentServer();
-        const detailQuery = useAlbumDetail({ query: { id: albumId }, serverId: server?.id });
+        const detailQuery = useQuery(
+            albumQueries.detail({ query: { id: albumId }, serverId: server?.id }),
+        );
         const cq = useContainerQuery();
         const { t } = useTranslation();
 
@@ -146,7 +150,7 @@ export const AlbumDetailHeader = forwardRef(
                                         onChange={handleUpdateRating}
                                         readOnly={
                                             detailQuery?.isFetching ||
-                                            updateRatingMutation.isLoading
+                                            updateRatingMutation.isPending
                                         }
                                         value={detailQuery?.data?.userRating || 0}
                                     />

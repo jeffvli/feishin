@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,9 +7,9 @@ import {
     MultiSelectWithInvalidData,
     SelectWithInvalidData,
 } from '/@/renderer/components/select-with-invalid-data';
-import { useAlbumArtistList } from '/@/renderer/features/artists/queries/album-artist-list-query';
-import { useGenreList } from '/@/renderer/features/genres';
-import { useTagList } from '/@/renderer/features/tag/queries/use-tag-list';
+import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
+import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
+import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import {
     AlbumListFilter,
     getServerById,
@@ -39,7 +40,7 @@ interface NavidromeAlbumFiltersProps {
     disableArtistFilter?: boolean;
     onFilterChange: (filters: AlbumListFilter) => void;
     pageKey: string;
-    serverId?: string;
+    serverId: string;
 }
 
 export const NavidromeAlbumFilters = ({
@@ -54,18 +55,20 @@ export const NavidromeAlbumFilters = ({
     const { setFilter } = useListStoreActions();
     const server = getServerById(serverId);
 
-    const genreListQuery = useGenreList({
-        options: {
-            cacheTime: 1000 * 60 * 2,
-            staleTime: 1000 * 60 * 1,
-        },
-        query: {
-            sortBy: GenreListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId,
-    });
+    const genreListQuery = useQuery(
+        genresQueries.list({
+            options: {
+                gcTime: 1000 * 60 * 2,
+                staleTime: 1000 * 60 * 1,
+            },
+            query: {
+                sortBy: GenreListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
 
     const genreList = useMemo(() => {
         if (!genreListQuery?.data) return [];
@@ -90,16 +93,18 @@ export const NavidromeAlbumFilters = ({
         onFilterChange(updatedFilters);
     }, 250);
 
-    const tagsQuery = useTagList({
-        options: {
-            cacheTime: 1000 * 60 * 2,
-            staleTime: 1000 * 60 * 1,
-        },
-        query: {
-            type: LibraryItem.ALBUM,
-        },
-        serverId,
-    });
+    const tagsQuery = useQuery(
+        sharedQueries.tags({
+            options: {
+                gcTime: 1000 * 60 * 2,
+                staleTime: 1000 * 60 * 1,
+            },
+            query: {
+                type: LibraryItem.ALBUM,
+            },
+            serverId,
+        }),
+    );
 
     const yesNoUndefinedFilters = [
         {
@@ -199,19 +204,21 @@ export const NavidromeAlbumFilters = ({
         onFilterChange(updatedFilters);
     }, 500);
 
-    const albumArtistListQuery = useAlbumArtistList({
-        options: {
-            cacheTime: 1000 * 60 * 2,
-            staleTime: 1000 * 60 * 1,
-        },
-        query: {
-            // searchTerm: debouncedSearchTerm,
-            sortBy: AlbumArtistListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId,
-    });
+    const albumArtistListQuery = useQuery(
+        artistsQueries.albumArtistList({
+            options: {
+                gcTime: 1000 * 60 * 2,
+                staleTime: 1000 * 60 * 1,
+            },
+            query: {
+                // searchTerm: debouncedSearchTerm,
+                sortBy: AlbumArtistListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
 
     const selectableAlbumArtists = useMemo(() => {
         if (!albumArtistListQuery?.data?.items) return [];

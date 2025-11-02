@@ -1,14 +1,15 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
+import { useQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
 
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { ListContext } from '/@/renderer/context/list-context';
+import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { PlaylistListContent } from '/@/renderer/features/playlists/components/playlist-list-content';
 import { PlaylistListHeader } from '/@/renderer/features/playlists/components/playlist-list-header';
-import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
-import { AnimatedPage } from '/@/renderer/features/shared';
+import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { useCurrentServer, useListStoreByKey } from '/@/renderer/store';
 import { PlaylistListSort, PlaylistSongListQuery, SortOrder } from '/@/shared/types/domain-types';
 
@@ -20,20 +21,21 @@ const PlaylistListRoute = () => {
     const pageKey = 'playlist';
     const { filter } = useListStoreByKey<PlaylistSongListQuery>({ key: pageKey });
 
-    const itemCountCheck = usePlaylistList({
-        options: {
-            cacheTime: 1000 * 60 * 60 * 2,
-            staleTime: 1000 * 60 * 60 * 2,
-        },
-        query: {
-            ...filter,
-            limit: 1,
-            sortBy: PlaylistListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId: server?.id,
-    });
+    const itemCountCheck = useQuery(
+        playlistsQueries.list({
+            options: {
+                gcTime: 1000 * 60 * 60 * 2,
+            },
+            query: {
+                ...filter,
+                limit: 1,
+                sortBy: PlaylistListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        }),
+    );
 
     const itemCount =
         itemCountCheck.data?.totalRecordCount === null

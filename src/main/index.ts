@@ -38,7 +38,7 @@ import {
 } from './utils';
 import './features';
 
-import { TitleTheme } from '/@/shared/types/types';
+import { PlaybackType, TitleTheme } from '/@/shared/types/types';
 
 export default class AppUpdater {
     constructor() {
@@ -549,7 +549,9 @@ async function createWindow(first = true): Promise<void> {
 }
 
 const enableWindowsMediaSession = store.get('mediaSession', false) as boolean;
-const shouldDisableMediaFeatures = !isWindows() || !enableWindowsMediaSession;
+const playbackType = store.get('playbackType', PlaybackType.WEB) as PlaybackType;
+const shouldDisableMediaFeatures =
+    !isWindows() || !enableWindowsMediaSession || playbackType !== PlaybackType.WEB;
 if (shouldDisableMediaFeatures) {
     app.commandLine.appendSwitch(
         'disable-features',

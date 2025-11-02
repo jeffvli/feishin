@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { SettingsContent } from '/@/renderer/features/settings/components/settings-content';
 import { SettingsHeader } from '/@/renderer/features/settings/components/settings-header';
 import { SettingSearchContext } from '/@/renderer/features/settings/context/search-context';
-import { AnimatedPage } from '/@/renderer/features/shared';
+import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { Flex } from '/@/shared/components/flex/flex';
 
 const SettingsRoute = () => {

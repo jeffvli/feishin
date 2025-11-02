@@ -1,24 +1,25 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { openModal } from '@mantine/modals';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { ALBUM_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
 import { JellyfinAlbumFilters } from '/@/renderer/features/albums/components/jellyfin-album-filters';
 import { NavidromeAlbumFilters } from '/@/renderer/features/albums/components/navidrome-album-filters';
 import { SubsonicAlbumFilters } from '/@/renderer/features/albums/components/subsonic-album-filters';
-import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
+import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { FilterButton } from '/@/renderer/features/shared/components/filter-button';
 import { FolderButton } from '/@/renderer/features/shared/components/folder-button';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { MoreButton } from '/@/renderer/features/shared/components/more-button';
+import { OrderToggleButton } from '/@/renderer/features/shared/components/order-toggle-button';
 import { RefreshButton } from '/@/renderer/features/shared/components/refresh-button';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
@@ -101,6 +102,11 @@ const FILTERS = {
             defaultOrder: SortOrder.DESC,
             name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
             value: AlbumListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.explicitStatus', { postProcess: 'titleCase' }),
+            value: AlbumListSort.EXPLICIT_STATUS,
         },
         {
             defaultOrder: SortOrder.DESC,
@@ -220,7 +226,9 @@ export const AlbumListHeaderFilters = ({
         server,
     });
 
-    const musicFoldersQuery = useMusicFolders({ query: null, serverId: server?.id });
+    const musicFoldersQuery = useQuery(
+        sharedQueries.musicFolders({ query: null, serverId: server?.id }),
+    );
 
     const sortByLabel =
         (server?.type &&
@@ -283,7 +291,7 @@ export const AlbumListHeaderFilters = ({
     };
 
     const handleRefresh = useCallback(() => {
-        queryClient.invalidateQueries(queryKeys.albums.list(server?.id || ''));
+        queryClient.invalidateQueries({ queryKey: queryKeys.albums.list(server?.id || '') });
         onFilterChange(filter);
     }, [filter, onFilterChange, queryClient, server?.id]);
 

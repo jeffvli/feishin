@@ -245,6 +245,7 @@ const normalizeSong = (
         discNumber: (item.ParentIndexNumber && item.ParentIndexNumber) || 1,
         discSubtitle: null,
         duration: item.RunTimeTicks / 10000,
+        explicitStatus: null,
         gain:
             item.NormalizationGain !== undefined
                 ? {
@@ -317,6 +318,7 @@ const normalizeAlbum = (
         comment: null,
         createdAt: item.DateCreated,
         duration: item.RunTimeTicks / 10000,
+        explicitStatus: null,
         genres: item.GenreItems?.map((entry) => ({
             id: entry.Id,
             imageUrl: null,

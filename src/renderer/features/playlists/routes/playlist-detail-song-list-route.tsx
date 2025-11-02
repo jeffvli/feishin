@@ -1,24 +1,24 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { closeAllModals, openModal } from '@mantine/modals';
-import Fuse from 'fuse.js';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'motion/react';
 import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router';
 
 import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
+import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { PlaylistDetailSongListContent } from '/@/renderer/features/playlists/components/playlist-detail-song-list-content';
 import { PlaylistDetailSongListHeader } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header';
 import { PlaylistQueryBuilder } from '/@/renderer/features/playlists/components/playlist-query-builder';
 import { SaveAsPlaylistForm } from '/@/renderer/features/playlists/components/save-as-playlist-form';
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
-import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
-import { usePlaylistSongList } from '/@/renderer/features/playlists/queries/playlist-song-list-query';
-import { AnimatedPage } from '/@/renderer/features/shared';
+import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, usePlaylistDetailStore } from '/@/renderer/store';
+import { searchSongs } from '/@/renderer/utils/search-songs';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Box } from '/@/shared/components/box/box';
 import { Group } from '/@/shared/components/group/group';
@@ -35,7 +35,9 @@ const PlaylistDetailSongListRoute = () => {
     const server = useCurrentServer();
     const handlePlayQueueAdd = useHandlePlayQueueAdd();
 
-    const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
+    const detailQuery = useQuery(
+        playlistsQueries.detail({ query: { id: playlistId }, serverId: server?.id }),
+    );
     const createPlaylistMutation = useCreatePlaylist({});
     const deletePlaylistMutation = useDeletePlaylist({});
 
@@ -148,12 +150,14 @@ const PlaylistDetailSongListRoute = () => {
 
     const page = usePlaylistDetailStore();
 
-    const playlistSongs = usePlaylistSongList({
-        query: {
-            id: playlistId,
-        },
-        serverId: server?.id,
-    });
+    const playlistSongs = useQuery(
+        playlistsQueries.songList({
+            query: {
+                id: playlistId,
+            },
+            serverId: server?.id,
+        }),
+    );
 
     const filterSortedSongs = useMemo(() => {
         let items = playlistSongs.data?.items;
@@ -162,20 +166,7 @@ const PlaylistDetailSongListRoute = () => {
             const searchTerm = page?.table.id[playlistId]?.filter?.searchTerm;
 
             if (searchTerm) {
-                const fuse = new Fuse(items, {
-                    fieldNormWeight: 1,
-                    ignoreLocation: true,
-                    keys: [
-                        'name',
-                        'album',
-                        {
-                            getFn: (song) => song.artists.map((artist) => artist.name),
-                            name: 'artist',
-                        },
-                    ],
-                    threshold: 0,
-                });
-                items = fuse.search(searchTerm).map((item) => item.item);
+                items = searchSongs(items, searchTerm);
             }
 
             const sortBy = page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID;
@@ -223,7 +214,7 @@ const PlaylistDetailSongListRoute = () => {
                         </Group>
                         {isQueryBuilderExpanded && (
                             <PlaylistQueryBuilder
-                                isSaving={createPlaylistMutation?.isLoading}
+                                isSaving={createPlaylistMutation?.isPending}
                                 key={JSON.stringify(detailQuery?.data?.rules)}
                                 limit={detailQuery?.data?.rules?.limit}
                                 onSave={handleSave}

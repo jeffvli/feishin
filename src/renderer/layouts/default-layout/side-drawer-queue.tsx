@@ -5,7 +5,7 @@ import { useLocation } from 'react-router';
 
 import styles from './side-drawer-queue.module.css';
 
-import { DrawerPlayQueue } from '/@/renderer/features/now-playing';
+import { DrawerPlayQueue } from '/@/renderer/features/now-playing/components/drawer-play-queue';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAppStore, useSidebarStore } from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';

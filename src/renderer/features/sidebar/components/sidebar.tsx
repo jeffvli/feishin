@@ -203,7 +203,7 @@ export const Sidebar = () => {
                             <img
                                 className={styles.sidebarImage}
                                 loading="eager"
-                                src={upsizedImageUrl || ''}
+                                src={upsizedImageUrl || undefined}
                             />
                         </Tooltip>
                         <ActionIcon

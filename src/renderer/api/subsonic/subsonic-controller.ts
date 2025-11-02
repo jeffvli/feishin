@@ -34,6 +34,7 @@ const ALBUM_LIST_SORT_MAPPING: Record<AlbumListSort, AlbumListSortType | undefin
     [AlbumListSort.COMMUNITY_RATING]: undefined,
     [AlbumListSort.CRITIC_RATING]: undefined,
     [AlbumListSort.DURATION]: undefined,
+    [AlbumListSort.EXPLICIT_STATUS]: undefined,
     [AlbumListSort.FAVORITED]: AlbumListSortType.STARRED,
     [AlbumListSort.NAME]: AlbumListSortType.ALPHABETICAL_BY_NAME,
     [AlbumListSort.PLAY_COUNT]: AlbumListSortType.FREQUENT,
@@ -251,7 +252,10 @@ export const SubsonicController: ControllerEndpoint = {
         };
     },
     getAlbumArtistListCount: (args) =>
-        SubsonicController.getAlbumArtistList(args).then((res) => res!.totalRecordCount!),
+        SubsonicController.getAlbumArtistList({
+            ...args,
+            query: { ...args.query, startIndex: 0 },
+        }).then((res) => res!.totalRecordCount!),
     getAlbumDetail: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -601,7 +605,10 @@ export const SubsonicController: ControllerEndpoint = {
         };
     },
     getArtistListCount: async (args) =>
-        SubsonicController.getArtistList(args).then((res) => res!.totalRecordCount!),
+        SubsonicController.getArtistList({
+            ...args,
+            query: { ...args.query, startIndex: 0 },
+        }).then((res) => res!.totalRecordCount!),
     getDownloadUrl: (args) => {
         const { apiClientProps, query } = args;
 

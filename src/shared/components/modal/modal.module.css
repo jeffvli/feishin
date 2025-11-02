@@ -1,17 +1,26 @@
-.title {
-    font-size: var(--theme-font-size-lg);
-    font-weight: 700;
-}
-
-.body {
-    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
-}
-
 .header {
+    display: flex;
+    justify-content: center;
+    padding: none;
     background: var(--theme-colors-background);
-    border-bottom: none;
+    border-radius: 0;
+}
+
+.header h2 {
+    width: 100%;
+    font-size: var(--theme-font-size-2xl);
+    font-weight: 700;
+    user-select: none;
 }
 
 .content {
+    overflow: hidden;
     background: var(--theme-colors-background);
+    border: 2px solid var(--theme-colors-border);
+}
+
+.close {
+    position: absolute;
+    top: var(--theme-spacing-md);
+    right: var(--theme-spacing-md);
 }

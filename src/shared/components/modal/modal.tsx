@@ -12,6 +12,7 @@ import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
+import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Stack } from '/@/shared/components/stack/stack';
 
 export interface ModalProps extends Omit<MantineModalProps, 'onClose'> {
@@ -113,15 +114,23 @@ export const ModalsProvider = ({ children, ...rest }: ModalsProviderProps) => {
                 centered: true,
                 classNames: {
                     body: styles.body,
+                    close: styles.close,
                     content: styles.content,
                     header: styles.header,
+                    inner: styles.inner,
+                    overlay: styles.overlay,
                     root: styles.root,
                     title: styles.title,
                 },
                 closeButtonProps: {
-                    icon: <Icon icon="x" />,
+                    icon: <Icon icon="x" size="xl" />,
                 },
-                radius: 'lg',
+                overlayProps: {
+                    backgroundOpacity: 0.8,
+                    blur: 4,
+                },
+                radius: 'xl',
+                scrollAreaComponent: ScrollArea,
                 transitionProps: {
                     duration: 300,
                     exitDuration: 300,

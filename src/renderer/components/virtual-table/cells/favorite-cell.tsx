@@ -1,7 +1,8 @@
 import type { ICellRendererParams } from '@ag-grid-community/core';
 
 import { CellContainer } from '/@/renderer/components/virtual-table/cells/generic-cell';
-import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
+import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 
 export const FavoriteCell = ({ data, node, value }: ICellRendererParams) => {

@@ -16,8 +16,9 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Swiper as SwiperCore } from 'swiper/types';
 
 import { PosterCard } from '/@/renderer/components/card/poster-card';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { useCreateFavorite, useDeleteFavorite } from '/@/renderer/features/shared';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
+import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { usePlayButtonBehavior } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';

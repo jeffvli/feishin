@@ -27,10 +27,14 @@ export const useUpdatePlaylist = (args: MutationHookArgs) => {
 
             if (!serverId) return;
 
-            queryClient.invalidateQueries(queryKeys.playlists.list(serverId));
+            queryClient.invalidateQueries({
+                queryKey: queryKeys.playlists.list(serverId),
+            });
 
             if (query?.id) {
-                queryClient.invalidateQueries(queryKeys.playlists.detail(serverId, query.id));
+                queryClient.invalidateQueries({
+                    queryKey: queryKeys.playlists.detail(serverId, query.id),
+                });
             }
         },
         ...options,

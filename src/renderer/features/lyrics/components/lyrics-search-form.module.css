@@ -6,8 +6,14 @@
     border-radius: 5px;
 
     &:hover,
+    &:active,
     &:focus-visible {
-        color: var(--theme-btn-default-fg-hover);
-        background: var(--theme-btn-default-bg-hover);
+        @mixin dark {
+            background-color: lighten(var(--theme-colors-background), 10%);
+        }
+
+        @mixin light {
+            background-color: darken(var(--theme-colors-background), 5%);
+        }
     }
 }

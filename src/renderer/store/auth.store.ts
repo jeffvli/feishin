@@ -91,7 +91,8 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
 
 export const useCurrentServerId = () => useAuthStore((state) => state.currentServer)?.id || '';
 
-export const useCurrentServer = () => useAuthStore((state) => state.currentServer);
+export const useCurrentServer = () =>
+    useAuthStore((state) => state.currentServer) as ServerListItem;
 
 export const useServerList = () => useAuthStore((state) => state.serverList);
 

@@ -1,19 +1,20 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
+import { useQuery } from '@tanstack/react-query';
 import isEmpty from 'lodash/isEmpty';
 import { useCallback, useMemo, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { ListContext } from '/@/renderer/context/list-context';
+import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumListContent } from '/@/renderer/features/albums/components/album-list-content';
 import { AlbumListHeader } from '/@/renderer/features/albums/components/album-list-header';
-import { useAlbumListCount } from '/@/renderer/features/albums/queries/album-list-count-query';
-import { useGenreList } from '/@/renderer/features/genres';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { AnimatedPage } from '/@/renderer/features/shared';
+import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServer, useListFilterByKey } from '/@/renderer/store';
 import {
@@ -53,18 +54,20 @@ const AlbumListRoute = () => {
         key: pageKey,
     });
 
-    const genreList = useGenreList({
-        options: {
-            cacheTime: 1000 * 60 * 60,
-            enabled: !!genreId,
-        },
-        query: {
-            sortBy: GenreListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId: server?.id,
-    });
+    const genreList = useQuery(
+        genresQueries.list({
+            options: {
+                enabled: !!genreId,
+                gcTime: 1000 * 60 * 60,
+            },
+            query: {
+                sortBy: GenreListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId: server?.id,
+        }),
+    );
 
     const genreTitle = useMemo(() => {
         if (!genreList.data) return '';
@@ -75,16 +78,18 @@ const AlbumListRoute = () => {
         return genre?.name;
     }, [genreId, genreList.data]);
 
-    const itemCountCheck = useAlbumListCount({
-        options: {
-            cacheTime: 1000 * 60,
-            staleTime: 1000 * 60,
-        },
-        query: {
-            ...albumListFilter,
-        },
-        serverId: server?.id,
-    });
+    const itemCountCheck = useQuery(
+        albumQueries.listCount({
+            options: {
+                gcTime: 1000 * 60,
+                staleTime: 1000 * 60,
+            },
+            query: {
+                ...albumListFilter,
+            },
+            serverId: server?.id,
+        }),
+    );
 
     const itemCount = itemCountCheck.data === null ? undefined : itemCountCheck.data;
 

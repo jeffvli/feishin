@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './full-screen-player-queue.module.css';
 
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
-import { PlayQueue } from '/@/renderer/features/now-playing';
+import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { FullScreenSimilarSongs } from '/@/renderer/features/player/components/full-screen-similar-songs';
 import { usePlaybackSettings } from '/@/renderer/store';
 import {

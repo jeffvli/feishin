@@ -3,7 +3,7 @@ import { MouseEvent, useCallback } from 'react';
 
 import styles from './playerbar.module.css';
 
-import { AudioPlayer } from '/@/renderer/components';
+import { AudioPlayer } from '/@/renderer/components/audio-player';
 import { CenterControls } from '/@/renderer/features/player/components/center-controls';
 import { LeftControls } from '/@/renderer/features/player/components/left-controls';
 import { RightControls } from '/@/renderer/features/player/components/right-controls';

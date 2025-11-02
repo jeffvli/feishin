@@ -1,8 +1,9 @@
+import { useQuery } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { ChangeEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useGenreList } from '/@/renderer/features/genres';
+import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
 import { SongListFilter, useListFilterByKey, useListStoreActions } from '/@/renderer/store';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -16,7 +17,7 @@ interface SubsonicSongFiltersProps {
     customFilters?: Partial<SongListFilter>;
     onFilterChange: (filters: SongListFilter) => void;
     pageKey: string;
-    serverId?: string;
+    serverId: string;
 }
 
 export const SubsonicSongFilters = ({
@@ -31,14 +32,16 @@ export const SubsonicSongFilters = ({
 
     const isGenrePage = customFilters?.genreIds !== undefined;
 
-    const genreListQuery = useGenreList({
-        query: {
-            sortBy: GenreListSort.NAME,
-            sortOrder: SortOrder.ASC,
-            startIndex: 0,
-        },
-        serverId,
-    });
+    const genreListQuery = useQuery(
+        genresQueries.list({
+            query: {
+                sortBy: GenreListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
 
     const genreList = useMemo(() => {
         if (!genreListQuery?.data) return [];

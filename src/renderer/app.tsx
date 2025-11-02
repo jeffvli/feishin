@@ -17,7 +17,7 @@ import 'overlayscrollbars/overlayscrollbars.css';
 import '/styles/overlayscrollbars.css';
 import i18n from '/@/i18n/i18n';
 import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
-import { PlayQueueHandlerContext } from '/@/renderer/features/player';
+import { PlayQueueHandlerContext } from '/@/renderer/features/player/context/play-queue-handler-context';
 import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-context';
 import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';

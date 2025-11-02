@@ -108,7 +108,15 @@
         "newVersion": "een nieuwe versie is geinstalleerd ({{version}})",
         "viewReleaseNotes": "zie release notes",
         "albumGain": "album gain",
-        "translation": "vertaling"
+        "translation": "vertaling",
+        "explicitStatus": "expliciete status",
+        "bitDepth": "bitdiepte",
+        "codec": "codec",
+        "mbid": "MusicBrainz ID",
+        "share": "deel",
+        "explicit": "expliciet",
+        "sampleRate": "sample rate",
+        "tags": "tags"
     },
     "filter": {
         "rating": "rating",
@@ -152,7 +160,8 @@
         "releaseYear": "release jaar",
         "songCount": "aantal nummers",
         "toYear": "tot jaar",
-        "trackNumber": "track"
+        "trackNumber": "track",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "page": {
         "contextMenu": {
@@ -171,7 +180,12 @@
             "addFavorite": "$t(action.addToFavorites)",
             "play": "$t(player.play)",
             "numberSelected": "{{count}} geselecteerd",
-            "removeFromQueue": "$t(action.removeFromQueue)"
+            "removeFromQueue": "$t(action.removeFromQueue)",
+            "download": "download",
+            "shareItem": "deel item",
+            "goToAlbum": "ga naar $t(entity.album_one)",
+            "goToAlbumArtist": "ga naar $t(entity.albumArtist_one)",
+            "showDetails": "haal info op"
         },
         "appMenu": {
             "selectServer": "selecteer server",
@@ -183,11 +197,14 @@
             "openBrowserDevtools": "open browser devtools",
             "quit": "$t(common.quit)",
             "goBack": "terug",
-            "goForward": "vooruit"
+            "goForward": "vooruit",
+            "privateModeOff": "schakel private modus uit",
+            "privateModeOn": "schakel private modus in"
         },
         "albumDetail": {
             "moreFromArtist": "meer van deze $t(entity.artist_one)",
-            "moreFromGeneric": "meer van {{item}}"
+            "moreFromGeneric": "meer van {{item}}",
+            "released": "uitgebracht"
         },
         "fullscreenPlayer": {
             "config": {
@@ -196,14 +213,58 @@
                 "opacity": "opaciteit",
                 "lyricSize": "tekstgrootte",
                 "lyricAlignment": "songtekst uitlijning",
-                "lyricGap": "tekstkloof"
-            }
+                "lyricGap": "tekstkloof",
+                "dynamicImageBlur": "blur grootte van afbeelding",
+                "dynamicIsImage": "schakel achtergrondafbeelding in",
+                "showLyricMatch": "toon liedtekst match",
+                "synchronized": "gesynchronizeerd",
+                "unsynchronized": "niet gesynchronizeerd",
+                "useImageAspectRatio": "gebruik aspect ratio van de afbeelding"
+            },
+            "lyrics": "liedtekst",
+            "related": "gerelateerd",
+            "upNext": "volgende",
+            "noLyrics": "geen liedtekst gevonden"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
         },
         "albumList": {
-            "title": "$t(entity.album_other)"
+            "title": "$t(entity.album_other)",
+            "artistAlbums": "albums van {{artist}}"
+        },
+        "albumArtistDetail": {
+            "about": "Over {{artist}}",
+            "appearsOn": "verschijnt op",
+            "viewDiscography": "bekijk discografie",
+            "relatedArtists": "gerelateerd $t(entity.artist_other)",
+            "topSongs": "top nummers",
+            "topSongsFrom": "top nummers van {{title}}",
+            "viewAll": "bekijk alle",
+            "viewAllTracks": "bekijk alle $t(entity.track_other)"
+        },
+        "manageServers": {
+            "title": "beheer servers",
+            "serverDetails": "server details",
+            "url": "URL",
+            "username": "gebruikersnaam",
+            "editServerDetailsTooltip": "bewerk server details",
+            "removeServer": "verwijder server"
+        },
+        "genreList": {
+            "showAlbums": "toon $t(entity.genre_one) $t(entity.album_other)",
+            "showTracks": "toon $t(entity.genre_one) $t(entity.track_other)"
+        },
+        "globalSearch": {
+            "commands": {
+                "goToPage": "ga naar pagina",
+                "searchFor": "zoek naar {{query}}",
+                "serverCommands": "server commandos"
+            },
+            "title": "commandos"
+        },
+        "home": {
+            "explore": "ontdek van uw biblitheek"
         }
     },
     "error": {
@@ -225,7 +286,11 @@
         "mpvRequired": "MPV vereist",
         "audioDeviceFetchError": "er is iets mis gegaan met het ophalen van de audioapparaten",
         "invalidServer": "ongeldige server",
-        "loginRateError": "te veel login pogingen, probeer het opnieuw in een paar seconde"
+        "loginRateError": "te veel login pogingen, probeer het opnieuw in een paar seconde",
+        "badValue": "ongeldige optie \"{{value}}\". Deze waarde bestaat niet langer",
+        "networkError": "een netwerkfout heeft zich voorgedaan",
+        "notificationDenied": "toestemming voor meldingen werd afgewezen. Deze instelling heeft geen effect",
+        "openError": "kon het bestand niet openen"
     },
     "entity": {
         "genre_one": "genre",
@@ -289,7 +354,8 @@
             "input_savePassword": "wachtwoord opslaan",
             "ignoreSsl": "negeer ssl $t(common.restartRequired)",
             "ignoreCors": "negeer cors $t(common.restartRequired)",
-            "error_savePassword": "er is iets mis gegaan met het opslaan van het wachtwoord"
+            "error_savePassword": "er is iets mis gegaan met het opslaan van het wachtwoord",
+            "input_preferInstantMix": "verkies directe mix"
         },
         "deletePlaylist": {
             "title": "verwijder $t(entity.playlist_one)",
@@ -312,7 +378,8 @@
         },
         "queryEditor": {
             "input_optionMatchAll": "alles matchen",
-            "input_optionMatchAny": "elke match"
+            "input_optionMatchAny": "elke match",
+            "title": "zoekopdrachtbewerker"
         },
         "lyricSearch": {
             "input_name": "$t(common.name)",
@@ -320,11 +387,26 @@
             "title": "tekst zoeken"
         },
         "editPlaylist": {
-            "title": "$t(entity.playlist_one) aanpassen"
+            "title": "$t(entity.playlist_one) aanpassen",
+            "publicJellyfinNote": "Jellyfin laat niet weten of een playlist publiek of privaat is. Als u wilt dat dit publiek blijft, selecteer de volgende invoer",
+            "success": "$t(entity.playlist_one) succesvol geüpdatet"
         },
         "updateServer": {
             "title": "update server",
             "success": "server succesvol geüpdatet"
+        },
+        "shareItem": {
+            "allowDownloading": "sta downloaden toe",
+            "description": "beschrijving",
+            "setExpiration": "stel vervaldatum in",
+            "success": "deel link gekopiëerd naar klembord (of klik hier om te openen)",
+            "expireInvalid": "vervaldatum moet in de toekomst zijn",
+            "createFailed": "kon share niet aanmaken (is delen aangezet?)"
+        },
+        "privateMode": {
+            "enabled": "private modus ingeschakeld, afspeelstatus is nu verborgen voor externe integraties",
+            "disabled": "private modus uitgeschakeld, afspeelstatus is nu zichtbaar voor externe integraties",
+            "title": "private modus"
         }
     }
 }

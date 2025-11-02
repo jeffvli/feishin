@@ -2,7 +2,7 @@ import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/li
 
 import { ChangeEvent, MutableRefObject, useCallback } from 'react';
 
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { useListContext } from '/@/renderer/context/list-context';
 import {
     UseHandleListFilterChangeProps,

@@ -118,7 +118,10 @@
         "comingSoon": "laster…",
         "trackPeak": "pistaren gailurra",
         "albumPeak": "albumaren gailurra",
-        "gap": "hutsunea"
+        "gap": "hutsunea",
+        "explicitStatus": "egoera esplizitua",
+        "explicit": "esplizitua",
+        "clean": "garbia"
     },
     "player": {
         "repeat": "errepikatu",
@@ -330,12 +333,12 @@
         "releaseDate": "argitalpen data",
         "releaseYear": "argitalpen urtea",
         "toYear": "urtera arte",
-        "fromYear": "urtetik aurrera"
+        "fromYear": "urtetik aurrera",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "setting": {
         "hotkey_playbackPause": "pausatu",
         "hotkey_playbackPlay": "erreproduzitu",
-        "language": "hizkuntza",
         "playbackStyle_optionNormal": "normala",
         "playButtonBehavior_optionPlay": "$t(player.play)",
         "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
@@ -391,8 +394,6 @@
         "lastfmApiKey_description": "{{lastfm}}-ren API gakoa. Azaleko arterako beharrezkoa.",
         "lyricFetch": "eskuratu letrak internetetik",
         "lyricFetch_description": "Eskuratu letrak hainbat internet iturrietatik",
-        "notify": "gaitu abesti japinarazpenak",
-        "notify_description": "erakutsi jakinarazpenak uneko abestia aldatzean",
         "audioExclusiveMode_description": "gaitu irteera esklusiboko modua. Modu honetan, sistema normalean blokeatuta egoten da, eta mpv-k bakarrik atera ahal izango du audioa",
         "audioDevice_description": "aukeratu erreproduzitzeko erabiliko den audio gailua (web erreproduzitzailea bakarrik)",
         "audioPlayer": "audio erreproduzitzailea",
@@ -400,7 +401,6 @@
         "buttonSize": "erreproduzitzaile barrako botoien tamaina",
         "crossfadeDuration": "crossfade iraupena",
         "crossfadeDuration_description": "crossfade efektuaren iraupena ezartzen du",
-        "crossfadeStyle": "crossfade estiloa",
         "crossfadeStyle_description": "aukeratu audio erreproduzitzailearentzat erabiliko den crossfade estiloa",
         "disableLibraryUpdateOnStartup": "desgaitu bertsio berrien egiaztapena abiaraztean",
         "discordApplicationId_description": "{{discord}} jarduera-egoeraren aplikazioaren IDa (lehenetsia {{defaultId}} da)",
@@ -410,7 +410,6 @@
         "discordIdleStatus_description": "gaituta dagoenean, eguneratu egoera erreproduzitzailea inaktibo dagoen bitartean",
         "discordListening_description": "erakutsi egoera entzuten bezala erreproduzitzen ordez",
         "discordListening": "erakutsi egoera entzuten bezala",
-        "discordRichPresence": "{{discord}} jarduera-egoera",
         "discordRichPresence_description": "gaitu erreprodukzioa egoera {{discord}}-en jarduera-egoeran. Irudi gakoak hauek dira: {{icon}}, {{playing}}, eta {{paused}}",
         "discordServeImage": "zerbitzatu {{discord}} irudiak zerbitzaritik",
         "discordServeImage_description": "partekatu {{discord}} jarduera-egoerarentzako azala artea zerbitzaritik bertatik, Jellyfin eta Navidrome-rentzat bakarrik eskuragarri. {{discord}}-(e)k bot bat erabiltzen du irudiak eskuratzeko, beraz, zure zerbitzaria internet publikotik eskuragarri egon behar da",
@@ -512,7 +511,6 @@
         "minimumScrobbleSeconds_description": "erreproduzitu behar den abestiaren gutxieneko iraupena segundotan scrobble egin aurretik",
         "mpvExecutablePath": "mpv exekutagarriaren bidea",
         "mpvExecutablePath_description": "ezartzen du mpv exekutagarriaren bidea. hutsik uzten bada, bide lehenetsia erabiliko da",
-        "mpvExtraParameters": "mpv parametroak",
         "mpvExtraParameters_help": "lerro bakoitzeko bat",
         "musicbrainz": "erakutsi MusicBrainz estekak",
         "musicbrainz_description": "erakutsi MusicbBrainz-erako estekak artista/album orrietan, MusicBrainz ID existitzen den lekuetan",
@@ -532,7 +530,9 @@
         "customCssNotice": "Abisua: garbiketa batzuk dauden arren (url() eta content: debekatuz), css pertsonalizatua erabiltzeak arriskuak sor ditzake interfazea aldatuz gero",
         "customCss_description": "css eduki pertsonalizatua. Oharra: edukia eta urruneko URLak debekatutako propietateak dira. Zure edukiaren aurrebista erakusten da behean. Ezarri ez dituzun eremu gehigarriak daude garbiketa dela eta",
         "enableRemote": "gaitu urruneko kontrol zerbitzaria",
-        "enableRemote_description": "urruneko kontrol zerbitzariari beste gailu batzuei aplikazioa kontrolatzeko aukera ematen dio"
+        "enableRemote_description": "urruneko kontrol zerbitzariari beste gailu batzuei aplikazioa kontrolatzeko aukera ematen dio",
+        "doubleClickBehavior_description": "egia bada, bilaketa batean bat datozen pista guztiak ilaran jarriko dira. bestela, klikatutakoak bakarrik jarriko dira ilaran",
+        "imageAspectRatio_description": "gaituta badago, azaleko artea jatorrizko aspektu-erlazioa erabiliz erakutsiko da. 1:1 ez den arterako, gainerako espazioa hutsik egongo da"
     },
     "form": {
         "addServer": {

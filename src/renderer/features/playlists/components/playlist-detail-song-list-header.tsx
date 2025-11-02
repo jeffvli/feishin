@@ -1,13 +1,15 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
+import { useQuery } from '@tanstack/react-query';
 import { MutableRefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
+import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { PlaylistDetailSongListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header-filters';
-import { usePlaylistDetail } from '/@/renderer/features/playlists/queries/playlist-detail-query';
-import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
+import { FilterBar } from '/@/renderer/features/shared/components/filter-bar';
+import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { useCurrentServer } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString } from '/@/renderer/utils';
@@ -33,7 +35,9 @@ export const PlaylistDetailSongListHeader = ({
     const { t } = useTranslation();
     const { playlistId } = useParams() as { playlistId: string };
     const server = useCurrentServer();
-    const detailQuery = usePlaylistDetail({ query: { id: playlistId }, serverId: server?.id });
+    const detailQuery = useQuery(
+        playlistsQueries.detail({ query: { id: playlistId }, serverId: server?.id }),
+    );
 
     const playButtonBehavior = usePlayButtonBehavior();
 

@@ -5,7 +5,7 @@ import { MutableRefObject } from 'react';
 import { generatePath, useNavigate } from 'react-router';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
 import { VirtualTable } from '/@/renderer/components/virtual-table';
 import { useCurrentSongRowStyles } from '/@/renderer/components/virtual-table/hooks/use-current-song-row-styles';
 import { useVirtualTable } from '/@/renderer/components/virtual-table/hooks/use-virtual-table';
@@ -14,7 +14,7 @@ import {
     ARTIST_CONTEXT_MENU_ITEMS,
     SONG_CONTEXT_MENU_ITEMS,
 } from '/@/renderer/features/context-menu/context-menu-items';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useListStoreByKey, usePlayButtonBehavior } from '/@/renderer/store';
 import { LibraryItem, QueueSong, SongListQuery } from '/@/shared/types/domain-types';

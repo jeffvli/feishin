@@ -516,7 +516,6 @@
         "contextMenu_description": "permite esconder elementos exibidos no menu quando clica num elemento com o botão direito. elementos não selecionados serão escondidos",
         "crossfadeDuration": "duraçao de crossfade",
         "crossfadeDuration_description": "define a duração do efeito crossfade",
-        "crossfadeStyle": "estilo do crossfade",
         "crossfadeStyle_description": "seleciona qual estilo de crossfade usado no player de áudio",
         "customCssEnable": "ativar css customizado",
         "customCssEnable_description": "permite escrever css customizado",

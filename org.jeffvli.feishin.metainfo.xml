@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop-application">
+  <id>org.jeffvli.feishin</id>
+  <name>Feishin</name>
+  <summary>Jellyfin, Navidrome, and OpenSubsonic Compatible Music Player</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <content_rating type="oars-1.1"/>
+  <description>
+    <p>A modern, cross-platform music player for Jellyfin, Navidrome, and OpenSubsonic servers.</p>
+    <p>Features</p>
+    <ul>
+      <li>MPV player backend</li>
+      <li>Web player backend</li>
+      <li>Jellyfin server support</li>
+      <li>Navidrome server support</li>
+      <li>OpenSubsonic server support</li>
+      <li>Modern UI</li>
+      <li>Scrobble playback to your server</li>
+      <li>Smart playlist editor (Navidrome)</li>
+      <li>Synchronized and unsynchronized lyrics support</li>
+    </ul>
+  </description>
+  <developer id="org.jeffvli">
+    <name>jeffvli</name>
+  </developer>
+  <launchable type="desktop-id">org.jeffvli.feishin.desktop</launchable>
+  <url type="homepage">https://github.com/jeffvli/feishin</url>
+  <screenshots>
+    <screenshot type="default">
+      <caption>The main menu</caption>
+      <image type="source">https://raw.githubusercontent.com/jeffvli/feishin/development/media/preview_home.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Browsing an album</caption>
+      <image type="source">https://raw.githubusercontent.com/jeffvli/feishin/development/media/preview_album_detail.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Smart playlist creation</caption>
+      <image type="source">https://raw.githubusercontent.com/jeffvli/feishin/development/media/preview_smart_playlist.png</image>
+    </screenshot>
+  </screenshots>
+  <categories>
+    <category>AudioVideo</category>
+    <category>Audio</category>
+    <category>Player</category>
+    <category>Music</category>
+  </categories>
+  <releases>
+    <release date="2025-10-13" type="stable" version="0.21.2"></release>
+    <release date="2025-10-13" type="stable" version="0.21.1"></release>
+    <release date="2025-10-13" type="stable" version="0.21.0"></release>
+    <release date="2025-09-11" type="stable" version="0.20.1"></release>
+    <release date="2025-09-07" type="stable" version="0.20.0"></release>
+    <release date="2025-07-31" type="stable" version="0.19.0"></release>
+    <release date="2025-07-08" type="stable" version="0.18.0"></release>
+    <release date="2025-06-30" type="stable" version="0.17.0"></release>
+    <release date="2025-06-26" type="stable" version="0.16.0"></release>
+    <release date="2025-06-25" type="stable" version="0.15.1"></release>
+    <release date="2025-06-25" type="stable" version="0.15.0"></release>
+    <release date="2025-06-03" type="stable" version="0.14.0"></release>
+    <release date="2025-05-26" type="stable" version="0.13.0"></release>
+    <release date="2025-05-13" type="stable" version="0.12.7"></release>
+    <release date="2025-05-08" type="stable" version="0.12.6"></release>
+    <release date="2025-05-07" type="stable" version="0.12.5"></release>
+    <release date="2025-03-10" type="stable" version="0.12.3"></release>
+    <release date="2025-01-25" type="stable" version="0.12.2"></release>
+    <release date="2024-11-20" type="stable" version="0.12.1"></release>
+    <release date="2024-11-19" type="stable" version="0.12.0"></release>
+    <release date="2024-10-15" type="stable" version="0.11.1"></release>
+    <release date="2024-10-10" type="stable" version="0.11.0"></release>
+    <release date="2024-09-29" type="stable" version="0.10.1"></release>
+    <release date="2024-09-27" type="stable" version="0.10.0"></release>
+    <release date="2024-09-11" type="stable" version="0.9.0"></release>
+    <release date="2024-09-04" type="stable" version="0.8.1"></release>
+    <release date="2024-09-03" type="stable" version="0.8.0"></release>
+    <release date="2024-07-30" type="stable" version="0.7.3"></release>
+    <release date="2024-07-30" type="stable" version="0.7.2"></release>
+    <release date="2024-05-07" type="stable" version="0.7.1"></release>
+    <release date="2024-05-07" type="stable" version="0.7.0"></release>
+    <release date="2024-03-13" type="stable" version="0.6.1"></release>
+    <release date="2024-03-06" type="stable" version="0.6.0"></release>
+    <release date="2023-12-14" type="stable" version="0.5.3"></release>
+    <release date="2023-11-18" type="stable" version="0.5.2"></release>
+    <release date="2023-11-02" type="stable" version="0.5.1"></release>
+    <release date="2023-10-31" type="stable" version="0.5.0"></release>
+    <release date="2023-10-08" type="stable" version="0.4.1"></release>
+    <release date="2023-09-25" type="stable" version="0.4.0"></release>
+    <release date="2023-08-08" type="stable" version="0.3.0"></release>
+    <release date="2023-06-14" type="stable" version="0.2.0"></release>
+    <release date="2023-05-22" type="stable" version="0.1.1"></release>
+    <release date="2023-05-22" type="stable" version="0.1.0"></release>
+    <release date="2023-04-03" type="development" version="0.0.1-alpha6"></release>
+    <release date="2023-02-09" type="development" version="0.0.1-alpha5"></release>
+    <release date="2023-01-16" type="development" version="0.0.1-alpha4"></release>
+    <release date="2023-01-03" type="development" version="0.0.1-alpha3"></release>
+    <release date="2022-12-30" type="development" version="0.0.1-alpha2"></release>
+    <release date="2022-11-21" type="development" version="0.0.1-alpha1"></release>
+  </releases>
+</component>

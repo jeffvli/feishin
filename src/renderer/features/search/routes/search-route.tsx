@@ -5,7 +5,7 @@ import { useLocation, useParams } from 'react-router';
 
 import { SearchContent } from '/@/renderer/features/search/components/search-content';
 import { SearchHeader } from '/@/renderer/features/search/components/search-header';
-import { AnimatedPage } from '/@/renderer/features/shared';
+import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 
 const SearchRoute = () => {
     const { state: locationState } = useLocation();

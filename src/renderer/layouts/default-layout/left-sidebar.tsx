@@ -2,7 +2,7 @@ import { useRef } from 'react';
 
 import styles from './left-sidebar.module.css';
 
-import { ResizeHandle } from '/@/renderer/features/shared';
+import { ResizeHandle } from '/@/renderer/features/shared/components/resize-handle';
 import { CollapsedSidebar } from '/@/renderer/features/sidebar/components/collapsed-sidebar';
 import { Sidebar } from '/@/renderer/features/sidebar/components/sidebar';
 import { useSidebarStore } from '/@/renderer/store';

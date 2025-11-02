@@ -118,7 +118,13 @@
         "trackGain": "усиление трека",
         "translation": "перевод",
         "albumPeak": "пик альбома",
-        "trackPeak": "пик трека"
+        "trackPeak": "пик трека",
+        "additionalParticipants": "Другие участники",
+        "newVersion": "новая версия приложения установлена ({{version}})",
+        "viewReleaseNotes": "Список изменений",
+        "bitDepth": "Разрядность",
+        "sampleRate": "частота дискретизации",
+        "tags": "теги"
     },
     "entity": {
         "album_one": "альбом",
@@ -272,7 +278,9 @@
         "loginRateError": "превышено максимальное количество попыток входа, пожалуйста, попробуйте ещё раз через несколько секунд",
         "openError": "не удалось открыть файл",
         "badAlbum": "вы видите эту страницу из-за того, что эта песня не входит в альбом. скорее всего, вы видите эту ошибку, так как песня находится в корневой директории папки с музыкой. Jellyfin группирует треки только по папкам",
-        "networkError": "возникла ошибка сети"
+        "networkError": "возникла ошибка сети",
+        "badValue": "Недопустимый параметр «{{value}}». Это значение больше не существует",
+        "notificationDenied": "Доступ к уведомлениям запрещен. Настройка не работает"
     },
     "filter": {
         "isCompilation": "сборник",
@@ -363,7 +371,9 @@
             "settings": "$t(common.setting_other)",
             "home": "$t(common.home)",
             "artists": "$t(entity.artist_other)",
-            "albumArtists": "$t(entity.albumArtist_other)"
+            "albumArtists": "$t(entity.albumArtist_other)",
+            "myLibrary": "Моя библиотека",
+            "shared": "Публичные плейлисты $t(entity.playlist_other)"
         },
         "fullscreenPlayer": {
             "config": {
@@ -398,7 +408,9 @@
             "openBrowserDevtools": "открыть инструменты разработчика",
             "quit": "$t(common.quit)",
             "goBack": "назад",
-            "goForward": "вперёд"
+            "goForward": "вперёд",
+            "privateModeOff": "Выключить приватный режим",
+            "privateModeOn": "Включить приватный режим"
         },
         "manageServers": {
             "title": "сервера",
@@ -427,14 +439,17 @@
             "numberSelected": "{{count}} выбрано",
             "removeFromQueue": "$t(action.removeFromQueue)",
             "showDetails": "получить информацию",
-            "shareItem": "поделиться"
+            "shareItem": "поделиться",
+            "goToAlbum": "Перейти $t(entity.album_one)",
+            "goToAlbumArtist": "Перейти $t(entity.albumArtist_one)"
         },
         "home": {
             "mostPlayed": "слушают чаще всего",
             "newlyAdded": "недавно добавленные релизы",
             "title": "$t(common.home)",
             "explore": "откройте новое",
-            "recentlyPlayed": "игралось недавно"
+            "recentlyPlayed": "игралось недавно",
+            "recentlyReleased": "Новинки"
         },
         "albumDetail": {
             "moreFromArtist": "больше от $t(entity.artist_one)",
@@ -458,7 +473,8 @@
         },
         "trackList": {
             "title": "$t(entity.track_other)",
-            "genreTracks": "\"{{genre}}\" $t(entity.track_other)"
+            "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
+            "artistTracks": "Треки {{artist}}"
         },
         "globalSearch": {
             "commands": {
@@ -521,7 +537,9 @@
             "input_savePassword": "сохранить пароль",
             "ignoreSsl": "игнорировать ssl ($t(common.restartRequired))",
             "ignoreCors": "игнорировать CORS ($t(common.restartRequired))",
-            "error_savePassword": "произошла ошибка при сохранении пароля"
+            "error_savePassword": "произошла ошибка при сохранении пароля",
+            "input_preferInstantMix": "Предпочитать автоподборку",
+            "input_preferInstantMixDescription": "Использовать быстрый микс только для поиска похожих композиций. Полезно, если у вас есть плагины, которые изменяют это поведение"
         },
         "addToPlaylist": {
             "success": "добавлено: $t(entity.trackWithCount, {\"count\": {{message}} }) в $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -535,7 +553,8 @@
         },
         "queryEditor": {
             "input_optionMatchAll": "сопоставить все",
-            "input_optionMatchAny": "сопоставить любой"
+            "input_optionMatchAny": "сопоставить любой",
+            "title": "Редактор запросов"
         },
         "lyricSearch": {
             "input_name": "$t(common.name)",
@@ -544,7 +563,8 @@
         },
         "editPlaylist": {
             "title": "редактировать $t(entity.playlist_one)",
-            "success": "$t(entity.playlist_one) обновлён успешно"
+            "success": "$t(entity.playlist_one) обновлён успешно",
+            "publicJellyfinNote": "Jellyfin по какой-то причине не предоставляет информацию о том, публичный плейлист или нет. Если вы хотите, чтобы он остался публичным, выберите следующую опцию"
         },
         "shareItem": {
             "success": "ссылка скопирована в буфер обмена (нажмите здесь, чтобы открыть)",
@@ -553,6 +573,11 @@
             "allowDownloading": "разрешить скачивание",
             "setExpiration": "установить срок действия",
             "description": "описание"
+        },
+        "privateMode": {
+            "enabled": "Приватный режим включен. Статус воспроизведения скрыт от внешних интеграций",
+            "disabled": "Приватный режим отключен. Статус воспроизведения теперь виден внешним интеграциям",
+            "title": "Приватный режим"
         }
     },
     "setting": {
@@ -569,7 +594,6 @@
         "enableRemote_description": "включает сервер удалённого управления для управления воспроизведением с помощью других устройств",
         "fontType_optionSystem": "системный",
         "mpvExecutablePath_description": "укажите папку, в которой находится исполняющий файл аудиоплеера MPV. если оставить пустым, будет использоваться путь по умолчанию",
-        "crossfadeStyle": "вид эффекта crossfade",
         "fontType_optionBuiltIn": "встроенный",
         "disableLibraryUpdateOnStartup": "отключить проверку новых версий при запуске приложения",
         "minimizeToTray_description": "сворачивать приложение в панель уведомлений",
@@ -639,12 +663,10 @@
         "hotkey_unfavoritePreviousSong": "удалить $t(common.previousSong) из избранного",
         "hotkey_volumeUp": "увеличить громкость",
         "hotkey_zoomIn": "увеличить масштаб",
-        "language": "язык",
         "lyricFetchProvider_description": "выберите источники для получения текстов песен. порядок источников соответствует очередности их запросов",
         "minimumScrobblePercentage_description": "минимальный процент прослушивания трека, прежде чем он будет засчитан как прослушанный",
         "minimumScrobbleSeconds_description": "минимальное время прослушивания трека в секундах, прежде чем он будет засчитан как прослушанный",
         "playbackStyle_optionNormal": "нормальный",
-        "mpvExtraParameters": "параметры mpv",
         "mpvExtraParameters_help": "по одному на строчку",
         "playbackStyle_description": "выберите стиль воспроизведения, который будет использоваться аудиоплеером",
         "playButtonBehavior_description": "устанавливает поведение кнопки воспроизведения при добавлении треков в очередь",
@@ -676,8 +698,6 @@
         "useSystemTheme": "использовать тему системы",
         "themeLight": "тема (светлая)",
         "themeLight_description": "устанавливает светлую тему приложения",
-        "transcodeNote": "эффект применяется после 1 (для веб) - 2 (для mpv) песни",
-        "transcode": "включить транскодинг",
         "transcode_description": "активирует транскодинг в другие форматы",
         "transcodeBitrate": "битрейт транскодинга",
         "transcodeBitrate_description": "выберите битрейт транскодинга. 0 - автоматическое определение сервером",
@@ -744,7 +764,6 @@
         "volumeWidth_description": "ширина слайдера звука (в px)",
         "webAudio": "использовать веб аудио",
         "webAudio_description": "использование веб аудио. включение активирует продвинутые возможности (например, replaygain). отключите, если вам это не нужно",
-        "discordRichPresence": "состояние профиля {{discord}}",
         "discordApplicationId": "{{discord}} application id",
         "discordApplicationId_description": "application id приложения {{discord}} которое будет отображаться в статусе профиля (по умолчанию {{defaultId}})",
         "discordIdleStatus": "показывать состояние простоя",
@@ -762,6 +781,7 @@
         "discordRichPresence_description": "включить статус воспроизведения в статус профиля в {{discord}}. Ключи изображений: {{icon}}, {{playing}} и {{paused}}",
         "lyricOffset": "синхронизация текста треков (мс)",
         "audioExclusiveMode": "эксклюзивный режим аудио",
-        "audioExclusiveMode_description": "включить режим эксклюзивного вывода. В этом режиме система обычно блокируется, и только mpv сможет выводить звук"
+        "audioExclusiveMode_description": "включить режим эксклюзивного вывода. В этом режиме система обычно блокируется, и только mpv сможет выводить звук",
+        "artistBackground": "Фоновое изображение исполнителя"
     }
 }

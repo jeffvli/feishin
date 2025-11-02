@@ -1,6 +1,6 @@
 import { AppRoute } from '@ts-rest/core';
+import { TFunction } from 'i18next';
 import { ReactNode } from 'react';
-import { Song } from 'src/main/features/core/lyrics/netease';
 
 import {
     Album,
@@ -9,6 +9,7 @@ import {
     LibraryItem,
     Playlist,
     QueueSong,
+    Song,
 } from '/@/shared/types/domain-types';
 import { ServerFeatures } from '/@/shared/types/features-types';
 
@@ -40,7 +41,7 @@ export type CardRoute = {
 
 export type CardRow<T> = {
     arrayProperty?: string;
-    format?: (value: T) => ReactNode;
+    format?: (value: T, t: TFunction) => ReactNode;
     property: keyof T;
     route?: CardRoute;
 };

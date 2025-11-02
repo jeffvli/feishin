@@ -5,9 +5,10 @@ import { ChangeEvent, MutableRefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { GenreListHeaderFilters } from '/@/renderer/features/genres/components/genre-list-header-filters';
-import { FilterBar, LibraryHeaderBar } from '/@/renderer/features/shared';
+import { FilterBar } from '/@/renderer/features/shared/components/filter-bar';
+import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useDisplayRefresh } from '/@/renderer/hooks/use-display-refresh';

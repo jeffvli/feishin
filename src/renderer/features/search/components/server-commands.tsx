@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
-import { ServerList } from '/@/renderer/features/servers';
+import { ServerList } from '/@/renderer/features/servers/components/server-list';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAuthStoreActions, useServerList } from '/@/renderer/store';
 import { ServerListItem } from '/@/shared/types/domain-types';

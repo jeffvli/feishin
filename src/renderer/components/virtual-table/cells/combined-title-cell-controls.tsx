@@ -2,7 +2,7 @@ import clsx from 'clsx';
 
 import styles from './combined-title-cell-controls.module.css';
 
-import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { LibraryItem } from '/@/shared/types/domain-types';

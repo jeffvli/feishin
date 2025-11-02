@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { useSettingSearchContext } from '/@/renderer/features/settings/context/search-context';
-import { LibraryHeaderBar } from '/@/renderer/features/shared';
+import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useSettingsStoreActions } from '/@/renderer/store/settings.store';

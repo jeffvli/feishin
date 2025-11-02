@@ -14,11 +14,11 @@ import debounce from 'lodash/debounce';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
-import { ErrorFallback } from '/@/renderer/features/action-required';
-import { useHandleTableContextMenu } from '/@/renderer/features/context-menu';
+import { ErrorFallback } from '/@/renderer/features/action-required/components/error-fallback';
 import { QUEUE_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
+import { useHandleTableContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 import { PlayersRef } from '/@/renderer/features/player/ref/players-ref';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
 import { useAppFocus } from '/@/renderer/hooks';
@@ -39,6 +39,7 @@ import {
     useSettingsStoreActions,
     useTableSettings,
 } from '/@/renderer/store/settings.store';
+import { searchSongs } from '/@/renderer/utils/search-songs';
 import { setQueue, setQueueNext } from '/@/renderer/utils/set-transcoded-queue-data';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 import { PlaybackType, TableType } from '/@/shared/types/types';
@@ -46,10 +47,11 @@ import { PlaybackType, TableType } from '/@/shared/types/types';
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 
 type QueueProps = {
+    searchTerm?: string;
     type: TableType;
 };
 
-export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
+export const PlayQueue = forwardRef(({ searchTerm, type }: QueueProps, ref: Ref<any>) => {
     const tableRef = useRef<AgGridReactType | null>(null);
     const mergedRef = useMergedRef(ref, tableRef);
     const queue = useDefaultQueue();
@@ -66,6 +68,14 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
     const volume = useVolume();
     const isFocused = useAppFocus();
     const isFocusedRef = useRef<boolean>(isFocused);
+
+    const songs = useMemo(() => {
+        if (searchTerm) {
+            return searchSongs(queue, searchTerm);
+        }
+
+        return queue;
+    }, [queue, searchTerm]);
 
     useEffect(() => {
         if (tableRef.current) {
@@ -276,7 +286,7 @@ export const PlayQueue = forwardRef(({ type }: QueueProps, ref: Ref<any>) => {
                     ref={mergedRef}
                     rowBuffer={50}
                     rowClassRules={rowClassRules}
-                    rowData={queue}
+                    rowData={songs}
                     rowDragEntireRow
                     rowDragMultiRow
                     rowHeight={tableConfig.rowHeight || 40}

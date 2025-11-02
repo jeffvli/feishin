@@ -1,6 +1,7 @@
 import { useForm } from '@mantine/form';
 import { useDebouncedValue } from '@mantine/hooks';
 import { openModal } from '@mantine/modals';
+import { useQuery } from '@tanstack/react-query';
 import orderBy from 'lodash/orderBy';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './lyrics-search-form.module.css';
 
 import i18n from '/@/i18n/i18n';
-import { useLyricSearch } from '/@/renderer/features/lyrics/queries/lyric-search-query';
+import { lyricsQueries } from '/@/renderer/features/lyrics/api/lyrics-api';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
@@ -75,9 +76,11 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
     const [debouncedArtist] = useDebouncedValue(form.values.artist, 500);
     const [debouncedName] = useDebouncedValue(form.values.name, 500);
 
-    const { data, isInitialLoading } = useLyricSearch({
-        query: { artist: debouncedArtist, name: debouncedName },
-    });
+    const { data, isInitialLoading } = useQuery(
+        lyricsQueries.search({
+            query: { artist: debouncedArtist, name: debouncedName },
+        }),
+    );
 
     const searchResults = useMemo(() => {
         if (!data) return [];

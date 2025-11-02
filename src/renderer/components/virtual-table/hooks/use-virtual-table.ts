@@ -19,7 +19,8 @@ import { useSearchParams } from 'react-router-dom';
 import { api } from '/@/renderer/api';
 import { queryKeys, QueryPagination } from '/@/renderer/api/query-keys';
 import { getColumnDefs, VirtualTableProps } from '/@/renderer/components/virtual-table';
-import { SetContextMenuItems, useHandleTableContextMenu } from '/@/renderer/features/context-menu';
+import { SetContextMenuItems } from '/@/renderer/features/context-menu/events';
+import { useHandleTableContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 import { AppRoute } from '/@/renderer/router/routes';
 import { PersistedTableColumn, useListStoreActions } from '/@/renderer/store';
 import { ListKey, useListStoreByKey } from '/@/renderer/store/list.store';
@@ -163,20 +164,23 @@ export const useVirtualTable = <TFilter extends BaseQuery<any>>({
                         },
                     );
 
-                    const results = (await queryClient.fetchQuery(queryKey, async ({ signal }) => {
-                        const res = await queryFn!({
-                            apiClientProps: {
-                                server,
-                                signal,
-                            },
-                            query: {
-                                ...properties.filter,
-                                limit,
-                                startIndex,
-                            },
-                        });
+                    const results = (await queryClient.fetchQuery({
+                        queryFn: async ({ signal }) => {
+                            const res = await queryFn!({
+                                apiClientProps: {
+                                    server,
+                                    signal,
+                                },
+                                query: {
+                                    ...properties.filter,
+                                    limit,
+                                    startIndex,
+                                },
+                            });
 
-                        return res;
+                            return res;
+                        },
+                        queryKey,
                     })) as BasePaginatedResponse<any>;
 
                     if (isClientSideSort && results?.items) {

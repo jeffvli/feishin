@@ -6,13 +6,13 @@ import { ListOnScrollProps } from 'react-window';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { ALBUMARTIST_CARD_ROWS } from '/@/renderer/components/card/card-rows';
+import { VirtualGridAutoSizerContainer } from '/@/renderer/components/virtual-grid/virtual-grid-wrapper';
 import {
-    VirtualGridAutoSizerContainer,
     VirtualInfiniteGrid,
     VirtualInfiniteGridRef,
-} from '/@/renderer/components/virtual-grid';
+} from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { useListContext } from '/@/renderer/context/list-context';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { useHandleFavorite } from '/@/renderer/features/shared/hooks/use-handle-favorite';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useListStoreActions } from '/@/renderer/store';
@@ -46,12 +46,13 @@ export const ArtistListGridView = ({ gridRef, itemCount }: ArtistListGridViewPro
             ...filter,
         };
 
-        const queriesFromCache: [QueryKey, ArtistListResponse][] = queryClient.getQueriesData({
-            exact: false,
-            fetchStatus: 'idle',
-            queryKey: queryKeys.artists.list(server?.id || '', query),
-            stale: false,
-        });
+        const queriesFromCache: [QueryKey, ArtistListResponse | undefined][] =
+            queryClient.getQueriesData({
+                exact: false,
+                fetchStatus: 'idle',
+                queryKey: queryKeys.artists.list(server?.id || '', query),
+                stale: false,
+            });
 
         const itemData: AlbumArtist[] = [];
 
@@ -84,9 +85,9 @@ export const ArtistListGridView = ({ gridRef, itemCount }: ArtistListGridViewPro
 
             const queryKey = queryKeys.artists.list(server?.id || '', query);
 
-            const artistsRes = await queryClient.fetchQuery(
-                queryKey,
-                async ({ signal }) =>
+            const artistsRes = await queryClient.fetchQuery({
+                gcTime: 1000 * 60 * 1,
+                queryFn: async ({ signal }) =>
                     api.controller.getArtistList({
                         apiClientProps: {
                             server,
@@ -94,8 +95,8 @@ export const ArtistListGridView = ({ gridRef, itemCount }: ArtistListGridViewPro
                         },
                         query,
                     }),
-                { cacheTime: 1000 * 60 * 1 },
-            );
+                queryKey,
+            });
 
             return artistsRes;
         },

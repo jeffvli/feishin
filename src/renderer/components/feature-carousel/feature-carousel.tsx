@@ -9,7 +9,7 @@ import { generatePath, Link } from 'react-router-dom';
 import styles from './feature-carousel.module.css';
 
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
-import { PlayButton } from '/@/renderer/features/shared';
+import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayButtonBehavior } from '/@/renderer/store';
 import { Badge } from '/@/shared/components/badge/badge';

@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
-import { usePlayQueueAdd } from '/@/renderer/features/player';
-import { LibraryHeaderBar } from '/@/renderer/features/shared';
+import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Badge } from '/@/shared/components/badge/badge';
 import { SpinnerIcon } from '/@/shared/components/spinner/spinner';

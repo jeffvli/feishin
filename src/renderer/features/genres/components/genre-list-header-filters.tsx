@@ -1,19 +1,20 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
 import { MouseEvent, MutableRefObject, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid';
+import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { GENRE_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { useListContext } from '/@/renderer/context/list-context';
-import { OrderToggleButton, useMusicFolders } from '/@/renderer/features/shared';
+import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { FolderButton } from '/@/renderer/features/shared/components/folder-button';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { MoreButton } from '/@/renderer/features/shared/components/more-button';
+import { OrderToggleButton } from '/@/renderer/features/shared/components/order-toggle-button';
 import { RefreshButton } from '/@/renderer/features/shared/components/refresh-button';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
@@ -93,7 +94,9 @@ export const GenreListHeaderFilters = ({
         server,
     });
 
-    const musicFoldersQuery = useMusicFolders({ query: null, serverId: server?.id });
+    const musicFoldersQuery = useQuery(
+        sharedQueries.musicFolders({ query: null, serverId: server?.id }),
+    );
 
     const sortByLabel =
         (server?.type &&
@@ -121,7 +124,7 @@ export const GenreListHeaderFilters = ({
     );
 
     const handleRefresh = useCallback(() => {
-        queryClient.invalidateQueries(queryKeys.genres.list(server?.id || ''));
+        queryClient.invalidateQueries({ queryKey: queryKeys.genres.list(server?.id || '') });
         onFilterChange(filter);
     }, [filter, onFilterChange, queryClient, server?.id]);
 

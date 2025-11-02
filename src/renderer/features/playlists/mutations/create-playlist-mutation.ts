@@ -25,7 +25,10 @@ export const useCreatePlaylist = (args: MutationHookArgs) => {
         onSuccess: (_args, variables) => {
             const server = getServerById(variables.serverId);
             if (server) {
-                queryClient.invalidateQueries(queryKeys.playlists.list(server.id));
+                queryClient.invalidateQueries({
+                    exact: false,
+                    queryKey: queryKeys.playlists.list(server.id),
+                });
             }
         },
         ...options,

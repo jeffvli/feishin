@@ -4,8 +4,8 @@ import { HashRouter, Route, Routes } from 'react-router-dom';
 import { AppRoute } from './routes';
 
 import ArtistListRoute from '/@/renderer/features/artists/routes/artist-list-route';
-import { AddToPlaylistContextModal } from '/@/renderer/features/playlists';
-import { ShareItemContextModal } from '/@/renderer/features/sharing';
+import { AddToPlaylistContextModal } from '/@/renderer/features/playlists/components/add-to-playlist-context-modal';
+import { ShareItemContextModal } from '/@/renderer/features/sharing/components/share-item-context-modal';
 import { DefaultLayout } from '/@/renderer/layouts/default-layout';
 import { AppOutlet } from '/@/renderer/router/app-outlet';
 import { TitlebarOutlet } from '/@/renderer/router/titlebar-outlet';
