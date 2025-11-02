@@ -45,9 +45,12 @@
 
         &:hover,
         &:focus-visible {
+            background: darken(var(--theme-colors-primary-filled), 10%);
+        }
+
+        &:focus-visible {
             outline: 1px solid var(--theme-colors-primary-filled);
             outline-offset: 2px;
-            background: darken(var(--theme-colors-primary-filled), 10%);
         }
     }
 
