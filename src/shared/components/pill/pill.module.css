@@ -1,0 +1,32 @@
+.label {
+  font-family: var(--theme-content-font-family);
+}
+
+.label.sm {
+  font-size: var(--theme-font-size-sm);
+}
+
+.label.md {
+  font-size: var(--theme-font-size-md);
+}
+
+.label.lg {
+  font-size: var(--theme-font-size-lg);
+}
+
+.label.xl {
+  font-size: var(--theme-font-size-xl);
+}
+
+.label.xs {
+  font-size: var(--theme-font-size-xs);
+}
+
+
+.remove {
+    transition: color 0.1s ease-in-out;
+
+    &:hover {
+        color: var(--theme-colors-foreground-muted);
+    }
+}
