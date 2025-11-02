@@ -250,6 +250,7 @@
             "title": "add server"
         },
         "addToPlaylist": {
+            "create": "create $t(entity.playlist_one) {{playlist}}",
             "input_playlists": "$t(entity.playlist_other)",
             "input_skipDuplicates": "skip duplicates",
             "searchOrCreate": "Search $t(entity.playlist_other) or type to create a new one",

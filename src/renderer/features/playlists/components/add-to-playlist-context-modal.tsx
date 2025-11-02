@@ -1,4 +1,3 @@
-import { Pill } from '@mantine/core';
 import { useSelection } from '@mantine/hooks';
 import { closeModal, ContextModalProps } from '@mantine/modals';
 import { useCallback, useMemo, useState } from 'react';
@@ -15,6 +14,7 @@ import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
+import { Pill } from '/@/shared/components/pill/pill';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
@@ -332,7 +332,7 @@ export const AddToPlaylistContextModal = ({
                                     </Table.Td>
                                     <Table.Td>
                                         <Text p={5} size="lg">
-                                            Create {search}
+                                            {t('form.addToPlaylist.create', { playlist: search })}
                                         </Text>
                                     </Table.Td>
                                 </Table.Tr>
