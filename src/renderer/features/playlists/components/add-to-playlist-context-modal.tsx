@@ -1,7 +1,9 @@
 import { useForm } from '@mantine/form';
 import { closeModal, ContextModalProps } from '@mantine/modals';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import styles from './add-to-playlist-context-modal.module.css';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
@@ -10,10 +12,12 @@ import { useAddToPlaylist } from '/@/renderer/features/playlists/mutations/add-t
 import { usePlaylistList } from '/@/renderer/features/playlists/queries/playlist-list-query';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServer } from '/@/renderer/store';
+import { formatDurationString } from '/@/renderer/utils';
 import { Box } from '/@/shared/components/box/box';
 import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Flex } from '/@/shared/components/flex/flex';
+import { Grid } from '/@/shared/components/grid/grid';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Image } from '/@/shared/components/image/image';
@@ -27,6 +31,7 @@ import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import {
+    Playlist,
     PlaylistListSort,
     SongListQuery,
     SongListSort,
@@ -76,21 +81,11 @@ export const AddToPlaylistContextModal = ({
     });
 
     const [playlistSelect, playlistMap] = useMemo(() => {
-        const existingPlaylists = new Array<{
-            description: null | string;
-            imageUrl: null | string;
-            label: string;
-            value: string;
-        }>();
+        const existingPlaylists = new Array<Playlist & { label: string; value: string }>();
         const playlistMap = new Map<string, string>();
 
         for (const playlist of playlistList.data?.items ?? []) {
-            existingPlaylists.push({
-                description: playlist.description,
-                imageUrl: playlist.imageUrl,
-                label: playlist.name,
-                value: playlist.id,
-            });
+            existingPlaylists.push({ ...playlist, label: playlist.name, value: playlist.id });
             playlistMap.set(playlist.id, playlist.name);
         }
 
@@ -423,7 +418,7 @@ export const AddToPlaylistContextModal = ({
                         value={search}
                     />
                     <ScrollArea style={{ maxHeight: '18rem' }}>
-                        <Table highlightOnHover>
+                        <Table styles={{ td: { padding: 'var(--theme-spacing-sm)' } }}>
                             <Table.Tbody>
                                 {filteredItems.map((item, index) => (
                                     <Table.Tr
@@ -460,31 +455,8 @@ export const AddToPlaylistContextModal = ({
                                                 tabIndex={-1}
                                             />
                                         </Table.Td>
-                                        <Table.Td>
-                                            <Group>
-                                                {item.imageUrl && (
-                                                    <Image
-                                                        imageContainerProps={{
-                                                            style: {
-                                                                height: '3rem',
-                                                                width: '3rem',
-                                                            },
-                                                        }}
-                                                        src={item.imageUrl}
-                                                    />
-                                                )}
-                                                <Stack gap="xs">
-                                                    <Text isNoSelect>{item.label}</Text>
-                                                    <Text
-                                                        isMuted
-                                                        isNoSelect
-                                                        overflow="hidden"
-                                                        w="95%"
-                                                    >
-                                                        {item.description || '—'}
-                                                    </Text>
-                                                </Stack>
-                                            </Group>
+                                        <Table.Td style={{ maxWidth: 0, width: '100%' }}>
+                                            <PlaylistTableItem item={item} />
                                         </Table.Td>
                                     </Table.Tr>
                                 ))}
@@ -563,3 +535,61 @@ export const AddToPlaylistContextModal = ({
         </Box>
     );
 };
+
+const PlaylistTableItem = memo(
+    ({ item }: { item: Playlist & { label: string; value: string } }) => {
+        const { t } = useTranslation();
+
+        return (
+            <Box className={styles.container} w="100%">
+                <Grid align="center" gutter="xs" w="100%">
+                    <Grid.Col span="content">
+                        <Flex align="center" justify="center" px="sm">
+                            {item.imageUrl && (
+                                <Image
+                                    imageContainerProps={{
+                                        className: styles.imageContainer,
+                                    }}
+                                    src={item.imageUrl}
+                                />
+                            )}
+                        </Flex>
+                    </Grid.Col>
+                    <Grid.Col className={styles.gridCol} span="auto">
+                        <Stack gap="xs" w="100%">
+                            <Text className={styles.labelText} isNoSelect overflow="hidden">
+                                {item.label}
+                            </Text>
+                            <Group justify="space-between" wrap="nowrap">
+                                <Group gap="md" wrap="nowrap">
+                                    <Group align="center" gap="xs" wrap="nowrap">
+                                        <Icon color="muted" icon="track" size="sm" />
+                                        <Text isMuted size="sm">
+                                            {item.songCount}
+                                        </Text>
+                                    </Group>
+                                    <Group align="center" gap="xs" wrap="nowrap">
+                                        <Icon color="muted" icon="duration" size="sm" />
+                                        <Text isMuted size="sm">
+                                            {formatDurationString(item.duration ?? 0)}
+                                        </Text>
+                                    </Group>
+                                </Group>
+
+                                <Text className={styles.statusText} isMuted size="sm">
+                                    {item.public
+                                        ? t('common.public', {
+                                              postProcess: 'titleCase',
+                                          })
+                                        : t('common.private', {
+                                              postProcess: 'titleCase',
+                                          })}
+                                </Text>
+                            </Group>
+                        </Stack>
+                    </Grid.Col>
+                </Grid>
+            </Box>
+        );
+    },
+);

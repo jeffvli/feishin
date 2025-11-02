@@ -92,6 +92,8 @@
         "playerMustBePaused": "player must be paused",
         "preview": "preview",
         "previousSong": "previous $t(entity.track_one)",
+        "private": "private",
+        "public": "public",
         "quit": "quit",
         "random": "random",
         "rating": "rating",

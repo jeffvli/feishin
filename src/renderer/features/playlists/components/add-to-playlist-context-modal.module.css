@@ -1,0 +1,25 @@
+.container {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.grid-col {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.image-container {
+    width: 3rem;
+    height: 3rem;
+}
+
+.label-text {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.status-text {
+    flex-shrink: 0;
+}
