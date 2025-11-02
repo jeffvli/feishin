@@ -10,6 +10,7 @@
     width: 100%;
     font-size: var(--theme-font-size-2xl);
     font-weight: 700;
+    user-select: none;
 }
 
 .content {
