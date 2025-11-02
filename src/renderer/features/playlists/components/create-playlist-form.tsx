@@ -10,8 +10,8 @@ import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/crea
 import { convertQueryGroupToNDQuery } from '/@/renderer/features/playlists/utils';
 import { useCurrentServer } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
-import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
 import { TextInput } from '/@/shared/components/text-input/text-input';
@@ -155,17 +155,17 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                 )}
 
                 <Group justify="flex-end">
-                    <Button onClick={onCancel} variant="subtle">
-                        {t('common.cancel', { postProcess: 'titleCase' })}
-                    </Button>
-                    <Button
+                    <ModalButton onClick={onCancel} px="2xl" uppercase variant="subtle">
+                        {t('common.cancel')}
+                    </ModalButton>
+                    <ModalButton
                         disabled={isSubmitDisabled}
                         loading={mutation.isLoading}
                         type="submit"
                         variant="filled"
                     >
-                        {t('common.create', { postProcess: 'titleCase' })}
-                    </Button>
+                        {t('common.create')}
+                    </ModalButton>
                 </Group>
             </Stack>
         </form>

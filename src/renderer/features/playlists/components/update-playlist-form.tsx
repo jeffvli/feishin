@@ -9,8 +9,8 @@ import { useUpdatePlaylist } from '/@/renderer/features/playlists/mutations/upda
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServer } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
-import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { Select } from '/@/shared/components/select/select';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
@@ -140,17 +140,15 @@ export const UpdatePlaylistForm = ({ body, onCancel, query, users }: UpdatePlayl
                     </>
                 )}
                 <Group justify="flex-end">
-                    <Button onClick={onCancel} variant="subtle">
-                        {t('common.cancel', { postProcess: 'titleCase' })}
-                    </Button>
-                    <Button
+                    <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
+                    <ModalButton
                         disabled={isSubmitDisabled}
                         loading={mutation.isLoading}
                         type="submit"
                         variant="filled"
                     >
-                        {t('common.save', { postProcess: 'titleCase' })}
-                    </Button>
+                        {t('common.save')}
+                    </ModalButton>
                 </Group>
             </Stack>
         </form>
