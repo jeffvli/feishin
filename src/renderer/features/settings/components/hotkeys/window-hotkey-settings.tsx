@@ -16,7 +16,7 @@ export const WindowHotkeySettings = () => {
     const { t } = useTranslation();
     const settings = useHotkeySettings();
     const { setSettings } = useSettingsStoreActions();
-    const { mediaSession: enableWindowsMediaSession, type: playbackType } = usePlaybackSettings();
+    const { mediaSession: enableMediaSession, type: playbackType } = usePlaybackSettings();
 
     const options: SettingOption[] = [
         {
@@ -25,9 +25,7 @@ export const WindowHotkeySettings = () => {
                     defaultChecked={settings.globalMediaHotkeys}
                     disabled={
                         !isElectron() ||
-                        (enableWindowsMediaSession &&
-                            isWindows &&
-                            playbackType === PlaybackType.WEB)
+                        (enableMediaSession && isWindows && playbackType === PlaybackType.WEB)
                     }
                     onChange={(e) => {
                         setSettings({
