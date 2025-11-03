@@ -154,7 +154,7 @@ export const AlbumDetailHeader = forwardRef(
                     title={detailQuery?.data?.name || ''}
                     {...background}
                 >
-                    <Stack gap="sm">
+                    <Stack gap="lg">
                         <Pill.Group>
                             {metadataItems.map(
                                 (item, index) =>
