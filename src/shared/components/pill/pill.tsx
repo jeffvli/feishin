@@ -3,7 +3,9 @@ import clsx from 'clsx';
 
 import styles from './pill.module.css';
 
-export const Pill = ({ children, size = 'md', ...props }: MantinePillProps) => {
+interface PillProps extends MantinePillProps {}
+
+export const Pill = ({ children, classNames, radius = 'md', size = 'md', ...props }: PillProps) => {
     return (
         <MantinePill
             classNames={{
@@ -17,8 +19,10 @@ export const Pill = ({ children, size = 'md', ...props }: MantinePillProps) => {
                 }),
                 remove: styles.remove,
                 root: styles.root,
+                ...classNames,
             }}
-            size="md"
+            radius={radius}
+            size={size}
             {...props}
         >
             {children}
