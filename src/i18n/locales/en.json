@@ -508,17 +508,17 @@
         },
         "secondary": {
             "audiobook": "audiobook",
-            "audio drama": "audio drama",
+            "audioDrama": "audio drama",
             "compilation": "compilation",
-            "dj-mix": "dj mix",
+            "djMix": "dj mix",
             "demo": "demo",
-            "field recording": "field recording",
+            "fieldRecording": "field recording",
             "interview": "interview",
             "live": "live",
-            "mixtape/street": "mixtape",
+            "mixtape": "mixtape",
             "remix": "remix",
             "soundtrack": "soundtrack",
-            "spokenword": "spoken word"
+            "spokenWord": "spoken word"
         }
     },
     "setting": {
