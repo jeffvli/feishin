@@ -14,6 +14,7 @@ import { queryClient } from '/@/renderer/lib/react-query';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { formatDateAbsoluteUTC, formatDurationString, titleCase } from '/@/renderer/utils';
+import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
 import { Group } from '/@/shared/components/group/group';
 import { Pill } from '/@/shared/components/pill/pill';
 import { Rating } from '/@/shared/components/rating/rating';
@@ -81,9 +82,14 @@ export const AlbumDetailHeader = forwardRef(
             }
         }, detailQuery.data !== undefined);
 
-        const releaseTypes =
-            detailQuery.data?.releaseTypes.map((type) => ({ id: type, value: titleCase(type) })) ||
-            [];
+        const releaseTypes = useMemo(
+            () =>
+                normalizeReleaseTypes(detailQuery.data?.releaseTypes ?? [], t).map((type) => ({
+                    id: type,
+                    value: titleCase(type),
+                })) || [],
+            [detailQuery.data?.releaseTypes, t],
+        );
 
         const metadataItems = releaseTypes.concat([
             {

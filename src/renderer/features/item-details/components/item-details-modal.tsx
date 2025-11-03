@@ -9,6 +9,7 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { formatDurationString, formatSizeString } from '/@/renderer/utils';
 import { formatDateRelative, formatRating } from '/@/renderer/utils/format';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
+import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
 import { sanitize } from '/@/renderer/utils/sanitize';
 import { SEPARATOR_STRING } from '/@/shared/api/utils';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -122,7 +123,10 @@ const BoolField = (key: boolean) =>
 const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
     { key: 'name', label: 'common.title' },
     { label: 'entity.albumArtist_one', render: (item) => formatArtists(item.albumArtists) },
-    { label: 'common.releaseType', render: (item) => item.releaseTypes.join(SEPARATOR_STRING) },
+    {
+        label: 'common.releaseType',
+        render: (item, t) => normalizeReleaseTypes(item.releaseTypes, t).join(SEPARATOR_STRING),
+    },
     { label: 'entity.genre_other', render: FormatGenre },
     {
         label: 'common.duration',
