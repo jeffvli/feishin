@@ -395,7 +395,9 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         const res = await jfApiClient(apiClientProps).getGenreList({
             query: {
+                EnableTotalRecordCount: true,
                 Fields: 'ItemCounts',
+                Limit: query.limit,
                 ParentId: query?.musicFolderId,
                 Recursive: true,
                 SearchTerm: query?.searchTerm,
