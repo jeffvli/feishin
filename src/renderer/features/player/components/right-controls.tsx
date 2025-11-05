@@ -15,6 +15,7 @@ import {
     useHotkeySettings,
     useMuted,
     usePlaybackSettings,
+    usePlaybackType,
     usePreviousSong,
     useSettingsStore,
     useSettingsStoreActions,
@@ -31,6 +32,7 @@ import { Rating } from '/@/shared/components/rating/rating';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Switch } from '/@/shared/components/switch/switch';
 import { LibraryItem, QueueSong, ServerType, Song } from '/@/shared/types/domain-types';
+import { PlaybackType } from '/@/shared/types/types';
 
 const ipc = isElectron() ? window.api.ipc : null;
 const remote = isElectron() ? window.api.remote : null;
@@ -56,6 +58,7 @@ export const RightControls = () => {
     } = useRightControls();
     const { setSettings } = useSettingsStoreActions();
     const playbackSettings = usePlaybackSettings();
+    const playbackType = usePlaybackType();
 
     const speed = useSpeed();
     const volumeWidth = useSettingsStore((state) => state.general.volumeWidth);
@@ -234,26 +237,28 @@ export const RightControls = () => {
                         />
                     </DropdownMenu.Target>
                     <DropdownMenu.Dropdown>
-                        <Option>
-                            <Option.Label>
-                                {t('setting.preservePitch', {
-                                    postProcess: 'sentenceCase',
-                                })}
-                            </Option.Label>
-                            <Option.Control>
-                                <Switch
-                                    defaultChecked={speedPreservePitch}
-                                    onChange={(e) => {
-                                        setSettings({
-                                            playback: {
-                                                ...playbackSettings,
-                                                preservePitch: e.currentTarget.checked,
-                                            },
-                                        });
-                                    }}
-                                />
-                            </Option.Control>
-                        </Option>
+                        {playbackType === PlaybackType.WEB && (
+                            <Option>
+                                <Option.Label>
+                                    {t('setting.preservePitch', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </Option.Label>
+                                <Option.Control>
+                                    <Switch
+                                        defaultChecked={speedPreservePitch}
+                                        onChange={(e) => {
+                                            setSettings({
+                                                playback: {
+                                                    ...playbackSettings,
+                                                    preservePitch: e.currentTarget.checked,
+                                                },
+                                            });
+                                        }}
+                                    />
+                                </Option.Control>
+                            </Option>
+                        )}
                         <Slider
                             label={formatPlaybackSpeedSliderLabel}
                             marks={[
