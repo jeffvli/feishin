@@ -205,9 +205,9 @@ export const NavidromeAlbumFilters = ({ disableArtistFilter }: NavidromeAlbumFil
                     <MultiSelectWithInvalidData
                         clearable
                         data={genreList}
-                        defaultValue={query.genres}
+                        defaultValue={query.genreId}
                         label={t('entity.genre', { count: 2, postProcess: 'sentenceCase' })}
-                        onChange={(e) => (e ? setAlbumGenre(e) : undefined)}
+                        onChange={(e) => (e ? setGenreId(e) : undefined)}
                         searchable
                     />
                 </Group>

@@ -38,7 +38,7 @@ export const SubsonicAlbumFilters = ({
 
     const [maxYear, setMaxYear] = useQueryState(FILTER_KEYS.ALBUM.MAX_YEAR, parseAsInteger);
 
-    const [genres, setGenres] = useQueryState(FILTER_KEYS.ALBUM.GENRES, parseAsString);
+    const [genreId, setGenreId] = useQueryState(FILTER_KEYS.ALBUM.GENRE_ID, parseAsString);
 
     const [artistIds, setArtistIds] = useQueryState(
         FILTER_KEYS.ALBUM.ARTIST_IDS,
@@ -103,7 +103,7 @@ export const SubsonicAlbumFilters = ({
     }, [genreListQuery.data]);
 
     const handleGenresFilter = debounce((e: null | string) => {
-        setGenres(e ?? null);
+        setGenreId(e ?? null);
         const updatedFilters: Partial<AlbumListFilter> = {
             genres: e ? [e] : undefined,
         };
@@ -152,7 +152,7 @@ export const SubsonicAlbumFilters = ({
             <Group grow>
                 <NumberInput
                     defaultValue={minYear ?? undefined}
-                    disabled={genres !== null}
+                    disabled={genreId !== null}
                     hideControls={false}
                     label={t('filter.fromYear', { postProcess: 'sentenceCase' })}
                     max={5000}
@@ -161,7 +161,7 @@ export const SubsonicAlbumFilters = ({
                 />
                 <NumberInput
                     defaultValue={maxYear ?? undefined}
-                    disabled={genres !== null}
+                    disabled={genreId !== null}
                     hideControls={false}
                     label={t('filter.toYear', { postProcess: 'sentenceCase' })}
                     max={5000}
@@ -173,7 +173,7 @@ export const SubsonicAlbumFilters = ({
                 <Select
                     clearable
                     data={genreList}
-                    defaultValue={genres ?? undefined}
+                    defaultValue={genreId ?? undefined}
                     disabled={Boolean(minYear || maxYear)}
                     label={t('entity.genre', { count: 1, postProcess: 'titleCase' })}
                     onChange={handleGenresFilter}

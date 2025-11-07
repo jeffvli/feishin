@@ -39,12 +39,12 @@ export const JellyfinAlbumFilters = ({
     const {
         query,
         setAlbumArtist,
-        setAlbumCompilation,
-        setAlbumFavorite,
-        setAlbumGenre,
+        setCompilation,
         setCustom,
-        setMaxAlbumYear,
-        setMinAlbumYear,
+        setFavorite,
+        setGenreId,
+        setMaxYear,
+        setMinYear,
     } = useAlbumListFilters();
 
     // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
@@ -87,7 +87,7 @@ export const JellyfinAlbumFilters = ({
             {
                 label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
                 onChange: (favoriteValue?: boolean) => {
-                    setAlbumFavorite(favoriteValue ?? null);
+                    setFavorite(favoriteValue ?? null);
                 },
                 value: query.favorite,
             },
@@ -97,7 +97,7 @@ export const JellyfinAlbumFilters = ({
             filters.push({
                 label: t('filter.isCompilation', { postProcess: 'sentenceCase' }),
                 onChange: (compilationValue?: boolean) => {
-                    setAlbumCompilation(compilationValue ?? null);
+                    setCompilation(compilationValue ?? null);
                 },
                 value: query.compilation,
             });
@@ -108,24 +108,24 @@ export const JellyfinAlbumFilters = ({
         query.favorite,
         query.artistIds?.length,
         query.compilation,
-        setAlbumFavorite,
-        setAlbumCompilation,
+        setFavorite,
+        setCompilation,
     ]);
 
     const handleMinYearFilter = debounce((e: number | string) => {
         if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
         const year = e === '' ? undefined : (e as number);
-        setMinAlbumYear(year ?? null);
+        setMinYear(year ?? null);
     }, 500);
 
     const handleMaxYearFilter = debounce((e: number | string) => {
         if (typeof e === 'number' && (e < 1700 || e > 2300)) return;
         const year = e === '' ? undefined : (e as number);
-        setMaxAlbumYear(year ?? null);
+        setMaxYear(year ?? null);
     }, 500);
 
     const handleGenresFilter = debounce((e: string[] | undefined) => {
-        setAlbumGenre(e ?? null);
+        setGenreId(e ?? null);
     }, 250);
 
     const albumArtistListQuery = useQuery(
@@ -200,7 +200,7 @@ export const JellyfinAlbumFilters = ({
                 <MultiSelectWithInvalidData
                     clearable
                     data={genreList}
-                    defaultValue={query.genres ?? undefined}
+                    defaultValue={query.genreId ?? undefined}
                     label={t('entity.genre', { count: 2, postProcess: 'sentenceCase' })}
                     onChange={handleGenresFilter}
                     searchable
