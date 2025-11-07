@@ -10,7 +10,6 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
-import { getServerById } from '/@/renderer/store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const getQueryKeyName = (itemType: LibraryItem): string => {
@@ -138,7 +137,7 @@ export const useItemListInfiniteLoader = ({
                     gcTime: 1000 * 15,
                     queryFn: async ({ signal }) => {
                         const result = await listQueryFn({
-                            apiClientProps: { server: getServerById(serverId), signal },
+                            apiClientProps: { serverId, signal },
                             query: queryParams,
                         });
 

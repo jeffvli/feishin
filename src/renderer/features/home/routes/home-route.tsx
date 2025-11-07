@@ -45,8 +45,6 @@ const HomeRoute = () => {
     const { windowBarStyle } = useWindowSettings();
     const { homeFeature, homeItems } = useGeneralSettings();
 
-    const itemsPerPage = 10;
-
     const queriesEnabled = useMemo(() => {
         return homeItems.reduce(
             (previous: Record<HomeItem, boolean>, current) => ({
@@ -79,16 +77,6 @@ const HomeRoute = () => {
     const featureItemsWithImage = useMemo(() => {
         return feature.data?.items?.filter((item) => item.imageUrl) ?? [];
     }, [feature.data?.items]);
-
-    const queriesEnabled = useMemo(() => {
-        return homeItems.reduce(
-            (previous: Record<HomeItem, boolean>, current) => ({
-                ...previous,
-                [current.id]: !current.disabled,
-            }),
-            {} as Record<HomeItem, boolean>,
-        );
-    }, [homeItems]);
 
     const random = useQuery(
         albumQueries.list({

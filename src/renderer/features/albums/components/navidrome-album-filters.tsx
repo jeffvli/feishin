@@ -12,7 +12,7 @@ import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { useCurrentServer } from '/@/renderer/store';
-import { NDSongQueryFields } from '/@/shared/api/navidrome.types';
+import { NDSongQueryFields } from '/@/shared/api/navidrome/navidrome-types';
 import { hasFeature } from '/@/shared/api/utils';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';

@@ -6,7 +6,7 @@ import { PlaylistListFilter, SongListFilter } from '/@/renderer/store/list.store
 import { DataTableProps } from '/@/renderer/store/settings.store';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
 import { PlaylistListSort, SortOrder } from '/@/shared/types/domain-types';
-import { ListDisplayType, TableColumn, ListPagination } from '/@/shared/types/types';
+import { ListDisplayType, ListPagination, TableColumn } from '/@/shared/types/types';
 
 export interface PlaylistSlice extends PlaylistState {
     actions: {
