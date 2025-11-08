@@ -1,10 +1,15 @@
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { QueryClient, useIsFetching, useQueryClient } from '@tanstack/react-query';
+import { nanoid } from 'nanoid/non-secure';
+import { createContext, useCallback, useContext, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
+import { queryKeys } from '/@/renderer/api/query-keys';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { AddToQueueType, usePlayerActions } from '/@/renderer/store';
+import { toast } from '/@/shared/components/toast/toast';
 import {
+    instanceOfCancellationError,
     LibraryItem,
     PlaylistSongListResponse,
     QueueSong,
@@ -84,9 +89,30 @@ export const PlayerContext = createContext<PlayerContext>({
     toggleShuffle: () => {},
 });
 
+const getRootQueryKey = (itemType: LibraryItem, serverId: string) => {
+    switch (itemType) {
+        case LibraryItem.ALBUM:
+            return queryKeys.songs.root(serverId);
+        case LibraryItem.ALBUM_ARTIST:
+            return queryKeys.songs.root(serverId);
+        case LibraryItem.ARTIST:
+            return queryKeys.songs.root(serverId);
+        case LibraryItem.GENRE:
+            return queryKeys.songs.root(serverId);
+        case LibraryItem.PLAYLIST:
+            return queryKeys.playlists.root(serverId);
+        case LibraryItem.SONG:
+            return queryKeys.songs.root(serverId);
+        default:
+            return queryKeys.songs.root(serverId);
+    }
+};
+
 export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const storeActions = usePlayerActions();
+    const timeoutIds = useRef<null | Record<string, ReturnType<typeof setTimeout>>>({});
 
     const addToQueueByData = useCallback(
         (data: Song[], type: AddToQueueType) => {
@@ -102,19 +128,73 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
     const addToQueueByFetch = useCallback(
         async (serverId: string, id: string[], itemType: LibraryItem, type: AddToQueueType) => {
-            const songs = await fetchSongsByItemType(queryClient, serverId, {
-                id,
-                itemType,
-            });
+            let toastId: null | string = null;
+            const fetchId = nanoid();
 
-            if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
-                const edge = type.edge === 'top' ? 'top' : 'bottom';
-                storeActions.addToQueueByUniqueId(songs, type.uniqueId, edge);
-            } else {
-                storeActions.addToQueueByType(songs, type as Play);
+            timeoutIds.current = {
+                ...timeoutIds.current,
+                [fetchId]: setTimeout(() => {
+                    toastId = toast.info({
+                        autoClose: false,
+                        message: t('player.playbackFetchCancel', {
+                            postProcess: 'sentenceCase',
+                        }),
+                        onClose: () => {
+                            queryClient.cancelQueries({
+                                exact: false,
+                                queryKey: getRootQueryKey(itemType, serverId),
+                            });
+                        },
+                        title: t('player.playbackFetchInProgress', {
+                            postProcess: 'sentenceCase',
+                        }),
+                    });
+                }, 2000),
+            };
+
+            try {
+                const songs = await queryClient.fetchQuery({
+                    gcTime: 0,
+                    queryFn: () => {
+                        return fetchSongsByItemType(queryClient, serverId, {
+                            id,
+                            itemType,
+                        });
+                    },
+                    queryKey: queryKeys.player.fetch(),
+                    staleTime: 0,
+                });
+
+                clearTimeout(timeoutIds.current[fetchId] as ReturnType<typeof setTimeout>);
+                delete timeoutIds.current[fetchId];
+                if (toastId) {
+                    toast.hide(toastId);
+                }
+
+                if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
+                    const edge = type.edge === 'top' ? 'top' : 'bottom';
+                    storeActions.addToQueueByUniqueId(songs, type.uniqueId, edge);
+                } else {
+                    storeActions.addToQueueByType(songs, type as Play);
+                }
+            } catch (err: any) {
+                if (instanceOfCancellationError(err)) {
+                    return;
+                }
+
+                clearTimeout(timeoutIds.current[fetchId] as ReturnType<typeof setTimeout>);
+                delete timeoutIds.current[fetchId];
+                if (toastId) {
+                    toast.hide(toastId);
+                }
+
+                toast.error({
+                    message: err.message,
+                    title: t('error.genericError', { postProcess: 'sentenceCase' }) as string,
+                });
             }
         },
-        [queryClient, storeActions],
+        [queryClient, storeActions, t],
     );
 
     const clearQueue = useCallback(() => {
@@ -465,3 +545,8 @@ export async function fetchSongsByItemType(
 
     return songs;
 }
+
+export const useIsPlayerFetching = () => {
+    const fetcherCount = useIsFetching({ queryKey: queryKeys.player.fetch() });
+    return fetcherCount > 0;
+};

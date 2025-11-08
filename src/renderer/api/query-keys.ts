@@ -176,6 +176,11 @@ export const queryKeys: Record<
     musicFolders: {
         list: (serverId: string) => [serverId, 'musicFolders', 'list'] as const,
     },
+    player: {
+        fetch: () => {
+            return ['player', 'fetch'] as const;
+        },
+    },
     playlists: {
         detail: (serverId: string, id?: string, query?: PlaylistDetailQuery) => {
             const { filter, pagination } = splitPaginatedQuery(query);
