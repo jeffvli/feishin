@@ -24,11 +24,12 @@ export const RatingColumn = (props: ItemTableListInnerColumn) => {
         const item = props.data[props.rowIndex] as any;
 
         setRatingMutation.mutate({
+            apiClientProps: { serverId: item.serverId as string },
             query: {
-                item: [item],
+                id: [item.id],
                 rating: newRating,
+                type: item.itemType,
             },
-            serverId: item.serverId as string,
         });
     };
 

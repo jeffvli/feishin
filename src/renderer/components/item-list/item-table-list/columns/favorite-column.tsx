@@ -33,21 +33,27 @@ export const FavoriteColumn = (props: ItemTableListInnerColumn) => {
 
                         if (row) {
                             deleteFavorite.mutate({
+                                apiClientProps: {
+                                    serverId: (props.data as any)[props.rowIndex]
+                                        .serverId as string,
+                                },
                                 query: {
                                     id: [(props.data as any)[props.rowIndex].id as string],
                                     type: (props.data as any)[props.rowIndex]
                                         .itemType as LibraryItem,
                                 },
-                                serverId: (props.data as any)[props.rowIndex].serverId as string,
                             });
                         } else {
                             createFavorite.mutate({
+                                apiClientProps: {
+                                    serverId: (props.data as any)[props.rowIndex]
+                                        .serverId as string,
+                                },
                                 query: {
                                     id: [(props.data as any)[props.rowIndex].id as string],
                                     type: (props.data as any)[props.rowIndex]
                                         .itemType as LibraryItem,
                                 },
-                                serverId: (props.data as any)[props.rowIndex].serverId as string,
                             });
                         }
                     }}
