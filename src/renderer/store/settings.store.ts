@@ -1140,4 +1140,7 @@ export const migrateSettings = (settings: SettingsState, settingsVersion: number
     useSettingsStore.persist.getOptions().migrate!(settings, settingsVersion) as SettingsState;
 
 export const useListSettings = (type: ItemListKey) =>
-    useSettingsStore((state) => state.lists[type as keyof typeof state.lists], shallow);
+    useSettingsStore(
+        (state) => state.lists[type as keyof typeof state.lists],
+        shallow,
+    ) as ItemListSettings;

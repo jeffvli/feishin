@@ -21,11 +21,7 @@ export const RowIndexColumn = (props: ItemTableListInnerColumn) => {
                     icon="arrowDownS"
                     iconProps={{ color: 'muted', size: 'md' }}
                     onClick={(e) =>
-                        controls.onItemExpand?.(
-                            props.data[props.rowIndex] as any,
-                            props.itemType,
-                            e,
-                        )
+                        controls.onExpand?.(props.data[props.rowIndex] as any, props.itemType, e)
                     }
                     size="xs"
                     variant="subtle"

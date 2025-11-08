@@ -1,102 +1,104 @@
-import { MouseEvent } from 'react';
+import { useMemo } from 'react';
 
-import {
-    ItemListItem,
-    ItemListStateActions,
-} from '/@/renderer/components/item-list/helpers/item-list-state';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { ItemListItem } from '/@/renderer/components/item-list/helpers/item-list-state';
+import { DefaultItemControlProps, ItemControls } from '/@/renderer/components/item-list/types';
+import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
 import { Play } from '/@/shared/types/types';
 
-const handleItemClick = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    if (!item) {
-        return;
-    }
+export const useDefaultItemListControls = () => {
+    const player = usePlayerContext();
 
-    const itemListItem: ItemListItem = {
-        id: item.id,
-        itemType,
-        serverId: item.serverId,
-    };
+    const controls: ItemControls = useMemo(() => {
+        return {
+            onClick: ({ internalState, item, itemType }: DefaultItemControlProps) => {
+                if (!item) {
+                    return;
+                }
 
-    // Regular click - deselect all others and select only this item
-    // If this item is already the only selected item, deselect it
-    const selectedItems = internalState.getSelected();
-    const isOnlySelected = selectedItems.length === 1 && selectedItems[0].id === item.id;
+                const itemListItem: ItemListItem = {
+                    _serverId: item._serverId,
+                    id: item.id,
+                    itemType,
+                };
 
-    if (isOnlySelected) {
-        internalState.clearSelected();
-    } else {
-        internalState.setSelected([itemListItem]);
-    }
-};
+                // Regular click - deselect all others and select only this item
+                // If this item is already the only selected item, deselect it
+                const selectedItems = internalState.getSelected();
+                const isOnlySelected =
+                    selectedItems.length === 1 && selectedItems[0].id === item.id;
 
-const handleItemDoubleClick = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemDoubleClick', item, itemType, internalState);
-};
+                if (isOnlySelected) {
+                    internalState.clearSelected();
+                } else {
+                    internalState.setSelected([itemListItem]);
+                }
+            },
 
-const handleItemExpand = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    if (!item) {
-        return;
-    }
+            onDoubleClick: ({ internalState, item, itemType }: DefaultItemControlProps) => {
+                console.log('onDoubleClick', item, itemType, internalState);
+            },
 
-    return internalState.toggleExpanded({
-        id: item.id,
-        itemType,
-        serverId: item.serverId,
-    });
-};
+            onExpand: ({ internalState, item, itemType }: DefaultItemControlProps) => {
+                if (!item || !internalState) {
+                    return;
+                }
 
-const handleItemFavorite = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemFavorite', item, itemType, internalState);
-};
+                return internalState?.toggleExpanded({
+                    _serverId: item._serverId,
+                    id: item.id,
+                    itemType,
+                });
+            },
 
-const handleItemRating = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemRating', item, itemType, internalState);
-};
+            onFavorite: ({
+                favorite,
+                item,
+                itemType,
+            }: DefaultItemControlProps & { favorite: boolean }) => {
+                if (!item) {
+                    return;
+                }
 
-const handleItemMore = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemMore', item, itemType, internalState);
-};
+                player.setFavorite(item._serverId, [item.id], itemType, favorite);
+            },
 
-const handleItemPlay = (
-    item: (ItemListItem & object) | undefined,
-    itemType: LibraryItem,
-    playType: Play,
-    internalState: ItemListStateActions,
-) => {
-    console.log('handleItemPlay', item, itemType, playType, internalState);
-};
+            onMore: ({ internalState, item, itemType }: DefaultItemControlProps) => {
+                console.log('handleItemMore', item, itemType, internalState);
+            },
 
-export const itemListControls = {
-    handleItemClick,
-    handleItemDoubleClick,
-    handleItemExpand,
-    handleItemFavorite,
-    handleItemMore,
-    handleItemPlay,
-    handleItemRating,
+            onPlay: ({
+                item,
+                itemType,
+                playType,
+            }: DefaultItemControlProps & { playType: Play }) => {
+                if (!item) {
+                    return;
+                }
+
+                player.addToQueueByFetch(item._serverId, [item.id], itemType, playType);
+            },
+
+            onRating: ({
+                item,
+                itemType,
+                rating,
+            }: DefaultItemControlProps & { rating: number }) => {
+                if (!item) {
+                    return;
+                }
+
+                const previousRating = (item as { userRating: number }).userRating || 0;
+
+                let newRating = rating;
+
+                if (previousRating === rating) {
+                    newRating = 0;
+                }
+
+                player.setRating(item._serverId, [item.id], itemType, newRating);
+            },
+        };
+    }, [player]);
+
+    return controls;
 };

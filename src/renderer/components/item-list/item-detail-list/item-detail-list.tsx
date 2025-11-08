@@ -125,7 +125,7 @@ export const ItemDetailList = ({
                 internalState.toggleExpanded({
                     id: item.id as string,
                     itemType: itemType,
-                    serverId: item.serverId as string,
+                    _serverId: item.serverId as string,
                 });
             }
         },

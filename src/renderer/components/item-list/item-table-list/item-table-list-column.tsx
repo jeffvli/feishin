@@ -5,7 +5,6 @@ import { CellComponentProps } from 'react-window-v2';
 import styles from './item-table-list-column.module.css';
 
 import i18n from '/@/i18n/i18n';
-import { itemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import { ActionsColumn } from '/@/renderer/components/item-list/item-table-list/columns/actions-column';
 import { AlbumArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-artists-column';
 import { ArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/artists-column';
@@ -29,7 +28,7 @@ import { TextColumn } from '/@/renderer/components/item-list/item-table-list/col
 import { TitleColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-column';
 import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-combined-column';
 import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
-import { ItemControls } from '/@/renderer/components/item-list/types';
+import { ItemControls, ItemListItem } from '/@/renderer/components/item-list/types';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
@@ -47,36 +46,10 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
 
     const isHeaderEnabled = !!props.enableHeader;
 
-    const controls: ItemControls = {
-        onClick: (item, itemType, event) => {
-            if (props.onRowClick && item) {
-                props.onRowClick(item, event);
-            } else {
-                itemListControls.handleItemClick(item, itemType, props.internalState);
-            }
-        },
-        onDoubleClick: (item, itemType) =>
-            itemListControls.handleItemDoubleClick(item, itemType, props.internalState),
-        onFavorite: (item, itemType) =>
-            itemListControls.handleItemFavorite(item, itemType, props.internalState),
-        onItemExpand: (item, itemType) =>
-            itemListControls.handleItemExpand(item, itemType, props.internalState),
-        onMore: (item, itemType) =>
-            itemListControls.handleItemMore(item, itemType, props.internalState),
-        onPlay: (item, itemType, playType) =>
-            itemListControls.handleItemPlay(item, itemType, playType, props.internalState),
-        onRating: (item, itemType) =>
-            itemListControls.handleItemRating(item, itemType, props.internalState),
-    };
+    const controls = props.controls;
 
     if (isHeaderEnabled && props.rowIndex === 0) {
-        return (
-            <TableColumnHeaderContainer
-                {...props}
-                controls={controls}
-                type={type}
-            ></TableColumnHeaderContainer>
-        );
+        return <TableColumnHeaderContainer {...props} controls={controls} type={type} />;
     }
 
     switch (type) {
@@ -211,7 +184,12 @@ export const TableColumnTextContainer = (
         }
 
         if (isDataRow && item && props.enableSelection) {
-            props.controls.onClick?.(item as any, props.itemType, event);
+            props.controls.onClick?.({
+                event,
+                internalState: props.internalState,
+                item: item as ItemListItem,
+                itemType: props.itemType,
+            });
         }
     };
 
@@ -315,7 +293,12 @@ export const TableColumnContainer = (
         }
 
         if (isDataRow && item && props.enableSelection) {
-            props.controls.onClick?.(item as any, props.itemType, event);
+            props.controls.onClick?.({
+                event,
+                internalState: props.internalState,
+                item: item as ItemListItem,
+                itemType: props.itemType,
+            });
         }
     };
 

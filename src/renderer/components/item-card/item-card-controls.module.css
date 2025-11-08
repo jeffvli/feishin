@@ -75,6 +75,13 @@
     }
 }
 
+.play-button.disabled,
+.play-button.loading {
+    cursor: not-allowed;
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(1);
+}
+
 .play-button.primary {
     left: 50%;
     width: 25%;

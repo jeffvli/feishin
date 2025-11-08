@@ -24,12 +24,16 @@ import {
     ListOnScrollProps,
 } from 'react-window';
 
-import { ExpandedListContainer } from '../expanded-list-container';
 import styles from './item-grid-list.module.css';
 
-import { getDataRowsCount, ItemCard } from '/@/renderer/components/item-card/item-card';
+import {
+    getDataRowsCount,
+    ItemCard,
+    ItemCardProps,
+} from '/@/renderer/components/item-card/item-card';
+import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded-list-container';
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
-import { itemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
+import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
     ItemListStateActions,
     useItemListState,
@@ -38,6 +42,7 @@ import { ItemControls, ItemListHandle } from '/@/renderer/components/item-list/t
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface VirtualizedGridListProps {
+    controls: ItemControls;
     data: unknown[];
     enableExpansion: boolean;
     enableSelection: boolean;
@@ -59,6 +64,7 @@ interface VirtualizedGridListProps {
 
 const VirtualizedGridList = React.memo(
     ({
+        controls,
         data,
         enableExpansion,
         enableSelection,
@@ -76,50 +82,7 @@ const VirtualizedGridList = React.memo(
         const itemData: GridItemProps = useMemo(() => {
             return {
                 columns: tableMeta?.columnCount || 0,
-                controls: {
-                    onClick: enableSelection
-                        ? (item, itemType) => {
-                              return itemListControls.handleItemClick(
-                                  item,
-                                  itemType,
-                                  internalState,
-                              );
-                          }
-                        : undefined,
-                    onDoubleClick: (item, itemType) => {
-                        return itemListControls.handleItemDoubleClick(
-                            item,
-                            itemType,
-                            internalState,
-                        );
-                    },
-                    onFavorite: (item, itemType) => {
-                        return itemListControls.handleItemFavorite(item, itemType, internalState);
-                    },
-                    onItemExpand: enableExpansion
-                        ? (item, itemType) => {
-                              return itemListControls.handleItemExpand(
-                                  item,
-                                  itemType,
-                                  internalState,
-                              );
-                          }
-                        : undefined,
-                    onMore: (item, itemType) => {
-                        return itemListControls.handleItemMore(item, itemType, internalState);
-                    },
-                    onPlay: (item, itemType, playType) => {
-                        return itemListControls.handleItemPlay(
-                            item,
-                            itemType,
-                            playType,
-                            internalState,
-                        );
-                    },
-                    onRating: (item, itemType) => {
-                        return itemListControls.handleItemRating(item, itemType, internalState);
-                    },
-                },
+                controls,
                 data,
                 enableExpansion,
                 enableSelection,
@@ -128,7 +91,16 @@ const VirtualizedGridList = React.memo(
                 itemType,
                 tableMeta,
             };
-        }, [enableSelection, enableExpansion, internalState, tableMeta, data, itemType, gap]);
+        }, [
+            tableMeta,
+            controls,
+            data,
+            enableExpansion,
+            enableSelection,
+            gap,
+            internalState,
+            itemType,
+        ]);
 
         const debouncedOnScrollEnd = useMemo(
             () =>
@@ -253,7 +225,7 @@ const createThrottledSetTableMeta = (itemsPerRow?: number) => {
 
 export interface GridItemProps {
     columns: number;
-    controls: ItemControls;
+    controls: ItemCardProps['controls'];
     data: any[];
     enableExpansion?: boolean;
     enableSelection?: boolean;
@@ -354,6 +326,8 @@ export const ItemGridList = ({
         throttledSetTableMeta(containerWidth, data.length, itemType, setTableMeta);
     }, [containerWidth, data.length, itemType, throttledSetTableMeta]);
 
+    const controls = useDefaultItemListControls();
+
     return (
         <div
             className={styles.itemGridContainer}
@@ -361,6 +335,7 @@ export const ItemGridList = ({
             ref={mergedContainerRef}
         >
             <VirtualizedGridList
+                controls={controls}
                 data={data}
                 enableExpansion={enableExpansion}
                 enableSelection={enableSelection}
@@ -411,7 +386,13 @@ const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
                     key={`card-${i}-${index}`}
                     style={{ '--columns': columns } as CSSProperties}
                 >
-                    <ItemCard controls={controls} data={data[i]} itemType={itemType} withControls />
+                    <ItemCard
+                        controls={controls}
+                        data={data[i]}
+                        internalState={props.data.internalState}
+                        itemType={itemType}
+                        withControls
+                    />
                 </div>,
             );
         } else {

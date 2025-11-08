@@ -1,5 +1,3 @@
-import { MouseEvent } from 'react';
-
 import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
 import {
     Album,
@@ -11,43 +9,35 @@ import {
 } from '/@/shared/types/domain-types';
 import { Play, TableColumn } from '/@/shared/types/types';
 
+export interface DefaultItemControlProps {
+    event: null | React.MouseEvent<unknown>;
+    internalState?: ItemListStateActions;
+    item: ItemListItem | undefined;
+    itemType: LibraryItem;
+}
+
 export interface ItemControls {
-    onClick?: (
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
-        itemType: LibraryItem,
-        e: MouseEvent<HTMLDivElement>,
-    ) => void;
-    onDoubleClick?: (
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
-        itemType: LibraryItem,
-        e: MouseEvent<HTMLDivElement>,
-    ) => void;
-    onFavorite?: (
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
-        itemType: LibraryItem,
-        e: MouseEvent<HTMLButtonElement>,
-    ) => void;
-    onItemExpand?: (
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
-        itemType: LibraryItem,
-        e: MouseEvent<HTMLButtonElement>,
-    ) => void;
-    onMore?: (
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
-        itemType: LibraryItem,
-        e: MouseEvent<HTMLButtonElement>,
-    ) => void;
-    onPlay?: (
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
-        itemType: LibraryItem,
-        playType: Play,
-        e: MouseEvent<HTMLButtonElement>,
-    ) => void;
-    onRating?: (
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
-        itemType: LibraryItem,
-        e: MouseEvent<HTMLDivElement>,
-    ) => void;
+    onClick?: ({ internalState, item, itemType }: DefaultItemControlProps) => void;
+    onDoubleClick?: ({ internalState, item, itemType }: DefaultItemControlProps) => void;
+    onExpand?: ({ internalState, item, itemType }: DefaultItemControlProps) => void;
+    onFavorite?: ({
+        internalState,
+        item,
+        itemType,
+    }: DefaultItemControlProps & { favorite: boolean }) => void;
+    onMore?: ({ internalState, item, itemType }: DefaultItemControlProps) => void;
+    onPlay?: ({
+        internalState,
+        item,
+        itemType,
+        playType,
+    }: DefaultItemControlProps & { playType: Play }) => void;
+    onRating?: ({
+        internalState,
+        item,
+        itemType,
+        rating,
+    }: DefaultItemControlProps & { rating: number }) => void;
 }
 
 export interface ItemListComponentProps<TQuery> {
@@ -72,6 +62,8 @@ export interface ItemListHandle {
     scrollToIndex: (index: number, options?: { behavior?: 'auto' | 'smooth' }) => void;
     scrollToOffset: (offset: number, options?: { behavior?: 'auto' | 'smooth' }) => void;
 }
+
+export type ItemListItem = Album | AlbumArtist | Artist | Playlist | Song | undefined;
 
 export interface ItemListTableComponentProps<TQuery> extends ItemListComponentProps<TQuery> {
     columns: ItemTableListColumnConfig[];

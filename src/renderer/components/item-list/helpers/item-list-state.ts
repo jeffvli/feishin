@@ -13,9 +13,9 @@ export type ItemListAction =
     | { type: 'CLEAR_SELECTED' };
 
 export interface ItemListItem {
+    _serverId: string;
     id: string;
     itemType: LibraryItem;
-    serverId: string;
 }
 
 export interface ItemListState {
@@ -80,6 +80,8 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
         case 'SET_EXPANDED': {
             const newExpanded = new Set<string>();
             const newExpandedItems = new Map<string, ItemListItem>();
+
+            console.log('SET_EXPANDED', action.payload);
 
             if (action.payload.length > 0) {
                 const firstItem = action.payload[0];
@@ -158,9 +160,6 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
     }
 };
 
-/**
- * Initial state for item grid
- */
 export const initialItemListState: ItemListState = {
     expanded: new Set(),
     expandedItems: new Map(),

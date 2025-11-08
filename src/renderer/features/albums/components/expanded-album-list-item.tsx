@@ -25,7 +25,7 @@ export const ExpandedAlbumListItem = ({ item }: ExpandedAlbumListItemProps) => {
     const { data, isLoading } = useSuspenseQuery(
         albumQueries.detail({
             query: { id: item.id },
-            serverId: item.serverId,
+            serverId: item._serverId,
         }),
     );
 

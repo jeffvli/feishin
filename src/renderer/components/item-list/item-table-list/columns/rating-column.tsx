@@ -2,7 +2,7 @@ import {
     ItemTableListInnerColumn,
     TableColumnContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
-import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
+import { ItemListItem } from '/@/renderer/components/item-list/types';
 import { Rating } from '/@/shared/components/rating/rating';
 
 export const RatingColumn = (props: ItemTableListInnerColumn) => {
@@ -10,35 +10,20 @@ export const RatingColumn = (props: ItemTableListInnerColumn) => {
         props.columns[props.columnIndex].id
     ];
 
-    const setRatingMutation = useSetRating({});
-
-    const handleChangeRating = (rating: number) => {
-        const previousRating = row || 0;
-
-        let newRating = rating;
-
-        if (previousRating === rating) {
-            newRating = 0;
-        }
-
-        const item = props.data[props.rowIndex] as any;
-
-        setRatingMutation.mutate({
-            apiClientProps: { serverId: item.serverId as string },
-            query: {
-                id: [item.id],
-                rating: newRating,
-                type: item.itemType,
-            },
-        });
-    };
-
     if (typeof row === 'number' || row === null) {
         return (
             <TableColumnContainer {...props}>
                 <Rating
                     className={row ? undefined : 'hover-only-flex'}
-                    onChange={handleChangeRating}
+                    onChange={(rating) => {
+                        props.controls.onRating?.({
+                            event: null,
+                            internalState: props.internalState,
+                            item: props.data[props.rowIndex] as ItemListItem,
+                            itemType: props.itemType,
+                            rating,
+                        });
+                    }}
                     size="xs"
                     value={row || 0}
                 />

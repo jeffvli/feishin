@@ -21,19 +21,25 @@ import styles from './item-table-list.module.css';
 
 import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded-list-container';
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
+import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
     ItemListItem,
     ItemListStateActions,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { parseTableColumns } from '/@/renderer/components/item-list/helpers/parse-table-columns';
-import { ItemListHandle, ItemTableListColumnConfig } from '/@/renderer/components/item-list/types';
+import {
+    ItemControls,
+    ItemListHandle,
+    ItemTableListColumnConfig,
+} from '/@/renderer/components/item-list/types';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface VirtualizedTableGridProps {
     calculatedColumnWidths: number[];
     CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
     cellPadding: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
+    controls: ItemControls;
     data: unknown[];
     enableAlternateRowColors: boolean;
     enableExpansion: boolean;
@@ -68,6 +74,7 @@ const VirtualizedTableGrid = React.memo(
         calculatedColumnWidths,
         CellComponent,
         cellPadding,
+        controls,
         data,
         enableAlternateRowColors,
         enableExpansion,
@@ -105,6 +112,7 @@ const VirtualizedTableGrid = React.memo(
             () => ({
                 cellPadding,
                 columns: parsedColumns,
+                controls,
                 data: enableHeader ? [null, ...data] : data,
                 enableAlternateRowColors,
                 enableExpansion,
@@ -121,6 +129,7 @@ const VirtualizedTableGrid = React.memo(
             }),
             [
                 cellPadding,
+                controls,
                 parsedColumns,
                 enableHeader,
                 data,
@@ -402,6 +411,7 @@ VirtualizedTableGrid.displayName = 'VirtualizedTableGrid';
 export interface TableItemProps {
     cellPadding?: ItemTableListProps['cellPadding'];
     columns: ItemTableListColumnConfig[];
+    controls: ItemControls;
     data: ItemTableListProps['data'];
     enableAlternateRowColors?: ItemTableListProps['enableAlternateRowColors'];
     enableExpansion?: ItemTableListProps['enableExpansion'];
@@ -918,9 +928,9 @@ export const ItemTableList = ({
             }
 
             const itemListItem: ItemListItem = {
+                _serverId: item.serverId,
                 id: item.id,
                 itemType,
-                serverId: item.serverId,
             };
 
             // Check if ctrl/cmd key is held for multi-selection
@@ -971,9 +981,9 @@ export const ItemTableList = ({
                                 'serverId' in rangeItem
                             ) {
                                 rangeItems.push({
+                                    _serverId: (rangeItem as any).serverId,
                                     id: (rangeItem as any).id,
                                     itemType,
-                                    serverId: (rangeItem as any).serverId,
                                 });
                             }
                         }
@@ -1071,12 +1081,15 @@ export const ItemTableList = ({
         handleRef.current = imperativeHandle;
     }, [imperativeHandle]);
 
+    const controls = useDefaultItemListControls();
+
     return (
         <div className={styles.itemTableListContainer}>
             <VirtualizedTableGrid
                 calculatedColumnWidths={calculatedColumnWidths}
                 CellComponent={CellComponent}
                 cellPadding={cellPadding}
+                controls={controls}
                 data={data}
                 enableAlternateRowColors={enableAlternateRowColors}
                 enableExpansion={enableExpansion}

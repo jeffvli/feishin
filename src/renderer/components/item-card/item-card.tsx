@@ -6,6 +6,7 @@ import { generatePath, Link } from 'react-router';
 import styles from './item-card.module.css';
 
 import { ItemCardControls } from '/@/renderer/components/item-card/item-card-controls';
+import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls } from '/@/renderer/components/item-list/types';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Image } from '/@/shared/components/image/image';
@@ -21,24 +22,26 @@ import {
     Song,
 } from '/@/shared/types/domain-types';
 
-type DataRow = {
-    format: (data: Album | AlbumArtist | Artist | Playlist | Song) => ReactNode | string;
-    id: string;
-    isMuted?: boolean;
-};
-
-interface ItemCardProps {
-    controls: ItemControls;
+export interface ItemCardProps {
+    controls?: ItemControls;
     data: Album | AlbumArtist | Artist | Playlist | Song | undefined;
+    internalState?: ItemListStateActions;
     isRound?: boolean;
     itemType: LibraryItem;
     type?: 'compact' | 'default' | 'poster';
     withControls?: boolean;
 }
 
+type DataRow = {
+    format: (data: Album | AlbumArtist | Artist | Playlist | Song) => ReactNode | string;
+    id: string;
+    isMuted?: boolean;
+};
+
 export const ItemCard = ({
     controls,
     data,
+    internalState,
     isRound,
     itemType,
     type = 'poster',
@@ -54,6 +57,7 @@ export const ItemCard = ({
                     controls={controls}
                     data={data}
                     imageUrl={imageUrl}
+                    internalState={internalState}
                     isRound={isRound}
                     itemType={itemType}
                     rows={rows}
@@ -66,6 +70,7 @@ export const ItemCard = ({
                     controls={controls}
                     data={data}
                     imageUrl={imageUrl}
+                    internalState={internalState}
                     isRound={isRound}
                     itemType={itemType}
                     rows={rows}
@@ -79,6 +84,7 @@ export const ItemCard = ({
                     controls={controls}
                     data={data}
                     imageUrl={imageUrl}
+                    internalState={internalState}
                     isRound={isRound}
                     itemType={itemType}
                     rows={rows}
@@ -89,8 +95,9 @@ export const ItemCard = ({
 };
 
 export interface ItemCardDerivativeProps extends Omit<ItemCardProps, 'type'> {
-    controls: ItemControls;
+    controls?: ItemControls;
     imageUrl: string | undefined;
+    internalState?: ItemListStateActions;
     rows: DataRow[];
 }
 
@@ -119,7 +126,7 @@ const CompactItemCard = ({
         };
 
         const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-            controls?.onClick?.(data, itemType, e);
+            // controls?.onClick?.(data, itemType, e);
         };
 
         return (
@@ -195,7 +202,7 @@ const DefaultItemCard = ({
         };
 
         const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-            controls?.onClick?.(data, itemType, e);
+            // controls?.onClick?.(data, itemType, e);
         };
 
         return (
@@ -250,6 +257,7 @@ const PosterItemCard = ({
     controls,
     data,
     imageUrl,
+    internalState,
     isRound,
     itemType,
     rows,
@@ -271,7 +279,7 @@ const PosterItemCard = ({
         };
 
         const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-            controls?.onClick?.(data, itemType, e);
+            // controls?.onClick?.(data, itemType, e);
         };
 
         return (
@@ -289,6 +297,7 @@ const PosterItemCard = ({
                     {withControls && showControls && data && (
                         <ItemCardControls
                             controls={controls}
+                            internalState={internalState}
                             item={data}
                             itemType={itemType}
                             type="poster"
