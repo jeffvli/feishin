@@ -18,6 +18,7 @@ import { AnyLibraryItem, Genre, LibraryItem } from '/@/shared/types/domain-types
 import { ListDisplayType } from '/@/shared/types/types';
 
 export type VirtualInfiniteGridRef = {
+    getItemData: () => (LibraryItemOrGenre | undefined)[];
     resetLoadMoreItemsCache: () => void;
     scrollTo: (index: number) => void;
     setItemData: (data: LibraryItemOrGenre[]) => void;
@@ -143,6 +144,9 @@ export const VirtualInfiniteGrid = forwardRef(
         const debouncedLoadMoreItems = debounce(loadMoreItems, 500);
 
         useImperativeHandle(ref, () => ({
+            getItemData: () => {
+                return itemData;
+            },
             resetLoadMoreItemsCache: () => {
                 if (loader.current) {
                     loader.current.resetloadMoreItemsCache(false);

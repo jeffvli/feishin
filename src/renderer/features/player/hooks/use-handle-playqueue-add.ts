@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import isElectron from 'is-electron';
+import { sortBy } from 'lodash';
 import { nanoid } from 'nanoid/non-secure';
 import { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -168,6 +169,13 @@ export const useHandlePlayQueueAdd = () => {
 
                 songs =
                     songList?.items?.map((song: Song) => ({ ...song, uniqueId: nanoid() })) || null;
+
+                // Special case for albums since we want the order of album ids to be respected when building the queue.
+                if (itemType === LibraryItem.ALBUM) {
+                    songs = sortBy(songs, (song) => {
+                        return id.indexOf(song.albumId);
+                    });
+                }
             } else if (byData) {
                 songs = byData.map((song) => ({ ...song, uniqueId: nanoid() })) || null;
             }

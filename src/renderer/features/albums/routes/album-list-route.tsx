@@ -1,12 +1,11 @@
 import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
 
 import { useQuery } from '@tanstack/react-query';
+import { compact } from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 import { useCallback, useMemo, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { api } from '/@/renderer/api';
-import { queryKeys } from '/@/renderer/api/query-keys';
 import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
 import { ListContext } from '/@/renderer/context/list-context';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
@@ -15,7 +14,6 @@ import { AlbumListHeader } from '/@/renderer/features/albums/components/album-li
 import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
-import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServer, useListFilterByKey } from '/@/renderer/store';
 import {
     AlbumListQuery,
@@ -95,36 +93,19 @@ const AlbumListRoute = () => {
 
     const handlePlay = useCallback(
         async (args: { initialSongId?: string; playType: Play }) => {
-            if (!itemCount || itemCount === 0) return;
+            const albumsFromGrid = compact(gridRef.current?.getItemData());
+            if (!itemCount || itemCount === 0 || albumsFromGrid.length === 0) return;
             const { playType } = args;
-            const query = {
-                ...albumListFilter,
-                ...customFilters,
-                startIndex: 0,
-            };
-            const queryKey = queryKeys.albums.list(server?.id || '', query);
-
-            const albumListRes = await queryClient.fetchQuery({
-                queryFn: ({ signal }) => {
-                    return api.controller.getAlbumList({
-                        apiClientProps: { serverId: server?.id || '', signal },
-                        query,
-                    });
-                },
-                queryKey,
-            });
-
-            const albumIds = albumListRes?.items?.map((a) => a.id) || [];
 
             handlePlayQueueAdd?.({
                 byItemType: {
-                    id: albumIds,
+                    id: albumsFromGrid.map((a) => a.id),
                     type: LibraryItem.ALBUM,
                 },
                 playType,
             });
         },
-        [albumListFilter, customFilters, handlePlayQueueAdd, itemCount, server],
+        [handlePlayQueueAdd, itemCount],
     );
 
     const providerValue = useMemo(() => {
