@@ -91,15 +91,36 @@ const AlbumListRoute = () => {
 
     const itemCount = itemCountCheck.data === null ? undefined : itemCountCheck.data;
 
+    const getAlbumIdsFromTable = () => {
+        if (!tableRef.current?.api) {
+            return undefined;
+        }
+        const items: string[] = [];
+
+        tableRef.current?.api.forEachNode((row) => {
+            if (row.id) {
+                items.push(row.id);
+            }
+        });
+        return items;
+    };
+    const getAlbumIdsFromGrid = () => {
+        if (!gridRef.current) {
+            return undefined;
+        }
+
+        return compact(gridRef.current.getItemData()).map((i) => i.id);
+    };
+
     const handlePlay = useCallback(
         async (args: { initialSongId?: string; playType: Play }) => {
-            const albumsFromGrid = compact(gridRef.current?.getItemData());
-            if (!itemCount || itemCount === 0 || albumsFromGrid.length === 0) return;
+            const albumIdsFromView = getAlbumIdsFromGrid() || getAlbumIdsFromTable() || [];
+            if (!itemCount || itemCount === 0 || albumIdsFromView.length === 0) return;
             const { playType } = args;
 
             handlePlayQueueAdd?.({
                 byItemType: {
-                    id: albumsFromGrid.map((a) => a.id),
+                    id: albumIdsFromView,
                     type: LibraryItem.ALBUM,
                 },
                 playType,
