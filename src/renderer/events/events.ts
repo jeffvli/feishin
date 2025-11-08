@@ -21,10 +21,12 @@ export type UserFavoriteEventPayload = {
     favorite: boolean;
     id: string[];
     itemType: LibraryItem;
+    serverId: string;
 };
 
 export type UserRatingEventPayload = {
     id: string[];
     itemType: LibraryItem;
     rating: null | number;
+    serverId: string;
 };

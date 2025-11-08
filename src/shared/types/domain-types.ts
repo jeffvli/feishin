@@ -887,8 +887,9 @@ export interface PlaylistListQuery extends BaseQuery<PlaylistListSort> {
 export type PlaylistListResponse = BasePaginatedResponse<Playlist[]>;
 
 export type RatingQuery = {
-    item: AnyLibraryItems;
+    id: string[];
     rating: number;
+    type: LibraryItem;
 };
 
 // Rating

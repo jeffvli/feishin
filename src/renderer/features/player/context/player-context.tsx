@@ -5,6 +5,9 @@ import { useTranslation } from 'react-i18next';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
+import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
+import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
+import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { AddToQueueType, usePlayerActions } from '/@/renderer/store';
 import { toast } from '/@/shared/components/toast/toast';
@@ -46,6 +49,13 @@ interface PlayerContext {
     moveSelectedToBottom: (items: QueueSong[]) => void;
     moveSelectedToNext: (items: QueueSong[]) => void;
     moveSelectedToTop: (items: QueueSong[]) => void;
+    setFavorite: (
+        serverId: string,
+        id: string[],
+        itemType: LibraryItem,
+        isFavorite: boolean,
+    ) => void;
+    setRating: (serverId: string, id: string[], itemType: LibraryItem, rating: number) => void;
     setRepeat: (repeat: PlayerRepeat) => void;
     setShuffle: (shuffle: PlayerShuffle) => void;
     setSpeed: (speed: number) => void;
@@ -78,6 +88,8 @@ export const PlayerContext = createContext<PlayerContext>({
     moveSelectedToBottom: () => {},
     moveSelectedToNext: () => {},
     moveSelectedToTop: () => {},
+    setFavorite: () => {},
+    setRating: () => {},
     setRepeat: () => {},
     setShuffle: () => {},
     setSpeed: () => {},
@@ -347,6 +359,38 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         storeActions.toggleShuffle();
     }, [storeActions]);
 
+    const createFavoriteMutation = useCreateFavorite({});
+    const deleteFavoriteMutation = useDeleteFavorite({});
+
+    const setFavorite = useCallback(
+        (serverId: string, id: string[], itemType: LibraryItem, isFavorite: boolean) => {
+            if (isFavorite) {
+                createFavoriteMutation.mutate({
+                    apiClientProps: { serverId },
+                    query: { id, type: itemType },
+                });
+            } else {
+                deleteFavoriteMutation.mutate({
+                    apiClientProps: { serverId },
+                    query: { id, type: itemType },
+                });
+            }
+        },
+        [createFavoriteMutation, deleteFavoriteMutation],
+    );
+
+    const setRatingMutation = useSetRating({});
+
+    const setRating = useCallback(
+        (serverId: string, id: string[], itemType: LibraryItem, rating: number) => {
+            setRatingMutation.mutate({
+                apiClientProps: { serverId },
+                query: { id, rating, type: itemType },
+            });
+        },
+        [setRatingMutation],
+    );
+
     const contextValue: PlayerContext = useMemo(
         () => ({
             addToQueueByData,
@@ -369,6 +413,8 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
             moveSelectedToBottom,
             moveSelectedToNext,
             moveSelectedToTop,
+            setFavorite,
+            setRating,
             setRepeat,
             setShuffle,
             setSpeed,
@@ -401,6 +447,8 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
             moveSelectedToBottom,
             moveSelectedToNext,
             moveSelectedToTop,
+            setFavorite,
+            setRating,
             setRepeat,
             setShuffle,
             setVolume,

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import { eventEmitter } from '/@/renderer/events/event-emitter';
 import {
     subscribeCurrentTrack,
     subscribePlayerMute,
@@ -12,7 +13,7 @@ import {
     subscribePlayerStatus,
     subscribePlayerVolume,
 } from '/@/renderer/store';
-import { QueueData, QueueSong } from '/@/shared/types/domain-types';
+import { LibraryItem, QueueData, QueueSong } from '/@/shared/types/domain-types';
 import { PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
 interface PlayerEvents {
@@ -40,6 +41,18 @@ interface PlayerEventsCallbacks {
     onPlayerSpeed?: (properties: { speed: number }, prev: { speed: number }) => void;
     onPlayerStatus?: (properties: { status: PlayerStatus }, prev: { status: PlayerStatus }) => void;
     onPlayerVolume?: (properties: { volume: number }, prev: { volume: number }) => void;
+    onUserFavorite?: (properties: {
+        favorite: boolean;
+        id: string[];
+        itemType: LibraryItem;
+        serverId: string;
+    }) => void;
+    onUserRating?: (properties: {
+        id: string[];
+        itemType: LibraryItem;
+        rating: null | number;
+        serverId: string;
+    }) => void;
 }
 
 export function usePlayerEvents(callbacks: PlayerEventsCallbacks, deps: React.DependencyList) {
@@ -114,6 +127,14 @@ function createPlayerEvents(callbacks: PlayerEventsCallbacks): PlayerEvents {
     if (callbacks.onPlayerShuffle) {
         const unsubscribe = subscribePlayerShuffle(callbacks.onPlayerShuffle);
         unsubscribers.push(unsubscribe);
+    }
+
+    if (callbacks.onUserRating) {
+        eventEmitter.on('USER_RATING', callbacks.onUserRating);
+    }
+
+    if (callbacks.onUserFavorite) {
+        eventEmitter.on('USER_FAVORITE', callbacks.onUserFavorite);
     }
 
     return {

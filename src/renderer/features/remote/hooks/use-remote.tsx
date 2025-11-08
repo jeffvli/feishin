@@ -7,7 +7,7 @@ import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-
 import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { usePlayerActions, useRemoteSettings } from '/@/renderer/store';
 import { toast } from '/@/shared/components/toast/toast';
-import { LibraryItem, Song } from '/@/shared/types/domain-types';
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerShuffle } from '/@/shared/types/types';
 
 const remote = isElectron() ? window.api.remote : null;
@@ -60,14 +60,9 @@ export const useRemote = () => {
                 updateRatingMutation.mutate({
                     apiClientProps: { serverId: data.serverId },
                     query: {
-                        item: [
-                            {
-                                _serverId: data.serverId,
-                                id: data.id,
-                                itemType: LibraryItem.SONG,
-                            } as Song,
-                        ],
+                        id: [data.id],
                         rating: data.rating,
+                        type: LibraryItem.SONG,
                     },
                 });
             },
@@ -145,6 +140,20 @@ export const useRemote = () => {
                 }
 
                 remote.updateVolume(properties.volume);
+            },
+            onUserFavorite: (properties) => {
+                if (!remote) {
+                    return;
+                }
+
+                remote.updateFavorite(properties.favorite, properties.serverId, properties.id);
+            },
+            onUserRating: (properties) => {
+                if (!remote) {
+                    return;
+                }
+
+                remote.updateRating(properties.rating || 0, properties.serverId, properties.id);
             },
         },
         [],
