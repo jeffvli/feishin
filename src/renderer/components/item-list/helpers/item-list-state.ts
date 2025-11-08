@@ -30,6 +30,8 @@ export interface ItemListStateActions {
     clearAll: () => void;
     clearExpanded: () => void;
     clearSelected: () => void;
+    findItemIndex: (itemId: string) => number;
+    getData: () => unknown[];
     getExpanded: () => ItemListItem[];
     getExpandedIds: () => string[];
     getSelected: () => ItemListItem[];
@@ -168,7 +170,7 @@ export const initialItemListState: ItemListState = {
     version: 0,
 };
 
-export const useItemListState = (): ItemListStateActions => {
+export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActions => {
     const [state, dispatch] = useReducer(itemListReducer, initialItemListState);
 
     const setExpanded = useCallback((items: ItemListItem[]) => {
@@ -241,11 +243,27 @@ export const useItemListState = (): ItemListStateActions => {
         return itemGridSelectors.hasAnySelected(state);
     }, [state]);
 
+    const getData = useCallback(() => {
+        return getDataFn ? getDataFn() : [];
+    }, [getDataFn]);
+
+    const findItemIndex = useCallback(
+        (itemId: string) => {
+            const data = getDataFn ? getDataFn() : [];
+            // Filter out null/undefined values (e.g., header row)
+            const validData = data.filter((d) => d && typeof d === 'object' && 'id' in d);
+            return validData.findIndex((d) => (d as any).id === itemId);
+        },
+        [getDataFn],
+    );
+
     return useMemo(
         () => ({
             clearAll,
             clearExpanded,
             clearSelected,
+            findItemIndex,
+            getData,
             getExpanded,
             getExpandedIds,
             getSelected,
@@ -264,6 +282,8 @@ export const useItemListState = (): ItemListStateActions => {
             clearAll,
             clearExpanded,
             clearSelected,
+            findItemIndex,
+            getData,
             getExpanded,
             getExpandedIds,
             getSelected,

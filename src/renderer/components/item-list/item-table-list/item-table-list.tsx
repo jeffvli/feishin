@@ -871,7 +871,7 @@ export const ItemTableList = ({
         }
 
         return undefined;
-    }, []);
+    }, [pinnedLeftColumnCount, pinnedRightColumnCount]);
 
     // Handle left and right shadow visibility based on horizontal scroll
     useEffect(() => {
@@ -917,7 +917,11 @@ export const ItemTableList = ({
         [enableHeader, headerHeight, rowHeight, pinnedRowCount, size],
     );
 
-    const internalState = useItemListState();
+    const getDataFn = useCallback(() => {
+        return enableHeader ? [null, ...data] : data;
+    }, [data, enableHeader]);
+
+    const internalState = useItemListState(getDataFn);
 
     const hasExpanded = internalState.hasExpanded();
 

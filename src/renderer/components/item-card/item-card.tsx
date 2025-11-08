@@ -105,12 +105,17 @@ const CompactItemCard = ({
     controls,
     data,
     imageUrl,
+    internalState,
     isRound,
     itemType,
     rows,
     withControls,
 }: ItemCardDerivativeProps) => {
     const [showControls, setShowControls] = useState(false);
+    const isSelected =
+        data && internalState && typeof data === 'object' && 'id' in data
+            ? internalState.isSelected((data as any).id)
+            : false;
 
     if (data) {
         const handleMouseEnter = () => {
@@ -126,11 +131,34 @@ const CompactItemCard = ({
         };
 
         const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-            // controls?.onClick?.(data, itemType, e);
+            if (!data || !controls || !internalState) {
+                return;
+            }
+
+            // Don't trigger selection if clicking on interactive elements
+            const target = e.target as HTMLElement;
+            const isInteractiveElement = target.closest(
+                'button, a, input, select, textarea, [role="button"]',
+            );
+
+            if (isInteractiveElement) {
+                return;
+            }
+
+            controls.onClick?.({
+                event: e,
+                internalState,
+                item: data as any,
+                itemType,
+            });
         };
 
         return (
-            <div className={clsx(styles.container, styles.compact)}>
+            <div
+                className={clsx(styles.container, styles.compact, {
+                    [styles.selected]: isSelected,
+                })}
+            >
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
                     onClick={handleClick}
@@ -181,12 +209,17 @@ const DefaultItemCard = ({
     controls,
     data,
     imageUrl,
+    internalState,
     isRound,
     itemType,
     rows,
     withControls,
 }: ItemCardDerivativeProps) => {
     const [showControls, setShowControls] = useState(false);
+    const isSelected =
+        data && internalState && typeof data === 'object' && 'id' in data
+            ? internalState.isSelected((data as any).id)
+            : false;
 
     if (data) {
         const handleMouseEnter = () => {
@@ -202,11 +235,34 @@ const DefaultItemCard = ({
         };
 
         const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-            // controls?.onClick?.(data, itemType, e);
+            if (!data || !controls || !internalState) {
+                return;
+            }
+
+            // Don't trigger selection if clicking on interactive elements
+            const target = e.target as HTMLElement;
+            const isInteractiveElement = target.closest(
+                'button, a, input, select, textarea, [role="button"]',
+            );
+
+            if (isInteractiveElement) {
+                return;
+            }
+
+            controls.onClick?.({
+                event: e,
+                internalState,
+                item: data as any,
+                itemType,
+            });
         };
 
         return (
-            <div className={clsx(styles.container)}>
+            <div
+                className={clsx(styles.container, {
+                    [styles.selected]: isSelected,
+                })}
+            >
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
                     onClick={handleClick}
@@ -264,6 +320,10 @@ const PosterItemCard = ({
     withControls,
 }: ItemCardDerivativeProps) => {
     const [showControls, setShowControls] = useState(false);
+    const isSelected =
+        data && internalState && typeof data === 'object' && 'id' in data
+            ? internalState.isSelected((data as any).id)
+            : false;
 
     if (data) {
         const handleMouseEnter = () => {
@@ -279,11 +339,34 @@ const PosterItemCard = ({
         };
 
         const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-            // controls?.onClick?.(data, itemType, e);
+            if (!data || !controls || !internalState) {
+                return;
+            }
+
+            // Don't trigger selection if clicking on interactive elements
+            const target = e.target as HTMLElement;
+            const isInteractiveElement = target.closest(
+                'button, a, input, select, textarea, [role="button"]',
+            );
+
+            if (isInteractiveElement) {
+                return;
+            }
+
+            controls.onClick?.({
+                event: e,
+                internalState,
+                item: data as any,
+                itemType,
+            });
         };
 
         return (
-            <div className={clsx(styles.container, styles.poster)}>
+            <div
+                className={clsx(styles.container, styles.poster, {
+                    [styles.selected]: isSelected,
+                })}
+            >
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
                     onClick={handleClick}

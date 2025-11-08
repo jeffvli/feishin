@@ -273,7 +273,11 @@ export const ItemGridList = ({
     const { ref: containerRef, width: containerWidth } = useElementSize();
     const mergedContainerRef = useMergedRef(containerRef, rootRef);
 
-    const internalState = useItemListState();
+    const getDataFn = useCallback(() => {
+        return data;
+    }, [data]);
+
+    const internalState = useItemListState(getDataFn);
 
     const [initialize] = useOverlayScrollbars({
         defer: true,
