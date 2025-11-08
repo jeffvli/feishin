@@ -15,7 +15,7 @@ import {
 } from '/@/renderer/store/full-screen-player.store';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
-import { PlayerType } from '/@/shared/types/types';
+import { ItemListKey, PlayerType } from '/@/shared/types/types';
 
 const Visualizer = lazy(() =>
     import('/@/renderer/features/player/components/visualizer').then((module) => ({
@@ -99,7 +99,7 @@ export const FullScreenPlayerQueue = () => {
             </Group>
             {activeTab === 'queue' ? (
                 <div className={styles.queueContainer}>
-                    <PlayQueue type="fullScreen" />
+                    <PlayQueue listKey={ItemListKey.FULL_SCREEN} searchTerm={undefined} />
                 </div>
             ) : activeTab === 'related' ? (
                 <div className={styles.queueContainer}>

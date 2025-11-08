@@ -1,17 +1,24 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-
 import { useRef, useState } from 'react';
 
-import { useWindowSettings } from '/@/renderer/store/settings.store';
-import { Song } from '/@/shared/types/domain-types';
-import { Platform } from '/@/shared/types/types';
+import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
+import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
+import { Flex } from '/@/shared/components/flex/flex';
+import { ItemListKey } from '/@/shared/types/types';
 
 export const SidebarPlayQueue = () => {
-    const queueRef = useRef<null | { grid: AgGridReactType<Song> }>(null);
+    const tableRef = useRef<null>(null);
+    // const queueRef = useRef<null | { grid: AgGridReactType<Song> }>(null);
     const [search, setSearch] = useState<string | undefined>(undefined);
-    const { windowBarStyle } = useWindowSettings();
 
-    const isWeb = windowBarStyle === Platform.WEB;
-
-    return null;
+    return (
+        <Flex direction="column" h="100%">
+            <PlayQueueListControls
+                handleSearch={setSearch}
+                searchTerm={search}
+                tableRef={tableRef}
+                type={ItemListKey.SIDE_QUEUE}
+            />
+            <PlayQueue listKey={ItemListKey.SIDE_QUEUE} searchTerm={search} />
+        </Flex>
+    );
 };

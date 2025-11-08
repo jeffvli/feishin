@@ -1,7 +1,8 @@
 .right-sidebar-container {
     position: relative;
     grid-area: right-sidebar;
-    height: 100%;
+    min-height: 0;
+    overflow: hidden;
     border-left: 1px solid alpha(var(--theme-colors-border), 0.3);
 
     .current-song-cell:not(.current-playlist-song-cell) svg {

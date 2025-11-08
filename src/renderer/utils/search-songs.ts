@@ -1,8 +1,8 @@
 import Fuse from 'fuse.js';
 
-import { Song } from '/@/shared/types/domain-types';
+import { QueueSong } from '/@/shared/types/domain-types';
 
-export const searchSongs = (songs: Song[], searchTerm: string) => {
+export const searchSongs = (songs: QueueSong[], searchTerm: string) => {
     const fuse = new Fuse(songs, {
         fieldNormWeight: 1,
         ignoreLocation: true,

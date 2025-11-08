@@ -27,7 +27,7 @@ export const DrawerPlayQueue = () => {
                 />
             </div>
             <Flex bg="var(--theme-colors-background)" h="100%" mb="0.6rem">
-                <PlayQueue ref={queueRef} searchTerm={search} type="sideQueue" />
+                <PlayQueue ref={queueRef} searchTerm={search} listKey="sideQueue" />
             </Flex>
         </Flex>
     );
