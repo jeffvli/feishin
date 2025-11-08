@@ -189,7 +189,7 @@ export const App = () => {
     }, [language]);
 
     return (
-        <MantineProvider defaultColorScheme={mode as 'dark' | 'light'} theme={theme}>
+        <MantineProvider forceColorScheme={mode} theme={theme}>
             <Notifications
                 containerWidth="300px"
                 position="bottom-center"
