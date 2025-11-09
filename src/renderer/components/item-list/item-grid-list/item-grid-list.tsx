@@ -11,6 +11,7 @@ import React, {
     RefObject,
     useCallback,
     useEffect,
+    useImperativeHandle,
     useLayoutEffect,
     useMemo,
     useRef,
@@ -35,6 +36,7 @@ import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
+    ItemListItem,
     ItemListStateActions,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
@@ -271,7 +273,9 @@ export const ItemGridList = ({
     const outerRef = useRef(null);
     const listRef = useRef<FixedSizeList<GridItemProps>>(null);
     const { ref: containerRef, width: containerWidth } = useElementSize();
-    const mergedContainerRef = useMergedRef(containerRef, rootRef);
+    const containerFocusRef = useRef<HTMLDivElement | null>(null);
+    const handleRef = useRef<ItemListHandle | null>(null);
+    const mergedContainerRef = useMergedRef(containerRef, rootRef, containerFocusRef);
 
     const getDataFn = useCallback(() => {
         return data;
@@ -332,11 +336,254 @@ export const ItemGridList = ({
 
     const controls = useDefaultItemListControls();
 
+    // Scroll to a specific index
+    const scrollToIndex = useCallback(
+        (index: number) => {
+            if (!listRef.current || !tableMeta) return;
+            const row = Math.floor(index / tableMeta.columnCount);
+            listRef.current.scrollToItem(row, 'smart');
+        },
+        [tableMeta],
+    );
+
+    // Scroll to a specific offset
+    const scrollToOffset = useCallback((offset: number) => {
+        if (!listRef.current) return;
+        listRef.current.scrollTo(offset);
+    }, []);
+
+    // Handle keyboard navigation
+    const handleKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLDivElement>) => {
+            console.log('handleKeyDown', e.key);
+            if (!enableSelection || !tableMeta) return;
+            if (
+                e.key !== 'ArrowDown' &&
+                e.key !== 'ArrowUp' &&
+                e.key !== 'ArrowLeft' &&
+                e.key !== 'ArrowRight'
+            )
+                return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            const selected = internalState.getSelected();
+            let currentIndex = -1;
+
+            if (selected.length > 0) {
+                const lastSelected = selected[selected.length - 1];
+                currentIndex = data.findIndex(
+                    (d: any) => d && typeof d === 'object' && 'id' in d && d.id === lastSelected.id,
+                );
+            }
+
+            // Calculate grid position
+            const currentRow =
+                currentIndex !== -1 ? Math.floor(currentIndex / tableMeta.columnCount) : 0;
+            const currentCol = currentIndex !== -1 ? currentIndex % tableMeta.columnCount : 0;
+            const totalRows = Math.ceil(data.length / tableMeta.columnCount);
+
+            let newIndex = 0;
+            if (currentIndex !== -1) {
+                switch (e.key) {
+                    case 'ArrowDown': {
+                        // Move down one row
+                        const nextRow = currentRow + 1;
+                        if (nextRow < totalRows) {
+                            const nextRowStart = nextRow * tableMeta.columnCount;
+                            const nextRowEnd = Math.min(
+                                nextRowStart + tableMeta.columnCount - 1,
+                                data.length - 1,
+                            );
+                            // Keep same column position, or use last item in row if column doesn't exist
+                            newIndex = Math.min(nextRowStart + currentCol, nextRowEnd);
+                        } else {
+                            newIndex = currentIndex;
+                        }
+                        break;
+                    }
+                    case 'ArrowLeft': {
+                        // Move left, wrap to previous row if at start of row
+                        if (currentCol > 0) {
+                            newIndex = currentIndex - 1;
+                        } else if (currentRow > 0) {
+                            // Wrap to end of previous row
+                            newIndex = Math.max(
+                                (currentRow - 1) * tableMeta.columnCount +
+                                    tableMeta.columnCount -
+                                    1,
+                                0,
+                            );
+                            newIndex = Math.min(newIndex, data.length - 1);
+                        } else {
+                            newIndex = currentIndex;
+                        }
+                        break;
+                    }
+                    case 'ArrowRight': {
+                        // Move right, wrap to next row if at end of row
+                        if (
+                            currentCol < tableMeta.columnCount - 1 &&
+                            currentIndex < data.length - 1
+                        ) {
+                            newIndex = currentIndex + 1;
+                        } else if (currentRow < totalRows - 1) {
+                            // Wrap to start of next row
+                            newIndex = Math.min(
+                                (currentRow + 1) * tableMeta.columnCount,
+                                data.length - 1,
+                            );
+                        } else {
+                            newIndex = currentIndex;
+                        }
+                        break;
+                    }
+                    case 'ArrowUp': {
+                        // Move up one row
+                        const prevRow = currentRow - 1;
+                        if (prevRow >= 0) {
+                            const prevRowStart = prevRow * tableMeta.columnCount;
+                            const prevRowEnd = Math.min(
+                                prevRowStart + tableMeta.columnCount - 1,
+                                data.length - 1,
+                            );
+                            // Keep same column position, or use last item in row if column doesn't exist
+                            newIndex = Math.min(prevRowStart + currentCol, prevRowEnd);
+                        } else {
+                            newIndex = currentIndex;
+                        }
+                        break;
+                    }
+                }
+            } else {
+                // No selection, start at first item
+                newIndex = 0;
+            }
+
+            const newItem: any = data[newIndex];
+            if (!newItem) return;
+
+            // Handle Shift + Arrow for incremental range selection (matches shift+click behavior)
+            if (e.shiftKey) {
+                const selectedItems = internalState.getSelected();
+                const lastSelectedItem = selectedItems[selectedItems.length - 1];
+
+                if (lastSelectedItem) {
+                    // Find the indices of the last selected item and new item
+                    const lastIndex = data.findIndex(
+                        (d: any) =>
+                            d && typeof d === 'object' && 'id' in d && d.id === lastSelectedItem.id,
+                    );
+
+                    if (lastIndex !== -1 && newIndex !== -1) {
+                        // Create range selection from last selected to new position
+                        const startIndex = Math.min(lastIndex, newIndex);
+                        const stopIndex = Math.max(lastIndex, newIndex);
+
+                        const rangeItems: ItemListItem[] = [];
+                        for (let i = startIndex; i <= stopIndex; i++) {
+                            const rangeItem = data[i];
+                            if (
+                                rangeItem &&
+                                typeof rangeItem === 'object' &&
+                                'id' in rangeItem &&
+                                'serverId' in rangeItem
+                            ) {
+                                rangeItems.push({
+                                    _serverId: (rangeItem as any).serverId,
+                                    id: (rangeItem as any).id,
+                                    itemType,
+                                });
+                            }
+                        }
+
+                        // Add range items to selection (matching shift+click behavior)
+                        const currentSelected = internalState.getSelected();
+                        const newSelected = [...currentSelected];
+                        rangeItems.forEach((rangeItem) => {
+                            if (!newSelected.some((selected) => selected.id === rangeItem.id)) {
+                                newSelected.push(rangeItem);
+                            }
+                        });
+
+                        // Ensure the last item in selection is the item at newIndex for incremental extension
+                        const newItemListItem: ItemListItem = {
+                            _serverId: newItem.serverId,
+                            id: newItem.id,
+                            itemType,
+                        };
+                        // Remove the new item from its current position if it exists
+                        const filteredSelected = newSelected.filter(
+                            (item) => item.id !== newItemListItem.id,
+                        );
+                        // Add it at the end so it becomes the last selected item
+                        filteredSelected.push(newItemListItem);
+                        internalState.setSelected(filteredSelected);
+                    }
+                } else {
+                    // No previous selection, just select the new item
+                    internalState.setSelected([
+                        {
+                            _serverId: newItem.serverId,
+                            id: newItem.id,
+                            itemType,
+                        },
+                    ]);
+                }
+            } else {
+                // Without Shift: select only the new item
+                internalState.setSelected([
+                    {
+                        _serverId: newItem.serverId,
+                        id: newItem.id,
+                        itemType,
+                    },
+                ]);
+            }
+
+            scrollToIndex(newIndex);
+        },
+        [data, enableSelection, internalState, itemType, tableMeta, scrollToIndex],
+    );
+
+    // Create imperative handle
+    const imperativeHandle: ItemListHandle = useMemo(() => {
+        return {
+            clearExpanded: () => {
+                internalState.clearExpanded();
+            },
+            clearSelected: () => {
+                internalState.clearSelected();
+            },
+            getItem: (index: number) => data[index],
+            getItemCount: () => data.length,
+            getItems: () => data,
+            internalState,
+            scrollToIndex: (index: number) => {
+                scrollToIndex(index);
+            },
+            scrollToOffset: (offset: number) => {
+                scrollToOffset(offset);
+            },
+        };
+    }, [data, internalState, scrollToIndex, scrollToOffset]);
+
+    // Expose handle via ref
+    useEffect(() => {
+        handleRef.current = imperativeHandle;
+    }, [imperativeHandle]);
+
+    // Expose handle via forwardRef
+    useImperativeHandle(ref, () => imperativeHandle, [imperativeHandle]);
+
     return (
         <div
             className={styles.itemGridContainer}
             data-overlayscrollbars-initialize=""
+            onKeyDown={handleKeyDown}
+            onMouseDown={(e) => (e.currentTarget as HTMLDivElement).focus()}
             ref={mergedContainerRef}
+            tabIndex={0}
         >
             <VirtualizedGridList
                 controls={controls}

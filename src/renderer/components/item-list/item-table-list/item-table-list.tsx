@@ -556,6 +556,7 @@ export const ItemTableList = ({
     const [showLeftShadow, setShowLeftShadow] = useState(false);
     const [showRightShadow, setShowRightShadow] = useState(false);
     const handleRef = useRef<ItemListHandle | null>(null);
+    const containerFocusRef = useRef<HTMLDivElement | null>(null);
 
     const onScrollEndRef = useRef<ItemTableListProps['onScrollEnd']>(onScrollEnd);
     useEffect(() => {
@@ -582,17 +583,61 @@ export const ItemTableList = ({
         }
     }, []);
 
+    const DEFAULT_ROW_HEIGHT = size === 'compact' ? 40 : size === 'large' ? 88 : 64;
+
     const calculateScrollTopForIndex = useCallback(
         (index: number) => {
             const adjustedIndex = enableHeader ? Math.max(0, index - 1) : index;
             let scrollTop = 0;
+
+            // Create a minimal mock cellProps for rowHeight function calls if needed
+            const mockCellProps: TableItemProps = {
+                cellPadding,
+                columns: parsedColumns,
+                controls: {} as ItemControls,
+                data: enableHeader ? [null, ...data] : data,
+                enableAlternateRowColors,
+                enableExpansion,
+                enableHeader,
+                enableHorizontalBorders,
+                enableRowHoverHighlight,
+                enableSelection,
+                enableVerticalBorders,
+                getRowHeight: () => DEFAULT_ROW_HEIGHT,
+                internalState: {} as ItemListStateActions,
+                itemType,
+                size,
+            };
+
             for (let i = 0; i < adjustedIndex; i++) {
-                const height = rowHeight as number;
+                let height: number;
+                if (typeof rowHeight === 'number') {
+                    height = rowHeight;
+                } else if (typeof rowHeight === 'function') {
+                    height = rowHeight(i, mockCellProps);
+                } else {
+                    height = DEFAULT_ROW_HEIGHT;
+                }
                 scrollTop += height;
             }
             return scrollTop;
         },
-        [enableHeader, rowHeight],
+        [
+            enableHeader,
+            rowHeight,
+            size,
+            DEFAULT_ROW_HEIGHT,
+            cellPadding,
+            parsedColumns,
+            enableAlternateRowColors,
+            enableExpansion,
+            enableHorizontalBorders,
+            enableRowHoverHighlight,
+            enableSelection,
+            enableVerticalBorders,
+            itemType,
+            data,
+        ],
     );
 
     const scrollToTableIndex = useCallback(
@@ -1038,6 +1083,125 @@ export const ItemTableList = ({
         [data, enableSelection, internalState, itemType],
     );
 
+    const handleKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLDivElement>) => {
+            if (!enableSelection) return;
+            if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            const selected = internalState.getSelected();
+            let currentIndex = -1;
+
+            if (selected.length > 0) {
+                const lastSelected = selected[selected.length - 1];
+                currentIndex = data.findIndex(
+                    (d: any) => d && typeof d === 'object' && 'id' in d && d.id === lastSelected.id,
+                );
+            }
+
+            let newIndex = 0;
+            if (currentIndex !== -1) {
+                newIndex =
+                    e.key === 'ArrowDown'
+                        ? Math.min(currentIndex + 1, data.length - 1)
+                        : Math.max(currentIndex - 1, 0);
+            }
+
+            const newItem: any = data[newIndex];
+            if (!newItem) return;
+
+            // Handle Shift + Arrow for incremental range selection (matches shift+click behavior)
+            if (e.shiftKey) {
+                const selectedItems = internalState.getSelected();
+                const lastSelectedItem = selectedItems[selectedItems.length - 1];
+
+                if (lastSelectedItem) {
+                    // Find the indices of the last selected item and new item
+                    const lastIndex = data.findIndex(
+                        (d: any) =>
+                            d && typeof d === 'object' && 'id' in d && d.id === lastSelectedItem.id,
+                    );
+
+                    if (lastIndex !== -1 && newIndex !== -1) {
+                        // Create range selection from last selected to new position
+                        const startIndex = Math.min(lastIndex, newIndex);
+                        const stopIndex = Math.max(lastIndex, newIndex);
+
+                        const rangeItems: ItemListItem[] = [];
+                        for (let i = startIndex; i <= stopIndex; i++) {
+                            const rangeItem = data[i];
+                            if (
+                                rangeItem &&
+                                typeof rangeItem === 'object' &&
+                                'id' in rangeItem &&
+                                'serverId' in rangeItem
+                            ) {
+                                rangeItems.push({
+                                    _serverId: (rangeItem as any).serverId,
+                                    id: (rangeItem as any).id,
+                                    itemType,
+                                });
+                            }
+                        }
+
+                        // Add range items to selection (matching shift+click behavior)
+                        const currentSelected = internalState.getSelected();
+                        const newSelected = [...currentSelected];
+                        rangeItems.forEach((rangeItem) => {
+                            if (!newSelected.some((selected) => selected.id === rangeItem.id)) {
+                                newSelected.push(rangeItem);
+                            }
+                        });
+
+                        // Ensure the last item in selection is the item at newIndex for incremental extension
+                        const newItemListItem: ItemListItem = {
+                            _serverId: newItem.serverId,
+                            id: newItem.id,
+                            itemType,
+                        };
+                        // Remove the new item from its current position if it exists
+                        const filteredSelected = newSelected.filter(
+                            (item) => item.id !== newItemListItem.id,
+                        );
+                        // Add it at the end so it becomes the last selected item
+                        filteredSelected.push(newItemListItem);
+                        internalState.setSelected(filteredSelected);
+                    }
+                } else {
+                    // No previous selection, just select the new item
+                    internalState.setSelected([
+                        {
+                            _serverId: newItem.serverId,
+                            id: newItem.id,
+                            itemType,
+                        },
+                    ]);
+                }
+            } else {
+                // Without Shift: select only the new item
+                internalState.setSelected([
+                    {
+                        _serverId: newItem.serverId,
+                        id: newItem.id,
+                        itemType,
+                    },
+                ]);
+            }
+
+            const offset = calculateScrollTopForIndex(newIndex);
+            scrollToTableOffset(offset);
+        },
+        [
+            data,
+            enableSelection,
+            internalState,
+            itemType,
+            calculateScrollTopForIndex,
+            scrollToTableOffset,
+        ],
+    );
+
     const isInitialScrollPositionSet = useRef<boolean>(false);
 
     useEffect(() => {
@@ -1088,7 +1252,13 @@ export const ItemTableList = ({
     const controls = useDefaultItemListControls();
 
     return (
-        <div className={styles.itemTableListContainer}>
+        <div
+            className={styles.itemTableListContainer}
+            onKeyDown={handleKeyDown}
+            onMouseDown={(e) => (e.currentTarget as HTMLDivElement).focus()}
+            ref={containerFocusRef}
+            tabIndex={0}
+        >
             <VirtualizedTableGrid
                 calculatedColumnWidths={calculatedColumnWidths}
                 CellComponent={CellComponent}
