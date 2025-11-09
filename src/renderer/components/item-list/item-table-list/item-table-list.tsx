@@ -1,5 +1,6 @@
 // Component adapted from https://github.com/bvaughn/react-window/issues/826
 
+import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
 import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
 import debounce from 'lodash/debounce';
@@ -23,8 +24,8 @@ import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
-    ItemListStateItem,
     ItemListStateActions,
+    ItemListStateItem,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { parseTableColumns } from '/@/renderer/components/item-list/helpers/parse-table-columns';
@@ -42,6 +43,7 @@ interface VirtualizedTableGridProps {
     controls: ItemControls;
     data: unknown[];
     enableAlternateRowColors: boolean;
+    enableDrag?: boolean;
     enableExpansion: boolean;
     enableHeader: boolean;
     enableHorizontalBorders: boolean;
@@ -77,6 +79,7 @@ const VirtualizedTableGrid = React.memo(
         controls,
         data,
         enableAlternateRowColors,
+        enableDrag,
         enableExpansion,
         enableHeader,
         enableHorizontalBorders,
@@ -115,6 +118,7 @@ const VirtualizedTableGrid = React.memo(
                 controls,
                 data: enableHeader ? [null, ...data] : data,
                 enableAlternateRowColors,
+                enableDrag,
                 enableExpansion,
                 enableHeader,
                 enableHorizontalBorders,
@@ -134,6 +138,7 @@ const VirtualizedTableGrid = React.memo(
                 enableHeader,
                 data,
                 enableAlternateRowColors,
+                enableDrag,
                 enableExpansion,
                 enableHorizontalBorders,
                 enableRowHoverHighlight,
@@ -414,6 +419,7 @@ export interface TableItemProps {
     controls: ItemControls;
     data: ItemTableListProps['data'];
     enableAlternateRowColors?: ItemTableListProps['enableAlternateRowColors'];
+    enableDrag?: ItemTableListProps['enableDrag'];
     enableExpansion?: ItemTableListProps['enableExpansion'];
     enableHeader?: ItemTableListProps['enableHeader'];
     enableHorizontalBorders?: ItemTableListProps['enableHorizontalBorders'];
@@ -434,6 +440,7 @@ interface ItemTableListProps {
     currentPage?: number;
     data: unknown[];
     enableAlternateRowColors?: boolean;
+    enableDrag?: boolean;
     enableExpansion?: boolean;
     enableHeader?: boolean;
     enableHorizontalBorders?: boolean;
@@ -461,6 +468,7 @@ export const ItemTableList = ({
     currentPage,
     data,
     enableAlternateRowColors = false,
+    enableDrag = true,
     enableExpansion = true,
     enableHeader = true,
     enableHorizontalBorders = false,
@@ -677,10 +685,19 @@ export const ItemTableList = ({
                 elements: { viewport: root.firstElementChild as HTMLElement },
                 target: root,
             });
+
+            if (enableDrag) {
+                autoScrollForElements({
+                    canScroll: () => true,
+                    element: root.firstElementChild as HTMLElement,
+                    getAllowedAxis: () => 'vertical',
+                    getConfiguration: () => ({ maxScrollSpeed: 'fast' }),
+                });
+            }
         }
 
         return undefined;
-    }, [initialize]);
+    }, [enableDrag, initialize]);
 
     useEffect(() => {
         const header = pinnedRowRef.current?.childNodes[0] as HTMLDivElement;
@@ -1266,6 +1283,7 @@ export const ItemTableList = ({
                 controls={controls}
                 data={data}
                 enableAlternateRowColors={enableAlternateRowColors}
+                enableDrag={enableDrag}
                 enableExpansion={enableExpansion}
                 enableHeader={enableHeader}
                 enableHorizontalBorders={enableHorizontalBorders}

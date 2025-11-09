@@ -24,13 +24,13 @@ importers:
         specifier: ^28.2.1
         version: 28.2.1
       '@atlaskit/pragmatic-drag-and-drop':
-        specifier: 1.4.0
-        version: 1.4.0
+        specifier: 1.7.7
+        version: 1.7.7
       '@atlaskit/pragmatic-drag-and-drop-auto-scroll':
-        specifier: ^2.1.0
-        version: 2.1.1
+        specifier: ^2.1.2
+        version: 2.1.2
       '@atlaskit/pragmatic-drag-and-drop-hitbox':
-        specifier: ^1.0.3
+        specifier: ^1.1.0
         version: 1.1.0
       '@electron-toolkit/preload':
         specifier: ^3.0.1
@@ -395,17 +395,14 @@ packages:
     peerDependencies:
       ajv: '>=8'
 
-  '@atlaskit/pragmatic-drag-and-drop-auto-scroll@2.1.1':
-    resolution: {integrity: sha512-VAQEb3NVLY9Q5ZgC5Eiws9Uf6xOINY9/pAZMdbOVlF90uRXEkmpYqdTL+zeyZ8U8deuqYCmXr7oWIEnxpNQVzA==}
+  '@atlaskit/pragmatic-drag-and-drop-auto-scroll@2.1.2':
+    resolution: {integrity: sha512-6BgAUxSNbQFiG3uqNxf53cDQADn5mSeh/JsQzCHo46GPQnVWIJk77zWC8yZ++0Mfg1ECy02zNrbniF7SgHAhXQ==}
 
   '@atlaskit/pragmatic-drag-and-drop-hitbox@1.1.0':
     resolution: {integrity: sha512-JWt6eVp6Br2FPHRM8s0dUIHQk/jFInGP1f3ti5CdtM1Ji5/pt8Akm44wDC063Gv2i5RGseixtbW0z/t6RYtbdg==}
 
-  '@atlaskit/pragmatic-drag-and-drop@1.4.0':
-    resolution: {integrity: sha512-qRY3PTJIcxfl/QB8Gwswz+BRvlmgAC5pB+J2hL6dkIxgqAgVwOhAamMUKsrOcFU/axG2Q7RbNs1xfoLKDuhoPg==}
-
-  '@atlaskit/pragmatic-drag-and-drop@1.7.4':
-    resolution: {integrity: sha512-lZHnO9BJdHPKnwB0uvVUCyDnIhL+WAHzXQ2EXX0qacogOsnvIUiCgY0BLKhBqTCWln3/f/Ox5jU54MKO6ayh9A==}
+  '@atlaskit/pragmatic-drag-and-drop@1.7.7':
+    resolution: {integrity: sha512-jX+68AoSTqO/fhCyJDTZ38Ey6/wyL2Iq+J/moanma0YyktpnoHxevjY1UNJHYp0NCburdQDZSL1ZFac1mO1osQ==}
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -5857,23 +5854,17 @@ snapshots:
       jsonpointer: 5.0.1
       leven: 3.1.0
 
-  '@atlaskit/pragmatic-drag-and-drop-auto-scroll@2.1.1':
+  '@atlaskit/pragmatic-drag-and-drop-auto-scroll@2.1.2':
     dependencies:
-      '@atlaskit/pragmatic-drag-and-drop': 1.7.4
+      '@atlaskit/pragmatic-drag-and-drop': 1.7.7
       '@babel/runtime': 7.27.1
 
   '@atlaskit/pragmatic-drag-and-drop-hitbox@1.1.0':
     dependencies:
-      '@atlaskit/pragmatic-drag-and-drop': 1.7.4
+      '@atlaskit/pragmatic-drag-and-drop': 1.7.7
       '@babel/runtime': 7.27.1
 
-  '@atlaskit/pragmatic-drag-and-drop@1.4.0':
-    dependencies:
-      '@babel/runtime': 7.27.1
-      bind-event-listener: 3.0.0
-      raf-schd: 4.0.3
-
-  '@atlaskit/pragmatic-drag-and-drop@1.7.4':
+  '@atlaskit/pragmatic-drag-and-drop@1.7.7':
     dependencies:
       '@babel/runtime': 7.27.1
       bind-event-listener: 3.0.0

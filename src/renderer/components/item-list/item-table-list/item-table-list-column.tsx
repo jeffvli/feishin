@@ -1,3 +1,4 @@
+import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
 import React, { CSSProperties, ReactNode, useEffect, useRef } from 'react';
 import { CellComponentProps } from 'react-window-v2';
@@ -5,6 +6,7 @@ import { CellComponentProps } from 'react-window-v2';
 import styles from './item-table-list-column.module.css';
 
 import i18n from '/@/i18n/i18n';
+import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
 import { ActionsColumn } from '/@/renderer/components/item-list/item-table-list/columns/actions-column';
 import { AlbumArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-artists-column';
 import { ArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/artists-column';
@@ -29,9 +31,11 @@ import { TitleColumn } from '/@/renderer/components/item-list/item-table-list/co
 import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-combined-column';
 import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemControls, ItemListItem } from '/@/renderer/components/item-list/types';
+import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
+import { DragTarget, DragTargetMap } from '/@/shared/types/drag-and-drop';
 import { TableColumn } from '/@/shared/types/types';
 
 export interface ItemTableListColumn extends CellComponentProps<TableItemProps> {}
@@ -145,6 +149,58 @@ export const TableColumnTextContainer = (
             ? props.internalState.isSelected((item as any).id)
             : false;
 
+    const shouldEnableDrag = !!props.enableDrag && isDataRow && !!item;
+
+    const { isDragging: isDraggingLocal, ref: dragRef } = useDragDrop<HTMLDivElement>({
+        drag: {
+            getId: () => {
+                if (!item || !isDataRow) {
+                    return [];
+                }
+
+                const draggedItems = getDraggedItems(
+                    item as any,
+                    props.itemType,
+                    props.internalState,
+                );
+                return draggedItems.map((draggedItem) => draggedItem.id);
+            },
+            getItem: () => {
+                if (!item || !isDataRow) {
+                    return [];
+                }
+
+                return [item];
+            },
+            onDragStart: () => {
+                if (!item || !isDataRow || !props.internalState) {
+                    return;
+                }
+
+                const draggedItems = getDraggedItems(
+                    item as any,
+                    props.itemType,
+                    props.internalState,
+                );
+                props.internalState.setDragging(draggedItems);
+            },
+            onDrop: () => {
+                if (props.internalState) {
+                    props.internalState.setDragging([]);
+                }
+            },
+            target: DragTargetMap[props.itemType] || DragTarget.GENERIC,
+        },
+        isEnabled: shouldEnableDrag,
+    });
+
+    const isDragging =
+        item && typeof item === 'object' && 'id' in item && props.internalState
+            ? props.internalState.isDragging((item as any).id)
+            : isDraggingLocal;
+
+    const mergedRef = useMergedRef(containerRef, shouldEnableDrag ? dragRef : null);
+
     useEffect(() => {
         if (!isDataRow || !containerRef.current) return;
 
@@ -203,6 +259,7 @@ export const TableColumnTextContainer = (
                 [styles.center]: props.columns[props.columnIndex].align === 'center',
                 [styles.compact]: props.size === 'compact',
                 [styles.dataRow]: isDataRow,
+                [styles.dragging]: isDataRow && isDragging,
                 [styles.large]: props.size === 'large',
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
                 [styles.paddingLg]: props.cellPadding === 'lg',
@@ -219,7 +276,7 @@ export const TableColumnTextContainer = (
             })}
             data-row-index={isDataRow ? props.rowIndex : undefined}
             onClick={handleCellClick}
-            ref={containerRef}
+            ref={mergedRef}
             style={props.style}
         >
             <Text
@@ -253,6 +310,58 @@ export const TableColumnContainer = (
         item && typeof item === 'object' && 'id' in item
             ? props.internalState.isSelected((item as any).id)
             : false;
+
+    const shouldEnableDrag = !!props.enableDrag && isDataRow && !!item;
+
+    const { isDragging: isDraggingLocal, ref: dragRef } = useDragDrop<HTMLDivElement>({
+        drag: {
+            getId: () => {
+                if (!item || !isDataRow) {
+                    return [];
+                }
+
+                const draggedItems = getDraggedItems(
+                    item as any,
+                    props.itemType,
+                    props.internalState,
+                );
+                return draggedItems.map((draggedItem) => draggedItem.id);
+            },
+            getItem: () => {
+                if (!item || !isDataRow) {
+                    return [];
+                }
+
+                return [item];
+            },
+            onDragStart: () => {
+                if (!item || !isDataRow || !props.internalState) {
+                    return;
+                }
+
+                const draggedItems = getDraggedItems(
+                    item as any,
+                    props.itemType,
+                    props.internalState,
+                );
+                props.internalState.setDragging(draggedItems);
+            },
+            onDrop: () => {
+                if (props.internalState) {
+                    props.internalState.setDragging([]);
+                }
+            },
+            target: DragTargetMap[props.itemType] || DragTarget.GENERIC,
+        },
+        isEnabled: shouldEnableDrag,
+    });
+
+    const isDragging =
+        item && typeof item === 'object' && 'id' in item && props.internalState
+            ? props.internalState.isDragging((item as any).id)
+            : isDraggingLocal;
+
+    const mergedRef = useMergedRef(containerRef, shouldEnableDrag ? dragRef : null);
 
     useEffect(() => {
         if (!isDataRow || !containerRef.current) return;
@@ -312,6 +421,7 @@ export const TableColumnContainer = (
                 [styles.center]: props.columns[props.columnIndex].align === 'center',
                 [styles.compact]: props.size === 'compact',
                 [styles.dataRow]: isDataRow,
+                [styles.dragging]: isDataRow && isDragging,
                 [styles.large]: props.size === 'large',
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
                 [styles.paddingLg]: props.cellPadding === 'lg',
@@ -328,7 +438,7 @@ export const TableColumnContainer = (
             })}
             data-row-index={isDataRow ? props.rowIndex : undefined}
             onClick={handleCellClick}
-            ref={containerRef}
+            ref={mergedRef}
             style={{ ...props.containerStyle, ...props.style }}
         >
             {props.children}

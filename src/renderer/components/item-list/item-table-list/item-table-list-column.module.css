@@ -115,6 +115,10 @@
     }
 }
 
+.container.data-row.dragging {
+    opacity: 0.5;
+}
+
 .container.data-row > * {
     position: relative;
     z-index: 2;
