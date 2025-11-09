@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import styles from './expanded-list-item.module.css';
 
 import {
-    ItemListItem,
+    ItemListStateItem,
     ItemListStateActions,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ExpandedAlbumListItem } from '/@/renderer/features/albums/components/expanded-album-list-item';
@@ -35,7 +35,7 @@ export const ExpandedListItem = ({ internalState, itemType }: ExpandedListItemPr
 };
 
 interface SelectedItemProps {
-    item: ItemListItem;
+    item: ItemListStateItem;
     itemType: LibraryItem;
 }
 

@@ -23,7 +23,7 @@ import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
-    ItemListItem,
+    ItemListStateItem,
     ItemListStateActions,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
@@ -976,7 +976,7 @@ export const ItemTableList = ({
                 return;
             }
 
-            const itemListItem: ItemListItem = {
+            const itemListItem: ItemListStateItem = {
                 _serverId: item.serverId,
                 id: item.id,
                 itemType,
@@ -1020,7 +1020,7 @@ export const ItemTableList = ({
                         const startIndex = Math.min(lastIndex, currentIndex);
                         const stopIndex = Math.max(lastIndex, currentIndex);
 
-                        const rangeItems: ItemListItem[] = [];
+                        const rangeItems: ItemListStateItem[] = [];
                         for (let i = startIndex; i <= stopIndex; i++) {
                             const rangeItem = data[i];
                             if (
@@ -1128,7 +1128,7 @@ export const ItemTableList = ({
                         const startIndex = Math.min(lastIndex, newIndex);
                         const stopIndex = Math.max(lastIndex, newIndex);
 
-                        const rangeItems: ItemListItem[] = [];
+                        const rangeItems: ItemListStateItem[] = [];
                         for (let i = startIndex; i <= stopIndex; i++) {
                             const rangeItem = data[i];
                             if (
@@ -1155,7 +1155,7 @@ export const ItemTableList = ({
                         });
 
                         // Ensure the last item in selection is the item at newIndex for incremental extension
-                        const newItemListItem: ItemListItem = {
+                        const newItemListItem: ItemListStateItem = {
                             _serverId: newItem.serverId,
                             id: newItem.id,
                             itemType,

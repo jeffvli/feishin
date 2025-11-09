@@ -6,8 +6,10 @@ import { generatePath, Link } from 'react-router';
 import styles from './item-card.module.css';
 
 import { ItemCardControls } from '/@/renderer/components/item-card/item-card-controls';
+import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
 import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls } from '/@/renderer/components/item-list/types';
+import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Image } from '/@/shared/components/image/image';
 import { Separator } from '/@/shared/components/separator/separator';
@@ -21,10 +23,12 @@ import {
     Playlist,
     Song,
 } from '/@/shared/types/domain-types';
+import { DragTarget } from '/@/shared/types/drag-and-drop';
 
 export interface ItemCardProps {
     controls?: ItemControls;
     data: Album | AlbumArtist | Artist | Playlist | Song | undefined;
+    enableDrag?: boolean;
     internalState?: ItemListStateActions;
     isRound?: boolean;
     itemType: LibraryItem;
@@ -41,6 +45,7 @@ type DataRow = {
 export const ItemCard = ({
     controls,
     data,
+    enableDrag,
     internalState,
     isRound,
     itemType,
@@ -56,6 +61,7 @@ export const ItemCard = ({
                 <CompactItemCard
                     controls={controls}
                     data={data}
+                    enableDrag={enableDrag}
                     imageUrl={imageUrl}
                     internalState={internalState}
                     isRound={isRound}
@@ -69,6 +75,7 @@ export const ItemCard = ({
                 <PosterItemCard
                     controls={controls}
                     data={data}
+                    enableDrag={enableDrag}
                     imageUrl={imageUrl}
                     internalState={internalState}
                     isRound={isRound}
@@ -83,6 +90,7 @@ export const ItemCard = ({
                 <DefaultItemCard
                     controls={controls}
                     data={data}
+                    enableDrag={enableDrag}
                     imageUrl={imageUrl}
                     internalState={internalState}
                     isRound={isRound}
@@ -312,6 +320,7 @@ const DefaultItemCard = ({
 const PosterItemCard = ({
     controls,
     data,
+    enableDrag,
     imageUrl,
     internalState,
     isRound,
@@ -324,6 +333,43 @@ const PosterItemCard = ({
         data && internalState && typeof data === 'object' && 'id' in data
             ? internalState.isSelected((data as any).id)
             : false;
+
+    const { isDragging: isDraggingLocal, ref } = useDragDrop<HTMLDivElement>({
+        drag: {
+            getId: () => {
+                if (!data) {
+                    return [];
+                }
+
+                const draggedItems = getDraggedItems(data, itemType, internalState);
+                return draggedItems.map((item) => item.id);
+            },
+            getItem: () => {
+                if (!data) {
+                    return [];
+                }
+
+                return [data];
+            },
+            onDragStart: () => {
+                if (!data || !internalState) {
+                    return;
+                }
+
+                const draggedItems = getDraggedItems(data, itemType, internalState);
+                internalState.setDragging(draggedItems);
+            },
+            onDrop: () => {
+                if (internalState) {
+                    internalState.setDragging([]);
+                }
+            },
+            target: DragTarget.ALBUM,
+        },
+        isEnabled: !!enableDrag && !!data,
+    });
+
+    const isDragging = data && internalState ? internalState.isDragging(data.id) : isDraggingLocal;
 
     if (data) {
         const handleMouseEnter = () => {
@@ -364,8 +410,10 @@ const PosterItemCard = ({
         return (
             <div
                 className={clsx(styles.container, styles.poster, {
+                    [styles.dragging]: isDragging,
                     [styles.selected]: isSelected,
                 })}
+                ref={ref}
             >
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}

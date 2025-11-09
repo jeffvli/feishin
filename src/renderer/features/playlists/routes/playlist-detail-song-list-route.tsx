@@ -7,7 +7,6 @@ import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router';
 
-import { useHandlePlayQueueAdd } from '/@/renderer/features/player/hooks/use-handle-playqueue-add';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { PlaylistDetailSongListHeader } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header';
 import { PlaylistQueryBuilder } from '/@/renderer/features/playlists/components/playlist-query-builder';
@@ -32,7 +31,6 @@ const PlaylistDetailSongListRoute = () => {
     const tableRef = useRef<AgGridReactType | null>(null);
     const { playlistId } = useParams() as { playlistId: string };
     const server = useCurrentServer();
-    const handlePlayQueueAdd = useHandlePlayQueueAdd();
 
     const detailQuery = useQuery(
         playlistsQueries.detail({ query: { id: playlistId }, serverId: server?.id }),
@@ -159,13 +157,13 @@ const PlaylistDetailSongListRoute = () => {
     );
 
     const filterSortedSongs = useMemo(() => {
-        let items = playlistSongs.data?.items;
+        const items = playlistSongs.data?.items;
 
         if (items) {
             const searchTerm = page?.table.id[playlistId]?.filter?.searchTerm;
 
             if (searchTerm) {
-                items = searchSongs(items, searchTerm);
+                // items = searchSongs(items, searchTerm);
             }
 
             const sortBy = page?.table.id[playlistId]?.filter?.sortBy || SongListSort.ID;
@@ -182,10 +180,10 @@ const PlaylistDetailSongListRoute = () => {
             : undefined;
 
     const handlePlay = (play: Play) => {
-        handlePlayQueueAdd?.({
-            byData: filterSortedSongs,
-            playType: play,
-        });
+        // handlePlayQueueAdd?.({
+        //     byData: filterSortedSongs,
+        //     playType: play,
+        // });
     };
 
     return (

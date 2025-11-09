@@ -53,7 +53,7 @@ export const dndUtils = {
             id: string[];
             item?: TDataType[];
             operation?: DragOperation[];
-            type: DragTarget;
+            type: DragTarget | string;
         },
         metadata?: T,
     ) => {

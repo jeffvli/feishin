@@ -4,47 +4,57 @@ import { itemGridSelectors } from '/@/renderer/components/item-list/helpers/item
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 export type ItemListAction =
-    | { payload: ItemListItem; type: 'TOGGLE_EXPANDED' }
-    | { payload: ItemListItem; type: 'TOGGLE_SELECTED' }
-    | { payload: ItemListItem[]; type: 'SET_EXPANDED' }
-    | { payload: ItemListItem[]; type: 'SET_SELECTED' }
+    | { payload: ItemListStateItem; type: 'TOGGLE_EXPANDED' }
+    | { payload: ItemListStateItem; type: 'TOGGLE_SELECTED' }
+    | { payload: ItemListStateItem[]; type: 'SET_DRAGGING' }
+    | { payload: ItemListStateItem[]; type: 'SET_EXPANDED' }
+    | { payload: ItemListStateItem[]; type: 'SET_SELECTED' }
     | { type: 'CLEAR_ALL' }
+    | { type: 'CLEAR_DRAGGING' }
     | { type: 'CLEAR_EXPANDED' }
     | { type: 'CLEAR_SELECTED' };
 
-export interface ItemListItem {
-    _serverId: string;
-    id: string;
-    itemType: LibraryItem;
-}
-
 export interface ItemListState {
+    dragging: Set<string>;
+    draggingItems: Map<string, ItemListStateItem>;
     expanded: Set<string>;
-    expandedItems: Map<string, ItemListItem>;
+    expandedItems: Map<string, ItemListStateItem>;
     selected: Set<string>;
-    selectedItems: Map<string, ItemListItem>;
+    selectedItems: Map<string, ItemListStateItem>;
     version: number;
 }
 
 export interface ItemListStateActions {
     clearAll: () => void;
+    clearDragging: () => void;
     clearExpanded: () => void;
     clearSelected: () => void;
     findItemIndex: (itemId: string) => number;
     getData: () => unknown[];
-    getExpanded: () => ItemListItem[];
+    getDragging: () => ItemListStateItem[];
+    getDraggingIds: () => string[];
+    getExpanded: () => ItemListStateItem[];
     getExpandedIds: () => string[];
-    getSelected: () => ItemListItem[];
+    getSelected: () => ItemListStateItem[];
     getSelectedIds: () => string[];
     getVersion: () => number;
+    hasDragging: () => boolean;
     hasExpanded: () => boolean;
     hasSelected: () => boolean;
+    isDragging: (itemId: string) => boolean;
     isExpanded: (itemId: string) => boolean;
     isSelected: (itemId: string) => boolean;
-    setExpanded: (items: ItemListItem[]) => void;
-    setSelected: (items: ItemListItem[]) => void;
-    toggleExpanded: (item: ItemListItem) => void;
-    toggleSelected: (item: ItemListItem) => void;
+    setDragging: (items: ItemListStateItem[]) => void;
+    setExpanded: (items: ItemListStateItem[]) => void;
+    setSelected: (items: ItemListStateItem[]) => void;
+    toggleExpanded: (item: ItemListStateItem) => void;
+    toggleSelected: (item: ItemListStateItem) => void;
+}
+
+export interface ItemListStateItem {
+    _serverId: string;
+    id: string;
+    itemType: LibraryItem;
 }
 
 /**
@@ -56,10 +66,20 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
         case 'CLEAR_ALL':
             return {
                 ...state,
+                dragging: new Set(),
+                draggingItems: new Map(),
                 expanded: new Set(),
                 expandedItems: new Map(),
                 selected: new Set(),
                 selectedItems: new Map(),
+                version: state.version + 1,
+            };
+
+        case 'CLEAR_DRAGGING':
+            return {
+                ...state,
+                dragging: new Set(),
+                draggingItems: new Map(),
                 version: state.version + 1,
             };
 
@@ -79,9 +99,26 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
                 version: state.version + 1,
             };
 
+        case 'SET_DRAGGING': {
+            const newDragging = new Set<string>();
+            const newDraggingItems = new Map<string, ItemListStateItem>();
+
+            action.payload.forEach((item) => {
+                newDragging.add(item.id);
+                newDraggingItems.set(item.id, item);
+            });
+
+            return {
+                ...state,
+                dragging: newDragging,
+                draggingItems: newDraggingItems,
+                version: state.version + 1,
+            };
+        }
+
         case 'SET_EXPANDED': {
             const newExpanded = new Set<string>();
-            const newExpandedItems = new Map<string, ItemListItem>();
+            const newExpandedItems = new Map<string, ItemListStateItem>();
 
             console.log('SET_EXPANDED', action.payload);
 
@@ -101,7 +138,7 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
 
         case 'SET_SELECTED': {
             const newSelected = new Set<string>();
-            const newSelectedItems = new Map<string, ItemListItem>();
+            const newSelectedItems = new Map<string, ItemListStateItem>();
 
             action.payload.forEach((item) => {
                 newSelected.add(item.id);
@@ -118,7 +155,7 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
 
         case 'TOGGLE_EXPANDED': {
             const newExpanded = new Set<string>();
-            const newExpandedItems = new Map<string, ItemListItem>();
+            const newExpandedItems = new Map<string, ItemListStateItem>();
 
             // If the item is already expanded, collapse it
             if (state.expanded.has(action.payload.id)) {
@@ -163,6 +200,8 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
 };
 
 export const initialItemListState: ItemListState = {
+    dragging: new Set(),
+    draggingItems: new Map(),
     expanded: new Set(),
     expandedItems: new Map(),
     selected: new Set(),
@@ -173,19 +212,23 @@ export const initialItemListState: ItemListState = {
 export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActions => {
     const [state, dispatch] = useReducer(itemListReducer, initialItemListState);
 
-    const setExpanded = useCallback((items: ItemListItem[]) => {
+    const setExpanded = useCallback((items: ItemListStateItem[]) => {
         dispatch({ payload: items, type: 'SET_EXPANDED' });
     }, []);
 
-    const setSelected = useCallback((items: ItemListItem[]) => {
+    const setDragging = useCallback((items: ItemListStateItem[]) => {
+        dispatch({ payload: items, type: 'SET_DRAGGING' });
+    }, []);
+
+    const setSelected = useCallback((items: ItemListStateItem[]) => {
         dispatch({ payload: items, type: 'SET_SELECTED' });
     }, []);
 
-    const toggleExpanded = useCallback((item: ItemListItem) => {
+    const toggleExpanded = useCallback((item: ItemListStateItem) => {
         dispatch({ payload: item, type: 'TOGGLE_EXPANDED' });
     }, []);
 
-    const toggleSelected = useCallback((item: ItemListItem) => {
+    const toggleSelected = useCallback((item: ItemListStateItem) => {
         dispatch({ payload: item, type: 'TOGGLE_SELECTED' });
     }, []);
 
@@ -207,9 +250,17 @@ export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActi
         return itemGridSelectors.getExpanded(state);
     }, [state]);
 
+    const getDragging = useCallback(() => {
+        return itemGridSelectors.getDragging(state);
+    }, [state]);
+
     const getSelected = useCallback(() => {
         return itemGridSelectors.getSelected(state);
     }, [state]);
+
+    const getDraggingIds = useCallback(() => {
+        return Array.from(state.dragging);
+    }, [state.dragging]);
 
     const getExpandedIds = useCallback(() => {
         return Array.from(state.expanded);
@@ -221,6 +272,10 @@ export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActi
 
     const clearExpanded = useCallback(() => {
         dispatch({ type: 'CLEAR_EXPANDED' });
+    }, []);
+
+    const clearDragging = useCallback(() => {
+        dispatch({ type: 'CLEAR_DRAGGING' });
     }, []);
 
     const clearSelected = useCallback(() => {
@@ -239,9 +294,20 @@ export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActi
         return itemGridSelectors.hasAnyExpanded(state);
     }, [state]);
 
+    const hasDragging = useCallback(() => {
+        return itemGridSelectors.hasAnyDragging(state);
+    }, [state]);
+
     const hasSelected = useCallback(() => {
         return itemGridSelectors.hasAnySelected(state);
     }, [state]);
+
+    const isDragging = useCallback(
+        (itemId: string) => {
+            return itemGridSelectors.isDragging(state, itemId);
+        },
+        [state],
+    );
 
     const getData = useCallback(() => {
         return getDataFn ? getDataFn() : [];
@@ -260,19 +326,25 @@ export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActi
     return useMemo(
         () => ({
             clearAll,
+            clearDragging,
             clearExpanded,
             clearSelected,
             findItemIndex,
             getData,
+            getDragging,
+            getDraggingIds,
             getExpanded,
             getExpandedIds,
             getSelected,
             getSelectedIds,
             getVersion,
+            hasDragging,
             hasExpanded,
             hasSelected,
+            isDragging,
             isExpanded,
             isSelected,
+            setDragging,
             setExpanded,
             setSelected,
             toggleExpanded,
@@ -280,19 +352,25 @@ export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActi
         }),
         [
             clearAll,
+            clearDragging,
             clearExpanded,
             clearSelected,
             findItemIndex,
             getData,
+            getDragging,
+            getDraggingIds,
             getExpanded,
             getExpandedIds,
             getSelected,
             getSelectedIds,
             getVersion,
+            hasDragging,
             hasExpanded,
             hasSelected,
+            isDragging,
             isExpanded,
             isSelected,
+            setDragging,
             setExpanded,
             setSelected,
             toggleExpanded,

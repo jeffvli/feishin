@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { ItemListItem } from '/@/renderer/components/item-list/helpers/item-list-state';
+import { ItemListStateItem } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { DefaultItemControlProps, ItemControls } from '/@/renderer/components/item-list/types';
 import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
 import { Play } from '/@/shared/types/types';
@@ -15,7 +15,7 @@ export const useDefaultItemListControls = () => {
                     return;
                 }
 
-                const itemListItem: ItemListItem = {
+                const itemListItem: ItemListStateItem = {
                     _serverId: item._serverId,
                     id: item.id,
                     itemType,
@@ -61,7 +61,7 @@ export const useDefaultItemListControls = () => {
                             const startIndex = Math.min(lastIndex, currentIndex);
                             const stopIndex = Math.max(lastIndex, currentIndex);
 
-                            const rangeItems: ItemListItem[] = [];
+                            const rangeItems: ItemListStateItem[] = [];
                             for (let i = startIndex; i <= stopIndex; i++) {
                                 const rangeItem = validData[i];
                                 if (

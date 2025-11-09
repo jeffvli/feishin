@@ -36,8 +36,8 @@ import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
-    ItemListItem,
     ItemListStateActions,
+    ItemListStateItem,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls, ItemListHandle } from '/@/renderer/components/item-list/types';
@@ -46,6 +46,7 @@ import { LibraryItem } from '/@/shared/types/domain-types';
 interface VirtualizedGridListProps {
     controls: ItemControls;
     data: unknown[];
+    enableDrag?: boolean;
     enableExpansion: boolean;
     enableSelection: boolean;
     gap: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
@@ -68,6 +69,7 @@ const VirtualizedGridList = React.memo(
     ({
         controls,
         data,
+        enableDrag,
         enableExpansion,
         enableSelection,
         gap,
@@ -86,6 +88,7 @@ const VirtualizedGridList = React.memo(
                 columns: tableMeta?.columnCount || 0,
                 controls,
                 data,
+                enableDrag,
                 enableExpansion,
                 enableSelection,
                 gap,
@@ -97,6 +100,7 @@ const VirtualizedGridList = React.memo(
             tableMeta,
             controls,
             data,
+            enableDrag,
             enableExpansion,
             enableSelection,
             gap,
@@ -229,6 +233,7 @@ export interface GridItemProps {
     columns: number;
     controls: ItemCardProps['controls'];
     data: any[];
+    enableDrag?: boolean;
     enableExpansion?: boolean;
     enableSelection?: boolean;
     gap: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
@@ -244,6 +249,7 @@ export interface GridItemProps {
 export interface ItemGridListProps {
     currentPage?: number;
     data: unknown[];
+    enableDrag?: boolean;
     enableExpansion?: boolean;
     enableSelection?: boolean;
     gap?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
@@ -258,6 +264,7 @@ export interface ItemGridListProps {
 
 export const ItemGridList = ({
     data,
+    enableDrag = true,
     enableExpansion = true,
     enableSelection = true,
     gap = 'sm',
@@ -336,7 +343,6 @@ export const ItemGridList = ({
 
     const controls = useDefaultItemListControls();
 
-    // Scroll to a specific index
     const scrollToIndex = useCallback(
         (index: number) => {
             if (!listRef.current || !tableMeta) return;
@@ -346,7 +352,6 @@ export const ItemGridList = ({
         [tableMeta],
     );
 
-    // Scroll to a specific offset
     const scrollToOffset = useCallback((offset: number) => {
         if (!listRef.current) return;
         listRef.current.scrollTo(offset);
@@ -355,7 +360,6 @@ export const ItemGridList = ({
     // Handle keyboard navigation
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLDivElement>) => {
-            console.log('handleKeyDown', e.key);
             if (!enableSelection || !tableMeta) return;
             if (
                 e.key !== 'ArrowDown' &&
@@ -480,7 +484,7 @@ export const ItemGridList = ({
                         const startIndex = Math.min(lastIndex, newIndex);
                         const stopIndex = Math.max(lastIndex, newIndex);
 
-                        const rangeItems: ItemListItem[] = [];
+                        const rangeItems: ItemListStateItem[] = [];
                         for (let i = startIndex; i <= stopIndex; i++) {
                             const rangeItem = data[i];
                             if (
@@ -507,7 +511,7 @@ export const ItemGridList = ({
                         });
 
                         // Ensure the last item in selection is the item at newIndex for incremental extension
-                        const newItemListItem: ItemListItem = {
+                        const newItemListItem: ItemListStateItem = {
                             _serverId: newItem.serverId,
                             id: newItem.id,
                             itemType,
@@ -546,7 +550,6 @@ export const ItemGridList = ({
         [data, enableSelection, internalState, itemType, tableMeta, scrollToIndex],
     );
 
-    // Create imperative handle
     const imperativeHandle: ItemListHandle = useMemo(() => {
         return {
             clearExpanded: () => {
@@ -568,12 +571,10 @@ export const ItemGridList = ({
         };
     }, [data, internalState, scrollToIndex, scrollToOffset]);
 
-    // Expose handle via ref
     useEffect(() => {
         handleRef.current = imperativeHandle;
     }, [imperativeHandle]);
 
-    // Expose handle via forwardRef
     useImperativeHandle(ref, () => imperativeHandle, [imperativeHandle]);
 
     return (
@@ -588,6 +589,7 @@ export const ItemGridList = ({
             <VirtualizedGridList
                 controls={controls}
                 data={data}
+                enableDrag={enableDrag}
                 enableExpansion={enableExpansion}
                 enableSelection={enableSelection}
                 gap={gap}
@@ -614,7 +616,7 @@ export const ItemGridList = ({
 
 const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
     const { index, style } = props;
-    const { columns, controls, data, gap, itemType } = props.data;
+    const { columns, controls, data, enableDrag, gap, itemType } = props.data;
 
     const items: ReactNode[] = [];
     const itemCount = data.length;
@@ -640,6 +642,7 @@ const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
                     <ItemCard
                         controls={controls}
                         data={data[i]}
+                        enableDrag={enableDrag}
                         internalState={props.data.internalState}
                         itemType={itemType}
                         withControls

@@ -6,7 +6,7 @@ import { Fragment, Suspense } from 'react';
 
 import styles from './expanded-album-list-item.module.css';
 
-import { ItemListItem } from '/@/renderer/components/item-list/helpers/item-list-state';
+import { ItemListStateItem } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { Group } from '/@/shared/components/group/group';
@@ -18,7 +18,7 @@ import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { Text } from '/@/shared/components/text/text';
 
 interface ExpandedAlbumListItemProps {
-    item: ItemListItem;
+    item: ItemListStateItem;
 }
 
 export const ExpandedAlbumListItem = ({ item }: ExpandedAlbumListItemProps) => {

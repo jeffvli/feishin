@@ -10,15 +10,13 @@
     border-radius: var(--theme-radius-md);
 }
 
-.container.previewed {
-    outline: 2px dashed var(--theme-colors-primary);
-    outline-offset: 2px;
-    opacity: 0.7;
-}
-
 .container.selected {
     outline: 2px solid var(--theme-colors-primary);
     outline-offset: 2px;
+}
+
+.container.dragging {
+    opacity: 0.5;
 }
 
 .image-container {
