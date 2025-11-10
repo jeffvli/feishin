@@ -125,7 +125,7 @@ export const AlbumDetailHeader = forwardRef(
 
         if (originalDifferentFromRelease) {
             const formatted = `♫ ${formatDateAbsoluteUTC(detailQuery!.data!.originalDate)}`;
-            metadataItems.splice(0, 0, {
+            metadataItems.splice(releaseTypes.length, 0, {
                 id: 'originalDate',
                 value: formatted,
             });
