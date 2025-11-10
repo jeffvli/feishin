@@ -23,7 +23,7 @@ import {
 } from '/@/shared/types/domain-types';
 import { Play, PlayerRepeat, PlayerShuffle } from '/@/shared/types/types';
 
-interface PlayerContext {
+export interface PlayerContext {
     addToQueueByData: (data: Song[], type: AddToQueueType) => void;
     addToQueueByFetch: (
         serverId: string,

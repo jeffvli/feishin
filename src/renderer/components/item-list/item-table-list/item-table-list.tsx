@@ -11,6 +11,7 @@ import React, {
     Ref,
     useCallback,
     useEffect,
+    useId,
     useImperativeHandle,
     useMemo,
     useRef,
@@ -26,6 +27,7 @@ import { useDefaultItemListControls } from '/@/renderer/components/item-list/hel
 import {
     ItemListStateActions,
     ItemListStateItem,
+    ItemListStateItemWithRequiredProperties,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { parseTableColumns } from '/@/renderer/components/item-list/helpers/parse-table-columns';
@@ -34,7 +36,44 @@ import {
     ItemListHandle,
     ItemTableListColumnConfig,
 } from '/@/renderer/components/item-list/types';
+import {
+    PlayerContext,
+    usePlayerContext,
+} from '/@/renderer/features/player/context/player-context';
 import { LibraryItem } from '/@/shared/types/domain-types';
+
+/**
+ * Type guard to check if an item has the required properties (id and serverId)
+ * Similar to the type guard used in ItemCard
+ */
+const hasRequiredItemProperties = (item: unknown): item is { id: string; serverId: string } => {
+    return (
+        typeof item === 'object' &&
+        item !== null &&
+        'id' in item &&
+        typeof (item as any).id === 'string' &&
+        'serverId' in item &&
+        typeof (item as any).serverId === 'string'
+    );
+};
+
+/**
+ * Type guard to check if an item has the required properties for ItemListStateItemWithRequiredProperties
+ */
+const hasRequiredStateItemProperties = (
+    item: unknown,
+): item is ItemListStateItemWithRequiredProperties => {
+    return (
+        typeof item === 'object' &&
+        item !== null &&
+        'id' in item &&
+        typeof (item as any).id === 'string' &&
+        '_serverId' in item &&
+        typeof (item as any)._serverId === 'string' &&
+        'itemType' in item &&
+        typeof (item as any).itemType === 'string'
+    );
+};
 
 interface VirtualizedTableGridProps {
     calculatedColumnWidths: number[];
@@ -64,9 +103,11 @@ interface VirtualizedTableGridProps {
     pinnedRightColumnRef: React.RefObject<HTMLDivElement>;
     pinnedRowCount: number;
     pinnedRowRef: React.RefObject<HTMLDivElement>;
+    playerContext: PlayerContext;
     showLeftShadow: boolean;
     showRightShadow: boolean;
     size: 'compact' | 'default' | 'large';
+    tableId: string;
     totalColumnCount: number;
     totalRowCount: number;
 }
@@ -100,9 +141,11 @@ const VirtualizedTableGrid = React.memo(
         pinnedRightColumnRef,
         pinnedRowCount,
         pinnedRowRef,
+        playerContext,
         showLeftShadow,
         showRightShadow,
         size,
+        tableId,
         totalColumnCount,
         totalRowCount,
     }: VirtualizedTableGridProps) => {
@@ -129,7 +172,9 @@ const VirtualizedTableGrid = React.memo(
                 internalState,
                 itemType,
                 onRowClick,
+                playerContext,
                 size,
+                tableId,
             }),
             [
                 cellPadding,
@@ -146,9 +191,11 @@ const VirtualizedTableGrid = React.memo(
                 enableVerticalBorders,
                 getRowHeight,
                 internalState,
+                playerContext,
                 itemType,
                 onRowClick,
                 size,
+                tableId,
             ],
         );
 
@@ -430,7 +477,9 @@ export interface TableItemProps {
     internalState: ItemListStateActions;
     itemType: ItemTableListProps['itemType'];
     onRowClick?: (item: any, event: React.MouseEvent<HTMLDivElement>) => void;
+    playerContext: PlayerContext;
     size?: ItemTableListProps['size'];
+    tableId: string;
 }
 
 interface ItemTableListProps {
@@ -484,10 +533,11 @@ export const ItemTableList = ({
     rowHeight,
     size = 'default',
 }: ItemTableListProps) => {
+    const tableId = useId();
     const totalItemCount = enableHeader ? data.length + 1 : data.length;
     const parsedColumns = useMemo(() => parseTableColumns(columns), [columns]);
     const columnCount = parsedColumns.length;
-
+    const playerContext = usePlayerContext();
     const [centerContainerWidth, setCenterContainerWidth] = useState(0);
 
     useEffect(() => {
@@ -614,7 +664,9 @@ export const ItemTableList = ({
                 getRowHeight: () => DEFAULT_ROW_HEIGHT,
                 internalState: {} as ItemListStateActions,
                 itemType,
+                playerContext,
                 size,
+                tableId,
             };
 
             for (let i = 0; i < adjustedIndex; i++) {
@@ -632,11 +684,9 @@ export const ItemTableList = ({
         },
         [
             enableHeader,
-            rowHeight,
-            size,
-            DEFAULT_ROW_HEIGHT,
             cellPadding,
             parsedColumns,
+            data,
             enableAlternateRowColors,
             enableExpansion,
             enableHorizontalBorders,
@@ -644,7 +694,11 @@ export const ItemTableList = ({
             enableSelection,
             enableVerticalBorders,
             itemType,
-            data,
+            playerContext,
+            size,
+            tableId,
+            DEFAULT_ROW_HEIGHT,
+            rowHeight,
         ],
     );
 
@@ -989,7 +1043,7 @@ export const ItemTableList = ({
 
     const handleRowClick = useCallback(
         (item: any, event: React.MouseEvent<HTMLDivElement>) => {
-            if (!enableSelection || !item) {
+            if (!enableSelection || !item || !hasRequiredItemProperties(item)) {
                 return;
             }
 
@@ -1007,29 +1061,35 @@ export const ItemTableList = ({
                     // Remove this item from selection
                     const currentSelected = internalState.getSelected();
                     const filteredSelected = currentSelected.filter(
-                        (selectedItem) => selectedItem.id !== item.id,
+                        (selectedItem): selectedItem is ItemListStateItemWithRequiredProperties =>
+                            hasRequiredStateItemProperties(selectedItem) &&
+                            selectedItem.id !== item.id,
                     );
                     internalState.setSelected(filteredSelected);
                 } else {
                     // Add this item to selection
                     const currentSelected = internalState.getSelected();
-                    const newSelected = [...currentSelected, itemListItem];
+                    const validSelected = currentSelected.filter(hasRequiredStateItemProperties);
+                    const newSelected: ItemListStateItemWithRequiredProperties[] = [
+                        ...validSelected,
+                        itemListItem as ItemListStateItemWithRequiredProperties,
+                    ];
                     internalState.setSelected(newSelected);
                 }
             }
             // Check if shift key is held for range selection
             else if (event.shiftKey) {
                 const selectedItems = internalState.getSelected();
-                const lastSelectedItem = selectedItems[selectedItems.length - 1];
+                const validSelectedItems = selectedItems.filter(hasRequiredStateItemProperties);
+                const lastSelectedItem = validSelectedItems[validSelectedItems.length - 1];
 
                 if (lastSelectedItem) {
                     // Find the indices of the last selected item and current item
                     const lastIndex = data.findIndex(
-                        (d) =>
-                            d && typeof d === 'object' && 'id' in d && d.id === lastSelectedItem.id,
+                        (d) => hasRequiredItemProperties(d) && d.id === lastSelectedItem.id,
                     );
                     const currentIndex = data.findIndex(
-                        (d) => d && typeof d === 'object' && 'id' in d && d.id === item.id,
+                        (d) => hasRequiredItemProperties(d) && d.id === item.id,
                     );
 
                     if (lastIndex !== -1 && currentIndex !== -1) {
@@ -1037,20 +1097,15 @@ export const ItemTableList = ({
                         const startIndex = Math.min(lastIndex, currentIndex);
                         const stopIndex = Math.max(lastIndex, currentIndex);
 
-                        const rangeItems: ItemListStateItem[] = [];
+                        const rangeItems: ItemListStateItemWithRequiredProperties[] = [];
                         for (let i = startIndex; i <= stopIndex; i++) {
                             const rangeItem = data[i];
-                            if (
-                                rangeItem &&
-                                typeof rangeItem === 'object' &&
-                                'id' in rangeItem &&
-                                'serverId' in rangeItem
-                            ) {
+                            if (hasRequiredItemProperties(rangeItem)) {
                                 rangeItems.push({
-                                    _serverId: (rangeItem as any).serverId,
-                                    id: (rangeItem as any).id,
+                                    _serverId: rangeItem.serverId,
+                                    id: rangeItem.id,
                                     itemType,
-                                });
+                                } as ItemListStateItemWithRequiredProperties);
                             }
                         }
 
@@ -1061,7 +1116,10 @@ export const ItemTableList = ({
                             // Deselect the range
                             const currentSelected = internalState.getSelected();
                             const filteredSelected = currentSelected.filter(
-                                (selectedItem) =>
+                                (
+                                    selectedItem,
+                                ): selectedItem is ItemListStateItemWithRequiredProperties =>
+                                    hasRequiredStateItemProperties(selectedItem) &&
                                     !rangeItems.some(
                                         (rangeItem) => rangeItem.id === selectedItem.id,
                                     ),
@@ -1070,7 +1128,12 @@ export const ItemTableList = ({
                         } else {
                             // Select the range
                             const currentSelected = internalState.getSelected();
-                            const newSelected = [...currentSelected];
+                            const validSelected = currentSelected.filter(
+                                hasRequiredStateItemProperties,
+                            );
+                            const newSelected: ItemListStateItemWithRequiredProperties[] = [
+                                ...validSelected,
+                            ];
                             rangeItems.forEach((rangeItem) => {
                                 if (!newSelected.some((selected) => selected.id === rangeItem.id)) {
                                     newSelected.push(rangeItem);
@@ -1081,19 +1144,24 @@ export const ItemTableList = ({
                     }
                 } else {
                     // No previous selection, just toggle this item
-                    internalState.toggleSelected(itemListItem);
+                    internalState.toggleSelected(
+                        itemListItem as ItemListStateItemWithRequiredProperties,
+                    );
                 }
             } else {
                 // Regular click - deselect all others and select only this item
                 // If this item is already the only selected item, deselect it
                 const selectedItems = internalState.getSelected();
+                const validSelectedItems = selectedItems.filter(hasRequiredStateItemProperties);
                 const isOnlySelected =
-                    selectedItems.length === 1 && selectedItems[0].id === item.id;
+                    validSelectedItems.length === 1 && validSelectedItems[0].id === item.id;
 
                 if (isOnlySelected) {
                     internalState.clearSelected();
                 } else {
-                    internalState.setSelected([itemListItem]);
+                    internalState.setSelected([
+                        itemListItem as ItemListStateItemWithRequiredProperties,
+                    ]);
                 }
             }
         },
@@ -1108,12 +1176,13 @@ export const ItemTableList = ({
             e.stopPropagation();
 
             const selected = internalState.getSelected();
+            const validSelected = selected.filter(hasRequiredStateItemProperties);
             let currentIndex = -1;
 
-            if (selected.length > 0) {
-                const lastSelected = selected[selected.length - 1];
+            if (validSelected.length > 0) {
+                const lastSelected = validSelected[validSelected.length - 1];
                 currentIndex = data.findIndex(
-                    (d: any) => d && typeof d === 'object' && 'id' in d && d.id === lastSelected.id,
+                    (d) => hasRequiredItemProperties(d) && d.id === lastSelected.id,
                 );
             }
 
@@ -1131,13 +1200,13 @@ export const ItemTableList = ({
             // Handle Shift + Arrow for incremental range selection (matches shift+click behavior)
             if (e.shiftKey) {
                 const selectedItems = internalState.getSelected();
-                const lastSelectedItem = selectedItems[selectedItems.length - 1];
+                const validSelectedItems = selectedItems.filter(hasRequiredStateItemProperties);
+                const lastSelectedItem = validSelectedItems[validSelectedItems.length - 1];
 
                 if (lastSelectedItem) {
                     // Find the indices of the last selected item and new item
                     const lastIndex = data.findIndex(
-                        (d: any) =>
-                            d && typeof d === 'object' && 'id' in d && d.id === lastSelectedItem.id,
+                        (d) => hasRequiredItemProperties(d) && d.id === lastSelectedItem.id,
                     );
 
                     if (lastIndex !== -1 && newIndex !== -1) {
@@ -1145,26 +1214,26 @@ export const ItemTableList = ({
                         const startIndex = Math.min(lastIndex, newIndex);
                         const stopIndex = Math.max(lastIndex, newIndex);
 
-                        const rangeItems: ItemListStateItem[] = [];
+                        const rangeItems: ItemListStateItemWithRequiredProperties[] = [];
                         for (let i = startIndex; i <= stopIndex; i++) {
                             const rangeItem = data[i];
-                            if (
-                                rangeItem &&
-                                typeof rangeItem === 'object' &&
-                                'id' in rangeItem &&
-                                'serverId' in rangeItem
-                            ) {
+                            if (hasRequiredItemProperties(rangeItem)) {
                                 rangeItems.push({
-                                    _serverId: (rangeItem as any).serverId,
-                                    id: (rangeItem as any).id,
+                                    _serverId: rangeItem.serverId,
+                                    id: rangeItem.id,
                                     itemType,
-                                });
+                                } as ItemListStateItemWithRequiredProperties);
                             }
                         }
 
                         // Add range items to selection (matching shift+click behavior)
                         const currentSelected = internalState.getSelected();
-                        const newSelected = [...currentSelected];
+                        const validSelected = currentSelected.filter(
+                            hasRequiredStateItemProperties,
+                        );
+                        const newSelected: ItemListStateItemWithRequiredProperties[] = [
+                            ...validSelected,
+                        ];
                         rangeItems.forEach((rangeItem) => {
                             if (!newSelected.some((selected) => selected.id === rangeItem.id)) {
                                 newSelected.push(rangeItem);
@@ -1172,38 +1241,44 @@ export const ItemTableList = ({
                         });
 
                         // Ensure the last item in selection is the item at newIndex for incremental extension
-                        const newItemListItem: ItemListStateItem = {
-                            _serverId: newItem.serverId,
-                            id: newItem.id,
-                            itemType,
-                        };
-                        // Remove the new item from its current position if it exists
-                        const filteredSelected = newSelected.filter(
-                            (item) => item.id !== newItemListItem.id,
-                        );
-                        // Add it at the end so it becomes the last selected item
-                        filteredSelected.push(newItemListItem);
-                        internalState.setSelected(filteredSelected);
+                        if (hasRequiredItemProperties(newItem)) {
+                            const newItemListItem: ItemListStateItemWithRequiredProperties = {
+                                _serverId: newItem.serverId,
+                                id: newItem.id,
+                                itemType,
+                            } as ItemListStateItemWithRequiredProperties;
+                            // Remove the new item from its current position if it exists
+                            const filteredSelected = newSelected.filter(
+                                (item) => item.id !== newItemListItem.id,
+                            );
+                            // Add it at the end so it becomes the last selected item
+                            filteredSelected.push(newItemListItem);
+                            internalState.setSelected(filteredSelected);
+                        }
                     }
                 } else {
                     // No previous selection, just select the new item
+                    if (hasRequiredItemProperties(newItem)) {
+                        internalState.setSelected([
+                            {
+                                _serverId: newItem.serverId,
+                                id: newItem.id,
+                                itemType,
+                            } as ItemListStateItemWithRequiredProperties,
+                        ]);
+                    }
+                }
+            } else {
+                // Without Shift: select only the new item
+                if (hasRequiredItemProperties(newItem)) {
                     internalState.setSelected([
                         {
                             _serverId: newItem.serverId,
                             id: newItem.id,
                             itemType,
-                        },
+                        } as ItemListStateItemWithRequiredProperties,
                     ]);
                 }
-            } else {
-                // Without Shift: select only the new item
-                internalState.setSelected([
-                    {
-                        _serverId: newItem.serverId,
-                        id: newItem.id,
-                        itemType,
-                    },
-                ]);
             }
 
             const offset = calculateScrollTopForIndex(newIndex);
@@ -1304,9 +1379,11 @@ export const ItemTableList = ({
                 pinnedRightColumnRef={pinnedRightColumnRef}
                 pinnedRowCount={pinnedRowCount}
                 pinnedRowRef={pinnedRowRef}
+                playerContext={playerContext}
                 showLeftShadow={showLeftShadow}
                 showRightShadow={showRightShadow}
                 size={size}
+                tableId={tableId}
                 totalColumnCount={totalColumnCount}
                 totalRowCount={totalRowCount}
             />

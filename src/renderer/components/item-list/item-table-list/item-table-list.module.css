@@ -13,14 +13,17 @@
     min-width: 0;
     height: 100%;
     min-height: 0;
+    overflow: hidden;
 }
 
 .item-table-grid-container {
     position: relative;
     flex: 1 1 auto;
     width: 100%;
+    min-width: 0;
     height: 100%;
     min-height: 0;
+    overflow: hidden;
 }
 
 .item-table-pinned-rows-container {

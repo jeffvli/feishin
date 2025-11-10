@@ -35,13 +35,17 @@ import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
-import { DragTarget, DragTargetMap } from '/@/shared/types/drag-and-drop';
+import { LibraryItem } from '/@/shared/types/domain-types';
+import { DragOperation, DragTarget, DragTargetMap } from '/@/shared/types/drag-and-drop';
 import { TableColumn } from '/@/shared/types/types';
 
 export interface ItemTableListColumn extends CellComponentProps<TableItemProps> {}
 
 export interface ItemTableListInnerColumn extends ItemTableListColumn {
     controls: ItemControls;
+    dragRef?: null | React.Ref<HTMLDivElement>;
+    isDraggedOver?: 'bottom' | 'top' | null;
+    isDragging?: boolean;
     type: TableColumn;
 }
 
@@ -49,8 +53,148 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
     const type = props.columns[props.columnIndex].id as TableColumn;
 
     const isHeaderEnabled = !!props.enableHeader;
+    const isDataRow = isHeaderEnabled ? props.rowIndex > 0 : true;
+    const item = isDataRow ? props.data[props.rowIndex] : null;
+    const shouldEnableDrag = !!props.enableDrag && isDataRow && !!item;
+
+    const {
+        isDraggedOver,
+        isDragging: isDraggingLocal,
+        ref: dragRef,
+    } = useDragDrop<HTMLDivElement>({
+        drag: {
+            getId: () => {
+                if (!item || !isDataRow) {
+                    return [];
+                }
+
+                const draggedItems = getDraggedItems(item as any, props.internalState);
+
+                console.log('getId', draggedItems);
+
+                return draggedItems.map((draggedItem) => draggedItem.id);
+            },
+            getItem: () => {
+                if (!item || !isDataRow) {
+                    return [];
+                }
+
+                const draggedItems = getDraggedItems(item as any, props.internalState);
+
+                console.log('getItem', draggedItems);
+
+                return draggedItems;
+            },
+            itemType: props.itemType,
+            onDragStart: () => {
+                if (!item || !isDataRow || !props.internalState) {
+                    return;
+                }
+
+                const draggedItems = getDraggedItems(item as any, props.internalState);
+
+                props.internalState.setDragging(draggedItems);
+            },
+            onDrop: () => {
+                if (props.internalState) {
+                    props.internalState.setDragging([]);
+                }
+            },
+            operation:
+                props.itemType === LibraryItem.QUEUE_SONG
+                    ? [DragOperation.REORDER, DragOperation.ADD]
+                    : [DragOperation.ADD],
+            target: DragTargetMap[props.itemType] || DragTarget.GENERIC,
+        },
+        drop: {
+            canDrop: () => {
+                if (props.itemType === LibraryItem.QUEUE_SONG) {
+                    return true;
+                }
+
+                return false;
+            },
+            getData: () => {
+                return {
+                    id: [(item as unknown as { id: string }).id],
+                    item: [item as unknown as unknown[]],
+                    itemType: props.itemType,
+                    type: DragTargetMap[props.itemType] || DragTarget.GENERIC,
+                };
+            },
+            onDrag: () => {
+                return;
+            },
+            onDragLeave: () => {
+                return;
+            },
+            onDrop: (args) => {
+                if (args.self.type === DragTarget.QUEUE_SONG) {
+                    const sourceServerId = (
+                        args.source.item?.[0] as unknown as { _serverId: string }
+                    )._serverId;
+
+                    const sourceItemType = args.source.itemType as LibraryItem;
+
+                    const droppedOnUniqueId = (
+                        args.self.item?.[0] as unknown as { _uniqueId: string }
+                    )._uniqueId;
+
+                    switch (args.source.type) {
+                        case DragTarget.ALBUM: {
+                            props.playerContext.addToQueueByFetch(
+                                sourceServerId,
+                                args.source.id,
+                                sourceItemType,
+                                { edge: args.edge, uniqueId: droppedOnUniqueId },
+                            );
+                            break;
+                        }
+                        case DragTarget.ALBUM_ARTIST: {
+                            break;
+                        }
+                        case DragTarget.ARTIST: {
+                            break;
+                        }
+                        case DragTarget.GENRE: {
+                            break;
+                        }
+                        case DragTarget.PLAYLIST: {
+                            break;
+                        }
+                        case DragTarget.QUEUE_SONG: {
+                            break;
+                        }
+                        case DragTarget.SONG: {
+                            break;
+                        }
+                        case DragTarget.TABLE_COLUMN: {
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
+                    }
+                }
+
+                return;
+            },
+        },
+        isEnabled: shouldEnableDrag,
+    });
+
+    const isDragging =
+        item && typeof item === 'object' && 'id' in item && props.internalState
+            ? props.internalState.isDragging((item as any).id)
+            : isDraggingLocal;
 
     const controls = props.controls;
+
+    const dragProps = {
+        dragRef: shouldEnableDrag ? dragRef : null,
+        isDraggedOver: isDraggedOver === 'top' || isDraggedOver === 'bottom' ? isDraggedOver : null,
+        isDragging,
+    };
 
     if (isHeaderEnabled && props.rowIndex === 0) {
         return <TableColumnHeaderContainer {...props} controls={controls} type={type} />;
@@ -59,22 +203,22 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
     switch (type) {
         case TableColumn.ACTIONS:
         case TableColumn.SKIP:
-            return <ActionsColumn {...props} controls={controls} type={type} />;
+            return <ActionsColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.ALBUM_ARTIST:
-            return <AlbumArtistsColumn {...props} controls={controls} type={type} />;
+            return <AlbumArtistsColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.ALBUM_COUNT:
         case TableColumn.PLAY_COUNT:
         case TableColumn.SONG_COUNT:
-            return <CountColumn {...props} controls={controls} type={type} />;
+            return <CountColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.ARTIST:
-            return <ArtistsColumn {...props} controls={controls} type={type} />;
+            return <ArtistsColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.BIOGRAPHY:
         case TableColumn.COMMENT:
-            return <TextColumn {...props} controls={controls} type={type} />;
+            return <TextColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.BIT_RATE:
         case TableColumn.BPM:
@@ -82,50 +226,52 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
         case TableColumn.DISC_NUMBER:
         case TableColumn.TRACK_NUMBER:
         case TableColumn.YEAR:
-            return <NumericColumn {...props} controls={controls} type={type} />;
+            return <NumericColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.DATE_ADDED:
         case TableColumn.RELEASE_DATE:
-            return <DateColumn {...props} controls={controls} type={type} />;
+            return <DateColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.DURATION:
-            return <DurationColumn {...props} controls={controls} type={type} />;
+            return <DurationColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.GENRE:
-            return <GenreColumn {...props} controls={controls} type={type} />;
+            return <GenreColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.GENRE_BADGE:
-            return <GenreBadgeColumn {...props} controls={controls} type={type} />;
+            return <GenreBadgeColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.IMAGE:
-            return <ImageColumn {...props} controls={controls} type={type} />;
+            return <ImageColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.LAST_PLAYED:
-            return <RelativeDateColumn {...props} controls={controls} type={type} />;
+            return <RelativeDateColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.PATH:
-            return <PathColumn {...props} controls={controls} type={type} />;
+            return <PathColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.ROW_INDEX:
-            return <RowIndexColumn {...props} controls={controls} type={type} />;
+            return <RowIndexColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.SIZE:
-            return <SizeColumn {...props} controls={controls} type={type} />;
+            return <SizeColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.TITLE:
-            return <TitleColumn {...props} controls={controls} type={type} />;
+            return <TitleColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.TITLE_COMBINED:
-            return <TitleCombinedColumn {...props} controls={controls} type={type} />;
+            return (
+                <TitleCombinedColumn {...props} {...dragProps} controls={controls} type={type} />
+            );
 
         case TableColumn.USER_FAVORITE:
-            return <FavoriteColumn {...props} controls={controls} type={type} />;
+            return <FavoriteColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.USER_RATING:
-            return <RatingColumn {...props} controls={controls} type={type} />;
+            return <RatingColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         default:
-            return <DefaultColumn {...props} controls={controls} type={type} />;
+            return <DefaultColumn {...props} {...dragProps} controls={controls} type={type} />;
     }
 };
 
@@ -137,6 +283,9 @@ export const TableColumnTextContainer = (
         className?: string;
         containerClassName?: string;
         controls: ItemControls;
+        dragRef?: null | React.Ref<HTMLDivElement>;
+        isDraggedOver?: 'bottom' | 'top' | null;
+        isDragging?: boolean;
         type: TableColumn;
     },
 ) => {
@@ -149,57 +298,8 @@ export const TableColumnTextContainer = (
             ? props.internalState.isSelected((item as any).id)
             : false;
 
-    const shouldEnableDrag = !!props.enableDrag && isDataRow && !!item;
-
-    const { isDragging: isDraggingLocal, ref: dragRef } = useDragDrop<HTMLDivElement>({
-        drag: {
-            getId: () => {
-                if (!item || !isDataRow) {
-                    return [];
-                }
-
-                const draggedItems = getDraggedItems(
-                    item as any,
-                    props.itemType,
-                    props.internalState,
-                );
-                return draggedItems.map((draggedItem) => draggedItem.id);
-            },
-            getItem: () => {
-                if (!item || !isDataRow) {
-                    return [];
-                }
-
-                return [item];
-            },
-            onDragStart: () => {
-                if (!item || !isDataRow || !props.internalState) {
-                    return;
-                }
-
-                const draggedItems = getDraggedItems(
-                    item as any,
-                    props.itemType,
-                    props.internalState,
-                );
-                props.internalState.setDragging(draggedItems);
-            },
-            onDrop: () => {
-                if (props.internalState) {
-                    props.internalState.setDragging([]);
-                }
-            },
-            target: DragTargetMap[props.itemType] || DragTarget.GENERIC,
-        },
-        isEnabled: shouldEnableDrag,
-    });
-
-    const isDragging =
-        item && typeof item === 'object' && 'id' in item && props.internalState
-            ? props.internalState.isDragging((item as any).id)
-            : isDraggingLocal;
-
-    const mergedRef = useMergedRef(containerRef, shouldEnableDrag ? dragRef : null);
+    const isDragging = props.isDragging ?? false;
+    const mergedRef = useMergedRef(containerRef, props.dragRef ?? null);
 
     useEffect(() => {
         if (!isDataRow || !containerRef.current) return;
@@ -209,13 +309,17 @@ export const TableColumnTextContainer = (
 
         const handleMouseEnter = () => {
             // Find all cells in the same row and add hover class
-            const allCells = document.querySelectorAll(`[data-row-index="${rowIndex}"]`);
+            const allCells = document.querySelectorAll(
+                `[data-row-index="${props.tableId}-${rowIndex}"]`,
+            );
             allCells.forEach((cell) => cell.classList.add(styles.rowHovered));
         };
 
         const handleMouseLeave = () => {
             // Remove hover class from all cells in the same row
-            const allCells = document.querySelectorAll(`[data-row-index="${rowIndex}"]`);
+            const allCells = document.querySelectorAll(
+                `[data-row-index="${props.tableId}-${rowIndex}"]`,
+            );
             allCells.forEach((cell) => cell.classList.remove(styles.rowHovered));
         };
 
@@ -226,7 +330,53 @@ export const TableColumnTextContainer = (
             container.removeEventListener('mouseenter', handleMouseEnter);
             container.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, [isDataRow, props.rowIndex, props.enableRowHoverHighlight]);
+    }, [isDataRow, props.rowIndex, props.enableRowHoverHighlight, props.tableId]);
+
+    // Apply dragged over state to all cells in the row so border can span entire row
+    useEffect(() => {
+        if (!isDataRow || !containerRef.current) return;
+
+        const rowIndex = props.rowIndex;
+        const draggedOverState = props.isDraggedOver;
+
+        if (draggedOverState) {
+            // Find all cells in the same row and add dragged over class
+            const allCells = document.querySelectorAll(
+                `[data-row-index="${props.tableId}-${rowIndex}"]`,
+            );
+            allCells.forEach((cell, index) => {
+                if (draggedOverState === 'top') {
+                    cell.classList.add(styles.draggedOverTop);
+                    cell.classList.remove(styles.draggedOverBottom);
+                    // Mark first cell so border can span full width
+                    if (index === 0) {
+                        cell.classList.add(styles.draggedOverFirstCell);
+                    } else {
+                        cell.classList.remove(styles.draggedOverFirstCell);
+                    }
+                } else if (draggedOverState === 'bottom') {
+                    cell.classList.add(styles.draggedOverBottom);
+                    cell.classList.remove(styles.draggedOverTop);
+                    // Mark first cell so border can span full width
+                    if (index === 0) {
+                        cell.classList.add(styles.draggedOverFirstCell);
+                    } else {
+                        cell.classList.remove(styles.draggedOverFirstCell);
+                    }
+                }
+            });
+        } else {
+            // Remove dragged over classes from all cells in the same row
+            const allCells = document.querySelectorAll(
+                `[data-row-index="${props.tableId}-${rowIndex}"]`,
+            );
+            allCells.forEach((cell) => {
+                cell.classList.remove(styles.draggedOverTop);
+                cell.classList.remove(styles.draggedOverBottom);
+                cell.classList.remove(styles.draggedOverFirstCell);
+            });
+        }
+    }, [isDataRow, props.rowIndex, props.isDraggedOver, props.tableId]);
 
     const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
         // Don't trigger row selection if clicking on interactive elements
@@ -259,6 +409,8 @@ export const TableColumnTextContainer = (
                 [styles.center]: props.columns[props.columnIndex].align === 'center',
                 [styles.compact]: props.size === 'compact',
                 [styles.dataRow]: isDataRow,
+                [styles.draggedOverBottom]: isDataRow && props.isDraggedOver === 'bottom',
+                [styles.draggedOverTop]: isDataRow && props.isDraggedOver === 'top',
                 [styles.dragging]: isDataRow && isDragging,
                 [styles.large]: props.size === 'large',
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
@@ -274,7 +426,7 @@ export const TableColumnTextContainer = (
                     props.enableHorizontalBorders && props.enableHeader && props.rowIndex > 0,
                 [styles.withVerticalBorder]: props.enableVerticalBorders,
             })}
-            data-row-index={isDataRow ? props.rowIndex : undefined}
+            data-row-index={isDataRow ? `${props.tableId}-${props.rowIndex}` : undefined}
             onClick={handleCellClick}
             ref={mergedRef}
             style={props.style}
@@ -299,6 +451,9 @@ export const TableColumnContainer = (
         className?: string;
         containerStyle?: CSSProperties;
         controls: ItemControls;
+        dragRef?: null | React.Ref<HTMLDivElement>;
+        isDraggedOver?: 'bottom' | 'top' | null;
+        isDragging?: boolean;
         type: TableColumn;
     },
 ) => {
@@ -311,57 +466,8 @@ export const TableColumnContainer = (
             ? props.internalState.isSelected((item as any).id)
             : false;
 
-    const shouldEnableDrag = !!props.enableDrag && isDataRow && !!item;
-
-    const { isDragging: isDraggingLocal, ref: dragRef } = useDragDrop<HTMLDivElement>({
-        drag: {
-            getId: () => {
-                if (!item || !isDataRow) {
-                    return [];
-                }
-
-                const draggedItems = getDraggedItems(
-                    item as any,
-                    props.itemType,
-                    props.internalState,
-                );
-                return draggedItems.map((draggedItem) => draggedItem.id);
-            },
-            getItem: () => {
-                if (!item || !isDataRow) {
-                    return [];
-                }
-
-                return [item];
-            },
-            onDragStart: () => {
-                if (!item || !isDataRow || !props.internalState) {
-                    return;
-                }
-
-                const draggedItems = getDraggedItems(
-                    item as any,
-                    props.itemType,
-                    props.internalState,
-                );
-                props.internalState.setDragging(draggedItems);
-            },
-            onDrop: () => {
-                if (props.internalState) {
-                    props.internalState.setDragging([]);
-                }
-            },
-            target: DragTargetMap[props.itemType] || DragTarget.GENERIC,
-        },
-        isEnabled: shouldEnableDrag,
-    });
-
-    const isDragging =
-        item && typeof item === 'object' && 'id' in item && props.internalState
-            ? props.internalState.isDragging((item as any).id)
-            : isDraggingLocal;
-
-    const mergedRef = useMergedRef(containerRef, shouldEnableDrag ? dragRef : null);
+    const isDragging = props.isDragging ?? false;
+    const mergedRef = useMergedRef(containerRef, props.dragRef ?? null);
 
     useEffect(() => {
         if (!isDataRow || !containerRef.current) return;
@@ -371,13 +477,17 @@ export const TableColumnContainer = (
 
         const handleMouseEnter = () => {
             // Find all cells in the same row and add hover class
-            const allCells = document.querySelectorAll(`[data-row-index="${rowIndex}"]`);
+            const allCells = document.querySelectorAll(
+                `[data-row-index="${props.tableId}-${rowIndex}"]`,
+            );
             allCells.forEach((cell) => cell.classList.add(styles.rowHovered));
         };
 
         const handleMouseLeave = () => {
             // Remove hover class from all cells in the same row
-            const allCells = document.querySelectorAll(`[data-row-index="${rowIndex}"]`);
+            const allCells = document.querySelectorAll(
+                `[data-row-index="${props.tableId}-${rowIndex}"]`,
+            );
             allCells.forEach((cell) => cell.classList.remove(styles.rowHovered));
         };
 
@@ -388,7 +498,53 @@ export const TableColumnContainer = (
             container.removeEventListener('mouseenter', handleMouseEnter);
             container.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, [isDataRow, props.rowIndex, props.enableRowHoverHighlight]);
+    }, [isDataRow, props.rowIndex, props.enableRowHoverHighlight, props.tableId]);
+
+    // Apply dragged over state to all cells in the row so border can span entire row
+    useEffect(() => {
+        if (!isDataRow || !containerRef.current) return;
+
+        const rowIndex = props.rowIndex;
+        const draggedOverState = props.isDraggedOver;
+
+        if (draggedOverState) {
+            // Find all cells in the same row and add dragged over class
+            const allCells = document.querySelectorAll(
+                `[data-row-index="${props.tableId}-${rowIndex}"]`,
+            );
+            allCells.forEach((cell, index) => {
+                if (draggedOverState === 'top') {
+                    cell.classList.add(styles.draggedOverTop);
+                    cell.classList.remove(styles.draggedOverBottom);
+                    // Mark first cell so border can span full width
+                    if (index === 0) {
+                        cell.classList.add(styles.draggedOverFirstCell);
+                    } else {
+                        cell.classList.remove(styles.draggedOverFirstCell);
+                    }
+                } else if (draggedOverState === 'bottom') {
+                    cell.classList.add(styles.draggedOverBottom);
+                    cell.classList.remove(styles.draggedOverTop);
+                    // Mark first cell so border can span full width
+                    if (index === 0) {
+                        cell.classList.add(styles.draggedOverFirstCell);
+                    } else {
+                        cell.classList.remove(styles.draggedOverFirstCell);
+                    }
+                }
+            });
+        } else {
+            // Remove dragged over classes from all cells in the same row
+            const allCells = document.querySelectorAll(
+                `[data-row-index="${props.tableId}-${rowIndex}"]`,
+            );
+            allCells.forEach((cell) => {
+                cell.classList.remove(styles.draggedOverTop);
+                cell.classList.remove(styles.draggedOverBottom);
+                cell.classList.remove(styles.draggedOverFirstCell);
+            });
+        }
+    }, [isDataRow, props.rowIndex, props.isDraggedOver, props.tableId]);
 
     const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
         // Don't trigger row selection if clicking on interactive elements
@@ -421,6 +577,8 @@ export const TableColumnContainer = (
                 [styles.center]: props.columns[props.columnIndex].align === 'center',
                 [styles.compact]: props.size === 'compact',
                 [styles.dataRow]: isDataRow,
+                [styles.draggedOverBottom]: isDataRow && props.isDraggedOver === 'bottom',
+                [styles.draggedOverTop]: isDataRow && props.isDraggedOver === 'top',
                 [styles.dragging]: isDataRow && isDragging,
                 [styles.large]: props.size === 'large',
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
@@ -436,7 +594,7 @@ export const TableColumnContainer = (
                     props.enableHorizontalBorders && props.enableHeader && props.rowIndex > 0,
                 [styles.withVerticalBorder]: props.enableVerticalBorders,
             })}
-            data-row-index={isDataRow ? props.rowIndex : undefined}
+            data-row-index={isDataRow ? `${props.tableId}-${props.rowIndex}` : undefined}
             onClick={handleCellClick}
             ref={mergedRef}
             style={{ ...props.containerStyle, ...props.style }}

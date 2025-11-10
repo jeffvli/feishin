@@ -1,28 +1,25 @@
 import {
     ItemListStateActions,
-    ItemListStateItem,
+    ItemListStateItemWithRequiredProperties,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
-import {
-    Album,
-    AlbumArtist,
-    Artist,
-    LibraryItem,
-    Playlist,
-    Song,
-} from '/@/shared/types/domain-types';
+import { Album, AlbumArtist, Artist, Playlist, Song } from '/@/shared/types/domain-types';
 
 /**
- * Converts domain data to ItemListStateItem format
+ * Type guard to assert that an item has the required properties for dragging
  */
-const convertToItemListItem = (
-    data: Album | AlbumArtist | Artist | Playlist | Song,
-    itemType: LibraryItem,
-): ItemListStateItem => {
-    return {
-        _serverId: data._serverId,
-        id: data.id,
-        itemType,
-    };
+const hasRequiredDragProperties = (
+    item: unknown,
+): item is ItemListStateItemWithRequiredProperties => {
+    return (
+        typeof item === 'object' &&
+        item !== null &&
+        'id' in item &&
+        typeof (item as any).id === 'string' &&
+        'itemType' in item &&
+        typeof (item as any).itemType === 'string' &&
+        '_serverId' in item &&
+        typeof (item as any)._serverId === 'string'
+    );
 };
 
 /**
@@ -34,31 +31,40 @@ const convertToItemListItem = (
  * @param itemType - The type of library item
  * @param internalState - The item list state actions (optional)
  * @param updateSelection - Whether to update the selection state (default: true)
- * @returns Array of ItemListItem objects that should be dragged
+ * @returns Array of items that should be dragged (with original values, asserting id, itemType, and _serverId)
  */
 export const getDraggedItems = (
     data: Album | AlbumArtist | Artist | Playlist | Song | undefined,
-    itemType: LibraryItem,
     internalState?: ItemListStateActions,
     updateSelection: boolean = true,
-): ItemListStateItem[] => {
+): ItemListStateItemWithRequiredProperties[] => {
     if (!data || !internalState) {
         return [];
     }
 
-    // Convert data to ItemListStateItem format
-    const draggedItem = convertToItemListItem(data, itemType);
+    if (!hasRequiredDragProperties(data)) {
+        return [];
+    }
+
+    const draggedItem = data as ItemListStateItemWithRequiredProperties;
 
     const previouslySelected = internalState.getSelected();
-    const isDraggingSelectedItem = previouslySelected.some((selected) => selected.id === data.id);
+    const isDraggingSelectedItem = previouslySelected.some((selected) => {
+        if (hasRequiredDragProperties(selected)) {
+            return selected.id === data.id;
+        }
+        return false;
+    });
 
-    const draggedItems: ItemListStateItem[] = [];
+    const draggedItems: ItemListStateItemWithRequiredProperties[] = [];
 
     if (isDraggingSelectedItem) {
-        // If dragging a selected item, drag all selected items
-        draggedItems.push(...previouslySelected);
+        const selectedItems = previouslySelected.filter(
+            (item): item is ItemListStateItemWithRequiredProperties =>
+                hasRequiredDragProperties(item),
+        );
+        draggedItems.push(...selectedItems);
     } else {
-        // If dragging an unselected item, select it and drag only it
         if (updateSelection) {
             internalState.setSelected([draggedItem]);
         }

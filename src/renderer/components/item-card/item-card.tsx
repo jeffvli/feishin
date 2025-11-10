@@ -23,7 +23,7 @@ import {
     Playlist,
     Song,
 } from '/@/shared/types/domain-types';
-import { DragTarget } from '/@/shared/types/drag-and-drop';
+import { DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
 
 export interface ItemCardProps {
     controls?: ItemControls;
@@ -341,7 +341,7 @@ const PosterItemCard = ({
                     return [];
                 }
 
-                const draggedItems = getDraggedItems(data, itemType, internalState);
+                const draggedItems = getDraggedItems(data, internalState);
                 return draggedItems.map((item) => item.id);
             },
             getItem: () => {
@@ -349,14 +349,16 @@ const PosterItemCard = ({
                     return [];
                 }
 
-                return [data];
+                const draggedItems = getDraggedItems(data, internalState);
+                return draggedItems;
             },
+            itemType,
             onDragStart: () => {
                 if (!data || !internalState) {
                     return;
                 }
 
-                const draggedItems = getDraggedItems(data, itemType, internalState);
+                const draggedItems = getDraggedItems(data, internalState);
                 internalState.setDragging(draggedItems);
             },
             onDrop: () => {
@@ -364,6 +366,10 @@ const PosterItemCard = ({
                     internalState.setDragging([]);
                 }
             },
+            operation:
+                itemType === LibraryItem.QUEUE_SONG
+                    ? [DragOperation.REORDER, DragOperation.ADD]
+                    : [DragOperation.ADD],
             target: DragTarget.ALBUM,
         },
         isEnabled: !!enableDrag && !!data,

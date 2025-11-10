@@ -101,7 +101,7 @@ export const PlayQueueListControls = ({
         //     mpvPlayer!.pause();
         // }
 
-        updateSong(undefined);
+        player.clearQueue();
 
         // setCurrentTime(0);
         // pause();

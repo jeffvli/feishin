@@ -1,4 +1,4 @@
-import { ItemListAction, ItemListStateItem, ItemListState } from './item-list-state';
+import { ItemListAction, ItemListState, ItemListStateItemWithRequiredProperties } from './item-list-state';
 
 /**
  * Action creators for item grid state management
@@ -17,27 +17,27 @@ export const itemGridActions = {
         type: 'CLEAR_SELECTED',
     }),
 
-    setDragging: (items: ItemListStateItem[]): ItemListAction => ({
+    setDragging: (items: ItemListStateItemWithRequiredProperties[]): ItemListAction => ({
         payload: items,
         type: 'SET_DRAGGING',
     }),
 
-    setExpanded: (items: ItemListStateItem[]): ItemListAction => ({
+    setExpanded: (items: ItemListStateItemWithRequiredProperties[]): ItemListAction => ({
         payload: items,
         type: 'SET_EXPANDED',
     }),
 
-    setSelected: (items: ItemListStateItem[]): ItemListAction => ({
+    setSelected: (items: ItemListStateItemWithRequiredProperties[]): ItemListAction => ({
         payload: items,
         type: 'SET_SELECTED',
     }),
 
-    toggleExpanded: (item: ItemListStateItem): ItemListAction => ({
+    toggleExpanded: (item: ItemListStateItemWithRequiredProperties): ItemListAction => ({
         payload: item,
         type: 'TOGGLE_EXPANDED',
     }),
 
-    toggleSelected: (item: ItemListStateItem): ItemListAction => ({
+    toggleSelected: (item: ItemListStateItemWithRequiredProperties): ItemListAction => ({
         payload: item,
         type: 'TOGGLE_SELECTED',
     }),
@@ -48,7 +48,7 @@ export const itemGridActions = {
  * These can be reused to extract specific data from state
  */
 export const itemGridSelectors = {
-    getDragging: (state: ItemListState): ItemListStateItem[] => {
+    getDragging: (state: ItemListState): unknown[] => {
         return Array.from(state.draggingItems.values());
     },
 
@@ -60,7 +60,7 @@ export const itemGridSelectors = {
         return Array.from(state.dragging);
     },
 
-    getExpanded: (state: ItemListState): ItemListStateItem[] => {
+    getExpanded: (state: ItemListState): unknown[] => {
         return Array.from(state.expandedItems.values());
     },
 
@@ -72,7 +72,7 @@ export const itemGridSelectors = {
         return Array.from(state.expanded);
     },
 
-    getSelected: (state: ItemListState): ItemListStateItem[] => {
+    getSelected: (state: ItemListState): unknown[] => {
         return Array.from(state.selectedItems.values());
     },
 
@@ -146,7 +146,7 @@ export const itemListUtils = {
      * Toggle expansion of all items in a list
      */
     toggleAllExpanded: (
-        items: ItemListStateItem[],
+        items: ItemListStateItemWithRequiredProperties[],
         currentState: ItemListState,
     ): ItemListAction => {
         const allExpanded = items.every((item) => currentState.expanded.has(item.id));
@@ -157,7 +157,7 @@ export const itemListUtils = {
      * Toggle selection of all items in a list
      */
     toggleAllSelected: (
-        items: ItemListStateItem[],
+        items: ItemListStateItemWithRequiredProperties[],
         currentState: ItemListState,
     ): ItemListAction => {
         const allSelected = items.every((item) => currentState.selected.has(item.id));

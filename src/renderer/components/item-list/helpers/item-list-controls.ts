@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { ItemListStateItem } from '/@/renderer/components/item-list/helpers/item-list-state';
+import { ItemListStateItemWithRequiredProperties } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { DefaultItemControlProps, ItemControls } from '/@/renderer/components/item-list/types';
 import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
 import { Play } from '/@/shared/types/types';
@@ -10,16 +10,13 @@ export const useDefaultItemListControls = () => {
 
     const controls: ItemControls = useMemo(() => {
         return {
-            onClick: ({ event, internalState, item, itemType }: DefaultItemControlProps) => {
+            onClick: ({ event, internalState, item }: DefaultItemControlProps) => {
                 if (!item || !internalState || !event) {
                     return;
                 }
 
-                const itemListItem: ItemListStateItem = {
-                    _serverId: item._serverId,
-                    id: item.id,
-                    itemType,
-                };
+                // Use the full item instead of converting to minimal
+                const itemListItem = item as ItemListStateItemWithRequiredProperties;
 
                 // Check if ctrl/cmd key is held for multi-selection
                 if (event.ctrlKey || event.metaKey) {
@@ -29,13 +26,27 @@ export const useDefaultItemListControls = () => {
                         // Remove this item from selection
                         const currentSelected = internalState.getSelected();
                         const filteredSelected = currentSelected.filter(
-                            (selectedItem) => selectedItem.id !== item.id,
+                            (
+                                selectedItem,
+                            ): selectedItem is ItemListStateItemWithRequiredProperties =>
+                                typeof selectedItem === 'object' &&
+                                selectedItem !== null &&
+                                'id' in selectedItem &&
+                                (selectedItem as any).id !== item.id,
                         );
                         internalState.setSelected(filteredSelected);
                     } else {
                         // Add this item to selection
                         const currentSelected = internalState.getSelected();
-                        const newSelected = [...currentSelected, itemListItem];
+                        const newSelected = [
+                            ...currentSelected.filter(
+                                (
+                                    selectedItem,
+                                ): selectedItem is ItemListStateItemWithRequiredProperties =>
+                                    typeof selectedItem === 'object' && selectedItem !== null,
+                            ),
+                            itemListItem,
+                        ];
                         internalState.setSelected(newSelected);
                     }
                 }
@@ -44,7 +55,12 @@ export const useDefaultItemListControls = () => {
                     const selectedItems = internalState.getSelected();
                     const lastSelectedItem = selectedItems[selectedItems.length - 1];
 
-                    if (lastSelectedItem) {
+                    if (
+                        lastSelectedItem &&
+                        typeof lastSelectedItem === 'object' &&
+                        lastSelectedItem !== null &&
+                        'id' in lastSelectedItem
+                    ) {
                         // Get the data array from internalState
                         const data = internalState.getData();
                         // Filter out null/undefined values (e.g., header row)
@@ -53,7 +69,7 @@ export const useDefaultItemListControls = () => {
                         );
 
                         // Find the indices of the last selected item and current item
-                        const lastIndex = internalState.findItemIndex(lastSelectedItem.id);
+                        const lastIndex = internalState.findItemIndex((lastSelectedItem as any).id);
                         const currentIndex = internalState.findItemIndex(item.id);
 
                         if (lastIndex !== -1 && currentIndex !== -1) {
@@ -61,28 +77,38 @@ export const useDefaultItemListControls = () => {
                             const startIndex = Math.min(lastIndex, currentIndex);
                             const stopIndex = Math.max(lastIndex, currentIndex);
 
-                            const rangeItems: ItemListStateItem[] = [];
+                            const rangeItems: ItemListStateItemWithRequiredProperties[] = [];
                             for (let i = startIndex; i <= stopIndex; i++) {
                                 const rangeItem = validData[i];
                                 if (
                                     rangeItem &&
                                     typeof rangeItem === 'object' &&
                                     'id' in rangeItem &&
-                                    '_serverId' in rangeItem
+                                    '_serverId' in rangeItem &&
+                                    'itemType' in rangeItem
                                 ) {
-                                    rangeItems.push({
-                                        _serverId: (rangeItem as any)._serverId,
-                                        id: (rangeItem as any).id,
-                                        itemType,
-                                    });
+                                    rangeItems.push(
+                                        rangeItem as ItemListStateItemWithRequiredProperties,
+                                    );
                                 }
                             }
 
                             // Merge with existing selection, avoiding duplicates
                             const currentSelected = internalState.getSelected();
-                            const newSelected = [...currentSelected];
+                            const newSelected = [
+                                ...currentSelected.filter(
+                                    (
+                                        selectedItem,
+                                    ): selectedItem is ItemListStateItemWithRequiredProperties =>
+                                        typeof selectedItem === 'object' && selectedItem !== null,
+                                ),
+                            ];
                             rangeItems.forEach((rangeItem) => {
-                                if (!newSelected.some((selected) => selected.id === rangeItem.id)) {
+                                if (
+                                    !newSelected.some(
+                                        (selected) => (selected as any).id === rangeItem.id,
+                                    )
+                                ) {
                                     newSelected.push(rangeItem);
                                 }
                             });
@@ -97,7 +123,11 @@ export const useDefaultItemListControls = () => {
                     // If this item is already the only selected item, deselect it
                     const selectedItems = internalState.getSelected();
                     const isOnlySelected =
-                        selectedItems.length === 1 && selectedItems[0].id === item.id;
+                        selectedItems.length === 1 &&
+                        typeof selectedItems[0] === 'object' &&
+                        selectedItems[0] !== null &&
+                        'id' in selectedItems[0] &&
+                        (selectedItems[0] as any).id === item.id;
 
                     if (isOnlySelected) {
                         internalState.clearSelected();
@@ -111,16 +141,14 @@ export const useDefaultItemListControls = () => {
                 console.log('onDoubleClick', item, itemType, internalState);
             },
 
-            onExpand: ({ internalState, item, itemType }: DefaultItemControlProps) => {
+            onExpand: ({ internalState, item }: DefaultItemControlProps) => {
                 if (!item || !internalState) {
                     return;
                 }
 
-                return internalState?.toggleExpanded({
-                    _serverId: item._serverId,
-                    id: item.id,
-                    itemType,
-                });
+                return internalState?.toggleExpanded(
+                    item as ItemListStateItemWithRequiredProperties,
+                );
             },
 
             onFavorite: ({

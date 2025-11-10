@@ -8,35 +8,34 @@ import {
     BaseEventPayload,
     CleanupFn,
     ElementDragType,
-    Input,
 } from '@atlaskit/pragmatic-drag-and-drop/dist/types/internal-types';
 import {
     draggable,
     dropTargetForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { disableNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/disable-native-drag-preview';
-import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview';
-import { values } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
-import { createRoot } from 'react-dom/client';
 
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { dndUtils, DragData, DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
 
 interface UseDraggableProps {
     drag?: {
         getId: () => string[];
         getItem: () => unknown[];
+        itemType?: LibraryItem;
         onDragStart?: () => void;
         onDrop?: () => void;
         onGenerateDragPreview?: (data: BaseEventPayload<ElementDragType>) => void;
+        operation: DragOperation[];
         target: DragTarget | string;
     };
     drop?: {
         canDrop: (args: { source: DragData }) => boolean;
-        getData: (args: { element: HTMLElement; input: Input }) => DragData;
-        onDrag: (args: { self: DragData }) => void;
+        getData: () => DragData;
+        onDrag: (args: { edge: Edge | null }) => void;
         onDragLeave: () => void;
-        onDrop: (args: { self: DragData }) => void;
+        onDrop: (args: { edge: Edge | null; self: DragData; source: DragData }) => void;
     };
     isEnabled: boolean;
 }
@@ -49,6 +48,7 @@ export const useDragDrop = <TElement extends HTMLElement>({
     const ref = useRef<null | TElement>(null);
 
     const [isDragging, setIsDragging] = useState(false);
+    const [isDraggedOver, setIsDraggedOver] = useState<Edge | null>(null);
 
     useEffect(() => {
         if (!ref.current || !isEnabled) return;
@@ -66,6 +66,8 @@ export const useDragDrop = <TElement extends HTMLElement>({
                         const data = dndUtils.generateDragData({
                             id,
                             item,
+                            itemType: drag.itemType,
+                            operation: drag.operation,
                             type: drag.target,
                         });
                         return data;
@@ -96,59 +98,53 @@ export const useDragDrop = <TElement extends HTMLElement>({
             );
         }
 
-        // if (drop) {
-        //     functions.push(
-        //         dropTargetForElements({
-        //             canDrop: (args) => {
-        //                 const data = args.source.data as unknown as DragData;
-        //                 const isSelf = (args.source.data.id as string[])[0] === option.value;
-        //                 return dndUtils.isDropTarget(data.type, [DragTarget.GENERIC]) && !isSelf;
-        //             },
-        //             element: ref.current,
-        //             getData: ({ element, input }) => {
-        //                 const data = dndUtils.generateDragData({
-        //                     id: [option.value],
-        //                     operation: [DragOperation.REORDER],
-        //                     type: DragTarget.GENERIC,
-        //                 });
+        if (drop) {
+            functions.push(
+                dropTargetForElements({
+                    canDrop: (args) => {
+                        return (
+                            drop.canDrop?.({ source: args.source.data as unknown as DragData }) ||
+                            false
+                        );
+                    },
+                    element: ref.current,
+                    getData: (args) => {
+                        const dropData = drop.getData();
 
-        //                 return attachClosestEdge(data, {
-        //                     allowedEdges: ['top', 'bottom'],
-        //                     element,
-        //                     input,
-        //                 });
-        //             },
-        //             onDrag: (args) => {
-        //                 const closestEdgeOfTarget: Edge | null = extractClosestEdge(args.self.data);
-        //                 setIsDraggedOver(closestEdgeOfTarget);
-        //             },
-        //             onDragLeave: () => {
-        //                 setIsDraggedOver(null);
-        //             },
-        //             onDrop: (args) => {
-        //                 const closestEdgeOfTarget: Edge | null = extractClosestEdge(args.self.data);
+                        const data = dndUtils.generateDragData(dropData);
 
-        //                 const from = args.source.data.id as string[];
-        //                 const to = args.self.data.id as string[];
-
-        //                 const newOrder = dndUtils.reorderById({
-        //                     edge: closestEdgeOfTarget,
-        //                     idFrom: from[0],
-        //                     idTo: to[0],
-        //                     list: values,
-        //                 });
-
-        //                 onChange(newOrder);
-        //                 setIsDraggedOver(null);
-        //             },
-        //         }),
-        //     );
-        // }
+                        return attachClosestEdge(data, {
+                            allowedEdges: ['top', 'bottom'],
+                            element: args.element,
+                            input: args.input,
+                        });
+                    },
+                    onDrag: (args) => {
+                        const closestEdgeOfTarget: Edge | null = extractClosestEdge(args.self.data);
+                        drop.onDrag?.({ edge: closestEdgeOfTarget });
+                        setIsDraggedOver(closestEdgeOfTarget);
+                    },
+                    onDragLeave: () => {
+                        setIsDraggedOver(null);
+                    },
+                    onDrop: (args) => {
+                        const closestEdgeOfTarget: Edge | null = extractClosestEdge(args.self.data);
+                        drop.onDrop?.({
+                            edge: closestEdgeOfTarget,
+                            self: args.self.data as unknown as DragData,
+                            source: args.source.data as unknown as DragData,
+                        });
+                        setIsDraggedOver(null);
+                    },
+                }),
+            );
+        }
 
         return combine(...functions);
-    }, [drag, drop, isDragging]);
+    }, [drag, drop, isDragging, isDraggedOver, isEnabled]);
 
     return {
+        isDraggedOver,
         isDragging,
         ref,
     };
