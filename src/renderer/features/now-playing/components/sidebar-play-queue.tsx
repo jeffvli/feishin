@@ -7,11 +7,10 @@ import { ItemListKey } from '/@/shared/types/types';
 
 export const SidebarPlayQueue = () => {
     const tableRef = useRef<null>(null);
-    // const queueRef = useRef<null | { grid: AgGridReactType<Song> }>(null);
     const [search, setSearch] = useState<string | undefined>(undefined);
 
     return (
-        <Flex direction="column" h="100%">
+        <Flex direction="column" h="100%" w="100%">
             <PlayQueueListControls
                 handleSearch={setSearch}
                 searchTerm={search}
