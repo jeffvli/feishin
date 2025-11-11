@@ -50,6 +50,7 @@ interface VirtualizedGridListProps {
     enableExpansion: boolean;
     enableSelection: boolean;
     gap: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
+    height: number;
     initialTop?: ItemGridListProps['initialTop'];
     internalState: ItemListStateActions;
     itemType: LibraryItem;
@@ -63,6 +64,7 @@ interface VirtualizedGridListProps {
         itemHeight: number;
         rowCount: number;
     };
+    width: number;
 }
 
 const VirtualizedGridList = React.memo(
@@ -73,6 +75,7 @@ const VirtualizedGridList = React.memo(
         enableExpansion,
         enableSelection,
         gap,
+        height,
         initialTop,
         internalState,
         itemType,
@@ -82,6 +85,7 @@ const VirtualizedGridList = React.memo(
         outerRef,
         ref,
         tableMeta,
+        width,
     }: VirtualizedGridListProps) => {
         const itemData: GridItemProps = useMemo(() => {
             return {
@@ -146,28 +150,20 @@ const VirtualizedGridList = React.memo(
         }
 
         return (
-            <div className={styles.autoSizerContainer}>
-                <AutoSizer>
-                    {({ height, width }) => {
-                        return (
-                            <FixedSizeList
-                                height={height}
-                                initialScrollOffset={initialTop || 0}
-                                itemCount={itemData.tableMeta?.rowCount || 0}
-                                itemData={itemData}
-                                itemSize={itemData.tableMeta?.itemHeight || 0}
-                                onItemsRendered={debouncedOnItemsRendered}
-                                onScroll={handleOnScroll}
-                                outerRef={outerRef}
-                                ref={ref}
-                                width={width}
-                            >
-                                {ListComponent}
-                            </FixedSizeList>
-                        );
-                    }}
-                </AutoSizer>
-            </div>
+            <FixedSizeList
+                height={height}
+                initialScrollOffset={initialTop || 0}
+                itemCount={itemData.tableMeta?.rowCount || 0}
+                itemData={itemData}
+                itemSize={itemData.tableMeta?.itemHeight || 0}
+                onItemsRendered={debouncedOnItemsRendered}
+                onScroll={handleOnScroll}
+                outerRef={outerRef}
+                ref={ref}
+                width={width}
+            >
+                {ListComponent}
+            </FixedSizeList>
         );
     },
 );
@@ -311,6 +307,14 @@ export const ItemGridList = ({
         },
     });
 
+    const hasExpanded = internalState.hasExpanded();
+
+    const [tableMeta, setTableMeta] = useState<null | {
+        columnCount: number;
+        itemHeight: number;
+        rowCount: number;
+    }>(null);
+
     useEffect(() => {
         const { current: root } = rootRef;
         const { current: outer } = outerRef;
@@ -323,15 +327,7 @@ export const ItemGridList = ({
                 target: root,
             });
         }
-    }, [initialize]);
-
-    const hasExpanded = internalState.hasExpanded();
-
-    const [tableMeta, setTableMeta] = useState<null | {
-        columnCount: number;
-        itemHeight: number;
-        rowCount: number;
-    }>(null);
+    }, [initialize, tableMeta]);
 
     const throttledSetTableMeta = useMemo(() => {
         return createThrottledSetTableMeta(itemsPerRow);
@@ -377,7 +373,11 @@ export const ItemGridList = ({
             if (selected.length > 0) {
                 const lastSelected = selected[selected.length - 1];
                 currentIndex = data.findIndex(
-                    (d: any) => d && typeof d === 'object' && 'id' in d && d.id === lastSelected.id,
+                    (d: any) =>
+                        d &&
+                        typeof d === 'object' &&
+                        'id' in d &&
+                        d.id === (lastSelected as any).id,
                 );
             }
 
@@ -476,7 +476,10 @@ export const ItemGridList = ({
                     // Find the indices of the last selected item and new item
                     const lastIndex = data.findIndex(
                         (d: any) =>
-                            d && typeof d === 'object' && 'id' in d && d.id === lastSelectedItem.id,
+                            d &&
+                            typeof d === 'object' &&
+                            'id' in d &&
+                            d.id === (lastSelectedItem as any).id,
                     );
 
                     if (lastIndex !== -1 && newIndex !== -1) {
@@ -505,7 +508,9 @@ export const ItemGridList = ({
                         const currentSelected = internalState.getSelected();
                         const newSelected = [...currentSelected];
                         rangeItems.forEach((rangeItem) => {
-                            if (!newSelected.some((selected) => selected.id === rangeItem.id)) {
+                            if (
+                                !newSelected.some((selected: any) => selected.id === rangeItem.id)
+                            ) {
                                 newSelected.push(rangeItem);
                             }
                         });
@@ -518,11 +523,11 @@ export const ItemGridList = ({
                         };
                         // Remove the new item from its current position if it exists
                         const filteredSelected = newSelected.filter(
-                            (item) => item.id !== newItemListItem.id,
+                            (item: any) => item.id !== newItemListItem.id,
                         );
                         // Add it at the end so it becomes the last selected item
                         filteredSelected.push(newItemListItem);
-                        internalState.setSelected(filteredSelected);
+                        internalState.setSelected(filteredSelected as any);
                     }
                 } else {
                     // No previous selection, just select the new item
@@ -586,23 +591,29 @@ export const ItemGridList = ({
             ref={mergedContainerRef}
             tabIndex={0}
         >
-            <VirtualizedGridList
-                controls={controls}
-                data={data}
-                enableDrag={enableDrag}
-                enableExpansion={enableExpansion}
-                enableSelection={enableSelection}
-                gap={gap}
-                initialTop={initialTop}
-                internalState={internalState}
-                itemType={itemType}
-                onRangeChanged={onRangeChanged}
-                onScroll={onScroll ?? (() => {})}
-                onScrollEnd={onScrollEnd ?? (() => {})}
-                outerRef={outerRef}
-                ref={listRef}
-                tableMeta={tableMeta}
-            />
+            <AutoSizer>
+                {({ height, width }) => (
+                    <VirtualizedGridList
+                        controls={controls}
+                        data={data}
+                        enableDrag={enableDrag}
+                        enableExpansion={enableExpansion}
+                        enableSelection={enableSelection}
+                        gap={gap}
+                        height={height}
+                        initialTop={initialTop}
+                        internalState={internalState}
+                        itemType={itemType}
+                        onRangeChanged={onRangeChanged}
+                        onScroll={onScroll ?? (() => {})}
+                        onScrollEnd={onScrollEnd ?? (() => {})}
+                        outerRef={outerRef}
+                        ref={listRef}
+                        tableMeta={tableMeta}
+                        width={width}
+                    />
+                )}
+            </AutoSizer>
             <AnimatePresence>
                 {hasExpanded && (
                     <ExpandedListContainer>
