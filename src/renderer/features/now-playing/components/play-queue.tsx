@@ -5,12 +5,18 @@ import { forwardRef, useEffect, useMemo, useRef } from 'react';
 
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
-import { useIsPlayerFetching } from '/@/renderer/features/player/context/player-context';
+import {
+    useIsPlayerFetching,
+    usePlayerContext,
+} from '/@/renderer/features/player/context/player-context';
+import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { useListSettings, usePlayerQueue } from '/@/renderer/store';
 import { searchSongs } from '/@/renderer/utils/search-songs';
+import { Flex } from '/@/shared/components/flex/flex';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
-import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
-import { ItemListKey } from '/@/shared/types/types';
+import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
+import { DragTarget } from '/@/shared/types/drag-and-drop';
+import { ItemListKey, Play } from '/@/shared/types/types';
 
 type QueueProps = {
     listKey: ItemListKey;
@@ -60,9 +66,11 @@ export const PlayQueue = forwardRef(({ listKey, searchTerm }: QueueProps, ref: R
         }
     }, [data.length, playQueueKeyRef]);
 
+    const isEmpty = data.length === 0;
+
     return (
         <>
-            <LoadingOverlay visible={isFetching} />
+            <LoadingOverlay pos="absolute" visible={isFetching} />
             <ItemTableList
                 CellComponent={ItemTableListColumn}
                 columns={table.columns}
@@ -84,6 +92,145 @@ export const PlayQueue = forwardRef(({ listKey, searchTerm }: QueueProps, ref: R
                 ref={ref}
                 size={table.size}
             />
+            {isEmpty && <EmptyQueueDropZone />}
         </>
     );
 });
+
+const EmptyQueueDropZone = () => {
+    const playerContext = usePlayerContext();
+
+    const { isDraggedOver, ref } = useDragDrop<HTMLDivElement>({
+        drop: {
+            canDrop: () => {
+                return true;
+            },
+            getData: () => {
+                return {
+                    id: [],
+                    item: [],
+                    itemType: LibraryItem.QUEUE_SONG,
+                    type: DragTarget.QUEUE_SONG,
+                };
+            },
+            onDrag: () => {
+                return;
+            },
+            onDragLeave: () => {
+                return;
+            },
+            onDrop: (args) => {
+                if (args.self.type === DragTarget.QUEUE_SONG) {
+                    const sourceServerId = (
+                        args.source.item?.[0] as unknown as { _serverId: string }
+                    )?._serverId;
+
+                    const sourceItemType = args.source.itemType as LibraryItem;
+
+                    switch (args.source.type) {
+                        case DragTarget.ALBUM: {
+                            if (sourceServerId) {
+                                playerContext.addToQueueByFetch(
+                                    sourceServerId,
+                                    args.source.id,
+                                    sourceItemType,
+                                    Play.NOW,
+                                );
+                            }
+                            break;
+                        }
+                        case DragTarget.ALBUM_ARTIST: {
+                            if (sourceServerId) {
+                                playerContext.addToQueueByFetch(
+                                    sourceServerId,
+                                    args.source.id,
+                                    sourceItemType,
+                                    Play.NOW,
+                                );
+                            }
+                            break;
+                        }
+                        case DragTarget.ARTIST: {
+                            if (sourceServerId) {
+                                playerContext.addToQueueByFetch(
+                                    sourceServerId,
+                                    args.source.id,
+                                    sourceItemType,
+                                    Play.NOW,
+                                );
+                            }
+                            break;
+                        }
+                        case DragTarget.GENRE: {
+                            if (sourceServerId) {
+                                playerContext.addToQueueByFetch(
+                                    sourceServerId,
+                                    args.source.id,
+                                    sourceItemType,
+                                    Play.NOW,
+                                );
+                            }
+                            break;
+                        }
+                        case DragTarget.PLAYLIST: {
+                            if (sourceServerId) {
+                                playerContext.addToQueueByFetch(
+                                    sourceServerId,
+                                    args.source.id,
+                                    sourceItemType,
+                                    Play.NOW,
+                                );
+                            }
+                            break;
+                        }
+                        case DragTarget.QUEUE_SONG: {
+                            const sourceItems = (args.source.item || []) as QueueSong[];
+                            if (sourceItems.length > 0) {
+                                playerContext.addToQueueByData(sourceItems, Play.NOW);
+                            }
+                            break;
+                        }
+                        case DragTarget.SONG: {
+                            const sourceItems = (args.source.item || []) as Song[];
+                            if (sourceItems.length > 0) {
+                                playerContext.addToQueueByData(sourceItems, Play.NOW);
+                            }
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
+                    }
+                }
+
+                return;
+            },
+        },
+        isEnabled: true,
+    });
+
+    return (
+        <Flex
+            align="center"
+            className="empty-queue-drop-zone"
+            direction="column"
+            gap="md"
+            justify="center"
+            ref={ref}
+            style={{
+                backgroundColor: 'var(--theme-colors-background)',
+                borderRadius: 'var(--theme-radius-md)',
+                bottom: 0,
+                left: 0,
+                opacity: 0.6,
+                outline: isDraggedOver ? '2px solid var(--theme-colors-primary)' : 'none',
+                outlineOffset: '-4px',
+                position: 'absolute',
+                right: 0,
+                top: '40px',
+                zIndex: 10,
+            }}
+            w="100%"
+        />
+    );
+};
