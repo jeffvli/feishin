@@ -35,7 +35,7 @@ import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 import { DragOperation, DragTarget, DragTargetMap } from '/@/shared/types/drag-and-drop';
 import { TableColumn } from '/@/shared/types/types';
 
@@ -80,8 +80,6 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
                 }
 
                 const draggedItems = getDraggedItems(item as any, props.internalState);
-
-                console.log('getItem', draggedItems);
 
                 return draggedItems;
             },
@@ -151,30 +149,74 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
                             break;
                         }
                         case DragTarget.ALBUM_ARTIST: {
+                            props.playerContext.addToQueueByFetch(
+                                sourceServerId,
+                                args.source.id,
+                                sourceItemType,
+                                { edge: args.edge, uniqueId: droppedOnUniqueId },
+                            );
                             break;
                         }
                         case DragTarget.ARTIST: {
+                            props.playerContext.addToQueueByFetch(
+                                sourceServerId,
+                                args.source.id,
+                                sourceItemType,
+                                { edge: args.edge, uniqueId: droppedOnUniqueId },
+                            );
                             break;
                         }
                         case DragTarget.GENRE: {
+                            props.playerContext.addToQueueByFetch(
+                                sourceServerId,
+                                args.source.id,
+                                sourceItemType,
+                                { edge: args.edge, uniqueId: droppedOnUniqueId },
+                            );
                             break;
                         }
                         case DragTarget.PLAYLIST: {
+                            props.playerContext.addToQueueByFetch(
+                                sourceServerId,
+                                args.source.id,
+                                sourceItemType,
+                                { edge: args.edge, uniqueId: droppedOnUniqueId },
+                            );
                             break;
                         }
                         case DragTarget.QUEUE_SONG: {
+                            const sourceItems = (args.source.item || []) as QueueSong[];
+                            if (
+                                sourceItems.length > 0 &&
+                                args.edge &&
+                                (args.edge === 'top' || args.edge === 'bottom')
+                            ) {
+                                props.playerContext.moveSelectedTo(
+                                    sourceItems,
+                                    args.edge,
+                                    droppedOnUniqueId,
+                                );
+                            }
                             break;
                         }
                         case DragTarget.SONG: {
-                            break;
-                        }
-                        case DragTarget.TABLE_COLUMN: {
+                            const sourceItems = (args.source.item || []) as Song[];
+                            if (sourceItems.length > 0) {
+                                props.playerContext.addToQueueByData(sourceItems, {
+                                    edge: args.edge,
+                                    uniqueId: droppedOnUniqueId,
+                                });
+                            }
                             break;
                         }
                         default: {
                             break;
                         }
                     }
+                }
+
+                if (props.internalState) {
+                    props.internalState.setDragging([]);
                 }
 
                 return;

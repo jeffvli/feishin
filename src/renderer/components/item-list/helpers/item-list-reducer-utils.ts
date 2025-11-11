@@ -1,4 +1,8 @@
-import { ItemListAction, ItemListState, ItemListStateItemWithRequiredProperties } from './item-list-state';
+import {
+    ItemListAction,
+    ItemListState,
+    ItemListStateItemWithRequiredProperties,
+} from './item-list-state';
 
 /**
  * Action creators for item grid state management
