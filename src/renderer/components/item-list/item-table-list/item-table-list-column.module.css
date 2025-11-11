@@ -119,7 +119,7 @@
     opacity: 0.5;
 }
 
-.container.data-row.dragged-over-top::before {
+.container.data-row.dragged-over-top::after {
     position: absolute;
     top: -2px;
     right: 0;
@@ -131,7 +131,7 @@
     background-color: var(--theme-colors-primary);
 }
 
-.container.data-row.dragged-over-top.dragged-over-first-cell::before {
+.container.data-row.dragged-over-top.dragged-over-first-cell::after {
     right: -9999px;
     left: -9999px;
     margin-right: 9999px;
