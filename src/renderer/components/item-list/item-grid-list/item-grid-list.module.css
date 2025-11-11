@@ -3,6 +3,7 @@
     flex-direction: column !important;
     width: 100%;
     height: 100%;
+    padding-right: var(--theme-spacing-md);
     outline: none;
     border: none;
 }
