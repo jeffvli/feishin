@@ -640,6 +640,31 @@ const initialState: SettingsState = {
         globalMediaHotkeys: false,
     },
     lists: {
+        fullScreen: {
+            display: ListDisplayType.TABLE,
+            grid: {
+                itemGap: 'md',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                columns: SONG_TABLE_COLUMNS.map((column) => ({
+                    align: column.align,
+                    autoSize: column.autoSize,
+                    id: column.value,
+                    isEnabled: column.isEnabled,
+                    pinned: column.pinned,
+                    width: column.width,
+                })),
+                enableAlternateRowColors: true,
+                enableHorizontalBorders: true,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'default',
+            },
+        },
         [LibraryItem.ALBUM]: {
             display: ListDisplayType.TABLE,
             grid: {
@@ -848,6 +873,31 @@ const initialState: SettingsState = {
             },
         },
         [LibraryItem.SONG]: {
+            display: ListDisplayType.TABLE,
+            grid: {
+                itemGap: 'md',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                columns: SONG_TABLE_COLUMNS.map((column) => ({
+                    align: column.align,
+                    autoSize: column.autoSize,
+                    id: column.value,
+                    isEnabled: column.isEnabled,
+                    pinned: column.pinned,
+                    width: column.width,
+                })),
+                enableAlternateRowColors: true,
+                enableHorizontalBorders: true,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'default',
+            },
+        },
+        sideQueue: {
             display: ListDisplayType.TABLE,
             grid: {
                 itemGap: 'md',
