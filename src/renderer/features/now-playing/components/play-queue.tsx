@@ -24,7 +24,7 @@ type QueueProps = {
 };
 
 export const PlayQueue = forwardRef(({ listKey, searchTerm }: QueueProps, ref: Ref<any>) => {
-    const { table } = useListSettings(listKey);
+    const { table } = useListSettings(listKey) || {};
 
     const queue = usePlayerQueue();
     const isFetching = useIsPlayerFetching();

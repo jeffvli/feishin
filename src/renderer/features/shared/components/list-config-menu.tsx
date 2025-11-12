@@ -82,7 +82,9 @@ interface ListConfigMenuProps {
 }
 
 export const ListConfigMenu = (props: ListConfigMenuProps) => {
-    const displayType = useSettingsStore((state) => state.lists[props.listKey].display);
+    const displayType = useSettingsStore(
+        (state) => state.lists[props.listKey]?.display,
+    ) as ListDisplayType;
     const { setList } = useSettingsStoreActions();
 
     return (
