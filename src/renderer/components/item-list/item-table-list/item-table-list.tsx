@@ -26,7 +26,6 @@ import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
     ItemListStateActions,
-    ItemListStateItem,
     ItemListStateItemWithRequiredProperties,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
@@ -101,7 +100,6 @@ interface VirtualizedTableGridProps {
     itemType: LibraryItem;
     mergedRowRef: React.Ref<HTMLDivElement>;
     onRangeChanged?: ItemTableListProps['onRangeChanged'];
-    onRowClick?: (item: any, event: React.MouseEvent<HTMLDivElement>) => void;
     parsedColumns: ReturnType<typeof parseTableColumns>;
     pinnedLeftColumnCount: number;
     pinnedLeftColumnRef: React.RefObject<HTMLDivElement>;
@@ -139,7 +137,6 @@ const VirtualizedTableGrid = React.memo(
         itemType,
         mergedRowRef,
         onRangeChanged,
-        onRowClick,
         parsedColumns,
         pinnedLeftColumnCount,
         pinnedLeftColumnRef,
@@ -177,7 +174,6 @@ const VirtualizedTableGrid = React.memo(
                 getRowHeight,
                 internalState,
                 itemType,
-                onRowClick,
                 playerContext,
                 size,
                 tableId,
@@ -199,7 +195,6 @@ const VirtualizedTableGrid = React.memo(
                 internalState,
                 playerContext,
                 itemType,
-                onRowClick,
                 size,
                 tableId,
             ],
@@ -1095,133 +1090,6 @@ export const ItemTableList = ({
 
     const hasExpanded = internalState.hasExpanded();
 
-    const handleRowClick = useCallback(
-        (item: any, event: React.MouseEvent<HTMLDivElement>) => {
-            if (!enableSelection || !item || !hasRequiredItemProperties(item)) {
-                return;
-            }
-
-            const itemListItem: ItemListStateItem = {
-                _serverId: item.serverId,
-                id: item.id,
-                itemType,
-            };
-
-            // Check if ctrl/cmd key is held for multi-selection
-            if (event.ctrlKey || event.metaKey) {
-                const isCurrentlySelected = internalState.isSelected(item.id);
-
-                if (isCurrentlySelected) {
-                    // Remove this item from selection
-                    const currentSelected = internalState.getSelected();
-                    const filteredSelected = currentSelected.filter(
-                        (selectedItem): selectedItem is ItemListStateItemWithRequiredProperties =>
-                            hasRequiredStateItemProperties(selectedItem) &&
-                            selectedItem.id !== item.id,
-                    );
-                    internalState.setSelected(filteredSelected);
-                } else {
-                    // Add this item to selection
-                    const currentSelected = internalState.getSelected();
-                    const validSelected = currentSelected.filter(hasRequiredStateItemProperties);
-                    const newSelected: ItemListStateItemWithRequiredProperties[] = [
-                        ...validSelected,
-                        itemListItem as ItemListStateItemWithRequiredProperties,
-                    ];
-                    internalState.setSelected(newSelected);
-                }
-            }
-            // Check if shift key is held for range selection
-            else if (event.shiftKey) {
-                const selectedItems = internalState.getSelected();
-                const validSelectedItems = selectedItems.filter(hasRequiredStateItemProperties);
-                const lastSelectedItem = validSelectedItems[validSelectedItems.length - 1];
-
-                if (lastSelectedItem) {
-                    // Find the indices of the last selected item and current item
-                    const lastIndex = data.findIndex(
-                        (d) => hasRequiredItemProperties(d) && d.id === lastSelectedItem.id,
-                    );
-                    const currentIndex = data.findIndex(
-                        (d) => hasRequiredItemProperties(d) && d.id === item.id,
-                    );
-
-                    if (lastIndex !== -1 && currentIndex !== -1) {
-                        // Create range selection
-                        const startIndex = Math.min(lastIndex, currentIndex);
-                        const stopIndex = Math.max(lastIndex, currentIndex);
-
-                        const rangeItems: ItemListStateItemWithRequiredProperties[] = [];
-                        for (let i = startIndex; i <= stopIndex; i++) {
-                            const rangeItem = data[i];
-                            if (hasRequiredItemProperties(rangeItem)) {
-                                rangeItems.push({
-                                    _serverId: rangeItem.serverId,
-                                    id: rangeItem.id,
-                                    itemType,
-                                } as ItemListStateItemWithRequiredProperties);
-                            }
-                        }
-
-                        // Toggle selection for the range
-                        const isCurrentlySelected = internalState.isSelected(item.id);
-
-                        if (isCurrentlySelected) {
-                            // Deselect the range
-                            const currentSelected = internalState.getSelected();
-                            const filteredSelected = currentSelected.filter(
-                                (
-                                    selectedItem,
-                                ): selectedItem is ItemListStateItemWithRequiredProperties =>
-                                    hasRequiredStateItemProperties(selectedItem) &&
-                                    !rangeItems.some(
-                                        (rangeItem) => rangeItem.id === selectedItem.id,
-                                    ),
-                            );
-                            internalState.setSelected(filteredSelected);
-                        } else {
-                            // Select the range
-                            const currentSelected = internalState.getSelected();
-                            const validSelected = currentSelected.filter(
-                                hasRequiredStateItemProperties,
-                            );
-                            const newSelected: ItemListStateItemWithRequiredProperties[] = [
-                                ...validSelected,
-                            ];
-                            rangeItems.forEach((rangeItem) => {
-                                if (!newSelected.some((selected) => selected.id === rangeItem.id)) {
-                                    newSelected.push(rangeItem);
-                                }
-                            });
-                            internalState.setSelected(newSelected);
-                        }
-                    }
-                } else {
-                    // No previous selection, just toggle this item
-                    internalState.toggleSelected(
-                        itemListItem as ItemListStateItemWithRequiredProperties,
-                    );
-                }
-            } else {
-                // Regular click - deselect all others and select only this item
-                // If this item is already the only selected item, deselect it
-                const selectedItems = internalState.getSelected();
-                const validSelectedItems = selectedItems.filter(hasRequiredStateItemProperties);
-                const isOnlySelected =
-                    validSelectedItems.length === 1 && validSelectedItems[0].id === item.id;
-
-                if (isOnlySelected) {
-                    internalState.clearSelected();
-                } else {
-                    internalState.setSelected([
-                        itemListItem as ItemListStateItemWithRequiredProperties,
-                    ]);
-                }
-            }
-        },
-        [data, enableSelection, internalState, itemType],
-    );
-
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLDivElement>) => {
             if (!enableSelection) return;
@@ -1425,7 +1293,6 @@ export const ItemTableList = ({
                 itemType={itemType}
                 mergedRowRef={mergedRowRef}
                 onRangeChanged={onRangeChanged}
-                onRowClick={handleRowClick}
                 parsedColumns={parsedColumns}
                 pinnedLeftColumnCount={pinnedLeftColumnCount}
                 pinnedLeftColumnRef={pinnedLeftColumnRef}
