@@ -90,6 +90,30 @@ interface State {
     queue: QueueData;
 }
 
+const initialState: State = {
+    player: {
+        crossfadeDuration: 5,
+        index: -1,
+        muted: false,
+        playerNum: 1,
+        queueType: PlayerQueueType.DEFAULT,
+        repeat: PlayerRepeat.NONE,
+        seekToTimestamp: uniqueSeekToTimestamp(0),
+        shuffle: PlayerShuffle.NONE,
+        speed: 1,
+        status: PlayerStatus.PAUSED,
+        timestamp: 0,
+        transitionType: PlayerStyle.GAPLESS,
+        volume: 30,
+    },
+    queue: {
+        default: [],
+        priority: [],
+        shuffled: [],
+        songs: {},
+    },
+};
+
 export const usePlayerStoreBase = create<PlayerState>()(
     persist(
         subscribeWithSelector(
@@ -940,29 +964,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                         }
                     });
                 },
-                player: {
-                    crossfadeDuration: 5,
-                    index: -1,
-                    muted: false,
-                    playerNum: 1,
-                    queueType: PlayerQueueType.DEFAULT,
-                    repeat: PlayerRepeat.NONE,
-                    seekBackward: 10,
-                    seekForward: 10,
-                    seekToTimestamp: uniqueSeekToTimestamp(0),
-                    shuffle: PlayerShuffle.NONE,
-                    speed: 1,
-                    status: PlayerStatus.PAUSED,
-                    timestamp: 0,
-                    transitionType: PlayerStyle.GAPLESS,
-                    volume: 30,
-                },
-                queue: {
-                    default: [],
-                    priority: [],
-                    shuffled: [],
-                    songs: {},
-                },
+                ...initialState,
                 setCrossfadeDuration: (duration: number) => {
                     set((state) => {
                         const normalizedDuration = Math.max(0, Math.min(10, duration));
@@ -1073,6 +1075,14 @@ export const usePlayerStoreBase = create<PlayerState>()(
             merge: (persistedState: any, currentState: any) => {
                 return merge(currentState, persistedState);
             },
+            migrate: (persistedState, version) => {
+                if (version === 1) {
+                    // Replace the old player store state with the new one
+                    persistedState = { ...initialState };
+                }
+
+                return persistedState;
+            },
             name: 'player-store',
             partialize: (state) => {
                 const shouldRestorePlayQueue = useSettingsStore.getState().general.resume;
@@ -1111,7 +1121,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                 return filteredState;
             },
             storage: createJSONStorage(() => idbStateStorage),
-            version: 1,
+            version: 2,
         },
     ),
 );
