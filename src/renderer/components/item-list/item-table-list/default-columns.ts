@@ -649,13 +649,39 @@ export const GENRE_TABLE_COLUMNS: DefaultTableColumn[] = [
     },
 ];
 
-export const pickTableColumns = (columns: DefaultTableColumn[], enabledColumns: TableColumn[]) => {
-    return columns.map((column) => ({
-        align: column.align,
-        autoSize: column.autoSize,
-        id: column.value,
-        isEnabled: enabledColumns.includes(column.value),
-        pinned: column.pinned,
-        width: column.width,
-    }));
+export const pickTableColumns = (options: {
+    autoSizeColumns?: TableColumn[];
+    columns: DefaultTableColumn[];
+    enabledColumns: TableColumn[];
+    pinnedLeftColumns?: TableColumn[];
+    pinnedRightColumns?: TableColumn[];
+}) => {
+    const {
+        autoSizeColumns = [],
+        columns,
+        enabledColumns,
+        pinnedLeftColumns = [],
+        pinnedRightColumns = [],
+    } = options;
+
+    return columns.map((column) => {
+        const pinned: 'left' | 'right' | null = pinnedLeftColumns.includes(column.value)
+            ? 'left'
+            : pinnedRightColumns.includes(column.value)
+              ? 'right'
+              : null;
+
+        const isEnabled = enabledColumns.includes(column.value);
+
+        const autoSize = autoSizeColumns.includes(column.value);
+
+        return {
+            align: column.align,
+            autoSize,
+            id: column.value,
+            isEnabled,
+            pinned,
+            width: column.width,
+        };
+    });
 };
