@@ -198,6 +198,16 @@ export const TableConfig = ({ extraOptions, listKey, tableColumnsData }: TableCo
                     postProcess: 'sentenceCase',
                 }),
             },
+            {
+                component: (
+                    <ListConfigBooleanControl
+                        onChange={(e) => setList(listKey, { table: { autoFitColumns: e } })}
+                        value={list.table.autoFitColumns}
+                    />
+                ),
+                id: 'autoFitColumns',
+                label: t('table.config.general.autoFitColumns', { postProcess: 'sentenceCase' }),
+            },
 
             ...(extraOptions || []),
         ];
@@ -244,7 +254,8 @@ const TableColumnConfig = ({
 
     const handleChangeEnabled = useCallback(
         (item: ItemTableListColumnConfig, checked: boolean) => {
-            const value = useSettingsStore.getState().lists[listKey].table.columns;
+            const value = useSettingsStore.getState().lists[listKey]?.table.columns;
+            if (!value) return;
             const index = value.findIndex((v) => v.id === item.id);
             const newValues = [...value];
             newValues[index] = { ...newValues[index], isEnabled: checked };
@@ -255,7 +266,8 @@ const TableColumnConfig = ({
 
     const handleMoveUp = useCallback(
         (item: ItemTableListColumnConfig) => {
-            const value = useSettingsStore.getState().lists[listKey].table.columns;
+            const value = useSettingsStore.getState().lists[listKey]?.table.columns;
+            if (!value) return;
             const index = value.findIndex((v) => v.id === item.id);
             if (index === 0) return;
             const newValues = [...value];
@@ -267,7 +279,8 @@ const TableColumnConfig = ({
 
     const handleMoveDown = useCallback(
         (item: ItemTableListColumnConfig) => {
-            const value = useSettingsStore.getState().lists[listKey].table.columns;
+            const value = useSettingsStore.getState().lists[listKey]?.table.columns;
+            if (!value) return;
             const index = value.findIndex((v) => v.id === item.id);
             if (index === value.length - 1) return;
             const newValues = [...value];
@@ -279,7 +292,8 @@ const TableColumnConfig = ({
 
     const handlePinToLeft = useCallback(
         (item: ItemTableListColumnConfig) => {
-            const value = useSettingsStore.getState().lists[listKey].table.columns;
+            const value = useSettingsStore.getState().lists[listKey]?.table.columns;
+            if (!value) return;
             const index = value.findIndex((v) => v.id === item.id);
             const newValues = [...value];
 
@@ -299,7 +313,8 @@ const TableColumnConfig = ({
 
     const handlePinToRight = useCallback(
         (item: ItemTableListColumnConfig) => {
-            const value = useSettingsStore.getState().lists[listKey].table.columns;
+            const value = useSettingsStore.getState().lists[listKey]?.table.columns;
+            if (!value) return;
             const index = value.findIndex((v) => v.id === item.id);
             const newValues = [...value];
 
@@ -319,7 +334,8 @@ const TableColumnConfig = ({
 
     const handleAlignLeft = useCallback(
         (item: ItemTableListColumnConfig) => {
-            const value = useSettingsStore.getState().lists[listKey].table.columns;
+            const value = useSettingsStore.getState().lists[listKey]?.table.columns;
+            if (!value) return;
             const index = value.findIndex((v) => v.id === item.id);
             const newValues = [...value];
             newValues[index] = { ...newValues[index], align: 'start' };
@@ -330,7 +346,8 @@ const TableColumnConfig = ({
 
     const handleAlignCenter = useCallback(
         (item: ItemTableListColumnConfig) => {
-            const value = useSettingsStore.getState().lists[listKey].table.columns;
+            const value = useSettingsStore.getState().lists[listKey]?.table.columns;
+            if (!value) return;
             const index = value.findIndex((v) => v.id === item.id);
             const newValues = [...value];
             newValues[index] = { ...newValues[index], align: 'center' };
@@ -341,7 +358,8 @@ const TableColumnConfig = ({
 
     const handleAlignRight = useCallback(
         (item: ItemTableListColumnConfig) => {
-            const value = useSettingsStore.getState().lists[listKey].table.columns;
+            const value = useSettingsStore.getState().lists[listKey]?.table.columns;
+            if (!value) return;
             const index = value.findIndex((v) => v.id === item.id);
             const newValues = [...value];
             newValues[index] = { ...newValues[index], align: 'end' };
@@ -352,7 +370,8 @@ const TableColumnConfig = ({
 
     const handleAutoSize = useCallback(
         (item: ItemTableListColumnConfig, checked: boolean) => {
-            const value = useSettingsStore.getState().lists[listKey].table.columns;
+            const value = useSettingsStore.getState().lists[listKey]?.table.columns;
+            if (!value) return;
             const index = value.findIndex((v) => v.id === item.id);
             const newValues = [...value];
             newValues[index] = { ...newValues[index], autoSize: checked };
@@ -375,7 +394,8 @@ const TableColumnConfig = ({
                 number = 2000;
             }
 
-            const value = useSettingsStore.getState().lists[listKey].table.columns;
+            const value = useSettingsStore.getState().lists[listKey]?.table.columns;
+            if (!value) return;
             const index = value.findIndex((v) => v.id === item.id);
             const newValues = [...value];
             newValues[index] = { ...newValues[index], width: number };

@@ -483,6 +483,7 @@ export interface TableItemProps {
 }
 
 interface ItemTableListProps {
+    autoFitColumns?: boolean;
     CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
     cellPadding?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     columns: ItemTableListColumnConfig[];
@@ -511,6 +512,7 @@ interface ItemTableListProps {
 }
 
 export const ItemTableList = ({
+    autoFitColumns = false,
     CellComponent,
     cellPadding = 'sm',
     columns,
@@ -539,34 +541,32 @@ export const ItemTableList = ({
     const columnCount = parsedColumns.length;
     const playerContext = usePlayerContext();
     const [centerContainerWidth, setCenterContainerWidth] = useState(0);
-
-    useEffect(() => {
-        const el = rowRef.current;
-        if (!el) return;
-
-        const updateWidth = () => {
-            setCenterContainerWidth(el.clientWidth || 0);
-        };
-
-        updateWidth();
-
-        const resizeObserver = new ResizeObserver(() => {
-            updateWidth();
-        });
-
-        resizeObserver.observe(el);
-
-        return () => {
-            resizeObserver.disconnect();
-        };
-    }, []);
+    const [totalContainerWidth, setTotalContainerWidth] = useState(0);
 
     // Compute distributed widths: unpinned columns with autoWidth will share any remaining space
+    // When autoSizeColumns is true, all column widths are treated as proportions and scaled to fit the container
     const calculatedColumnWidths = useMemo(() => {
         const baseWidths = parsedColumns.map((c) => c.width);
+
+        // When autoSizeColumns is enabled, treat all widths as proportions and scale to fit container
+        if (autoFitColumns) {
+            // Calculate total reference width (sum of all base widths)
+            const totalReferenceWidth = baseWidths.reduce((sum, width) => sum + width, 0);
+
+            if (totalReferenceWidth === 0 || totalContainerWidth === 0) {
+                return baseWidths;
+            }
+
+            // Scale factor to fit all columns proportionally within the total container width
+            const scaleFactor = totalContainerWidth / totalReferenceWidth;
+
+            // Apply scale factor to all columns proportionally
+            return baseWidths.map((width) => width * scaleFactor);
+        }
+
+        // Original behavior: distribute extra space to auto-size columns
         const distributed = baseWidths.slice();
 
-        // Identify unpinned columns and auto-width candidates
         const unpinnedIndices: number[] = [];
         const autoUnpinnedIndices: number[] = [];
 
@@ -597,7 +597,7 @@ export const ItemTableList = ({
         });
 
         return distributed;
-    }, [parsedColumns, centerContainerWidth]);
+    }, [parsedColumns, centerContainerWidth, autoFitColumns, totalContainerWidth]);
 
     const pinnedLeftColumnCount = parsedColumns.filter((col) => col.pinned === 'left').length;
     const pinnedRightColumnCount = parsedColumns.filter((col) => col.pinned === 'right').length;
@@ -615,6 +615,49 @@ export const ItemTableList = ({
     const [showRightShadow, setShowRightShadow] = useState(false);
     const handleRef = useRef<ItemListHandle | null>(null);
     const containerFocusRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        const el = rowRef.current;
+        if (!el) return;
+
+        const updateWidth = () => {
+            setCenterContainerWidth(el.clientWidth || 0);
+        };
+
+        updateWidth();
+
+        const resizeObserver = new ResizeObserver(() => {
+            updateWidth();
+        });
+
+        resizeObserver.observe(el);
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
+
+    // Track total container width for autoSizeColumns
+    useEffect(() => {
+        const el = containerFocusRef.current;
+        if (!el || !autoFitColumns) return;
+
+        const updateWidth = () => {
+            setTotalContainerWidth(el.clientWidth || 0);
+        };
+
+        updateWidth();
+
+        const resizeObserver = new ResizeObserver(() => {
+            updateWidth();
+        });
+
+        resizeObserver.observe(el);
+
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, [autoFitColumns]);
 
     const onScrollEndRef = useRef<ItemTableListProps['onScrollEnd']>(onScrollEnd);
     useEffect(() => {

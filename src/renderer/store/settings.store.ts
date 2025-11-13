@@ -10,6 +10,7 @@ import i18n from '/@/i18n/i18n';
 import {
     ALBUM_TABLE_COLUMNS,
     PLAYLIST_SONG_TABLE_COLUMNS,
+    PLAYLIST_TABLE_COLUMNS,
     SONG_TABLE_COLUMNS,
 } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table/table-config-dropdown';
@@ -122,6 +123,7 @@ const ItemTableListColumnConfigSchema = z.object({
 });
 
 const ItemTableListPropsSchema = z.object({
+    autoFitColumns: z.boolean(),
     columns: z.array(ItemTableListColumnConfigSchema),
     enableAlternateRowColors: z.boolean(),
     enableHorizontalBorders: z.boolean(),
@@ -650,6 +652,7 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
+                autoFitColumns: false,
                 columns: SONG_TABLE_COLUMNS.map((column) => ({
                     align: column.align,
                     autoSize: column.autoSize,
@@ -675,6 +678,7 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
+                autoFitColumns: false,
                 columns: ALBUM_TABLE_COLUMNS.map((column) => ({
                     align: column.align,
                     autoSize: column.autoSize,
@@ -700,6 +704,7 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
+                autoFitColumns: false,
                 columns: ALBUMARTIST_TABLE_COLUMNS.map((column) => ({
                     align: 'start' as const,
                     autoSize: false,
@@ -725,6 +730,7 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
+                autoFitColumns: false,
                 columns: ALBUMARTIST_TABLE_COLUMNS.map((column) => ({
                     align: 'start' as const,
                     autoSize: false,
@@ -750,71 +756,15 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
-                columns: [
-                    {
-                        align: 'center',
-                        autoSize: false,
-                        id: TableColumn.ROW_INDEX,
-                        isEnabled: true,
-                        pinned: 'left',
-                        width: 80,
-                    },
-                    {
-                        align: 'center',
-                        autoSize: false,
-                        id: TableColumn.IMAGE,
-                        isEnabled: true,
-                        pinned: 'left',
-                        width: 70,
-                    },
-                    {
-                        align: 'start',
-                        autoSize: false,
-                        id: TableColumn.TITLE,
-                        isEnabled: true,
-                        pinned: 'left',
-                        width: 300,
-                    },
-                    {
-                        align: 'start',
-                        autoSize: false,
-                        id: TableColumn.TITLE_COMBINED,
-                        isEnabled: false,
-                        pinned: 'left',
-                        width: 300,
-                    },
-                    {
-                        align: 'center',
-                        autoSize: false,
-                        id: TableColumn.DURATION,
-                        isEnabled: true,
-                        pinned: null,
-                        width: 100,
-                    },
-                    {
-                        align: 'center',
-                        autoSize: false,
-                        id: TableColumn.OWNER,
-                        isEnabled: true,
-                        pinned: null,
-                        width: 150,
-                    },
-                    {
-                        align: 'center',
-                        autoSize: false,
-                        id: TableColumn.SONG_COUNT,
-                        isEnabled: true,
-                        pinned: null,
-                        width: 100,
-                    },
-                    {
-                        align: 'center',
-                        id: TableColumn.ACTIONS,
-                        isEnabled: true,
-                        pinned: 'right',
-                        width: 60,
-                    },
-                ],
+                autoFitColumns: false,
+                columns: PLAYLIST_TABLE_COLUMNS.map((column) => ({
+                    align: column.align,
+                    autoSize: column.autoSize,
+                    id: column.value,
+                    isEnabled: column.isEnabled,
+                    pinned: column.pinned,
+                    width: column.width,
+                })),
                 enableAlternateRowColors: true,
                 enableHorizontalBorders: true,
                 enableRowHoverHighlight: true,
@@ -832,6 +782,7 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
+                autoFitColumns: false,
                 columns: PLAYLIST_SONG_TABLE_COLUMNS.map((column) => ({
                     align: column.align,
                     autoSize: column.autoSize,
@@ -857,6 +808,7 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
+                autoFitColumns: false,
                 columns: SONG_TABLE_COLUMNS.map((column) => ({
                     align: column.align,
                     autoSize: column.autoSize,
@@ -882,6 +834,7 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
+                autoFitColumns: false,
                 columns: SONG_TABLE_COLUMNS.map((column) => ({
                     align: column.align,
                     autoSize: column.autoSize,
@@ -897,7 +850,7 @@ const initialState: SettingsState = {
                 size: 'default',
             },
         },
-        sideQueue: {
+        ['sideQueue']: {
             display: ListDisplayType.TABLE,
             grid: {
                 itemGap: 'md',
@@ -907,6 +860,7 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
+                autoFitColumns: true,
                 columns: SONG_TABLE_COLUMNS.map((column) => ({
                     align: column.align,
                     autoSize: column.autoSize,
