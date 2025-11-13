@@ -167,6 +167,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                         state.player.index = 0;
                                         state.player.status = PlayerStatus.PLAYING;
                                         state.player.playerNum = 1;
+                                        state.player.timestamp = 0;
                                         state.queue.default = newUniqueIds;
 
                                         if (state.player.shuffle === PlayerShuffle.TRACK) {
@@ -245,6 +246,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                         state.queue.default = [];
                                         state.player.status = PlayerStatus.PLAYING;
                                         state.player.playerNum = 1;
+                                        state.player.timestamp = 0;
 
                                         // Add the first item after the current playing track
 
@@ -569,6 +571,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                     set((state) => {
                         state.player.index = Math.min(queue.items.length - 1, currentIndex + 1);
                         state.player.playerNum = 1;
+                        state.player.timestamp = 0;
                     });
                 },
                 mediaPause: () => {
@@ -585,6 +588,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
 
                             if (index !== -1) {
                                 state.player.index = index;
+                                state.player.timestamp = 0;
                             }
                         }
 
@@ -597,6 +601,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                     set((state) => {
                         // Only decrement if we're not at the start
                         state.player.index = Math.max(0, currentIndex - 1);
+                        state.player.timestamp = 0;
                     });
                 },
                 mediaSeekToTimestamp: (timestamp: number) => {
