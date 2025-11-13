@@ -32,6 +32,7 @@ import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table
 import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemControls, ItemListItem } from '/@/renderer/components/item-list/types';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
+import { Flex } from '/@/shared/components/flex/flex';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
@@ -653,7 +654,7 @@ export const TableColumnHeaderContainer = (
     },
 ) => {
     return (
-        <div
+        <Flex
             className={clsx(styles.container, styles.headerContainer, props.containerClassName, {
                 [styles.paddingLg]: props.cellPadding === 'lg',
                 [styles.paddingMd]: props.cellPadding === 'md',
@@ -673,12 +674,16 @@ export const TableColumnHeaderContainer = (
             >
                 {columnLabelMap[props.type]}
             </Text>
-        </div>
+        </Flex>
     );
 };
 
 const columnLabelMap: Record<TableColumn, ReactNode | string> = {
-    [TableColumn.ACTIONS]: <Icon fill="default" icon="ellipsisHorizontal" size="md" />,
+    [TableColumn.ACTIONS]: (
+        <Flex className={styles.headerIconWrapper}>
+            <Icon fill="default" icon="ellipsisHorizontal" />
+        </Flex>
+    ),
     [TableColumn.ALBUM]: i18n.t('table.column.album', { postProcess: 'upperCase' }) as string,
     [TableColumn.ALBUM_ARTIST]: i18n.t('table.column.albumArtist', {
         postProcess: 'upperCase',
@@ -698,10 +703,16 @@ const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.DATE_ADDED]: i18n.t('table.column.dateAdded', {
         postProcess: 'upperCase',
     }) as string,
-    [TableColumn.DISC_NUMBER]: i18n.t('table.column.discNumber', {
-        postProcess: 'upperCase',
-    }) as string,
-    [TableColumn.DURATION]: <Icon icon="duration" size="md" />,
+    [TableColumn.DISC_NUMBER]: (
+        <Flex className={styles.headerIconWrapper}>
+            <Icon icon="disc" />
+        </Flex>
+    ),
+    [TableColumn.DURATION]: (
+        <Flex className={styles.headerIconWrapper}>
+            <Icon icon="duration" />
+        </Flex>
+    ),
     [TableColumn.GENRE]: i18n.t('table.column.genre', { postProcess: 'upperCase' }) as string,
     [TableColumn.GENRE_BADGE]: i18n.t('table.column.genre', {
         postProcess: 'upperCase',
@@ -719,7 +730,11 @@ const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.RELEASE_DATE]: i18n.t('table.column.releaseDate', {
         postProcess: 'upperCase',
     }) as string,
-    [TableColumn.ROW_INDEX]: <Icon icon="hash" size="md" />,
+    [TableColumn.ROW_INDEX]: (
+        <Flex className={styles.headerIconWrapper}>
+            <Icon icon="hash" />
+        </Flex>
+    ),
     [TableColumn.SIZE]: i18n.t('table.column.size', { postProcess: 'upperCase' }) as string,
     [TableColumn.SKIP]: '',
     [TableColumn.SONG_COUNT]: i18n.t('table.column.songCount', {
@@ -729,10 +744,16 @@ const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.TITLE_COMBINED]: i18n.t('table.column.title', {
         postProcess: 'upperCase',
     }) as string,
-    [TableColumn.TRACK_NUMBER]: i18n.t('table.column.trackNumber', {
-        postProcess: 'upperCase',
-    }) as string,
-    [TableColumn.USER_FAVORITE]: <Icon icon="favorite" size="md" />,
+    [TableColumn.TRACK_NUMBER]: (
+        <Flex className={styles.headerIconWrapper}>
+            <Icon icon="itemSong" />
+        </Flex>
+    ),
+    [TableColumn.USER_FAVORITE]: (
+        <Flex className={styles.headerIconWrapper}>
+            <Icon icon="favorite" />
+        </Flex>
+    ),
     [TableColumn.USER_RATING]: i18n.t('table.column.rating', {
         postProcess: 'upperCase',
     }) as string,
