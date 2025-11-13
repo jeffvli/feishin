@@ -560,14 +560,34 @@ export const ItemTableList = ({
             const totalReferenceWidth = baseWidths.reduce((sum, width) => sum + width, 0);
 
             if (totalReferenceWidth === 0 || totalContainerWidth === 0) {
-                return baseWidths;
+                return baseWidths.map((width) => Math.round(width));
             }
 
             // Scale factor to fit all columns proportionally within the total container width
             const scaleFactor = totalContainerWidth / totalReferenceWidth;
 
-            // Apply scale factor to all columns proportionally
-            return baseWidths.map((width) => width * scaleFactor);
+            // Apply scale factor to all columns proportionally and round to integers
+            const scaledWidths = baseWidths.map((width) => Math.round(width * scaleFactor));
+
+            // Adjust for rounding errors: ensure total equals totalContainerWidth
+            const totalScaled = scaledWidths.reduce((sum, width) => sum + width, 0);
+            const difference = totalContainerWidth - totalScaled;
+
+            if (difference !== 0 && scaledWidths.length > 0) {
+                // Distribute the difference to the largest columns
+                const sortedIndices = scaledWidths
+                    .map((width, idx) => ({ idx, width }))
+                    .sort((a, b) => b.width - a.width);
+
+                const adjustmentPerColumn = Math.sign(difference);
+                const adjustmentCount = Math.abs(difference);
+
+                for (let i = 0; i < adjustmentCount && i < sortedIndices.length; i++) {
+                    scaledWidths[sortedIndices[i].idx] += adjustmentPerColumn;
+                }
+            }
+
+            return scaledWidths;
         }
 
         // Original behavior: distribute extra space to auto-size columns
@@ -586,7 +606,7 @@ export const ItemTableList = ({
         });
 
         if (unpinnedIndices.length === 0 || autoUnpinnedIndices.length === 0) {
-            return distributed;
+            return distributed.map((width) => Math.round(width));
         }
 
         const unpinnedBaseTotal = unpinnedIndices.reduce((sum, idx) => sum + baseWidths[idx], 0);
@@ -594,15 +614,16 @@ export const ItemTableList = ({
         // Distribute only when there is extra space within the center container
         const extra = Math.max(0, centerContainerWidth - unpinnedBaseTotal);
         if (extra <= 0) {
-            return distributed;
+            return distributed.map((width) => Math.round(width));
         }
 
         const extraPer = extra / autoUnpinnedIndices.length;
         autoUnpinnedIndices.forEach((idx) => {
-            distributed[idx] = baseWidths[idx] + extraPer;
+            distributed[idx] = Math.round(baseWidths[idx] + extraPer);
         });
 
-        return distributed;
+        // Round all widths to integers
+        return distributed.map((width) => Math.round(width));
     }, [parsedColumns, centerContainerWidth, autoFitColumns, totalContainerWidth]);
 
     const pinnedLeftColumnCount = parsedColumns.filter((col) => col.pinned === 'left').length;
