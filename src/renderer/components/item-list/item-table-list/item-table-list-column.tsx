@@ -342,6 +342,13 @@ export const TableColumnTextContainer = (
     const isDragging = props.isDragging ?? false;
     const mergedRef = useMergedRef(containerRef, props.dragRef ?? null);
 
+    const isLastColumn = props.columnIndex === props.columns.length - 1;
+    const isLastRow =
+        isDataRow &&
+        (props.enableHeader
+            ? props.rowIndex === props.data.length
+            : props.rowIndex === props.data.length - 1);
+
     useEffect(() => {
         if (!isDataRow || !containerRef.current) return;
 
@@ -464,8 +471,11 @@ export const TableColumnTextContainer = (
                 [styles.rowHoverHighlightEnabled]: isDataRow && props.enableRowHoverHighlight,
                 [styles.rowSelected]: isDataRow && isSelected,
                 [styles.withHorizontalBorder]:
-                    props.enableHorizontalBorders && props.enableHeader && props.rowIndex > 0,
-                [styles.withVerticalBorder]: props.enableVerticalBorders,
+                    props.enableHorizontalBorders &&
+                    props.enableHeader &&
+                    props.rowIndex > 0 &&
+                    !isLastRow,
+                [styles.withVerticalBorder]: props.enableVerticalBorders && !isLastColumn,
             })}
             data-row-index={isDataRow ? `${props.tableId}-${props.rowIndex}` : undefined}
             onClick={handleCellClick}
@@ -509,6 +519,13 @@ export const TableColumnContainer = (
 
     const isDragging = props.isDragging ?? false;
     const mergedRef = useMergedRef(containerRef, props.dragRef ?? null);
+
+    const isLastColumn = props.columnIndex === props.columns.length - 1;
+    const isLastRow =
+        isDataRow &&
+        (props.enableHeader
+            ? props.rowIndex === props.data.length
+            : props.rowIndex === props.data.length - 1);
 
     useEffect(() => {
         if (!isDataRow || !containerRef.current) return;
@@ -632,8 +649,11 @@ export const TableColumnContainer = (
                 [styles.rowHoverHighlightEnabled]: isDataRow && props.enableRowHoverHighlight,
                 [styles.rowSelected]: isDataRow && isSelected,
                 [styles.withHorizontalBorder]:
-                    props.enableHorizontalBorders && props.enableHeader && props.rowIndex > 0,
-                [styles.withVerticalBorder]: props.enableVerticalBorders,
+                    props.enableHorizontalBorders &&
+                    props.enableHeader &&
+                    props.rowIndex > 0 &&
+                    !isLastRow,
+                [styles.withVerticalBorder]: props.enableVerticalBorders && !isLastColumn,
             })}
             data-row-index={isDataRow ? `${props.tableId}-${props.rowIndex}` : undefined}
             onClick={handleCellClick}
