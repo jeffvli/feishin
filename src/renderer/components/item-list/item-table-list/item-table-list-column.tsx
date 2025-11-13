@@ -70,8 +70,6 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
 
                 const draggedItems = getDraggedItems(item as any, props.internalState);
 
-                console.log('getId', draggedItems);
-
                 return draggedItems.map((draggedItem) => draggedItem.id);
             },
             getItem: () => {
