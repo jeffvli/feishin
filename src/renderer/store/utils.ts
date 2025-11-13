@@ -21,15 +21,12 @@ export const mergeOverridingColumns = <T>(persistedState: unknown, currentState:
 
 export const idbStateStorage: StateStorage = {
     getItem: async (name: string): Promise<null | string> => {
-        console.log(name, 'has been retrieved');
         return (await get(name)) || null;
     },
     removeItem: async (name: string): Promise<void> => {
-        console.log(name, 'has been deleted');
         await del(name);
     },
     setItem: async (name: string, value: string): Promise<void> => {
-        console.log(name, 'with value', value, 'has been saved');
         await set(name, value);
     },
 };
