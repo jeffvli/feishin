@@ -26,7 +26,6 @@ interface MpvPlayerEngineProps {
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.api.mpvPlayerListener : null;
 const ipc = isElectron() ? window.api.ipc : null;
-const utils = isElectron() ? window.api.utils : null;
 
 const PROGRESS_UPDATE_INTERVAL = 250;
 const TRANSITION_PROGRESS_INTERVAL = 10;
@@ -74,8 +73,6 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
 
                 mpvPlayer?.volume(properties.volume);
             }
-
-            utils?.restoreQueue();
         };
 
         initializeMpv();
