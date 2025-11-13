@@ -20,6 +20,7 @@ import {
     SongListResponse,
     SongListSort,
     SortOrder,
+    sortSongsByFetchedOrder,
 } from '/@/shared/types/domain-types';
 import { Play, PlayerRepeat, PlayerShuffle } from '/@/shared/types/types';
 
@@ -183,11 +184,13 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                     toast.hide(toastId);
                 }
 
+                const sortedSongs = sortSongsByFetchedOrder(songs, id, itemType);
+
                 if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
                     const edge = type.edge === 'top' ? 'top' : 'bottom';
-                    storeActions.addToQueueByUniqueId(songs, type.uniqueId, edge);
+                    storeActions.addToQueueByUniqueId(sortedSongs, type.uniqueId, edge);
                 } else {
-                    storeActions.addToQueueByType(songs, type as Play);
+                    storeActions.addToQueueByType(sortedSongs, type as Play);
                 }
             } catch (err: any) {
                 if (instanceOfCancellationError(err)) {

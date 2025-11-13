@@ -1595,6 +1595,81 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
     return results;
 };
 
+export const sortSongsByFetchedOrder = (
+    songs: Song[],
+    fetchedIds: string[],
+    itemType: LibraryItem,
+): Song[] => {
+    // Group songs by the fetched ID they belong to
+    const songsByFetchedId = new Map<string, Song[]>();
+
+    for (const song of songs) {
+        let matchedId: string | undefined;
+
+        switch (itemType) {
+            case LibraryItem.ALBUM:
+                matchedId = fetchedIds.find((id) => song.albumId === id);
+                break;
+            case LibraryItem.ALBUM_ARTIST:
+                matchedId = fetchedIds.find((id) =>
+                    song.albumArtists.some((artist) => artist.id === id),
+                );
+                break;
+            case LibraryItem.ARTIST:
+                matchedId = fetchedIds.find((id) =>
+                    song.artists.some((artist) => artist.id === id),
+                );
+                break;
+            case LibraryItem.GENRE:
+                matchedId = fetchedIds.find((id) => song.genres.some((genre) => genre.id === id));
+                break;
+            case LibraryItem.PLAYLIST:
+                // For playlists, we might need to track which playlist each song came from
+                // This is a simplified approach - you may need to adjust based on your data structure
+                matchedId = fetchedIds.find((id) => song.playlistItemId === id);
+                break;
+            default:
+                break;
+        }
+
+        if (matchedId) {
+            if (!songsByFetchedId.has(matchedId)) {
+                songsByFetchedId.set(matchedId, []);
+            }
+            songsByFetchedId.get(matchedId)!.push(song);
+        }
+    }
+
+    // Sort each group by discNumber and trackNumber
+    for (const [fetchedId, groupSongs] of songsByFetchedId.entries()) {
+        const sortedGroup = orderBy(groupSongs, ['discNumber', 'trackNumber'], ['asc', 'asc']);
+        songsByFetchedId.set(fetchedId, sortedGroup);
+    }
+
+    // Combine groups in the order of fetchedIds
+    const result: Song[] = [];
+    for (const fetchedId of fetchedIds) {
+        const groupSongs = songsByFetchedId.get(fetchedId);
+        if (groupSongs) {
+            result.push(...groupSongs);
+        }
+    }
+
+    // Add any songs that didn't match any fetched ID at the end
+    const matchedIds = new Set(result.map((s) => s.id));
+    const unmatchedSongs = songs.filter((s) => !matchedIds.has(s.id));
+    if (unmatchedSongs.length > 0) {
+        const sortedUnmatched = orderBy(
+            unmatchedSongs,
+            ['discNumber', 'trackNumber'],
+            ['asc', 'asc'],
+        );
+        result.push(...sortedUnmatched);
+    }
+
+    return result;
+};
+
 export const sortAlbumArtistList = (
     artists: AlbumArtist[],
     sortBy: AlbumArtistListSort | ArtistListSort,
