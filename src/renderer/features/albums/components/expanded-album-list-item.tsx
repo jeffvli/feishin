@@ -18,6 +18,7 @@ import { ItemListItem } from '/@/renderer/components/item-list/types';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Separator } from '/@/shared/components/separator/separator';
@@ -40,6 +41,7 @@ interface AlbumTracksTableProps {
 }
 
 interface ExpandedAlbumListItemProps {
+    internalState?: ItemListStateActions;
     item: ItemListStateItem;
 }
 
@@ -163,7 +165,7 @@ const AlbumTracksTable = ({ isDark, serverId, songs }: AlbumTracksTableProps) =>
     );
 };
 
-export const ExpandedAlbumListItem = ({ item }: ExpandedAlbumListItemProps) => {
+export const ExpandedAlbumListItem = ({ internalState, item }: ExpandedAlbumListItemProps) => {
     const { data, isLoading } = useSuspenseQuery(
         albumQueries.detail({
             query: { id: item.id },
@@ -201,13 +203,37 @@ export const ExpandedAlbumListItem = ({ item }: ExpandedAlbumListItemProps) => {
                 <div className={styles.expanded}>
                     <div className={styles.content}>
                         <div className={styles.header}>
-                            <TextTitle
-                                className={clsx(styles.itemTitle, { [styles.dark]: color.isDark })}
-                                fw={700}
-                                order={4}
-                            >
-                                {data?.name}
-                            </TextTitle>
+                            <div className={styles.headerTitle}>
+                                <TextTitle
+                                    className={clsx(styles.itemTitle, {
+                                        [styles.dark]: color.isDark,
+                                    })}
+                                    fw={700}
+                                    order={4}
+                                >
+                                    {data?.name}
+                                </TextTitle>
+                                {internalState && (
+                                    <ActionIcon
+                                        className={clsx(styles.closeButton, {
+                                            [styles.dark]: color.isDark,
+                                        })}
+                                        icon="x"
+                                        iconProps={{
+                                            size: 'xl',
+                                        }}
+                                        onClick={() => {
+                                            const rowId = internalState.extractRowId(item);
+                                            if (rowId) {
+                                                internalState.clearExpanded();
+                                            }
+                                        }}
+                                        radius="50%"
+                                        size="sm"
+                                        variant="subtle"
+                                    />
+                                )}
+                            </div>
                             <Group
                                 className={clsx(styles.itemSubtitle, {
                                     [styles.dark]: color.isDark,
