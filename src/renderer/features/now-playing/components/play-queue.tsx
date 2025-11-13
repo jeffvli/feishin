@@ -12,6 +12,7 @@ import {
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { useListSettings, usePlayerQueue } from '/@/renderer/store';
 import { searchSongs } from '/@/renderer/utils/search-songs';
+import { Box } from '/@/shared/components/box/box';
 import { Flex } from '/@/shared/components/flex/flex';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
 import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
@@ -69,9 +70,10 @@ export const PlayQueue = forwardRef(({ listKey, searchTerm }: QueueProps, ref: R
     const isEmpty = data.length === 0;
 
     return (
-        <>
+        <Box className="play-queue" pos="relative" style={{ flex: 1, minHeight: 0 }} w="100%">
             <LoadingOverlay pos="absolute" visible={isFetching} />
             <ItemTableList
+                autoFitColumns={table.autoFitColumns}
                 CellComponent={ItemTableListColumn}
                 columns={table.columns}
                 data={data || []}
@@ -93,7 +95,7 @@ export const PlayQueue = forwardRef(({ listKey, searchTerm }: QueueProps, ref: R
                 size={table.size}
             />
             {isEmpty && <EmptyQueueDropZone />}
-        </>
+        </Box>
     );
 });
 

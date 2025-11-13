@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
-import { Flex } from '/@/shared/components/flex/flex';
+import { Stack } from '/@/shared/components/stack/stack';
 import { ItemListKey } from '/@/shared/types/types';
 
 export const SidebarPlayQueue = () => {
@@ -10,7 +10,7 @@ export const SidebarPlayQueue = () => {
     const [search, setSearch] = useState<string | undefined>(undefined);
 
     return (
-        <Flex direction="column" h="100%" w="100%">
+        <Stack gap={0} h="100%" id="sidebar-play-queue-container" pos="relative" w="100%">
             <PlayQueueListControls
                 handleSearch={setSearch}
                 searchTerm={search}
@@ -18,6 +18,6 @@ export const SidebarPlayQueue = () => {
                 type={ItemListKey.SIDE_QUEUE}
             />
             <PlayQueue listKey={ItemListKey.SIDE_QUEUE} searchTerm={search} />
-        </Flex>
+        </Stack>
     );
 };
