@@ -60,6 +60,10 @@
     line-clamp: 3;
 }
 
+.container.data-row {
+    cursor: pointer;
+}
+
 .container.with-horizontal-border {
     border-bottom: 1px solid var(--theme-colors-border);
 }
@@ -160,12 +164,6 @@
 .container.data-row > * {
     position: relative;
     z-index: 2;
-}
-
-.container.data-row {
-    cursor: pointer;
-    border-top: 1px solid transparent;
-    border-bottom: 1px solid transparent;
 }
 
 .header-container {
