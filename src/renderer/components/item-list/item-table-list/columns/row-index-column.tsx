@@ -7,6 +7,7 @@ import {
     TableColumnContainer,
     TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
+import { ItemListItem } from '/@/renderer/components/item-list/types';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Text } from '/@/shared/components/text/text';
 
@@ -21,7 +22,12 @@ export const RowIndexColumn = (props: ItemTableListInnerColumn) => {
                     icon="arrowDownS"
                     iconProps={{ color: 'muted', size: 'md' }}
                     onClick={(e) =>
-                        controls.onExpand?.(props.data[props.rowIndex] as any, props.itemType, e)
+                        controls.onExpand?.({
+                            event: e,
+                            internalState: props.internalState,
+                            item: props.data[props.rowIndex] as ItemListItem,
+                            itemType: props.itemType,
+                        })
                     }
                     size="xs"
                     variant="subtle"
