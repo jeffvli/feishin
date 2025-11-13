@@ -15,12 +15,16 @@ export const useDefaultItemListControls = () => {
                     return;
                 }
 
-                // Use the full item instead of converting to minimal
+                // Extract rowId from the item
+                const rowId = internalState.extractRowId(item);
+                if (!rowId) return;
+
+                // Use the item directly (rowId is separate, used only as key in state)
                 const itemListItem = item as ItemListStateItemWithRequiredProperties;
 
                 // Check if ctrl/cmd key is held for multi-selection
                 if (event.ctrlKey || event.metaKey) {
-                    const isCurrentlySelected = internalState.isSelected(item.id);
+                    const isCurrentlySelected = internalState.isSelected(rowId);
 
                     if (isCurrentlySelected) {
                         // Remove this item from selection
@@ -31,8 +35,7 @@ export const useDefaultItemListControls = () => {
                             ): selectedItem is ItemListStateItemWithRequiredProperties =>
                                 typeof selectedItem === 'object' &&
                                 selectedItem !== null &&
-                                'id' in selectedItem &&
-                                (selectedItem as any).id !== item.id,
+                                internalState.extractRowId(selectedItem) !== rowId,
                         );
                         internalState.setSelected(filteredSelected);
                     } else {
@@ -58,19 +61,18 @@ export const useDefaultItemListControls = () => {
                     if (
                         lastSelectedItem &&
                         typeof lastSelectedItem === 'object' &&
-                        lastSelectedItem !== null &&
-                        'id' in lastSelectedItem
+                        lastSelectedItem !== null
                     ) {
                         // Get the data array from internalState
                         const data = internalState.getData();
                         // Filter out null/undefined values (e.g., header row)
-                        const validData = data.filter(
-                            (d) => d && typeof d === 'object' && 'id' in d,
-                        );
+                        const validData = data.filter((d) => d && typeof d === 'object');
 
                         // Find the indices of the last selected item and current item
-                        const lastIndex = internalState.findItemIndex((lastSelectedItem as any).id);
-                        const currentIndex = internalState.findItemIndex(item.id);
+                        const lastRowId = internalState.extractRowId(lastSelectedItem);
+                        if (!lastRowId) return;
+                        const lastIndex = internalState.findItemIndex(lastRowId);
+                        const currentIndex = internalState.findItemIndex(rowId);
 
                         if (lastIndex !== -1 && currentIndex !== -1) {
                             // Create range selection - select ALL items in the range
@@ -83,13 +85,15 @@ export const useDefaultItemListControls = () => {
                                 if (
                                     rangeItem &&
                                     typeof rangeItem === 'object' &&
-                                    'id' in rangeItem &&
                                     '_serverId' in rangeItem &&
                                     'itemType' in rangeItem
                                 ) {
-                                    rangeItems.push(
-                                        rangeItem as ItemListStateItemWithRequiredProperties,
-                                    );
+                                    const rangeRowId = internalState.extractRowId(rangeItem);
+                                    if (rangeRowId) {
+                                        rangeItems.push(
+                                            rangeItem as ItemListStateItemWithRequiredProperties,
+                                        );
+                                    }
                                 }
                             }
 
@@ -104,9 +108,12 @@ export const useDefaultItemListControls = () => {
                                 ),
                             ];
                             rangeItems.forEach((rangeItem) => {
+                                const rangeRowId = internalState.extractRowId(rangeItem);
                                 if (
+                                    rangeRowId &&
                                     !newSelected.some(
-                                        (selected) => (selected as any).id === rangeItem.id,
+                                        (selected) =>
+                                            internalState.extractRowId(selected) === rangeRowId,
                                     )
                                 ) {
                                     newSelected.push(rangeItem);
@@ -126,8 +133,7 @@ export const useDefaultItemListControls = () => {
                         selectedItems.length === 1 &&
                         typeof selectedItems[0] === 'object' &&
                         selectedItems[0] !== null &&
-                        'id' in selectedItems[0] &&
-                        (selectedItems[0] as any).id === item.id;
+                        internalState.extractRowId(selectedItems[0]) === rowId;
 
                     if (isOnlySelected) {
                         internalState.clearSelected();
@@ -146,9 +152,14 @@ export const useDefaultItemListControls = () => {
                     return;
                 }
 
-                return internalState?.toggleExpanded(
-                    item as ItemListStateItemWithRequiredProperties,
-                );
+                // Extract rowId from the item
+                const rowId = internalState.extractRowId(item);
+                if (!rowId) return;
+
+                // Use the item directly (rowId is separate, used only as key in state)
+                const itemListItem = item as ItemListStateItemWithRequiredProperties;
+
+                return internalState?.toggleExpanded(itemListItem);
             },
 
             onFavorite: ({

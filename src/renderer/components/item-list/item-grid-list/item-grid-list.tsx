@@ -34,10 +34,11 @@ import {
 } from '/@/renderer/components/item-card/item-card';
 import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded-list-container';
 import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
+import { createExtractRowId } from '/@/renderer/components/item-list/helpers/extract-row-id';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
     ItemListStateActions,
-    ItemListStateItem,
+    ItemListStateItemWithRequiredProperties,
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls, ItemListHandle } from '/@/renderer/components/item-list/types';
@@ -249,6 +250,7 @@ export interface ItemGridListProps {
     enableExpansion?: boolean;
     enableSelection?: boolean;
     gap?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
+    getRowId?: ((item: unknown) => string) | string;
     initialTop?: number;
     itemsPerRow?: number;
     itemType: LibraryItem;
@@ -264,6 +266,7 @@ export const ItemGridList = ({
     enableExpansion = true,
     enableSelection = true,
     gap = 'sm',
+    getRowId,
     initialTop,
     itemsPerRow,
     itemType,
@@ -284,7 +287,9 @@ export const ItemGridList = ({
         return data;
     }, [data]);
 
-    const internalState = useItemListState(getDataFn);
+    const extractRowId = useMemo(() => createExtractRowId(getRowId), [getRowId]);
+
+    const internalState = useItemListState(getDataFn, extractRowId);
 
     const [initialize] = useOverlayScrollbars({
         defer: false,
@@ -372,13 +377,13 @@ export const ItemGridList = ({
 
             if (selected.length > 0) {
                 const lastSelected = selected[selected.length - 1];
-                currentIndex = data.findIndex(
-                    (d: any) =>
-                        d &&
-                        typeof d === 'object' &&
-                        'id' in d &&
-                        d.id === (lastSelected as any).id,
-                );
+                const lastRowId = internalState.extractRowId(lastSelected);
+                if (lastRowId) {
+                    currentIndex = data.findIndex((d: any) => {
+                        const rowId = internalState.extractRowId(d);
+                        return rowId === lastRowId;
+                    });
+                }
             }
 
             // Calculate grid position
@@ -474,85 +479,87 @@ export const ItemGridList = ({
 
                 if (lastSelectedItem) {
                     // Find the indices of the last selected item and new item
-                    const lastIndex = data.findIndex(
-                        (d: any) =>
-                            d &&
-                            typeof d === 'object' &&
-                            'id' in d &&
-                            d.id === (lastSelectedItem as any).id,
-                    );
+                    const lastRowId = internalState.extractRowId(lastSelectedItem);
+                    if (!lastRowId) return;
+
+                    const lastIndex = data.findIndex((d: any) => {
+                        const rowId = internalState.extractRowId(d);
+                        return rowId === lastRowId;
+                    });
 
                     if (lastIndex !== -1 && newIndex !== -1) {
                         // Create range selection from last selected to new position
                         const startIndex = Math.min(lastIndex, newIndex);
                         const stopIndex = Math.max(lastIndex, newIndex);
 
-                        const rangeItems: ItemListStateItem[] = [];
+                        const rangeItems: ItemListStateItemWithRequiredProperties[] = [];
                         for (let i = startIndex; i <= stopIndex; i++) {
                             const rangeItem = data[i];
                             if (
                                 rangeItem &&
                                 typeof rangeItem === 'object' &&
-                                'id' in rangeItem &&
-                                'serverId' in rangeItem
+                                '_serverId' in rangeItem &&
+                                'itemType' in rangeItem &&
+                                internalState.extractRowId(rangeItem)
                             ) {
-                                rangeItems.push({
-                                    _serverId: (rangeItem as any).serverId,
-                                    id: (rangeItem as any).id,
-                                    itemType,
-                                });
+                                rangeItems.push(
+                                    rangeItem as ItemListStateItemWithRequiredProperties,
+                                );
                             }
                         }
 
                         // Add range items to selection (matching shift+click behavior)
                         const currentSelected = internalState.getSelected();
-                        const newSelected = [...currentSelected];
+                        const newSelected: ItemListStateItemWithRequiredProperties[] = [
+                            ...currentSelected.filter(
+                                (item): item is ItemListStateItemWithRequiredProperties =>
+                                    typeof item === 'object' && item !== null,
+                            ),
+                        ];
                         rangeItems.forEach((rangeItem) => {
+                            const rangeRowId = internalState.extractRowId(rangeItem);
                             if (
-                                !newSelected.some((selected: any) => selected.id === rangeItem.id)
+                                rangeRowId &&
+                                !newSelected.some(
+                                    (selected) =>
+                                        internalState.extractRowId(selected) === rangeRowId,
+                                )
                             ) {
                                 newSelected.push(rangeItem);
                             }
                         });
 
                         // Ensure the last item in selection is the item at newIndex for incremental extension
-                        const newItemListItem: ItemListStateItem = {
-                            _serverId: newItem.serverId,
-                            id: newItem.id,
-                            itemType,
-                        };
-                        // Remove the new item from its current position if it exists
-                        const filteredSelected = newSelected.filter(
-                            (item: any) => item.id !== newItemListItem.id,
-                        );
-                        // Add it at the end so it becomes the last selected item
-                        filteredSelected.push(newItemListItem);
-                        internalState.setSelected(filteredSelected as any);
+                        const newItemListItem = newItem as ItemListStateItemWithRequiredProperties;
+                        const newItemRowId = internalState.extractRowId(newItemListItem);
+                        if (newItemRowId) {
+                            // Remove the new item from its current position if it exists
+                            const filteredSelected = newSelected.filter(
+                                (item) => internalState.extractRowId(item) !== newItemRowId,
+                            );
+                            // Add it at the end so it becomes the last selected item
+                            filteredSelected.push(newItemListItem);
+                            internalState.setSelected(filteredSelected);
+                        }
                     }
                 } else {
                     // No previous selection, just select the new item
-                    internalState.setSelected([
-                        {
-                            _serverId: newItem.serverId,
-                            id: newItem.id,
-                            itemType,
-                        },
-                    ]);
+                    const newItemListItem = newItem as ItemListStateItemWithRequiredProperties;
+                    if (internalState.extractRowId(newItemListItem)) {
+                        internalState.setSelected([newItemListItem]);
+                    }
                 }
             } else {
                 // Without Shift: select only the new item
-                internalState.setSelected([
-                    {
-                        _serverId: newItem.serverId,
-                        id: newItem.id,
-                        itemType,
-                    },
-                ]);
+                const newItemListItem = newItem as ItemListStateItemWithRequiredProperties;
+                if (internalState.extractRowId(newItemListItem)) {
+                    internalState.setSelected([newItemListItem]);
+                }
             }
 
             scrollToIndex(newIndex);
         },
-        [data, enableSelection, internalState, itemType, tableMeta, scrollToIndex],
+        [data, enableSelection, internalState, tableMeta, scrollToIndex],
     );
 
     const imperativeHandle: ItemListHandle = useMemo(() => {

@@ -335,7 +335,7 @@ export const TableColumnTextContainer = (
     const item = isDataRow ? props.data[props.rowIndex] : null;
     const isSelected =
         item && typeof item === 'object' && 'id' in item
-            ? props.internalState.isSelected((item as any).id)
+            ? props.internalState.isSelected(props.internalState.extractRowId(item) || '')
             : false;
 
     const isDragging = props.isDragging ?? false;
@@ -503,7 +503,7 @@ export const TableColumnContainer = (
     const item = isDataRow ? props.data[props.rowIndex] : null;
     const isSelected =
         item && typeof item === 'object' && 'id' in item
-            ? props.internalState.isSelected((item as any).id)
+            ? props.internalState.isSelected(props.internalState.extractRowId(item) || '')
             : false;
 
     const isDragging = props.isDragging ?? false;

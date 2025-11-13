@@ -21,27 +21,47 @@ export const itemGridActions = {
         type: 'CLEAR_SELECTED',
     }),
 
-    setDragging: (items: ItemListStateItemWithRequiredProperties[]): ItemListAction => ({
+    setDragging: (
+        items: ItemListStateItemWithRequiredProperties[],
+        extractRowId: (item: unknown) => string | undefined,
+    ): ItemListAction => ({
+        extractRowId,
         payload: items,
         type: 'SET_DRAGGING',
     }),
 
-    setExpanded: (items: ItemListStateItemWithRequiredProperties[]): ItemListAction => ({
+    setExpanded: (
+        items: ItemListStateItemWithRequiredProperties[],
+        extractRowId: (item: unknown) => string | undefined,
+    ): ItemListAction => ({
+        extractRowId,
         payload: items,
         type: 'SET_EXPANDED',
     }),
 
-    setSelected: (items: ItemListStateItemWithRequiredProperties[]): ItemListAction => ({
+    setSelected: (
+        items: ItemListStateItemWithRequiredProperties[],
+        extractRowId: (item: unknown) => string | undefined,
+    ): ItemListAction => ({
+        extractRowId,
         payload: items,
         type: 'SET_SELECTED',
     }),
 
-    toggleExpanded: (item: ItemListStateItemWithRequiredProperties): ItemListAction => ({
+    toggleExpanded: (
+        item: ItemListStateItemWithRequiredProperties,
+        extractRowId: (item: unknown) => string | undefined,
+    ): ItemListAction => ({
+        extractRowId,
         payload: item,
         type: 'TOGGLE_EXPANDED',
     }),
 
-    toggleSelected: (item: ItemListStateItemWithRequiredProperties): ItemListAction => ({
+    toggleSelected: (
+        item: ItemListStateItemWithRequiredProperties,
+        extractRowId: (item: unknown) => string | undefined,
+    ): ItemListAction => ({
+        extractRowId,
         payload: item,
         type: 'TOGGLE_SELECTED',
     }),
@@ -104,16 +124,16 @@ export const itemGridSelectors = {
         return state.selected.size > 0;
     },
 
-    isDragging: (state: ItemListState, itemId: string): boolean => {
-        return state.dragging.has(itemId);
+    isDragging: (state: ItemListState, rowId: string): boolean => {
+        return state.dragging.has(rowId);
     },
 
-    isExpanded: (state: ItemListState, itemId: string): boolean => {
-        return state.expanded.has(itemId);
+    isExpanded: (state: ItemListState, rowId: string): boolean => {
+        return state.expanded.has(rowId);
     },
 
-    isSelected: (state: ItemListState, itemId: string): boolean => {
-        return state.selected.has(itemId);
+    isSelected: (state: ItemListState, rowId: string): boolean => {
+        return state.selected.has(rowId);
     },
 };
 
@@ -121,15 +141,15 @@ export const itemListUtils = {
     /**
      * Check if all items in a list are selected
      */
-    areAllSelected: (state: ItemListState, itemIds: string[]): boolean => {
-        return itemIds.every((id) => state.selected.has(id));
+    areAllSelected: (state: ItemListState, rowIds: string[]): boolean => {
+        return rowIds.every((id) => state.selected.has(id));
     },
 
     /**
      * Check if any items in a list are selected
      */
-    areAnySelected: (state: ItemListState, itemIds: string[]): boolean => {
-        return itemIds.some((id) => state.selected.has(id));
+    areAnySelected: (state: ItemListState, rowIds: string[]): boolean => {
+        return rowIds.some((id) => state.selected.has(id));
     },
 
     /**
@@ -152,9 +172,15 @@ export const itemListUtils = {
     toggleAllExpanded: (
         items: ItemListStateItemWithRequiredProperties[],
         currentState: ItemListState,
+        extractRowId: (item: unknown) => string | undefined,
     ): ItemListAction => {
-        const allExpanded = items.every((item) => currentState.expanded.has(item.id));
-        return allExpanded ? itemGridActions.clearExpanded() : itemGridActions.setExpanded(items);
+        const allExpanded = items.every((item) => {
+            const rowId = extractRowId(item);
+            return rowId ? currentState.expanded.has(rowId) : false;
+        });
+        return allExpanded
+            ? itemGridActions.clearExpanded()
+            : itemGridActions.setExpanded(items, extractRowId);
     },
 
     /**
@@ -163,8 +189,14 @@ export const itemListUtils = {
     toggleAllSelected: (
         items: ItemListStateItemWithRequiredProperties[],
         currentState: ItemListState,
+        extractRowId: (item: unknown) => string | undefined,
     ): ItemListAction => {
-        const allSelected = items.every((item) => currentState.selected.has(item.id));
-        return allSelected ? itemGridActions.clearSelected() : itemGridActions.setSelected(items);
+        const allSelected = items.every((item) => {
+            const rowId = extractRowId(item);
+            return rowId ? currentState.selected.has(rowId) : false;
+        });
+        return allSelected
+            ? itemGridActions.clearSelected()
+            : itemGridActions.setSelected(items, extractRowId);
     },
 };

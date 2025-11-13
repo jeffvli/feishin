@@ -4,11 +4,31 @@ import { itemGridSelectors } from '/@/renderer/components/item-list/helpers/item
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 export type ItemListAction =
-    | { payload: ItemListStateItemWithRequiredProperties; type: 'TOGGLE_EXPANDED' }
-    | { payload: ItemListStateItemWithRequiredProperties; type: 'TOGGLE_SELECTED' }
-    | { payload: ItemListStateItemWithRequiredProperties[]; type: 'SET_DRAGGING' }
-    | { payload: ItemListStateItemWithRequiredProperties[]; type: 'SET_EXPANDED' }
-    | { payload: ItemListStateItemWithRequiredProperties[]; type: 'SET_SELECTED' }
+    | {
+          extractRowId: (item: unknown) => string | undefined;
+          payload: ItemListStateItemWithRequiredProperties;
+          type: 'TOGGLE_EXPANDED';
+      }
+    | {
+          extractRowId: (item: unknown) => string | undefined;
+          payload: ItemListStateItemWithRequiredProperties;
+          type: 'TOGGLE_SELECTED';
+      }
+    | {
+          extractRowId: (item: unknown) => string | undefined;
+          payload: ItemListStateItemWithRequiredProperties[];
+          type: 'SET_DRAGGING';
+      }
+    | {
+          extractRowId: (item: unknown) => string | undefined;
+          payload: ItemListStateItemWithRequiredProperties[];
+          type: 'SET_EXPANDED';
+      }
+    | {
+          extractRowId: (item: unknown) => string | undefined;
+          payload: ItemListStateItemWithRequiredProperties[];
+          type: 'SET_SELECTED';
+      }
     | { type: 'CLEAR_ALL' }
     | { type: 'CLEAR_DRAGGING' }
     | { type: 'CLEAR_EXPANDED' }
@@ -29,7 +49,8 @@ export interface ItemListStateActions {
     clearDragging: () => void;
     clearExpanded: () => void;
     clearSelected: () => void;
-    findItemIndex: (itemId: string) => number;
+    extractRowId: (item: unknown) => string | undefined;
+    findItemIndex: (rowId: string) => number;
     getData: () => unknown[];
     getDragging: () => unknown[];
     getDraggingIds: () => string[];
@@ -41,9 +62,9 @@ export interface ItemListStateActions {
     hasDragging: () => boolean;
     hasExpanded: () => boolean;
     hasSelected: () => boolean;
-    isDragging: (itemId: string) => boolean;
-    isExpanded: (itemId: string) => boolean;
-    isSelected: (itemId: string) => boolean;
+    isDragging: (rowId: string) => boolean;
+    isExpanded: (rowId: string) => boolean;
+    isSelected: (rowId: string) => boolean;
     setDragging: (items: ItemListStateItemWithRequiredProperties[]) => void;
     setExpanded: (items: ItemListStateItemWithRequiredProperties[]) => void;
     setSelected: (items: ItemListStateItemWithRequiredProperties[]) => void;
@@ -110,8 +131,11 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
             const newDraggingItems = new Map<string, unknown>();
 
             action.payload.forEach((item) => {
-                newDragging.add(item.id);
-                newDraggingItems.set(item.id, item);
+                const rowId = action.extractRowId(item);
+                if (rowId) {
+                    newDragging.add(rowId);
+                    newDraggingItems.set(rowId, item);
+                }
             });
 
             return {
@@ -128,8 +152,11 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
 
             if (action.payload.length > 0) {
                 const firstItem = action.payload[0];
-                newExpanded.add(firstItem.id);
-                newExpandedItems.set(firstItem.id, firstItem);
+                const rowId = action.extractRowId(firstItem);
+                if (rowId) {
+                    newExpanded.add(rowId);
+                    newExpandedItems.set(rowId, firstItem);
+                }
             }
 
             return {
@@ -145,8 +172,11 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
             const newSelectedItems = new Map<string, unknown>();
 
             action.payload.forEach((item) => {
-                newSelected.add(item.id);
-                newSelectedItems.set(item.id, item);
+                const rowId = action.extractRowId(item);
+                if (rowId) {
+                    newSelected.add(rowId);
+                    newSelectedItems.set(rowId, item);
+                }
             });
 
             return {
@@ -161,13 +191,18 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
             const newExpanded = new Set<string>();
             const newExpandedItems = new Map<string, unknown>();
 
+            const rowId = action.extractRowId(action.payload);
+            if (!rowId) {
+                return state;
+            }
+
             // If the item is already expanded, collapse it
-            if (state.expanded.has(action.payload.id)) {
+            if (state.expanded.has(rowId)) {
                 // Item is expanded, so collapse it (leave sets empty)
             } else {
                 // Item is not expanded, so expand it (clear others first for single expansion)
-                newExpanded.add(action.payload.id);
-                newExpandedItems.set(action.payload.id, action.payload);
+                newExpanded.add(rowId);
+                newExpandedItems.set(rowId, action.payload);
             }
 
             return {
@@ -182,12 +217,17 @@ export const itemListReducer = (state: ItemListState, action: ItemListAction): I
             const newSelected = new Set(state.selected);
             const newSelectedItems = new Map(state.selectedItems);
 
-            if (newSelected.has(action.payload.id)) {
-                newSelected.delete(action.payload.id);
-                newSelectedItems.delete(action.payload.id);
+            const rowId = action.extractRowId(action.payload);
+            if (!rowId) {
+                return state;
+            }
+
+            if (newSelected.has(rowId)) {
+                newSelected.delete(rowId);
+                newSelectedItems.delete(rowId);
             } else {
-                newSelected.add(action.payload.id);
-                newSelectedItems.set(action.payload.id, action.payload);
+                newSelected.add(rowId);
+                newSelectedItems.set(rowId, action.payload);
             }
 
             return {
@@ -213,39 +253,91 @@ export const initialItemListState: ItemListState = {
     version: 0,
 };
 
-export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActions => {
+export const useItemListState = (
+    getDataFn?: () => unknown[],
+    extractRowId?: (item: unknown) => string | undefined,
+): ItemListStateActions => {
     const [state, dispatch] = useReducer(itemListReducer, initialItemListState);
 
-    const setExpanded = useCallback((items: ItemListStateItemWithRequiredProperties[]) => {
-        dispatch({ payload: items, type: 'SET_EXPANDED' });
-    }, []);
+    const extractRowIdFn = useCallback(
+        (item: unknown) => {
+            if (extractRowId) {
+                return extractRowId(item);
+            }
+            // Fallback to id if extractRowId is not provided
+            if (item && typeof item === 'object' && 'id' in item) {
+                return (item as any).id;
+            }
+            return undefined;
+        },
+        [extractRowId],
+    );
 
-    const setDragging = useCallback((items: ItemListStateItemWithRequiredProperties[]) => {
-        dispatch({ payload: items, type: 'SET_DRAGGING' });
-    }, []);
+    const setExpanded = useCallback(
+        (items: ItemListStateItemWithRequiredProperties[]) => {
+            dispatch({
+                extractRowId: extractRowIdFn,
+                payload: items,
+                type: 'SET_EXPANDED',
+            });
+        },
+        [extractRowIdFn],
+    );
 
-    const setSelected = useCallback((items: ItemListStateItemWithRequiredProperties[]) => {
-        dispatch({ payload: items, type: 'SET_SELECTED' });
-    }, []);
+    const setDragging = useCallback(
+        (items: ItemListStateItemWithRequiredProperties[]) => {
+            dispatch({
+                extractRowId: extractRowIdFn,
+                payload: items,
+                type: 'SET_DRAGGING',
+            });
+        },
+        [extractRowIdFn],
+    );
 
-    const toggleExpanded = useCallback((item: ItemListStateItemWithRequiredProperties) => {
-        dispatch({ payload: item, type: 'TOGGLE_EXPANDED' });
-    }, []);
+    const setSelected = useCallback(
+        (items: ItemListStateItemWithRequiredProperties[]) => {
+            dispatch({
+                extractRowId: extractRowIdFn,
+                payload: items,
+                type: 'SET_SELECTED',
+            });
+        },
+        [extractRowIdFn],
+    );
 
-    const toggleSelected = useCallback((item: ItemListStateItemWithRequiredProperties) => {
-        dispatch({ payload: item, type: 'TOGGLE_SELECTED' });
-    }, []);
+    const toggleExpanded = useCallback(
+        (item: ItemListStateItemWithRequiredProperties) => {
+            dispatch({
+                extractRowId: extractRowIdFn,
+                payload: item,
+                type: 'TOGGLE_EXPANDED',
+            });
+        },
+        [extractRowIdFn],
+    );
+
+    const toggleSelected = useCallback(
+        (item: ItemListStateItemWithRequiredProperties) => {
+            dispatch({
+                extractRowId: extractRowIdFn,
+                payload: item,
+                type: 'TOGGLE_SELECTED',
+            });
+        },
+        [extractRowIdFn],
+    );
 
     const isExpanded = useCallback(
-        (itemId: string) => {
-            return itemGridSelectors.isExpanded(state, itemId);
+        (rowId: string) => {
+            return itemGridSelectors.isExpanded(state, rowId);
         },
         [state],
     );
 
     const isSelected = useCallback(
-        (itemId: string) => {
-            return itemGridSelectors.isSelected(state, itemId);
+        (rowId: string) => {
+            return itemGridSelectors.isSelected(state, rowId);
         },
         [state],
     );
@@ -307,8 +399,8 @@ export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActi
     }, [state]);
 
     const isDragging = useCallback(
-        (itemId: string) => {
-            return itemGridSelectors.isDragging(state, itemId);
+        (rowId: string) => {
+            return itemGridSelectors.isDragging(state, rowId);
         },
         [state],
     );
@@ -318,13 +410,17 @@ export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActi
     }, [getDataFn]);
 
     const findItemIndex = useCallback(
-        (itemId: string) => {
+        (rowId: string) => {
             const data = getDataFn ? getDataFn() : [];
             // Filter out null/undefined values (e.g., header row)
-            const validData = data.filter((d) => d && typeof d === 'object' && 'id' in d);
-            return validData.findIndex((d) => (d as any).id === itemId);
+            const validData = data.filter((d) => d && typeof d === 'object');
+            if (!extractRowId) {
+                // Fallback to id if extractRowId is not provided
+                return validData.findIndex((d) => (d as any).id === rowId);
+            }
+            return validData.findIndex((d) => extractRowId(d) === rowId);
         },
-        [getDataFn],
+        [getDataFn, extractRowId],
     );
 
     return useMemo(
@@ -333,6 +429,7 @@ export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActi
             clearDragging,
             clearExpanded,
             clearSelected,
+            extractRowId: extractRowIdFn,
             findItemIndex,
             getData,
             getDragging,
@@ -359,6 +456,7 @@ export const useItemListState = (getDataFn?: () => unknown[]): ItemListStateActi
             clearDragging,
             clearExpanded,
             clearSelected,
+            extractRowIdFn,
             findItemIndex,
             getData,
             getDragging,

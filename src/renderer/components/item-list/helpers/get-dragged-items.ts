@@ -46,12 +46,18 @@ export const getDraggedItems = (
         return [];
     }
 
+    const rowId = internalState.extractRowId(data);
+
+    if (!rowId) {
+        return [];
+    }
+
     const draggedItem = data as ItemListStateItemWithRequiredProperties;
 
     const previouslySelected = internalState.getSelected();
     const isDraggingSelectedItem = previouslySelected.some((selected) => {
         if (hasRequiredDragProperties(selected)) {
-            return selected.id === data.id;
+            return internalState.extractRowId(selected) === rowId;
         }
         return false;
     });

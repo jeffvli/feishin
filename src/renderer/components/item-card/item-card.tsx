@@ -122,7 +122,7 @@ const CompactItemCard = ({
     const [showControls, setShowControls] = useState(false);
     const isSelected =
         data && internalState && typeof data === 'object' && 'id' in data
-            ? internalState.isSelected((data as any).id)
+            ? internalState.isSelected(internalState.extractRowId(data) || '')
             : false;
 
     if (data) {
@@ -226,7 +226,7 @@ const DefaultItemCard = ({
     const [showControls, setShowControls] = useState(false);
     const isSelected =
         data && internalState && typeof data === 'object' && 'id' in data
-            ? internalState.isSelected((data as any).id)
+            ? internalState.isSelected(internalState.extractRowId(data) || '')
             : false;
 
     if (data) {
@@ -331,7 +331,7 @@ const PosterItemCard = ({
     const [showControls, setShowControls] = useState(false);
     const isSelected =
         data && internalState && typeof data === 'object' && 'id' in data
-            ? internalState.isSelected((data as any).id)
+            ? internalState.isSelected(internalState.extractRowId(data) || '')
             : false;
 
     const { isDragging: isDraggingLocal, ref } = useDragDrop<HTMLDivElement>({
