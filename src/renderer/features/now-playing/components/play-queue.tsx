@@ -76,7 +76,7 @@ export const PlayQueue = forwardRef(({ listKey, searchTerm }: QueueProps, ref: R
                 autoFitColumns={table.autoFitColumns}
                 CellComponent={ItemTableListColumn}
                 columns={table.columns}
-                data={data || []}
+                data={data}
                 enableAlternateRowColors={table.enableAlternateRowColors}
                 enableDrag={true}
                 enableExpansion={false}
@@ -85,6 +85,7 @@ export const PlayQueue = forwardRef(({ listKey, searchTerm }: QueueProps, ref: R
                 enableRowHoverHighlight={table.enableRowHoverHighlight}
                 enableSelection={true}
                 enableVerticalBorders={table.enableVerticalBorders}
+                getRowId="_uniqueId"
                 initialTop={{
                     to: 0,
                     type: 'offset',
