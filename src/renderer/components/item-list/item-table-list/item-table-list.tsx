@@ -75,6 +75,12 @@ const hasRequiredStateItemProperties = (
     );
 };
 
+enum TableItemSize {
+    COMPACT = 40,
+    DEFAULT = 64,
+    LARGE = 88,
+}
+
 interface VirtualizedTableGridProps {
     calculatedColumnWidths: number[];
     CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
@@ -684,7 +690,12 @@ export const ItemTableList = ({
         }
     }, []);
 
-    const DEFAULT_ROW_HEIGHT = size === 'compact' ? 40 : size === 'large' ? 88 : 64;
+    const DEFAULT_ROW_HEIGHT =
+        size === 'compact'
+            ? TableItemSize.COMPACT
+            : size === 'large'
+              ? TableItemSize.LARGE
+              : TableItemSize.DEFAULT;
 
     const calculateScrollTopForIndex = useCallback(
         (index: number) => {
