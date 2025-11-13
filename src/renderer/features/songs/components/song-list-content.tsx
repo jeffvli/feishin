@@ -85,6 +85,7 @@ export const SongListView = ({
                 case ListPaginationType.INFINITE:
                     return (
                         <SongListInfiniteTable
+                            autoFitColumns={table.autoFitColumns}
                             columns={table.columns}
                             enableAlternateRowColors={table.enableAlternateRowColors}
                             enableHorizontalBorders={table.enableHorizontalBorders}
@@ -99,6 +100,7 @@ export const SongListView = ({
                 case ListPaginationType.PAGINATED:
                     return (
                         <SongListPaginatedTable
+                            autoFitColumns={table.autoFitColumns}
                             columns={table.columns}
                             enableAlternateRowColors={table.enableAlternateRowColors}
                             enableHorizontalBorders={table.enableHorizontalBorders}

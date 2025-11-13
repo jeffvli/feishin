@@ -22,6 +22,7 @@ interface AlbumListPaginatedTableProps extends ItemListTableComponentProps<Album
 export const AlbumListPaginatedTable = forwardRef<any, AlbumListPaginatedTableProps>(
     (
         {
+            autoFitColumns = false,
             columns,
             enableAlternateRowColors = false,
             enableHorizontalBorders = false,
@@ -71,6 +72,7 @@ export const AlbumListPaginatedTable = forwardRef<any, AlbumListPaginatedTablePr
                 totalItemCount={totalItemCount}
             >
                 <ItemTableList
+                    autoFitColumns={autoFitColumns}
                     CellComponent={ItemTableListColumn}
                     columns={columns}
                     currentPage={currentPage}

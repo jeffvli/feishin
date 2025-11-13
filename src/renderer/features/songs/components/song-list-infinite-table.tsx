@@ -16,6 +16,7 @@ interface SongListInfiniteTableProps extends ItemListTableComponentProps<SongLis
 export const SongListInfiniteTable = forwardRef<any, SongListInfiniteTableProps>(
     (
         {
+            autoFitColumns = false,
             columns,
             enableAlternateRowColors = false,
             enableHorizontalBorders = false,
@@ -56,6 +57,7 @@ export const SongListInfiniteTable = forwardRef<any, SongListInfiniteTableProps>
 
         return (
             <ItemTableList
+                autoFitColumns={autoFitColumns}
                 CellComponent={ItemTableListColumn}
                 columns={columns}
                 data={data}

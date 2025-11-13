@@ -66,6 +66,7 @@ export interface ItemListHandle {
 export type ItemListItem = Album | AlbumArtist | Artist | Playlist | Song | undefined;
 
 export interface ItemListTableComponentProps<TQuery> extends ItemListComponentProps<TQuery> {
+    autoFitColumns?: boolean;
     columns: ItemTableListColumnConfig[];
     enableAlternateRowColors?: boolean;
     enableHorizontalBorders?: boolean;

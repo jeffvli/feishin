@@ -21,6 +21,7 @@ interface AlbumListInfiniteTableProps extends ItemListTableComponentProps<AlbumL
 export const AlbumListInfiniteTable = forwardRef<any, AlbumListInfiniteTableProps>(
     (
         {
+            autoFitColumns = false,
             columns,
             enableAlternateRowColors = false,
             enableHorizontalBorders = false,
@@ -61,6 +62,7 @@ export const AlbumListInfiniteTable = forwardRef<any, AlbumListInfiniteTableProp
 
         return (
             <ItemTableList
+                autoFitColumns={autoFitColumns}
                 CellComponent={ItemTableListColumn}
                 columns={columns}
                 data={data}

@@ -17,6 +17,7 @@ interface SongListPaginatedTableProps extends ItemListTableComponentProps<SongLi
 export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProps>(
     (
         {
+            autoFitColumns = false,
             columns,
             enableAlternateRowColors = false,
             enableHorizontalBorders = false,
@@ -66,6 +67,7 @@ export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProp
                 totalItemCount={totalItemCount}
             >
                 <ItemTableList
+                    autoFitColumns={autoFitColumns}
                     CellComponent={ItemTableListColumn}
                     columns={columns}
                     currentPage={currentPage}

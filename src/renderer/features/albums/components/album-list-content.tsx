@@ -90,6 +90,7 @@ export const AlbumListView = ({
                 case ListPaginationType.INFINITE: {
                     return (
                         <AlbumListInfiniteTable
+                            autoFitColumns={table.autoFitColumns}
                             columns={table.columns}
                             enableAlternateRowColors={table.enableAlternateRowColors}
                             enableHorizontalBorders={table.enableHorizontalBorders}
@@ -105,6 +106,7 @@ export const AlbumListView = ({
                 case ListPaginationType.PAGINATED: {
                     return (
                         <AlbumListPaginatedTable
+                            autoFitColumns={table.autoFitColumns}
                             columns={table.columns}
                             enableAlternateRowColors={table.enableAlternateRowColors}
                             enableHorizontalBorders={table.enableHorizontalBorders}
