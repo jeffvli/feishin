@@ -1,12 +1,13 @@
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid';
 import { create } from 'zustand';
-import { persist, subscribeWithSelector } from 'zustand/middleware';
+import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { useShallow } from 'zustand/react/shallow';
 
 import { createSelectors } from '/@/renderer/lib/zustand';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
+import { idbStateStorage } from '/@/renderer/store/utils';
 import { shuffleInPlace } from '/@/renderer/utils/shuffle';
 import { PlayerData, QueueData, QueueSong, Song } from '/@/shared/types/domain-types';
 import {
@@ -1068,12 +1069,25 @@ export const usePlayerStoreBase = create<PlayerState>()(
                 return merge(currentState, persistedState);
             },
             name: 'player-store',
-            // TODO: We need to use an alternative persistence method for the queue since it may not fit localStorage
             partialize: (state) => {
-                return Object.fromEntries(
-                    Object.entries(state).filter(([key]) => !['queue'].includes(key)),
-                );
+                // Exclude playerNum, seekToTimestamp, status, and timestamp from stored player object
+                // These are not needed to be stored since they are ephemeral properties
+                const excludedKeys = ['playerNum', 'seekToTimestamp', 'status', 'timestamp'];
+
+                if (state.player) {
+                    return {
+                        ...state,
+                        player: Object.fromEntries(
+                            Object.entries(state.player).filter(
+                                ([key]) => !excludedKeys.includes(key),
+                            ),
+                        ) as typeof state.player,
+                    };
+                }
+
+                return state;
             },
+            storage: createJSONStorage(() => idbStateStorage),
             version: 1,
         },
     ),
