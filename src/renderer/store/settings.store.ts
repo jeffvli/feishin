@@ -9,6 +9,7 @@ import { createWithEqualityFn } from 'zustand/traditional';
 import i18n from '/@/i18n/i18n';
 import {
     ALBUM_TABLE_COLUMNS,
+    pickTableColumns,
     PLAYLIST_SONG_TABLE_COLUMNS,
     PLAYLIST_TABLE_COLUMNS,
     SONG_TABLE_COLUMNS,
@@ -861,14 +862,16 @@ const initialState: SettingsState = {
             pagination: ListPaginationType.INFINITE,
             table: {
                 autoFitColumns: true,
-                columns: SONG_TABLE_COLUMNS.map((column) => ({
-                    align: column.align,
-                    autoSize: column.autoSize,
-                    id: column.value,
-                    isEnabled: column.isEnabled,
-                    pinned: column.pinned,
-                    width: column.width,
-                })),
+                columns: pickTableColumns({
+                    autoSizeColumns: [TableColumn.TITLE_COMBINED],
+                    columns: SONG_TABLE_COLUMNS,
+                    enabledColumns: [
+                        TableColumn.ROW_INDEX,
+                        TableColumn.TITLE_COMBINED,
+                        TableColumn.DURATION,
+                        TableColumn.USER_FAVORITE,
+                    ],
+                }),
                 enableAlternateRowColors: true,
                 enableHorizontalBorders: true,
                 enableRowHoverHighlight: true,
