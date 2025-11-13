@@ -1070,22 +1070,40 @@ export const usePlayerStoreBase = create<PlayerState>()(
             },
             name: 'player-store',
             partialize: (state) => {
+                const shouldRestorePlayQueue = useSettingsStore.getState().general.resume;
+
                 // Exclude playerNum, seekToTimestamp, status, and timestamp from stored player object
                 // These are not needed to be stored since they are ephemeral properties
-                const excludedKeys = ['playerNum', 'seekToTimestamp', 'status', 'timestamp'];
+                const excludedPlayerKeys = ['playerNum', 'seekToTimestamp', 'status', 'timestamp'];
 
-                if (state.player) {
-                    return {
-                        ...state,
-                        player: Object.fromEntries(
-                            Object.entries(state.player).filter(
-                                ([key]) => !excludedKeys.includes(key),
-                            ),
-                        ) as typeof state.player,
-                    };
+                // If we're not restoring the play queue, we don't need the index property
+                if (!shouldRestorePlayQueue) {
+                    excludedPlayerKeys.push('index');
                 }
 
-                return state;
+                // Filter top-level state entries
+                const filteredStateEntries = Object.entries(state).filter(([key]) => {
+                    // Exclude queue if shouldRestorePlayQueue is false
+                    if (!shouldRestorePlayQueue && key === 'queue') {
+                        return false;
+                    }
+                    return true;
+                });
+
+                const filteredState = Object.fromEntries(
+                    filteredStateEntries,
+                ) as Partial<PlayerState>;
+
+                // Filter player object
+                if (filteredState.player) {
+                    filteredState.player = Object.fromEntries(
+                        Object.entries(filteredState.player).filter(
+                            ([key]) => !excludedPlayerKeys.includes(key),
+                        ),
+                    ) as typeof filteredState.player;
+                }
+
+                return filteredState;
             },
             storage: createJSONStorage(() => idbStateStorage),
             version: 1,
