@@ -287,7 +287,7 @@ export const ItemGridList = ({
     const internalState = useItemListState(getDataFn);
 
     const [initialize] = useOverlayScrollbars({
-        defer: true,
+        defer: false,
         events: {
             initialized(osInstance) {
                 const { viewport } = osInstance.elements();

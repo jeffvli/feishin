@@ -765,7 +765,7 @@ export const ItemTableList = ({
     );
 
     const [initialize] = useOverlayScrollbars({
-        defer: true,
+        defer: false,
         events: {
             initialized(osInstance) {
                 const { viewport } = osInstance.elements();
