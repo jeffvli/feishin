@@ -12,7 +12,7 @@ import { disableNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/elem
 import { useDebouncedState } from '@mantine/hooks';
 import clsx from 'clsx';
 import Fuse from 'fuse.js';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './table-config.module.css';
@@ -498,274 +498,286 @@ const TableColumnConfig = ({
 };
 
 const DragHandle = ({ dragHandleRef }: { dragHandleRef: React.RefObject<HTMLButtonElement> }) => {
-    const { t } = useTranslation();
-
     return (
         <ActionIcon
-            icon="dragVertical"
+            icon="dragHorizontal"
             iconProps={{
                 size: 'md',
             }}
             ref={dragHandleRef}
             size="xs"
             style={{ cursor: 'grab' }}
-            tooltip={{
-                label: t('table.config.general.dragToReorder', {
-                    postProcess: 'sentenceCase',
-                }),
-            }}
             variant="transparent"
         />
     );
 };
 
-const TableColumnItem = ({
-    handleAlignCenter,
-    handleAlignLeft,
-    handleAlignRight,
-    handleAutoSize,
-    handleChangeEnabled,
-    handleMoveDown,
-    handleMoveUp,
-    handlePinToLeft,
-    handlePinToRight,
-    handleReorder,
-    handleRowWidth,
-    item,
-    label,
-    matches,
-}: {
-    handleAlignCenter: (item: ItemTableListColumnConfig) => void;
-    handleAlignLeft: (item: ItemTableListColumnConfig) => void;
-    handleAlignRight: (item: ItemTableListColumnConfig) => void;
-    handleAutoSize: (item: ItemTableListColumnConfig, checked: boolean) => void;
-    handleChangeEnabled: (item: ItemTableListColumnConfig, checked: boolean) => void;
-    handleMoveDown: (item: ItemTableListColumnConfig) => void;
-    handleMoveUp: (item: ItemTableListColumnConfig) => void;
-    handlePinToLeft: (item: ItemTableListColumnConfig) => void;
-    handlePinToRight: (item: ItemTableListColumnConfig) => void;
-    handleReorder: (idFrom: string, idTo: string, edge: Edge | null) => void;
-    handleRowWidth: (item: ItemTableListColumnConfig, number: number | string) => void;
-    item: ItemTableListColumnConfig;
-    label: string;
-    matches: null | readonly Fuse.FuseResultMatch[];
-}) => {
-    const { t } = useTranslation();
-    const ref = useRef<HTMLDivElement>(null);
-    const dragHandleRef = useRef<HTMLButtonElement>(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [isDraggedOver, setIsDraggedOver] = useState<Edge | null>(null);
+const TableColumnItem = memo(
+    ({
+        handleAlignCenter,
+        handleAlignLeft,
+        handleAlignRight,
+        handleAutoSize,
+        handleChangeEnabled,
+        handleMoveDown,
+        handleMoveUp,
+        handlePinToLeft,
+        handlePinToRight,
+        handleReorder,
+        handleRowWidth,
+        item,
+        label,
+        matches,
+    }: {
+        handleAlignCenter: (item: ItemTableListColumnConfig) => void;
+        handleAlignLeft: (item: ItemTableListColumnConfig) => void;
+        handleAlignRight: (item: ItemTableListColumnConfig) => void;
+        handleAutoSize: (item: ItemTableListColumnConfig, checked: boolean) => void;
+        handleChangeEnabled: (item: ItemTableListColumnConfig, checked: boolean) => void;
+        handleMoveDown: (item: ItemTableListColumnConfig) => void;
+        handleMoveUp: (item: ItemTableListColumnConfig) => void;
+        handlePinToLeft: (item: ItemTableListColumnConfig) => void;
+        handlePinToRight: (item: ItemTableListColumnConfig) => void;
+        handleReorder: (idFrom: string, idTo: string, edge: Edge | null) => void;
+        handleRowWidth: (item: ItemTableListColumnConfig, number: number | string) => void;
+        item: ItemTableListColumnConfig;
+        label: string;
+        matches: null | readonly Fuse.FuseResultMatch[];
+    }) => {
+        const { t } = useTranslation();
+        const ref = useRef<HTMLDivElement>(null);
+        const dragHandleRef = useRef<HTMLButtonElement>(null);
+        const [isDragging, setIsDragging] = useState(false);
+        const [isDraggedOver, setIsDraggedOver] = useState<Edge | null>(null);
 
-    useEffect(() => {
-        if (!ref.current || !dragHandleRef.current) {
-            return;
-        }
+        useEffect(() => {
+            if (!ref.current || !dragHandleRef.current) {
+                return;
+            }
 
-        return combine(
-            draggable({
-                element: dragHandleRef.current,
-                getInitialData: () => {
-                    const data = dndUtils.generateDragData({
-                        id: [item.id],
-                        operation: [DragOperation.REORDER],
-                        type: DragTarget.TABLE_COLUMN,
-                    });
-                    return data;
-                },
-                onDragStart: () => {
-                    setIsDragging(true);
-                },
-                onDrop: () => {
-                    setIsDragging(false);
-                },
-                onGenerateDragPreview: (data) => {
-                    disableNativeDragPreview({ nativeSetDragImage: data.nativeSetDragImage });
-                },
-            }),
-            dropTargetForElements({
-                canDrop: (args) => {
-                    const data = args.source.data as unknown as DragData;
-                    const isSelf = (args.source.data.id as string[])[0] === item.id;
-                    return dndUtils.isDropTarget(data.type, [DragTarget.TABLE_COLUMN]) && !isSelf;
-                },
-                element: ref.current,
-                getData: ({ element, input }) => {
-                    const data = dndUtils.generateDragData({
-                        id: [item.id],
-                        operation: [DragOperation.REORDER],
-                        type: DragTarget.TABLE_COLUMN,
-                    });
+            return combine(
+                draggable({
+                    element: dragHandleRef.current,
+                    getInitialData: () => {
+                        const data = dndUtils.generateDragData({
+                            id: [item.id],
+                            operation: [DragOperation.REORDER],
+                            type: DragTarget.TABLE_COLUMN,
+                        });
+                        return data;
+                    },
+                    onDragStart: () => {
+                        setIsDragging(true);
+                    },
+                    onDrop: () => {
+                        setIsDragging(false);
+                    },
+                    onGenerateDragPreview: (data) => {
+                        disableNativeDragPreview({ nativeSetDragImage: data.nativeSetDragImage });
+                    },
+                }),
+                dropTargetForElements({
+                    canDrop: (args) => {
+                        const data = args.source.data as unknown as DragData;
+                        const isSelf = (args.source.data.id as string[])[0] === item.id;
+                        return (
+                            dndUtils.isDropTarget(data.type, [DragTarget.TABLE_COLUMN]) && !isSelf
+                        );
+                    },
+                    element: ref.current,
+                    getData: ({ element, input }) => {
+                        const data = dndUtils.generateDragData({
+                            id: [item.id],
+                            operation: [DragOperation.REORDER],
+                            type: DragTarget.TABLE_COLUMN,
+                        });
 
-                    return attachClosestEdge(data, {
-                        allowedEdges: ['top', 'bottom'],
-                        element,
-                        input,
-                    });
-                },
-                onDrag: (args) => {
-                    const closestEdgeOfTarget: Edge | null = extractClosestEdge(args.self.data);
-                    setIsDraggedOver(closestEdgeOfTarget);
-                },
-                onDragLeave: () => {
-                    setIsDraggedOver(null);
-                },
-                onDrop: (args) => {
-                    const closestEdgeOfTarget: Edge | null = extractClosestEdge(args.self.data);
+                        return attachClosestEdge(data, {
+                            allowedEdges: ['top', 'bottom'],
+                            element,
+                            input,
+                        });
+                    },
+                    onDrag: (args) => {
+                        const closestEdgeOfTarget: Edge | null = extractClosestEdge(args.self.data);
+                        setIsDraggedOver(closestEdgeOfTarget);
+                    },
+                    onDragLeave: () => {
+                        setIsDraggedOver(null);
+                    },
+                    onDrop: (args) => {
+                        const closestEdgeOfTarget: Edge | null = extractClosestEdge(args.self.data);
 
-                    const from = args.source.data.id as string[];
-                    const to = args.self.data.id as string[];
+                        const from = args.source.data.id as string[];
+                        const to = args.self.data.id as string[];
 
-                    handleReorder(from[0], to[0], closestEdgeOfTarget);
-                    setIsDraggedOver(null);
-                },
-            }),
+                        handleReorder(from[0], to[0], closestEdgeOfTarget);
+                        setIsDraggedOver(null);
+                    },
+                }),
+            );
+        }, [item.id, handleReorder]);
+
+        return (
+            <div
+                className={clsx(styles.item, {
+                    [styles.draggedOverBottom]: isDraggedOver === 'bottom',
+                    [styles.draggedOverTop]: isDraggedOver === 'top',
+                    [styles.dragging]: isDragging,
+                    [styles.matched]: matches && matches.length > 0,
+                })}
+                ref={ref}
+            >
+                <Group wrap="nowrap">
+                    <DragHandle dragHandleRef={dragHandleRef} />
+                    <Checkbox
+                        checked={item.isEnabled}
+                        id={item.id}
+                        label={label}
+                        onChange={(e) => handleChangeEnabled(item, e.currentTarget.checked)}
+                        size="sm"
+                    />
+                </Group>
+                <Group wrap="nowrap">
+                    <ActionIconGroup className={styles.group}>
+                        <ActionIcon
+                            icon="arrowUp"
+                            iconProps={{ size: 'md' }}
+                            onClick={() => handleMoveUp(item)}
+                            size="xs"
+                            tooltip={{
+                                label: t('table.config.general.moveUp', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                            }}
+                            variant="subtle"
+                        />
+                        <ActionIcon
+                            icon="arrowDown"
+                            iconProps={{ size: 'md' }}
+                            onClick={() => handleMoveDown(item)}
+                            size="xs"
+                            tooltip={{
+                                label: t('table.config.general.moveDown', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                            }}
+                            variant="subtle"
+                        />
+                    </ActionIconGroup>
+                    <ActionIconGroup className={styles.group}>
+                        <ActionIcon
+                            icon="arrowLeftToLine"
+                            iconProps={{ size: 'md' }}
+                            onClick={() => handlePinToLeft(item)}
+                            size="xs"
+                            tooltip={{
+                                label: t('table.config.general.pinToLeft', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                            }}
+                            variant={item.pinned === 'left' ? 'filled' : 'subtle'}
+                        />
+                        <ActionIcon
+                            icon="arrowRightToLine"
+                            iconProps={{ size: 'md' }}
+                            onClick={() => handlePinToRight(item)}
+                            size="xs"
+                            tooltip={{
+                                label: t('table.config.general.pinToRight', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                            }}
+                            variant={item.pinned === 'right' ? 'filled' : 'subtle'}
+                        />
+                    </ActionIconGroup>
+                    <ActionIconGroup className={styles.group}>
+                        <ActionIcon
+                            icon="alignLeft"
+                            iconProps={{ size: 'md' }}
+                            onClick={() => handleAlignLeft(item)}
+                            size="xs"
+                            tooltip={{
+                                label: t('table.config.general.alignLeft', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                            }}
+                            variant={item.align === 'start' ? 'filled' : 'subtle'}
+                        />
+                        <ActionIcon
+                            icon="alignCenter"
+                            iconProps={{ size: 'md' }}
+                            onClick={() => handleAlignCenter(item)}
+                            size="xs"
+                            tooltip={{
+                                label: t('table.config.general.alignCenter', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                            }}
+                            variant={item.align === 'center' ? 'filled' : 'subtle'}
+                        />
+                        <ActionIcon
+                            icon="alignRight"
+                            iconProps={{ size: 'md' }}
+                            onClick={() => handleAlignRight(item)}
+                            size="xs"
+                            tooltip={{
+                                label: t('table.config.general.alignRight', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                            }}
+                            variant={item.align === 'end' ? 'filled' : 'subtle'}
+                        />
+                    </ActionIconGroup>
+                    <NumberInput
+                        className={clsx(styles.group, styles.numberInput)}
+                        hideControls={false}
+                        leftSection={
+                            <>
+                                {item.pinned === null && (
+                                    <Tooltip
+                                        label={t('table.config.general.autosize', {
+                                            postProcess: 'sentenceCase',
+                                        })}
+                                    >
+                                        <Checkbox
+                                            checked={item.autoSize}
+                                            disabled={item.pinned !== null}
+                                            id={item.id}
+                                            onChange={(e) =>
+                                                handleAutoSize(item, e.currentTarget.checked)
+                                            }
+                                            size="xs"
+                                        />
+                                    </Tooltip>
+                                )}
+                            </>
+                        }
+                        max={2000}
+                        min={0}
+                        onChange={(value) => handleRowWidth(item, value)}
+                        size="xs"
+                        step={10}
+                        stepHoldDelay={300}
+                        stepHoldInterval={100}
+                        value={item.width}
+                        variant="subtle"
+                    />
+                </Group>
+            </div>
         );
-    }, [item.id, handleReorder]);
-
-    return (
-        <div
-            className={clsx(styles.item, {
-                [styles.draggedOverBottom]: isDraggedOver === 'bottom',
-                [styles.draggedOverTop]: isDraggedOver === 'top',
-                [styles.dragging]: isDragging,
-                [styles.matched]: matches && matches.length > 0,
-            })}
-            ref={ref}
-        >
-            <Group wrap="nowrap">
-                <DragHandle dragHandleRef={dragHandleRef} />
-                <Checkbox
-                    checked={item.isEnabled}
-                    id={item.id}
-                    label={label}
-                    onChange={(e) => handleChangeEnabled(item, e.currentTarget.checked)}
-                    size="sm"
-                />
-            </Group>
-            <Group wrap="nowrap">
-                <ActionIconGroup className={styles.group}>
-                    <ActionIcon
-                        icon="arrowUp"
-                        iconProps={{ size: 'md' }}
-                        onClick={() => handleMoveUp(item)}
-                        size="xs"
-                        tooltip={{
-                            label: t('table.config.general.moveUp', {
-                                postProcess: 'sentenceCase',
-                            }),
-                        }}
-                        variant="subtle"
-                    />
-                    <ActionIcon
-                        icon="arrowDown"
-                        iconProps={{ size: 'md' }}
-                        onClick={() => handleMoveDown(item)}
-                        size="xs"
-                        tooltip={{
-                            label: t('table.config.general.moveDown', {
-                                postProcess: 'sentenceCase',
-                            }),
-                        }}
-                        variant="subtle"
-                    />
-                </ActionIconGroup>
-                <ActionIconGroup className={styles.group}>
-                    <ActionIcon
-                        icon="arrowLeftToLine"
-                        iconProps={{ size: 'md' }}
-                        onClick={() => handlePinToLeft(item)}
-                        size="xs"
-                        tooltip={{
-                            label: t('table.config.general.pinToLeft', {
-                                postProcess: 'sentenceCase',
-                            }),
-                        }}
-                        variant={item.pinned === 'left' ? 'filled' : 'subtle'}
-                    />
-                    <ActionIcon
-                        icon="arrowRightToLine"
-                        iconProps={{ size: 'md' }}
-                        onClick={() => handlePinToRight(item)}
-                        size="xs"
-                        tooltip={{
-                            label: t('table.config.general.pinToRight', {
-                                postProcess: 'sentenceCase',
-                            }),
-                        }}
-                        variant={item.pinned === 'right' ? 'filled' : 'subtle'}
-                    />
-                </ActionIconGroup>
-                <ActionIconGroup className={styles.group}>
-                    <ActionIcon
-                        icon="alignLeft"
-                        iconProps={{ size: 'md' }}
-                        onClick={() => handleAlignLeft(item)}
-                        size="xs"
-                        tooltip={{
-                            label: t('table.config.general.alignLeft', {
-                                postProcess: 'sentenceCase',
-                            }),
-                        }}
-                        variant={item.align === 'start' ? 'filled' : 'subtle'}
-                    />
-                    <ActionIcon
-                        icon="alignCenter"
-                        iconProps={{ size: 'md' }}
-                        onClick={() => handleAlignCenter(item)}
-                        size="xs"
-                        tooltip={{
-                            label: t('table.config.general.alignCenter', {
-                                postProcess: 'sentenceCase',
-                            }),
-                        }}
-                        variant={item.align === 'center' ? 'filled' : 'subtle'}
-                    />
-                    <ActionIcon
-                        icon="alignRight"
-                        iconProps={{ size: 'md' }}
-                        onClick={() => handleAlignRight(item)}
-                        size="xs"
-                        tooltip={{
-                            label: t('table.config.general.alignRight', {
-                                postProcess: 'sentenceCase',
-                            }),
-                        }}
-                        variant={item.align === 'end' ? 'filled' : 'subtle'}
-                    />
-                </ActionIconGroup>
-                <NumberInput
-                    className={clsx(styles.group, styles.numberInput)}
-                    hideControls={false}
-                    leftSection={
-                        <>
-                            {item.pinned === null && (
-                                <Tooltip
-                                    label={t('table.config.general.autosize', {
-                                        postProcess: 'sentenceCase',
-                                    })}
-                                >
-                                    <Checkbox
-                                        checked={item.autoSize}
-                                        disabled={item.pinned !== null}
-                                        id={item.id}
-                                        onChange={(e) =>
-                                            handleAutoSize(item, e.currentTarget.checked)
-                                        }
-                                        size="xs"
-                                    />
-                                </Tooltip>
-                            )}
-                        </>
-                    }
-                    max={2000}
-                    min={0}
-                    onChange={(value) => handleRowWidth(item, value)}
-                    size="xs"
-                    step={10}
-                    value={item.width}
-                    variant="subtle"
-                />
-            </Group>
-        </div>
-    );
-};
+    },
+    (prevProps, nextProps) => {
+        // Custom comparison function for better memoization
+        return (
+            prevProps.item.id === nextProps.item.id &&
+            prevProps.item.isEnabled === nextProps.item.isEnabled &&
+            prevProps.item.autoSize === nextProps.item.autoSize &&
+            prevProps.item.width === nextProps.item.width &&
+            prevProps.item.pinned === nextProps.item.pinned &&
+            prevProps.item.align === nextProps.item.align &&
+            prevProps.label === nextProps.label &&
+            prevProps.matches === nextProps.matches
+        );
+    },
+);
