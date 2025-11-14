@@ -11,6 +11,7 @@ import {
     ALBUM_ARTIST_TABLE_COLUMNS,
     ALBUM_TABLE_COLUMNS,
     GENRE_TABLE_COLUMNS,
+    pickGridRows,
     pickTableColumns,
     PLAYLIST_SONG_TABLE_COLUMNS,
     PLAYLIST_TABLE_COLUMNS,
@@ -124,6 +125,16 @@ const ItemTableListColumnConfigSchema = z.object({
     width: z.number(),
 });
 
+export type ItemTableListColumnConfig = z.infer<typeof ItemTableListColumnConfigSchema>;
+
+const ItemGridListRowConfigSchema = z.object({
+    align: z.enum(['center', 'end', 'start']),
+    id: z.nativeEnum(TableColumn),
+    isEnabled: z.boolean(),
+});
+
+export type ItemGridListRowConfig = z.infer<typeof ItemGridListRowConfigSchema>;
+
 const ItemTableListPropsSchema = z.object({
     autoFitColumns: z.boolean(),
     columns: z.array(ItemTableListColumnConfigSchema),
@@ -140,6 +151,7 @@ const ItemListConfigSchema = z.object({
         itemGap: z.enum(['lg', 'md', 'sm', 'xl', 'xs']),
         itemsPerRow: z.number(),
         itemsPerRowEnabled: z.boolean(),
+        rows: z.array(ItemGridListRowConfigSchema),
     }),
     itemsPerPage: z.number(),
     pagination: z.nativeEnum(ListPaginationType),
@@ -421,6 +433,7 @@ export type DataGridProps = {
     itemGap: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     itemsPerRow: number;
     itemsPerRowEnabled: boolean;
+    rows: ItemGridListRowConfig[];
 };
 
 export type DataTableProps = z.infer<typeof ItemTableListPropsSchema>;
@@ -650,6 +663,7 @@ const initialState: SettingsState = {
                 itemGap: 'md',
                 itemsPerRow: 6,
                 itemsPerRowEnabled: false,
+                rows: [],
             },
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
@@ -676,6 +690,28 @@ const initialState: SettingsState = {
                 itemGap: 'md',
                 itemsPerRow: 6,
                 itemsPerRowEnabled: false,
+                rows: pickGridRows({
+                    alignLeftColumns: [
+                        TableColumn.TITLE,
+                        TableColumn.ALBUM_ARTIST,
+                        TableColumn.YEAR,
+                    ],
+                    columns: ALBUM_TABLE_COLUMNS,
+                    enabledColumns: [TableColumn.TITLE, TableColumn.ALBUM_ARTIST, TableColumn.YEAR],
+                    pickColumns: [
+                        TableColumn.TITLE,
+                        TableColumn.DURATION,
+                        TableColumn.ALBUM_ARTIST,
+                        TableColumn.BIT_RATE,
+                        TableColumn.BPM,
+                        TableColumn.DATE_ADDED,
+                        TableColumn.DURATION,
+                        TableColumn.GENRE,
+                        TableColumn.PLAY_COUNT,
+                        TableColumn.SONG_COUNT,
+                        TableColumn.YEAR,
+                    ],
+                }),
             },
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
@@ -702,6 +738,17 @@ const initialState: SettingsState = {
                 itemGap: 'md',
                 itemsPerRow: 6,
                 itemsPerRowEnabled: false,
+                rows: pickGridRows({
+                    alignLeftColumns: [TableColumn.TITLE],
+                    columns: ALBUM_ARTIST_TABLE_COLUMNS,
+                    enabledColumns: [TableColumn.TITLE],
+                    pickColumns: [
+                        TableColumn.TITLE,
+                        TableColumn.PLAY_COUNT,
+                        TableColumn.ALBUM_COUNT,
+                        TableColumn.SONG_COUNT,
+                    ],
+                }),
             },
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
@@ -728,6 +775,17 @@ const initialState: SettingsState = {
                 itemGap: 'md',
                 itemsPerRow: 6,
                 itemsPerRowEnabled: false,
+                rows: pickGridRows({
+                    alignLeftColumns: [TableColumn.TITLE],
+                    columns: ALBUM_ARTIST_TABLE_COLUMNS,
+                    enabledColumns: [TableColumn.TITLE],
+                    pickColumns: [
+                        TableColumn.TITLE,
+                        TableColumn.PLAY_COUNT,
+                        TableColumn.ALBUM_COUNT,
+                        TableColumn.SONG_COUNT,
+                    ],
+                }),
             },
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
@@ -754,6 +812,24 @@ const initialState: SettingsState = {
                 itemGap: 'md',
                 itemsPerRow: 6,
                 itemsPerRowEnabled: false,
+                rows: pickGridRows({
+                    alignLeftColumns: [
+                        TableColumn.TITLE,
+                        TableColumn.SONG_COUNT,
+                        TableColumn.ALBUM_COUNT,
+                    ],
+                    columns: GENRE_TABLE_COLUMNS,
+                    enabledColumns: [
+                        TableColumn.TITLE,
+                        TableColumn.SONG_COUNT,
+                        TableColumn.ALBUM_COUNT,
+                    ],
+                    pickColumns: [
+                        TableColumn.TITLE,
+                        TableColumn.ALBUM_COUNT,
+                        TableColumn.SONG_COUNT,
+                    ],
+                }),
             },
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
@@ -780,6 +856,12 @@ const initialState: SettingsState = {
                 itemGap: 'md',
                 itemsPerRow: 6,
                 itemsPerRowEnabled: false,
+                rows: pickGridRows({
+                    alignLeftColumns: [TableColumn.TITLE, TableColumn.SONG_COUNT],
+                    columns: PLAYLIST_TABLE_COLUMNS,
+                    enabledColumns: [TableColumn.TITLE],
+                    pickColumns: [TableColumn.TITLE, TableColumn.SONG_COUNT],
+                }),
             },
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
@@ -806,6 +888,7 @@ const initialState: SettingsState = {
                 itemGap: 'md',
                 itemsPerRow: 6,
                 itemsPerRowEnabled: false,
+                rows: [],
             },
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
@@ -832,6 +915,7 @@ const initialState: SettingsState = {
                 itemGap: 'md',
                 itemsPerRow: 6,
                 itemsPerRowEnabled: false,
+                rows: [],
             },
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
@@ -858,6 +942,25 @@ const initialState: SettingsState = {
                 itemGap: 'md',
                 itemsPerRow: 6,
                 itemsPerRowEnabled: false,
+                rows: pickGridRows({
+                    alignLeftColumns: [TableColumn.TITLE, TableColumn.ARTIST],
+                    columns: SONG_TABLE_COLUMNS,
+                    enabledColumns: [TableColumn.TITLE, TableColumn.ARTIST],
+                    pickColumns: [
+                        TableColumn.TITLE,
+                        TableColumn.ARTIST,
+                        TableColumn.DURATION,
+                        TableColumn.YEAR,
+                        TableColumn.BIT_RATE,
+                        TableColumn.BPM,
+                        TableColumn.CODEC,
+                        TableColumn.DATE_ADDED,
+                        TableColumn.GENRE,
+                        TableColumn.LAST_PLAYED,
+                        TableColumn.RELEASE_DATE,
+                        TableColumn.TRACK_NUMBER,
+                    ],
+                }),
             },
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
@@ -884,6 +987,7 @@ const initialState: SettingsState = {
                 itemGap: 'md',
                 itemsPerRow: 6,
                 itemsPerRowEnabled: false,
+                rows: [],
             },
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,

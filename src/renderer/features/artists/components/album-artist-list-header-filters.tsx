@@ -1,4 +1,4 @@
-import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
+import { ALBUM_ARTIST_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { ListMusicFolderDropdown } from '/@/renderer/features/shared/components/list-music-folder-dropdown';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
@@ -33,7 +33,7 @@ export const AlbumArtistListHeaderFilters = () => {
             <Group gap="sm" wrap="nowrap">
                 <ListConfigMenu
                     listKey={ItemListKey.ALBUM_ARTIST}
-                    tableColumnsData={ALBUMARTIST_TABLE_COLUMNS}
+                    tableColumnsData={ALBUM_ARTIST_TABLE_COLUMNS}
                 />
             </Group>
         </Flex>

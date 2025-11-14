@@ -122,14 +122,15 @@ export const ListConfigMenu = (props: ListConfigMenuProps) => {
 
 const Config = ({
     displayType,
+    tableColumnsData,
     ...props
 }: ListConfigMenuProps & { displayType: ListDisplayType }) => {
     switch (displayType) {
         case ListDisplayType.GRID:
-            return <GridConfig {...props} />;
+            return <GridConfig {...props} gridRowsData={tableColumnsData} />;
 
         case ListDisplayType.TABLE:
-            return <TableConfig {...props} />;
+            return <TableConfig {...props} tableColumnsData={tableColumnsData} />;
 
         default:
             return null;

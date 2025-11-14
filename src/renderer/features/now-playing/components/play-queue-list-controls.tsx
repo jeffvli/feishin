@@ -1,8 +1,8 @@
 import { type MutableRefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
-import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';

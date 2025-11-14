@@ -1,7 +1,8 @@
 import i18n from '/@/i18n/i18n';
+import { ItemGridListRowConfig, ItemTableListColumnConfig } from '/@/renderer/store';
 import { TableColumn } from '/@/shared/types/types';
 
-type DefaultTableColumn = {
+export type DefaultTableColumn = {
     align: 'center' | 'end' | 'start';
     autoSize: boolean;
     isEnabled: boolean;
@@ -642,6 +643,24 @@ export const GENRE_TABLE_COLUMNS: DefaultTableColumn[] = [
         align: 'center',
         autoSize: false,
         isEnabled: true,
+        label: i18n.t('table.config.label.songCount', { postProcess: 'titleCase' }),
+        pinned: null,
+        value: TableColumn.SONG_COUNT,
+        width: 100,
+    },
+    {
+        align: 'center',
+        autoSize: false,
+        isEnabled: true,
+        label: i18n.t('table.config.label.albumCount', { postProcess: 'titleCase' }),
+        pinned: null,
+        value: TableColumn.ALBUM_COUNT,
+        width: 100,
+    },
+    {
+        align: 'center',
+        autoSize: false,
+        isEnabled: true,
         label: i18n.t('table.config.label.actions', { postProcess: 'titleCase' }),
         pinned: 'right',
         value: TableColumn.ACTIONS,
@@ -650,38 +669,77 @@ export const GENRE_TABLE_COLUMNS: DefaultTableColumn[] = [
 ];
 
 export const pickTableColumns = (options: {
+    alignCenterColumns?: TableColumn[];
+    alignLeftColumns?: TableColumn[];
+    alignRightColumns?: TableColumn[];
     autoSizeColumns?: TableColumn[];
     columns: DefaultTableColumn[];
     enabledColumns: TableColumn[];
+    pickColumns?: TableColumn[];
     pinnedLeftColumns?: TableColumn[];
     pinnedRightColumns?: TableColumn[];
-}) => {
+}): ItemTableListColumnConfig[] => {
     const {
+        alignCenterColumns = [],
+        alignLeftColumns = [],
+        alignRightColumns = [],
         autoSizeColumns = [],
         columns,
         enabledColumns,
+        pickColumns = [],
         pinnedLeftColumns = [],
         pinnedRightColumns = [],
     } = options;
 
-    return columns.map((column) => {
-        const pinned: 'left' | 'right' | null = pinnedLeftColumns.includes(column.value)
-            ? 'left'
-            : pinnedRightColumns.includes(column.value)
-              ? 'right'
-              : null;
+    const columnsToPick: ItemTableListColumnConfig[] = [];
+
+    columns.forEach((column) => {
+        if (pickColumns.length > 0 && !pickColumns?.includes(column.value)) {
+            return;
+        }
+
+        let pinned: 'left' | 'right' | null = column.pinned;
+
+        if (pinnedLeftColumns.includes(column.value)) {
+            pinned = 'left';
+        } else if (pinnedRightColumns.includes(column.value)) {
+            pinned = 'right';
+        }
+
+        let align: 'center' | 'end' | 'start' = column.align;
+
+        if (alignCenterColumns.includes(column.value)) {
+            align = 'center';
+        } else if (alignLeftColumns.includes(column.value)) {
+            align = 'start';
+        } else if (alignRightColumns.includes(column.value)) {
+            align = 'end';
+        }
 
         const isEnabled = enabledColumns.includes(column.value);
 
         const autoSize = autoSizeColumns.includes(column.value);
 
-        return {
-            align: column.align,
+        columnsToPick.push({
+            align,
             autoSize,
             id: column.value,
             isEnabled,
             pinned,
             width: column.width,
-        };
+        });
     });
+
+    return columnsToPick;
+};
+
+export const pickGridRows = (
+    options: Parameters<typeof pickTableColumns>[0],
+): ItemGridListRowConfig[] => {
+    const columns = pickTableColumns(options);
+    return columns.map((column) => ({
+        align: column.align,
+        id: column.id as TableColumn,
+        isEnabled: column.isEnabled,
+    }));
 };

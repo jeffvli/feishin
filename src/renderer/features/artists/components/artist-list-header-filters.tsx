@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { ARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
+import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { ListMusicFolderDropdown } from '/@/renderer/features/shared/components/list-music-folder-dropdown';
@@ -52,7 +52,7 @@ export const ArtistListHeaderFilters = () => {
             <Group gap="sm" wrap="nowrap">
                 <ListConfigMenu
                     listKey={ItemListKey.ARTIST}
-                    tableColumnsData={ARTIST_TABLE_COLUMNS}
+                    tableColumnsData={ALBUMARTIST_TABLE_COLUMNS}
                 />
             </Group>
         </Flex>

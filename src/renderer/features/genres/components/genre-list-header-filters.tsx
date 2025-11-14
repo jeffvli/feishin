@@ -1,4 +1,4 @@
-import { GENRE_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
+import { GENRE_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { ListFilters } from '/@/renderer/features/shared/components/list-filters';
 import { ListMusicFolderDropdown } from '/@/renderer/features/shared/components/list-music-folder-dropdown';
