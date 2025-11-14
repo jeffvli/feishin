@@ -1,18 +1,16 @@
 import { parseAsString, useQueryState } from 'nuqs';
 
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
+import { useListFilterPersistence } from '/@/renderer/features/shared/hooks/use-list-filter-persistence';
 import { useCurrentServer } from '/@/renderer/store';
-import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
 export const useSortOrderFilter = (defaultValue: null | string, listKey: ItemListKey) => {
     const server = useCurrentServer();
+    const { getFilter, setFilter } = useListFilterPersistence(server.id, listKey);
 
-    const [persisted, setPersisted] = useLocalStorage({
-        defaultValue: SortOrder.ASC,
-        key: getPersistenceKey(server.id, listKey),
-    });
+    const persisted = getFilter(FILTER_KEYS.SHARED.SORT_ORDER);
 
     const [sortOrder, setSortOrder] = useQueryState(
         FILTER_KEYS.SHARED.SORT_ORDER,
@@ -21,7 +19,7 @@ export const useSortOrderFilter = (defaultValue: null | string, listKey: ItemLis
 
     const handleSetSortOrder = (sortOrder: SortOrder) => {
         setSortOrder(sortOrder);
-        setPersisted(sortOrder);
+        setFilter(FILTER_KEYS.SHARED.SORT_ORDER, sortOrder);
     };
 
     return {
@@ -30,7 +28,7 @@ export const useSortOrderFilter = (defaultValue: null | string, listKey: ItemLis
     };
 };
 
-const getDefaultSortOrder = (defaultValue: null | string, persisted: null | string) => {
+const getDefaultSortOrder = (defaultValue: null | string, persisted: string | undefined) => {
     if (persisted) {
         return parseAsString.withDefault(persisted);
     }
@@ -40,8 +38,4 @@ const getDefaultSortOrder = (defaultValue: null | string, persisted: null | stri
     }
 
     return parseAsString;
-};
-
-const getPersistenceKey = (serverId: string, listKey: ItemListKey) => {
-    return `${serverId}-list-${listKey}-${FILTER_KEYS.SHARED.SORT_ORDER}`;
 };

@@ -1,17 +1,15 @@
 import { parseAsString, useQueryState } from 'nuqs';
 
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
+import { useListFilterPersistence } from '/@/renderer/features/shared/hooks/use-list-filter-persistence';
 import { useCurrentServer } from '/@/renderer/store';
-import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { ItemListKey } from '/@/shared/types/types';
 
 export const useMusicFolderIdFilter = (defaultValue: null | string, listKey: ItemListKey) => {
     const server = useCurrentServer();
+    const { getFilter, setFilter } = useListFilterPersistence(server.id, listKey);
 
-    const [persisted, setPersisted] = useLocalStorage({
-        defaultValue: '',
-        key: getPersistenceKey(server.id, listKey),
-    });
+    const persisted = getFilter(FILTER_KEYS.SHARED.MUSIC_FOLDER_ID);
 
     const [musicFolderId, setMusicFolderId] = useQueryState(
         FILTER_KEYS.SHARED.MUSIC_FOLDER_ID,
@@ -20,7 +18,7 @@ export const useMusicFolderIdFilter = (defaultValue: null | string, listKey: Ite
 
     const handleSetMusicFolderId = (musicFolderId: string) => {
         setMusicFolderId(musicFolderId);
-        setPersisted(musicFolderId);
+        setFilter(FILTER_KEYS.SHARED.MUSIC_FOLDER_ID, musicFolderId);
     };
 
     return {
@@ -29,7 +27,7 @@ export const useMusicFolderIdFilter = (defaultValue: null | string, listKey: Ite
     };
 };
 
-const getDefaultMusicFolderId = (defaultValue: null | string, persisted: null | string) => {
+const getDefaultMusicFolderId = (defaultValue: null | string, persisted: string | undefined) => {
     if (persisted) {
         return parseAsString.withDefault(persisted);
     }
@@ -39,8 +37,4 @@ const getDefaultMusicFolderId = (defaultValue: null | string, persisted: null | 
     }
 
     return parseAsString;
-};
-
-const getPersistenceKey = (serverId: string, listKey: ItemListKey) => {
-    return `${serverId}-list-${listKey}-${FILTER_KEYS.SHARED.MUSIC_FOLDER_ID}`;
 };

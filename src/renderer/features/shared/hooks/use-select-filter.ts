@@ -1,7 +1,7 @@
 import { parseAsString, useQueryState } from 'nuqs';
 
+import { useListFilterPersistence } from '/@/renderer/features/shared/hooks/use-list-filter-persistence';
 import { useCurrentServer } from '/@/renderer/store';
-import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { ItemListKey } from '/@/shared/types/types';
 
 export const useSelectFilter = (
@@ -10,17 +10,15 @@ export const useSelectFilter = (
     listKey: ItemListKey,
 ) => {
     const server = useCurrentServer();
+    const { getFilter, setFilter } = useListFilterPersistence(server.id, listKey);
 
-    const [persisted, setPersisted] = useLocalStorage({
-        defaultValue: defaultValue || '',
-        key: getPersistenceKey(server.id, listKey, filterKey),
-    });
+    const persisted = getFilter(filterKey);
 
     const [value, setValue] = useQueryState(filterKey, getDefaultValue(defaultValue, persisted));
 
     const handleSetValue = (newValue: string) => {
         setValue(newValue);
-        setPersisted(newValue);
+        setFilter(filterKey, newValue);
     };
 
     return {
@@ -30,7 +28,7 @@ export const useSelectFilter = (
     };
 };
 
-const getDefaultValue = (defaultValue: null | string, persisted: null | string) => {
+const getDefaultValue = (defaultValue: null | string, persisted: string | undefined) => {
     if (persisted) {
         return parseAsString.withDefault(persisted);
     }
@@ -40,8 +38,4 @@ const getDefaultValue = (defaultValue: null | string, persisted: null | string) 
     }
 
     return parseAsString;
-};
-
-const getPersistenceKey = (serverId: string, listKey: ItemListKey, filterKey: string) => {
-    return `${serverId}-list-${listKey}-${filterKey}`;
 };
