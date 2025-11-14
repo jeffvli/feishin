@@ -57,7 +57,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
                 );
 
                 if (songIndex !== -1) {
-                    tableRef.current.scrollToIndex(songIndex);
+                    tableRef.current.scrollToIndex(songIndex, { align: 'center' });
                 }
             },
         },
