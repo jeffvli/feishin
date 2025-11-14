@@ -8,7 +8,7 @@ import {
  * Action creators for item grid state management
  * These can be reused across different components and contexts
  */
-export const itemGridActions = {
+export const itemListActions = {
     clearAll: (): ItemListAction => ({
         type: 'CLEAR_ALL',
     }),
@@ -71,7 +71,7 @@ export const itemGridActions = {
  * Selector functions for item grid state
  * These can be reused to extract specific data from state
  */
-export const itemGridSelectors = {
+export const itemListSelectors = {
     getDragging: (state: ItemListState): unknown[] => {
         return Array.from(state.draggingItems.values());
     },
@@ -179,8 +179,8 @@ export const itemListUtils = {
             return rowId ? currentState.expanded.has(rowId) : false;
         });
         return allExpanded
-            ? itemGridActions.clearExpanded()
-            : itemGridActions.setExpanded(items, extractRowId);
+            ? itemListActions.clearExpanded()
+            : itemListActions.setExpanded(items, extractRowId);
     },
 
     /**
@@ -196,7 +196,7 @@ export const itemListUtils = {
             return rowId ? currentState.selected.has(rowId) : false;
         });
         return allSelected
-            ? itemGridActions.clearSelected()
-            : itemGridActions.setSelected(items, extractRowId);
+            ? itemListActions.clearSelected()
+            : itemListActions.setSelected(items, extractRowId);
     },
 };

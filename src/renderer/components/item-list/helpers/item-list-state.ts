@@ -1,7 +1,35 @@
 import { useCallback, useMemo, useReducer } from 'react';
 
-import { itemGridSelectors } from '/@/renderer/components/item-list/helpers/item-list-reducer-utils';
+import { itemListSelectors } from '/@/renderer/components/item-list/helpers/item-list-reducer-utils';
 import { LibraryItem } from '/@/shared/types/domain-types';
+
+const sortByDataOrder = <T>(
+    items: T[],
+    data: unknown[],
+    extractRowId: (item: unknown) => string | undefined,
+    isIdArray: boolean,
+): T[] => {
+    const rowIdToIndex = new Map<string, number>();
+
+    // Create a map of rowId to index in the data array
+    data.forEach((item, index) => {
+        if (item && typeof item === 'object') {
+            const itemRowId = extractRowId(item);
+            if (itemRowId) {
+                rowIdToIndex.set(itemRowId, index);
+            }
+        }
+    });
+
+    // Sort items by their index in the data array (create new array to avoid mutation)
+    return [...items].sort((a, b) => {
+        const rowIdA = isIdArray ? (a as string) : extractRowId(a as unknown);
+        const rowIdB = isIdArray ? (b as string) : extractRowId(b as unknown);
+        const indexA = rowIdA ? (rowIdToIndex.get(rowIdA) ?? Infinity) : Infinity;
+        const indexB = rowIdB ? (rowIdToIndex.get(rowIdB) ?? Infinity) : Infinity;
+        return indexA - indexB;
+    });
+};
 
 export type ItemListAction =
     | {
@@ -330,29 +358,31 @@ export const useItemListState = (
 
     const isExpanded = useCallback(
         (rowId: string) => {
-            return itemGridSelectors.isExpanded(state, rowId);
+            return itemListSelectors.isExpanded(state, rowId);
         },
         [state],
     );
 
     const isSelected = useCallback(
         (rowId: string) => {
-            return itemGridSelectors.isSelected(state, rowId);
+            return itemListSelectors.isSelected(state, rowId);
         },
         [state],
     );
 
     const getExpanded = useCallback(() => {
-        return itemGridSelectors.getExpanded(state);
+        return itemListSelectors.getExpanded(state);
     }, [state]);
 
     const getDragging = useCallback(() => {
-        return itemGridSelectors.getDragging(state);
+        return itemListSelectors.getDragging(state);
     }, [state]);
 
     const getSelected = useCallback(() => {
-        return itemGridSelectors.getSelected(state);
-    }, [state]);
+        const selectedItems = itemListSelectors.getSelected(state);
+        const data = getDataFn ? getDataFn() : [];
+        return sortByDataOrder(selectedItems, data, extractRowIdFn, false);
+    }, [state, getDataFn, extractRowIdFn]);
 
     const getDraggingIds = useCallback(() => {
         return Array.from(state.dragging);
@@ -363,8 +393,10 @@ export const useItemListState = (
     }, [state.expanded]);
 
     const getSelectedIds = useCallback(() => {
-        return Array.from(state.selected);
-    }, [state.selected]);
+        const selectedIds = Array.from(state.selected);
+        const data = getDataFn ? getDataFn() : [];
+        return sortByDataOrder(selectedIds, data, extractRowIdFn, true);
+    }, [state.selected, getDataFn, extractRowIdFn]);
 
     const clearExpanded = useCallback(() => {
         dispatch({ type: 'CLEAR_EXPANDED' });
@@ -383,24 +415,24 @@ export const useItemListState = (
     }, []);
 
     const getVersion = useCallback(() => {
-        return itemGridSelectors.getVersion(state);
+        return itemListSelectors.getVersion(state);
     }, [state]);
 
     const hasExpanded = useCallback(() => {
-        return itemGridSelectors.hasAnyExpanded(state);
+        return itemListSelectors.hasAnyExpanded(state);
     }, [state]);
 
     const hasDragging = useCallback(() => {
-        return itemGridSelectors.hasAnyDragging(state);
+        return itemListSelectors.hasAnyDragging(state);
     }, [state]);
 
     const hasSelected = useCallback(() => {
-        return itemGridSelectors.hasAnySelected(state);
+        return itemListSelectors.hasAnySelected(state);
     }, [state]);
 
     const isDragging = useCallback(
         (rowId: string) => {
-            return itemGridSelectors.isDragging(state, rowId);
+            return itemListSelectors.isDragging(state, rowId);
         },
         [state],
     );
