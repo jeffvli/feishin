@@ -6,6 +6,7 @@ import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import {
     AlbumArtistListSort,
     AlbumListSort,
+    GenreListSort,
     LibraryItem,
     ServerType,
     SongListSort,
@@ -444,8 +445,35 @@ const ALBUM_ARTIST_LIST_FILTERS: Partial<
     ],
 };
 
+const GENRE_LIST_FILTERS: Partial<
+    Record<ServerType, Array<{ defaultOrder: SortOrder; name: string; value: string }>>
+> = {
+    [ServerType.JELLYFIN]: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: GenreListSort.NAME,
+        },
+    ],
+    [ServerType.NAVIDROME]: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: GenreListSort.NAME,
+        },
+    ],
+    [ServerType.SUBSONIC]: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: GenreListSort.NAME,
+        },
+    ],
+};
+
 const FILTERS: Partial<Record<LibraryItem, any>> = {
     [LibraryItem.ALBUM]: ALBUM_LIST_FILTERS,
     [LibraryItem.ALBUM_ARTIST]: ALBUM_ARTIST_LIST_FILTERS,
+    [LibraryItem.GENRE]: GENRE_LIST_FILTERS,
     [LibraryItem.SONG]: SONG_LIST_FILTERS,
 };

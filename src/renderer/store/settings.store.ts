@@ -8,13 +8,14 @@ import { createWithEqualityFn } from 'zustand/traditional';
 
 import i18n from '/@/i18n/i18n';
 import {
+    ALBUM_ARTIST_TABLE_COLUMNS,
     ALBUM_TABLE_COLUMNS,
+    GENRE_TABLE_COLUMNS,
     pickTableColumns,
     PLAYLIST_SONG_TABLE_COLUMNS,
     PLAYLIST_TABLE_COLUMNS,
     SONG_TABLE_COLUMNS,
 } from '/@/renderer/components/item-list/item-table-list/default-columns';
-import { ALBUMARTIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table/table-config-dropdown';
 import { ContextMenuItemType } from '/@/renderer/features/context-menu/events';
 import { AppRoute } from '/@/renderer/router/routes';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
@@ -706,13 +707,13 @@ const initialState: SettingsState = {
             pagination: ListPaginationType.INFINITE,
             table: {
                 autoFitColumns: false,
-                columns: ALBUMARTIST_TABLE_COLUMNS.map((column) => ({
-                    align: 'start' as const,
-                    autoSize: false,
+                columns: ALBUM_ARTIST_TABLE_COLUMNS.map((column) => ({
+                    align: column.align,
+                    autoSize: column.autoSize,
                     id: column.value,
-                    isEnabled: true,
-                    pinned: null,
-                    width: 200,
+                    isEnabled: column.isEnabled,
+                    pinned: column.pinned,
+                    width: column.width,
                 })),
                 enableAlternateRowColors: true,
                 enableHorizontalBorders: true,
@@ -732,19 +733,45 @@ const initialState: SettingsState = {
             pagination: ListPaginationType.INFINITE,
             table: {
                 autoFitColumns: false,
-                columns: ALBUMARTIST_TABLE_COLUMNS.map((column) => ({
-                    align: 'start' as const,
-                    autoSize: false,
+                columns: ALBUM_ARTIST_TABLE_COLUMNS.map((column) => ({
+                    align: column.align,
+                    autoSize: column.autoSize,
                     id: column.value,
-                    isEnabled: true,
-                    pinned: null,
-                    width: 200,
+                    isEnabled: column.isEnabled,
+                    pinned: column.pinned,
+                    width: column.width,
                 })),
                 enableAlternateRowColors: true,
                 enableHorizontalBorders: true,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
                 size: 'default',
+            },
+        },
+        [LibraryItem.GENRE]: {
+            display: ListDisplayType.TABLE,
+            grid: {
+                itemGap: 'md',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                autoFitColumns: false,
+                columns: GENRE_TABLE_COLUMNS.map((column) => ({
+                    align: column.align,
+                    autoSize: column.autoSize,
+                    id: column.value,
+                    isEnabled: column.isEnabled,
+                    pinned: column.pinned,
+                    width: column.width,
+                })),
+                enableAlternateRowColors: true,
+                enableHorizontalBorders: true,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'compact',
             },
         },
         [LibraryItem.PLAYLIST]: {
@@ -872,8 +899,8 @@ const initialState: SettingsState = {
                         TableColumn.USER_FAVORITE,
                     ],
                 }),
-                enableAlternateRowColors: true,
-                enableHorizontalBorders: true,
+                enableAlternateRowColors: false,
+                enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
                 size: 'default',

@@ -1,0 +1,98 @@
+import { UseSuspenseQueryOptions } from '@tanstack/react-query';
+import { forwardRef } from 'react';
+
+import { api } from '/@/renderer/api';
+import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
+import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
+import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
+import { useItemListPagination } from '/@/renderer/components/item-list/item-list-pagination/use-item-list-pagination';
+import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
+import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
+import { ItemListTableComponentProps } from '/@/renderer/components/item-list/types';
+import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
+import {
+    GenreListQuery,
+    GenreListSort,
+    LibraryItem,
+    SortOrder,
+} from '/@/shared/types/domain-types';
+
+interface GenreListPaginatedTableProps extends ItemListTableComponentProps<GenreListQuery> {}
+
+export const GenreListPaginatedTable = forwardRef<any, GenreListPaginatedTableProps>(
+    (
+        {
+            autoFitColumns = false,
+            columns,
+            enableAlternateRowColors = false,
+            enableHorizontalBorders = false,
+            enableRowHoverHighlight = true,
+            enableSelection = true,
+            enableVerticalBorders = false,
+            itemsPerPage = 100,
+            query = {
+                sortBy: GenreListSort.NAME,
+                sortOrder: SortOrder.ASC,
+            },
+            saveScrollOffset = true,
+            serverId,
+            size = 'default',
+        },
+        ref,
+    ) => {
+        const listCountQuery = genresQueries.listCount({
+            query: { ...query },
+            serverId: serverId,
+        }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
+
+        const listQueryFn = api.controller.getGenreList;
+
+        const { currentPage, onChange } = useItemListPagination();
+
+        const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
+            currentPage,
+            itemsPerPage,
+            itemType: LibraryItem.GENRE,
+            listCountQuery,
+            listQueryFn,
+            query,
+            serverId,
+        });
+
+        const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
+            enabled: saveScrollOffset,
+        });
+
+        return (
+            <ItemListWithPagination
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                onChange={onChange}
+                pageCount={pageCount}
+                totalItemCount={totalItemCount}
+            >
+                <ItemTableList
+                    autoFitColumns={autoFitColumns}
+                    CellComponent={ItemTableListColumn}
+                    columns={columns}
+                    currentPage={currentPage}
+                    data={data || []}
+                    enableAlternateRowColors={enableAlternateRowColors}
+                    enableExpansion={false}
+                    enableHorizontalBorders={enableHorizontalBorders}
+                    enableRowHoverHighlight={enableRowHoverHighlight}
+                    enableSelection={enableSelection}
+                    enableVerticalBorders={enableVerticalBorders}
+                    initialTop={{
+                        to: scrollOffset ?? 0,
+                        type: 'offset',
+                    }}
+                    itemType={LibraryItem.GENRE}
+                    onScrollEnd={handleOnScrollEnd}
+                    ref={ref}
+                    size={size}
+                />
+            </ItemListWithPagination>
+        );
+    },
+);
