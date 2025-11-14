@@ -126,6 +126,43 @@ const CompactItemCard = ({
             ? internalState.isSelected(internalState.extractRowId(data) || '')
             : false;
 
+    const handleClick = useDoubleClick({
+        onDoubleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+            if (!data || !controls || !internalState) {
+                return;
+            }
+
+            controls.onDoubleClick?.({
+                event: e,
+                internalState,
+                item: data as any,
+                itemType,
+            });
+        },
+        onSingleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+            if (!data || !controls || !internalState) {
+                return;
+            }
+
+            // Don't trigger selection if clicking on interactive elements
+            const target = e.target as HTMLElement;
+            const isInteractiveElement = target.closest(
+                'button, a, input, select, textarea, [role="button"]',
+            );
+
+            if (isInteractiveElement) {
+                return;
+            }
+
+            controls.onClick?.({
+                event: e,
+                internalState,
+                item: data as any,
+                itemType,
+            });
+        },
+    });
+
     if (data) {
         const handleMouseEnter = () => {
             if (withControls) {
@@ -138,43 +175,6 @@ const CompactItemCard = ({
                 setShowControls(false);
             }
         };
-
-        const handleClick = useDoubleClick({
-            onSingleClick: (e: React.MouseEvent<HTMLDivElement>) => {
-                if (!data || !controls || !internalState) {
-                    return;
-                }
-
-                // Don't trigger selection if clicking on interactive elements
-                const target = e.target as HTMLElement;
-                const isInteractiveElement = target.closest(
-                    'button, a, input, select, textarea, [role="button"]',
-                );
-
-                if (isInteractiveElement) {
-                    return;
-                }
-
-                controls.onClick?.({
-                    event: e,
-                    internalState,
-                    item: data as any,
-                    itemType,
-                });
-            },
-            onDoubleClick: (e: React.MouseEvent<HTMLDivElement>) => {
-                if (!data || !controls || !internalState) {
-                    return;
-                }
-
-                controls.onDoubleClick?.({
-                    event: e,
-                    internalState,
-                    item: data as any,
-                    itemType,
-                });
-            },
-        });
 
         const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
             if (!data || !controls || !internalState) {
@@ -259,6 +259,43 @@ const DefaultItemCard = ({
             ? internalState.isSelected(internalState.extractRowId(data) || '')
             : false;
 
+    const handleClick = useDoubleClick({
+        onDoubleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+            if (!data || !controls || !internalState) {
+                return;
+            }
+
+            controls.onDoubleClick?.({
+                event: e,
+                internalState,
+                item: data as any,
+                itemType,
+            });
+        },
+        onSingleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+            if (!data || !controls || !internalState) {
+                return;
+            }
+
+            // Don't trigger selection if clicking on interactive elements
+            const target = e.target as HTMLElement;
+            const isInteractiveElement = target.closest(
+                'button, a, input, select, textarea, [role="button"]',
+            );
+
+            if (isInteractiveElement) {
+                return;
+            }
+
+            controls.onClick?.({
+                event: e,
+                internalState,
+                item: data as any,
+                itemType,
+            });
+        },
+    });
+
     if (data) {
         const handleMouseEnter = () => {
             if (withControls) {
@@ -271,43 +308,6 @@ const DefaultItemCard = ({
                 setShowControls(false);
             }
         };
-
-        const handleClick = useDoubleClick({
-            onSingleClick: (e: React.MouseEvent<HTMLDivElement>) => {
-                if (!data || !controls || !internalState) {
-                    return;
-                }
-
-                // Don't trigger selection if clicking on interactive elements
-                const target = e.target as HTMLElement;
-                const isInteractiveElement = target.closest(
-                    'button, a, input, select, textarea, [role="button"]',
-                );
-
-                if (isInteractiveElement) {
-                    return;
-                }
-
-                controls.onClick?.({
-                    event: e,
-                    internalState,
-                    item: data as any,
-                    itemType,
-                });
-            },
-            onDoubleClick: (e: React.MouseEvent<HTMLDivElement>) => {
-                if (!data || !controls || !internalState) {
-                    return;
-                }
-
-                controls.onDoubleClick?.({
-                    event: e,
-                    internalState,
-                    item: data as any,
-                    itemType,
-                });
-            },
-        });
 
         const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
             if (!data || !controls || !internalState) {
@@ -436,6 +436,43 @@ const PosterItemCard = ({
 
     const isDragging = data && internalState ? internalState.isDragging(data.id) : isDraggingLocal;
 
+    const handleClick = useDoubleClick({
+        onDoubleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+            if (!data || !controls || !internalState) {
+                return;
+            }
+
+            controls.onDoubleClick?.({
+                event: e,
+                internalState,
+                item: data as any,
+                itemType,
+            });
+        },
+        onSingleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+            if (!data || !controls || !internalState) {
+                return;
+            }
+
+            // Don't trigger selection if clicking on interactive elements
+            const target = e.target as HTMLElement;
+            const isInteractiveElement = target.closest(
+                'button, a, input, select, textarea, [role="button"]',
+            );
+
+            if (isInteractiveElement) {
+                return;
+            }
+
+            controls.onClick?.({
+                event: e,
+                internalState,
+                item: data as any,
+                itemType,
+            });
+        },
+    });
+
     if (data) {
         const handleMouseEnter = () => {
             if (withControls) {
@@ -448,43 +485,6 @@ const PosterItemCard = ({
                 setShowControls(false);
             }
         };
-
-        const handleClick = useDoubleClick({
-            onSingleClick: (e: React.MouseEvent<HTMLDivElement>) => {
-                if (!data || !controls || !internalState) {
-                    return;
-                }
-
-                // Don't trigger selection if clicking on interactive elements
-                const target = e.target as HTMLElement;
-                const isInteractiveElement = target.closest(
-                    'button, a, input, select, textarea, [role="button"]',
-                );
-
-                if (isInteractiveElement) {
-                    return;
-                }
-
-                controls.onClick?.({
-                    event: e,
-                    internalState,
-                    item: data as any,
-                    itemType,
-                });
-            },
-            onDoubleClick: (e: React.MouseEvent<HTMLDivElement>) => {
-                if (!data || !controls || !internalState) {
-                    return;
-                }
-
-                controls.onDoubleClick?.({
-                    event: e,
-                    internalState,
-                    item: data as any,
-                    itemType,
-                });
-            },
-        });
 
         const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
             if (!data || !controls || !internalState) {
