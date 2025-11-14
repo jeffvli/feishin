@@ -703,14 +703,16 @@ export const ItemTableList = ({
             | HTMLDivElement
             | undefined;
 
+        const behavior = 'instant';
+
         if (mainContainer) {
-            mainContainer.scrollTo({ behavior: 'instant', top: offset });
+            mainContainer.scrollTo({ behavior, top: offset });
         }
         if (pinnedLeftContainer) {
-            pinnedLeftContainer.scrollTo({ behavior: 'instant', top: offset });
+            pinnedLeftContainer.scrollTo({ behavior, top: offset });
         }
         if (pinnedRightContainer) {
-            pinnedRightContainer.scrollTo({ behavior: 'instant', top: offset });
+            pinnedRightContainer.scrollTo({ behavior, top: offset });
         }
     }, []);
 
@@ -781,11 +783,80 @@ export const ItemTableList = ({
     );
 
     const scrollToTableIndex = useCallback(
-        (index: number) => {
-            const offset = calculateScrollTopForIndex(index);
+        (index: number, options?: { align?: 'bottom' | 'center' | 'top' }) => {
+            const mainContainer = rowRef.current?.childNodes[0] as HTMLDivElement | undefined;
+            if (!mainContainer) return;
+
+            const viewportHeight = mainContainer.clientHeight;
+            const align = options?.align || 'top';
+
+            // Calculate the base scroll offset (top of the row)
+            let offset = calculateScrollTopForIndex(index);
+
+            // Calculate row height for the target index
+            const adjustedIndex = enableHeader ? Math.max(0, index - 1) : index;
+            const mockCellProps: TableItemProps = {
+                cellPadding,
+                columns: parsedColumns,
+                controls: {} as ItemControls,
+                data: enableHeader ? [null, ...data] : data,
+                enableAlternateRowColors,
+                enableExpansion,
+                enableHeader,
+                enableHorizontalBorders,
+                enableRowHoverHighlight,
+                enableSelection,
+                enableVerticalBorders,
+                getRowHeight: () => DEFAULT_ROW_HEIGHT,
+                internalState: {} as ItemListStateActions,
+                itemType,
+                playerContext,
+                size,
+                tableId,
+            };
+
+            let targetRowHeight: number;
+            if (typeof rowHeight === 'number') {
+                targetRowHeight = rowHeight;
+            } else if (typeof rowHeight === 'function') {
+                targetRowHeight = rowHeight(adjustedIndex, mockCellProps);
+            } else {
+                targetRowHeight = DEFAULT_ROW_HEIGHT;
+            }
+
+            // Adjust offset based on alignment
+            if (align === 'center') {
+                offset = offset - viewportHeight / 2 + targetRowHeight / 2;
+            } else if (align === 'bottom') {
+                offset = offset - viewportHeight + targetRowHeight;
+            }
+            // 'top' uses the base offset
+
+            // Ensure offset is not negative
+            offset = Math.max(0, offset);
+
             scrollToTableOffset(offset);
         },
-        [calculateScrollTopForIndex, scrollToTableOffset],
+        [
+            calculateScrollTopForIndex,
+            scrollToTableOffset,
+            enableHeader,
+            cellPadding,
+            parsedColumns,
+            data,
+            enableAlternateRowColors,
+            enableExpansion,
+            enableHorizontalBorders,
+            enableRowHoverHighlight,
+            enableSelection,
+            enableVerticalBorders,
+            itemType,
+            playerContext,
+            size,
+            tableId,
+            DEFAULT_ROW_HEIGHT,
+            rowHeight,
+        ],
     );
 
     const [initialize] = useOverlayScrollbars({
@@ -1280,8 +1351,8 @@ export const ItemTableList = ({
     const imperativeHandle: ItemListHandle = useMemo(() => {
         return {
             internalState,
-            scrollToIndex: (index: number) => {
-                scrollToTableIndex(enableHeader ? index + 1 : index);
+            scrollToIndex: (index: number, options?: { align?: 'bottom' | 'center' | 'top' }) => {
+                scrollToTableIndex(enableHeader ? index + 1 : index, options);
             },
             scrollToOffset: (offset: number) => {
                 scrollToTableOffset(offset);

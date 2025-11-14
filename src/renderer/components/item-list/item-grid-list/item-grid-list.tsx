@@ -360,10 +360,24 @@ export const ItemGridList = ({
     const controls = useDefaultItemListControls();
 
     const scrollToIndex = useCallback(
-        (index: number) => {
+        (
+            index: number,
+            options?: { align?: 'bottom' | 'center' | 'top'; behavior?: 'auto' | 'smooth' },
+        ) => {
             if (!listRef.current || !tableMeta) return;
             const row = Math.floor(index / tableMeta.columnCount);
-            listRef.current.scrollToItem(row, 'smart');
+
+            // Map alignment options to react-window's alignment
+            let alignment: 'auto' | 'center' | 'end' | 'smart' | 'start' = 'smart';
+            if (options?.align === 'top') {
+                alignment = 'start';
+            } else if (options?.align === 'center') {
+                alignment = 'center';
+            } else if (options?.align === 'bottom') {
+                alignment = 'end';
+            }
+
+            listRef.current.scrollToItem(row, alignment);
         },
         [tableMeta],
     );
@@ -580,8 +594,8 @@ export const ItemGridList = ({
     const imperativeHandle: ItemListHandle = useMemo(() => {
         return {
             internalState,
-            scrollToIndex: (index: number) => {
-                scrollToIndex(index);
+            scrollToIndex: (index: number, options?: { align?: 'bottom' | 'center' | 'top' }) => {
+                scrollToIndex(index, options);
             },
             scrollToOffset: (offset: number) => {
                 scrollToOffset(offset);

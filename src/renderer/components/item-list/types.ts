@@ -54,7 +54,10 @@ export interface ItemListGridComponentProps<TQuery> extends ItemListComponentPro
 
 export interface ItemListHandle {
     internalState: ItemListStateActions;
-    scrollToIndex: (index: number, options?: { behavior?: 'auto' | 'smooth' }) => void;
+    scrollToIndex: (
+        index: number,
+        options?: { align?: 'top' | 'bottom' | 'center'; behavior?: 'auto' | 'smooth' },
+    ) => void;
     scrollToOffset: (offset: number, options?: { behavior?: 'auto' | 'smooth' }) => void;
 }
 
