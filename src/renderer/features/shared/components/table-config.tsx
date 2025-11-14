@@ -500,14 +500,14 @@ const TableColumnConfig = ({
 const DragHandle = ({ dragHandleRef }: { dragHandleRef: React.RefObject<HTMLButtonElement> }) => {
     return (
         <ActionIcon
-            icon="dragHorizontal"
+            icon="dragVertical"
             iconProps={{
                 size: 'md',
             }}
             ref={dragHandleRef}
             size="xs"
             style={{ cursor: 'grab' }}
-            variant="transparent"
+            variant="default"
         />
     );
 };
