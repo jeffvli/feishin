@@ -36,12 +36,17 @@ enum AlbumFilterKeys {
     RECENTLY_PLAYED = 'recentlyPlayed',
 }
 
+enum ArtistFilterKeys {
+    ROLE = 'role',
+}
+
 enum SharedFilterKeys {
     MUSIC_FOLDER_ID = 'musicFolderId',
     SEARCH_TERM = 'searchTerm',
     SORT_BY = 'sortBy',
     SORT_ORDER = 'sortOrder',
 }
+
 enum SongFilterKeys {
     _CUSTOM = '_custom',
     ALBUM_IDS = 'albumIds',
@@ -59,6 +64,7 @@ const PaginationFilterKeys = {
 
 export const FILTER_KEYS = {
     ALBUM: AlbumFilterKeys,
+    ARTIST: ArtistFilterKeys,
     PAGINATION: PaginationFilterKeys,
     SHARED: SharedFilterKeys,
     SONG: SongFilterKeys,

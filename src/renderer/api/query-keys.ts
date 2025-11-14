@@ -144,6 +144,19 @@ export const queryKeys: Record<
             [serverId, 'albums', 'songs', query] as const,
     },
     artists: {
+        count: (serverId: string, query?: ArtistListQuery) => {
+            const { filter, pagination } = splitPaginatedQuery(query);
+
+            if (query && pagination) {
+                return [serverId, 'artists', 'count', filter, pagination] as const;
+            }
+
+            if (query) {
+                return [serverId, 'artists', 'count', filter] as const;
+            }
+
+            return [serverId, 'artists', 'count'] as const;
+        },
         list: (serverId: string, query?: ArtistListQuery) => {
             const { filter, pagination } = splitPaginatedQuery(query);
             if (query && pagination) {

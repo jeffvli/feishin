@@ -1,43 +1,129 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import { lazy, Suspense } from 'react';
 
-import { lazy, MutableRefObject, Suspense } from 'react';
-
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
-import { useListContext } from '/@/renderer/context/list-context';
-import { useListStoreByKey } from '/@/renderer/store';
+import { useArtistListFilters } from '/@/renderer/features/artists/hooks/use-artist-list-filters';
+import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
-import { ListDisplayType } from '/@/shared/types/types';
+import { ItemListKey, ListDisplayType, ListPaginationType } from '/@/shared/types/types';
 
-const ArtistListGridView = lazy(() =>
-    import('/@/renderer/features/artists/components/artist-list-grid-view').then((module) => ({
-        default: module.ArtistListGridView,
+const ArtistListInfiniteGrid = lazy(() =>
+    import('/@/renderer/features/artists/components/artist-list-infinite-grid').then((module) => ({
+        default: module.ArtistListInfiniteGrid,
     })),
 );
 
-const ArtistListTableView = lazy(() =>
-    import('/@/renderer/features/artists/components/artist-list-table-view').then((module) => ({
-        default: module.ArtistListTableView,
+const ArtistListPaginatedGrid = lazy(() =>
+    import('/@/renderer/features/artists/components/artist-list-paginated-grid').then((module) => ({
+        default: module.ArtistListPaginatedGrid,
     })),
 );
 
-interface ArtistListContentProps {
-    gridRef: MutableRefObject<null | VirtualInfiniteGridRef>;
-    itemCount?: number;
-    tableRef: MutableRefObject<AgGridReactType | null>;
-}
+const ArtistListInfiniteTable = lazy(() =>
+    import('/@/renderer/features/artists/components/artist-list-infinite-table').then((module) => ({
+        default: module.ArtistListInfiniteTable,
+    })),
+);
 
-export const ArtistListContent = ({ gridRef, itemCount, tableRef }: ArtistListContentProps) => {
-    const { pageKey } = useListContext();
-    const { display } = useListStoreByKey({ key: pageKey });
-    const isGrid = display === ListDisplayType.CARD || display === ListDisplayType.GRID;
+const ArtistListPaginatedTable = lazy(() =>
+    import('/@/renderer/features/artists/components/artist-list-paginated-table').then((module) => ({
+        default: module.ArtistListPaginatedTable,
+    })),
+);
+
+export const ArtistListContent = () => {
+    const { display, grid, itemsPerPage, pagination, table } = useListSettings(ItemListKey.ARTIST);
 
     return (
         <Suspense fallback={<Spinner container />}>
-            {isGrid ? (
-                <ArtistListGridView gridRef={gridRef} itemCount={itemCount} />
-            ) : (
-                <ArtistListTableView itemCount={itemCount} tableRef={tableRef} />
-            )}
+            <ArtistListView
+                display={display}
+                grid={grid}
+                itemsPerPage={itemsPerPage}
+                pagination={pagination}
+                table={table}
+            />
         </Suspense>
     );
+};
+
+export const ArtistListView = ({
+    display,
+    grid,
+    itemsPerPage,
+    pagination,
+    table,
+}: ItemListSettings) => {
+    const server = useCurrentServer();
+
+    const { query } = useArtistListFilters();
+
+    switch (display) {
+        case ListDisplayType.GRID: {
+            switch (pagination) {
+                case ListPaginationType.INFINITE: {
+                    return (
+                        <ArtistListInfiniteGrid
+                            gap={grid.itemGap}
+                            itemsPerPage={itemsPerPage}
+                            itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
+                            query={query}
+                            serverId={server.id}
+                        />
+                    );
+                }
+                case ListPaginationType.PAGINATED: {
+                    return (
+                        <ArtistListPaginatedGrid
+                            gap={grid.itemGap}
+                            itemsPerPage={itemsPerPage}
+                            itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
+                            query={query}
+                            serverId={server.id}
+                        />
+                    );
+                }
+                default:
+                    return null;
+            }
+        }
+        case ListDisplayType.TABLE: {
+            switch (pagination) {
+                case ListPaginationType.INFINITE: {
+                    return (
+                        <ArtistListInfiniteTable
+                            autoFitColumns={table.autoFitColumns}
+                            columns={table.columns}
+                            enableAlternateRowColors={table.enableAlternateRowColors}
+                            enableHorizontalBorders={table.enableHorizontalBorders}
+                            enableRowHoverHighlight={table.enableRowHoverHighlight}
+                            enableVerticalBorders={table.enableVerticalBorders}
+                            itemsPerPage={itemsPerPage}
+                            query={query}
+                            serverId={server.id}
+                            size={table.size}
+                        />
+                    );
+                }
+                case ListPaginationType.PAGINATED: {
+                    return (
+                        <ArtistListPaginatedTable
+                            autoFitColumns={table.autoFitColumns}
+                            columns={table.columns}
+                            enableAlternateRowColors={table.enableAlternateRowColors}
+                            enableHorizontalBorders={table.enableHorizontalBorders}
+                            enableRowHoverHighlight={table.enableRowHoverHighlight}
+                            enableVerticalBorders={table.enableVerticalBorders}
+                            itemsPerPage={itemsPerPage}
+                            query={query}
+                            serverId={server.id}
+                            size={table.size}
+                        />
+                    );
+                }
+                default:
+                    return null;
+            }
+        }
+    }
+
+    return null;
 };

@@ -4,23 +4,22 @@ import { forwardRef } from 'react';
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
-import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
-import { useItemListPagination } from '/@/renderer/components/item-list/item-list-pagination/use-item-list-pagination';
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
+import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
+import { useItemListPagination } from '/@/renderer/components/item-list/item-list-pagination/use-item-list-pagination';
 import { ItemListTableComponentProps } from '/@/renderer/components/item-list/types';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import {
-    AlbumArtistListQuery,
-    AlbumArtistListSort,
+    ArtistListQuery,
+    ArtistListSort,
     LibraryItem,
     SortOrder,
 } from '/@/shared/types/domain-types';
 
-interface AlbumArtistListPaginatedTableProps
-    extends ItemListTableComponentProps<AlbumArtistListQuery> {}
+interface ArtistListPaginatedTableProps extends ItemListTableComponentProps<ArtistListQuery> {}
 
-export const AlbumArtistListPaginatedTable = forwardRef<any, AlbumArtistListPaginatedTableProps>(
+export const ArtistListPaginatedTable = forwardRef<any, ArtistListPaginatedTableProps>(
     (
         {
             autoFitColumns = false,
@@ -32,7 +31,7 @@ export const AlbumArtistListPaginatedTable = forwardRef<any, AlbumArtistListPagi
             enableVerticalBorders = false,
             itemsPerPage = 100,
             query = {
-                sortBy: AlbumArtistListSort.NAME,
+                sortBy: ArtistListSort.NAME,
                 sortOrder: SortOrder.ASC,
             },
             saveScrollOffset = true,
@@ -41,19 +40,19 @@ export const AlbumArtistListPaginatedTable = forwardRef<any, AlbumArtistListPagi
         },
         ref,
     ) => {
-        const listCountQuery = artistsQueries.albumArtistListCount({
+        const listCountQuery = artistsQueries.artistListCount({
             query: { ...query },
             serverId: serverId,
         }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
 
-        const listQueryFn = api.controller.getAlbumArtistList;
+        const listQueryFn = api.controller.getArtistList;
 
         const { currentPage, onChange } = useItemListPagination();
 
         const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
             currentPage,
             itemsPerPage,
-            itemType: LibraryItem.ALBUM_ARTIST,
+            itemType: LibraryItem.ARTIST,
             listCountQuery,
             listQueryFn,
             query,
@@ -88,7 +87,7 @@ export const AlbumArtistListPaginatedTable = forwardRef<any, AlbumArtistListPagi
                         to: scrollOffset ?? 0,
                         type: 'offset',
                     }}
-                    itemType={LibraryItem.ALBUM_ARTIST}
+                    itemType={LibraryItem.ARTIST}
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
                     size={size}

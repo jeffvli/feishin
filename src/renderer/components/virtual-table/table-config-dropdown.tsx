@@ -287,6 +287,21 @@ export const PLAYLIST_TABLE_COLUMNS = [
     },
 ];
 
+export const ARTIST_TABLE_COLUMNS = [
+    {
+        label: i18n.t('table.config.label.rowIndex', { postProcess: 'titleCase' }),
+        value: TableColumn.ROW_INDEX,
+    },
+    {
+        label: i18n.t('table.config.label.title', { postProcess: 'titleCase' }),
+        value: TableColumn.TITLE,
+    },
+    {
+        label: i18n.t('table.config.label.actions', { postProcess: 'titleCase' }),
+        value: TableColumn.ACTIONS,
+    },
+];
+
 export const GENRE_TABLE_COLUMNS = [
     {
         label: i18n.t('table.config.label.rowIndex', { postProcess: 'titleCase' }),

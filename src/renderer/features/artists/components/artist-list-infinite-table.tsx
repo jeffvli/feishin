@@ -9,17 +9,16 @@ import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table
 import { ItemListTableComponentProps } from '/@/renderer/components/item-list/types';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import {
-    AlbumArtistListQuery,
-    AlbumArtistListSort,
+    ArtistListQuery,
+    ArtistListSort,
     LibraryItem,
     SortOrder,
 } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
-interface AlbumArtistListInfiniteTableProps
-    extends ItemListTableComponentProps<AlbumArtistListQuery> {}
+interface ArtistListInfiniteTableProps extends ItemListTableComponentProps<ArtistListQuery> {}
 
-export const AlbumArtistListInfiniteTable = forwardRef<any, AlbumArtistListInfiniteTableProps>(
+export const ArtistListInfiniteTable = forwardRef<any, ArtistListInfiniteTableProps>(
     (
         {
             autoFitColumns = false,
@@ -31,7 +30,7 @@ export const AlbumArtistListInfiniteTable = forwardRef<any, AlbumArtistListInfin
             enableVerticalBorders = false,
             itemsPerPage = 100,
             query = {
-                sortBy: AlbumArtistListSort.NAME,
+                sortBy: ArtistListSort.NAME,
                 sortOrder: SortOrder.ASC,
             },
             saveScrollOffset = true,
@@ -40,17 +39,17 @@ export const AlbumArtistListInfiniteTable = forwardRef<any, AlbumArtistListInfin
         },
         ref,
     ) => {
-        const listCountQuery = artistsQueries.albumArtistListCount({
+        const listCountQuery = artistsQueries.artistListCount({
             query: { ...query },
             serverId: serverId,
         }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
 
-        const listQueryFn = api.controller.getAlbumArtistList;
+        const listQueryFn = api.controller.getArtistList;
 
         const { data, onRangeChanged } = useItemListInfiniteLoader({
-            eventKey: ItemListKey.ALBUM_ARTIST,
+            eventKey: ItemListKey.ARTIST,
             itemsPerPage,
-            itemType: LibraryItem.ALBUM_ARTIST,
+            itemType: LibraryItem.ARTIST,
             listCountQuery,
             listQueryFn,
             query,
@@ -77,7 +76,7 @@ export const AlbumArtistListInfiniteTable = forwardRef<any, AlbumArtistListInfin
                     to: scrollOffset ?? 0,
                     type: 'offset',
                 }}
-                itemType={LibraryItem.ALBUM_ARTIST}
+                itemType={LibraryItem.ARTIST}
                 onRangeChanged={onRangeChanged}
                 onScrollEnd={handleOnScrollEnd}
                 ref={ref}

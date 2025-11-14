@@ -51,15 +51,29 @@ export const artistsQueries = {
             ...args.options,
         });
     },
-    artistListCount: (args: QueryHookArgs<ListCountQuery<ArtistListQuery>>) => {
+    artistList: (args: QueryHookArgs<ArtistListQuery>) => {
         return queryOptions({
             queryFn: ({ signal }) => {
-                return api.controller.getArtistListCount({
+                return api.controller.getArtistList({
                     apiClientProps: { serverId: args.serverId, signal },
                     query: args.query,
                 });
             },
-            queryKey: queryKeys.albumArtists.count(
+            queryKey: queryKeys.artists.list(args.serverId, args.query),
+            ...args.options,
+        });
+    },
+    artistListCount: (args: QueryHookArgs<ListCountQuery<ArtistListQuery>>) => {
+        return queryOptions({
+            queryFn: ({ signal }) => {
+                return api.controller
+                    .getArtistList({
+                        apiClientProps: { serverId: args.serverId, signal },
+                        query: { ...args.query, limit: 1, startIndex: 0 },
+                    })
+                    .then((result) => result?.totalRecordCount ?? 0);
+            },
+            queryKey: queryKeys.artists.count(
                 args.serverId,
                 Object.keys(args.query).length === 0 ? undefined : args.query,
             ),
