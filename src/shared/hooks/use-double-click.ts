@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 export const useDoubleClick = ({
-    latency = 160,
+    latency = 180,
     onDoubleClick = () => null,
     onSingleClick = () => null,
 }: {
