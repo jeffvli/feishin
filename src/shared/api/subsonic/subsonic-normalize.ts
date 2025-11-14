@@ -94,9 +94,12 @@ const getGenres = (
         | z.infer<typeof ssType._response.album>
         | z.infer<typeof ssType._response.albumListEntry>
         | z.infer<typeof ssType._response.song>,
+    server?: null | ServerListItemWithCredential,
 ): Genre[] => {
     return item.genres
         ? item.genres.map((genre) => ({
+              _serverId: server?.id || 'unknown',
+              _serverType: ServerType.SUBSONIC,
               id: genre.name,
               imageUrl: null,
               itemType: LibraryItem.GENRE,
@@ -105,6 +108,8 @@ const getGenres = (
         : item.genre
           ? [
                 {
+                    _serverId: server?.id || 'unknown',
+                    _serverType: ServerType.SUBSONIC,
                     id: item.genre,
                     imageUrl: null,
                     itemType: LibraryItem.GENRE,
@@ -161,7 +166,7 @@ const normalizeSong = (
                       track: item.replayGain.trackGain,
                   }
                 : null,
-        genres: getGenres(item),
+        genres: getGenres(item, server),
         id: item.id.toString(),
         imagePlaceholderUrl: null,
         imageUrl,
@@ -260,7 +265,7 @@ const normalizeAlbum = (
                 : item.explicitStatus === 'clean'
                   ? ExplicitStatus.CLEAN
                   : null,
-        genres: getGenres(item),
+        genres: getGenres(item, server),
         id: item.id.toString(),
         imagePlaceholderUrl: null,
         imageUrl,
@@ -320,8 +325,13 @@ const normalizePlaylist = (
     };
 };
 
-const normalizeGenre = (item: z.infer<typeof ssType._response.genre>): Genre => {
+const normalizeGenre = (
+    item: z.infer<typeof ssType._response.genre>,
+    server: null | ServerListItemWithCredential,
+): Genre => {
     return {
+        _serverId: server?.id || 'unknown',
+        _serverType: ServerType.SUBSONIC,
         albumCount: item.albumCount,
         id: item.value,
         imageUrl: null,

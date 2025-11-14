@@ -262,6 +262,8 @@ export type GainInfo = {
 };
 
 export type Genre = {
+    _serverId: string;
+    _serverType: ServerType;
     albumCount?: number;
     id: string;
     imageUrl: null | string;

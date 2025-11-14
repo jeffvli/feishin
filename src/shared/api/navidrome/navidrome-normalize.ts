@@ -430,8 +430,13 @@ const normalizePlaylist = (
     };
 };
 
-const normalizeGenre = (item: z.infer<typeof ndType._response.genre>): Genre => {
+const normalizeGenre = (
+    item: z.infer<typeof ndType._response.genre>,
+    server: null | ServerListItem,
+): Genre => {
     return {
+        _serverId: server?.id || 'unknown',
+        _serverType: ServerType.NAVIDROME,
         albumCount: undefined,
         id: item.id,
         imageUrl: null,

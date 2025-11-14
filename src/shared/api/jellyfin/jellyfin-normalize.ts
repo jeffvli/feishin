@@ -504,6 +504,8 @@ const normalizeGenre = (
     server: null | ServerListItem,
 ): Genre => {
     return {
+        _serverId: server?.id || '',
+        _serverType: ServerType.JELLYFIN,
         albumCount: undefined,
         id: item.Id,
         imageUrl: getGenreCoverArtUrl({ baseUrl: server?.url || '', item, size: 200 }),

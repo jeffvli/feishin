@@ -647,7 +647,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                 break;
         }
 
-        const genres = results.map(ssNormalize.genre);
+        const genres = results.map((genre) => ssNormalize.genre(genre, apiClientProps.server));
 
         return {
             items: genres,

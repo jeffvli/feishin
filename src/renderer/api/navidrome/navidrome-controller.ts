@@ -370,7 +370,7 @@ export const NavidromeController: InternalControllerEndpoint = {
         }
 
         return {
-            items: res.body.data.map((genre) => ndNormalize.genre(genre)),
+            items: res.body.data.map((genre) => ndNormalize.genre(genre, apiClientProps.server)),
             startIndex: query.startIndex || 0,
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
