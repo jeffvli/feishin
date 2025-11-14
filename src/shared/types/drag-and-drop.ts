@@ -8,6 +8,7 @@ export enum DragTarget {
     ARTIST = LibraryItem.ARTIST,
     GENERIC = 'generic',
     GENRE = LibraryItem.GENRE,
+    GRID_ROW = 'gridRow',
     PLAYLIST = LibraryItem.PLAYLIST,
     QUEUE_SONG = LibraryItem.QUEUE_SONG,
     SONG = LibraryItem.SONG,

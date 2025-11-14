@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
+import { useGridRows } from '/@/renderer/components/item-list/helpers/use-grid-rows';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
 import { ItemGridList } from '/@/renderer/components/item-list/item-grid-list/item-grid-list';
 import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
@@ -15,6 +16,7 @@ import {
     LibraryItem,
     SortOrder,
 } from '/@/shared/types/domain-types';
+import { ItemListKey } from '/@/shared/types/types';
 
 interface AlbumListPaginatedGridProps extends ItemListGridComponentProps<AlbumListQuery> {}
 
@@ -55,6 +57,8 @@ export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProp
             enabled: saveScrollOffset,
         });
 
+        const rows = useGridRows(LibraryItem.ALBUM, ItemListKey.ALBUM);
+
         return (
             <ItemListWithPagination
                 currentPage={currentPage}
@@ -74,6 +78,7 @@ export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProp
                     itemType={LibraryItem.ALBUM}
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
+                    rows={rows}
                 />
             </ItemListWithPagination>
         );

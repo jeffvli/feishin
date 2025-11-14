@@ -128,6 +128,7 @@
         "yes": "yes",
         "explicit": "explicit",
         "clean": "clean",
+        "gridRows": "grid rows",
         "tableColumns": "table columns"
     },
     "entity": {
@@ -858,6 +859,7 @@
             "label": {
                 "actions": "$t(common.action_other)",
                 "album": "$t(entity.album_one)",
+                "albumCount": "$t(entity.album_other)",
                 "albumArtist": "$t(entity.albumArtist_one)",
                 "artist": "$t(entity.artist_one)",
                 "biography": "$t(common.biography)",

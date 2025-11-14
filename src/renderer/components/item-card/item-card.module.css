@@ -96,6 +96,18 @@
     color: var(--theme-colors-foreground-muted);
 }
 
+.row.align-start {
+    text-align: left;
+}
+
+.row.align-center {
+    text-align: center;
+}
+
+.row.align-end {
+    text-align: right;
+}
+
 .container.poster {
     padding: 0;
     background-color: inherit;

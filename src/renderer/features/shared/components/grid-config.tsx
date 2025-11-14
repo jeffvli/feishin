@@ -253,9 +253,6 @@ const GridRowConfig = ({
         );
     }, [data]);
 
-    console.log('data', data);
-    console.log(labelMap);
-
     const handleChangeEnabled = useCallback(
         (item: ItemGridListRowConfig, checked: boolean) => {
             const value = useSettingsStore.getState().lists[listKey]?.grid.rows;

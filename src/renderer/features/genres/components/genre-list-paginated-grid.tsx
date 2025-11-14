@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
+import { useGridRows } from '/@/renderer/components/item-list/helpers/use-grid-rows';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
 import { ItemGridList } from '/@/renderer/components/item-list/item-grid-list/item-grid-list';
 import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
@@ -15,6 +16,7 @@ import {
     LibraryItem,
     SortOrder,
 } from '/@/shared/types/domain-types';
+import { ItemListKey } from '/@/shared/types/types';
 
 interface GenreListPaginatedGridProps extends ItemListGridComponentProps<GenreListQuery> {}
 
@@ -56,6 +58,8 @@ export const GenreListPaginatedGrid = forwardRef<any, GenreListPaginatedGridProp
             enabled: saveScrollOffset,
         });
 
+        const rows = useGridRows(LibraryItem.GENRE, ItemListKey.GENRE);
+
         return (
             <ItemListWithPagination
                 currentPage={currentPage}
@@ -76,6 +80,7 @@ export const GenreListPaginatedGrid = forwardRef<any, GenreListPaginatedGridProp
                     itemType={LibraryItem.GENRE}
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
+                    rows={rows}
                 />
             </ItemListWithPagination>
         );

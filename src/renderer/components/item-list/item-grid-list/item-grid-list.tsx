@@ -60,6 +60,7 @@ interface VirtualizedGridListProps {
     onScrollEnd?: ItemGridListProps['onScrollEnd'];
     outerRef: RefObject<any>;
     ref: RefObject<FixedSizeList<GridItemProps>>;
+    rows?: ItemCardProps['rows'];
     tableMeta: null | {
         columnCount: number;
         itemHeight: number;
@@ -85,6 +86,7 @@ const VirtualizedGridList = React.memo(
         onScrollEnd,
         outerRef,
         ref,
+        rows,
         tableMeta,
         width,
     }: VirtualizedGridListProps) => {
@@ -99,11 +101,13 @@ const VirtualizedGridList = React.memo(
                 gap,
                 internalState,
                 itemType,
+                rows,
                 tableMeta,
             };
         }, [
             tableMeta,
             controls,
+            rows,
             data,
             enableDrag,
             enableExpansion,
@@ -167,59 +171,51 @@ const VirtualizedGridList = React.memo(
 
 VirtualizedGridList.displayName = 'VirtualizedGridList';
 
-const createThrottledSetTableMeta = (itemsPerRow?: number) => {
-    return throttle(
-        (
-            width: number,
-            dataLength: number,
-            type: LibraryItem,
-            setTableMeta: (meta: any) => void,
-        ) => {
-            const isSm = width >= 600;
-            const isMd = width >= 768;
-            const isLg = width >= 960;
-            const isXl = width >= 1200;
-            const is2xl = width >= 1440;
-            const is3xl = width >= 1920;
-            const is4xl = width >= 2560;
+const createThrottledSetTableMeta = (itemsPerRow?: number, rowsCount?: number) => {
+    return throttle((width: number, dataLength: number, setTableMeta: (meta: any) => void) => {
+        const isSm = width >= 600;
+        const isMd = width >= 768;
+        const isLg = width >= 960;
+        const isXl = width >= 1200;
+        const is2xl = width >= 1440;
+        const is3xl = width >= 1920;
+        const is4xl = width >= 2560;
 
-            let dynamicItemsPerRow = 2;
+        let dynamicItemsPerRow = 2;
 
-            if (is4xl) {
-                dynamicItemsPerRow = 12;
-            } else if (is3xl) {
-                dynamicItemsPerRow = 10;
-            } else if (is2xl) {
-                dynamicItemsPerRow = 8;
-            } else if (isXl) {
-                dynamicItemsPerRow = 6;
-            } else if (isLg) {
-                dynamicItemsPerRow = 5;
-            } else if (isMd) {
-                dynamicItemsPerRow = 4;
-            } else if (isSm) {
-                dynamicItemsPerRow = 3;
-            } else {
-                dynamicItemsPerRow = 2;
-            }
+        if (is4xl) {
+            dynamicItemsPerRow = 12;
+        } else if (is3xl) {
+            dynamicItemsPerRow = 10;
+        } else if (is2xl) {
+            dynamicItemsPerRow = 8;
+        } else if (isXl) {
+            dynamicItemsPerRow = 6;
+        } else if (isLg) {
+            dynamicItemsPerRow = 5;
+        } else if (isMd) {
+            dynamicItemsPerRow = 4;
+        } else if (isSm) {
+            dynamicItemsPerRow = 3;
+        } else {
+            dynamicItemsPerRow = 2;
+        }
 
-            const setItemsPerRow = itemsPerRow || dynamicItemsPerRow;
+        const setItemsPerRow = itemsPerRow || dynamicItemsPerRow;
 
-            const widthPerItem = Number(width) / setItemsPerRow;
-            const itemHeight = widthPerItem + getDataRowsCount(type) * 26;
+        const widthPerItem = Number(width) / setItemsPerRow;
+        const itemHeight = widthPerItem + (rowsCount || getDataRowsCount()) * 26;
 
-            if (widthPerItem === 0) {
-                return;
-            }
+        if (widthPerItem === 0) {
+            return;
+        }
 
-            setTableMeta({
-                columnCount: setItemsPerRow,
-                itemHeight,
-                rowCount: Math.ceil(dataLength / setItemsPerRow),
-            });
-        },
-        200,
-    );
+        setTableMeta({
+            columnCount: setItemsPerRow,
+            itemHeight,
+            rowCount: Math.ceil(dataLength / setItemsPerRow),
+        });
+    }, 200);
 };
 
 export interface GridItemProps {
@@ -232,6 +228,7 @@ export interface GridItemProps {
     gap: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     internalState: ItemListStateActions;
     itemType: LibraryItem;
+    rows?: ItemCardProps['rows'];
     tableMeta: null | {
         columnCount: number;
         itemHeight: number;
@@ -257,6 +254,7 @@ export interface ItemGridListProps {
     onScroll?: (offset: number, direction: 'down' | 'up') => void;
     onScrollEnd?: (offset: number, direction: 'down' | 'up') => void;
     ref?: Ref<ItemListHandle>;
+    rows?: ItemCardProps['rows'];
 }
 
 export const ItemGridList = ({
@@ -273,6 +271,7 @@ export const ItemGridList = ({
     onScroll,
     onScrollEnd,
     ref,
+    rows,
 }: ItemGridListProps) => {
     const rootRef = useRef(null);
     const outerRef = useRef(null);
@@ -334,12 +333,12 @@ export const ItemGridList = ({
     }, [initialize, tableMeta]);
 
     const throttledSetTableMeta = useMemo(() => {
-        return createThrottledSetTableMeta(itemsPerRow);
-    }, [itemsPerRow]);
+        return createThrottledSetTableMeta(itemsPerRow, rows?.length);
+    }, [itemsPerRow, rows?.length]);
 
     useLayoutEffect(() => {
-        throttledSetTableMeta(containerWidth, data.length, itemType, setTableMeta);
-    }, [containerWidth, data.length, itemType, throttledSetTableMeta]);
+        throttledSetTableMeta(containerWidth, data.length, setTableMeta);
+    }, [containerWidth, data.length, throttledSetTableMeta]);
 
     const controls = useDefaultItemListControls();
 
@@ -620,6 +619,7 @@ export const ItemGridList = ({
                         onScrollEnd={onScrollEnd ?? (() => {})}
                         outerRef={outerRef}
                         ref={listRef}
+                        rows={rows}
                         tableMeta={tableMeta}
                         width={width}
                     />
@@ -638,7 +638,7 @@ export const ItemGridList = ({
 
 const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
     const { index, style } = props;
-    const { columns, controls, data, enableDrag, gap, itemType } = props.data;
+    const { columns, controls, data, enableDrag, gap, itemType, rows } = props.data;
 
     const items: ReactNode[] = [];
     const itemCount = data.length;
@@ -667,6 +667,7 @@ const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
                         enableDrag={enableDrag}
                         internalState={props.data.internalState}
                         itemType={itemType}
+                        rows={rows}
                         withControls
                     />
                 </div>,

@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListInfiniteLoader } from '/@/renderer/components/item-list/helpers/item-list-infinite-loader';
+import { useGridRows } from '/@/renderer/components/item-list/helpers/use-grid-rows';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
 import { ItemGridList } from '/@/renderer/components/item-list/item-grid-list/item-grid-list';
 import { ItemListGridComponentProps } from '/@/renderer/components/item-list/types';
@@ -53,6 +54,8 @@ export const ArtistListInfiniteGrid = forwardRef<any, ArtistListInfiniteGridProp
             enabled: saveScrollOffset,
         });
 
+        const rows = useGridRows(LibraryItem.ARTIST, ItemListKey.ARTIST);
+
         return (
             <ItemGridList
                 data={data}
@@ -65,6 +68,7 @@ export const ArtistListInfiniteGrid = forwardRef<any, ArtistListInfiniteGridProp
                 itemType={LibraryItem.ARTIST}
                 onRangeChanged={onRangeChanged}
                 onScrollEnd={handleOnScrollEnd}
+                rows={rows}
             />
         );
     },
