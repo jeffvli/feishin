@@ -28,20 +28,32 @@ export const Modal = ({ children, classNames, handlers, ...rest }: ModalProps) =
     return (
         <MantineModal
             {...rest}
+            centered={true}
             classNames={{
                 body: styles.body,
+                close: styles.close,
                 content: styles.content,
                 header: styles.header,
+                inner: styles.inner,
+                overlay: styles.overlay,
                 root: styles.root,
                 title: styles.title,
                 ...classNames,
             }}
+            closeButtonProps={{
+                icon: <Icon icon="x" size="xl" />,
+            }}
             onClose={handlers.close}
-            radius="lg"
+            overlayProps={{
+                backgroundOpacity: 0.8,
+                blur: 4,
+            }}
+            radius="xl"
+            scrollAreaComponent={ScrollArea}
             transitionProps={{
                 duration: 300,
                 exitDuration: 300,
-                transition: 'fade',
+                transition: 'fade' as const,
             }}
         >
             {children}
