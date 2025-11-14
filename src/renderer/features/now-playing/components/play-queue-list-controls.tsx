@@ -1,22 +1,22 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-
 import { type MutableRefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
-import { usePlaybackType } from '/@/renderer/store/settings.store';
+import { SearchInput } from '/@/renderer/features/shared/components/search-input';
+import { usePlayerSong, usePlayerStoreBase } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
-import { Song } from '/@/shared/types/domain-types';
+import { QueueSong } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
 interface PlayQueueListOptionsProps {
     handleSearch: (value: string) => void;
     searchTerm?: string;
-    tableRef: MutableRefObject<null | { grid: AgGridReactType<Song> }>;
+    tableRef: MutableRefObject<ItemListHandle | null>;
     type: ItemListKey;
 }
 
@@ -24,94 +24,60 @@ export const PlayQueueListControls = ({
     handleSearch,
     searchTerm,
     tableRef,
-    type,
 }: PlayQueueListOptionsProps) => {
     const { t } = useTranslation();
-    // const {
-    //     clearQueue,
-    //     moveToBottomOfQueue,
-    //     moveToNextOfQueue,
-    //     moveToTopOfQueue,
-    //     removeFromQueue,
-    //     shuffleQueue,
-    // } = useQueueControls();
-
-    // const { pause } = usePlayerControls();
-
     const player = usePlayerContext();
-
-    const playbackType = usePlaybackType();
-    // const setCurrentTime = useSetCurrentTime();
+    const currentSong = usePlayerSong();
 
     const handleMoveToNext = () => {
-        // const selectedRows = tableRef?.current?.grid.api.getSelectedRows();
-        // const uniqueIds = selectedRows?.map((row) => row.uniqueId);
-        // if (!uniqueIds?.length) return;
-        // // const playerData = moveToNextOfQueue(uniqueIds);
-        // // if (playbackType === PlaybackType.LOCAL) {
-        // //     setQueueNext(playerData);
-        // // }
-        // player.moveSelectedToNext(selectedRows);
+        const selectedItems = tableRef?.current?.internalState.getSelected() as
+            | QueueSong[]
+            | undefined;
+        if (!selectedItems || selectedItems.length === 0) return;
+        player.moveSelectedToNext(selectedItems);
     };
 
     const handleMoveToBottom = () => {
-        // const selectedRows = tableRef?.current?.grid.api.getSelectedRows();
-        // const uniqueIds = selectedRows?.map((row) => row.uniqueId);
-        // if (!uniqueIds?.length) return;
-        // const playerData = moveToBottomOfQueue(uniqueIds);
-        // if (playbackType === PlaybackType.LOCAL) {
-        //     setQueueNext(playerData);
-        // }
+        const selectedItems = tableRef?.current?.internalState.getSelected() as
+            | QueueSong[]
+            | undefined;
+        if (!selectedItems || selectedItems.length === 0) return;
+        player.moveSelectedToBottom(selectedItems);
     };
 
     const handleMoveToTop = () => {
-        // const selectedRows = tableRef?.current?.grid.api.getSelectedRows();
-        // const uniqueIds = selectedRows?.map((row) => row.uniqueId);
-        // if (!uniqueIds?.length) return;
-        // const playerData = moveToTopOfQueue(uniqueIds);
-        // if (playbackType === PlaybackType.LOCAL) {
-        //     setQueueNext(playerData);
-        // }
+        const selectedItems = tableRef?.current?.internalState.getSelected() as
+            | QueueSong[]
+            | undefined;
+        if (!selectedItems || selectedItems.length === 0) return;
+        player.moveSelectedToTop(selectedItems);
     };
 
     const handleRemoveSelected = () => {
-        // const selectedRows = tableRef?.current?.grid.api.getSelectedRows();
-        // const uniqueIds = selectedRows?.map((row) => row.uniqueId);
-        // if (!uniqueIds?.length) return;
-        // const currentSong = usePlayerStore.getState().current.song;
-        // const playerData = removeFromQueue(uniqueIds);
-        // const isCurrentSongRemoved = currentSong && uniqueIds.includes(currentSong.uniqueId);
-        // if (playbackType === PlaybackType.LOCAL) {
-        //     if (isCurrentSongRemoved) {
-        //         setQueue(playerData);
-        //     } else {
-        //         setQueueNext(playerData);
-        //     }
-        // }
-        // if (isCurrentSongRemoved) {
-        //     updateSong(playerData.current.song);
-        // }
+        const selectedItems = tableRef?.current?.internalState.getSelected() as
+            | QueueSong[]
+            | undefined;
+        if (!selectedItems || selectedItems.length === 0) return;
+
+        const selectedUniqueIds = selectedItems.map((item) => item._uniqueId);
+        const isCurrentSongRemoved =
+            currentSong && selectedUniqueIds.includes(currentSong._uniqueId);
+
+        player.clearSelected(selectedItems);
+
+        if (isCurrentSongRemoved) {
+            // Get the new current song after removal
+            const newCurrentSong = usePlayerStoreBase.getState().getCurrentSong();
+            updateSong(newCurrentSong);
+        }
     };
 
     const handleClearQueue = () => {
-        // const playerData = clearQueue();
-
-        // if (playbackType === PlaybackType.LOCAL) {
-        //     setQueue(playerData);
-        //     mpvPlayer!.pause();
-        // }
-
         player.clearQueue();
-
-        // setCurrentTime(0);
-        // pause();
     };
 
     const handleShuffleQueue = () => {
-        // const playerData = shuffleQueue();
-        // if (playbackType === PlaybackType.LOCAL) {
-        //     setQueueNext(playerData);
-        // }
+        player.shuffleAll();
     };
 
     return (
@@ -165,7 +131,12 @@ export const PlayQueueListControls = ({
                     variant="subtle"
                 />
             </Group>
-            <Group>
+            <Group gap="xs">
+                <SearchInput
+                    enableHotkey={false}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    value={searchTerm}
+                />
                 <ListConfigMenu
                     listKey={ItemListKey.SIDE_QUEUE}
                     tableColumnsData={SONG_TABLE_COLUMNS}

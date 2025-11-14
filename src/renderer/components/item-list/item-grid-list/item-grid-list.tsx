@@ -564,15 +564,6 @@ export const ItemGridList = ({
 
     const imperativeHandle: ItemListHandle = useMemo(() => {
         return {
-            clearExpanded: () => {
-                internalState.clearExpanded();
-            },
-            clearSelected: () => {
-                internalState.clearSelected();
-            },
-            getItem: (index: number) => data[index],
-            getItemCount: () => data.length,
-            getItems: () => data,
             internalState,
             scrollToIndex: (index: number) => {
                 scrollToIndex(index);
@@ -581,7 +572,7 @@ export const ItemGridList = ({
                 scrollToOffset(offset);
             },
         };
-    }, [data, internalState, scrollToIndex, scrollToOffset]);
+    }, [internalState, scrollToIndex, scrollToOffset]);
 
     useEffect(() => {
         handleRef.current = imperativeHandle;

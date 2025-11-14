@@ -1276,15 +1276,6 @@ export const ItemTableList = ({
 
     const imperativeHandle: ItemListHandle = useMemo(() => {
         return {
-            clearExpanded: () => {
-                internalState.clearExpanded();
-            },
-            clearSelected: () => {
-                internalState.clearSelected();
-            },
-            getItem: (index: number) => (enableHeader ? data[index - 1] : data[index]),
-            getItemCount: () => (enableHeader ? data.length : data.length),
-            getItems: () => data,
             internalState,
             scrollToIndex: (index: number) => {
                 scrollToTableIndex(enableHeader ? index + 1 : index);
@@ -1293,7 +1284,7 @@ export const ItemTableList = ({
                 scrollToTableOffset(offset);
             },
         };
-    }, [data, enableHeader, internalState, scrollToTableIndex, scrollToTableOffset]);
+    }, [enableHeader, internalState, scrollToTableIndex, scrollToTableOffset]);
 
     useImperativeHandle(ref, () => imperativeHandle);
 

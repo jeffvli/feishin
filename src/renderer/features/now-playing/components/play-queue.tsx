@@ -1,10 +1,9 @@
-import type { Ref } from 'react';
-
 import { nanoid } from 'nanoid/non-secure';
 import { forwardRef, useEffect, useMemo, useRef } from 'react';
 
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
+import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import {
     useIsPlayerFetching,
     usePlayerContext,
@@ -24,7 +23,7 @@ type QueueProps = {
     searchTerm: string | undefined;
 };
 
-export const PlayQueue = forwardRef(({ listKey, searchTerm }: QueueProps, ref: Ref<any>) => {
+export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, searchTerm }, ref) => {
     const { table } = useListSettings(listKey) || {};
 
     const queue = usePlayerQueue();
