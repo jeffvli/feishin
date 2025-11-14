@@ -9,6 +9,11 @@ import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 import { Play, TableColumn } from '/@/shared/types/types';
 
 interface UseDefaultItemListControlsArgs {
+    onColumnReordered?: (
+        columnIdFrom: TableColumn,
+        columnIdTo: TableColumn,
+        edge: 'bottom' | 'left' | 'right' | 'top' | null,
+    ) => void;
     onColumnResized?: (columnId: TableColumn, width: number) => void;
 }
 
@@ -16,7 +21,7 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
     const player = usePlayerContext();
     const navigate = useNavigate();
 
-    const { onColumnResized } = args || {};
+    const { onColumnReordered, onColumnResized } = args || {};
 
     const controls: ItemControls = useMemo(() => {
         return {
@@ -153,6 +158,18 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                 }
             },
 
+            onColumnReordered: ({
+                columnIdFrom,
+                columnIdTo,
+                edge,
+            }: {
+                columnIdFrom: TableColumn;
+                columnIdTo: TableColumn;
+                edge: 'bottom' | 'left' | 'right' | 'top' | null;
+            }) => {
+                onColumnReordered?.(columnIdFrom, columnIdTo, edge);
+            },
+
             onColumnResized: ({ columnId, width }: { columnId: TableColumn; width: number }) => {
                 onColumnResized?.(columnId, width);
             },
@@ -249,7 +266,7 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                 player.setRating(item._serverId, [item.id], itemType, newRating);
             },
         };
-    }, [onColumnResized, navigate, player]);
+    }, [onColumnReordered, onColumnResized, navigate, player]);
 
     return controls;
 };

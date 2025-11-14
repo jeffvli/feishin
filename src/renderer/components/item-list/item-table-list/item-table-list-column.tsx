@@ -1,3 +1,14 @@
+import {
+    attachClosestEdge,
+    type Edge,
+    extractClosestEdge,
+} from '@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge';
+import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
+import {
+    draggable,
+    dropTargetForElements,
+} from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import { disableNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/disable-native-drag-preview';
 import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
 import React, { CSSProperties, ReactNode, useEffect, useRef, useState } from 'react';
@@ -38,7 +49,13 @@ import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
 import { useDoubleClick } from '/@/shared/hooks/use-double-click';
 import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
-import { DragOperation, DragTarget, DragTargetMap } from '/@/shared/types/drag-and-drop';
+import {
+    dndUtils,
+    DragData,
+    DragOperation,
+    DragTarget,
+    DragTargetMap,
+} from '/@/shared/types/drag-and-drop';
 import { TableColumn } from '/@/shared/types/types';
 
 export interface ItemTableListColumn extends CellComponentProps<TableItemProps> {}
@@ -808,15 +825,101 @@ export const TableColumnHeaderContainer = (
         props.controls.onColumnResized?.({ columnId, width });
     };
 
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [isDraggedOver, setIsDraggedOver] = useState<Edge | null>(null);
+
+    useEffect(() => {
+        if (!containerRef.current || !props.enableColumnReorder) {
+            return;
+        }
+
+        const handleReorder = (
+            columnIdFrom: TableColumn,
+            columnIdTo: TableColumn,
+            edge: Edge | null,
+        ) => {
+            props.controls.onColumnReordered?.({ columnIdFrom, columnIdTo, edge });
+        };
+
+        return combine(
+            draggable({
+                element: containerRef.current,
+                getInitialData: () => {
+                    const data = dndUtils.generateDragData({
+                        id: [props.type],
+                        operation: [DragOperation.REORDER],
+                        type: DragTarget.TABLE_COLUMN,
+                    });
+                    return data;
+                },
+                onDragStart: () => {
+                    setIsDragging(true);
+                },
+                onDrop: () => {
+                    setIsDragging(false);
+                },
+                onGenerateDragPreview: (data) => {
+                    disableNativeDragPreview({ nativeSetDragImage: data.nativeSetDragImage });
+                },
+            }),
+            dropTargetForElements({
+                canDrop: (args) => {
+                    const data = args.source.data as unknown as DragData;
+                    const isSelf = (args.source.data.id as string[])[0] === props.type;
+                    return dndUtils.isDropTarget(data.type, [DragTarget.TABLE_COLUMN]) && !isSelf;
+                },
+                element: containerRef.current,
+                getData: ({ element, input }) => {
+                    const data = dndUtils.generateDragData({
+                        id: [props.type],
+                        operation: [DragOperation.REORDER],
+                        type: DragTarget.TABLE_COLUMN,
+                    });
+
+                    return attachClosestEdge(data, {
+                        allowedEdges: ['left', 'right'],
+                        element,
+                        input,
+                    });
+                },
+                onDrag: (args) => {
+                    const closestEdgeOfTarget: Edge | null = extractClosestEdge(args.self.data);
+                    setIsDraggedOver(closestEdgeOfTarget);
+                },
+                onDragLeave: () => {
+                    setIsDraggedOver(null);
+                },
+                onDrop: (args) => {
+                    const closestEdgeOfTarget: Edge | null = extractClosestEdge(args.self.data);
+
+                    const from = args.source.data.id as string[];
+                    const to = args.self.data.id as string[];
+
+                    handleReorder(
+                        from[0] as TableColumn,
+                        to[0] as TableColumn,
+                        closestEdgeOfTarget,
+                    );
+                    setIsDraggedOver(null);
+                },
+            }),
+        );
+    }, [props.type, props.enableColumnReorder, props.controls]);
+
     return (
         <Flex
             className={clsx(styles.container, styles.headerContainer, props.containerClassName, {
+                [styles.headerDraggedOverLeft]: isDraggedOver === 'left',
+                [styles.headerDraggedOverRight]: isDraggedOver === 'right',
+                [styles.headerDragging]: isDragging,
                 [styles.paddingLg]: props.cellPadding === 'lg',
                 [styles.paddingMd]: props.cellPadding === 'md',
                 [styles.paddingSm]: props.cellPadding === 'sm',
                 [styles.paddingXl]: props.cellPadding === 'xl',
                 [styles.paddingXs]: props.cellPadding === 'xs',
             })}
+            ref={containerRef}
             style={props.style}
         >
             <Text

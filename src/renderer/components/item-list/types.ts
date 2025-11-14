@@ -18,6 +18,15 @@ export interface DefaultItemControlProps {
 
 export interface ItemControls {
     onClick?: ({ internalState, item, itemType }: DefaultItemControlProps) => void;
+    onColumnReordered?: ({
+        columnIdFrom,
+        columnIdTo,
+        edge,
+    }: {
+        columnIdFrom: TableColumn;
+        columnIdTo: TableColumn;
+        edge: 'top' | 'bottom' | 'left' | 'right' | null;
+    }) => void;
     onColumnResized?: ({ columnId, width }: { columnId: TableColumn; width: number }) => void;
     onDoubleClick?: ({ internalState, item, itemType }: DefaultItemControlProps) => void;
     onExpand?: ({ internalState, item, itemType }: DefaultItemControlProps) => void;

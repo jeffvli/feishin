@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
+import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
 import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
 import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
@@ -66,6 +67,10 @@ export const AlbumArtistListPaginatedTable = forwardRef<any, AlbumArtistListPagi
             enabled: saveScrollOffset,
         });
 
+        const { handleColumnReordered } = useItemListColumnReorder({
+            itemListKey: ItemListKey.ALBUM_ARTIST,
+        });
+
         const { handleColumnResized } = useItemListColumnResize({
             itemListKey: ItemListKey.ALBUM_ARTIST,
         });
@@ -95,6 +100,7 @@ export const AlbumArtistListPaginatedTable = forwardRef<any, AlbumArtistListPagi
                         type: 'offset',
                     }}
                     itemType={LibraryItem.ALBUM_ARTIST}
+                    onColumnReordered={handleColumnReordered}
                     onColumnResized={handleColumnResized}
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}

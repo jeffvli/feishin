@@ -191,6 +191,33 @@
     padding: 0 var(--theme-spacing-xl);
 }
 
+.header-dragging {
+    cursor: grabbing;
+    opacity: 0.5;
+}
+
+.header-dragged-over-left::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    width: 3px;
+    content: '';
+    background-color: var(--theme-colors-primary);
+}
+
+.header-dragged-over-right::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    width: 3px;
+    content: '';
+    background-color: var(--theme-colors-primary);
+}
+
 .header-content {
     display: flex;
     align-items: center;

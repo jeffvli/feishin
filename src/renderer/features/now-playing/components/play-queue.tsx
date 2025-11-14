@@ -1,6 +1,8 @@
 import { useDebouncedValue, useMergedRef } from '@mantine/hooks';
 import { forwardRef, useMemo, useRef } from 'react';
 
+import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
+import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
@@ -44,6 +46,14 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
 
     const isEmpty = data.length === 0;
 
+    const { handleColumnReordered } = useItemListColumnReorder({
+        itemListKey: listKey,
+    });
+
+    const { handleColumnResized } = useItemListColumnResize({
+        itemListKey: listKey,
+    });
+
     usePlayerEvents(
         {
             onCurrentSongChange: (properties) => {
@@ -86,6 +96,8 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
                     type: 'offset',
                 }}
                 itemType={LibraryItem.QUEUE_SONG}
+                onColumnReordered={handleColumnReordered}
+                onColumnResized={handleColumnResized}
                 ref={mergedRef}
                 size={table.size}
             />

@@ -90,6 +90,7 @@ interface VirtualizedTableGridProps {
     controls: ItemControls;
     data: unknown[];
     enableAlternateRowColors: boolean;
+    enableColumnReorder: boolean;
     enableColumnResize: boolean;
     enableDrag?: boolean;
     enableExpansion: boolean;
@@ -128,6 +129,7 @@ const VirtualizedTableGrid = React.memo(
         controls,
         data,
         enableAlternateRowColors,
+        enableColumnReorder,
         enableColumnResize,
         enableDrag,
         enableExpansion,
@@ -169,6 +171,7 @@ const VirtualizedTableGrid = React.memo(
                 controls,
                 data: enableHeader ? [null, ...data] : data,
                 enableAlternateRowColors,
+                enableColumnReorder,
                 enableColumnResize,
                 enableDrag,
                 enableExpansion,
@@ -191,6 +194,7 @@ const VirtualizedTableGrid = React.memo(
                 enableHeader,
                 data,
                 enableAlternateRowColors,
+                enableColumnReorder,
                 enableColumnResize,
                 enableDrag,
                 enableExpansion,
@@ -475,6 +479,7 @@ export interface TableItemProps {
     controls: ItemControls;
     data: ItemTableListProps['data'];
     enableAlternateRowColors?: ItemTableListProps['enableAlternateRowColors'];
+    enableColumnReorder?: boolean;
     enableColumnResize?: boolean;
     enableDrag?: ItemTableListProps['enableDrag'];
     enableExpansion?: ItemTableListProps['enableExpansion'];
@@ -515,6 +520,11 @@ interface ItemTableListProps {
         type: 'index' | 'offset';
     };
     itemType: LibraryItem;
+    onColumnReordered?: (
+        columnIdFrom: TableColumn,
+        columnIdTo: TableColumn,
+        edge: 'top' | 'bottom' | 'left' | 'right' | null,
+    ) => void;
     onColumnResized?: (columnId: TableColumn, width: number) => void;
     onRangeChanged?: (range: { startIndex: number; stopIndex: number }) => void;
     onScrollEnd?: (offset: number, internalState: ItemListStateActions) => void;
@@ -542,6 +552,7 @@ export const ItemTableList = ({
     headerHeight = 40,
     initialTop,
     itemType,
+    onColumnReordered,
     onColumnResized,
     onRangeChanged,
     onScrollEnd,
@@ -1372,6 +1383,7 @@ export const ItemTableList = ({
     }, [imperativeHandle]);
 
     const controls = useDefaultItemListControls({
+        onColumnReordered,
         onColumnResized,
     });
 
@@ -1390,6 +1402,7 @@ export const ItemTableList = ({
                 controls={controls}
                 data={data}
                 enableAlternateRowColors={enableAlternateRowColors}
+                enableColumnReorder={!!onColumnReordered}
                 enableColumnResize={!!onColumnResized}
                 enableDrag={enableDrag}
                 enableExpansion={enableExpansion}
