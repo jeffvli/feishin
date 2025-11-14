@@ -1,3 +1,4 @@
+import { useDebouncedValue } from '@mantine/hooks';
 import { nanoid } from 'nanoid/non-secure';
 import { forwardRef, useEffect, useMemo, useRef } from 'react';
 
@@ -29,13 +30,15 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
     const queue = usePlayerQueue();
     const isFetching = useIsPlayerFetching();
 
+    const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
+
     const data: QueueSong[] = useMemo(() => {
-        if (searchTerm) {
-            return searchSongs(queue, searchTerm);
+        if (debouncedSearchTerm) {
+            return searchSongs(queue, debouncedSearchTerm);
         }
 
         return queue;
-    }, [queue, searchTerm]);
+    }, [queue, debouncedSearchTerm]);
 
     const playQueueKeyRef = useRef({
         alreadyRendered: false,
