@@ -122,7 +122,11 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
             target: DragTargetMap[props.itemType] || DragTarget.GENERIC,
         },
         drop: {
-            canDrop: () => {
+            canDrop: (args) => {
+                if (args.source.type === DragTarget.TABLE_COLUMN) {
+                    return false;
+                }
+
                 if (props.itemType === LibraryItem.QUEUE_SONG) {
                     return true;
                 }
@@ -846,11 +850,14 @@ export const TableColumnHeaderContainer = (
             draggable({
                 element: containerRef.current,
                 getInitialData: () => {
-                    const data = dndUtils.generateDragData({
-                        id: [props.type],
-                        operation: [DragOperation.REORDER],
-                        type: DragTarget.TABLE_COLUMN,
-                    });
+                    const data = dndUtils.generateDragData(
+                        {
+                            id: [props.type],
+                            operation: [DragOperation.REORDER],
+                            type: DragTarget.TABLE_COLUMN,
+                        },
+                        { tableId: props.tableId },
+                    );
                     return data;
                 },
                 onDragStart: () => {
@@ -866,16 +873,25 @@ export const TableColumnHeaderContainer = (
             dropTargetForElements({
                 canDrop: (args) => {
                     const data = args.source.data as unknown as DragData;
+                    const sourceTableId = (data.metadata as { tableId?: string })?.tableId;
                     const isSelf = (args.source.data.id as string[])[0] === props.type;
-                    return dndUtils.isDropTarget(data.type, [DragTarget.TABLE_COLUMN]) && !isSelf;
+                    const isSameTable = sourceTableId === props.tableId;
+                    return (
+                        dndUtils.isDropTarget(data.type, [DragTarget.TABLE_COLUMN]) &&
+                        !isSelf &&
+                        isSameTable
+                    );
                 },
                 element: containerRef.current,
                 getData: ({ element, input }) => {
-                    const data = dndUtils.generateDragData({
-                        id: [props.type],
-                        operation: [DragOperation.REORDER],
-                        type: DragTarget.TABLE_COLUMN,
-                    });
+                    const data = dndUtils.generateDragData(
+                        {
+                            id: [props.type],
+                            operation: [DragOperation.REORDER],
+                            type: DragTarget.TABLE_COLUMN,
+                        },
+                        { tableId: props.tableId },
+                    );
 
                     return attachClosestEdge(data, {
                         allowedEdges: ['left', 'right'],
@@ -905,7 +921,7 @@ export const TableColumnHeaderContainer = (
                 },
             }),
         );
-    }, [props.type, props.enableColumnReorder, props.controls]);
+    }, [props.type, props.enableColumnReorder, props.controls, props.tableId]);
 
     return (
         <Flex
