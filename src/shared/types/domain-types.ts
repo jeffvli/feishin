@@ -164,6 +164,7 @@ export enum ImageType {
 }
 
 export type Album = {
+    _itemType: LibraryItem.ALBUM;
     _serverId: string;
     _serverType: ServerType;
     albumArtist: string;
@@ -179,7 +180,6 @@ export type Album = {
     imagePlaceholderUrl: null | string;
     imageUrl: null | string;
     isCompilation: boolean | null;
-    itemType: LibraryItem.ALBUM;
     lastPlayedAt: null | string;
     mbzId: null | string;
     name: string;
@@ -201,6 +201,7 @@ export type Album = {
 } & { songs?: Song[] };
 
 export type AlbumArtist = {
+    _itemType: LibraryItem.ALBUM_ARTIST;
     _serverId: string;
     _serverType: ServerType;
     albumCount: null | number;
@@ -210,7 +211,6 @@ export type AlbumArtist = {
     genres: Genre[];
     id: string;
     imageUrl: null | string;
-    itemType: LibraryItem.ALBUM_ARTIST;
     lastPlayedAt: null | string;
     mbz: null | string;
     name: string;
@@ -222,12 +222,12 @@ export type AlbumArtist = {
 };
 
 export type Artist = {
+    _itemType: LibraryItem.ARTIST;
     _serverId: string;
     _serverType: ServerType;
     biography: null | string;
     createdAt: string;
     id: string;
-    itemType: LibraryItem.ARTIST;
     name: string;
     remoteCreatedAt: null | string;
     updatedAt: string;
@@ -262,12 +262,12 @@ export type GainInfo = {
 };
 
 export type Genre = {
+    _itemType: LibraryItem.GENRE;
     _serverId: string;
     _serverType: ServerType;
     albumCount?: number;
     id: string;
     imageUrl: null | string;
-    itemType: LibraryItem.GENRE;
     name: string;
     songCount?: number;
 };
@@ -300,6 +300,7 @@ export type MusicFolder = {
 export type MusicFoldersResponse = MusicFolder[];
 
 export type Playlist = {
+    _itemType: LibraryItem.PLAYLIST;
     _serverId: string;
     _serverType: ServerType;
     description: null | string;
@@ -308,7 +309,6 @@ export type Playlist = {
     id: string;
     imagePlaceholderUrl: null | string;
     imageUrl: null | string;
-    itemType: LibraryItem.PLAYLIST;
     name: string;
     owner: null | string;
     ownerId: null | string;
@@ -331,6 +331,7 @@ export type RelatedArtist = {
 };
 
 export type Song = {
+    _itemType: LibraryItem.SONG;
     _serverId: string;
     _serverType: ServerType;
     album: null | string;
@@ -355,7 +356,6 @@ export type Song = {
     id: string;
     imagePlaceholderUrl: null | string;
     imageUrl: null | string;
-    itemType: LibraryItem.SONG;
     lastPlayedAt: null | string;
     lyrics: null | string;
     mbzRecordingId: null | string;

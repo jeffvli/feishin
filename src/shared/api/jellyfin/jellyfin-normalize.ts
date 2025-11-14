@@ -227,6 +227,7 @@ const normalizeSong = (
     }
 
     return {
+        _itemType: LibraryItem.SONG,
         _serverId: server?.id || '',
         _serverType: ServerType.JELLYFIN,
         album: item.Album,
@@ -265,15 +266,16 @@ const normalizeSong = (
                     }
                   : null,
         genres: item.GenreItems?.map((entry) => ({
+            _itemType: LibraryItem.GENRE,
+            _serverId: server?.id || '',
+            _serverType: ServerType.JELLYFIN,
             id: entry.Id,
             imageUrl: null,
-            itemType: LibraryItem.GENRE,
             name: entry.Name,
         })),
         id: item.Id,
         imagePlaceholderUrl: null,
         imageUrl: getSongCoverArtUrl({ baseUrl: server?.url || '', item, size: imageSize || 100 }),
-        itemType: LibraryItem.SONG,
         lastPlayedAt: null,
         lyrics: null,
         mbzRecordingId: null,
@@ -307,6 +309,7 @@ const normalizeAlbum = (
     imageSize?: number,
 ): Album => {
     return {
+        _itemType: LibraryItem.ALBUM,
         _serverId: server?.id || '',
         _serverType: ServerType.JELLYFIN,
         albumArtist: item.AlbumArtist,
@@ -327,9 +330,11 @@ const normalizeAlbum = (
         duration: item.RunTimeTicks / 10000,
         explicitStatus: null,
         genres: item.GenreItems?.map((entry) => ({
+            _itemType: LibraryItem.GENRE,
+            _serverId: server?.id || '',
+            _serverType: ServerType.JELLYFIN,
             id: entry.Id,
             imageUrl: null,
-            itemType: LibraryItem.GENRE,
             name: entry.Name,
         })),
         id: item.Id,
@@ -340,7 +345,6 @@ const normalizeAlbum = (
             size: imageSize || 300,
         }),
         isCompilation: null,
-        itemType: LibraryItem.ALBUM,
         lastPlayedAt: null,
         mbzId: item.ProviderIds?.MusicBrainzAlbum || null,
         name: item.Name,
@@ -383,6 +387,7 @@ const normalizeAlbumArtist = (
         ) || [];
 
     return {
+        _itemType: LibraryItem.ALBUM_ARTIST,
         _serverId: server?.id || '',
         _serverType: ServerType.JELLYFIN,
         albumCount: item.AlbumCount ?? null,
@@ -390,9 +395,11 @@ const normalizeAlbumArtist = (
         biography: item.Overview || null,
         duration: item.RunTimeTicks / 10000,
         genres: item.GenreItems?.map((entry) => ({
+            _itemType: LibraryItem.GENRE,
+            _serverId: server?.id || '',
+            _serverType: ServerType.JELLYFIN,
             id: entry.Id,
             imageUrl: null,
-            itemType: LibraryItem.GENRE,
             name: entry.Name,
         })),
         id: item.Id,
@@ -401,7 +408,6 @@ const normalizeAlbumArtist = (
             item,
             size: imageSize || 300,
         }),
-        itemType: LibraryItem.ALBUM_ARTIST,
         lastPlayedAt: null,
         mbz: item.ProviderIds?.MusicBrainzArtist || null,
         name: item.Name,
@@ -427,20 +433,22 @@ const normalizePlaylist = (
     const imagePlaceholderUrl = null;
 
     return {
+        _itemType: LibraryItem.PLAYLIST,
         _serverId: server?.id || '',
         _serverType: ServerType.JELLYFIN,
         description: item.Overview || null,
         duration: item.RunTimeTicks / 10000,
         genres: item.GenreItems?.map((entry) => ({
+            _itemType: LibraryItem.GENRE,
+            _serverId: server?.id || '',
+            _serverType: ServerType.JELLYFIN,
             id: entry.Id,
             imageUrl: null,
-            itemType: LibraryItem.GENRE,
             name: entry.Name,
         })),
         id: item.Id,
         imagePlaceholderUrl,
         imageUrl: imageUrl || null,
-        itemType: LibraryItem.PLAYLIST,
         name: item.Name,
         owner: null,
         ownerId: null,
@@ -504,12 +512,12 @@ const normalizeGenre = (
     server: null | ServerListItem,
 ): Genre => {
     return {
+        _itemType: LibraryItem.GENRE,
         _serverId: server?.id || '',
         _serverType: ServerType.JELLYFIN,
         albumCount: undefined,
         id: item.Id,
         imageUrl: getGenreCoverArtUrl({ baseUrl: server?.url || '', item, size: 200 }),
-        itemType: LibraryItem.GENRE,
         name: item.Name,
         songCount: undefined,
     };

@@ -87,7 +87,7 @@ export const useDefaultItemListControls = () => {
                                     rangeItem &&
                                     typeof rangeItem === 'object' &&
                                     '_serverId' in rangeItem &&
-                                    'itemType' in rangeItem
+                                    '_itemType' in rangeItem
                                 ) {
                                     const rangeRowId = internalState.extractRowId(rangeItem);
                                     if (rangeRowId) {

@@ -73,15 +73,15 @@ export interface ItemListStateActions {
 }
 
 export interface ItemListStateItem {
+    _itemType: LibraryItem;
     _serverId: string;
     id: string;
-    itemType: LibraryItem;
 }
 
 export type ItemListStateItemWithRequiredProperties = Record<string, unknown> & {
+    _itemType: LibraryItem;
     _serverId: string;
     id: string;
-    itemType: LibraryItem;
 };
 
 /**

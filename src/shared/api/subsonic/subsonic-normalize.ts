@@ -98,21 +98,21 @@ const getGenres = (
 ): Genre[] => {
     return item.genres
         ? item.genres.map((genre) => ({
+              _itemType: LibraryItem.GENRE,
               _serverId: server?.id || 'unknown',
               _serverType: ServerType.SUBSONIC,
               id: genre.name,
               imageUrl: null,
-              itemType: LibraryItem.GENRE,
               name: genre.name,
           }))
         : item.genre
           ? [
                 {
+                    _itemType: LibraryItem.GENRE,
                     _serverId: server?.id || 'unknown',
                     _serverType: ServerType.SUBSONIC,
                     id: item.genre,
                     imageUrl: null,
-                    itemType: LibraryItem.GENRE,
                     name: item.genre,
                 },
             ]
@@ -135,6 +135,7 @@ const normalizeSong = (
     const streamUrl = `${server?.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=Feishin&${server?.credential}`;
 
     return {
+        _itemType: LibraryItem.SONG,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.SUBSONIC,
         album: item.album || '',
@@ -170,7 +171,6 @@ const normalizeSong = (
         id: item.id.toString(),
         imagePlaceholderUrl: null,
         imageUrl,
-        itemType: LibraryItem.SONG,
         lastPlayedAt: null,
         lyrics: null,
         mbzRecordingId: item.musicBrainzId || null,
@@ -215,6 +215,7 @@ const normalizeAlbumArtist = (
         }) || null;
 
     return {
+        _itemType: LibraryItem.ALBUM_ARTIST,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.SUBSONIC,
         albumCount: item.albumCount ? Number(item.albumCount) : 0,
@@ -224,7 +225,6 @@ const normalizeAlbumArtist = (
         genres: [],
         id: item.id.toString(),
         imageUrl,
-        itemType: LibraryItem.ALBUM_ARTIST,
         lastPlayedAt: null,
         mbz: null,
         name: item.name,
@@ -250,6 +250,7 @@ const normalizeAlbum = (
         }) || null;
 
     return {
+        _itemType: LibraryItem.ALBUM,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.SUBSONIC,
         albumArtist: item.artist,
@@ -270,7 +271,6 @@ const normalizeAlbum = (
         imagePlaceholderUrl: null,
         imageUrl,
         isCompilation: null,
-        itemType: LibraryItem.ALBUM,
         lastPlayedAt: null,
         mbzId: null,
         name: item.name,
@@ -302,6 +302,7 @@ const normalizePlaylist = (
     server?: null | ServerListItemWithCredential,
 ): Playlist => {
     return {
+        _itemType: LibraryItem.PLAYLIST,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.SUBSONIC,
         description: item.comment || null,
@@ -315,7 +316,6 @@ const normalizePlaylist = (
             credential: server?.credential,
             size: 300,
         }),
-        itemType: LibraryItem.PLAYLIST,
         name: item.name,
         owner: item.owner,
         ownerId: item.owner,
@@ -330,12 +330,12 @@ const normalizeGenre = (
     server: null | ServerListItemWithCredential,
 ): Genre => {
     return {
+        _itemType: LibraryItem.GENRE,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.SUBSONIC,
         albumCount: item.albumCount,
         id: item.value,
         imageUrl: null,
-        itemType: LibraryItem.GENRE,
         name: item.value,
         songCount: item.songCount,
     };

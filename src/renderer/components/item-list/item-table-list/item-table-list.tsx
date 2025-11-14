@@ -70,8 +70,8 @@ const hasRequiredStateItemProperties = (
         typeof (item as any).id === 'string' &&
         '_serverId' in item &&
         typeof (item as any)._serverId === 'string' &&
-        'itemType' in item &&
-        typeof (item as any).itemType === 'string' &&
+        '_itemType' in item &&
+        typeof (item as any)._itemType === 'string' &&
         'rowId' in item &&
         typeof (item as any).rowId === 'string'
     );
@@ -1126,7 +1126,7 @@ export const ItemTableList = ({
                 typeof item === 'object' &&
                 item !== null &&
                 '_serverId' in item &&
-                'itemType' in item
+                '_itemType' in item
             ) {
                 return item as ItemListStateItemWithRequiredProperties;
             }

@@ -151,6 +151,7 @@ const normalizeSong = (
         album: item.album,
         albumId: item.albumId,
         ...getArtists(item),
+        _itemType: LibraryItem.SONG,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.NAVIDROME,
         artistName: item.artist,
@@ -176,15 +177,16 @@ const normalizeSong = (
                 ? { album: item.rgAlbumGain, track: item.rgTrackGain }
                 : null,
         genres: (item.genres || []).map((genre) => ({
+            _itemType: LibraryItem.GENRE,
+            _serverId: server?.id || 'unknown',
+            _serverType: ServerType.NAVIDROME,
             id: genre.id,
             imageUrl: null,
-            itemType: LibraryItem.GENRE,
             name: genre.name,
         })),
         id,
         imagePlaceholderUrl,
         imageUrl,
-        itemType: LibraryItem.SONG,
         lastPlayedAt: normalizePlayDate(item),
         lyrics: item.lyrics ? item.lyrics : null,
         mbzRecordingId: item.mbzReleaseTrackId || null,
@@ -278,6 +280,7 @@ const normalizeAlbum = (
     return {
         ...parseAlbumTags(item),
         ...getArtists(item),
+        _itemType: LibraryItem.ALBUM,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.NAVIDROME,
         albumArtist: item.albumArtist,
@@ -292,17 +295,18 @@ const normalizeAlbum = (
                   ? ExplicitStatus.CLEAN
                   : null,
         genres: (item.genres || []).map((genre) => ({
+            _itemType: LibraryItem.GENRE,
+            _serverId: server?.id || 'unknown',
+            _serverType: ServerType.NAVIDROME,
             id: genre.id,
             imageUrl: null,
-            itemType: LibraryItem.GENRE,
             name: genre.name,
         })),
         id: item.id,
         imagePlaceholderUrl,
         imageUrl,
-        isCompilation: item.compilation,
 
-        itemType: LibraryItem.ALBUM,
+        isCompilation: item.compilation,
         lastPlayedAt: normalizePlayDate(item),
         mbzId: item.mbzAlbumId || null,
         name: item.name,
@@ -363,6 +367,7 @@ const normalizeAlbumArtist = (
     }
 
     return {
+        _itemType: LibraryItem.ALBUM_ARTIST,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.NAVIDROME,
         albumCount,
@@ -370,14 +375,15 @@ const normalizeAlbumArtist = (
         biography: item.biography || null,
         duration: null,
         genres: (item.genres || []).map((genre) => ({
+            _itemType: LibraryItem.GENRE,
+            _serverId: server?.id || 'unknown',
+            _serverType: ServerType.NAVIDROME,
             id: genre.id,
             imageUrl: null,
-            itemType: LibraryItem.GENRE,
             name: genre.name,
         })),
         id: item.id,
         imageUrl: imageUrl || null,
-        itemType: LibraryItem.ALBUM_ARTIST,
         lastPlayedAt: normalizePlayDate(item),
         mbz: item.mbzArtistId || null,
         name: item.name,
@@ -410,6 +416,7 @@ const normalizePlaylist = (
     const imagePlaceholderUrl = null;
 
     return {
+        _itemType: LibraryItem.PLAYLIST,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.NAVIDROME,
         description: item.comment,
@@ -418,7 +425,6 @@ const normalizePlaylist = (
         id: item.id,
         imagePlaceholderUrl,
         imageUrl,
-        itemType: LibraryItem.PLAYLIST,
         name: item.name,
         owner: item.ownerName,
         ownerId: item.ownerId,
@@ -435,12 +441,12 @@ const normalizeGenre = (
     server: null | ServerListItem,
 ): Genre => {
     return {
+        _itemType: LibraryItem.GENRE,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.NAVIDROME,
         albumCount: undefined,
         id: item.id,
         imageUrl: null,
-        itemType: LibraryItem.GENRE,
         name: item.name,
         songCount: undefined,
     };

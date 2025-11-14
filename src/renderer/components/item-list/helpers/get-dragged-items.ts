@@ -15,8 +15,8 @@ const hasRequiredDragProperties = (
         item !== null &&
         'id' in item &&
         typeof (item as any).id === 'string' &&
-        'itemType' in item &&
-        typeof (item as any).itemType === 'string' &&
+        '_itemType' in item &&
+        typeof (item as any)._itemType === 'string' &&
         '_serverId' in item &&
         typeof (item as any)._serverId === 'string'
     );

@@ -36,8 +36,8 @@ export const ActionsColumn = (props: ItemTableListInnerColumn) => {
                         color: 'muted',
                         size: 'md',
                     }}
-                    onDoubleClick={handleActionDoubleClick}
                     onClick={handleActionClick}
+                    onDoubleClick={handleActionDoubleClick}
                     size="xs"
                     variant="subtle"
                 />
