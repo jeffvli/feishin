@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router';
 
+import { getTitlePath } from '/@/renderer/components/item-list/helpers/get-title-path';
 import { ItemListStateItemWithRequiredProperties } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { DefaultItemControlProps, ItemControls } from '/@/renderer/components/item-list/types';
 import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
@@ -8,6 +10,7 @@ import { Play } from '/@/shared/types/types';
 
 export const useDefaultItemListControls = () => {
     const player = usePlayerContext();
+    const navigate = useNavigate();
 
     const controls: ItemControls = useMemo(() => {
         return {
@@ -151,6 +154,20 @@ export const useDefaultItemListControls = () => {
 
                 internalState.setSelected([item]);
 
+                if (
+                    itemType === LibraryItem.ALBUM ||
+                    itemType === LibraryItem.ALBUM_ARTIST ||
+                    itemType === LibraryItem.ARTIST ||
+                    itemType === LibraryItem.GENRE ||
+                    itemType === LibraryItem.PLAYLIST
+                ) {
+                    const path = getTitlePath(itemType, item.id);
+                    if (path) {
+                        navigate(path);
+                        return;
+                    }
+                }
+
                 if (itemType === LibraryItem.QUEUE_SONG) {
                     const queueSong = item as QueueSong;
                     if (queueSong._uniqueId) {
@@ -222,7 +239,7 @@ export const useDefaultItemListControls = () => {
                 player.setRating(item._serverId, [item.id], itemType, newRating);
             },
         };
-    }, [player]);
+    }, [player, navigate]);
 
     return controls;
 };
