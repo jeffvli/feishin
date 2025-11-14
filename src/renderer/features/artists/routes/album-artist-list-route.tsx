@@ -1,56 +1,30 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-
-import { useQuery } from '@tanstack/react-query';
-import { useMemo, useRef } from 'react';
+import { useMemo, useState } from 'react';
 
 import { ListContext } from '/@/renderer/context/list-context';
-import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
+import { AlbumArtistListContent } from '/@/renderer/features/artists/components/album-artist-list-content';
 import { AlbumArtistListHeader } from '/@/renderer/features/artists/components/album-artist-list-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
-import { useCurrentServer } from '/@/renderer/store/auth.store';
-import { useListFilterByKey } from '/@/renderer/store/list.store';
-import { AlbumArtistListQuery, LibraryItem } from '/@/shared/types/domain-types';
+import { ItemListKey } from '/@/shared/types/types';
 
 const AlbumArtistListRoute = () => {
-    const gridRef = useRef<null>(null);
-    const tableRef = useRef<AgGridReactType | null>(null);
-    const pageKey = LibraryItem.ALBUM_ARTIST;
-    const server = useCurrentServer();
+    const pageKey = ItemListKey.ALBUM_ARTIST;
 
-    const albumArtistListFilter = useListFilterByKey<AlbumArtistListQuery>({ key: pageKey });
-
-    const itemCountCheck = useQuery(
-        artistsQueries.albumArtistListCount({
-            options: {
-                gcTime: 1000 * 60,
-            },
-            query: albumArtistListFilter,
-            serverId: server?.id,
-        }),
-    );
-
-    const itemCount = itemCountCheck.data === null ? undefined : itemCountCheck.data;
+    const [itemCount, setItemCount] = useState<number | undefined>(undefined);
 
     const providerValue = useMemo(() => {
         return {
             id: undefined,
+            itemCount,
             pageKey,
+            setItemCount,
         };
-    }, [pageKey]);
+    }, [itemCount, pageKey, setItemCount]);
 
     return (
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
-                <AlbumArtistListHeader
-                    gridRef={gridRef}
-                    itemCount={itemCount}
-                    tableRef={tableRef}
-                />
-                {/* <AlbumArtistListContent
-                    gridRef={gridRef}
-                    itemCount={itemCount}
-                    tableRef={tableRef}
-                /> */}
+                <AlbumArtistListHeader />
+                <AlbumArtistListContent />
             </ListContext.Provider>
         </AnimatedPage>
     );
