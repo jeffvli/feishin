@@ -12,7 +12,7 @@
 
 .container.selected {
     outline: 2px solid var(--theme-colors-primary);
-    outline-offset: 2px;
+    outline-offset: var(--card-gap, var(--theme-spacing-md));
 }
 
 .container.dragging {

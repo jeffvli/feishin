@@ -31,20 +31,30 @@
 
 .item-row.gap-xs {
     padding: var(--theme-spacing-xs);
+
+    --card-gap: 2px;
 }
 
 .item-row.gap-sm {
     padding: var(--theme-spacing-sm);
+
+    --card-gap: var(--theme-spacing-xs);
 }
 
 .item-row.gap-md {
     padding: var(--theme-spacing-md);
+
+    --card-gap: var(--theme-spacing-sm);
 }
 
 .item-row.gap-lg {
     padding: var(--theme-spacing-lg);
+
+    --card-gap: var(--theme-spacing-sm);
 }
 
 .item-row.gap-xl {
     padding: var(--theme-spacing-xl);
+
+    --card-gap: var(--theme-spacing-sm);
 }
