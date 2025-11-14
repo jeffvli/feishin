@@ -1,6 +1,5 @@
 import { useDebouncedValue } from '@mantine/hooks';
-import { nanoid } from 'nanoid/non-secure';
-import { forwardRef, useEffect, useMemo, useRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
@@ -40,35 +39,6 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
         return queue;
     }, [queue, debouncedSearchTerm]);
 
-    const playQueueKeyRef = useRef({
-        alreadyRendered: false,
-        key: nanoid(),
-        prevLength: 0,
-    });
-
-    useEffect(() => {
-        if (playQueueKeyRef.current.alreadyRendered && playQueueKeyRef.current.prevLength === 0) {
-            return;
-        }
-
-        if (data.length === 0) {
-            playQueueKeyRef.current = {
-                alreadyRendered: false,
-                key: nanoid(),
-                prevLength: data.length,
-            };
-            return;
-        }
-
-        if (data.length > 0 && !playQueueKeyRef.current.alreadyRendered) {
-            playQueueKeyRef.current = {
-                alreadyRendered: true,
-                key: nanoid(),
-                prevLength: data.length,
-            };
-        }
-    }, [data.length, playQueueKeyRef]);
-
     const isEmpty = data.length === 0;
 
     return (
@@ -93,7 +63,6 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
                     type: 'offset',
                 }}
                 itemType={LibraryItem.QUEUE_SONG}
-                key={playQueueKeyRef.current.key}
                 ref={ref}
                 size={table.size}
             />
