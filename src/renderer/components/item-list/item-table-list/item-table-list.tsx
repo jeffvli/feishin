@@ -115,6 +115,7 @@ interface VirtualizedTableGridProps {
     playerContext: PlayerContext;
     showLeftShadow: boolean;
     showRightShadow: boolean;
+    showTopShadow: boolean;
     size: 'compact' | 'default' | 'large';
     tableId: string;
     totalColumnCount: number;
@@ -154,6 +155,7 @@ const VirtualizedTableGrid = React.memo(
         playerContext,
         showLeftShadow,
         showRightShadow,
+        showTopShadow,
         size,
         tableId,
         totalColumnCount,
@@ -293,12 +295,15 @@ const VirtualizedTableGrid = React.memo(
             <div className={styles.itemTableContainer}>
                 <div
                     className={styles.itemTablePinnedColumnsGridContainer}
-                    style={{
-                        minWidth: `${Array.from({ length: pinnedLeftColumnCount }, () => 0).reduce(
-                            (a, _, i) => a + columnWidth(i),
-                            0,
-                        )}px`,
-                    }}
+                    style={
+                        {
+                            '--header-height': `${headerHeight}px`,
+                            minWidth: `${Array.from(
+                                { length: pinnedLeftColumnCount },
+                                () => 0,
+                            ).reduce((a, _, i) => a + columnWidth(i), 0)}px`,
+                        } as React.CSSProperties
+                    }
                 >
                     {!!(pinnedLeftColumnCount || pinnedRowCount) && (
                         <div
@@ -322,8 +327,10 @@ const VirtualizedTableGrid = React.memo(
                                 rowCount={pinnedRowCount}
                                 rowHeight={getRowHeight}
                             />
-                            {enableHeader && <div className={styles.itemTablePinnedHeaderShadow} />}
                         </div>
+                    )}
+                    {enableHeader && showTopShadow && (
+                        <div className={styles.itemTableTopScrollShadow} />
                     )}
                     {!!pinnedLeftColumnCount && (
                         <div
@@ -344,7 +351,14 @@ const VirtualizedTableGrid = React.memo(
                         </div>
                     )}
                 </div>
-                <div className={styles.itemTablePinnedRowsContainer}>
+                <div
+                    className={styles.itemTablePinnedRowsContainer}
+                    style={
+                        {
+                            '--header-height': `${headerHeight}px`,
+                        } as React.CSSProperties
+                    }
+                >
                     {!!pinnedRowCount && (
                         <div
                             className={clsx(styles.itemTablePinnedRowsGridContainer, {
@@ -373,8 +387,10 @@ const VirtualizedTableGrid = React.memo(
                                 rowCount={Array.from({ length: pinnedRowCount }, () => 0).length}
                                 rowHeight={getRowHeight}
                             />
-                            {enableHeader && <div className={styles.itemTablePinnedHeaderShadow} />}
                         </div>
+                    )}
+                    {enableHeader && showTopShadow && (
+                        <div className={styles.itemTableTopScrollShadow} />
                     )}
                     <div className={styles.itemTableGridContainer} ref={mergedRowRef}>
                         <Grid
@@ -402,16 +418,20 @@ const VirtualizedTableGrid = React.memo(
                 {!!pinnedRightColumnCount && (
                     <div
                         className={styles.itemTablePinnedColumnsGridContainer}
-                        style={{
-                            minWidth: `${Array.from(
-                                { length: pinnedRightColumnCount },
-                                () => 0,
-                            ).reduce(
-                                (a, _, i) =>
-                                    a + columnWidth(i + pinnedLeftColumnCount + totalColumnCount),
-                                0,
-                            )}px`,
-                        }}
+                        style={
+                            {
+                                '--header-height': `${headerHeight}px`,
+                                minWidth: `${Array.from(
+                                    { length: pinnedRightColumnCount },
+                                    () => 0,
+                                ).reduce(
+                                    (a, _, i) =>
+                                        a +
+                                        columnWidth(i + pinnedLeftColumnCount + totalColumnCount),
+                                    0,
+                                )}px`,
+                            } as React.CSSProperties
+                        }
                     >
                         {!!(pinnedRightColumnCount || pinnedRowCount) && (
                             <div
@@ -439,10 +459,10 @@ const VirtualizedTableGrid = React.memo(
                                     rowCount={pinnedRowCount}
                                     rowHeight={getRowHeight}
                                 />
-                                {enableHeader && (
-                                    <div className={styles.itemTablePinnedHeaderShadow} />
-                                )}
                             </div>
+                        )}
+                        {enableHeader && showTopShadow && (
+                            <div className={styles.itemTableTopScrollShadow} />
                         )}
                         <div
                             className={styles.itemTablePinnedRightColumnsContainer}
@@ -523,7 +543,7 @@ interface ItemTableListProps {
     onColumnReordered?: (
         columnIdFrom: TableColumn,
         columnIdTo: TableColumn,
-        edge: 'top' | 'bottom' | 'left' | 'right' | null,
+        edge: 'bottom' | 'left' | 'right' | 'top' | null,
     ) => void;
     onColumnResized?: (columnId: TableColumn, width: number) => void;
     onRangeChanged?: (range: { startIndex: number; stopIndex: number }) => void;
@@ -659,6 +679,7 @@ export const ItemTableList = ({
     const mergedRowRef = useMergedRef(rowRef, scrollContainerRef);
     const [showLeftShadow, setShowLeftShadow] = useState(false);
     const [showRightShadow, setShowRightShadow] = useState(false);
+    const [showTopShadow, setShowTopShadow] = useState(false);
     const handleRef = useRef<ItemListHandle | null>(null);
     const containerFocusRef = useRef<HTMLDivElement | null>(null);
 
@@ -1181,6 +1202,29 @@ export const ItemTableList = ({
         };
     }, [pinnedLeftColumnCount, pinnedRightColumnCount]);
 
+    // Handle top shadow visibility based on vertical scroll
+    useEffect(() => {
+        const row = rowRef.current?.childNodes[0] as HTMLDivElement;
+
+        if (!row || !enableHeader) {
+            setShowTopShadow(false);
+            return;
+        }
+
+        const checkScrollPosition = () => {
+            const scrollTop = row.scrollTop;
+            setShowTopShadow(scrollTop > 0);
+        };
+
+        checkScrollPosition();
+
+        row.addEventListener('scroll', checkScrollPosition);
+
+        return () => {
+            row.removeEventListener('scroll', checkScrollPosition);
+        };
+    }, [enableHeader]);
+
     const getRowHeight = useCallback(
         (index: number, cellProps: TableItemProps) => {
             const height = size === 'compact' ? 40 : size === 'large' ? 88 : 64;
@@ -1427,6 +1471,7 @@ export const ItemTableList = ({
                 playerContext={playerContext}
                 showLeftShadow={showLeftShadow}
                 showRightShadow={showRightShadow}
+                showTopShadow={showTopShadow}
                 size={size}
                 tableId={tableId}
                 totalColumnCount={totalColumnCount}
