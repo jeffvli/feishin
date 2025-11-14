@@ -41,7 +41,7 @@
 }
 
 .item-table-pinned-rows-grid-container.with-header {
-    border-bottom: 2px solid var(--theme-colors-border);
+    border-bottom: 1px solid var(--theme-colors-border);
 }
 
 .item-table-pinned-columns-grid-container {
@@ -58,7 +58,7 @@
 }
 
 .item-table-pinned-intersection-grid-container.with-header {
-    border-bottom: 2px solid var(--theme-colors-border);
+    border-bottom: 1px solid var(--theme-colors-border);
 }
 
 .item-table-pinned-columns-container {

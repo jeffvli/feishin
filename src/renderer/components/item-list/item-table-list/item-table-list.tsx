@@ -304,6 +304,7 @@ const VirtualizedTableGrid = React.memo(
                                     { length: pinnedRowCount },
                                     () => 0,
                                 ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
+                                overflow: 'hidden',
                             }}
                         >
                             <Grid
@@ -351,6 +352,7 @@ const VirtualizedTableGrid = React.memo(
                                         { length: pinnedRowCount },
                                         () => 0,
                                     ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
+                                    overflow: 'hidden',
                                 } as React.CSSProperties
                             }
                         >
@@ -415,6 +417,7 @@ const VirtualizedTableGrid = React.memo(
                                         { length: pinnedRowCount },
                                         () => 0,
                                     ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
+                                    overflow: 'hidden',
                                 }}
                             >
                                 <Grid
