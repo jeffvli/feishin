@@ -1,9 +1,10 @@
-import { useDebouncedValue } from '@mantine/hooks';
-import { forwardRef, useMemo } from 'react';
+import { useDebouncedValue, useMergedRef } from '@mantine/hooks';
+import { forwardRef, useMemo, useRef } from 'react';
 
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
+import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import {
     useIsPlayerFetching,
     usePlayerContext,
@@ -28,6 +29,8 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
 
     const queue = usePlayerQueue();
     const isFetching = useIsPlayerFetching();
+    const tableRef = useRef<ItemListHandle>(null);
+    const mergedRef = useMergedRef(ref, tableRef);
 
     const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
 
@@ -40,6 +43,26 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
     }, [queue, debouncedSearchTerm]);
 
     const isEmpty = data.length === 0;
+
+    usePlayerEvents(
+        {
+            onCurrentSongChange: (properties) => {
+                const currentSong = properties.song;
+                if (!currentSong || !tableRef.current) {
+                    return;
+                }
+
+                const songIndex = data.findIndex(
+                    (song) => song._uniqueId === currentSong._uniqueId,
+                );
+
+                if (songIndex !== -1) {
+                    tableRef.current.scrollToIndex(songIndex);
+                }
+            },
+        },
+        [data],
+    );
 
     return (
         <Box className="play-queue" pos="relative" style={{ flex: 1, minHeight: 0 }} w="100%">
@@ -63,7 +86,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
                     type: 'offset',
                 }}
                 itemType={LibraryItem.QUEUE_SONG}
-                ref={ref}
+                ref={mergedRef}
                 size={table.size}
             />
             {isEmpty && <EmptyQueueDropZone />}
