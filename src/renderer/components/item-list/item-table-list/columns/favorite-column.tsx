@@ -22,6 +22,8 @@ export const FavoriteColumn = (props: ItemTableListInnerColumn) => {
                         size: 'md',
                     }}
                     onClick={(event) => {
+                        event.stopPropagation();
+                        event.preventDefault();
                         props.controls.onFavorite?.({
                             event,
                             favorite: !row,
@@ -29,6 +31,10 @@ export const FavoriteColumn = (props: ItemTableListInnerColumn) => {
                             item: props.data[props.rowIndex] as ItemListItem,
                             itemType: props.itemType,
                         });
+                    }}
+                    onDoubleClick={(event) => {
+                        event.stopPropagation();
+                        event.preventDefault();
                     }}
                     size="xs"
                     variant="subtle"

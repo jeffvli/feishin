@@ -176,12 +176,17 @@ export const ItemCardControls = ({
                     icon="ellipsisHorizontal"
                     onClick={(e) => {
                         e.stopPropagation();
+                        e.preventDefault();
                         controls?.onMore?.({
                             event: e,
                             internalState,
                             item,
                             itemType,
                         });
+                    }}
+                    onDoubleClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
                     }}
                 />
             )}
@@ -260,13 +265,24 @@ interface SecondaryButtonProps {
     onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
 }
 
-const SecondaryButton = ({ className, icon, onClick }: SecondaryButtonProps) => {
+const SecondaryButton = ({
+    className,
+    icon,
+    onClick,
+    onDoubleClick,
+}: SecondaryButtonProps & { onDoubleClick?: (e: MouseEvent<HTMLButtonElement>) => void }) => {
     return (
         <button
             className={clsx(styles.secondaryButton, className)}
             onClick={(e) => {
                 e.stopPropagation();
+                e.preventDefault();
                 onClick?.(e);
+            }}
+            onDoubleClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onDoubleClick?.(e);
             }}
         >
             <Icon icon={icon} size="lg" />

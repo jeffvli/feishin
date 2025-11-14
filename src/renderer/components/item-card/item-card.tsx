@@ -15,6 +15,7 @@ import { Image } from '/@/shared/components/image/image';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
+import { useDoubleClick } from '/@/shared/hooks/use-double-click';
 import {
     Album,
     AlbumArtist,
@@ -138,22 +139,50 @@ const CompactItemCard = ({
             }
         };
 
-        const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        const handleClick = useDoubleClick({
+            onSingleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+                if (!data || !controls || !internalState) {
+                    return;
+                }
+
+                // Don't trigger selection if clicking on interactive elements
+                const target = e.target as HTMLElement;
+                const isInteractiveElement = target.closest(
+                    'button, a, input, select, textarea, [role="button"]',
+                );
+
+                if (isInteractiveElement) {
+                    return;
+                }
+
+                controls.onClick?.({
+                    event: e,
+                    internalState,
+                    item: data as any,
+                    itemType,
+                });
+            },
+            onDoubleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+                if (!data || !controls || !internalState) {
+                    return;
+                }
+
+                controls.onDoubleClick?.({
+                    event: e,
+                    internalState,
+                    item: data as any,
+                    itemType,
+                });
+            },
+        });
+
+        const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
             if (!data || !controls || !internalState) {
                 return;
             }
 
-            // Don't trigger selection if clicking on interactive elements
-            const target = e.target as HTMLElement;
-            const isInteractiveElement = target.closest(
-                'button, a, input, select, textarea, [role="button"]',
-            );
-
-            if (isInteractiveElement) {
-                return;
-            }
-
-            controls.onClick?.({
+            e.preventDefault();
+            controls.onMore?.({
                 event: e,
                 internalState,
                 item: data as any,
@@ -170,6 +199,7 @@ const CompactItemCard = ({
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
                     onClick={handleClick}
+                    onContextMenu={handleContextMenu}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                 >
@@ -242,22 +272,50 @@ const DefaultItemCard = ({
             }
         };
 
-        const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        const handleClick = useDoubleClick({
+            onSingleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+                if (!data || !controls || !internalState) {
+                    return;
+                }
+
+                // Don't trigger selection if clicking on interactive elements
+                const target = e.target as HTMLElement;
+                const isInteractiveElement = target.closest(
+                    'button, a, input, select, textarea, [role="button"]',
+                );
+
+                if (isInteractiveElement) {
+                    return;
+                }
+
+                controls.onClick?.({
+                    event: e,
+                    internalState,
+                    item: data as any,
+                    itemType,
+                });
+            },
+            onDoubleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+                if (!data || !controls || !internalState) {
+                    return;
+                }
+
+                controls.onDoubleClick?.({
+                    event: e,
+                    internalState,
+                    item: data as any,
+                    itemType,
+                });
+            },
+        });
+
+        const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
             if (!data || !controls || !internalState) {
                 return;
             }
 
-            // Don't trigger selection if clicking on interactive elements
-            const target = e.target as HTMLElement;
-            const isInteractiveElement = target.closest(
-                'button, a, input, select, textarea, [role="button"]',
-            );
-
-            if (isInteractiveElement) {
-                return;
-            }
-
-            controls.onClick?.({
+            e.preventDefault();
+            controls.onMore?.({
                 event: e,
                 internalState,
                 item: data as any,
@@ -274,6 +332,7 @@ const DefaultItemCard = ({
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
                     onClick={handleClick}
+                    onContextMenu={handleContextMenu}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                 >
@@ -390,22 +449,50 @@ const PosterItemCard = ({
             }
         };
 
-        const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        const handleClick = useDoubleClick({
+            onSingleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+                if (!data || !controls || !internalState) {
+                    return;
+                }
+
+                // Don't trigger selection if clicking on interactive elements
+                const target = e.target as HTMLElement;
+                const isInteractiveElement = target.closest(
+                    'button, a, input, select, textarea, [role="button"]',
+                );
+
+                if (isInteractiveElement) {
+                    return;
+                }
+
+                controls.onClick?.({
+                    event: e,
+                    internalState,
+                    item: data as any,
+                    itemType,
+                });
+            },
+            onDoubleClick: (e: React.MouseEvent<HTMLDivElement>) => {
+                if (!data || !controls || !internalState) {
+                    return;
+                }
+
+                controls.onDoubleClick?.({
+                    event: e,
+                    internalState,
+                    item: data as any,
+                    itemType,
+                });
+            },
+        });
+
+        const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
             if (!data || !controls || !internalState) {
                 return;
             }
 
-            // Don't trigger selection if clicking on interactive elements
-            const target = e.target as HTMLElement;
-            const isInteractiveElement = target.closest(
-                'button, a, input, select, textarea, [role="button"]',
-            );
-
-            if (isInteractiveElement) {
-                return;
-            }
-
-            controls.onClick?.({
+            e.preventDefault();
+            controls.onMore?.({
                 event: e,
                 internalState,
                 item: data as any,
@@ -424,6 +511,7 @@ const PosterItemCard = ({
                 <div
                     className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
                     onClick={handleClick}
+                    onContextMenu={handleContextMenu}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                 >

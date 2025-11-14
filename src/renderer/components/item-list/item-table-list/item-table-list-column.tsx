@@ -36,6 +36,7 @@ import { Flex } from '/@/shared/components/flex/flex';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
+import { useDoubleClick } from '/@/shared/hooks/use-double-click';
 import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 import { DragOperation, DragTarget, DragTargetMap } from '/@/shared/types/drag-and-drop';
 import { TableColumn } from '/@/shared/types/types';
@@ -426,19 +427,43 @@ export const TableColumnTextContainer = (
         }
     }, [isDataRow, props.rowIndex, props.isDraggedOver, props.tableId]);
 
-    const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
-        // Don't trigger row selection if clicking on interactive elements
-        const target = event.target as HTMLElement;
-        const isInteractiveElement = target.closest(
-            'button, a, input, select, textarea, [role="button"]',
-        );
+    const handleClick = useDoubleClick({
+        onDoubleClick: (event: React.MouseEvent<HTMLDivElement>) => {
+            if (isDataRow && item) {
+                props.controls.onDoubleClick?.({
+                    event,
+                    internalState: props.internalState,
+                    item: item as ItemListItem,
+                    itemType: props.itemType,
+                });
+            }
+        },
+        onSingleClick: (event: React.MouseEvent<HTMLDivElement>) => {
+            // Don't trigger row selection if clicking on interactive elements
+            const target = event.target as HTMLElement;
+            const isInteractiveElement = target.closest(
+                'button, a, input, select, textarea, [role="button"]',
+            );
 
-        if (isInteractiveElement) {
-            return;
-        }
+            if (isInteractiveElement) {
+                return;
+            }
 
-        if (isDataRow && item && props.enableSelection) {
-            props.controls.onClick?.({
+            if (isDataRow && item && props.enableSelection) {
+                props.controls.onClick?.({
+                    event,
+                    internalState: props.internalState,
+                    item: item as ItemListItem,
+                    itemType: props.itemType,
+                });
+            }
+        },
+    });
+
+    const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (isDataRow && item) {
+            event.preventDefault();
+            props.controls.onMore?.({
                 event,
                 internalState: props.internalState,
                 item: item as ItemListItem,
@@ -478,7 +503,8 @@ export const TableColumnTextContainer = (
                 [styles.withVerticalBorder]: props.enableVerticalBorders && !isLastColumn,
             })}
             data-row-index={isDataRow ? `${props.tableId}-${props.rowIndex}` : undefined}
-            onClick={handleCellClick}
+            onClick={handleClick}
+            onContextMenu={handleContextMenu}
             ref={mergedRef}
             style={props.style}
         >
@@ -604,19 +630,43 @@ export const TableColumnContainer = (
         }
     }, [isDataRow, props.rowIndex, props.isDraggedOver, props.tableId]);
 
-    const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
-        // Don't trigger row selection if clicking on interactive elements
-        const target = event.target as HTMLElement;
-        const isInteractiveElement = target.closest(
-            'button, a, input, select, textarea, [role="button"]',
-        );
+    const handleClick = useDoubleClick({
+        onDoubleClick: (event: React.MouseEvent<HTMLDivElement>) => {
+            if (isDataRow && item) {
+                props.controls.onDoubleClick?.({
+                    event,
+                    internalState: props.internalState,
+                    item: item as ItemListItem,
+                    itemType: props.itemType,
+                });
+            }
+        },
+        onSingleClick: (event: React.MouseEvent<HTMLDivElement>) => {
+            // Don't trigger row selection if clicking on interactive elements
+            const target = event.target as HTMLElement;
+            const isInteractiveElement = target.closest(
+                'button, a, input, select, textarea, [role="button"]',
+            );
 
-        if (isInteractiveElement) {
-            return;
-        }
+            if (isInteractiveElement) {
+                return;
+            }
 
-        if (isDataRow && item && props.enableSelection) {
-            props.controls.onClick?.({
+            if (isDataRow && item && props.enableSelection) {
+                props.controls.onClick?.({
+                    event,
+                    internalState: props.internalState,
+                    item: item as ItemListItem,
+                    itemType: props.itemType,
+                });
+            }
+        },
+    });
+
+    const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (isDataRow && item) {
+            event.preventDefault();
+            props.controls.onMore?.({
                 event,
                 internalState: props.internalState,
                 item: item as ItemListItem,
@@ -656,7 +706,8 @@ export const TableColumnContainer = (
                 [styles.withVerticalBorder]: props.enableVerticalBorders && !isLastColumn,
             })}
             data-row-index={isDataRow ? `${props.tableId}-${props.rowIndex}` : undefined}
-            onClick={handleCellClick}
+            onClick={handleClick}
+            onContextMenu={handleContextMenu}
             ref={mergedRef}
             style={{ ...props.containerStyle, ...props.style }}
         >
