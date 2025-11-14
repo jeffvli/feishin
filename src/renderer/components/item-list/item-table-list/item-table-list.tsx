@@ -3,7 +3,6 @@
 import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
 import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
-import debounce from 'lodash/debounce';
 import { AnimatePresence } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import React, {
@@ -266,22 +265,20 @@ const VirtualizedTableGrid = React.memo(
             [pinnedLeftColumnCount, pinnedRowCount, CellComponent],
         );
 
-        const debouncedOnCellsRendered = useMemo(() => {
-            return debounce(
-                (items: {
-                    columnStartIndex: number;
-                    columnStopIndex: number;
-                    rowStartIndex: number;
-                    rowStopIndex: number;
-                }) => {
-                    onRangeChanged?.({
-                        startIndex: items.rowStartIndex,
-                        stopIndex: items.rowStopIndex,
-                    });
-                },
-                45,
-            );
-        }, [onRangeChanged]);
+        const handleOnCellsRendered = useCallback(
+            (items: {
+                columnStartIndex: number;
+                columnStopIndex: number;
+                rowStartIndex: number;
+                rowStopIndex: number;
+            }) => {
+                onRangeChanged?.({
+                    startIndex: items.rowStartIndex,
+                    stopIndex: items.rowStopIndex,
+                });
+            },
+            [onRangeChanged],
+        );
 
         return (
             <div className={styles.itemTableContainer}>
@@ -379,7 +376,7 @@ const VirtualizedTableGrid = React.memo(
                             columnWidth={(index) => {
                                 return columnWidth(index + pinnedLeftColumnCount);
                             }}
-                            onCellsRendered={debouncedOnCellsRendered}
+                            onCellsRendered={handleOnCellsRendered}
                             rowCount={totalRowCount}
                             rowHeight={(index, cellProps) => {
                                 return getRowHeight(index + pinnedRowCount, cellProps);

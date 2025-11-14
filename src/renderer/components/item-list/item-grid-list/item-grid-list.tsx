@@ -1,6 +1,5 @@
 import { useElementSize, useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
-import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { AnimatePresence } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
@@ -114,38 +113,23 @@ const VirtualizedGridList = React.memo(
             itemType,
         ]);
 
-        const debouncedOnScrollEnd = useMemo(
-            () =>
-                onScrollEnd
-                    ? debounce((scrollOffset: number, direction: 'down' | 'up') => {
-                          onScrollEnd(scrollOffset, direction);
-                      }, 100)
-                    : undefined,
-            [onScrollEnd],
-        );
-
-        useEffect(() => {
-            return () => {
-                debouncedOnScrollEnd?.cancel();
-            };
-        }, [debouncedOnScrollEnd]);
-
         const handleOnScroll = useCallback(
             ({ scrollDirection, scrollOffset }: ListOnScrollProps) => {
                 onScroll?.(scrollOffset, scrollDirection === 'forward' ? 'down' : 'up');
-                debouncedOnScrollEnd?.(scrollOffset, scrollDirection === 'forward' ? 'down' : 'up');
+                onScrollEnd?.(scrollOffset, scrollDirection === 'forward' ? 'down' : 'up');
             },
-            [onScroll, debouncedOnScrollEnd],
+            [onScroll, onScrollEnd],
         );
 
-        const debouncedOnItemsRendered = useMemo(() => {
-            return debounce((items: ListOnItemsRenderedProps) => {
+        const handleOnItemsRendered = useCallback(
+            (items: ListOnItemsRenderedProps) => {
                 onRangeChanged?.({
                     startIndex: items.visibleStartIndex * (tableMeta?.columnCount || 0),
                     stopIndex: items.visibleStopIndex * (tableMeta?.columnCount || 0),
                 });
-            }, 50);
-        }, [onRangeChanged, tableMeta?.columnCount]);
+            },
+            [onRangeChanged, tableMeta?.columnCount],
+        );
 
         if (!tableMeta) {
             return null;
@@ -169,7 +153,7 @@ const VirtualizedGridList = React.memo(
                 itemCount={itemData.tableMeta?.rowCount || 0}
                 itemData={itemData}
                 itemSize={itemData.tableMeta?.itemHeight || 0}
-                onItemsRendered={debouncedOnItemsRendered}
+                onItemsRendered={handleOnItemsRendered}
                 onScroll={handleOnScroll}
                 outerRef={outerRef}
                 ref={ref}
