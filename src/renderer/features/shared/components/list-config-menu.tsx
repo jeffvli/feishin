@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
 import { GridConfig } from '/@/renderer/features/shared/components/grid-config';
@@ -7,11 +8,11 @@ import { TableConfig } from '/@/renderer/features/shared/components/table-config
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
-import { Popover } from '/@/shared/components/popover/popover';
-import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
+import { Modal } from '/@/shared/components/modal/modal';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Table } from '/@/shared/components/table/table';
+import { useDisclosure } from '/@/shared/hooks/use-disclosure';
 import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 
 const DISPLAY_TYPES = [
@@ -82,41 +83,40 @@ interface ListConfigMenuProps {
 }
 
 export const ListConfigMenu = (props: ListConfigMenuProps) => {
+    const { t } = useTranslation();
     const displayType = useSettingsStore(
         (state) => state.lists[props.listKey]?.display,
     ) as ListDisplayType;
     const { setList } = useSettingsStoreActions();
+    const [isOpen, handlers] = useDisclosure(false);
 
     return (
-        <Popover position="bottom-end" trapFocus width={640}>
-            <Popover.Target>
-                <SettingsButton />
-            </Popover.Target>
-            <Popover.Dropdown>
-                <ScrollArea
-                    allowDragScroll
-                    scrollX
-                    style={{ height: 'auto', maxHeight: '70dvh', padding: '1rem' }}
-                >
-                    <Stack>
-                        <SegmentedControl
-                            data={DISPLAY_TYPES.map((type) => ({
-                                ...type,
-                            }))}
-                            fullWidth
-                            onChange={(value) => {
-                                setList(props.listKey, {
-                                    display: value as ListDisplayType,
-                                });
-                            }}
-                            value={displayType}
-                            withItemsBorders={false}
-                        />
-                        <Config displayType={displayType} {...props} />
-                    </Stack>
-                </ScrollArea>
-            </Popover.Dropdown>
-        </Popover>
+        <>
+            <SettingsButton onClick={handlers.toggle} />
+            <Modal
+                handlers={handlers}
+                opened={isOpen}
+                size="lg"
+                title={t('common.configure', { postProcess: 'sentenceCase' })}
+            >
+                <Stack>
+                    <SegmentedControl
+                        data={DISPLAY_TYPES.map((type) => ({
+                            ...type,
+                        }))}
+                        fullWidth
+                        onChange={(value) => {
+                            setList(props.listKey, {
+                                display: value as ListDisplayType,
+                            });
+                        }}
+                        value={displayType}
+                        withItemsBorders={false}
+                    />
+                    <Config displayType={displayType} {...props} />
+                </Stack>
+            </Modal>
+        </>
     );
 };
 
