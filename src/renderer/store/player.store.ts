@@ -1031,7 +1031,25 @@ export const usePlayerStoreBase = create<PlayerState>()(
                 shuffleAll: () => {
                     set((state) => {
                         const queue = state.queue.default;
-                        state.queue.default = shuffleInPlace([...queue]);
+                        const currentIndex = state.player.index;
+
+                        // If there's a current song playing, keep it in place
+                        if (currentIndex >= 0 && currentIndex < queue.length) {
+                            const currentSong = queue[currentIndex];
+                            const beforeCurrent = queue.slice(0, currentIndex);
+                            const afterCurrent = queue.slice(currentIndex + 1);
+
+                            const shuffledBefore = shuffleInPlace([...beforeCurrent]);
+                            const shuffledAfter = shuffleInPlace([...afterCurrent]);
+
+                            state.queue.default = [
+                                ...shuffledBefore,
+                                currentSong,
+                                ...shuffledAfter,
+                            ];
+                        } else {
+                            state.queue.default = shuffleInPlace([...queue]);
+                        }
                     });
                 },
                 shuffleSelected: (items: QueueSong[]) => {
