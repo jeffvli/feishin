@@ -6,11 +6,17 @@ import { ItemListStateItemWithRequiredProperties } from '/@/renderer/components/
 import { DefaultItemControlProps, ItemControls } from '/@/renderer/components/item-list/types';
 import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
-import { Play } from '/@/shared/types/types';
+import { Play, TableColumn } from '/@/shared/types/types';
 
-export const useDefaultItemListControls = () => {
+interface UseDefaultItemListControlsArgs {
+    onColumnResized?: (columnId: TableColumn, width: number) => void;
+}
+
+export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs) => {
     const player = usePlayerContext();
     const navigate = useNavigate();
+
+    const { onColumnResized } = args || {};
 
     const controls: ItemControls = useMemo(() => {
         return {
@@ -147,6 +153,10 @@ export const useDefaultItemListControls = () => {
                 }
             },
 
+            onColumnResized: ({ columnId, width }: { columnId: TableColumn; width: number }) => {
+                onColumnResized?.(columnId, width);
+            },
+
             onDoubleClick: ({ internalState, item, itemType }: DefaultItemControlProps) => {
                 if (!item || !internalState) {
                     return;
@@ -239,7 +249,7 @@ export const useDefaultItemListControls = () => {
                 player.setRating(item._serverId, [item.id], itemType, newRating);
             },
         };
-    }, [player, navigate]);
+    }, [onColumnResized, navigate, player]);
 
     return controls;
 };

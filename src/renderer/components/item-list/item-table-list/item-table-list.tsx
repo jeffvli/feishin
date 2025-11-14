@@ -40,6 +40,7 @@ import {
     usePlayerContext,
 } from '/@/renderer/features/player/context/player-context';
 import { LibraryItem } from '/@/shared/types/domain-types';
+import { TableColumn } from '/@/shared/types/types';
 
 /**
  * Type guard to check if an item has the required properties (id and serverId)
@@ -89,6 +90,7 @@ interface VirtualizedTableGridProps {
     controls: ItemControls;
     data: unknown[];
     enableAlternateRowColors: boolean;
+    enableColumnResize: boolean;
     enableDrag?: boolean;
     enableExpansion: boolean;
     enableHeader: boolean;
@@ -126,6 +128,7 @@ const VirtualizedTableGrid = React.memo(
         controls,
         data,
         enableAlternateRowColors,
+        enableColumnResize,
         enableDrag,
         enableExpansion,
         enableHeader,
@@ -166,6 +169,7 @@ const VirtualizedTableGrid = React.memo(
                 controls,
                 data: enableHeader ? [null, ...data] : data,
                 enableAlternateRowColors,
+                enableColumnResize,
                 enableDrag,
                 enableExpansion,
                 enableHeader,
@@ -187,6 +191,7 @@ const VirtualizedTableGrid = React.memo(
                 enableHeader,
                 data,
                 enableAlternateRowColors,
+                enableColumnResize,
                 enableDrag,
                 enableExpansion,
                 enableHorizontalBorders,
@@ -470,6 +475,7 @@ export interface TableItemProps {
     controls: ItemControls;
     data: ItemTableListProps['data'];
     enableAlternateRowColors?: ItemTableListProps['enableAlternateRowColors'];
+    enableColumnResize?: boolean;
     enableDrag?: ItemTableListProps['enableDrag'];
     enableExpansion?: ItemTableListProps['enableExpansion'];
     enableHeader?: ItemTableListProps['enableHeader'];
@@ -509,6 +515,7 @@ interface ItemTableListProps {
         type: 'index' | 'offset';
     };
     itemType: LibraryItem;
+    onColumnResized?: (columnId: TableColumn, width: number) => void;
     onRangeChanged?: (range: { startIndex: number; stopIndex: number }) => void;
     onScrollEnd?: (offset: number, internalState: ItemListStateActions) => void;
     ref?: Ref<ItemListHandle>;
@@ -535,6 +542,7 @@ export const ItemTableList = ({
     headerHeight = 40,
     initialTop,
     itemType,
+    onColumnResized,
     onRangeChanged,
     onScrollEnd,
     ref,
@@ -1363,7 +1371,9 @@ export const ItemTableList = ({
         handleRef.current = imperativeHandle;
     }, [imperativeHandle]);
 
-    const controls = useDefaultItemListControls();
+    const controls = useDefaultItemListControls({
+        onColumnResized,
+    });
 
     return (
         <div
@@ -1380,6 +1390,7 @@ export const ItemTableList = ({
                 controls={controls}
                 data={data}
                 enableAlternateRowColors={enableAlternateRowColors}
+                enableColumnResize={!!onColumnResized}
                 enableDrag={enableDrag}
                 enableExpansion={enableExpansion}
                 enableHeader={enableHeader}

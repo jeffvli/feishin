@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
+import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
 import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
 import { useItemListPagination } from '/@/renderer/components/item-list/item-list-pagination/use-item-list-pagination';
@@ -16,6 +17,7 @@ import {
     LibraryItem,
     SortOrder,
 } from '/@/shared/types/domain-types';
+import { ItemListKey } from '/@/shared/types/types';
 
 interface GenreListPaginatedTableProps extends ItemListTableComponentProps<GenreListQuery> {}
 
@@ -63,6 +65,10 @@ export const GenreListPaginatedTable = forwardRef<any, GenreListPaginatedTablePr
             enabled: saveScrollOffset,
         });
 
+        const { handleColumnResized } = useItemListColumnResize({
+            itemListKey: ItemListKey.GENRE,
+        });
+
         return (
             <ItemListWithPagination
                 currentPage={currentPage}
@@ -88,6 +94,7 @@ export const GenreListPaginatedTable = forwardRef<any, GenreListPaginatedTablePr
                         type: 'offset',
                     }}
                     itemType={LibraryItem.GENRE}
+                    onColumnResized={handleColumnResized}
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
                     size={size}

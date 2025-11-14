@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
+import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
@@ -16,6 +17,7 @@ import {
     LibraryItem,
     SortOrder,
 } from '/@/shared/types/domain-types';
+import { ItemListKey } from '/@/shared/types/types';
 
 interface ArtistListPaginatedTableProps extends ItemListTableComponentProps<ArtistListQuery> {}
 
@@ -63,6 +65,10 @@ export const ArtistListPaginatedTable = forwardRef<any, ArtistListPaginatedTable
             enabled: saveScrollOffset,
         });
 
+        const { handleColumnResized } = useItemListColumnResize({
+            itemListKey: ItemListKey.ARTIST,
+        });
+
         return (
             <ItemListWithPagination
                 currentPage={currentPage}
@@ -88,6 +94,7 @@ export const ArtistListPaginatedTable = forwardRef<any, ArtistListPaginatedTable
                         type: 'offset',
                     }}
                     itemType={LibraryItem.ARTIST}
+                    onColumnResized={handleColumnResized}
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
                     size={size}

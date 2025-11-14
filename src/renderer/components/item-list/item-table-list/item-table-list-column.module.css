@@ -167,6 +167,7 @@
 }
 
 .header-container {
+    position: relative;
     background: none;
 }
 
@@ -261,4 +262,59 @@
 .container.data-row:hover :global(.hide-on-hover),
 .container.data-row.row-hovered :global(.hide-on-hover) {
     display: none;
+}
+
+.resize-handle {
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    z-index: 10;
+    width: 8px;
+    margin-right: -4px;
+    cursor: col-resize;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.resize-handle::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 2px;
+    content: '';
+    background-color: transparent;
+    transition: background-color 0.15s ease;
+}
+
+.header-container:hover .resize-handle {
+    opacity: 1;
+}
+
+.header-container:hover .resize-handle::before {
+    background-color: var(--theme-colors-border);
+}
+
+.resize-handle-left {
+    left: 0;
+    margin-right: 0;
+    margin-left: -4px;
+}
+
+.resize-handle-left::before {
+    right: auto;
+    left: 0;
+}
+
+.resize-handle-right {
+    right: 0;
+    margin-right: 0;
+}
+
+.resize-handle-dragging {
+    opacity: 1;
+}
+
+.resize-handle:hover {
+    opacity: 1;
 }

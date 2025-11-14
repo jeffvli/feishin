@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListInfiniteLoader } from '/@/renderer/components/item-list/helpers/item-list-infinite-loader';
+import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
@@ -61,6 +62,10 @@ export const AlbumArtistListInfiniteTable = forwardRef<any, AlbumArtistListInfin
             enabled: saveScrollOffset,
         });
 
+        const { handleColumnResized } = useItemListColumnResize({
+            itemListKey: ItemListKey.ALBUM_ARTIST,
+        });
+
         return (
             <ItemTableList
                 autoFitColumns={autoFitColumns}
@@ -78,6 +83,7 @@ export const AlbumArtistListInfiniteTable = forwardRef<any, AlbumArtistListInfin
                     type: 'offset',
                 }}
                 itemType={LibraryItem.ALBUM_ARTIST}
+                onColumnResized={handleColumnResized}
                 onRangeChanged={onRangeChanged}
                 onScrollEnd={handleOnScrollEnd}
                 ref={ref}

@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListInfiniteLoader } from '/@/renderer/components/item-list/helpers/item-list-infinite-loader';
+import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
@@ -60,6 +61,10 @@ export const GenreListInfiniteTable = forwardRef<any, GenreListInfiniteTableProp
             enabled: saveScrollOffset,
         });
 
+        const { handleColumnResized } = useItemListColumnResize({
+            itemListKey: ItemListKey.GENRE,
+        });
+
         return (
             <ItemTableList
                 autoFitColumns={autoFitColumns}
@@ -77,6 +82,7 @@ export const GenreListInfiniteTable = forwardRef<any, GenreListInfiniteTableProp
                     type: 'offset',
                 }}
                 itemType={LibraryItem.GENRE}
+                onColumnResized={handleColumnResized}
                 onRangeChanged={onRangeChanged}
                 onScrollEnd={handleOnScrollEnd}
                 ref={ref}

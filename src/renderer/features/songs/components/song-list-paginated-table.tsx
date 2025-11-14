@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
+import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
 import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
 import { useItemListPagination } from '/@/renderer/components/item-list/item-list-pagination/use-item-list-pagination';
@@ -11,6 +12,7 @@ import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table
 import { ItemListTableComponentProps } from '/@/renderer/components/item-list/types';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/shared/types/domain-types';
+import { ItemListKey } from '/@/shared/types/types';
 
 interface SongListPaginatedTableProps extends ItemListTableComponentProps<SongListQuery> {}
 
@@ -58,6 +60,10 @@ export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProp
             enabled: saveScrollOffset,
         });
 
+        const { handleColumnResized } = useItemListColumnResize({
+            itemListKey: ItemListKey.SONG,
+        });
+
         return (
             <ItemListWithPagination
                 currentPage={currentPage}
@@ -82,6 +88,7 @@ export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProp
                         type: 'offset',
                     }}
                     itemType={LibraryItem.SONG}
+                    onColumnResized={handleColumnResized}
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
                     size={size}

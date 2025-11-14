@@ -1,6 +1,6 @@
 import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
-import React, { CSSProperties, ReactNode, useEffect, useRef } from 'react';
+import React, { CSSProperties, ReactNode, useEffect, useRef, useState } from 'react';
 import { CellComponentProps } from 'react-window-v2';
 
 import styles from './item-table-list-column.module.css';
@@ -716,6 +716,82 @@ export const TableColumnContainer = (
     );
 };
 
+interface ColumnResizeHandleProps {
+    columnId: TableColumn;
+    initialWidth: number;
+    onResize: (columnId: TableColumn, width: number) => void;
+    side: 'left' | 'right';
+}
+
+const ColumnResizeHandle = ({
+    columnId,
+    initialWidth,
+    onResize,
+    side,
+}: ColumnResizeHandleProps) => {
+    const [isDragging, setIsDragging] = useState(false);
+    const handleRef = useRef<HTMLDivElement>(null);
+    const startWidthRef = useRef<number>(initialWidth);
+    const startXRef = useRef<number>(0);
+    const finalWidthRef = useRef<number>(initialWidth);
+
+    // Update the ref when initialWidth changes (but not during drag)
+    useEffect(() => {
+        if (!isDragging) {
+            startWidthRef.current = initialWidth;
+        }
+    }, [initialWidth, isDragging]);
+
+    useEffect(() => {
+        if (!isDragging) return;
+
+        const handleMouseMove = (event: MouseEvent) => {
+            const deltaX = event.clientX - startXRef.current;
+            const newWidth = Math.min(Math.max(10, startWidthRef.current + deltaX), 1000);
+            finalWidthRef.current = newWidth;
+        };
+
+        const handleMouseUp = () => {
+            setIsDragging(false);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            onResize(columnId, finalWidthRef.current);
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging, columnId, onResize]);
+
+    const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setIsDragging(true);
+        startWidthRef.current = initialWidth;
+        startXRef.current = event.clientX;
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+    };
+
+    return (
+        <div
+            className={clsx(styles.resizeHandle, {
+                [styles.resizeHandleDragging]: isDragging,
+                [styles.resizeHandleLeft]: side === 'left',
+                [styles.resizeHandleRight]: side === 'right',
+            })}
+            onMouseDown={handleMouseDown}
+            ref={handleRef}
+        />
+    );
+};
+
 export const TableColumnHeaderContainer = (
     props: ItemTableListColumn & {
         className?: string;
@@ -724,6 +800,14 @@ export const TableColumnHeaderContainer = (
         type: TableColumn;
     },
 ) => {
+    const columnConfig = props.columns[props.columnIndex];
+    // Use the actual rendered width from style if available, otherwise fall back to config width
+    const currentWidth = (props.style?.width as number | undefined) || columnConfig.width;
+
+    const handleResize = (columnId: TableColumn, width: number) => {
+        props.controls.onColumnResized?.({ columnId, width });
+    };
+
     return (
         <Flex
             className={clsx(styles.container, styles.headerContainer, props.containerClassName, {
@@ -745,6 +829,14 @@ export const TableColumnHeaderContainer = (
             >
                 {columnLabelMap[props.type]}
             </Text>
+            {!columnConfig.autoSize && props.enableColumnResize && (
+                <ColumnResizeHandle
+                    columnId={props.type}
+                    initialWidth={currentWidth}
+                    onResize={handleResize}
+                    side="right"
+                />
+            )}
         </Flex>
     );
 };
