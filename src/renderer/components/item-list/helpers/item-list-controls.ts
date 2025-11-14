@@ -144,10 +144,12 @@ export const useDefaultItemListControls = () => {
                 }
             },
 
-            onDoubleClick: ({ item, itemType }: DefaultItemControlProps) => {
-                if (!item) {
+            onDoubleClick: ({ internalState, item, itemType }: DefaultItemControlProps) => {
+                if (!item || !internalState) {
                     return;
                 }
+
+                internalState.setSelected([item]);
 
                 if (itemType === LibraryItem.QUEUE_SONG) {
                     const queueSong = item as QueueSong;
