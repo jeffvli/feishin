@@ -215,9 +215,7 @@ export const ExpandedAlbumListItem = ({ internalState, item }: ExpandedAlbumList
                                 </TextTitle>
                                 {internalState && (
                                     <ActionIcon
-                                        className={clsx(styles.closeButton, {
-                                            [styles.dark]: color.isDark,
-                                        })}
+                                        className={clsx(styles.closeButton)}
                                         icon="x"
                                         iconProps={{
                                             size: 'xl',
@@ -230,7 +228,7 @@ export const ExpandedAlbumListItem = ({ internalState, item }: ExpandedAlbumList
                                         }}
                                         radius="50%"
                                         size="sm"
-                                        variant="subtle"
+                                        variant="default"
                                     />
                                 )}
                             </div>

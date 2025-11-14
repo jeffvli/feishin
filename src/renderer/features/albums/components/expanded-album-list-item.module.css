@@ -43,6 +43,12 @@
     top: 0;
     right: 0;
     z-index: 10;
+    opacity: 0.3;
+    transition: opacity 0.3s ease-in-out;
+
+    &:hover {
+        opacity: 0.6;
+    }
 }
 
 .content {
