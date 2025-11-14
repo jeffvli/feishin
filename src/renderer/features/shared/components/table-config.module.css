@@ -9,6 +9,7 @@
 }
 
 .item {
+    position: relative;
     display: flex;
     flex-wrap: nowrap;
     gap: var(--theme-spacing-md);
@@ -23,4 +24,30 @@
 .item.matched {
     outline: 2px solid var(--theme-colors-primary);
     outline-offset: 2px;
+}
+
+.item.dragging {
+    opacity: 0.5;
+}
+
+.item.dragged-over-top::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1;
+    height: 2px;
+    content: '';
+    background-color: var(--theme-colors-primary);
+}
+
+.item.dragged-over-bottom::before {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    height: 2px;
+    content: '';
+    background-color: var(--theme-colors-primary);
 }
