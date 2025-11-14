@@ -8,6 +8,7 @@ import React, {
     CSSProperties,
     memo,
     ReactNode,
+    Ref,
     RefObject,
     useCallback,
     useEffect,
@@ -150,10 +151,21 @@ const VirtualizedGridList = React.memo(
             return null;
         }
 
+        const calculateInitialScrollOffset = (): number => {
+            if (!initialTop) return 0;
+
+            if (initialTop.type === 'offset') {
+                return initialTop.to;
+            }
+
+            const rowIndex = Math.floor(initialTop.to / (tableMeta?.columnCount || 1));
+            return rowIndex * (tableMeta?.itemHeight || 0);
+        };
+
         return (
             <FixedSizeList
                 height={height}
-                initialScrollOffset={initialTop || 0}
+                initialScrollOffset={calculateInitialScrollOffset()}
                 itemCount={itemData.tableMeta?.rowCount || 0}
                 itemData={itemData}
                 itemSize={itemData.tableMeta?.itemHeight || 0}
@@ -251,13 +263,16 @@ export interface ItemGridListProps {
     enableSelection?: boolean;
     gap?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     getRowId?: ((item: unknown) => string) | string;
-    initialTop?: number;
+    initialTop?: {
+        to: number;
+        type: 'index' | 'offset';
+    };
     itemsPerRow?: number;
     itemType: LibraryItem;
     onRangeChanged?: (range: { startIndex: number; stopIndex: number }) => void;
     onScroll?: (offset: number, direction: 'down' | 'up') => void;
     onScrollEnd?: (offset: number, direction: 'down' | 'up') => void;
-    ref?: RefObject<ItemListHandle>;
+    ref?: Ref<ItemListHandle>;
 }
 
 export const ItemGridList = ({
@@ -503,7 +518,7 @@ export const ItemGridList = ({
                                 internalState.extractRowId(rangeItem)
                             ) {
                                 rangeItems.push(
-                                    rangeItem as ItemListStateItemWithRequiredProperties,
+                                    rangeItem as unknown as ItemListStateItemWithRequiredProperties,
                                 );
                             }
                         }

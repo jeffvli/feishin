@@ -57,7 +57,10 @@ export const ArtistListInfiniteGrid = forwardRef<any, ArtistListInfiniteGridProp
             <ItemGridList
                 data={data}
                 gap={gap}
-                initialTop={scrollOffset ?? 0}
+                initialTop={{
+                    to: scrollOffset ?? 0,
+                    type: 'offset',
+                }}
                 itemsPerRow={itemsPerRow}
                 itemType={LibraryItem.ARTIST}
                 onRangeChanged={onRangeChanged}
