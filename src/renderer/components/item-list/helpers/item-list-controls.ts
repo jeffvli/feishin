@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { ItemListStateItemWithRequiredProperties } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { DefaultItemControlProps, ItemControls } from '/@/renderer/components/item-list/types';
 import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
+import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 export const useDefaultItemListControls = () => {
@@ -143,8 +144,17 @@ export const useDefaultItemListControls = () => {
                 }
             },
 
-            onDoubleClick: ({ internalState, item, itemType }: DefaultItemControlProps) => {
-                console.log('onDoubleClick', item, itemType, internalState);
+            onDoubleClick: ({ item, itemType }: DefaultItemControlProps) => {
+                if (!item) {
+                    return;
+                }
+
+                if (itemType === LibraryItem.QUEUE_SONG) {
+                    const queueSong = item as QueueSong;
+                    if (queueSong._uniqueId) {
+                        player.mediaPlay(queueSong._uniqueId);
+                    }
+                }
             },
 
             onExpand: ({ internalState, item }: DefaultItemControlProps) => {
