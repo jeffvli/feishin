@@ -201,6 +201,29 @@ export const usePlayerStoreBase = create<PlayerState>()(
 
                                     break;
                                 }
+                                case Play.SHUFFLE: {
+                                    set((state) => {
+                                        // Add new songs to songs object
+                                        newItems.forEach((item) => {
+                                            state.queue.songs[item._uniqueId] = item;
+                                        });
+
+                                        // Shuffle the new items before adding to queue
+                                        const shuffledIds = shuffleInPlace([...newUniqueIds]);
+
+                                        state.queue.default = [];
+                                        state.player.index = 0;
+                                        state.player.status = PlayerStatus.PLAYING;
+                                        state.player.playerNum = 1;
+                                        state.player.timestamp = 0;
+                                        state.queue.default = shuffledIds;
+
+                                        // Always maintain shuffled array when using Play.SHUFFLE
+                                        state.queue.shuffled = shuffleInPlace([...shuffledIds]);
+                                    });
+
+                                    break;
+                                }
                             }
                             break;
                         }
@@ -328,6 +351,32 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                         if (state.player.shuffle === PlayerShuffle.TRACK) {
                                             state.queue.shuffled = shuffleInPlace(newUniqueIds);
                                         }
+                                    });
+                                    break;
+                                }
+                                case Play.SHUFFLE: {
+                                    set((state) => {
+                                        // Add new songs to songs object
+                                        newItems.forEach((item) => {
+                                            state.queue.songs[item._uniqueId] = item;
+                                        });
+
+                                        // Shuffle the new items before adding to queue
+                                        const shuffledIds = shuffleInPlace([...newUniqueIds]);
+
+                                        state.queue.default = [];
+                                        state.queue.priority = [];
+                                        state.player.index = 0;
+                                        state.player.status = PlayerStatus.PLAYING;
+                                        state.player.playerNum = 1;
+                                        state.player.timestamp = 0;
+
+                                        // Add first item to priority queue, rest to default
+                                        state.queue.priority = [shuffledIds[0]];
+                                        state.queue.default = shuffledIds.slice(1);
+
+                                        // Always maintain shuffled array when using Play.SHUFFLE
+                                        state.queue.shuffled = shuffleInPlace([...shuffledIds]);
                                     });
                                     break;
                                 }
