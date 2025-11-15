@@ -7,8 +7,7 @@ import { generatePath, Link } from 'react-router';
 
 import styles from './left-controls.module.css';
 
-import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
-import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
+import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useAppStoreActions,
@@ -41,11 +40,6 @@ export const LeftControls = () => {
 
     const isSongDefined = Boolean(currentSong?.id);
 
-    const handleGeneralContextMenu = useHandleGeneralContextMenu(
-        LibraryItem.SONG,
-        SONG_CONTEXT_MENU_ITEMS,
-    );
-
     const handleToggleFullScreenPlayer = (e?: KeyboardEvent | MouseEvent<HTMLDivElement>) => {
         // don't toggle if right click
         if (e && 'button' in e && e.button === 2) {
@@ -65,9 +59,14 @@ export const LeftControls = () => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (isSongDefined && !isFullScreenPlayerExpanded) {
-            handleGeneralContextMenu(e, [currentSong!]);
+        if (!currentSong) {
+            return;
         }
+
+        ContextMenuController.call({
+            cmd: { items: [currentSong], type: LibraryItem.SONG },
+            event: e,
+        });
     };
 
     const stopPropagation = (e?: MouseEvent) => e?.stopPropagation();
@@ -156,7 +155,7 @@ export const LeftControls = () => {
                             {isSongDefined && (
                                 <ActionIcon
                                     icon="ellipsisVertical"
-                                    onClick={(e) => handleGeneralContextMenu(e, [currentSong!])}
+                                    // onClick={(e) => handleGeneralContextMenu(e, [currentSong!])}
                                     size="xs"
                                     styles={{
                                         root: {

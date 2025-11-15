@@ -17,7 +17,7 @@ import { Separator } from '/@/shared/components/separator/separator';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Table } from '/@/shared/components/table/table';
 import { Text } from '/@/shared/components/text/text';
-import { ExplicitStatus } from '/@/shared/types/domain-types';
+import { Artist, ExplicitStatus } from '/@/shared/types/domain-types';
 import {
     Album,
     AlbumArtist,
@@ -29,7 +29,7 @@ import {
 } from '/@/shared/types/domain-types';
 
 export type ItemDetailsModalProps = {
-    item: Album | AlbumArtist | Playlist | Song;
+    item: Album | AlbumArtist | Artist | Playlist | Song;
 };
 
 type ItemDetailRow<T> = {
@@ -402,7 +402,7 @@ export const ItemDetailsModal = ({ item }: ItemDetailsModalProps) => {
     const { t } = useTranslation();
     let body: ReactNode[] = [];
 
-    switch (item.itemType) {
+    switch (item._itemType) {
         case LibraryItem.ALBUM:
             body = AlbumPropertyMapping.map((rule) => handleRow(t, item, rule));
             body.push(...handleParticipants(item, t));

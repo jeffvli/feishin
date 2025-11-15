@@ -2,7 +2,6 @@ import isElectron from 'is-electron';
 
 import { ApplicationSettings } from '/@/renderer/features/settings/components/general/application-settings';
 import { ArtistSettings } from '/@/renderer/features/settings/components/general/artist-settings';
-import { ContextMenuSettings } from '/@/renderer/features/settings/components/general/context-menu-settings';
 import { ControlSettings } from '/@/renderer/features/settings/components/general/control-settings';
 import { HomeSettings } from '/@/renderer/features/settings/components/general/home-settings';
 import { RemoteSettings } from '/@/renderer/features/settings/components/general/remote-settings';
@@ -22,7 +21,6 @@ export const GeneralTab = () => {
             <ArtistSettings />
             <SidebarReorder />
             <SidebarSettings />
-            <ContextMenuSettings />
             {isElectron() && <RemoteSettings />}
             <CacheSettings />
         </Stack>

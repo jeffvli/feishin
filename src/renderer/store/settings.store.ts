@@ -17,7 +17,6 @@ import {
     PLAYLIST_TABLE_COLUMNS,
     SONG_TABLE_COLUMNS,
 } from '/@/renderer/components/item-list/item-table-list/default-columns';
-import { ContextMenuItemType } from '/@/renderer/features/context-menu/events';
 import { AppRoute } from '/@/renderer/router/routes';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
 import { FontValueSchema } from '/@/renderer/types/fonts';
@@ -457,7 +456,6 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
         setSidebarItems: (items: SidebarItemType[]) => void;
         setTable: (type: ItemListKey, data: DataTableProps) => void;
         setTranscodingConfig: (config: TranscodingConfig) => void;
-        toggleContextMenuItem: (item: ContextMenuItemType) => void;
         toggleMediaSession: () => void;
         toggleSidebarCollapseShare: () => void;
     };
@@ -1156,12 +1154,6 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     setTranscodingConfig: (config) => {
                         set((state) => {
                             state.playback.transcode = config;
-                        });
-                    },
-                    toggleContextMenuItem: (item: ContextMenuItemType) => {
-                        set((state) => {
-                            state.general.disabledContextMenu[item] =
-                                !state.general.disabledContextMenu[item];
                         });
                     },
                     toggleMediaSession: () => {

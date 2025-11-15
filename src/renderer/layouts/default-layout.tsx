@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router';
 
 import styles from './default-layout.module.css';
 
+import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { CommandPalette } from '/@/renderer/features/search/components/command-palette';
 import { MainContent } from '/@/renderer/layouts/default-layout/main-content';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
@@ -88,6 +89,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
                 <PlayerBar />
             </div>
             <CommandPalette modalProps={{ handlers, opened }} />
+            <ContextMenuController.Root />
         </>
     );
 };

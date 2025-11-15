@@ -1,0 +1,109 @@
+.content {
+    z-index: 1000;
+    width: 20rem;
+    min-width: 20rem;
+    max-width: 20rem;
+    padding: var(--theme-spacing-xs);
+    color: var(--theme-colors-foreground);
+    background: var(--theme-colors-background);
+    border: 1px solid var(--theme-colors-border);
+    border-radius: var(--theme-radius-md);
+    filter: drop-shadow(0 0 5px rgb(0 0 0 / 50%));
+}
+
+.inner-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--base-gap-xs);
+    overflow: hidden;
+}
+
+.item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 8rem;
+    max-width: 100%;
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+    font-size: var(--theme-font-size-sm);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    cursor: default;
+    user-select: none;
+
+    &.has-left-icon {
+        padding-left: calc(var(--theme-spacing-md) + 1.5rem);
+    }
+
+    &.has-right-icon {
+        padding-right: calc(var(--theme-spacing-md) + 1.5rem);
+    }
+
+    & > *:not(.left-icon, .right-icon) {
+        flex: 1;
+        min-width: 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    &:hover {
+        background: var(--theme-colors-surface);
+    }
+}
+
+.item[data-highlighted] {
+    background: var(--theme-colors-surface);
+}
+
+.left-icon {
+    position: absolute;
+    top: 50%;
+    left: var(--theme-spacing-md);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    transform: translateY(-50%);
+}
+
+.right-icon {
+    position: absolute;
+    top: 50%;
+    right: var(--theme-spacing-md);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    transform: translateY(-50%);
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.item.selected {
+    &::before {
+        position: absolute;
+        top: 50%;
+        left: 2px;
+        width: 4px;
+        height: 50%;
+        content: '';
+        background-color: var(--theme-colors-primary-filled);
+        border-radius: var(--theme-border-radius-xl);
+        transform: translateY(-50%);
+    }
+}
+
+.divider {
+    height: 1px;
+    padding: 0;
+    margin: var(--theme-spacing-xs) 0;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--theme-colors-border);
+}
+
+.max-height {
+    max-height: 36rem;
+}

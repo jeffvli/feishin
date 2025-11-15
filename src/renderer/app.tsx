@@ -24,8 +24,8 @@ import { AppRouter } from '/@/renderer/router/app-router';
 import { useCssSettings, useHotkeySettings, useSettingsStore } from '/@/renderer/store';
 import { useAppTheme } from '/@/renderer/themes/use-app-theme';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
-import '/styles/overlayscrollbars.css';
 import { WebAudio } from '/@/shared/types/types';
+import '/styles/overlayscrollbars.css';
 
 ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 

@@ -6,8 +6,7 @@ import { useLocation } from 'react-router';
 
 import styles from './sidebar.module.css';
 
-import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
-import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
+import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
@@ -17,8 +16,8 @@ import {
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
 import {
     useAppStoreActions,
-    usePlayerSong,
     useFullScreenPlayerStore,
+    usePlayerSong,
     useSetFullScreenPlayerStore,
     useSidebarStore,
 } from '/@/renderer/store';
@@ -73,17 +72,19 @@ export const Sidebar = () => {
         setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
     };
 
-    const handleGeneralContextMenu = useHandleGeneralContextMenu(
-        LibraryItem.SONG,
-        SONG_CONTEXT_MENU_ITEMS,
-    );
-
     const handleToggleContextMenu = (e: MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
 
+        if (!currentSong) {
+            return;
+        }
+
         if (isSongDefined && !isFullScreenPlayerExpanded) {
-            handleGeneralContextMenu(e, [currentSong!]);
+            ContextMenuController.call({
+                cmd: { items: [currentSong!], type: LibraryItem.SONG },
+                event: e,
+            });
         }
     };
 

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import { getTitlePath } from '/@/renderer/components/item-list/helpers/get-title-path';
 import { ItemListStateItemWithRequiredProperties } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { DefaultItemControlProps, ItemControls } from '/@/renderer/components/item-list/types';
+import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 import { Play, TableColumn } from '/@/shared/types/types';
@@ -230,8 +231,38 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                 player.setFavorite(item._serverId, [item.id], itemType, favorite);
             },
 
-            onMore: ({ internalState, item, itemType }: DefaultItemControlProps) => {
-                console.log('handleItemMore', item, itemType, internalState);
+            onMore: ({ event, internalState, item, itemType }: DefaultItemControlProps) => {
+                if (!item || !internalState || !event) {
+                    return;
+                }
+
+                const rowId = internalState.extractRowId(item);
+
+                if (!rowId) return;
+
+                // If none selected, select this item
+                if (internalState.getSelected().length === 0) {
+                    internalState.setSelected([item]);
+                    return ContextMenuController.call({
+                        cmd: { items: [item] as any[], type: itemType as any },
+                        event,
+                    });
+                }
+                // If this item is not already selected, replace the selection with this item
+                else if (!internalState.isSelected(rowId)) {
+                    internalState.setSelected([item]);
+                    return ContextMenuController.call({
+                        cmd: { items: [item] as any[], type: itemType as any },
+                        event,
+                    });
+                }
+
+                const selectedItems = internalState.getSelected();
+
+                return ContextMenuController.call({
+                    cmd: { items: selectedItems as any[], type: itemType as any },
+                    event,
+                });
             },
 
             onPlay: ({

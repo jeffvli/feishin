@@ -8,74 +8,18 @@ export type ContextMenuEvents = {
     openContextMenu: (args: OpenContextMenuProps) => void;
 };
 
-export type ContextMenuItemType =
-    | 'addToFavorites'
-    | 'addToPlaylist'
-    | 'createPlaylist'
-    | 'deletePlaylist'
-    | 'deselectAll'
-    | 'download'
-    | 'goToAlbum'
-    | 'goToAlbumArtist'
-    | 'moveToBottomOfQueue'
-    | 'moveToNextOfQueue'
-    | 'moveToTopOfQueue'
-    | 'play'
-    | 'playLast'
-    | 'playNext'
-    | 'playShuffled'
-    | 'playSimilarSongs'
-    | 'removeFromFavorites'
-    | 'removeFromPlaylist'
-    | 'removeFromQueue'
-    | 'setRating'
-    | 'shareItem'
-    | 'showDetails';
-
-export type OpenContextMenuProps = {
-    context?: any;
-    data: any[];
-    dataNodes?: RowNode[];
-    menuItems: SetContextMenuItems;
-    resetGridCache?: () => void;
-    tableApi?: GridOptions['api'];
-    type: LibraryItem;
-    xPos: number;
-    yPos: number;
-};
-
-export const CONFIGURABLE_CONTEXT_MENU_ITEMS: ContextMenuItemType[] = [
-    'moveToBottomOfQueue',
-    'moveToTopOfQueue',
-    'play',
-    'playLast',
-    'playNext',
-    'playShuffled',
-    'playSimilarSongs',
-    'addToPlaylist',
-    'removeFromPlaylist',
-    'addToFavorites',
-    'removeFromFavorites',
-    'setRating',
-    'download',
-    'shareItem',
-    'goToAlbum',
-    'goToAlbumArtist',
-    'showDetails',
-];
-
-export const CONTEXT_MENU_ITEM_MAPPING: { [k in ContextMenuItemType]?: string } = {
-    moveToBottomOfQueue: 'moveToBottom',
-    moveToTopOfQueue: 'moveToTop',
-    playLast: 'addLast',
-    playNext: 'addNext',
+export const CONTEXT_MENU_ITEM_MAPPING: { [k in ContextMenuItemKeys]?: string } = {
+    [ContextMenuItemKey.MOVE_TO_BOTTOM_OF_QUEUE]: 'moveToBottom',
+    [ContextMenuItemKey.MOVE_TO_TOP_OF_QUEUE]: 'moveToTop',
+    [ContextMenuItemKey.PLAY_LAST]: 'addLast',
+    [ContextMenuItemKey.PLAY_NEXT]: 'addNext',
 };
 
 export type SetContextMenuItems = {
     children?: boolean;
     disabled?: boolean;
     divider?: boolean;
-    id: ContextMenuItemType;
+    id: ContextMenuItemKeys;
     onClick?: () => void;
 }[];
 

@@ -7,7 +7,6 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required/components/error-fallback';
 import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
-import { useHandleTableContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { usePlayButtonBehavior, useTableSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
@@ -21,7 +20,7 @@ export type SimilarSongsListProps = {
 
 export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListProps) => {
     const tableRef = useRef<AgGridReact<Song> | null>(null);
-    const tableConfig = useTableSettings(fullScreen ? 'fullScreen' : 'songs');
+    // const tableConfig = useTableSettings(fullScreen ? 'fullScreen' : 'songs');
 
     const songQuery = useQuery(
         songsQueries.similar({
@@ -37,12 +36,12 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
         }),
     );
 
-    const columnDefs = useMemo(
-        () => getColumnDefs(tableConfig.columns, false, 'generic'),
-        [tableConfig.columns],
-    );
+    // const columnDefs = useMemo(
+    //     () => getColumnDefs(tableConfig.columns, false, 'generic'),
+    //     [tableConfig.columns],
+    // );
 
-    const onCellContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
+    // const onCellContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
 
     const handleRowDoubleClick = (e: RowDoubleClickedEvent<Song>) => {
         if (!e.data || !songQuery.data) return;
@@ -58,7 +57,7 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
         <Spinner container size={25} />
     ) : (
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <VirtualTable
+            {/* <VirtualTable
                 autoFitColumns={tableConfig.autoFit}
                 columnDefs={columnDefs}
                 context={{
@@ -76,7 +75,7 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
                 rowData={songQuery.data ?? []}
                 rowHeight={tableConfig.rowHeight || 40}
                 shouldUpdateSong
-            />
+            /> */}
         </ErrorBoundary>
     );
 };
