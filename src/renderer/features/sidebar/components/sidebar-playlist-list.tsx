@@ -3,19 +3,18 @@ import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { MouseEvent, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router';
-import { Link } from 'react-router';
+import { generatePath, Link } from 'react-router';
 
 import styles from './sidebar-playlist-list.module.css';
 
-import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
-import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { ButtonProps } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Text } from '/@/shared/components/text/text';
@@ -30,7 +29,7 @@ import { Play } from '/@/shared/types/types';
 
 interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onPlay'> {
     name: string;
-    onPlay: (id: string, playType: Play.LAST | Play.NEXT | Play.NOW | Play.SHUFFLE) => void;
+    onPlay: (id: string, playType: Play) => void;
     to: string;
 }
 
@@ -70,14 +69,13 @@ const RowControls = ({
     const { t } = useTranslation();
 
     return (
-        <Group className={styles.controls} gap="xs" wrap="nowrap">
+        <ActionIconGroup className={styles.controls}>
             <ActionIcon
                 icon="mediaPlay"
                 iconProps={{
                     size: 'md',
                 }}
                 onClick={() => {
-                    if (!id) return;
                     onPlay(id, Play.NOW);
                 }}
                 size="xs"
@@ -93,7 +91,6 @@ const RowControls = ({
                     size: 'md',
                 }}
                 onClick={() => {
-                    if (!id) return;
                     onPlay(id, Play.SHUFFLE);
                 }}
                 size="xs"
@@ -109,7 +106,6 @@ const RowControls = ({
                     size: 'md',
                 }}
                 onClick={() => {
-                    if (!id) return;
                     onPlay(id, Play.LAST);
                 }}
                 size="xs"
@@ -125,7 +121,6 @@ const RowControls = ({
                     size: 'md',
                 }}
                 onClick={() => {
-                    if (!id) return;
                     onPlay(id, Play.NEXT);
                 }}
                 size="xs"
@@ -135,12 +130,12 @@ const RowControls = ({
                 }}
                 variant="subtle"
             />
-        </Group>
+        </ActionIconGroup>
     );
 };
 
 export const SidebarPlaylistList = () => {
-    const handlePlayQueueAdd = usePlayQueueAdd();
+    const player = usePlayerContext();
     const { t } = useTranslation();
     const server = useCurrentServer();
 
@@ -157,15 +152,9 @@ export const SidebarPlaylistList = () => {
 
     const handlePlayPlaylist = useCallback(
         (id: string, playType: Play) => {
-            handlePlayQueueAdd?.({
-                byItemType: {
-                    id: [id],
-                    type: LibraryItem.PLAYLIST,
-                },
-                playType,
-            });
+            player.addToQueueByFetch(server.id, [id], LibraryItem.PLAYLIST, playType);
         },
-        [handlePlayQueueAdd],
+        [player, server.id],
     );
 
     const data = playlistsQuery.data;
@@ -258,7 +247,7 @@ export const SidebarPlaylistList = () => {
 };
 
 export const SidebarSharedPlaylistList = () => {
-    const handlePlayQueueAdd = usePlayQueueAdd();
+    const player = usePlayerContext();
     const { t } = useTranslation();
     const server = useCurrentServer();
 
@@ -275,15 +264,10 @@ export const SidebarSharedPlaylistList = () => {
 
     const handlePlayPlaylist = useCallback(
         (id: string, playType: Play) => {
-            handlePlayQueueAdd?.({
-                byItemType: {
-                    id: [id],
-                    type: LibraryItem.PLAYLIST,
-                },
-                playType,
-            });
+            if (!server?.id) return;
+            player.addToQueueByFetch(server.id, [id], LibraryItem.PLAYLIST, playType);
         },
-        [handlePlayQueueAdd],
+        [player, server?.id],
     );
 
     const data = playlistsQuery.data;
