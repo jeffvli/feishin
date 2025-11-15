@@ -50,6 +50,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
 
     const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const isInitializedRef = useRef<boolean>(false);
+    const hasPopulatedQueueRef = useRef<boolean>(false);
 
     const mpvExtraParameters = useSettingsStore((store) => store.playback.mpvExtraParameters);
     const mpvProperties = useSettingsStore((store) => store.playback.mpvProperties);
@@ -85,20 +86,21 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             mpvPlayer?.stop();
             mpvPlayer?.cleanup();
             isInitializedRef.current = false;
+            hasPopulatedQueueRef.current = false;
         };
     }, [mpvExtraParameters, mpvProperties]);
 
     // Populate mpv queue after initialization
     useEffect(() => {
-        if (!mpvPlayer || !isInitializedRef.current) {
+        if (!mpvPlayer || !isInitializedRef.current || hasPopulatedQueueRef.current) {
             return;
         }
 
         if (currentSrc) {
-            const shouldPause = playerStatus !== PlayerStatus.PLAYING;
-            mpvPlayer.setQueue(currentSrc, nextSrc, shouldPause);
+            mpvPlayer.setQueue(currentSrc, nextSrc, true);
+            hasPopulatedQueueRef.current = true;
         }
-    }, [currentSrc, nextSrc, playerStatus]);
+    }, [currentSrc, nextSrc]);
 
     // Update volume
     useEffect(() => {
