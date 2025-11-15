@@ -22,3 +22,9 @@
     right: var(--theme-spacing-xs);
     transform: translateY(-50%);
 }
+
+.row-dragged-over {
+    border-radius: var(--mantine-radius-sm);
+    box-shadow: 0 0 0 2px var(--theme-colors-primary);
+    opacity: 0.8;
+}

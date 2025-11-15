@@ -46,10 +46,12 @@ export const AddToPlaylistContextModal = ({
     albumId?: string[];
     artistId?: string[];
     genreId?: string[];
+    initialSelectedIds?: string[];
+    playlistId?: string[];
     songId?: string[];
 }>) => {
     const { t } = useTranslation();
-    const { albumId, artistId, genreId, songId } = innerProps;
+    const { albumId, artistId, genreId, initialSelectedIds, playlistId, songId } = innerProps;
     const server = useCurrentServer();
     const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState<string>('');
@@ -60,7 +62,7 @@ export const AddToPlaylistContextModal = ({
     const form = useForm({
         initialValues: {
             newPlaylists: [] as string[],
-            selectedPlaylistIds: [] as string[],
+            selectedPlaylistIds: initialSelectedIds || [],
             skipDuplicates: true,
         },
     });
@@ -159,6 +161,28 @@ export const AddToPlaylistContextModal = ({
         [server],
     );
 
+    const getSongsByPlaylist = useCallback(
+        async (playlistId: string) => {
+            const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId);
+
+            const songsRes = await queryClient.fetchQuery({
+                queryFn: ({ signal }) => {
+                    if (!server) throw new Error('No server');
+                    return api.controller.getPlaylistSongList({
+                        apiClientProps: { serverId: server?.id || '', signal },
+                        query: {
+                            id: playlistId,
+                        },
+                    });
+                },
+                queryKey,
+            });
+
+            return songsRes;
+        },
+        [server],
+    );
+
     const handleSubmit = form.onSubmit(async (values) => {
         if (isLoading) {
             return;
@@ -191,6 +215,13 @@ export const AddToPlaylistContextModal = ({
                 });
 
                 allSongIds.push(...(songs?.items?.map((song) => song.id) || []));
+            }
+
+            if (playlistId && playlistId.length > 0) {
+                for (const id of playlistId) {
+                    const songs = await getSongsByPlaylist(id);
+                    allSongIds.push(...(songs?.items?.map((song) => song.id) || []));
+                }
             }
 
             if (songId && songId.length > 0) {

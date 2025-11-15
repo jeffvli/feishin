@@ -1,4 +1,4 @@
-import { closeAllModals, openModal } from '@mantine/modals';
+import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { MouseEvent, useCallback, useMemo, useState } from 'react';
@@ -11,6 +11,7 @@ import { usePlayerContext } from '/@/renderer/features/player/context/player-con
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
+import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
@@ -23,8 +24,10 @@ import {
     Playlist,
     PlaylistListSort,
     ServerType,
+    Song,
     SortOrder,
 } from '/@/shared/types/domain-types';
+import { DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
 import { Play } from '/@/shared/types/types';
 
 interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onPlay'> {
@@ -35,14 +38,94 @@ interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onPlay'> {
 
 const PlaylistRowButton = ({ name, onPlay, to, ...props }: PlaylistRowButtonProps) => {
     const url = generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: to });
+    const { t } = useTranslation();
 
     const [isHovered, setIsHovered] = useState(false);
 
+    const { isDraggedOver, ref } = useDragDrop<HTMLDivElement>({
+        drop: {
+            canDrop: (args) => {
+                return (
+                    args.source.itemType !== undefined &&
+                    args.source.type !== DragTarget.PLAYLIST &&
+                    (args.source.operation?.includes(DragOperation.ADD) ?? false)
+                );
+            },
+            getData: () => {
+                return {
+                    id: [to],
+                    item: [],
+                    itemType: LibraryItem.PLAYLIST,
+                    type: DragTarget.PLAYLIST,
+                };
+            },
+            onDrag: () => {
+                return;
+            },
+            onDragLeave: () => {
+                return;
+            },
+            onDrop: (args) => {
+                const sourceItemType = args.source.itemType as LibraryItem;
+                const sourceIds = args.source.id;
+
+                const modalProps: {
+                    albumId?: string[];
+                    artistId?: string[];
+                    genreId?: string[];
+                    initialSelectedIds?: string[];
+                    playlistId?: string[];
+                    songId?: string[];
+                } = {
+                    initialSelectedIds: [to],
+                };
+
+                switch (sourceItemType) {
+                    case LibraryItem.ALBUM:
+                        modalProps.albumId = sourceIds;
+                        break;
+                    case LibraryItem.ALBUM_ARTIST:
+                    case LibraryItem.ARTIST:
+                        modalProps.artistId = sourceIds;
+                        break;
+                    case LibraryItem.GENRE:
+                        modalProps.genreId = sourceIds;
+                        break;
+                    case LibraryItem.PLAYLIST:
+                        modalProps.playlistId = sourceIds;
+                        break;
+                    case LibraryItem.PLAYLIST_SONG:
+                    case LibraryItem.QUEUE_SONG:
+                    case LibraryItem.SONG:
+                        if (args.source.item && Array.isArray(args.source.item)) {
+                            const songs = args.source.item as Song[];
+                            modalProps.songId = songs.map((song) => song.id);
+                        } else {
+                            modalProps.songId = sourceIds;
+                        }
+                        break;
+                    default:
+                        return;
+                }
+
+                openContextModal({
+                    innerProps: modalProps,
+                    modal: 'addToPlaylist',
+                    title: t('form.addToPlaylist.title', { postProcess: 'titleCase' }),
+                });
+            },
+        },
+        isEnabled: true,
+    });
+
     return (
         <div
-            className={styles.row}
+            className={clsx(styles.row, {
+                [styles.rowDraggedOver]: isDraggedOver,
+            })}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            ref={ref}
         >
             <SidebarItem
                 className={clsx({
