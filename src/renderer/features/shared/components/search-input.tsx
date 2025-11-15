@@ -76,13 +76,14 @@ export const SearchInput = ({
 
     const hasValue = props.value || ref.current?.value;
     const shouldShowInput = isInputMode || hasValue;
+    const shouldExpand = isInputMode || hasValue;
 
     const containerStyle: CSSProperties = {
         display: 'inline-flex',
         overflow: 'hidden',
         position: 'relative',
         transition: 'width 0.3s ease-in-out',
-        width: shouldShowInput ? '200px' : '40px',
+        width: shouldExpand ? '200px' : '36px',
     };
 
     const buttonStyle: CSSProperties = {
