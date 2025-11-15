@@ -501,7 +501,7 @@ export const FolderListContent = ({
                 <Group p="md">
                     <Box
                         aria-label="Go back to previous folder"
-                        className={styles.backButton}
+                        className={styles['back-button']}
                         component="button"
                         onClick={handleBack}
                         onKeyDown={(e) => {
@@ -524,7 +524,7 @@ export const FolderListContent = ({
                         }
                     >
                         <Box
-                            className={styles.breadcrumbItem}
+                            className={styles['breadcrumb-item']}
                             onClick={() => handleBreadcrumbClick(-1)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
@@ -538,7 +538,7 @@ export const FolderListContent = ({
                             <Text
                                 aria-label="Go to folders list"
                                 c="blue"
-                                className={styles.breadcrumbText}
+                                className={styles['breadcrumb-text']}
                                 size="sm"
                             >
                                 Folders
@@ -547,7 +547,7 @@ export const FolderListContent = ({
                         {path?.map((pathItem, index) =>
                             index < path.length - 1 ? (
                                 <Box
-                                    className={styles.breadcrumbItem}
+                                    className={styles['breadcrumb-item']}
                                     key={pathItem.id}
                                     onClick={() => handleBreadcrumbClick(index)}
                                     onKeyDown={(e) => {
@@ -562,7 +562,7 @@ export const FolderListContent = ({
                                     <Text
                                         aria-label={`Navigate to: ${pathItem.name}`}
                                         c="blue"
-                                        className={styles.breadcrumbText}
+                                        className={styles['breadcrumb-text']}
                                         size="sm"
                                     >
                                         {pathItem.name}
@@ -572,7 +572,7 @@ export const FolderListContent = ({
                                 <Text
                                     aria-label={`Current folder: ${pathItem.name}`}
                                     c="white"
-                                    className={styles.currentBreadcrumbText}
+                                    className={styles['current-breadcrumb-text']}
                                     key={pathItem.id}
                                     role="text"
                                     size="sm"
@@ -606,7 +606,7 @@ export const FolderListContent = ({
                     Error: {(musicFoldersQuery.error as Error)?.message}
                 </Text>
             )}
-            <Box aria-label="Folder contents" className={styles.folderContent} role="main">
+            <Box aria-label="Folder contents" className={styles['folder-content']} role="main">
                 <Stack
                     aria-label={`${folderId ? 'Folder contents' : 'Folders'} list`}
                     gap="xs"
@@ -630,7 +630,7 @@ export const FolderListContent = ({
                         items.map((item) => (
                             <Group
                                 aria-label={`${item.isDir ? 'Folder' : 'Song'}: ${item.title || item.name}`}
-                                className={styles.folderItem}
+                                className={styles['folder-item']}
                                 key={item.id}
                                 onClick={() =>
                                     item.isDir ? handleFolderClick(item) : handlePlaySong(item)
@@ -700,7 +700,9 @@ export const FolderListContent = ({
                                         </ActionIcon>
                                     </Tooltip>
                                 )}
-                                <Text className={styles.songTitle}>{item.title || item.name}</Text>
+                                <Text className={styles['song-title']}>
+                                    {item.title || item.name}
+                                </Text>
                             </Group>
                         ))}
                 </Stack>

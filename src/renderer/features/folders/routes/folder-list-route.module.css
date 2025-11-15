@@ -3,54 +3,54 @@
     overflow: hidden;
 }
 
-.backButton {
+.back-button {
+    cursor: pointer;
     background: none;
     border: none;
-    cursor: pointer;
 }
 
 .breadcrumbs {
     flex: 1;
 }
 
-.breadcrumbItem {
+.breadcrumb-item {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
     background-color: transparent;
     border-radius: 8px;
-    cursor: pointer;
-    position: relative;
     transition: background-color 0.2s ease;
-    display: inline-block;
 }
 
-.breadcrumbItem:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+.breadcrumb-item:hover {
+    background-color: rgb(255 255 255 / 5%);
 }
 
-.breadcrumbText {
+.breadcrumb-text {
     user-select: none;
 }
 
-.currentBreadcrumbText {
+.current-breadcrumb-text {
     user-select: auto;
 }
 
-.folderContent {
+.folder-content {
     flex: 1;
     overflow-y: auto;
 }
 
-.folderItem {
+.folder-item {
+    position: relative;
+    cursor: pointer;
     background-color: transparent;
     border-radius: 8px;
-    cursor: pointer;
-    position: relative;
     transition: background-color 0.2s ease;
 }
 
-.folderItem:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+.folder-item:hover {
+    background-color: rgb(255 255 255 / 5%);
 }
 
-.songTitle {
+.song-title {
     flex: 1;
 }
