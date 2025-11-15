@@ -403,6 +403,10 @@
             "visualizer": "visualizer",
             "noLyrics": "no lyrics found"
         },
+        "folderList": {
+            "title": "Folders",
+            "description": "Browse music by folder structure"
+        },
         "genreList": {
             "showAlbums": "show $t(entity.genre_one) $t(entity.album_other)",
             "showTracks": "show $t(entity.genre_one) $t(entity.track_other)",

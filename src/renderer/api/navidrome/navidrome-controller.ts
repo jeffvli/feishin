@@ -353,6 +353,11 @@ export const NavidromeController: InternalControllerEndpoint = {
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
     getDownloadUrl: SubsonicController.getDownloadUrl,
+    getFolderList: async () => {
+        // Navidrome supports Subsonic API, so this should work
+        // But for now, delegate to Subsonic implementation
+        throw new Error('Use Subsonic API endpoint for folder browsing on Navidrome servers');
+    },
     getGenreList: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -716,6 +721,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             id: res.body.data.id,
         };
     },
+
     updatePlaylist: async (args) => {
         const { apiClientProps, body, query } = args;
 

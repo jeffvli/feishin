@@ -91,6 +91,14 @@ export const ALBUM_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { divider: true, id: 'showDetails' },
 ];
 
+export const FOLDER_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
+    { id: 'play' },
+    { id: 'playLast' },
+    { id: 'playNext' },
+    { divider: true, id: 'playShuffled' },
+    { divider: true, id: 'addToPlaylist' },
+];
+
 export const GENRE_CONTEXT_MENU_ITEMS: SetContextMenuItems = [
     { id: 'play' },
     { id: 'playLast' },

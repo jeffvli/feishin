@@ -476,6 +476,12 @@ export const sidebarItems: SidebarItemType[] = [
         route: AppRoute.LIBRARY_GENRES,
     },
     {
+        disabled: false,
+        id: 'Folders',
+        label: i18n.t('page.sidebar.folders'),
+        route: AppRoute.LIBRARY_FOLDERS,
+    },
+    {
         disabled: true,
         id: 'Playlists',
         label: i18n.t('page.sidebar.playlists'),

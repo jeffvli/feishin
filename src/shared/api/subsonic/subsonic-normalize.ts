@@ -334,9 +334,51 @@ const normalizeGenre = (item: z.infer<typeof ssType._response.genre>): Genre => 
     };
 };
 
+const normalizeFolderItem = (
+    item: z.infer<typeof ssType._response.directoryChild>,
+    server?: null | ServerListItemWithCredential,
+): import('/@/shared/types/domain-types').FolderItem => {
+    const imageUrl =
+        getCoverArtUrl({
+            baseUrl: server?.url,
+            coverArtId: item.coverArt?.toString(),
+            credential: server?.credential,
+            size: 300,
+        }) || null;
+
+    return {
+        album: item.album,
+        albumId: item.albumId?.toString(),
+        artist: item.artist,
+        artistId: item.artistId?.toString(),
+        coverArt: item.coverArt?.toString(),
+        created: item.created,
+        duration: item.duration,
+        genre: item.genre,
+        id: item.id.toString(),
+        imageUrl,
+        isDir: item.isDir,
+        itemType: LibraryItem.FOLDER,
+        name: item.title,
+        parent: item.parent,
+        path: item.path,
+        playCount: item.playCount,
+        serverId: server?.id || 'unknown',
+        serverType: ServerType.SUBSONIC,
+        size: item.size,
+        starred: !!item.starred,
+        suffix: item.suffix,
+        title: item.title,
+        track: item.track,
+        userRating: item.userRating,
+        year: item.year,
+    };
+};
+
 export const ssNormalize = {
     album: normalizeAlbum,
     albumArtist: normalizeAlbumArtist,
+    folderItem: normalizeFolderItem,
     genre: normalizeGenre,
     playlist: normalizePlaylist,
     song: normalizeSong,

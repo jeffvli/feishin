@@ -620,6 +620,77 @@ export const SubsonicController: InternalControllerEndpoint = {
             '&c=Feishin'
         );
     },
+    getFolderList: async (args) => {
+        const { apiClientProps, query } = args;
+
+        // Check if this is a root music folder ID (single digit like '0', '1', etc.)
+        // These IDs from getMusicFolders are NOT valid directory IDs
+        // We need to use getIndexes instead to get the top-level content
+        const isMusicFolderId = /^\d+$/.test(query.id);
+
+        if (isMusicFolderId) {
+            const res = await ssApiClient(apiClientProps).getIndexes({
+                query: {
+                    musicFolderId: query.id,
+                },
+            });
+
+            if (res.status !== 200) {
+                throw new Error(`Failed to get folder list: ${JSON.stringify(res.body)}`);
+            }
+
+            // Convert index entries to folder items
+            const items: any[] = [];
+            res.body.indexes?.index?.forEach((idx) => {
+                idx.artist?.forEach((artist) => {
+                    items.push({
+                        id: artist.id.toString(),
+                        imageUrl: null,
+                        isDir: true,
+                        itemType: 'folder' as const,
+                        name: artist.name,
+                        serverId: apiClientProps.server?.id || 'unknown',
+                        serverType: 'subsonic' as const,
+                        title: artist.name,
+                    });
+                });
+            });
+
+            return {
+                id: query.id,
+                items,
+                name: 'Music',
+                parent: undefined,
+            };
+        }
+
+        // For actual directory IDs, use getMusicDirectory
+        const requestQuery = {
+            id: query.id,
+        };
+
+        const res = await ssApiClient(apiClientProps).getMusicDirectory({
+            query: requestQuery,
+        });
+
+        if (res.status !== 200) {
+            throw new Error(`Failed to get folder list: ${JSON.stringify(res.body)}`);
+        }
+
+        const directory = res.body.directory;
+
+        const result = {
+            id: directory.id.toString(),
+            items:
+                directory.child?.map((item) =>
+                    ssNormalize.folderItem(item, apiClientProps.server),
+                ) || [],
+            name: directory.name,
+            parent: directory.parent,
+        };
+
+        return result;
+    },
     getGenreList: async ({ apiClientProps, query }) => {
         const sortOrder = query.sortOrder.toLowerCase() as 'asc' | 'desc';
 

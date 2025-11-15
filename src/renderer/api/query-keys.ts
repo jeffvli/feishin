@@ -4,6 +4,7 @@ import type {
     AlbumDetailQuery,
     AlbumListQuery,
     ArtistListQuery,
+    FolderListQuery,
     GenreListQuery,
     LyricSearchQuery,
     LyricsQuery,
@@ -157,6 +158,13 @@ export const queryKeys: Record<
             return [serverId, 'artists', 'list'] as const;
         },
         root: (serverId: string) => [serverId, 'artists'] as const,
+    },
+    folders: {
+        list: (serverId: string, query?: FolderListQuery) => {
+            if (query) return [serverId, 'folders', 'list', query] as const;
+            return [serverId, 'folders', 'list'] as const;
+        },
+        root: (serverId: string) => [serverId, 'folders'] as const,
     },
     genres: {
         list: (serverId: string, query?: GenreListQuery) => {

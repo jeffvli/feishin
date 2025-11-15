@@ -281,6 +281,20 @@ export const controller: GeneralController = {
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },
+    getFolderList(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getFolderList`,
+            );
+        }
+
+        return apiController(
+            'getFolderList',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
+    },
     getGenreList(args) {
         const server = getServerById(args.apiClientProps.serverId);
 

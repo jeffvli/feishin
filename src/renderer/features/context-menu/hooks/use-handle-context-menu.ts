@@ -6,6 +6,7 @@ import {
     Album,
     AlbumArtist,
     Artist,
+    FolderItem,
     LibraryItem,
     QueueSong,
     Song,
@@ -72,7 +73,7 @@ export const useHandleGeneralContextMenu = (
 ) => {
     const handleContextMenu = (
         e: any,
-        data: Album[] | AlbumArtist[] | Artist[] | QueueSong[] | Song[],
+        data: Album[] | AlbumArtist[] | Artist[] | FolderItem[] | QueueSong[] | Song[],
     ) => {
         if (!e) return;
         const clickEvent = e as MouseEvent;

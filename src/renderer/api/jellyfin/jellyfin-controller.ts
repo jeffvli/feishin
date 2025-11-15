@@ -386,6 +386,11 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         return `${apiClientProps.server?.url}/items/${query.id}/download?api_key=${apiClientProps.server?.credential}`;
     },
+    getFolderList: async () => {
+        // Jellyfin doesn't have folder-based navigation like Subsonic
+        // This would need to be implemented using Jellyfin's folder structure
+        throw new Error('Folder browsing not supported for Jellyfin servers');
+    },
     getGenreList: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -1085,6 +1090,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             songs: songs.map((item) => jfNormalize.song(item, apiClientProps.server, '')),
         };
     },
+
     updatePlaylist: async (args) => {
         const { apiClientProps, body, query } = args;
 

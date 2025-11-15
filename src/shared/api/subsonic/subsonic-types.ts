@@ -548,6 +548,73 @@ const albumInfo = z.object({
     }),
 });
 
+const directoryChild = z.object({
+    album: z.string().optional(),
+    albumId: id.optional(),
+    artist: z.string().optional(),
+    artistId: id.optional(),
+    averageRating: z.number().optional(),
+    contentType: z.string().optional(),
+    coverArt: z.string().optional(),
+    created: z.string().optional(),
+    duration: z.number().optional(),
+    genre: z.string().optional(),
+    id,
+    isDir: z.boolean(),
+    isVideo: z.boolean().optional(),
+    parent: z.string().optional(),
+    path: z.string().optional(),
+    playCount: z.number().optional(),
+    size: z.number().optional(),
+    starred: z.string().optional(),
+    suffix: z.string().optional(),
+    title: z.string(),
+    track: z.number().optional(),
+    type: z.string().optional(),
+    userRating: z.number().optional(),
+    year: z.number().optional(),
+});
+
+const directory = z.object({
+    averageRating: z.number().optional(),
+    child: z.array(directoryChild).optional(),
+    id,
+    name: z.string(),
+    parent: z.string().optional(),
+    playCount: z.number().optional(),
+    starred: z.string().optional(),
+    userRating: z.number().optional(),
+});
+
+const getMusicDirectoryParameters = z.object({
+    id: z.string(),
+});
+
+const getMusicDirectory = z.object({
+    directory,
+});
+
+const getIndexesParameters = z.object({
+    ifModifiedSince: z.number().optional(),
+    musicFolderId: z.string().optional(),
+});
+
+const getIndexes = z.object({
+    indexes: z.object({
+        ignoredArticles: z.string().optional(),
+        index: z
+            .array(
+                z.object({
+                    artist: z.array(artistListEntry).optional(),
+                    name: z.string(),
+                }),
+            )
+            .optional(),
+        lastModified: z.number(),
+        shortcut: z.array(artistListEntry).optional(),
+    }),
+});
+
 export const ssType = {
     _parameters: {
         albumInfo: albumInfoParameters,
@@ -563,6 +630,8 @@ export const ssType = {
         getArtists: getArtistsParameters,
         getGenre: getGenresParameters,
         getGenres: getGenresParameters,
+        getIndexes: getIndexesParameters,
+        getMusicDirectory: getMusicDirectoryParameters,
         getPlaylist: getPlaylistParameters,
         getPlaylists: getPlaylistsParameters,
         getSong: getSongParameters,
@@ -591,12 +660,16 @@ export const ssType = {
         baseResponse,
         createFavorite,
         createPlaylist,
+        directory,
+        directoryChild,
         genre,
         getAlbum,
         getAlbumList2,
         getArtist,
         getArtists,
         getGenres,
+        getIndexes,
+        getMusicDirectory,
         getPlaylist,
         getPlaylists,
         getSong,

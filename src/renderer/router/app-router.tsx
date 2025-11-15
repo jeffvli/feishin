@@ -59,6 +59,8 @@ const DummyAlbumDetailRoute = lazy(
 
 const GenreListRoute = lazy(() => import('/@/renderer/features/genres/routes/genre-list-route'));
 
+const FolderListRoute = lazy(() => import('/@/renderer/features/folders/routes/folder-list-route'));
+
 const SettingsRoute = lazy(() => import('/@/renderer/features/settings/routes/settings-route'));
 
 const SearchRoute = lazy(() => import('/@/renderer/features/search/routes/search-route'));
@@ -160,6 +162,11 @@ export const AppRouter = () => {
                                     element={<SongListRoute />}
                                     errorElement={<RouteErrorBoundary />}
                                     path={AppRoute.LIBRARY_SONGS}
+                                />
+                                <Route
+                                    element={<FolderListRoute />}
+                                    errorElement={<RouteErrorBoundary />}
+                                    path={AppRoute.LIBRARY_FOLDERS}
                                 />
                                 <Route
                                     element={<PlaylistListRoute />}

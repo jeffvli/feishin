@@ -31,6 +31,7 @@ export enum LibraryItem {
     ALBUM = 'album',
     ALBUM_ARTIST = 'albumArtist',
     ARTIST = 'artist',
+    FOLDER = 'folder',
     GENRE = 'genre',
     PLAYLIST = 'playlist',
     SONG = 'song',
@@ -253,6 +254,47 @@ export interface BaseQuery<T> {
 
 export type EndpointDetails = {
     server: ServerListItem;
+};
+
+export type FolderItem = {
+    album?: string;
+    albumId?: string;
+    artist?: string;
+    artistId?: string;
+    coverArt?: string;
+    created?: string;
+    duration?: number;
+    genre?: string;
+    id: string;
+    imageUrl: null | string;
+    isDir: boolean;
+    itemType: LibraryItem.FOLDER;
+    name: string;
+    parent?: string;
+    path?: string;
+    playCount?: number;
+    serverId: string;
+    serverType: ServerType;
+    size?: number;
+    starred?: boolean;
+    suffix?: string;
+    title: string;
+    track?: number;
+    userRating?: number;
+    year?: number;
+};
+
+export type FolderListArgs = BaseEndpointArgs & { query: FolderListQuery };
+
+export interface FolderListQuery {
+    id: string;
+}
+
+export type FolderListResponse = {
+    id: string;
+    items: FolderItem[];
+    name: string;
+    parent?: string;
 };
 
 export type GainInfo = {
@@ -1236,6 +1278,7 @@ export type ControllerEndpoint = {
     getArtistList: (args: ArtistListArgs) => Promise<ArtistListResponse>;
     getArtistListCount: (args: ArtistListCountArgs) => Promise<number>;
     getDownloadUrl: (args: DownloadArgs) => string;
+    getFolderList: (args: FolderListArgs) => Promise<FolderListResponse>;
     getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
     getLyrics?: (args: LyricsArgs) => Promise<LyricsResponse>;
     getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
@@ -1314,6 +1357,7 @@ export type InternalControllerEndpoint = {
     getArtistList: (args: ReplaceApiClientProps<ArtistListArgs>) => Promise<ArtistListResponse>;
     getArtistListCount: (args: ReplaceApiClientProps<ArtistListCountArgs>) => Promise<number>;
     getDownloadUrl: (args: ReplaceApiClientProps<DownloadArgs>) => string;
+    getFolderList: (args: ReplaceApiClientProps<FolderListArgs>) => Promise<FolderListResponse>;
     getGenreList: (args: ReplaceApiClientProps<GenreListArgs>) => Promise<GenreListResponse>;
     getLyrics?: (args: ReplaceApiClientProps<LyricsArgs>) => Promise<LyricsResponse>;
     getMusicFolderList: (

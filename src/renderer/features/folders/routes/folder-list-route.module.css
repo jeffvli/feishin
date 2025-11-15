@@ -1,0 +1,56 @@
+.container {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.backButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.breadcrumbs {
+    flex: 1;
+}
+
+.breadcrumbItem {
+    background-color: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.2s ease;
+    display: inline-block;
+}
+
+.breadcrumbItem:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.breadcrumbText {
+    user-select: none;
+}
+
+.currentBreadcrumbText {
+    user-select: auto;
+}
+
+.folderContent {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.folderItem {
+    background-color: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.2s ease;
+}
+
+.folderItem:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.songTitle {
+    flex: 1;
+}

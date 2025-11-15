@@ -100,6 +100,22 @@ export const contract = c.router({
             200: ssType._response.getGenres,
         },
     },
+    getIndexes: {
+        method: 'GET',
+        path: 'getIndexes.view',
+        query: ssType._parameters.getIndexes,
+        responses: {
+            200: ssType._response.getIndexes,
+        },
+    },
+    getMusicDirectory: {
+        method: 'GET',
+        path: 'getMusicDirectory.view',
+        query: ssType._parameters.getMusicDirectory,
+        responses: {
+            200: ssType._response.getMusicDirectory,
+        },
+    },
     getMusicFolderList: {
         method: 'GET',
         path: 'getMusicFolders.view',
