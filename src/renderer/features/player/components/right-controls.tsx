@@ -4,7 +4,7 @@ import { useCallback, useEffect, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CustomPlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
-import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
@@ -78,7 +78,7 @@ export const RightControls = () => {
     const speed = usePlayerSpeed();
     const volumeWidth = useSettingsStore((state) => state.general.volumeWidth);
     const speedPreservePitch = useSettingsStore((state) => state.playback.preservePitch);
-    const { mediaToggleMute, setSpeed, setVolume } = usePlayerContext();
+    const { mediaToggleMute, setSpeed, setVolume } = usePlayer();
     const updateRatingMutation = useSetRating({});
     const addToFavoritesMutation = useCreateFavorite({});
     const removeFromFavoritesMutation = useDeleteFavorite({});

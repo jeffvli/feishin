@@ -35,10 +35,7 @@ import {
     ItemListHandle,
     ItemTableListColumnConfig,
 } from '/@/renderer/components/item-list/types';
-import {
-    PlayerContext,
-    usePlayerContext,
-} from '/@/renderer/features/player/context/player-context';
+import { PlayerContext, usePlayer } from '/@/renderer/features/player/context/player-context';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { TableColumn } from '/@/shared/types/types';
 
@@ -584,7 +581,7 @@ export const ItemTableList = ({
     const totalItemCount = enableHeader ? data.length + 1 : data.length;
     const parsedColumns = useMemo(() => parseTableColumns(columns), [columns]);
     const columnCount = parsedColumns.length;
-    const playerContext = usePlayerContext();
+    const playerContext = usePlayer();
     const [centerContainerWidth, setCenterContainerWidth] = useState(0);
     const [totalContainerWidth, setTotalContainerWidth] = useState(0);
 

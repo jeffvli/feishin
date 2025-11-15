@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import { getTitlePath } from '/@/renderer/components/item-list/helpers/get-title-path';
 import { ItemListStateItemWithRequiredProperties } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { DefaultItemControlProps, ItemControls } from '/@/renderer/components/item-list/types';
-import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 import { Play, TableColumn } from '/@/shared/types/types';
 
@@ -18,7 +18,7 @@ interface UseDefaultItemListControlsArgs {
 }
 
 export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs) => {
-    const player = usePlayerContext();
+    const player = usePlayer();
     const navigate = useNavigate();
 
     const { onColumnReordered, onColumnResized } = args || {};

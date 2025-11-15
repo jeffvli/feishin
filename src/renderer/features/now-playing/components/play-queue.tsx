@@ -7,10 +7,7 @@ import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
-import {
-    useIsPlayerFetching,
-    usePlayerContext,
-} from '/@/renderer/features/player/context/player-context';
+import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { useListSettings, usePlayerQueue } from '/@/renderer/store';
 import { searchSongs } from '/@/renderer/utils/search-songs';
@@ -107,7 +104,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
 });
 
 const EmptyQueueDropZone = () => {
-    const playerContext = usePlayerContext();
+    const playerContext = usePlayer();
 
     const { isDraggedOver, ref } = useDragDrop<HTMLDivElement>({
         drop: {

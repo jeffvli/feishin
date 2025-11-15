@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
-import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { updateSong } from '/@/renderer/features/player/update-remote-song';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
@@ -26,7 +26,7 @@ export const PlayQueueListControls = ({
     tableRef,
 }: PlayQueueListOptionsProps) => {
     const { t } = useTranslation();
-    const player = usePlayerContext();
+    const player = usePlayer();
     const currentSong = usePlayerSong();
 
     const handleMoveToNext = () => {

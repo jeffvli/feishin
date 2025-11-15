@@ -466,7 +466,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     return <PlayerContext.Provider value={contextValue}>{children}</PlayerContext.Provider>;
 };
 
-export const usePlayerContext = () => {
+export const usePlayer = () => {
     return useContext(PlayerContext);
 };
 

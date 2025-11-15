@@ -6,7 +6,7 @@ import styles from './center-controls.module.css';
 import { PlayButton, PlayerButton } from '/@/renderer/features/player/components/player-button';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { openShuffleAllModal } from '/@/renderer/features/player/components/shuffle-all-modal';
-import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import {
     usePlayerRepeat,
@@ -37,7 +37,7 @@ export const CenterControls = () => {
         mediaTogglePlayPause,
         toggleRepeat,
         toggleShuffle,
-    } = usePlayerContext();
+    } = usePlayer();
 
     const handlePlayQueueAdd = usePlayQueueAdd();
 

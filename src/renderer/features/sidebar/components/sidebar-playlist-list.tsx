@@ -7,7 +7,7 @@ import { generatePath, Link } from 'react-router';
 
 import styles from './sidebar-playlist-list.module.css';
 
-import { usePlayerContext } from '/@/renderer/features/player/context/player-context';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
@@ -218,7 +218,7 @@ const RowControls = ({
 };
 
 export const SidebarPlaylistList = () => {
-    const player = usePlayerContext();
+    const player = usePlayer();
     const { t } = useTranslation();
     const server = useCurrentServer();
 
@@ -330,7 +330,7 @@ export const SidebarPlaylistList = () => {
 };
 
 export const SidebarSharedPlaylistList = () => {
-    const player = usePlayerContext();
+    const player = usePlayer();
     const { t } = useTranslation();
     const server = useCurrentServer();
 
