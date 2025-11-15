@@ -1,53 +1,52 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-
 import debounce from 'lodash/debounce';
-import { ChangeEvent, MutableRefObject } from 'react';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link, useParams, useSearchParams } from 'react-router';
 
+import { ALBUM_ARTIST_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
+import { ALBUM_TABLE_COLUMNS, SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { FilterBar } from '/@/renderer/features/shared/components/filter-bar';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
+import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { useContainerQuery } from '/@/renderer/hooks';
-import { useListFilterRefresh } from '/@/renderer/hooks/use-list-filter-refresh';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useListStoreByKey } from '/@/renderer/store';
-import { Button } from '/@/shared/components/button/button';
+import { Button, ButtonGroup } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
-import {
-    AlbumArtistListQuery,
-    AlbumListQuery,
-    LibraryItem,
-    SongListQuery,
-} from '/@/shared/types/domain-types';
+import { LibraryItem } from '/@/shared/types/domain-types';
+import { ItemListKey } from '/@/shared/types/types';
 
 interface SearchHeaderProps {
     navigationId: string;
-    tableRef: MutableRefObject<AgGridReactType | null>;
 }
 
-export const SearchHeader = ({ navigationId, tableRef }: SearchHeaderProps) => {
+export const SearchHeader = ({ navigationId }: SearchHeaderProps) => {
     const { t } = useTranslation();
     const { itemType } = useParams() as { itemType: LibraryItem };
     const [searchParams, setSearchParams] = useSearchParams();
     const cq = useContainerQuery();
-    const server = useCurrentServer();
-    const { filter } = useListStoreByKey<AlbumArtistListQuery | AlbumListQuery | SongListQuery>({
-        key: itemType,
-    });
-
-    const { handleRefreshTable } = useListFilterRefresh({
-        itemType,
-        server,
-    });
 
     const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
         setSearchParams({ query: e.target.value }, { replace: true, state: { navigationId } });
-        handleRefreshTable(tableRef, { ...filter, searchTerm: e.target.value });
     }, 200);
+
+    const listConfigMenuProps = {
+        [LibraryItem.ALBUM]: {
+            listKey: ItemListKey.ALBUM,
+            tableColumnsData: ALBUM_TABLE_COLUMNS,
+        },
+        [LibraryItem.ALBUM_ARTIST]: {
+            listKey: ItemListKey.ALBUM_ARTIST,
+            tableColumnsData: ALBUM_ARTIST_TABLE_COLUMNS,
+        },
+        [LibraryItem.SONG]: {
+            listKey: ItemListKey.SONG,
+            tableColumnsData: SONG_TABLE_COLUMNS,
+        },
+    };
 
     return (
         <Stack gap={0} ref={cq.ref}>
@@ -65,54 +64,59 @@ export const SearchHeader = ({ navigationId, tableRef }: SearchHeaderProps) => {
                 </Flex>
             </PageHeader>
             <FilterBar>
-                <Group>
-                    <Button
-                        component={Link}
-                        fw={600}
-                        replace
-                        size="compact-md"
-                        state={{ navigationId }}
-                        to={{
-                            pathname: generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG }),
-                            search: searchParams.toString(),
-                        }}
-                        variant={itemType === LibraryItem.SONG ? 'filled' : 'subtle'}
-                    >
-                        {t('entity.track_other', { postProcess: 'sentenceCase' })}
-                    </Button>
-                    <Button
-                        component={Link}
-                        fw={600}
-                        replace
-                        size="compact-md"
-                        state={{ navigationId }}
-                        to={{
-                            pathname: generatePath(AppRoute.SEARCH, {
-                                itemType: LibraryItem.ALBUM,
-                            }),
-                            search: searchParams.toString(),
-                        }}
-                        variant={itemType === LibraryItem.ALBUM ? 'filled' : 'subtle'}
-                    >
-                        {t('entity.album_other', { postProcess: 'sentenceCase' })}
-                    </Button>
-                    <Button
-                        component={Link}
-                        fw={600}
-                        replace
-                        size="compact-md"
-                        state={{ navigationId }}
-                        to={{
-                            pathname: generatePath(AppRoute.SEARCH, {
-                                itemType: LibraryItem.ALBUM_ARTIST,
-                            }),
-                            search: searchParams.toString(),
-                        }}
-                        variant={itemType === LibraryItem.ALBUM_ARTIST ? 'filled' : 'subtle'}
-                    >
-                        {t('entity.artist_other', { postProcess: 'sentenceCase' })}
-                    </Button>
-                </Group>
+                <Flex justify="space-between" w="100%">
+                    <ButtonGroup>
+                        <Button
+                            component={Link}
+                            fw={600}
+                            replace
+                            size="compact-md"
+                            state={{ navigationId }}
+                            to={{
+                                pathname: generatePath(AppRoute.SEARCH, {
+                                    itemType: LibraryItem.SONG,
+                                }),
+                                search: searchParams.toString(),
+                            }}
+                            variant={itemType === LibraryItem.SONG ? 'filled' : 'default'}
+                        >
+                            {t('entity.track_other', { postProcess: 'sentenceCase' })}
+                        </Button>
+                        <Button
+                            component={Link}
+                            fw={600}
+                            replace
+                            size="compact-md"
+                            state={{ navigationId }}
+                            to={{
+                                pathname: generatePath(AppRoute.SEARCH, {
+                                    itemType: LibraryItem.ALBUM,
+                                }),
+                                search: searchParams.toString(),
+                            }}
+                            variant={itemType === LibraryItem.ALBUM ? 'filled' : 'default'}
+                        >
+                            {t('entity.album_other', { postProcess: 'sentenceCase' })}
+                        </Button>
+                        <Button
+                            component={Link}
+                            fw={600}
+                            replace
+                            size="compact-md"
+                            state={{ navigationId }}
+                            to={{
+                                pathname: generatePath(AppRoute.SEARCH, {
+                                    itemType: LibraryItem.ALBUM_ARTIST,
+                                }),
+                                search: searchParams.toString(),
+                            }}
+                            variant={itemType === LibraryItem.ALBUM_ARTIST ? 'filled' : 'default'}
+                        >
+                            {t('entity.artist_other', { postProcess: 'sentenceCase' })}
+                        </Button>
+                    </ButtonGroup>
+                    <ListConfigMenu {...listConfigMenuProps[itemType]} />
+                </Flex>
             </FilterBar>
         </Stack>
     );
