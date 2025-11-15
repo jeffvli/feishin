@@ -9,6 +9,7 @@ import {
     ArtistListSort,
     GenreListSort,
     LibraryItem,
+    PlaylistListSort,
     ServerType,
     SongListSort,
     SortOrder,
@@ -558,10 +559,72 @@ const GENRE_LIST_FILTERS: Partial<
     ],
 };
 
+const PLAYLIST_LIST_FILTERS: Partial<
+    Record<ServerType, Array<{ defaultOrder: SortOrder; name: string; value: string }>>
+> = {
+    [ServerType.JELLYFIN]: [
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.SONG_COUNT,
+        },
+    ],
+    [ServerType.NAVIDROME]: [
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.DURATION,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.NAME,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.owner', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.OWNER,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.isPublic', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.PUBLIC,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.SONG_COUNT,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.recentlyUpdated', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.UPDATED_AT,
+        },
+    ],
+    [ServerType.SUBSONIC]: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: PlaylistListSort.NAME,
+        },
+    ],
+};
+
 const FILTERS: Partial<Record<LibraryItem, any>> = {
     [LibraryItem.ALBUM]: ALBUM_LIST_FILTERS,
     [LibraryItem.ALBUM_ARTIST]: ALBUM_ARTIST_LIST_FILTERS,
     [LibraryItem.ARTIST]: ARTIST_LIST_FILTERS,
     [LibraryItem.GENRE]: GENRE_LIST_FILTERS,
+    [LibraryItem.PLAYLIST]: PLAYLIST_LIST_FILTERS,
     [LibraryItem.SONG]: SONG_LIST_FILTERS,
 };

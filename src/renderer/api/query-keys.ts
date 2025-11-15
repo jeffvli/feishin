@@ -208,6 +208,19 @@ export const queryKeys: Record<
         },
     },
     playlists: {
+        count: (serverId: string, query?: PlaylistListQuery) => {
+            const { filter, pagination } = splitPaginatedQuery(query);
+
+            if (query && pagination) {
+                return [serverId, 'playlists', 'count', filter, pagination] as const;
+            }
+
+            if (query) {
+                return [serverId, 'playlists', 'count', filter] as const;
+            }
+
+            return [serverId, 'playlists', 'count'] as const;
+        },
         detail: (serverId: string, id?: string, query?: PlaylistDetailQuery) => {
             const { filter, pagination } = splitPaginatedQuery(query);
             if (query && pagination) {

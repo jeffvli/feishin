@@ -790,7 +790,7 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
-                autoFitColumns: false,
+                autoFitColumns: true,
                 columns: ALBUM_ARTIST_TABLE_COLUMNS.map((column) => ({
                     align: column.align,
                     autoSize: column.autoSize,
@@ -834,7 +834,7 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
-                autoFitColumns: false,
+                autoFitColumns: true,
                 columns: GENRE_TABLE_COLUMNS.map((column) => ({
                     align: column.align,
                     autoSize: column.autoSize,
@@ -866,7 +866,7 @@ const initialState: SettingsState = {
             itemsPerPage: 100,
             pagination: ListPaginationType.INFINITE,
             table: {
-                autoFitColumns: false,
+                autoFitColumns: true,
                 columns: PLAYLIST_TABLE_COLUMNS.map((column) => ({
                     align: column.align,
                     autoSize: column.autoSize,

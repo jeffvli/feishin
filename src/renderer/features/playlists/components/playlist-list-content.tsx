@@ -1,43 +1,129 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
+import { lazy, Suspense } from 'react';
 
-import { lazy, MutableRefObject, Suspense } from 'react';
-
-import { VirtualInfiniteGridRef } from '/@/renderer/components/virtual-grid/virtual-infinite-grid';
-import { useListContext } from '/@/renderer/context/list-context';
-import { useListStoreByKey } from '/@/renderer/store/list.store';
+import { usePlaylistListFilters } from '/@/renderer/features/playlists/hooks/use-playlist-list-filters';
+import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
-import { ListDisplayType } from '/@/shared/types/types';
+import { ItemListKey, ListDisplayType, ListPaginationType } from '/@/shared/types/types';
 
-const PlaylistListTableView = lazy(() =>
-    import('/@/renderer/features/playlists/components/playlist-list-table-view').then((module) => ({
-        default: module.PlaylistListTableView,
+const PlaylistListInfiniteGrid = lazy(() =>
+    import('/@/renderer/features/playlists/components/playlist-list-infinite-grid').then((module) => ({
+        default: module.PlaylistListInfiniteGrid,
     })),
 );
 
-const PlaylistListGridView = lazy(() =>
-    import('/@/renderer/features/playlists/components/playlist-list-grid-view').then((module) => ({
-        default: module.PlaylistListGridView,
+const PlaylistListPaginatedGrid = lazy(() =>
+    import('/@/renderer/features/playlists/components/playlist-list-paginated-grid').then((module) => ({
+        default: module.PlaylistListPaginatedGrid,
     })),
 );
 
-interface PlaylistListContentProps {
-    gridRef: MutableRefObject<null | VirtualInfiniteGridRef>;
-    itemCount?: number;
-    tableRef: MutableRefObject<AgGridReactType | null>;
-}
+const PlaylistListInfiniteTable = lazy(() =>
+    import('/@/renderer/features/playlists/components/playlist-list-infinite-table').then((module) => ({
+        default: module.PlaylistListInfiniteTable,
+    })),
+);
 
-export const PlaylistListContent = ({ gridRef, itemCount, tableRef }: PlaylistListContentProps) => {
-    const { pageKey } = useListContext();
-    const { display } = useListStoreByKey({ key: pageKey });
+const PlaylistListPaginatedTable = lazy(() =>
+    import('/@/renderer/features/playlists/components/playlist-list-paginated-table').then((module) => ({
+        default: module.PlaylistListPaginatedTable,
+    })),
+);
+
+export const PlaylistListContent = () => {
+    const { display, grid, itemsPerPage, pagination, table } = useListSettings(ItemListKey.PLAYLIST);
 
     return (
         <Suspense fallback={<Spinner container />}>
-            {display === ListDisplayType.CARD || display === ListDisplayType.GRID ? (
-                <PlaylistListGridView gridRef={gridRef} itemCount={itemCount} />
-            ) : (
-                <PlaylistListTableView itemCount={itemCount} tableRef={tableRef} />
-            )}
-            <div />
+            <PlaylistListView
+                display={display}
+                grid={grid}
+                itemsPerPage={itemsPerPage}
+                pagination={pagination}
+                table={table}
+            />
         </Suspense>
     );
+};
+
+export const PlaylistListView = ({
+    display,
+    grid,
+    itemsPerPage,
+    pagination,
+    table,
+}: ItemListSettings) => {
+    const server = useCurrentServer();
+
+    const { query } = usePlaylistListFilters();
+
+    switch (display) {
+        case ListDisplayType.GRID: {
+            switch (pagination) {
+                case ListPaginationType.INFINITE: {
+                    return (
+                        <PlaylistListInfiniteGrid
+                            gap={grid.itemGap}
+                            itemsPerPage={itemsPerPage}
+                            itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
+                            query={query}
+                            serverId={server.id}
+                        />
+                    );
+                }
+                case ListPaginationType.PAGINATED: {
+                    return (
+                        <PlaylistListPaginatedGrid
+                            gap={grid.itemGap}
+                            itemsPerPage={itemsPerPage}
+                            itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
+                            query={query}
+                            serverId={server.id}
+                        />
+                    );
+                }
+                default:
+                    return null;
+            }
+        }
+        case ListDisplayType.TABLE: {
+            switch (pagination) {
+                case ListPaginationType.INFINITE: {
+                    return (
+                        <PlaylistListInfiniteTable
+                            autoFitColumns={table.autoFitColumns}
+                            columns={table.columns}
+                            enableAlternateRowColors={table.enableAlternateRowColors}
+                            enableHorizontalBorders={table.enableHorizontalBorders}
+                            enableRowHoverHighlight={table.enableRowHoverHighlight}
+                            enableVerticalBorders={table.enableVerticalBorders}
+                            itemsPerPage={itemsPerPage}
+                            query={query}
+                            serverId={server.id}
+                            size={table.size}
+                        />
+                    );
+                }
+                case ListPaginationType.PAGINATED: {
+                    return (
+                        <PlaylistListPaginatedTable
+                            autoFitColumns={table.autoFitColumns}
+                            columns={table.columns}
+                            enableAlternateRowColors={table.enableAlternateRowColors}
+                            enableHorizontalBorders={table.enableHorizontalBorders}
+                            enableRowHoverHighlight={table.enableRowHoverHighlight}
+                            enableVerticalBorders={table.enableVerticalBorders}
+                            itemsPerPage={itemsPerPage}
+                            query={query}
+                            serverId={server.id}
+                            size={table.size}
+                        />
+                    );
+                }
+                default:
+                    return null;
+            }
+        }
+    }
+
+    return null;
 };
