@@ -1,8 +1,8 @@
 .content {
     z-index: 1000;
-    width: 20rem;
-    min-width: 20rem;
-    max-width: 20rem;
+    width: 16rem;
+    min-width: 16rem;
+    max-width: 16rem;
     padding: var(--theme-spacing-xs);
     color: var(--theme-colors-foreground);
     background: var(--theme-colors-background);
