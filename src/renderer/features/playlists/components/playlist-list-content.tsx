@@ -3,34 +3,45 @@ import { lazy, Suspense } from 'react';
 import { usePlaylistListFilters } from '/@/renderer/features/playlists/hooks/use-playlist-list-filters';
 import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
+import { PlaylistListQuery } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, ListPaginationType } from '/@/shared/types/types';
 
 const PlaylistListInfiniteGrid = lazy(() =>
-    import('/@/renderer/features/playlists/components/playlist-list-infinite-grid').then((module) => ({
-        default: module.PlaylistListInfiniteGrid,
-    })),
+    import('/@/renderer/features/playlists/components/playlist-list-infinite-grid').then(
+        (module) => ({
+            default: module.PlaylistListInfiniteGrid,
+        }),
+    ),
 );
 
 const PlaylistListPaginatedGrid = lazy(() =>
-    import('/@/renderer/features/playlists/components/playlist-list-paginated-grid').then((module) => ({
-        default: module.PlaylistListPaginatedGrid,
-    })),
+    import('/@/renderer/features/playlists/components/playlist-list-paginated-grid').then(
+        (module) => ({
+            default: module.PlaylistListPaginatedGrid,
+        }),
+    ),
 );
 
 const PlaylistListInfiniteTable = lazy(() =>
-    import('/@/renderer/features/playlists/components/playlist-list-infinite-table').then((module) => ({
-        default: module.PlaylistListInfiniteTable,
-    })),
+    import('/@/renderer/features/playlists/components/playlist-list-infinite-table').then(
+        (module) => ({
+            default: module.PlaylistListInfiniteTable,
+        }),
+    ),
 );
 
 const PlaylistListPaginatedTable = lazy(() =>
-    import('/@/renderer/features/playlists/components/playlist-list-paginated-table').then((module) => ({
-        default: module.PlaylistListPaginatedTable,
-    })),
+    import('/@/renderer/features/playlists/components/playlist-list-paginated-table').then(
+        (module) => ({
+            default: module.PlaylistListPaginatedTable,
+        }),
+    ),
 );
 
 export const PlaylistListContent = () => {
-    const { display, grid, itemsPerPage, pagination, table } = useListSettings(ItemListKey.PLAYLIST);
+    const { display, grid, itemsPerPage, pagination, table } = useListSettings(
+        ItemListKey.PLAYLIST,
+    );
 
     return (
         <Suspense fallback={<Spinner container />}>
@@ -49,9 +60,10 @@ export const PlaylistListView = ({
     display,
     grid,
     itemsPerPage,
+    overrideQuery,
     pagination,
     table,
-}: ItemListSettings) => {
+}: ItemListSettings & { overrideQuery?: Omit<PlaylistListQuery, 'limit' | 'startIndex'> }) => {
     const server = useCurrentServer();
 
     const { query } = usePlaylistListFilters();
@@ -65,7 +77,7 @@ export const PlaylistListView = ({
                             gap={grid.itemGap}
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                         />
                     );
@@ -76,7 +88,7 @@ export const PlaylistListView = ({
                             gap={grid.itemGap}
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                         />
                     );
@@ -97,7 +109,7 @@ export const PlaylistListView = ({
                             enableRowHoverHighlight={table.enableRowHoverHighlight}
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                             size={table.size}
                         />
@@ -113,7 +125,7 @@ export const PlaylistListView = ({
                             enableRowHoverHighlight={table.enableRowHoverHighlight}
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                             size={table.size}
                         />

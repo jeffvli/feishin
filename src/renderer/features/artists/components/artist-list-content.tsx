@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import { useArtistListFilters } from '/@/renderer/features/artists/hooks/use-artist-list-filters';
 import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
+import { ArtistListQuery } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, ListPaginationType } from '/@/shared/types/types';
 
 const ArtistListInfiniteGrid = lazy(() =>
@@ -24,9 +25,11 @@ const ArtistListInfiniteTable = lazy(() =>
 );
 
 const ArtistListPaginatedTable = lazy(() =>
-    import('/@/renderer/features/artists/components/artist-list-paginated-table').then((module) => ({
-        default: module.ArtistListPaginatedTable,
-    })),
+    import('/@/renderer/features/artists/components/artist-list-paginated-table').then(
+        (module) => ({
+            default: module.ArtistListPaginatedTable,
+        }),
+    ),
 );
 
 export const ArtistListContent = () => {
@@ -45,13 +48,16 @@ export const ArtistListContent = () => {
     );
 };
 
+export type OverrideArtistListQuery = Omit<ArtistListQuery, 'limit' | 'startIndex'>;
+
 export const ArtistListView = ({
     display,
     grid,
     itemsPerPage,
+    overrideQuery,
     pagination,
     table,
-}: ItemListSettings) => {
+}: ItemListSettings & { overrideQuery?: OverrideArtistListQuery }) => {
     const server = useCurrentServer();
 
     const { query } = useArtistListFilters();
@@ -65,7 +71,7 @@ export const ArtistListView = ({
                             gap={grid.itemGap}
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                         />
                     );
@@ -76,7 +82,7 @@ export const ArtistListView = ({
                             gap={grid.itemGap}
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                         />
                     );
@@ -97,7 +103,7 @@ export const ArtistListView = ({
                             enableRowHoverHighlight={table.enableRowHoverHighlight}
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                             size={table.size}
                         />
@@ -113,7 +119,7 @@ export const ArtistListView = ({
                             enableRowHoverHighlight={table.enableRowHoverHighlight}
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                             size={table.size}
                         />

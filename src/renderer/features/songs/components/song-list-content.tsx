@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import { useSongListFilters } from '/@/renderer/features/songs/hooks/use-song-list-filters';
 import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
+import { SongListQuery } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, ListPaginationType } from '/@/shared/types/types';
 
 const SongListInfiniteGrid = lazy(() =>
@@ -42,13 +43,16 @@ export const SongListContent = () => {
     );
 };
 
+export type OverrideSongListQuery = Omit<SongListQuery, 'limit' | 'startIndex'>;
+
 export const SongListView = ({
     display,
     grid,
     itemsPerPage,
+    overrideQuery,
     pagination,
     table,
-}: ItemListSettings) => {
+}: ItemListSettings & { overrideQuery?: OverrideSongListQuery }) => {
     const server = useCurrentServer();
 
     const { query } = useSongListFilters();
@@ -62,7 +66,7 @@ export const SongListView = ({
                             gap={grid.itemGap}
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                         />
                     );
@@ -72,7 +76,7 @@ export const SongListView = ({
                             gap={grid.itemGap}
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                         />
                     );
@@ -92,7 +96,7 @@ export const SongListView = ({
                             enableRowHoverHighlight={table.enableRowHoverHighlight}
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                             size={table.size}
                         />
@@ -107,7 +111,7 @@ export const SongListView = ({
                             enableRowHoverHighlight={table.enableRowHoverHighlight}
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
-                            query={query}
+                            query={overrideQuery ?? query}
                             serverId={server.id}
                             size={table.size}
                         />
