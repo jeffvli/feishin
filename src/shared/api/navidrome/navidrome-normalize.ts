@@ -205,7 +205,7 @@ const normalizeSong = (
             ? new Date(item.releaseDate)
             : new Date(Date.UTC(item.year, 0, 1))
         ).toISOString(),
-        releaseYear: String(item.year),
+        releaseYear: item.year || null,
         sampleRate: item.sampleRate || null,
         size: item.size,
         streamUrl: `${server?.url}/rest/stream.view?id=${id}&v=1.13.0&c=Feishin&${server?.credential}`,
@@ -320,7 +320,7 @@ const normalizeAlbum = (
             ? new Date(item.releaseDate)
             : new Date(Date.UTC(item.minYear, 0, 1))
         ).toISOString(),
-        releaseYear: item.minYear,
+        releaseYear: item.minYear || null,
         size: item.size,
         songCount: item.songCount,
         songs: item.songs ? item.songs.map((song) => normalizeSong(song, server)) : undefined,

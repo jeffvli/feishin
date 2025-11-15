@@ -291,7 +291,7 @@ const normalizeSong = (
             : item.ProductionYear
               ? new Date(item.ProductionYear, 0, 1).toISOString()
               : null,
-        releaseYear: item.ProductionYear ? String(item.ProductionYear) : null,
+        releaseYear: item.ProductionYear || null,
         sampleRate,
         size,
         streamUrl,

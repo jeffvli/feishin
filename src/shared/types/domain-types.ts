@@ -367,7 +367,7 @@ export type Song = {
     playCount: number;
     playlistItemId?: string;
     releaseDate: null | string;
-    releaseYear: null | string;
+    releaseYear: null | number;
     sampleRate: null | number;
     size: number;
     streamUrl: string;

@@ -187,7 +187,7 @@ const normalizeSong = (
                 : null,
         playCount: item?.playCount || 0,
         releaseDate: null,
-        releaseYear: item.year ? String(item.year) : null,
+        releaseYear: item.year || null,
         sampleRate: item.samplingRate || null,
         size: item.size,
         streamUrl,
@@ -280,7 +280,7 @@ const normalizeAlbum = (
         recordLabels: item.recordLabels?.map((item) => item.name) || [],
         releaseDate: item.year ? new Date(Date.UTC(item.year, 0, 1)).toISOString() : null,
         releaseTypes: item.releaseTypes || [],
-        releaseYear: item.year ? Number(item.year) : null,
+        releaseYear: item.year || null,
         size: null,
         songCount: item.songCount,
         songs:
