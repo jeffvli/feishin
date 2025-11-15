@@ -69,7 +69,7 @@ const queueDrawerVariants: Variants = {
 
 interface RightSidebarProps {
     isResizing: boolean;
-    startResizing: (direction: 'left' | 'right') => void;
+    startResizing: (direction: 'left' | 'right', mouseEvent?: MouseEvent) => void;
 }
 
 export const RightSidebar = forwardRef(
@@ -102,7 +102,7 @@ export const RightSidebar = forwardRef(
                                     isResizing={isResizingRight}
                                     onMouseDown={(e) => {
                                         e.preventDefault();
-                                        startResizing('right');
+                                        startResizing('right', e.nativeEvent);
                                     }}
                                     placement="left"
                                     ref={ref}

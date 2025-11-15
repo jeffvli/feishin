@@ -1,16 +1,7 @@
 import clsx from 'clsx';
 import throttle from 'lodash/throttle';
 import { motion } from 'motion/react';
-import {
-    CSSProperties,
-    lazy,
-    Suspense,
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router';
 
 import styles from './main-content.module.css';
@@ -42,19 +33,62 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
 
     const showSideQueue = rightExpanded && location.pathname !== AppRoute.NOW_PLAYING;
     const rightSidebarRef = useRef<HTMLDivElement | null>(null);
+    const mainContentRef = useRef<HTMLDivElement | null>(null);
+    const initialRightWidthRef = useRef<string>(rightWidth);
+    const initialMouseXRef = useRef<number>(0);
 
-    const startResizing = useCallback((position: 'left' | 'right') => {
-        if (position === 'left') return setIsResizing(true);
-        return setIsResizingRight(true);
-    }, []);
+    useEffect(() => {
+        if (mainContentRef.current && !isResizing && !isResizingRight) {
+            mainContentRef.current.style.setProperty('--sidebar-width', leftWidth);
+            mainContentRef.current.style.setProperty('--right-sidebar-width', rightWidth);
+            initialRightWidthRef.current = rightWidth;
+        }
+    }, [leftWidth, rightWidth, isResizing, isResizingRight]);
+
+    const startResizing = useCallback(
+        (position: 'left' | 'right', mouseEvent?: MouseEvent) => {
+            if (position === 'left') {
+                setIsResizing(true);
+            } else {
+                setIsResizingRight(true);
+                if (mainContentRef.current && rightSidebarRef.current && mouseEvent) {
+                    const currentWidth =
+                        mainContentRef.current.style.getPropertyValue('--right-sidebar-width');
+                    if (currentWidth) {
+                        initialRightWidthRef.current = currentWidth;
+                    } else {
+                        initialRightWidthRef.current = rightWidth;
+                    }
+                    initialMouseXRef.current = mouseEvent.clientX;
+                } else {
+                    initialRightWidthRef.current = rightWidth;
+                }
+            }
+        },
+        [rightWidth],
+    );
 
     const stopResizing = useCallback(() => {
-        setIsResizing(false);
-        setIsResizingRight(false);
-    }, []);
+        if (isResizing && mainContentRef.current) {
+            const finalWidth = mainContentRef.current.style.getPropertyValue('--sidebar-width');
+            if (finalWidth) {
+                setSideBar({ collapsed: false, leftWidth: finalWidth });
+            }
+            setIsResizing(false);
+        } else if (isResizingRight && mainContentRef.current) {
+            const finalWidth =
+                mainContentRef.current.style.getPropertyValue('--right-sidebar-width');
+            if (finalWidth) {
+                setSideBar({ rightWidth: finalWidth });
+            }
+            setIsResizingRight(false);
+        }
+    }, [isResizing, isResizingRight, setSideBar]);
 
     const resize = useCallback(
         (mouseMoveEvent: any) => {
+            if (!mainContentRef.current) return;
+
             if (isResizing) {
                 const width = mouseMoveEvent.clientX;
                 const constrainedWidth = `${constrainSidebarWidth(width)}px`;
@@ -62,21 +96,21 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
                 if (width < MINIMUM_SIDEBAR_WIDTH - 100) {
                     setSideBar({ collapsed: true });
                 } else {
-                    setSideBar({ collapsed: false, leftWidth: constrainedWidth });
+                    mainContentRef.current.style.setProperty('--sidebar-width', constrainedWidth);
                 }
             } else if (isResizingRight) {
-                const start = Number(rightWidth.split('px')[0]);
-                const { left } = rightSidebarRef!.current!.getBoundingClientRect();
-                const width = `${constrainRightSidebarWidth(
-                    start + left - mouseMoveEvent.clientX,
-                )}px`;
-                setSideBar({ rightWidth: width });
+                const initialWidth = Number(initialRightWidthRef.current.split('px')[0]);
+                const initialMouseX = initialMouseXRef.current;
+                const deltaX = mouseMoveEvent.clientX - initialMouseX;
+                const newWidth = initialWidth - deltaX;
+                const width = `${constrainRightSidebarWidth(newWidth)}px`;
+                mainContentRef.current.style.setProperty('--right-sidebar-width', width);
             }
         },
-        [isResizing, isResizingRight, setSideBar, rightWidth],
+        [isResizing, isResizingRight, setSideBar],
     );
 
-    const throttledResize = useMemo(() => throttle(resize, 50), [resize]);
+    const throttledResize = useMemo(() => throttle(resize, 10), [resize]);
 
     useEffect(() => {
         window.addEventListener('mousemove', throttledResize);
@@ -96,12 +130,7 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
                 [styles.sidebarExpanded]: !collapsed,
             })}
             id="main-content"
-            style={
-                {
-                    '--right-sidebar-width': rightWidth,
-                    '--sidebar-width': leftWidth,
-                } as CSSProperties
-            }
+            ref={mainContentRef}
         >
             {!shell && (
                 <>

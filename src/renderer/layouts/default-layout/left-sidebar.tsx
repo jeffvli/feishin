@@ -9,7 +9,7 @@ import { useSidebarStore } from '/@/renderer/store';
 
 interface LeftSidebarProps {
     isResizing: boolean;
-    startResizing: (direction: 'left' | 'right') => void;
+    startResizing: (direction: 'left' | 'right', mouseEvent?: MouseEvent) => void;
 }
 
 export const LeftSidebar = ({ isResizing, startResizing }: LeftSidebarProps) => {
