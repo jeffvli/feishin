@@ -121,7 +121,7 @@
         "react-player": "^2.11.0",
         "react-router": "^7.9.4",
         "react-virtualized-auto-sizer": "^1.0.26",
-        "react-window": "2.2.3",
+        "react-window": "1.8.11",
         "react-window-v2": "npm:react-window@^2.2.3",
         "semver": "^7.5.4",
         "string-to-color": "^2.2.2",
