@@ -1,9 +1,8 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import { useParams } from 'react-router';
 
+import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { ListContext } from '/@/renderer/context/list-context';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistDetailTopSongsListHeader } from '/@/renderer/features/artists/components/album-artist-detail-top-songs-list-header';
@@ -12,7 +11,7 @@ import { useCurrentServer } from '/@/renderer/store/auth.store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const AlbumArtistDetailTopSongsListRoute = () => {
-    const tableRef = useRef<AgGridReactType | null>(null);
+    const tableRef = useRef<ItemListHandle | null>(null);
     const { albumArtistId, artistId } = useParams() as {
         albumArtistId?: string;
         artistId?: string;

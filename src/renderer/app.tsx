@@ -1,6 +1,3 @@
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { ModuleRegistry } from '@ag-grid-community/core';
-import { InfiniteRowModelModule } from '@ag-grid-community/infinite-row-model';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
@@ -11,7 +8,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import '/@/shared/styles/global.css';
 
-import '@ag-grid-community/styles/ag-grid.css';
 import 'overlayscrollbars/overlayscrollbars.css';
 
 import i18n from '/@/i18n/i18n';
@@ -26,8 +22,6 @@ import { useAppTheme } from '/@/renderer/themes/use-app-theme';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { WebAudio } from '/@/shared/types/types';
 import '/styles/overlayscrollbars.css';
-
-ModuleRegistry.registerModules([ClientSideRowModelModule, InfiniteRowModelModule]);
 
 const ipc = isElectron() ? window.api.ipc : null;
 

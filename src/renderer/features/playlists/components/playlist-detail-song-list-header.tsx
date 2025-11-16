@@ -1,10 +1,9 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-
 import { useQuery } from '@tanstack/react-query';
 import { MutableRefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
+import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { PlaylistDetailSongListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header-filters';
@@ -20,10 +19,9 @@ import { Play } from '/@/shared/types/types';
 
 interface PlaylistDetailHeaderProps {
     handlePlay: (playType: Play) => void;
-
     handleToggleShowQueryBuilder: () => void;
     itemCount?: number;
-    tableRef: MutableRefObject<AgGridReactType | null>;
+    tableRef: MutableRefObject<ItemListHandle | null>;
 }
 
 export const PlaylistDetailSongListHeader = ({

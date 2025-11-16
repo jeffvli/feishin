@@ -1,16 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { forwardRef, Ref, useCallback, useMemo } from 'react';
+import { forwardRef, Ref, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router';
-import { Link } from 'react-router';
+import { generatePath, Link, useParams } from 'react-router';
 
-import { queryKeys } from '/@/renderer/api/query-keys';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { LibraryHeader } from '/@/renderer/features/shared/components/library-header';
 import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { useContainerQuery } from '/@/renderer/hooks';
-import { useSongChange } from '/@/renderer/hooks/use-song-change';
-import { queryClient } from '/@/renderer/lib/react-query';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { formatDateAbsoluteUTC, formatDurationString, titleCase } from '/@/renderer/utils';
@@ -20,7 +16,7 @@ import { Pill } from '/@/shared/components/pill/pill';
 import { Rating } from '/@/shared/components/rating/rating';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
-import { AlbumDetailResponse, LibraryItem, ServerType } from '/@/shared/types/domain-types';
+import { LibraryItem, ServerType } from '/@/shared/types/domain-types';
 
 interface AlbumDetailHeaderProps {
     background: {
@@ -51,36 +47,6 @@ export const AlbumDetailHeader = forwardRef(
         const releasePrefix = originalDifferentFromRelease
             ? t('page.albumDetail.released', { postProcess: 'sentenceCase' })
             : '♫';
-
-        const songIds = useMemo(() => {
-            return new Set(detailQuery.data?.songs?.map((song) => song.id));
-        }, [detailQuery.data?.songs]);
-
-        const handleSongChange = useCallback(
-            (id: string) => {
-                if (songIds.has(id)) {
-                    const queryKey = queryKeys.albums.detail(server?.id, { id: albumId });
-                    queryClient.setQueryData<AlbumDetailResponse | undefined>(
-                        queryKey,
-                        (previous) => {
-                            if (!previous) return undefined;
-
-                            return {
-                                ...previous,
-                                playCount: previous.playCount ? previous.playCount + 1 : 1,
-                            };
-                        },
-                    );
-                }
-            },
-            [albumId, server?.id, songIds],
-        );
-
-        useSongChange((ids, event) => {
-            if (event.event === 'play') {
-                handleSongChange(ids[0]);
-            }
-        }, detailQuery.data !== undefined);
 
         const releaseTypes = useMemo(
             () =>
@@ -139,8 +105,9 @@ export const AlbumDetailHeader = forwardRef(
             updateRatingMutation.mutate({
                 apiClientProps: { serverId: detailQuery.data._serverId },
                 query: {
-                    item: [detailQuery.data],
+                    id: [detailQuery.data.id],
                     rating,
+                    type: LibraryItem.ALBUM,
                 },
             });
         };

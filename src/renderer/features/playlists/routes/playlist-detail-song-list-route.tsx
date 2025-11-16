@@ -1,5 +1,3 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'motion/react';
@@ -7,6 +5,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router';
 
+import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { PlaylistDetailSongListHeader } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header';
 import { PlaylistQueryBuilder } from '/@/renderer/features/playlists/components/playlist-query-builder';
@@ -16,7 +15,6 @@ import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/dele
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, usePlaylistDetailStore } from '/@/renderer/store';
-import { searchSongs } from '/@/renderer/utils/search-songs';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Box } from '/@/shared/components/box/box';
 import { Group } from '/@/shared/components/group/group';
@@ -28,7 +26,7 @@ import { Play } from '/@/shared/types/types';
 const PlaylistDetailSongListRoute = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const tableRef = useRef<AgGridReactType | null>(null);
+    const tableRef = useRef<ItemListHandle | null>(null);
     const { playlistId } = useParams() as { playlistId: string };
     const server = useCurrentServer();
 

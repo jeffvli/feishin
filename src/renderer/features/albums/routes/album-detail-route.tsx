@@ -1,5 +1,3 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { useParams } from 'react-router';
@@ -17,7 +15,6 @@ import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const AlbumDetailRoute = () => {
-    const tableRef = useRef<AgGridReactType | null>(null);
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
     const { albumBackground, albumBackgroundBlur } = useGeneralSettings();
@@ -74,7 +71,7 @@ const AlbumDetailRoute = () => {
                     }}
                     ref={headerRef}
                 />
-                <AlbumDetailContent background={background} tableRef={tableRef} />
+                <AlbumDetailContent background={background} />
             </NativeScrollArea>
         </AnimatedPage>
     );

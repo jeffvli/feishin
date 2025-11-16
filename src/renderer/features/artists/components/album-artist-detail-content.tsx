@@ -1,4 +1,3 @@
-import { RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { useQuery } from '@tanstack/react-query';
 import { Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,7 +31,6 @@ import {
     AlbumArtist,
     AlbumListSort,
     LibraryItem,
-    QueueSong,
     ServerType,
     SortOrder,
 } from '/@/shared/types/domain-types';
@@ -194,10 +192,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         });
     };
 
-    const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
-        if (!e.data || !topSongsQuery?.data) return;
-    };
-
     const createFavoriteMutation = useCreateFavorite({});
     const deleteFavoriteMutation = useDeleteFavorite({});
 
@@ -268,7 +262,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             icon="ellipsisHorizontal"
                             onClick={(e) => {
                                 if (!detailQuery?.data) return;
-                                // handleGeneralContextMenu(e, [detailQuery.data!]);
                             }}
                             size="lg"
                             variant="transparent"

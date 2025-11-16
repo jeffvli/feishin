@@ -8,21 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@ag-grid-community/client-side-row-model':
-        specifier: ^28.2.1
-        version: 28.2.1
-      '@ag-grid-community/core':
-        specifier: ^28.2.1
-        version: 28.2.1
-      '@ag-grid-community/infinite-row-model':
-        specifier: ^28.2.1
-        version: 28.2.1
-      '@ag-grid-community/react':
-        specifier: ^28.2.1
-        version: 28.2.1(@ag-grid-community/core@28.2.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@ag-grid-community/styles':
-        specifier: ^28.2.1
-        version: 28.2.1
       '@atlaskit/pragmatic-drag-and-drop':
         specifier: 1.7.7
         version: 1.7.7
@@ -368,25 +353,6 @@ packages:
 
   7zip-bin@5.2.0:
     resolution: {integrity: sha512-ukTPVhqG4jNzMro2qA9HSCSSVJN3aN7tlb+hfqYCt3ER0yWroeA2VR38MNrOHLQ/cVj+DaIMad0kFCtWWowh/A==}
-
-  '@ag-grid-community/client-side-row-model@28.2.1':
-    resolution: {integrity: sha512-JLLNVNAtSbVjg/h0+JqNxbRGzHR9xl3YHO4kVt8Bu0UO1XQLfGLT8wkzqQTcEOiq0pEfFTee7/BGT3oHOQfUQg==}
-
-  '@ag-grid-community/core@28.2.1':
-    resolution: {integrity: sha512-qGhqZhY8KbPlr3cJBVkNjGKu+cOyFc8IGvPcvlm0pjNC9cdxO/ct9Sa1Dg+k3ACCEroMEt1apBvnoOgurpvewQ==}
-
-  '@ag-grid-community/infinite-row-model@28.2.1':
-    resolution: {integrity: sha512-jvEvVNQ/USlQjGW0LbryR4/I1ZSgOBPn4tg45KWm3+R0jmDSfetI20D5t3UaSQHY6ZQMDVYxR3xSkorPFI3Vng==}
-
-  '@ag-grid-community/react@28.2.1':
-    resolution: {integrity: sha512-VWtiBMhvDKp//lIa2Ovzv+/gcQj6wnZDhngyPW5e97Sl+sIs6/UngHSTbbmhIb+wWUCIKmSRL1+R05PNnKjFTA==}
-    peerDependencies:
-      '@ag-grid-community/core': ~28.2.1
-      react: ^16.3.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.3.0 || ^17.0.0 || ^18.0.0
-
-  '@ag-grid-community/styles@28.2.1':
-    resolution: {integrity: sha512-dy3Z46zTnzrwJOnH+tFvIvY9g/8qIi+b7XmbQlmATBr9zcNMk0wqWH1/9sNHs1fFW6m3Csvu4ctyzdr9mSw1YA==}
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -6087,25 +6053,6 @@ packages:
 snapshots:
 
   7zip-bin@5.2.0: {}
-
-  '@ag-grid-community/client-side-row-model@28.2.1':
-    dependencies:
-      '@ag-grid-community/core': 28.2.1
-
-  '@ag-grid-community/core@28.2.1': {}
-
-  '@ag-grid-community/infinite-row-model@28.2.1':
-    dependencies:
-      '@ag-grid-community/core': 28.2.1
-
-  '@ag-grid-community/react@28.2.1(@ag-grid-community/core@28.2.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
-    dependencies:
-      '@ag-grid-community/core': 28.2.1
-      prop-types: 15.8.1
-      react: 19.1.0
-      react-dom: 19.1.0(react@19.1.0)
-
-  '@ag-grid-community/styles@28.2.1': {}
 
   '@ampproject/remapping@2.3.0':
     dependencies:
