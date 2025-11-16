@@ -30,7 +30,7 @@ export const SearchHeader = ({ navigationId }: SearchHeaderProps) => {
     const { t } = useTranslation();
     const { itemType } = useParams() as { itemType: LibraryItem };
     const [searchParams, setSearchParams] = useSearchParams();
-    const cq = useContainerQuery();
+    const { ref, ...cq } = useContainerQuery();
 
     const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
         setSearchParams({ query: e.target.value }, { replace: true, state: { navigationId } });
@@ -52,7 +52,7 @@ export const SearchHeader = ({ navigationId }: SearchHeaderProps) => {
     };
 
     return (
-        <Stack gap={0} ref={cq.ref}>
+        <Stack gap={0} ref={ref}>
             <PageHeader>
                 <Flex justify="space-between" w="100%">
                     <LibraryHeaderBar>

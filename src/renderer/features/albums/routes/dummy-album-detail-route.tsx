@@ -32,7 +32,7 @@ import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, SongDetailResponse } from '/@/shared/types/domain-types';
 
 const DummyAlbumDetailRoute = () => {
-    const cq = useContainerQuery();
+    const { ref, ...cq } = useContainerQuery();
     const { t } = useTranslation();
 
     const { albumId } = useParams() as { albumId: string };
@@ -120,7 +120,7 @@ const DummyAlbumDetailRoute = () => {
 
     return (
         <AnimatedPage key={`dummy-album-detail-${albumId}`}>
-            <Stack ref={cq.ref}>
+            <Stack ref={ref}>
                 <LibraryHeader
                     background={background}
                     imageUrl={detailQuery?.data?.imageUrl}

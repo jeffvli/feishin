@@ -22,7 +22,7 @@ export const SettingsHeader = ({ setSearch }: SettingsHeaderProps) => {
     const { t } = useTranslation();
     const { reset } = useSettingsStoreActions();
     const search = useSettingSearchContext();
-    const cq = useContainerQuery();
+    const { ref, ...cq } = useContainerQuery();
 
     const handleResetToDefault = () => {
         reset();
@@ -41,7 +41,7 @@ export const SettingsHeader = ({ setSearch }: SettingsHeaderProps) => {
     };
 
     return (
-        <Flex ref={cq.ref}>
+        <Flex ref={ref}>
             <PageHeader>
                 <LibraryHeaderBar>
                     <Flex align="center" justify="space-between" w="100%">

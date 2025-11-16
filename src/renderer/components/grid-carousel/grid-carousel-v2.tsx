@@ -44,7 +44,7 @@ const pageVariants: Variants = {
 
 export function GridCarousel(props: GridCarouselProps) {
     const { cards, hasNextPage, loadNextPage, onNextPage, onPrevPage, rowCount = 1, title } = props;
-    const cq = useContainerQuery({
+    const { ref, ...cq } = useContainerQuery({
         lg: 900,
         md: 600,
         sm: 360,
@@ -120,7 +120,7 @@ export function GridCarousel(props: GridCarouselProps) {
     }, [handleNextPage, handlePrevPage, isNextDisabled, isPrevDisabled, x]);
 
     return (
-        <div className={styles.gridCarousel} ref={cq.ref}>
+        <div className={styles.gridCarousel} ref={ref}>
             {cq.isCalculated && (
                 <>
                     <div className={styles.navigation}>

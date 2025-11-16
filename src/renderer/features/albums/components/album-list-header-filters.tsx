@@ -5,7 +5,6 @@ import { ListMusicFolderDropdown } from '/@/renderer/features/shared/components/
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButton } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
-import { useContainerQuery } from '/@/renderer/hooks';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
@@ -13,11 +12,9 @@ import { AlbumListSort, LibraryItem, SortOrder } from '/@/shared/types/domain-ty
 import { ItemListKey } from '/@/shared/types/types';
 
 export const AlbumListHeaderFilters = () => {
-    const cq = useContainerQuery();
-
     return (
         <Flex justify="space-between">
-            <Group gap="sm" ref={cq.ref} w="100%">
+            <Group gap="sm" w="100%">
                 <ListSortByDropdown
                     defaultSortByValue={AlbumListSort.NAME}
                     itemType={LibraryItem.ALBUM}

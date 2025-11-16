@@ -20,7 +20,7 @@ import { ItemListKey } from '/@/shared/types/types';
 export const PlaylistListHeaderFilters = () => {
     const { t } = useTranslation();
     const server = useCurrentServer();
-    const cq = useContainerQuery();
+    const { ref, ...cq } = useContainerQuery();
 
     const handleCreatePlaylistModal = () => {
         openModal({
@@ -32,7 +32,7 @@ export const PlaylistListHeaderFilters = () => {
 
     return (
         <Flex justify="space-between">
-            <Group gap="sm" ref={cq.ref} w="100%">
+            <Group gap="sm" ref={ref} w="100%">
                 <ListSortByDropdown
                     defaultSortByValue={PlaylistListSort.NAME}
                     itemType={LibraryItem.PLAYLIST}

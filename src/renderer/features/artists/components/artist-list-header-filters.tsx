@@ -18,14 +18,14 @@ import { ArtistListSort, LibraryItem, SortOrder } from '/@/shared/types/domain-t
 import { ItemListKey } from '/@/shared/types/types';
 
 export const ArtistListHeaderFilters = () => {
-    const cq = useContainerQuery();
+    const { ref, ...cq } = useContainerQuery();
     const server = useCurrentServer();
 
     const rolesQuery = useQuery(sharedQueries.roles({ query: {}, serverId: server.id }));
 
     return (
         <Flex justify="space-between">
-            <Group gap="sm" ref={cq.ref} w="100%">
+            <Group gap="sm" ref={ref} w="100%">
                 <ListSortByDropdown
                     defaultSortByValue={ArtistListSort.NAME}
                     itemType={LibraryItem.ARTIST}

@@ -15,12 +15,12 @@ import { TextInput } from '/@/shared/components/text-input/text-input';
 
 export const ActionBar = () => {
     const { t } = useTranslation();
-    const cq = useContainerQuery({ md: 300 });
+    const { ref, ...cq } = useContainerQuery({ md: 300 });
     const navigate = useNavigate();
     const { open } = useCommandPalette();
 
     return (
-        <div className={styles.container} ref={cq.ref}>
+        <div className={styles.container} ref={ref}>
             <Grid display="flex" gutter="sm" px="1rem" w="100%">
                 <Grid.Col span={6}>
                     <TextInput

@@ -39,7 +39,7 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
         albumQueries.detail({ query: { id: albumId }, serverId: server.id }),
     );
 
-    const cq = useContainerQuery();
+    const { ref, ...cq } = useContainerQuery();
     const { externalLinks, lastFM, musicBrainz } = useGeneralSettings();
     const genreRoute = useGenreRoute();
 
@@ -96,7 +96,7 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
     const mbzId = detailQuery?.data?.mbzId;
 
     return (
-        <div className={styles.contentContainer} ref={cq.ref}>
+        <div className={styles.contentContainer} ref={ref}>
             <LibraryBackgroundOverlay backgroundColor={background} />
             <div className={styles.detailContainer}>
                 <section>
@@ -198,7 +198,7 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
                     </section>
                 )}
 
-                <Stack gap="lg" mt="3rem" ref={cq.ref}>
+                <Stack gap="lg" mt="3rem">
                     {cq.height || cq.width ? (
                         <>
                             {carousels

@@ -12,11 +12,11 @@ import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/shared/types/dom
 import { ItemListKey } from '/@/shared/types/types';
 
 export const AlbumArtistListHeaderFilters = () => {
-    const cq = useContainerQuery();
+    const { ref, ...cq } = useContainerQuery();
 
     return (
         <Flex justify="space-between">
-            <Group gap="sm" ref={cq.ref} w="100%">
+            <Group gap="sm" ref={ref} w="100%">
                 <ListSortByDropdown
                     defaultSortByValue={AlbumArtistListSort.NAME}
                     itemType={LibraryItem.ALBUM_ARTIST}

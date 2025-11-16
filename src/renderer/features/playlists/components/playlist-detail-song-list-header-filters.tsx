@@ -260,7 +260,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
     );
     const isSmartPlaylist = detailQuery.data?.rules;
 
-    const cq = useContainerQuery();
+    const { ref, ...cq } = useContainerQuery();
 
     const sortByLabel =
         (server?.type &&
@@ -331,7 +331,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
 
     return (
         <Flex justify="space-between">
-            <Group gap="sm" ref={cq.ref} w="100%">
+            <Group gap="sm" ref={ref} w="100%">
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
                         <Button

@@ -13,11 +13,11 @@ import { GenreListSort, LibraryItem, SortOrder } from '/@/shared/types/domain-ty
 import { ItemListKey } from '/@/shared/types/types';
 
 export const GenreListHeaderFilters = () => {
-    const cq = useContainerQuery();
+    const { ref, ...cq } = useContainerQuery();
 
     return (
         <Flex justify="space-between">
-            <Group gap="sm" ref={cq.ref} w="100%">
+            <Group gap="sm" ref={ref} w="100%">
                 <ListSortByDropdown
                     defaultSortByValue={GenreListSort.NAME}
                     itemType={LibraryItem.GENRE}

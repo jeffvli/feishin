@@ -48,7 +48,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         artistId?: string;
     };
     const routeId = (artistId || albumArtistId) as string;
-    const cq = useContainerQuery();
+    const { ref, ...cq } = useContainerQuery();
     const handlePlayQueueAdd = usePlayQueueAdd();
     const server = useCurrentServer();
     const genrePath = useGenreRoute();
@@ -234,10 +234,10 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         detailQuery?.isLoading ||
         (server?.type === ServerType.NAVIDROME && enabledItem.topSongs && topSongsQuery?.isLoading);
 
-    if (isLoading) return <div className={styles.contentContainer} ref={cq.ref} />;
+    if (isLoading) return <div className={styles.contentContainer} ref={ref} />;
 
     return (
-        <div className={styles.contentContainer} ref={cq.ref}>
+        <div className={styles.contentContainer} ref={ref}>
             <LibraryBackgroundOverlay backgroundColor={background} />
             <div className={styles.detailContainer}>
                 <Group gap="md">
