@@ -8,8 +8,6 @@ import styles from './dummy-album-detail-route.module.css';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { SONG_ALBUM_PAGE } from '/@/renderer/features/context-menu/context-menu-items';
-import { useHandleGeneralContextMenu } from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { LibraryHeader } from '/@/renderer/features/shared/components/library-header';
@@ -96,8 +94,6 @@ const DummyAlbumDetailRoute = () => {
 
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
     const comment = detailQuery?.data?.comment;
-
-    const handleGeneralContextMenu = useHandleGeneralContextMenu(LibraryItem.SONG, SONG_ALBUM_PAGE);
 
     const handlePlay = () => {
         handlePlayQueueAdd?.({
@@ -190,7 +186,6 @@ const DummyAlbumDetailRoute = () => {
                                 icon="ellipsisHorizontal"
                                 onClick={(e) => {
                                     if (!detailQuery?.data) return;
-                                    handleGeneralContextMenu(e, [detailQuery.data!]);
                                 }}
                                 variant="subtle"
                             />

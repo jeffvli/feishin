@@ -26,9 +26,9 @@ const hasRequiredDragProperties = (
  * Gets the items that should be dragged based on the current data and selection state.
  * If the current item is already selected, drag all selected items.
  * Otherwise, select and drag only the current item.
+ * If internalState is not provided, returns the single item wrapped in an array.
  *
  * @param data - The item data to drag (Album, AlbumArtist, Artist, Playlist, or Song)
- * @param itemType - The type of library item
  * @param internalState - The item list state actions (optional)
  * @param updateSelection - Whether to update the selection state (default: true)
  * @returns Array of items that should be dragged (with original values, asserting id, itemType, and _serverId)
@@ -38,7 +38,7 @@ export const getDraggedItems = (
     internalState?: ItemListStateActions,
     updateSelection: boolean = true,
 ): ItemListStateItemWithRequiredProperties[] => {
-    if (!data || !internalState) {
+    if (!data) {
         return [];
     }
 
@@ -46,13 +46,17 @@ export const getDraggedItems = (
         return [];
     }
 
+    const draggedItem = data as ItemListStateItemWithRequiredProperties;
+
+    if (!internalState) {
+        return [draggedItem];
+    }
+
     const rowId = internalState.extractRowId(data);
 
     if (!rowId) {
-        return [];
+        return [draggedItem];
     }
-
-    const draggedItem = data as ItemListStateItemWithRequiredProperties;
 
     const previouslySelected = internalState.getSelected();
     const isDraggingSelectedItem = previouslySelected.some((selected) => {

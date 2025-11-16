@@ -1,0 +1,56 @@
+.grid-carousel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-md);
+    width: 100%;
+    margin: 0 auto;
+    container-name: grid-carousel;
+    container-type: inline-size;
+}
+
+.navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cards-to-show, 2), minmax(0, 1fr));
+    gap: var(--theme-spacing-md);
+    height: calc(var(--row-count) * (100cqw / var(--cards-to-show, 2) + 3rem));
+    overflow: hidden;
+}
+
+.page-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--theme-spacing-sm) 0;
+    cursor: grab;
+    user-select: none;
+}
+
+.page-indicator:active {
+    cursor: grabbing;
+}
+
+.indicator-track {
+    width: 20px;
+    height: 4px;
+    touch-action: none;
+    cursor: grab;
+    border-radius: 2px;
+
+    @mixin light {
+        background-color: darken(var(--theme-colors-background), 10%);
+    }
+
+    @mixin dark {
+        background-color: lighten(var(--theme-colors-background), 15%);
+    }
+}
+
+.indicator-track:active {
+    cursor: grabbing;
+}

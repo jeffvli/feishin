@@ -21,5 +21,7 @@ export const useContainerQuery = (props?: UseContainerQueryProps) => {
     const is2xl = width >= (xxl || 1920);
     const is3xl = width >= (xxxl || 2560);
 
-    return { height, is2xl, is3xl, isLg, isMd, isSm, isXl, isXs, ref, width };
+    const isCalculated = width !== 0;
+
+    return { height, is2xl, is3xl, isCalculated, isLg, isMd, isSm, isXl, isXs, ref, width };
 };

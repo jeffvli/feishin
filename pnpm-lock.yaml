@@ -173,9 +173,6 @@ importers:
       overlayscrollbars-react:
         specifier: ^0.5.6
         version: 0.5.6(overlayscrollbars@2.11.3)(react@19.1.0)
-      postcss-simple-vars:
-        specifier: ^7.0.1
-        version: 7.0.1(postcss@8.5.3)
       qs:
         specifier: ^6.14.0
         version: 6.14.0
@@ -324,6 +321,9 @@ importers:
       postcss-preset-mantine:
         specifier: ^1.17.0
         version: 1.17.0(postcss@8.5.3)
+      postcss-simple-vars:
+        specifier: ^7.0.1
+        version: 7.0.1(postcss@8.5.3)
       prettier:
         specifier: ^3.5.3
         version: 3.5.3

@@ -1,24 +1,14 @@
-import { ColDef, RowDoubleClickedEvent } from '@ag-grid-community/core';
+import { RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router';
-import { createSearchParams, Link } from 'react-router';
+import { createSearchParams, generatePath, Link, useParams } from 'react-router';
 
 import styles from './album-artist-detail-content.module.css';
 
-import { MemoizedSwiperGridCarousel } from '/@/renderer/components/grid-carousel/grid-carousel';
-import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
-import { albumQueries } from '/@/renderer/features/albums/api/album-api';
+import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
-import {
-    ARTIST_CONTEXT_MENU_ITEMS,
-    SONG_CONTEXT_MENU_ITEMS,
-} from '/@/renderer/features/context-menu/context-menu-items';
-import {
-    useHandleGeneralContextMenu,
-    useHandleTableContextMenu,
-} from '/@/renderer/features/context-menu/hooks/use-handle-context-menu';
+import { AlbumArtistGridCarousel } from '/@/renderer/features/artists/components/album-artist-grid-carousel';
 import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
@@ -34,11 +24,11 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Grid } from '/@/shared/components/grid/grid';
 import { Group } from '/@/shared/components/group/group';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
 import {
-    Album,
     AlbumArtist,
     AlbumListSort,
     LibraryItem,
@@ -46,7 +36,7 @@ import {
     ServerType,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { CardRow, Play, TableColumn } from '/@/shared/types/types';
+import { Play } from '/@/shared/types/types';
 
 interface AlbumArtistDetailContentProps {
     background?: string;
@@ -101,40 +91,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         artistName: detailQuery?.data?.name || '',
     })}`;
 
-    const recentAlbumsQuery = useQuery(
-        albumQueries.list({
-            options: {
-                enabled: enabledItem.recentAlbums,
-            },
-            query: {
-                artistIds: [routeId],
-                compilation: false,
-                limit: 15,
-                sortBy: AlbumListSort.RELEASE_DATE,
-                sortOrder: SortOrder.DESC,
-                startIndex: 0,
-            },
-            serverId: server?.id,
-        }),
-    );
-
-    const compilationAlbumsQuery = useQuery(
-        albumQueries.list({
-            options: {
-                enabled: enabledItem.compilations && server?.type !== ServerType.SUBSONIC,
-            },
-            query: {
-                artistIds: [routeId],
-                compilation: true,
-                limit: 15,
-                sortBy: AlbumListSort.RELEASE_DATE,
-                sortOrder: SortOrder.DESC,
-                startIndex: 0,
-            },
-            serverId: server?.id,
-        }),
-    );
-
     const topSongsQuery = useQuery(
         artistsQueries.topSongs({
             options: {
@@ -148,68 +104,18 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         }),
     );
 
-    const topSongsColumnDefs: ColDef[] = useMemo(
-        () =>
-            getColumnDefs([
-                { column: TableColumn.ROW_INDEX, width: 0 },
-                { column: TableColumn.TITLE_COMBINED, width: 0 },
-                { column: TableColumn.DURATION, width: 0 },
-                { column: TableColumn.ALBUM, width: 0 },
-                { column: TableColumn.YEAR, width: 0 },
-                { column: TableColumn.PLAY_COUNT, width: 0 },
-                { column: TableColumn.USER_FAVORITE, width: 0 },
-            ]),
-        [],
-    );
-
-    const cardRows: Record<string, CardRow<Album>[] | CardRow<AlbumArtist>[]> = {
-        album: [
-            {
-                property: 'name',
-                route: {
-                    route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-                    slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
-                },
-            },
-            {
-                arrayProperty: 'name',
-                property: 'albumArtists',
-                route: {
-                    route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
-                    slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
-                },
-            },
-        ],
-        albumArtist: [
-            {
-                property: 'name',
-                route: {
-                    route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
-                    slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
-                },
-            },
-        ],
-    };
-
-    const cardRoutes = {
-        album: {
-            route: AppRoute.LIBRARY_ALBUMS_DETAIL,
-            slugs: [{ idProperty: 'id', slugProperty: 'albumId' }],
-        },
-        albumArtist: {
-            route: AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
-            slugs: [{ idProperty: 'id', slugProperty: 'albumArtistId' }],
-        },
-    };
-
     const carousels = useMemo(() => {
         return [
             {
-                data: recentAlbumsQuery?.data?.items,
-                isHidden: !recentAlbumsQuery?.data?.items?.length || !enabledItem.recentAlbums,
+                isHidden: !enabledItem.recentAlbums || !routeId,
                 itemType: LibraryItem.ALBUM,
-                loading: recentAlbumsQuery?.isLoading || recentAlbumsQuery.isFetching,
                 order: itemOrder.recentAlbums,
+                query: {
+                    artistIds: routeId ? [routeId] : undefined,
+                    compilation: false,
+                },
+                sortBy: AlbumListSort.RELEASE_DATE,
+                sortOrder: SortOrder.DESC,
                 title: (
                     <Group align="flex-end">
                         <TextTitle fw={700} order={2}>
@@ -230,14 +136,16 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                 uniqueId: 'recentReleases',
             },
             {
-                data: compilationAlbumsQuery?.data?.items,
                 isHidden:
-                    !compilationAlbumsQuery?.data?.items?.length ||
-                    !enabledItem.compilations ||
-                    server?.type === ServerType.SUBSONIC,
+                    !enabledItem.compilations || server?.type === ServerType.SUBSONIC || !routeId,
                 itemType: LibraryItem.ALBUM,
-                loading: compilationAlbumsQuery?.isLoading || compilationAlbumsQuery.isFetching,
                 order: itemOrder.compilations,
+                query: {
+                    artistIds: routeId ? [routeId] : undefined,
+                    compilation: true,
+                },
+                sortBy: AlbumListSort.RELEASE_DATE,
+                sortOrder: SortOrder.DESC,
                 title: (
                     <TextTitle fw={700} order={2}>
                         {t('page.albumArtistDetail.appearsOn', { postProcess: 'sentenceCase' })}
@@ -246,7 +154,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                 uniqueId: 'compilationAlbums',
             },
             {
-                data: detailQuery?.data?.similarArtists || [],
+                data: (detailQuery?.data?.similarArtists || []) as AlbumArtist[],
                 isHidden: !detailQuery?.data?.similarArtists || !enabledItem.similarArtists,
                 itemType: LibraryItem.ALBUM_ARTIST,
                 order: itemOrder.similarArtists,
@@ -262,9 +170,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         ];
     }, [
         artistDiscographyLink,
-        compilationAlbumsQuery?.data?.items,
-        compilationAlbumsQuery.isFetching,
-        compilationAlbumsQuery?.isLoading,
         detailQuery?.data?.similarArtists,
         enabledItem.compilations,
         enabledItem.recentAlbums,
@@ -272,9 +177,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         itemOrder.compilations,
         itemOrder.recentAlbums,
         itemOrder.similarArtists,
-        recentAlbumsQuery?.data?.items,
-        recentAlbumsQuery.isFetching,
-        recentAlbumsQuery?.isLoading,
+        routeId,
         server?.type,
         t,
     ]);
@@ -291,16 +194,8 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         });
     };
 
-    const handleContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
-
     const handleRowDoubleClick = (e: RowDoubleClickedEvent<QueueSong>) => {
         if (!e.data || !topSongsQuery?.data) return;
-
-        handlePlayQueueAdd?.({
-            byData: topSongsQuery?.data?.items || [],
-            initialSongId: e.data.id,
-            playType: playButtonBehavior,
-        });
     };
 
     const createFavoriteMutation = useCreateFavorite({});
@@ -311,7 +206,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
 
         if (detailQuery.data.userFavorite) {
             deleteFavoriteMutation.mutate({
-                apiClientProps: { serverId: detailQuery.data.serverId },
+                apiClientProps: { serverId: detailQuery.data._serverId },
                 query: {
                     id: [detailQuery.data.id],
                     type: LibraryItem.ALBUM_ARTIST,
@@ -319,7 +214,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
             });
         } else {
             createFavoriteMutation.mutate({
-                apiClientProps: { serverId: detailQuery.data.serverId },
+                apiClientProps: { serverId: detailQuery.data._serverId },
                 query: {
                     id: [detailQuery.data.id],
                     type: LibraryItem.ALBUM_ARTIST,
@@ -329,17 +224,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
     };
 
     const albumCount = detailQuery?.data?.albumCount;
-    const artistContextItems =
-        (albumCount ?? 1) > 0
-            ? ARTIST_CONTEXT_MENU_ITEMS
-            : ARTIST_CONTEXT_MENU_ITEMS.filter((item) => !item.id.toLowerCase().includes('play'));
-
-    const handleGeneralContextMenu = useHandleGeneralContextMenu(
-        LibraryItem.ALBUM_ARTIST,
-        artistContextItems,
-    );
-
-    const topSongs = topSongsQuery?.data?.items?.slice(0, 10);
 
     const biography = useMemo(() => {
         const bio = detailQuery?.data?.biography;
@@ -384,7 +268,7 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             icon="ellipsisHorizontal"
                             onClick={(e) => {
                                 if (!detailQuery?.data) return;
-                                handleGeneralContextMenu(e, [detailQuery.data!]);
+                                // handleGeneralContextMenu(e, [detailQuery.data!]);
                             }}
                             size="lg"
                             variant="transparent"
@@ -512,28 +396,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                                         </Button>
                                     </Group>
                                 </Group>
-                                <VirtualTable
-                                    autoFitColumns
-                                    autoHeight
-                                    columnDefs={topSongsColumnDefs}
-                                    context={{
-                                        itemType: LibraryItem.SONG,
-                                    }}
-                                    deselectOnClickOutside
-                                    enableCellChangeFlash={false}
-                                    getRowId={(data) => data.data.uniqueId}
-                                    onCellContextMenu={handleContextMenu}
-                                    onRowDoubleClicked={handleRowDoubleClick}
-                                    rowData={topSongs}
-                                    rowHeight={60}
-                                    rowSelection="multiple"
-                                    shouldUpdateSong
-                                    stickyHeader
-                                    suppressCellFocus
-                                    suppressHorizontalScroll
-                                    suppressLoadingOverlay
-                                    suppressRowDrag
-                                />
                             </section>
                         </Grid.Col>
                     ) : null}
@@ -548,28 +410,30 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             >
                                 <section>
                                     <Stack gap="xl">
-                                        <MemoizedSwiperGridCarousel
-                                            cardRows={
-                                                cardRows[carousel.itemType as keyof typeof cardRows]
-                                            }
-                                            data={carousel.data}
-                                            isLoading={carousel.loading}
-                                            itemType={carousel.itemType}
-                                            route={
-                                                cardRoutes[
-                                                    carousel.itemType as keyof typeof cardRoutes
-                                                ]
-                                            }
-                                            swiperProps={{
-                                                grid: {
-                                                    rows: 2,
-                                                },
-                                            }}
-                                            title={{
-                                                label: carousel.title,
-                                            }}
-                                            uniqueId={carousel.uniqueId}
-                                        />
+                                        {carousel.itemType === LibraryItem.ALBUM ? (
+                                            'query' in carousel &&
+                                            carousel.query &&
+                                            carousel.sortBy &&
+                                            carousel.sortOrder ? (
+                                                <Suspense fallback={<Spinner container />}>
+                                                    <AlbumInfiniteCarousel
+                                                        query={carousel.query}
+                                                        rowCount={1}
+                                                        sortBy={carousel.sortBy}
+                                                        sortOrder={carousel.sortOrder}
+                                                        title={carousel.title}
+                                                    />
+                                                </Suspense>
+                                            ) : null
+                                        ) : carousel.itemType === LibraryItem.ALBUM_ARTIST ? (
+                                            'data' in carousel && carousel.data ? (
+                                                <AlbumArtistGridCarousel
+                                                    data={carousel.data}
+                                                    rowCount={1}
+                                                    title={carousel.title}
+                                                />
+                                            ) : null
+                                        ) : null}
                                     </Stack>
                                 </section>
                             </Grid.Col>

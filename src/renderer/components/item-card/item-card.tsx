@@ -460,12 +460,14 @@ const PosterItemCard = ({
             },
             itemType,
             onDragStart: () => {
-                if (!data || !internalState) {
+                if (!data) {
                     return;
                 }
 
                 const draggedItems = getDraggedItems(data, internalState);
-                internalState.setDragging(draggedItems);
+                if (internalState) {
+                    internalState.setDragging(draggedItems);
+                }
             },
             onDrop: () => {
                 if (internalState) {

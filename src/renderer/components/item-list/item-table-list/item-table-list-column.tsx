@@ -102,13 +102,14 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
             },
             itemType: props.itemType,
             onDragStart: () => {
-                if (!item || !isDataRow || !props.internalState) {
+                if (!item || !isDataRow) {
                     return;
                 }
 
                 const draggedItems = getDraggedItems(item as any, props.internalState);
-
-                props.internalState.setDragging(draggedItems);
+                if (props.internalState) {
+                    props.internalState.setDragging(draggedItems);
+                }
             },
             onDrop: () => {
                 if (props.internalState) {
