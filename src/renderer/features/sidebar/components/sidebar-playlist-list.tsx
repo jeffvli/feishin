@@ -110,7 +110,7 @@ const PlaylistRowButton = ({ name, onPlay, to, ...props }: PlaylistRowButtonProp
 
                 openContextModal({
                     innerProps: modalProps,
-                    modal: 'addToPlaylist',
+                    modalKey: 'addToPlaylist',
                     size: 'lg',
                     title: t('form.addToPlaylist.title', { postProcess: 'titleCase' }),
                 });
