@@ -1,3 +1,4 @@
+import { useInView } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useWindowSettings } from '/@/renderer/store/settings.store';
@@ -31,6 +32,15 @@ export const useStickyTableGroupRows = ({
 }) => {
     const { windowBarStyle } = useWindowSettings();
     const [stickyGroupIndex, setStickyGroupIndex] = useState<null | number>(null);
+
+    const topMargin =
+        windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS
+            ? '-130px'
+            : '-100px';
+
+    const isTableInView = useInView(containerRef, {
+        margin: `${topMargin} 0px 0px 0px`,
+    });
 
     const stickyTop = useMemo(() => {
         // If sticky header is showing, position group row below it with 1px offset to avoid conflict
@@ -169,8 +179,12 @@ export const useStickyTableGroupRows = ({
         stickyTop,
     ]);
 
+    const shouldShowStickyGroupRow = useMemo(() => {
+        return enabled && stickyGroupIndex !== null && isTableInView;
+    }, [enabled, stickyGroupIndex, isTableInView]);
+
     return {
-        shouldShowStickyGroupRow: stickyGroupIndex !== null,
+        shouldShowStickyGroupRow,
         stickyGroupIndex,
         stickyTop,
     };
