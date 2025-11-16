@@ -59,7 +59,7 @@ interface VirtualizedGridListProps {
     onScroll?: ItemGridListProps['onScroll'];
     onScrollEnd?: ItemGridListProps['onScrollEnd'];
     outerRef: RefObject<any>;
-    ref: RefObject<FixedSizeList<GridItemProps>>;
+    ref: RefObject<FixedSizeList<GridItemProps> | null>;
     rows?: ItemCardProps['rows'];
     tableMeta: null | {
         columnCount: number;
