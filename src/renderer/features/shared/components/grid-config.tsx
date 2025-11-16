@@ -46,9 +46,20 @@ type GridConfigProps = {
     }[];
     gridRowsData: { label: string; value: string }[];
     listKey: ItemListKey;
+    optionsConfig?: {
+        [key: string]: {
+            disabled?: boolean;
+            hidden?: boolean;
+        };
+    };
 };
 
-export const GridConfig = ({ extraOptions, gridRowsData, listKey }: GridConfigProps) => {
+export const GridConfig = ({
+    extraOptions,
+    gridRowsData,
+    listKey,
+    optionsConfig,
+}: GridConfigProps) => {
     const { t } = useTranslation();
 
     const list = useSettingsStore((state) => state.lists[listKey]) as ItemListSettings;
@@ -56,7 +67,7 @@ export const GridConfig = ({ extraOptions, gridRowsData, listKey }: GridConfigPr
     const { setList } = useSettingsStoreActions();
 
     const options = useMemo(() => {
-        return [
+        const allOptions = [
             {
                 component: (
                     <SegmentedControl
@@ -214,7 +225,24 @@ export const GridConfig = ({ extraOptions, gridRowsData, listKey }: GridConfigPr
 
             ...(extraOptions || []),
         ];
-    }, [list, t, grid, extraOptions, setList, listKey]);
+
+        // Filter and apply config (hidden/disabled)
+        return allOptions
+            .map((option) => {
+                const config = optionsConfig?.[option.id];
+                if (config?.hidden) {
+                    return null;
+                }
+                return {
+                    ...option,
+                    disabled: config?.disabled || false,
+                };
+            })
+            .filter(
+                (option): option is typeof allOptions[0] & { disabled?: boolean } =>
+                    option !== null,
+            );
+    }, [list, t, grid, extraOptions, optionsConfig, setList, listKey]);
 
     return (
         <>

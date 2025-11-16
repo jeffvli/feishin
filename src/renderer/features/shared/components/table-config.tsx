@@ -11,7 +11,7 @@ import {
 import { disableNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/disable-native-drag-preview';
 import { useDebouncedState } from '@mantine/hooks';
 import clsx from 'clsx';
-import Fuse from 'fuse.js';
+import Fuse, { type FuseResultMatch } from 'fuse.js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -45,17 +45,28 @@ interface TableConfigProps {
         label: string;
     }[];
     listKey: ItemListKey;
+    optionsConfig?: {
+        [key: string]: {
+            disabled?: boolean;
+            hidden?: boolean;
+        };
+    };
     tableColumnsData: { label: string; value: string }[];
 }
 
-export const TableConfig = ({ extraOptions, listKey, tableColumnsData }: TableConfigProps) => {
+export const TableConfig = ({
+    extraOptions,
+    listKey,
+    optionsConfig,
+    tableColumnsData,
+}: TableConfigProps) => {
     const { t } = useTranslation();
 
     const list = useSettingsStore((state) => state.lists[listKey]) as ItemListSettings;
     const { setList } = useSettingsStoreActions();
 
     const options = useMemo(() => {
-        return [
+        const allOptions = [
             {
                 component: (
                     <SegmentedControl
@@ -222,7 +233,18 @@ export const TableConfig = ({ extraOptions, listKey, tableColumnsData }: TableCo
 
             ...(extraOptions || []),
         ];
-    }, [extraOptions, listKey, setList, t, list]);
+
+        // Filter and apply config (hidden/disabled)
+        return allOptions
+            .map((option) => {
+                const config = optionsConfig?.[option.id];
+                if (config?.hidden) {
+                    return null;
+                }
+                return option;
+            })
+            .filter((option): option is NonNullable<typeof option> => option !== null);
+    }, [extraOptions, listKey, optionsConfig, setList, t, list]);
 
     return (
         <>
@@ -497,14 +519,18 @@ const TableColumnConfig = ({
     );
 };
 
-const DragHandle = ({ dragHandleRef }: { dragHandleRef: React.RefObject<HTMLButtonElement> }) => {
+const DragHandle = ({
+    dragHandleRef,
+}: {
+    dragHandleRef: React.RefObject<HTMLButtonElement | null>;
+}) => {
     return (
         <ActionIcon
             icon="dragVertical"
             iconProps={{
                 size: 'md',
             }}
-            ref={dragHandleRef}
+            ref={dragHandleRef as React.RefObject<HTMLButtonElement>}
             size="xs"
             style={{ cursor: 'grab' }}
             variant="default"
@@ -542,7 +568,7 @@ const TableColumnItem = memo(
         handleRowWidth: (item: ItemTableListColumnConfig, number: number | string) => void;
         item: ItemTableListColumnConfig;
         label: string;
-        matches: null | readonly Fuse.FuseResultMatch[];
+        matches: null | readonly FuseResultMatch[];
     }) => {
         const { t } = useTranslation();
         const ref = useRef<HTMLDivElement>(null);

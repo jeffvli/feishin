@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
@@ -77,8 +77,30 @@ export const ListConfigBooleanControl = ({
     );
 };
 
+export interface ListConfigMenuDisplayTypeConfig {
+    disabled?: boolean;
+    hidden?: boolean;
+    value: ListDisplayType;
+}
+
+export interface ListConfigMenuOptionConfig {
+    disabled?: boolean;
+    hidden?: boolean;
+}
+
+export interface ListConfigMenuOptionsConfig {
+    grid?: {
+        [key: string]: ListConfigMenuOptionConfig;
+    };
+    table?: {
+        [key: string]: ListConfigMenuOptionConfig;
+    };
+}
+
 interface ListConfigMenuProps {
+    displayTypes?: ListConfigMenuDisplayTypeConfig[];
     listKey: ItemListKey;
+    optionsConfig?: ListConfigMenuOptionsConfig;
     tableColumnsData: { label: string; value: string }[];
 }
 
@@ -89,6 +111,29 @@ export const ListConfigMenu = (props: ListConfigMenuProps) => {
     ) as ListDisplayType;
     const { setList } = useSettingsStoreActions();
     const [isOpen, handlers] = useDisclosure(false);
+
+    // Filter display types based on config
+    const availableDisplayTypes = useMemo(() => {
+        if (!props.displayTypes) {
+            return DISPLAY_TYPES;
+        }
+
+        const filtered = DISPLAY_TYPES.map((type) => {
+            const config = props.displayTypes?.find((c) => c.value === type.value);
+            if (config?.hidden) {
+                return null;
+            }
+            const result: (typeof DISPLAY_TYPES)[0] & { disabled?: boolean } = {
+                ...type,
+            };
+            if (config?.disabled) {
+                result.disabled = true;
+            }
+            return result;
+        }).filter((type): type is NonNullable<typeof type> => type !== null);
+
+        return filtered;
+    }, [props.displayTypes]);
 
     return (
         <>
@@ -101,9 +146,7 @@ export const ListConfigMenu = (props: ListConfigMenuProps) => {
             >
                 <Stack>
                     <SegmentedControl
-                        data={DISPLAY_TYPES.map((type) => ({
-                            ...type,
-                        }))}
+                        data={availableDisplayTypes}
                         fullWidth
                         onChange={(value) => {
                             setList(props.listKey, {
@@ -122,15 +165,28 @@ export const ListConfigMenu = (props: ListConfigMenuProps) => {
 
 const Config = ({
     displayType,
+    optionsConfig,
     tableColumnsData,
     ...props
 }: ListConfigMenuProps & { displayType: ListDisplayType }) => {
     switch (displayType) {
         case ListDisplayType.GRID:
-            return <GridConfig {...props} gridRowsData={tableColumnsData} />;
+            return (
+                <GridConfig
+                    {...props}
+                    gridRowsData={tableColumnsData}
+                    optionsConfig={optionsConfig?.grid}
+                />
+            );
 
         case ListDisplayType.TABLE:
-            return <TableConfig {...props} tableColumnsData={tableColumnsData} />;
+            return (
+                <TableConfig
+                    {...props}
+                    optionsConfig={optionsConfig?.table}
+                    tableColumnsData={tableColumnsData}
+                />
+            );
 
         default:
             return null;
