@@ -706,7 +706,7 @@ export const pickTableColumns = (options: {
             pinned = 'right';
         }
 
-        let align: 'center' | 'end' | 'start' = 'start';
+        let align: 'center' | 'end' | 'start' = column.align;
 
         if (alignCenterColumns.includes(column.value)) {
             align = 'center';
@@ -738,7 +738,7 @@ export const pickGridRows = (
 ): ItemGridListRowConfig[] => {
     const columns = pickTableColumns(options);
     return columns.map((column) => ({
-        align: column.align,
+        align: 'start',
         id: column.id as TableColumn,
         isEnabled: column.isEnabled,
     }));
