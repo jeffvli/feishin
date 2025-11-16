@@ -18,7 +18,6 @@
     display: grid;
     grid-template-columns: repeat(var(--cards-to-show, 2), minmax(0, 1fr));
     gap: var(--theme-spacing-md);
-    height: calc(var(--row-count) * (100cqw / var(--cards-to-show, 2) + 3rem));
     overflow: hidden;
 }
 
