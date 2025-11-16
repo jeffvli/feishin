@@ -11,3 +11,9 @@
     --os-track-border-radius: 0;
     --os-handle-border-radius: 0;
 }
+
+.feishin.os-scrollbar,
+.feishin .os-scrollbar-track,
+.feishin .os-scrollbar-handle {
+    z-index: 200;
+}

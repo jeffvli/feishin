@@ -19,3 +19,15 @@
         -webkit-app-region: no-drag;
     }
 }
+
+.scroll-area :global(.os-scrollbar) {
+    z-index: 200;
+}
+
+.scroll-area :global(.os-scrollbar-track) {
+    z-index: 200;
+}
+
+.scroll-area :global(.os-scrollbar-handle) {
+    z-index: 200;
+}
