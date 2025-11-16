@@ -1,16 +1,13 @@
 import { RowDoubleClickedEvent } from '@ag-grid-community/core';
 import { AgGridReact } from '@ag-grid-community/react';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { getColumnDefs, VirtualTable } from '/@/renderer/components/virtual-table';
 import { ErrorFallback } from '/@/renderer/features/action-required/components/error-fallback';
-import { SONG_CONTEXT_MENU_ITEMS } from '/@/renderer/features/context-menu/context-menu-items';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
-import { usePlayButtonBehavior, useTableSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
-import { LibraryItem, Song } from '/@/shared/types/domain-types';
+import { Song } from '/@/shared/types/domain-types';
 
 export type SimilarSongsListProps = {
     count?: number;
@@ -56,26 +53,6 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
     return songQuery.isLoading ? (
         <Spinner container size={25} />
     ) : (
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
-            {/* <VirtualTable
-                autoFitColumns={tableConfig.autoFit}
-                columnDefs={columnDefs}
-                context={{
-                    count,
-                    itemType: LibraryItem.SONG,
-                    onCellContextMenu,
-                    song,
-                }}
-                deselectOnClickOutside={fullScreen}
-                getRowId={(data) => data.data.uniqueId}
-                onCellContextMenu={onCellContextMenu}
-                onCellDoubleClicked={handleRowDoubleClick}
-                ref={tableRef}
-                rowBuffer={50}
-                rowData={songQuery.data ?? []}
-                rowHeight={tableConfig.rowHeight || 40}
-                shouldUpdateSong
-            /> */}
-        </ErrorBoundary>
+        <ErrorBoundary FallbackComponent={ErrorFallback}></ErrorBoundary>
     );
 };

@@ -6,15 +6,14 @@ import { useLocation } from 'react-router';
 
 import styles from './full-screen-player.module.css';
 
-import { TableConfigDropdown } from '/@/renderer/components/virtual-table';
 import { FullScreenPlayerImage } from '/@/renderer/features/player/components/full-screen-player-image';
 import { FullScreenPlayerQueue } from '/@/renderer/features/player/components/full-screen-player-queue';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import {
-    usePlayerSong,
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
     useLyricsSettings,
+    usePlayerSong,
     useSettingsStore,
     useSettingsStoreActions,
     useWindowSettings,
@@ -348,7 +347,6 @@ const Controls = ({ isPageHovered }: ControlsProps) => {
                         </Option.Control>
                     </Option>
                     <Divider my="sm" />
-                    <TableConfigDropdown type="fullScreen" />
                 </Popover.Dropdown>
             </Popover>
         </Group>

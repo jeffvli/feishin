@@ -3,9 +3,12 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link, useParams, useSearchParams } from 'react-router';
 
-import { ALBUM_ARTIST_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
+import {
+    ALBUM_ARTIST_TABLE_COLUMNS,
+    ALBUM_TABLE_COLUMNS,
+    SONG_TABLE_COLUMNS,
+} from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
-import { ALBUM_TABLE_COLUMNS, SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { FilterBar } from '/@/renderer/features/shared/components/filter-bar';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';

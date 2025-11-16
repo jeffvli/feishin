@@ -1,7 +1,7 @@
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
 
-import { PLAYLIST_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
+import { PLAYLIST_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { ListFilters } from '/@/renderer/features/shared/components/list-filters';

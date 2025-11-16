@@ -1,32 +1,25 @@
-import type { AgGridReact as AgGridReactType } from '@ag-grid-community/react/lib/agGridReact';
-
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import debounce from 'lodash/debounce';
-import { ChangeEvent, MouseEvent, MutableRefObject, useCallback } from 'react';
+import { ChangeEvent, MouseEvent, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 
 import i18n from '/@/i18n/i18n';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { SONG_TABLE_COLUMNS } from '/@/renderer/components/virtual-table';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { openUpdatePlaylistModal } from '/@/renderer/features/playlists/components/update-playlist-form';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
-import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { MoreButton } from '/@/renderer/features/shared/components/more-button';
 import { OrderToggleButton } from '/@/renderer/features/shared/components/order-toggle-button';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
-    PersistedTableColumn,
     useCurrentServer,
     usePlaylistDetailStore,
     useSetPlaylistDetailFilters,
-    useSetPlaylistDetailTable,
     useSetPlaylistStore,
-    useSetPlaylistTablePagination,
 } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
@@ -242,7 +235,7 @@ const FILTERS = {
 interface PlaylistDetailSongListHeaderFiltersProps {
     handlePlay: (playType: Play) => void;
     handleToggleShowQueryBuilder: () => void;
-    tableRef: MutableRefObject<AgGridReactType | null>;
+    tableRef: any;
 }
 
 export const PlaylistDetailSongListHeaderFilters = ({
@@ -269,107 +262,37 @@ export const PlaylistDetailSongListHeaderFilters = ({
 
     const cq = useContainerQuery();
 
-    const setPagination = useSetPlaylistTablePagination();
-    const setTable = useSetPlaylistDetailTable();
-
     const sortByLabel =
         (server?.type &&
             FILTERS[server.type as keyof typeof FILTERS].find((f) => f.value === sortBy)?.name) ||
         'Unknown';
 
-    const handleItemSize = (e: number) => {
-        setTable({ rowHeight: e });
-    };
-
-    const debouncedHandleItemSize = debounce(handleItemSize, 20);
-
     const handleFilterChange = useCallback(async () => {
-        tableRef.current?.api.redrawRows();
-        tableRef.current?.api.ensureIndexVisible(0, 'top');
-
-        if (page.display === ListDisplayType.TABLE_PAGINATED) {
-            setPagination({ data: { currentPage: 0 } });
-        }
-    }, [tableRef, page.display, setPagination]);
+        // tableRef.current?.api.redrawRows();
+        // tableRef.current?.api.ensureIndexVisible(0, 'top');
+        // if (page.display === ListDisplayType.TABLE) {
+        //     setPagination({ data: { currentPage: 0 } });
+        // }
+    }, []);
 
     const handleRefresh = () => {
         queryClient.invalidateQueries({
             queryKey: queryKeys.playlists.songList(server?.id || '', playlistId),
         });
-        handleFilterChange();
     };
 
-    const handleSetSortBy = useCallback(
-        (e: MouseEvent<HTMLButtonElement>) => {
-            if (!e.currentTarget?.value || !server?.type) return;
+    const handleSetSortBy = useCallback((e: MouseEvent<HTMLButtonElement>) => {}, []);
 
-            const newSortOrder = FILTERS[server.type as keyof typeof FILTERS].find(
-                (f) => f.value === e.currentTarget.value,
-            )?.defaultOrder;
+    const handleToggleSortOrder = useCallback(() => {}, [
+        sortOrder,
+        handleFilterChange,
+        playlistId,
+        setFilter,
+    ]);
 
-            setFilter(playlistId, {
-                sortBy: e.currentTarget.value as SongListSort,
-                sortOrder: newSortOrder || SortOrder.ASC,
-            });
+    const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {}, 500);
 
-            handleFilterChange();
-        },
-        [handleFilterChange, playlistId, server?.type, setFilter],
-    );
-
-    const handleToggleSortOrder = useCallback(() => {
-        const newSortOrder = sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
-        setFilter(playlistId, { sortOrder: newSortOrder });
-        handleFilterChange();
-    }, [sortOrder, handleFilterChange, playlistId, setFilter]);
-
-    const handleSearch = debounce((e: ChangeEvent<HTMLInputElement>) => {
-        setFilter(playlistId, { searchTerm: e.target.value });
-        handleFilterChange();
-    }, 500);
-
-    const handleSetViewType = useCallback(
-        (displayType: ListDisplayType) => {
-            setPage({ detail: { ...page, display: displayType } });
-        },
-        [page, setPage],
-    );
-
-    const handleTableColumns = (values: string[]) => {
-        const existingColumns = page.table.columns;
-
-        if (values.length === 0) {
-            return setTable({
-                columns: [],
-            });
-        }
-
-        // If adding a column
-        if (values.length > existingColumns.length) {
-            const newColumn = {
-                column: values[values.length - 1],
-                width: 100,
-            } as PersistedTableColumn;
-
-            setTable({ columns: [...existingColumns, newColumn] });
-        } else {
-            // If removing a column
-            const removed = existingColumns.filter((column) => !values.includes(column.column));
-            const newColumns = existingColumns.filter((column) => !removed.includes(column));
-
-            setTable({ columns: newColumns });
-        }
-
-        return tableRef.current?.api.sizeColumnsToFit();
-    };
-
-    const handleAutoFitColumns = (autoFitColumns: boolean) => {
-        setTable({ autoFit: autoFitColumns });
-
-        if (autoFitColumns) {
-            tableRef.current?.api.sizeColumnsToFit();
-        }
-    };
+    const handleSetViewType = useCallback((displayType: ListDisplayType) => {}, [page, setPage]);
 
     const deletePlaylistMutation = useDeletePlaylist({});
 
@@ -501,20 +424,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 </DropdownMenu>
                 <SearchInput defaultValue={searchTerm} onChange={handleSearch} />
             </Group>
-            <Group>
-                <ListConfigMenu
-                    autoFitColumns={page.table.autoFit}
-                    disabledViewTypes={[ListDisplayType.GRID, ListDisplayType.LIST]}
-                    displayType={page.display}
-                    itemSize={page.table.rowHeight}
-                    onChangeAutoFitColumns={handleAutoFitColumns}
-                    onChangeDisplayType={handleSetViewType}
-                    onChangeItemSize={debouncedHandleItemSize}
-                    onChangeTableColumns={handleTableColumns}
-                    tableColumns={page.table.columns.map((column) => column.column)}
-                    tableColumnsData={SONG_TABLE_COLUMNS}
-                />
-            </Group>
+            <Group></Group>
         </Flex>
     );
 };

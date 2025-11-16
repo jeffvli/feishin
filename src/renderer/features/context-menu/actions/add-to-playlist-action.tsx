@@ -259,6 +259,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 resourceType: itemType,
             },
             modal: 'addToPlaylist',
+            size: 'lg',
             title: t('page.contextMenu.addToPlaylist', { postProcess: 'sentenceCase' }),
         });
     }, [itemType, items, t]);
