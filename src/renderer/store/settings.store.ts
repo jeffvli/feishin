@@ -218,7 +218,7 @@ const GeneralSettingsSchema = z.object({
     artistBackgroundBlur: z.number(),
     artistItems: z.array(SortableItemSchema(ArtistItemSchema)),
     buttonSize: z.number(),
-    disabledContextMenu: z.record(z.boolean()),
+    disabledContextMenu: z.record(z.string(), z.boolean()),
     doubleClickQueueAll: z.boolean(),
     externalLinks: z.boolean(),
     followSystemTheme: z.boolean(),
@@ -655,6 +655,35 @@ const initialState: SettingsState = {
         globalMediaHotkeys: false,
     },
     lists: {
+        ['albumDetail']: {
+            display: ListDisplayType.TABLE,
+            grid: {
+                itemGap: 'md',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+                rows: [],
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                autoFitColumns: true,
+                columns: pickTableColumns({
+                    autoSizeColumns: [],
+                    columns: SONG_TABLE_COLUMNS,
+                    enabledColumns: [
+                        TableColumn.TRACK_NUMBER,
+                        TableColumn.TITLE,
+                        TableColumn.DURATION,
+                        TableColumn.USER_FAVORITE,
+                    ],
+                }),
+                enableAlternateRowColors: false,
+                enableHorizontalBorders: false,
+                enableRowHoverHighlight: false,
+                enableVerticalBorders: false,
+                size: 'compact',
+            },
+        },
         fullScreen: {
             display: ListDisplayType.TABLE,
             grid: {

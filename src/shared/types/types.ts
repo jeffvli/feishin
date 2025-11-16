@@ -20,11 +20,9 @@ export enum ItemListKey {
     ARTIST = LibraryItem.ARTIST,
     FULL_SCREEN = 'fullScreen',
     GENRE = LibraryItem.GENRE,
-    NOW_PLAYING = 'nowPlaying',
     PLAYLIST = LibraryItem.PLAYLIST,
     PLAYLIST_SONG = LibraryItem.PLAYLIST_SONG,
     QUEUE_SONG = LibraryItem.QUEUE_SONG,
-    SIDE_DRAWER_QUEUE = 'sideDrawerQueue',
     SIDE_QUEUE = 'sideQueue',
     SONG = LibraryItem.SONG,
 }

@@ -1,0 +1,37 @@
+.simple-item-table-container {
+    width: 100%;
+}
+
+/* .alternate-row-even {
+    background-color: initial;
+}
+
+.alternate-row-odd {
+    @mixin dark {
+        background-color: darken(var(--theme-colors-background), 30%);
+    }
+
+    @mixin light {
+        background-color: darken(var(--theme-colors-background), 2%);
+    }
+} */
+
+/* .row-hover {
+    cursor: pointer;
+}
+
+.row-hover:hover {
+    background-color: var(--theme-colors-surface);
+    opacity: 0.7;
+} */
+
+.row-selected {
+}
+
+/* .with-horizontal-border {
+    border-bottom: 1px solid var(--theme-colors-border);
+}
+
+.with-vertical-border {
+    border-right: 1px solid var(--theme-colors-border);
+} */

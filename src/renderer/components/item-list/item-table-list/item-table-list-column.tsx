@@ -11,7 +11,7 @@ import {
 import { disableNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/disable-native-drag-preview';
 import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
-import React, { CSSProperties, ReactNode, useEffect, useRef, useState } from 'react';
+import React, { CSSProperties, ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
 import { CellComponentProps } from 'react-window-v2';
 
 import styles from './item-table-list-column.module.css';
@@ -75,6 +75,48 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
     const isDataRow = isHeaderEnabled ? props.rowIndex > 0 : true;
     const item = isDataRow ? props.data[props.rowIndex] : null;
     const shouldEnableDrag = !!props.enableDrag && isDataRow && !!item;
+
+    // Check if this row should render a group header (must be before conditional returns)
+    // Group headers are rendered in the main grid at columnIndex 0 (first unpinned column)
+    // We detect this by checking if columnIndex equals pinnedLeftColumnCount (first column of main grid)
+    // or if columnIndex is 0 and there are no pinned columns
+    // Groups are defined by itemCount, so we calculate which group this row belongs to
+    let groupHeader: 'GROUP_HEADER' | null | ReactElement = null;
+    if (props.groups && isDataRow && props.groups.length > 0) {
+        // Calculate which group this row index belongs to
+        let cumulativeDataIndex = 0;
+        const headerOffset = props.enableHeader ? 1 : 0;
+
+        const originalData = props.data.filter((item) => item !== null);
+
+        for (let groupIndex = 0; groupIndex < props.groups.length; groupIndex++) {
+            const group = props.groups[groupIndex];
+            const groupHeaderIndex = headerOffset + cumulativeDataIndex + groupIndex;
+
+            if (props.rowIndex === groupHeaderIndex) {
+                const isMainGridFirstColumn =
+                    props.columnIndex === (props.pinnedLeftColumnCount || 0) ||
+                    (props.columnIndex === 0 && (props.pinnedLeftColumnCount || 0) === 0);
+
+                // Only render group header in the first column of the main grid
+                if (isMainGridFirstColumn) {
+                    groupHeader = group.render({
+                        data: originalData,
+                        groupIndex,
+                        index: props.rowIndex,
+                        internalState: props.internalState,
+                        startDataIndex: cumulativeDataIndex,
+                    });
+                } else {
+                    // For other columns in this row, return marker to skip rendering
+                    groupHeader = 'GROUP_HEADER';
+                }
+                break;
+            }
+
+            cumulativeDataIndex += group.itemCount;
+        }
+    }
 
     const {
         isDraggedOver,
@@ -262,6 +304,49 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
 
     if (isHeaderEnabled && props.rowIndex === 0) {
         return <TableColumnHeaderContainer {...props} controls={controls} type={type} />;
+    }
+
+    // Render group header if this row should have one
+    if (groupHeader) {
+        if (groupHeader === 'GROUP_HEADER') {
+            // For non-first columns, render empty cell (group header spans all columns)
+            return null;
+        }
+        // For first column of main grid, render the group header spanning full table width
+        // Calculate widths to span across all grids using calculated column widths
+        const pinnedLeftWidth =
+            props.pinnedLeftColumnWidths?.reduce((sum, width) => sum + width, 0) || 0;
+        const pinnedRightWidth =
+            props.pinnedRightColumnWidths?.reduce((sum, width) => sum + width, 0) || 0;
+
+        // Use calculated column widths if available (they include all columns in order)
+        // Otherwise fall back to summing column config widths
+        const totalTableWidth = props.calculatedColumnWidths
+            ? props.calculatedColumnWidths.reduce((sum, width) => sum + width, 0)
+            : pinnedLeftWidth +
+              props.columns
+                  .slice(
+                      props.pinnedLeftColumnCount || 0,
+                      props.columns.length - (props.pinnedRightColumnCount || 0),
+                  )
+                  .reduce((sum, col) => sum + col.width, 0) +
+              pinnedRightWidth;
+
+        // Use negative margins to extend beyond cell boundaries and span full width
+        // Apply props.style for virtualization positioning (top, left, position, etc.)
+        return (
+            <div
+                style={{
+                    ...props.style, // Apply virtualization styles (position, top, left, width, height)
+                    backgroundColor: 'var(--theme-bg-secondary)',
+                    borderBottom: '1px solid var(--theme-border-color)',
+                    marginLeft: pinnedLeftWidth > 0 ? `-${pinnedLeftWidth}px` : 0,
+                    width: `${totalTableWidth}px`,
+                }}
+            >
+                {groupHeader}
+            </div>
+        );
     }
 
     switch (type) {
