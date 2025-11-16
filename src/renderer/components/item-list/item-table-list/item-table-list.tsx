@@ -19,7 +19,6 @@ import React, {
 } from 'react';
 import { type CellComponentProps, Grid } from 'react-window-v2';
 
-import { useFixedTableHeader } from './hooks/use-fixed-table-header';
 import styles from './item-table-list.module.css';
 
 import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded-list-container';
@@ -32,6 +31,8 @@ import {
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { parseTableColumns } from '/@/renderer/components/item-list/helpers/parse-table-columns';
+import { useStickyTableGroupRows } from '/@/renderer/components/item-list/item-table-list/hooks/use-sticky-table-group-rows';
+import { useStickyTableHeader } from '/@/renderer/components/item-list/item-table-list/hooks/use-sticky-table-header';
 import {
     ItemControls,
     ItemListHandle,
@@ -620,6 +621,7 @@ interface ItemTableListProps {
     enableHorizontalBorders?: boolean;
     enableRowHoverHighlight?: boolean;
     enableSelection?: boolean;
+    enableStickyGroupRows?: boolean;
     enableStickyHeader?: boolean;
     enableVerticalBorders?: boolean;
     getRowId?: ((item: unknown) => string) | string;
@@ -658,6 +660,7 @@ export const ItemTableList = ({
     enableHorizontalBorders = false,
     enableRowHoverHighlight = true,
     enableSelection = true,
+    enableStickyGroupRows = false,
     enableStickyHeader = false,
     enableVerticalBorders = false,
     getRowId,
@@ -784,13 +787,14 @@ export const ItemTableList = ({
     const handleRef = useRef<ItemListHandle | null>(null);
     const containerFocusRef = useRef<HTMLDivElement | null>(null);
 
-    const { shouldShowStickyHeader, stickyTop } = useFixedTableHeader({
+    const { shouldShowStickyHeader, stickyTop } = useStickyTableHeader({
         containerRef: containerFocusRef,
         enabled: enableHeader && enableStickyHeader,
         headerRef: pinnedRowRef,
     });
 
     const stickyHeaderRef = useRef<HTMLDivElement | null>(null);
+    const stickyGroupRowRef = useRef<HTMLDivElement | null>(null);
 
     // Sync scroll position and update position of sticky header
     useEffect(() => {
@@ -1429,9 +1433,84 @@ export const ItemTableList = ({
         [enableHeader, headerHeight, rowHeight, pinnedRowCount, size, groups],
     );
 
+    // Create a wrapper for getRowHeight that doesn't require cellProps (for sticky group rows hook)
+    const getRowHeightWrapper = useCallback(
+        (index: number) => {
+            const height = size === 'compact' ? 40 : size === 'large' ? 88 : 64;
+
+            // Check if this row is a group header row and has a custom row height
+            if (groups && groups.length > 0) {
+                let cumulativeDataIndex = 0;
+                const headerOffset = enableHeader ? 1 : 0;
+
+                for (let groupIndex = 0; groupIndex < groups.length; groupIndex++) {
+                    const group = groups[groupIndex];
+                    const groupHeaderIndex = headerOffset + cumulativeDataIndex + groupIndex;
+
+                    if (index === groupHeaderIndex) {
+                        if (group.rowHeight !== undefined) {
+                            const groupRowHeight =
+                                typeof group.rowHeight === 'number'
+                                    ? group.rowHeight
+                                    : group.rowHeight(index);
+                            if (groupRowHeight !== undefined) {
+                                return groupRowHeight;
+                            }
+                        }
+                        break;
+                    }
+
+                    cumulativeDataIndex += group.itemCount;
+                }
+            }
+
+            const baseHeight = typeof rowHeight === 'number' ? rowHeight : height;
+
+            // If enableHeader is true and this is the first sticky row, use fixed header height
+            if (enableHeader && index === 0 && pinnedRowCount > 0) {
+                return headerHeight;
+            }
+
+            return baseHeight;
+        },
+        [enableHeader, headerHeight, rowHeight, pinnedRowCount, size, groups],
+    );
+
+    const getGroupRowHeightWrapper = useCallback(
+        (groupIndex: number) => {
+            if (!groups || groupIndex < 0 || groupIndex >= groups.length) {
+                return 40;
+            }
+
+            const group = groups[groupIndex];
+            if (group.rowHeight !== undefined) {
+                return typeof group.rowHeight === 'number' ? group.rowHeight : group.rowHeight(0);
+            }
+            return 40;
+        },
+        [groups],
+    );
+
+    const {
+        shouldShowStickyGroupRow,
+        stickyGroupIndex,
+        stickyTop: stickyGroupTop,
+    } = useStickyTableGroupRows({
+        containerRef: containerFocusRef,
+        enabled: enableStickyGroupRows && !!groups && groups.length > 0,
+        getGroupRowHeight: getGroupRowHeightWrapper,
+        getRowHeight: getRowHeightWrapper,
+        groups,
+        headerHeight,
+        mainGridRef: rowRef,
+        shouldShowStickyHeader,
+        stickyHeaderTop: stickyTop,
+    });
+
+    // Show sticky group row whenever it should be shown
+    const shouldRenderStickyGroupRow = shouldShowStickyGroupRow;
+
     const getDataFn = useCallback(() => {
-        // Reconstruct data array with group headers inserted
-        // Groups are defined by itemCount, so we calculate indexes based on cumulative item counts
         const result: (null | unknown)[] = enableHeader ? [null] : [];
 
         if (!groups || groups.length === 0) {
@@ -1446,7 +1525,6 @@ export const ItemTableList = ({
         const headerOffset = enableHeader ? 1 : 0;
 
         groups.forEach((group, groupIndex) => {
-            // Group header appears before its items
             // Index = header offset + cumulative data index + number of previous group headers
             const groupHeaderIndex = headerOffset + cumulativeDataIndex + groupIndex;
             groupIndexes.push(groupHeaderIndex);
@@ -1457,16 +1535,14 @@ export const ItemTableList = ({
         const startIndex = enableHeader ? 1 : 0;
         let groupHeaderCount = 0;
 
-        // Iterate through the expanded row space (data + group headers)
         for (
             let rowIndex = startIndex;
             rowIndex < startIndex + data.length + groupIndexes.length;
             rowIndex++
         ) {
-            // Check if this row should have a group header
             const expectedGroupIndex = groupIndexes[groupHeaderCount];
             if (expectedGroupIndex !== undefined && rowIndex === expectedGroupIndex) {
-                result.push(null); // Group header row
+                result.push(null);
                 groupHeaderCount++;
             } else if (dataIndex < data.length) {
                 result.push(data[dataIndex]);
@@ -1841,6 +1917,124 @@ export const ItemTableList = ({
         stickyHeaderItemProps,
     ]);
 
+    // Calculate group row height
+    const groupRowHeight = useMemo(() => {
+        if (stickyGroupIndex === null || !groups) {
+            return 40; // Default
+        }
+
+        const group = groups[stickyGroupIndex];
+        if (group.rowHeight !== undefined) {
+            return typeof group.rowHeight === 'number' ? group.rowHeight : group.rowHeight(0);
+        }
+        return 40; // Default group row height
+    }, [stickyGroupIndex, groups]);
+
+    const StickyGroupRow = useMemo(() => {
+        if (!shouldRenderStickyGroupRow || stickyGroupIndex === null || !groups) {
+            return null;
+        }
+
+        const group = groups[stickyGroupIndex];
+        const originalData = data.filter((item) => item !== null);
+        let cumulativeDataIndex = 0;
+        for (let i = 0; i < stickyGroupIndex; i++) {
+            cumulativeDataIndex += groups[i].itemCount;
+        }
+
+        const groupContent = group.render({
+            data: originalData,
+            groupIndex: stickyGroupIndex,
+            index: 0,
+            internalState,
+            startDataIndex: cumulativeDataIndex,
+        });
+
+        const pinnedLeftWidth = calculatedColumnWidths
+            .slice(0, pinnedLeftColumnCount)
+            .reduce((sum, width) => sum + width, 0);
+        const mainWidth = calculatedColumnWidths
+            .slice(pinnedLeftColumnCount, pinnedLeftColumnCount + totalColumnCount)
+            .reduce((sum, width) => sum + width, 0);
+        const pinnedRightWidth = calculatedColumnWidths
+            .slice(pinnedLeftColumnCount + totalColumnCount)
+            .reduce((sum, width) => sum + width, 0);
+
+        const totalTableWidth = calculatedColumnWidths.reduce((sum, width) => sum + width, 0);
+
+        // Calculate the actual sticky position accounting for sticky header
+        const actualStickyTop = stickyGroupTop;
+
+        return (
+            <div
+                className={styles.stickyGroupRow}
+                ref={stickyGroupRowRef}
+                style={{
+                    top: `${actualStickyTop}px`,
+                }}
+            >
+                <div className={styles.stickyGroupRowContent}>
+                    {pinnedLeftColumnCount > 0 && (
+                        <div
+                            className={styles.stickyGroupRowSection}
+                            style={{ width: `${pinnedLeftWidth}px` }}
+                        >
+                            <div
+                                style={{
+                                    height: groupRowHeight,
+                                    width: `${pinnedLeftWidth}px`,
+                                }}
+                            >
+                                {groupContent}
+                            </div>
+                        </div>
+                    )}
+                    <div
+                        className={styles.stickyGroupRowSection}
+                        style={{ width: `${mainWidth}px` }}
+                    >
+                        <div
+                            style={{
+                                height: groupRowHeight,
+                                marginLeft: pinnedLeftWidth > 0 ? `-${pinnedLeftWidth}px` : 0,
+                                width: `${totalTableWidth}px`,
+                            }}
+                        >
+                            {groupContent}
+                        </div>
+                    </div>
+                    {pinnedRightColumnCount > 0 && (
+                        <div
+                            className={styles.stickyGroupRowSection}
+                            style={{ width: `${pinnedRightWidth}px` }}
+                        >
+                            <div
+                                style={{
+                                    height: groupRowHeight,
+                                    width: `${pinnedRightWidth}px`,
+                                }}
+                            >
+                                {groupContent}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    }, [
+        shouldRenderStickyGroupRow,
+        stickyGroupIndex,
+        groups,
+        data,
+        internalState,
+        calculatedColumnWidths,
+        pinnedLeftColumnCount,
+        pinnedRightColumnCount,
+        totalColumnCount,
+        groupRowHeight,
+        stickyGroupTop,
+    ]);
+
     return (
         <div
             className={styles.itemTableListContainer}
@@ -1856,6 +2050,7 @@ export const ItemTableList = ({
             tabIndex={0}
         >
             {StickyHeader}
+            {StickyGroupRow}
             <VirtualizedTableGrid
                 calculatedColumnWidths={calculatedColumnWidths}
                 CellComponent={CellComponent}

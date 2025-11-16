@@ -405,14 +405,16 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                         <Checkbox
                             checked={isAllSelected}
                             indeterminate={isSomeSelected}
+                            label={
+                                <Text size="sm">
+                                    {t('common.disc', { postProcess: 'sentenceCase' })}{' '}
+                                    {discGroup.discNumber}
+                                    {discGroup.discSubtitle && ` - ${discGroup.discSubtitle}`}
+                                </Text>
+                            }
                             onChange={handleCheckboxChange}
                             size="xs"
                         />
-                        <Text size="sm">
-                            {t('common.disc', { postProcess: 'sentenceCase' })}{' '}
-                            {discGroup.discNumber}
-                            {discGroup.discSubtitle && ` - ${discGroup.discSubtitle}`}
-                        </Text>
                     </Group>
                 );
             },
@@ -437,6 +439,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
             enableHorizontalBorders={tableConfig.enableHorizontalBorders}
             enableRowHoverHighlight={tableConfig.enableRowHoverHighlight}
             enableSelection
+            enableStickyGroupRows
             enableStickyHeader
             enableVerticalBorders={tableConfig.enableVerticalBorders}
             groups={groups}

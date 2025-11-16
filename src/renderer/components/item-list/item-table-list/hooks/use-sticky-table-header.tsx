@@ -4,7 +4,7 @@ import { RefObject, useMemo } from 'react';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/shared/types/types';
 
-export const useFixedTableHeader = ({
+export const useStickyTableHeader = ({
     containerRef,
     enabled,
     headerRef,

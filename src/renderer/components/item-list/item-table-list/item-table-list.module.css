@@ -88,6 +88,33 @@
     pointer-events: auto;
 }
 
+.sticky-group-row {
+    position: fixed;
+    z-index: 15;
+    display: flex;
+    flex-direction: row;
+    padding: 0 2rem;
+    margin: 0 -2rem;
+    pointer-events: none;
+    background-color: var(--theme-colors-background);
+    border-bottom: 1px solid var(--theme-colors-border);
+}
+
+.sticky-group-row-content {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    background-color: var(--theme-colors-background);
+}
+
+.sticky-group-row-section {
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    pointer-events: auto;
+    background-color: var(--theme-colors-background);
+}
+
 .item-table-pinned-rows-grid-container.with-header::after {
     position: absolute;
     right: 0;
