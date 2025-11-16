@@ -8,7 +8,6 @@ import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
-import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import {
     HomeItem,
     useCurrentServer,
@@ -17,13 +16,7 @@ import {
 } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
-import {
-    AlbumListSort,
-    LibraryItem,
-    ServerType,
-    SongListSort,
-    SortOrder,
-} from '/@/shared/types/domain-types';
+import { AlbumListSort, LibraryItem, ServerType, SortOrder } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
 
 const HomeRoute = () => {
@@ -35,7 +28,6 @@ const HomeRoute = () => {
 
     const isJellyfin = server?.type === ServerType.JELLYFIN;
 
-    // Only keep queries for FeatureCarousel and songs carousel (which still uses old carousel)
     const feature = useQuery(
         albumQueries.list({
             options: {
@@ -53,25 +45,6 @@ const HomeRoute = () => {
         }),
     );
 
-    const mostPlayedSongs = useQuery(
-        songsQueries.list(
-            {
-                options: {
-                    enabled: isJellyfin,
-                    staleTime: 1000 * 60 * 5,
-                },
-                query: {
-                    limit: 15,
-                    sortBy: SongListSort.PLAY_COUNT,
-                    sortOrder: SortOrder.DESC,
-                    startIndex: 0,
-                },
-                serverId: server?.id,
-            },
-            300,
-        ),
-    );
-
     const featureItemsWithImage = useMemo(() => {
         return feature.data?.items?.filter((item) => item.imageUrl) ?? [];
     }, [feature.data?.items]);
@@ -79,9 +52,7 @@ const HomeRoute = () => {
     // Carousel configuration - queries are now handled inside AlbumInfiniteCarousel
     const carousels = {
         [HomeItem.MOST_PLAYED]: {
-            data: mostPlayedSongs?.data?.items,
             itemType: isJellyfin ? LibraryItem.SONG : LibraryItem.ALBUM,
-            query: mostPlayedSongs,
             sortBy: AlbumListSort.PLAY_COUNT,
             sortOrder: SortOrder.DESC,
             title: t('page.home.mostPlayed', { postProcess: 'sentenceCase' }),
@@ -167,7 +138,6 @@ const HomeRoute = () => {
                             );
                         }
 
-                        // Songs carousel (only for Jellyfin most played) - keep using old carousel for now
                         if ('data' in carousel && 'query' in carousel) {
                             // TODO: Create SongInfiniteCarousel
                             return null;
