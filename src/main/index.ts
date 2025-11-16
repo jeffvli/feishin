@@ -114,10 +114,10 @@ const installExtensions = async () => {
         const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
         const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS'];
 
-        return installer
-            .default(
+        installer
+            .installExtension(
                 extensions.map((name) => installer[name]),
-                forceDownload,
+                { forceDownload },
             )
             .then((installedExtensions) => {
                 createLog({
