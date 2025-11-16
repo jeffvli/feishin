@@ -698,7 +698,7 @@ export const pickTableColumns = (options: {
             return;
         }
 
-        let pinned: 'left' | 'right' | null = column.pinned;
+        let pinned: 'left' | 'right' | null = null;
 
         if (pinnedLeftColumns.includes(column.value)) {
             pinned = 'left';
@@ -706,7 +706,7 @@ export const pickTableColumns = (options: {
             pinned = 'right';
         }
 
-        let align: 'center' | 'end' | 'start' = column.align;
+        let align: 'center' | 'end' | 'start' = 'start';
 
         if (alignCenterColumns.includes(column.value)) {
             align = 'center';
