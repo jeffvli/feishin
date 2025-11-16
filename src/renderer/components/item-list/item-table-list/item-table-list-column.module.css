@@ -61,7 +61,7 @@
 }
 
 .container.data-row {
-    cursor: pointer;
+    cursor: default;
 }
 
 .container.with-horizontal-border {
