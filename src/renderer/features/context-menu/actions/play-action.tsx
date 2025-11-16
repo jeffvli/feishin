@@ -4,15 +4,16 @@ import { useTranslation } from 'react-i18next';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useCurrentServerId } from '/@/renderer/store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface PlayActionProps {
     ids: string[];
     itemType: LibraryItem;
+    songs?: Song[];
 }
 
-export const PlayAction = ({ ids, itemType }: PlayActionProps) => {
+export const PlayAction = ({ ids, itemType, songs }: PlayActionProps) => {
     const { t } = useTranslation();
     const player = usePlayer();
     const serverId = useCurrentServerId();
@@ -20,9 +21,14 @@ export const PlayAction = ({ ids, itemType }: PlayActionProps) => {
     const handlePlay = useCallback(
         (playType: Play) => {
             if (ids.length === 0 || !serverId) return;
-            player.addToQueueByFetch(serverId, ids, itemType, playType);
+
+            if (itemType === LibraryItem.SONG) {
+                player.addToQueueByData(songs || [], playType);
+            } else {
+                player.addToQueueByFetch(serverId, ids, itemType, playType);
+            }
         },
-        [ids, itemType, player, serverId],
+        [ids, itemType, player, serverId, songs],
     );
 
     const handlePlayNow = useCallback(() => {
