@@ -18,6 +18,11 @@ import { PlayerStatus } from '/@/shared/types/types';
 const discordRpc = isElectron() ? window.api.discordRpc : null;
 type ActivityState = [QueueSong | undefined, number, PlayerStatus];
 
+const MAX_FIELD_LENGTH = 125;
+
+const truncate = (field: string) =>
+    field.length <= 125 ? field : field.substring(0, MAX_FIELD_LENGTH) + '...';
+
 export const useDiscordRpc = () => {
     const discordSettings = useDiscordSettings();
     const generalSettings = useGeneralSettings();
@@ -66,13 +71,15 @@ export const useDiscordRpc = () => {
                 };
 
                 const activity: SetActivity = {
-                    details: (song?.name && song.name.padEnd(2, ' ')) || 'Idle',
+                    details: truncate((song?.name && song.name.padEnd(2, ' ')) || 'Idle'),
                     instance: false,
                     largeImageKey: undefined,
-                    largeImageText: (song?.album && song.album.padEnd(2, ' ')) || 'Unknown album',
+                    largeImageText: truncate(
+                        (song?.album && song.album.padEnd(2, ' ')) || 'Unknown album',
+                    ),
                     smallImageKey: undefined,
                     smallImageText: sentenceCase(current[2]),
-                    state: (artists && artists.padEnd(2, ' ')) || 'Unknown artist',
+                    state: truncate((artists && artists.padEnd(2, ' ')) || 'Unknown artist'),
                     statusDisplayType: statusDisplayMap[discordSettings.displayType],
                     // I would love to use the actual type as opposed to hardcoding to 2,
                     // but manually installing the discord-types package appears to break things
