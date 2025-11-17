@@ -1,8 +1,8 @@
 import { useHotkeys, useMediaQuery } from '@mantine/hooks';
-import isElectron from 'is-electron';
-import { useCallback, useEffect, WheelEvent } from 'react';
+import { useCallback, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { PlayerConfig } from '/@/renderer/features/player/components/player-config';
 import { CustomPlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
@@ -13,29 +13,17 @@ import {
     useCurrentServer,
     useGeneralSettings,
     useHotkeySettings,
-    usePlaybackSettings,
-    usePlaybackType,
     usePlayerData,
     usePlayerMuted,
-    usePlayerSpeed,
     usePlayerVolume,
     useSettingsStore,
-    useSettingsStoreActions,
     useSidebarStore,
 } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
-import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
-import { Option } from '/@/shared/components/option/option';
 import { Rating } from '/@/shared/components/rating/rating';
-import { Slider } from '/@/shared/components/slider/slider';
-import { Switch } from '/@/shared/components/switch/switch';
-import { LibraryItem, QueueSong, ServerType, Song } from '/@/shared/types/domain-types';
-import { PlayerType } from '/@/shared/types/types';
-
-const ipc = isElectron() ? window.api.ipc : null;
-const remote = isElectron() ? window.api.remote : null;
+import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 
 const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {
     let volumeToSet;
@@ -71,14 +59,9 @@ export const RightControls = () => {
     const { setSideBar } = useAppStoreActions();
     const { rightExpanded: isQueueExpanded } = useSidebarStore();
     const { bindings } = useHotkeySettings();
-    const { setSettings } = useSettingsStoreActions();
-    const playbackSettings = usePlaybackSettings();
-    const playbackType = usePlaybackType();
     const { volumeWheelStep } = useGeneralSettings();
-    const speed = usePlayerSpeed();
     const volumeWidth = useSettingsStore((state) => state.general.volumeWidth);
-    const speedPreservePitch = useSettingsStore((state) => state.playback.preservePitch);
-    const { mediaToggleMute, setSpeed, setVolume } = usePlayer();
+    const { mediaToggleMute, setVolume } = usePlayer();
     const updateRatingMutation = useSetRating({});
     const addToFavoritesMutation = useCreateFavorite({});
     const removeFromFavoritesMutation = useDeleteFavorite({});
@@ -101,8 +84,9 @@ export const RightControls = () => {
         updateRatingMutation.mutate({
             apiClientProps: { serverId: currentSong?._serverId || '' },
             query: {
-                item: [currentSong],
+                id: [currentSong.id],
                 rating,
+                type: LibraryItem.SONG,
             },
         });
     };
@@ -141,13 +125,6 @@ export const RightControls = () => {
         mediaToggleMute();
     }, [mediaToggleMute]);
 
-    const handleSpeed = useCallback(
-        (e: number) => {
-            setSpeed(e);
-        },
-        [setSpeed],
-    );
-
     const handleVolumeSlider = useCallback(
         (e: number) => {
             setVolume(e);
@@ -171,14 +148,6 @@ export const RightControls = () => {
 
     const handleToggleQueue = () => {
         setSideBar({ rightExpanded: !isQueueExpanded });
-    };
-
-    const formatPlaybackSpeedSliderLabel = (value: number) => {
-        const bpm = Number(currentSong?.bpm);
-        if (bpm > 0) {
-            return `${value} x / ${(bpm * value).toFixed(1)} BPM`;
-        }
-        return `${value} x`;
     };
 
     const isSongDefined = Boolean(currentSong?.id);
@@ -223,49 +192,6 @@ export const RightControls = () => {
         [bindings.rate5.isGlobal ? '' : bindings.rate5.hotkey, () => handleUpdateRating(5)],
     ]);
 
-    useEffect(() => {
-        if (remote) {
-            remote.requestFavorite((_event, { favorite, id, serverId }) => {
-                const mutator = favorite ? addToFavoritesMutation : removeFromFavoritesMutation;
-                mutator.mutate({
-                    apiClientProps: { serverId },
-                    query: {
-                        id: [id],
-                        type: LibraryItem.SONG,
-                    },
-                });
-            });
-
-            remote.requestRating((_event, { id, rating, serverId }) => {
-                updateRatingMutation.mutate({
-                    apiClientProps: { serverId },
-                    query: {
-                        item: [
-                            {
-                                _serverId: currentSong?._serverId || '',
-                                id,
-                                itemType: LibraryItem.SONG,
-                            } as Song, // This is not a type-safe cast, but it works because those are all the prop
-                        ],
-                        rating,
-                    },
-                });
-            });
-
-            return () => {
-                ipc?.removeAllListeners('request-favorite');
-                ipc?.removeAllListeners('request-rating');
-            };
-        }
-
-        return () => {};
-    }, [
-        addToFavoritesMutation,
-        currentSong?._serverId,
-        removeFromFavoritesMutation,
-        updateRatingMutation,
-    ]);
-
     return (
         <Flex align="flex-end" direction="column" h="100%" px="1rem" py="0.5rem">
             <Group h="calc(100% / 3)">
@@ -278,73 +204,7 @@ export const RightControls = () => {
                 )}
             </Group>
             <Group align="center" gap="xs" wrap="nowrap">
-                <DropdownMenu arrowOffset={12} offset={0} position="top-end" width={425} withArrow>
-                    <DropdownMenu.Target>
-                        <ActionIcon
-                            icon="mediaSpeed"
-                            iconProps={{
-                                size: 'lg',
-                            }}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }}
-                            size="sm"
-                            tooltip={{
-                                label: t('player.playbackSpeed', { postProcess: 'sentenceCase' }),
-                                openDelay: 0,
-                            }}
-                            variant="subtle"
-                        />
-                    </DropdownMenu.Target>
-                    <DropdownMenu.Dropdown>
-                        {playbackType === PlayerType.WEB && (
-                            <Option>
-                                <Option.Label>
-                                    {t('setting.preservePitch', {
-                                        postProcess: 'sentenceCase',
-                                    })}
-                                </Option.Label>
-                                <Option.Control>
-                                    <Switch
-                                        defaultChecked={speedPreservePitch}
-                                        onChange={(e) => {
-                                            setSettings({
-                                                playback: {
-                                                    ...playbackSettings,
-                                                    preservePitch: e.currentTarget.checked,
-                                                },
-                                            });
-                                        }}
-                                    />
-                                </Option.Control>
-                            </Option>
-                        )}
-                        <Slider
-                            label={formatPlaybackSpeedSliderLabel}
-                            marks={[
-                                { label: '0.5', value: 0.5 },
-                                { label: '0.75', value: 0.75 },
-                                { label: '1', value: 1 },
-                                { label: '1.25', value: 1.25 },
-                                { label: '1.5', value: 1.5 },
-                            ]}
-                            max={1.5}
-                            min={0.5}
-                            onChange={handleSpeed}
-                            onDoubleClick={() => handleSpeed(1)}
-                            step={0.01}
-                            styles={{
-                                markLabel: {
-                                    paddingTop: '0.5rem',
-                                },
-                                root: {
-                                    margin: '1rem 1rem 2rem 1rem',
-                                },
-                            }}
-                            value={speed}
-                        />
-                    </DropdownMenu.Dropdown>
-                </DropdownMenu>
+                <PlayerConfig />
                 <ActionIcon
                     icon="favorite"
                     iconProps={{

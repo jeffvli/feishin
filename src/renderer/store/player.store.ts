@@ -1218,6 +1218,7 @@ export const usePlayerActions = () => {
             moveSelectedToNext: state.moveSelectedToNext,
             moveSelectedToTop: state.moveSelectedToTop,
             setCrossfadeDuration: state.setCrossfadeDuration,
+            setQueueType: state.setQueueType,
             setRepeat: state.setRepeat,
             setShuffle: state.setShuffle,
             setSpeed: state.setSpeed,
