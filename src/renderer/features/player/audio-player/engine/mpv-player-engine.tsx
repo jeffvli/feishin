@@ -17,7 +17,7 @@ interface MpvPlayerEngineProps {
     nextSrc: string | undefined;
     onEnded: () => void;
     onProgress: (e: PlayerOnProgressProps) => void;
-    playerRef: RefObject<MpvPlayerEngineHandle>;
+    playerRef: RefObject<MpvPlayerEngineHandle | null>;
     playerStatus: PlayerStatus;
     speed?: number;
     volume: number;
@@ -109,7 +109,9 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
         }
 
         const vol = volume / 100 || 0;
-        setInternalVolume(vol);
+        queueMicrotask(() => {
+            setInternalVolume(vol);
+        });
         mpvPlayer.volume(volume);
     }, [volume]);
 
@@ -147,11 +149,15 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             if (currentSrc) {
                 // Set current song at position 0 and next song at position 1
                 mpvPlayer.setQueue(currentSrc, nextSrc, playerStatus !== PlayerStatus.PLAYING);
-                setPreviousCurrentSrc(currentSrc);
+                setTimeout(() => {
+                    setPreviousCurrentSrc(currentSrc);
+                }, 0);
             } else {
                 // Clear queue if no current song
                 mpvPlayer.setQueue(undefined, undefined, true);
-                setPreviousCurrentSrc(undefined);
+                setTimeout(() => {
+                    setPreviousCurrentSrc(undefined);
+                }, 0);
             }
         } else {
             // If currentSrc hasn't changed but nextSrc has, update position 1

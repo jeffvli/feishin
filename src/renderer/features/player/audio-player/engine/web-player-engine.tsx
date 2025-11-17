@@ -26,7 +26,7 @@ interface WebPlayerEngineProps {
     onProgressPlayer1: (e: PlayerOnProgressProps) => void;
     onProgressPlayer2: (e: PlayerOnProgressProps) => void;
     playerNum: number;
-    playerRef: RefObject<WebPlayerEngineHandle>;
+    playerRef: RefObject<null | WebPlayerEngineHandle>;
     playerStatus: PlayerStatus;
     speed?: number;
     src1: string | undefined;

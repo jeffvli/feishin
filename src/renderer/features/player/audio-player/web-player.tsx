@@ -1,7 +1,7 @@
 import type { Dispatch } from 'react';
 import type ReactPlayer from 'react-player';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
     WebPlayerEngine,
@@ -23,7 +23,7 @@ const PLAY_PAUSE_FADE_DURATION = 300;
 const PLAY_PAUSE_FADE_INTERVAL = 10;
 
 export function WebPlayer() {
-    const playerRef = useRef<WebPlayerEngineHandle>(null);
+    const playerRef = useRef<null | WebPlayerEngineHandle>(null);
     const { num, player1, player2, status } = usePlayerData();
     const { mediaAutoNext, setTimestamp } = usePlayerActions();
     const { crossfadeDuration, speed, transitionType } = usePlayerProperties();
@@ -71,12 +71,6 @@ export function WebPlayer() {
 
     const onProgressPlayer1 = useCallback(
         (e: PlayerOnProgressProps) => {
-            if (transitionType === 'crossfade' && num === 1) {
-                setTimestamp(Number(e.playedSeconds.toFixed(0)));
-            } else if (transitionType === 'gapless') {
-                setTimestamp(Number(e.playedSeconds.toFixed(0)));
-            }
-
             if (!playerRef.current?.player1()) {
                 return;
             }
@@ -108,17 +102,11 @@ export function WebPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, isTransitioning, num, setTimestamp, transitionType, volume],
+        [crossfadeDuration, isTransitioning, num, transitionType, volume],
     );
 
     const onProgressPlayer2 = useCallback(
         (e: PlayerOnProgressProps) => {
-            if (transitionType === PlayerStyle.CROSSFADE && num === 2) {
-                setTimestamp(Number(e.playedSeconds.toFixed(0)));
-            } else if (transitionType === PlayerStyle.GAPLESS) {
-                setTimestamp(Number(e.playedSeconds.toFixed(0)));
-            }
-
             if (!playerRef.current?.player2()) {
                 return;
             }
@@ -150,7 +138,7 @@ export function WebPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, isTransitioning, num, setTimestamp, transitionType, volume],
+        [crossfadeDuration, isTransitioning, num, transitionType, volume],
     );
 
     const handleOnEndedPlayer1 = useCallback(() => {
@@ -204,6 +192,34 @@ export function WebPlayer() {
         },
         [volume, num, isTransitioning],
     );
+
+    useEffect(() => {
+        if (localPlayerStatus !== PlayerStatus.PLAYING) {
+            return;
+        }
+
+        const interval = setInterval(() => {
+            const activePlayer =
+                num === 1 ? playerRef.current?.player1() : playerRef.current?.player2();
+            const internalPlayer =
+                activePlayer?.ref?.getInternalPlayer() as HTMLAudioElement | null;
+
+            if (!internalPlayer) {
+                return;
+            }
+
+            const currentTime = internalPlayer.currentTime;
+
+            if (
+                transitionType === PlayerStyle.CROSSFADE ||
+                transitionType === PlayerStyle.GAPLESS
+            ) {
+                setTimestamp(Number(currentTime.toFixed(0)));
+            }
+        }, 500);
+
+        return () => clearInterval(interval);
+    }, [localPlayerStatus, num, setTimestamp, transitionType]);
 
     useMainPlayerListener();
 

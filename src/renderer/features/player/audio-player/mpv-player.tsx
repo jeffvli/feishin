@@ -1,10 +1,10 @@
-import { useCallback, useRef, useState } from 'react';
+import isElectron from 'is-electron';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { MpvPlayerEngine, MpvPlayerEngineHandle } from './engine/mpv-player-engine';
 
 import { useMainPlayerListener } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
-import { PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
 import {
     usePlayerActions,
     usePlayerData,
@@ -16,6 +16,8 @@ import { PlayerStatus } from '/@/shared/types/types';
 
 const PLAY_PAUSE_FADE_DURATION = 300;
 const PLAY_PAUSE_FADE_INTERVAL = 10;
+
+const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 
 export function MpvPlayer() {
     const playerRef = useRef<MpvPlayerEngineHandle>(null);
@@ -64,12 +66,10 @@ export function MpvPlayer() {
         [isTransitioning],
     );
 
-    const onProgress = useCallback(
-        (e: PlayerOnProgressProps) => {
-            setTimestamp(Number(e.playedSeconds.toFixed(0)));
-        },
-        [setTimestamp],
-    );
+    const onProgress = useCallback(() => {
+        // Progress callback is now only used for transition logic
+        // Timestamp updates are handled separately in useEffect
+    }, []);
 
     const handleOnEnded = useCallback(() => {
         // When mpv auto-advances to the next song (position 1 becomes position 0),
@@ -106,6 +106,29 @@ export function MpvPlayer() {
         },
         [volume, isTransitioning, fadeAndSetStatus],
     );
+
+    useEffect(() => {
+        if (localPlayerStatus !== PlayerStatus.PLAYING) {
+            return;
+        }
+
+        const interval = setInterval(async () => {
+            if (!mpvPlayer) {
+                return;
+            }
+
+            try {
+                const time = await mpvPlayer.getCurrentTime();
+                if (time !== undefined) {
+                    setTimestamp(Number(time.toFixed(0)));
+                }
+            } catch {
+                // Do nothing
+            }
+        }, 500);
+
+        return () => clearInterval(interval);
+    }, [localPlayerStatus, setTimestamp]);
 
     useMainPlayerListener();
 
