@@ -1,7 +1,6 @@
 import clsx from 'clsx';
-import throttle from 'lodash/throttle';
 import { motion } from 'motion/react';
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router';
 
 import styles from './main-content.module.css';
@@ -110,16 +109,14 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
         [isResizing, isResizingRight, setSideBar],
     );
 
-    const throttledResize = useMemo(() => throttle(resize, 10), [resize]);
-
     useEffect(() => {
-        window.addEventListener('mousemove', throttledResize);
+        window.addEventListener('mousemove', resize);
         window.addEventListener('mouseup', stopResizing);
         return () => {
-            window.removeEventListener('mousemove', throttledResize);
+            window.removeEventListener('mousemove', resize);
             window.removeEventListener('mouseup', stopResizing);
         };
-    }, [throttledResize, stopResizing]);
+    }, [resize, stopResizing]);
 
     return (
         <motion.div
