@@ -18,10 +18,10 @@ import { PlayerStatus } from '/@/shared/types/types';
 const discordRpc = isElectron() ? window.api.discordRpc : null;
 type ActivityState = [QueueSong | undefined, number, PlayerStatus];
 
-const MAX_FIELD_LENGTH = 125;
+const MAX_FIELD_LENGTH = 127;
 
 const truncate = (field: string) =>
-    field.length <= MAX_FIELD_LENGTH ? field : field.substring(0, MAX_FIELD_LENGTH - 1) + '...';
+    field.length <= MAX_FIELD_LENGTH ? field : field.substring(0, MAX_FIELD_LENGTH - 1) + '…';
 
 export const useDiscordRpc = () => {
     const discordSettings = useDiscordSettings();
