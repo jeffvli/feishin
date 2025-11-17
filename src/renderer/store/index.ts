@@ -7,3 +7,4 @@ export * from './list.store';
 export * from './player.store';
 export * from './playlist.store';
 export * from './settings.store';
+export * from './timestamp.store';

@@ -7,6 +7,10 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { createSelectors } from '/@/renderer/lib/zustand';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
+import {
+    setTimestamp as setTimestampStore,
+    useTimestampStoreBase,
+} from '/@/renderer/store/timestamp.store';
 import { idbStateStorage } from '/@/renderer/store/utils';
 import { shuffleInPlace } from '/@/renderer/utils/shuffle';
 import { PlayerData, QueueData, QueueSong, Song } from '/@/shared/types/domain-types';
@@ -56,7 +60,6 @@ interface Actions {
     setRepeat: (repeat: PlayerRepeat) => void;
     setShuffle: (shuffle: PlayerShuffle) => void;
     setSpeed: (speed: number) => void;
-    setTimestamp: (timestamp: number) => void;
     setTransitionType: (transitionType: PlayerStyle) => void;
     setVolume: (volume: number) => void;
     shuffle: () => void;
@@ -83,7 +86,6 @@ interface State {
         shuffle: PlayerShuffle;
         speed: number;
         status: PlayerStatus;
-        timestamp: number;
         transitionType: PlayerStyle;
         volume: number;
     };
@@ -102,7 +104,6 @@ const initialState: State = {
         shuffle: PlayerShuffle.NONE,
         speed: 1,
         status: PlayerStatus.PAUSED,
-        timestamp: 0,
         transitionType: PlayerStyle.GAPLESS,
         volume: 30,
     },
@@ -191,7 +192,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                         state.player.index = 0;
                                         state.player.status = PlayerStatus.PLAYING;
                                         state.player.playerNum = 1;
-                                        state.player.timestamp = 0;
+                                        setTimestampStore(0);
                                         state.queue.default = newUniqueIds;
 
                                         if (state.player.shuffle === PlayerShuffle.TRACK) {
@@ -215,7 +216,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                         state.player.index = 0;
                                         state.player.status = PlayerStatus.PLAYING;
                                         state.player.playerNum = 1;
-                                        state.player.timestamp = 0;
+                                        setTimestampStore(0);
                                         state.queue.default = shuffledIds;
 
                                         // Always maintain shuffled array when using Play.SHUFFLE
@@ -293,7 +294,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                         state.queue.default = [];
                                         state.player.status = PlayerStatus.PLAYING;
                                         state.player.playerNum = 1;
-                                        state.player.timestamp = 0;
+                                        setTimestampStore(0);
 
                                         // Add the first item after the current playing track
 
@@ -369,7 +370,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                         state.player.index = 0;
                                         state.player.status = PlayerStatus.PLAYING;
                                         state.player.playerNum = 1;
-                                        state.player.timestamp = 0;
+                                        setTimestampStore(0);
 
                                         // Add first item to priority queue, rest to default
                                         state.queue.priority = [shuffledIds[0]];
@@ -612,7 +613,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                     set((state) => {
                         state.player.index = newIndex;
                         state.player.playerNum = newPlayerNum;
-                        state.player.timestamp = 0;
+                        setTimestampStore(0);
                         state.player.status = newStatus;
                     });
 
@@ -644,7 +645,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                     set((state) => {
                         state.player.index = Math.min(queue.items.length - 1, currentIndex + 1);
                         state.player.playerNum = 1;
-                        state.player.timestamp = 0;
+                        setTimestampStore(0);
                     });
                 },
                 mediaPause: () => {
@@ -661,7 +662,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
 
                             if (index !== -1) {
                                 state.player.index = index;
-                                state.player.timestamp = 0;
+                                setTimestampStore(0);
                             }
                         }
 
@@ -674,7 +675,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
                     set((state) => {
                         // Only decrement if we're not at the start
                         state.player.index = Math.max(0, currentIndex - 1);
-                        state.player.timestamp = 0;
+                        setTimestampStore(0);
                     });
                 },
                 mediaSeekToTimestamp: (timestamp: number) => {
@@ -683,41 +684,41 @@ export const usePlayerStoreBase = create<PlayerState>()(
                     });
                 },
                 mediaSkipBackward: (offset?: number) => {
-                    set((state) => {
-                        const offsetFromSettings =
-                            useSettingsStore.getState().general.skipButtons.skipBackwardSeconds;
-                        const timeToSkip = offset ?? offsetFromSettings ?? 5;
-                        const newTimestamp = Math.max(0, state.player.timestamp - timeToSkip);
+                    const offsetFromSettings =
+                        useSettingsStore.getState().general.skipButtons.skipBackwardSeconds;
+                    const timeToSkip = offset ?? offsetFromSettings ?? 5;
+                    const currentTimestamp = useTimestampStoreBase.getState().timestamp;
+                    const newTimestamp = Math.max(0, currentTimestamp - timeToSkip);
 
+                    set((state) => {
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(newTimestamp);
                     });
                 },
                 mediaSkipForward: (offset?: number) => {
+                    const state = get();
+                    const queue = state.getQueue();
+                    const index = state.player.index;
+                    const currentTrack = queue.items[index];
+                    const duration = currentTrack?.duration;
+                    const offsetFromSettings =
+                        useSettingsStore.getState().general.skipButtons.skipForwardSeconds;
+                    const timeToSkip = offset ?? offsetFromSettings ?? 5;
+
+                    if (!duration) {
+                        return;
+                    }
+
+                    const currentTimestamp = useTimestampStoreBase.getState().timestamp;
+                    const newTimestamp = Math.min(duration - 1, currentTimestamp + timeToSkip);
+
                     set((state) => {
-                        const queue = state.getQueue();
-                        const index = state.player.index;
-                        const currentTrack = queue.items[index];
-                        const duration = currentTrack?.duration;
-                        const offsetFromSettings =
-                            useSettingsStore.getState().general.skipButtons.skipForwardSeconds;
-                        const timeToSkip = offset ?? offsetFromSettings ?? 5;
-
-                        if (!duration) {
-                            return;
-                        }
-
-                        const newTimestamp = Math.min(
-                            duration - 1,
-                            state.player.timestamp + timeToSkip,
-                        );
-
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(newTimestamp);
                     });
                 },
                 mediaStop: () => {
                     set((state) => {
                         state.player.status = PlayerStatus.PAUSED;
-                        state.player.timestamp = 0;
+                        setTimestampStore(0);
                         state.player.index = -1;
                         state.queue.default = [];
                         state.queue.priority = [];
@@ -1056,11 +1057,6 @@ export const usePlayerStoreBase = create<PlayerState>()(
                         state.player.speed = normalizedSpeed;
                     });
                 },
-                setTimestamp: (timestamp: number) => {
-                    set((state) => {
-                        state.player.timestamp = timestamp;
-                    });
-                },
                 setTransitionType: (transitionType: PlayerStyle) => {
                     set((state) => {
                         state.player.transitionType = transitionType;
@@ -1154,9 +1150,10 @@ export const usePlayerStoreBase = create<PlayerState>()(
             partialize: (state) => {
                 const shouldRestorePlayQueue = useSettingsStore.getState().general.resume;
 
-                // Exclude playerNum, seekToTimestamp, status, and timestamp from stored player object
+                // Exclude playerNum, seekToTimestamp, and status from stored player object
                 // These are not needed to be stored since they are ephemeral properties
-                const excludedPlayerKeys = ['playerNum', 'seekToTimestamp', 'status', 'timestamp'];
+                // Note: timestamp is now in a separate store and doesn't need to be excluded here
+                const excludedPlayerKeys = ['playerNum', 'seekToTimestamp', 'status'];
 
                 // If we're not restoring the play queue, we don't need the index property
                 if (!shouldRestorePlayQueue) {
@@ -1196,7 +1193,7 @@ export const usePlayerStoreBase = create<PlayerState>()(
 export const usePlayerStore = createSelectors(usePlayerStoreBase);
 
 export const usePlayerActions = () => {
-    return usePlayerStoreBase(
+    const actions = usePlayerStoreBase(
         useShallow((state) => ({
             addToQueueByType: state.addToQueueByType,
             addToQueueByUniqueId: state.addToQueueByUniqueId,
@@ -1224,7 +1221,6 @@ export const usePlayerActions = () => {
             setRepeat: state.setRepeat,
             setShuffle: state.setShuffle,
             setSpeed: state.setSpeed,
-            setTimestamp: state.setTimestamp,
             setTransitionType: state.setTransitionType,
             setVolume: state.setVolume,
             shuffle: state.shuffle,
@@ -1234,6 +1230,11 @@ export const usePlayerActions = () => {
             toggleShuffle: state.toggleShuffle,
         })),
     );
+
+    return {
+        ...actions,
+        setTimestamp: setTimestampStore,
+    };
 };
 
 export type AddToQueueByPlayType = Play;
@@ -1286,17 +1287,6 @@ export const subscribeCurrentTrack = (
             equalityFn: (a, b) => {
                 return a.song?._uniqueId === b.song?._uniqueId;
             },
-        },
-    );
-};
-
-export const subscribePlayerProgress = (
-    onChange: (properties: { timestamp: number }, prev: { timestamp: number }) => void,
-) => {
-    return usePlayerStoreBase.subscribe(
-        (state) => state.player.timestamp,
-        (timestamp, prevTimestamp) => {
-            onChange({ timestamp }, { timestamp: prevTimestamp });
         },
     );
 };
@@ -1398,10 +1388,6 @@ export const usePlayerProperties = () => {
     );
 };
 
-export const usePlayerProgress = () => {
-    return usePlayerStoreBase((state) => state.player.timestamp);
-};
-
 export const usePlayerDuration = () => {
     return usePlayerStoreBase((state) => {
         const queue = state.getQueue();
@@ -1479,10 +1465,6 @@ export const usePlayerVolume = () => {
 
 export const usePlayerSpeed = () => {
     return usePlayerStoreBase((state) => state.player.speed);
-};
-
-export const usePlayerTimestamp = () => {
-    return usePlayerStoreBase((state) => state.player.timestamp);
 };
 
 export const usePlayerSong = () => {
