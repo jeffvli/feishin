@@ -21,7 +21,7 @@ type ActivityState = [QueueSong | undefined, number, PlayerStatus];
 const MAX_FIELD_LENGTH = 125;
 
 const truncate = (field: string) =>
-    field.length <= 125 ? field : field.substring(0, MAX_FIELD_LENGTH) + '...';
+    field.length <= MAX_FIELD_LENGTH ? field : field.substring(0, MAX_FIELD_LENGTH - 1) + '...';
 
 export const useDiscordRpc = () => {
     const discordSettings = useDiscordSettings();
