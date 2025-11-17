@@ -7,7 +7,6 @@ import { del, get, set } from 'idb-keyval';
 import { createRoot } from 'react-dom/client';
 
 import { App } from '/@/renderer/app';
-import { RootErrorBoundary } from '/@/renderer/components/error-boundary/root-error-boundary';
 import { queryClient } from '/@/renderer/lib/react-query';
 
 function createIDBPersister(idbValidKey: IDBValidKey = 'reactQuery') {
@@ -27,34 +26,32 @@ function createIDBPersister(idbValidKey: IDBValidKey = 'reactQuery') {
 const indexedDbPersister = createIDBPersister('feishin');
 
 createRoot(document.getElementById('root')!).render(
-    <RootErrorBoundary>
-        <PersistQueryClientProvider
-            client={queryClient}
-            persistOptions={{
-                buster: 'feishin',
-                dehydrateOptions: {
-                    shouldDehydrateQuery: (query) => {
-                        const isSuccess = query.state.status === 'success';
-                        const isLyricsQueryKey =
-                            query.queryKey.includes('song') &&
-                            query.queryKey.includes('lyrics') &&
-                            query.queryKey.includes('select');
+    <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{
+            buster: 'feishin',
+            dehydrateOptions: {
+                shouldDehydrateQuery: (query) => {
+                    const isSuccess = query.state.status === 'success';
+                    const isLyricsQueryKey =
+                        query.queryKey.includes('song') &&
+                        query.queryKey.includes('lyrics') &&
+                        query.queryKey.includes('select');
 
-                        return isSuccess && isLyricsQueryKey;
+                    return isSuccess && isLyricsQueryKey;
+                },
+            },
+            hydrateOptions: {
+                defaultOptions: {
+                    queries: {
+                        gcTime: Infinity,
                     },
                 },
-                hydrateOptions: {
-                    defaultOptions: {
-                        queries: {
-                            gcTime: Infinity,
-                        },
-                    },
-                },
-                maxAge: Infinity,
-                persister: indexedDbPersister,
-            }}
-        >
-            <App />
-        </PersistQueryClientProvider>
-    </RootErrorBoundary>,
+            },
+            maxAge: Infinity,
+            persister: indexedDbPersister,
+        }}
+    >
+        <App />
+    </PersistQueryClientProvider>,
 );

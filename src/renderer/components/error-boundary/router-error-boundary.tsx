@@ -1,6 +1,7 @@
 import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 
+import { ServerSelector } from '/@/renderer/features/sidebar/components/server-selector';
 import { Box } from '/@/shared/components/box/box';
 import { Button } from '/@/shared/components/button/button';
 import { Center } from '/@/shared/components/center/center';
@@ -9,15 +10,15 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 
-interface RootErrorFallbackProps {
+interface RouterErrorFallbackProps {
     error: Error;
     resetErrorBoundary: () => void;
 }
 
-const RootErrorFallback = ({ error, resetErrorBoundary }: RootErrorFallbackProps) => {
+const RouterErrorFallback = ({ error, resetErrorBoundary }: RouterErrorFallbackProps) => {
     const { t } = useTranslation();
 
-    const handleReload = () => {
+    const handleRefresh = () => {
         window.location.reload();
     };
 
@@ -29,14 +30,27 @@ const RootErrorFallback = ({ error, resetErrorBoundary }: RootErrorFallbackProps
                 width: '100vw',
             }}
         >
+            <Box
+                style={{
+                    padding: 'var(--theme-spacing-md)',
+                    position: 'absolute',
+                    right: 0,
+                    top: 0,
+                    zIndex: 1000,
+                }}
+            >
+                <ServerSelector />
+            </Box>
             <Center style={{ height: '100vh' }}>
                 <Stack style={{ maxWidth: '50%' }}>
                     <Group gap="xs">
                         <Icon fill="error" icon="error" size="lg" />
-                        <Text size="lg">{t('error.genericError')}</Text>
+                        <Text size="lg">
+                            {t('error.genericError', { postProcess: 'sentenceCase' })}
+                        </Text>
                     </Group>
                     <Text size="sm" style={{ wordBreak: 'break-word' }}>
-                        {error?.message || t('error.genericError')}
+                        {error?.message || t('error.genericError', { postProcess: 'sentenceCase' })}
                     </Text>
                     {process.env.NODE_ENV === 'development' && error?.stack && (
                         <Text
@@ -56,10 +70,10 @@ const RootErrorFallback = ({ error, resetErrorBoundary }: RootErrorFallbackProps
                     )}
                     <Group grow>
                         <Button onClick={resetErrorBoundary} size="md" variant="default">
-                            {t('common.reload')}
+                            {t('common.reload', { postProcess: 'sentenceCase' })}
                         </Button>
-                        <Button onClick={handleReload} size="md" variant="filled">
-                            {t('common.reload')}
+                        <Button onClick={handleRefresh} size="md" variant="filled">
+                            {t('common.refresh', { postProcess: 'sentenceCase' })}
                         </Button>
                     </Group>
                 </Stack>
@@ -68,14 +82,14 @@ const RootErrorFallback = ({ error, resetErrorBoundary }: RootErrorFallbackProps
     );
 };
 
-interface RootErrorBoundaryProps {
+interface RouterErrorBoundaryProps {
     children: React.ReactNode;
 }
 
-export const RootErrorBoundary = ({ children }: RootErrorBoundaryProps) => {
+export const RouterErrorBoundary = ({ children }: RouterErrorBoundaryProps) => {
     return (
         <ErrorBoundary
-            FallbackComponent={RootErrorFallback}
+            FallbackComponent={RouterErrorFallback}
             onError={(error, errorInfo) => {
                 if (process.env.NODE_ENV === 'development') {
                     console.error('Root error boundary caught an error:', error, errorInfo);

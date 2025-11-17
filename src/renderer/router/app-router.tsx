@@ -3,7 +3,7 @@ import { HashRouter, Route, Routes } from 'react-router';
 
 import { AppRoute } from './routes';
 
-import ArtistListRoute from '/@/renderer/features/artists/routes/artist-list-route';
+import { RouterErrorBoundary } from '/@/renderer/components/error-boundary/router-error-boundary';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists/components/add-to-playlist-context-modal';
 import { ShareItemContextModal } from '/@/renderer/features/sharing/components/share-item-context-modal';
 import { DefaultLayout } from '/@/renderer/layouts/default-layout';
@@ -36,6 +36,8 @@ const InvalidRoute = lazy(
 );
 
 const HomeRoute = lazy(() => import('/@/renderer/features/home/routes/home-route'));
+
+const ArtistListRoute = lazy(() => import('/@/renderer/features/artists/routes/artist-list-route'));
 
 const AlbumArtistListRoute = lazy(
     () => import('/@/renderer/features/artists/routes/album-artist-list-route'),
@@ -70,142 +72,148 @@ const RouteErrorBoundary = lazy(
 export const AppRouter = () => {
     const router = (
         <HashRouter>
-            <ModalsProvider
-                modals={{
-                    addToPlaylist: AddToPlaylistContextModal,
-                    base: BaseContextModal,
-                    shareItem: ShareItemContextModal,
-                }}
-            >
-                <Routes>
-                    <Route element={<TitlebarOutlet />}>
-                        <Route element={<AppOutlet />} errorElement={<RouteErrorBoundary />}>
-                            <Route element={<DefaultLayout />}>
-                                <Route
-                                    element={<HomeRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    index
-                                />
-                                <Route
-                                    element={<HomeRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.HOME}
-                                />
-                                <Route
-                                    element={<SearchRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.SEARCH}
-                                />
-                                <Route
-                                    element={<SettingsRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.SETTINGS}
-                                />
-                                <Route
-                                    element={<NowPlayingRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.NOW_PLAYING}
-                                />
-                                <Route path={AppRoute.LIBRARY_GENRES}>
+            <RouterErrorBoundary>
+                <ModalsProvider
+                    modals={{
+                        addToPlaylist: AddToPlaylistContextModal,
+                        base: BaseContextModal,
+                        shareItem: ShareItemContextModal,
+                    }}
+                >
+                    <Routes>
+                        <Route element={<TitlebarOutlet />}>
+                            <Route element={<AppOutlet />} errorElement={<RouteErrorBoundary />}>
+                                <Route element={<DefaultLayout />}>
                                     <Route
-                                        element={<GenreListRoute />}
+                                        element={<HomeRoute />}
                                         errorElement={<RouteErrorBoundary />}
                                         index
                                     />
                                     <Route
-                                        element={<AlbumListRoute />}
-                                        path={AppRoute.LIBRARY_GENRES_ALBUMS}
+                                        element={<HomeRoute />}
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.HOME}
                                     />
                                     <Route
-                                        element={<SongListRoute />}
-                                        path={AppRoute.LIBRARY_GENRES_SONGS}
-                                    />
-                                </Route>
-                                <Route
-                                    element={<AlbumListRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.LIBRARY_ALBUMS}
-                                />
-                                <Route
-                                    element={<AlbumDetailRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.LIBRARY_ALBUMS_DETAIL}
-                                />
-                                <Route
-                                    element={<ArtistListRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.LIBRARY_ARTISTS}
-                                />
-                                <Route path={AppRoute.LIBRARY_ARTISTS_DETAIL}>
-                                    <Route element={<AlbumArtistDetailRoute />} index />
-                                    <Route
-                                        element={<AlbumListRoute />}
-                                        path={AppRoute.LIBRARY_ARTISTS_DETAIL_DISCOGRAPHY}
+                                        element={<SearchRoute />}
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.SEARCH}
                                     />
                                     <Route
-                                        element={<SongListRoute />}
-                                        path={AppRoute.LIBRARY_ARTISTS_DETAIL_SONGS}
+                                        element={<SettingsRoute />}
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.SETTINGS}
                                     />
                                     <Route
-                                        element={<AlbumArtistDetailTopSongsListRoute />}
-                                        path={AppRoute.LIBRARY_ARTISTS_DETAIL_TOP_SONGS}
+                                        element={<NowPlayingRoute />}
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.NOW_PLAYING}
                                     />
-                                </Route>
-                                <Route
-                                    element={<DummyAlbumDetailRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.FAKE_LIBRARY_ALBUM_DETAILS}
-                                />
-                                <Route
-                                    element={<SongListRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.LIBRARY_SONGS}
-                                />
-                                <Route
-                                    element={<PlaylistListRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.PLAYLISTS}
-                                />
-                                <Route
-                                    element={<PlaylistDetailSongListRoute />}
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.PLAYLISTS_DETAIL_SONGS}
-                                />
-                                <Route
-                                    errorElement={<RouteErrorBoundary />}
-                                    path={AppRoute.LIBRARY_ALBUM_ARTISTS}
-                                >
-                                    <Route element={<AlbumArtistListRoute />} index />
-                                    <Route path={AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL}>
-                                        <Route element={<AlbumArtistDetailRoute />} index />
+                                    <Route path={AppRoute.LIBRARY_GENRES}>
+                                        <Route
+                                            element={<GenreListRoute />}
+                                            errorElement={<RouteErrorBoundary />}
+                                            index
+                                        />
                                         <Route
                                             element={<AlbumListRoute />}
-                                            path={AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY}
+                                            path={AppRoute.LIBRARY_GENRES_ALBUMS}
                                         />
                                         <Route
                                             element={<SongListRoute />}
-                                            path={AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_SONGS}
+                                            path={AppRoute.LIBRARY_GENRES_SONGS}
+                                        />
+                                    </Route>
+                                    <Route
+                                        element={<AlbumListRoute />}
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.LIBRARY_ALBUMS}
+                                    />
+                                    <Route
+                                        element={<AlbumDetailRoute />}
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.LIBRARY_ALBUMS_DETAIL}
+                                    />
+                                    <Route
+                                        element={<ArtistListRoute />}
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.LIBRARY_ARTISTS}
+                                    />
+                                    <Route path={AppRoute.LIBRARY_ARTISTS_DETAIL}>
+                                        <Route element={<AlbumArtistDetailRoute />} index />
+                                        <Route
+                                            element={<AlbumListRoute />}
+                                            path={AppRoute.LIBRARY_ARTISTS_DETAIL_DISCOGRAPHY}
+                                        />
+                                        <Route
+                                            element={<SongListRoute />}
+                                            path={AppRoute.LIBRARY_ARTISTS_DETAIL_SONGS}
                                         />
                                         <Route
                                             element={<AlbumArtistDetailTopSongsListRoute />}
-                                            path={AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_TOP_SONGS}
+                                            path={AppRoute.LIBRARY_ARTISTS_DETAIL_TOP_SONGS}
                                         />
                                     </Route>
+                                    <Route
+                                        element={<DummyAlbumDetailRoute />}
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.FAKE_LIBRARY_ALBUM_DETAILS}
+                                    />
+                                    <Route
+                                        element={<SongListRoute />}
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.LIBRARY_SONGS}
+                                    />
+                                    <Route
+                                        element={<PlaylistListRoute />}
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.PLAYLISTS}
+                                    />
+                                    <Route
+                                        element={<PlaylistDetailSongListRoute />}
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.PLAYLISTS_DETAIL_SONGS}
+                                    />
+                                    <Route
+                                        errorElement={<RouteErrorBoundary />}
+                                        path={AppRoute.LIBRARY_ALBUM_ARTISTS}
+                                    >
+                                        <Route element={<AlbumArtistListRoute />} index />
+                                        <Route path={AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL}>
+                                            <Route element={<AlbumArtistDetailRoute />} index />
+                                            <Route
+                                                element={<AlbumListRoute />}
+                                                path={
+                                                    AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY
+                                                }
+                                            />
+                                            <Route
+                                                element={<SongListRoute />}
+                                                path={AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_SONGS}
+                                            />
+                                            <Route
+                                                element={<AlbumArtistDetailTopSongsListRoute />}
+                                                path={
+                                                    AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_TOP_SONGS
+                                                }
+                                            />
+                                        </Route>
+                                    </Route>
+                                    <Route element={<InvalidRoute />} path="*" />
                                 </Route>
-                                <Route element={<InvalidRoute />} path="*" />
                             </Route>
                         </Route>
-                    </Route>
-                    <Route element={<TitlebarOutlet />}>
-                        <Route element={<DefaultLayout shell />}>
-                            <Route
-                                element={<ActionRequiredRoute />}
-                                path={AppRoute.ACTION_REQUIRED}
-                            />
+                        <Route element={<TitlebarOutlet />}>
+                            <Route element={<DefaultLayout shell />}>
+                                <Route
+                                    element={<ActionRequiredRoute />}
+                                    path={AppRoute.ACTION_REQUIRED}
+                                />
+                            </Route>
                         </Route>
-                    </Route>
-                </Routes>
-            </ModalsProvider>
+                    </Routes>
+                </ModalsProvider>
+            </RouterErrorBoundary>
         </HashRouter>
     );
 
