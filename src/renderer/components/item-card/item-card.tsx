@@ -568,15 +568,17 @@ const PosterItemCard = ({
                         className={clsx(styles.image, { [styles.isRound]: isRound })}
                         src={imageUrl}
                     />
-                    {withControls && showControls && data && (
-                        <ItemCardControls
-                            controls={controls}
-                            internalState={internalState}
-                            item={data}
-                            itemType={itemType}
-                            type="poster"
-                        />
-                    )}
+                    <AnimatePresence>
+                        {withControls && showControls && data && (
+                            <ItemCardControls
+                                controls={controls}
+                                internalState={internalState}
+                                item={data}
+                                itemType={itemType}
+                                type="poster"
+                            />
+                        )}
+                    </AnimatePresence>
                 </div>
                 {data && (
                     <div className={styles.detailContainer}>
