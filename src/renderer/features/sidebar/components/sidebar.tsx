@@ -163,9 +163,9 @@ export const Sidebar = () => {
                     )}
                 </Accordion>
             </ScrollArea>
-            <div style={{ flexShrink: 0, position: 'relative', zIndex: 1 }}>
+            <motion.div className={styles.serverSelectorWrapper} layout>
                 <ServerSelector showImage={showImage} />
-            </div>
+            </motion.div>
             <AnimatePresence initial={false} mode="popLayout">
                 {showImage && (
                     <motion.div

@@ -79,3 +79,9 @@
 .accordion-content:last-child {
     padding-bottom: var(--theme-spacing-md);
 }
+
+.server-selector-wrapper {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+}
