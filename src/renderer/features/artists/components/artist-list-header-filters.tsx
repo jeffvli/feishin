@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { ALBUM_ARTIST_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
-import { ListMusicFolderDropdown } from '/@/renderer/features/shared/components/list-music-folder-dropdown';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
 import { ListSelectFilter } from '/@/renderer/features/shared/components/list-select-filter';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
@@ -36,7 +35,6 @@ export const ArtistListHeaderFilters = () => {
                     defaultSortOrder={SortOrder.ASC}
                     listKey={ItemListKey.ARTIST}
                 />
-                <ListMusicFolderDropdown listKey={ItemListKey.ARTIST} />
                 {rolesQuery.data && rolesQuery.data.length > 0 && (
                     <>
                         <Divider orientation="vertical" />

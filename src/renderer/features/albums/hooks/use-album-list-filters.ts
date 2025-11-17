@@ -7,7 +7,6 @@ import {
     useQueryState,
 } from 'nuqs';
 
-import { useMusicFolderIdFilter } from '/@/renderer/features/shared/hooks/use-music-folder-id-filter';
 import { useSearchTermFilter } from '/@/renderer/features/shared/hooks/use-search-term-filter';
 import { useSortByFilter } from '/@/renderer/features/shared/hooks/use-sort-by-filter';
 import { useSortOrderFilter } from '/@/renderer/features/shared/hooks/use-sort-order-filter';
@@ -19,8 +18,6 @@ export const useAlbumListFilters = () => {
     const { sortBy } = useSortByFilter<AlbumListSort>(null, ItemListKey.ALBUM);
 
     const { sortOrder } = useSortOrderFilter(null, ItemListKey.ALBUM);
-
-    const { musicFolderId } = useMusicFolderIdFilter(null, ItemListKey.ALBUM);
 
     const { searchTerm, setSearchTerm } = useSearchTermFilter('');
 
@@ -67,7 +64,6 @@ export const useAlbumListFilters = () => {
         [FILTER_KEYS.ALBUM.MAX_YEAR]: maxYear ?? undefined,
         [FILTER_KEYS.ALBUM.MIN_YEAR]: minYear ?? undefined,
         [FILTER_KEYS.ALBUM.RECENTLY_PLAYED]: recentlyPlayed ?? undefined,
-        [FILTER_KEYS.SHARED.MUSIC_FOLDER_ID]: musicFolderId ?? undefined,
         [FILTER_KEYS.SHARED.SEARCH_TERM]: searchTerm ?? undefined,
         [FILTER_KEYS.SHARED.SORT_BY]: sortBy ?? undefined,
         [FILTER_KEYS.SHARED.SORT_ORDER]: sortOrder ?? undefined,

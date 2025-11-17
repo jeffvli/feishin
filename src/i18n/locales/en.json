@@ -349,6 +349,9 @@
             "openBrowserDevtools": "open browser devtools",
             "quit": "$t(common.quit)",
             "selectServer": "select server",
+            "selectMusicFolder": "select music folder",
+            "noMusicFolder": "no music folder selected",
+            "multipleMusicFolders": "{{count}} music folders selected",
             "settings": "$t(common.setting_other)",
             "version": "version {{version}}"
         },

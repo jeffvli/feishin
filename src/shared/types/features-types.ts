@@ -4,6 +4,7 @@ export enum ServerFeature {
     BFR = 'bfr',
     LYRICS_MULTIPLE_STRUCTURED = 'lyricsMultipleStructured',
     LYRICS_SINGLE_STRUCTURED = 'lyricsSingleStructured',
+    MUSIC_FOLDER_MULTISELECT = 'musicFolderMultiselect',
     PLAYLISTS_SMART = 'playlistsSmart',
     PUBLIC_PLAYLIST = 'publicPlaylist',
     SHARING_ALBUM_SONG = 'sharingAlbumSong',

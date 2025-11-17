@@ -13,6 +13,8 @@
 }
 
 .scroll-area {
+    flex: 1;
+    min-height: 0;
     padding: 0 var(--theme-spacing-md) var(--theme-spacing-md) var(--theme-spacing-md);
 }
 
@@ -27,10 +29,11 @@
 }
 
 .image-container {
-    position: absolute;
-    bottom: 0;
+    position: relative;
+    flex-shrink: 0;
     width: var(--sidebar-image-height);
     height: var(--sidebar-image-height);
+    padding: var(--theme-spacing-md);
     cursor: pointer;
     animation: fade-in 0.2s ease-in-out;
 
@@ -48,7 +51,7 @@
     height: 100%;
     object-fit: var(--theme-image-fit);
     background: var(--theme-colors-foreground-muted);
-    border-radius: 0;
+    border-radius: var(--theme-radius-md);
 }
 
 .accordion-root {

@@ -1,0 +1,46 @@
+.button-container {
+    align-items: center;
+    width: 100%;
+    padding: var(--theme-spacing-md);
+    cursor: pointer;
+}
+
+.button-container-no-bottom-padding {
+    padding-bottom: 0;
+}
+
+.button-group {
+    padding: var(--theme-spacing-sm);
+    background: var(--theme-colors-surface);
+    border-radius: var(--theme-radius-md);
+}
+
+.logo {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    object-fit: cover;
+    border-radius: var(--theme-radius-md);
+}
+
+.button-stack {
+    flex: 1;
+    min-width: 0;
+}
+
+.popover-target {
+    width: 100%;
+}
+
+.scroll-area {
+    max-height: 400px;
+}
+
+.server-logo {
+    width: var(--theme-font-size-md);
+    height: var(--theme-font-size-md);
+}
+
+.server-button {
+    justify-content: flex-start;
+}

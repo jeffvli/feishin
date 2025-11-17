@@ -1388,7 +1388,7 @@ export const SubsonicController: InternalControllerEndpoint = {
     setRating: async (args) => {
         const { apiClientProps, query } = args;
 
-        const itemIds = query.item.map((item) => item.id);
+        const itemIds = query.id;
 
         for (const id of itemIds) {
             await ssApiClient(apiClientProps).setRating({

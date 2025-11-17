@@ -266,6 +266,7 @@ const genreListSort = {
 
 const genreListParameters = paginationParameters.extend({
     _sort: z.nativeEnum(genreListSort).optional(),
+    library_id: z.array(z.string()).optional(),
     name: z.string().optional(),
 });
 
@@ -308,6 +309,7 @@ const albumArtistList = z.array(albumArtist);
 const albumArtistListParameters = paginationParameters.extend({
     _sort: z.nativeEnum(NDAlbumArtistListSort).optional(),
     genre_id: z.string().optional(),
+    library_id: z.array(z.string()).optional(),
     missing: z.boolean().optional(),
     name: z.string().optional(),
     role: z.string().optional(),
@@ -374,6 +376,7 @@ const albumListParameters = paginationParameters.extend({
     genre_id: z.union([z.string(), z.string().array()]).optional(),
     has_rating: z.boolean().optional(),
     id: z.string().optional(),
+    library_id: z.array(z.string()).optional(),
     name: z.string().optional(),
     recently_added: z.boolean().optional(),
     recently_played: z.boolean().optional(),
@@ -456,6 +459,7 @@ const songListParameters = paginationParameters.extend({
     artist_id: z.array(z.string()).optional(),
     artists_id: z.array(z.string()).optional(),
     genre_id: z.array(z.string()).optional(),
+    library_id: z.array(z.string()).optional(),
     path: z.string().optional(),
     starred: z.boolean().optional(),
     title: z.string().optional(),

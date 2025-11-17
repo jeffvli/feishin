@@ -59,6 +59,14 @@ const excludeMissing = (server?: null | ServerListItemWithCredential) => {
     return undefined;
 };
 
+const getLibraryId = (musicFolderId?: string | string[]): string[] | undefined => {
+    if (!musicFolderId) {
+        return undefined;
+    }
+
+    return Array.isArray(musicFolderId) ? musicFolderId : [musicFolderId];
+};
+
 const getArtistSongKey = (server: null | ServerListItemWithCredential) =>
     hasFeature(server, ServerFeature.TRACK_ALBUM_ARTIST_SEARCH) ? 'artists_id' : 'album_artist_id';
 
@@ -189,6 +197,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 _order: sortOrderMap.navidrome[query.sortOrder],
                 _sort: albumArtistListSortMap.navidrome[query.sortBy],
                 _start: query.startIndex,
+                library_id: getLibraryId(query.musicFolderId),
                 name: query.searchTerm,
                 ...query._custom,
                 role: hasFeature(apiClientProps.server, ServerFeature.BFR) ? 'albumartist' : '',
@@ -287,6 +296,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 artist_id: query.artistIds?.[0],
                 compilation: query.compilation,
                 genre_id: genres,
+                library_id: getLibraryId(query.musicFolderId),
                 name: query.searchTerm,
                 ...query._custom,
                 starred: query.favorite,
@@ -318,6 +328,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 _order: sortOrderMap.navidrome[query.sortOrder],
                 _sort: albumArtistListSortMap.navidrome[query.sortBy],
                 _start: query.startIndex,
+                library_id: getLibraryId(query.musicFolderId),
                 name: query.searchTerm,
                 ...query._custom,
                 role: query.role || undefined,
@@ -361,6 +372,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 _order: sortOrderMap.navidrome[query.sortOrder],
                 _sort: genreListSortMap.navidrome[query.sortBy],
                 _start: query.startIndex,
+                library_id: getLibraryId(query.musicFolderId),
                 name: query.searchTerm,
             },
         });
@@ -480,6 +492,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             ...navidromeFeatures,
             ...subsonicArgs.features,
             publicPlaylist: [1],
+            [ServerFeature.MUSIC_FOLDER_MULTISELECT]: [1],
         };
 
         return {
@@ -567,6 +580,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 album_id: query.albumIds,
                 genre_id: query.genreIds,
                 [getArtistSongKey(apiClientProps.server)]: query.artistIds ?? query.albumArtistIds,
+                library_id: getLibraryId(query.musicFolderId),
                 starred: query.favorite,
                 title: query.searchTerm,
                 ...query._custom,

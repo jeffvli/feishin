@@ -127,7 +127,7 @@
         "semver": "^7.5.4",
         "string-to-color": "^2.2.2",
         "ws": "^8.18.2",
-        "zod": "^4.1.12",
+        "zod": "^3.22.3",
         "zustand": "^5.0.5"
     },
     "devDependencies": {

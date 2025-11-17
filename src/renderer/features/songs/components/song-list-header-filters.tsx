@@ -1,7 +1,6 @@
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { ListFilters } from '/@/renderer/features/shared/components/list-filters';
-import { ListMusicFolderDropdown } from '/@/renderer/features/shared/components/list-music-folder-dropdown';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButton } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
@@ -25,7 +24,6 @@ export const SongListHeaderFilters = () => {
                     defaultSortOrder={SortOrder.ASC}
                     listKey={ItemListKey.SONG}
                 />
-                <ListMusicFolderDropdown listKey={ItemListKey.SONG} />
                 <ListFilters itemType={LibraryItem.SONG} />
                 <ListRefreshButton listKey={ItemListKey.SONG} />
             </Group>

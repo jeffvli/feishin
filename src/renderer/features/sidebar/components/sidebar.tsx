@@ -8,6 +8,7 @@ import styles from './sidebar.module.css';
 
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
+import { ServerSelector } from '/@/renderer/features/sidebar/components/server-selector';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import {
@@ -106,15 +107,6 @@ export const Sidebar = () => {
         return items;
     }, [sidebarItems, translatedSidebarItemMap]);
 
-    const scrollAreaHeight = useMemo(() => {
-        if (showImage) {
-            // Subtract the height of the top bar and padding
-            return `calc(100% - 65px - var(--mantine-spacing-xs) - ${sidebar.leftWidth})`;
-        }
-
-        return '100%';
-    }, [showImage, sidebar.leftWidth]);
-
     const isCustomWindowBar =
         windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS;
 
@@ -125,16 +117,10 @@ export const Sidebar = () => {
             })}
             id="left-sidebar"
         >
-            <Group grow id="global-search-container">
+            <Group grow id="global-search-container" style={{ flexShrink: 0 }}>
                 <ActionBar />
             </Group>
-            <ScrollArea
-                allowDragScroll
-                className={styles.scrollArea}
-                style={{
-                    height: scrollAreaHeight,
-                }}
-            >
+            <ScrollArea allowDragScroll className={styles.scrollArea}>
                 <Accordion
                     classNames={{
                         content: styles.accordionContent,
@@ -177,6 +163,9 @@ export const Sidebar = () => {
                     )}
                 </Accordion>
             </ScrollArea>
+            <div style={{ flexShrink: 0, position: 'relative', zIndex: 1 }}>
+                <ServerSelector showImage={showImage} />
+            </div>
             <AnimatePresence initial={false} mode="popLayout">
                 {showImage && (
                     <motion.div
@@ -221,8 +210,8 @@ export const Sidebar = () => {
                             style={{
                                 cursor: 'default',
                                 position: 'absolute',
-                                right: 5,
-                                top: 5,
+                                right: '1rem',
+                                top: '1rem',
                             }}
                             tooltip={{
                                 label: t('common.collapse', {

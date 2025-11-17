@@ -89,6 +89,7 @@ export type QueueSong = Song & {
 export type ServerListItem = {
     features?: ServerFeatures;
     id: string;
+    musicFolderId?: string[];
     name: string;
     preferInstantMix?: boolean;
     savePassword?: boolean;
@@ -280,7 +281,7 @@ export interface GenreListQuery extends BaseQuery<GenreListSort> {
         navidrome?: null;
     };
     limit?: number;
-    musicFolderId?: string;
+    musicFolderId?: string | string[];
     searchTerm?: string;
     startIndex: number;
 }
@@ -436,7 +437,7 @@ export interface AlbumListQuery extends AlbumListNavidromeQuery, BaseQuery<Album
     limit?: number;
     maxYear?: number;
     minYear?: number;
-    musicFolderId?: string;
+    musicFolderId?: string | string[];
     searchTerm?: string;
     startIndex: number;
 }
@@ -564,7 +565,7 @@ export interface SongListQuery extends BaseQuery<SongListSort> {
     limit?: number;
     maxYear?: number;
     minYear?: number;
-    musicFolderId?: string;
+    musicFolderId?: string | string[];
     searchTerm?: string;
     startIndex: number;
 }
@@ -667,7 +668,7 @@ export type AlbumArtistListCountArgs = BaseEndpointArgs & {
 export interface AlbumArtistListQuery extends BaseQuery<AlbumArtistListSort> {
     _custom?: Record<string, any>;
     limit?: number;
-    musicFolderId?: string;
+    musicFolderId?: string | string[];
     searchTerm?: string;
     startIndex: number;
 }
@@ -759,7 +760,7 @@ export type ArtistListCountArgs = BaseEndpointArgs & { query: ListCountQuery<Art
 export interface ArtistListQuery extends BaseQuery<ArtistListSort> {
     _custom?: Record<string, any>;
     limit?: number;
-    musicFolderId?: string;
+    musicFolderId?: string | string[];
     role?: string;
     searchTerm?: string;
     startIndex: number;
@@ -1058,7 +1059,7 @@ export type ArtistInfoArgs = BaseEndpointArgs & { query: ArtistInfoQuery };
 export type ArtistInfoQuery = {
     artistId: string;
     limit: number;
-    musicFolderId?: string;
+    musicFolderId?: string | string[];
 };
 
 export type FullLyricsMetadata = Omit<InternetProviderLyricResponse, 'id' | 'lyrics' | 'source'> & {
@@ -1104,7 +1105,7 @@ export type RandomSongListQuery = {
     limit?: number;
     maxYear?: number;
     minYear?: number;
-    musicFolderId?: string;
+    musicFolderId?: string | string[];
     played: Played;
 };
 
@@ -1127,14 +1128,14 @@ export type ScrobbleResponse = null;
 export type SearchAlbumArtistsQuery = {
     albumArtistLimit?: number;
     albumArtistStartIndex?: number;
-    musicFolderId?: string;
+    musicFolderId?: string | string[];
     query?: string;
 };
 
 export type SearchAlbumsQuery = {
     albumLimit?: number;
     albumStartIndex?: number;
-    musicFolderId?: string;
+    musicFolderId?: string | string[];
     query?: string;
 };
 
@@ -1147,7 +1148,7 @@ export type SearchQuery = {
     albumArtistStartIndex?: number;
     albumLimit?: number;
     albumStartIndex?: number;
-    musicFolderId?: string;
+    musicFolderId?: string | string[];
     query?: string;
     songLimit?: number;
     songStartIndex?: number;
@@ -1160,7 +1161,7 @@ export type SearchResponse = {
 };
 
 export type SearchSongsQuery = {
-    musicFolderId?: string;
+    musicFolderId?: string | string[];
     query?: string;
     songLimit?: number;
     songStartIndex?: number;

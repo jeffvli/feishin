@@ -16,6 +16,7 @@ export interface AuthSlice extends AuthState {
         deleteServer: (id: string) => void;
         getServer: (id: string) => null | ServerListItemWithCredential;
         setCurrentServer: (server: null | ServerListItemWithCredential) => void;
+        setMusicFolderId: (musicFolderId: string[] | undefined) => void;
         updateServer: (id: string, args: Partial<ServerListItemWithCredential>) => void;
     };
 }
@@ -64,15 +65,36 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
                             }
                         });
                     },
-                    updateServer: (id: string, args: Partial<ServerListItem>) => {
+                    setMusicFolderId: (musicFolderId: string[] | undefined) => {
+                        set((state) => {
+                            if (state.currentServer) {
+                                state.currentServer.musicFolderId = musicFolderId;
+                                const serverId = state.currentServer.id;
+                                if (state.serverList[serverId]) {
+                                    state.serverList[serverId].musicFolderId = musicFolderId;
+                                }
+                            }
+                        });
+                    },
+                    updateServer: (id: string, args: Partial<ServerListItemWithCredential>) => {
                         set((state) => {
                             const updatedServer = {
                                 ...state.serverList[id],
                                 ...args,
                             };
 
+                            if (
+                                state.currentServer?.id === id &&
+                                !('musicFolderId' in args) &&
+                                state.currentServer.musicFolderId !== undefined
+                            ) {
+                                updatedServer.musicFolderId = state.currentServer.musicFolderId;
+                            }
+
                             state.serverList[id] = updatedServer;
-                            state.currentServer = updatedServer;
+                            if (state.currentServer?.id === id) {
+                                state.currentServer = updatedServer;
+                            }
                         });
                     },
                 },
@@ -97,6 +119,7 @@ export const useCurrentServer = () =>
         return {
             features: state.currentServer?.features,
             id: state.currentServer?.id,
+            musicFolderId: state.currentServer?.musicFolderId,
             name: state.currentServer?.name,
             preferInstantMix: state.currentServer?.preferInstantMix,
             savePassword: state.currentServer?.savePassword,

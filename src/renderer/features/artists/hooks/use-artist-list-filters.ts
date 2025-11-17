@@ -1,4 +1,3 @@
-import { useMusicFolderIdFilter } from '/@/renderer/features/shared/hooks/use-music-folder-id-filter';
 import { useSearchTermFilter } from '/@/renderer/features/shared/hooks/use-search-term-filter';
 import { useSelectFilter } from '/@/renderer/features/shared/hooks/use-select-filter';
 import { useSortByFilter } from '/@/renderer/features/shared/hooks/use-sort-by-filter';
@@ -12,15 +11,12 @@ export const useArtistListFilters = () => {
 
     const { sortOrder } = useSortOrderFilter(null, ItemListKey.ARTIST);
 
-    const { musicFolderId } = useMusicFolderIdFilter(null, ItemListKey.ARTIST);
-
     const { searchTerm, setSearchTerm } = useSearchTermFilter('');
 
     const { value: role } = useSelectFilter(FILTER_KEYS.ARTIST.ROLE, '', ItemListKey.ARTIST);
 
     const query = {
         [FILTER_KEYS.ARTIST.ROLE]: role ?? undefined,
-        [FILTER_KEYS.SHARED.MUSIC_FOLDER_ID]: musicFolderId ?? undefined,
         [FILTER_KEYS.SHARED.SEARCH_TERM]: searchTerm ?? undefined,
         [FILTER_KEYS.SHARED.SORT_BY]: sortBy ?? undefined,
         [FILTER_KEYS.SHARED.SORT_ORDER]: sortOrder ?? undefined,

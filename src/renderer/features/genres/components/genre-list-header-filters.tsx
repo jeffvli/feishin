@@ -1,7 +1,6 @@
 import { GENRE_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { ListFilters } from '/@/renderer/features/shared/components/list-filters';
-import { ListMusicFolderDropdown } from '/@/renderer/features/shared/components/list-music-folder-dropdown';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButton } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
@@ -28,7 +27,6 @@ export const GenreListHeaderFilters = () => {
                     defaultSortOrder={SortOrder.ASC}
                     listKey={ItemListKey.GENRE}
                 />
-                <ListMusicFolderDropdown listKey={ItemListKey.GENRE} />
                 <ListFilters itemType={LibraryItem.GENRE} />
                 <ListRefreshButton listKey={ItemListKey.GENRE} />
             </Group>
