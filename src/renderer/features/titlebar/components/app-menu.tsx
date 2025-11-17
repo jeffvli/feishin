@@ -8,7 +8,7 @@ import packageJson from '../../../../../package.json';
 import { ServerSelectorItems } from '/@/renderer/features/sidebar/components/server-selector-items';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAppStore, useAppStoreActions, useSidebarStore } from '/@/renderer/store';
-import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
+import { DropdownMenu, MenuItemProps } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Icon } from '/@/shared/components/icon/icon';
 import { toast } from '/@/shared/components/toast/toast';
 
@@ -264,8 +264,7 @@ export const AppMenu = () => {
                     item.leftSection ||
                     (item.icon && <Icon color={item.iconColor} icon={item.icon} />);
 
-                const props: any = {
-                    key: item.id,
+                const props = {
                     leftSection,
                     ...(item.rightSection && { rightSection: item.rightSection }),
                     ...(item.onClick && { onClick: item.onClick }),
@@ -273,9 +272,13 @@ export const AppMenu = () => {
                     ...(item.to && { to: item.to }),
                     ...(item.href && { href: item.href }),
                     ...(item.target && { target: item.target }),
-                };
+                } as MenuItemProps;
 
-                return <DropdownMenu.Item {...props}>{item.label}</DropdownMenu.Item>;
+                return (
+                    <DropdownMenu.Item key={item.id} {...props}>
+                        {item.label}
+                    </DropdownMenu.Item>
+                );
             }
 
             default:

@@ -14,13 +14,13 @@ import styles from './dropdown-menu.module.css';
 
 import { createPolymorphicComponent } from '/@/shared/utils/create-polymorphic-component';
 
-type MenuDividerProps = MantineMenuDividerProps;
-type MenuDropdownProps = MantineMenuDropdownProps;
-interface MenuItemProps extends MantineMenuItemProps {
+export interface MenuItemProps extends MantineMenuItemProps {
     children: ReactNode;
     isDanger?: boolean;
     isSelected?: boolean;
 }
+type MenuDividerProps = MantineMenuDividerProps;
+type MenuDropdownProps = MantineMenuDropdownProps;
 type MenuLabelProps = MantineMenuLabelProps;
 type MenuProps = MantineMenuProps;
 
