@@ -224,3 +224,9 @@ export const useSetColorScheme = () => {
 
     return { setColorScheme };
 };
+
+export const useColorScheme = () => {
+    const { colorScheme } = useMantineColorScheme();
+
+    return colorScheme === 'dark' ? 'dark' : 'light';
+};

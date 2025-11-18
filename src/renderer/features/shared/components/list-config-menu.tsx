@@ -6,6 +6,7 @@ import { GridConfig } from '/@/renderer/features/shared/components/grid-config';
 import { SettingsButton } from '/@/renderer/features/shared/components/settings-button';
 import { TableConfig } from '/@/renderer/features/shared/components/table-config';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store';
+import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Modal } from '/@/shared/components/modal/modal';
@@ -196,7 +197,7 @@ const Config = ({
 export const ListConfigTable = ({
     options,
 }: {
-    options: { component: ReactNode; id: string; label: ReactNode | string }[];
+    options: { component: ReactNode; id: string; isDivider?: boolean; label: ReactNode | string }[];
 }) => {
     return (
         <Table
@@ -208,12 +209,23 @@ export const ListConfigTable = ({
             withTableBorder={false}
         >
             <Table.Tbody>
-                {options.map((option) => (
-                    <Table.Tr key={option.id}>
-                        <Table.Th w="50%">{option.label}</Table.Th>
-                        <Table.Td p={0}>{option.component}</Table.Td>
-                    </Table.Tr>
-                ))}
+                {options.map((option) => {
+                    if (option.isDivider) {
+                        return (
+                            <Table.Tr key={option.id}>
+                                <Table.Td colSpan={2} px={0} py="md">
+                                    <Divider />
+                                </Table.Td>
+                            </Table.Tr>
+                        );
+                    }
+                    return (
+                        <Table.Tr key={option.id}>
+                            <Table.Th w="50%">{option.label}</Table.Th>
+                            <Table.Td p={0}>{option.component}</Table.Td>
+                        </Table.Tr>
+                    );
+                })}
             </Table.Tbody>
         </Table>
     );

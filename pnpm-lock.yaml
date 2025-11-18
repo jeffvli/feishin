@@ -65,6 +65,9 @@ importers:
       '@types/react-window':
         specifier: ^1.8.8
         version: 1.8.8
+      '@wavesurfer/react':
+        specifier: ^1.0.11
+        version: 1.0.11(react@19.1.0)(wavesurfer.js@7.11.1)
       '@xhayper/discord-rpc':
         specifier: ^1.3.0
         version: 1.3.0
@@ -206,6 +209,9 @@ importers:
       string-to-color:
         specifier: ^2.2.2
         version: 2.2.2
+      wavesurfer.js:
+        specifier: ^7.11.1
+        version: 7.11.1
       ws:
         specifier: ^8.18.2
         version: 8.18.2
@@ -2068,6 +2074,12 @@ packages:
   '@vladfrangu/async_event_emitter@2.4.6':
     resolution: {integrity: sha512-RaI5qZo6D2CVS6sTHFKg1v5Ohq/+Bo2LZ5gzUEwZ/WkHhwtGTCB/sVLw8ijOkAUxasZ+WshN/Rzj4ywsABJ5ZA==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
+
+  '@wavesurfer/react@1.0.11':
+    resolution: {integrity: sha512-DRpaA3MRTKy4Jby12xvoHASa+w31FZtxaqanXcJjfqNqfamkKi8VJfRnz+Uub9LkpdgoAc3g5SuZF75lEcGgzQ==}
+    peerDependencies:
+      react: ^18.2.0 || ^19.0.0
+      wavesurfer.js: '>=7.7.14'
 
   '@xhayper/discord-rpc@1.3.0':
     resolution: {integrity: sha512-0NmUTiODl7u3UEjmO6y0Syp3dmgVLAt2EHrH4QKTQcXRwtF8Wl7Eipdn/GSSZ8HkDwxQFvcDGJMxT9VWB0pH8g==}
@@ -5601,6 +5613,9 @@ packages:
     resolution: {integrity: sha512-IC8sL7aB4/ZgFcGI2T1LczZeFWZ06b3zoHH7jBPyHxOtIIz1jppWHjjEXkOFvFojBVAK9pV7g47xOZ4LW3QLfg==}
     engines: {node: 8.* || >= 10.*}
 
+  wavesurfer.js@7.11.1:
+    resolution: {integrity: sha512-8Q+wwItpjJAlhQ7crQLtKwgfbqqczm5/wx+76K4PptP+MBAjB0OA78+A9OuLnULz/8GpAQ+fKM6s81DonEO0Sg==}
+
   wcwidth@1.0.1:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
 
@@ -7715,6 +7730,11 @@ snapshots:
       - supports-color
 
   '@vladfrangu/async_event_emitter@2.4.6': {}
+
+  '@wavesurfer/react@1.0.11(react@19.1.0)(wavesurfer.js@7.11.1)':
+    dependencies:
+      react: 19.1.0
+      wavesurfer.js: 7.11.1
 
   '@xhayper/discord-rpc@1.3.0':
     dependencies:
@@ -11636,6 +11656,8 @@ snapshots:
       ensure-posix-path: 1.1.1
       matcher-collection: 2.0.1
       minimatch: 3.1.2
+
+  wavesurfer.js@7.11.1: {}
 
   wcwidth@1.0.1:
     dependencies:

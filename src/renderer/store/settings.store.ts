@@ -202,6 +202,18 @@ const SkipButtonsSchema = z.object({
     skipForwardSeconds: z.number(),
 });
 
+const PlayerbarSliderTypeSchema = z.enum(['slider', 'waveform']);
+
+const BarAlignSchema = z.enum(['top', 'bottom', 'center']);
+
+const PlayerbarSliderSchema = z.object({
+    barAlign: BarAlignSchema,
+    barGap: z.number(),
+    barRadius: z.number(),
+    barWidth: z.number(),
+    type: PlayerbarSliderTypeSchema,
+});
+
 const GeneralSettingsSchema = z.object({
     accent: z
         .string()
@@ -233,6 +245,7 @@ const GeneralSettingsSchema = z.object({
     passwordStore: z.string().optional(),
     playButtonBehavior: z.nativeEnum(Play),
     playerbarOpenDrawer: z.boolean(),
+    playerbarSlider: PlayerbarSliderSchema,
     resume: z.boolean(),
     showQueueDrawerButton: z.boolean(),
     sidebarCollapsedNavigation: z.boolean(),
@@ -365,6 +378,12 @@ export enum ArtistItem {
     TOP_SONGS = 'topSongs',
 }
 
+export enum BarAlign {
+    BOTTOM = 'bottom',
+    CENTER = 'center',
+    TOP = 'top',
+}
+
 export enum BindingActions {
     BROWSER_BACK = 'browserBack',
     BROWSER_FORWARD = 'browserForward',
@@ -426,6 +445,11 @@ export enum HomeItem {
     RECENTLY_ADDED = 'recentlyAdded',
     RECENTLY_PLAYED = 'recentlyPlayed',
     RECENTLY_RELEASED = 'recentlyReleased',
+}
+
+export enum PlayerbarSliderType {
+    SLIDER = 'slider',
+    WAVEFORM = 'waveform',
 }
 
 export type DataGridProps = {
@@ -596,6 +620,13 @@ const initialState: SettingsState = {
         passwordStore: undefined,
         playButtonBehavior: Play.NOW,
         playerbarOpenDrawer: false,
+        playerbarSlider: {
+            barAlign: BarAlign.CENTER,
+            barGap: 1,
+            barRadius: 4,
+            barWidth: 2,
+            type: PlayerbarSliderType.WAVEFORM,
+        },
         resume: true,
         showQueueDrawerButton: false,
         sidebarCollapsedNavigation: true,
@@ -1303,3 +1334,7 @@ export const useListSettings = (type: ItemListKey) =>
         (state) => state.lists[type as keyof typeof state.lists],
         shallow,
     ) as ItemListSettings;
+
+export const usePrimaryColor = () => useSettingsStore((store) => store.general.accent);
+
+export const usePlayerbarSlider = () => useSettingsStore((store) => store.general.playerbarSlider);
