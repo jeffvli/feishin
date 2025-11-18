@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { useCurrentServerId } from '/@/renderer/store';
+import { useCurrentServerId, usePlayButtonBehavior } from '/@/renderer/store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
@@ -47,6 +47,12 @@ export const PlayAction = ({ ids, itemType, songs }: PlayActionProps) => {
         handlePlay(Play.SHUFFLE);
     }, [handlePlay]);
 
+    const playButtonBehavior = usePlayButtonBehavior();
+
+    const defaultPlayAction = useCallback(() => {
+        handlePlay(playButtonBehavior);
+    }, [handlePlay, playButtonBehavior]);
+
     if (ids.length === 0) return null;
 
     return (
@@ -54,7 +60,7 @@ export const PlayAction = ({ ids, itemType, songs }: PlayActionProps) => {
             <ContextMenu.SubmenuTarget>
                 <ContextMenu.Item
                     leftIcon="mediaPlay"
-                    onSelect={(e) => e.preventDefault()}
+                    onSelect={defaultPlayAction}
                     rightIcon="arrowRightS"
                 >
                     {t('player.play', { postProcess: 'sentenceCase' })}
