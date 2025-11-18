@@ -72,6 +72,7 @@ export const SongListInfiniteTable = forwardRef<any, SongListInfiniteTableProps>
                 columns={columns}
                 data={data}
                 enableAlternateRowColors={enableAlternateRowColors}
+                enableExpansion={false}
                 enableHorizontalBorders={enableHorizontalBorders}
                 enableRowHoverHighlight={enableRowHoverHighlight}
                 enableSelection={enableSelection}

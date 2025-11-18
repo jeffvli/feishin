@@ -84,6 +84,7 @@ export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProp
                     currentPage={currentPage}
                     data={data || []}
                     enableAlternateRowColors={enableAlternateRowColors}
+                    enableExpansion={false}
                     enableHorizontalBorders={enableHorizontalBorders}
                     enableRowHoverHighlight={enableRowHoverHighlight}
                     enableSelection={enableSelection}
