@@ -2,7 +2,8 @@ import { useWavesurfer } from '@wavesurfer/react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import styles from './playerbar-slider.module.css';
+import { CustomPlayerbarSlider } from './playerbar-slider';
+import styles from './playerbar-waveform.module.css';
 
 import { api } from '/@/renderer/api';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
@@ -149,6 +150,23 @@ export const PlayerbarWaveform = () => {
             wavesurfer.seekTo(ratio);
         }
     }, [wavesurfer, currentTime, songDuration]);
+
+    // Show disabled slider when there's no current song
+    if (!currentSong) {
+        return (
+            <CustomPlayerbarSlider
+                disabled
+                max={100}
+                min={0}
+                onClick={(e) => {
+                    e?.stopPropagation();
+                }}
+                size={6}
+                value={0}
+                w="100%"
+            />
+        );
+    }
 
     return (
         <div

@@ -74,14 +74,3 @@
     align-items: center;
     height: 100%;
 }
-
-.wavesurfer-container {
-    width: 100%;
-    cursor: pointer;
-}
-
-.waveform {
-    align-items: center;
-    width: 100%;
-    height: 100%;
-}

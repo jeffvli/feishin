@@ -1,0 +1,10 @@
+.wavesurfer-container {
+    width: 100%;
+    cursor: pointer;
+}
+
+.waveform {
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
