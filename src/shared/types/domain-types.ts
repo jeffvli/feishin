@@ -1,4 +1,3 @@
-import { Omit } from 'lodash';
 import orderBy from 'lodash/orderBy';
 import reverse from 'lodash/reverse';
 import shuffle from 'lodash/shuffle';

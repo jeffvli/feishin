@@ -1,5 +1,5 @@
 import isElectron from 'is-electron';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { api } from '/@/renderer/api';

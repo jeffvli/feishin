@@ -122,56 +122,56 @@ button {
 @font-face {
     font-family: Archivo;
     font-weight: 100 1000;
-    src: url('../../../assets/fonts/Archivo-VariableFont_wdth,wght.ttf');
+    src: url('../../../assets/fonts/Archivo-VariableFont_wdth,wght.woff2');
 }
 
 @font-face {
     font-family: Raleway;
     font-weight: 100 1000;
-    src: url('../../../assets/fonts/Raleway-VariableFont_wght.ttf');
+    src: url('../../../assets/fonts/Raleway-VariableFont_wght.woff2');
 }
 
 @font-face {
     font-family: Fredoka;
     font-weight: 100 1000;
-    src: url('../../../assets/fonts/Fredoka-VariableFont_wdth,wght.ttf');
+    src: url('../../../assets/fonts/Fredoka-VariableFont_wdth,wght.woff2');
 }
 
 @font-face {
     font-family: 'League Spartan';
     font-weight: 100 1000;
-    src: url('../../../assets/fonts/LeagueSpartan-VariableFont_wght.ttf');
+    src: url('../../../assets/fonts/LeagueSpartan-VariableFont_wght.woff2');
 }
 
 @font-face {
     font-family: Lexend;
     font-weight: 100 1000;
-    src: url('../../../assets/fonts/Lexend-VariableFont_wght.ttf');
+    src: url('../../../assets/fonts/Lexend-VariableFont_wght.woff2');
 }
 
 @font-face {
     font-family: Inter;
     font-weight: 100 1000;
-    src: url('../../../assets/fonts/Inter-VariableFont_slnt,wght.ttf');
+    src: url('../../../assets/fonts/Inter-VariableFont_slnt,wght.woff2');
 }
 
 @font-face {
     font-family: Sora;
     font-weight: 100 1000;
-    src: url('../../../assets/fonts/Sora-VariableFont_wght.ttf');
+    src: url('../../../assets/fonts/Sora-VariableFont_wght.woff2');
 }
 
 @font-face {
     font-family: 'Work Sans';
     font-weight: 100 1000;
-    src: url('../../../assets/fonts/WorkSans-VariableFont_wght.ttf');
+    src: url('../../../assets/fonts/WorkSans-VariableFont_wght.woff2');
 }
 
 @font-face {
     font-family: Poppins;
     font-style: normal;
     font-weight: 400;
-    src: url('../../../assets/fonts/Poppins-Regular.ttf');
+    src: url('../../../assets/fonts/Poppins-Regular.woff2');
     font-display: swap;
 }
 
@@ -179,7 +179,7 @@ button {
     font-family: Poppins;
     font-style: normal;
     font-weight: 600;
-    src: url('../../../assets/fonts/Poppins-SemiBold.ttf');
+    src: url('../../../assets/fonts/Poppins-SemiBold.woff2');
     font-display: swap;
 }
 
@@ -187,7 +187,7 @@ button {
     font-family: Poppins;
     font-style: normal;
     font-weight: 700;
-    src: url('../../../assets/fonts/Poppins-Bold.ttf');
+    src: url('../../../assets/fonts/Poppins-Bold.woff2');
     font-display: swap;
 }
 
@@ -195,7 +195,7 @@ button {
     font-family: Poppins;
     font-style: normal;
     font-weight: 800;
-    src: url('../../../assets/fonts/Poppins-ExtraBold.ttf');
+    src: url('../../../assets/fonts/Poppins-ExtraBold.woff2');
     font-display: swap;
 }
 
@@ -203,20 +203,20 @@ button {
     font-family: Poppins;
     font-style: normal;
     font-weight: 900;
-    src: url('../../../assets/fonts/Poppins-Black.ttf');
+    src: url('../../../assets/fonts/Poppins-Black.woff2');
     font-display: swap;
 }
 
 @font-face {
     font-family: Raleway;
     font-weight: 100 1000;
-    src: url('../../../assets/fonts/Raleway-VariableFont_wght.ttf');
+    src: url('../../../assets/fonts/Raleway-VariableFont_wght.woff2');
 }
 
 @font-face {
     font-family: 'Noto Sans JP';
     font-weight: 100 900;
-    src: url('../../../assets/fonts/NotoSansJP-VariableFont_wght.ttf');
+    src: url('../../../assets/fonts/NotoSansJP-VariableFont_wght.woff2');
     unicode-range: U+3000-9FFF, U+FF00-FFEF; /* Japanese characters */
 }
 

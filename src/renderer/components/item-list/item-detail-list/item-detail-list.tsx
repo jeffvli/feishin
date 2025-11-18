@@ -1,4 +1,4 @@
-import { throttle } from 'lodash';
+import throttle from 'lodash/throttle';
 import { AnimatePresence, motion, Variants } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import {

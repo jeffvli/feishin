@@ -98,6 +98,7 @@
         "format-duration": "^3.0.2",
         "fuse.js": "^7.1.0",
         "i18next": "^25.6.2",
+        "i18next-http-backend": "^3.0.2",
         "idb-keyval": "^6.2.2",
         "immer": "^10.2.0",
         "is-electron": "^2.2.2",

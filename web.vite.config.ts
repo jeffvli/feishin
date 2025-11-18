@@ -20,7 +20,7 @@ export default defineConfig({
                 favicon: normalizePath(path.resolve(__dirname, './assets/icons/favicon.ico')),
                 index: normalizePath(path.resolve(__dirname, './src/renderer/index.html')),
                 preview_full_screen_player: normalizePath(
-                    path.resolve(__dirname, './media/preview_full_screen_player.png'),
+                    path.resolve(__dirname, './media/preview_full_screen_player.webp'),
                 ),
             },
             output: {
@@ -98,9 +98,9 @@ export default defineConfig({
                     {
                         form_factor: 'wide',
                         label: 'Full screen player showing music player and lyrics',
-                        sizes: '1440x900',
-                        src: 'preview_full_screen_player.png',
-                        type: 'image/png',
+                        sizes: '720x450',
+                        src: 'preview_full_screen_player.webp',
+                        type: 'image/webp',
                     },
                 ],
                 short_name: 'Feishin',

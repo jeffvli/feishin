@@ -1,14 +1,61 @@
 import { MantineProvider } from '@mantine/core';
-import '@mantine/core/styles.css';
-import '@mantine/dates/styles.css';
 import { Notifications } from '@mantine/notifications';
+// Base mantine styles (required)
+import '@mantine/core/styles/baseline.css';
+import '@mantine/core/styles/default-css-variables.css';
+import '@mantine/core/styles/global.css';
+// Shared mantine styles
+import '@mantine/core/styles/ScrollArea.css';
+import '@mantine/core/styles/UnstyledButton.css';
+import '@mantine/core/styles/VisuallyHidden.css';
+import '@mantine/core/styles/Paper.css';
+import '@mantine/core/styles/Popover.css';
+import '@mantine/core/styles/CloseButton.css';
+import '@mantine/core/styles/Group.css';
+import '@mantine/core/styles/Loader.css';
+import '@mantine/core/styles/Overlay.css';
+import '@mantine/core/styles/ModalBase.css';
+import '@mantine/core/styles/Input.css';
+import '@mantine/core/styles/InlineInput.css';
+import '@mantine/core/styles/Flex.css';
+import '@mantine/core/styles/FloatingIndicator.css';
+import '@mantine/core/styles/ActionIcon.css';
+// Component-specific mantine styles (needs to be updated if new components are added)
+import '@mantine/core/styles/Accordion.css';
+import '@mantine/core/styles/ActionIcon.css';
+import '@mantine/core/styles/Badge.css';
+import '@mantine/core/styles/Button.css';
+import '@mantine/core/styles/Center.css';
+import '@mantine/core/styles/Checkbox.css';
+import '@mantine/core/styles/Code.css';
+import '@mantine/core/styles/ColorInput.css';
+import '@mantine/core/styles/Dialog.css';
+import '@mantine/core/styles/Divider.css';
+import '@mantine/core/styles/Flex.css';
+import '@mantine/core/styles/Grid.css';
+import '@mantine/core/styles/Group.css';
+import '@mantine/core/styles/Kbd.css';
+import '@mantine/core/styles/LoadingOverlay.css';
+import '@mantine/core/styles/Menu.css';
+import '@mantine/core/styles/Modal.css';
+import '@mantine/core/styles/NumberInput.css';
+import '@mantine/core/styles/Pagination.css';
+import '@mantine/core/styles/PasswordInput.css';
+import '@mantine/core/styles/Pill.css';
+import '@mantine/core/styles/Rating.css';
+import '@mantine/core/styles/SegmentedControl.css';
+import '@mantine/core/styles/Slider.css';
+import '@mantine/core/styles/Stack.css';
+import '@mantine/core/styles/Switch.css';
+import '@mantine/core/styles/Table.css';
+import '@mantine/core/styles/Tabs.css';
+import '@mantine/core/styles/Text.css';
+import '@mantine/core/styles/Title.css';
+import '@mantine/core/styles/Tooltip.css';
+import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import isElectron from 'is-electron';
 import { useEffect, useMemo, useRef, useState } from 'react';
-
-import '/@/shared/styles/global.css';
-
-import 'overlayscrollbars/overlayscrollbars.css';
 
 import i18n from '/@/i18n/i18n';
 import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
@@ -21,6 +68,10 @@ import { useCssSettings, useHotkeySettings, useSettingsStore } from '/@/renderer
 import { useAppTheme } from '/@/renderer/themes/use-app-theme';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { WebAudio } from '/@/shared/types/types';
+import '/@/shared/styles/global.css';
+
+import 'overlayscrollbars/overlayscrollbars.css';
+
 import '/styles/overlayscrollbars.css';
 
 const ipc = isElectron() ? window.api.ipc : null;
