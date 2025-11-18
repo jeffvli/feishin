@@ -226,8 +226,52 @@ const VirtualizedTableGrid = React.memo(
             return result;
         }, [data, enableHeader, groups]);
 
+        const adjustedRowIndexMap = useMemo(() => {
+            const map = new Map<number, number>();
+
+            if (!groups || groups.length === 0) {
+                const startIndex = enableHeader ? 1 : 0;
+                const endIndex = enableHeader ? dataWithGroups.length : dataWithGroups.length;
+                for (let rowIndex = startIndex; rowIndex < endIndex; rowIndex++) {
+                    map.set(rowIndex, enableHeader ? rowIndex : rowIndex + 1);
+                }
+                return map;
+            }
+
+            const groupIndexes: number[] = [];
+            let cumulativeDataIndex = 0;
+            const headerOffset = enableHeader ? 1 : 0;
+
+            groups.forEach((group, groupIndex) => {
+                const groupHeaderIndex = headerOffset + cumulativeDataIndex + groupIndex;
+                groupIndexes.push(groupHeaderIndex);
+                cumulativeDataIndex += group.itemCount;
+            });
+
+            let adjustedIndex = 1;
+            const startIndex = enableHeader ? 0 : 0;
+            const endIndex = dataWithGroups.length;
+
+            for (let rowIndex = startIndex; rowIndex < endIndex; rowIndex++) {
+                if (enableHeader && rowIndex === 0) {
+                    // Header row
+                    map.set(rowIndex, 0);
+                } else if (groupIndexes.includes(rowIndex)) {
+                    // Group header row - don't increment adjustedIndex
+                    map.set(rowIndex, 0);
+                } else {
+                    // Data row
+                    map.set(rowIndex, adjustedIndex);
+                    adjustedIndex++;
+                }
+            }
+
+            return map;
+        }, [dataWithGroups, enableHeader, groups]);
+
         const itemProps: TableItemProps = useMemo(
             () => ({
+                adjustedRowIndexMap,
                 calculatedColumnWidths,
                 cellPadding,
                 columns: parsedColumns,
@@ -256,6 +300,7 @@ const VirtualizedTableGrid = React.memo(
                 tableId,
             }),
             [
+                adjustedRowIndexMap,
                 calculatedColumnWidths,
                 cellPadding,
                 controls,
@@ -577,6 +622,7 @@ export interface TableGroupHeader {
 }
 
 export interface TableItemProps {
+    adjustedRowIndexMap?: Map<number, number>; // Maps rowIndex to adjustedRowIndex (1-indexed, excluding group rows)
     calculatedColumnWidths?: number[];
     cellPadding?: ItemTableListProps['cellPadding'];
     columns: ItemTableListColumnConfig[];

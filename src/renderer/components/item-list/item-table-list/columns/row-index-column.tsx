@@ -29,7 +29,19 @@ export const RowIndexColumn = (props: ItemTableListInnerColumn) => {
 };
 
 const DefaultRowIndexColumn = (props: ItemTableListInnerColumn) => {
-    const { controls, enableExpansion } = props;
+    const {
+        adjustedRowIndexMap,
+        controls,
+        data,
+        enableExpansion,
+        enableHeader,
+        internalState,
+        itemType,
+        rowIndex,
+    } = props;
+
+    const adjustedRowIndex =
+        adjustedRowIndexMap?.get(rowIndex) ?? (enableHeader ? rowIndex : rowIndex + 1);
 
     if (enableExpansion) {
         return (
@@ -41,27 +53,31 @@ const DefaultRowIndexColumn = (props: ItemTableListInnerColumn) => {
                     onClick={(e) =>
                         controls.onExpand?.({
                             event: e,
-                            internalState: props.internalState,
-                            item: props.data[props.rowIndex] as ItemListItem,
-                            itemType: props.itemType,
+                            internalState,
+                            item: data[rowIndex] as ItemListItem,
+                            itemType,
                         })
                     }
                     size="xs"
                     variant="subtle"
                 />
                 <Text className="hide-on-hover" isMuted isNoSelect>
-                    {props.rowIndex}
+                    {adjustedRowIndex}
                 </Text>
             </TableColumnContainer>
         );
     }
 
-    return <TableColumnTextContainer {...props}>{props.rowIndex}</TableColumnTextContainer>;
+    return <TableColumnTextContainer {...props}>{adjustedRowIndex}</TableColumnTextContainer>;
 };
 
 const QueueSongRowIndexColumn = (props: ItemTableListInnerColumn) => {
     const status = usePlayerStatus();
     const { isActive } = useIsCurrentSong(props.data[props.rowIndex] as QueueSong);
+
+    const adjustedRowIndex =
+        props.adjustedRowIndexMap?.get(props.rowIndex) ??
+        (props.enableHeader ? props.rowIndex : props.rowIndex + 1);
 
     return (
         <TableColumnTextContainer {...props}>
@@ -76,7 +92,7 @@ const QueueSongRowIndexColumn = (props: ItemTableListInnerColumn) => {
                     </Flex>
                 )
             ) : (
-                props.rowIndex
+                adjustedRowIndex
             )}
         </TableColumnTextContainer>
     );
