@@ -232,8 +232,16 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
             },
 
             onMore: ({ event, internalState, item, itemType }: DefaultItemControlProps) => {
-                if (!item || !internalState || !event) {
+                if (!item || !event) {
                     return;
+                }
+
+                // If no internalState, call ContextMenuController directly
+                if (!internalState) {
+                    return ContextMenuController.call({
+                        cmd: { items: [item] as any[], type: itemType as any },
+                        event,
+                    });
                 }
 
                 const rowId = internalState.extractRowId(item);

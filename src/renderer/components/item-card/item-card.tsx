@@ -183,11 +183,12 @@ const CompactItemCard = ({
         };
 
         const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-            if (!data || !controls || !internalState) {
+            if (!data || !controls) {
                 return;
             }
 
             e.preventDefault();
+
             controls.onMore?.({
                 event: e,
                 internalState,
@@ -337,11 +338,12 @@ const DefaultItemCard = ({
         };
 
         const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-            if (!data || !controls || !internalState) {
+            if (!data || !controls) {
                 return;
             }
 
             e.preventDefault();
+
             controls.onMore?.({
                 event: e,
                 internalState,
@@ -536,11 +538,12 @@ const PosterItemCard = ({
         };
 
         const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-            if (!data || !controls || !internalState) {
+            if (!data || !controls) {
                 return;
             }
 
             e.preventDefault();
+
             controls.onMore?.({
                 event: e,
                 internalState,
