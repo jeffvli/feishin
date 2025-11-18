@@ -802,7 +802,8 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                     (id) => !itemUniqueIds.includes(id),
                                 );
 
-                                recalculatePlayerIndex(state, newPriorityQueue);
+                                const combinedQueue = [...newPriorityQueue, ...newDefaultQueue];
+                                recalculatePlayerIndex(state, combinedQueue);
 
                                 state.queue.priority = newPriorityQueue;
                                 state.queue.default = newDefaultQueue;
@@ -835,7 +836,8 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                         (id) => !itemUniqueIds.includes(id),
                                     );
 
-                                    recalculatePlayerIndex(state, newDefaultQueue);
+                                    const combinedQueue = [...newPriorityQueue, ...newDefaultQueue];
+                                    recalculatePlayerIndex(state, combinedQueue);
 
                                     state.queue.default = newDefaultQueue;
                                     state.queue.priority = newPriorityQueue;
@@ -866,7 +868,8 @@ export const usePlayerStoreBase = create<PlayerState>()(
 
                             const newDefaultQueue = [...filtered];
 
-                            recalculatePlayerIndex(state, newPriorityQueue);
+                            const combinedQueue = [...newPriorityQueue, ...newDefaultQueue];
+                            recalculatePlayerIndex(state, combinedQueue);
 
                             state.queue.default = newDefaultQueue;
                             state.queue.priority = newPriorityQueue;
@@ -936,7 +939,8 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                     (id) => !uniqueIds.includes(id),
                                 );
 
-                                recalculatePlayerIndex(state, newPriorityQueue);
+                                const combinedQueue = [...newPriorityQueue, ...newDefaultQueue];
+                                recalculatePlayerIndex(state, combinedQueue);
 
                                 state.queue.priority = newPriorityQueue;
                                 state.queue.default = newDefaultQueue;
@@ -966,7 +970,8 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                         (id) => !uniqueIds.includes(id),
                                     );
 
-                                    recalculatePlayerIndex(state, newDefaultQueue);
+                                    const combinedQueue = [...newPriorityQueue, ...newDefaultQueue];
+                                    recalculatePlayerIndex(state, combinedQueue);
 
                                     state.queue.default = newDefaultQueue;
                                     state.queue.priority = newPriorityQueue;
@@ -997,7 +1002,8 @@ export const usePlayerStoreBase = create<PlayerState>()(
 
                             const newDefaultQueue = [...filtered];
 
-                            recalculatePlayerIndex(state, newPriorityQueue);
+                            const combinedQueue = [...newPriorityQueue, ...newDefaultQueue];
+                            recalculatePlayerIndex(state, combinedQueue);
 
                             state.queue.default = newDefaultQueue;
                             state.queue.priority = newPriorityQueue;
