@@ -1,5 +1,5 @@
 import isElectron from 'is-electron';
-import { ReactNode } from 'react';
+import { Fragment, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 
@@ -107,7 +107,7 @@ export const AppMenu = () => {
     const menuConfig: MenuItem[] = [
         {
             condition: privateMode,
-            id: 'private-mode',
+            id: 'private-mode-off',
             item: {
                 icon: 'lock',
                 iconColor: 'error',
@@ -119,7 +119,7 @@ export const AppMenu = () => {
         },
         {
             condition: !privateMode,
-            id: 'private-mode',
+            id: 'private-mode-on',
             item: {
                 icon: 'lockOpen',
                 label: t('page.appMenu.privateModeOn', { postProcess: 'sentenceCase' }),
@@ -155,7 +155,7 @@ export const AppMenu = () => {
         },
         {
             condition: collapsed,
-            id: 'sidebar-toggle',
+            id: 'sidebar-expand',
             item: {
                 icon: 'panelRightOpen',
                 id: 'expand-sidebar',
@@ -167,7 +167,7 @@ export const AppMenu = () => {
         },
         {
             condition: !collapsed,
-            id: 'sidebar-toggle',
+            id: 'sidebar-collapse',
             item: {
                 icon: 'panelRightClose',
                 id: 'collapse-sidebar',
@@ -246,12 +246,17 @@ export const AppMenu = () => {
             case 'conditional-group':
                 if (!item.condition) return null;
                 return (
-                    <div key={item.id}>{item.items.map((subItem) => renderMenuItem(subItem))}</div>
+                    <div key={item.id}>
+                        {item.items.map((subItem) => {
+                            console.log(subItem.id);
+                            return <Fragment key={subItem.id}>{renderMenuItem(subItem)}</Fragment>;
+                        })}
+                    </div>
                 );
 
             case 'conditional-item':
                 if (!item.condition) return null;
-                return renderMenuItem(item.item as MenuItem);
+                return <Fragment key={item.id}>{renderMenuItem(item.item as MenuItem)}</Fragment>;
 
             case 'custom':
                 return <div key={item.id}>{item.component}</div>;
