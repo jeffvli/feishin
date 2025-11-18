@@ -1,4 +1,3 @@
-import { useSetState } from '@mantine/hooks';
 import clsx from 'clsx';
 import { AnimatePresence, HTMLMotionProps, motion, Variants } from 'motion/react';
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -18,6 +17,7 @@ import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
+import { useSetState } from '/@/shared/hooks/use-set-state';
 import { PlayerData, QueueSong } from '/@/shared/types/domain-types';
 
 const imageVariants: Variants = {

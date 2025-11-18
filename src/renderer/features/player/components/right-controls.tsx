@@ -1,4 +1,3 @@
-import { useHotkeys, useMediaQuery } from '@mantine/hooks';
 import { useCallback, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -23,6 +22,8 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Rating } from '/@/shared/components/rating/rating';
+import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
+import { useMediaQuery } from '/@/shared/hooks/use-media-query';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 
 const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {

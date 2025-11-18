@@ -1,7 +1,7 @@
-import { useDebouncedCallback } from '@mantine/hooks';
 import { parseAsString, useQueryState } from 'nuqs';
 
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
+import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
 
 export const useSearchTermFilter = (defaultValue?: string) => {
     const [searchTerm, setSearchTerm] = useQueryState(

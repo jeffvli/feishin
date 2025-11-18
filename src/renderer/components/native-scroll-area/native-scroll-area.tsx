@@ -1,4 +1,3 @@
-import { useMergedRef } from '@mantine/hooks';
 import { useInView } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import { CSSProperties, forwardRef, ReactNode, Ref, useEffect, useRef, useState } from 'react';
@@ -7,6 +6,7 @@ import styles from './native-scroll-area.module.css';
 
 import { PageHeader, PageHeaderProps } from '/@/renderer/components/page-header/page-header';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
+import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
 import { Platform } from '/@/shared/types/types';
 
 interface NativeScrollAreaProps {

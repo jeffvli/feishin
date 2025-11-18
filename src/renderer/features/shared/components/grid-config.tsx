@@ -9,9 +9,8 @@ import {
     dropTargetForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { disableNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/disable-native-drag-preview';
-import { useDebouncedState } from '@mantine/hooks';
 import clsx from 'clsx';
-import Fuse from 'fuse.js';
+import Fuse, { FuseResultMatch } from 'fuse.js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -35,6 +34,7 @@ import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
+import { useDebouncedState } from '/@/shared/hooks/use-debounced-state';
 import { dndUtils, DragData, DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
 import { ItemListKey, ListPaginationType } from '/@/shared/types/types';
 
@@ -239,7 +239,7 @@ export const GridConfig = ({
                 };
             })
             .filter(
-                (option): option is typeof allOptions[0] & { disabled?: boolean } =>
+                (option): option is (typeof allOptions)[0] & { disabled: boolean } =>
                     option !== null,
             );
     }, [list, t, grid, extraOptions, optionsConfig, setList, listKey]);
@@ -433,7 +433,11 @@ const GridRowConfig = ({
     );
 };
 
-const DragHandle = ({ dragHandleRef }: { dragHandleRef: React.RefObject<HTMLButtonElement> }) => {
+const DragHandle = ({
+    dragHandleRef,
+}: {
+    dragHandleRef: React.RefObject<HTMLButtonElement | null>;
+}) => {
     return (
         <ActionIcon
             icon="dragVertical"
@@ -470,11 +474,11 @@ const GridRowItem = memo(
         handleReorder: (idFrom: string, idTo: string, edge: Edge | null) => void;
         item: ItemGridListRowConfig;
         label: string;
-        matches: null | readonly Fuse.FuseResultMatch[];
+        matches: null | readonly FuseResultMatch[];
     }) => {
         const { t } = useTranslation();
         const ref = useRef<HTMLDivElement>(null);
-        const dragHandleRef = useRef<HTMLButtonElement>(null);
+        const dragHandleRef = useRef<HTMLButtonElement | null>(null);
         const [isDragging, setIsDragging] = useState(false);
         const [isDraggedOver, setIsDraggedOver] = useState<Edge | null>(null);
 

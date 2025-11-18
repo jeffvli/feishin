@@ -1,4 +1,3 @@
-import { useDebouncedValue, useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
 import { forwardRef, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -25,6 +24,8 @@ import { searchSongs } from '/@/renderer/utils/search-songs';
 import { Flex } from '/@/shared/components/flex/flex';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
 import { Text } from '/@/shared/components/text/text';
+import { useDebouncedValue } from '/@/shared/hooks/use-debounced-value';
+import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
 import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 import { DragTarget } from '/@/shared/types/drag-and-drop';
 import { ItemListKey, Play, PlayerQueueType } from '/@/shared/types/types';

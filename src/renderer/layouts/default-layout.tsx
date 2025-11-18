@@ -1,4 +1,3 @@
-import { HotkeyItem, useHotkeys } from '@mantine/hooks';
 import clsx from 'clsx';
 import isElectron from 'is-electron';
 import { lazy } from 'react';
@@ -19,6 +18,7 @@ import {
     useSettingsStoreActions,
     useWindowSettings,
 } from '/@/renderer/store/settings.store';
+import { HotkeyItem, useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { Platform, PlayerType } from '/@/shared/types/types';
 
 if (!isElectron()) {

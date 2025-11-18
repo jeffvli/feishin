@@ -1,4 +1,3 @@
-import { useElementSize, useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
 import throttle from 'lodash/throttle';
 import { AnimatePresence } from 'motion/react';
@@ -42,6 +41,8 @@ import {
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls, ItemListHandle } from '/@/renderer/components/item-list/types';
+import { useElementSize } from '/@/shared/hooks/use-element-size';
+import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface VirtualizedGridListProps {

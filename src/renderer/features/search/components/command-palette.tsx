@@ -1,4 +1,3 @@
-import { useDebouncedValue, useDisclosure } from '@mantine/hooks';
 import { useQuery } from '@tanstack/react-query';
 import { Fragment, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +22,8 @@ import { Kbd } from '/@/shared/components/kbd/kbd';
 import { Modal } from '/@/shared/components/modal/modal';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { TextInput } from '/@/shared/components/text-input/text-input';
+import { useDebouncedValue } from '/@/shared/hooks/use-debounced-value';
+import { useDisclosure } from '/@/shared/hooks/use-disclosure';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface CommandPaletteProps {

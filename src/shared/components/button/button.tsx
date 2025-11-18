@@ -1,7 +1,6 @@
 import type { ButtonVariant, ButtonProps as MantineButtonProps } from '@mantine/core';
 
 import { ElementProps, Button as MantineButton } from '@mantine/core';
-import { useTimeout } from '@mantine/hooks';
 import clsx from 'clsx';
 import { forwardRef, useCallback, useRef, useState } from 'react';
 
@@ -9,6 +8,7 @@ import styles from './button.module.css';
 
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Tooltip, TooltipProps } from '/@/shared/components/tooltip/tooltip';
+import { useTimeout } from '/@/shared/hooks/use-timeout';
 import { createPolymorphicComponent } from '/@/shared/utils/create-polymorphic-component';
 
 export interface ButtonProps

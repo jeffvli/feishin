@@ -1,4 +1,3 @@
-import { useDisclosure, useTimeout } from '@mantine/hooks';
 import { AnimatePresence, motion, Variants } from 'motion/react';
 import { useCallback } from 'react';
 import { useLocation } from 'react-router';
@@ -9,6 +8,8 @@ import { DrawerPlayQueue } from '/@/renderer/features/now-playing/components/dra
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAppStore, useSidebarStore } from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
+import { useDisclosure } from '/@/shared/hooks/use-disclosure';
+import { useTimeout } from '/@/shared/hooks/use-timeout';
 import { Platform } from '/@/shared/types/types';
 
 const queueDrawerVariants: Variants = {

@@ -1,5 +1,4 @@
 import { useForm } from '@mantine/form';
-import { useDebouncedValue } from '@mantine/hooks';
 import { openModal } from '@mantine/modals';
 import { useQuery } from '@tanstack/react-query';
 import orderBy from 'lodash/orderBy';
@@ -17,6 +16,7 @@ import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
+import { useDebouncedValue } from '/@/shared/hooks/use-debounced-value';
 import {
     InternetProviderLyricSearchResponse,
     LyricSource,

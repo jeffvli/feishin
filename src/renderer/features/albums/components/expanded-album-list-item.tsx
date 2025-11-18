@@ -1,4 +1,3 @@
-import { useMergedRef } from '@mantine/hooks';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import formatDuration from 'format-duration';
@@ -25,6 +24,7 @@ import { Separator } from '/@/shared/components/separator/separator';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { Text } from '/@/shared/components/text/text';
+import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
 import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { DragOperation, DragTarget, DragTargetMap } from '/@/shared/types/drag-and-drop';
 

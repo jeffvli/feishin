@@ -1,4 +1,3 @@
-import { useHotkeys } from '@mantine/hooks';
 import { ChangeEvent, CSSProperties, KeyboardEvent, useRef, useState } from 'react';
 import { shallow } from 'zustand/shallow';
 
@@ -7,6 +6,7 @@ import { ActionIcon, ActionIconProps } from '/@/shared/components/action-icon/ac
 import { Box } from '/@/shared/components/box/box';
 import { Icon } from '/@/shared/components/icon/icon';
 import { TextInput, TextInputProps } from '/@/shared/components/text-input/text-input';
+import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 
 interface SearchInputProps extends TextInputProps {
     buttonProps?: Partial<ActionIconProps>;

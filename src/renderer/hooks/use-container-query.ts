@@ -1,4 +1,4 @@
-import { useElementSize } from '@mantine/hooks';
+import { useElementSize } from '/@/shared/hooks/use-element-size';
 
 interface UseContainerQueryProps {
     '2xl'?: number;

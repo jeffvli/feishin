@@ -1,7 +1,6 @@
 // Component adapted from https://github.com/bvaughn/react-window/issues/826
 
 import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
-import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
@@ -39,6 +38,7 @@ import {
     ItemTableListColumnConfig,
 } from '/@/renderer/components/item-list/types';
 import { PlayerContext, usePlayer } from '/@/renderer/features/player/context/player-context';
+import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { TableColumn } from '/@/shared/types/types';
 

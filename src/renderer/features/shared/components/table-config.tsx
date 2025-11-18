@@ -9,7 +9,6 @@ import {
     dropTargetForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { disableNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/disable-native-drag-preview';
-import { useDebouncedState } from '@mantine/hooks';
 import clsx from 'clsx';
 import Fuse, { type FuseResultMatch } from 'fuse.js';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -35,6 +34,7 @@ import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
+import { useDebouncedState } from '/@/shared/hooks/use-debounced-state';
 import { dndUtils, DragData, DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
 import { ItemListKey, ListPaginationType } from '/@/shared/types/types';
 

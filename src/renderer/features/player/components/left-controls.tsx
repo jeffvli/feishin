@@ -1,4 +1,3 @@
-import { useHotkeys } from '@mantine/hooks';
 import clsx from 'clsx';
 import { AnimatePresence, LayoutGroup, motion } from 'motion/react';
 import React, { MouseEvent } from 'react';
@@ -24,6 +23,7 @@ import { Separator } from '/@/shared/components/separator/separator';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
+import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 export const LeftControls = () => {

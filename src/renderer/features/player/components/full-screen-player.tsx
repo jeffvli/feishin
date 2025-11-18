@@ -1,4 +1,3 @@
-import { useHotkeys } from '@mantine/hooks';
 import { motion, Variants } from 'motion/react';
 import { CSSProperties, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +26,7 @@ import { Popover } from '/@/shared/components/popover/popover';
 import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Switch } from '/@/shared/components/switch/switch';
+import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { Platform } from '/@/shared/types/types';
 
 const mainBackground = 'var(--theme-colors-background)';

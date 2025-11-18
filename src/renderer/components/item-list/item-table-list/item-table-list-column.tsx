@@ -9,7 +9,6 @@ import {
     dropTargetForElements,
 } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
 import { disableNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/element/disable-native-drag-preview';
-import { useMergedRef } from '@mantine/hooks';
 import clsx from 'clsx';
 import React, { CSSProperties, ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
 import { CellComponentProps } from 'react-window-v2';
@@ -48,6 +47,7 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
 import { useDoubleClick } from '/@/shared/hooks/use-double-click';
+import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
 import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 import {
     dndUtils,
