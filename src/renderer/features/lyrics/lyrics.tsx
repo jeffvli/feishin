@@ -19,8 +19,9 @@ import {
     UnsynchronizedLyrics,
     UnsynchronizedLyricsProps,
 } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
+import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { queryClient } from '/@/renderer/lib/react-query';
-import { usePlayerSong, useLyricsSettings, usePlayerStore } from '/@/renderer/store';
+import { useLyricsSettings, usePlayerSong } from '/@/renderer/store';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -130,22 +131,17 @@ export const Lyrics = () => {
         }),
     );
 
-    useEffect(() => {
-        const unsubSongChange = usePlayerStore.subscribe(
-            (state) => state.current.song,
-            () => {
+    usePlayerEvents(
+        {
+            onCurrentSongChange: () => {
                 setOverride(undefined);
                 setIndex(0);
                 setShowTranslation(false);
                 setTranslatedLyrics(null);
             },
-            { equalityFn: (a, b) => a?.id === b?.id },
-        );
-
-        return () => {
-            unsubSongChange();
-        };
-    }, []);
+        },
+        [],
+    );
 
     useEffect(() => {
         if (lyrics && !translatedLyrics && enableAutoTranslation) {

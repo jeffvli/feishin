@@ -62,9 +62,6 @@ importers:
       '@ts-rest/core':
         specifier: ^3.52.1
         version: 3.52.1(@types/node@24.10.1)(zod@3.25.76)
-      '@types/react-window':
-        specifier: ^1.8.8
-        version: 1.8.8
       '@wavesurfer/react':
         specifier: ^1.0.11
         version: 1.0.11(react@19.1.0)(wavesurfer.js@7.11.1)
@@ -249,6 +246,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.5)
+      '@types/react-window':
+        specifier: ^1.8.8
+        version: 1.8.8
       '@types/source-map-support':
         specifier: ^0.5.10
         version: 0.5.10
