@@ -1,5 +1,8 @@
 import { useDebouncedValue, useMergedRef } from '@mantine/hooks';
+import clsx from 'clsx';
 import { forwardRef, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
+
+import styles from './play-queue.module.css';
 
 import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
 import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
@@ -19,9 +22,7 @@ import {
     usePlayerQueueType,
 } from '/@/renderer/store';
 import { searchSongs } from '/@/renderer/utils/search-songs';
-import { Box } from '/@/shared/components/box/box';
 import { Flex } from '/@/shared/components/flex/flex';
-import { Group } from '/@/shared/components/group/group';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
@@ -58,7 +59,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
                     itemCount: group.count,
                     render: (): ReactElement => {
                         return (
-                            <Group align="center" h="100%" px="md" w="100%" wrap="nowrap">
+                            <div className={styles.groupRow}>
                                 <Text
                                     fw={600}
                                     overflow="visible"
@@ -70,7 +71,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
                                 >
                                     {group.name}
                                 </Text>
-                            </Group>
+                            </div>
                         );
                     },
                     rowHeight: 40,
@@ -124,7 +125,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
     });
 
     return (
-        <Box className="play-queue" pos="relative" style={{ flex: 1, minHeight: 0 }} w="100%">
+        <div className={styles.container}>
             <LoadingOverlay pos="absolute" visible={isFetching} />
             <ItemTableList
                 autoFitColumns={table.autoFitColumns}
@@ -152,7 +153,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
                 size={table.size}
             />
             {isEmpty && <EmptyQueueDropZone />}
-        </Box>
+        </div>
     );
 });
 
@@ -271,24 +272,13 @@ const EmptyQueueDropZone = () => {
     return (
         <Flex
             align="center"
-            className="empty-queue-drop-zone"
+            className={clsx(styles.dropZone, {
+                [styles.draggedOver]: isDraggedOver,
+            })}
             direction="column"
             gap="md"
             justify="center"
             ref={ref}
-            style={{
-                backgroundColor: 'var(--theme-colors-background)',
-                borderRadius: 'var(--theme-radius-md)',
-                bottom: 0,
-                left: 0,
-                opacity: 0.6,
-                outline: isDraggedOver ? '2px solid var(--theme-colors-primary)' : 'none',
-                outlineOffset: '-4px',
-                position: 'absolute',
-                right: 0,
-                top: '40px',
-                zIndex: 10,
-            }}
             w="100%"
         />
     );
