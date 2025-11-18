@@ -1,22 +1,32 @@
 import { useDebouncedValue, useMergedRef } from '@mantine/hooks';
-import { forwardRef, useMemo, useRef } from 'react';
+import { forwardRef, ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
 import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
-import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
+import {
+    ItemTableList,
+    TableGroupHeader,
+} from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
-import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
-import { useListSettings, usePlayerQueue } from '/@/renderer/store';
+import {
+    subscribeCurrentTrack,
+    subscribePlayerQueue,
+    useListSettings,
+    usePlayerActions,
+    usePlayerQueueType,
+} from '/@/renderer/store';
 import { searchSongs } from '/@/renderer/utils/search-songs';
 import { Box } from '/@/shared/components/box/box';
 import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
+import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 import { DragTarget } from '/@/shared/types/drag-and-drop';
-import { ItemListKey, Play } from '/@/shared/types/types';
+import { ItemListKey, Play, PlayerQueueType } from '/@/shared/types/types';
 
 type QueueProps = {
     listKey: ItemListKey;
@@ -26,22 +36,84 @@ type QueueProps = {
 export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, searchTerm }, ref) => {
     const { table } = useListSettings(listKey) || {};
 
-    const queue = usePlayerQueue();
     const isFetching = useIsPlayerFetching();
     const tableRef = useRef<ItemListHandle>(null);
     const mergedRef = useMergedRef(ref, tableRef);
+    const { getQueue } = usePlayerActions();
+    const queueType = usePlayerQueueType();
 
     const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
 
-    const data: QueueSong[] = useMemo(() => {
+    const [data, setData] = useState<QueueSong[]>([]);
+    const [groups, setGroups] = useState<TableGroupHeader[]>([]);
+
+    useEffect(() => {
+        const setQueue = () => {
+            const queue = getQueue() || { groups: [], items: [] };
+
+            setData(queue.items);
+
+            if (queueType === PlayerQueueType.PRIORITY && queue.groups && queue.groups.length > 0) {
+                const transformedGroups: TableGroupHeader[] = queue.groups.map((group) => ({
+                    itemCount: group.count,
+                    render: (): ReactElement => {
+                        return (
+                            <Group align="center" h="100%" px="md" w="100%" wrap="nowrap">
+                                <Text
+                                    fw={600}
+                                    overflow="visible"
+                                    size="md"
+                                    style={{
+                                        textWrap: 'nowrap',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
+                                    {group.name}
+                                </Text>
+                            </Group>
+                        );
+                    },
+                    rowHeight: 40,
+                }));
+                setGroups(transformedGroups);
+            } else {
+                setGroups([]);
+            }
+        };
+
+        const unsub = subscribePlayerQueue(() => {
+            setQueue();
+        });
+
+        const unsubCurrentTrack = subscribeCurrentTrack((e) => {
+            if (e.index !== -1) {
+                tableRef.current?.scrollToIndex(e.index, {
+                    align: 'top',
+                    behavior: 'smooth',
+                });
+            }
+        });
+
+        setQueue();
+
+        return () => {
+            unsub();
+            unsubCurrentTrack();
+        };
+    }, [getQueue, queueType, tableRef]);
+
+    console.log(groups);
+
+    const filteredData: QueueSong[] = useMemo(() => {
         if (debouncedSearchTerm) {
-            return searchSongs(queue, debouncedSearchTerm);
+            const searched = searchSongs(data, debouncedSearchTerm);
+            return searched;
         }
 
-        return queue;
-    }, [queue, debouncedSearchTerm]);
+        return data;
+    }, [data, debouncedSearchTerm]);
 
-    const isEmpty = data.length === 0;
+    const isEmpty = filteredData.length === 0;
 
     const { handleColumnReordered } = useItemListColumnReorder({
         itemListKey: listKey,
@@ -51,26 +123,6 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
         itemListKey: listKey,
     });
 
-    usePlayerEvents(
-        {
-            onCurrentSongChange: (properties) => {
-                const currentSong = properties.song;
-                if (!currentSong || !tableRef.current) {
-                    return;
-                }
-
-                const songIndex = data.findIndex(
-                    (song) => song._uniqueId === currentSong._uniqueId,
-                );
-
-                if (songIndex !== -1) {
-                    tableRef.current.scrollToIndex(songIndex, { align: 'center' });
-                }
-            },
-        },
-        [data],
-    );
-
     return (
         <Box className="play-queue" pos="relative" style={{ flex: 1, minHeight: 0 }} w="100%">
             <LoadingOverlay pos="absolute" visible={isFetching} />
@@ -78,16 +130,17 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
                 autoFitColumns={table.autoFitColumns}
                 CellComponent={ItemTableListColumn}
                 columns={table.columns}
-                data={data}
+                data={filteredData}
                 enableAlternateRowColors={table.enableAlternateRowColors}
-                enableDrag={true}
+                enableDrag
                 enableExpansion={false}
-                enableHeader={true}
+                enableHeader
                 enableHorizontalBorders={table.enableHorizontalBorders}
                 enableRowHoverHighlight={table.enableRowHoverHighlight}
-                enableSelection={true}
+                enableSelection
                 enableVerticalBorders={table.enableVerticalBorders}
                 getRowId="_uniqueId"
+                groups={groups.length > 0 ? groups : undefined}
                 initialTop={{
                     to: 0,
                     type: 'offset',
