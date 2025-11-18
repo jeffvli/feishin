@@ -27,6 +27,8 @@ export default tseslint.config(
         rules: {
             ...eslintPluginReactHooks.configs.recommended.rules,
             ...eslintPluginReactRefresh.configs.vite.rules,
+            'react-hooks/set-state-in-effect': 'off',
+            'react-hooks/refs': 'off',
             '@typescript-eslint/explicit-function-return-type': 'off',
             '@typescript-eslint/no-duplicate-enum-values': 'off',
             '@typescript-eslint/no-explicit-any': 'off',

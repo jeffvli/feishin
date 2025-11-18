@@ -32,10 +32,8 @@ export const SearchInput = ({
             () => {
                 if (enableHotkey) {
                     setIsInputMode(true);
-                    setTimeout(() => {
-                        ref?.current?.focus();
-                        ref?.current?.select();
-                    }, 0);
+                    ref?.current?.focus();
+                    ref?.current?.select();
                 }
             },
         ],

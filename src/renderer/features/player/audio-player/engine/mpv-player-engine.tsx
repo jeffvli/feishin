@@ -149,15 +149,11 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             if (currentSrc) {
                 // Set current song at position 0 and next song at position 1
                 mpvPlayer.setQueue(currentSrc, nextSrc, playerStatus !== PlayerStatus.PLAYING);
-                setTimeout(() => {
-                    setPreviousCurrentSrc(currentSrc);
-                }, 0);
+                setPreviousCurrentSrc(currentSrc);
             } else {
                 // Clear queue if no current song
                 mpvPlayer.setQueue(undefined, undefined, true);
-                setTimeout(() => {
-                    setPreviousCurrentSrc(undefined);
-                }, 0);
+                setPreviousCurrentSrc(undefined);
             }
         } else {
             // If currentSrc hasn't changed but nextSrc has, update position 1

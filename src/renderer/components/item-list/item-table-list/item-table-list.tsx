@@ -1249,9 +1249,7 @@ export const ItemTableList = ({
                         behavior: 'instant',
                         left: scrollLeft,
                     });
-                    setTimeout(() => {
-                        isScrolling.row = false;
-                    }, 0);
+                    isScrolling.row = false;
                 }
 
                 // Sync from main content to header and sticky columns
@@ -1282,11 +1280,9 @@ export const ItemTableList = ({
                             top: scrollTop,
                         });
                     }
-                    setTimeout(() => {
-                        isScrolling.header = false;
-                        isScrolling.pinnedLeft = false;
-                        isScrolling.pinnedRight = false;
-                    }, 0);
+                    isScrolling.header = false;
+                    isScrolling.pinnedLeft = false;
+                    isScrolling.pinnedRight = false;
                 }
 
                 // Sync vertical scroll between left pinned column and main content (only if pinnedLeft exists)
@@ -1296,9 +1292,7 @@ export const ItemTableList = ({
                         behavior: 'instant',
                         top: scrollTop,
                     });
-                    setTimeout(() => {
-                        isScrolling.row = false;
-                    }, 0);
+                    isScrolling.row = false;
                 }
 
                 // Sync vertical scroll between right pinned column and main content (only if pinnedRight exists)
@@ -1308,9 +1302,7 @@ export const ItemTableList = ({
                         behavior: 'instant',
                         top: scrollTop,
                     });
-                    setTimeout(() => {
-                        isScrolling.row = false;
-                    }, 0);
+                    isScrolling.row = false;
                 }
             };
 
