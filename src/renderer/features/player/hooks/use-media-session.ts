@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 
 import {
+    usePlaybackSettings,
     usePlayerSong,
     usePlayerStatus,
-    usePlaybackSettings,
     useSettingsStore,
 } from '/@/renderer/store';
 import { PlayerStatus } from '/@/shared/types/types';
