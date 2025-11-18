@@ -11,11 +11,16 @@ import {
 } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
+import { eventEmitter } from '/@/renderer/events/event-emitter';
+import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import {
     subscribeCurrentTrack,
     subscribePlayerQueue,
+    updateQueueFavorites,
+    updateQueueRatings,
+    useCurrentServerId,
     useListSettings,
     usePlayerActions,
     usePlayerQueueType,
@@ -43,6 +48,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
     const mergedRef = useMergedRef(ref, tableRef);
     const { getQueue } = usePlayerActions();
     const queueType = usePlayerQueueType();
+    const serverId = useCurrentServerId();
 
     const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
 
@@ -103,6 +109,33 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
             unsubCurrentTrack();
         };
     }, [getQueue, queueType, tableRef]);
+
+    // Listen to favorite and rating events to update queue songs
+    useEffect(() => {
+        const handleFavorite = (payload: UserFavoriteEventPayload) => {
+            if (payload.itemType !== LibraryItem.SONG || payload.serverId !== serverId) {
+                return;
+            }
+
+            updateQueueFavorites(payload.id, payload.favorite);
+        };
+
+        const handleRating = (payload: UserRatingEventPayload) => {
+            if (payload.itemType !== LibraryItem.SONG || payload.serverId !== serverId) {
+                return;
+            }
+
+            updateQueueRatings(payload.id, payload.rating);
+        };
+
+        eventEmitter.on('USER_FAVORITE', handleFavorite);
+        eventEmitter.on('USER_RATING', handleRating);
+
+        return () => {
+            eventEmitter.off('USER_FAVORITE', handleFavorite);
+            eventEmitter.off('USER_RATING', handleRating);
+        };
+    }, [serverId]);
 
     const filteredData: QueueSong[] = useMemo(() => {
         if (debouncedSearchTerm) {

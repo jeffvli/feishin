@@ -37,6 +37,7 @@ export const useDeleteFavorite = (args: MutationHookArgs) => {
                 favorite: true,
                 id: variables.query.id,
                 itemType: variables.query.type,
+                serverId: variables.apiClientProps.serverId,
             });
         },
         onMutate: (variables) => {
@@ -44,6 +45,7 @@ export const useDeleteFavorite = (args: MutationHookArgs) => {
                 favorite: false,
                 id: variables.query.id,
                 itemType: variables.query.type,
+                serverId: variables.apiClientProps.serverId,
             });
 
             return null;

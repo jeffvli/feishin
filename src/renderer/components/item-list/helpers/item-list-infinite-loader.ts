@@ -264,6 +264,10 @@ export const useItemListInfiniteLoader = ({
 
     useEffect(() => {
         const handleFavorite = (payload: UserFavoriteEventPayload) => {
+            if (payload.itemType !== itemType || payload.serverId !== serverId) {
+                return;
+            }
+
             const idToIndexMap = data.data
                 .filter(Boolean)
                 .reduce((acc: Record<string, number>, item: any, index: number) => {
@@ -271,7 +275,9 @@ export const useItemListInfiniteLoader = ({
                     return acc;
                 }, {});
 
-            const dataIndexes = payload.id.map((id: string) => idToIndexMap[id]);
+            const dataIndexes = payload.id
+                .map((id: string) => idToIndexMap[id])
+                .filter((idx) => idx !== undefined);
 
             if (dataIndexes.length === 0) {
                 return;
@@ -281,6 +287,10 @@ export const useItemListInfiniteLoader = ({
         };
 
         const handleRating = (payload: UserRatingEventPayload) => {
+            if (payload.itemType !== itemType || payload.serverId !== serverId) {
+                return;
+            }
+
             const idToIndexMap = data.data
                 .filter(Boolean)
                 .reduce((acc: Record<string, number>, item: any, index: number) => {
@@ -288,7 +298,9 @@ export const useItemListInfiniteLoader = ({
                     return acc;
                 }, {});
 
-            const dataIndexes = payload.id.map((id: string) => idToIndexMap[id]);
+            const dataIndexes = payload.id
+                .map((id: string) => idToIndexMap[id])
+                .filter((idx) => idx !== undefined);
 
             if (dataIndexes.length === 0) {
                 return;
@@ -304,7 +316,7 @@ export const useItemListInfiniteLoader = ({
             eventEmitter.off('USER_FAVORITE', handleFavorite);
             eventEmitter.off('USER_RATING', handleRating);
         };
-    }, [data, eventKey, updateItems]);
+    }, [data, eventKey, itemType, serverId, updateItems]);
 
     return { data: data.data, onRangeChanged, refresh, updateItems };
 };

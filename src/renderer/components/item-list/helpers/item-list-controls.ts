@@ -18,6 +18,16 @@ interface UseDefaultItemListControlsArgs {
     onColumnResized?: (columnId: TableColumn, width: number) => void;
 }
 
+const itemTypeMapping = {
+    [LibraryItem.ALBUM]: LibraryItem.ALBUM,
+    [LibraryItem.ALBUM_ARTIST]: LibraryItem.ALBUM_ARTIST,
+    [LibraryItem.ARTIST]: LibraryItem.ARTIST,
+    [LibraryItem.GENRE]: LibraryItem.GENRE,
+    [LibraryItem.PLAYLIST]: LibraryItem.PLAYLIST,
+    [LibraryItem.PLAYLIST_SONG]: LibraryItem.SONG,
+    [LibraryItem.QUEUE_SONG]: LibraryItem.SONG,
+};
+
 export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs) => {
     const player = usePlayer();
     const navigate = useNavigate();
@@ -228,7 +238,13 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                     return;
                 }
 
-                player.setFavorite(item._serverId, [item.id], itemType, favorite);
+                const apiItemType = itemTypeMapping[itemType] || itemType;
+
+                if (!item.id || !item._serverId) {
+                    return;
+                }
+
+                player.setFavorite(item._serverId, [item.id], apiItemType, favorite);
             },
 
             onMore: ({ event, internalState, item, itemType }: DefaultItemControlProps) => {
@@ -294,6 +310,12 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                     return;
                 }
 
+                const apiItemType = itemTypeMapping[itemType] || itemType;
+
+                if (!item.id || !item._serverId) {
+                    return;
+                }
+
                 const previousRating = (item as { userRating: number }).userRating || 0;
 
                 let newRating = rating;
@@ -302,7 +324,7 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                     newRating = 0;
                 }
 
-                player.setRating(item._serverId, [item.id], itemType, newRating);
+                player.setRating(item._serverId, [item.id], apiItemType, newRating);
             },
         };
     }, [onColumnReordered, onColumnResized, navigate, player]);

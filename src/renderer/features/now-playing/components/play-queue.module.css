@@ -8,9 +8,10 @@
 .group-row {
     display: flex;
     align-items: center;
-    justify-content: center;
     width: 100%;
     height: 100%;
+    padding: 0 var(--theme-spacing-md);
+    text-transform: uppercase;
     user-select: none;
 }
 

@@ -8,7 +8,7 @@ import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/i
 import { ItemControls } from '/@/renderer/components/item-list/types';
 import { useIsPlayerFetching } from '/@/renderer/features/player/context/player-context';
 import { animationVariants } from '/@/shared/components/animations/animation-variants';
-import { AppIcon, Icon } from '/@/shared/components/icon/icon';
+import { AppIcon, Icon, IconProps } from '/@/shared/components/icon/icon';
 import { Rating } from '/@/shared/components/rating/rating';
 import {
     Album,
@@ -124,6 +124,14 @@ export const ItemCardControls = ({
                 <SecondaryButton
                     className={styles.favorite}
                     icon="favorite"
+                    iconProps={{
+                        color: (item as { userFavorite: boolean }).userFavorite
+                            ? 'primary'
+                            : 'default',
+                        fill: (item as { userFavorite: boolean }).userFavorite
+                            ? 'primary'
+                            : undefined,
+                    }}
                     onClick={(e) => {
                         e.stopPropagation();
 
@@ -268,9 +276,13 @@ interface SecondaryButtonProps {
 const SecondaryButton = ({
     className,
     icon,
+    iconProps,
     onClick,
     onDoubleClick,
-}: SecondaryButtonProps & { onDoubleClick?: (e: MouseEvent<HTMLButtonElement>) => void }) => {
+}: SecondaryButtonProps & {
+    iconProps?: Partial<IconProps>;
+    onDoubleClick?: (e: MouseEvent<HTMLButtonElement>) => void;
+}) => {
     return (
         <button
             className={clsx(styles.secondaryButton, className)}
@@ -285,7 +297,7 @@ const SecondaryButton = ({
                 onDoubleClick?.(e);
             }}
         >
-            <Icon icon={icon} size="lg" />
+            <Icon icon={icon} size="lg" {...iconProps} />
         </button>
     );
 };

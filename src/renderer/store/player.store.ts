@@ -1448,10 +1448,19 @@ export const usePlayerData = (): PlayerData => {
 
 export const updateQueueFavorites = (ids: string[], favorite: boolean) => {
     usePlayerStoreBase.setState((state) => {
-        // Update songs in the songs object
         Object.values(state.queue.songs).forEach((song) => {
             if (ids.includes(song.id)) {
                 song.userFavorite = favorite;
+            }
+        });
+    });
+};
+
+export const updateQueueRatings = (ids: string[], rating: null | number) => {
+    usePlayerStoreBase.setState((state) => {
+        Object.values(state.queue.songs).forEach((song) => {
+            if (ids.includes(song.id)) {
+                song.userRating = rating;
             }
         });
     });

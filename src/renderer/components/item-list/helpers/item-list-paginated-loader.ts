@@ -145,6 +145,10 @@ export const useItemListPaginatedLoader = ({
                 return;
             }
 
+            if (payload.itemType !== itemType || payload.serverId !== serverId) {
+                return;
+            }
+
             const idToIndexMap = data
                 .filter(Boolean)
                 .reduce((acc: Record<string, number>, item: any, index: number) => {
@@ -152,7 +156,9 @@ export const useItemListPaginatedLoader = ({
                     return acc;
                 }, {});
 
-            const dataIndexes = payload.id.map((id: string) => idToIndexMap[id]);
+            const dataIndexes = payload.id
+                .map((id: string) => idToIndexMap[id])
+                .filter((idx) => idx !== undefined);
 
             if (dataIndexes.length === 0) {
                 return;
@@ -166,6 +172,10 @@ export const useItemListPaginatedLoader = ({
                 return;
             }
 
+            if (payload.itemType !== itemType || payload.serverId !== serverId) {
+                return;
+            }
+
             const idToIndexMap = data.reduce(
                 (acc: Record<string, number>, item: any, index: number) => {
                     acc[item.id] = index;
@@ -174,7 +184,9 @@ export const useItemListPaginatedLoader = ({
                 {},
             );
 
-            const dataIndexes = payload.id.map((id: string) => idToIndexMap[id]);
+            const dataIndexes = payload.id
+                .map((id: string) => idToIndexMap[id])
+                .filter((idx) => idx !== undefined);
 
             if (dataIndexes.length === 0) {
                 return;
@@ -192,7 +204,7 @@ export const useItemListPaginatedLoader = ({
             eventEmitter.off('USER_FAVORITE', handleFavorite);
             eventEmitter.off('USER_RATING', handleRating);
         };
-    }, [data, eventKey, refresh, updateItems]);
+    }, [data, eventKey, itemType, serverId, refresh, updateItems]);
 
     return { data, pageCount, totalItemCount };
 };
