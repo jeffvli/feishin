@@ -49,6 +49,7 @@
         "@mantine/core",
         "@mantine/modals",
         "@mantine/dates",
+        "@mantine/hooks",
         "@radix-ui/react-context-menu"
     ],
     "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
