@@ -397,7 +397,7 @@ export const PlayerConfig = () => {
         <Popover position="top-end" width={500} withArrow>
             <Popover.Target>
                 <ActionIcon
-                    icon="mediaSpeed"
+                    icon="mediaSettings"
                     iconProps={{
                         size: 'lg',
                     }}
