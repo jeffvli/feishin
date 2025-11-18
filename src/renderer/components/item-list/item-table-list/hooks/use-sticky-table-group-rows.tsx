@@ -12,7 +12,6 @@ export interface GroupRowInfo {
 export const useStickyTableGroupRows = ({
     containerRef,
     enabled,
-    getGroupRowHeight,
     getRowHeight,
     groups,
     headerHeight,
@@ -22,9 +21,8 @@ export const useStickyTableGroupRows = ({
 }: {
     containerRef: React.RefObject<HTMLDivElement | null>;
     enabled: boolean;
-    getGroupRowHeight?: (groupIndex: number) => number;
     getRowHeight: (index: number) => number;
-    groups?: Array<{ itemCount: number; rowHeight?: ((index: number) => number) | number }>;
+    groups?: Array<{ itemCount: number }>;
     headerHeight: number;
     mainGridRef: React.RefObject<HTMLDivElement | null>;
     shouldShowStickyHeader?: boolean;
@@ -125,7 +123,8 @@ export const useStickyTableGroupRows = ({
                 const rowViewportTop = containerTop + rowTop - scrollTop;
 
                 // Get the height of this group row to account for its own offset
-                const groupRowHeight = getGroupRowHeight ? getGroupRowHeight(groupIndex) : 40; // Default group row height
+                // Use getRowHeight to get the actual row height for the group header row
+                const groupRowHeight = getRowHeight(rowIndex);
 
                 // Calculate the sticky position accounting for the sticky group row's own height
                 // Similar to how stickyTop accounts for sticky header height, we add the group row height
@@ -173,7 +172,6 @@ export const useStickyTableGroupRows = ({
         groupRowIndexes,
         mainGridRef,
         containerRef,
-        getGroupRowHeight,
         getRowHeight,
         headerHeight,
         stickyTop,

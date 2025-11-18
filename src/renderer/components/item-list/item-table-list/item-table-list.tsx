@@ -574,7 +574,6 @@ export interface TableGroupHeader {
         internalState: ItemListStateActions;
         startDataIndex: number;
     }) => ReactElement;
-    rowHeight?: ((index: number) => number) | number;
 }
 
 export interface TableItemProps {
@@ -1393,33 +1392,6 @@ export const ItemTableList = ({
         (index: number, cellProps: TableItemProps) => {
             const height = size === 'compact' ? 40 : size === 'large' ? 88 : 64;
 
-            // Check if this row is a group header row and has a custom row height
-            if (groups && groups.length > 0) {
-                // Calculate which group this index belongs to
-                let cumulativeDataIndex = 0;
-                const headerOffset = enableHeader ? 1 : 0;
-
-                for (let groupIndex = 0; groupIndex < groups.length; groupIndex++) {
-                    const group = groups[groupIndex];
-                    const groupHeaderIndex = headerOffset + cumulativeDataIndex + groupIndex;
-
-                    if (index === groupHeaderIndex) {
-                        if (group.rowHeight !== undefined) {
-                            const groupRowHeight =
-                                typeof group.rowHeight === 'number'
-                                    ? group.rowHeight
-                                    : group.rowHeight(index);
-                            if (groupRowHeight !== undefined) {
-                                return groupRowHeight;
-                            }
-                        }
-                        break;
-                    }
-
-                    cumulativeDataIndex += group.itemCount;
-                }
-            }
-
             const baseHeight =
                 typeof rowHeight === 'number' ? rowHeight : rowHeight?.(index, cellProps) || height;
 
@@ -1430,39 +1402,13 @@ export const ItemTableList = ({
 
             return baseHeight;
         },
-        [enableHeader, headerHeight, rowHeight, pinnedRowCount, size, groups],
+        [enableHeader, headerHeight, rowHeight, pinnedRowCount, size],
     );
 
     // Create a wrapper for getRowHeight that doesn't require cellProps (for sticky group rows hook)
     const getRowHeightWrapper = useCallback(
         (index: number) => {
             const height = size === 'compact' ? 40 : size === 'large' ? 88 : 64;
-
-            // Check if this row is a group header row and has a custom row height
-            if (groups && groups.length > 0) {
-                let cumulativeDataIndex = 0;
-                const headerOffset = enableHeader ? 1 : 0;
-
-                for (let groupIndex = 0; groupIndex < groups.length; groupIndex++) {
-                    const group = groups[groupIndex];
-                    const groupHeaderIndex = headerOffset + cumulativeDataIndex + groupIndex;
-
-                    if (index === groupHeaderIndex) {
-                        if (group.rowHeight !== undefined) {
-                            const groupRowHeight =
-                                typeof group.rowHeight === 'number'
-                                    ? group.rowHeight
-                                    : group.rowHeight(index);
-                            if (groupRowHeight !== undefined) {
-                                return groupRowHeight;
-                            }
-                        }
-                        break;
-                    }
-
-                    cumulativeDataIndex += group.itemCount;
-                }
-            }
 
             const baseHeight = typeof rowHeight === 'number' ? rowHeight : height;
 
@@ -1473,22 +1419,7 @@ export const ItemTableList = ({
 
             return baseHeight;
         },
-        [enableHeader, headerHeight, rowHeight, pinnedRowCount, size, groups],
-    );
-
-    const getGroupRowHeightWrapper = useCallback(
-        (groupIndex: number) => {
-            if (!groups || groupIndex < 0 || groupIndex >= groups.length) {
-                return 40;
-            }
-
-            const group = groups[groupIndex];
-            if (group.rowHeight !== undefined) {
-                return typeof group.rowHeight === 'number' ? group.rowHeight : group.rowHeight(0);
-            }
-            return 40;
-        },
-        [groups],
+        [enableHeader, headerHeight, rowHeight, pinnedRowCount, size],
     );
 
     const {
@@ -1498,7 +1429,6 @@ export const ItemTableList = ({
     } = useStickyTableGroupRows({
         containerRef: containerFocusRef,
         enabled: enableStickyGroupRows && !!groups && groups.length > 0,
-        getGroupRowHeight: getGroupRowHeightWrapper,
         getRowHeight: getRowHeightWrapper,
         groups,
         headerHeight,
@@ -1917,18 +1847,24 @@ export const ItemTableList = ({
         stickyHeaderItemProps,
     ]);
 
-    // Calculate group row height
+    // Calculate group row height (use same as regular table row height)
     const groupRowHeight = useMemo(() => {
         if (stickyGroupIndex === null || !groups) {
-            return 40; // Default
+            const height = size === 'compact' ? 40 : size === 'large' ? 88 : 64;
+            return typeof rowHeight === 'number' ? rowHeight : height;
         }
 
-        const group = groups[stickyGroupIndex];
-        if (group.rowHeight !== undefined) {
-            return typeof group.rowHeight === 'number' ? group.rowHeight : group.rowHeight(0);
+        // Calculate the row index for this group header
+        let cumulativeDataIndex = 0;
+        const headerOffset = enableHeader ? 1 : 0;
+        for (let i = 0; i < stickyGroupIndex; i++) {
+            cumulativeDataIndex += groups[i].itemCount;
         }
-        return 40; // Default group row height
-    }, [stickyGroupIndex, groups]);
+        const groupHeaderIndex = headerOffset + cumulativeDataIndex + stickyGroupIndex;
+
+        // Use the regular row height for group rows
+        return getRowHeightWrapper(groupHeaderIndex);
+    }, [stickyGroupIndex, groups, getRowHeightWrapper, enableHeader, rowHeight, size]);
 
     const StickyGroupRow = useMemo(() => {
         if (!shouldRenderStickyGroupRow || stickyGroupIndex === null || !groups) {
