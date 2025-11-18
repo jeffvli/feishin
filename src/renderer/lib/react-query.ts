@@ -23,10 +23,11 @@ const queryConfig: DefaultOptions = {
         retry: process.env.NODE_ENV === 'production',
     },
     queries: {
-        gcTime: 1000 * 60 * 3,
+        experimental_prefetchInRender: true,
+        gcTime: 1000 * 20, // 20 seconds
         refetchOnWindowFocus: false,
         retry: process.env.NODE_ENV === 'production',
-        staleTime: 1000 * 5,
+        staleTime: 1000 * 5, // 5 seconds
         throwOnError: (error: any) => {
             return error?.response?.status >= 500;
         },
