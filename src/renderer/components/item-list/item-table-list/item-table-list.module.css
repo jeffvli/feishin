@@ -158,6 +158,8 @@
     min-width: 0;
     height: 100%;
     min-height: 0;
+    overflow-x: visible; /* Allow group headers to extend beyond container */
+    overflow-y: auto; /* Maintain vertical scrolling */
 }
 
 .item-table-pinned-right-columns-container {

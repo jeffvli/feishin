@@ -77,10 +77,8 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
     const shouldEnableDrag = !!props.enableDrag && isDataRow && !!item;
 
     // Check if this row should render a group header (must be before conditional returns)
-    // Group headers are rendered in the main grid at columnIndex 0 (first unpinned column)
-    // We detect this by checking if columnIndex equals pinnedLeftColumnCount (first column of main grid)
-    // or if columnIndex is 0 and there are no pinned columns
-    // Groups are defined by itemCount, so we calculate which group this row belongs to
+    // Group headers need to be rendered consistently across all grids (pinned left, main, pinned right)
+    // to maintain proper styling and row heights
     let groupHeader: 'GROUP_HEADER' | null | ReactElement = null;
     if (props.groups && isDataRow && props.groups.length > 0) {
         // Calculate which group this row index belongs to
@@ -94,12 +92,18 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
             const groupHeaderIndex = headerOffset + cumulativeDataIndex + groupIndex;
 
             if (props.rowIndex === groupHeaderIndex) {
+                // Determine where to render the group header content:
+                // - If pinned left columns exist, render in the first pinned left column
+                // - Otherwise, render in the first column of the main grid
+                const hasPinnedLeftColumns = (props.pinnedLeftColumnCount || 0) > 0;
+                const isFirstPinnedLeftColumn = props.columnIndex === 0 && hasPinnedLeftColumns;
                 const isMainGridFirstColumn =
-                    props.columnIndex === (props.pinnedLeftColumnCount || 0) ||
-                    (props.columnIndex === 0 && (props.pinnedLeftColumnCount || 0) === 0);
+                    !hasPinnedLeftColumns &&
+                    (props.columnIndex === (props.pinnedLeftColumnCount || 0) ||
+                        (props.columnIndex === 0 && (props.pinnedLeftColumnCount || 0) === 0));
 
-                // Only render group header in the first column of the main grid
-                if (isMainGridFirstColumn) {
+                // Render group header content in the first pinned left column (if exists) or first main grid column
+                if (isFirstPinnedLeftColumn || isMainGridFirstColumn) {
                     groupHeader = group.render({
                         data: originalData,
                         groupIndex,
@@ -108,7 +112,7 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
                         startDataIndex: cumulativeDataIndex,
                     });
                 } else {
-                    // For other columns in this row, return marker to skip rendering
+                    // For other columns, mark as group header row for styled rendering
                     groupHeader = 'GROUP_HEADER';
                 }
                 break;
@@ -309,11 +313,14 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
     // Render group header if this row should have one
     if (groupHeader) {
         if (groupHeader === 'GROUP_HEADER') {
-            // For non-first columns, render empty cell (group header spans all columns)
-            return null;
+            // For non-first columns (pinned left, other main columns, pinned right),
+            // render a styled cell that matches the group header styling
+            // This ensures consistent row heights and styling across all grids
+            return <div style={{ ...props.style }} />;
         }
-        // For first column of main grid, render the group header spanning full table width
-        // Calculate widths to span across all grids using calculated column widths
+        // Render the group header spanning full table width
+        // If rendering in pinned left column, extend right to cover all columns
+        // If rendering in main grid, extend left to cover pinned columns
         const pinnedLeftWidth =
             props.pinnedLeftColumnWidths?.reduce((sum, width) => sum + width, 0) || 0;
         const pinnedRightWidth =
@@ -332,12 +339,31 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
                   .reduce((sum, col) => sum + col.width, 0) +
               pinnedRightWidth;
 
-        // Use negative margins to extend beyond cell boundaries and span full width
-        // Apply props.style for virtualization positioning (top, left, position, etc.)
+        // Determine if we're rendering in the first pinned left column
+        const isFirstPinnedLeftColumn =
+            props.columnIndex === 0 && (props.pinnedLeftColumnCount || 0) > 0;
+
+        if (isFirstPinnedLeftColumn) {
+            return (
+                <div
+                    style={{
+                        ...props.style,
+                        backgroundColor: 'var(--theme-bg-secondary)',
+                        borderBottom: '1px solid var(--theme-border-color)',
+                        marginLeft: 0,
+                        marginRight: 0,
+                    }}
+                >
+                    {groupHeader}
+                </div>
+            );
+        }
+
+        // For main grid, use negative margin to extend left
         return (
             <div
                 style={{
-                    ...props.style, // Apply virtualization styles (position, top, left, width, height)
+                    ...props.style,
                     backgroundColor: 'var(--theme-bg-secondary)',
                     borderBottom: '1px solid var(--theme-border-color)',
                     marginLeft: pinnedLeftWidth > 0 ? `-${pinnedLeftWidth}px` : 0,
