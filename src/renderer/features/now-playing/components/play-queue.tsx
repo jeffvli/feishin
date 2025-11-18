@@ -104,8 +104,6 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
         };
     }, [getQueue, queueType, tableRef]);
 
-    console.log(groups);
-
     const filteredData: QueueSong[] = useMemo(() => {
         if (debouncedSearchTerm) {
             const searched = searchSongs(data, debouncedSearchTerm);

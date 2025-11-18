@@ -773,6 +773,9 @@ export const usePlayerStoreBase = create<PlayerState>()(
                             recalculatePlayerIndex(state, newQueue);
                             state.queue.default = newQueue;
                         } else {
+                            const currentTrack = state.getCurrentSong() as QueueSong | undefined;
+                            const currentTrackUniqueId = currentTrack?._uniqueId;
+
                             const priorityIndex = state.queue.priority.findIndex(
                                 (id) => id === uniqueId,
                             );
@@ -803,7 +806,11 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                 );
 
                                 const combinedQueue = [...newPriorityQueue, ...newDefaultQueue];
-                                recalculatePlayerIndex(state, combinedQueue);
+                                recalculatePlayerIndexByUniqueId(
+                                    state,
+                                    currentTrackUniqueId,
+                                    combinedQueue,
+                                );
 
                                 state.queue.priority = newPriorityQueue;
                                 state.queue.default = newDefaultQueue;
@@ -837,7 +844,11 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                     );
 
                                     const combinedQueue = [...newPriorityQueue, ...newDefaultQueue];
-                                    recalculatePlayerIndex(state, combinedQueue);
+                                    recalculatePlayerIndexByUniqueId(
+                                        state,
+                                        currentTrackUniqueId,
+                                        combinedQueue,
+                                    );
 
                                     state.queue.default = newDefaultQueue;
                                     state.queue.priority = newPriorityQueue;
@@ -1527,6 +1538,21 @@ function recalculatePlayerIndex(state: any, queue: string[]) {
 
     const index = queue.findIndex((id) => id === currentTrack._uniqueId);
     state.player.index = Math.max(0, index);
+}
+
+function recalculatePlayerIndexByUniqueId(
+    state: any,
+    currentTrackUniqueId: string | undefined,
+    queue: string[],
+) {
+    if (!currentTrackUniqueId) {
+        return;
+    }
+
+    const recalculatedIndex = queue.findIndex((id) => id === currentTrackUniqueId);
+    if (recalculatedIndex !== -1) {
+        state.player.index = recalculatedIndex;
+    }
 }
 
 function toQueueSong(item: Song): QueueSong {
