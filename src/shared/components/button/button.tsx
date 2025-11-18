@@ -2,7 +2,7 @@ import type { ButtonVariant, ButtonProps as MantineButtonProps } from '@mantine/
 
 import { ElementProps, Button as MantineButton } from '@mantine/core';
 import clsx from 'clsx';
-import { forwardRef, useCallback, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 
 import styles from './button.module.css';
 
@@ -117,20 +117,35 @@ interface TimeoutButtonProps extends ButtonProps {
 export const TimeoutButton = ({ timeoutProps, ...props }: TimeoutButtonProps) => {
     const [, setTimeoutRemaining] = useState(timeoutProps.duration);
     const [isRunning, setIsRunning] = useState(false);
-    const intervalRef = useRef(0);
+    const intervalRef = useRef<null | number>(null);
 
     const callback = () => {
         timeoutProps.callback();
         setTimeoutRemaining(timeoutProps.duration);
-        clearInterval(intervalRef.current);
+        if (intervalRef.current !== null) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+        }
         setIsRunning(false);
     };
 
     const { clear, start } = useTimeout(callback, timeoutProps.duration);
 
+    useEffect(() => {
+        return () => {
+            if (intervalRef.current !== null) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        };
+    }, []);
+
     const startTimeout = useCallback(() => {
         if (isRunning) {
-            clearInterval(intervalRef.current);
+            if (intervalRef.current !== null) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
             setIsRunning(false);
             clear();
         } else {

@@ -1,4 +1,4 @@
-import { ChangeEvent, CSSProperties, KeyboardEvent, useRef, useState } from 'react';
+import { ChangeEvent, CSSProperties, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { shallow } from 'zustand/shallow';
 
 import { useSettingsStore } from '/@/renderer/store';
@@ -58,10 +58,24 @@ export const SearchInput = ({
         }
     };
 
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
+
     const handleButtonClick = () => {
         setIsInputMode(true);
-        setTimeout(() => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+        timeoutRef.current = setTimeout(() => {
             ref?.current?.focus();
+            timeoutRef.current = null;
         }, 0);
     };
 

@@ -42,6 +42,7 @@ export const useFastAverageColor = (args: {
     });
 
     useEffect(() => {
+        let isMounted = true;
         const fac = new FastAverageColor();
 
         if (src && srcLoaded) {
@@ -56,35 +57,41 @@ export const useFastAverageColor = (args: {
                 mode: 'speed',
             })
                 .then((color) => {
-                    idRef.current = id;
-                    return setBackground({
-                        background: color.rgb,
-                        isDark: color.isDark,
-                        isLight: color.isLight,
-                    });
+                    if (isMounted) {
+                        idRef.current = id;
+                        setBackground({
+                            background: color.rgb,
+                            isDark: color.isDark,
+                            isLight: color.isLight,
+                        });
+                        setIsLoading(false);
+                    }
                 })
                 .catch((e) => {
-                    console.error('Error fetching average color', e);
-                    idRef.current = id;
-                    return setBackground({
-                        background: 'rgba(0, 0, 0, 0)',
-                        isDark: true,
-                        isLight: false,
-                    });
-                })
-                .finally(() => {
-                    setIsLoading(false);
+                    if (isMounted) {
+                        console.error('Error fetching average color', e);
+                        idRef.current = id;
+                        setBackground({
+                            background: 'rgba(0, 0, 0, 0)',
+                            isDark: true,
+                            isLight: false,
+                        });
+                        setIsLoading(false);
+                    }
                 });
         } else if (srcLoaded) {
-            idRef.current = id;
-            return setBackground({
-                background: 'var(--theme-colors-foreground-muted)',
-                isDark: true,
-                isLight: false,
-            });
+            if (isMounted) {
+                idRef.current = id;
+                setBackground({
+                    background: 'var(--theme-colors-foreground-muted)',
+                    isDark: true,
+                    isLight: false,
+                });
+            }
         }
 
         return () => {
+            isMounted = false;
             fac.destroy();
         };
     }, [algorithm, srcLoaded, src, id]);
