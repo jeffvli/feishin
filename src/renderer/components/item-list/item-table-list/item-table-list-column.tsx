@@ -348,8 +348,6 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
                 <div
                     style={{
                         ...props.style,
-                        backgroundColor: 'var(--theme-bg-secondary)',
-                        borderBottom: '1px solid var(--theme-border-color)',
                         marginLeft: 0,
                         marginRight: 0,
                     }}
@@ -364,8 +362,6 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
             <div
                 style={{
                     ...props.style,
-                    backgroundColor: 'var(--theme-bg-secondary)',
-                    borderBottom: '1px solid var(--theme-border-color)',
                     marginLeft: pinnedLeftWidth > 0 ? `-${pinnedLeftWidth}px` : 0,
                     width: `${totalTableWidth}px`,
                 }}
