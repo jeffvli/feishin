@@ -12,9 +12,8 @@ import { useCurrentServer } from '/@/renderer/store';
 import { formatDateAbsoluteUTC, formatDurationString, titleCase } from '/@/renderer/utils';
 import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
-import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
-import { Pill } from '/@/shared/components/pill/pill';
+import { Pill, PillLink } from '/@/shared/components/pill/pill';
 import { Rating } from '/@/shared/components/rating/rating';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
@@ -147,34 +146,33 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement, AlbumDetailHeaderPro
                         {metadataItems.map(
                             (item, index) =>
                                 item.value && (
-                                    <Pill key={`item-${item.id}-${index}`}>{item.value}</Pill>
+                                    <Pill key={`item-${item.id}-${index}`} size="md">
+                                        {item.value}
+                                    </Pill>
                                 ),
                         )}
                     </Pill.Group>
                     {showGenres && (
-                        <Group gap="sm">
+                        <Pill.Group>
                             {detailQuery?.data?.genres?.map((genre) => (
-                                <Button
-                                    component={Link}
+                                <PillLink
                                     key={`genre-${genre.id}`}
-                                    radius="md"
-                                    size="compact-md"
+                                    size="md"
                                     to={generatePath(genreRoute, {
                                         genreId: genre.id,
                                     })}
-                                    variant="outline"
                                 >
                                     {genre.name}
-                                </Button>
+                                </PillLink>
                             ))}
-                        </Group>
+                        </Pill.Group>
                     )}
-                    <Group align="center" gap="sm">
+                    <Group align="center" gap="xs">
                         <ActionIcon
                             icon="favorite"
                             iconProps={{
                                 fill: detailQuery?.data?.userFavorite ? 'primary' : undefined,
-                                size: 'lg',
+                                size: 'md',
                             }}
                             onClick={handleFavorite}
                             size="xs"
@@ -184,6 +182,7 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement, AlbumDetailHeaderPro
                             <Rating
                                 onChange={handleUpdateRating}
                                 readOnly={detailQuery?.isFetching}
+                                size="md"
                                 styles={{
                                     input: {
                                         background: 'transparent',

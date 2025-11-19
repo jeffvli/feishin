@@ -4,7 +4,7 @@
     grid-template-areas: 'image' 'info';
     grid-template-rows: auto 1fr;
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: var(--theme-spacing-md);
     align-items: center;
     justify-items: center;
     width: 100%;
@@ -78,7 +78,7 @@
     display: flex;
     flex-direction: column;
     grid-area: info;
-    gap: var(--theme-spacing-md);
+    gap: var(--theme-spacing-sm);
     align-items: center;
     justify-content: center;
     width: 100%;
