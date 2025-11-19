@@ -106,10 +106,16 @@ export const ConfirmModal = ({
         <Stack>
             <Flex>{children}</Flex>
             <Group justify="flex-end">
-                <Button data-focus onClick={handleCancel} variant="default">
+                <Button onClick={handleCancel} variant="default">
                     {labels?.cancel ? labels.cancel : 'Cancel'}
                 </Button>
-                <Button disabled={disabled} loading={loading} onClick={onConfirm} variant="filled">
+                <Button
+                    data-autofocus
+                    disabled={disabled}
+                    loading={loading}
+                    onClick={onConfirm}
+                    variant="filled"
+                >
                     {labels?.confirm ? labels.confirm : 'Confirm'}
                 </Button>
             </Group>
