@@ -1,12 +1,11 @@
 import formatDuration from 'format-duration';
-import { useEffect, useRef, useState } from 'react';
 
+import { PlayerbarSeekSlider } from './playerbar-seek-slider';
 import styles from './playerbar-slider.module.css';
 import { PlayerbarWaveform } from './playerbar-waveform';
 
 import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
-import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useRemote } from '/@/renderer/features/remote/hooks/use-remote';
 import {
     useAppStore,
@@ -27,10 +26,7 @@ export const PlayerbarSlider = () => {
     const playerbarSlider = usePlayerbarSlider();
 
     const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
-    const [isSeeking, setIsSeeking] = useState(false);
-    const [seekValue, setSeekValue] = useState(0);
     const currentTime = usePlayerTimestamp();
-    const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const formattedDuration = formatDuration(songDuration * 1000 || 0);
     const formattedTimeRemaining = formatDuration((currentTime - songDuration) * 1000 || 0);
@@ -38,20 +34,6 @@ export const PlayerbarSlider = () => {
 
     const { showTimeRemaining } = useAppStore();
     const { setShowTimeRemaining } = useAppStoreActions();
-
-    const { mediaSeekToTimestamp } = usePlayer();
-
-    const handleSeekToTimestamp = (timestamp: number) => {
-        mediaSeekToTimestamp(timestamp);
-    };
-
-    useEffect(() => {
-        return () => {
-            if (seekTimeoutRef.current) {
-                clearTimeout(seekTimeoutRef.current);
-            }
-        };
-    }, []);
 
     useRemote();
 
@@ -76,36 +58,7 @@ export const PlayerbarSlider = () => {
                     {isWaveform ? (
                         <PlayerbarWaveform />
                     ) : (
-                        <CustomPlayerbarSlider
-                            label={(value) => formatDuration(value * 1000)}
-                            max={songDuration}
-                            min={0}
-                            onChange={(e) => {
-                                // Cancel any pending timeout if user starts seeking again
-                                if (seekTimeoutRef.current) {
-                                    clearTimeout(seekTimeoutRef.current);
-                                    seekTimeoutRef.current = null;
-                                }
-                                setIsSeeking(true);
-                                setSeekValue(e);
-                            }}
-                            onChangeEnd={(e) => {
-                                setSeekValue(e);
-                                handleSeekToTimestamp(e);
-
-                                // Delay resetting isSeeking to allow currentTime to catch up
-                                seekTimeoutRef.current = setTimeout(() => {
-                                    setIsSeeking(false);
-                                    seekTimeoutRef.current = null;
-                                }, 300);
-                            }}
-                            onClick={(e) => {
-                                e?.stopPropagation();
-                            }}
-                            size={6}
-                            value={!isSeeking ? currentTime : seekValue}
-                            w="100%"
-                        />
+                        <PlayerbarSeekSlider max={songDuration} min={0} />
                     )}
                 </div>
                 <div className={styles.sliderValueWrapper}>
