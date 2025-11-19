@@ -6,7 +6,7 @@ import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/nati
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistDetailContent } from '/@/renderer/features/artists/components/album-artist-detail-content';
 import { AlbumArtistDetailHeader } from '/@/renderer/features/artists/components/album-artist-detail-header';
-import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { useFastAverageColor } from '/@/renderer/hooks';
@@ -27,7 +27,7 @@ const AlbumArtistDetailRoute = () => {
 
     const routeId = (artistId || albumArtistId) as string;
 
-    const handlePlayQueueAdd = usePlayQueueAdd();
+    const { addToQueueByFetch } = usePlayer();
     const playButtonBehavior = usePlayButtonBehavior();
     const detailQuery = useQuery(
         artistsQueries.albumArtistDetail({
@@ -46,13 +46,8 @@ const AlbumArtistDetailRoute = () => {
     const background = (artistBackground && `url(${backgroundUrl})`) || backgroundColor;
 
     const handlePlay = () => {
-        handlePlayQueueAdd?.({
-            byItemType: {
-                id: [routeId],
-                type: LibraryItem.ALBUM_ARTIST,
-            },
-            playType: playButtonBehavior,
-        });
+        if (!server?.id) return;
+        addToQueueByFetch(server.id, [routeId], LibraryItem.ALBUM_ARTIST, playButtonBehavior);
     };
 
     return (

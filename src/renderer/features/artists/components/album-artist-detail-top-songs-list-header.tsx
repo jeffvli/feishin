@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
-import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { Badge } from '/@/shared/components/badge/badge';
@@ -21,14 +21,11 @@ export const AlbumArtistDetailTopSongsListHeader = ({
     title,
 }: AlbumArtistDetailTopSongsListHeaderProps) => {
     const { t } = useTranslation();
-    const handlePlayQueueAdd = usePlayQueueAdd();
+    const { addToQueueByData } = usePlayer();
     const playButtonBehavior = usePlayButtonBehavior();
 
     const handlePlay = async (playType: Play) => {
-        handlePlayQueueAdd?.({
-            byData: data,
-            playType,
-        });
+        addToQueueByData(data, playType);
     };
 
     return (

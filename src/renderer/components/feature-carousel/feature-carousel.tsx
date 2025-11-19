@@ -8,10 +8,10 @@ import { generatePath, Link } from 'react-router';
 
 import styles from './feature-carousel.module.css';
 
-import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import { AppRoute } from '/@/renderer/router/routes';
-import { usePlayButtonBehavior } from '/@/renderer/store';
+import { useCurrentServer, usePlayButtonBehavior } from '/@/renderer/store';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
@@ -43,7 +43,8 @@ interface FeatureCarouselProps {
 
 export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
     const { t } = useTranslation();
-    const handlePlayQueueAdd = usePlayQueueAdd();
+    const { addToQueueByFetch } = usePlayer();
+    const server = useCurrentServer();
     const [itemIndex, setItemIndex] = useState(0);
     const [direction, setDirection] = useState(0);
     const playType = usePlayButtonBehavior();
@@ -131,15 +132,14 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 e.stopPropagation();
-                                                if (!currentItem) return;
+                                                if (!currentItem || !server?.id) return;
 
-                                                handlePlayQueueAdd?.({
-                                                    byItemType: {
-                                                        id: [currentItem.id],
-                                                        type: LibraryItem.ALBUM,
-                                                    },
+                                                addToQueueByFetch(
+                                                    server.id,
+                                                    [currentItem.id],
+                                                    LibraryItem.ALBUM,
                                                     playType,
-                                                });
+                                                );
                                             }}
                                             variant="outline"
                                         >

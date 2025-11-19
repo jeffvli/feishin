@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { generatePath, Link, useParams } from 'react-router';
 
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { LibraryHeader } from '/@/renderer/features/shared/components/library-header';
-import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { formatDateAbsoluteUTC, formatDurationString, titleCase } from '/@/renderer/utils';
@@ -95,19 +95,26 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement, AlbumDetailHeaderPro
             });
         }
 
-        const updateRatingMutation = useSetRating({});
+        const { setRating } = usePlayer();
 
         const handleUpdateRating = (rating: number) => {
             if (!detailQuery?.data) return;
 
-            updateRatingMutation.mutate({
-                apiClientProps: { serverId: detailQuery.data._serverId },
-                query: {
-                    id: [detailQuery.data.id],
-                    rating,
-                    type: LibraryItem.ALBUM,
-                },
-            });
+            if (detailQuery.data.userRating === rating) {
+                return setRating(
+                    detailQuery.data._serverId,
+                    [detailQuery.data.id],
+                    LibraryItem.ALBUM,
+                    0,
+                );
+            }
+
+            return setRating(
+                detailQuery.data._serverId,
+                [detailQuery.data.id],
+                LibraryItem.ALBUM,
+                rating,
+            );
         };
 
         return (
@@ -130,7 +137,7 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement, AlbumDetailHeaderPro
                         {showRating && (
                             <Rating
                                 onChange={handleUpdateRating}
-                                readOnly={detailQuery?.isFetching || updateRatingMutation.isPending}
+                                readOnly={detailQuery?.isFetching}
                                 value={detailQuery?.data?.userRating || 0}
                             />
                         )}

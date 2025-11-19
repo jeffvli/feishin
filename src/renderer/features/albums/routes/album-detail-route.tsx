@@ -6,7 +6,7 @@ import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/nati
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumDetailContent } from '/@/renderer/features/albums/components/album-detail-content';
 import { AlbumDetailHeader } from '/@/renderer/features/albums/components/album-detail-header';
-import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { useFastAverageColor } from '/@/renderer/hooks';
@@ -29,17 +29,12 @@ const AlbumDetailRoute = () => {
         src: detailQuery.data?.imageUrl,
         srcLoaded: !detailQuery.isLoading,
     });
-    const handlePlayQueueAdd = usePlayQueueAdd();
+    const { addToQueueByFetch } = usePlayer();
     const playButtonBehavior = usePlayButtonBehavior();
 
     const handlePlay = () => {
-        handlePlayQueueAdd?.({
-            byItemType: {
-                id: [albumId],
-                type: LibraryItem.ALBUM,
-            },
-            playType: playButtonBehavior,
-        });
+        if (!server?.id) return;
+        addToQueueByFetch(server.id, [albumId], LibraryItem.ALBUM, playButtonBehavior);
     };
 
     const backgroundUrl = detailQuery.data?.imageUrl || '';

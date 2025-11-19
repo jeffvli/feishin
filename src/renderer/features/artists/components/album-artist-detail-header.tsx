@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { LibraryHeader } from '/@/renderer/features/shared/components/library-header';
-import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { formatDurationString } from '/@/renderer/utils';
@@ -65,18 +65,26 @@ export const AlbumArtistDetailHeader = forwardRef(
             },
         ];
 
-        const updateRatingMutation = useSetRating({});
+        const { setRating } = usePlayer();
 
         const handleUpdateRating = (rating: number) => {
             if (!detailQuery?.data) return;
 
-            updateRatingMutation.mutate({
-                apiClientProps: { serverId: detailQuery?.data.serverId },
-                query: {
-                    item: [detailQuery.data],
-                    rating,
-                },
-            });
+            if (detailQuery.data.userRating === rating) {
+                return setRating(
+                    detailQuery.data._serverId,
+                    [detailQuery.data.id],
+                    LibraryItem.ALBUM_ARTIST,
+                    0,
+                );
+            }
+
+            return setRating(
+                detailQuery.data._serverId,
+                [detailQuery.data.id],
+                LibraryItem.ALBUM_ARTIST,
+                rating,
+            );
         };
 
         const showRating = detailQuery?.data?._serverType === ServerType.NAVIDROME;
@@ -104,9 +112,7 @@ export const AlbumArtistDetailHeader = forwardRef(
                                 <Text isNoSelect>•</Text>
                                 <Rating
                                     onChange={handleUpdateRating}
-                                    readOnly={
-                                        detailQuery?.isFetching || updateRatingMutation.isPending
-                                    }
+                                    readOnly={detailQuery?.isFetching}
                                     value={detailQuery?.data?.userRating || 0}
                                 />
                             </>

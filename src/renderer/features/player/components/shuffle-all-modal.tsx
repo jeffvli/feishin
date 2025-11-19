@@ -10,6 +10,7 @@ import { createWithEqualityFn } from 'zustand/traditional';
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useAuthStore } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
@@ -22,14 +23,13 @@ import { Stack } from '/@/shared/components/stack/stack';
 import {
     GenreListResponse,
     GenreListSort,
-    MusicFolderListResponse,
     Played,
     RandomSongListQuery,
     ServerListItem,
     ServerType,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { Play, PlayQueueAddOptions } from '/@/shared/types/types';
+import { Play } from '/@/shared/types/types';
 
 interface ShuffleAllSlice extends RandomSongListQuery {
     actions: {
@@ -74,19 +74,12 @@ export const useShuffleAllStoreActions = () => useShuffleAllStore((state) => sta
 
 interface ShuffleAllModalProps {
     genres: GenreListResponse | undefined;
-    handlePlayQueueAdd: ((options: PlayQueueAddOptions) => void) | undefined;
-    musicFolders: MusicFolderListResponse | undefined;
     queryClient: QueryClient;
     server: null | ServerListItem;
 }
 
-export const ShuffleAllModal = ({
-    genres,
-    handlePlayQueueAdd,
-    musicFolders,
-    queryClient,
-    server,
-}: ShuffleAllModalProps) => {
+export const ShuffleAllModal = ({ genres, queryClient, server }: ShuffleAllModalProps) => {
+    const { addToQueueByData } = usePlayer();
     const { t } = useTranslation();
     const { enableMaxYear, enableMinYear, genre, limit, maxYear, minYear, musicFolderId, played } =
         useShuffleAllStore();
@@ -114,10 +107,7 @@ export const ShuffleAllModal = ({
             staleTime: 0,
         });
 
-        handlePlayQueueAdd?.({
-            byData: res?.items || [],
-            playType,
-        });
+        addToQueueByData(res?.items || [], playType);
 
         closeAllModals();
     };
@@ -136,14 +126,6 @@ export const ShuffleAllModal = ({
             };
         });
     }, [genres, server?.type]);
-
-    const musicFolderData = useMemo(() => {
-        if (!musicFolders) return [];
-        return musicFolders.items.map((musicFolder) => ({
-            label: musicFolder.name,
-            value: String(musicFolder.id),
-        }));
-    }, [musicFolders]);
 
     return (
         <Stack gap="md">
@@ -193,15 +175,6 @@ export const ShuffleAllModal = ({
                 onChange={(e) => setStore({ genre: e || '' })}
                 value={genre}
             />
-            <Select
-                clearable
-                data={musicFolderData}
-                label="Music folder"
-                onChange={(e) => {
-                    setStore({ musicFolderId: e ? String(e) : '' });
-                }}
-                value={musicFolderId}
-            />
             {server?.type === ServerType.JELLYFIN && (
                 <Select
                     clearable
@@ -247,9 +220,7 @@ export const ShuffleAllModal = ({
     );
 };
 
-export const openShuffleAllModal = async (
-    props: Pick<ShuffleAllModalProps, 'handlePlayQueueAdd' | 'queryClient'>,
-) => {
+export const openShuffleAllModal = async (props: Pick<ShuffleAllModalProps, 'queryClient'>) => {
     const server = useAuthStore.getState().currentServer;
 
     const genres = await props.queryClient.fetchQuery({
@@ -270,28 +241,8 @@ export const openShuffleAllModal = async (
         staleTime: 1000 * 60 * 60 * 4,
     });
 
-    const musicFolders = await props.queryClient.fetchQuery({
-        gcTime: 1000 * 60 * 5,
-        queryFn: ({ signal }) =>
-            api.controller.getMusicFolderList({
-                apiClientProps: {
-                    serverId: server?.id || '',
-                    signal,
-                },
-            }),
-        queryKey: queryKeys.musicFolders.list(server?.id),
-        staleTime: 1000 * 60 * 60 * 4,
-    });
-
     openModal({
-        children: (
-            <ShuffleAllModal
-                genres={genres}
-                musicFolders={musicFolders}
-                server={server}
-                {...props}
-            />
-        ),
+        children: <ShuffleAllModal genres={genres} server={server} {...props} />,
         size: 'sm',
         title: i18n.t('player.playRandom', { postProcess: 'sentenceCase' }) as string,
     });

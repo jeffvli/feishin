@@ -7,7 +7,6 @@ import { PlayButton, PlayerButton } from '/@/renderer/features/player/components
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { openShuffleAllModal } from '/@/renderer/features/player/components/shuffle-all-modal';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
 import {
     usePlayerRepeat,
     usePlayerShuffle,
@@ -38,8 +37,6 @@ export const CenterControls = () => {
         toggleRepeat,
         toggleShuffle,
     } = usePlayer();
-
-    const handlePlayQueueAdd = usePlayQueueAdd();
 
     return (
         <>
@@ -170,7 +167,6 @@ export const CenterControls = () => {
                         icon={<Icon fill="default" icon="mediaRandom" size={buttonSize} />}
                         onClick={() =>
                             openShuffleAllModal({
-                                handlePlayQueueAdd,
                                 queryClient,
                             })
                         }

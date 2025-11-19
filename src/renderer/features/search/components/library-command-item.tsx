@@ -3,17 +3,18 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './library-command-item.module.css';
 
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
+import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Image } from '/@/shared/components/image/image';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem } from '/@/shared/types/domain-types';
-import { Play, PlayQueueAddOptions } from '/@/shared/types/types';
+import { Play } from '/@/shared/types/types';
 
 interface LibraryCommandItemProps {
     disabled?: boolean;
-    handlePlayQueueAdd?: (options: PlayQueueAddOptions) => void;
     id: string;
     imageUrl: null | string;
     isHighlighted?: boolean;
@@ -24,7 +25,6 @@ interface LibraryCommandItemProps {
 
 export const LibraryCommandItem = ({
     disabled,
-    handlePlayQueueAdd,
     id,
     imageUrl,
     isHighlighted,
@@ -33,20 +33,17 @@ export const LibraryCommandItem = ({
     title,
 }: LibraryCommandItemProps) => {
     const { t } = useTranslation();
+    const { addToQueueByFetch } = usePlayer();
+    const server = useCurrentServer();
 
     const handlePlay = useCallback(
         (e: SyntheticEvent, id: string, playType: Play) => {
             e.stopPropagation();
             e.preventDefault();
-            handlePlayQueueAdd?.({
-                byItemType: {
-                    id: [id],
-                    type: itemType,
-                },
-                playType,
-            });
+            if (!server?.id) return;
+            addToQueueByFetch(server.id, [id], itemType, playType);
         },
-        [handlePlayQueueAdd, itemType],
+        [addToQueueByFetch, itemType, server?.id],
     );
 
     const [isHovered, setIsHovered] = useState(false);

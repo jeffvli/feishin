@@ -12,6 +12,8 @@ import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
+import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
@@ -33,7 +35,7 @@ import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { AlbumListSort, LibraryItem, Song, SortOrder } from '/@/shared/types/domain-types';
-import { ItemListKey, ListDisplayType, Play } from '/@/shared/types/types';
+import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 
 interface AlbumDetailContentProps {
     background?: string;
@@ -89,10 +91,29 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
     ];
     const playButtonBehavior = usePlayButtonBehavior();
 
-    const handlePlay = async (playType?: Play) => {};
+    const { addToQueueByFetch, setFavorite } = usePlayer();
+
+    const handlePlay = () => {
+        if (!server?.id) return;
+        addToQueueByFetch(server.id, [albumId], LibraryItem.ALBUM, playButtonBehavior);
+    };
 
     const handleFavorite = () => {
         if (!detailQuery?.data) return;
+        setFavorite(
+            detailQuery.data._serverId,
+            [detailQuery.data.id],
+            LibraryItem.ALBUM,
+            !detailQuery.data.userFavorite,
+        );
+    };
+
+    const handleMoreOptions = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (!detailQuery?.data) return;
+        ContextMenuController.call({
+            cmd: { items: [detailQuery.data], type: LibraryItem.ALBUM },
+            event: e,
+        });
     };
 
     const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
@@ -107,7 +128,7 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
                 <section>
                     <Group gap="sm" justify="space-between">
                         <Group>
-                            <PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+                            <PlayButton onClick={handlePlay} />
                             <Group gap="xs">
                                 <ActionIcon
                                     icon="favorite"
@@ -122,9 +143,7 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
                                 />
                                 <ActionIcon
                                     icon="ellipsisHorizontal"
-                                    onClick={(e) => {
-                                        if (!detailQuery?.data) return;
-                                    }}
+                                    onClick={handleMoreOptions}
                                     size="lg"
                                     variant="transparent"
                                 />

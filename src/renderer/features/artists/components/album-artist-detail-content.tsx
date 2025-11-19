@@ -8,11 +8,10 @@ import styles from './album-artist-detail-content.module.css';
 import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistGridCarousel } from '/@/renderer/features/artists/components/album-artist-grid-carousel';
-import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
-import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
-import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -48,8 +47,8 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
         artistId?: string;
     };
     const routeId = (artistId || albumArtistId) as string;
-    const { ref, ...cq } = useContainerQuery();
-    const handlePlayQueueAdd = usePlayQueueAdd();
+    const { ref } = useContainerQuery();
+    const { addToQueueByFetch, setFavorite } = usePlayer();
     const server = useCurrentServer();
     const genrePath = useGenreRoute();
 
@@ -183,38 +182,31 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
     const playButtonBehavior = usePlayButtonBehavior();
 
     const handlePlay = async (playType?: Play) => {
-        handlePlayQueueAdd?.({
-            byItemType: {
-                id: [routeId],
-                type: albumArtistId ? LibraryItem.ALBUM_ARTIST : LibraryItem.ARTIST,
-            },
-            playType: playType || playButtonBehavior,
-        });
+        if (!server?.id) return;
+        addToQueueByFetch(
+            server.id,
+            [routeId],
+            albumArtistId ? LibraryItem.ALBUM_ARTIST : LibraryItem.ARTIST,
+            playType || playButtonBehavior,
+        );
     };
-
-    const createFavoriteMutation = useCreateFavorite({});
-    const deleteFavoriteMutation = useDeleteFavorite({});
 
     const handleFavorite = () => {
         if (!detailQuery?.data) return;
+        setFavorite(
+            detailQuery.data._serverId,
+            [detailQuery.data.id],
+            LibraryItem.ALBUM_ARTIST,
+            !detailQuery.data.userFavorite,
+        );
+    };
 
-        if (detailQuery.data.userFavorite) {
-            deleteFavoriteMutation.mutate({
-                apiClientProps: { serverId: detailQuery.data._serverId },
-                query: {
-                    id: [detailQuery.data.id],
-                    type: LibraryItem.ALBUM_ARTIST,
-                },
-            });
-        } else {
-            createFavoriteMutation.mutate({
-                apiClientProps: { serverId: detailQuery.data._serverId },
-                query: {
-                    id: [detailQuery.data.id],
-                    type: LibraryItem.ALBUM_ARTIST,
-                },
-            });
-        }
+    const handleMoreOptions = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (!detailQuery?.data) return;
+        ContextMenuController.call({
+            cmd: { items: [detailQuery.data], type: LibraryItem.ALBUM_ARTIST },
+            event: e,
+        });
     };
 
     const albumCount = detailQuery?.data?.albumCount;
@@ -251,18 +243,13 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
                             iconProps={{
                                 fill: detailQuery?.data?.userFavorite ? 'primary' : undefined,
                             }}
-                            loading={
-                                createFavoriteMutation.isPending || deleteFavoriteMutation.isPending
-                            }
                             onClick={handleFavorite}
                             size="lg"
                             variant="transparent"
                         />
                         <ActionIcon
                             icon="ellipsisHorizontal"
-                            onClick={(e) => {
-                                if (!detailQuery?.data) return;
-                            }}
+                            onClick={handleMoreOptions}
                             size="lg"
                             variant="transparent"
                         />

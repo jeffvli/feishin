@@ -8,7 +8,7 @@ import styles from './full-screen-player-image.module.css';
 
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
-import { usePlayerData, usePlayerStore } from '/@/renderer/store';
+import { subscribeCurrentTrack, usePlayerData, usePlayerStoreBase } from '/@/renderer/store';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Center } from '/@/shared/components/center/center';
@@ -18,7 +18,6 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { useSetState } from '/@/shared/hooks/use-set-state';
-import { PlayerData, QueueSong } from '/@/shared/types/domain-types';
 
 const imageVariants: Variants = {
     closed: {
@@ -91,22 +90,27 @@ export const FullScreenPlayerImage = () => {
 
     const albumArtRes = useSettingsStore((store) => store.general.albumArtRes);
 
-    const { queue } = usePlayerData();
-    const currentSong = queue.current;
+    const { currentSong, nextSong } = usePlayerData();
     const { background } = useFastAverageColor({
         algorithm: 'dominant',
-        src: queue.current?.imageUrl,
+        src: currentSong?.imageUrl,
         srcLoaded: true,
     });
     const imageKey = `image-${background}`;
     const [imageState, setImageState] = useSetState({
-        bottomImage: scaleImageUrl(mainImageDimensions.idealSize, queue.next?.imageUrl),
+        bottomImage: scaleImageUrl(mainImageDimensions.idealSize, nextSong?.imageUrl),
         current: 0,
-        topImage: scaleImageUrl(mainImageDimensions.idealSize, queue.current?.imageUrl),
+        topImage: scaleImageUrl(mainImageDimensions.idealSize, currentSong?.imageUrl),
     });
 
     const updateImageSize = useCallback(() => {
         if (mainImageRef.current) {
+            const state = usePlayerStoreBase.getState();
+            const playerData = state.getQueue();
+            const currentIndex = state.player.index;
+            const current = playerData.items[currentIndex];
+            const next = playerData.items[currentIndex + 1];
+
             setMainImageDimensions({
                 idealSize:
                     albumArtRes ||
@@ -114,46 +118,54 @@ export const FullScreenPlayerImage = () => {
             });
 
             setImageState({
-                bottomImage: scaleImageUrl(mainImageDimensions.idealSize, queue.next?.imageUrl),
+                bottomImage: scaleImageUrl(mainImageDimensions.idealSize, next?.imageUrl),
                 current: 0,
-                topImage: scaleImageUrl(mainImageDimensions.idealSize, queue.current?.imageUrl),
+                topImage: scaleImageUrl(mainImageDimensions.idealSize, current?.imageUrl),
             });
         }
-    }, [mainImageDimensions.idealSize, queue, setImageState, albumArtRes]);
+    }, [mainImageDimensions.idealSize, setImageState, albumArtRes]);
 
     useLayoutEffect(() => {
         updateImageSize();
     }, [updateImageSize]);
 
+    // Use ref to track current image state to avoid recreating subscription
+    const imageStateRef = useRef(imageState);
     useEffect(() => {
-        const unsubSongChange = usePlayerStore.subscribe(
-            (state) => [state.current.song, state.actions.getPlayerData().queue],
-            (state) => {
-                const isTop = imageState.current === 0;
-                const queue = state[1] as PlayerData['queue'];
+        imageStateRef.current = imageState;
+    }, [imageState]);
 
-                const currentImageUrl = scaleImageUrl(
-                    mainImageDimensions.idealSize,
-                    queue.current?.imageUrl,
-                );
-                const nextImageUrl = scaleImageUrl(
-                    mainImageDimensions.idealSize,
-                    queue.next?.imageUrl,
-                );
+    useEffect(() => {
+        const unsubSongChange = subscribeCurrentTrack(({ index, song }, prev) => {
+            // Only update if the song actually changed
+            if (song?._uniqueId === prev.song?._uniqueId) {
+                return;
+            }
 
-                setImageState({
-                    bottomImage: isTop ? currentImageUrl : nextImageUrl,
-                    current: isTop ? 1 : 0,
-                    topImage: isTop ? nextImageUrl : currentImageUrl,
-                });
-            },
-            { equalityFn: (a, b) => (a[0] as QueueSong)?.id === (b[0] as QueueSong)?.id },
-        );
+            // Use ref to get current state without causing dependency issues
+            const isTop = imageStateRef.current.current === 0;
+            const state = usePlayerStoreBase.getState();
+            const queue = state.getQueue();
+            const currentSong = queue.items[index];
+            const nextSong = queue.items[index + 1];
+
+            const currentImageUrl = scaleImageUrl(
+                mainImageDimensions.idealSize,
+                currentSong?.imageUrl,
+            );
+            const nextImageUrl = scaleImageUrl(mainImageDimensions.idealSize, nextSong?.imageUrl);
+
+            setImageState({
+                bottomImage: isTop ? currentImageUrl : nextImageUrl,
+                current: isTop ? 1 : 0,
+                topImage: isTop ? nextImageUrl : currentImageUrl,
+            });
+        });
 
         return () => {
             unsubSongChange();
         };
-    }, [imageState, mainImageDimensions.idealSize, queue, setImageState]);
+    }, [mainImageDimensions.idealSize, setImageState]);
 
     return (
         <Flex

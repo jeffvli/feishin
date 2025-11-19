@@ -8,7 +8,7 @@ import styles from './dummy-album-detail-route.module.css';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { usePlayQueueAdd } from '/@/renderer/features/player/hooks/use-playqueue-add';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { LibraryHeader } from '/@/renderer/features/shared/components/library-header';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
@@ -53,7 +53,7 @@ const DummyAlbumDetailRoute = () => {
         src: detailQuery.data?.imageUrl,
         srcLoaded: !detailQuery.isLoading,
     });
-    const handlePlayQueueAdd = usePlayQueueAdd();
+    const { addToQueueByFetch } = usePlayer();
     const playButtonBehavior = usePlayButtonBehavior();
 
     const createFavoriteMutation = useCreateFavorite({});
@@ -96,13 +96,8 @@ const DummyAlbumDetailRoute = () => {
     const comment = detailQuery?.data?.comment;
 
     const handlePlay = () => {
-        handlePlayQueueAdd?.({
-            byItemType: {
-                id: [albumId],
-                type: LibraryItem.SONG,
-            },
-            playType: playButtonBehavior,
-        });
+        if (!server?.id) return;
+        addToQueueByFetch(server.id, [albumId], LibraryItem.SONG, playButtonBehavior);
     };
 
     const metadataItems = [
