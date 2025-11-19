@@ -1,5 +1,8 @@
+/* eslint-disable perfectionist/sort-imports */
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
+import 'overlayscrollbars/overlayscrollbars.css';
+import '/styles/overlayscrollbars.css';
 // Base mantine styles (required)
 import '@mantine/core/styles/baseline.css';
 import '@mantine/core/styles/default-css-variables.css';
@@ -70,10 +73,6 @@ import { useAppTheme } from '/@/renderer/themes/use-app-theme';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { WebAudio } from '/@/shared/types/types';
 import '/@/shared/styles/global.css';
-
-import 'overlayscrollbars/overlayscrollbars.css';
-
-import '/styles/overlayscrollbars.css';
 
 const ipc = isElectron() ? window.api.ipc : null;
 
