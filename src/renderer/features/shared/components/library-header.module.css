@@ -97,7 +97,7 @@
     }
 
     .metadata-section,
-    .metadata-section > div {
+    .metadata-section > div:first-of-type {
         align-items: flex-start;
         justify-content: flex-start;
         text-align: left;
