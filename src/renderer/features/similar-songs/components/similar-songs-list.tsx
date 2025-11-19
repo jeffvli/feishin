@@ -1,12 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
-import { useRef } from 'react';
+import { useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
-import { ItemListHandle } from '/@/renderer/components/item-list/types';
+import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
+import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
+import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
+import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ErrorFallback } from '/@/renderer/features/action-required/components/error-fallback';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
+import { useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
-import { Song } from '/@/shared/types/domain-types';
+import { LibraryItem, Song } from '/@/shared/types/domain-types';
+import { ItemListKey } from '/@/shared/types/types';
 
 export type SimilarSongsListProps = {
     count?: number;
@@ -14,10 +19,7 @@ export type SimilarSongsListProps = {
     song: Song;
 };
 
-export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListProps) => {
-    const tableRef = useRef<ItemListHandle | null>(null);
-    // const tableConfig = useTableSettings(fullScreen ? 'fullScreen' : 'songs');
-
+export const SimilarSongsList = ({ count, song }: SimilarSongsListProps) => {
     const songQuery = useQuery(
         songsQueries.similar({
             options: {
@@ -32,16 +34,44 @@ export const SimilarSongsList = ({ count, fullScreen, song }: SimilarSongsListPr
         }),
     );
 
-    // const columnDefs = useMemo(
-    //     () => getColumnDefs(tableConfig.columns, false, 'generic'),
-    //     [tableConfig.columns],
-    // );
+    const { table } = useListSettings(ItemListKey.SONG);
+    const { table: fullScreenTable } = useListSettings(ItemListKey.FULL_SCREEN);
 
-    // const onCellContextMenu = useHandleTableContextMenu(LibraryItem.SONG, SONG_CONTEXT_MENU_ITEMS);
+    const { handleColumnReordered } = useItemListColumnReorder({
+        itemListKey: ItemListKey.SONG,
+    });
 
-    return songQuery.isLoading ? (
-        <Spinner container size={25} />
-    ) : (
-        <ErrorBoundary FallbackComponent={ErrorFallback}></ErrorBoundary>
+    const { handleColumnResized } = useItemListColumnResize({
+        itemListKey: ItemListKey.SONG,
+    });
+
+    const tableData = useMemo(() => {
+        return songQuery.data || [];
+    }, [songQuery.data]);
+
+    if (songQuery.isLoading || songQuery.isRefetching) {
+        return <Spinner container size={25} />;
+    }
+
+    return (
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <ItemTableList
+                autoFitColumns={table?.autoFitColumns}
+                CellComponent={ItemTableListColumn}
+                columns={table?.columns || []}
+                data={tableData}
+                enableAlternateRowColors={fullScreenTable?.enableAlternateRowColors}
+                enableExpansion={false}
+                enableHeader
+                enableHorizontalBorders={fullScreenTable?.enableHorizontalBorders}
+                enableRowHoverHighlight={fullScreenTable?.enableRowHoverHighlight}
+                enableSelection
+                enableVerticalBorders={fullScreenTable?.enableVerticalBorders}
+                itemType={LibraryItem.SONG}
+                onColumnReordered={handleColumnReordered}
+                onColumnResized={handleColumnResized}
+                size={table?.size}
+            />
+        </ErrorBoundary>
     );
 };

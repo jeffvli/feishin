@@ -1,7 +1,10 @@
 .queue-container {
     position: relative;
     display: flex;
+    width: 100%;
+    min-width: 0;
     height: 100%;
+    overflow: hidden;
 
     :global(.ag-header) {
         display: none;
@@ -46,6 +49,8 @@
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-columns: 1fr;
+    width: 100%;
+    min-width: 0;
     padding: 1rem;
 
     &::before {

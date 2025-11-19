@@ -6,6 +6,7 @@ import { GridConfig } from '/@/renderer/features/shared/components/grid-config';
 import { SettingsButton } from '/@/renderer/features/shared/components/settings-button';
 import { TableConfig } from '/@/renderer/features/shared/components/table-config';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store';
+import { ActionIconProps } from '/@/shared/components/action-icon/action-icon';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -99,6 +100,7 @@ export interface ListConfigMenuOptionsConfig {
 }
 
 interface ListConfigMenuProps {
+    buttonProps?: ActionIconProps;
     displayTypes?: ListConfigMenuDisplayTypeConfig[];
     listKey: ItemListKey;
     optionsConfig?: ListConfigMenuOptionsConfig;
@@ -138,7 +140,7 @@ export const ListConfigMenu = (props: ListConfigMenuProps) => {
 
     return (
         <>
-            <SettingsButton onClick={handlers.toggle} />
+            <SettingsButton {...props.buttonProps} onClick={handlers.toggle} />
             <Modal
                 handlers={handlers}
                 opened={isOpen}
