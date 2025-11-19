@@ -13,9 +13,12 @@ import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-
 import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { AddToQueueType, usePlayerActions } from '/@/renderer/store';
+import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { ConfirmModal } from '/@/shared/components/modal/modal';
+import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
+import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import {
     instanceOfCancellationError,
     LibraryItem,
@@ -141,8 +144,17 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const timeoutIds = useRef<null | Record<string, ReturnType<typeof setTimeout>>>({});
     const queueFetchConfirmThreshold = 100;
 
+    const [doNotShowAgain, setDoNotShowAgain] = useLocalStorage({
+        defaultValue: false,
+        key: 'large_fetch_confirmation',
+    });
+
     const confirmLargeFetch = useCallback(
         (itemCount: number): Promise<boolean> => {
+            if (doNotShowAgain) {
+                return Promise.resolve(true);
+            }
+
             return new Promise((resolve) => {
                 openModal({
                     children: (
@@ -160,23 +172,31 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                                 closeAllModals();
                             }}
                         >
-                            <Text>
-                                {t('player.confirmLargeFetch', {
-                                    count: itemCount,
-                                    defaultValue: `You are about to add ${itemCount} items to the queue. Continue?`,
-                                    postProcess: 'sentenceCase',
-                                })}
-                            </Text>
+                            <Stack>
+                                <Text>
+                                    {t('action.largeFetch', {
+                                        count: itemCount,
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                </Text>
+                                <Checkbox
+                                    label={t('common.doNotShowAgain', {
+                                        postProcess: 'sentenceCase',
+                                    })}
+                                    onChange={(event) => {
+                                        setDoNotShowAgain(event.currentTarget.checked);
+                                    }}
+                                />
+                            </Stack>
                         </ConfirmModal>
                     ),
-                    title: t('player.confirmLargeFetchTitle', {
-                        defaultValue: 'Confirm Large Queue Addition',
-                        postProcess: 'titleCase',
+                    title: t('common.areYouSure', {
+                        postProcess: 'sentenceCase',
                     }),
                 });
             });
         },
-        [t],
+        [doNotShowAgain, setDoNotShowAgain, t],
     );
 
     const addToQueueByData = useCallback(

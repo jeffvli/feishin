@@ -8,6 +8,7 @@
         "deselectAll": "deselect all",
         "editPlaylist": "edit $t(entity.playlist_one)",
         "goToPage": "go to page",
+        "largeFetch": "this action will attempt to fetch {{count}} items from your server",
         "moveToNext": "move to next",
         "moveToBottom": "move to bottom",
         "moveToTop": "move to top",
@@ -64,6 +65,7 @@
         "disable": "disable",
         "disc": "disc",
         "dismiss": "dismiss",
+        "doNotShowAgain": "do not show this again",
         "duration": "duration",
         "edit": "edit",
         "enable": "enable",
@@ -258,6 +260,10 @@
             "input_username": "username",
             "success": "server added successfully",
             "title": "add server"
+        },
+        "largeFetchConfirmation": {
+            "title": "add items to the queue",
+            "description": "This request will attempt to fetch {{count}} items from the server"
         },
         "addToPlaylist": {
             "create": "create $t(entity.playlist_one) {{playlist}}",
