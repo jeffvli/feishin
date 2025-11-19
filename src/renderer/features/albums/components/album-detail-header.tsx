@@ -125,47 +125,45 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement, AlbumDetailHeaderPro
                     title={detailQuery?.data?.name || ''}
                     {...background}
                 >
-                    <Stack gap="lg">
-                        <Pill.Group>
-                            {metadataItems.map(
-                                (item, index) =>
-                                    item.value && (
-                                        <Pill key={`item-${item.id}-${index}`}>{item.value}</Pill>
-                                    ),
-                            )}
-                        </Pill.Group>
-                        {showRating && (
-                            <Rating
-                                onChange={handleUpdateRating}
-                                readOnly={detailQuery?.isFetching}
-                                value={detailQuery?.data?.userRating || 0}
-                            />
+                    <Pill.Group>
+                        {metadataItems.map(
+                            (item, index) =>
+                                item.value && (
+                                    <Pill key={`item-${item.id}-${index}`}>{item.value}</Pill>
+                                ),
                         )}
-                        <Group
-                            gap="md"
-                            mah="4rem"
-                            style={{
-                                overflow: 'hidden',
-                                WebkitBoxOrient: 'vertical',
-                                WebkitLineClamp: 2,
-                            }}
-                        >
-                            {detailQuery?.data?.albumArtists.map((artist) => (
-                                <Text
-                                    component={Link}
-                                    fw={600}
-                                    isLink
-                                    key={`artist-${artist.id}`}
-                                    to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
-                                        albumArtistId: artist.id,
-                                    })}
-                                    variant="subtle"
-                                >
-                                    {artist.name}
-                                </Text>
-                            ))}
-                        </Group>
-                    </Stack>
+                    </Pill.Group>
+                    {showRating && (
+                        <Rating
+                            onChange={handleUpdateRating}
+                            readOnly={detailQuery?.isFetching}
+                            value={detailQuery?.data?.userRating || 0}
+                        />
+                    )}
+                    <Group
+                        gap="md"
+                        mah="4rem"
+                        style={{
+                            overflow: 'hidden',
+                            WebkitBoxOrient: 'vertical',
+                            WebkitLineClamp: 2,
+                        }}
+                    >
+                        {detailQuery?.data?.albumArtists.map((artist) => (
+                            <Text
+                                component={Link}
+                                fw={600}
+                                isLink
+                                key={`artist-${artist.id}`}
+                                to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                                    albumArtistId: artist.id,
+                                })}
+                                variant="subtle"
+                            >
+                                {artist.name}
+                            </Text>
+                        ))}
+                    </Group>
                 </LibraryHeader>
             </Stack>
         );
