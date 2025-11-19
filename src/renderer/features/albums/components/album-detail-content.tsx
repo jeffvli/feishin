@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link, useParams } from 'react-router';
 
@@ -17,6 +17,7 @@ import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
+import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { useCurrentServer } from '/@/renderer/store';
@@ -30,9 +31,11 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
+import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { AlbumListSort, LibraryItem, Song, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
@@ -149,17 +152,6 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
                                 />
                             </Group>
                         </Group>
-                        <ListConfigMenu
-                            displayTypes={[{ hidden: true, value: ListDisplayType.GRID }]}
-                            listKey={ItemListKey.ALBUM_DETAIL}
-                            optionsConfig={{
-                                table: {
-                                    itemsPerPage: { hidden: true },
-                                    pagination: { hidden: true },
-                                },
-                            }}
-                            tableColumnsData={SONG_TABLE_COLUMNS}
-                        />
                     </Group>
                 </section>
                 {showGenres && (
@@ -273,11 +265,16 @@ interface AlbumDetailSongsTableProps {
 
 const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
     const { t } = useTranslation();
+    const [searchTerm, setSearchTerm] = useState('');
     const tableConfig = useSettingsStore((state) => state.lists[ItemListKey.ALBUM_DETAIL]?.table);
 
     const columns = useMemo(() => {
         return tableConfig?.columns || [];
     }, [tableConfig?.columns]);
+
+    const filteredSongs = useMemo(() => {
+        return searchLibraryItems(songs, searchTerm, LibraryItem.SONG);
+    }, [songs, searchTerm]);
 
     const { handleColumnReordered } = useItemListColumnReorder({
         itemListKey: ItemListKey.ALBUM_DETAIL,
@@ -288,7 +285,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
     });
 
     const discGroups = useMemo(() => {
-        if (songs.length === 0) return [];
+        if (filteredSongs.length === 0) return [];
 
         const groups: Array<{
             discNumber: number;
@@ -298,7 +295,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
         let lastDiscNumber = -1;
         let currentGroupStartIndex = 0;
 
-        songs.forEach((song, index) => {
+        filteredSongs.forEach((song, index) => {
             if (song.discNumber !== lastDiscNumber) {
                 // If we have a previous group, calculate its item count
                 if (groups.length > 0) {
@@ -317,44 +314,18 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
 
         // Set item count for the last group
         if (groups.length > 0) {
-            groups[groups.length - 1].itemCount = songs.length - currentGroupStartIndex;
+            groups[groups.length - 1].itemCount = filteredSongs.length - currentGroupStartIndex;
         }
 
         return groups;
-    }, [songs]);
-
-    // const maxHeight = useMemo(() => {
-    //     if (!tableConfig) return undefined;
-
-    //     const headerHeight = 40;
-    //     const rowHeights = {
-    //         compact: 40,
-    //         default: 64,
-    //         large: 88,
-    //     };
-    //     const rowHeight = rowHeights[tableConfig.size || 'default'];
-    //     const maxRows = 20;
-
-    //     return headerHeight + maxRows * rowHeight;
-    // }, [tableConfig]);
-
-    // Uncomment to enable static table height
-    // const containerHeight = useMemo(() => {
-    //     if (!tableConfig || !maxHeight) return undefined;
-
-    //     const headerHeight = 40;
-    //     const rowHeights = {
-    //         compact: 40,
-    //         default: 64,
-    //         large: 88,
-    //     };
-    //     const rowHeight = rowHeights[tableConfig.size || 'default'];
-    //     const actualRows = Math.min(songs.length, 20);
-
-    //     return Math.min(headerHeight + actualRows * rowHeight, maxHeight);
-    // }, [tableConfig, maxHeight, songs.length]);
+    }, [filteredSongs]);
 
     const groups = useMemo(() => {
+        // Remove groups when filtering
+        if (searchTerm.trim()) {
+            return undefined;
+        }
+
         if (discGroups.length <= 1) {
             return undefined;
         }
@@ -439,33 +410,66 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
             },
             rowHeight: 40,
         }));
-    }, [discGroups, t]);
+    }, [discGroups, t, searchTerm]);
 
     if (!tableConfig || columns.length === 0) {
         return null;
     }
 
     return (
-        <ItemTableList
-            autoFitColumns={tableConfig.autoFitColumns}
-            CellComponent={ItemTableListColumn}
-            columns={columns}
-            data={songs}
-            enableAlternateRowColors={tableConfig.enableAlternateRowColors}
-            enableDrag
-            enableExpansion={false}
-            enableHeader
-            enableHorizontalBorders={tableConfig.enableHorizontalBorders}
-            enableRowHoverHighlight={tableConfig.enableRowHoverHighlight}
-            enableSelection
-            enableStickyGroupRows
-            enableStickyHeader
-            enableVerticalBorders={tableConfig.enableVerticalBorders}
-            groups={groups}
-            itemType={LibraryItem.SONG}
-            onColumnReordered={handleColumnReordered}
-            onColumnResized={handleColumnResized}
-            size={tableConfig.size}
-        />
+        <Stack gap="md">
+            <Group gap="sm" w="100%">
+                <TextInput
+                    flex={1}
+                    leftSection={<Icon icon="search" />}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder={t('common.search', { postProcess: 'sentenceCase' })}
+                    radius="xl"
+                    rightSection={
+                        searchTerm ? (
+                            <ActionIcon
+                                icon="x"
+                                onClick={() => setSearchTerm('')}
+                                size="sm"
+                                variant="transparent"
+                            />
+                        ) : null
+                    }
+                    value={searchTerm}
+                />
+                <ListConfigMenu
+                    displayTypes={[{ hidden: true, value: ListDisplayType.GRID }]}
+                    listKey={ItemListKey.ALBUM_DETAIL}
+                    optionsConfig={{
+                        table: {
+                            itemsPerPage: { hidden: true },
+                            pagination: { hidden: true },
+                        },
+                    }}
+                    tableColumnsData={SONG_TABLE_COLUMNS}
+                />
+            </Group>
+            <ItemTableList
+                autoFitColumns={tableConfig.autoFitColumns}
+                CellComponent={ItemTableListColumn}
+                columns={columns}
+                data={filteredSongs}
+                enableAlternateRowColors={tableConfig.enableAlternateRowColors}
+                enableDrag
+                enableExpansion={false}
+                enableHeader
+                enableHorizontalBorders={tableConfig.enableHorizontalBorders}
+                enableRowHoverHighlight={tableConfig.enableRowHoverHighlight}
+                enableSelection
+                enableStickyGroupRows
+                enableStickyHeader
+                enableVerticalBorders={tableConfig.enableVerticalBorders}
+                groups={groups}
+                itemType={LibraryItem.SONG}
+                onColumnReordered={handleColumnReordered}
+                onColumnResized={handleColumnResized}
+                size={tableConfig.size}
+            />
+        </Stack>
     );
 };
