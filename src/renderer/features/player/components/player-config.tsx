@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import isElectron from 'is-electron';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ListConfigTable } from '/@/renderer/features/shared/components/list-config-menu';
@@ -8,35 +9,61 @@ import {
     usePlayerProperties,
     usePlayerQueueType,
     usePlayerSpeed,
+    usePlayerStatus,
 } from '/@/renderer/store';
-import {
-    BarAlign,
-    PlayerbarSliderType,
-    useGeneralSettings,
-    usePlaybackSettings,
-    usePlayerbarSlider,
-    useSettingsStore,
-    useSettingsStoreActions,
-} from '/@/renderer/store/settings.store';
+import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Popover } from '/@/shared/components/popover/popover';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
+import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
-import { Switch } from '/@/shared/components/switch/switch';
-import { PlayerQueueType, PlayerStyle, PlayerType } from '/@/shared/types/types';
+import { toast } from '/@/shared/components/toast/toast';
+import {
+    CrossfadeStyle,
+    PlayerQueueType,
+    PlayerStatus,
+    PlayerStyle,
+    PlayerType,
+} from '/@/shared/types/types';
+
+const ipc = isElectron() ? window.api.ipc : null;
+
+const getAudioDevice = async () => {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return (devices || []).filter((dev: MediaDeviceInfo) => dev.kind === 'audiooutput');
+};
 
 export const PlayerConfig = () => {
     const { t } = useTranslation();
     const { currentSong } = usePlayerData();
     const speed = usePlayerSpeed();
     const queueType = usePlayerQueueType();
-    const { crossfadeDuration, transitionType } = usePlayerProperties();
-    const { setCrossfadeDuration, setQueueType, setSpeed, setTransitionType } = usePlayerActions();
+    const status = usePlayerStatus();
+    const { crossfadeDuration, crossfadeStyle, transitionType } = usePlayerProperties();
+    const { setCrossfadeDuration, setCrossfadeStyle, setQueueType, setSpeed, setTransitionType } =
+        usePlayerActions();
     const playbackSettings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
-    const speedPreservePitch = useSettingsStore((state) => state.playback.preservePitch);
-    const playerbarSlider = usePlayerbarSlider();
-    const generalSettings = useGeneralSettings();
+
+    const [audioDevices, setAudioDevices] = useState<{ label: string; value: string }[]>([]);
+
+    useEffect(() => {
+        const fetchAudioDevices = () => {
+            getAudioDevice()
+                .then((dev) =>
+                    setAudioDevices(dev.map((d) => ({ label: d.label, value: d.deviceId }))),
+                )
+                .catch(() =>
+                    toast.error({
+                        message: t('error.audioDeviceFetchError', { postProcess: 'sentenceCase' }),
+                    }),
+                );
+        };
+
+        if (playbackSettings.type === PlayerType.WEB) {
+            fetchAudioDevices();
+        }
+    }, [playbackSettings.type, t]);
 
     const options = useMemo(() => {
         const formatPlaybackSpeedSliderLabel = (value: number) => {
@@ -72,248 +99,161 @@ export const PlayerConfig = () => {
             },
             {
                 component: null,
+                id: 'divider-0',
+                isDivider: true,
+                label: '',
+            },
+            {
+                component: (
+                    <Select
+                        comboboxProps={{ withinPortal: false }}
+                        data={[
+                            {
+                                disabled: !isElectron(),
+                                label: 'MPV',
+                                value: PlayerType.LOCAL,
+                            },
+                            { label: 'Web', value: PlayerType.WEB },
+                        ]}
+                        defaultValue={playbackSettings.type}
+                        disabled={status === PlayerStatus.PLAYING}
+                        onChange={(e) => {
+                            setSettings({
+                                playback: { ...playbackSettings, type: e as PlayerType },
+                            });
+                            ipc?.send('settings-set', {
+                                property: 'playbackType',
+                                value: e,
+                            });
+                        }}
+                        width="100%"
+                    />
+                ),
+                id: 'audioPlayerType',
+                label: t('setting.audioPlayer', { postProcess: 'titleCase' }),
+            },
+            {
+                component: (
+                    <Select
+                        clearable
+                        comboboxProps={{ withinPortal: false }}
+                        data={audioDevices}
+                        defaultValue={playbackSettings.audioDeviceId}
+                        disabled={playbackSettings.type !== PlayerType.WEB}
+                        onChange={(e) =>
+                            setSettings({
+                                playback: {
+                                    ...playbackSettings,
+                                    audioDeviceId: e,
+                                },
+                            })
+                        }
+                        width="100%"
+                    />
+                ),
+                id: 'audioDevice',
+                label: t('setting.audioDevice', { postProcess: 'titleCase' }),
+            },
+            {
+                component: null,
                 id: 'divider-1',
                 isDivider: true,
                 label: '',
             },
-            ...(playbackSettings.type === PlayerType.WEB
-                ? [
-                      {
-                          component: (
-                              <SegmentedControl
-                                  data={[
-                                      {
-                                          label: t('setting.playbackStyle', {
-                                              context: 'optionNormal',
-                                              postProcess: 'titleCase',
-                                          }),
-                                          value: PlayerStyle.GAPLESS,
-                                      },
-                                      {
-                                          label: t('setting.playbackStyle', {
-                                              context: 'optionCrossFade',
-                                              postProcess: 'titleCase',
-                                          }),
-                                          value: PlayerStyle.CROSSFADE,
-                                      },
-                                  ]}
-                                  onChange={(value) => setTransitionType(value as PlayerStyle)}
-                                  size="sm"
-                                  value={transitionType}
-                                  w="100%"
-                              />
-                          ),
-                          id: 'transitionType',
-                          label: t('setting.playbackStyle', {
-                              postProcess: 'titleCase',
-                          }),
-                      },
-                  ]
-                : []),
-
-            ...(playbackSettings.type === PlayerType.WEB && transitionType === PlayerStyle.CROSSFADE
-                ? [
-                      {
-                          component: (
-                              <Slider
-                                  defaultValue={crossfadeDuration}
-                                  marks={[
-                                      { label: '3', value: 3 },
-                                      { label: '6', value: 6 },
-                                      { label: '9', value: 9 },
-                                      { label: '12', value: 12 },
-                                      { label: '15', value: 15 },
-                                  ]}
-                                  max={15}
-                                  min={3}
-                                  onChangeEnd={setCrossfadeDuration}
-                                  styles={{
-                                      root: {},
-                                  }}
-                                  w="100%"
-                              />
-                          ),
-                          id: 'crossfadeDuration',
-                          label: t('setting.crossfadeDuration', {
-                              postProcess: 'titleCase',
-                          }),
-                      },
-                  ]
-                : []),
             {
                 component: (
                     <SegmentedControl
                         data={[
                             {
-                                label: t('setting.playerbarSliderType', {
-                                    context: 'optionSlider',
+                                label: t('setting.playbackStyle', {
+                                    context: 'optionNormal',
                                     postProcess: 'titleCase',
                                 }),
-                                value: PlayerbarSliderType.SLIDER,
+                                value: PlayerStyle.GAPLESS,
                             },
                             {
-                                label: t('setting.playerbarSliderType', {
-                                    context: 'optionWaveform',
+                                label: t('setting.playbackStyle', {
+                                    context: 'optionCrossFade',
                                     postProcess: 'titleCase',
                                 }),
-                                value: PlayerbarSliderType.WAVEFORM,
+                                value: PlayerStyle.CROSSFADE,
                             },
                         ]}
-                        onChange={(value) => {
-                            setSettings({
-                                general: {
-                                    ...generalSettings,
-                                    playerbarSlider: {
-                                        ...playerbarSlider,
-                                        type: value as PlayerbarSliderType,
-                                    },
-                                },
-                            });
-                        }}
+                        disabled={
+                            !isElectron() ||
+                            playbackSettings.type !== PlayerType.WEB ||
+                            status === PlayerStatus.PLAYING
+                        }
+                        onChange={(value) => setTransitionType(value as PlayerStyle)}
                         size="sm"
-                        value={playerbarSlider?.type || PlayerbarSliderType.WAVEFORM}
+                        value={transitionType}
                         w="100%"
                     />
                 ),
-                id: 'playerbarSliderType',
-                label: t('setting.playerbarSlider', { postProcess: 'titleCase' }),
+                id: 'transitionType',
+                label: t('setting.playbackStyle', {
+                    postProcess: 'titleCase',
+                }),
             },
-            ...(playerbarSlider?.type === PlayerbarSliderType.WAVEFORM
-                ? [
-                      {
-                          component: (
-                              <SegmentedControl
-                                  data={[
-                                      {
-                                          label: t('setting.playerbarWaveformAlign', {
-                                              context: 'optionTop',
-                                              postProcess: 'titleCase',
-                                          }),
-                                          value: BarAlign.TOP,
-                                      },
-                                      {
-                                          label: t('setting.playerbarWaveformAlign', {
-                                              context: 'optionCenter',
-                                              postProcess: 'titleCase',
-                                          }),
-                                          value: BarAlign.CENTER,
-                                      },
-                                      {
-                                          label: t('setting.playerbarWaveformAlign', {
-                                              context: 'optionBottom',
-                                              postProcess: 'titleCase',
-                                          }),
-                                          value: BarAlign.BOTTOM,
-                                      },
-                                  ]}
-                                  onChange={(value) => {
-                                      setSettings({
-                                          general: {
-                                              ...generalSettings,
-                                              playerbarSlider: {
-                                                  ...playerbarSlider,
-                                                  barAlign: (value as BarAlign) || BarAlign.CENTER,
-                                              },
-                                          },
-                                      });
-                                  }}
-                                  size="sm"
-                                  value={playerbarSlider?.barAlign || BarAlign.CENTER}
-                                  w="100%"
-                              />
-                          ),
-                          id: 'barAlign',
-                          label: t('setting.playerbarWaveformAlign', {
-                              postProcess: 'titleCase',
-                          }),
-                      },
-                      {
-                          component: (
-                              <Slider
-                                  defaultValue={playerbarSlider?.barWidth ?? 2}
-                                  max={10}
-                                  min={0}
-                                  onChangeEnd={(value) => {
-                                      setSettings({
-                                          general: {
-                                              ...generalSettings,
-                                              playerbarSlider: {
-                                                  ...playerbarSlider,
-                                                  barWidth: value,
-                                              },
-                                          },
-                                      });
-                                  }}
-                                  step={1}
-                                  styles={{
-                                      root: {},
-                                  }}
-                                  w="100%"
-                              />
-                          ),
-                          id: 'barWidth',
-                          label: t('setting.playerbarWaveformBarWidth', {
-                              postProcess: 'titleCase',
-                          }),
-                      },
-                      {
-                          component: (
-                              <Slider
-                                  defaultValue={playerbarSlider?.barGap || 0}
-                                  max={10}
-                                  min={0}
-                                  onChangeEnd={(value) => {
-                                      setSettings({
-                                          general: {
-                                              ...generalSettings,
-                                              playerbarSlider: {
-                                                  ...playerbarSlider,
-                                                  barGap: value,
-                                              },
-                                          },
-                                      });
-                                  }}
-                                  step={1}
-                                  styles={{
-                                      root: {},
-                                  }}
-                                  w="100%"
-                              />
-                          ),
-                          id: 'barGap',
-                          label: t('setting.playerbarWaveformGap', { postProcess: 'titleCase' }),
-                      },
-                      {
-                          component: (
-                              <Slider
-                                  defaultValue={playerbarSlider?.barRadius ?? 4}
-                                  max={20}
-                                  min={0}
-                                  onChangeEnd={(value) => {
-                                      setSettings({
-                                          general: {
-                                              ...generalSettings,
-                                              playerbarSlider: {
-                                                  ...playerbarSlider,
-                                                  barRadius: value,
-                                              },
-                                          },
-                                      });
-                                  }}
-                                  step={1}
-                                  styles={{
-                                      root: {},
-                                  }}
-                                  w="100%"
-                              />
-                          ),
-                          id: 'barRadius',
-                          label: t('setting.playerbarWaveformRadius', {
-                              postProcess: 'titleCase',
-                          }),
-                      },
-                  ]
-                : []),
+            {
+                component: (
+                    <Select
+                        comboboxProps={{ withinPortal: false }}
+                        data={[
+                            { label: 'Linear', value: CrossfadeStyle.LINEAR },
+                            { label: 'Equal Power', value: CrossfadeStyle.EQUAL_POWER },
+                            { label: 'S-Curve', value: CrossfadeStyle.S_CURVE },
+                            { label: 'Exponential', value: CrossfadeStyle.EXPONENTIAL },
+                        ]}
+                        defaultValue={crossfadeStyle}
+                        disabled={
+                            playbackSettings.type !== PlayerType.WEB ||
+                            transitionType !== PlayerStyle.CROSSFADE ||
+                            status === PlayerStatus.PLAYING
+                        }
+                        onChange={(e) => {
+                            if (e) {
+                                setCrossfadeStyle(e as CrossfadeStyle);
+                            }
+                        }}
+                        width="100%"
+                    />
+                ),
+                id: 'crossfadeStyle',
+                label: t('setting.crossfadeStyle', {
+                    postProcess: 'titleCase',
+                }),
+            },
+            {
+                component: (
+                    <Slider
+                        defaultValue={crossfadeDuration}
+                        disabled={
+                            playbackSettings.type !== PlayerType.WEB ||
+                            transitionType !== PlayerStyle.CROSSFADE ||
+                            status === PlayerStatus.PLAYING
+                        }
+                        marks={[
+                            { label: '3', value: 3 },
+                            { label: '6', value: 6 },
+                            { label: '9', value: 9 },
+                            { label: '12', value: 12 },
+                            { label: '15', value: 15 },
+                        ]}
+                        max={15}
+                        min={3}
+                        onChangeEnd={setCrossfadeDuration}
+                        styles={{
+                            root: {},
+                        }}
+                        w="100%"
+                    />
+                ),
+                id: 'crossfadeDuration',
+                label: t('setting.crossfadeDuration', {
+                    postProcess: 'titleCase',
+                }),
+            },
             {
                 component: null,
                 id: 'divider-2',
@@ -323,6 +263,7 @@ export const PlayerConfig = () => {
             {
                 component: (
                     <Slider
+                        defaultValue={speed}
                         label={formatPlaybackSpeedSliderLabel}
                         marks={[
                             { label: '0.5', value: 0.5 },
@@ -335,49 +276,26 @@ export const PlayerConfig = () => {
                         ]}
                         max={2}
                         min={0.5}
-                        onChange={setSpeed}
+                        onChangeEnd={setSpeed}
                         onDoubleClick={() => setSpeed(1)}
                         step={0.01}
                         styles={{
                             markLabel: {},
                             root: {},
                         }}
-                        value={speed}
                         w="100%"
                     />
                 ),
                 id: 'playbackSpeed',
                 label: t('player.playbackSpeed', { postProcess: 'titleCase' }),
             },
-            ...(speed !== 1
-                ? [
-                      {
-                          component: (
-                              <Switch
-                                  defaultChecked={speedPreservePitch}
-                                  onChange={(e) => {
-                                      setSettings({
-                                          playback: {
-                                              ...playbackSettings,
-                                              preservePitch: e.currentTarget.checked,
-                                          },
-                                      });
-                                  }}
-                              />
-                          ),
-                          id: 'preservePitch',
-                          label: t('setting.preservePitch', {
-                              postProcess: 'titleCase',
-                          }),
-                      },
-                  ]
-                : []),
         ];
 
         return allOptions;
     }, [
         playbackSettings,
-        speedPreservePitch,
+        audioDevices,
+        status,
         setSettings,
         currentSong,
         speed,
@@ -388,8 +306,8 @@ export const PlayerConfig = () => {
         setTransitionType,
         crossfadeDuration,
         setCrossfadeDuration,
-        playerbarSlider,
-        generalSettings,
+        crossfadeStyle,
+        setCrossfadeStyle,
         t,
     ]);
 

@@ -15,6 +15,7 @@ import { idbStateStorage } from '/@/renderer/store/utils';
 import { shuffleInPlace } from '/@/renderer/utils/shuffle';
 import { PlayerData, QueueData, QueueSong, Song } from '/@/shared/types/domain-types';
 import {
+    CrossfadeStyle,
     Play,
     PlayerQueueType,
     PlayerRepeat,
@@ -56,6 +57,7 @@ interface Actions {
     moveSelectedToNext: (items: QueueSong[]) => void;
     moveSelectedToTop: (items: QueueSong[]) => void;
     setCrossfadeDuration: (duration: number) => void;
+    setCrossfadeStyle: (style: CrossfadeStyle) => void;
     setQueueType: (queueType: PlayerQueueType) => void;
     setRepeat: (repeat: PlayerRepeat) => void;
     setShuffle: (shuffle: PlayerShuffle) => void;
@@ -77,6 +79,7 @@ interface GroupedQueue {
 interface State {
     player: {
         crossfadeDuration: number;
+        crossfadeStyle: CrossfadeStyle;
         index: number;
         muted: boolean;
         playerNum: 1 | 2;
@@ -95,6 +98,7 @@ interface State {
 const initialState: State = {
     player: {
         crossfadeDuration: 5,
+        crossfadeStyle: CrossfadeStyle.EQUAL_POWER,
         index: -1,
         muted: false,
         playerNum: 1,
@@ -1048,6 +1052,11 @@ export const usePlayerStoreBase = create<PlayerState>()(
                         state.player.crossfadeDuration = normalizedDuration;
                     });
                 },
+                setCrossfadeStyle: (style: CrossfadeStyle) => {
+                    set((state) => {
+                        state.player.crossfadeStyle = style;
+                    });
+                },
                 setQueueType: (queueType: PlayerQueueType) => {
                     set((state) => {
                         // From default -> priority, move all items from default to priority
@@ -1245,6 +1254,7 @@ export const usePlayerActions = () => {
             moveSelectedToNext: state.moveSelectedToNext,
             moveSelectedToTop: state.moveSelectedToTop,
             setCrossfadeDuration: state.setCrossfadeDuration,
+            setCrossfadeStyle: state.setCrossfadeStyle,
             setQueueType: state.setQueueType,
             setRepeat: state.setRepeat,
             setShuffle: state.setShuffle,
@@ -1403,6 +1413,7 @@ export const usePlayerProperties = () => {
     return usePlayerStoreBase(
         useShallow((state) => ({
             crossfadeDuration: state.player.crossfadeDuration,
+            crossfadeStyle: state.player.crossfadeStyle,
             isMuted: state.player.muted,
             playerNum: state.player.playerNum,
             queueType: state.player.queueType,

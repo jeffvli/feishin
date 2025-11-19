@@ -7,13 +7,17 @@ import {
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import {
+    BarAlign,
     GenreTarget,
+    PlayerbarSliderType,
     SideQueueType,
     useGeneralSettings,
+    usePlayerbarSlider,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Switch } from '/@/shared/components/switch/switch';
@@ -43,6 +47,7 @@ const SIDE_QUEUE_OPTIONS = [
 export const ControlSettings = () => {
     const { t } = useTranslation();
     const settings = useGeneralSettings();
+    const playerbarSlider = usePlayerbarSlider();
     const { setSettings } = useSettingsStoreActions();
 
     const controlOptions: SettingOption[] = [
@@ -621,6 +626,202 @@ export const ControlSettings = () => {
             isHidden: false,
             title: t('setting.playerbarOpenDrawer', { postProcess: 'sentenceCase' }),
         },
+        {
+            control: (
+                <SegmentedControl
+                    data={[
+                        {
+                            label: t('setting.playerbarSliderType', {
+                                context: 'optionSlider',
+                                postProcess: 'titleCase',
+                            }),
+                            value: PlayerbarSliderType.SLIDER,
+                        },
+                        {
+                            label: t('setting.playerbarSliderType', {
+                                context: 'optionWaveform',
+                                postProcess: 'titleCase',
+                            }),
+                            value: PlayerbarSliderType.WAVEFORM,
+                        },
+                    ]}
+                    onChange={(value) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                playerbarSlider: {
+                                    ...playerbarSlider,
+                                    type: value as PlayerbarSliderType,
+                                },
+                            },
+                        });
+                    }}
+                    size="sm"
+                    value={playerbarSlider?.type || PlayerbarSliderType.WAVEFORM}
+                    w="100%"
+                />
+            ),
+            description: t('setting.playerbarSlider', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.playerbarSlider', { postProcess: 'sentenceCase' }),
+        },
+        ...(playerbarSlider?.type === PlayerbarSliderType.WAVEFORM
+            ? [
+                  {
+                      control: (
+                          <SegmentedControl
+                              data={[
+                                  {
+                                      label: t('setting.playerbarWaveformAlign', {
+                                          context: 'optionTop',
+                                          postProcess: 'titleCase',
+                                      }),
+                                      value: BarAlign.TOP,
+                                  },
+                                  {
+                                      label: t('setting.playerbarWaveformAlign', {
+                                          context: 'optionCenter',
+                                          postProcess: 'titleCase',
+                                      }),
+                                      value: BarAlign.CENTER,
+                                  },
+                                  {
+                                      label: t('setting.playerbarWaveformAlign', {
+                                          context: 'optionBottom',
+                                          postProcess: 'titleCase',
+                                      }),
+                                      value: BarAlign.BOTTOM,
+                                  },
+                              ]}
+                              onChange={(value) => {
+                                  setSettings({
+                                      general: {
+                                          ...settings,
+                                          playerbarSlider: {
+                                              ...playerbarSlider,
+                                              barAlign: (value as BarAlign) || BarAlign.CENTER,
+                                          },
+                                      },
+                                  });
+                              }}
+                              size="sm"
+                              value={playerbarSlider?.barAlign || BarAlign.CENTER}
+                              w="100%"
+                          />
+                      ),
+                      description: t('setting.playerbarWaveformAlign', {
+                          context: 'description',
+                          postProcess: 'sentenceCase',
+                      }),
+                      isHidden: false,
+                      title: t('setting.playerbarWaveformAlign', {
+                          postProcess: 'sentenceCase',
+                      }),
+                  },
+                  {
+                      control: (
+                          <Slider
+                              defaultValue={playerbarSlider?.barWidth ?? 2}
+                              max={10}
+                              min={0}
+                              onChangeEnd={(value) => {
+                                  setSettings({
+                                      general: {
+                                          ...settings,
+                                          playerbarSlider: {
+                                              ...playerbarSlider,
+                                              barWidth: value,
+                                          },
+                                      },
+                                  });
+                              }}
+                              step={1}
+                              styles={{
+                                  root: {},
+                              }}
+                              w="120px"
+                          />
+                      ),
+                      description: t('setting.playerbarWaveformBarWidth', {
+                          context: 'description',
+                          postProcess: 'sentenceCase',
+                      }),
+                      isHidden: false,
+                      title: t('setting.playerbarWaveformBarWidth', {
+                          postProcess: 'sentenceCase',
+                      }),
+                  },
+                  {
+                      control: (
+                          <Slider
+                              defaultValue={playerbarSlider?.barGap || 0}
+                              max={10}
+                              min={0}
+                              onChangeEnd={(value) => {
+                                  setSettings({
+                                      general: {
+                                          ...settings,
+                                          playerbarSlider: {
+                                              ...playerbarSlider,
+                                              barGap: value,
+                                          },
+                                      },
+                                  });
+                              }}
+                              step={1}
+                              styles={{
+                                  root: {},
+                              }}
+                              w="120px"
+                          />
+                      ),
+                      description: t('setting.playerbarWaveformGap', {
+                          context: 'description',
+                          postProcess: 'sentenceCase',
+                      }),
+                      isHidden: false,
+                      title: t('setting.playerbarWaveformGap', {
+                          postProcess: 'sentenceCase',
+                      }),
+                  },
+                  {
+                      control: (
+                          <Slider
+                              defaultValue={playerbarSlider?.barRadius ?? 4}
+                              max={20}
+                              min={0}
+                              onChangeEnd={(value) => {
+                                  setSettings({
+                                      general: {
+                                          ...settings,
+                                          playerbarSlider: {
+                                              ...playerbarSlider,
+                                              barRadius: value,
+                                          },
+                                      },
+                                  });
+                              }}
+                              step={1}
+                              styles={{
+                                  root: {},
+                              }}
+                              w="120px"
+                          />
+                      ),
+                      description: t('setting.playerbarWaveformRadius', {
+                          context: 'description',
+                          postProcess: 'sentenceCase',
+                      }),
+                      isHidden: false,
+                      title: t('setting.playerbarWaveformRadius', {
+                          postProcess: 'sentenceCase',
+                      }),
+                  },
+              ]
+            : []),
     ];
 
     return <SettingsSection options={controlOptions} />;

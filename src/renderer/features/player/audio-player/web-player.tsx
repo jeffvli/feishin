@@ -17,7 +17,7 @@ import {
     usePlayerProperties,
     usePlayerVolume,
 } from '/@/renderer/store';
-import { PlayerStatus, PlayerStyle } from '/@/shared/types/types';
+import { CrossfadeStyle, PlayerStatus, PlayerStyle } from '/@/shared/types/types';
 
 const PLAY_PAUSE_FADE_DURATION = 300;
 const PLAY_PAUSE_FADE_INTERVAL = 10;
@@ -26,7 +26,7 @@ export function WebPlayer() {
     const playerRef = useRef<null | WebPlayerEngineHandle>(null);
     const { num, player1, player2, status } = usePlayerData();
     const { mediaAutoNext, setTimestamp } = usePlayerActions();
-    const { crossfadeDuration, speed, transitionType } = usePlayerProperties();
+    const { crossfadeDuration, crossfadeStyle, speed, transitionType } = usePlayerProperties();
     const isMuted = usePlayerMuted();
     const volume = usePlayerVolume();
 
@@ -79,6 +79,7 @@ export function WebPlayer() {
                 case PlayerStyle.CROSSFADE:
                     crossfadeHandler({
                         crossfadeDuration: crossfadeDuration,
+                        crossfadeStyle,
                         currentPlayer: playerRef.current.player1(),
                         currentPlayerNum: num,
                         currentTime: e.playedSeconds,
@@ -102,7 +103,7 @@ export function WebPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, isTransitioning, num, transitionType, volume],
+        [crossfadeDuration, crossfadeStyle, isTransitioning, num, transitionType, volume],
     );
 
     const onProgressPlayer2 = useCallback(
@@ -115,6 +116,7 @@ export function WebPlayer() {
                 case PlayerStyle.CROSSFADE:
                     crossfadeHandler({
                         crossfadeDuration: crossfadeDuration,
+                        crossfadeStyle,
                         currentPlayer: playerRef.current.player2(),
                         currentPlayerNum: num,
                         currentTime: e.playedSeconds,
@@ -138,7 +140,7 @@ export function WebPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, isTransitioning, num, transitionType, volume],
+        [crossfadeDuration, crossfadeStyle, isTransitioning, num, transitionType, volume],
     );
 
     const handleOnEndedPlayer1 = useCallback(() => {
@@ -171,6 +173,22 @@ export function WebPlayer() {
         {
             onPlayerSeekToTimestamp: (properties) => {
                 const timestamp = properties.timestamp;
+
+                // Reset transition state if seeking during a crossfade transition
+                if (isTransitioning && transitionType === PlayerStyle.CROSSFADE) {
+                    setIsTransitioning(false);
+
+                    if (num === 1) {
+                        playerRef.current?.player1()?.setVolume(volume);
+                        playerRef.current?.player2()?.setVolume(0);
+                        playerRef.current?.player2()?.ref?.getInternalPlayer()?.pause();
+                    } else {
+                        playerRef.current?.player2()?.setVolume(volume);
+                        playerRef.current?.player1()?.setVolume(0);
+                        playerRef.current?.player1()?.ref?.getInternalPlayer()?.pause();
+                    }
+                }
+
                 if (num === 1) {
                     playerRef.current?.player1()?.ref?.seekTo(timestamp);
                 } else {
@@ -179,6 +197,26 @@ export function WebPlayer() {
             },
             onPlayerStatus: async (properties) => {
                 const status = properties.status;
+
+                // Reset crossfade transition if paused during a crossfade transition
+                if (
+                    status === PlayerStatus.PAUSED &&
+                    isTransitioning &&
+                    transitionType === PlayerStyle.CROSSFADE
+                ) {
+                    setIsTransitioning(false);
+
+                    if (num === 1) {
+                        playerRef.current?.player1()?.setVolume(volume);
+                        playerRef.current?.player2()?.setVolume(0);
+                        playerRef.current?.player2()?.ref?.getInternalPlayer()?.pause();
+                    } else {
+                        playerRef.current?.player2()?.setVolume(volume);
+                        playerRef.current?.player1()?.setVolume(0);
+                        playerRef.current?.player1()?.ref?.getInternalPlayer()?.pause();
+                    }
+                }
+
                 if (status === PlayerStatus.PAUSED) {
                     fadeAndSetStatus(volume, 0, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PAUSED);
                 } else if (status === PlayerStatus.PLAYING) {
@@ -190,7 +228,7 @@ export function WebPlayer() {
                 playerRef.current?.setVolume(volume);
             },
         },
-        [volume, num, isTransitioning],
+        [volume, num, isTransitioning, transitionType],
     );
 
     useEffect(() => {
@@ -244,6 +282,7 @@ export function WebPlayer() {
 
 function crossfadeHandler(args: {
     crossfadeDuration: number;
+    crossfadeStyle: CrossfadeStyle;
     currentPlayer: {
         ref: null | ReactPlayer;
         setVolume: (volume: number) => void;
@@ -262,6 +301,7 @@ function crossfadeHandler(args: {
 }) {
     const {
         crossfadeDuration,
+        crossfadeStyle,
         currentPlayer,
         currentPlayerNum,
         currentTime,
@@ -290,13 +330,55 @@ function crossfadeHandler(args: {
 
     const timeLeft = duration - currentTime;
 
-    // Calculate the volume levels based on time remaining
-    const currentPlayerVolume = (timeLeft / crossfadeDuration) * volume;
-    const nextPlayerVolume = ((crossfadeDuration - timeLeft) / crossfadeDuration) * volume;
+    const progress = (crossfadeDuration - timeLeft) / crossfadeDuration;
+
+    const { easeIn, easeOut } = getCrossfadeEasing(crossfadeStyle);
+
+    const easedProgressOut = easeOut(progress);
+    const easedProgressIn = easeIn(progress);
+
+    const currentPlayerVolume = (1 - easedProgressOut) * volume;
+    const nextPlayerVolume = easedProgressIn * volume;
 
     // Set volumes for both players
     currentPlayer.setVolume(currentPlayerVolume);
     nextPlayer.setVolume(nextPlayerVolume);
+}
+
+/**
+ * Equal power easing - maintains constant power during crossfade
+ * Fade in: sin(π/2 * t)
+ * Fade out: 1 - cos(π/2 * t) so that (1 - result) = cos(π/2 * t)
+ */
+function equalPowerEaseIn(t: number): number {
+    const clampedT = Math.max(0, Math.min(1, t));
+    return Math.sin((Math.PI / 2) * clampedT);
+}
+
+function equalPowerEaseOut(t: number): number {
+    const clampedT = Math.max(0, Math.min(1, t));
+    return 1 - Math.cos((Math.PI / 2) * clampedT);
+}
+
+/**
+ * Exponential easing - natural exponential decay/rise
+ * Fade in: 1 - exp(-k * t) where k controls the curve steepness
+ * Fade out: exp(-k * t) normalized to go from 1 to 0
+ */
+function exponentialEaseIn(t: number): number {
+    const clampedT = Math.max(0, Math.min(1, t));
+    const k = 5;
+    return 1 - Math.exp(-k * clampedT);
+}
+
+function exponentialEaseOut(t: number): number {
+    const clampedT = Math.max(0, Math.min(1, t));
+    const k = 5;
+    // Exponential decay: exp(-k * t) goes from 1 (at t=0) to exp(-k) (at t=1)
+    // Normalize to go from 1 to 0
+    const startValue = Math.exp(0); // = 1
+    const endValue = Math.exp(-k);
+    return (Math.exp(-k * clampedT) - endValue) / (startValue - endValue);
 }
 
 function gaplessHandler(args: {
@@ -332,6 +414,40 @@ function gaplessHandler(args: {
     return null;
 }
 
+function getCrossfadeEasing(style: CrossfadeStyle): {
+    easeIn: (t: number) => number;
+    easeOut: (t: number) => number;
+} {
+    switch (style) {
+        case CrossfadeStyle.EQUAL_POWER:
+            return {
+                easeIn: equalPowerEaseIn,
+                easeOut: equalPowerEaseOut,
+            };
+        case CrossfadeStyle.EXPONENTIAL:
+            return {
+                easeIn: exponentialEaseIn,
+                easeOut: exponentialEaseOut,
+            };
+        case CrossfadeStyle.LINEAR:
+            return {
+                easeIn: linearEase,
+                easeOut: linearEase,
+            };
+        case CrossfadeStyle.S_CURVE:
+            return {
+                easeIn: sCurveEase,
+                easeOut: sCurveEase,
+            };
+        // Default to equal power for other styles
+        default:
+            return {
+                easeIn: equalPowerEaseIn,
+                easeOut: equalPowerEaseOut,
+            };
+    }
+}
+
 function getDuration(ref: null | ReactPlayer | undefined) {
     return ref?.getInternalPlayer()?.duration || 0;
 }
@@ -343,4 +459,20 @@ function getDurationPadding(isFlac: boolean) {
         case true:
             return 0.065;
     }
+}
+
+/**
+ * Linear easing - simple linear interpolation
+ */
+function linearEase(t: number): number {
+    return Math.max(0, Math.min(1, t));
+}
+
+/**
+ * S-Curve easing (smoothstep) - smooth S-shaped curve
+ * Uses smoothstep function: t²(3 - 2t)
+ */
+function sCurveEase(t: number): number {
+    const clampedT = Math.max(0, Math.min(1, t));
+    return clampedT * clampedT * (3 - 2 * clampedT);
 }

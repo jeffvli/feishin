@@ -25,14 +25,12 @@ import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { AppTheme } from '/@/shared/themes/app-theme-types';
 import { LibraryItem, LyricSource } from '/@/shared/types/domain-types';
 import {
-    CrossfadeStyle,
     FontType,
     ItemListKey,
     ListDisplayType,
     ListPaginationType,
     Platform,
     Play,
-    PlayerStyle,
     PlayerType,
     TableColumn,
 } from '/@/shared/types/types';
@@ -306,15 +304,11 @@ const ScrobbleSettingsSchema = z.object({
 
 const PlaybackSettingsSchema = z.object({
     audioDeviceId: z.string().nullable().optional(),
-    crossfadeDuration: z.number(),
-    crossfadeStyle: z.nativeEnum(CrossfadeStyle),
     mediaSession: z.boolean(),
     mpvExtraParameters: z.array(z.string()),
     mpvProperties: MpvSettingsSchema,
-    muted: z.boolean(),
     preservePitch: z.boolean(),
     scrobble: ScrobbleSettingsSchema,
-    style: z.nativeEnum(PlayerStyle),
     transcode: TranscodingConfigSchema,
     type: z.nativeEnum(PlayerType),
     webAudio: z.boolean(),
@@ -1090,8 +1084,6 @@ const initialState: SettingsState = {
     },
     playback: {
         audioDeviceId: undefined,
-        crossfadeDuration: 5,
-        crossfadeStyle: CrossfadeStyle.EQUALPOWER,
         mediaSession: false,
         mpvExtraParameters: [],
         mpvProperties: {
@@ -1104,7 +1096,6 @@ const initialState: SettingsState = {
             replayGainMode: 'no',
             replayGainPreampDB: 0,
         },
-        muted: false,
         preservePitch: true,
         scrobble: {
             enabled: true,
@@ -1112,7 +1103,6 @@ const initialState: SettingsState = {
             scrobbleAtDuration: 240,
             scrobbleAtPercentage: 75,
         },
-        style: PlayerStyle.GAPLESS,
         transcode: {
             enabled: false,
         },
@@ -1289,10 +1279,7 @@ export const useTableSettings = (type: ItemListKey) =>
 
 export const useGeneralSettings = () => useSettingsStore((state) => state.general, shallow);
 
-export const usePlaybackType = () =>
-    useSettingsStore((state) => {
-        return state.playback.type;
-    });
+export const usePlaybackType = () => useSettingsStore((state) => state.playback.type, shallow);
 
 export const usePlayButtonBehavior = () =>
     useSettingsStore((state) => state.general.playButtonBehavior, shallow);
