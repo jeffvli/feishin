@@ -1,4 +1,5 @@
 import { Rating as MantineRating, RatingProps as MantineRatingProps } from '@mantine/core';
+import clsx from 'clsx';
 import debounce from 'lodash/debounce';
 import { useCallback } from 'react';
 
@@ -6,7 +7,7 @@ import styles from './rating.module.css';
 
 interface RatingProps extends MantineRatingProps {}
 
-export const Rating = ({ classNames, onChange, style, ...props }: RatingProps) => {
+export const Rating = ({ classNames, onChange, size, style, ...props }: RatingProps) => {
     const valueChange = useCallback(
         (rating: number) => {
             if (onChange) {
@@ -25,6 +26,13 @@ export const Rating = ({ classNames, onChange, style, ...props }: RatingProps) =
     return (
         <MantineRating
             classNames={{
+                root: clsx(styles.root, {
+                    [styles.lg]: size === 'lg',
+                    [styles.md]: size === 'md',
+                    [styles.sm]: size === 'sm',
+                    [styles.xl]: size === 'xl',
+                    [styles.xs]: size === 'xs',
+                }),
                 symbolBody: styles.symbolBody,
                 ...classNames,
             }}

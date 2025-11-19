@@ -1,3 +1,23 @@
+.root.xs {
+    --rating-size: var(--theme-font-size-xs) !important;
+}
+
+.root.sm {
+    --rating-size: var(--theme-font-size-sm) !important;
+}
+
+.root.md {
+    --rating-size: var(--theme-font-size-md) !important;
+}
+
+.root.lg {
+    --rating-size: var(--theme-font-size-lg) !important;
+}
+
+.root.xl {
+    --rating-size: var(--theme-font-size-xl) !important;
+}
+
 .symbol-body {
     svg {
         stroke: alpha(var(--theme-colors-foreground), 0.7);
