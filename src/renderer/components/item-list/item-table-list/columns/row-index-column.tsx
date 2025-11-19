@@ -37,10 +37,15 @@ const DefaultRowIndexColumn = (props: ItemTableListInnerColumn) => {
         internalState,
         itemType,
         rowIndex,
+        startRowIndex,
     } = props;
 
-    const adjustedRowIndex =
+    let adjustedRowIndex =
         adjustedRowIndexMap?.get(rowIndex) ?? (enableHeader ? rowIndex : rowIndex + 1);
+
+    if (startRowIndex !== undefined && adjustedRowIndex > 0) {
+        adjustedRowIndex = startRowIndex + adjustedRowIndex;
+    }
 
     if (enableExpansion) {
         return (
@@ -75,9 +80,13 @@ const QueueSongRowIndexColumn = (props: ItemTableListInnerColumn) => {
     const song = props.data[props.rowIndex] as QueueSong;
     const isActive = props.activeRowId === song?._uniqueId;
 
-    const adjustedRowIndex =
+    let adjustedRowIndex =
         props.adjustedRowIndexMap?.get(props.rowIndex) ??
         (props.enableHeader ? props.rowIndex : props.rowIndex + 1);
+
+    if (props.startRowIndex !== undefined && adjustedRowIndex > 0) {
+        adjustedRowIndex = props.startRowIndex + adjustedRowIndex;
+    }
 
     return (
         <TableColumnTextContainer {...props}>

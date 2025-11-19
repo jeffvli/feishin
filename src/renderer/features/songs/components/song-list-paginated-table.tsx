@@ -69,6 +69,8 @@ export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProp
             itemListKey: ItemListKey.SONG,
         });
 
+        const startRowIndex = currentPage * itemsPerPage;
+
         return (
             <ItemListWithPagination
                 currentPage={currentPage}
@@ -81,7 +83,6 @@ export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProp
                     autoFitColumns={autoFitColumns}
                     CellComponent={ItemTableListColumn}
                     columns={columns}
-                    currentPage={currentPage}
                     data={data || []}
                     enableAlternateRowColors={enableAlternateRowColors}
                     enableExpansion={false}
@@ -99,6 +100,7 @@ export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProp
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
                     size={size}
+                    startRowIndex={startRowIndex}
                 />
             </ItemListWithPagination>
         );

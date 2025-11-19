@@ -74,6 +74,8 @@ export const GenreListPaginatedTable = forwardRef<any, GenreListPaginatedTablePr
             itemListKey: ItemListKey.GENRE,
         });
 
+        const startRowIndex = currentPage * itemsPerPage;
+
         return (
             <ItemListWithPagination
                 currentPage={currentPage}
@@ -86,7 +88,6 @@ export const GenreListPaginatedTable = forwardRef<any, GenreListPaginatedTablePr
                     autoFitColumns={autoFitColumns}
                     CellComponent={ItemTableListColumn}
                     columns={columns}
-                    currentPage={currentPage}
                     data={data || []}
                     enableAlternateRowColors={enableAlternateRowColors}
                     enableExpansion={false}
@@ -104,6 +105,7 @@ export const GenreListPaginatedTable = forwardRef<any, GenreListPaginatedTablePr
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
                     size={size}
+                    startRowIndex={startRowIndex}
                 />
             </ItemListWithPagination>
         );

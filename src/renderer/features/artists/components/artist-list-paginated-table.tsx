@@ -6,10 +6,10 @@ import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/hel
 import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
 import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
-import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
-import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
 import { useItemListPagination } from '/@/renderer/components/item-list/item-list-pagination/use-item-list-pagination';
+import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
+import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemListTableComponentProps } from '/@/renderer/components/item-list/types';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import {
@@ -74,6 +74,8 @@ export const ArtistListPaginatedTable = forwardRef<any, ArtistListPaginatedTable
             itemListKey: ItemListKey.ARTIST,
         });
 
+        const startRowIndex = currentPage * itemsPerPage;
+
         return (
             <ItemListWithPagination
                 currentPage={currentPage}
@@ -86,7 +88,6 @@ export const ArtistListPaginatedTable = forwardRef<any, ArtistListPaginatedTable
                     autoFitColumns={autoFitColumns}
                     CellComponent={ItemTableListColumn}
                     columns={columns}
-                    currentPage={currentPage}
                     data={data || []}
                     enableAlternateRowColors={enableAlternateRowColors}
                     enableExpansion={false}
@@ -104,6 +105,7 @@ export const ArtistListPaginatedTable = forwardRef<any, ArtistListPaginatedTable
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
                     size={size}
+                    startRowIndex={startRowIndex}
                 />
             </ItemListWithPagination>
         );

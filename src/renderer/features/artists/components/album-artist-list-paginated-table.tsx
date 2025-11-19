@@ -75,6 +75,8 @@ export const AlbumArtistListPaginatedTable = forwardRef<any, AlbumArtistListPagi
             itemListKey: ItemListKey.ALBUM_ARTIST,
         });
 
+        const startRowIndex = currentPage * itemsPerPage;
+
         return (
             <ItemListWithPagination
                 currentPage={currentPage}
@@ -87,7 +89,6 @@ export const AlbumArtistListPaginatedTable = forwardRef<any, AlbumArtistListPagi
                     autoFitColumns={autoFitColumns}
                     CellComponent={ItemTableListColumn}
                     columns={columns}
-                    currentPage={currentPage}
                     data={data || []}
                     enableAlternateRowColors={enableAlternateRowColors}
                     enableExpansion={false}
@@ -105,6 +106,7 @@ export const AlbumArtistListPaginatedTable = forwardRef<any, AlbumArtistListPagi
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
                     size={size}
+                    startRowIndex={startRowIndex}
                 />
             </ItemListWithPagination>
         );

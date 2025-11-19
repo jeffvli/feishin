@@ -119,6 +119,7 @@ interface VirtualizedTableGridProps {
     showRightShadow: boolean;
     showTopShadow: boolean;
     size: 'compact' | 'default' | 'large';
+    startRowIndex?: number;
     tableId: string;
     totalColumnCount: number;
     totalRowCount: number;
@@ -161,6 +162,7 @@ const VirtualizedTableGrid = React.memo(
         showRightShadow,
         showTopShadow,
         size,
+        startRowIndex,
         tableId,
         totalColumnCount,
         totalRowCount,
@@ -300,6 +302,7 @@ const VirtualizedTableGrid = React.memo(
                 pinnedRightColumnWidths,
                 playerContext,
                 size,
+                startRowIndex,
                 tableId,
             }),
             [
@@ -330,6 +333,7 @@ const VirtualizedTableGrid = React.memo(
                 pinnedRightColumnWidths,
                 playerContext,
                 size,
+                startRowIndex,
                 tableId,
             ],
         );
@@ -654,6 +658,7 @@ export interface TableItemProps {
     pinnedRightColumnWidths?: number[];
     playerContext: PlayerContext;
     size?: ItemTableListProps['size'];
+    startRowIndex?: number;
     tableId: string;
 }
 
@@ -663,7 +668,6 @@ interface ItemTableListProps {
     CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
     cellPadding?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     columns: ItemTableListColumnConfig[];
-    currentPage?: number;
     data: unknown[];
     enableAlternateRowColors?: boolean;
     enableDrag?: boolean;
@@ -684,6 +688,7 @@ interface ItemTableListProps {
         type: 'index' | 'offset';
     };
     itemType: LibraryItem;
+    startRowIndex?: number;
     onColumnReordered?: (
         columnIdFrom: TableColumn,
         columnIdTo: TableColumn,
@@ -703,7 +708,6 @@ export const ItemTableList = ({
     CellComponent,
     cellPadding = 'sm',
     columns,
-    currentPage,
     data,
     enableAlternateRowColors = false,
     enableDrag = true,
@@ -727,6 +731,7 @@ export const ItemTableList = ({
     ref,
     rowHeight,
     size = 'default',
+    startRowIndex,
 }: ItemTableListProps) => {
     const tableId = useId();
     const totalItemCount = enableHeader ? data.length + 1 : data.length;
@@ -1682,12 +1687,12 @@ export const ItemTableList = ({
         }
     }, [initialTop, scrollToTableIndex, scrollToTableOffset]);
 
-    // Scroll to top when currentPage changes
+    // Scroll to top when startRowIndex changes
     useEffect(() => {
-        if (currentPage !== undefined) {
+        if (startRowIndex !== undefined) {
             scrollToTableOffset(0);
         }
-    }, [currentPage, scrollToTableOffset]);
+    }, [startRowIndex, scrollToTableOffset]);
 
     const imperativeHandle: ItemListHandle = useMemo(() => {
         return {
@@ -2068,6 +2073,7 @@ export const ItemTableList = ({
                 showRightShadow={showRightShadow}
                 showTopShadow={showTopShadow}
                 size={size}
+                startRowIndex={startRowIndex}
                 tableId={tableId}
                 totalColumnCount={totalColumnCount}
                 totalRowCount={totalRowCount}
