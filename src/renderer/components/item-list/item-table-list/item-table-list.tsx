@@ -626,7 +626,7 @@ export interface TableGroupHeader {
 }
 
 export interface TableItemProps {
-    activeRowId?: string; // Active row's uniqueId for QUEUE_SONG performance optimization
+    activeRowId?: string;
     adjustedRowIndexMap?: Map<number, number>;
     calculatedColumnWidths?: number[];
     cellPadding?: ItemTableListProps['cellPadding'];

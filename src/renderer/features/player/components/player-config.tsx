@@ -401,9 +401,6 @@ export const PlayerConfig = () => {
                     iconProps={{
                         size: 'lg',
                     }}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
                     size="sm"
                     tooltip={{
                         label: t('common.setting_other', { postProcess: 'titleCase' }),
