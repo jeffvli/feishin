@@ -1,5 +1,10 @@
 .symbol-body {
     svg {
-        stroke: var(--theme-colors-foreground-muted);
+        stroke: alpha(var(--theme-colors-foreground), 0.7);
+        stroke-width: 2px;
+
+        &:not([data-filled='true']) {
+            fill: transparent;
+        }
     }
 }
