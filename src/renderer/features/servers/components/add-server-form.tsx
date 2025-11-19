@@ -301,7 +301,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             })}
                         />
                     )}
-                    <Group grow>
+                    <Group grow justify="flex-end">
                         {onCancel && (
                             <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
                         )}

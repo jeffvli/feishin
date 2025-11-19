@@ -1,4 +1,5 @@
 import { openModal } from '@mantine/modals';
+import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 
@@ -15,6 +16,8 @@ import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
+
+const localSettings = isElectron() ? window.api.localSettings : null;
 
 const ActionRequiredRoute = () => {
     const { t } = useTranslation();
@@ -60,7 +63,7 @@ const ActionRequiredRoute = () => {
                     <Stack mt="2rem">
                         {canReturnHome && <Navigate to={AppRoute.HOME} />}
                         {/* This should be displayed if a credential is required */}
-                        {isCredentialRequired && (
+                        {isCredentialRequired && !localSettings?.env.SERVER_LOCK && (
                             <Group justify="center" wrap="nowrap">
                                 <Button
                                     fullWidth

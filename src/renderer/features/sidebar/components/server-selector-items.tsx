@@ -1,5 +1,6 @@
 import { openModal } from '@mantine/modals';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
@@ -15,6 +16,8 @@ import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Icon } from '/@/shared/components/icon/icon';
 import { ServerListItemWithCredential, ServerType } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
+
+const localSettings = isElectron() ? window.api.localSettings : null;
 
 export const ServerSelectorItems = () => {
     const { t } = useTranslation();
@@ -87,6 +90,8 @@ export const ServerSelectorItems = () => {
         });
     };
 
+    const serverLock = localSettings?.env.SERVER_LOCK || false;
+
     return (
         <>
             <DropdownMenu.Label>
@@ -120,12 +125,14 @@ export const ServerSelectorItems = () => {
                     </DropdownMenu.Item>
                 );
             })}
-            <DropdownMenu.Item
-                leftSection={<Icon icon="edit" />}
-                onClick={handleManageServersModal}
-            >
-                {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}
-            </DropdownMenu.Item>
+            {!serverLock && (
+                <DropdownMenu.Item
+                    leftSection={<Icon icon="edit" />}
+                    onClick={handleManageServersModal}
+                >
+                    {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}
+                </DropdownMenu.Item>
+            )}
             {musicFolders && musicFolders.items.length > 0 && (
                 <>
                     <DropdownMenu.Divider />

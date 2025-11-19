@@ -35,6 +35,8 @@ const InvalidRoute = lazy(
     () => import('/@/renderer/features/action-required/routes/invalid-route'),
 );
 
+const LoginRoute = lazy(() => import('/@/renderer/features/login/routes/login-route'));
+
 const HomeRoute = lazy(() => import('/@/renderer/features/home/routes/home-route'));
 
 const ArtistListRoute = lazy(() => import('/@/renderer/features/artists/routes/artist-list-route'));
@@ -209,6 +211,7 @@ export const AppRouter = () => {
                                     element={<ActionRequiredRoute />}
                                     path={AppRoute.ACTION_REQUIRED}
                                 />
+                                <Route element={<LoginRoute />} path={AppRoute.LOGIN} />
                             </Route>
                         </Route>
                     </Routes>

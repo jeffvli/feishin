@@ -1,4 +1,5 @@
 import { openModal } from '@mantine/modals';
+import isElectron from 'is-electron';
 import { Dispatch, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -8,6 +9,8 @@ import { ServerList } from '/@/renderer/features/servers/components/server-list'
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAuthStoreActions, useServerList } from '/@/renderer/store';
 import { ServerListItemWithCredential } from '/@/shared/types/domain-types';
+
+const localSettings = isElectron() ? window.api.localSettings : null;
 
 interface ServerCommandsProps {
     handleClose: () => void;
@@ -42,6 +45,8 @@ export const ServerCommands = ({ handleClose, setPages, setQuery }: ServerComman
         [handleClose, navigate, setCurrentServer, setPages, setQuery],
     );
 
+    const serverLock = localSettings?.env.SERVER_LOCK || false;
+
     return (
         <>
             <Command.Group
@@ -54,11 +59,13 @@ export const ServerCommands = ({ handleClose, setPages, setQuery }: ServerComman
                     >{`${serverList[key].name}...`}</Command.Item>
                 ))}
             </Command.Group>
-            <Command.Group heading={t('common.manage', { postProcess: 'sentenceCase' })}>
-                <Command.Item onSelect={handleManageServersModal}>
-                    {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}...
-                </Command.Item>
-            </Command.Group>
+            {!serverLock && (
+                <Command.Group heading={t('common.manage', { postProcess: 'sentenceCase' })}>
+                    <Command.Item onSelect={handleManageServersModal}>
+                        {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}...
+                    </Command.Item>
+                </Command.Group>
+            )}
             <Command.Separator />
         </>
     );
