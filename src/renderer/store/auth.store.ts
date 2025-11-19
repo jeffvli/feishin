@@ -116,6 +116,10 @@ export const useCurrentServerId = () => useAuthStore((state) => state.currentSer
 
 export const useCurrentServer = () =>
     useAuthStore((state) => {
+        if (!state.currentServer) {
+            return null;
+        }
+
         return {
             features: state.currentServer?.features,
             id: state.currentServer?.id,

@@ -58,6 +58,11 @@ export const useServerAuthenticated = () => {
     }, 300);
 
     useEffect(() => {
+        if (!server) {
+            setReady(AuthState.INVALID);
+            return;
+        }
+
         if (priorServerId.current !== server?.id) {
             const serverWithAuth = getServerById(server!.id);
             priorServerId.current = server?.id || '';

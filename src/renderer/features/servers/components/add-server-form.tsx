@@ -238,6 +238,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                                 context: 'name',
                                 postProcess: 'titleCase',
                             })}
+                            required
                             {...form.getInputProps('name')}
                         />
                         <TextInput
@@ -246,6 +247,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                                 context: 'url',
                                 postProcess: 'titleCase',
                             })}
+                            required
                             {...form.getInputProps('url')}
                         />
                     </Group>
@@ -254,6 +256,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             context: 'username',
                             postProcess: 'titleCase',
                         })}
+                        required
                         {...form.getInputProps('username')}
                     />
                     <PasswordInput
@@ -298,7 +301,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             })}
                         />
                     )}
-                    <Group justify="flex-end">
+                    <Group grow>
                         {onCancel && (
                             <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
                         )}
