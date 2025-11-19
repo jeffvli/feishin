@@ -82,7 +82,11 @@ export function Image({
         );
     }
 
-    return <ImageUnloader />;
+    return (
+        <ImageContainer className={containerClassName}>
+            <ImageUnloader />
+        </ImageContainer>
+    );
 }
 
 const ImageContainer = forwardRef(
