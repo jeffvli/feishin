@@ -5,6 +5,7 @@ import '@mantine/core/styles/baseline.css';
 import '@mantine/core/styles/default-css-variables.css';
 import '@mantine/core/styles/global.css';
 // Shared mantine styles
+import '@mantine/core/styles/Combobox.css';
 import '@mantine/core/styles/ScrollArea.css';
 import '@mantine/core/styles/UnstyledButton.css';
 import '@mantine/core/styles/VisuallyHidden.css';
