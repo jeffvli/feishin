@@ -23,7 +23,7 @@
 .loader {
     width: 100%;
     height: 100%;
-    aspect-ratio: 1 / 1;
+    border-radius: var(--theme-radius-md);
 }
 
 .image-container {
@@ -39,14 +39,15 @@
     justify-content: center;
     width: 100%;
     height: 100%;
-    aspect-ratio: 1 / 1;
     background-color: darken(var(--theme-colors-foreground), 40%);
+    border-radius: var(--theme-radius-md);
     opacity: 0.3;
 }
 
 .skeleton {
     width: 100%;
     height: 100%;
+    border-radius: var(--theme-radius-md);
 }
 
 .view-wrapper {
