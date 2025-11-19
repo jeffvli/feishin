@@ -10,11 +10,11 @@ import { PlaylistDetailSongListHeaderFilters } from '/@/renderer/features/playli
 import { FilterBar } from '/@/renderer/features/shared/components/filter-bar';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { useCurrentServer } from '/@/renderer/store';
-import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString } from '/@/renderer/utils';
 import { Badge } from '/@/shared/components/badge/badge';
 import { SpinnerIcon } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface PlaylistDetailHeaderProps {
@@ -37,8 +37,6 @@ export const PlaylistDetailSongListHeader = ({
         playlistsQueries.detail({ query: { id: playlistId }, serverId: server?.id }),
     );
 
-    const playButtonBehavior = usePlayButtonBehavior();
-
     if (detailQuery.isLoading) return null;
     const isSmartPlaylist = detailQuery?.data?.rules;
     const playlistDuration = detailQuery?.data?.duration;
@@ -47,7 +45,10 @@ export const PlaylistDetailSongListHeader = ({
         <Stack gap={0}>
             <PageHeader>
                 <LibraryHeaderBar>
-                    <LibraryHeaderBar.PlayButton onClick={() => handlePlay(playButtonBehavior)} />
+                    <LibraryHeaderBar.PlayButton
+                        ids={[playlistId]}
+                        itemType={LibraryItem.PLAYLIST}
+                    />
                     <LibraryHeaderBar.Title>{detailQuery?.data?.name}</LibraryHeaderBar.Title>
                     {!!playlistDuration && <Badge>{formatDurationString(playlistDuration)}</Badge>}
                     <Badge>

@@ -45,5 +45,5 @@ export const ArtistListHeader = ({ title }: ArtistListHeaderProps) => {
 const PlayButton = () => {
     const { query } = useArtistListFilters();
 
-    return <LibraryHeaderBar.PlayButton itemType={LibraryItem.ARTIST} query={query} />;
+    return <LibraryHeaderBar.PlayButton itemType={LibraryItem.ARTIST} listQuery={query} />;
 };

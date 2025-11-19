@@ -51,5 +51,5 @@ export const SongListHeader = ({ title }: SongListHeaderProps) => {
 const PlayButton = () => {
     const { query } = useSongListFilters();
 
-    return <LibraryHeaderBar.PlayButton itemType={LibraryItem.SONG} query={query} />;
+    return <LibraryHeaderBar.PlayButton itemType={LibraryItem.SONG} listQuery={query} />;
 };

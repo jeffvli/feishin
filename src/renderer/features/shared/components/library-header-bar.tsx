@@ -11,7 +11,7 @@ import { useCurrentServerId } from '/@/renderer/store';
 import { Badge, BadgeProps } from '/@/shared/components/badge/badge';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface LibraryHeaderBarProps {
@@ -24,26 +24,41 @@ export const LibraryHeaderBar = ({ children }: LibraryHeaderBarProps) => {
 
 interface HeaderPlayButtonProps {
     className?: string;
+    ids?: string[];
     itemType: LibraryItem;
-    query: Record<string, any>;
+    listQuery?: Record<string, any>;
+    songs?: Song[];
 }
 
 interface TitleProps {
     children: ReactNode;
 }
 
-const HeaderPlayButton = ({ className, itemType, query, ...props }: HeaderPlayButtonProps) => {
+const HeaderPlayButton = ({
+    className,
+    ids,
+    itemType,
+    listQuery,
+    songs,
+    ...props
+}: HeaderPlayButtonProps) => {
     const serverId = useCurrentServerId();
     const { t } = useTranslation();
     const player = usePlayer();
 
     const handlePlay = useCallback(
         (playType: Play) => {
-            if (!serverId) return;
-            player.addToQueueByListQuery(serverId, query, itemType, playType);
+            if (listQuery) {
+                player.addToQueueByListQuery(serverId, listQuery, itemType, playType);
+            } else if (ids) {
+                player.addToQueueByFetch(serverId, ids, itemType, playType);
+            } else if (songs) {
+                player.addToQueueByData(songs, playType);
+            }
+
             closeAllModals();
         },
-        [serverId, query, itemType, player],
+        [listQuery, ids, songs, player, serverId, itemType],
     );
 
     const openPlayTypeModal = useCallback(() => {

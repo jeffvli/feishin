@@ -45,5 +45,5 @@ export const GenreListHeader = ({ title }: GenreListHeaderProps) => {
 const PlayButton = () => {
     const { query } = useGenreListFilters();
 
-    return <LibraryHeaderBar.PlayButton itemType={LibraryItem.GENRE} query={query} />;
+    return <LibraryHeaderBar.PlayButton itemType={LibraryItem.GENRE} listQuery={query} />;
 };

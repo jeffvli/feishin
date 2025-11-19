@@ -6,12 +6,10 @@ import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/nati
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumDetailContent } from '/@/renderer/features/albums/components/album-detail-content';
 import { AlbumDetailHeader } from '/@/renderer/features/albums/components/album-detail-header';
-import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
-import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const AlbumDetailRoute = () => {
@@ -21,21 +19,16 @@ const AlbumDetailRoute = () => {
 
     const { albumId } = useParams() as { albumId: string };
     const server = useCurrentServer();
+
     const detailQuery = useQuery(
         albumQueries.detail({ query: { id: albumId }, serverId: server?.id }),
     );
+
     const { background: backgroundColor, colorId } = useFastAverageColor({
         id: albumId,
         src: detailQuery.data?.imageUrl,
         srcLoaded: !detailQuery.isLoading,
     });
-    const { addToQueueByFetch } = usePlayer();
-    const playButtonBehavior = usePlayButtonBehavior();
-
-    const handlePlay = () => {
-        if (!server?.id) return;
-        addToQueueByFetch(server.id, [albumId], LibraryItem.ALBUM, playButtonBehavior);
-    };
 
     const backgroundUrl = detailQuery.data?.imageUrl || '';
     const background = (albumBackground && `url(${backgroundUrl})`) || backgroundColor;
@@ -47,7 +40,10 @@ const AlbumDetailRoute = () => {
                     backgroundColor: backgroundColor || undefined,
                     children: (
                         <LibraryHeaderBar>
-                            <LibraryHeaderBar.PlayButton onClick={handlePlay} />
+                            <LibraryHeaderBar.PlayButton
+                                ids={[albumId]}
+                                itemType={LibraryItem.ALBUM}
+                            />
                             <LibraryHeaderBar.Title>
                                 {detailQuery?.data?.name}
                             </LibraryHeaderBar.Title>
