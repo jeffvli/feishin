@@ -6,10 +6,13 @@ import { generatePath, Link, useParams } from 'react-router';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { LibraryHeader } from '/@/renderer/features/shared/components/library-header';
+import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { formatDateAbsoluteUTC, formatDurationString, titleCase } from '/@/renderer/utils';
 import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Pill } from '/@/shared/components/pill/pill';
 import { Rating } from '/@/shared/components/rating/rating';
@@ -33,10 +36,15 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement, AlbumDetailHeaderPro
             albumQueries.detail({ query: { id: albumId }, serverId: server?.id }),
         );
         const { t } = useTranslation();
+        const genreRoute = useGenreRoute();
 
         const showRating =
             detailQuery?.data?._serverType === ServerType.NAVIDROME ||
             detailQuery?.data?._serverType === ServerType.SUBSONIC;
+
+        const showGenres = detailQuery?.data?.genres
+            ? detailQuery?.data?.genres.length !== 0
+            : false;
 
         const originalDifferentFromRelease =
             detailQuery.data?.originalDate &&
@@ -95,7 +103,17 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement, AlbumDetailHeaderPro
             });
         }
 
-        const { setRating } = usePlayer();
+        const { setFavorite, setRating } = usePlayer();
+
+        const handleFavorite = () => {
+            if (!detailQuery?.data) return;
+            setFavorite(
+                detailQuery.data._serverId,
+                [detailQuery.data.id],
+                LibraryItem.ALBUM,
+                !detailQuery.data.userFavorite,
+            );
+        };
 
         const handleUpdateRating = (rating: number) => {
             if (!detailQuery?.data) return;
@@ -133,13 +151,48 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement, AlbumDetailHeaderPro
                                 ),
                         )}
                     </Pill.Group>
-                    {showRating && (
-                        <Rating
-                            onChange={handleUpdateRating}
-                            readOnly={detailQuery?.isFetching}
-                            value={detailQuery?.data?.userRating || 0}
-                        />
+                    {showGenres && (
+                        <Group gap="sm">
+                            {detailQuery?.data?.genres?.map((genre) => (
+                                <Button
+                                    component={Link}
+                                    key={`genre-${genre.id}`}
+                                    radius="md"
+                                    size="compact-md"
+                                    to={generatePath(genreRoute, {
+                                        genreId: genre.id,
+                                    })}
+                                    variant="outline"
+                                >
+                                    {genre.name}
+                                </Button>
+                            ))}
+                        </Group>
                     )}
+                    <Group align="center" gap="sm">
+                        <ActionIcon
+                            icon="favorite"
+                            iconProps={{
+                                fill: detailQuery?.data?.userFavorite ? 'primary' : undefined,
+                                size: 'lg',
+                            }}
+                            onClick={handleFavorite}
+                            size="xs"
+                            variant="transparent"
+                        />
+                        {showRating && (
+                            <Rating
+                                onChange={handleUpdateRating}
+                                readOnly={detailQuery?.isFetching}
+                                styles={{
+                                    input: {
+                                        background: 'transparent',
+                                    },
+                                }}
+                                value={detailQuery?.data?.userRating || 0}
+                            />
+                        )}
+                    </Group>
                     <Group
                         gap="md"
                         mah="4rem"

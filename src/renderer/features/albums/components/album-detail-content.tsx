@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Suspense, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import styles from './album-detail-content.module.css';
 
@@ -19,7 +19,6 @@ import { ListConfigMenu } from '/@/renderer/features/shared/components/list-conf
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { useContainerQuery } from '/@/renderer/hooks';
-import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { useCurrentServer } from '/@/renderer/store';
 import {
     useGeneralSettings,
@@ -28,7 +27,6 @@ import {
 } from '/@/renderer/store/settings.store';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
-import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -54,7 +52,6 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
 
     const { ref, ...cq } = useContainerQuery();
     const { externalLinks, lastFM, musicBrainz } = useGeneralSettings();
-    const genreRoute = useGenreRoute();
 
     const carousels = [
         {
@@ -94,21 +91,11 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
     ];
     const playButtonBehavior = usePlayButtonBehavior();
 
-    const { addToQueueByFetch, setFavorite } = usePlayer();
+    const { addToQueueByFetch } = usePlayer();
 
     const handlePlay = () => {
         if (!server?.id) return;
         addToQueueByFetch(server.id, [albumId], LibraryItem.ALBUM, playButtonBehavior);
-    };
-
-    const handleFavorite = () => {
-        if (!detailQuery?.data) return;
-        setFavorite(
-            detailQuery.data._serverId,
-            [detailQuery.data.id],
-            LibraryItem.ALBUM,
-            !detailQuery.data.userFavorite,
-        );
     };
 
     const handleMoreOptions = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -119,7 +106,6 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
         });
     };
 
-    const showGenres = detailQuery?.data?.genres ? detailQuery?.data?.genres.length !== 0 : false;
     const comment = detailQuery?.data?.comment;
 
     const mbzId = detailQuery?.data?.mbzId;
@@ -132,48 +118,15 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
                     <Group gap="sm" justify="space-between">
                         <Group>
                             <PlayButton onClick={handlePlay} />
-                            <Group gap="xs">
-                                <ActionIcon
-                                    icon="favorite"
-                                    iconProps={{
-                                        fill: detailQuery?.data?.userFavorite
-                                            ? 'primary'
-                                            : undefined,
-                                    }}
-                                    onClick={handleFavorite}
-                                    size="lg"
-                                    variant="transparent"
-                                />
-                                <ActionIcon
-                                    icon="ellipsisHorizontal"
-                                    onClick={handleMoreOptions}
-                                    size="lg"
-                                    variant="transparent"
-                                />
-                            </Group>
+                            <ActionIcon
+                                icon="ellipsisHorizontal"
+                                onClick={handleMoreOptions}
+                                size="lg"
+                                variant="transparent"
+                            />
                         </Group>
                     </Group>
                 </section>
-                {showGenres && (
-                    <section>
-                        <Group gap="sm">
-                            {detailQuery?.data?.genres?.map((genre) => (
-                                <Button
-                                    component={Link}
-                                    key={`genre-${genre.id}`}
-                                    radius="md"
-                                    size="compact-md"
-                                    to={generatePath(genreRoute, {
-                                        genreId: genre.id,
-                                    })}
-                                    variant="outline"
-                                >
-                                    {genre.name}
-                                </Button>
-                            ))}
-                        </Group>
-                    </section>
-                )}
                 {externalLinks && (lastFM || musicBrainz) ? (
                     <section>
                         <Group gap="sm">
@@ -435,6 +388,12 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                             />
                         ) : null
                     }
+                    styles={{
+                        input: {
+                            background: 'transparent',
+                            border: '1px solid rgba(255, 255, 255, 0.05)',
+                        },
+                    }}
                     value={searchTerm}
                 />
                 <ListConfigMenu
