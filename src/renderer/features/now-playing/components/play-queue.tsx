@@ -14,6 +14,7 @@ import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/context/player-context';
+import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import {
     subscribeCurrentTrack,
@@ -26,7 +27,6 @@ import {
     usePlayerQueueType,
     usePlayerSong,
 } from '/@/renderer/store';
-import { searchSongs } from '/@/renderer/utils/search-songs';
 import { Flex } from '/@/shared/components/flex/flex';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
 import { Text } from '/@/shared/components/text/text';
@@ -140,7 +140,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
 
     const filteredData: QueueSong[] = useMemo(() => {
         if (debouncedSearchTerm) {
-            const searched = searchSongs(data, debouncedSearchTerm);
+            const searched = searchLibraryItems(data, debouncedSearchTerm, LibraryItem.SONG);
             return searched;
         }
 

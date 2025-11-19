@@ -1,6 +1,17 @@
+import Fuse from 'fuse.js';
 import z from 'zod';
 
 import i18n from '/@/i18n/i18n';
+import {
+    Album,
+    AlbumArtist,
+    Artist,
+    Genre,
+    LibraryItem,
+    Playlist,
+    QueueSong,
+    Song,
+} from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 export const PLAY_TYPES = [
@@ -68,4 +79,149 @@ export const FILTER_KEYS = {
     PAGINATION: PaginationFilterKeys,
     SHARED: SharedFilterKeys,
     SONG: SongFilterKeys,
+};
+
+interface CreateFuseOptions {
+    fieldNormWeight?: number;
+    ignoreLocation?: boolean;
+    threshold?: number;
+}
+
+type FuseSearchableItem = Album | AlbumArtist | Artist | Genre | Playlist | QueueSong | Song;
+
+export const createFuseForLibraryItem = <T extends FuseSearchableItem>(
+    items: T[],
+    itemType: LibraryItem,
+    options: CreateFuseOptions = {},
+): Fuse<T> => {
+    const { fieldNormWeight = 1, ignoreLocation = true, threshold = 0.3 } = options;
+
+    if (items.length === 0) {
+        return new Fuse(items, {
+            fieldNormWeight,
+            ignoreLocation,
+            keys: [],
+            threshold,
+        });
+    }
+
+    const sampleItem = items[0];
+
+    const stringKeys = Object.keys(sampleItem).filter(
+        (key) =>
+            typeof sampleItem[key as keyof T] === 'string' &&
+            !key.startsWith('_') &&
+            key !== 'id' &&
+            key !== 'albumId' &&
+            key !== 'streamUrl' &&
+            key !== 'serverId' &&
+            key !== 'ownerId',
+    ) as string[];
+
+    const nestedKeys: Array<{ getFn: (item: T) => string; name: string }> = [];
+
+    switch (itemType) {
+        case LibraryItem.ALBUM: {
+            nestedKeys.push(
+                {
+                    getFn: (item) => {
+                        const a = item as Album;
+                        return a.artists?.map((artist) => artist.name).join(' ') || '';
+                    },
+                    name: 'artists',
+                },
+                {
+                    getFn: (item) => {
+                        const a = item as Album;
+                        return a.albumArtists?.map((artist) => artist.name).join(' ') || '';
+                    },
+                    name: 'albumArtists',
+                },
+                {
+                    getFn: (item) => {
+                        const a = item as Album;
+                        return a.genres?.map((genre) => genre.name).join(' ') || '';
+                    },
+                    name: 'genres',
+                },
+            );
+            break;
+        }
+
+        case LibraryItem.ALBUM_ARTIST: {
+            nestedKeys.push({
+                getFn: (item) => {
+                    const aa = item as AlbumArtist;
+                    return aa.genres?.map((genre) => genre.name).join(' ') || '';
+                },
+                name: 'genres',
+            });
+            break;
+        }
+
+        case LibraryItem.ARTIST:
+        case LibraryItem.GENRE:
+            break;
+
+        case LibraryItem.PLAYLIST: {
+            nestedKeys.push({
+                getFn: (item) => {
+                    const p = item as Playlist;
+                    return p.genres?.map((genre) => genre.name).join(' ') || '';
+                },
+                name: 'genres',
+            });
+            break;
+        }
+
+        case LibraryItem.PLAYLIST_SONG:
+        case LibraryItem.QUEUE_SONG:
+        case LibraryItem.SONG: {
+            nestedKeys.push(
+                {
+                    getFn: (item) => {
+                        const s = item as QueueSong | Song;
+                        return s.artists?.map((artist) => artist.name).join(' ') || '';
+                    },
+                    name: 'artists',
+                },
+                {
+                    getFn: (item) => {
+                        const s = item as QueueSong | Song;
+                        return s.albumArtists?.map((artist) => artist.name).join(' ') || '';
+                    },
+                    name: 'albumArtists',
+                },
+                {
+                    getFn: (item) => {
+                        const s = item as QueueSong | Song;
+                        return s.genres?.map((genre) => genre.name).join(' ') || '';
+                    },
+                    name: 'genres',
+                },
+            );
+            break;
+        }
+    }
+
+    return new Fuse(items, {
+        fieldNormWeight,
+        ignoreLocation,
+        keys: [...stringKeys, ...nestedKeys],
+        threshold,
+    });
+};
+
+export const searchLibraryItems = <T extends FuseSearchableItem>(
+    items: T[],
+    searchTerm: string,
+    itemType: LibraryItem,
+    options?: CreateFuseOptions,
+): T[] => {
+    if (!searchTerm.trim()) {
+        return items;
+    }
+
+    const fuse = createFuseForLibraryItem(items, itemType, options);
+    return fuse.search(searchTerm).map((result) => result.item);
 };
