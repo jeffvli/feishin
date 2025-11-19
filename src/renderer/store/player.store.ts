@@ -417,6 +417,9 @@ export const usePlayerStoreBase = create<PlayerState>()(
 
                             state.queue.default = newQueue;
                         } else {
+                            const currentTrack = state.getCurrentSong() as QueueSong | undefined;
+                            const currentTrackUniqueId = currentTrack?._uniqueId;
+
                             const priorityIndex = state.queue.priority.findIndex(
                                 (id) => id === uniqueId,
                             );
@@ -450,6 +453,13 @@ export const usePlayerStoreBase = create<PlayerState>()(
                                     ];
                                 }
                             }
+
+                            const combinedQueue = [...state.queue.priority, ...state.queue.default];
+                            recalculatePlayerIndexByUniqueId(
+                                state,
+                                currentTrackUniqueId,
+                                combinedQueue,
+                            );
 
                             if (state.player.shuffle === PlayerShuffle.TRACK) {
                                 const currentIndex = state.player.index;
