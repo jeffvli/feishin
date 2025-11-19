@@ -24,6 +24,7 @@ import {
     useListSettings,
     usePlayerActions,
     usePlayerQueueType,
+    usePlayerSong,
 } from '/@/renderer/store';
 import { searchSongs } from '/@/renderer/utils/search-songs';
 import { Flex } from '/@/shared/components/flex/flex';
@@ -156,10 +157,14 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
         itemListKey: listKey,
     });
 
+    const currentSong = usePlayerSong();
+    const currentSongUniqueId = currentSong?._uniqueId;
+
     return (
         <div className={styles.container}>
             <LoadingOverlay pos="absolute" visible={isFetching} />
             <ItemTableList
+                activeRowId={currentSongUniqueId}
                 autoFitColumns={table.autoFitColumns}
                 CellComponent={ItemTableListColumn}
                 columns={table.columns}

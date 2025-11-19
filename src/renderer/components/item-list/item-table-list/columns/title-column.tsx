@@ -10,7 +10,6 @@ import {
     ItemTableListInnerColumn,
     TableColumnContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
-import { useIsCurrentSong } from '/@/renderer/features/player/hooks/use-is-current-song';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 
@@ -70,7 +69,8 @@ function QueueSongTitleColumn(props: ItemTableListInnerColumn) {
         props.columns[props.columnIndex].id
     ];
 
-    const { isActive } = useIsCurrentSong(props.data[props.rowIndex] as QueueSong);
+    const song = props.data[props.rowIndex] as QueueSong;
+    const isActive = props.activeRowId === song?._uniqueId;
 
     if (typeof row === 'string') {
         const path = getTitlePath(props.itemType, (props.data[props.rowIndex] as any).id as string);

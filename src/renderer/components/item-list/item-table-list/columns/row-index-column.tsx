@@ -8,7 +8,6 @@ import {
     TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemListItem } from '/@/renderer/components/item-list/types';
-import { useIsCurrentSong } from '/@/renderer/features/player/hooks/use-is-current-song';
 import { usePlayerStatus } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
@@ -73,7 +72,8 @@ const DefaultRowIndexColumn = (props: ItemTableListInnerColumn) => {
 
 const QueueSongRowIndexColumn = (props: ItemTableListInnerColumn) => {
     const status = usePlayerStatus();
-    const { isActive } = useIsCurrentSong(props.data[props.rowIndex] as QueueSong);
+    const song = props.data[props.rowIndex] as QueueSong;
+    const isActive = props.activeRowId === song?._uniqueId;
 
     const adjustedRowIndex =
         props.adjustedRowIndexMap?.get(props.rowIndex) ??

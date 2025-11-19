@@ -84,6 +84,7 @@ enum TableItemSize {
 }
 
 interface VirtualizedTableGridProps {
+    activeRowId?: string;
     calculatedColumnWidths: number[];
     CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
     cellPadding: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
@@ -125,6 +126,7 @@ interface VirtualizedTableGridProps {
 
 const VirtualizedTableGrid = React.memo(
     ({
+        activeRowId,
         calculatedColumnWidths,
         CellComponent,
         cellPadding,
@@ -271,6 +273,7 @@ const VirtualizedTableGrid = React.memo(
 
         const itemProps: TableItemProps = useMemo(
             () => ({
+                activeRowId,
                 adjustedRowIndexMap,
                 calculatedColumnWidths,
                 cellPadding,
@@ -300,11 +303,12 @@ const VirtualizedTableGrid = React.memo(
                 tableId,
             }),
             [
+                activeRowId,
                 adjustedRowIndexMap,
                 calculatedColumnWidths,
                 cellPadding,
-                controls,
                 parsedColumns,
+                controls,
                 dataWithGroups,
                 enableAlternateRowColors,
                 enableColumnReorder,
@@ -622,7 +626,8 @@ export interface TableGroupHeader {
 }
 
 export interface TableItemProps {
-    adjustedRowIndexMap?: Map<number, number>; // Maps rowIndex to adjustedRowIndex (1-indexed, excluding group rows)
+    activeRowId?: string; // Active row's uniqueId for QUEUE_SONG performance optimization
+    adjustedRowIndexMap?: Map<number, number>;
     calculatedColumnWidths?: number[];
     cellPadding?: ItemTableListProps['cellPadding'];
     columns: ItemTableListColumnConfig[];
@@ -653,6 +658,7 @@ export interface TableItemProps {
 }
 
 interface ItemTableListProps {
+    activeRowId?: string;
     autoFitColumns?: boolean;
     CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
     cellPadding?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
@@ -692,6 +698,7 @@ interface ItemTableListProps {
 }
 
 export const ItemTableList = ({
+    activeRowId,
     autoFitColumns = false,
     CellComponent,
     cellPadding = 'sm',
@@ -2026,6 +2033,7 @@ export const ItemTableList = ({
             {StickyHeader}
             {StickyGroupRow}
             <VirtualizedTableGrid
+                activeRowId={activeRowId}
                 calculatedColumnWidths={calculatedColumnWidths}
                 CellComponent={CellComponent}
                 cellPadding={cellPadding}

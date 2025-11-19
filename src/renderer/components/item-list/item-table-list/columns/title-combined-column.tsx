@@ -10,7 +10,6 @@ import {
     ItemTableListInnerColumn,
     TableColumnContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
-import { useIsCurrentSong } from '/@/renderer/features/player/hooks/use-is-current-song';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Image } from '/@/shared/components/image/image';
 import { Text } from '/@/shared/components/text/text';
@@ -79,7 +78,8 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
 export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
     const row: object | undefined = (props.data as (any | undefined)[])[props.rowIndex];
 
-    const { isActive } = useIsCurrentSong(props.data[props.rowIndex] as QueueSong);
+    const song = props.data[props.rowIndex] as QueueSong;
+    const isActive = props.activeRowId === song?._uniqueId;
 
     const artists = useMemo(() => {
         if (row && 'artists' in row && Array.isArray(row.artists)) {
