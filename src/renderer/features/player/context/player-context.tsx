@@ -1,15 +1,20 @@
+import { closeAllModals, openModal } from '@mantine/modals';
 import { QueryClient, useIsFetching, useQueryClient } from '@tanstack/react-query';
 import { nanoid } from 'nanoid/non-secure';
 import { createContext, useCallback, useContext, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { albumQueries } from '/@/renderer/features/albums/api/album-api';
+import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { AddToQueueType, usePlayerActions } from '/@/renderer/store';
+import { ConfirmModal } from '/@/shared/components/modal/modal';
+import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import {
     instanceOfCancellationError,
@@ -31,7 +36,14 @@ export interface PlayerContext {
         id: string[],
         itemType: LibraryItem,
         type: AddToQueueType,
+        skipConfirmation?: boolean,
     ) => void;
+    addToQueueByListQuery: (
+        serverId: string,
+        query: any,
+        itemType: LibraryItem,
+        type: AddToQueueType,
+    ) => Promise<void>;
     clearQueue: () => void;
     clearSelected: (items: QueueSong[]) => void;
     decreaseVolume: (amount: number) => void;
@@ -71,6 +83,7 @@ export interface PlayerContext {
 export const PlayerContext = createContext<PlayerContext>({
     addToQueueByData: () => {},
     addToQueueByFetch: () => {},
+    addToQueueByListQuery: async () => {},
     clearQueue: () => {},
     clearSelected: () => {},
     decreaseVolume: () => {},
@@ -126,6 +139,45 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const queryClient = useQueryClient();
     const storeActions = usePlayerActions();
     const timeoutIds = useRef<null | Record<string, ReturnType<typeof setTimeout>>>({});
+    const queueFetchConfirmThreshold = 100;
+
+    const confirmLargeFetch = useCallback(
+        (itemCount: number): Promise<boolean> => {
+            return new Promise((resolve) => {
+                openModal({
+                    children: (
+                        <ConfirmModal
+                            labels={{
+                                cancel: t('common.cancel', { postProcess: 'titleCase' }),
+                                confirm: t('common.confirm', { postProcess: 'titleCase' }),
+                            }}
+                            onCancel={() => {
+                                resolve(false);
+                                closeAllModals();
+                            }}
+                            onConfirm={() => {
+                                resolve(true);
+                                closeAllModals();
+                            }}
+                        >
+                            <Text>
+                                {t('player.confirmLargeFetch', {
+                                    count: itemCount,
+                                    defaultValue: `You are about to add ${itemCount} items to the queue. Continue?`,
+                                    postProcess: 'sentenceCase',
+                                })}
+                            </Text>
+                        </ConfirmModal>
+                    ),
+                    title: t('player.confirmLargeFetchTitle', {
+                        defaultValue: 'Confirm Large Queue Addition',
+                        postProcess: 'titleCase',
+                    }),
+                });
+            });
+        },
+        [t],
+    );
 
     const addToQueueByData = useCallback(
         (data: Song[], type: AddToQueueType) => {
@@ -140,7 +192,20 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     const addToQueueByFetch = useCallback(
-        async (serverId: string, id: string[], itemType: LibraryItem, type: AddToQueueType) => {
+        async (
+            serverId: string,
+            id: string[],
+            itemType: LibraryItem,
+            type: AddToQueueType,
+            skipConfirmation?: boolean,
+        ) => {
+            if (!skipConfirmation && id.length > queueFetchConfirmThreshold) {
+                const confirmed = await confirmLargeFetch(id.length);
+                if (!confirmed) {
+                    return;
+                }
+            }
+
             let toastId: null | string = null;
             const fetchId = nanoid();
 
@@ -209,7 +274,154 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 });
             }
         },
-        [queryClient, storeActions, t],
+        [confirmLargeFetch, queueFetchConfirmThreshold, queryClient, storeActions, t],
+    );
+
+    const addToQueueByListQuery = useCallback(
+        async (serverId: string, query: any, itemType: LibraryItem, type: AddToQueueType) => {
+            let toastId: null | string = null;
+            let fetchId: null | string = null;
+
+            try {
+                // Get total count first
+                let totalCount = 0;
+                let listQueryFn: any;
+                let listCountQueryFn: any;
+
+                switch (itemType) {
+                    case LibraryItem.ALBUM: {
+                        listQueryFn = albumQueries.list;
+                        listCountQueryFn = albumQueries.listCount;
+                        break;
+                    }
+                    case LibraryItem.ALBUM_ARTIST: {
+                        listQueryFn = artistsQueries.albumArtistList;
+                        listCountQueryFn = artistsQueries.albumArtistListCount;
+                        break;
+                    }
+                    case LibraryItem.ARTIST: {
+                        listQueryFn = artistsQueries.artistList;
+                        listCountQueryFn = artistsQueries.artistListCount;
+                        break;
+                    }
+                    case LibraryItem.PLAYLIST: {
+                        listQueryFn = playlistsQueries.list;
+                        listCountQueryFn = playlistsQueries.listCount;
+                        break;
+                    }
+                    case LibraryItem.SONG: {
+                        listQueryFn = songsQueries.list;
+                        listCountQueryFn = songsQueries.listCount;
+                        break;
+                    }
+                    default: {
+                        throw new Error(`Unsupported item type: ${itemType}`);
+                    }
+                }
+
+                // Get total count
+                const countResult = (await queryClient.fetchQuery(
+                    listCountQueryFn({
+                        query: { ...query },
+                        serverId,
+                    }),
+                )) as number;
+                totalCount = countResult || 0;
+
+                // Check if we need confirmation
+                if (totalCount > queueFetchConfirmThreshold) {
+                    const confirmed = await confirmLargeFetch(totalCount);
+                    if (!confirmed) {
+                        return;
+                    }
+                }
+
+                // Start timeout only after confirmation (if needed)
+                fetchId = nanoid();
+
+                timeoutIds.current = {
+                    ...timeoutIds.current,
+                    [fetchId]: setTimeout(() => {
+                        toastId = toast.info({
+                            autoClose: false,
+                            message: t('player.playbackFetchCancel', {
+                                postProcess: 'sentenceCase',
+                            }),
+                            onClose: () => {
+                                queryClient.cancelQueries({
+                                    exact: false,
+                                    queryKey: getRootQueryKey(itemType, serverId),
+                                });
+                            },
+                            title: t('player.playbackFetchInProgress', {
+                                postProcess: 'sentenceCase',
+                            }),
+                        });
+                    }, 2000),
+                };
+
+                // Paginate through all items to collect IDs
+                const allIds: string[] = [];
+                const pageSize = 500; // Fetch in chunks
+                let startIndex = 0;
+
+                while (startIndex < totalCount) {
+                    const pageQuery = {
+                        ...query,
+                        limit: pageSize,
+                        startIndex,
+                    };
+
+                    const pageResult = (await queryClient.fetchQuery(
+                        listQueryFn({
+                            query: pageQuery,
+                            serverId,
+                        }),
+                    )) as { items: any[] };
+
+                    if (pageResult?.items) {
+                        const pageIds = pageResult.items.map((item: any) => item.id);
+                        allIds.push(...pageIds);
+                    }
+
+                    // If we got fewer items than requested, we've reached the end
+                    if (!pageResult?.items || pageResult.items.length < pageSize) {
+                        break;
+                    }
+
+                    startIndex += pageSize;
+                }
+
+                if (fetchId && timeoutIds.current) {
+                    clearTimeout(timeoutIds.current[fetchId] as ReturnType<typeof setTimeout>);
+                    delete timeoutIds.current[fetchId];
+                }
+                if (toastId) {
+                    toast.hide(toastId);
+                }
+
+                // Now call addToQueueByFetch with all collected IDs (skip confirmation since we already confirmed)
+                await addToQueueByFetch(serverId, allIds, itemType, type, true);
+            } catch (err: any) {
+                if (instanceOfCancellationError(err)) {
+                    return;
+                }
+
+                if (fetchId && timeoutIds.current) {
+                    clearTimeout(timeoutIds.current[fetchId] as ReturnType<typeof setTimeout>);
+                    delete timeoutIds.current[fetchId];
+                }
+                if (toastId) {
+                    toast.hide(toastId);
+                }
+
+                toast.error({
+                    message: err.message,
+                    title: t('error.genericError', { postProcess: 'sentenceCase' }) as string,
+                });
+            }
+        },
+        [confirmLargeFetch, queueFetchConfirmThreshold, queryClient, addToQueueByFetch, t],
     );
 
     const clearQueue = useCallback(() => {
@@ -398,6 +610,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         () => ({
             addToQueueByData,
             addToQueueByFetch,
+            addToQueueByListQuery,
             clearQueue,
             clearSelected,
             decreaseVolume,
@@ -431,6 +644,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         [
             addToQueueByData,
             addToQueueByFetch,
+            addToQueueByListQuery,
             clearQueue,
             clearSelected,
             decreaseVolume,
