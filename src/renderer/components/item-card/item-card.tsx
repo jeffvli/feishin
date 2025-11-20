@@ -208,6 +208,12 @@ const CompactItemCard = ({
             handleClick(e as any);
         };
 
+        const handleLinkDragStart = (e: React.DragEvent<HTMLAnchorElement>) => {
+            // Prevent default browser link drag behavior to allow custom drag and drop
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
         const imageContainerClassName = clsx(styles.imageContainer, {
             [styles.isRound]: isRound,
         });
@@ -257,11 +263,13 @@ const CompactItemCard = ({
                     [styles.selected]: isSelected,
                 })}
             >
-                {navigationPath ? (
+                {navigationPath && !internalState ? (
                     <Link
                         className={imageContainerClassName}
+                        draggable={false}
                         onClick={handleImageClick}
                         onContextMenu={handleContextMenu}
+                        onDragStart={handleLinkDragStart}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                         to={navigationPath}
@@ -400,6 +408,12 @@ const DefaultItemCard = ({
             handleClick(e as any);
         };
 
+        const handleLinkDragStart = (e: React.DragEvent<HTMLAnchorElement>) => {
+            // Prevent default browser link drag behavior to allow custom drag and drop
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
         const imageContainerClassName = clsx(styles.imageContainer, {
             [styles.isRound]: isRound,
         });
@@ -433,11 +447,13 @@ const DefaultItemCard = ({
                     [styles.selected]: isSelected,
                 })}
             >
-                {navigationPath ? (
+                {navigationPath && !internalState ? (
                     <Link
                         className={imageContainerClassName}
+                        draggable={false}
                         onClick={handleImageClick}
                         onContextMenu={handleContextMenu}
+                        onDragStart={handleLinkDragStart}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                         to={navigationPath}
@@ -637,6 +653,12 @@ const PosterItemCard = ({
             handleClick(e as any);
         };
 
+        const handleLinkDragStart = (e: React.DragEvent<HTMLAnchorElement>) => {
+            // Prevent default browser link drag behavior to allow custom drag and drop
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
         const imageContainerClassName = clsx(styles.imageContainer, {
             [styles.isRound]: isRound,
         });
@@ -673,11 +695,13 @@ const PosterItemCard = ({
                 })}
                 ref={ref}
             >
-                {navigationPath ? (
+                {navigationPath && !internalState ? (
                     <Link
                         className={imageContainerClassName}
+                        draggable={false}
                         onClick={handleImageClick}
                         onContextMenu={handleContextMenu}
+                        onDragStart={handleLinkDragStart}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                         to={navigationPath}
