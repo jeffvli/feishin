@@ -40,7 +40,14 @@ const ArtistsColumn = (props: ItemTableListInnerColumn) => {
                 >
                     {artists.map((artist, index) => (
                         <Fragment key={artist.id}>
-                            <Text component={Link} isLink isMuted isNoSelect to={artist.path}>
+                            <Text
+                                component={Link}
+                                isLink
+                                isMuted
+                                isNoSelect
+                                state={{ item: artist }}
+                                to={artist.path}
+                            >
                                 {artist.name}
                             </Text>
                             {index < artists.length - 1 && ', '}

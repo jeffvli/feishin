@@ -34,10 +34,12 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
         const rowHeight = props.getRowHeight(props.rowIndex, props);
         const path = getTitlePath(props.itemType, (props.data[props.rowIndex] as any).id as string);
 
+        const item = props.data[props.rowIndex] as any;
         const titleLinkProps = path
             ? {
                   component: Link,
                   isLink: true,
+                  state: { item },
                   to: path,
               }
             : {};
@@ -56,7 +58,14 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                     <div className={styles.artists}>
                         {artists.map((artist, index) => (
                             <span key={artist.id}>
-                                <Text component={Link} isLink isMuted isNoSelect to={artist.path}>
+                                <Text
+                                    component={Link}
+                                    isLink
+                                    isMuted
+                                    isNoSelect
+                                    state={{ item: artist }}
+                                    to={artist.path}
+                                >
                                     {artist.name}
                                 </Text>
                                 {index < artists.length - 1 && ', '}
@@ -97,12 +106,14 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
         const rowHeight = props.getRowHeight(props.rowIndex, props);
         const path = getTitlePath(props.itemType, (props.data[props.rowIndex] as any).id as string);
 
+        const item = props.data[props.rowIndex] as any;
         const textStyles = isActive ? { color: 'var(--theme-colors-primary)' } : {};
 
         const titleLinkProps = path
             ? {
                   component: Link,
                   isLink: true,
+                  state: { item },
                   to: path,
               }
             : {};
@@ -126,7 +137,14 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
                     <div className={styles.artists}>
                         {artists.map((artist, index) => (
                             <span key={artist.id}>
-                                <Text component={Link} isLink isMuted isNoSelect to={artist.path}>
+                                <Text
+                                    component={Link}
+                                    isLink
+                                    isMuted
+                                    isNoSelect
+                                    state={{ item: artist }}
+                                    to={artist.path}
+                                >
                                     {artist.name}
                                 </Text>
                                 {index < artists.length - 1 && ', '}

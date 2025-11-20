@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 
 import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
@@ -20,9 +20,13 @@ const AlbumDetailRoute = () => {
     const { albumId } = useParams() as { albumId: string };
     const server = useCurrentServer();
 
-    const detailQuery = useQuery(
-        albumQueries.detail({ query: { id: albumId }, serverId: server?.id }),
-    );
+    const location = useLocation();
+
+    const detailQuery = useQuery({
+        ...albumQueries.detail({ query: { id: albumId }, serverId: server?.id }),
+        initialData: location.state?.item,
+        staleTime: 0,
+    });
 
     const { background: backgroundColor, colorId } = useFastAverageColor({
         id: albumId,

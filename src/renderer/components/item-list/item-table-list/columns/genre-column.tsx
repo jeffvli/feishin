@@ -40,7 +40,14 @@ const GenreColumn = (props: ItemTableListInnerColumn) => {
                 >
                     {genres.map((genre, index) => (
                         <Fragment key={genre.id}>
-                            <Text component={Link} isLink isMuted isNoSelect to={genre.path}>
+                            <Text
+                                component={Link}
+                                isLink
+                                isMuted
+                                isNoSelect
+                                state={{ item: genre }}
+                                to={genre.path}
+                            >
                                 {genre.name}
                             </Text>
                             {index < genres.length - 1 && ', '}

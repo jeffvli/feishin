@@ -280,6 +280,7 @@ const CompactItemCard = ({
                         onDragStart={handleLinkDragStart}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
+                        state={{ item: data }}
                         to={navigationPath}
                     >
                         {imageContainerContent}
@@ -466,6 +467,7 @@ const DefaultItemCard = ({
                         onDragStart={handleLinkDragStart}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
+                        state={{ item: data }}
                         to={navigationPath}
                     >
                         {imageContainerContent}
@@ -716,6 +718,7 @@ const PosterItemCard = ({
                         onDragStart={handleLinkDragStart}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
+                        state={{ item: data }}
                         to={navigationPath}
                     >
                         {imageContainerContent}
@@ -789,6 +792,7 @@ export const getDataRows = (): DataRow[] => {
                                 case LibraryItem.ALBUM:
                                     return (
                                         <Link
+                                            state={{ item: data }}
                                             to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
                                                 albumId: data.id,
                                             })}
@@ -799,6 +803,7 @@ export const getDataRows = (): DataRow[] => {
                                 case LibraryItem.ALBUM_ARTIST:
                                     return (
                                         <Link
+                                            state={{ item: data }}
                                             to={generatePath(
                                                 AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
                                                 {
@@ -812,6 +817,7 @@ export const getDataRows = (): DataRow[] => {
                                 case LibraryItem.PLAYLIST:
                                     return (
                                         <Link
+                                            state={{ item: data }}
                                             to={generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, {
                                                 playlistId: data.id,
                                             })}
@@ -836,6 +842,7 @@ export const getDataRows = (): DataRow[] => {
                     return (data as Album | Song).albumArtists.map((artist, index) => (
                         <Fragment key={artist.id}>
                             <Link
+                                state={{ item: artist }}
                                 to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                     albumArtistId: artist.id,
                                 })}
@@ -859,6 +866,7 @@ export const getDataRows = (): DataRow[] => {
                     return (data as Album | Song).artists.map((artist, index) => (
                         <Fragment key={artist.id}>
                             <Link
+                                state={{ item: artist }}
                                 to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
                                     albumArtistId: artist.id,
                                 })}
@@ -945,8 +953,14 @@ export const getDataRows = (): DataRow[] => {
                 if ('album' in data && data.album) {
                     const song = data as Song;
                     if ('albumId' in song && song.albumId) {
+                        const albumData = {
+                            id: song.albumId,
+                            imageUrl: song.imageUrl,
+                            name: song.album,
+                        };
                         return (
                             <Link
+                                state={{ item: albumData }}
                                 to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
                                     albumId: song.albumId,
                                 })}
@@ -1024,7 +1038,6 @@ const getItemNavigationPath = (
         return null;
     }
 
-    // Check if data has _itemType (like in title row logic)
     const effectiveItemType = '_itemType' in data && data._itemType ? data._itemType : itemType;
 
     return getTitlePath(effectiveItemType, data.id);

@@ -31,11 +31,13 @@ function DefaultTitleColumn(props: ItemTableListInnerColumn) {
 
     if (typeof row === 'string') {
         const path = getTitlePath(props.itemType, (props.data[props.rowIndex] as any).id as string);
+        const item = props.data[props.rowIndex] as any;
 
         const titleLinkProps = path
             ? {
                   component: Link,
                   isLink: true,
+                  state: { item },
                   to: path,
               }
             : {};
@@ -74,6 +76,7 @@ function QueueSongTitleColumn(props: ItemTableListInnerColumn) {
 
     if (typeof row === 'string') {
         const path = getTitlePath(props.itemType, (props.data[props.rowIndex] as any).id as string);
+        const item = props.data[props.rowIndex] as any;
 
         const textStyles = isActive ? { color: 'var(--theme-colors-primary)' } : {};
 
@@ -81,6 +84,7 @@ function QueueSongTitleColumn(props: ItemTableListInnerColumn) {
             ? {
                   component: Link,
                   isLink: true,
+                  state: { item },
                   to: path,
               }
             : {};

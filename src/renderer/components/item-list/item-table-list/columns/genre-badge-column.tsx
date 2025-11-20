@@ -39,6 +39,7 @@ const GenreBadgeColumn = (props: ItemTableListInnerColumn) => {
                         <Badge
                             component={Link}
                             key={genre.id}
+                            state={{ item: genre }}
                             style={{
                                 backgroundColor: genre.color,
                                 color: genre.isLight ? 'black' : 'white',

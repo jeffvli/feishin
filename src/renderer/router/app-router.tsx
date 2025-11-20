@@ -1,13 +1,12 @@
 import { lazy, Suspense } from 'react';
 import { HashRouter, Route, Routes } from 'react-router';
 
-import { AppRoute } from './routes';
-
 import { RouterErrorBoundary } from '/@/renderer/components/error-boundary/router-error-boundary';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists/components/add-to-playlist-context-modal';
 import { ShareItemContextModal } from '/@/renderer/features/sharing/components/share-item-context-modal';
 import { ResponsiveLayout } from '/@/renderer/layouts/responsive-layout';
 import { AppOutlet } from '/@/renderer/router/app-outlet';
+import { AppRoute } from '/@/renderer/router/routes';
 import { TitlebarOutlet } from '/@/renderer/router/titlebar-outlet';
 import { BaseContextModal, ModalsProvider } from '/@/shared/components/modal/modal';
 

@@ -201,7 +201,7 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                 ) {
                     const path = getTitlePath(itemType, item.id);
                     if (path) {
-                        navigate(path);
+                        navigate(path, { state: { item } });
                         return;
                     }
                 }
