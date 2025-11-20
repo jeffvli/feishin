@@ -340,12 +340,14 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 }
 
                 // Get total count
-                const countResult = (await queryClient.fetchQuery(
-                    listCountQueryFn({
+                const countResult = (await queryClient.fetchQuery({
+                    ...listCountQueryFn({
                         query: { ...query },
                         serverId,
                     }),
-                )) as number;
+                    gcTime: 0,
+                    staleTime: 0,
+                })) as number;
                 totalCount = countResult || 0;
 
                 // Check if we need confirmation
@@ -392,12 +394,14 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                         startIndex,
                     };
 
-                    const pageResult = (await queryClient.fetchQuery(
-                        listQueryFn({
+                    const pageResult = (await queryClient.fetchQuery({
+                        ...listQueryFn({
                             query: pageQuery,
                             serverId,
                         }),
-                    )) as { items: any[] };
+                        gcTime: 0,
+                        staleTime: 0,
+                    })) as { items: any[] };
 
                     if (pageResult?.items) {
                         const pageIds = pageResult.items.map((item: any) => item.id);
@@ -729,8 +733,8 @@ export async function fetchSongsByItemType(
 
             for (const id of args.id) {
                 promises.push(
-                    queryClient.fetchQuery(
-                        songsQueries.list({
+                    queryClient.fetchQuery({
+                        ...songsQueries.list({
                             query: {
                                 albumIds: [id],
                                 sortBy: SongListSort.ID,
@@ -740,7 +744,9 @@ export async function fetchSongsByItemType(
                             },
                             serverId: serverId,
                         }),
-                    ),
+                        gcTime: 0,
+                        staleTime: 0,
+                    }),
                 );
             }
 
@@ -756,8 +762,8 @@ export async function fetchSongsByItemType(
 
             for (const id of args.id) {
                 promises.push(
-                    queryClient.fetchQuery(
-                        songsQueries.list({
+                    queryClient.fetchQuery({
+                        ...songsQueries.list({
                             query: {
                                 albumArtistIds: [id],
                                 limit: -1,
@@ -768,7 +774,9 @@ export async function fetchSongsByItemType(
                             },
                             serverId: serverId,
                         }),
-                    ),
+                        gcTime: 0,
+                        staleTime: 0,
+                    }),
                 );
             }
 
@@ -783,8 +791,8 @@ export async function fetchSongsByItemType(
 
             for (const id of args.id) {
                 promises.push(
-                    queryClient.fetchQuery(
-                        songsQueries.list({
+                    queryClient.fetchQuery({
+                        ...songsQueries.list({
                             query: {
                                 genreIds: [id],
                                 limit: -1,
@@ -795,7 +803,9 @@ export async function fetchSongsByItemType(
                             },
                             serverId: serverId,
                         }),
-                    ),
+                        gcTime: 0,
+                        staleTime: 0,
+                    }),
                 );
             }
 
@@ -809,15 +819,17 @@ export async function fetchSongsByItemType(
 
             for (const id of args.id) {
                 promises.push(
-                    queryClient.fetchQuery(
-                        playlistsQueries.songList({
+                    queryClient.fetchQuery({
+                        ...playlistsQueries.songList({
                             query: {
                                 id: id,
                                 ...args.params,
                             },
                             serverId: serverId,
                         }),
-                    ),
+                        gcTime: 0,
+                        staleTime: 0,
+                    }),
                 );
             }
 
