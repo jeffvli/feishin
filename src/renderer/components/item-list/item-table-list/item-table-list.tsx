@@ -2,7 +2,7 @@
 
 import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
 import clsx from 'clsx';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import React, {
     type JSXElementConstructor,
@@ -38,6 +38,7 @@ import {
     ItemTableListColumnConfig,
 } from '/@/renderer/components/item-list/types';
 import { PlayerContext, usePlayer } from '/@/renderer/features/player/context/player-context';
+import { animationProps } from '/@/shared/components/animations/animation-props';
 import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { TableColumn } from '/@/shared/types/types';
@@ -2047,7 +2048,7 @@ export const ItemTableList = ({
     ]);
 
     return (
-        <div
+        <motion.div
             className={styles.itemTableListContainer}
             onKeyDown={handleKeyDown}
             onMouseDown={(e) => {
@@ -2059,6 +2060,8 @@ export const ItemTableList = ({
             }}
             ref={containerFocusRef}
             tabIndex={0}
+            {...animationProps.fadeIn}
+            transition={{ duration: 1, ease: 'anticipate' }}
         >
             {StickyHeader}
             {StickyGroupRow}
@@ -2110,6 +2113,6 @@ export const ItemTableList = ({
                     </ExpandedListContainer>
                 )}
             </AnimatePresence>
-        </div>
+        </motion.div>
     );
 };

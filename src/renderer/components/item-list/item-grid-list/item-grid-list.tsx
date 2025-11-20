@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import throttle from 'lodash/throttle';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import React, {
     CSSProperties,
@@ -41,6 +41,7 @@ import {
     useItemListState,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls, ItemListHandle } from '/@/renderer/components/item-list/types';
+import { animationProps } from '/@/shared/components/animations/animation-props';
 import { useElementSize } from '/@/shared/hooks/use-element-size';
 import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
 import { LibraryItem } from '/@/shared/types/domain-types';
@@ -618,13 +619,15 @@ export const ItemGridList = ({
     useImperativeHandle(ref, () => imperativeHandle, [imperativeHandle]);
 
     return (
-        <div
+        <motion.div
             className={styles.itemGridContainer}
             data-overlayscrollbars-initialize=""
             onKeyDown={handleKeyDown}
             onMouseDown={(e) => (e.currentTarget as HTMLDivElement).focus()}
             ref={mergedContainerRef}
             tabIndex={0}
+            {...animationProps.fadeIn}
+            transition={{ duration: 1, ease: 'anticipate' }}
         >
             <AutoSizer>
                 {({ height, width }) => (
@@ -657,7 +660,7 @@ export const ItemGridList = ({
                     </ExpandedListContainer>
                 )}
             </AnimatePresence>
-        </div>
+        </motion.div>
     );
 };
 
