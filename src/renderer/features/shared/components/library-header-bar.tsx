@@ -1,5 +1,5 @@
 import { closeAllModals, openModal } from '@mantine/modals';
-import { ReactNode, useCallback } from 'react';
+import { memo, ReactNode, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './library-header-bar.module.css';
@@ -18,7 +18,7 @@ interface LibraryHeaderBarProps {
     children: ReactNode;
 }
 
-export const LibraryHeaderBar = ({ children }: LibraryHeaderBarProps) => {
+const LibraryHeaderBarComponent = ({ children }: LibraryHeaderBarProps) => {
     return <div className={styles.headerContainer}>{children}</div>;
 };
 
@@ -94,6 +94,8 @@ const HeaderBadge = ({ children, isLoading, ...props }: HeaderBadgeProps) => {
     return <Badge {...props}>{isLoading ? <Spinner /> : children}</Badge>;
 };
 
-LibraryHeaderBar.Title = Title;
-LibraryHeaderBar.PlayButton = HeaderPlayButton;
-LibraryHeaderBar.Badge = HeaderBadge;
+export const LibraryHeaderBar = Object.assign(memo(LibraryHeaderBarComponent), {
+    Badge: HeaderBadge,
+    PlayButton: HeaderPlayButton,
+    Title,
+});

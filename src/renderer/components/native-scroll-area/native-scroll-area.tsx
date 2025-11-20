@@ -32,30 +32,38 @@ export const NativeScrollArea = forwardRef(
             current: pageHeaderProps?.target?.current,
         });
 
+        const scrollHandlerRef = useRef<number | null>(null);
+
         const [initialize] = useOverlayScrollbars({
             defer: false,
             events: {
                 scroll: (_instance, e) => {
-                    if (noHeader) {
-                        return setIsPastOffset(true);
+                    if (scrollHandlerRef.current) {
+                        cancelAnimationFrame(scrollHandlerRef.current);
                     }
 
-                    if (pageHeaderProps?.target || !pageHeaderProps?.offset) {
-                        return setIsPastOffset(true);
-                    }
+                    scrollHandlerRef.current = requestAnimationFrame(() => {
+                        if (noHeader) {
+                            return setIsPastOffset(true);
+                        }
 
-                    const offset = pageHeaderProps?.offset;
-                    const scrollTop = (e?.target as HTMLDivElement)?.scrollTop;
+                        if (pageHeaderProps?.target || !pageHeaderProps?.offset) {
+                            return setIsPastOffset(true);
+                        }
 
-                    if (scrollTop > offset && isPastOffset === false) {
-                        return setIsPastOffset(true);
-                    }
+                        const offset = pageHeaderProps?.offset;
+                        const scrollTop = (e?.target as HTMLDivElement)?.scrollTop;
 
-                    if (scrollTop <= offset && isPastOffset === true) {
-                        return setIsPastOffset(false);
-                    }
+                        if (scrollTop > offset && isPastOffset === false) {
+                            return setIsPastOffset(true);
+                        }
 
-                    return null;
+                        if (scrollTop <= offset && isPastOffset === true) {
+                            return setIsPastOffset(false);
+                        }
+
+                        return null;
+                    });
                 },
             },
             options: {
