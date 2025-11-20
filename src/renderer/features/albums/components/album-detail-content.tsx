@@ -398,25 +398,21 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
 
                 <Stack gap="lg" mt="3rem">
                     {cq.height || cq.width ? (
-                        <>
+                        <Suspense fallback={<Spinner container />}>
                             {carousels
                                 .filter((c) => !c.isHidden)
                                 .map((carousel) => (
-                                    <Suspense
-                                        fallback={<Spinner container />}
+                                    <AlbumInfiniteCarousel
+                                        excludeIds={carousel.excludeIds}
                                         key={`carousel-${carousel.uniqueId}`}
-                                    >
-                                        <AlbumInfiniteCarousel
-                                            excludeIds={carousel.excludeIds}
-                                            query={carousel.query}
-                                            rowCount={1}
-                                            sortBy={carousel.sortBy}
-                                            sortOrder={carousel.sortOrder}
-                                            title={carousel.title}
-                                        />
-                                    </Suspense>
+                                        query={carousel.query}
+                                        rowCount={1}
+                                        sortBy={carousel.sortBy}
+                                        sortOrder={carousel.sortOrder}
+                                        title={carousel.title}
+                                    />
                                 ))}
-                        </>
+                        </Suspense>
                     ) : null}
                 </Stack>
             </div>

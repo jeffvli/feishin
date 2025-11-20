@@ -27,7 +27,7 @@ interface AlbumCarouselProps {
     title: React.ReactNode | string;
 }
 
-export function AlbumInfiniteCarousel(props: AlbumCarouselProps) {
+const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps) => {
     const { excludeIds, query: additionalQuery, rowCount = 1, sortBy, sortOrder, title } = props;
     const rows = useGridRows(LibraryItem.ALBUM, ItemListKey.ALBUM);
     const {
@@ -84,7 +84,11 @@ export function AlbumInfiniteCarousel(props: AlbumCarouselProps) {
             title={title}
         />
     );
-}
+};
+
+export const AlbumInfiniteCarousel = (props: AlbumCarouselProps) => {
+    return <BaseAlbumInfiniteCarousel {...props} />;
+};
 
 function useAlbumListInfinite(
     sortBy: AlbumListSort,
