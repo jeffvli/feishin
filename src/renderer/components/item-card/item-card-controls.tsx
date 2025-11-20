@@ -22,6 +22,7 @@ import { Play } from '/@/shared/types/types';
 
 interface ItemCardControlsProps {
     controls?: ItemControls;
+    enableExpansion?: boolean;
     internalState?: ItemListStateActions;
     item: Album | AlbumArtist | Artist | Playlist | Song | undefined;
     itemType: LibraryItem;
@@ -51,6 +52,7 @@ const containerProps = {
 
 export const ItemCardControls = ({
     controls,
+    enableExpansion,
     internalState,
     item,
     itemType,
@@ -198,7 +200,7 @@ export const ItemCardControls = ({
                     }}
                 />
             )}
-            {controls?.onExpand && (
+            {controls?.onExpand && enableExpansion && (
                 <SecondaryButton
                     className={styles.expand}
                     icon="arrowDownS"

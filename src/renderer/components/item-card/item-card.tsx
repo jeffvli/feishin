@@ -40,6 +40,7 @@ export interface ItemCardProps {
     controls?: ItemControls;
     data: Album | AlbumArtist | Artist | Playlist | Song | undefined;
     enableDrag?: boolean;
+    enableExpansion?: boolean;
     internalState?: ItemListStateActions;
     isRound?: boolean;
     itemType: LibraryItem;
@@ -52,6 +53,7 @@ export const ItemCard = ({
     controls,
     data,
     enableDrag,
+    enableExpansion,
     internalState,
     isRound,
     itemType,
@@ -70,6 +72,7 @@ export const ItemCard = ({
                     controls={controls}
                     data={data}
                     enableDrag={enableDrag}
+                    enableExpansion={enableExpansion}
                     imageUrl={imageUrl}
                     internalState={internalState}
                     isRound={isRound}
@@ -84,6 +87,7 @@ export const ItemCard = ({
                     controls={controls}
                     data={data}
                     enableDrag={enableDrag}
+                    enableExpansion={enableExpansion}
                     imageUrl={imageUrl}
                     internalState={internalState}
                     isRound={isRound}
@@ -99,6 +103,7 @@ export const ItemCard = ({
                     controls={controls}
                     data={data}
                     enableDrag={enableDrag}
+                    enableExpansion={enableExpansion}
                     imageUrl={imageUrl}
                     internalState={internalState}
                     isRound={isRound}
@@ -112,6 +117,7 @@ export const ItemCard = ({
 
 export interface ItemCardDerivativeProps extends Omit<ItemCardProps, 'type'> {
     controls?: ItemControls;
+    enableExpansion?: boolean;
     imageUrl: string | undefined;
     internalState?: ItemListStateActions;
     rows: DataRow[];
@@ -120,6 +126,7 @@ export interface ItemCardDerivativeProps extends Omit<ItemCardProps, 'type'> {
 const CompactItemCard = ({
     controls,
     data,
+    enableExpansion,
     imageUrl,
     internalState,
     isRound,
@@ -232,6 +239,7 @@ const CompactItemCard = ({
                     {withControls && showControls && (
                         <ItemCardControls
                             controls={controls}
+                            enableExpansion={enableExpansion}
                             item={data}
                             itemType={itemType}
                             type="compact"
@@ -320,6 +328,7 @@ const CompactItemCard = ({
 const DefaultItemCard = ({
     controls,
     data,
+    enableExpansion,
     imageUrl,
     internalState,
     isRound,
@@ -432,6 +441,7 @@ const DefaultItemCard = ({
                     {withControls && showControls && (
                         <ItemCardControls
                             controls={controls}
+                            enableExpansion={enableExpansion}
                             item={data}
                             itemType={itemType}
                             type="default"
@@ -520,6 +530,7 @@ const PosterItemCard = ({
     controls,
     data,
     enableDrag,
+    enableExpansion,
     imageUrl,
     internalState,
     isRound,
@@ -677,6 +688,7 @@ const PosterItemCard = ({
                     {withControls && showControls && data && (
                         <ItemCardControls
                             controls={controls}
+                            enableExpansion={enableExpansion}
                             internalState={internalState}
                             item={data}
                             itemType={itemType}

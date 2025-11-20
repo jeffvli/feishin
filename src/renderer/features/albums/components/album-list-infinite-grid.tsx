@@ -58,6 +58,7 @@ export const AlbumListInfiniteGrid = forwardRef<any, AlbumListInfiniteGridProps>
         return (
             <ItemGridList
                 data={data}
+                enableExpansion
                 gap={gap}
                 initialTop={{
                     to: scrollOffset ?? 0,

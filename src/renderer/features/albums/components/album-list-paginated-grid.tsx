@@ -71,6 +71,7 @@ export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProp
                 <ItemGridList
                     currentPage={currentPage}
                     data={data || []}
+                    enableExpansion
                     gap={gap}
                     initialTop={{
                         to: scrollOffset ?? 0,

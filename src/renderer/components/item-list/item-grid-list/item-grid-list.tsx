@@ -261,7 +261,7 @@ export interface ItemGridListProps {
 export const ItemGridList = ({
     data,
     enableDrag = true,
-    enableExpansion = true,
+    enableExpansion = false,
     enableSelection = true,
     gap = 'sm',
     getRowId,
@@ -690,6 +690,7 @@ const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
                         controls={controls}
                         data={data[i]}
                         enableDrag={enableDrag}
+                        enableExpansion={props.data.enableExpansion}
                         internalState={props.data.internalState}
                         itemType={itemType}
                         rows={rows}
