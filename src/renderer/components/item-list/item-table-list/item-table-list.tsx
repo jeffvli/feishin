@@ -845,57 +845,45 @@ export const ItemTableList = ({
     const handleRef = useRef<ItemListHandle | null>(null);
     const containerFocusRef = useRef<HTMLDivElement | null>(null);
 
+    const stickyHeaderRef = useRef<HTMLDivElement | null>(null);
+    const stickyGroupRowRef = useRef<HTMLDivElement | null>(null);
+    const stickyHeaderLeftRef = useRef<HTMLDivElement | null>(null);
+    const stickyHeaderMainRef = useRef<HTMLDivElement | null>(null);
+    const stickyHeaderRightRef = useRef<HTMLDivElement | null>(null);
+
     const { shouldShowStickyHeader, stickyTop } = useStickyTableHeader({
         containerRef: containerFocusRef,
         enabled: enableHeader && enableStickyHeader,
         headerRef: pinnedRowRef,
+        mainGridRef: rowRef,
+        pinnedLeftColumnRef,
+        pinnedRightColumnRef,
+        stickyHeaderMainRef,
     });
 
-    const stickyHeaderRef = useRef<HTMLDivElement | null>(null);
-    const stickyGroupRowRef = useRef<HTMLDivElement | null>(null);
-
-    // Sync scroll position and update position of sticky header
+    // Update position and width of sticky header (scroll sync is handled in the hook)
     useEffect(() => {
-        if (
-            !shouldShowStickyHeader ||
-            !stickyHeaderRef.current ||
-            !rowRef.current ||
-            !containerFocusRef.current
-        ) {
+        if (!shouldShowStickyHeader || !stickyHeaderRef.current || !containerFocusRef.current) {
             return;
         }
 
         const stickyHeader = stickyHeaderRef.current;
-        const stickyMainSection = stickyHeader.querySelector(
-            `.${styles.stickyHeaderSection}`,
-        ) as HTMLDivElement;
-        const mainGrid = rowRef.current.childNodes[0] as HTMLDivElement;
         const container = containerFocusRef.current;
-
-        if (!stickyMainSection || !mainGrid || !container) {
-            return;
-        }
 
         const updatePosition = () => {
             const containerRect = container.getBoundingClientRect();
             stickyHeader.style.left = `${containerRect.left}px`;
-        };
-
-        const syncScroll = () => {
-            stickyMainSection.scrollLeft = mainGrid.scrollLeft;
+            stickyHeader.style.width = `${containerRect.width}px`;
         };
 
         updatePosition();
-        syncScroll();
 
         window.addEventListener('resize', updatePosition);
         window.addEventListener('scroll', updatePosition, true);
-        mainGrid.addEventListener('scroll', syncScroll);
 
         return () => {
             window.removeEventListener('resize', updatePosition);
             window.removeEventListener('scroll', updatePosition, true);
-            mainGrid.removeEventListener('scroll', syncScroll);
         };
     }, [shouldShowStickyHeader]);
 
@@ -1516,6 +1504,36 @@ export const ItemTableList = ({
     // Show sticky group row whenever it should be shown
     const shouldRenderStickyGroupRow = shouldShowStickyGroupRow;
 
+    // Update position and width of sticky group row
+    useEffect(() => {
+        if (
+            !shouldRenderStickyGroupRow ||
+            !stickyGroupRowRef.current ||
+            !containerFocusRef.current
+        ) {
+            return;
+        }
+
+        const stickyGroupRow = stickyGroupRowRef.current;
+        const container = containerFocusRef.current;
+
+        const updatePosition = () => {
+            const containerRect = container.getBoundingClientRect();
+            stickyGroupRow.style.left = `${containerRect.left}px`;
+            stickyGroupRow.style.width = `${containerRect.width}px`;
+        };
+
+        updatePosition();
+
+        window.addEventListener('resize', updatePosition);
+        window.addEventListener('scroll', updatePosition, true);
+
+        return () => {
+            window.removeEventListener('resize', updatePosition);
+            window.removeEventListener('scroll', updatePosition, true);
+        };
+    }, [shouldRenderStickyGroupRow]);
+
     const getDataFn = useCallback(() => {
         const result: (null | unknown)[] = enableHeader ? [null] : [];
 
@@ -1829,8 +1847,16 @@ export const ItemTableList = ({
                 <div className={styles.stickyHeaderRow}>
                     {pinnedLeftColumnCount > 0 && (
                         <div
-                            className={styles.stickyHeaderSection}
-                            style={{ width: `${pinnedLeftWidth}px` }}
+                            className={clsx(
+                                styles.stickyHeaderSection,
+                                styles.stickyHeaderPinnedLeft,
+                            )}
+                            ref={stickyHeaderLeftRef}
+                            style={{
+                                flex: '0 1 auto',
+                                minWidth: `${pinnedLeftWidth}px`,
+                                overflow: 'hidden',
+                            }}
                         >
                             {parsedColumns
                                 .filter((col) => col.pinned === 'left')
@@ -1855,33 +1881,62 @@ export const ItemTableList = ({
                                 })}
                         </div>
                     )}
-                    <div className={styles.stickyHeaderSection} style={{ width: `${mainWidth}px` }}>
-                        {parsedColumns
-                            .filter((col) => col.pinned === null)
-                            .map((col) => {
-                                const columnIndex = parsedColumns.findIndex((c) => c === col);
-                                return (
-                                    <CellComponent
-                                        ariaAttributes={{
-                                            'aria-colindex': columnIndex + 1,
-                                            role: 'gridcell',
-                                        }}
-                                        columnIndex={columnIndex}
-                                        key={col.id}
-                                        rowIndex={0}
-                                        style={{
-                                            height: headerHeight,
-                                            width: calculatedColumnWidths[columnIndex],
-                                        }}
-                                        {...stickyHeaderItemProps}
-                                    />
-                                );
-                            })}
+                    <div
+                        className={clsx(
+                            styles.stickyHeaderSection,
+                            styles.stickyHeaderMain,
+                            styles.noScrollbar,
+                        )}
+                        ref={stickyHeaderMainRef}
+                        style={{
+                            flex: '1 1 auto',
+                            minWidth: 0,
+                            overflowX: 'auto',
+                            overflowY: 'hidden',
+                        }}
+                    >
+                        <div
+                            style={{
+                                display: 'flex',
+                                minWidth: `${mainWidth}px`,
+                            }}
+                        >
+                            {parsedColumns
+                                .filter((col) => col.pinned === null)
+                                .map((col) => {
+                                    const columnIndex = parsedColumns.findIndex((c) => c === col);
+                                    return (
+                                        <CellComponent
+                                            ariaAttributes={{
+                                                'aria-colindex': columnIndex + 1,
+                                                role: 'gridcell',
+                                            }}
+                                            columnIndex={columnIndex}
+                                            key={col.id}
+                                            rowIndex={0}
+                                            style={{
+                                                flexShrink: 0,
+                                                height: headerHeight,
+                                                width: calculatedColumnWidths[columnIndex],
+                                            }}
+                                            {...stickyHeaderItemProps}
+                                        />
+                                    );
+                                })}
+                        </div>
                     </div>
                     {pinnedRightColumnCount > 0 && (
                         <div
-                            className={styles.stickyHeaderSection}
-                            style={{ width: `${pinnedRightWidth}px` }}
+                            className={clsx(
+                                styles.stickyHeaderSection,
+                                styles.stickyHeaderPinnedRight,
+                            )}
+                            ref={stickyHeaderRightRef}
+                            style={{
+                                flex: '0 1 auto',
+                                minWidth: `${pinnedRightWidth}px`,
+                                overflow: 'hidden',
+                            }}
                         >
                             {parsedColumns
                                 .filter((col) => col.pinned === 'right')
@@ -2003,7 +2058,13 @@ export const ItemTableList = ({
                     )}
                     <div
                         className={styles.stickyGroupRowSection}
-                        style={{ width: `${mainWidth}px` }}
+                        style={{
+                            marginLeft: pinnedLeftColumnCount > 0 ? 0 : '-2rem',
+                            marginRight: '-2rem',
+                            paddingLeft: pinnedLeftColumnCount > 0 ? 0 : '2rem',
+                            paddingRight: '2rem',
+                            width: `${mainWidth}px`,
+                        }}
                     >
                         <div
                             style={{
@@ -2025,9 +2086,7 @@ export const ItemTableList = ({
                                     height: groupRowHeight,
                                     width: `${pinnedRightWidth}px`,
                                 }}
-                            >
-                                {groupContent}
-                            </div>
+                            />
                         </div>
                     )}
                 </div>

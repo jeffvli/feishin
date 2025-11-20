@@ -552,7 +552,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                             id={`disc-${discGroup.discNumber}`}
                             indeterminate={isSomeSelected}
                             label={
-                                <Text component="label" size="sm">
+                                <Text component="label" size="sm" truncate>
                                     {t('common.disc', { postProcess: 'sentenceCase' })}{' '}
                                     {discGroup.discNumber}
                                     {discGroup.discSubtitle && ` - ${discGroup.discSubtitle}`}
