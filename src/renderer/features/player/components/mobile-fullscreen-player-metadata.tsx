@@ -39,7 +39,12 @@ export const MobileFullscreenPlayerMetadata = memo(
         return (
             <div className={styles.metadataContainer}>
                 <div className={styles.titleRow}>
-                    <TextTitle className={PlaybackSelectors.songTitle} fw={700} order={2}>
+                    <TextTitle
+                        className={PlaybackSelectors.songTitle}
+                        fw={700}
+                        order={2}
+                        ta="center"
+                    >
                         {title || '—'}
                     </TextTitle>
                 </div>
