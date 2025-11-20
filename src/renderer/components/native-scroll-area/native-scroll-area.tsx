@@ -32,7 +32,7 @@ export const NativeScrollArea = forwardRef(
             current: pageHeaderProps?.target?.current,
         });
 
-        const scrollHandlerRef = useRef<number | null>(null);
+        const scrollHandlerRef = useRef<null | number>(null);
 
         const [initialize] = useOverlayScrollbars({
             defer: false,
