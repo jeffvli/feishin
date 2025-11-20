@@ -3,11 +3,16 @@
     user-select: auto;
     background: alpha(var(--theme-colors-background), 0.5);
     border: 1px solid var(--theme-colors-border);
+    transition: background-color 0.2s ease-in-out;
 
     &[data-variant='outline'] {
         background: transparent;
         border: 1px solid var(--theme-colors-border);
     }
+}
+
+.root.link:hover {
+    background: alpha(var(--theme-colors-surface), 0.5);
 }
 
 .label {

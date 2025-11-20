@@ -14,3 +14,80 @@
         opacity: 0.6;
     }
 }
+
+.button.unthemed {
+    @mixin light {
+        color: white;
+        background: black;
+
+        svg {
+            color: white;
+            fill: white;
+        }
+
+        &:hover {
+            background: lighten(black, 10%);
+        }
+    }
+
+    @mixin dark {
+        color: black;
+        background: white;
+
+        svg {
+            color: black;
+            fill: black;
+        }
+
+        &:hover {
+            background: darken(white, 20%);
+        }
+    }
+}
+
+.wide-button {
+    padding-right: var(--theme-spacing-xl);
+    padding-left: var(--theme-spacing-xl);
+    background: white;
+    border-radius: var(--theme-radius-xl);
+    transition: background-color 0.2s ease-in-out;
+}
+
+.wide-button.unthemed {
+    @mixin light {
+        background: black;
+
+        svg {
+            color: white;
+            fill: white;
+        }
+
+        &:hover {
+            background: lighten(black, 10%);
+        }
+    }
+
+    @mixin dark {
+        background: white;
+
+        svg {
+            color: black;
+            fill: black;
+        }
+
+        &:hover {
+            background: darken(white, 20%);
+        }
+    }
+}
+
+.wide-button-label {
+    font-size: var(--theme-font-size-md);
+    font-weight: 600;
+    color: black;
+
+    svg {
+        color: black;
+        fill: black;
+    }
+}

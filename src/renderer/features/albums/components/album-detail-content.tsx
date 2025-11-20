@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { Suspense, useMemo, useState } from 'react';
+import { ReactNode, Suspense, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router';
+import { generatePath, useParams } from 'react-router';
 
 import styles from './album-detail-content.module.css';
 
@@ -12,35 +12,309 @@ import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
-import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
-import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
-import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { useContainerQuery } from '/@/renderer/hooks';
+import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
+import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
+import { useGeneralSettings, useSettingsStore } from '/@/renderer/store/settings.store';
 import {
-    useGeneralSettings,
-    usePlayButtonBehavior,
-    useSettingsStore,
-} from '/@/renderer/store/settings.store';
+    formatDateAbsoluteUTC,
+    formatDurationString,
+    formatSizeString,
+    titleCase,
+} from '/@/renderer/utils';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
+import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
+import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
+import { Pill, PillLink } from '/@/shared/components/pill/pill';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
-import { AlbumListSort, LibraryItem, Song, SortOrder } from '/@/shared/types/domain-types';
+import {
+    Album,
+    AlbumListSort,
+    ExplicitStatus,
+    LibraryItem,
+    Song,
+    SortOrder,
+} from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 
 interface AlbumDetailContentProps {
     background?: string;
 }
+
+interface AlbumMetadataTagsProps {
+    album: Album | undefined;
+}
+
+const AlbumMetadataTags = ({ album }: AlbumMetadataTagsProps) => {
+    const { t } = useTranslation();
+
+    const metadataItems = useMemo(() => {
+        if (!album) return [];
+
+        const originalDifferentFromRelease =
+            album.originalDate && album.originalDate !== album.releaseDate;
+
+        const releasePrefix = originalDifferentFromRelease
+            ? t('page.albumDetail.released', { postProcess: 'sentenceCase' })
+            : '♫';
+
+        const releaseTypes = normalizeReleaseTypes(album.releaseTypes ?? [], t).map((type) => ({
+            id: type,
+            value: titleCase(type),
+        }));
+
+        const items: Array<{ id: string; value: ReactNode | string | undefined }> = [];
+
+        if (originalDifferentFromRelease && album.originalDate) {
+            items.push({
+                id: 'originalDate',
+                value: `♫ ${formatDateAbsoluteUTC(album.originalDate)}`,
+            });
+        }
+
+        items.push(...releaseTypes);
+
+        items.push(
+            {
+                id: 'releaseDate',
+                value: album.releaseDate
+                    ? `${releasePrefix} ${formatDateAbsoluteUTC(album.releaseDate)}`
+                    : undefined,
+            },
+            {
+                id: 'releaseYear',
+                value: album.releaseYear?.toString(),
+            },
+            {
+                id: 'songCount',
+                value: album.songCount
+                    ? t('entity.trackWithCount', {
+                          count: album.songCount,
+                      })
+                    : undefined,
+            },
+            {
+                id: 'duration',
+                value: album.duration ? (
+                    <Flex align="center" gap="xs">
+                        <Icon icon="duration" size="md" /> {formatDurationString(album.duration)}
+                    </Flex>
+                ) : undefined,
+            },
+            {
+                id: 'size',
+                value: album.size ? formatSizeString(album.size) : undefined,
+            },
+            {
+                id: 'playCount',
+                value:
+                    typeof album.playCount === 'number'
+                        ? t('entity.play', {
+                              count: album.playCount,
+                          })
+                        : undefined,
+            },
+            {
+                id: 'explicitStatus',
+                value:
+                    album.explicitStatus === ExplicitStatus.EXPLICIT
+                        ? t('common.explicit', { postProcess: 'sentenceCase' })
+                        : album.explicitStatus === ExplicitStatus.CLEAN
+                          ? t('common.clean', { postProcess: 'sentenceCase' })
+                          : undefined,
+            },
+            {
+                id: 'isCompilation',
+                value:
+                    album.isCompilation !== null
+                        ? t('filter.isCompilation', { postProcess: 'sentenceCase' })
+                        : undefined,
+            },
+            {
+                id: 'recordLabels',
+                value:
+                    album.recordLabels && album.recordLabels.length > 0
+                        ? album.recordLabels.join(', ')
+                        : undefined,
+            },
+            {
+                id: 'version',
+                value: album.version || undefined,
+            },
+        );
+
+        return items.filter((item) => item.value);
+    }, [album, t]);
+
+    if (metadataItems.length === 0) return null;
+
+    return (
+        <Stack gap="xs">
+            <Text fw={600} isNoSelect size="sm" tt="uppercase">
+                {t('common.tags', { postProcess: 'sentenceCase' })}
+            </Text>
+            <Pill.Group>
+                {metadataItems.map((item, index) => (
+                    <Pill key={`item-${item.id}-${index}`} size="md">
+                        {item.value}
+                    </Pill>
+                ))}
+            </Pill.Group>
+        </Stack>
+    );
+};
+
+interface AlbumMetadataGenresProps {
+    genres?: Array<{ id: string; name: string }>;
+}
+
+const AlbumMetadataGenres = ({ genres }: AlbumMetadataGenresProps) => {
+    const { t } = useTranslation();
+    const genreRoute = useGenreRoute();
+
+    if (!genres || genres.length === 0) return null;
+
+    return (
+        <Stack gap="xs">
+            <Text fw={600} isNoSelect size="sm" tt="uppercase">
+                {t('entity.genre', {
+                    count: genres.length,
+                })}
+            </Text>
+            <Pill.Group>
+                {genres.map((genre) => (
+                    <PillLink
+                        key={`genre-${genre.id}`}
+                        size="md"
+                        to={generatePath(genreRoute, {
+                            genreId: genre.id,
+                        })}
+                    >
+                        {genre.name}
+                    </PillLink>
+                ))}
+            </Pill.Group>
+        </Stack>
+    );
+};
+
+interface AlbumMetadataArtistsProps {
+    artists?: Array<{ id: string; name: string }>;
+}
+
+const AlbumMetadataArtists = ({ artists }: AlbumMetadataArtistsProps) => {
+    const { t } = useTranslation();
+
+    if (!artists || artists.length === 0) return null;
+
+    return (
+        <Stack gap="xs">
+            <Text fw={600} isNoSelect size="sm" tt="uppercase">
+                {t('entity.albumArtist', {
+                    count: artists.length,
+                })}
+            </Text>
+            <Pill.Group>
+                {artists.map((artist) => (
+                    <PillLink
+                        key={`artist-${artist.id}`}
+                        size="md"
+                        to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                            albumArtistId: artist.id,
+                        })}
+                    >
+                        {artist.name}
+                    </PillLink>
+                ))}
+            </Pill.Group>
+        </Stack>
+    );
+};
+
+interface AlbumMetadataExternalLinksProps {
+    albumArtist?: string;
+    albumName?: string;
+    externalLinks: boolean;
+    lastFM: boolean;
+    mbzId?: null | string;
+    musicBrainz: boolean;
+}
+
+const AlbumMetadataExternalLinks = ({
+    albumArtist,
+    albumName,
+    externalLinks,
+    lastFM,
+    mbzId,
+    musicBrainz,
+}: AlbumMetadataExternalLinksProps) => {
+    const { t } = useTranslation();
+
+    if (!externalLinks || (!lastFM && !musicBrainz)) return null;
+
+    return (
+        <Stack gap="xs">
+            <Text fw={600} isNoSelect size="sm" tt="uppercase">
+                {t('common.externalLinks', {
+                    postProcess: 'sentenceCase',
+                })}
+            </Text>
+            <Group gap="sm">
+                {lastFM && (
+                    <ActionIcon
+                        component="a"
+                        href={`https://www.last.fm/music/${encodeURIComponent(
+                            albumArtist || '',
+                        )}/${encodeURIComponent(albumName || '')}`}
+                        icon="brandLastfm"
+                        iconProps={{
+                            fill: 'default',
+                            size: 'xl',
+                        }}
+                        radius="md"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                        tooltip={{
+                            label: t('action.openIn.lastfm'),
+                        }}
+                        variant="subtle"
+                    />
+                )}
+                {mbzId && musicBrainz ? (
+                    <ActionIcon
+                        component="a"
+                        href={`https://musicbrainz.org/release/${mbzId}`}
+                        icon="brandMusicBrainz"
+                        iconProps={{
+                            fill: 'default',
+                            size: 'xl',
+                        }}
+                        radius="md"
+                        rel="noopener noreferrer"
+                        size="md"
+                        target="_blank"
+                        tooltip={{
+                            label: t('action.openIn.musicbrainz'),
+                        }}
+                        variant="subtle"
+                    />
+                ) : null}
+            </Group>
+        </Stack>
+    );
+};
 
 export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
     const { t } = useTranslation();
@@ -89,22 +363,6 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
             uniqueId: 'relatedGenres',
         },
     ];
-    const playButtonBehavior = usePlayButtonBehavior();
-
-    const { addToQueueByFetch } = usePlayer();
-
-    const handlePlay = () => {
-        if (!server?.id) return;
-        addToQueueByFetch(server.id, [albumId], LibraryItem.ALBUM, playButtonBehavior);
-    };
-
-    const handleMoreOptions = (e: React.MouseEvent<HTMLButtonElement>) => {
-        if (!detailQuery?.data) return;
-        ContextMenuController.call({
-            cmd: { items: [detailQuery.data], type: LibraryItem.ALBUM },
-            event: e,
-        });
-    };
 
     const comment = detailQuery?.data?.comment;
 
@@ -114,75 +372,29 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
         <div className={styles.contentContainer} ref={ref}>
             <LibraryBackgroundOverlay backgroundColor={background} />
             <div className={styles.detailContainer}>
-                <section>
-                    <Group gap="sm" justify="space-between">
-                        <Group>
-                            <PlayButton onClick={handlePlay} />
-                            <ActionIcon
-                                icon="ellipsisHorizontal"
-                                onClick={handleMoreOptions}
-                                size="lg"
-                                variant="transparent"
+                {comment && <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>}
+                <div className={styles.contentLayout}>
+                    <div className={styles.metadataColumn}>
+                        <Stack gap="2xl">
+                            <AlbumMetadataArtists artists={detailQuery?.data?.albumArtists} />
+                            <AlbumMetadataGenres genres={detailQuery?.data?.genres} />
+                            <AlbumMetadataTags album={detailQuery?.data} />
+                            <AlbumMetadataExternalLinks
+                                albumArtist={detailQuery?.data?.albumArtist}
+                                albumName={detailQuery?.data?.name}
+                                externalLinks={externalLinks}
+                                lastFM={lastFM}
+                                mbzId={mbzId || undefined}
+                                musicBrainz={musicBrainz}
                             />
-                        </Group>
-                    </Group>
-                </section>
-                {externalLinks && (lastFM || musicBrainz) ? (
-                    <section>
-                        <Group gap="sm">
-                            {lastFM && (
-                                <ActionIcon
-                                    component="a"
-                                    href={`https://www.last.fm/music/${encodeURIComponent(
-                                        detailQuery?.data?.albumArtist || '',
-                                    )}/${encodeURIComponent(detailQuery.data?.name || '')}`}
-                                    icon="brandLastfm"
-                                    iconProps={{
-                                        fill: 'default',
-                                        size: 'xl',
-                                    }}
-                                    radius="md"
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                    tooltip={{
-                                        label: t('action.openIn.lastfm'),
-                                    }}
-                                    variant="subtle"
-                                />
-                            )}
-                            {mbzId && musicBrainz ? (
-                                <ActionIcon
-                                    component="a"
-                                    href={`https://musicbrainz.org/release/${mbzId}`}
-                                    icon="brandMusicBrainz"
-                                    iconProps={{
-                                        fill: 'default',
-                                        size: 'xl',
-                                    }}
-                                    radius="md"
-                                    rel="noopener noreferrer"
-                                    size="md"
-                                    target="_blank"
-                                    tooltip={{
-                                        label: t('action.openIn.musicbrainz'),
-                                    }}
-                                    variant="subtle"
-                                />
-                            ) : null}
-                        </Group>
-                    </section>
-                ) : null}
-                {comment && (
-                    <section>
-                        <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
-                    </section>
-                )}
-
-                {detailQuery?.data?.songs && detailQuery.data.songs.length > 0 && (
-                    <section>
-                        <AlbumDetailSongsTable songs={detailQuery.data.songs} />
-                    </section>
-                )}
+                        </Stack>
+                    </div>
+                    {detailQuery?.data?.songs && detailQuery.data.songs.length > 0 && (
+                        <div className={styles.songsColumn}>
+                            <AlbumDetailSongsTable songs={detailQuery.data.songs} />
+                        </div>
+                    )}
+                </div>
 
                 <Stack gap="lg" mt="3rem">
                     {cq.height || cq.width ? (
@@ -338,18 +550,13 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                 };
 
                 return (
-                    <Group
-                        align="center"
-                        h="100%"
-                        px="md"
-                        style={{ background: 'var(--theme-colors-background)' }}
-                        w="100%"
-                    >
+                    <Group align="center" h="100%" px="md" w="100%">
                         <Checkbox
                             checked={isAllSelected}
+                            id={`disc-${discGroup.discNumber}`}
                             indeterminate={isSomeSelected}
                             label={
-                                <Text size="sm">
+                                <Text component="label" size="sm">
                                     {t('common.disc', { postProcess: 'sentenceCase' })}{' '}
                                     {discGroup.discNumber}
                                     {discGroup.discSubtitle && ` - ${discGroup.discSubtitle}`}

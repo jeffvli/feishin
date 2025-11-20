@@ -28,6 +28,7 @@ interface HeaderPlayButtonProps {
     itemType: LibraryItem;
     listQuery?: Record<string, any>;
     songs?: Song[];
+    variant?: 'default' | 'filled';
 }
 
 interface TitleProps {
@@ -40,6 +41,7 @@ const HeaderPlayButton = ({
     itemType,
     listQuery,
     songs,
+    variant = 'filled',
     ...props
 }: HeaderPlayButtonProps) => {
     const serverId = useCurrentServerId();
@@ -73,14 +75,19 @@ const HeaderPlayButton = ({
 
     return (
         <div className={styles.playButtonContainer}>
-            <PlayButton className={className} onClick={openPlayTypeModal} {...props} />
+            <PlayButton
+                className={className}
+                onClick={openPlayTypeModal}
+                variant={variant}
+                {...props}
+            />
         </div>
     );
 };
 
 const Title = ({ children }: TitleProps) => {
     return (
-        <TextTitle fw={700} order={1} overflow="hidden">
+        <TextTitle fw={700} order={2} overflow="hidden">
             {children}
         </TextTitle>
     );

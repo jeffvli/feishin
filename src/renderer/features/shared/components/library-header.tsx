@@ -7,9 +7,16 @@ import { Link } from 'react-router';
 
 import styles from './library-header.module.css';
 
+import {
+    WidePlayButton,
+    WideShuffleButton,
+} from '/@/renderer/features/shared/components/play-button';
 import { useGeneralSettings } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Center } from '/@/shared/components/center/center';
+import { Group } from '/@/shared/components/group/group';
 import { Image } from '/@/shared/components/image/image';
+import { Rating } from '/@/shared/components/rating/rating';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
@@ -117,6 +124,7 @@ export const LibraryHeader = forwardRef(
                 {title && (
                     <div className={styles.metadataSection}>
                         <Text
+                            className={styles.itemType}
                             component={Link}
                             fw={600}
                             isLink
@@ -127,7 +135,7 @@ export const LibraryHeader = forwardRef(
                             {itemTypeString()}
                         </Text>
                         <h1 className={styles.title}>
-                            <AutoTextSize maxFontSizePx={80} minFontSizePx={36} mode="box">
+                            <AutoTextSize maxFontSizePx={80} minFontSizePx={32} mode="box">
                                 {title}
                             </AutoTextSize>
                         </h1>
@@ -138,3 +146,54 @@ export const LibraryHeader = forwardRef(
         );
     },
 );
+
+interface LibraryHeaderMenuProps {
+    favorite?: boolean;
+    onFavorite?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    onMore?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    onPlay?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    onRating?: (rating: number) => void;
+    onShuffle?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    rating?: number;
+}
+
+export const LibraryHeaderMenu = ({
+    favorite,
+    onFavorite,
+    onMore,
+    onPlay,
+    onRating,
+    onShuffle,
+    rating,
+}: LibraryHeaderMenuProps) => {
+    return (
+        <div className={styles.libraryHeaderMenu}>
+            <Group wrap="nowrap">
+                {onPlay && <WidePlayButton onClick={onPlay} />}
+                {onShuffle && <WideShuffleButton onClick={onShuffle} />}
+            </Group>
+            <Group gap="sm" wrap="nowrap">
+                {onRating && <Rating onChange={onRating} size="lg" value={rating || 0} />}
+                {onFavorite && (
+                    <ActionIcon
+                        icon="favorite"
+                        iconProps={{
+                            fill: favorite ? 'primary' : undefined,
+                        }}
+                        onClick={onFavorite}
+                        size="lg"
+                        variant="transparent"
+                    />
+                )}
+                {onMore && (
+                    <ActionIcon
+                        icon="ellipsisHorizontal"
+                        onClick={onMore}
+                        size="lg"
+                        variant="transparent"
+                    />
+                )}
+            </Group>
+        </div>
+    );
+};

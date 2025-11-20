@@ -47,6 +47,7 @@ const AlbumDetailRoute = () => {
                             <LibraryHeaderBar.PlayButton
                                 ids={[albumId]}
                                 itemType={LibraryItem.ALBUM}
+                                variant="default"
                             />
                             <LibraryHeaderBar.Title>
                                 {detailQuery?.data?.name}

@@ -1,26 +1,36 @@
 .root.xs {
     --rating-size: var(--theme-font-size-xs) !important;
+
+    padding: 0 var(--theme-spacing-xs);
 }
 
 .root.sm {
     --rating-size: var(--theme-font-size-sm) !important;
+
+    padding: 0 var(--theme-spacing-sm);
 }
 
 .root.md {
     --rating-size: var(--theme-font-size-md) !important;
+
+    padding: 0 var(--theme-spacing-md);
 }
 
 .root.lg {
     --rating-size: var(--theme-font-size-lg) !important;
+
+    padding: 0 var(--theme-spacing-md);
 }
 
 .root.xl {
     --rating-size: var(--theme-font-size-xl) !important;
+
+    padding: 0 var(--theme-spacing-md);
 }
 
 .symbol-body {
     svg {
-        stroke: alpha(var(--theme-colors-foreground), 0.7);
+        stroke: var(--theme-colors-foreground);
         stroke-width: 2px;
 
         &:not([data-filled='true']) {

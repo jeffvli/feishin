@@ -80,7 +80,7 @@ export const PillLink = forwardRef<HTMLDivElement, PillLinkProps>(({ children, .
                     [styles.xs]: size === 'xs',
                 }),
                 remove: styles.remove,
-                root: styles.root,
+                root: clsx(styles.root, styles.link),
                 ...classNames,
             }}
             component={Link}
