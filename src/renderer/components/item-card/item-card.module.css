@@ -21,9 +21,12 @@
 
 .image-container {
     position: relative;
+    display: block;
     width: 100%;
     aspect-ratio: 1;
     overflow: hidden;
+    color: inherit;
+    text-decoration: none;
 
     &::before {
         position: absolute;

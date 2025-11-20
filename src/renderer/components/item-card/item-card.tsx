@@ -8,6 +8,7 @@ import styles from './item-card.module.css';
 
 import { ItemCardControls } from '/@/renderer/components/item-card/item-card-controls';
 import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
+import { getTitlePath } from '/@/renderer/components/item-list/helpers/get-title-path';
 import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls } from '/@/renderer/components/item-list/types';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
@@ -170,6 +171,8 @@ const CompactItemCard = ({
     });
 
     if (data) {
+        const navigationPath = getItemNavigationPath(data, itemType);
+
         const handleMouseEnter = () => {
             if (withControls) {
                 setShowControls(true);
@@ -182,7 +185,7 @@ const CompactItemCard = ({
             }
         };
 
-        const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+        const handleContextMenu = (e: React.MouseEvent<HTMLElement>) => {
             if (!data || !controls) {
                 return;
             }
@@ -197,50 +200,81 @@ const CompactItemCard = ({
             });
         };
 
+        const handleImageClick = (e: React.MouseEvent<HTMLElement>) => {
+            // Prevent navigation on double-click, let the double-click handler work
+            if (e.detail === 2 && navigationPath) {
+                e.preventDefault();
+            }
+            handleClick(e as any);
+        };
+
+        const imageContainerClassName = clsx(styles.imageContainer, {
+            [styles.isRound]: isRound,
+        });
+
+        const imageContainerContent = (
+            <>
+                <Image
+                    className={clsx(styles.image, { [styles.isRound]: isRound })}
+                    src={imageUrl}
+                />
+                <AnimatePresence>
+                    {withControls && showControls && (
+                        <ItemCardControls
+                            controls={controls}
+                            item={data}
+                            itemType={itemType}
+                            type="compact"
+                        />
+                    )}
+                </AnimatePresence>
+                <div className={clsx(styles.detailContainer, styles.compact)}>
+                    {rows
+                        .filter(
+                            (row): row is NonNullable<typeof row> =>
+                                row !== null && row !== undefined,
+                        )
+                        .map((row, index) => (
+                            <ItemCardRow
+                                data={data!}
+                                index={index}
+                                key={row.id}
+                                row={row}
+                                type="compact"
+                            />
+                        ))}
+                </div>
+            </>
+        );
+
         return (
             <div
                 className={clsx(styles.container, styles.compact, {
                     [styles.selected]: isSelected,
                 })}
             >
-                <div
-                    className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onClick={handleClick}
-                    onContextMenu={handleContextMenu}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                >
-                    <Image
-                        className={clsx(styles.image, { [styles.isRound]: isRound })}
-                        src={imageUrl}
-                    />
-                    <AnimatePresence>
-                        {withControls && showControls && (
-                            <ItemCardControls
-                                controls={controls}
-                                item={data}
-                                itemType={itemType}
-                                type="compact"
-                            />
-                        )}
-                    </AnimatePresence>
-                    <div className={clsx(styles.detailContainer, styles.compact)}>
-                        {rows
-                            .filter(
-                                (row): row is NonNullable<typeof row> =>
-                                    row !== null && row !== undefined,
-                            )
-                            .map((row, index) => (
-                                <ItemCardRow
-                                    data={data!}
-                                    index={index}
-                                    key={row.id}
-                                    row={row}
-                                    type="compact"
-                                />
-                            ))}
+                {navigationPath ? (
+                    <Link
+                        className={imageContainerClassName}
+                        onClick={handleImageClick}
+                        onContextMenu={handleContextMenu}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                        to={navigationPath}
+                    >
+                        {imageContainerContent}
+                    </Link>
+                ) : (
+                    <div
+                        className={imageContainerClassName}
+                        onClick={handleImageClick}
+                        onContextMenu={handleContextMenu}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        {imageContainerContent}
                     </div>
-                </div>
+                )}
             </div>
         );
     }
@@ -325,6 +359,8 @@ const DefaultItemCard = ({
     });
 
     if (data) {
+        const navigationPath = getItemNavigationPath(data, itemType);
+
         const handleMouseEnter = () => {
             if (withControls) {
                 setShowControls(true);
@@ -337,7 +373,7 @@ const DefaultItemCard = ({
             }
         };
 
-        const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+        const handleContextMenu = (e: React.MouseEvent<HTMLElement>) => {
             if (!data || !controls) {
                 return;
             }
@@ -352,34 +388,65 @@ const DefaultItemCard = ({
             });
         };
 
+        const handleImageClick = (e: React.MouseEvent<HTMLElement>) => {
+            // Prevent navigation on double-click, let the double-click handler work
+            if (e.detail === 2 && navigationPath) {
+                e.preventDefault();
+            }
+            handleClick(e as any);
+        };
+
+        const imageContainerClassName = clsx(styles.imageContainer, {
+            [styles.isRound]: isRound,
+        });
+
+        const imageContainerContent = (
+            <>
+                <Image
+                    className={clsx(styles.image, { [styles.isRound]: isRound })}
+                    src={imageUrl}
+                />
+                <AnimatePresence>
+                    {withControls && showControls && (
+                        <ItemCardControls
+                            controls={controls}
+                            item={data}
+                            itemType={itemType}
+                            type="default"
+                        />
+                    )}
+                </AnimatePresence>
+            </>
+        );
+
         return (
             <div
                 className={clsx(styles.container, {
                     [styles.selected]: isSelected,
                 })}
             >
-                <div
-                    className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onClick={handleClick}
-                    onContextMenu={handleContextMenu}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                >
-                    <Image
-                        className={clsx(styles.image, { [styles.isRound]: isRound })}
-                        src={imageUrl}
-                    />
-                    <AnimatePresence>
-                        {withControls && showControls && (
-                            <ItemCardControls
-                                controls={controls}
-                                item={data}
-                                itemType={itemType}
-                                type="default"
-                            />
-                        )}
-                    </AnimatePresence>
-                </div>
+                {navigationPath ? (
+                    <Link
+                        className={imageContainerClassName}
+                        onClick={handleImageClick}
+                        onContextMenu={handleContextMenu}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                        to={navigationPath}
+                    >
+                        {imageContainerContent}
+                    </Link>
+                ) : (
+                    <div
+                        className={imageContainerClassName}
+                        onClick={handleImageClick}
+                        onContextMenu={handleContextMenu}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        {imageContainerContent}
+                    </div>
+                )}
                 <div className={styles.detailContainer}>
                     {rows
                         .filter(
@@ -525,6 +592,8 @@ const PosterItemCard = ({
     });
 
     if (data) {
+        const navigationPath = getItemNavigationPath(data, itemType);
+
         const handleMouseEnter = () => {
             if (withControls) {
                 setShowControls(true);
@@ -537,7 +606,7 @@ const PosterItemCard = ({
             }
         };
 
-        const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+        const handleContextMenu = (e: React.MouseEvent<HTMLElement>) => {
             if (!data || !controls) {
                 return;
             }
@@ -552,6 +621,38 @@ const PosterItemCard = ({
             });
         };
 
+        const handleImageClick = (e: React.MouseEvent<HTMLElement>) => {
+            // Prevent navigation on double-click, let the double-click handler work
+            if (e.detail === 2 && navigationPath) {
+                e.preventDefault();
+            }
+            handleClick(e as any);
+        };
+
+        const imageContainerClassName = clsx(styles.imageContainer, {
+            [styles.isRound]: isRound,
+        });
+
+        const imageContainerContent = (
+            <>
+                <Image
+                    className={clsx(styles.image, { [styles.isRound]: isRound })}
+                    src={imageUrl}
+                />
+                <AnimatePresence>
+                    {withControls && showControls && data && (
+                        <ItemCardControls
+                            controls={controls}
+                            internalState={internalState}
+                            item={data}
+                            itemType={itemType}
+                            type="poster"
+                        />
+                    )}
+                </AnimatePresence>
+            </>
+        );
+
         return (
             <div
                 className={clsx(styles.container, styles.poster, {
@@ -560,29 +661,28 @@ const PosterItemCard = ({
                 })}
                 ref={ref}
             >
-                <div
-                    className={clsx(styles.imageContainer, { [styles.isRound]: isRound })}
-                    onClick={handleClick}
-                    onContextMenu={handleContextMenu}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                >
-                    <Image
-                        className={clsx(styles.image, { [styles.isRound]: isRound })}
-                        src={imageUrl}
-                    />
-                    <AnimatePresence>
-                        {withControls && showControls && data && (
-                            <ItemCardControls
-                                controls={controls}
-                                internalState={internalState}
-                                item={data}
-                                itemType={itemType}
-                                type="poster"
-                            />
-                        )}
-                    </AnimatePresence>
-                </div>
+                {navigationPath ? (
+                    <Link
+                        className={imageContainerClassName}
+                        onClick={handleImageClick}
+                        onContextMenu={handleContextMenu}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                        to={navigationPath}
+                    >
+                        {imageContainerContent}
+                    </Link>
+                ) : (
+                    <div
+                        className={imageContainerClassName}
+                        onClick={handleImageClick}
+                        onContextMenu={handleContextMenu}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        {imageContainerContent}
+                    </div>
+                )}
                 {data && (
                     <div className={styles.detailContainer}>
                         {rows
@@ -866,6 +966,20 @@ const getImageUrl = (data: Album | AlbumArtist | Artist | Playlist | Song | unde
     }
 
     return undefined;
+};
+
+const getItemNavigationPath = (
+    data: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+    itemType: LibraryItem,
+): null | string => {
+    if (!data || !('id' in data) || !data.id) {
+        return null;
+    }
+
+    // Check if data has _itemType (like in title row logic)
+    const effectiveItemType = '_itemType' in data && data._itemType ? data._itemType : itemType;
+
+    return getTitlePath(effectiveItemType, data.id);
 };
 
 const ItemCardRow = ({
