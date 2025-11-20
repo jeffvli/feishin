@@ -74,10 +74,18 @@
     -webkit-box-orient: vertical;
 }
 
+.item-title.dark {
+    color: white !important;
+}
+
 .item-subtitle {
     z-index: 10;
     color: black;
     white-space: nowrap;
+}
+
+.item-subtitle.dark {
+    color: white !important;
 }
 
 .dark {
