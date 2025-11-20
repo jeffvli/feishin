@@ -1,0 +1,198 @@
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--theme-colors-background);
+}
+
+.background-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--theme-overlay-header);
+    backdrop-filter: blur(var(--image-blur));
+}
+
+.player-state,
+.queue-state,
+.lyrics-state {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    background: transparent;
+}
+
+.player-state[style*='z-index: 2'],
+.queue-state[style*='z-index: 2'],
+.lyrics-state[style*='z-index: 2'] {
+    pointer-events: auto;
+}
+
+.header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem;
+}
+
+.header-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+    padding: 1rem;
+    padding-top: 0.5rem;
+}
+
+.image {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    max-height: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 30%);
+}
+
+.imageNativeAspectRatio {
+    aspect-ratio: auto;
+    height: auto;
+    max-height: 100%;
+}
+
+.album-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.metadata-container {
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+    padding: 1rem;
+    padding-top: 1.5rem;
+}
+
+.title-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.metadata-row {
+    justify-content: center;
+    width: 100%;
+}
+
+.actions-row {
+    justify-content: center;
+    width: 100%;
+}
+
+.progress-container {
+    display: flex;
+    flex-shrink: 0;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+    padding: 0 1rem;
+    padding-bottom: 1.5rem;
+}
+
+.time-container {
+    flex-shrink: 0;
+    min-width: 3.5ch;
+}
+
+.slider-wrapper {
+    flex: 1;
+}
+
+.controls-container {
+    display: flex;
+    flex-shrink: 0;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0 1rem;
+    padding-bottom: 1.5rem;
+}
+
+.bottom-controls-bar {
+    display: flex;
+    flex-shrink: 0;
+    align-items: stretch;
+    justify-content: center;
+    width: 100%;
+    margin-top: auto;
+    border-top: 1px solid var(--theme-colors-border);
+}
+
+.bottom-controls-group {
+    display: flex;
+    width: 100%;
+    height: 100%;
+
+    button {
+        padding: 1.5rem;
+    }
+}
+
+.bottom-control-icon {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+}
+
+.queue-header,
+.lyrics-header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem;
+}
+
+.queue-content,
+.lyrics-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 1rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}

@@ -1,0 +1,55 @@
+.layout {
+    position: relative;
+    display: grid;
+    grid-template-areas:
+        'window-bar'
+        'main-content'
+        'player';
+    grid-template-rows: 0 calc(100vh - 90px) 90px;
+    grid-template-columns: 1fr;
+    gap: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--theme-colors-background);
+}
+
+.drawer-button {
+    position: absolute;
+    bottom: calc(90px + 0.75rem);
+    left: 0.75rem;
+    z-index: 100;
+    background: color-mix(in srgb, var(--theme-colors-background) 90%, transparent);
+    border: 1px solid var(--theme-colors-border);
+    backdrop-filter: blur(10px);
+}
+
+.main-content {
+    position: relative;
+    grid-area: main-content;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.full-screen-player-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 200;
+    visibility: hidden;
+    pointer-events: none;
+    background: var(--theme-colors-background);
+    opacity: 0;
+    transition:
+        opacity 0.3s ease-in-out,
+        visibility 0.3s ease-in-out;
+}
+
+.full-screen-player-visible {
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 1;
+}

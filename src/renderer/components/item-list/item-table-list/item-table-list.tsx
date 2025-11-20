@@ -688,7 +688,6 @@ interface ItemTableListProps {
         type: 'index' | 'offset';
     };
     itemType: LibraryItem;
-    startRowIndex?: number;
     onColumnReordered?: (
         columnIdFrom: TableColumn,
         columnIdTo: TableColumn,
@@ -700,6 +699,7 @@ interface ItemTableListProps {
     ref?: Ref<ItemListHandle>;
     rowHeight?: ((index: number, cellProps: TableItemProps) => number) | number;
     size?: 'compact' | 'default' | 'large';
+    startRowIndex?: number;
 }
 
 export const ItemTableList = ({
@@ -1111,7 +1111,7 @@ export const ItemTableList = ({
         ],
     );
 
-    const [initialize] = useOverlayScrollbars({
+    const [initialize, osInstance] = useOverlayScrollbars({
         defer: false,
         events: {
             initialized(osInstance) {
@@ -1135,24 +1135,49 @@ export const ItemTableList = ({
     useEffect(() => {
         const { current: root } = scrollContainerRef;
 
-        if (root) {
-            initialize({
-                elements: { viewport: root.firstElementChild as HTMLElement },
-                target: root,
-            });
-
-            if (enableDrag) {
-                autoScrollForElements({
-                    canScroll: () => true,
-                    element: root.firstElementChild as HTMLElement,
-                    getAllowedAxis: () => 'vertical',
-                    getConfiguration: () => ({ maxScrollSpeed: 'fast' }),
-                });
-            }
+        if (!root || !root.firstElementChild) {
+            return;
         }
 
-        return undefined;
-    }, [enableDrag, initialize]);
+        const viewport = root.firstElementChild as HTMLElement;
+
+        initialize({
+            elements: { viewport },
+            target: root,
+        });
+
+        if (enableDrag) {
+            autoScrollForElements({
+                canScroll: () => true,
+                element: viewport,
+                getAllowedAxis: () => 'vertical',
+                getConfiguration: () => ({ maxScrollSpeed: 'fast' }),
+            });
+        }
+
+        return () => {
+            try {
+                const instance = osInstance();
+                const { current: root } = scrollContainerRef;
+
+                // Check if instance exists and elements are still connected to the DOM
+                if (instance && root) {
+                    const viewport = root.firstElementChild as HTMLElement;
+
+                    // Check if elements are still in the document
+                    const rootInDocument = document.contains(root);
+                    const viewportInDocument = viewport && document.contains(viewport);
+
+                    // Only destroy if elements are still in the document
+                    if (rootInDocument && viewportInDocument) {
+                        instance.destroy();
+                    }
+                }
+            } catch {
+                // Ignore error
+            }
+        };
+    }, [enableDrag, initialize, osInstance]);
 
     useEffect(() => {
         const header = pinnedRowRef.current?.childNodes[0] as HTMLDivElement;

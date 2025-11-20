@@ -4,13 +4,10 @@ import { PlayerbarSeekSlider } from './playerbar-seek-slider';
 import styles from './playerbar-slider.module.css';
 import { PlayerbarWaveform } from './playerbar-waveform';
 
-import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
-import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
 import { useRemote } from '/@/renderer/features/remote/hooks/use-remote';
 import {
     useAppStore,
     useAppStoreActions,
-    usePlaybackType,
     usePlayerSong,
     usePlayerTimestamp,
 } from '/@/renderer/store';
@@ -18,10 +15,8 @@ import { PlayerbarSliderType, usePlayerbarSlider } from '/@/renderer/store/setti
 import { Slider, SliderProps } from '/@/shared/components/slider/slider';
 import { Text } from '/@/shared/components/text/text';
 import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
-import { PlayerType } from '/@/shared/types/types';
 
 export const PlayerbarSlider = () => {
-    const playbackType = usePlaybackType();
     const currentSong = usePlayerSong();
     const playerbarSlider = usePlayerbarSlider();
 
@@ -76,8 +71,6 @@ export const PlayerbarSlider = () => {
                     </Text>
                 </div>
             </div>
-            {playbackType === PlayerType.WEB && <WebPlayer />}
-            {playbackType === PlayerType.LOCAL && <MpvPlayer />}
         </>
     );
 };

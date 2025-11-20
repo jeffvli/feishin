@@ -11,6 +11,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import i18n from '/@/i18n/i18n';
 import { useDiscordRpc } from '/@/renderer/features/discord-rpc/use-discord-rpc';
+import { AudioPlayers } from '/@/renderer/features/player/components/audio-players';
 import { PlayerProvider } from '/@/renderer/features/player/context/player-context';
 import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-context';
 import { useServerVersion } from '/@/renderer/hooks/use-server-version';
@@ -87,6 +88,7 @@ export const App = () => {
             <WebAudioContext.Provider value={webAudioProvider}>
                 <PlayerProvider>
                     <AppRouter />
+                    <AudioPlayers />
                 </PlayerProvider>
             </WebAudioContext.Provider>
             <IsUpdatedDialog />

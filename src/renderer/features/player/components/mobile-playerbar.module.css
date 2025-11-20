@@ -1,0 +1,66 @@
+.container {
+    display: flex;
+    gap: var(--theme-spacing-sm);
+    align-items: center;
+    width: 100%;
+    height: 90px;
+    padding: 0.5rem 1rem;
+    overflow: hidden;
+}
+
+.image-wrapper {
+    position: relative;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.image {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.playerbar-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.metadata-stack {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0;
+    justify-content: center;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.line-item {
+    display: inline-block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.line-item.secondary {
+    color: var(--theme-colors-foreground-muted);
+}
+
+.controls-wrapper {
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+}

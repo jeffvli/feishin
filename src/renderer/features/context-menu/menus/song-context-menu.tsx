@@ -21,8 +21,6 @@ export const SongContextMenu = ({ items }: SongContextMenuProps) => {
         return { ids };
     }, [items]);
 
-    console.log(items, ids);
-
     return (
         <ContextMenu.Content>
             <PlayAction ids={ids} itemType={LibraryItem.SONG} songs={items} />

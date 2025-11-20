@@ -248,7 +248,6 @@ export const AppMenu = () => {
                 return (
                     <div key={item.id}>
                         {item.items.map((subItem) => {
-                            console.log(subItem.id);
                             return <Fragment key={subItem.id}>{renderMenuItem(subItem)}</Fragment>;
                         })}
                     </div>

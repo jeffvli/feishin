@@ -290,7 +290,7 @@ export const ItemGridList = ({
 
     const internalState = useItemListState(getDataFn, extractRowId);
 
-    const [initialize] = useOverlayScrollbars({
+    const [initialize, osInstance] = useOverlayScrollbars({
         defer: false,
         events: {
             initialized(osInstance) {
@@ -323,15 +323,39 @@ export const ItemGridList = ({
         const { current: root } = rootRef;
         const { current: outer } = outerRef;
 
-        if (root && outer) {
-            initialize({
-                elements: {
-                    viewport: outer,
-                },
-                target: root,
-            });
+        if (!tableMeta || !root || !outer) {
+            return;
         }
-    }, [initialize, tableMeta]);
+
+        initialize({
+            elements: {
+                viewport: outer,
+            },
+            target: root,
+        });
+
+        return () => {
+            try {
+                const instance = osInstance();
+                const { current: root } = rootRef;
+                const { current: outer } = outerRef;
+
+                // Check if instance exists and elements are still connected to the DOM
+                if (instance) {
+                    // Check if elements are still in the document
+                    const rootInDocument = root && document.contains(root);
+                    const outerInDocument = outer && document.contains(outer);
+
+                    // Only destroy if elements are still in the document
+                    if (rootInDocument && outerInDocument) {
+                        instance.destroy();
+                    }
+                }
+            } catch {
+                // Ignore error
+            }
+        };
+    }, [initialize, osInstance, tableMeta]);
 
     const throttledSetTableMeta = useMemo(() => {
         return createThrottledSetTableMeta(itemsPerRow, rows?.length);

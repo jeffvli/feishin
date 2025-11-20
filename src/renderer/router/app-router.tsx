@@ -6,7 +6,7 @@ import { AppRoute } from './routes';
 import { RouterErrorBoundary } from '/@/renderer/components/error-boundary/router-error-boundary';
 import { AddToPlaylistContextModal } from '/@/renderer/features/playlists/components/add-to-playlist-context-modal';
 import { ShareItemContextModal } from '/@/renderer/features/sharing/components/share-item-context-modal';
-import { DefaultLayout } from '/@/renderer/layouts/default-layout';
+import { ResponsiveLayout } from '/@/renderer/layouts/responsive-layout';
 import { AppOutlet } from '/@/renderer/router/app-outlet';
 import { TitlebarOutlet } from '/@/renderer/router/titlebar-outlet';
 import { BaseContextModal, ModalsProvider } from '/@/shared/components/modal/modal';
@@ -85,7 +85,7 @@ export const AppRouter = () => {
                     <Routes>
                         <Route element={<TitlebarOutlet />}>
                             <Route element={<AppOutlet />} errorElement={<RouteErrorBoundary />}>
-                                <Route element={<DefaultLayout />}>
+                                <Route element={<ResponsiveLayout />}>
                                     <Route
                                         element={<HomeRoute />}
                                         errorElement={<RouteErrorBoundary />}
@@ -206,7 +206,7 @@ export const AppRouter = () => {
                             </Route>
                         </Route>
                         <Route element={<TitlebarOutlet />}>
-                            <Route element={<DefaultLayout shell />}>
+                            <Route element={<ResponsiveLayout shell />}>
                                 <Route
                                     element={<ActionRequiredRoute />}
                                     path={AppRoute.ACTION_REQUIRED}
