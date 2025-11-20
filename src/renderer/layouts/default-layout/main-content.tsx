@@ -35,6 +35,7 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
     const mainContentRef = useRef<HTMLDivElement | null>(null);
     const initialRightWidthRef = useRef<string>(rightWidth);
     const initialMouseXRef = useRef<number>(0);
+    const wasCollapsedDuringDragRef = useRef<boolean>(false);
 
     useEffect(() => {
         if (mainContentRef.current && !isResizing && !isResizingRight) {
@@ -48,6 +49,7 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
         (position: 'left' | 'right', mouseEvent?: MouseEvent) => {
             if (position === 'left') {
                 setIsResizing(true);
+                wasCollapsedDuringDragRef.current = false;
             } else {
                 setIsResizingRight(true);
                 if (mainContentRef.current && rightSidebarRef.current && mouseEvent) {
@@ -69,11 +71,14 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
 
     const stopResizing = useCallback(() => {
         if (isResizing && mainContentRef.current) {
-            const finalWidth = mainContentRef.current.style.getPropertyValue('--sidebar-width');
-            if (finalWidth) {
-                setSideBar({ collapsed: false, leftWidth: finalWidth });
+            if (!wasCollapsedDuringDragRef.current) {
+                const finalWidth = mainContentRef.current.style.getPropertyValue('--sidebar-width');
+                if (finalWidth) {
+                    setSideBar({ collapsed: false, leftWidth: finalWidth });
+                }
             }
             setIsResizing(false);
+            wasCollapsedDuringDragRef.current = false;
         } else if (isResizingRight && mainContentRef.current) {
             const finalWidth =
                 mainContentRef.current.style.getPropertyValue('--right-sidebar-width');
@@ -90,11 +95,19 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
 
             if (isResizing) {
                 const width = mouseMoveEvent.clientX;
-                const constrainedWidth = `${constrainSidebarWidth(width)}px`;
+                const constrainedWidthValue = constrainSidebarWidth(width);
+                const constrainedWidth = `${constrainedWidthValue}px`;
 
                 if (width < MINIMUM_SIDEBAR_WIDTH - 100) {
-                    setSideBar({ collapsed: true });
+                    if (!wasCollapsedDuringDragRef.current) {
+                        wasCollapsedDuringDragRef.current = true;
+                        setSideBar({ collapsed: true });
+                    }
                 } else {
+                    if (wasCollapsedDuringDragRef.current) {
+                        wasCollapsedDuringDragRef.current = false;
+                        setSideBar({ collapsed: false });
+                    }
                     mainContentRef.current.style.setProperty('--sidebar-width', constrainedWidth);
                 }
             } else if (isResizingRight) {
