@@ -212,12 +212,16 @@ const CompactItemCard = ({
             [styles.isRound]: isRound,
         });
 
+        const isFavorite =
+            'userFavorite' in data && (data as { userFavorite: boolean }).userFavorite;
+
         const imageContainerContent = (
             <>
                 <Image
                     className={clsx(styles.image, { [styles.isRound]: isRound })}
                     src={imageUrl}
                 />
+                {isFavorite && <div className={styles.favoriteBadge} />}
                 <AnimatePresence>
                     {withControls && showControls && (
                         <ItemCardControls
@@ -400,12 +404,16 @@ const DefaultItemCard = ({
             [styles.isRound]: isRound,
         });
 
+        const isFavorite =
+            'userFavorite' in data && (data as { userFavorite: boolean }).userFavorite;
+
         const imageContainerContent = (
             <>
                 <Image
                     className={clsx(styles.image, { [styles.isRound]: isRound })}
                     src={imageUrl}
                 />
+                {isFavorite && <div className={styles.favoriteBadge} />}
                 <AnimatePresence>
                     {withControls && showControls && (
                         <ItemCardControls
@@ -633,12 +641,16 @@ const PosterItemCard = ({
             [styles.isRound]: isRound,
         });
 
+        const isFavorite =
+            'userFavorite' in data && (data as { userFavorite: boolean }).userFavorite;
+
         const imageContainerContent = (
             <>
                 <Image
                     className={clsx(styles.image, { [styles.isRound]: isRound })}
                     src={imageUrl}
                 />
+                {isFavorite && <div className={styles.favoriteBadge} />}
                 <AnimatePresence>
                     {withControls && showControls && data && (
                         <ItemCardControls
