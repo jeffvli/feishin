@@ -25,6 +25,7 @@ export const PlaylistListPaginatedGrid = forwardRef<any, PlaylistListPaginatedGr
         {
             gap = 'md',
             itemsPerPage = 100,
+            itemsPerRow,
             query = {
                 sortBy: PlaylistListSort.NAME,
                 sortOrder: SortOrder.ASC,
@@ -75,6 +76,7 @@ export const PlaylistListPaginatedGrid = forwardRef<any, PlaylistListPaginatedGr
                         to: scrollOffset ?? 0,
                         type: 'offset',
                     }}
+                    itemsPerRow={itemsPerRow}
                     itemType={LibraryItem.PLAYLIST}
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}

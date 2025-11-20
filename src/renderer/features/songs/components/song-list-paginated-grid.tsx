@@ -19,6 +19,7 @@ export const SongListPaginatedGrid = forwardRef<any, SongListPaginatedGridProps>
         {
             gap = 'md',
             itemsPerPage = 100,
+            itemsPerRow,
             query = {
                 sortBy: SongListSort.NAME,
                 sortOrder: SortOrder.ASC,
@@ -60,6 +61,7 @@ export const SongListPaginatedGrid = forwardRef<any, SongListPaginatedGridProps>
                     currentPage={currentPage}
                     data={data || []}
                     gap={gap}
+                    itemsPerRow={itemsPerRow}
                     itemType={LibraryItem.SONG}
                     ref={ref}
                     rows={rows}

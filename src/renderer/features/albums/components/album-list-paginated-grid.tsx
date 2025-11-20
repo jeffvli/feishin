@@ -25,6 +25,7 @@ export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProp
         {
             gap = 'md',
             itemsPerPage = 100,
+            itemsPerRow,
             query = {
                 sortBy: AlbumListSort.NAME,
                 sortOrder: SortOrder.ASC,
@@ -75,6 +76,7 @@ export const AlbumListPaginatedGrid = forwardRef<any, AlbumListPaginatedGridProp
                         to: scrollOffset ?? 0,
                         type: 'offset',
                     }}
+                    itemsPerRow={itemsPerRow}
                     itemType={LibraryItem.ALBUM}
                     onScrollEnd={handleOnScrollEnd}
                     ref={ref}
