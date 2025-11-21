@@ -10,7 +10,6 @@ import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistGridCarousel } from '/@/renderer/features/artists/components/album-artist-grid-carousel';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
@@ -35,11 +34,7 @@ import {
 } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
-interface AlbumArtistDetailContentProps {
-    background?: string;
-}
-
-export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailContentProps) => {
+export const AlbumArtistDetailContent = () => {
     const { t } = useTranslation();
     const { artistItems, externalLinks, lastFM, musicBrainz } = useGeneralSettings();
     const { albumArtistId, artistId } = useParams() as {
@@ -230,7 +225,6 @@ export const AlbumArtistDetailContent = ({ background }: AlbumArtistDetailConten
 
     return (
         <div className={styles.contentContainer} ref={ref}>
-            <LibraryBackgroundOverlay backgroundColor={background} />
             <div className={styles.detailContainer}>
                 <Group gap="md">
                     <PlayButton

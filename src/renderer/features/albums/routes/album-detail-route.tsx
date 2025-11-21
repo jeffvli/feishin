@@ -7,6 +7,11 @@ import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumDetailContent } from '/@/renderer/features/albums/components/album-detail-content';
 import { AlbumDetailHeader } from '/@/renderer/features/albums/components/album-detail-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import {
+    LibraryBackgroundImage,
+    LibraryBackgroundOverlay,
+} from '/@/renderer/features/shared/components/library-background-overlay';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
@@ -28,14 +33,15 @@ const AlbumDetailRoute = () => {
         staleTime: 0,
     });
 
-    const { background: backgroundColor, colorId } = useFastAverageColor({
+    const { background: backgroundColor } = useFastAverageColor({
         id: albumId,
         src: detailQuery.data?.imageUrl,
         srcLoaded: !detailQuery.isLoading,
     });
 
-    const backgroundUrl = detailQuery.data?.imageUrl || '';
-    const background = (albumBackground && `url(${backgroundUrl})`) || backgroundColor;
+    const background = backgroundColor;
+
+    const showBlurredImage = Boolean(detailQuery.data?.imageUrl) && albumBackground;
 
     return (
         <AnimatedPage key={`album-detail-${albumId}`}>
@@ -59,15 +65,19 @@ const AlbumDetailRoute = () => {
                 }}
                 ref={scrollAreaRef}
             >
-                <AlbumDetailHeader
-                    background={{
-                        background,
-                        blur: (albumBackground && albumBackgroundBlur) || 0,
-                        loading: !backgroundColor || colorId !== albumId,
-                    }}
-                    ref={headerRef}
-                />
-                <AlbumDetailContent background={background} />
+                {showBlurredImage ? (
+                    <LibraryBackgroundImage
+                        blur={albumBackgroundBlur}
+                        headerRef={headerRef}
+                        imageUrl={detailQuery.data.imageUrl!}
+                    />
+                ) : (
+                    <LibraryBackgroundOverlay backgroundColor={background} headerRef={headerRef} />
+                )}
+                <LibraryContainer>
+                    <AlbumDetailHeader ref={headerRef as React.Ref<HTMLDivElement>} />
+                    <AlbumDetailContent />
+                </LibraryContainer>
             </NativeScrollArea>
         </AnimatedPage>
     );

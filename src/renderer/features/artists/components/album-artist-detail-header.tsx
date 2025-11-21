@@ -15,16 +15,8 @@ import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, ServerType } from '/@/shared/types/domain-types';
 
-interface AlbumArtistDetailHeaderProps {
-    background: {
-        background?: string;
-        blur: number;
-        loading: boolean;
-    };
-}
-
 export const AlbumArtistDetailHeader = forwardRef(
-    ({ background }: AlbumArtistDetailHeaderProps, ref: Ref<HTMLDivElement>) => {
+    (_props, ref: Ref<HTMLDivElement>) => {
         const { albumArtistId, artistId } = useParams() as {
             albumArtistId?: string;
             artistId?: string;
@@ -95,7 +87,6 @@ export const AlbumArtistDetailHeader = forwardRef(
                 item={{ route: AppRoute.LIBRARY_ALBUM_ARTISTS, type: LibraryItem.ALBUM_ARTIST }}
                 ref={ref}
                 title={detailQuery?.data?.name || ''}
-                {...background}
             >
                 <Stack>
                     <Group>

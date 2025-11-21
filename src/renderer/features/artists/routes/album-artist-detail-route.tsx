@@ -7,10 +7,14 @@ import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistDetailContent } from '/@/renderer/features/artists/components/album-artist-detail-content';
 import { AlbumArtistDetailHeader } from '/@/renderer/features/artists/components/album-artist-detail-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import {
+    LibraryBackgroundImage,
+    LibraryBackgroundOverlay,
+} from '/@/renderer/features/shared/components/library-background-overlay';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { useFastAverageColor } from '/@/renderer/hooks';
-import { useCurrentServer } from '/@/renderer/store';
-import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const AlbumArtistDetailRoute = () => {
@@ -37,20 +41,20 @@ const AlbumArtistDetailRoute = () => {
         staleTime: 0,
     });
 
-    const { background: backgroundColor, colorId } = useFastAverageColor({
+    const { background: backgroundColor } = useFastAverageColor({
         id: artistId,
         src: detailQuery.data?.imageUrl,
         srcLoaded: !detailQuery.isLoading,
     });
 
-    const backgroundUrl = detailQuery.data?.imageUrl || '';
-    const background = (artistBackground && `url(${backgroundUrl})`) || backgroundColor;
+    const background = backgroundColor;
+    const showBlurredImage = Boolean(detailQuery.data?.imageUrl) && artistBackground;
 
     return (
         <AnimatedPage key={`album-artist-detail-${routeId}`}>
             <NativeScrollArea
                 pageHeaderProps={{
-                    backgroundColor: background,
+                    backgroundColor: backgroundColor || undefined,
                     children: (
                         <LibraryHeaderBar>
                             <LibraryHeaderBar.PlayButton
@@ -67,15 +71,19 @@ const AlbumArtistDetailRoute = () => {
                 }}
                 ref={scrollAreaRef}
             >
-                <AlbumArtistDetailHeader
-                    background={{
-                        background,
-                        blur: (artistBackground && artistBackgroundBlur) || 0,
-                        loading: !backgroundColor || colorId !== artistId,
-                    }}
-                    ref={headerRef}
-                />
-                <AlbumArtistDetailContent background={background} />
+                {showBlurredImage && detailQuery.data?.imageUrl ? (
+                    <LibraryBackgroundImage
+                        blur={artistBackgroundBlur}
+                        headerRef={headerRef}
+                        imageUrl={detailQuery.data.imageUrl}
+                    />
+                ) : (
+                    <LibraryBackgroundOverlay backgroundColor={background} headerRef={headerRef} />
+                )}
+                <LibraryContainer>
+                    <AlbumArtistDetailHeader ref={headerRef as React.Ref<HTMLDivElement>} />
+                    <AlbumArtistDetailContent />
+                </LibraryContainer>
             </NativeScrollArea>
         </AnimatedPage>
     );

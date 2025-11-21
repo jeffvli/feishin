@@ -1,6 +1,5 @@
 import { closeAllModals, openModal } from '@mantine/modals';
 import { AutoTextSize } from 'auto-text-size';
-import clsx from 'clsx';
 import { forwardRef, ReactNode, Ref, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -11,7 +10,6 @@ import {
     WidePlayButton,
     WideShuffleButton,
 } from '/@/renderer/features/shared/components/play-button';
-import { useGeneralSettings } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
@@ -21,8 +19,6 @@ import { Text } from '/@/shared/components/text/text';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface LibraryHeaderProps {
-    background?: string;
-    blur?: number;
     children?: ReactNode;
     imagePlaceholderUrl?: null | string;
     imageUrl?: null | string;
@@ -32,13 +28,9 @@ interface LibraryHeaderProps {
 }
 
 export const LibraryHeader = forwardRef(
-    (
-        { background, blur, children, imageUrl, item, title }: LibraryHeaderProps,
-        ref: Ref<HTMLDivElement>,
-    ) => {
+    ({ children, imageUrl, item, title }: LibraryHeaderProps, ref: Ref<HTMLDivElement>) => {
         const { t } = useTranslation();
         const [isImageError, setIsImageError] = useState<boolean | null>(false);
-        const { albumBackground } = useGeneralSettings();
 
         const onImageError = () => {
             setIsImageError(true);
@@ -92,15 +84,6 @@ export const LibraryHeader = forwardRef(
 
         return (
             <div className={styles.libraryHeader} ref={ref}>
-                <div
-                    className={styles.background}
-                    style={{ background, filter: `blur(${blur ?? 0}rem)` }}
-                />
-                <div
-                    className={clsx(styles.backgroundOverlay, {
-                        [styles.opaqueOverlay]: albumBackground,
-                    })}
-                />
                 <div
                     className={styles.imageSection}
                     onClick={() => openImage()}

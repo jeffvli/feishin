@@ -12,7 +12,6 @@ import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
-import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { useContainerQuery } from '/@/renderer/hooks';
@@ -49,9 +48,6 @@ import {
 } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 
-interface AlbumDetailContentProps {
-    background?: string;
-}
 
 interface AlbumMetadataTagsProps {
     album: Album | undefined;
@@ -316,7 +312,7 @@ const AlbumMetadataExternalLinks = ({
     );
 };
 
-export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
+export const AlbumDetailContent = () => {
     const { t } = useTranslation();
     const { albumId } = useParams() as { albumId: string };
     const server = useCurrentServer();
@@ -370,7 +366,6 @@ export const AlbumDetailContent = ({ background }: AlbumDetailContentProps) => {
 
     return (
         <div className={styles.contentContainer} ref={ref}>
-            <LibraryBackgroundOverlay backgroundColor={background} />
             <div className={styles.detailContainer}>
                 {comment && <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>}
                 <div className={styles.contentLayout}>

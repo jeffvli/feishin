@@ -10,6 +10,9 @@ export const getFastAverageColor = async (args: {
         algorithm: args.algorithm || 'dominant',
         ignoredColor: [
             [255, 255, 255, 255, 90], // White
+            [255, 255, 255, 255, 50], // Light gray
+            [255, 255, 255, 255, 30], // Very light gray
+            [255, 255, 255, 255, 10], // Very very light gray
             [0, 0, 0, 255, 30], // Black
             [0, 0, 0, 0, 40], // Transparent
         ],
