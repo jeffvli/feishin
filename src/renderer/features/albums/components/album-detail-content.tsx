@@ -48,7 +48,6 @@ import {
 } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 
-
 interface AlbumMetadataTagsProps {
     album: Album | undefined;
 }
@@ -369,6 +368,11 @@ export const AlbumDetailContent = () => {
             <div className={styles.detailContainer}>
                 {comment && <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>}
                 <div className={styles.contentLayout}>
+                    <div className={styles.songsColumn}>
+                        {detailQuery?.data?.songs && detailQuery.data.songs.length > 0 && (
+                            <AlbumDetailSongsTable songs={detailQuery.data.songs} />
+                        )}
+                    </div>
                     <div className={styles.metadataColumn}>
                         <Stack gap="2xl">
                             <AlbumMetadataArtists artists={detailQuery?.data?.albumArtists} />
@@ -384,11 +388,6 @@ export const AlbumDetailContent = () => {
                             />
                         </Stack>
                     </div>
-                    {detailQuery?.data?.songs && detailQuery.data.songs.length > 0 && (
-                        <div className={styles.songsColumn}>
-                            <AlbumDetailSongsTable songs={detailQuery.data.songs} />
-                        </div>
-                    )}
                 </div>
 
                 <Stack gap="lg" mt="3rem">
