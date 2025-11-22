@@ -65,7 +65,10 @@ export const queryKeys: Record<
             return [serverId, 'albumArtists', 'count'] as const;
         },
         detail: (serverId: string, query?: AlbumArtistDetailQuery) => {
-            if (query) return [serverId, 'albumArtists', 'detail', query] as const;
+            if (query) {
+                return [serverId, 'albumArtists', 'detail', query] as const;
+            }
+
             return [serverId, 'albumArtists', 'detail'] as const;
         },
         list: (serverId: string, query?: AlbumArtistListQuery) => {
@@ -108,8 +111,13 @@ export const queryKeys: Record<
 
             return [serverId, 'albums', 'count'] as const;
         },
-        detail: (serverId: string, query?: AlbumDetailQuery) =>
-            [serverId, 'albums', 'detail', query] as const,
+        detail: (serverId: string, query?: AlbumDetailQuery) => {
+            if (query) {
+                return [serverId, 'albums', 'detail', query] as const;
+            }
+
+            return [serverId, 'albums', 'detail'] as const;
+        },
         list: (serverId: string, query?: AlbumListQuery, artistId?: string) => {
             const { filter, pagination } = splitPaginatedQuery(query);
 
@@ -279,7 +287,10 @@ export const queryKeys: Record<
             return [serverId, 'songs', 'count'] as const;
         },
         detail: (serverId: string, query?: SongDetailQuery) => {
-            if (query) return [serverId, 'songs', 'detail', query] as const;
+            if (query) {
+                return [serverId, 'songs', 'detail', query] as const;
+            }
+
             return [serverId, 'songs', 'detail'] as const;
         },
         list: (serverId: string, query?: SongListQuery) => {
