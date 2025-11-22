@@ -13,6 +13,7 @@ import { SaveAsPlaylistForm } from '/@/renderer/features/playlists/components/sa
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, usePlaylistDetailStore } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
@@ -186,44 +187,48 @@ const PlaylistDetailSongListRoute = () => {
 
     return (
         <AnimatedPage key={`playlist-detail-songList-${playlistId}`}>
-            <PlaylistDetailSongListHeader
-                handlePlay={handlePlay}
-                handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
-                itemCount={itemCount}
-                tableRef={tableRef}
-            />
+            <LibraryContainer>
+                <PlaylistDetailSongListHeader
+                    handlePlay={handlePlay}
+                    handleToggleShowQueryBuilder={handleToggleShowQueryBuilder}
+                    itemCount={itemCount}
+                    tableRef={tableRef}
+                />
 
-            {(isSmartPlaylist || showQueryBuilder) && (
-                <motion.div>
-                    <Box h="100%" mah="35vh" p="md" w="100%">
-                        <Group pb="md">
-                            <ActionIcon
-                                icon={isQueryBuilderExpanded ? 'arrowUpS' : 'arrowDownS'}
-                                iconProps={{
-                                    size: 'md',
-                                }}
-                                onClick={handleToggleExpand}
-                                size="xs"
-                            />
-                            <Text>{t('form.queryEditor.title', { postProcess: 'titleCase' })}</Text>
-                        </Group>
-                        {isQueryBuilderExpanded && (
-                            <PlaylistQueryBuilder
-                                isSaving={createPlaylistMutation?.isPending}
-                                key={JSON.stringify(detailQuery?.data?.rules)}
-                                limit={detailQuery?.data?.rules?.limit}
-                                onSave={handleSave}
-                                onSaveAs={handleSaveAs}
-                                playlistId={playlistId}
-                                query={detailQuery?.data?.rules}
-                                sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
-                                sortOrder={detailQuery?.data?.rules?.order || 'asc'}
-                            />
-                        )}
-                    </Box>
-                </motion.div>
-            )}
-            {/* <PlaylistDetailSongListContent songs={filterSortedSongs} tableRef={tableRef} /> */}
+                {(isSmartPlaylist || showQueryBuilder) && (
+                    <motion.div>
+                        <Box h="100%" mah="35vh" p="md" w="100%">
+                            <Group pb="md">
+                                <ActionIcon
+                                    icon={isQueryBuilderExpanded ? 'arrowUpS' : 'arrowDownS'}
+                                    iconProps={{
+                                        size: 'md',
+                                    }}
+                                    onClick={handleToggleExpand}
+                                    size="xs"
+                                />
+                                <Text>
+                                    {t('form.queryEditor.title', { postProcess: 'titleCase' })}
+                                </Text>
+                            </Group>
+                            {isQueryBuilderExpanded && (
+                                <PlaylistQueryBuilder
+                                    isSaving={createPlaylistMutation?.isPending}
+                                    key={JSON.stringify(detailQuery?.data?.rules)}
+                                    limit={detailQuery?.data?.rules?.limit}
+                                    onSave={handleSave}
+                                    onSaveAs={handleSaveAs}
+                                    playlistId={playlistId}
+                                    query={detailQuery?.data?.rules}
+                                    sortBy={detailQuery?.data?.rules?.sort || SongListSort.ALBUM}
+                                    sortOrder={detailQuery?.data?.rules?.order || 'asc'}
+                                />
+                            )}
+                        </Box>
+                    </motion.div>
+                )}
+                {/* <PlaylistDetailSongListContent songs={filterSortedSongs} tableRef={tableRef} /> */}
+            </LibraryContainer>
         </AnimatedPage>
     );
 };

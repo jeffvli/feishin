@@ -5,6 +5,7 @@ import { NowPlayingHeader } from '/@/renderer/features/now-playing/components/no
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { ItemListKey } from '/@/shared/types/types';
 
 const NowPlayingRoute = () => {
@@ -13,14 +14,16 @@ const NowPlayingRoute = () => {
 
     return (
         <AnimatedPage>
-            <NowPlayingHeader />
-            <PlayQueueListControls
-                handleSearch={setSearch}
-                searchTerm={search}
-                tableRef={queueRef}
-                type={ItemListKey.QUEUE_SONG}
-            />
-            <PlayQueue listKey={ItemListKey.QUEUE_SONG} searchTerm={search} />
+            <LibraryContainer>
+                <NowPlayingHeader />
+                <PlayQueueListControls
+                    handleSearch={setSearch}
+                    searchTerm={search}
+                    tableRef={queueRef}
+                    type={ItemListKey.QUEUE_SONG}
+                />
+                <PlayQueue listKey={ItemListKey.QUEUE_SONG} searchTerm={search} />
+            </LibraryContainer>
         </AnimatedPage>
     );
 };

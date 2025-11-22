@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from 'react-router';
 import { ListContext } from '/@/renderer/context/list-context';
 import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { SongListContent } from '/@/renderer/features/songs/components/song-list-content';
 import { SongListHeader } from '/@/renderer/features/songs/components/song-list-header';
 import { useCurrentServer } from '/@/renderer/store';
@@ -73,8 +74,10 @@ const TrackListRoute = () => {
     return (
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
-                <SongListHeader title={title} />
-                <SongListContent />
+                <LibraryContainer>
+                    <SongListHeader title={title} />
+                    <SongListContent />
+                </LibraryContainer>
             </ListContext.Provider>
         </AnimatedPage>
     );

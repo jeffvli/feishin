@@ -4,6 +4,7 @@ import { useLocation, useParams } from 'react-router';
 import { SearchContent } from '/@/renderer/features/search/components/search-content';
 import { SearchHeader } from '/@/renderer/features/search/components/search-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 
 const SearchRoute = () => {
     const { state: locationState } = useLocation();
@@ -13,8 +14,10 @@ const SearchRoute = () => {
 
     return (
         <AnimatedPage key={`search-${navigationId}`}>
-            <SearchHeader navigationId={navigationId} />
-            <SearchContent key={`page-${itemType}`} />
+            <LibraryContainer>
+                <SearchHeader navigationId={navigationId} />
+                <SearchContent key={`page-${itemType}`} />
+            </LibraryContainer>
         </AnimatedPage>
     );
 };
