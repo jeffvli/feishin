@@ -85,12 +85,25 @@ export const useDeleteFavorite = (args: MutationHookArgs) => {
 
                     break;
                 }
+                case LibraryItem.PLAYLIST_SONG:
+                case LibraryItem.QUEUE_SONG:
                 case LibraryItem.SONG: {
-                    const queryKey = queryKeys.songs.detail(variables.apiClientProps.serverId);
+                    const songDetailQueryKey = queryKeys.songs.detail(
+                        variables.apiClientProps.serverId,
+                    );
 
                     queryClient.invalidateQueries({
                         exact: false,
-                        queryKey,
+                        queryKey: songDetailQueryKey,
+                    });
+
+                    const albumDetailQueryKey = queryKeys.albums.detail(
+                        variables.apiClientProps.serverId,
+                    );
+
+                    queryClient.invalidateQueries({
+                        exact: false,
+                        queryKey: albumDetailQueryKey,
                     });
 
                     break;
