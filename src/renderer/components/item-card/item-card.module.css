@@ -108,6 +108,10 @@
     }
 }
 
+.row.bold {
+    font-weight: 500;
+}
+
 .row.muted {
     color: var(--theme-colors-foreground-muted);
 }

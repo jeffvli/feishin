@@ -1082,11 +1082,13 @@ const ItemCardRow = ({
     return (
         <Text
             className={clsx(styles.row, alignmentClass, {
+                [styles.bold]: index === 0,
                 [styles.compact]: type === 'compact',
                 [styles.default]: type === 'default',
                 [styles.muted]: isMuted,
                 [styles.poster]: type === 'poster',
             })}
+            size={index > 0 ? 'sm' : 'md'}
         >
             {row.format(data)}
         </Text>
