@@ -19,6 +19,7 @@ import i18n from '/@/i18n/i18n';
 import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
 import { ActionsColumn } from '/@/renderer/components/item-list/item-table-list/columns/actions-column';
 import { AlbumArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-artists-column';
+import { AlbumColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-column';
 import { ArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/artists-column';
 import { CountColumn } from '/@/renderer/components/item-list/item-table-list/columns/count-column';
 import {
@@ -375,6 +376,9 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
         case TableColumn.ACTIONS:
         case TableColumn.SKIP:
             return <ActionsColumn {...props} {...dragProps} controls={controls} type={type} />;
+
+        case TableColumn.ALBUM:
+            return <AlbumColumn {...props} {...dragProps} controls={controls} type={type} />;
 
         case TableColumn.ALBUM_ARTIST:
             return <AlbumArtistsColumn {...props} {...dragProps} controls={controls} type={type} />;
