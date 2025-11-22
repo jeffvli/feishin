@@ -1,7 +1,7 @@
 .container {
     position: relative;
     width: 100%;
-    max-width: 1600px;
+    max-width: var(--theme-content-max-width);
     margin: 0 auto;
 }
 

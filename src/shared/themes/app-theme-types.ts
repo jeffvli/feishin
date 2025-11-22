@@ -11,6 +11,7 @@ export type AppThemeConfiguration = Partial<BaseAppThemeConfiguration>;
 
 export interface BaseAppThemeConfiguration {
     app: {
+        'content-max-width'?: CSSProperties['maxWidth'];
         'overlay-header'?: CSSProperties['background'];
         'overlay-subheader'?: CSSProperties['background'];
         'root-font-size'?: CSSProperties['fontSize'];

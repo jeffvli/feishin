@@ -2,6 +2,7 @@ import { AppThemeConfiguration } from './app-theme-types';
 
 export const defaultTheme: AppThemeConfiguration = {
     app: {
+        'content-max-width': '1600px',
         'overlay-header':
             'linear-gradient(transparent 0%, rgb(0 0 0 / 85%) 100%), var(--theme-background-noise)',
         'overlay-subheader':
