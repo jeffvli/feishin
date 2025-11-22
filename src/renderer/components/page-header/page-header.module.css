@@ -6,9 +6,6 @@
     height: 65px;
     pointer-events: none;
     opacity: 0;
-    transition:
-        opacity 0.2s ease-in-out,
-        visibility 0.2s ease-in-out;
 }
 
 .container[data-visible='true'] {
