@@ -10,6 +10,9 @@ import {
     WidePlayButton,
     WideShuffleButton,
 } from '/@/renderer/features/shared/components/play-button';
+import { useIsMutatingCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
+import { useIsMutatingDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
+import { useIsMutatingRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
@@ -149,6 +152,10 @@ export const LibraryHeaderMenu = ({
     onShuffle,
     rating,
 }: LibraryHeaderMenuProps) => {
+    const isMutatingRating = useIsMutatingRating();
+    const isMutatingCreateFavorite = useIsMutatingCreateFavorite();
+    const isMutatingDeleteFavorite = useIsMutatingDeleteFavorite();
+
     return (
         <div className={styles.libraryHeaderMenu}>
             <Group wrap="nowrap">
@@ -156,12 +163,20 @@ export const LibraryHeaderMenu = ({
                 {onShuffle && <WideShuffleButton onClick={onShuffle} />}
             </Group>
             <Group gap="sm" wrap="nowrap">
-                {onRating && <Rating onChange={onRating} size="lg" value={rating || 0} />}
+                {onRating && (
+                    <Rating
+                        onChange={onRating}
+                        readOnly={isMutatingRating}
+                        size="lg"
+                        value={rating || 0}
+                    />
+                )}
                 {onFavorite && (
                     <ActionIcon
+                        disabled={isMutatingCreateFavorite || isMutatingDeleteFavorite}
                         icon="favorite"
                         iconProps={{
-                            fill: favorite ? 'primary' : undefined,
+                            fill: favorite ? 'favorite' : undefined,
                         }}
                         onClick={onFavorite}
                         size="lg"

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useIsMutating, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import isElectron from 'is-electron';
 
@@ -6,23 +6,17 @@ import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
-import { useSetAlbumListItemDataById } from '/@/renderer/store';
 import { useFavoriteEvent } from '/@/renderer/store/event.store';
-import {
-    AlbumArtistDetailResponse,
-    AlbumDetailResponse,
-    FavoriteArgs,
-    FavoriteResponse,
-    LibraryItem,
-} from '/@/shared/types/domain-types';
+import { FavoriteArgs, FavoriteResponse, LibraryItem } from '/@/shared/types/domain-types';
 
 const remote = isElectron() ? window.api.remote : null;
+
+const createFavoriteQueryKey = ['set-favorite', true];
 
 export const useCreateFavorite = (args: MutationHookArgs) => {
     const { options } = args || {};
     const queryClient = useQueryClient();
-    const setAlbumListData = useSetAlbumListItemDataById();
-    // const setQueueFavorite = useSetQueueFavorite();
+
     const setFavoriteEvent = useFavoriteEvent();
 
     return useMutation<FavoriteResponse, AxiosError, FavoriteArgs, null>({
@@ -32,6 +26,7 @@ export const useCreateFavorite = (args: MutationHookArgs) => {
                 apiClientProps: { serverId: args.apiClientProps.serverId },
             });
         },
+        mutationKey: createFavoriteQueryKey,
         onError: (_error, variables) => {
             eventEmitter.emit('USER_FAVORITE', {
                 favorite: false,
@@ -51,56 +46,61 @@ export const useCreateFavorite = (args: MutationHookArgs) => {
             return null;
         },
         onSuccess: (_data, variables) => {
-            const { apiClientProps } = variables;
-            const serverId = apiClientProps.serverId;
-
-            if (!serverId) return;
-
-            for (const id of variables.query.id) {
-                // Set the userFavorite property to true for the album in the album list data store
-                if (variables.query.type === LibraryItem.ALBUM) {
-                    setAlbumListData(id, { userFavorite: true });
-                }
-            }
-
             if (variables.query.type === LibraryItem.SONG) {
-                remote?.updateFavorite(true, serverId, variables.query.id);
+                remote?.updateFavorite(true, variables.apiClientProps.serverId, variables.query.id);
                 // setQueueFavorite(variables.query.id, true);
                 setFavoriteEvent(variables.query.id, true);
             }
 
-            // We only need to set if we're already on the album detail page
-            if (variables.query.type === LibraryItem.ALBUM && variables.query.id.length === 1) {
-                const queryKey = queryKeys.albums.detail(serverId, { id: variables.query.id[0] });
-                const previous = queryClient.getQueryData<AlbumDetailResponse>(queryKey);
-
-                if (previous) {
-                    queryClient.setQueryData<AlbumDetailResponse>(queryKey, {
-                        ...previous,
-                        userFavorite: true,
+            switch (variables.query.type) {
+                case LibraryItem.ALBUM: {
+                    const queryKey = queryKeys.albums.detail(variables.apiClientProps.serverId);
+                    queryClient.invalidateQueries({
+                        exact: false,
+                        queryKey,
                     });
+
+                    break;
                 }
-            }
+                case LibraryItem.ALBUM_ARTIST: {
+                    const queryKey = queryKeys.albumArtists.detail(
+                        variables.apiClientProps.serverId,
+                    );
 
-            // We only need to set if we're already on the album detail page
-            if (
-                variables.query.type === LibraryItem.ALBUM_ARTIST &&
-                variables.query.id.length === 1
-            ) {
-                const queryKey = queryKeys.albumArtists.detail(serverId, {
-                    id: variables.query.id[0],
-                });
-
-                const previous = queryClient.getQueryData<AlbumArtistDetailResponse>(queryKey);
-
-                if (previous) {
-                    queryClient.setQueryData<AlbumArtistDetailResponse>(queryKey, {
-                        ...previous,
-                        userFavorite: true,
+                    queryClient.invalidateQueries({
+                        exact: false,
+                        queryKey,
                     });
+
+                    break;
+                }
+                case LibraryItem.ARTIST: {
+                    const queryKey = queryKeys.artists.detail(variables.apiClientProps.serverId);
+
+                    queryClient.invalidateQueries({
+                        exact: false,
+                        queryKey,
+                    });
+
+                    break;
+                }
+                case LibraryItem.SONG: {
+                    const queryKey = queryKeys.songs.detail(variables.apiClientProps.serverId);
+
+                    queryClient.invalidateQueries({
+                        exact: false,
+                        queryKey,
+                    });
+
+                    break;
                 }
             }
         },
         ...options,
     });
+};
+
+export const useIsMutatingCreateFavorite = () => {
+    const mutatingCount = useIsMutating({ mutationKey: createFavoriteQueryKey });
+    return mutatingCount > 0;
 };
