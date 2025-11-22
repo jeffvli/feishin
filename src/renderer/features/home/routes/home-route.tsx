@@ -7,6 +7,7 @@ import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/nati
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import {
     HomeItem,
@@ -115,34 +116,36 @@ const HomeRoute = () => {
                 }}
                 ref={scrollAreaRef}
             >
-                <Stack
-                    gap="lg"
-                    mb="5rem"
-                    pt={windowBarStyle === Platform.WEB ? '5rem' : '3rem'}
-                    px="2rem"
-                >
-                    {homeFeature && <FeatureCarousel data={featureItemsWithImage} />}
-                    {sortedCarousel.map((carousel) => {
-                        if (carousel.itemType === LibraryItem.ALBUM) {
-                            return (
-                                <AlbumInfiniteCarousel
-                                    key={`carousel-${carousel.uniqueId}`}
-                                    rowCount={1}
-                                    sortBy={carousel.sortBy}
-                                    sortOrder={carousel.sortOrder}
-                                    title={carousel.title}
-                                />
-                            );
-                        }
+                <LibraryContainer>
+                    <Stack
+                        gap="lg"
+                        mb="5rem"
+                        pt={windowBarStyle === Platform.WEB ? '5rem' : '3rem'}
+                        px="2rem"
+                    >
+                        {homeFeature && <FeatureCarousel data={featureItemsWithImage} />}
+                        {sortedCarousel.map((carousel) => {
+                            if (carousel.itemType === LibraryItem.ALBUM) {
+                                return (
+                                    <AlbumInfiniteCarousel
+                                        key={`carousel-${carousel.uniqueId}`}
+                                        rowCount={1}
+                                        sortBy={carousel.sortBy}
+                                        sortOrder={carousel.sortOrder}
+                                        title={carousel.title}
+                                    />
+                                );
+                            }
 
-                        if ('data' in carousel && 'query' in carousel) {
-                            // TODO: Create SongInfiniteCarousel
+                            if ('data' in carousel && 'query' in carousel) {
+                                // TODO: Create SongInfiniteCarousel
+                                return null;
+                            }
+
                             return null;
-                        }
-
-                        return null;
-                    })}
-                </Stack>
+                        })}
+                    </Stack>
+                </LibraryContainer>
             </NativeScrollArea>
         </AnimatedPage>
     );

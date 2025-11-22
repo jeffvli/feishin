@@ -45,16 +45,19 @@ interface FeatureCarouselProps {
 
 const getItemsPerRow = (breakpoints: {
     is2xl: boolean;
+    is3xl: boolean;
     isLg: boolean;
     isMd: boolean;
     isSm: boolean;
     isXl: boolean;
 }) => {
+    if (breakpoints.is3xl) return 6;
     if (breakpoints.is2xl) return 5;
     if (breakpoints.isXl) return 5;
     if (breakpoints.isLg) return 4;
     if (breakpoints.isMd) return 3;
-    return 1;
+    if (breakpoints.isSm) return 2;
+    return 2;
 };
 
 interface CarouselItemProps {
@@ -143,6 +146,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
     const [startIndex, setStartIndex] = useState(0);
     const {
         is2xl,
+        is3xl,
         isLg,
         isMd,
         isSm,
@@ -150,6 +154,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
         ref: containerRef,
     } = useContainerQuery({
         '2xl': 1920,
+        '3xl': 2560,
         lg: 1024,
         md: 768,
         sm: 640,
@@ -157,8 +162,8 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
     });
 
     const itemsPerRow = useMemo(
-        () => getItemsPerRow({ is2xl, isLg, isMd, isSm, isXl }),
-        [is2xl, isLg, isMd, isSm, isXl],
+        () => getItemsPerRow({ is2xl, is3xl, isLg, isMd, isSm, isXl }),
+        [is2xl, is3xl, isLg, isMd, isSm, isXl],
     );
 
     const visibleItems = useMemo(() => {
@@ -198,6 +203,7 @@ export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
                     exit="exit"
                     initial="enter"
                     key={`carousel-${startIndex}`}
+                    style={{ '--items-per-row': itemsPerRow } as React.CSSProperties}
                     variants={fadeVariants}
                 >
                     {visibleItems.map((album) => (
