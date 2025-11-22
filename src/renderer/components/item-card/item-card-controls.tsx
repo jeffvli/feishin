@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { motion } from 'motion/react';
-import { MouseEvent } from 'react';
+import { memo, MouseEvent, useMemo } from 'react';
 
 import styles from './item-card-controls.module.css';
 
@@ -50,6 +50,134 @@ const containerProps = {
     },
 };
 
+const createPlayHandler =
+    (
+        controls: ItemControls | undefined,
+        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+        internalState: ItemListStateActions | undefined,
+        itemType: LibraryItem,
+        playType: Play,
+    ) =>
+    (e: MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (!item) {
+            return;
+        }
+
+        controls?.onPlay?.({
+            event: e,
+            internalState,
+            item,
+            itemType,
+            playType,
+        });
+    };
+
+const createFavoriteHandler =
+    (
+        controls: ItemControls | undefined,
+        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+        internalState: ItemListStateActions | undefined,
+        itemType: LibraryItem,
+    ) =>
+    (e: MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (!item) {
+            return;
+        }
+
+        const newFavorite = !(item as { userFavorite: boolean }).userFavorite;
+        controls?.onFavorite?.({
+            event: e,
+            favorite: newFavorite,
+            internalState,
+            item,
+            itemType,
+        });
+    };
+
+const createRatingChangeHandler =
+    (
+        controls: ItemControls | undefined,
+        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+        internalState: ItemListStateActions | undefined,
+        itemType: LibraryItem,
+    ) =>
+    (rating: number) => {
+        if (!item) {
+            return;
+        }
+
+        let newRating = rating;
+
+        if (rating === (item as { userRating: number }).userRating) {
+            newRating = 0;
+        }
+
+        controls?.onRating?.({
+            event: null,
+            internalState,
+            item,
+            itemType,
+            rating: newRating,
+        });
+    };
+
+const ratingClickHandler = (e: MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+};
+
+const ratingMouseDownHandler = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+};
+
+const moreDoubleClickHandler = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+};
+
+const createMoreHandler =
+    (
+        controls: ItemControls | undefined,
+        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+        internalState: ItemListStateActions | undefined,
+        itemType: LibraryItem,
+    ) =>
+    (e: MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
+        controls?.onMore?.({
+            event: e,
+            internalState,
+            item,
+            itemType,
+        });
+    };
+
+const createExpandHandler =
+    (
+        controls: ItemControls | undefined,
+        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+        internalState: ItemListStateActions | undefined,
+        itemType: LibraryItem,
+    ) =>
+    (e: MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
+        controls?.onExpand?.({
+            event: e,
+            internalState,
+            item,
+            itemType,
+        });
+    };
+
 export const ItemCardControls = ({
     controls,
     enableExpansion,
@@ -60,65 +188,65 @@ export const ItemCardControls = ({
 }: ItemCardControlsProps) => {
     const isPlayerFetching = useIsPlayerFetching();
 
+    const playNowHandler = useMemo(
+        () => createPlayHandler(controls, item, internalState, itemType, Play.NOW),
+        [controls, item, internalState, itemType],
+    );
+
+    const playNextHandler = useMemo(
+        () => createPlayHandler(controls, item, internalState, itemType, Play.NEXT),
+        [controls, item, internalState, itemType],
+    );
+
+    const playLastHandler = useMemo(
+        () => createPlayHandler(controls, item, internalState, itemType, Play.LAST),
+        [controls, item, internalState, itemType],
+    );
+
+    const favoriteHandler = useMemo(
+        () => createFavoriteHandler(controls, item, internalState, itemType),
+        [controls, item, internalState, itemType],
+    );
+
+    const ratingChangeHandler = useMemo(
+        () => createRatingChangeHandler(controls, item, internalState, itemType),
+        [controls, item, internalState, itemType],
+    );
+
+    const moreHandler = useMemo(
+        () => createMoreHandler(controls, item, internalState, itemType),
+        [controls, item, internalState, itemType],
+    );
+
+    const expandHandler = useMemo(
+        () => createExpandHandler(controls, item, internalState, itemType),
+        [controls, item, internalState, itemType],
+    );
+
+    const isFavorite = (item as { userFavorite?: boolean })?.userFavorite ?? false;
+
+    const favoriteIconProps = useMemo<Partial<IconProps>>(
+        () => ({
+            color: isFavorite ? ('primary' as const) : ('default' as const),
+            fill: isFavorite ? ('primary' as const) : undefined,
+        }),
+        [isFavorite],
+    );
+
     return (
         <motion.div className={clsx(styles.container)} {...containerProps[type]}>
             {controls?.onPlay && (
                 <>
-                    <PlayButton
-                        disabled={isPlayerFetching}
-                        onClick={(e) => {
-                            e.stopPropagation();
-
-                            if (!item) {
-                                return;
-                            }
-
-                            controls?.onPlay?.({
-                                event: e,
-                                internalState,
-                                item,
-                                itemType,
-                                playType: Play.NOW,
-                            });
-                        }}
-                    />
+                    <PlayButton disabled={isPlayerFetching} onClick={playNowHandler} />
                     <SecondaryPlayButton
                         className={styles.left}
                         icon="mediaPlayNext"
-                        onClick={(e) => {
-                            e.stopPropagation();
-
-                            if (!item) {
-                                return;
-                            }
-
-                            controls?.onPlay?.({
-                                event: e,
-                                internalState,
-                                item,
-                                itemType,
-                                playType: Play.NEXT,
-                            });
-                        }}
+                        onClick={playNextHandler}
                     />
                     <SecondaryPlayButton
                         className={styles.right}
                         icon="mediaPlayLast"
-                        onClick={(e) => {
-                            e.stopPropagation();
-
-                            if (!item) {
-                                return;
-                            }
-
-                            controls?.onPlay?.({
-                                event: e,
-                                internalState,
-                                item,
-                                itemType,
-                                playType: Play.LAST,
-                            });
-                        }}
+                        onClick={playLastHandler}
                     />
                 </>
             )}
@@ -126,57 +254,16 @@ export const ItemCardControls = ({
                 <SecondaryButton
                     className={styles.favorite}
                     icon="favorite"
-                    iconProps={{
-                        color: (item as { userFavorite: boolean }).userFavorite
-                            ? 'primary'
-                            : 'default',
-                        fill: (item as { userFavorite: boolean }).userFavorite
-                            ? 'primary'
-                            : undefined,
-                    }}
-                    onClick={(e) => {
-                        e.stopPropagation();
-
-                        if (!item) {
-                            return;
-                        }
-
-                        const newFavorite = !(item as { userFavorite: boolean }).userFavorite;
-                        controls?.onFavorite?.({
-                            event: e,
-                            favorite: newFavorite,
-                            internalState,
-                            item,
-                            itemType,
-                        });
-                    }}
+                    iconProps={favoriteIconProps}
+                    onClick={favoriteHandler}
                 />
             )}
             {controls?.onRating && (
                 <Rating
                     className={styles.rating}
-                    onChange={(rating) => {
-                        if (!item) {
-                            return;
-                        }
-
-                        let newRating = rating;
-
-                        if (rating === (item as { userRating: number }).userRating) {
-                            newRating = 0;
-                        }
-
-                        controls?.onRating?.({
-                            event: null,
-                            internalState,
-                            item,
-                            itemType,
-                            rating: newRating,
-                        });
-                    }}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
+                    onChange={ratingChangeHandler}
+                    onClick={ratingClickHandler}
+                    onMouseDown={ratingMouseDownHandler}
                     size="xs"
                 />
             )}
@@ -184,90 +271,92 @@ export const ItemCardControls = ({
                 <SecondaryButton
                     className={styles.options}
                     icon="ellipsisHorizontal"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        controls?.onMore?.({
-                            event: e,
-                            internalState,
-                            item,
-                            itemType,
-                        });
-                    }}
-                    onDoubleClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                    }}
+                    onClick={moreHandler}
+                    onDoubleClick={moreDoubleClickHandler}
                 />
             )}
             {controls?.onExpand && enableExpansion && (
                 <SecondaryButton
                     className={styles.expand}
                     icon="arrowDownS"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        controls?.onExpand?.({
-                            event: e,
-                            internalState,
-                            item,
-                            itemType,
-                        });
-                    }}
+                    onClick={expandHandler}
                 />
             )}
         </motion.div>
     );
 };
 
-const PlayButton = ({
-    disabled,
-    loading,
-    onClick,
-}: {
-    disabled?: boolean;
-    loading?: boolean;
-    onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
-}) => {
-    return (
-        <button
-            className={clsx(styles.playButton, styles.primary, {
-                [styles.disabled]: disabled,
-            })}
-            disabled={disabled}
-            onClick={(e) => {
-                e.stopPropagation();
-                if (disabled || loading) {
-                    return;
-                }
-                onClick?.(e);
-            }}
-        >
-            <Icon icon="mediaPlay" size="lg" />
-        </button>
-    );
-};
+const PlayButton = memo(
+    ({
+        disabled,
+        loading,
+        onClick,
+    }: {
+        disabled?: boolean;
+        loading?: boolean;
+        onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
+    }) => {
+        const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (disabled || loading) {
+                return;
+            }
+            onClick?.(e);
+        };
 
-const SecondaryPlayButton = ({
-    className,
-    icon,
-    onClick,
-}: {
-    className?: string;
-    icon: keyof typeof AppIcon;
-    onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
-}) => {
-    return (
-        <button
-            className={clsx(styles.playButton, styles.secondary, className)}
-            onClick={(e) => {
-                e.stopPropagation();
-                onClick?.(e);
-            }}
-        >
-            <Icon icon={icon} size="lg" />
-        </button>
-    );
-};
+        const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            e.preventDefault();
+        };
+
+        return (
+            <button
+                className={clsx(styles.playButton, styles.primary, {
+                    [styles.disabled]: disabled,
+                })}
+                disabled={disabled}
+                onClick={handleClick}
+                onMouseDown={handleMouseDown}
+            >
+                <Icon icon="mediaPlay" size="lg" />
+            </button>
+        );
+    },
+);
+
+const SecondaryPlayButton = memo(
+    ({
+        className,
+        icon,
+        onClick,
+    }: {
+        className?: string;
+        icon: keyof typeof AppIcon;
+        onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
+    }) => {
+        const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onClick?.(e);
+        };
+
+        const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            e.preventDefault();
+        };
+
+        return (
+            <button
+                className={clsx(styles.playButton, styles.secondary, className)}
+                onClick={handleClick}
+                onMouseDown={handleMouseDown}
+            >
+                <Icon icon={icon} size="lg" />
+            </button>
+        );
+    },
+);
 
 interface SecondaryButtonProps {
     className?: string;
@@ -275,31 +364,43 @@ interface SecondaryButtonProps {
     onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
 }
 
-const SecondaryButton = ({
-    className,
-    icon,
-    iconProps,
-    onClick,
-    onDoubleClick,
-}: SecondaryButtonProps & {
-    iconProps?: Partial<IconProps>;
-    onDoubleClick?: (e: MouseEvent<HTMLButtonElement>) => void;
-}) => {
-    return (
-        <button
-            className={clsx(styles.secondaryButton, className)}
-            onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                onClick?.(e);
-            }}
-            onDoubleClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                onDoubleClick?.(e);
-            }}
-        >
-            <Icon icon={icon} size="lg" {...iconProps} />
-        </button>
-    );
-};
+const SecondaryButton = memo(
+    ({
+        className,
+        icon,
+        iconProps,
+        onClick,
+        onDoubleClick,
+    }: SecondaryButtonProps & {
+        iconProps?: Partial<IconProps>;
+        onDoubleClick?: (e: MouseEvent<HTMLButtonElement>) => void;
+    }) => {
+        const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onClick?.(e);
+        };
+
+        const handleDoubleClick = (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onDoubleClick?.(e);
+        };
+
+        const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            e.preventDefault();
+        };
+
+        return (
+            <button
+                className={clsx(styles.secondaryButton, className)}
+                onClick={handleClick}
+                onDoubleClick={handleDoubleClick}
+                onMouseDown={handleMouseDown}
+            >
+                <Icon icon={icon} size="lg" {...iconProps} />
+            </button>
+        );
+    },
+);
