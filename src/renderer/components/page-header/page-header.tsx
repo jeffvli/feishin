@@ -37,7 +37,7 @@ const variants: Variants = {
 
 export const PageHeader = ({
     animated,
-    backgroundColor = 'var(--theme-colors-background)',
+    backgroundColor,
     children,
     height,
     isHidden,
@@ -134,8 +134,8 @@ export const PageHeader = ({
                         />
                         <div
                             className={clsx(styles.backgroundImageOverlay, {
-                                [styles.dark]: mode === 'dark',
-                                [styles.light]: mode === 'light',
+                                [styles.dark]: backgroundColor && mode === 'dark',
+                                [styles.light]: backgroundColor && mode === 'light',
                             })}
                         />
                     </>
