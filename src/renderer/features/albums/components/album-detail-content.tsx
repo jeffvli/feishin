@@ -507,7 +507,6 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                 }).length;
 
                 const isAllSelected = selectedCount === groupItems.length;
-                const isSomeSelected = selectedCount > 0 && selectedCount < groupItems.length;
 
                 const handleCheckboxChange = () => {
                     const selectableItems = groupItems;
@@ -544,7 +543,6 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                         <Checkbox
                             checked={isAllSelected}
                             id={`disc-${discGroup.discNumber}`}
-                            indeterminate={isSomeSelected}
                             label={
                                 <Text component="label" size="sm" truncate>
                                     {t('common.disc', { postProcess: 'sentenceCase' })}{' '}
