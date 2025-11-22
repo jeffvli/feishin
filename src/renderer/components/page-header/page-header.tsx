@@ -1,6 +1,7 @@
 import clsx from 'clsx';
+import { useInView } from 'motion/react';
 import { AnimatePresence, motion, Variants } from 'motion/react';
-import { CSSProperties, ReactNode, useRef } from 'react';
+import { CSSProperties, ReactNode, RefObject, useEffect, useRef } from 'react';
 
 import styles from './page-header.module.css';
 
@@ -18,6 +19,8 @@ export interface PageHeaderProps
     height?: string;
     isHidden?: boolean;
     position?: string;
+    scrollContainerRef?: RefObject<HTMLDivElement | null>;
+    target?: RefObject<HTMLElement | null>;
 }
 
 const variants: Variants = {
@@ -39,6 +42,8 @@ export const PageHeader = ({
     height,
     isHidden,
     position,
+    scrollContainerRef,
+    target,
     ...props
 }: PageHeaderProps) => {
     const ref = useRef(null);
@@ -46,10 +51,56 @@ export const PageHeader = ({
     const { windowBarStyle } = useWindowSettings();
     const { mode } = useAppTheme();
 
+    const isInView = useInView({
+        current: target?.current || null,
+    });
+
+    useEffect(() => {
+        const headerElement = ref.current as HTMLElement | null;
+        const scrollContainer = scrollContainerRef?.current;
+
+        if (!scrollContainerRef) {
+            if (headerElement) {
+                headerElement.setAttribute('data-visible', isHidden ? 'false' : 'true');
+            }
+            return undefined;
+        }
+
+        if (!scrollContainer || !headerElement) {
+            if (headerElement) {
+                headerElement.setAttribute('data-visible', 'false');
+            }
+            return undefined;
+        }
+
+        const updateVisibility = () => {
+            const dataScrolled = scrollContainer.getAttribute('data-scrolled');
+            const isScrolled = dataScrolled === 'true';
+            const shouldShow = isScrolled && !isInView;
+
+            if (shouldShow) {
+                headerElement.setAttribute('data-visible', 'true');
+            } else {
+                headerElement.setAttribute('data-visible', 'false');
+            }
+        };
+
+        updateVisibility();
+
+        const observer = new MutationObserver(updateVisibility);
+        observer.observe(scrollContainer, {
+            attributeFilter: ['data-scrolled'],
+            attributes: true,
+        });
+
+        return () => observer.disconnect();
+    }, [isInView, scrollContainerRef, isHidden]);
+
     return (
         <>
             <Flex
                 className={styles.container}
+                data-visible="false"
                 ref={ref}
                 style={{ height, position: position as CSSProperties['position'] }}
                 {...props}
