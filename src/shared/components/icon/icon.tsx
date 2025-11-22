@@ -247,6 +247,7 @@ type IconColor =
     | 'contrast'
     | 'default'
     | 'error'
+    | 'favorite'
     | 'info'
     | 'inherit'
     | 'muted'

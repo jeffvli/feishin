@@ -62,6 +62,10 @@
     color: var(--theme-colors-state-warn);
 }
 
+.color-favorite {
+    color: rgb(255 49 49);
+}
+
 .fill {
     fill: transparent;
 }
@@ -100,6 +104,10 @@
 
 .fill-warn {
     fill: var(--theme-colors-state-warn);
+}
+
+.fill-favorite {
+    fill: rgb(255 49 49);
 }
 
 .spin {
