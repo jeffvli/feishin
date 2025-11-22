@@ -168,7 +168,7 @@ const DummyAlbumDetailRoute = () => {
                             <ActionIcon
                                 icon="favorite"
                                 iconProps={{
-                                    fill: detailQuery?.data?.userFavorite ? 'favorite' : undefined,
+                                    fill: detailQuery?.data?.userFavorite ? 'primary' : undefined,
                                 }}
                                 loading={
                                     createFavoriteMutation.isPending ||

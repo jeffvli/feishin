@@ -69,7 +69,7 @@ export const MobileFullscreenPlayerMetadata = memo(
                     <ActionIcon
                         icon="favorite"
                         iconProps={{
-                            fill: isFavorite ? 'favorite' : undefined,
+                            fill: isFavorite ? 'primary' : undefined,
                             size: 'md',
                         }}
                         onClick={onToggleFavorite}

@@ -109,7 +109,7 @@ export const ItemDetail = ({ data, itemType, onClick, withControls }: ItemDetail
                             <ActionIcon
                                 icon="favorite"
                                 iconProps={{
-                                    fill: data?.userFavorite ? 'favorite' : 'default',
+                                    fill: data?.userFavorite ? 'primary' : 'default',
                                 }}
                                 size="xs"
                             />

@@ -128,10 +128,10 @@ export const ItemCardControls = ({
                     icon="favorite"
                     iconProps={{
                         color: (item as { userFavorite: boolean }).userFavorite
-                            ? 'favorite'
+                            ? 'primary'
                             : 'default',
                         fill: (item as { userFavorite: boolean }).userFavorite
-                            ? 'favorite'
+                            ? 'primary'
                             : undefined,
                     }}
                     onClick={(e) => {
