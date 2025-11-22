@@ -1246,6 +1246,21 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return totalRecordCount;
     },
+    getStreamUrl: ({ apiClientProps: { server }, query }) => {
+        const { bitrate, format, id, transcode } = query;
+        let url = `${server?.url}/rest/stream.view?id=${id}&v=1.13.0&c=Feishin&${server?.credential}`;
+
+        if (transcode) {
+            if (format) {
+                url += `&format=${format}`;
+            }
+            if (bitrate !== undefined) {
+                url += `&maxBitRate=${bitrate}`;
+            }
+        }
+
+        return url;
+    },
     getStructuredLyrics: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -1310,18 +1325,6 @@ export const SubsonicController: InternalControllerEndpoint = {
             startIndex: 0,
             totalRecordCount: res.body.topSongs?.song?.length || 0,
         };
-    },
-    getTranscodingUrl: (args) => {
-        const { base, bitrate, format } = args.query;
-        let url = base;
-        if (format) {
-            url += `&format=${format}`;
-        }
-        if (bitrate !== undefined) {
-            url += `&maxBitRate=${bitrate}`;
-        }
-
-        return url;
     },
     removeFromPlaylist: async ({ apiClientProps, query }) => {
         const res = await ssApiClient(apiClientProps).updatePlaylist({

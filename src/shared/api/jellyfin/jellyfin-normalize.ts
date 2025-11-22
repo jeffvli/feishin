@@ -13,30 +13,6 @@ import {
 } from '/@/shared/types/domain-types';
 import { ServerListItem, ServerType } from '/@/shared/types/types';
 
-const getStreamUrl = (args: {
-    container?: string;
-    deviceId: string;
-    eTag?: string;
-    id: string;
-    mediaSourceId?: string;
-    server: null | ServerListItem;
-}) => {
-    const { deviceId, id, server } = args;
-
-    return (
-        `${server?.url}/audio` +
-        `/${id}/universal` +
-        `?userId=${server?.userId}` +
-        `&deviceId=${deviceId}` +
-        '&audioCodec=aac' +
-        `&apiKey=${server?.credential}` +
-        `&playSessionId=${deviceId}` +
-        '&container=opus,mp3,aac,m4a,m4b,flac,wav,ogg' +
-        '&transcodingContainer=ts' +
-        '&transcodingProtocol=http'
-    );
-};
-
 const getAlbumArtistCoverArtUrl = (args: {
     baseUrl: string;
     item: z.infer<typeof jfType._response.albumArtist>;
@@ -182,7 +158,6 @@ const getTags = (item: AlbumOrSong): null | Record<string, string[]> => {
 const normalizeSong = (
     item: z.infer<typeof jfType._response.song>,
     server: null | ServerListItem,
-    deviceId: string,
     imageSize?: number,
 ): Song => {
     let bitRate = 0;
@@ -191,7 +166,6 @@ const normalizeSong = (
     let path: null | string = null;
     let sampleRate: null | number = null;
     let size = 0;
-    let streamUrl = '';
 
     if (item.MediaSources?.length) {
         const source = item.MediaSources[0];
@@ -199,15 +173,6 @@ const normalizeSong = (
         container = source.Container;
         path = source.Path;
         size = source.Size;
-
-        streamUrl = getStreamUrl({
-            container: container,
-            deviceId,
-            eTag: source.ETag,
-            id: item.Id,
-            mediaSourceId: source.Id,
-            server,
-        });
 
         if ((source.MediaStreams?.length || 0) > 0) {
             for (const stream of source.MediaStreams) {
@@ -294,7 +259,6 @@ const normalizeSong = (
         releaseYear: item.ProductionYear || null,
         sampleRate,
         size,
-        streamUrl,
         tags: getTags(item),
         trackNumber: item.IndexNumber,
         updatedAt: item.DateCreated,
@@ -357,7 +321,7 @@ const normalizeAlbum = (
         releaseYear: item.ProductionYear || null,
         size: null,
         songCount: item?.ChildCount || null,
-        songs: item.Songs?.map((song) => normalizeSong(song, server, '', imageSize)),
+        songs: item.Songs?.map((song) => normalizeSong(song, server, imageSize)),
         tags: getTags(item),
         updatedAt: item?.DateLastMediaAdded || item.DateCreated,
         userFavorite: item.UserData?.IsFavorite || false,

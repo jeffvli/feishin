@@ -514,6 +514,20 @@ export const controller: GeneralController = {
             query: mergeMusicFolderId(args.query, server),
         });
     },
+    getStreamUrl(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getStreamUrl`,
+            );
+        }
+
+        return apiController(
+            'getStreamUrl',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
+    },
     getStructuredLyrics(args) {
         const server = getServerById(args.apiClientProps.serverId);
 
@@ -553,20 +567,6 @@ export const controller: GeneralController = {
 
         return apiController(
             'getTopSongs',
-            server.type,
-        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
-    },
-    getTranscodingUrl(args) {
-        const server = getServerById(args.apiClientProps.serverId);
-
-        if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getTranscodingUrl`,
-            );
-        }
-
-        return apiController(
-            'getTranscodingUrl',
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },

@@ -132,8 +132,6 @@ const normalizeSong = (
             size: size || 300,
         }) || null;
 
-    const streamUrl = `${server?.url}/rest/stream.view?id=${item.id}&v=1.13.0&c=Feishin&${server?.credential}`;
-
     return {
         _itemType: LibraryItem.SONG,
         _serverId: server?.id || 'unknown',
@@ -190,7 +188,6 @@ const normalizeSong = (
         releaseYear: item.year || null,
         sampleRate: item.samplingRate || null,
         size: item.size,
-        streamUrl,
         tags: null,
         trackNumber: item.track || 1,
         updatedAt: '',

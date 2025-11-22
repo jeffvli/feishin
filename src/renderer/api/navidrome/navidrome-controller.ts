@@ -605,6 +605,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             apiClientProps,
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
+    getStreamUrl: SubsonicController.getStreamUrl,
     getStructuredLyrics: SubsonicController.getStructuredLyrics,
     getTags: async (args) => {
         const { apiClientProps } = args;
@@ -646,7 +647,6 @@ export const NavidromeController: InternalControllerEndpoint = {
         };
     },
     getTopSongs: SubsonicController.getTopSongs,
-    getTranscodingUrl: SubsonicController.getTranscodingUrl,
     getUserList: async (args) => {
         const { apiClientProps, query } = args;
 

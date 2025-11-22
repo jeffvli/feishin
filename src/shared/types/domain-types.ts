@@ -370,7 +370,6 @@ export type Song = {
     releaseYear: null | number;
     sampleRate: null | number;
     size: number;
-    streamUrl: string;
     tags: null | Record<string, string[]>;
     trackNumber: number;
     updatedAt: string;
@@ -1224,10 +1223,10 @@ export type ControllerEndpoint = {
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
     getSongListCount: (args: SongListCountArgs) => Promise<number>;
+    getStreamUrl: (args: StreamArgs) => string;
     getStructuredLyrics?: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
     getTags?: (args: TagArgs) => Promise<TagResponses>;
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
-    getTranscodingUrl: (args: TranscodingArgs) => string;
     getUserList?: (args: UserListArgs) => Promise<UserListResponse>;
     movePlaylistItem?: (args: MoveItemArgs) => Promise<void>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
@@ -1314,12 +1313,12 @@ export type InternalControllerEndpoint = {
     getSongDetail: (args: ReplaceApiClientProps<SongDetailArgs>) => Promise<SongDetailResponse>;
     getSongList: (args: ReplaceApiClientProps<SongListArgs>) => Promise<SongListResponse>;
     getSongListCount: (args: ReplaceApiClientProps<SongListCountArgs>) => Promise<number>;
+    getStreamUrl: (args: ReplaceApiClientProps<StreamArgs>) => string;
     getStructuredLyrics?: (
         args: ReplaceApiClientProps<StructuredLyricsArgs>,
     ) => Promise<StructuredLyric[]>;
     getTags?: (args: ReplaceApiClientProps<TagArgs>) => Promise<TagResponses>;
     getTopSongs: (args: ReplaceApiClientProps<TopSongListArgs>) => Promise<TopSongListResponse>;
-    getTranscodingUrl: (args: ReplaceApiClientProps<TranscodingArgs>) => string;
     getUserList?: (args: ReplaceApiClientProps<UserListArgs>) => Promise<UserListResponse>;
     movePlaylistItem?: (args: ReplaceApiClientProps<MoveItemArgs>) => Promise<void>;
     removeFromPlaylist: (
@@ -1380,6 +1379,17 @@ export type SimilarSongsQuery = {
     songId: string;
 };
 
+export type StreamArgs = BaseEndpointArgs & {
+    query: StreamQuery;
+};
+
+export type StreamQuery = {
+    bitrate?: number;
+    format?: string;
+    id: string;
+    transcode: boolean;
+};
+
 export type StructuredLyric = (StructuredSyncedLyric | StructuredUnsyncedLyric) & {
     lang: string;
 };
@@ -1415,16 +1425,6 @@ export type TagQuery = {
 export type TagResponses = {
     boolTags?: string[];
     enumTags?: Tag[];
-};
-
-export type TranscodingArgs = BaseEndpointArgs & {
-    query: TranscodingQuery;
-};
-
-export type TranscodingQuery = {
-    base: string;
-    bitrate?: number;
-    format?: string;
 };
 
 type BaseEndpointArgsWithServer = {

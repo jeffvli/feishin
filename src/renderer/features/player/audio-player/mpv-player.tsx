@@ -5,7 +5,9 @@ import { MpvPlayerEngine, MpvPlayerEngineHandle } from './engine/mpv-player-engi
 
 import { useMainPlayerListener } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
+import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import {
+    usePlaybackSettings,
     usePlayerActions,
     usePlayerData,
     usePlayerMuted,
@@ -26,6 +28,7 @@ export function MpvPlayer() {
     const { speed } = usePlayerProperties();
     const isMuted = usePlayerMuted();
     const volume = usePlayerVolume();
+    const { transcode } = usePlaybackSettings();
 
     const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(status);
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -132,12 +135,15 @@ export function MpvPlayer() {
 
     useMainPlayerListener();
 
+    const currentUrl = useSongUrl(currentSong, true, transcode);
+    const nextUrl = useSongUrl(nextSong, false, transcode);
+
     return (
         <MpvPlayerEngine
-            currentSrc={currentSong?.streamUrl}
+            currentSrc={currentUrl}
             isMuted={isMuted}
             isTransitioning={isTransitioning}
-            nextSrc={nextSong?.streamUrl}
+            nextSrc={nextUrl}
             onEnded={handleOnEnded}
             onProgress={onProgress}
             playerRef={playerRef}

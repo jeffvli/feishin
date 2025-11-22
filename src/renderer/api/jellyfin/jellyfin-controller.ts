@@ -552,7 +552,7 @@ export const JellyfinController: InternalControllerEndpoint = {
         }
 
         return {
-            items: res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server, '')),
+            items: res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server)),
             startIndex: 0,
             totalRecordCount: res.body.TotalRecordCount,
         };
@@ -602,7 +602,7 @@ export const JellyfinController: InternalControllerEndpoint = {
         }
 
         return {
-            items: res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server, '')),
+            items: res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server)),
             startIndex: 0,
             totalRecordCount: res.body.Items.length || 0,
         };
@@ -647,7 +647,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             if (res.status === 200 && res.body.Items.length) {
                 const results = res.body.Items.reduce<Song[]>((acc, song) => {
                     if (song.Id !== query.songId) {
-                        acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+                        acc.push(jfNormalize.song(song, apiClientProps.server));
                     }
 
                     return acc;
@@ -676,7 +676,7 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         return mix.body.Items.reduce<Song[]>((acc, song) => {
             if (song.Id !== query.songId) {
-                acc.push(jfNormalize.song(song, apiClientProps.server, ''));
+                acc.push(jfNormalize.song(song, apiClientProps.server));
             }
 
             return acc;
@@ -696,7 +696,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             throw new Error('Failed to get song detail');
         }
 
-        return jfNormalize.song(res.body, apiClientProps.server, '');
+        return jfNormalize.song(res.body, apiClientProps.server);
     },
     getSongList: async (args) => {
         const { apiClientProps, query } = args;
@@ -809,7 +809,7 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         return {
             items: items.map((item) =>
-                jfNormalize.song(item, apiClientProps.server, '', query.imageSize),
+                jfNormalize.song(item, apiClientProps.server, query.imageSize),
             ),
             startIndex: query.startIndex,
             totalRecordCount,
@@ -820,6 +820,34 @@ export const JellyfinController: InternalControllerEndpoint = {
             apiClientProps,
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
+    getStreamUrl: ({ apiClientProps: { server }, query }) => {
+        const { bitrate, format, id, transcode } = query;
+        const deviceId = '';
+
+        let url =
+            `${server?.url}/audio` +
+            `/${id}/universal` +
+            `?userId=${server?.userId}` +
+            `&deviceId=${deviceId}` +
+            '&audioCodec=aac' +
+            `&apiKey=${server?.credential}` +
+            `&playSessionId=${deviceId}` +
+            '&container=opus,mp3,aac,m4a,m4b,flac,wav,ogg' +
+            '&transcodingContainer=ts' +
+            '&transcodingProtocol=http';
+
+        if (transcode) {
+            if (format) {
+                url = url.replace('audioCodec=aac', `audioCodec=${format}`);
+                url = url.replace('transcodingContainer=ts', `transcodingContainer=${format}`);
+            }
+            if (bitrate !== undefined) {
+                url += `&maxStreamingBitrate=${bitrate * 1000}`;
+            }
+        }
+
+        return url;
+    },
     getTags: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -873,23 +901,10 @@ export const JellyfinController: InternalControllerEndpoint = {
         }
 
         return {
-            items: res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server, '')),
+            items: res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server)),
             startIndex: 0,
             totalRecordCount: res.body.TotalRecordCount,
         };
-    },
-    getTranscodingUrl: (args) => {
-        const { base, bitrate, format } = args.query;
-        let url = base.replace('transcodingProtocol=hls', 'transcodingProtocol=http');
-        if (format) {
-            url = url.replace('audioCodec=aac', `audioCodec=${format}`);
-            url = url.replace('transcodingContainer=ts', `transcodingContainer=${format}`);
-        }
-        if (bitrate !== undefined) {
-            url += `&maxStreamingBitrate=${bitrate * 1000}`;
-        }
-
-        return url;
     },
     movePlaylistItem: async (args) => {
         const { apiClientProps, query } = args;
@@ -1082,7 +1097,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                 jfNormalize.albumArtist(item, apiClientProps.server),
             ),
             albums: albums.map((item) => jfNormalize.album(item, apiClientProps.server)),
-            songs: songs.map((item) => jfNormalize.song(item, apiClientProps.server, '')),
+            songs: songs.map((item) => jfNormalize.song(item, apiClientProps.server)),
         };
     },
     updatePlaylist: async (args) => {

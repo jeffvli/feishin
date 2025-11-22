@@ -9,8 +9,10 @@ import {
 } from '/@/renderer/features/player/audio-player/engine/wavesurfer-player-engine';
 import { useMainPlayerListener } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
+import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
 import {
+    usePlaybackSettings,
     usePlayerActions,
     usePlayerData,
     usePlayerMuted,
@@ -29,6 +31,7 @@ export function WaveSurferPlayer() {
     const { crossfadeDuration, speed, transitionType } = usePlayerProperties();
     const isMuted = usePlayerMuted();
     const volume = usePlayerVolume();
+    const { transcode } = usePlaybackSettings();
 
     const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(status);
     const [isTransitioning, setIsTransitioning] = useState<boolean | string>(false);
@@ -229,6 +232,9 @@ export function WaveSurferPlayer() {
 
     useMainPlayerListener();
 
+    const player1Url = useSongUrl(player1, num === 1, transcode);
+    const player2Url = useSongUrl(player2, num === 2, transcode);
+
     return (
         <WaveSurferPlayerEngine
             isMuted={isMuted}
@@ -241,8 +247,8 @@ export function WaveSurferPlayer() {
             playerRef={playerRef}
             playerStatus={localPlayerStatus}
             speed={speed}
-            src1={player1?.streamUrl}
-            src2={player2?.streamUrl}
+            src1={player1Url}
+            src2={player2Url}
             volume={volume}
         />
     );

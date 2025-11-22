@@ -7,6 +7,7 @@ import { CustomPlayerbarSlider } from './playerbar-slider';
 import styles from './playerbar-waveform.module.css';
 
 import { api } from '/@/renderer/api';
+import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     BarAlign,
@@ -37,26 +38,7 @@ export const PlayerbarWaveform = () => {
 
     const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
 
-    // Get the stream URL with transcoding support
-    const streamUrl = useMemo(() => {
-        if (!currentSong?._serverId || !currentSong?.streamUrl) {
-            return null;
-        }
-
-        if (!transcode.enabled) {
-            return currentSong.streamUrl;
-        }
-
-        return api.controller.getTranscodingUrl({
-            apiClientProps: {
-                serverId: currentSong._serverId,
-            },
-            query: {
-                base: currentSong.streamUrl,
-                ...transcode,
-            },
-        });
-    }, [currentSong, transcode]);
+    const streamUrl = useSongUrl(currentSong, true, transcode);
 
     const primaryColor = usePrimaryColor();
 
