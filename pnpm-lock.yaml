@@ -71,9 +71,6 @@ importers:
       audiomotion-analyzer:
         specifier: ^4.5.1
         version: 4.5.1
-      auto-text-size:
-        specifier: ^0.2.3
-        version: 0.2.3(react@19.1.0)
       axios:
         specifier: ^1.13.2
         version: 1.13.2
@@ -2252,11 +2249,6 @@ packages:
 
   audiomotion-analyzer@4.5.1:
     resolution: {integrity: sha512-vEO5HgivsZa9ZhQDItSMjXD5+qsRu6rAEKzAmrg7HbOFeM4tPVrE/wxiRREWxzbGpuH9NZT4Ze+v95G1w/rRAA==}
-
-  auto-text-size@0.2.3:
-    resolution: {integrity: sha512-OycpKD8n5jxnNaOiAJoNr3BkBsxRzHHhFQk15rgsOYq+O9lsMSPLbVN7ZibxjTwT7bl6Y5jawOtZJxRWaoxdcQ==}
-    peerDependencies:
-      react: '*'
 
   available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
@@ -7969,10 +7961,6 @@ snapshots:
   atomically@1.7.0: {}
 
   audiomotion-analyzer@4.5.1: {}
-
-  auto-text-size@0.2.3(react@19.1.0):
-    dependencies:
-      react: 19.1.0
 
   available-typed-arrays@1.0.7:
     dependencies:

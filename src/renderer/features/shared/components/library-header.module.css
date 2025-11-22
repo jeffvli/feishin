@@ -98,19 +98,9 @@
 
 .title {
     display: flex;
-    align-items: center !important;
-    height: 150px;
-    margin: 0;
-    overflow: hidden;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
+    margin: var(--theme-spacing-sm) 0;
+    font-size: clamp(2rem, 3.5dvw, 3.25rem);
     line-height: 1.2;
-    color: var(--theme-colors-foreground);
-    -webkit-box-orient: vertical;
-
-    @container (min-width: $mantine-breakpoint-sm) {
-        height: 90px;
-    }
 }
 
 .library-header-menu {

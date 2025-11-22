@@ -1,5 +1,4 @@
 import { closeAllModals, openModal } from '@mantine/modals';
-import { AutoTextSize } from 'auto-text-size';
 import { forwardRef, ReactNode, Ref, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -120,11 +119,7 @@ export const LibraryHeader = forwardRef(
                         >
                             {itemTypeString()}
                         </Text>
-                        <h1 className={styles.title}>
-                            <AutoTextSize maxFontSizePx={72} mode="box">
-                                {title}
-                            </AutoTextSize>
-                        </h1>
+                        <h1 className={styles.title}>{title}</h1>
                         {children}
                     </div>
                 )}
