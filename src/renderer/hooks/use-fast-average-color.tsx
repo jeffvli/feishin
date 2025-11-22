@@ -1,5 +1,14 @@
-import { FastAverageColor } from 'fast-average-color';
+import { FastAverageColor, FastAverageColorIgnoredColor } from 'fast-average-color';
 import { useEffect, useRef, useState } from 'react';
+
+const ignoredColors: FastAverageColorIgnoredColor = [
+    [255, 255, 255, 255, 90], // White
+    [255, 255, 255, 255, 50], // Light gray
+    [255, 255, 255, 255, 30], // Very light gray
+    [255, 255, 255, 255, 10], // Very very light gray
+    [0, 0, 0, 255, 30], // Black
+    [0, 0, 0, 0, 40], // Transparent
+];
 
 export const getFastAverageColor = async (args: {
     algorithm?: 'dominant' | 'simple' | 'sqrt';
@@ -8,14 +17,7 @@ export const getFastAverageColor = async (args: {
     const fac = new FastAverageColor();
     const background = await fac.getColorAsync(args.src, {
         algorithm: args.algorithm || 'dominant',
-        ignoredColor: [
-            [255, 255, 255, 255, 90], // White
-            [255, 255, 255, 255, 50], // Light gray
-            [255, 255, 255, 255, 30], // Very light gray
-            [255, 255, 255, 255, 10], // Very very light gray
-            [0, 0, 0, 255, 30], // Black
-            [0, 0, 0, 0, 40], // Transparent
-        ],
+        ignoredColor: ignoredColors,
         mode: 'speed',
     });
 
@@ -52,11 +54,7 @@ export const useFastAverageColor = (args: {
             setIsLoading(true);
             fac.getColorAsync(src, {
                 algorithm: algorithm || 'dominant',
-                ignoredColor: [
-                    [255, 255, 255, 255, 90], // White
-                    [0, 0, 0, 255, 30], // Black
-                    [0, 0, 0, 0, 40], // Transparent
-                ],
+                ignoredColor: ignoredColors,
                 mode: 'speed',
             })
                 .then((color) => {
