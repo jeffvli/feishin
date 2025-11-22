@@ -1,31 +1,36 @@
 .root.xs {
     --rating-size: var(--theme-font-size-xs) !important;
 
-    padding: 0 var(--theme-spacing-xs);
+    padding-right: var(--theme-spacing-xs);
+    padding-left: var(--theme-spacing-xs);
 }
 
 .root.sm {
     --rating-size: var(--theme-font-size-sm) !important;
 
-    padding: 0 var(--theme-spacing-sm);
+    padding-right: var(--theme-spacing-sm);
+    padding-left: var(--theme-spacing-sm);
 }
 
 .root.md {
     --rating-size: var(--theme-font-size-md) !important;
 
-    padding: 0 var(--theme-spacing-md);
+    padding-right: var(--theme-spacing-md);
+    padding-left: var(--theme-spacing-md);
 }
 
 .root.lg {
     --rating-size: var(--theme-font-size-lg) !important;
 
-    padding: 0 var(--theme-spacing-md);
+    padding-right: var(--theme-spacing-md);
+    padding-left: var(--theme-spacing-md);
 }
 
 .root.xl {
     --rating-size: var(--theme-font-size-xl) !important;
 
-    padding: 0 var(--theme-spacing-md);
+    padding-right: var(--theme-spacing-md);
+    padding-left: var(--theme-spacing-md);
 }
 
 .symbol-body {
