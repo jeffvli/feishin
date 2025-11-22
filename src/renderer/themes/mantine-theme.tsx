@@ -53,10 +53,10 @@ const mantineTheme: MantineThemeOverride = createTheme({
         '4xl': rem('28px'),
         '5xl': rem('32px'),
         lg: rem('16px'),
-        md: rem('13px'),
-        sm: rem('12px'),
+        md: rem('14px'),
+        sm: rem('13px'),
         xl: rem('18px'),
-        xs: rem('10px'),
+        xs: rem('11px'),
     },
     fontSmoothing: true,
     headings: {
@@ -64,22 +64,22 @@ const mantineTheme: MantineThemeOverride = createTheme({
         sizes: {
             h1: {
                 fontSize: rem('36px'),
-                fontWeight: '600',
+                fontWeight: '900',
                 lineHeight: rem('44px'),
             },
             h2: {
                 fontSize: rem('30px'),
-                fontWeight: '600',
+                fontWeight: '900',
                 lineHeight: rem('38px'),
             },
             h3: {
                 fontSize: rem('24px'),
-                fontWeight: '600',
+                fontWeight: '900',
                 lineHeight: rem('32px'),
             },
             h4: {
                 fontSize: rem('20px'),
-                fontWeight: '600',
+                fontWeight: '900',
                 lineHeight: rem('30px'),
             },
         },
