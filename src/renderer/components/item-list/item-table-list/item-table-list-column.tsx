@@ -324,21 +324,6 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
         // If rendering in main grid, extend left to cover pinned columns
         const pinnedLeftWidth =
             props.pinnedLeftColumnWidths?.reduce((sum, width) => sum + width, 0) || 0;
-        const pinnedRightWidth =
-            props.pinnedRightColumnWidths?.reduce((sum, width) => sum + width, 0) || 0;
-
-        // Use calculated column widths if available (they include all columns in order)
-        // Otherwise fall back to summing column config widths
-        const totalTableWidth = props.calculatedColumnWidths
-            ? props.calculatedColumnWidths.reduce((sum, width) => sum + width, 0)
-            : pinnedLeftWidth +
-              props.columns
-                  .slice(
-                      props.pinnedLeftColumnCount || 0,
-                      props.columns.length - (props.pinnedRightColumnCount || 0),
-                  )
-                  .reduce((sum, col) => sum + col.width, 0) +
-              pinnedRightWidth;
 
         // Determine if we're rendering in the first pinned left column
         const isFirstPinnedLeftColumn =
@@ -364,7 +349,6 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
                 style={{
                     ...props.style,
                     marginLeft: pinnedLeftWidth > 0 ? `-${pinnedLeftWidth}px` : 0,
-                    width: `${totalTableWidth}px`,
                 }}
             >
                 {groupHeader}
