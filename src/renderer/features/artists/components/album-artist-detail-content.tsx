@@ -235,7 +235,7 @@ export const AlbumArtistDetailContent = () => {
                         <ActionIcon
                             icon="favorite"
                             iconProps={{
-                                fill: detailQuery?.data?.userFavorite ? 'primary' : undefined,
+                                fill: detailQuery?.data?.userFavorite ? 'favorite' : undefined,
                             }}
                             onClick={handleFavorite}
                             size="lg"

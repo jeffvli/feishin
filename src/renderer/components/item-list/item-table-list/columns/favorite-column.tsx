@@ -17,8 +17,8 @@ export const FavoriteColumn = (props: ItemTableListInnerColumn) => {
                     className={row ? undefined : 'hover-only'}
                     icon="favorite"
                     iconProps={{
-                        color: row ? 'primary' : 'muted',
-                        fill: row ? 'primary' : undefined,
+                        color: row ? 'favorite' : 'muted',
+                        fill: row ? 'favorite' : undefined,
                         size: 'md',
                     }}
                     onClick={(event) => {

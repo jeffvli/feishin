@@ -209,7 +209,7 @@ export const RightControls = () => {
                 <ActionIcon
                     icon="favorite"
                     iconProps={{
-                        fill: currentSong?.userFavorite ? 'primary' : undefined,
+                        fill: currentSong?.userFavorite ? 'favorite' : undefined,
                         size: 'lg',
                     }}
                     onClick={(e) => {

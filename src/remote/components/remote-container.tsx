@@ -84,7 +84,7 @@ export const RemoteContainer = () => {
                     disabled={!id}
                     icon="favorite"
                     iconProps={{
-                        fill: song?.userFavorite ? 'primary' : 'default',
+                        fill: song?.userFavorite ? 'favorite' : 'default',
                     }}
                     onClick={() => {
                         if (!id) return;
