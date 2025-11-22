@@ -9,6 +9,10 @@
     }
 }
 
+.root {
+    cursor: default;
+}
+
 .inner {
     display: flex;
     justify-content: flex-start;

@@ -17,6 +17,7 @@ export const SidebarItem = ({ children, className, to, ...props }: SidebarItemPr
                 {
                     [styles.disabled]: props.disabled,
                     [styles.link]: true,
+                    [styles.root]: true,
                 },
                 className,
             )}

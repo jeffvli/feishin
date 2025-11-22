@@ -133,7 +133,7 @@ export const Sidebar = () => {
                 >
                     <Accordion.Item value="library">
                         <Accordion.Control>
-                            <Text fw={700} variant="secondary">
+                            <Text fw={500} variant="secondary">
                                 {t('page.sidebar.myLibrary', {
                                     postProcess: 'titleCase',
                                 })}
