@@ -118,7 +118,7 @@ export const LibraryHeader = forwardRef(
                             {itemTypeString()}
                         </Text>
                         <h1 className={styles.title}>
-                            <AutoTextSize maxFontSizePx={80} minFontSizePx={32} mode="box">
+                            <AutoTextSize maxFontSizePx={72} mode="box">
                                 {title}
                             </AutoTextSize>
                         </h1>
