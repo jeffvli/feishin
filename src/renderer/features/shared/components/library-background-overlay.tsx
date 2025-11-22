@@ -1,24 +1,67 @@
+import { generateColors } from '@mantine/colors-generator';
+import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 
 import styles from './library-background-overlay.module.css';
 
+import { useAppThemeColors } from '/@/renderer/themes/use-app-theme';
+
 interface LibraryBackgroundOverlayProps {
     backgroundColor?: string;
     headerRef: React.RefObject<HTMLDivElement | null>;
+    opacity?: number;
 }
 
 export const LibraryBackgroundOverlay = ({
     backgroundColor,
     headerRef,
+    opacity = 0.7,
 }: LibraryBackgroundOverlayProps) => {
     const height = useHeaderHeight(headerRef);
+
     return (
         <div
             className={styles.overlay}
             style={{
                 backgroundColor,
                 height: height ? `${height + 64}px` : undefined,
+                opacity,
             }}
+        />
+    );
+};
+
+interface BackgroundOverlayProps {
+    backgroundColor?: string;
+    direction?: string;
+    height?: number | string;
+    opacity?: number;
+}
+
+export const BackgroundOverlay = ({
+    backgroundColor,
+    direction = 'to bottom',
+    height = '100%',
+    opacity,
+}: BackgroundOverlayProps) => {
+    const theme = useAppThemeColors();
+
+    const colors = generateColors(backgroundColor || theme.color['--theme-colors-background']);
+
+    return (
+        <div
+            className={clsx(styles.backgroundOverlay)}
+            style={
+                {
+                    '--color-from': colors[6],
+                    '--color-to': colors[9],
+                    '--direction-and-possibly-color-interpolation': direction,
+                    '--dither': 'none',
+                    backgroundColor: backgroundColor,
+                    height,
+                    opacity,
+                } as React.CSSProperties
+            }
         />
     );
 };

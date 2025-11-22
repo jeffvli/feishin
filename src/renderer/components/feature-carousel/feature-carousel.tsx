@@ -1,39 +1,41 @@
-import type { Variants } from 'motion/react';
 import type { MouseEvent } from 'react';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useMemo, useState } from 'react';
 import { generatePath, Link } from 'react-router';
 
 import styles from './feature-carousel.module.css';
 
-import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { PlayButton } from '/@/renderer/features/shared/components/play-button';
+import { ItemCard } from '/@/renderer/components/item-card/item-card';
+import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
+import { BackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
+import { useContainerQuery, useFastAverageColor } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, usePlayButtonBehavior } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
-import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
-import { Icon } from '/@/shared/components/icon/icon';
-import { Image } from '/@/shared/components/image/image';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { Text } from '/@/shared/components/text/text';
 import { Album, LibraryItem } from '/@/shared/types/domain-types';
-import { Play } from '/@/shared/types/types';
 
-const variants: Variants = {
-    animate: {
+const fadeVariants = {
+    center: {
         opacity: 1,
-        transition: { opacity: { duration: 0.5 } },
+        transition: {
+            duration: 0.4,
+            ease: 'easeInOut' as const,
+        },
+    },
+    enter: {
+        opacity: 0,
     },
     exit: {
         opacity: 0,
-        transition: { opacity: { duration: 0.5 } },
-    },
-    initial: {
-        opacity: 0,
+        transition: {
+            duration: 0.4,
+            ease: 'easeInOut' as const,
+        },
     },
 };
 
@@ -41,146 +43,191 @@ interface FeatureCarouselProps {
     data: Album[] | undefined;
 }
 
-export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
-    const { t } = useTranslation();
-    const { addToQueueByFetch } = usePlayer();
-    const server = useCurrentServer();
-    const [itemIndex, setItemIndex] = useState(0);
-    const [direction, setDirection] = useState(0);
-    const playType = usePlayButtonBehavior();
+const getItemsPerRow = (breakpoints: {
+    is2xl: boolean;
+    isLg: boolean;
+    isMd: boolean;
+    isSm: boolean;
+    isXl: boolean;
+}) => {
+    if (breakpoints.is2xl) return 5;
+    if (breakpoints.isXl) return 5;
+    if (breakpoints.isLg) return 4;
+    if (breakpoints.isMd) return 3;
+    return 1;
+};
 
-    const currentItem = data?.[itemIndex];
+interface CarouselItemProps {
+    album: Album;
+}
 
-    const handleNext = (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        setDirection(1);
-        if (itemIndex === (data?.length || 0) - 1 || 0) {
-            setItemIndex(0);
-            return;
-        }
+const CarouselItem = ({ album }: CarouselItemProps) => {
+    const { background: backgroundColor } = useFastAverageColor({
+        algorithm: 'dominant',
+        src: album.imageUrl || null,
+        srcLoaded: true,
+    });
 
-        setItemIndex((prev) => prev + 1);
-    };
-
-    const handlePrevious = (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        setDirection(-1);
-        if (itemIndex === 0) {
-            setItemIndex((data?.length || 0) - 1);
-            return;
-        }
-
-        setItemIndex((prev) => prev - 1);
-    };
+    const controls = useDefaultItemListControls();
 
     return (
-        <Link
-            className={styles.wrapper}
-            to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: currentItem?.id || '' })}
-        >
-            <AnimatePresence custom={direction} initial={false} mode="popLayout">
-                {data && (
-                    <motion.div
-                        animate="animate"
-                        className={styles.carousel}
-                        custom={direction}
-                        exit="exit"
-                        initial="initial"
-                        key={`image-${itemIndex}`}
-                        variants={variants}
-                    >
-                        <div className={styles.grid}>
-                            <div className={styles.imageColumn}>
-                                <Image
-                                    height={225}
-                                    src={data[itemIndex]?.imageUrl || ''}
-                                    width={225}
-                                />
-                            </div>
-                            <div className={styles.infoColumn}>
-                                <Stack gap="md" style={{ width: '100%' }}>
-                                    <div className={styles.titleWrapper}>
-                                        <TextTitle
-                                            fw={900}
-                                            lineClamp={2}
-                                            order={1}
-                                            overflow="hidden"
-                                        >
-                                            {currentItem?.name}
-                                        </TextTitle>
-                                    </div>
-                                    <div className={styles.titleWrapper}>
-                                        {currentItem?.albumArtists.slice(0, 1).map((artist) => (
-                                            <Text fw={600} key={`carousel-artist-${artist.id}`}>
-                                                {artist.name}
-                                            </Text>
-                                        ))}
-                                    </div>
-                                    <Group>
-                                        {currentItem?.genres?.slice(0, 1).map((genre) => (
-                                            <Badge
-                                                key={`carousel-genre-${genre.id}`}
-                                                variant="default"
-                                            >
-                                                {genre.name}
-                                            </Badge>
-                                        ))}
-                                        <Badge variant="default">{currentItem?.releaseYear}</Badge>
-                                    </Group>
-                                    <Group justify="space-between">
-                                        <PlayButton
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                if (!currentItem || !server?.id) return;
+        <div className={styles.carouselItem}>
+            <BackgroundOverlay backgroundColor={backgroundColor} opacity={1} />
+            <Link
+                className={styles.carouselLink}
+                state={{ item: album }}
+                to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+                    albumId: album.id,
+                })}
+            >
+                <div className={styles.content}>
+                    <div className={styles.titleSection}>
+                        <TextTitle className={styles.title} fw={700} lineClamp={2} order={3}>
+                            {album.name}
+                        </TextTitle>
+                    </div>
 
-                                                addToQueueByFetch(
-                                                    server.id,
-                                                    [currentItem.id],
-                                                    LibraryItem.ALBUM,
-                                                    playType,
-                                                );
-                                            }}
-                                            variant="outline"
-                                        >
-                                            {t(
-                                                playType === Play.NOW
-                                                    ? 'player.play'
-                                                    : playType === Play.NEXT
-                                                      ? 'player.addNext'
-                                                      : 'player.addLast',
-                                                { postProcess: 'titleCase' },
-                                            )}
-                                        </PlayButton>
-                                        <Group gap="sm">
-                                            <Button
-                                                onClick={handlePrevious}
-                                                radius="lg"
-                                                variant="subtle"
-                                            >
-                                                <Icon icon="arrowLeftS" />
-                                            </Button>
-                                            <Button
-                                                onClick={handleNext}
-                                                radius="lg"
-                                                variant="subtle"
-                                            >
-                                                <Icon icon="arrowRightS" />
-                                            </Button>
-                                        </Group>
-                                    </Group>
-                                </Stack>
-                            </div>
-                        </div>
-                        <Image
-                            className={styles.backgroundImage}
-                            draggable="false"
-                            src={currentItem?.imageUrl || ''}
+                    <div
+                        className={styles.imageSection}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}
+                    >
+                        <ItemCard
+                            controls={controls}
+                            data={album}
+                            itemType={LibraryItem.ALBUM}
+                            rows={[]}
+                            type="poster"
+                            withControls
                         />
-                        <div className={styles.backgroundImageOverlay} />
-                    </motion.div>
-                )}
+                    </div>
+
+                    <div className={styles.metadataSection}>
+                        <Stack gap="sm">
+                            {album.albumArtists.slice(0, 1).map((artist) => (
+                                <Link
+                                    className={styles.artistLink}
+                                    key={`artist-${artist.id}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                    state={{ item: artist }}
+                                    to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                                        albumArtistId: artist.id,
+                                    })}
+                                >
+                                    <Text className={styles.artist} fw={600} size="md">
+                                        {artist.name}
+                                    </Text>
+                                </Link>
+                            ))}
+                            <Group gap="sm" justify="center" wrap="wrap">
+                                {album.genres?.slice(0, 2).map((genre) => (
+                                    <Badge key={`genre-${genre.id}`} size="sm">
+                                        {genre.name}
+                                    </Badge>
+                                ))}
+                                {album.releaseYear && <Badge size="sm">{album.releaseYear}</Badge>}
+                            </Group>
+                        </Stack>
+                    </div>
+                </div>
+            </Link>
+        </div>
+    );
+};
+
+export const FeatureCarousel = ({ data }: FeatureCarouselProps) => {
+    const [startIndex, setStartIndex] = useState(0);
+    const {
+        is2xl,
+        isLg,
+        isMd,
+        isSm,
+        isXl,
+        ref: containerRef,
+    } = useContainerQuery({
+        '2xl': 1920,
+        lg: 1024,
+        md: 768,
+        sm: 640,
+        xl: 1440,
+    });
+
+    const itemsPerRow = useMemo(
+        () => getItemsPerRow({ is2xl, isLg, isMd, isSm, isXl }),
+        [is2xl, isLg, isMd, isSm, isXl],
+    );
+
+    const visibleItems = useMemo(() => {
+        if (!data) return [];
+        const items: Album[] = [];
+        for (let i = 0; i < itemsPerRow; i++) {
+            const index = (startIndex + i) % data.length;
+            items.push(data[index]);
+        }
+        return items;
+    }, [data, startIndex, itemsPerRow]);
+
+    const handleNext = (e?: MouseEvent<HTMLButtonElement>) => {
+        e?.preventDefault();
+        e?.stopPropagation();
+        if (!data) return;
+        setStartIndex((prev) => (prev + itemsPerRow) % data.length);
+    };
+
+    const handlePrevious = (e?: MouseEvent<HTMLButtonElement>) => {
+        e?.preventDefault();
+        e?.stopPropagation();
+        if (!data) return;
+        setStartIndex((prev) => (prev - itemsPerRow + data.length) % data.length);
+    };
+
+    if (!data || data.length === 0) {
+        return null;
+    }
+
+    return (
+        <div className={styles.carouselContainer} ref={containerRef}>
+            <AnimatePresence initial={false} mode="popLayout">
+                <motion.div
+                    animate="center"
+                    className={styles.carousel}
+                    exit="exit"
+                    initial="enter"
+                    key={`carousel-${startIndex}`}
+                    variants={fadeVariants}
+                >
+                    {visibleItems.map((album) => (
+                        <CarouselItem album={album} key={`item-${album.id}-${startIndex}`} />
+                    ))}
+                </motion.div>
             </AnimatePresence>
-        </Link>
+
+            {data.length > itemsPerRow && (
+                <>
+                    <ActionIcon
+                        className={styles.navArrowLeft}
+                        icon="arrowLeftS"
+                        iconProps={{ size: 'xl' }}
+                        onClick={handlePrevious}
+                        radius="50%"
+                        size="md"
+                        variant="subtle"
+                    />
+                    <ActionIcon
+                        className={styles.navArrowRight}
+                        icon="arrowRightS"
+                        iconProps={{ size: 'xl' }}
+                        onClick={handleNext}
+                        radius="50%"
+                        size="md"
+                        variant="subtle"
+                    />
+                </>
+            )}
+        </div>
     );
 };

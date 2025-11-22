@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,12 +28,12 @@ const HomeRoute = () => {
 
     const isJellyfin = server?.type === ServerType.JELLYFIN;
 
-    const feature = useQuery(
-        albumQueries.list({
+    const feature = useSuspenseQuery({
+        ...albumQueries.list({
             options: {
                 enabled: homeFeature,
-                gcTime: 1000 * 60,
-                staleTime: 1000 * 60,
+                gcTime: 1000 * 30,
+                staleTime: 1000 * 30,
             },
             query: {
                 limit: 20,
@@ -43,7 +43,8 @@ const HomeRoute = () => {
             },
             serverId: server?.id,
         }),
-    );
+        queryKey: ['home', 'feature'],
+    });
 
     const featureItemsWithImage = useMemo(() => {
         return feature.data?.items?.filter((item) => item.imageUrl) ?? [];
@@ -124,17 +125,13 @@ const HomeRoute = () => {
                     {sortedCarousel.map((carousel) => {
                         if (carousel.itemType === LibraryItem.ALBUM) {
                             return (
-                                <Suspense
-                                    fallback={<Spinner container />}
+                                <AlbumInfiniteCarousel
                                     key={`carousel-${carousel.uniqueId}`}
-                                >
-                                    <AlbumInfiniteCarousel
-                                        rowCount={1}
-                                        sortBy={carousel.sortBy}
-                                        sortOrder={carousel.sortOrder}
-                                        title={carousel.title}
-                                    />
-                                </Suspense>
+                                    rowCount={1}
+                                    sortBy={carousel.sortBy}
+                                    sortOrder={carousel.sortOrder}
+                                    title={carousel.title}
+                                />
                             );
                         }
 
@@ -151,4 +148,12 @@ const HomeRoute = () => {
     );
 };
 
-export default HomeRoute;
+const SuspensedHomeRoute = () => {
+    return (
+        <Suspense fallback={<Spinner container />}>
+            <HomeRoute />
+        </Suspense>
+    );
+};
+
+export default SuspensedHomeRoute;
