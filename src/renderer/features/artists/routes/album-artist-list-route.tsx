@@ -4,6 +4,7 @@ import { ListContext } from '/@/renderer/context/list-context';
 import { AlbumArtistListContent } from '/@/renderer/features/artists/components/album-artist-list-content';
 import { AlbumArtistListHeader } from '/@/renderer/features/artists/components/album-artist-list-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { ItemListKey } from '/@/shared/types/types';
 
 const AlbumArtistListRoute = () => {
@@ -23,8 +24,10 @@ const AlbumArtistListRoute = () => {
     return (
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
-                <AlbumArtistListHeader />
-                <AlbumArtistListContent />
+                <LibraryContainer>
+                    <AlbumArtistListHeader />
+                    <AlbumArtistListContent />
+                </LibraryContainer>
             </ListContext.Provider>
         </AnimatedPage>
     );

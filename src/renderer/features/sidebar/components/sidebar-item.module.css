@@ -9,6 +9,10 @@
     }
 }
 
+.root {
+    cursor: default;
+}
+
 .inner {
     display: flex;
     justify-content: flex-start;
@@ -35,6 +39,10 @@
     &:focus-visible {
         border: 1px solid var(--theme-colors-primary-filled);
     }
+}
+
+.link.active {
+    color: var(--theme-colors-primary-filled);
 }
 
 .link.disabled {

@@ -1,8 +1,23 @@
 .container {
     position: relative;
     z-index: 190;
+    visibility: hidden;
     width: 100%;
     height: 65px;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.container[data-visible='true'] {
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.container.visible {
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 1;
 }
 
 .header {
@@ -66,6 +81,8 @@
 .title-wrapper {
     position: absolute;
     display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     height: 100%;
 }

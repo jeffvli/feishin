@@ -48,7 +48,6 @@ export const useCreateFavorite = (args: MutationHookArgs) => {
         onSuccess: (_data, variables) => {
             if (variables.query.type === LibraryItem.SONG) {
                 remote?.updateFavorite(true, variables.apiClientProps.serverId, variables.query.id);
-                // setQueueFavorite(variables.query.id, true);
                 setFavoriteEvent(variables.query.id, true);
             }
 
@@ -84,12 +83,25 @@ export const useCreateFavorite = (args: MutationHookArgs) => {
 
                     break;
                 }
+                case LibraryItem.PLAYLIST_SONG:
+                case LibraryItem.QUEUE_SONG:
                 case LibraryItem.SONG: {
-                    const queryKey = queryKeys.songs.detail(variables.apiClientProps.serverId);
+                    const songDetailQueryKey = queryKeys.songs.detail(
+                        variables.apiClientProps.serverId,
+                    );
 
                     queryClient.invalidateQueries({
                         exact: false,
-                        queryKey,
+                        queryKey: songDetailQueryKey,
+                    });
+
+                    const albumDetailQueryKey = queryKeys.albums.detail(
+                        variables.apiClientProps.serverId,
+                    );
+
+                    queryClient.invalidateQueries({
+                        exact: false,
+                        queryKey: albumDetailQueryKey,
                     });
 
                     break;

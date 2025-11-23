@@ -62,8 +62,7 @@ export const ItemCard = ({
     withControls,
 }: ItemCardProps) => {
     const imageUrl = getImageUrl(data);
-    const defaultRows = getDataRows();
-    const rows = providedRows && providedRows.length > 0 ? providedRows : defaultRows;
+    const rows = providedRows || [];
 
     switch (type) {
         case 'compact':

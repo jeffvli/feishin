@@ -1,8 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router';
-import { Link } from 'react-router';
+import { generatePath, Link, useParams } from 'react-router';
 
 import styles from './dummy-album-detail-route.module.css';
 
@@ -10,6 +9,7 @@ import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { LibraryHeader } from '/@/renderer/features/shared/components/library-header';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
@@ -115,112 +115,115 @@ const DummyAlbumDetailRoute = () => {
 
     return (
         <AnimatedPage key={`dummy-album-detail-${albumId}`}>
-            <Stack ref={ref}>
-                <LibraryHeader
-                    background={background}
-                    imageUrl={detailQuery?.data?.imageUrl}
-                    item={{ route: AppRoute.LIBRARY_SONGS, type: LibraryItem.SONG }}
-                    loading={!background || colorId !== albumId}
-                    title={detailQuery?.data?.name || ''}
-                >
-                    <Stack gap="sm">
-                        <Group gap="sm">
-                            {metadataItems.map((item, index) => (
-                                <Fragment key={`item-${item.id}-${index}`}>
-                                    {index > 0 && <Text isNoSelect>•</Text>}
-                                    <Text isMuted={item.secondary}>{item.value}</Text>
-                                </Fragment>
-                            ))}
-                        </Group>
-                        <Group
-                            gap="md"
-                            mah="4rem"
-                            style={{
-                                overflow: 'hidden',
-                                WebkitBoxOrient: 'vertical',
-                                WebkitLineClamp: 2,
-                            }}
-                        >
-                            {detailQuery?.data?.albumArtists.map((artist) => (
-                                <Text
-                                    component={Link}
-                                    fw={600}
-                                    isLink
-                                    key={`artist-${artist.id}`}
-                                    size="md"
-                                    to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
-                                        albumArtistId: artist.id,
-                                    })}
+            <LibraryContainer>
+                <Stack ref={ref}>
+                    <LibraryHeader
+                        imageUrl={detailQuery?.data?.imageUrl}
+                        item={{ route: AppRoute.LIBRARY_SONGS, type: LibraryItem.SONG }}
+                        loading={!background || colorId !== albumId}
+                        title={detailQuery?.data?.name || ''}
+                    >
+                        <Stack gap="sm">
+                            <Group gap="sm">
+                                {metadataItems.map((item, index) => (
+                                    <Fragment key={`item-${item.id}-${index}`}>
+                                        {index > 0 && <Text isNoSelect>•</Text>}
+                                        <Text isMuted={item.secondary}>{item.value}</Text>
+                                    </Fragment>
+                                ))}
+                            </Group>
+                            <Group
+                                gap="md"
+                                mah="4rem"
+                                style={{
+                                    overflow: 'hidden',
+                                    WebkitBoxOrient: 'vertical',
+                                    WebkitLineClamp: 2,
+                                }}
+                            >
+                                {detailQuery?.data?.albumArtists.map((artist) => (
+                                    <Text
+                                        component={Link}
+                                        fw={600}
+                                        isLink
+                                        key={`artist-${artist.id}`}
+                                        size="md"
+                                        to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                                            albumArtistId: artist.id,
+                                        })}
+                                        variant="subtle"
+                                    >
+                                        {artist.name}
+                                    </Text>
+                                ))}
+                            </Group>
+                        </Stack>
+                    </LibraryHeader>
+                </Stack>
+                <div className={styles.detailContainer}>
+                    <section>
+                        <Group gap="sm" justify="space-between">
+                            <Group>
+                                <PlayButton onClick={() => handlePlay()} />
+                                <ActionIcon
+                                    icon="favorite"
+                                    iconProps={{
+                                        fill: detailQuery?.data?.userFavorite
+                                            ? 'primary'
+                                            : undefined,
+                                    }}
+                                    loading={
+                                        createFavoriteMutation.isPending ||
+                                        deleteFavoriteMutation.isPending
+                                    }
+                                    onClick={handleFavorite}
                                     variant="subtle"
-                                >
-                                    {artist.name}
-                                </Text>
-                            ))}
-                        </Group>
-                    </Stack>
-                </LibraryHeader>
-            </Stack>
-            <div className={styles.detailContainer}>
-                <section>
-                    <Group gap="sm" justify="space-between">
-                        <Group>
-                            <PlayButton onClick={() => handlePlay()} />
-                            <ActionIcon
-                                icon="favorite"
-                                iconProps={{
-                                    fill: detailQuery?.data?.userFavorite ? 'primary' : undefined,
-                                }}
-                                loading={
-                                    createFavoriteMutation.isPending ||
-                                    deleteFavoriteMutation.isPending
-                                }
-                                onClick={handleFavorite}
-                                variant="subtle"
-                            />
-                            <ActionIcon
-                                icon="ellipsisHorizontal"
-                                onClick={(e) => {
-                                    if (!detailQuery?.data) return;
-                                }}
-                                variant="subtle"
-                            />
-                        </Group>
-                    </Group>
-                </section>
-                {showGenres && (
-                    <section>
-                        <Group gap="sm">
-                            {detailQuery?.data?.genres?.map((genre) => (
-                                <Button
-                                    component={Link}
-                                    key={`genre-${genre.id}`}
-                                    radius={0}
-                                    size="compact-md"
-                                    to={generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
-                                        genreId: genre.id,
-                                    })}
-                                    variant="outline"
-                                >
-                                    {genre.name}
-                                </Button>
-                            ))}
+                                />
+                                <ActionIcon
+                                    icon="ellipsisHorizontal"
+                                    onClick={(e) => {
+                                        if (!detailQuery?.data) return;
+                                    }}
+                                    variant="subtle"
+                                />
+                            </Group>
                         </Group>
                     </section>
-                )}
-                {comment && (
+                    {showGenres && (
+                        <section>
+                            <Group gap="sm">
+                                {detailQuery?.data?.genres?.map((genre) => (
+                                    <Button
+                                        component={Link}
+                                        key={`genre-${genre.id}`}
+                                        radius={0}
+                                        size="compact-md"
+                                        to={generatePath(AppRoute.LIBRARY_GENRES_SONGS, {
+                                            genreId: genre.id,
+                                        })}
+                                        variant="outline"
+                                    >
+                                        {genre.name}
+                                    </Button>
+                                ))}
+                            </Group>
+                        </section>
+                    )}
+                    {comment && (
+                        <section>
+                            <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
+                        </section>
+                    )}
                     <section>
-                        <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
+                        <Center>
+                            <Group mr={5}>
+                                <Icon fill="error" icon="error" size={30} />
+                            </Group>
+                            <h2>{t('error.badAlbum', { postProcess: 'sentenceCase' })}</h2>
+                        </Center>
                     </section>
-                )}
-                <section>
-                    <Center>
-                        <Group mr={5}>
-                            <Icon fill="error" icon="error" size={30} />
-                        </Group>
-                        <h2>{t('error.badAlbum', { postProcess: 'sentenceCase' })}</h2>
-                    </Center>
-                </section>
-            </div>
+                </div>
+            </LibraryContainer>
         </AnimatedPage>
     );
 };

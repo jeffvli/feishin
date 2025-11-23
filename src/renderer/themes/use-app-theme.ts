@@ -230,3 +230,55 @@ export const useColorScheme = () => {
 
     return colorScheme === 'dark' ? 'dark' : 'light';
 };
+
+export const useAppThemeColors = () => {
+    const accent = useSettingsStore((store) => store.general.accent);
+    const getCurrentTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const [isDarkTheme] = useState(getCurrentTheme());
+    const { followSystemTheme, theme, themeDark, themeLight } = useSettingsStore(
+        (state) => state.general,
+    );
+
+    const getSelectedTheme = () => {
+        if (followSystemTheme) {
+            return isDarkTheme ? themeDark : themeLight;
+        }
+
+        return theme;
+    };
+
+    const selectedTheme = getSelectedTheme();
+
+    const appTheme: AppThemeConfiguration = useMemo(() => {
+        const themeProperties = getAppTheme(selectedTheme);
+
+        return {
+            ...themeProperties,
+            colors: {
+                ...themeProperties.colors,
+                primary: accent,
+            },
+        };
+    }, [accent, selectedTheme]);
+
+    const themeVars = useMemo(() => {
+        return Object.entries(appTheme?.app ?? {})
+            .map(([key, value]) => {
+                return [`--theme-${key}`, value];
+            })
+            .filter(Boolean) as [string, string][];
+    }, [appTheme]);
+
+    const colorVars = useMemo(() => {
+        return Object.entries(appTheme?.colors ?? {})
+            .map(([key, value]) => {
+                return [`--theme-colors-${key}`, value];
+            })
+            .filter(Boolean) as [string, string][];
+    }, [appTheme]);
+
+    return {
+        color: Object.fromEntries(colorVars),
+        theme: Object.fromEntries(themeVars),
+    };
+};

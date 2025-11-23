@@ -7,6 +7,7 @@ import { ListContext } from '/@/renderer/context/list-context';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistDetailTopSongsListHeader } from '/@/renderer/features/artists/components/album-artist-detail-top-songs-list-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { useCurrentServer } from '/@/renderer/store/auth.store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
@@ -47,15 +48,17 @@ const AlbumArtistDetailTopSongsListRoute = () => {
     return (
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
-                <AlbumArtistDetailTopSongsListHeader
-                    data={topSongsQuery?.data?.items || []}
-                    itemCount={itemCount}
-                    title={detailQuery?.data?.name || 'Unknown'}
-                />
-                {/* <AlbumArtistDetailTopSongsListContent
-                    data={topSongsQuery?.data?.items || []}
-                    tableRef={tableRef}
-                /> */}
+                <LibraryContainer>
+                    <AlbumArtistDetailTopSongsListHeader
+                        data={topSongsQuery?.data?.items || []}
+                        itemCount={itemCount}
+                        title={detailQuery?.data?.name || 'Unknown'}
+                    />
+                    {/* <AlbumArtistDetailTopSongsListContent
+                        data={topSongsQuery?.data?.items || []}
+                        tableRef={tableRef}
+                    /> */}
+                </LibraryContainer>
             </ListContext.Provider>
         </AnimatedPage>
     );

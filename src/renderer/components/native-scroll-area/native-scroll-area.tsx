@@ -1,6 +1,5 @@
-import { useInView } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
-import { CSSProperties, forwardRef, ReactNode, Ref, useEffect, useRef, useState } from 'react';
+import { CSSProperties, forwardRef, ReactNode, Ref, useEffect, useRef } from 'react';
 
 import styles from './native-scroll-area.module.css';
 
@@ -25,12 +24,7 @@ export const NativeScrollArea = forwardRef(
         ref: Ref<HTMLDivElement>,
     ) => {
         const { windowBarStyle } = useWindowSettings();
-        const containerRef = useRef(null);
-        const [isPastOffset, setIsPastOffset] = useState(false);
-
-        const isInView = useInView({
-            current: pageHeaderProps?.target?.current,
-        });
+        const containerRef = useRef<HTMLDivElement | null>(null);
 
         const scrollHandlerRef = useRef<null | number>(null);
 
@@ -43,26 +37,23 @@ export const NativeScrollArea = forwardRef(
                     }
 
                     scrollHandlerRef.current = requestAnimationFrame(() => {
-                        if (noHeader) {
-                            return setIsPastOffset(true);
+                        if (noHeader || !pageHeaderProps) {
+                            return;
                         }
 
-                        if (pageHeaderProps?.target || !pageHeaderProps?.offset) {
-                            return setIsPastOffset(true);
+                        const scrollElement = e?.target as HTMLDivElement;
+                        if (!scrollElement || !containerRef.current) {
+                            return;
                         }
 
-                        const offset = pageHeaderProps?.offset;
-                        const scrollTop = (e?.target as HTMLDivElement)?.scrollTop;
+                        const offset = pageHeaderProps.offset || 0;
+                        const scrollTop = scrollElement.scrollTop;
 
-                        if (scrollTop > offset && isPastOffset === false) {
-                            return setIsPastOffset(true);
+                        if (scrollTop > offset) {
+                            containerRef.current.setAttribute('data-scrolled', 'true');
+                        } else {
+                            containerRef.current.setAttribute('data-scrolled', 'false');
                         }
-
-                        if (scrollTop <= offset && isPastOffset === true) {
-                            return setIsPastOffset(false);
-                        }
-
-                        return null;
                     });
                 },
             },
@@ -81,21 +72,22 @@ export const NativeScrollArea = forwardRef(
         useEffect(() => {
             if (containerRef.current) {
                 initialize(containerRef.current as HTMLDivElement);
+                if (!noHeader && pageHeaderProps) {
+                    containerRef.current.setAttribute('data-scrolled', 'false');
+                }
             }
-        }, [initialize]);
+        }, [initialize, noHeader, pageHeaderProps]);
 
         const mergedRef = useMergedRef(ref, containerRef);
-
-        const shouldShowHeader = !noHeader && isPastOffset && !isInView;
 
         return (
             <>
                 {windowBarStyle === Platform.WEB && <div className={styles.dragContainer} />}
-                {shouldShowHeader && (
+                {!noHeader && pageHeaderProps && (
                     <PageHeader
                         animated
-                        isHidden={false}
                         position="absolute"
+                        scrollContainerRef={containerRef}
                         {...pageHeaderProps}
                     />
                 )}

@@ -114,12 +114,20 @@ export const LibraryHeader = forwardRef(
                             fw={600}
                             isLink
                             size="md"
+                            style={{}}
                             to={item.route}
                             tt="uppercase"
                         >
                             {itemTypeString()}
                         </Text>
-                        <h1 className={styles.title}>{title}</h1>
+                        <h1
+                            className={styles.title}
+                            style={{
+                                fontSize: calculateTitleSize(title),
+                            }}
+                        >
+                            {title}
+                        </h1>
                         {children}
                     </div>
                 )}
@@ -127,6 +135,33 @@ export const LibraryHeader = forwardRef(
         );
     },
 );
+
+const calculateTitleSize = (title: string) => {
+    const titleLength = title.length;
+    let baseSize = '3.5dvw';
+
+    if (titleLength > 20) {
+        baseSize = '3dvw';
+    }
+
+    if (titleLength > 30) {
+        baseSize = '2.75dvw';
+    }
+
+    if (titleLength > 40) {
+        baseSize = '2.5dvw';
+    }
+
+    if (titleLength > 50) {
+        baseSize = '2.25dvw';
+    }
+
+    if (titleLength > 60) {
+        baseSize = '2dvw';
+    }
+
+    return `clamp(2rem, ${baseSize}, 3.25rem)`;
+};
 
 interface LibraryHeaderMenuProps {
     favorite?: boolean;

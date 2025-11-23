@@ -125,7 +125,9 @@ export function GridCarousel(props: GridCarouselProps) {
                 <>
                     <div className={styles.navigation}>
                         {typeof title === 'string' ? (
-                            <TextTitle order={4}>{title}</TextTitle>
+                            <TextTitle fw={700} order={3}>
+                                {title}
+                            </TextTitle>
                         ) : (
                             title
                         )}

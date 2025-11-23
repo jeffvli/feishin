@@ -241,25 +241,23 @@ export const SidebarPlaylistList = () => {
         [player, server.id],
     );
 
-    const data = playlistsQuery.data;
-
     const memoizedItemData = useMemo(() => {
         const base = { handlePlay: handlePlayPlaylist };
 
-        if (!server?.type || !server?.username || !data?.items) {
-            return { ...base, items: data?.items };
+        if (!server?.type || !server?.username || !playlistsQuery.data?.items) {
+            return { ...base, items: playlistsQuery.data?.items };
         }
 
         const owned: Array<[boolean, () => void] | Playlist> = [];
 
-        for (const playlist of data.items) {
+        for (const playlist of playlistsQuery.data?.items ?? []) {
             if (!playlist.owner || playlist.owner === server.username) {
                 owned.push(playlist);
             }
         }
 
         return { ...base, items: owned };
-    }, [data?.items, handlePlayPlaylist, server?.type, server?.username]);
+    }, [playlistsQuery.data?.items, handlePlayPlaylist, server?.type, server.username]);
 
     const handleCreatePlaylistModal = (e: MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
@@ -275,7 +273,7 @@ export const SidebarPlaylistList = () => {
         <Accordion.Item value="playlists">
             <Accordion.Control component="div" role="button" style={{ userSelect: 'none' }}>
                 <Group justify="space-between" pr="var(--theme-spacing-md)">
-                    <Text fw={600}>
+                    <Text fw={500}>
                         {t('page.sidebar.playlists', {
                             postProcess: 'titleCase',
                         })}
@@ -351,28 +349,26 @@ export const SidebarSharedPlaylistList = () => {
             if (!server?.id) return;
             player.addToQueueByFetch(server.id, [id], LibraryItem.PLAYLIST, playType);
         },
-        [player, server?.id],
+        [player, server.id],
     );
-
-    const data = playlistsQuery.data;
 
     const memoizedItemData = useMemo(() => {
         const base = { handlePlay: handlePlayPlaylist };
 
-        if (!server?.type || !server?.username || !data?.items) {
-            return { ...base, items: data?.items };
+        if (!server?.type || !server?.username || !playlistsQuery.data?.items) {
+            return { ...base, items: playlistsQuery.data?.items };
         }
 
         const shared: Playlist[] = [];
 
-        for (const playlist of data.items) {
+        for (const playlist of playlistsQuery.data?.items ?? []) {
             if (playlist.owner && playlist.owner !== server.username) {
                 shared.push(playlist);
             }
         }
 
         return { ...base, items: shared };
-    }, [data?.items, handlePlayPlaylist, server?.type, server?.username]);
+    }, [handlePlayPlaylist, playlistsQuery.data?.items, server?.type, server.username]);
 
     if (memoizedItemData?.items?.length === 0) {
         return null;
@@ -381,7 +377,7 @@ export const SidebarSharedPlaylistList = () => {
     return (
         <Accordion.Item value="shared-playlists">
             <Accordion.Control>
-                <Text fw={600} variant="secondary">
+                <Text fw={500} variant="secondary">
                     {t('page.sidebar.shared', {
                         postProcess: 'titleCase',
                     })}

@@ -143,10 +143,6 @@
         opacity: 1;
         transform: scale(0.9);
     }
-
-    svg {
-        stroke: rgb(255 255 255);
-    }
 }
 
 .user-data {

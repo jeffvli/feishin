@@ -4,6 +4,7 @@ import { ListContext } from '/@/renderer/context/list-context';
 import { GenreListContent } from '/@/renderer/features/genres/components/genre-list-content';
 import { GenreListHeader } from '/@/renderer/features/genres/components/genre-list-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { ItemListKey } from '/@/shared/types/types';
 
 const GenreListRoute = () => {
@@ -23,8 +24,10 @@ const GenreListRoute = () => {
     return (
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
-                <GenreListHeader />
-                <GenreListContent />
+                <LibraryContainer>
+                    <GenreListHeader />
+                    <GenreListContent />
+                </LibraryContainer>
             </ListContext.Provider>
         </AnimatedPage>
     );

@@ -5,6 +5,7 @@ import { ListContext } from '/@/renderer/context/list-context';
 import { AlbumListContent } from '/@/renderer/features/albums/components/album-list-content';
 import { AlbumListHeader } from '/@/renderer/features/albums/components/album-list-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 
 const AlbumListRoute = () => {
     const { albumArtistId, genreId } = useParams();
@@ -24,8 +25,10 @@ const AlbumListRoute = () => {
     return (
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
-                <AlbumListHeader />
-                <AlbumListContent />
+                <LibraryContainer>
+                    <AlbumListHeader />
+                    <AlbumListContent />
+                </LibraryContainer>
             </ListContext.Provider>
         </AnimatedPage>
     );

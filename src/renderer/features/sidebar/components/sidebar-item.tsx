@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { memo } from 'react';
-import { Link, LinkProps } from 'react-router';
+import { Link, LinkProps, useLocation } from 'react-router';
 
 import styles from './sidebar-item.module.css';
 
@@ -11,12 +11,18 @@ interface SidebarItemProps extends ButtonProps {
 }
 
 export const SidebarItem = ({ children, className, to, ...props }: SidebarItemProps) => {
+    const location = useLocation();
+    const toPath = typeof to === 'string' ? to : to.pathname || '';
+    const isActive = location.pathname === toPath;
+
     return (
         <Button
             className={clsx(
                 {
                     [styles.disabled]: props.disabled,
                     [styles.link]: true,
+                    [styles.root]: true,
+                    [styles.active]: isActive,
                 },
                 className,
             )}

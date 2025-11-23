@@ -5,6 +5,7 @@ import { ListContext } from '/@/renderer/context/list-context';
 import { PlaylistListContent } from '/@/renderer/features/playlists/components/playlist-list-content';
 import { PlaylistListHeader } from '/@/renderer/features/playlists/components/playlist-list-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { ItemListKey } from '/@/shared/types/types';
 
 const PlaylistListRoute = () => {
@@ -25,8 +26,10 @@ const PlaylistListRoute = () => {
     return (
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
-                <PlaylistListHeader />
-                <PlaylistListContent />
+                <LibraryContainer>
+                    <PlaylistListHeader />
+                    <PlaylistListContent />
+                </LibraryContainer>
             </ListContext.Provider>
         </AnimatedPage>
     );

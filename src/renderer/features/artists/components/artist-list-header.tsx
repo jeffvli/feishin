@@ -23,7 +23,7 @@ export const ArtistListHeader = ({ title }: ArtistListHeaderProps) => {
 
     return (
         <Stack gap={0}>
-            <PageHeader backgroundColor="var(--theme-colors-background)">
+            <PageHeader>
                 <LibraryHeaderBar>
                     <PlayButton />
                     <LibraryHeaderBar.Title>{pageTitle}</LibraryHeaderBar.Title>
