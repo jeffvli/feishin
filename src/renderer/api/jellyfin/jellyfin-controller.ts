@@ -832,15 +832,20 @@ export const JellyfinController: InternalControllerEndpoint = {
             '&audioCodec=aac' +
             `&apiKey=${server?.credential}` +
             `&playSessionId=${deviceId}` +
-            '&container=opus,mp3,aac,m4a,m4b,flac,wav,ogg' +
-            '&transcodingContainer=ts' +
-            '&transcodingProtocol=http';
+            '&container=opus,mp3,aac,m4a,m4b,flac,wav,ogg';
 
         if (transcode) {
-            if (format) {
-                url = url.replace('audioCodec=aac', `audioCodec=${format}`);
-                url = url.replace('transcodingContainer=ts', `transcodingContainer=${format}`);
-            }
+            // Some format appears to be required. Fall back to trusty MP3 if not specified
+            // Otherwise, ffmpeg appears to crash
+            const realFormat = format || 'mp3';
+
+            url += `&transcodingProtocol=http&transcodingContainer=${realFormat}`;
+            url = url.replace('audioCodec=aac', `audioCodec=${realFormat}`);
+            url = url.replace(
+                '&container=opus,mp3,aac,m4a,m4b,flac,wav,ogg',
+                `&container=${realFormat}`,
+            );
+
             if (bitrate !== undefined) {
                 url += `&maxStreamingBitrate=${bitrate * 1000}`;
             }
