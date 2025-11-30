@@ -10,9 +10,10 @@ export const openSettingsModal = () => {
         size: '2xl',
         styles: {
             content: {
-                height: 'calc(100dvh - 160px)',
+                height: '80%',
                 maxWidth: '960px',
                 minHeight: '540px',
+                width: '100%',
             },
         },
         transitionProps: {

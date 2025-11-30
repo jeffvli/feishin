@@ -7,7 +7,6 @@ import {
     WebPlayerEngine,
     WebPlayerEngineHandle,
 } from '/@/renderer/features/player/audio-player/engine/web-player-engine';
-import { useMainPlayerListener } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
@@ -270,8 +269,6 @@ export function WebPlayer() {
 
         return () => clearInterval(interval);
     }, [localPlayerStatus, num, setTimestamp, transitionType]);
-
-    useMainPlayerListener();
 
     const calculateReplayGain = useCallback(
         (song: QueueSong): number => {

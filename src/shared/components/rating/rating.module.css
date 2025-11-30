@@ -36,7 +36,7 @@
 .symbol-body {
     svg {
         stroke: var(--theme-colors-foreground);
-        stroke-width: 2px;
+        stroke-width: 1px;
 
         &:not([data-filled='true']) {
             fill: transparent;

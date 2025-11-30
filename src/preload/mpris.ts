@@ -1,21 +1,42 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 
-import { PlayerRepeat } from '/@/shared/types/types';
+import { QueueSong } from '/@/shared/types/domain-types';
+import { PlayerRepeat, PlayerStatus } from '/@/shared/types/types';
 
 const updatePosition = (timeSec: number) => {
-    ipcRenderer.send('mpris-update-position', timeSec);
+    ipcRenderer.send('update-position', timeSec);
 };
 
 const updateSeek = (timeSec: number) => {
-    ipcRenderer.send('mpris-update-seek', timeSec);
+    ipcRenderer.send('update-seek', timeSec);
 };
 
-const toggleRepeat = () => {
-    ipcRenderer.send('mpris-toggle-repeat');
+const updateVolume = (volume: number) => {
+    ipcRenderer.send('update-volume', volume);
 };
 
-const toggleShuffle = () => {
-    ipcRenderer.send('mpris-toggle-shuffle');
+const updateStatus = (status: PlayerStatus) => {
+    ipcRenderer.send('update-playback', status);
+};
+
+const updateRepeat = (repeat: PlayerRepeat) => {
+    ipcRenderer.send('update-repeat', repeat);
+};
+
+const updateShuffle = (shuffle: boolean) => {
+    ipcRenderer.send('update-shuffle', shuffle);
+};
+
+const updateSong = (song: QueueSong | undefined) => {
+    ipcRenderer.send('update-song', song);
+};
+
+const requestSeek = (cb: (event: IpcRendererEvent, data: { offset: number }) => void) => {
+    ipcRenderer.on('request-seek', cb);
+};
+
+const requestPosition = (cb: (event: IpcRendererEvent, data: { position: number }) => void) => {
+    ipcRenderer.on('request-position', cb);
 };
 
 const requestToggleRepeat = (
@@ -31,12 +52,17 @@ const requestToggleShuffle = (
 };
 
 export const mpris = {
+    requestPosition,
+    requestSeek,
     requestToggleRepeat,
     requestToggleShuffle,
-    toggleRepeat,
-    toggleShuffle,
     updatePosition,
+    updateRepeat,
     updateSeek,
+    updateShuffle,
+    updateSong,
+    updateStatus,
+    updateVolume,
 };
 
 export type Mpris = typeof mpris;

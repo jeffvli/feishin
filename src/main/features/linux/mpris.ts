@@ -115,7 +115,7 @@ ipcMain.on('update-position', (_event, arg: number) => {
     mprisPlayer.getPosition = () => arg * 1e6;
 });
 
-ipcMain.on('mpris-update-seek', (_event, arg) => {
+ipcMain.on('update-seek', (_event, arg) => {
     mprisPlayer.seeked(arg * 1e6);
 });
 

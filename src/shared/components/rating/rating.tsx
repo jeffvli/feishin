@@ -5,9 +5,20 @@ import { useCallback } from 'react';
 
 import styles from './rating.module.css';
 
-interface RatingProps extends MantineRatingProps {}
+interface RatingProps extends MantineRatingProps {
+    preventDefault?: boolean;
+    stopPropagation?: boolean;
+}
 
-export const Rating = ({ classNames, onChange, size, style, ...props }: RatingProps) => {
+export const Rating = ({
+    classNames,
+    onChange,
+    preventDefault = true,
+    size,
+    stopPropagation = true,
+    style,
+    ...props
+}: RatingProps) => {
     const valueChange = useCallback(
         (rating: number) => {
             if (onChange) {
@@ -44,8 +55,12 @@ export const Rating = ({ classNames, onChange, size, style, ...props }: RatingPr
                 debouncedOnChange(e);
             }}
             onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+                if (preventDefault) {
+                    e.preventDefault();
+                }
+                if (stopPropagation) {
+                    e.stopPropagation();
+                }
             }}
         />
     );

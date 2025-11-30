@@ -3,7 +3,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { MpvPlayerEngine, MpvPlayerEngineHandle } from './engine/mpv-player-engine';
 
-import { useMainPlayerListener } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import {
@@ -132,8 +131,6 @@ export function MpvPlayer() {
 
         return () => clearInterval(interval);
     }, [localPlayerStatus, setTimestamp]);
-
-    useMainPlayerListener();
 
     const currentUrl = useSongUrl(currentSong, true, transcode);
     const nextUrl = useSongUrl(nextSong, false, transcode);
