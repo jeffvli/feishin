@@ -331,12 +331,12 @@ export function WebPlayer() {
         if (!webAudio) return;
 
         if (player1 && player1Source && num === 1) {
-            const newVolume = (calculateReplayGain(player1) * volume) / 100;
+            const newGain = calculateReplayGain(player1);
 
             // This error SHOULD never happen, as calculateReplayGain is expected to
             // always return a real value. However, to prevent app crash, check this just in case
             try {
-                webAudio.gains[0].gain.setValueAtTime(Math.max(0, newVolume), 0);
+                webAudio.gains[0].gain.setValueAtTime(Math.max(0, newGain), 0);
             } catch (error) {
                 console.error('Error setting gain', error);
             }
@@ -347,9 +347,9 @@ export function WebPlayer() {
         if (!webAudio) return;
 
         if (player2 && player2Source && num === 2) {
-            const newVolume = (calculateReplayGain(player2) * volume) / 100;
+            const newGain = calculateReplayGain(player2);
             try {
-                webAudio.gains[1].gain.setValueAtTime(Math.max(0, newVolume), 0);
+                webAudio.gains[1].gain.setValueAtTime(Math.max(0, newGain), 0);
             } catch (error) {
                 console.error('Error setting gain', error);
             }
