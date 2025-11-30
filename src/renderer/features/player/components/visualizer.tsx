@@ -13,8 +13,8 @@ export const Visualizer = () => {
     const [motion, setMotion] = useState<AudioMotionAnalyzer>();
 
     useEffect(() => {
-        const { context, gain } = webAudio || {};
-        if (gain && context && canvasRef.current && !motion) {
+        const { context, gains } = webAudio || {};
+        if (gains && context && canvasRef.current && !motion) {
             const audioMotion = new AudioMotionAnalyzer(canvasRef.current, {
                 ansiBands: true,
                 audioCtx: context,
@@ -27,7 +27,7 @@ export const Visualizer = () => {
                 smoothing: 0.8,
             });
             setMotion(audioMotion);
-            audioMotion.connectInput(gain);
+            for (const gain of gains) audioMotion.connectInput(gain);
         }
 
         return () => {};

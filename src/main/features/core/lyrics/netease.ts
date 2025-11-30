@@ -20,24 +20,6 @@ export interface Result {
     songs: Song[];
 }
 
-export interface Song {
-    album: Album;
-    alias: string[];
-    artists: Artist[];
-    copyrightId: number;
-    duration: number;
-    fee: number;
-    ftype: number;
-    id: number;
-    mark: number;
-    mvid: number;
-    name: string;
-    rtype: number;
-    rUrl: null;
-    status: number;
-    transNames?: string[];
-}
-
 interface Album {
     artist: Artist;
     copyrightId: number;
@@ -67,6 +49,24 @@ interface Artist {
 interface NetEaseResponse {
     code: number;
     result: Result;
+}
+
+interface Song {
+    album: Album;
+    alias: string[];
+    artists: Artist[];
+    copyrightId: number;
+    duration: number;
+    fee: number;
+    ftype: number;
+    id: number;
+    mark: number;
+    mvid: number;
+    name: string;
+    rtype: number;
+    rUrl: null;
+    status: number;
+    transNames?: string[];
 }
 
 export async function getLyricsBySongId(songId: string): Promise<null | string> {

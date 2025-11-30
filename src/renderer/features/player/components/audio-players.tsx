@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import { useEffect } from 'react';
 
 import { eventEmitter } from '/@/renderer/events/event-emitter';
@@ -9,24 +10,84 @@ import { useMediaSession } from '/@/renderer/features/player/hooks/use-media-ses
 import { useMPRIS } from '/@/renderer/features/player/hooks/use-mpris';
 import { usePowerSaveBlocker } from '/@/renderer/features/player/hooks/use-power-save-blocker';
 import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
+import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import {
     updateQueueFavorites,
     updateQueueRatings,
     useCurrentServerId,
+    usePlaybackSettings,
     usePlaybackType,
+    useSettingsStoreActions,
 } from '/@/renderer/store';
+import { toast } from '/@/shared/components/toast/toast';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerType } from '/@/shared/types/types';
 
 export const AudioPlayers = () => {
     const playbackType = usePlaybackType();
     const serverId = useCurrentServerId();
+    const { resetSampleRate } = useSettingsStoreActions();
+
+    const {
+        audioDeviceId,
+        mpvProperties: { audioSampleRateHz },
+        webAudio,
+    } = usePlaybackSettings();
+    const { setWebAudio, webAudio: audioContext } = useWebAudio();
 
     useScrobble();
     usePowerSaveBlocker();
     useDiscordRpc();
     useMPRIS();
     useMediaSession();
+
+    useEffect(() => {
+        if (webAudio && 'AudioContext' in window) {
+            let context: AudioContext;
+
+            try {
+                context = new AudioContext({
+                    latencyHint: 'playback',
+                    sampleRate: audioSampleRateHz || undefined,
+                });
+            } catch (error) {
+                // In practice, this should never be hit because the UI should validate
+                // the range. However, the actual supported range is not guaranteed
+                toast.error({ message: (error as Error).message });
+                context = new AudioContext({ latencyHint: 'playback' });
+                resetSampleRate();
+            }
+
+            const gains = [context.createGain(), context.createGain()];
+            for (const gain of gains) {
+                gain.connect(context.destination);
+            }
+
+            setWebAudio!({ context, gains });
+        }
+
+        // Intentionally ignore the sample rate dependency, as it makes things really messy
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    useEffect(() => {
+        // Not standard, just used in chromium-based browsers. See
+        // https://developer.chrome.com/blog/audiocontext-setsinkid/.
+        // If the isElectron() check is every removed, fix this.
+        if (isElectron() && audioContext && 'setSinkId' in audioContext.context && audioDeviceId) {
+            const setSink = async () => {
+                try {
+                    if (audioContext.context.state !== 'closed') {
+                        await (audioContext.context as any).setSinkId(audioDeviceId);
+                    }
+                } catch (error) {
+                    toast.error({ message: `Error setting sink: ${(error as Error).message}` });
+                }
+            };
+
+            setSink();
+        }
+    }, [audioContext, audioDeviceId]);
 
     // Listen to favorite and rating events to update queue songs
     useEffect(() => {

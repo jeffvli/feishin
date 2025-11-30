@@ -1,12 +1,15 @@
 import type { RefObject } from 'react';
 
-import { useImperativeHandle, useRef, useState } from 'react';
+import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 
 import { AudioPlayer, PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
 import { convertToLogVolume } from '/@/renderer/features/player/audio-player/utils/player-utils';
+import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
+import { useMpvSettings, usePlaybackSettings } from '/@/renderer/store';
 import { LogCategory, logFn } from '/@/renderer/utils/logger';
 import { logMsg } from '/@/renderer/utils/logger-message';
+import { Song } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
 export interface WebPlayerEngineHandle extends AudioPlayer {
@@ -27,6 +30,8 @@ interface WebPlayerEngineProps {
     onEndedPlayer2: () => void;
     onProgressPlayer1: (e: PlayerOnProgressProps) => void;
     onProgressPlayer2: (e: PlayerOnProgressProps) => void;
+    onStartedPlayer1: (player: ReactPlayer) => void;
+    onStartedPlayer2: (player: ReactPlayer) => void;
     playerNum: number;
     playerRef: RefObject<null | WebPlayerEngineHandle>;
     playerStatus: PlayerStatus;
@@ -52,6 +57,8 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
         onEndedPlayer2,
         onProgressPlayer1,
         onProgressPlayer2,
+        onStartedPlayer1,
+        onStartedPlayer2,
         playerNum,
         playerRef,
         playerStatus,
@@ -158,6 +165,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 onEnded={src1 ? () => onEndedPlayer1() : undefined}
                 onError={handleOnError(player1Ref, () => onEndedPlayer1())}
                 onProgress={onProgressPlayer1}
+                onReady={onStartedPlayer1}
                 playbackRate={speed || 1}
                 playing={playerNum === 1 && playerStatus === PlayerStatus.PLAYING}
                 progressInterval={isTransitioning ? 10 : 250}
@@ -177,6 +185,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 onEnded={src2 ? () => onEndedPlayer2() : undefined}
                 onError={handleOnError(player2Ref, () => onEndedPlayer2())}
                 onProgress={onProgressPlayer2}
+                onReady={onStartedPlayer2}
                 playbackRate={speed || 1}
                 playing={playerNum === 2 && playerStatus === PlayerStatus.PLAYING}
                 progressInterval={isTransitioning ? 10 : 250}

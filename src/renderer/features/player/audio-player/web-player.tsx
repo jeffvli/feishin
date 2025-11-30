@@ -11,7 +11,9 @@ import { useMainPlayerListener } from '/@/renderer/features/player/audio-player/
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
+import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import {
+    useMpvSettings,
     usePlaybackSettings,
     usePlayerActions,
     usePlayerData,
@@ -19,6 +21,7 @@ import {
     usePlayerProperties,
     usePlayerVolume,
 } from '/@/renderer/store';
+import { QueueSong } from '/@/shared/types/domain-types';
 import { CrossfadeStyle, PlayerStatus, PlayerStyle } from '/@/shared/types/types';
 
 const PLAY_PAUSE_FADE_DURATION = 300;
@@ -28,6 +31,9 @@ export function WebPlayer() {
     const playerRef = useRef<null | WebPlayerEngineHandle>(null);
     const { num, player1, player2, status } = usePlayerData();
     const { mediaAutoNext, setTimestamp } = usePlayerActions();
+    const playback = useMpvSettings();
+    const { webAudio } = useWebAudio();
+
     const { crossfadeDuration, crossfadeStyle, speed, transitionType } = usePlayerProperties();
     const isMuted = usePlayerMuted();
     const volume = usePlayerVolume();
@@ -35,6 +41,9 @@ export function WebPlayer() {
 
     const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(status);
     const [isTransitioning, setIsTransitioning] = useState<boolean | string>(false);
+
+    const [player1Source, setPlayer1Source] = useState<MediaElementAudioSourceNode | null>(null);
+    const [player2Source, setPlayer2Source] = useState<MediaElementAudioSourceNode | null>(null);
 
     const fadeAndSetStatus = useCallback(
         async (startVolume: number, endVolume: number, duration: number, status: PlayerStatus) => {
@@ -264,8 +273,116 @@ export function WebPlayer() {
 
     useMainPlayerListener();
 
+    const calculateReplayGain = useCallback(
+        (song: QueueSong): number => {
+            if (playback.replayGainMode === 'no') {
+                return 1;
+            }
+
+            let gain: number | undefined;
+            let peak: number | undefined;
+
+            if (playback.replayGainMode === 'track') {
+                gain = song.gain?.track ?? song.gain?.album;
+                peak = song.peak?.track ?? song.peak?.album;
+            } else {
+                gain = song.gain?.album ?? song.gain?.track;
+                peak = song.peak?.album ?? song.peak?.track;
+            }
+
+            if (gain === undefined) {
+                gain = playback.replayGainFallbackDB;
+
+                if (!gain) {
+                    return 1;
+                }
+            }
+
+            if (peak === undefined) {
+                peak = 1;
+            }
+
+            const preAmp = playback.replayGainPreampDB ?? 0;
+
+            // https://wiki.hydrogenaud.io/index.php?title=ReplayGain_1.0_specification&section=19
+            // Normalized to max gain
+            const expectedGain = 10 ** ((gain + preAmp) / 20);
+
+            if (playback.replayGainClip) {
+                return Math.min(expectedGain, 1 / peak);
+            }
+            return expectedGain;
+        },
+        [
+            playback.replayGainClip,
+            playback.replayGainFallbackDB,
+            playback.replayGainMode,
+            playback.replayGainPreampDB,
+        ],
+    );
+
+    useEffect(() => {
+        if (!webAudio) return;
+
+        if (player1 && player1Source && num === 1) {
+            const newVolume = (calculateReplayGain(player1) * volume) / 100;
+            webAudio.gains[0].gain.setValueAtTime(Math.max(0, newVolume), 0);
+        }
+    }, [calculateReplayGain, num, player1, player1Source, volume, webAudio]);
+
+    useEffect(() => {
+        if (!webAudio) return;
+
+        if (player2 && player2Source && num === 2) {
+            const newVolume = (calculateReplayGain(player2) * volume) / 100;
+            webAudio.gains[1].gain.setValueAtTime(Math.max(0, newVolume), 0);
+        }
+    }, [calculateReplayGain, num, player1, player2Source, player2, volume, webAudio]);
+
     const player1Url = useSongUrl(player1, num === 1, transcode);
     const player2Url = useSongUrl(player2, num === 2, transcode);
+
+    const handlePlayer1Start = useCallback(
+        async (player: ReactPlayer) => {
+            if (!webAudio || player1Source) return;
+            if (player1Url) {
+                // This should fire once, only if the source is real (meaning we
+                // saw the dummy source) and the context is not ready
+                if (webAudio.context.state !== 'running') {
+                    await webAudio.context.resume();
+                }
+            }
+
+            const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
+            if (internal) {
+                const { context, gains } = webAudio;
+                const source = context.createMediaElementSource(internal);
+                source.connect(gains[0]);
+                setPlayer1Source(source);
+            }
+        },
+        [player1Source, player1Url, webAudio],
+    );
+
+    const handlePlayer2Start = useCallback(
+        async (player: ReactPlayer) => {
+            if (!webAudio || player2Source) return;
+            if (player2Url) {
+                if (webAudio.context.state !== 'running') {
+                    await webAudio.context.resume();
+                }
+            }
+
+            const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
+            if (internal) {
+                const { context, gains } = webAudio;
+                const source = context.createMediaElementSource(internal);
+                source.connect(gains[1]);
+                setPlayer2Source(source);
+            }
+        },
+        [player2Source, player2Url, webAudio],
+    );
 
     return (
         <WebPlayerEngine
@@ -275,6 +392,8 @@ export function WebPlayer() {
             onEndedPlayer2={handleOnEndedPlayer2}
             onProgressPlayer1={onProgressPlayer1}
             onProgressPlayer2={onProgressPlayer2}
+            onStartedPlayer1={handlePlayer1Start}
+            onStartedPlayer2={handlePlayer2Start}
             playerNum={num}
             playerRef={playerRef}
             playerStatus={localPlayerStatus}
