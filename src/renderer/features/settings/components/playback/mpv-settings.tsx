@@ -360,7 +360,7 @@ export const MpvSettings = () => {
             control: (
                 <NumberInput
                     defaultValue={settings.mpvProperties.replayGainPreampDB}
-                    onChange={(e) => handleSetMpvProperty('replayGainPreampDB', e)}
+                    onChange={(e) => handleSetMpvProperty('replayGainPreampDB', Number(e) || 0)}
                     width={75}
                 />
             ),

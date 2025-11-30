@@ -1,15 +1,12 @@
 import type { RefObject } from 'react';
 
-import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useImperativeHandle, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 
 import { AudioPlayer, PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
 import { convertToLogVolume } from '/@/renderer/features/player/audio-player/utils/player-utils';
-import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
-import { useMpvSettings, usePlaybackSettings } from '/@/renderer/store';
 import { LogCategory, logFn } from '/@/renderer/utils/logger';
 import { logMsg } from '/@/renderer/utils/logger-message';
-import { Song } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
 export interface WebPlayerEngineHandle extends AudioPlayer {

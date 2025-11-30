@@ -16,7 +16,9 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         {
             children,
             classNames,
+            defaultValue,
             maxWidth,
+            onChange,
             size = 'sm',
             style,
             variant = 'default',
@@ -38,6 +40,11 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                     ...classNames,
                 }}
                 hideControls
+                onChange={
+                    onChange
+                        ? (e) => onChange(typeof e === 'number' ? e : defaultValue || e)
+                        : undefined
+                }
                 ref={ref}
                 size={size}
                 style={{ maxWidth, width, ...style }}

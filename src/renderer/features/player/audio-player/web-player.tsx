@@ -306,7 +306,13 @@ export function WebPlayer() {
 
             // https://wiki.hydrogenaud.io/index.php?title=ReplayGain_1.0_specification&section=19
             // Normalized to max gain
-            const expectedGain = 10 ** ((gain + preAmp) / 20);
+            let expectedGain = 10 ** ((gain + preAmp) / 20);
+
+            // Nothing in the system should allow this. But, in the case that preAmp is a
+            // bad value (not a number, for example), a NaN gain will cause the entire system to panic
+            if (isNaN(expectedGain)) {
+                expectedGain = 1;
+            }
 
             if (playback.replayGainClip) {
                 return Math.min(expectedGain, 1 / peak);
@@ -326,7 +332,14 @@ export function WebPlayer() {
 
         if (player1 && player1Source && num === 1) {
             const newVolume = (calculateReplayGain(player1) * volume) / 100;
-            webAudio.gains[0].gain.setValueAtTime(Math.max(0, newVolume), 0);
+
+            // This error SHOULD never happen, as calculateReplayGain is expected to
+            // always return a real value. However, to prevent app crash, check this just in case
+            try {
+                webAudio.gains[0].gain.setValueAtTime(Math.max(0, newVolume), 0);
+            } catch (error) {
+                console.error('Error setting gain', error);
+            }
         }
     }, [calculateReplayGain, num, player1, player1Source, volume, webAudio]);
 
@@ -335,7 +348,11 @@ export function WebPlayer() {
 
         if (player2 && player2Source && num === 2) {
             const newVolume = (calculateReplayGain(player2) * volume) / 100;
-            webAudio.gains[1].gain.setValueAtTime(Math.max(0, newVolume), 0);
+            try {
+                webAudio.gains[1].gain.setValueAtTime(Math.max(0, newVolume), 0);
+            } catch (error) {
+                console.error('Error setting gain', error);
+            }
         }
     }, [calculateReplayGain, num, player1, player2Source, player2, volume, webAudio]);
 
