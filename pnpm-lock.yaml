@@ -257,7 +257,7 @@ importers:
         version: 8.18.1
       '@vitejs/plugin-react':
         specifier: ^5.1.1
-        version: 5.1.1(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1))
+        version: 5.1.1(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1))
       concurrently:
         specifier: ^9.2.1
         version: 9.2.1
@@ -275,7 +275,7 @@ importers:
         version: 4.0.0
       electron-vite:
         specifier: ^4.0.1
-        version: 4.0.1(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1))
+        version: 4.0.1(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1))
       eslint:
         specifier: ^9.24.0
         version: 9.27.0
@@ -326,7 +326,7 @@ importers:
         version: 5.8.3
       vite:
         specifier: ^7.2.2
-        version: 7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1)
+        version: 7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1)
       vite-plugin-conditional-import:
         specifier: ^0.1.7
         version: 0.1.7
@@ -335,10 +335,10 @@ importers:
         version: 1.6.0
       vite-plugin-ejs:
         specifier: ^1.7.0
-        version: 1.7.0(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1))
+        version: 1.7.0(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1))
       vite-plugin-pwa:
         specifier: ^1.1.0
-        version: 1.1.0(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
+        version: 1.1.0(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0)
 
 packages:
 
@@ -883,8 +883,8 @@ packages:
     resolution: {integrity: sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA==}
     engines: {node: '>=6.9.0'}
 
-  '@bufbuild/protobuf@2.4.0':
-    resolution: {integrity: sha512-RN9M76x7N11QRihKovEglEjjVCQEA9PRBVnDgk9xw8JHLrcUrp4FpAVSPSH91cNbcTft3u2vpLN4GMbiKY9PJw==}
+  '@bufbuild/protobuf@2.10.1':
+    resolution: {integrity: sha512-ckS3+vyJb5qGpEYv/s1OebUHDi/xSNtfgw1wqKZo7MR9F2z+qXr0q5XagafAG/9O0QPVIUfST0smluYSTpYFkg==}
 
   '@cacheable/memoize@2.0.3':
     resolution: {integrity: sha512-hl9wfQgpiydhQEIv7fkjEzTGE+tcosCXLKFDO707wYJ/78FVOlowb36djex5GdbSyeHnG62pomYLMuV/OT8Pbw==}
@@ -1944,9 +1944,6 @@ packages:
   '@types/estree@0.0.39':
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
 
-  '@types/estree@1.0.7':
-    resolution: {integrity: sha512-w28IoSUCJpidD/TGviZwwMJckNESJZXFu7NBZ5YJ4mEUnNraUn9Pm8HSZm/jDF1pDWYKspWE7oVphigUPRakIQ==}
-
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
@@ -2291,6 +2288,10 @@ packages:
     resolution: {integrity: sha512-JMWsdF+O8Orq3EMukbUN1QfbLK9mX2CkUmQBcW2T0s8OmdAUL5LLM/6wFwSrqXzlXB13yhyK9gTKS1rIizOduQ==}
     hasBin: true
 
+  baseline-browser-mapping@2.8.32:
+    resolution: {integrity: sha512-OPz5aBThlyLFgxyhdwf/s2+8ab3OvT7AdTNvKHBwpXomIYeXqpUUuT8LrdtxZSsWJ4R4CU1un4XGh5Ez3nlTpw==}
+    hasBin: true
+
   bind-event-listener@3.0.0:
     resolution: {integrity: sha512-PJvH288AWQhKs2v9zyfYdPzlPqf5bXbGMmhmUIY9x4dAUGIWgomO771oBQNwJnMQSnUIXhKu6sgzpBRXTlvb8Q==}
 
@@ -2337,6 +2338,11 @@ packages:
 
   browserslist@4.27.0:
     resolution: {integrity: sha512-AXVQwdhot1eqLihwasPElhX2tAZiBjWdJ9i/Zcj2S6QYIjkx62OKSfnobkriB81C3l4w0rVy3Nt4jaTBltYEpw==}
+    engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
+    hasBin: true
+
+  browserslist@4.28.0:
+    resolution: {integrity: sha512-tbydkR/CxfMwelN0vwdP/pLkDwyAASZ+VfWm4EOwlB6SWhx1sYnWLqo8N5j0rAzPfzfRaxt0mM/4wPU/Su84RQ==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
 
@@ -2403,6 +2409,9 @@ packages:
 
   caniuse-lite@1.0.30001751:
     resolution: {integrity: sha512-A0QJhug0Ly64Ii3eIqHu5X51ebln3k4yTUkY1j8drqpWHVreg/VLijN48cZ1bYPiqOQuqpkIKnzr/Ul8V+p6Cw==}
+
+  caniuse-lite@1.0.30001757:
+    resolution: {integrity: sha512-r0nnL/I28Zi/yjk1el6ilj27tKcdjLsNqAOZr0yVjWPrSQyHgKI2INaEWw21bAQSv2LXRt1XuCS/GomNpWOxsQ==}
 
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
@@ -2545,8 +2554,12 @@ packages:
     resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
     engines: {node: '>=18'}
 
-  core-js-compat@3.45.1:
-    resolution: {integrity: sha512-tqTt5T4PzsMIZ430XGviK4vzYSoeNJ6CXODi6c/voxOT6IZqBht5/EKaSNnYiEjjRYxjVz7DQIsOsY0XNi8PIA==}
+  cookie@1.1.1:
+    resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
+    engines: {node: '>=18'}
+
+  core-js-compat@3.47.0:
+    resolution: {integrity: sha512-IGfuznZ/n7Kp9+nypamBhvwdwLsW6KC8IOaURw2doAK5e98AG3acVLdh0woOnEqCfUtS+Vu882JE4k/DAm3ItQ==}
 
   core-util-is@1.0.2:
     resolution: {integrity: sha512-3lqz5YjWTYnW6dlDa5TLaTCcShfar1e40rmcJVwCBJC6mWlFuj0eCHIElmG1g5kyuJ/GD+8Wn4FFCcz4gJPfaQ==}
@@ -2815,6 +2828,9 @@ packages:
 
   electron-to-chromium@1.5.242:
     resolution: {integrity: sha512-msZ7SYGFpXkm/iUizlMrm/FPNeYo8uSltQccLVFO3fV4RN2JWGdG7Aatztxtw3uDWp3DkupfkrosLjUnhY+iOw==}
+
+  electron-to-chromium@1.5.262:
+    resolution: {integrity: sha512-NlAsMteRHek05jRUxUR0a5jpjYq9ykk6+kO0yRaMi5moe7u0fVIOeQ3Y30A8dIiWFBNUoQGi1ljb1i5VtS9WQQ==}
 
   electron-updater@6.6.2:
     resolution: {integrity: sha512-Cr4GDOkbAUqRHP5/oeOmH/L2Bn6+FQPxVLZtPbcmKZC63a1F3uu5EefYOssgZXG3u/zBlubbJ5PJdITdMVggbw==}
@@ -3467,10 +3483,6 @@ packages:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
 
-  ignore@7.0.4:
-    resolution: {integrity: sha512-gJzzk+PQNznz8ysRrC0aOkBNVRBDtE1n53IqyqEf3PXrYwomFs5q4pGMizBMJF+ykh03insJ27hB8gSrD2Hn8A==}
-    engines: {node: '>= 4'}
-
   ignore@7.0.5:
     resolution: {integrity: sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg==}
     engines: {node: '>= 4'}
@@ -3481,8 +3493,8 @@ packages:
   immer@10.2.0:
     resolution: {integrity: sha512-d/+XTN3zfODyjr89gM3mPq1WNX2B8pYsu7eORitdwyA2sBubnTl3laYlBk4sXY5FUa5qTZGBDPJICVbvqzjlbw==}
 
-  immutable@5.1.2:
-    resolution: {integrity: sha512-qHKXW1q6liAk1Oys6umoaZbDRqjcjgSrbnrifHsfsttza7zcvRAsL7mMV6xWcyhwQy7Xj5v4hhbr6b+iDYwlmQ==}
+  immutable@5.1.4:
+    resolution: {integrity: sha512-p6u1bG3YSnINT5RQmx/yRZBpenIl30kVxkTLDyHLIMk0gict704Q9n+thfDI7lTRm9vXdDYutVzXhzcThxTnXA==}
 
   import-fresh@3.3.1:
     resolution: {integrity: sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ==}
@@ -3513,8 +3525,8 @@ packages:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}
     engines: {node: '>= 0.4'}
 
-  ip-address@10.0.1:
-    resolution: {integrity: sha512-NWv9YLW4PoW2B7xtzaS3NCot75m6nK7Icdv0o3lfMceJVRfSoQwqD4wEH5rLwoKJwUiZ/rfpiVBhnaF0FK4HoA==}
+  ip-address@10.1.0:
+    resolution: {integrity: sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==}
     engines: {node: '>= 12'}
 
   is-arguments@1.2.0:
@@ -3712,8 +3724,8 @@ packages:
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
-  js-yaml@4.1.0:
-    resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
+  js-yaml@4.1.1:
+    resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
     hasBin: true
 
   jsbi@2.0.5:
@@ -4123,6 +4135,9 @@ packages:
 
   node-releases@2.0.26:
     resolution: {integrity: sha512-S2M9YimhSjBSvYnlr5/+umAnPHE++ODwt5e2Ij6FoX45HA/s4vHdkDx1eax2pAPeAOqu4s9b7ppahsyEFdVqQA==}
+
+  node-releases@2.0.27:
+    resolution: {integrity: sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==}
 
   nopt@6.0.0:
     resolution: {integrity: sha512-ZwLpbTgdhuZUnZzjd7nb1ZV+4DoiC6/sfiVKok72ym/4Tlf+DFdlHYmT2JPmcNNWV6Pi3SDf1kT+A4r9RTuT9g==}
@@ -4987,6 +5002,9 @@ packages:
   set-cookie-parser@2.7.1:
     resolution: {integrity: sha512-IOc8uWeOZgnb3ptbCURJWNjWUPcO3ZnTTdzsurqERrP6nPyv+paC55vJM0LpOlT2ne+Ix+9+CRG1MNLlyZ4GjQ==}
 
+  set-cookie-parser@2.7.2:
+    resolution: {integrity: sha512-oeM1lpU/UvhTxw+g3cIfxXHyJRc/uidd3yK1P242gzHds0udQBYzs3y8j4gCCW+ZJ7ad0yctld8RYO+bdurlvw==}
+
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
     engines: {node: '>= 0.4'}
@@ -5298,8 +5316,8 @@ packages:
     resolution: {integrity: sha512-G13vtMYPT/J8A4X2SjdtBTphZlrp1gKv6hZiOjw14RCWg6GbHuQBGtjlx75xLbYV/wEc0D7G5K4rxKP/cXk8Bw==}
     engines: {node: '>=10'}
 
-  terser@5.44.0:
-    resolution: {integrity: sha512-nIVck8DK+GM/0Frwd+nIhZ84pR/BX7rmXMfYwyg+Sri5oGVE99/E3KvXqpC2xHFxyqXyGHTKBSioxxplrO4I4w==}
+  terser@5.44.1:
+    resolution: {integrity: sha512-t/R3R/n0MSwnnazuPpPNVO60LX0SKL45pyl9YlvxIdkH0Of7D5qM2EVe+yASRIlY5pZ73nclYJfNANGWPwFDZw==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -6548,7 +6566,7 @@ snapshots:
       babel-plugin-polyfill-corejs2: 0.4.14(@babel/core@7.28.5)
       babel-plugin-polyfill-corejs3: 0.13.0(@babel/core@7.28.5)
       babel-plugin-polyfill-regenerator: 0.6.5(@babel/core@7.28.5)
-      core-js-compat: 3.45.1
+      core-js-compat: 3.47.0
       semver: 6.3.1
     transitivePeerDependencies:
       - supports-color
@@ -6587,7 +6605,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@bufbuild/protobuf@2.4.0':
+  '@bufbuild/protobuf@2.10.1':
     optional: true
 
   '@cacheable/memoize@2.0.3':
@@ -6875,7 +6893,7 @@ snapshots:
   '@eslint/config-array@0.20.0':
     dependencies:
       '@eslint/object-schema': 2.1.6
-      debug: 4.4.1
+      debug: 4.4.3
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -6893,12 +6911,12 @@ snapshots:
   '@eslint/eslintrc@3.3.1':
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.1
+      debug: 4.4.3
       espree: 10.3.0
       globals: 14.0.0
       ignore: 5.3.2
       import-fresh: 3.3.1
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       minimatch: 3.1.2
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
@@ -7417,7 +7435,7 @@ snapshots:
     dependencies:
       serialize-javascript: 6.0.2
       smob: 1.5.0
-      terser: 5.44.0
+      terser: 5.44.1
     optionalDependencies:
       rollup: 2.79.2
 
@@ -7593,8 +7611,6 @@ snapshots:
 
   '@types/estree@0.0.39': {}
 
-  '@types/estree@1.0.7': {}
-
   '@types/estree@1.0.8': {}
 
   '@types/fs-extra@9.0.13':
@@ -7679,7 +7695,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.32.1
       eslint: 9.27.0
       graphemer: 1.4.0
-      ignore: 7.0.4
+      ignore: 7.0.5
       natural-compare: 1.4.0
       ts-api-utils: 2.1.0(typescript@5.8.3)
       typescript: 5.8.3
@@ -7746,7 +7762,7 @@ snapshots:
       '@typescript-eslint/types': 8.32.1
       eslint-visitor-keys: 4.2.0
 
-  '@vitejs/plugin-react@5.1.1(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1))':
+  '@vitejs/plugin-react@5.1.1(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1))':
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
@@ -7754,7 +7770,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.47
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1)
+      vite: 7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -7876,7 +7892,7 @@ snapshots:
       hosted-git-info: 4.1.0
       is-ci: 3.0.1
       isbinaryfile: 5.0.4
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       json5: 2.2.3
       lazy-val: 1.0.5
       minimatch: 10.0.1
@@ -7999,7 +8015,7 @@ snapshots:
     dependencies:
       '@babel/core': 7.28.5
       '@babel/helper-define-polyfill-provider': 0.6.5(@babel/core@7.28.5)
-      core-js-compat: 3.45.1
+      core-js-compat: 3.47.0
     transitivePeerDependencies:
       - supports-color
 
@@ -8020,6 +8036,8 @@ snapshots:
   base64-js@1.5.1: {}
 
   baseline-browser-mapping@2.8.20: {}
+
+  baseline-browser-mapping@2.8.32: {}
 
   bind-event-listener@3.0.0: {}
 
@@ -8090,6 +8108,14 @@ snapshots:
       node-releases: 2.0.26
       update-browserslist-db: 1.1.4(browserslist@4.27.0)
 
+  browserslist@4.28.0:
+    dependencies:
+      baseline-browser-mapping: 2.8.32
+      caniuse-lite: 1.0.30001757
+      electron-to-chromium: 1.5.262
+      node-releases: 2.0.27
+      update-browserslist-db: 1.1.4(browserslist@4.28.0)
+
   buffer-builder@0.2.0:
     optional: true
 
@@ -8127,7 +8153,7 @@ snapshots:
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
       is-ci: 3.0.1
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       sanitize-filename: 1.6.3
       source-map-support: 0.5.21
       stat-mode: 1.0.0
@@ -8204,6 +8230,8 @@ snapshots:
   camelcase-css@2.0.1: {}
 
   caniuse-lite@1.0.30001751: {}
+
+  caniuse-lite@1.0.30001757: {}
 
   chalk@4.1.2:
     dependencies:
@@ -8352,9 +8380,12 @@ snapshots:
 
   cookie@1.0.2: {}
 
-  core-js-compat@3.45.1:
+  cookie@1.1.1:
+    optional: true
+
+  core-js-compat@3.47.0:
     dependencies:
-      browserslist: 4.27.0
+      browserslist: 4.28.0
 
   core-util-is@1.0.2:
     optional: true
@@ -8365,7 +8396,7 @@ snapshots:
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.1
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       parse-json: 5.2.0
     optionalDependencies:
       typescript: 5.8.3
@@ -8534,7 +8565,7 @@ snapshots:
       builder-util-runtime: 9.3.1
       fs-extra: 10.1.0
       iconv-lite: 0.6.3
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
     optionalDependencies:
       dmg-license: 1.0.11
     transitivePeerDependencies:
@@ -8682,11 +8713,13 @@ snapshots:
 
   electron-to-chromium@1.5.242: {}
 
+  electron-to-chromium@1.5.262: {}
+
   electron-updater@6.6.2:
     dependencies:
       builder-util-runtime: 9.3.1
       fs-extra: 10.1.0
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       lazy-val: 1.0.5
       lodash.escaperegexp: 4.1.2
       lodash.isequal: 4.5.0
@@ -8695,7 +8728,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  electron-vite@4.0.1(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1)):
+  electron-vite@4.0.1(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1)):
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-arrow-functions': 7.27.1(@babel/core@7.28.5)
@@ -8703,7 +8736,7 @@ snapshots:
       esbuild: 0.25.11
       magic-string: 0.30.17
       picocolors: 1.1.1
-      vite: 7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1)
+      vite: 7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -8981,12 +9014,12 @@ snapshots:
       '@humanfs/node': 0.16.6
       '@humanwhocodes/module-importer': 1.0.1
       '@humanwhocodes/retry': 0.4.3
-      '@types/estree': 1.0.7
+      '@types/estree': 1.0.8
       '@types/json-schema': 7.0.15
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.1
+      debug: 4.4.3
       escape-string-regexp: 4.0.0
       eslint-scope: 8.3.0
       eslint-visitor-keys: 4.2.0
@@ -9519,7 +9552,7 @@ snapshots:
       fs-extra: 11.3.2
       gulp-sort: 2.0.0
       i18next: 24.2.3(typescript@5.8.3)
-      js-yaml: 4.1.0
+      js-yaml: 4.1.1
       lilconfig: 3.1.3
       rsvp: 4.8.5
       sort-keys: 5.1.0
@@ -9559,15 +9592,13 @@ snapshots:
 
   ignore@5.3.2: {}
 
-  ignore@7.0.4: {}
-
   ignore@7.0.5: {}
 
   immediate@3.0.6: {}
 
   immer@10.2.0: {}
 
-  immutable@5.1.2:
+  immutable@5.1.4:
     optional: true
 
   import-fresh@3.3.1:
@@ -9596,7 +9627,7 @@ snapshots:
       hasown: 2.0.2
       side-channel: 1.1.0
 
-  ip-address@10.0.1: {}
+  ip-address@10.1.0: {}
 
   is-arguments@1.2.0:
     dependencies:
@@ -9778,7 +9809,7 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  js-yaml@4.1.0:
+  js-yaml@4.1.1:
     dependencies:
       argparse: 2.0.1
 
@@ -10141,6 +10172,8 @@ snapshots:
   node-mpv@https://codeload.github.com/jeffvli/Node-MPV/tar.gz/32b4d64395289ad710c41d481d2707a7acfc228f: {}
 
   node-releases@2.0.26: {}
+
+  node-releases@2.0.27: {}
 
   nopt@6.0.0:
     dependencies:
@@ -10576,9 +10609,9 @@ snapshots:
 
   react-router@7.9.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
-      cookie: 1.0.2
+      cookie: 1.1.1
       react: 19.1.0
-      set-cookie-parser: 2.7.1
+      set-cookie-parser: 2.7.2
     optionalDependencies:
       react-dom: 19.1.0(react@19.1.0)
     optional: true
@@ -10905,10 +10938,10 @@ snapshots:
 
   sass-embedded@1.89.0:
     dependencies:
-      '@bufbuild/protobuf': 2.4.0
+      '@bufbuild/protobuf': 2.10.1
       buffer-builder: 0.2.0
       colorjs.io: 0.5.2
-      immutable: 5.1.2
+      immutable: 5.1.4
       rxjs: 7.8.2
       supports-color: 8.1.1
       sync-child-process: 1.0.2
@@ -10959,6 +10992,9 @@ snapshots:
       randombytes: 2.1.0
 
   set-cookie-parser@2.7.1: {}
+
+  set-cookie-parser@2.7.2:
+    optional: true
 
   set-function-length@1.2.2:
     dependencies:
@@ -11057,7 +11093,7 @@ snapshots:
 
   socks@2.8.7:
     dependencies:
-      ip-address: 10.0.1
+      ip-address: 10.1.0
       smart-buffer: 4.2.0
 
   sort-keys@5.1.0:
@@ -11381,7 +11417,7 @@ snapshots:
       type-fest: 0.16.0
       unique-string: 2.0.0
 
-  terser@5.44.0:
+  terser@5.44.1:
     dependencies:
       '@jridgewell/source-map': 0.3.11
       acorn: 8.15.0
@@ -11561,6 +11597,12 @@ snapshots:
       escalade: 3.2.0
       picocolors: 1.1.1
 
+  update-browserslist-db@1.1.4(browserslist@4.28.0):
+    dependencies:
+      browserslist: 4.28.0
+      escalade: 3.2.0
+      picocolors: 1.1.1
+
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
@@ -11670,23 +11712,23 @@ snapshots:
       fast-glob: 3.3.3
       magic-string: 0.30.17
 
-  vite-plugin-ejs@1.7.0(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1)):
+  vite-plugin-ejs@1.7.0(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1)):
     dependencies:
       ejs: 3.1.10
-      vite: 7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1)
+      vite: 7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1)
 
-  vite-plugin-pwa@1.1.0(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0):
+  vite-plugin-pwa@1.1.0(vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1))(workbox-build@7.3.0(@types/babel__core@7.20.5))(workbox-window@7.3.0):
     dependencies:
       debug: 4.4.3
       pretty-bytes: 6.1.1
       tinyglobby: 0.2.15
-      vite: 7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1)
+      vite: 7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1)
       workbox-build: 7.3.0(@types/babel__core@7.20.5)
       workbox-window: 7.3.0
     transitivePeerDependencies:
       - supports-color
 
-  vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.0)(yaml@2.8.1):
+  vite@7.2.2(@types/node@24.10.1)(sass-embedded@1.89.0)(sugarss@5.0.1(postcss@8.5.6))(terser@5.44.1)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.11
       fdir: 6.5.0(picomatch@4.0.3)
@@ -11699,7 +11741,7 @@ snapshots:
       fsevents: 2.3.3
       sass-embedded: 1.89.0
       sugarss: 5.0.1(postcss@8.5.6)
-      terser: 5.44.0
+      terser: 5.44.1
       yaml: 2.8.1
 
   void-elements@3.1.0: {}
