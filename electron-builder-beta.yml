@@ -44,6 +44,7 @@ dmg:
 linux:
     target:
         - AppImage
+        - deb
         - tar.xz
     category: AudioVideo;Audio;Player
     icon: assets/icons/icon.png

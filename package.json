@@ -16,6 +16,7 @@
     "license": "GPL-3.0",
     "author": {
         "name": "jeffvli",
+        "email": "feishin@users.noreply.github.com",
         "url": "https://github.com/jeffvli/"
     },
     "main": "./out/main/index.js",
