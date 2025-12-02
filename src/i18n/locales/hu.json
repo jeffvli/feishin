@@ -3,7 +3,7 @@
         "moveToNext": "ugrás a következőre",
         "deletePlaylist": "$t(entity.playlist_one) törlése",
         "removeFromFavorites": "eltávolítás innen $t(entity.favorite_other)",
-        "setRating": "értékelés beállítása",
+        "setRating": "értékelés",
         "viewPlaylists": "$t(entity.playlist_other) megtekintése",
         "openIn": {
             "lastfm": "Megnyitás Last.fm-ben",
@@ -21,7 +21,14 @@
         "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist) szerkesztője",
         "addToFavorites": "$t(entity.favorite_other) kedvelése",
         "addToPlaylist": "hozzáadás lejátszási listához: $t(entity.playlist_one)",
-        "refresh": "$t(common.refresh)"
+        "refresh": "$t(common.refresh)",
+        "downloadStarted": "megkezdődött {{count}} elem letöltése",
+        "largeFetch": "ez a művelet {{count}} hálózati kérést fog küldeni a szerverednek",
+        "moveItems": "elemek mozgatása",
+        "shuffle": "keverés",
+        "shuffleAll": "összes keverése",
+        "shuffleSelected": "kiválasztottak keverése",
+        "viewMore": "további információ"
     },
     "common": {
         "collapse": "összecsukás",
@@ -68,7 +75,7 @@
         "filter_other": "szűrők",
         "filters": "szűrők",
         "forward": "előre",
-        "gap": "gap",
+        "gap": "hézag",
         "increase": "megnövelés",
         "left": "bal",
         "limit": "korlát",
@@ -125,11 +132,19 @@
         "sampleRate": "mintavételi frekvencia",
         "releaseType": "kiadás típusa",
         "explicitStatus": "nyílt státusz",
-        "tags": "címkék"
+        "tags": "címkék",
+        "doNotShowAgain": "ne mutasd többet",
+        "externalLinks": "külső linkek",
+        "faster": "gyorsabban",
+        "slower": "lassabban",
+        "sort": "rendezés",
+        "gridRows": "rács sorok",
+        "tableColumns": "táblázat oszlopok",
+        "itemsMore": "{{count}} még több"
     },
     "entity": {
-        "albumArtist_one": "album szerzője",
-        "albumArtist_other": "album szerzői",
+        "albumArtist_one": "Zenész",
+        "albumArtist_other": "Zenészek",
         "albumArtistCount_one": "{{count}} album szerző",
         "albumArtistCount_other": "{{count}} album szerzők",
         "albumWithCount_one": "{{count}} album",
@@ -285,7 +300,11 @@
         "queryEditor": {
             "title": "lekérdezés szerkesztő",
             "input_optionMatchAll": "összes egyezés",
-            "input_optionMatchAny": "bármelyik egyező"
+            "input_optionMatchAny": "bármelyik egyező",
+            "addRuleGroup": "szabálycsoport hozzáadás",
+            "removeRuleGroup": "szabálycsoport eltávolítás",
+            "resetToDefault": "alapértelmezettre visszaállítás",
+            "clearFilters": "szűrők törlése"
         },
         "shareItem": {
             "allowDownloading": "letöltés engedélyezése",
@@ -303,6 +322,21 @@
             "enabled": "privát mód engedélyezve, a lejátszási állapot mostantól rejtve marad a külső integrációk elől",
             "disabled": "A privát mód le van tiltva, a lejátszási állapot mostantól látható az engedélyezett külső integrációk számára",
             "title": "Privát mód"
+        },
+        "largeFetchConfirmation": {
+            "title": "műsorlistához ad",
+            "description": "Ez a kérés megpróbál letölteni {{count}} elemet a szerverről"
+        },
+        "shuffleAll": {
+            "title": "véletlenszerű lejátszás",
+            "input_genre": "$t(entity.genre_one)",
+            "input_limit": "Hány dal?",
+            "input_minYear": "ettől az évtől",
+            "input_maxYear": "eddig az évig",
+            "input_played_optionAll": "összes sáv",
+            "input_played": "csak szűrt zenék",
+            "input_played_optionUnplayed": "Csak a még nem lejátszottak",
+            "input_played_optionPlayed": "Csak a játszottak számok"
         }
     },
     "dragDropZone": {
@@ -336,18 +370,21 @@
             "title": "$t(entity.album_other)"
         },
         "appMenu": {
-            "collapseSidebar": "összecsukni az oldalsávot",
-            "expandSidebar": "kibővíteni az oldalsávot",
-            "goBack": "menj vissza",
-            "goForward": "menj előre",
-            "manageServers": "szerverek kezelése",
-            "privateModeOff": "Privát mód kikapcsolása",
-            "privateModeOn": "Privát mód bekapcsolása",
-            "openBrowserDevtools": "böngésző fejlesztői eszközeinek megnyitása",
+            "collapseSidebar": "oldalsáv",
+            "expandSidebar": "oldalsáv",
+            "goBack": "vissza",
+            "goForward": "előre",
+            "manageServers": "szerverek",
+            "privateModeOff": "Privát mód",
+            "privateModeOn": "Privát mód",
+            "openBrowserDevtools": "Fejlesztői eszközök",
             "quit": "$t(common.quit)",
             "selectServer": "Szerver választása",
             "settings": "$t(common.setting_other)",
-            "version": "verzió {{version}}"
+            "version": "verzió {{version}}",
+            "selectMusicFolder": "zene mappa kiválasztása",
+            "noMusicFolder": "nincs zene mappa kiválasztva",
+            "multipleMusicFolders": "{{count}} kiválasztott zene mappák"
         },
         "manageServers": {
             "title": "Szerverek kezelés",
@@ -378,10 +415,12 @@
             "removeFromQueue": "$t(action.removeFromQueue)",
             "setRating": "$t(action.setRating)",
             "playShuffled": "$t(player.shuffle)",
-            "shareItem": "elem megosztása",
-            "goToAlbum": "menj a $t(entity.album_one)",
+            "shareItem": "Megosztás",
+            "goToAlbum": "menj az $t(entity.album_one)",
             "goToAlbumArtist": "menj a $t(entity.albumArtist_one)",
-            "showDetails": "információkérés"
+            "showDetails": "info",
+            "moveItems": "$t(action.moveItems)",
+            "goTo": "menj"
         },
         "fullscreenPlayer": {
             "config": {
@@ -443,7 +482,22 @@
             "generalTab": "általános",
             "hotkeysTab": "gyorsbillentyűk",
             "windowTab": "ablak",
-            "playbackTab": "visszajátszás"
+            "playbackTab": "visszajátszás",
+            "analytics": "elemzés",
+            "updates": "frissítés",
+            "cache": "gyorsítótár",
+            "application": "applikáció",
+            "theme": "téma",
+            "controls": "irányítás",
+            "sidebar": "oldalsáv",
+            "remote": "távoli",
+            "exportImport": "import/export",
+            "scrobble": "scrobble",
+            "audio": "audio",
+            "lyrics": "dalszöveg",
+            "transcoding": "átkódolás",
+            "discord": "discord",
+            "queryBuilder": "lekérdezés-építő"
         },
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist_other)",
@@ -458,12 +512,16 @@
             "search": "$t(common.search)",
             "settings": "$t(common.setting_other)",
             "shared": "megosztott $t(entity.playlist_other)",
-            "tracks": "$t(entity.track_other)"
+            "tracks": "$t(entity.track_other)",
+            "favorites": "$t(entity.favorite_other)"
         },
         "trackList": {
-            "artistTracks": "sávok tőle {{artist}}",
+            "artistTracks": "dalok tőle {{artist}}",
             "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
             "title": "$t(entity.track_other)"
+        },
+        "favorites": {
+            "title": "$t(entity.favorite_other)"
         }
     },
     "player": {
@@ -488,7 +546,7 @@
         "repeat": "ismétlés",
         "repeat_all": "összes ismétlése",
         "repeat_off": "ismétlés kikapcsolva",
-        "shuffle": "kevert lejátszás",
+        "shuffle": "kevert (lejátszás)",
         "skip": "ugrás",
         "skip_back": "visszaugrás",
         "skip_forward": "előre ugrás",
@@ -497,7 +555,12 @@
         "unfavorite": "kedvencekből eltávolítás",
         "pause": "szünet",
         "viewQueue": "műsorlista megtekintése",
-        "shuffle_off": "kevert lejátszás ki"
+        "shuffle_off": "kevert lejátszás ki",
+        "addLastShuffled": "Hozzáadás a végére (keverve)",
+        "addNextShuffled": "Hozzáadás következőnek (keverve)",
+        "queueType": "lekérdezés típus",
+        "queueType_default": "alapértelmezett",
+        "queueType_priority": "prioritás"
     },
     "releaseType": {
         "primary": {
@@ -591,18 +654,16 @@
         "discordServeImage_description": "megosztja a {{discord}} borítóképet a szerverről (csak Jellyfin és Navidrome esetén elérhető). A {{discord}} botot használ a képek letöltéséhez, ezért a szervernek elérhetőnek kell lennie a nyilvános interneten",
         "discordUpdateInterval": "{{discord}} rich presence frissítési intervallum",
         "discordUpdateInterval_description": "az egyes frissítések közötti idő másodpercben (minimum 15 másodperc)",
-        "doubleClickBehavior_description": "Ha igaz, akkor a keresés során talált összes megfelelő szám a műsorlistára kerül. Ellenkező esetben csak a rákattintott szám kerül a műsorlistára",
-        "doubleClickBehavior": "dupla kattintással az összes keresett zeneszámot műsorlistára teszi",
         "enableAutoTranslation_description": "a dalszöveg betöltésekor automatikusan engedélyezze a fordítást",
         "enableAutoTranslation": "automatikus fordítás engedélyezése",
         "enableRemote_description": "lehetővé teszi egy távoli vezérlő szerver számára, hogy más eszközök vezéreljék az alkalmazást",
         "enableRemote": "távoli vezérlő szerver engedélyezése",
         "exitToTray_description": "kilépés az alkalmazásból a tálcára",
         "exitToTray": "kilépés a tálcára",
-        "exportImportSettings_control_description": "beállítások exportálása és importálása JSON-on keresztül",
+        "exportImportSettings_control_description": "Beállítások exportálása és importálása JSON-on keresztül",
         "exportImportSettings_control_exportText": "beállítások exportálása",
         "exportImportSettings_control_importText": "beállítások importálása",
-        "exportImportSettings_control_title": "beállítások exportálása és importálása",
+        "exportImportSettings_control_title": "Beállítások exportálása és importálása",
         "exportImportSettings_destructiveWarning": "A beállítások importálása végleges, ezért kérlek, olvasd el a fenti információkat, mielőtt rákattintasz az alábbi „Importálás” gombra!",
         "exportImportSettings_importBtn": "beállítások importálása",
         "exportImportSettings_importModalTitle": "Feishin beállítások importálása",
@@ -611,8 +672,6 @@
         "exportImportSettings_offendingKeyError": "\"{{offendingKey}}\" helytelen - {{reason}}",
         "externalLinks_description": "lehetővé teszi külső linkek (Last.fm, MusicBrainz) megjelenítését az előadó/album oldalakon",
         "externalLinks": "külső linkek megjelenítése",
-        "floatingQueueArea_description": "Lebegő ikon megjelenítése a képernyő jobb oldalán a műsorlista megnyitásához",
-        "floatingQueueArea": "Lebegő műsorlista területének megjelenítése",
         "followLyric_description": "görgess a dalszöveghez az aktuális lejátszási pozícióig",
         "followLyric": "kövesd az aktuális dalszöveget",
         "font_description": "beállítja az alkalmazáshoz használandó betűtípust",
@@ -622,7 +681,7 @@
         "fontType_optionCustom": "egyedi betűtípus",
         "fontType_optionSystem": "rendszer betűtípus",
         "fontType": "Font típusa",
-        "gaplessAudio_description": "Beállítja az MPV résmentes (gapless) lejátszását",
+        "gaplessAudio_description": "Beállítja az MPV résmentes (hézagmentes) lejátszását",
         "gaplessAudio_optionWeak": "gyenge (ajánlott)",
         "gaplessAudio": "hézagmentes hang",
         "genreBehavior_description": "meghatározza, hogy egy műfajra kattintva alapértelmezés szerint a zeneszámok vagy az albumok listája nyílik-e meg",
@@ -745,7 +804,7 @@
         "scrobble_description": "a lejátszás Scrobble-elése a médiaszerveredre",
         "showSkipButtons_description": "a lejátszó sávon megjelenő átugrás gombok megjelenítése vagy elrejtése",
         "showSkipButtons": "mutasd az átugrás gombot",
-        "sidebarConfiguration_description": "Válaszd ki az oldalsávban megjelenő elemeket és azok sorrendjét",
+        "sidebarConfiguration_description": "válaszd ki az oldalsávban megjelenő elemeket és azok sorrendjét",
         "sidebarCollapsedNavigation_description": "Navigáció megjelenítése vagy elrejtése az összecsukott oldalsávban",
         "sidebarCollapsedNavigation": "Összecsukott oldalsáv navigációja",
         "sidebarConfiguration": "oldalsáv konfigurációja",
@@ -755,7 +814,7 @@
         "sidePlayQueueStyle_description": "beállítja az oldalsó műsorlista stílusát",
         "mediaSession_description": "lehetővé teszi a Windows Media Session integrációját, a médiavezérlők és metaadatok megjelenítését a rendszer hangerő-átfedésben és a zárolási képernyőn (csak Windows)",
         "mediaSession": "média munkamenet engedélyezése",
-        "sidePlayQueueStyle": "oldalsó műsorlista stílusa",
+        "sidePlayQueueStyle": "oldalsó műsorlista stílus",
         "skipDuration": "átugrás hossza",
         "skipPlaylistPage_description": "lejátszási listához való navigáláskor az alapértelmezett oldal helyett a lejátszási lista dalainak listájára mutató oldalra lépjen",
         "skipPlaylistPage": "lejátszási lista oldalának átugrása",
@@ -788,13 +847,34 @@
         "zoom": "nagyítási arány",
         "webAudio": "web audio használata",
         "windowBarStyle_description": "válaszd ki az címsor stílusát",
-        "windowBarStyle": "címsor stílusa",
+        "windowBarStyle": "címsor",
         "zoom_description": "beállítja az alkalmazás nagyítási arányát",
         "volumeWheelStep_description": "A hangerő változásának mértéke az egérgörgő használatakor a hangerő sávon",
         "volumeWheelStep": "hangerőgörgő lépés",
         "volumeWidth": "hangerő sáv szélessége",
         "webAudio_description": "Web Audio használata. Ez lehetővé teszi a fejlettebb funkciókat, például a ReplayGain-t. (Kapcsold ki, ha problémát tapasztalsz)",
-        "volumeWidth_description": "hangerő sáv szélessége"
+        "volumeWidth_description": "hangerő sáv szélessége",
+        "analyticsDisable_description": "Anonim használati adatok kerülnek elküldésre a fejlesztőnek, hogy segítsék az alkalmazás fejlesztését",
+        "analyticsDisable": "Használati alapú adatok küldésének kikapcsolása",
+        "playerbarSlider": "lejátszósáv csúszka",
+        "playerbarSliderType_optionSlider": "csűszka",
+        "playerbarSliderType_optionWaveform": "hullámforma",
+        "playerbarWaveformAlign": "hullámforma igazítás",
+        "playerbarWaveformAlign_optionTop": "felső",
+        "playerbarWaveformAlign_optionCenter": "középső",
+        "playerbarWaveformAlign_optionBottom": "alsó",
+        "playerbarWaveformBarWidth": "hullámforma oszlopszélesség",
+        "playerbarWaveformGap": "hullámforma oszlopköz",
+        "playerbarWaveformRadius": "hullámforma sugara",
+        "showLyricsInSidebar_description": "a csatolt műsorlistához egy panel kerül hozzáadásra, amelyen a dalszövegek jelennek meg",
+        "showLyricsInSidebar": "dalszövegek megjelenítése a lejátszó oldalsávban",
+        "showVisualizerInSidebar_description": "a lejátszó oldalsávjához egy panel kerül hozzáadásra, amely megjeleníti a vizualizáció",
+        "showVisualizerInSidebar": "vizualizáció megjelenítése a lejátszó oldalsávban",
+        "queryBuilder": "lekérdezés-építő",
+        "queryBuilderCustomFields_inputLabel": "címke",
+        "queryBuilderCustomFields_inputTag": "jelölés",
+        "queryBuilderCustomFields": "egyéni mezők",
+        "queryBuilderCustomFields_description": "egyéni mezők hozzáadása a lekérdezés-építőhöz"
     },
     "table": {
         "config": {
@@ -826,13 +906,14 @@
                 "duration": "$t(common.duration)",
                 "favorite": "$t(common.favorite)",
                 "actions": "$t(common.action_other)",
-                "album": "$t(entity.album_one)"
+                "album": "$t(entity.album_one)",
+                "albumCount": "$t(entity.album_other)",
+                "genreBadge": "$t(entity.genre_one) (jelvények)",
+                "image": "kép"
             },
             "view": {
-                "card": "kártya",
                 "grid": "rács",
                 "list": "lista",
-                "poster": "poszter",
                 "table": "táblázat"
             },
             "general": {
@@ -843,7 +924,28 @@
                 "size": "$t(common.size)",
                 "tableColumns": "táblázat oszlopai",
                 "itemGap": "elemek közötti távolság (px)",
-                "itemSize": "elem mérete (px)"
+                "itemSize": "elem mérete (px)",
+                "advancedSettings": "speciális beállítások",
+                "autosize": "automatikus méret",
+                "moveUp": "felfelé",
+                "moveDown": "lefelé",
+                "pinToLeft": "balra tűz",
+                "pinToRight": "jobbra tűz",
+                "alignLeft": "igazítás balra",
+                "alignCenter": "igazítás középre",
+                "alignRight": "igazítás jobbra",
+                "itemsPerRow": "elemek soronként",
+                "size_default": "alapértelmezett",
+                "size_compact": "kompakt",
+                "size_large": "nagy",
+                "pagination": "oldalszámozás",
+                "pagination_itemsPerPage": "elemek oldalanként",
+                "pagination_infinite": "végtelen",
+                "pagination_paginate": "oldal számozva",
+                "alternateRowColors": "alternatív sor színek",
+                "horizontalBorders": "sorhatárok",
+                "rowHoverHighlight": "sor kiemelése egérrel",
+                "verticalBorders": "oszlophatárok"
             }
         },
         "column": {
@@ -870,7 +972,12 @@
             "title": "cím",
             "trackNumber": "sáv",
             "album": "album",
-            "albumArtist": "album előadó"
+            "albumArtist": "album előadó",
+            "owner": "tulajdonos"
         }
+    },
+    "queryBuilder": {
+        "standardTags": "általános címkék",
+        "customTags": "egyedi címkék"
     }
 }
