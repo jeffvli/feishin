@@ -1,13 +1,15 @@
 import { initClient, initContract } from '@ts-rest/core';
-import axios, { AxiosError, AxiosResponse, isAxiosError, Method } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, isAxiosError } from 'axios';
 import omitBy from 'lodash/omitBy';
 import qs from 'qs';
 import { z } from 'zod';
 
 import i18n from '/@/i18n/i18n';
 import { ssType } from '/@/shared/api/subsonic/subsonic-types';
+import { hasFeature } from '/@/shared/api/utils';
 import { toast } from '/@/shared/components/toast/toast';
 import { ServerListItemWithCredential } from '/@/shared/types/domain-types';
+import { ServerFeature } from '/@/shared/types/features-types';
 
 const c = initContract();
 
@@ -312,7 +314,7 @@ export const ssApiClient = (args: {
     const { server, signal, silent, url } = args;
 
     return initClient(contract, {
-        api: async ({ body, headers, method, path }) => {
+        api: async ({ headers, method, path }) => {
             let baseUrl: string | undefined;
             const authParams: Record<string, any> = {};
 
@@ -334,25 +336,36 @@ export const ssApiClient = (args: {
                 baseUrl = url;
             }
 
+            const request: AxiosRequestConfig = {
+                headers,
+                signal,
+                // In cases where we have a fallback, don't notify the error
+                transformResponse: silent ? silentlyTransformResponse : undefined,
+                url: `${baseUrl}/${api}`,
+            };
+
+            const data = {
+                c: 'Feishin',
+                f: 'json',
+                v: '1.13.0',
+                ...authParams,
+                ...params,
+            };
+
+            if (hasFeature(server, ServerFeature.FORM_POST)) {
+                headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                request.method = 'POST';
+                request.data = qs.stringify(data, { arrayFormat: 'repeat' });
+            } else {
+                request.method = method;
+                request.params = data;
+            }
+
             try {
-                const result = await axiosClient.request<
-                    z.infer<typeof ssType._response.baseResponse>
-                >({
-                    data: body,
-                    headers,
-                    method: method as Method,
-                    params: {
-                        c: 'Feishin',
-                        f: 'json',
-                        v: '1.13.0',
-                        ...authParams,
-                        ...params,
-                    },
-                    signal,
-                    // In cases where we have a fallback, don't notify the error
-                    transformResponse: silent ? silentlyTransformResponse : undefined,
-                    url: `${baseUrl}/${api}`,
-                });
+                const result =
+                    await axiosClient.request<z.infer<typeof ssType._response.baseResponse>>(
+                        request,
+                    );
 
                 return {
                     body: result.data['subsonic-response'],
