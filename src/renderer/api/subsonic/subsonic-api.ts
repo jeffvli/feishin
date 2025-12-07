@@ -352,7 +352,7 @@ export const ssApiClient = (args: {
                 ...params,
             };
 
-            if (hasFeature(server, ServerFeature.FORM_POST)) {
+            if (hasFeature(server, ServerFeature.OS_FORM_POST)) {
                 headers['Content-Type'] = 'application/x-www-form-urlencoded';
                 request.method = 'POST';
                 request.data = qs.stringify(data, { arrayFormat: 'repeat' });
