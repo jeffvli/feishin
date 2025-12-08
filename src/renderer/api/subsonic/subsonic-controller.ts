@@ -15,7 +15,7 @@ import {
     ssType,
     SubsonicExtensions,
 } from '/@/shared/api/subsonic/subsonic-types';
-import { sortAlbumArtistList, sortAlbumList, sortSongList } from '/@/shared/api/utils';
+import { hasFeature, sortAlbumArtistList, sortAlbumList, sortSongList } from '/@/shared/api/utils';
 import {
     AlbumListSort,
     GenreListSort,
@@ -27,7 +27,7 @@ import {
     SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { ServerFeatures } from '/@/shared/types/features-types';
+import { ServerFeature, ServerFeatures } from '/@/shared/types/features-types';
 
 const ALBUM_LIST_SORT_MAPPING: Record<AlbumListSort, AlbumListSortType | undefined> = {
     [AlbumListSort.ALBUM_ARTIST]: AlbumListSortType.ALPHABETICAL_BY_ARTIST,
@@ -913,6 +913,44 @@ export const SubsonicController: InternalControllerEndpoint = {
             totalRecordCount: items.length,
         };
     },
+    getPlayQueue: async ({ apiClientProps }) => {
+        if (hasFeature(apiClientProps.server, ServerFeature.SERVER_PLAY_QUEUE)) {
+            const res = await ssApiClient(apiClientProps).getPlayQueueByIndex();
+
+            if (res.status !== 200) {
+                throw new Error('Failed to get random songs');
+            }
+
+            const { changed, changedBy, currentIndex, entry, position, username } =
+                res.body.playQueueByIndex;
+
+            return {
+                changed,
+                changedBy,
+                currentIndex: currentIndex ?? 0,
+                entry: entry?.map((song) => ssNormalize.song(song, apiClientProps.server)) || [],
+                position,
+                username,
+            };
+        } else {
+            const res = await ssApiClient(apiClientProps).getPlayQueue();
+
+            if (res.status !== 200) {
+                throw new Error('Failed to get random songs');
+            }
+
+            const { changed, changedBy, current, entry, position, username } = res.body.playQueue;
+
+            return {
+                changed,
+                changedBy,
+                currentIndex: current ? entry.findIndex((item) => item.id === current) : 0,
+                entry: entry?.map((song) => ssNormalize.song(song, apiClientProps.server)) || [],
+                position,
+                username,
+            };
+        }
+    },
     getRandomSongList: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -967,6 +1005,7 @@ export const SubsonicController: InternalControllerEndpoint = {
         final.splice(0, 0, { label: 'all artists', value: '' });
         return final;
     },
+
     getServerInfo: async (args) => {
         const { apiClientProps } = args;
 
@@ -1001,6 +1040,10 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         if (subsonicFeatures[SubsonicExtensions.FORM_POST]) {
             features.osFormPost = [1];
+        }
+
+        if (subsonicFeatures[SubsonicExtensions.INDEX_BASED_QUEUE]) {
+            features.serverPlayQueue = [1];
         }
 
         return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };
@@ -1585,6 +1628,36 @@ export const SubsonicController: InternalControllerEndpoint = {
         }
 
         return null;
+    },
+    savePlayQueue: async ({ apiClientProps, query }) => {
+        if (hasFeature(apiClientProps.server, ServerFeature.SERVER_PLAY_QUEUE)) {
+            const res = await ssApiClient(apiClientProps).savePlayQueueByIndex({
+                query: {
+                    currentIndex: query.currentIndex !== undefined ? query.currentIndex : undefined,
+                    id: query.songs,
+                    position: query.positionMs,
+                },
+            });
+
+            if (res.status !== 200) {
+                throw new Error('Failed to save play queue');
+            }
+        } else {
+            const res = await ssApiClient(apiClientProps).savePlayQueue({
+                query: {
+                    current:
+                        query.currentIndex !== undefined && query.currentIndex < query.songs.length
+                            ? query.songs[query.currentIndex]
+                            : undefined,
+                    id: query.songs,
+                    position: query.positionMs,
+                },
+            });
+
+            if (res.status !== 200) {
+                throw new Error('Failed to save play queue');
+            }
+        }
     },
     scrobble: async (args) => {
         const { apiClientProps, query } = args;

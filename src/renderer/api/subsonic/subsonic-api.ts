@@ -141,6 +141,20 @@ export const contract = c.router({
             200: ssType._response.getPlaylists,
         },
     },
+    getPlayQueue: {
+        method: 'GET',
+        path: 'getPlayQueue.view',
+        responses: {
+            200: ssType._response.playQueue,
+        },
+    },
+    getPlayQueueByIndex: {
+        method: 'GET',
+        path: 'getPlayQueueByIndex.view',
+        responses: {
+            200: ssType._response.playQueueByIndex,
+        },
+    },
     getRandomSongList: {
         method: 'GET',
         path: 'getRandomSongs.view',
@@ -225,6 +239,22 @@ export const contract = c.router({
         query: ssType._parameters.removeFavorite,
         responses: {
             200: ssType._response.removeFavorite,
+        },
+    },
+    savePlayQueue: {
+        method: 'GET',
+        path: 'savePlayQueue.view',
+        query: ssType._parameters.saveQueue,
+        responses: {
+            200: ssType._response.saveQueue,
+        },
+    },
+    savePlayQueueByIndex: {
+        method: 'GET',
+        path: 'savePlayQueueByIndex.view',
+        query: ssType._parameters.savePlayQueueByIndex,
+        responses: {
+            200: ssType._response.saveQueue,
         },
     },
     scrobble: {

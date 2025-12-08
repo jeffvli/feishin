@@ -355,6 +355,7 @@ const similarSongs = z.object({
 
 export enum SubsonicExtensions {
     FORM_POST = 'formPost',
+    INDEX_BASED_QUEUE = 'indexBasedQueue',
     SONG_LYRICS = 'songLyrics',
     TRANSCODE_OFFSET = 'transcodeOffset',
 }
@@ -616,6 +617,42 @@ const getIndexesParameters = z.object({
     musicFolderId: z.string().optional(),
 });
 
+const saveQueueParameters = z.object({
+    current: z.string().optional(),
+    id: z.string().array(),
+    position: z.number().optional(),
+});
+
+const savePlayQueueByIndexParameters = z.object({
+    currentIndex: z.number().optional(),
+    id: z.string().array().optional(),
+    position: z.number().optional(),
+});
+
+const saveQueue = z.null();
+
+const playQueue = z.object({
+    playQueue: z.object({
+        changed: z.string(),
+        changedBy: z.string(),
+        current: z.string().optional(),
+        entry: song.array(),
+        position: z.number().optional(),
+        username: z.string(),
+    }),
+});
+
+const playQueueByIndex = z.object({
+    playQueueByIndex: z.object({
+        changed: z.string(),
+        changedBy: z.string(),
+        currentIndex: z.number().optional(),
+        entry: song.array().optional(),
+        position: z.number().optional(),
+        username: z.string(),
+    }),
+});
+
 export const ssType = {
     _parameters: {
         albumInfo: albumInfoParameters,
@@ -640,6 +677,8 @@ export const ssType = {
         getStarred: getStarredParameters,
         randomSongList: randomSongListParameters,
         removeFavorite: removeFavoriteParameters,
+        savePlayQueueByIndex: savePlayQueueByIndexParameters,
+        saveQueue: saveQueueParameters,
         scrobble: scrobbleParameters,
         search3: search3Parameters,
         setRating: setRatingParameters,
@@ -680,8 +719,11 @@ export const ssType = {
         ping,
         playlist,
         playlistListEntry,
+        playQueue,
+        playQueueByIndex,
         randomSongList,
         removeFavorite,
+        saveQueue,
         scrobble,
         search3,
         serverInfo,

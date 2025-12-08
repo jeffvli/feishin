@@ -48,6 +48,7 @@ export const logMsg = {
         playbackError: 'An error occurred during playback',
         playerFiltersApplied: 'Player filters applied',
         setFavorite: 'Set favorite',
+        setQueue: 'Set queue',
         setRating: 'Set rating',
         setRepeat: 'Set repeat',
         setShuffle: 'Set shuffle',

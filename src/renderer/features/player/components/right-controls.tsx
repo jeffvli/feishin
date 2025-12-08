@@ -2,6 +2,7 @@ import { t } from 'i18next';
 import { useCallback, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { api } from '/@/renderer/api';
 import { PopoverPlayQueue } from '/@/renderer/features/now-playing/components/popover-play-queue';
 import { PlayerConfig } from '/@/renderer/features/player/components/player-config';
 import { CustomPlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
@@ -18,22 +19,26 @@ import {
     usePlayerData,
     usePlayerMuted,
     usePlayerSong,
+    usePlayerStore,
     usePlayerVolume,
     useSettingsStore,
     useSettingsStoreActions,
     useSidebarRightExpanded,
+    useTimestampStoreBase,
 } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Rating } from '/@/shared/components/rating/rating';
+import { toast } from '/@/shared/components/toast/toast';
 import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { useMediaQuery } from '/@/shared/hooks/use-media-query';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
+import { Play } from '/@/shared/types/types';
 
 const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {
-    let volumeToSet;
+    let volumeToSet: number;
     const newVolumeGreaterThanHundred = volume + volumeWheelStep > 100;
     if (newVolumeGreaterThanHundred) {
         volumeToSet = 100;
@@ -45,7 +50,7 @@ const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {
 };
 
 const calculateVolumeDown = (volume: number, volumeWheelStep: number) => {
-    let volumeToSet;
+    let volumeToSet: number;
     const newVolumeLessThanZero = volume - volumeWheelStep < 0;
     if (newVolumeLessThanZero) {
         volumeToSet = 0;
@@ -65,6 +70,8 @@ export const RightControls = () => {
             </Group>
             <Group align="center" gap="xs" wrap="nowrap">
                 <PlayerConfig />
+                <SaveQueueButton />
+                <RestoreQueueButton />
                 <FavoriteButton />
                 <QueueButton />
                 <VolumeButton />
@@ -305,6 +312,116 @@ const RatingButton = () => {
                 />
             )}
         </>
+    );
+};
+
+const RestoreQueueButton = () => {
+    const server = useCurrentServer();
+    const player = usePlayer();
+
+    const serverId = server?.id;
+
+    const handleRestoreQueue = useCallback(async () => {
+        if (!serverId) return;
+
+        try {
+            const queue = await api.controller.getPlayQueue({
+                apiClientProps: { serverId },
+            });
+
+            if (queue) {
+                player.setQueue(queue.entry, queue.currentIndex, queue.position);
+            }
+        } catch (error) {
+            toast.error({
+                message: (error as Error).message,
+                title: 'Failed to get play queue',
+            });
+        }
+    }, [player, serverId]);
+
+    return (
+        <ActionIcon
+            icon="download"
+            onClick={handleRestoreQueue}
+            size="sm"
+            tooltip={{
+                label: t('player.restoreQueue', { postProcess: 'titleCase' }),
+                openDelay: 0,
+            }}
+            variant="subtle"
+        />
+    );
+};
+
+const SaveQueueButton = () => {
+    const server = useCurrentServer();
+
+    const handleSaveQueue = useCallback(() => {
+        if (!server?.id) return;
+
+        const { player, queue } = usePlayerStore.getState();
+        let uniqueIds: string[] = [];
+
+        if (queue.shuffled.length > 0) {
+            for (const shuffledIndex of queue.shuffled) {
+                uniqueIds.push(queue.default[shuffledIndex]);
+            }
+        } else {
+            uniqueIds = queue.default;
+        }
+
+        const songs: string[] = [];
+
+        if (uniqueIds.length > 0) {
+            for (const song of uniqueIds) {
+                if (queue.songs[song]._serverId !== server?.id) {
+                    toast.error({
+                        message: t('error.multipleServerSaveQueueError', {
+                            postProcess: 'sentenceCase',
+                        }),
+                        title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                    });
+
+                    return;
+                }
+
+                songs?.push(queue.songs[song].id);
+            }
+        }
+
+        api.controller
+            .savePlayQueue({
+                apiClientProps: { serverId: server?.id },
+                query: {
+                    currentIndex: queue.default.length > 0 ? player.index : undefined,
+                    positionMs: useTimestampStoreBase.getState().timestamp,
+                    songs,
+                },
+            })
+            .then(() => {
+                return toast.success({ message: '', title: 'Saved play queue' });
+            })
+            .catch((error) => {
+                toast.error({
+                    message: 'This is most likely because your queue is too large (> 1000 tracks)',
+                    title: 'Failed to save play queue',
+                });
+                console.error(error);
+            });
+    }, [server?.id]);
+
+    return (
+        <ActionIcon
+            icon="upload"
+            onClick={handleSaveQueue}
+            size="sm"
+            tooltip={{
+                label: t('player.saveQueue', { postProcess: 'titleCase' }),
+                openDelay: 0,
+            }}
+            variant="subtle"
+        />
     );
 };
 

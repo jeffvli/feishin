@@ -43,7 +43,7 @@ const VERSION_INFO: VersionInfo = [
             [ServerFeature.PUBLIC_PLAYLIST]: [1],
         },
     ],
-    ['10.0.0', { [ServerFeature.TAGS]: [1] }],
+    ['10.0.0', { [ServerFeature.SERVER_PLAY_QUEUE]: [1], [ServerFeature.TAGS]: [1] }],
 ];
 
 export const JellyfinController: InternalControllerEndpoint = {
@@ -772,6 +772,50 @@ export const JellyfinController: InternalControllerEndpoint = {
             totalRecordCount: res.body.TotalRecordCount,
         };
     },
+    getPlayQueue: async (args) => {
+        const { apiClientProps } = args;
+
+        const res = await jfApiClient(apiClientProps).getPlayQueue({
+            query: {
+                // DeviceId: 'Feishin',
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get play queue songs');
+        } else if (res.body.length === 0) {
+            throw new Error('No saved session');
+        }
+
+        const {
+            LastActivityDate,
+            NowPlayingQueue,
+            NowPlayingQueueFullItems,
+            PlaylistItemId,
+            PlayState,
+            UserName,
+        } = res.body[0];
+
+        const tempMapping = new Map<string, any>();
+        for (const song of NowPlayingQueueFullItems) {
+            tempMapping.set(song.Id, song);
+        }
+
+        const currentIndex = PlaylistItemId ? parseInt(PlaylistItemId, 10) : 0;
+        const entries = NowPlayingQueue.map((item) =>
+            jfNormalize.song(tempMapping.get(item.Id), apiClientProps.server),
+        );
+
+        return {
+            changed: LastActivityDate,
+            changedBy: UserName,
+            currentIndex,
+            entry: entries,
+            position:
+                PlayState.PositionTicks !== undefined ? PlayState.PositionTicks / 1000 : undefined,
+            username: UserName,
+        };
+    },
     getRandomSongList: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -1046,7 +1090,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             `&deviceId=${deviceId}` +
             '&audioCodec=aac' +
             `&apiKey=${server?.credential}` +
-            `&playSessionId=${deviceId}` +
+            `&playPlaySessionId=${deviceId}` +
             '&container=opus,mp3,aac,m4a,m4b,flac,wav,ogg';
 
         if (transcode) {
@@ -1290,6 +1334,29 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         return null;
     },
+    savePlayQueue: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const res = await jfApiClient(apiClientProps).savePlayQueue({
+            body: {
+                IsPaused: false,
+                ItemId:
+                    query.currentIndex !== undefined && query.currentIndex < query.songs.length
+                        ? query.songs[query.currentIndex]
+                        : '',
+                NowPlayingQueue: query.songs.map((song) => ({
+                    Id: song,
+                })),
+                PlaylistItemId: query.currentIndex?.toString(),
+                PlaySessionId: 'Feishin',
+                PositionTicks: query.positionMs !== undefined ? query.positionMs * 1000 : undefined,
+            },
+        });
+
+        if (res.status !== 204) {
+            throw new Error('Failed to save play queue');
+        }
+    },
     scrobble: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -1301,6 +1368,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                 body: {
                     IsPaused: true,
                     ItemId: query.id,
+                    PlaySessionId: 'Feishin',
                     PositionTicks: position,
                 },
             });
@@ -1312,6 +1380,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             jfApiClient(apiClientProps).scrobblePlaying({
                 body: {
                     ItemId: query.id,
+                    PlaySessionId: 'Feishin',
                     PositionTicks: position,
                 },
             });
@@ -1325,6 +1394,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                     EventName: query.event,
                     IsPaused: true,
                     ItemId: query.id,
+                    PlaySessionId: 'Feishin',
                     PositionTicks: position,
                 },
             });
@@ -1338,6 +1408,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                     EventName: query.event,
                     IsPaused: false,
                     ItemId: query.id,
+                    PlaySessionId: 'Feishin',
                     PositionTicks: position,
                 },
             });
@@ -1348,6 +1419,7 @@ export const JellyfinController: InternalControllerEndpoint = {
         jfApiClient(apiClientProps).scrobbleProgress({
             body: {
                 ItemId: query.id,
+                PlaySessionId: 'Feishin',
                 PositionTicks: position,
             },
         });

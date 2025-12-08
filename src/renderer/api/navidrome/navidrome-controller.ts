@@ -6,7 +6,7 @@ import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller
 import { ndNormalize } from '/@/shared/api/navidrome/navidrome-normalize';
 import { NDSongListSort } from '/@/shared/api/navidrome/navidrome-types';
 import { ssNormalize } from '/@/shared/api/subsonic/subsonic-normalize';
-import { getFeatures, hasFeature, VersionInfo } from '/@/shared/api/utils';
+import { getFeatures, hasFeature, hasFeatureWithVersion, VersionInfo } from '/@/shared/api/utils';
 import {
     albumArtistListSortMap,
     albumListSortMap,
@@ -25,6 +25,9 @@ import {
 import { ServerFeature } from '/@/shared/types/features-types';
 
 const VERSION_INFO: VersionInfo = [
+    // Why 2? Subsonic controller will return 1 for its own implementation
+    // Use 2 to denote that Navidrome's own API has a different endpoint
+    ['0.57.0', { [ServerFeature.SERVER_PLAY_QUEUE]: [2] }],
     ['0.56.0', { [ServerFeature.TRACK_ALBUM_ARTIST_SEARCH]: [1] }],
     ['0.55.0', { [ServerFeature.BFR]: [1], [ServerFeature.TAGS]: [1] }],
     ['0.49.3', { [ServerFeature.SHARING_ALBUM_SONG]: [1] }],
@@ -527,6 +530,32 @@ export const NavidromeController: InternalControllerEndpoint = {
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
     },
+    getPlayQueue: async (args) => {
+        const { apiClientProps } = args;
+
+        if (hasFeatureWithVersion(apiClientProps.server, ServerFeature.SERVER_PLAY_QUEUE, 2)) {
+            const res = await ndApiClient(apiClientProps).getQueue();
+
+            if (res.status !== 200) {
+                throw new Error('Failed to get play queue');
+            }
+
+            const { changedBy, current, items, position, updatedAt } = res.body.data;
+
+            const entries = items.map((song) => ndNormalize.song(song, apiClientProps.server));
+
+            return {
+                changed: updatedAt,
+                changedBy,
+                currentIndex: current !== undefined ? current : 0,
+                entry: entries,
+                position,
+                username: apiClientProps.server?.username ?? '',
+            };
+        }
+
+        return SubsonicController.getPlayQueue(args);
+    },
     getRandomSongList: SubsonicController.getRandomSongList,
     getRoles: async ({ apiClientProps }) =>
         hasFeature(apiClientProps.server, ServerFeature.BFR) ? NAVIDROME_ROLES : [],
@@ -548,11 +577,17 @@ export const NavidromeController: InternalControllerEndpoint = {
         const subsonicArgs = await SubsonicController.getServerInfo(args);
 
         const features = {
-            ...navidromeFeatures,
             ...subsonicArgs.features,
+            ...navidromeFeatures,
             publicPlaylist: [1],
             [ServerFeature.MUSIC_FOLDER_MULTISELECT]: [1],
         };
+
+        if (subsonicArgs.features.serverPlayQueue && navidromeFeatures.serverPlayQueue) {
+            features.serverPlayQueue = navidromeFeatures.serverPlayQueue.concat(
+                subsonicArgs.features.serverPlayQueue,
+            );
+        }
 
         return {
             features,
@@ -846,6 +881,30 @@ export const NavidromeController: InternalControllerEndpoint = {
         }
 
         return null;
+    },
+    savePlayQueue: async (args) => {
+        const { apiClientProps, query } = args;
+
+        // Prefer using Navidrome's API only in the situation where the OpenSubsonic extension is not present
+        // OpenSubsonic extension is preferable as the credentials never expire
+        if (
+            hasFeatureWithVersion(apiClientProps.server, ServerFeature.SERVER_PLAY_QUEUE, 2) &&
+            !hasFeatureWithVersion(apiClientProps.server, ServerFeature.SERVER_PLAY_QUEUE, 1)
+        ) {
+            const res = await ndApiClient(apiClientProps).saveQueue({
+                body: {
+                    current: query.currentIndex !== undefined ? query.currentIndex : undefined,
+                    ids: query.songs,
+                    position: query.positionMs,
+                },
+            });
+
+            if (res.status !== 200) {
+                throw new Error('Failed to save play queue');
+            }
+        }
+
+        return SubsonicController.savePlayQueue(args);
     },
     scrobble: SubsonicController.scrobble,
     search: SubsonicController.search,

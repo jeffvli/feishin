@@ -78,6 +78,7 @@ export interface PlayerContext {
         itemType: LibraryItem,
         isFavorite: boolean,
     ) => void;
+    setQueue: (data: Song[], index?: number, position?: number) => void;
     setRating: (serverId: string, id: string[], itemType: LibraryItem, rating: number) => void;
     setRepeat: (repeat: PlayerRepeat) => void;
     setShuffle: (shuffle: PlayerShuffle) => void;
@@ -114,6 +115,7 @@ export const PlayerContext = createContext<PlayerContext>({
     moveSelectedToNext: () => {},
     moveSelectedToTop: () => {},
     setFavorite: () => {},
+    setQueue: () => {},
     setRating: () => {},
     setRepeat: () => {},
     setShuffle: () => {},
@@ -627,6 +629,22 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         storeActions.mediaSkipForward();
     }, [storeActions]);
 
+    const setQueue = useCallback(
+        (data: Song[], index?: number, position?: number) => {
+            logFn.debug(logMsg[LogCategory.PLAYER].setQueue, {
+                category: LogCategory.PLAYER,
+                meta: {
+                    data: data.length,
+                    index,
+                    position,
+                },
+            });
+
+            storeActions.setQueue(data, index, position);
+        },
+        [storeActions],
+    );
+
     const setSpeed = useCallback(
         (speed: number) => {
             logFn.debug(logMsg[LogCategory.PLAYER].setSpeed, {
@@ -840,6 +858,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
             moveSelectedToNext,
             moveSelectedToTop,
             setFavorite,
+            setQueue,
             setRating,
             setRepeat,
             setShuffle,

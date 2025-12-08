@@ -50,6 +50,18 @@ export const hasFeature = (server: null | ServerListItem, feature: ServerFeature
     return (server.features[feature]?.length || 0) > 0;
 };
 
+export const hasFeatureWithVersion = (
+    server: null | ServerListItem,
+    feature: ServerFeature,
+    version: number,
+): boolean => {
+    if (!server || !server.features) {
+        return false;
+    }
+
+    return (server.features[feature] ?? []).includes(version);
+};
+
 export type VersionInfo = ReadonlyArray<
     [string, Partial<Record<ServerFeature, readonly number[]>>]
 >;

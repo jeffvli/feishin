@@ -8,6 +8,7 @@ export enum ServerFeature {
     OS_FORM_POST = 'osFormPost',
     PLAYLISTS_SMART = 'playlistsSmart',
     PUBLIC_PLAYLIST = 'publicPlaylist',
+    SERVER_PLAY_QUEUE = 'serverPlayQueue',
     SHARING_ALBUM_SONG = 'sharingAlbumSong',
     TAGS = 'tags',
     TRACK_ALBUM_ARTIST_SEARCH = 'trackAlbumArtistSearch',
