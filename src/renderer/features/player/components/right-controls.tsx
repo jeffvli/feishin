@@ -35,7 +35,6 @@ import { toast } from '/@/shared/components/toast/toast';
 import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { useMediaQuery } from '/@/shared/hooks/use-media-query';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
-import { Play } from '/@/shared/types/types';
 
 const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {
     let volumeToSet: number;
