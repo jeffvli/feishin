@@ -5,6 +5,7 @@ import { useParams } from 'react-router';
 
 import styles from './album-artist-detail-header.module.css';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
@@ -116,9 +117,15 @@ export const AlbumArtistDetailHeader = forwardRef((_props, ref: Ref<HTMLDivEleme
 
     const showRating = detailQuery?.data?._serverType === ServerType.NAVIDROME;
 
+    const imageUrl = useItemImageUrl({
+        id: detailQuery?.data?.id,
+        itemType: LibraryItem.ALBUM_ARTIST,
+        type: 'lg',
+    });
+
     return (
         <LibraryHeader
-            imageUrl={detailQuery?.data?.imageUrl}
+            imageUrl={imageUrl}
             item={{ route: AppRoute.LIBRARY_ALBUM_ARTISTS, type: LibraryItem.ALBUM_ARTIST }}
             ref={ref}
             title={detailQuery?.data?.name || ''}

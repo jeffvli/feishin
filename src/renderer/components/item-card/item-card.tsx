@@ -7,6 +7,7 @@ import { generatePath, Link } from 'react-router';
 import styles from './item-card.module.css';
 
 import { ItemCardControls } from '/@/renderer/components/item-card/item-card-controls';
+import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
 import { getTitlePath } from '/@/renderer/components/item-list/helpers/get-title-path';
 import {
@@ -18,7 +19,6 @@ import { ItemControls } from '/@/renderer/components/item-list/types';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
 import { formatDateAbsolute, formatDateRelative, formatRating } from '/@/renderer/utils/format';
-import { Image } from '/@/shared/components/image/image';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
@@ -137,7 +137,6 @@ const CompactItemCard = ({
     data,
     enableExpansion,
     enableNavigation,
-    imageUrl,
     internalState,
     isRound,
     itemType,
@@ -247,11 +246,13 @@ const CompactItemCard = ({
 
         const imageContainerContent = (
             <>
-                <Image
+                <ItemImage
                     className={clsx(styles.image, {
                         [styles.isRound]: isRound,
                     })}
-                    src={imageUrl}
+                    id={data?.id}
+                    itemType={itemType}
+                    src={(data as Album | AlbumArtist | Playlist | Song)?.imageUrl}
                 />
                 {isFavorite && <div className={styles.favoriteBadge} />}
                 {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
@@ -351,7 +352,6 @@ const DefaultItemCard = ({
     data,
     enableExpansion,
     enableNavigation,
-    imageUrl,
     internalState,
     isRound,
     itemType,
@@ -461,9 +461,11 @@ const DefaultItemCard = ({
 
         const imageContainerContent = (
             <>
-                <Image
+                <ItemImage
                     className={clsx(styles.image, { [styles.isRound]: isRound })}
-                    src={imageUrl}
+                    id={data?.id}
+                    itemType={itemType}
+                    src={(data as Album | AlbumArtist | Playlist | Song)?.imageUrl}
                 />
                 {isFavorite && <div className={styles.favoriteBadge} />}
                 {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
@@ -563,7 +565,6 @@ const PosterItemCard = ({
     enableDrag,
     enableExpansion,
     enableNavigation,
-    imageUrl,
     internalState,
     isRound,
     itemType,
@@ -720,9 +721,11 @@ const PosterItemCard = ({
 
         const imageContainerContent = (
             <>
-                <Image
+                <ItemImage
                     className={clsx(styles.image, { [styles.isRound]: isRound })}
-                    src={imageUrl}
+                    id={data?.id}
+                    itemType={itemType}
+                    src={(data as Album | AlbumArtist | Playlist | Song)?.imageUrl}
                 />
                 {isFavorite && <div className={styles.favoriteBadge} />}
                 {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}

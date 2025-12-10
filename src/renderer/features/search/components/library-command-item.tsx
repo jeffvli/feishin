@@ -2,6 +2,7 @@ import { CSSProperties, useCallback, useState } from 'react';
 
 import styles from './library-command-item.module.css';
 
+import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     LONG_PRESS_PLAY_BEHAVIOR,
@@ -11,7 +12,6 @@ import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-b
 import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
-import { Image } from '/@/shared/components/image/image';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
@@ -95,11 +95,13 @@ export const LibraryCommandItem = ({
         >
             <div className={styles.itemGrid} style={{ '--item-height': '40px' } as CSSProperties}>
                 <div className={styles.imageWrapper}>
-                    <Image
+                    <ItemImage
                         alt="cover"
                         className={styles.image}
                         height={40}
-                        src={imageUrl || ''}
+                        id={id}
+                        itemType={itemType}
+                        src={imageUrl}
                         width={40}
                     />
                 </div>

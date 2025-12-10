@@ -4,6 +4,7 @@ import { generatePath, Link } from 'react-router';
 
 import styles from './title-combined-column.module.css';
 
+import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { getTitlePath } from '/@/renderer/components/item-list/helpers/get-title-path';
 import {
     ColumnNullFallback,
@@ -19,13 +20,12 @@ import {
 import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayButtonBehavior } from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
-import { Image } from '/@/shared/components/image/image';
 import { Text } from '/@/shared/components/text/text';
 import { Folder, LibraryItem, QueueSong, RelatedAlbumArtist } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
-    const row: object | undefined = (props.data as (any | undefined)[])[props.rowIndex];
+    const row: object | undefined = (props.data as (any | undefined)[])[props.rowIndex]?.id;
     const item = props.data[props.rowIndex] as any;
     const internalState = (props as any).internalState;
     const playButtonBehavior = usePlayButtonBehavior();
@@ -110,7 +110,12 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
-                    <Image containerClassName={styles.image} src={row.imageUrl as string} />
+                    <ItemImage
+                        containerClassName={styles.image}
+                        id={item?.id}
+                        itemType={item?._itemType}
+                        src={item?.imageUrl}
+                    />
                     {isHovered && (
                         <div
                             className={clsx(styles.playButtonOverlay, {
@@ -263,7 +268,12 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
-                    <Image containerClassName={styles.image} src={row.imageUrl as string} />
+                    <ItemImage
+                        containerClassName={styles.image}
+                        id={item?.id}
+                        itemType={item?._itemType}
+                        src={item?.imageUrl}
+                    />
                     {isHovered && (
                         <div
                             className={clsx(styles.playButtonOverlay, {

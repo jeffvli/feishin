@@ -4,6 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 
 import styles from './mobile-fullscreen-player.module.css';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import {
     useFullScreenPlayerStore,
     useGeneralSettings,
@@ -14,6 +15,7 @@ import { Center } from '/@/shared/components/center/center';
 import { Icon } from '/@/shared/components/icon/icon';
 import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
 import { useSetState } from '/@/shared/hooks/use-set-state';
+import { LibraryItem } from '/@/shared/types/domain-types';
 
 const imageVariants: Variants = {
     closed: {
@@ -36,13 +38,6 @@ const imageVariants: Variants = {
             },
         };
     },
-};
-
-const scaleImageUrl = (imageSize: number, url?: null | string) => {
-    return url
-        ?.replace(/&size=\d+/, `&size=${imageSize}`)
-        .replace(/\?width=\d+/, `?width=${imageSize}`)
-        .replace(/&height=\d+/, `&height=${imageSize}`);
 };
 
 const MotionImage = motion.img;
@@ -88,10 +83,24 @@ export const MobileFullscreenPlayerAlbumArt = () => {
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();
 
+    const currentImageUrl = useItemImageUrl({
+        id: currentSong?.id,
+        imageUrl: currentSong?.imageUrl,
+        itemType: LibraryItem.SONG,
+        size: mainImageDimensions.idealSize,
+    });
+
+    const nextImageUrl = useItemImageUrl({
+        id: nextSong?.id,
+        imageUrl: nextSong?.imageUrl,
+        itemType: LibraryItem.SONG,
+        size: mainImageDimensions.idealSize,
+    });
+
     const [imageState, setImageState] = useSetState({
-        bottomImage: scaleImageUrl(mainImageDimensions.idealSize, nextSong?.imageUrl),
+        bottomImage: nextImageUrl,
         current: 0,
-        topImage: scaleImageUrl(mainImageDimensions.idealSize, currentSong?.imageUrl),
+        topImage: currentImageUrl,
     });
 
     const updateImageSize = useCallback(() => {
@@ -101,14 +110,8 @@ export const MobileFullscreenPlayerAlbumArt = () => {
                 Math.ceil((mainImageRef.current as HTMLDivElement).offsetHeight / 100) * 100;
 
             setMainImageDimensions({ idealSize });
-
-            setImageState({
-                bottomImage: scaleImageUrl(idealSize, nextSong?.imageUrl),
-                current: 0,
-                topImage: scaleImageUrl(idealSize, currentSong?.imageUrl),
-            });
         }
-    }, [albumArtRes, currentSong?.imageUrl, nextSong?.imageUrl, setImageState]);
+    }, [albumArtRes]);
 
     useLayoutEffect(() => {
         updateImageSize();
@@ -123,15 +126,13 @@ export const MobileFullscreenPlayerAlbumArt = () => {
         imageStateRef.current = imageState;
     }, [imageState]);
 
-    // Update images when song changes
+    // Update images when song or size changes
     useEffect(() => {
         if (currentSong?._uniqueId === previousSongRef.current) {
             return;
         }
 
         const isTop = imageStateRef.current.current === 0;
-        const currentImageUrl = scaleImageUrl(mainImageDimensions.idealSize, currentSong?.imageUrl);
-        const nextImageUrl = scaleImageUrl(mainImageDimensions.idealSize, nextSong?.imageUrl);
 
         setImageState({
             bottomImage: isTop ? currentImageUrl : nextImageUrl,
@@ -140,13 +141,7 @@ export const MobileFullscreenPlayerAlbumArt = () => {
         });
 
         previousSongRef.current = currentSong?._uniqueId;
-    }, [
-        currentSong?._uniqueId,
-        currentSong?.imageUrl,
-        nextSong?.imageUrl,
-        mainImageDimensions.idealSize,
-        setImageState,
-    ]);
+    }, [currentSong?._uniqueId, currentImageUrl, nextSong?._uniqueId, nextImageUrl, setImageState]);
 
     return (
         <div className={styles.imageContainer} ref={mainImageRef}>

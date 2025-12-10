@@ -7,6 +7,7 @@ import styles from './dummy-album-detail-route.module.css';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
@@ -113,12 +114,14 @@ const DummyAlbumDetailRoute = () => {
         },
     ];
 
+    const imageUrl = useItemImageUrl({ id: albumId, itemType: LibraryItem.ALBUM, type: 'lg' });
+
     return (
         <AnimatedPage key={`dummy-album-detail-${albumId}`}>
             <LibraryContainer>
                 <Stack>
                     <LibraryHeader
-                        imageUrl={detailQuery?.data?.imageUrl}
+                        imageUrl={imageUrl}
                         item={{ route: AppRoute.LIBRARY_SONGS, type: LibraryItem.SONG }}
                         loading={!background || colorId !== albumId}
                         title={detailQuery?.data?.name || ''}

@@ -27,8 +27,8 @@ const updateShuffle = (shuffle: boolean) => {
     ipcRenderer.send('update-shuffle', shuffle);
 };
 
-const updateSong = (song: QueueSong | undefined) => {
-    ipcRenderer.send('update-song', song);
+const updateSong = (song: QueueSong | undefined, imageUrl?: null | string) => {
+    ipcRenderer.send('update-song', song, imageUrl);
 };
 
 const requestSeek = (cb: (event: IpcRendererEvent, data: { offset: number }) => void) => {

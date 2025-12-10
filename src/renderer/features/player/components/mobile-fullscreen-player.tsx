@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './mobile-fullscreen-player.module.css';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
@@ -74,14 +75,24 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();
 
+    const currentImageUrl = useItemImageUrl({
+        id: currentSong?.id,
+        imageUrl: currentSong?.imageUrl,
+        itemType: LibraryItem.SONG,
+        type: 'lg',
+    });
+
+    const nextImageUrl = useItemImageUrl({
+        id: nextSong?.id,
+        imageUrl: nextSong?.imageUrl,
+        itemType: LibraryItem.SONG,
+        type: 'lg',
+    });
+
     const [imageState, setImageState] = useState({
-        bottomImage: nextSong?.imageUrl
-            ? nextSong.imageUrl.replace(/size=\d+/g, 'size=500')
-            : undefined,
+        bottomImage: nextImageUrl,
         current: 0,
-        topImage: currentSong?.imageUrl
-            ? currentSong.imageUrl.replace(/size=\d+/g, 'size=500')
-            : undefined,
+        topImage: currentImageUrl,
     });
 
     const previousSongRef = useRef<string | undefined>(currentSong?._uniqueId);
@@ -98,12 +109,6 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
         }
 
         const isTop = imageStateRef.current.current === 0;
-        const currentImageUrl = currentSong?.imageUrl
-            ? currentSong.imageUrl.replace(/size=\d+/g, 'size=500')
-            : undefined;
-        const nextImageUrl = nextSong?.imageUrl
-            ? nextSong.imageUrl.replace(/size=\d+/g, 'size=500')
-            : undefined;
 
         setImageState({
             bottomImage: isTop ? currentImageUrl : nextImageUrl,
@@ -112,7 +117,7 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
         });
 
         previousSongRef.current = currentSong?._uniqueId;
-    }, [currentSong?._uniqueId, currentSong?.imageUrl, nextSong?._uniqueId, nextSong?.imageUrl]);
+    }, [currentSong?._uniqueId, currentImageUrl, nextSong?._uniqueId, nextImageUrl]);
 
     if (!dynamicBackground || !dynamicIsImage) {
         return null;
@@ -299,9 +304,15 @@ interface MobilePlayerContainerProps {
 const MobilePlayerContainer = memo(
     ({ children, dynamicBackground, dynamicIsImage }: MobilePlayerContainerProps) => {
         const currentSong = usePlayerSong();
+        const imageUrl = useItemImageUrl({
+            id: currentSong?.id,
+            imageUrl: currentSong?.imageUrl,
+            itemType: LibraryItem.SONG,
+            type: 'lg',
+        });
         const { background } = useFastAverageColor({
             algorithm: 'dominant',
-            src: currentSong?.imageUrl,
+            src: imageUrl,
             srcLoaded: true,
         });
 

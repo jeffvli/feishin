@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 
 import styles from './full-screen-player-image.module.css';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { AppRoute } from '/@/renderer/router/routes';
 import { usePlayerData, usePlayerSong } from '/@/renderer/store';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
@@ -17,6 +18,7 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { useSetState } from '/@/shared/hooks/use-set-state';
+import { LibraryItem } from '/@/shared/types/domain-types';
 
 const imageVariants: Variants = {
     closed: {
@@ -39,13 +41,6 @@ const imageVariants: Variants = {
             },
         };
     },
-};
-
-const scaleImageUrl = (imageSize: number, url?: null | string) => {
-    return url
-        ?.replace(/&size=\d+/, `&size=${imageSize}`)
-        .replace(/\?width=\d+/, `?width=${imageSize}`)
-        .replace(/&height=\d+/, `&height=${imageSize}`);
 };
 
 const MotionImage = motion.img;
@@ -92,10 +87,24 @@ export const FullScreenPlayerImage = () => {
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();
 
+    const currentImageUrl = useItemImageUrl({
+        id: currentSong?.id,
+        imageUrl: currentSong?.imageUrl,
+        itemType: LibraryItem.SONG,
+        size: mainImageDimensions.idealSize,
+    });
+
+    const nextImageUrl = useItemImageUrl({
+        id: nextSong?.id,
+        imageUrl: nextSong?.imageUrl,
+        itemType: LibraryItem.SONG,
+        size: mainImageDimensions.idealSize,
+    });
+
     const [imageState, setImageState] = useSetState({
-        bottomImage: scaleImageUrl(mainImageDimensions.idealSize, nextSong?.imageUrl),
+        bottomImage: nextImageUrl,
         current: 0,
-        topImage: scaleImageUrl(mainImageDimensions.idealSize, currentSong?.imageUrl),
+        topImage: currentImageUrl,
     });
 
     const updateImageSize = useCallback(() => {
@@ -105,20 +114,8 @@ export const FullScreenPlayerImage = () => {
                     albumArtRes ||
                     Math.ceil((mainImageRef.current as HTMLDivElement).offsetHeight / 100) * 100,
             });
-
-            setImageState({
-                bottomImage: scaleImageUrl(mainImageDimensions.idealSize, nextSong?.imageUrl),
-                current: 0,
-                topImage: scaleImageUrl(mainImageDimensions.idealSize, currentSong?.imageUrl),
-            });
         }
-    }, [
-        mainImageDimensions.idealSize,
-        setImageState,
-        albumArtRes,
-        currentSong?.imageUrl,
-        nextSong?.imageUrl,
-    ]);
+    }, [albumArtRes]);
 
     useLayoutEffect(() => {
         updateImageSize();
@@ -133,15 +130,13 @@ export const FullScreenPlayerImage = () => {
         imageStateRef.current = imageState;
     }, [imageState]);
 
-    // Update images when song changes
+    // Update images when song or size changes
     useEffect(() => {
         if (currentSong?._uniqueId === previousSongRef.current) {
             return;
         }
 
         const isTop = imageStateRef.current.current === 0;
-        const currentImageUrl = scaleImageUrl(mainImageDimensions.idealSize, currentSong?.imageUrl);
-        const nextImageUrl = scaleImageUrl(mainImageDimensions.idealSize, nextSong?.imageUrl);
 
         setImageState({
             bottomImage: isTop ? currentImageUrl : nextImageUrl,
@@ -150,13 +145,7 @@ export const FullScreenPlayerImage = () => {
         });
 
         previousSongRef.current = currentSong?._uniqueId;
-    }, [
-        currentSong?._uniqueId,
-        currentSong?.imageUrl,
-        nextSong?.imageUrl,
-        mainImageDimensions.idealSize,
-        setImageState,
-    ]);
+    }, [currentSong?._uniqueId, currentImageUrl, nextSong?._uniqueId, nextImageUrl, setImageState]);
 
     return (
         <Flex
