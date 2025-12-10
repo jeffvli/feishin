@@ -1,5 +1,4 @@
 import { UseSuspenseQueryOptions } from '@tanstack/react-query';
-import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListInfiniteLoader } from '/@/renderer/components/item-list/helpers/item-list-infinite-loader';
@@ -13,55 +12,53 @@ import { ItemListKey } from '/@/shared/types/types';
 
 interface SongListInfiniteGridProps extends ItemListGridComponentProps<SongListQuery> {}
 
-export const SongListInfiniteGrid = forwardRef<any, SongListInfiniteGridProps>(
-    ({
-        gap = 'md',
-        itemsPerPage = 100,
-        itemsPerRow,
-        query = {
-            sortBy: SongListSort.NAME,
-            sortOrder: SortOrder.ASC,
-        },
-        saveScrollOffset = true,
-        serverId,
-    }) => {
-        const listCountQuery = songsQueries.listCount({
-            query: { ...query },
-            serverId: serverId,
-        }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
-
-        const listQueryFn = api.controller.getSongList;
-
-        const { data, onRangeChanged } = useItemListInfiniteLoader({
-            eventKey: ItemListKey.SONG,
-            itemsPerPage,
-            itemType: LibraryItem.SONG,
-            listCountQuery,
-            listQueryFn,
-            query,
-            serverId,
-        });
-
-        const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
-            enabled: saveScrollOffset,
-        });
-
-        const rows = useGridRows(LibraryItem.SONG, ItemListKey.SONG);
-
-        return (
-            <ItemGridList
-                data={data}
-                gap={gap}
-                initialTop={{
-                    to: scrollOffset ?? 0,
-                    type: 'offset',
-                }}
-                itemsPerRow={itemsPerRow}
-                itemType={LibraryItem.SONG}
-                onRangeChanged={onRangeChanged}
-                onScrollEnd={handleOnScrollEnd}
-                rows={rows}
-            />
-        );
+export const SongListInfiniteGrid = ({
+    gap = 'md',
+    itemsPerPage = 100,
+    itemsPerRow,
+    query = {
+        sortBy: SongListSort.NAME,
+        sortOrder: SortOrder.ASC,
     },
-);
+    saveScrollOffset = true,
+    serverId,
+}: SongListInfiniteGridProps) => {
+    const listCountQuery = songsQueries.listCount({
+        query: { ...query },
+        serverId: serverId,
+    }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
+
+    const listQueryFn = api.controller.getSongList;
+
+    const { data, onRangeChanged } = useItemListInfiniteLoader({
+        eventKey: ItemListKey.SONG,
+        itemsPerPage,
+        itemType: LibraryItem.SONG,
+        listCountQuery,
+        listQueryFn,
+        query,
+        serverId,
+    });
+
+    const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
+        enabled: saveScrollOffset,
+    });
+
+    const rows = useGridRows(LibraryItem.SONG, ItemListKey.SONG);
+
+    return (
+        <ItemGridList
+            data={data}
+            gap={gap}
+            initialTop={{
+                to: scrollOffset ?? 0,
+                type: 'offset',
+            }}
+            itemsPerRow={itemsPerRow}
+            itemType={LibraryItem.SONG}
+            onRangeChanged={onRangeChanged}
+            onScrollEnd={handleOnScrollEnd}
+            rows={rows}
+        />
+    );
+};

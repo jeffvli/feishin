@@ -1,5 +1,4 @@
 import { UseSuspenseQueryOptions } from '@tanstack/react-query';
-import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
@@ -14,60 +13,54 @@ import { ItemListKey } from '/@/shared/types/types';
 
 interface SongListPaginatedGridProps extends ItemListGridComponentProps<SongListQuery> {}
 
-export const SongListPaginatedGrid = forwardRef<any, SongListPaginatedGridProps>(
-    (
-        {
-            gap = 'md',
-            itemsPerPage = 100,
-            itemsPerRow,
-            query = {
-                sortBy: SongListSort.NAME,
-                sortOrder: SortOrder.ASC,
-            },
-            serverId,
-        },
-        ref,
-    ) => {
-        const listCountQuery = songsQueries.listCount({
-            query: { ...query },
-            serverId: serverId,
-        }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
-
-        const listQueryFn = api.controller.getSongList;
-
-        const { currentPage, onChange } = useItemListPagination();
-
-        const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
-            currentPage,
-            eventKey: ItemListKey.SONG,
-            itemsPerPage,
-            itemType: LibraryItem.SONG,
-            listCountQuery,
-            listQueryFn,
-            query,
-            serverId,
-        });
-
-        const rows = useGridRows(LibraryItem.SONG, ItemListKey.SONG);
-
-        return (
-            <ItemListWithPagination
-                currentPage={currentPage}
-                itemsPerPage={itemsPerPage}
-                onChange={onChange}
-                pageCount={pageCount}
-                totalItemCount={totalItemCount}
-            >
-                <ItemGridList
-                    currentPage={currentPage}
-                    data={data || []}
-                    gap={gap}
-                    itemsPerRow={itemsPerRow}
-                    itemType={LibraryItem.SONG}
-                    ref={ref}
-                    rows={rows}
-                />
-            </ItemListWithPagination>
-        );
+export const SongListPaginatedGrid = ({
+    gap = 'md',
+    itemsPerPage = 100,
+    itemsPerRow,
+    query = {
+        sortBy: SongListSort.NAME,
+        sortOrder: SortOrder.ASC,
     },
-);
+    serverId,
+}: SongListPaginatedGridProps) => {
+    const listCountQuery = songsQueries.listCount({
+        query: { ...query },
+        serverId: serverId,
+    }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
+
+    const listQueryFn = api.controller.getSongList;
+
+    const { currentPage, onChange } = useItemListPagination();
+
+    const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
+        currentPage,
+        eventKey: ItemListKey.SONG,
+        itemsPerPage,
+        itemType: LibraryItem.SONG,
+        listCountQuery,
+        listQueryFn,
+        query,
+        serverId,
+    });
+
+    const rows = useGridRows(LibraryItem.SONG, ItemListKey.SONG);
+
+    return (
+        <ItemListWithPagination
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            onChange={onChange}
+            pageCount={pageCount}
+            totalItemCount={totalItemCount}
+        >
+            <ItemGridList
+                currentPage={currentPage}
+                data={data || []}
+                gap={gap}
+                itemsPerRow={itemsPerRow}
+                itemType={LibraryItem.SONG}
+                rows={rows}
+            />
+        </ItemListWithPagination>
+    );
+};

@@ -1,5 +1,4 @@
 import { UseSuspenseQueryOptions } from '@tanstack/react-query';
-import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
@@ -17,93 +16,87 @@ import { ItemListKey } from '/@/shared/types/types';
 
 interface SongListPaginatedTableProps extends ItemListTableComponentProps<SongListQuery> {}
 
-export const SongListPaginatedTable = forwardRef<any, SongListPaginatedTableProps>(
-    (
-        {
-            autoFitColumns = false,
-            columns,
-            enableAlternateRowColors = false,
-            enableHorizontalBorders = false,
-            enableRowHoverHighlight = true,
-            enableSelection = true,
-            enableVerticalBorders = false,
-            itemsPerPage = 100,
-            query = {
-                sortBy: SongListSort.NAME,
-                sortOrder: SortOrder.ASC,
-            },
-            saveScrollOffset = true,
-            serverId,
-            size = 'default',
-        },
-        ref,
-    ) => {
-        const listCountQuery = songsQueries.listCount({
-            query: { ...query },
-            serverId: serverId,
-        }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
-
-        const listQueryFn = api.controller.getSongList;
-
-        const { currentPage, onChange } = useItemListPagination();
-
-        const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
-            currentPage,
-            eventKey: ItemListKey.SONG,
-            itemsPerPage,
-            itemType: LibraryItem.SONG,
-            listCountQuery,
-            listQueryFn,
-            query,
-            serverId,
-        });
-
-        const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
-            enabled: saveScrollOffset,
-        });
-
-        const { handleColumnReordered } = useItemListColumnReorder({
-            itemListKey: ItemListKey.SONG,
-        });
-
-        const { handleColumnResized } = useItemListColumnResize({
-            itemListKey: ItemListKey.SONG,
-        });
-
-        const startRowIndex = currentPage * itemsPerPage;
-
-        return (
-            <ItemListWithPagination
-                currentPage={currentPage}
-                itemsPerPage={itemsPerPage}
-                onChange={onChange}
-                pageCount={pageCount}
-                totalItemCount={totalItemCount}
-            >
-                <ItemTableList
-                    autoFitColumns={autoFitColumns}
-                    CellComponent={ItemTableListColumn}
-                    columns={columns}
-                    data={data || []}
-                    enableAlternateRowColors={enableAlternateRowColors}
-                    enableExpansion={false}
-                    enableHorizontalBorders={enableHorizontalBorders}
-                    enableRowHoverHighlight={enableRowHoverHighlight}
-                    enableSelection={enableSelection}
-                    enableVerticalBorders={enableVerticalBorders}
-                    initialTop={{
-                        to: scrollOffset ?? 0,
-                        type: 'offset',
-                    }}
-                    itemType={LibraryItem.SONG}
-                    onColumnReordered={handleColumnReordered}
-                    onColumnResized={handleColumnResized}
-                    onScrollEnd={handleOnScrollEnd}
-                    ref={ref}
-                    size={size}
-                    startRowIndex={startRowIndex}
-                />
-            </ItemListWithPagination>
-        );
+export const SongListPaginatedTable = ({
+    autoFitColumns = false,
+    columns,
+    enableAlternateRowColors = false,
+    enableHorizontalBorders = false,
+    enableRowHoverHighlight = true,
+    enableSelection = true,
+    enableVerticalBorders = false,
+    itemsPerPage = 100,
+    query = {
+        sortBy: SongListSort.NAME,
+        sortOrder: SortOrder.ASC,
     },
-);
+    saveScrollOffset = true,
+    serverId,
+    size = 'default',
+}: SongListPaginatedTableProps) => {
+    const listCountQuery = songsQueries.listCount({
+        query: { ...query },
+        serverId: serverId,
+    }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
+
+    const listQueryFn = api.controller.getSongList;
+
+    const { currentPage, onChange } = useItemListPagination();
+
+    const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
+        currentPage,
+        eventKey: ItemListKey.SONG,
+        itemsPerPage,
+        itemType: LibraryItem.SONG,
+        listCountQuery,
+        listQueryFn,
+        query,
+        serverId,
+    });
+
+    const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
+        enabled: saveScrollOffset,
+    });
+
+    const { handleColumnReordered } = useItemListColumnReorder({
+        itemListKey: ItemListKey.SONG,
+    });
+
+    const { handleColumnResized } = useItemListColumnResize({
+        itemListKey: ItemListKey.SONG,
+    });
+
+    const startRowIndex = currentPage * itemsPerPage;
+
+    return (
+        <ItemListWithPagination
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            onChange={onChange}
+            pageCount={pageCount}
+            totalItemCount={totalItemCount}
+        >
+            <ItemTableList
+                autoFitColumns={autoFitColumns}
+                CellComponent={ItemTableListColumn}
+                columns={columns}
+                data={data || []}
+                enableAlternateRowColors={enableAlternateRowColors}
+                enableExpansion={false}
+                enableHorizontalBorders={enableHorizontalBorders}
+                enableRowHoverHighlight={enableRowHoverHighlight}
+                enableSelection={enableSelection}
+                enableVerticalBorders={enableVerticalBorders}
+                initialTop={{
+                    to: scrollOffset ?? 0,
+                    type: 'offset',
+                }}
+                itemType={LibraryItem.SONG}
+                onColumnReordered={handleColumnReordered}
+                onColumnResized={handleColumnResized}
+                onScrollEnd={handleOnScrollEnd}
+                size={size}
+                startRowIndex={startRowIndex}
+            />
+        </ItemListWithPagination>
+    );
+};

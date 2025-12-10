@@ -106,6 +106,7 @@ export function WebPlayer() {
                         currentPlayerNum: num,
                         currentTime: e.playedSeconds,
                         duration: getDuration(playerRef.current.player1().ref),
+                        hasNextSong: Boolean(player2),
                         isTransitioning,
                         nextPlayer: playerRef.current.player2(),
                         playerNum: 1,
@@ -125,7 +126,7 @@ export function WebPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, crossfadeStyle, isTransitioning, num, transitionType, volume],
+        [crossfadeDuration, crossfadeStyle, isTransitioning, num, player2, transitionType, volume],
     );
 
     const onProgressPlayer2 = useCallback(
@@ -143,6 +144,7 @@ export function WebPlayer() {
                         currentPlayerNum: num,
                         currentTime: e.playedSeconds,
                         duration: getDuration(playerRef.current.player2().ref),
+                        hasNextSong: Boolean(player1),
                         isTransitioning,
                         nextPlayer: playerRef.current.player1(),
                         playerNum: 2,
@@ -162,7 +164,7 @@ export function WebPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, crossfadeStyle, isTransitioning, num, transitionType, volume],
+        [crossfadeDuration, crossfadeStyle, isTransitioning, num, player1, transitionType, volume],
     );
 
     const handleOnEndedPlayer1 = useCallback(() => {
@@ -193,7 +195,12 @@ export function WebPlayer() {
 
     usePlayerEvents(
         {
+            onCurrentSongChange: () => {
+                setIsTransitioning(false);
+            },
             onPlayerSeekToTimestamp: (properties) => {
+                setIsTransitioning(false);
+
                 const timestamp = properties.timestamp;
 
                 // Reset transition state if seeking during a crossfade transition
@@ -218,6 +225,8 @@ export function WebPlayer() {
                 }
             },
             onPlayerStatus: async (properties) => {
+                setIsTransitioning(false);
+
                 const status = properties.status;
 
                 // Reset crossfade transition if paused during a crossfade transition
@@ -226,8 +235,6 @@ export function WebPlayer() {
                     isTransitioning &&
                     transitionType === PlayerStyle.CROSSFADE
                 ) {
-                    setIsTransitioning(false);
-
                     if (num === 1) {
                         playerRef.current?.player1()?.setVolume(volume);
                         playerRef.current?.player2()?.setVolume(0);
@@ -461,6 +468,7 @@ function crossfadeHandler(args: {
     currentPlayerNum: number;
     currentTime: number;
     duration: number;
+    hasNextSong: boolean;
     isTransitioning: boolean | string;
     nextPlayer: {
         ref: null | ReactPlayer;
@@ -477,6 +485,7 @@ function crossfadeHandler(args: {
         currentPlayerNum,
         currentTime,
         duration,
+        hasNextSong,
         isTransitioning,
         nextPlayer,
         playerNum,
@@ -485,8 +494,21 @@ function crossfadeHandler(args: {
     } = args;
     const player = `player${playerNum}`;
 
+    // If there is no next song to transition to, ensure we don't enter or stay in a transition
+    if (!hasNextSong) {
+        currentPlayer.setVolume(volume);
+        nextPlayer.setVolume(0);
+        nextPlayer.ref?.getInternalPlayer()?.pause();
+
+        if (isTransitioning) {
+            setIsTransitioning(false);
+        }
+
+        return;
+    }
+
     if (!isTransitioning) {
-        if (currentTime > duration - crossfadeDuration) {
+        if (duration > 0 && currentTime > duration - crossfadeDuration) {
             nextPlayer.setVolume(0);
             nextPlayer.ref?.getInternalPlayer().play();
             return setIsTransitioning(player);

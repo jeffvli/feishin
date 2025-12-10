@@ -23,6 +23,7 @@ import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { AddToQueueType, usePlayerActions, useSettingsStore } from '/@/renderer/store';
 import { LogCategory, logFn } from '/@/renderer/utils/logger';
 import { logMsg } from '/@/renderer/utils/logger-message';
+import { shuffle as shuffleArray } from '/@/renderer/utils/shuffle';
 import { sortSongsByFetchedOrder } from '/@/shared/api/utils';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { ConfirmModal } from '/@/shared/components/modal/modal';
@@ -31,6 +32,7 @@ import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import {
+    AlbumListSort,
     instanceOfCancellationError,
     LibraryItem,
     PlaylistSongListResponse,
@@ -340,10 +342,17 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
             });
 
             try {
-                // Get total count first
                 let totalCount = 0;
                 let listQueryFn: any;
                 let listCountQueryFn: any;
+
+                // Special handling for albums with random sort: fetch in name order, then shuffle client-side
+                const isAlbumRandomSort =
+                    itemType === LibraryItem.ALBUM && query.sortBy === AlbumListSort.RANDOM;
+
+                const fetchQuery = isAlbumRandomSort
+                    ? { ...query, sortBy: AlbumListSort.NAME }
+                    : query;
 
                 switch (itemType) {
                     case LibraryItem.ALBUM: {
@@ -379,7 +388,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 // Get total count
                 const countResult = (await queryClient.fetchQuery({
                     ...listCountQueryFn({
-                        query: { ...query },
+                        query: { ...fetchQuery },
                         serverId,
                     }),
                     gcTime: 0,
@@ -433,7 +442,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
                 while (startIndex < totalCount) {
                     const pageQuery = {
-                        ...query,
+                        ...fetchQuery,
                         limit: pageSize,
                         startIndex,
                     };
@@ -474,10 +483,16 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                     toast.hide(toastId);
                 }
 
+                // Shuffle album IDs client-side if this was a random sort request
+                let finalResults = allResults;
+                if (isAlbumRandomSort && itemType === LibraryItem.ALBUM) {
+                    finalResults = shuffleArray(allResults as string[]) as typeof allResults;
+                }
+
                 if (itemType === LibraryItem.SONG) {
-                    addToQueueByData(allResults as Song[], type);
+                    addToQueueByData(finalResults as Song[], type);
                 } else {
-                    await addToQueueByFetch(serverId, allResults as string[], itemType, type);
+                    await addToQueueByFetch(serverId, finalResults as string[], itemType, type);
                 }
             } catch (err: any) {
                 if (instanceOfCancellationError(err)) {

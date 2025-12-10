@@ -1,5 +1,4 @@
 import { UseSuspenseQueryOptions } from '@tanstack/react-query';
-import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListInfiniteLoader } from '/@/renderer/components/item-list/helpers/item-list-infinite-loader';
@@ -20,79 +19,73 @@ import { ItemListKey } from '/@/shared/types/types';
 
 interface PlaylistListInfiniteTableProps extends ItemListTableComponentProps<PlaylistListQuery> {}
 
-export const PlaylistListInfiniteTable = forwardRef<any, PlaylistListInfiniteTableProps>(
-    (
-        {
-            autoFitColumns = false,
-            columns,
-            enableAlternateRowColors = false,
-            enableHorizontalBorders = false,
-            enableRowHoverHighlight = true,
-            enableSelection = true,
-            enableVerticalBorders = false,
-            itemsPerPage = 100,
-            query = {
-                sortBy: PlaylistListSort.NAME,
-                sortOrder: SortOrder.ASC,
-            },
-            saveScrollOffset = true,
-            serverId,
-            size = 'default',
-        },
-        ref,
-    ) => {
-        const listCountQuery = playlistsQueries.listCount({
-            query: { ...query },
-            serverId: serverId,
-        }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
-
-        const listQueryFn = api.controller.getPlaylistList;
-
-        const { data, onRangeChanged } = useItemListInfiniteLoader({
-            eventKey: ItemListKey.PLAYLIST,
-            itemsPerPage,
-            itemType: LibraryItem.PLAYLIST,
-            listCountQuery,
-            listQueryFn,
-            query,
-            serverId,
-        });
-
-        const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
-            enabled: saveScrollOffset,
-        });
-
-        const { handleColumnReordered } = useItemListColumnReorder({
-            itemListKey: ItemListKey.PLAYLIST,
-        });
-
-        const { handleColumnResized } = useItemListColumnResize({
-            itemListKey: ItemListKey.PLAYLIST,
-        });
-
-        return (
-            <ItemTableList
-                autoFitColumns={autoFitColumns}
-                CellComponent={ItemTableListColumn}
-                columns={columns}
-                data={data}
-                enableAlternateRowColors={enableAlternateRowColors}
-                enableHorizontalBorders={enableHorizontalBorders}
-                enableRowHoverHighlight={enableRowHoverHighlight}
-                enableSelection={enableSelection}
-                enableVerticalBorders={enableVerticalBorders}
-                initialTop={{
-                    to: scrollOffset ?? 0,
-                    type: 'offset',
-                }}
-                itemType={LibraryItem.PLAYLIST}
-                onColumnReordered={handleColumnReordered}
-                onColumnResized={handleColumnResized}
-                onRangeChanged={onRangeChanged}
-                onScrollEnd={handleOnScrollEnd}
-                ref={ref}
-                size={size}
-            />
-        );
+export const PlaylistListInfiniteTable = ({
+    autoFitColumns = false,
+    columns,
+    enableAlternateRowColors = false,
+    enableHorizontalBorders = false,
+    enableRowHoverHighlight = true,
+    enableSelection = true,
+    enableVerticalBorders = false,
+    itemsPerPage = 100,
+    query = {
+        sortBy: PlaylistListSort.NAME,
+        sortOrder: SortOrder.ASC,
     },
-);
+    saveScrollOffset = true,
+    serverId,
+    size = 'default',
+}: PlaylistListInfiniteTableProps) => {
+    const listCountQuery = playlistsQueries.listCount({
+        query: { ...query },
+        serverId: serverId,
+    }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
+
+    const listQueryFn = api.controller.getPlaylistList;
+
+    const { data, onRangeChanged } = useItemListInfiniteLoader({
+        eventKey: ItemListKey.PLAYLIST,
+        itemsPerPage,
+        itemType: LibraryItem.PLAYLIST,
+        listCountQuery,
+        listQueryFn,
+        query,
+        serverId,
+    });
+
+    const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
+        enabled: saveScrollOffset,
+    });
+
+    const { handleColumnReordered } = useItemListColumnReorder({
+        itemListKey: ItemListKey.PLAYLIST,
+    });
+
+    const { handleColumnResized } = useItemListColumnResize({
+        itemListKey: ItemListKey.PLAYLIST,
+    });
+
+    return (
+        <ItemTableList
+            autoFitColumns={autoFitColumns}
+            CellComponent={ItemTableListColumn}
+            columns={columns}
+            data={data}
+            enableAlternateRowColors={enableAlternateRowColors}
+            enableHorizontalBorders={enableHorizontalBorders}
+            enableRowHoverHighlight={enableRowHoverHighlight}
+            enableSelection={enableSelection}
+            enableVerticalBorders={enableVerticalBorders}
+            initialTop={{
+                to: scrollOffset ?? 0,
+                type: 'offset',
+            }}
+            itemType={LibraryItem.PLAYLIST}
+            onColumnReordered={handleColumnReordered}
+            onColumnResized={handleColumnResized}
+            onRangeChanged={onRangeChanged}
+            onScrollEnd={handleOnScrollEnd}
+            size={size}
+        />
+    );
+};

@@ -26,7 +26,6 @@ export const SimilarSongsList = ({ count, song }: SimilarSongsListProps) => {
                 gcTime: 1000 * 60 * 2,
             },
             query: {
-                albumArtistIds: song.albumArtists.map((art) => art.id),
                 count,
                 songId: song.id,
             },
@@ -34,15 +33,15 @@ export const SimilarSongsList = ({ count, song }: SimilarSongsListProps) => {
         }),
     );
 
-    const { table } = useListSettings(ItemListKey.SONG);
+    const { table } = useListSettings(ItemListKey.FULL_SCREEN);
     const { table: fullScreenTable } = useListSettings(ItemListKey.FULL_SCREEN);
 
     const { handleColumnReordered } = useItemListColumnReorder({
-        itemListKey: ItemListKey.SONG,
+        itemListKey: ItemListKey.FULL_SCREEN,
     });
 
     const { handleColumnResized } = useItemListColumnResize({
-        itemListKey: ItemListKey.SONG,
+        itemListKey: ItemListKey.FULL_SCREEN,
     });
 
     const tableData = useMemo(() => {

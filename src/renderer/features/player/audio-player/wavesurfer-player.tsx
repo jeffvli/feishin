@@ -85,6 +85,7 @@ export function WaveSurferPlayer() {
                         currentPlayerNum: num,
                         currentTime: e.playedSeconds,
                         duration: getDuration(playerRef.current.player1().ref),
+                        hasNextSong: Boolean(player2),
                         isTransitioning,
                         nextPlayer: playerRef.current.player2(),
                         playerNum: 1,
@@ -104,7 +105,7 @@ export function WaveSurferPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, isTransitioning, num, transitionType, volume],
+        [crossfadeDuration, isTransitioning, num, player2, transitionType, volume],
     );
 
     const onProgressPlayer2 = useCallback(
@@ -121,6 +122,7 @@ export function WaveSurferPlayer() {
                         currentPlayerNum: num,
                         currentTime: e.playedSeconds,
                         duration: getDuration(playerRef.current.player2().ref),
+                        hasNextSong: Boolean(player1),
                         isTransitioning,
                         nextPlayer: playerRef.current.player1(),
                         playerNum: 2,
@@ -140,7 +142,7 @@ export function WaveSurferPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, isTransitioning, num, transitionType, volume],
+        [crossfadeDuration, isTransitioning, num, player1, transitionType, volume],
     );
 
     const handleOnEndedPlayer1 = useCallback(() => {
@@ -260,6 +262,7 @@ function crossfadeHandler(args: {
     currentPlayerNum: number;
     currentTime: number;
     duration: number;
+    hasNextSong: boolean;
     isTransitioning: boolean | string;
     nextPlayer: {
         ref: null | WaveSurfer;
@@ -275,6 +278,7 @@ function crossfadeHandler(args: {
         currentPlayerNum,
         currentTime,
         duration,
+        hasNextSong,
         isTransitioning,
         nextPlayer,
         playerNum,
@@ -283,8 +287,20 @@ function crossfadeHandler(args: {
     } = args;
     const player = `player${playerNum}`;
 
+    // If there is no next song queued, don't begin or continue a transition
+    if (!hasNextSong) {
+        currentPlayer.setVolume(volume);
+        nextPlayer.setVolume(0);
+        nextPlayer.ref?.pause();
+
+        if (isTransitioning) {
+            setIsTransitioning(false);
+        }
+        return;
+    }
+
     if (!isTransitioning) {
-        if (currentTime > duration - crossfadeDuration) {
+        if (duration > 0 && currentTime > duration - crossfadeDuration) {
             nextPlayer.setVolume(0);
             nextPlayer.ref?.play();
             return setIsTransitioning(player);

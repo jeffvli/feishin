@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 
-import { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
 
 import { AudioPlayer, PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
@@ -153,14 +153,36 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
 
     useEffect(() => {
         const player1 = player1Ref.current?.getInternalPlayer();
-        if (player1) {
+        if (player1 && player1 instanceof HTMLAudioElement) {
             player1.preservesPitch = preservesPitch;
         }
         const player2 = player2Ref.current?.getInternalPlayer();
-        if (player2) {
+        if (player2 && player2 instanceof HTMLAudioElement) {
             player2.preservesPitch = preservesPitch;
         }
     }, [preservesPitch]);
+
+    const handleOnReadyPlayer1 = useCallback(
+        (player: ReactPlayer) => {
+            const internal = player.getInternalPlayer();
+            if (internal && internal instanceof HTMLAudioElement) {
+                internal.preservesPitch = preservesPitch;
+            }
+            onStartedPlayer1(player);
+        },
+        [onStartedPlayer1, preservesPitch],
+    );
+
+    const handleOnReadyPlayer2 = useCallback(
+        (player: ReactPlayer) => {
+            const internal = player.getInternalPlayer();
+            if (internal && internal instanceof HTMLAudioElement) {
+                internal.preservesPitch = preservesPitch;
+            }
+            onStartedPlayer2(player);
+        },
+        [onStartedPlayer2, preservesPitch],
+    );
 
     return (
         <div id="web-player-engine" style={{ display: 'none' }}>
@@ -175,7 +197,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 onEnded={src1 ? () => onEndedPlayer1() : undefined}
                 onError={handleOnError(player1Ref, () => onEndedPlayer1())}
                 onProgress={onProgressPlayer1}
-                onReady={onStartedPlayer1}
+                onReady={handleOnReadyPlayer1}
                 playbackRate={speed || 1}
                 playing={playerNum === 1 && playerStatus === PlayerStatus.PLAYING}
                 progressInterval={isTransitioning ? 10 : 250}
@@ -195,7 +217,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 onEnded={src2 ? () => onEndedPlayer2() : undefined}
                 onError={handleOnError(player2Ref, () => onEndedPlayer2())}
                 onProgress={onProgressPlayer2}
-                onReady={onStartedPlayer2}
+                onReady={handleOnReadyPlayer2}
                 playbackRate={speed || 1}
                 playing={playerNum === 2 && playerStatus === PlayerStatus.PLAYING}
                 progressInterval={isTransitioning ? 10 : 250}

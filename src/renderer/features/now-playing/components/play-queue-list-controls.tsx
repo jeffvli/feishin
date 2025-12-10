@@ -1,4 +1,4 @@
-import { type MutableRefObject } from 'react';
+import { RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
@@ -16,7 +16,7 @@ import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 interface PlayQueueListOptionsProps {
     handleSearch: (value: string) => void;
     searchTerm?: string;
-    tableRef: MutableRefObject<ItemListHandle | null>;
+    tableRef: RefObject<ItemListHandle | null>;
     type: ItemListKey;
 }
 
@@ -24,6 +24,7 @@ export const PlayQueueListControls = ({
     handleSearch,
     searchTerm,
     tableRef,
+    type,
 }: PlayQueueListOptionsProps) => {
     const { t } = useTranslation();
     const player = usePlayer();
@@ -144,7 +145,7 @@ export const PlayQueueListControls = ({
                             value: ListDisplayType.GRID,
                         },
                     ]}
-                    listKey={ItemListKey.SIDE_QUEUE}
+                    listKey={type}
                     optionsConfig={{
                         table: {
                             itemsPerPage: { hidden: true },

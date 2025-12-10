@@ -1,7 +1,7 @@
 import type { Variants } from 'motion/react';
 import type { ReactNode } from 'react';
 
-import { AnimatePresence, motion, useMotionValue } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import styles from './grid-carousel.module.css';
@@ -113,25 +113,42 @@ function BaseGridCarousel(props: GridCarouselProps) {
     const hasMoreCards = (currentPage.page + 1) * cardsToShow * rowCount < cards.length;
     const isNextDisabled = !hasMoreCards && (hasNextPage === false || hasNextPage === undefined);
 
-    const indicatorRef = useRef<HTMLDivElement>(null);
-    const x = useMotionValue(0);
-    const dragThreshold = 1;
+    const wheelCooldownRef = useRef(0);
+    const wheelThreshold = 10;
+    const wheelCooldownMs = 250;
 
-    const handleDragEnd = useCallback(() => {
-        const dragDistance = x.get();
-
-        if (Math.abs(dragDistance) > dragThreshold) {
-            if (dragDistance > 0 && !isPrevDisabled) {
-                // Dragged right, go to previous page
-                handlePrevPage();
-            } else if (dragDistance < 0 && !isNextDisabled) {
-                // Dragged left, go to next page
-                handleNextPage();
+    const handleWheel = useCallback(
+        (event: React.WheelEvent<HTMLDivElement>) => {
+            if (!event.shiftKey) {
+                return;
             }
-        }
 
-        x.set(0);
-    }, [handleNextPage, handlePrevPage, isNextDisabled, isPrevDisabled, x]);
+            const now = Date.now();
+            const elapsed = now - wheelCooldownRef.current;
+
+            const horizontalDelta = Math.abs(event.deltaY);
+
+            if (horizontalDelta < wheelThreshold || elapsed < wheelCooldownMs) {
+                return;
+            }
+
+            if (event.deltaY > 0 && !isNextDisabled) {
+                wheelCooldownRef.current = now;
+                handleNextPage();
+            } else if (event.deltaY < 0 && !isPrevDisabled) {
+                wheelCooldownRef.current = now;
+                handlePrevPage();
+            }
+        },
+        [
+            handleNextPage,
+            handlePrevPage,
+            isNextDisabled,
+            isPrevDisabled,
+            wheelCooldownMs,
+            wheelThreshold,
+        ],
+    );
 
     return (
         <div className={styles.gridCarousel} ref={ref}>
@@ -186,6 +203,7 @@ function BaseGridCarousel(props: GridCarouselProps) {
                             exit="exit"
                             initial="initial"
                             key={currentPage.page}
+                            onWheel={handleWheel}
                             style={
                                 {
                                     '--cards-to-show': cardsToShow,
@@ -199,18 +217,6 @@ function BaseGridCarousel(props: GridCarouselProps) {
                             ))}
                         </motion.div>
                     </AnimatePresence>
-                    <motion.div
-                        className={styles.pageIndicator}
-                        drag="x"
-                        dragConstraints={{ left: -20, right: 20 }}
-                        dragElastic={0.3}
-                        dragSnapToOrigin={true}
-                        onDragEnd={handleDragEnd}
-                        ref={indicatorRef}
-                        style={{ x }}
-                    >
-                        <motion.div className={styles.indicatorTrack} />
-                    </motion.div>
                 </>
             )}
         </div>

@@ -11,10 +11,11 @@ export const PathColumn = (props: ItemTableListInnerColumn) => {
     ];
 
     if (typeof row === 'string' && row) {
-        const maxLength = 50;
-        const displayPath = row.length > maxLength ? `...${row.slice(-maxLength + 3)}` : row;
-
-        return <TableColumnTextContainer {...props}>{displayPath}</TableColumnTextContainer>;
+        return (
+            <TableColumnTextContainer {...props}>
+                <span>{row}</span>
+            </TableColumnTextContainer>
+        );
     }
 
     if (row === null) {

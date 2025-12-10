@@ -4,6 +4,7 @@ import { rm } from 'fs/promises';
 import uniq from 'lodash/uniq';
 import MpvAPI from 'node-mpv';
 import { pid } from 'node:process';
+import process from 'process';
 
 import { getMainWindow, sendToastToRenderer } from '../../../index';
 import { createLog, isWindows } from '../../../utils';
@@ -149,12 +150,28 @@ export const getMpvInstance = () => {
     return mpvInstance;
 };
 
-const quit = async () => {
-    const instance = getMpvInstance();
-    if (instance) {
-        await instance.quit();
+const quit = async (instance?: MpvAPI | null) => {
+    const mpv = instance || getMpvInstance();
+    if (mpv) {
+        try {
+            await mpv.quit();
+        } catch {
+            // If quit() fails, try to kill the process directly
+            const mpvProcess = (mpv as any).process || (mpv as any).mpvProcess;
+            if (mpvProcess && typeof mpvProcess.kill === 'function') {
+                try {
+                    mpvProcess.kill('SIGTERM');
+                } catch (killErr) {
+                    mpvLog({ action: 'Failed to kill mpv process' }, killErr as NodeMpvError);
+                }
+            }
+        }
         if (!isWindows()) {
-            await rm(socketPath);
+            try {
+                await rm(socketPath);
+            } catch {
+                // Ignore errors when removing socket file
+            }
         }
     }
 };
@@ -431,6 +448,36 @@ enum MpvState {
 
 let mpvState = MpvState.STARTED;
 
+// Cleanup function that can be called from multiple places
+const cleanupMpv = async (force = false) => {
+    if (mpvState === MpvState.DONE && !force) {
+        return;
+    }
+
+    const instance = getMpvInstance();
+    if (instance) {
+        try {
+            if (!force) {
+                await instance.stop();
+            }
+            await quit(instance);
+        } catch (err: any | NodeMpvError) {
+            mpvLog({ action: `Failed to cleanup mpv` }, err);
+            // Force kill as fallback
+            const mpvProcess = (instance as any).process || (instance as any).mpvProcess;
+            if (mpvProcess && typeof mpvProcess.kill === 'function') {
+                try {
+                    mpvProcess.kill('SIGKILL');
+                } catch {
+                    // Ignore kill errors
+                }
+            }
+        } finally {
+            mpvInstance = null;
+        }
+    }
+};
+
 app.on('before-quit', async (event) => {
     switch (mpvState) {
         case MpvState.DONE:
@@ -442,8 +489,7 @@ app.on('before-quit', async (event) => {
             try {
                 mpvState = MpvState.IN_PROGRESS;
                 event.preventDefault();
-                await getMpvInstance()?.stop();
-                await quit();
+                await cleanupMpv();
             } catch (err: any | NodeMpvError) {
                 mpvLog({ action: `Failed to cleanly before-quit` }, err);
             } finally {
@@ -453,4 +499,47 @@ app.on('before-quit', async (event) => {
             break;
         }
     }
+});
+
+// Handle process exit events to ensure mpv is killed even if app crashes
+process.on('exit', () => {
+    const instance = getMpvInstance();
+    if (instance) {
+        // Try to access and kill the process directly
+        const mpvProcess = (instance as any).process || (instance as any).mpvProcess;
+        if (mpvProcess && typeof mpvProcess.kill === 'function') {
+            try {
+                mpvProcess.kill('SIGKILL');
+            } catch {
+                // Ignore errors during exit
+            }
+        }
+    }
+});
+
+// Handle signals that can terminate the process
+process.on('SIGINT', async () => {
+    await cleanupMpv(true);
+    process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+    await cleanupMpv(true);
+    process.exit(0);
+});
+
+// Handle uncaught exceptions - cleanup mpv before crashing
+process.on('uncaughtException', async (error) => {
+    console.error('Uncaught exception:', error);
+    await cleanupMpv(true).catch(() => {
+        // Ignore cleanup errors during crash
+    });
+});
+
+// Handle unhandled rejections - cleanup mpv
+process.on('unhandledRejection', async (reason) => {
+    console.error('Unhandled rejection:', reason);
+    await cleanupMpv(true).catch(() => {
+        // Ignore cleanup errors
+    });
 });

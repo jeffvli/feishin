@@ -1,5 +1,5 @@
 import isElectron from 'is-electron';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ListConfigTable } from '/@/renderer/features/shared/components/list-config-menu';
@@ -11,12 +11,17 @@ import {
     usePlayerSpeed,
     usePlayerStatus,
 } from '/@/renderer/store';
-import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import {
+    usePlaybackSettings,
+    useSettingsStore,
+    useSettingsStoreActions,
+} from '/@/renderer/store/settings.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Popover } from '/@/shared/components/popover/popover';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
+import { Switch } from '/@/shared/components/switch/switch';
 import { toast } from '/@/shared/components/toast/toast';
 import {
     CrossfadeStyle,
@@ -42,8 +47,19 @@ export const PlayerConfig = () => {
     const { crossfadeDuration, crossfadeStyle, transitionType } = usePlayerProperties();
     const { setCrossfadeDuration, setCrossfadeStyle, setQueueType, setSpeed, setTransitionType } =
         usePlayerActions();
+    const preservePitch = useSettingsStore((state) => state.playback.preservePitch);
+
     const playbackSettings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
+
+    const setPreservePitch = useCallback(
+        (value: boolean) => {
+            setSettings({
+                playback: { ...playbackSettings, preservePitch: value },
+            });
+        },
+        [playbackSettings, setSettings],
+    );
 
     const [audioDevices, setAudioDevices] = useState<{ label: string; value: string }[]>([]);
 
@@ -288,26 +304,38 @@ export const PlayerConfig = () => {
                 id: 'playbackSpeed',
                 label: t('player.playbackSpeed', { postProcess: 'titleCase' }),
             },
+            {
+                component: (
+                    <Switch
+                        defaultChecked={preservePitch}
+                        onChange={(e) => setPreservePitch(e.currentTarget.checked)}
+                    />
+                ),
+                id: 'preservePitch',
+                label: t('setting.preservePitch', { postProcess: 'titleCase' }),
+            },
         ];
 
         return allOptions;
     }, [
-        playbackSettings,
-        audioDevices,
-        status,
-        setSettings,
-        currentSong,
-        speed,
-        setSpeed,
+        t,
         queueType,
-        setQueueType,
+        playbackSettings,
+        status,
+        audioDevices,
         transitionType,
-        setTransitionType,
+        crossfadeStyle,
         crossfadeDuration,
         setCrossfadeDuration,
-        crossfadeStyle,
+        speed,
+        setSpeed,
+        preservePitch,
+        currentSong?.bpm,
+        setQueueType,
+        setSettings,
+        setTransitionType,
         setCrossfadeStyle,
-        t,
+        setPreservePitch,
     ]);
 
     return (

@@ -144,7 +144,7 @@
         "clean": "Jugendfrei",
         "recordLabel": "Plattenlabel",
         "slower": "langsamer",
-        "releaseType": "Veröffentlichungsart",
+        "releaseType": "Veröffentlichungsformat",
         "view": "Betrachten"
     },
     "error": {
@@ -356,7 +356,8 @@
                 "gap": "$t(common.gap)",
                 "size": "$t(common.size)",
                 "displayType": "Anzeigestil",
-                "autoFitColumns": "automatisch Spalten einpassen"
+                "autoFitColumns": "automatisch Spalten einpassen",
+                "size_default": "Standard"
             },
             "label": {
                 "dateAdded": "Hinzugefügt am",
@@ -540,7 +541,9 @@
             "scrobble": "scrobble",
             "audio": "Audio",
             "lyrics": "Songtexte",
-            "transcoding": "Transcoding"
+            "transcoding": "Transcoding",
+            "logger": "Logger",
+            "playerFilters": "Player-Filter"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
@@ -631,7 +634,8 @@
         "viewQueue": "Warteschlange anzeigen",
         "addLastShuffled": "Als Letztes spielen (zufällige Wiedergabe)",
         "addNextShuffled": "Als Nächstes spielen (zufällige Wiedergabe)",
-        "queueType_default": "Standard"
+        "queueType_default": "Standard",
+        "queueType_priority": "Priorität"
     },
     "setting": {
         "audioDevice_description": "wählen Sie das Audiogerät aus, das für die Wiedergabe verwendet werden soll (nur Webplayer)",
@@ -724,7 +728,7 @@
         "showSkipButton_description": "Ein- oder Ausblenden der Überspringen-Schaltflächen in der Player-Leiste",
         "savePlayQueue": "Wiedergabe-Warteschlange speichern",
         "minimumScrobbleSeconds_description": "die Mindestdauer in Sekunden, welche das Lied gespielt werden muss, bevor dieses gescrobbelt wird",
-        "skipPlaylistPage_description": "Gehen Sie beim Navigieren zu einer Wiedergabeliste zur Titelseite der Wiedergabeliste und nicht zur Standardseite",
+        "skipPlaylistPage_description": "Gehe beim Navigieren zu einer Wiedergabeliste zu deren Titelseite und nicht zur Standardseite",
         "fontType_description": "Die integrierte Schriftart wählt eine der von feishin bereitgestellten Schriftarten aus. Mit der Systemschriftart können Sie jede von Ihrem Betriebssystem bereitgestellte Schriftart auswählen. Benutzerdefiniert erlaubt es eine eigene Schriftart bereitzustellen",
         "playButtonBehavior": "Verhalten der Wiedergabetaste",
         "volumeWheelStep": "Lautstärkeregler Stufe",
@@ -826,7 +830,9 @@
         "language": "Sprache",
         "playerAlbumArtResolution": "Auflösung des Albumcovers",
         "imageAspectRatio": "Original Seitenverhältnis des Albumcovers verwenden",
-        "playerAlbumArtResolution_description": "die Auflösung des Albumcovers im großen Player. Eine höhere Auflösung sorgt für ein schärferes Bild, kann jedoch das Laden verlangsamen. Standardwert: 0 (automatische Berechnung)"
+        "playerAlbumArtResolution_description": "die Auflösung des Albumcovers im großen Player. Eine höhere Auflösung sorgt für ein schärferes Bild, kann jedoch das Laden verlangsamen. Standardwert: 0 (automatische Berechnung)",
+        "analyticsDisable": "Keine nutzungsbasierte Analyse",
+        "analyticsDisable_description": "Anonymisierte Nutzungsdaten werden an den Entwickler geschickt, um die Anwendung zu verbessern"
     },
     "dragDropZone": {
         "error_oneFileOnly": "Bitte wähle nur 1 Datei",
@@ -853,5 +859,32 @@
         "inTheRange": "ist im Bereich",
         "inTheRangeDate": "ist im Bereich (Datum)",
         "matchesRegex": "entspricht Regex"
+    },
+    "queryBuilder": {
+        "standardTags": "Standardtags",
+        "customTags": "benutzerdefinierte Tags"
+    },
+    "releaseType": {
+        "primary": {
+            "album": "$t(entity.album_one)",
+            "broadcast": "Broadcast",
+            "ep": "EP",
+            "other": "andere",
+            "single": "Single"
+        },
+        "secondary": {
+            "audiobook": "Hörbuch",
+            "audioDrama": "Hörspiel",
+            "compilation": "Compilation",
+            "djMix": "DJ Mix",
+            "demo": "Demo",
+            "fieldRecording": "Außenaufnahme",
+            "interview": "Interview",
+            "live": "Live",
+            "mixtape": "Mixtape",
+            "remix": "Remix",
+            "soundtrack": "Soundtrack",
+            "spokenWord": "Gesprochenes Wort"
+        }
     }
 }

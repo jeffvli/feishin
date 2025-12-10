@@ -10,7 +10,6 @@ import { AddServerForm } from '/@/renderer/features/servers/components/add-serve
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAuthStoreActions, useCurrentServer, useServerList } from '/@/renderer/store';
-import { Accordion } from '/@/shared/components/accordion/accordion';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -27,7 +26,6 @@ import {
 const localSettings = isElectron() ? window.api.localSettings : null;
 
 export const ServerRequired = () => {
-    const { t } = useTranslation();
     const serverList = useServerList();
 
     const serverLock =
@@ -43,19 +41,10 @@ export const ServerRequired = () => {
             <ScrollArea>
                 <Stack miw="300px">
                     <ServerSelector />
-                    {serverLock && (
+                    {!serverLock && (
                         <>
                             <Divider my="lg" />
-                            <Accordion>
-                                <Accordion.Item value="add-server">
-                                    <Accordion.Control>
-                                        {t('form.addServer.title', { postProcess: 'titleCase' })}
-                                    </Accordion.Control>
-                                    <Accordion.Panel>
-                                        <AddServerForm onCancel={null} />
-                                    </Accordion.Panel>
-                                </Accordion.Item>
-                            </Accordion>
+                            <AddServerForm onCancel={null} />
                         </>
                     )}
                 </Stack>

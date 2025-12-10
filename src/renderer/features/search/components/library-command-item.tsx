@@ -1,16 +1,19 @@
-import { CSSProperties, SyntheticEvent, useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { CSSProperties, useCallback, useState } from 'react';
 
 import styles from './library-command-item.module.css';
 
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
+import {
+    LONG_PRESS_PLAY_BEHAVIOR,
+    PlayTooltip,
+} from '/@/renderer/features/shared/components/play-button-group';
+import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-button-click';
 import { useCurrentServer } from '/@/renderer/store';
-import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
-import { Group } from '/@/shared/components/group/group';
 import { Image } from '/@/shared/components/image/image';
 import { Text } from '/@/shared/components/text/text';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface LibraryCommandItemProps {
@@ -19,6 +22,7 @@ interface LibraryCommandItemProps {
     imageUrl: null | string;
     isHighlighted?: boolean;
     itemType: LibraryItem;
+    song?: Song;
     subtitle?: string;
     title?: string;
 }
@@ -29,22 +33,53 @@ export const LibraryCommandItem = ({
     imageUrl,
     isHighlighted,
     itemType,
+    song,
     subtitle,
     title,
 }: LibraryCommandItemProps) => {
-    const { t } = useTranslation();
-    const { addToQueueByFetch } = usePlayer();
+    const { addToQueueByData, addToQueueByFetch } = usePlayer();
     const server = useCurrentServer();
 
     const handlePlay = useCallback(
-        (e: SyntheticEvent, id: string, playType: Play) => {
-            e.stopPropagation();
-            e.preventDefault();
+        (playType: Play) => {
             if (!server.id) return;
-            addToQueueByFetch(server.id, [id], itemType, playType);
+
+            // Use addToQueueByData for songs when we have the song data
+            if (itemType === LibraryItem.SONG && song) {
+                addToQueueByData([song], playType);
+            } else {
+                addToQueueByFetch(server.id, [id], itemType, playType);
+            }
         },
-        [addToQueueByFetch, itemType, server],
+        [addToQueueByData, addToQueueByFetch, id, itemType, server.id, song],
     );
+
+    const handlePlayNext = usePlayButtonClick({
+        onClick: () => {
+            handlePlay(Play.NEXT);
+        },
+        onLongPress: () => {
+            handlePlay(LONG_PRESS_PLAY_BEHAVIOR[Play.NEXT]);
+        },
+    });
+
+    const handlePlayNow = usePlayButtonClick({
+        onClick: () => {
+            handlePlay(Play.NOW);
+        },
+        onLongPress: () => {
+            handlePlay(LONG_PRESS_PLAY_BEHAVIOR[Play.NOW]);
+        },
+    });
+
+    const handlePlayLast = usePlayButtonClick({
+        onClick: () => {
+            handlePlay(Play.LAST);
+        },
+        onLongPress: () => {
+            handlePlay(LONG_PRESS_PLAY_BEHAVIOR[Play.LAST]);
+        },
+    });
 
     const [isHovered, setIsHovered] = useState(false);
 
@@ -76,74 +111,32 @@ export const LibraryCommandItem = ({
                 </div>
             </div>
             {showControls && (
-                <Group align="center" gap="sm" justify="flex-end" wrap="nowrap">
-                    <ActionIcon
-                        disabled={disabled}
-                        icon="mediaPlay"
-                        onClick={(e) => handlePlay(e, id, Play.NOW)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                handlePlay(e, id, Play.NOW);
-                            }
-                        }}
-                        size="xs"
-                        tabIndex={disabled ? -1 : 0}
-                        tooltip={{
-                            label: t('player.play', { postProcess: 'sentenceCase' }),
-                        }}
-                        variant="subtle"
-                    />
-                    {itemType !== LibraryItem.SONG && (
+                <ActionIconGroup>
+                    <PlayTooltip disabled={disabled} type={Play.NOW}>
                         <ActionIcon
-                            disabled={disabled}
-                            icon="mediaShuffle"
-                            onClick={(e) => handlePlay(e, id, Play.SHUFFLE)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handlePlay(e, id, Play.SHUFFLE);
-                                }
-                            }}
-                            size="xs"
-                            tabIndex={disabled ? -1 : 0}
-                            tooltip={{
-                                label: t('player.shuffle', { postProcess: 'sentenceCase' }),
-                            }}
+                            icon="mediaPlay"
                             variant="subtle"
+                            {...handlePlayNow.handlers}
+                            {...handlePlayNow.props}
                         />
-                    )}
-                    <ActionIcon
-                        disabled={disabled}
-                        icon="mediaPlayLast"
-                        onClick={(e) => handlePlay(e, id, Play.LAST)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                handlePlay(e, id, Play.LAST);
-                            }
-                        }}
-                        size="xs"
-                        tabIndex={disabled ? -1 : 0}
-                        tooltip={{
-                            label: t('player.addLast', { postProcess: 'sentenceCase' }),
-                        }}
-                        variant="subtle"
-                    />
-                    <ActionIcon
-                        disabled={disabled}
-                        icon="mediaPlayNext"
-                        onClick={(e) => handlePlay(e, id, Play.NEXT)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                handlePlay(e, id, Play.NEXT);
-                            }
-                        }}
-                        size="xs"
-                        tabIndex={disabled ? -1 : 0}
-                        tooltip={{
-                            label: t('player.addNext', { postProcess: 'sentenceCase' }),
-                        }}
-                        variant="subtle"
-                    />
-                </Group>
+                    </PlayTooltip>
+                    <PlayTooltip disabled={disabled} type={Play.NEXT}>
+                        <ActionIcon
+                            icon="mediaPlayNext"
+                            variant="subtle"
+                            {...handlePlayNext.handlers}
+                            {...handlePlayNext.props}
+                        />
+                    </PlayTooltip>
+                    <PlayTooltip disabled={disabled} type={Play.LAST}>
+                        <ActionIcon
+                            icon="mediaPlayLast"
+                            variant="subtle"
+                            {...handlePlayLast.handlers}
+                            {...handlePlayLast.props}
+                        />
+                    </PlayTooltip>
+                </ActionIconGroup>
             )}
         </Flex>
     );
