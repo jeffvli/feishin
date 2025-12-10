@@ -15,16 +15,7 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { useInViewport } from '/@/shared/hooks/use-in-viewport';
 
-interface ImageContainerProps extends HTMLAttributes<HTMLDivElement> {
-    children: ReactNode;
-    enableAnimation?: boolean;
-}
-
-interface ImageLoaderProps {
-    className?: string;
-}
-
-interface ImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> {
+export interface ImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> {
     containerClassName?: string;
     enableAnimation?: boolean;
     imageContainerProps?: Omit<ImageContainerProps, 'children'>;
@@ -32,6 +23,15 @@ interface ImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> {
     includeUnloader?: boolean;
     src: string | string[] | undefined;
     thumbHash?: string;
+}
+
+interface ImageContainerProps extends HTMLAttributes<HTMLDivElement> {
+    children: ReactNode;
+    enableAnimation?: boolean;
+}
+
+interface ImageLoaderProps {
+    className?: string;
 }
 
 interface ImageUnloaderProps {
