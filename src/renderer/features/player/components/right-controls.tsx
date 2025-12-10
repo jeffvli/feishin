@@ -165,7 +165,7 @@ const LyricsButton = () => {
         <ActionIcon
             icon="microphone"
             iconProps={{
-                color: activeTab === 'lyrics' ? 'primary' : undefined,
+                color: activeTab === 'lyrics' && isFullScreenPlayerExpanded ? 'primary' : undefined,
                 size: 'lg',
             }}
             onClick={(e) => {
