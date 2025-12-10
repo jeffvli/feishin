@@ -52,7 +52,7 @@ import {
     SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { ItemListKey, ListDisplayType, Play } from '/@/shared/types/types';
+import { ItemListKey, ListDisplayType, Play, TableColumn } from '/@/shared/types/types';
 
 interface AlbumMetadataTagsProps {
     album: Album | undefined;
@@ -375,7 +375,10 @@ export const AlbumDetailContent = () => {
                 <div className={styles.contentLayout}>
                     <div className={styles.songsColumn}>
                         {detailQuery?.data?.songs && detailQuery.data.songs.length > 0 && (
-                            <AlbumDetailSongsTable songs={detailQuery.data.songs} />
+                            <AlbumDetailSongsTable
+                                isCompilation={Boolean(detailQuery?.data?.isCompilation)}
+                                songs={detailQuery.data.songs}
+                            />
                         )}
                     </div>
                     <div className={styles.metadataColumn}>
@@ -420,10 +423,11 @@ export const AlbumDetailContent = () => {
 };
 
 interface AlbumDetailSongsTableProps {
+    isCompilation?: boolean;
     songs: Song[];
 }
 
-const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
+const AlbumDetailSongsTable = ({ isCompilation = false, songs }: AlbumDetailSongsTableProps) => {
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
     const tableConfig = useSettingsStore((state) => state.lists[ItemListKey.ALBUM_DETAIL]?.table);
@@ -433,9 +437,36 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
     const [sortBy, setSortBy] = useState<SongListSort>(SongListSort.ID);
     const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
 
-    const columns = useMemo(() => {
+    const configuredColumns = useMemo(() => {
         return tableConfig?.columns || [];
     }, [tableConfig?.columns]);
+
+    const renderedColumns = useMemo(() => {
+        if (!isCompilation || configuredColumns.length === 0) {
+            return configuredColumns;
+        }
+
+        const artistColumn = configuredColumns.find((column) => column.id === TableColumn.ARTIST);
+
+        if (!artistColumn) {
+            return configuredColumns;
+        }
+
+        const updatedArtistColumn = artistColumn.isEnabled
+            ? artistColumn
+            : { ...artistColumn, isEnabled: true };
+
+        const columnsWithoutArtist = configuredColumns.filter(
+            (column) => column.id !== TableColumn.ARTIST,
+        );
+        const titleIndex = columnsWithoutArtist.findIndex((column) => column.id === TableColumn.TITLE);
+        const insertionIndex = titleIndex === -1 ? columnsWithoutArtist.length : titleIndex + 1;
+
+        const nextColumns = [...columnsWithoutArtist];
+        nextColumns.splice(insertionIndex, 0, updatedArtistColumn);
+
+        return nextColumns;
+    }, [configuredColumns, isCompilation]);
 
     const filteredSongs = useMemo(() => {
         return sortSongList(
@@ -612,7 +643,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
         ],
     ]);
 
-    if (!tableConfig || columns.length === 0) {
+    if (!tableConfig || renderedColumns.length === 0) {
         return null;
     }
 
@@ -671,7 +702,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                 activeRowId={currentSongId}
                 autoFitColumns={tableConfig.autoFitColumns}
                 CellComponent={ItemTableListColumn}
-                columns={columns}
+                columns={renderedColumns}
                 data={filteredSongs}
                 enableAlternateRowColors={tableConfig.enableAlternateRowColors}
                 enableDrag
