@@ -8,7 +8,7 @@ const baseResponse = z.object({
 });
 
 const userParameters = z.object({
-    id: z.string(),
+    username: z.string(),
 });
 
 const user = z.object({

@@ -1477,7 +1477,7 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         const res = await ssApiClient(apiClientProps).getUser({
             query: {
-                id: query.id,
+                username: query.id,
             },
         });
 
