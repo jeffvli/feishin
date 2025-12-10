@@ -459,7 +459,9 @@ const AlbumDetailSongsTable = ({ isCompilation = false, songs }: AlbumDetailSong
         const columnsWithoutArtist = configuredColumns.filter(
             (column) => column.id !== TableColumn.ARTIST,
         );
-        const titleIndex = columnsWithoutArtist.findIndex((column) => column.id === TableColumn.TITLE);
+        const titleIndex = columnsWithoutArtist.findIndex(
+            (column) => column.id === TableColumn.TITLE,
+        );
         const insertionIndex = titleIndex === -1 ? columnsWithoutArtist.length : titleIndex + 1;
 
         const nextColumns = [...columnsWithoutArtist];
