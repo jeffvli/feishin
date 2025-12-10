@@ -114,7 +114,7 @@ const createMpv = async (data: {
     mpv.on('status', (status) => {
         if (status.property === 'playlist-pos') {
             if (status.value === -1) {
-                mpv?.stop();
+                mpv?.pause();
             }
 
             if (status.value !== 0) {
