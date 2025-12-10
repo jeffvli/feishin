@@ -370,6 +370,20 @@ export const controller: GeneralController = {
             query: mergeMusicFolderId(args.query, server),
         });
     },
+    getImageUrl(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            return null;
+        }
+
+        return (
+            apiController(
+                'getImageUrl',
+                server.type,
+            )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } }) || null
+        );
+    },
     getInternetRadioStations(args) {
         const server = getServerById(args.apiClientProps.serverId);
 

@@ -827,6 +827,28 @@ export const SubsonicController: InternalControllerEndpoint = {
             startIndex: query.startIndex,
         });
     },
+    getImageUrl: ({ apiClientProps: { server }, query }) => {
+        const { id, size } = query;
+        const imageSize = size || 300;
+
+        if (!server?.url || !server?.credential) {
+            return null;
+        }
+
+        // Check for default placeholder image ID
+        if (id.match('2a96cbd8b46e442fc41c2b86b821562f')) {
+            return null;
+        }
+
+        return (
+            `${server.url}/rest/getCoverArt.view` +
+            `?id=${id}` +
+            `&${server.credential}` +
+            '&v=1.13.0' +
+            '&c=Feishin' +
+            `&size=${imageSize}`
+        );
+    },
     getInternetRadioStations: async (args) => {
         const { apiClientProps } = args;
 
