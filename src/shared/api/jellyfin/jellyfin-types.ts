@@ -708,7 +708,6 @@ const scrobbleParameters = z.object({
     EventName: z.string().optional(),
     IsPaused: z.boolean().optional(),
     ItemId: z.string(),
-    PlaySessionId: z.string(),
     PositionTicks: z.number().optional(),
 });
 
