@@ -70,6 +70,11 @@ export const ItemCard = ({
     const imageUrl = getImageUrl(data);
     const rows = providedRows || [];
 
+    const upsizedImageUrl = imageUrl
+        ?.replace(/&size=\d+/, '&size=300')
+        .replace(/\?width=\d+/, '?width=300')
+        .replace(/&height=\d+/, '&height=300');
+
     switch (type) {
         case 'compact':
             return (
@@ -95,7 +100,7 @@ export const ItemCard = ({
                     enableDrag={enableDrag}
                     enableExpansion={enableExpansion}
                     enableNavigation={enableNavigation}
-                    imageUrl={imageUrl}
+                    imageUrl={upsizedImageUrl}
                     internalState={internalState}
                     isRound={isRound}
                     itemType={itemType}
@@ -112,7 +117,7 @@ export const ItemCard = ({
                     enableDrag={enableDrag}
                     enableExpansion={enableExpansion}
                     enableNavigation={enableNavigation}
-                    imageUrl={imageUrl}
+                    imageUrl={upsizedImageUrl}
                     internalState={internalState}
                     isRound={isRound}
                     itemType={itemType}
