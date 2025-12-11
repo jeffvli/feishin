@@ -330,7 +330,11 @@ const RestoreQueueButton = () => {
             });
 
             if (queue) {
-                player.setQueue(queue.entry, queue.currentIndex, queue.position);
+                player.setQueue(
+                    queue.entry,
+                    queue.currentIndex,
+                    queue.positionMs !== undefined ? queue.positionMs / 1000 : undefined,
+                );
             }
         } catch (error) {
             toast.error({
@@ -340,7 +344,7 @@ const RestoreQueueButton = () => {
         }
     }, [player, serverId]);
 
-    return (
+    return server?.type === ServerType.JELLYFIN ? null : (
         <ActionIcon
             icon="download"
             onClick={handleRestoreQueue}
@@ -395,7 +399,7 @@ const SaveQueueButton = () => {
                 apiClientProps: { serverId: server?.id },
                 query: {
                     currentIndex: queue.default.length > 0 ? player.index : undefined,
-                    positionMs: useTimestampStoreBase.getState().timestamp,
+                    positionMs: useTimestampStoreBase.getState().timestamp * 1000,
                     songs,
                 },
             })
@@ -411,7 +415,7 @@ const SaveQueueButton = () => {
             });
     }, [server?.id]);
 
-    return (
+    return server?.type === ServerType.JELLYFIN ? null : (
         <ActionIcon
             icon="upload"
             onClick={handleSaveQueue}

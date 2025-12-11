@@ -929,7 +929,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                 changedBy,
                 currentIndex: currentIndex ?? 0,
                 entry: entry?.map((song) => ssNormalize.song(song, apiClientProps.server)) || [],
-                position,
+                positionMs: position ?? 0,
                 username,
             };
         } else {
@@ -946,7 +946,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                 changedBy,
                 currentIndex: current ? entry.findIndex((item) => item.id === current) : 0,
                 entry: entry?.map((song) => ssNormalize.song(song, apiClientProps.server)) || [],
-                position,
+                positionMs: position ?? 0,
                 username,
             };
         }

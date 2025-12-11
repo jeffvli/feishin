@@ -549,7 +549,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 changedBy,
                 currentIndex: current !== undefined ? current : 0,
                 entry: entries,
-                position,
+                positionMs: position,
                 username: apiClientProps.server?.username ?? '',
             };
         }

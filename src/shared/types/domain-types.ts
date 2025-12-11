@@ -1337,7 +1337,7 @@ export type GetQueueResponse = {
     changedBy: string;
     currentIndex: number;
     entry: Song[];
-    position?: number;
+    positionMs: number;
     username: string;
 };
 

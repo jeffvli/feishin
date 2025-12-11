@@ -772,80 +772,8 @@ export const JellyfinController: InternalControllerEndpoint = {
             totalRecordCount: res.body.TotalRecordCount,
         };
     },
-    getPlayQueue: async (args) => {
-        const { apiClientProps } = args;
-
-        const res = await jfApiClient(apiClientProps).getPlayQueue({
-            query: {
-                // DeviceId: 'Feishin',
-            },
-        });
-
-        if (res.status !== 200) {
-            throw new Error('Failed to get play queue songs');
-        } else if (res.body.length === 0) {
-            throw new Error('No saved session');
-        }
-
-        let queueIndex = -1;
-        let maxAge = 0;
-
-        for (let idx = 0; idx < res.body.length; idx++) {
-            const { PlaylistItemId } = res.body[idx];
-
-            // Because Jellyfin doesn't have a way to share the same play queue across multiple devices easily
-            // hack it instead! Queues saved by feishin are in the form `feishin-{unix timestamp}-{index}`
-            // Pick the one that was most recently updated
-            if (PlaylistItemId && PlaylistItemId.startsWith('feishin-')) {
-                const playlistInfo = PlaylistItemId.split('-');
-                if (playlistInfo.length === 3) {
-                    const timestamp = parseInt(playlistInfo[1], 10);
-                    const index = parseInt(playlistInfo[2], 10);
-
-                    if (isNaN(timestamp) || isNaN(index)) {
-                        continue;
-                    }
-
-                    if (timestamp > maxAge) {
-                        maxAge = timestamp;
-                        queueIndex = idx;
-                    }
-                }
-            }
-        }
-
-        if (queueIndex === -1) {
-            throw new Error('No saved session');
-        }
-
-        const {
-            LastActivityDate,
-            NowPlayingQueue,
-            NowPlayingQueueFullItems,
-            PlaylistItemId,
-            PlayState,
-            UserName,
-        } = res.body[queueIndex];
-
-        const tempMapping = new Map<string, any>();
-        for (const song of NowPlayingQueueFullItems) {
-            tempMapping.set(song.Id, song);
-        }
-
-        const currentIndex = PlaylistItemId ? parseInt(PlaylistItemId, 10) : 0;
-        const entries = NowPlayingQueue.map((item) =>
-            jfNormalize.song(tempMapping.get(item.Id), apiClientProps.server),
-        );
-
-        return {
-            changed: LastActivityDate,
-            changedBy: UserName,
-            currentIndex,
-            entry: entries,
-            position:
-                PlayState.PositionTicks !== undefined ? PlayState.PositionTicks / 1000 : undefined,
-            username: UserName,
-        };
+    getPlayQueue: async () => {
+        throw new Error('Not supported');
     },
     getRandomSongList: async (args) => {
         const { apiClientProps, query } = args;
@@ -1365,33 +1293,8 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         return null;
     },
-    savePlayQueue: async (args) => {
-        const { apiClientProps, query } = args;
-
-        const currentIndex = query.currentIndex ?? 0;
-        const now = new Date().getTime();
-
-        const res = await jfApiClient(apiClientProps).savePlayQueue({
-            body: {
-                IsPaused: false,
-                ItemId:
-                    query.currentIndex !== undefined && query.currentIndex < query.songs.length
-                        ? query.songs[query.currentIndex]
-                        : '',
-                NowPlayingQueue: query.songs.map((song, idx) => ({
-                    Id: song,
-                    // the index must match PlaylistItemId. Otherwise, it must be a number
-                    PlaylistItemId:
-                        idx === currentIndex ? `feishin-${now}-${currentIndex}` : undefined,
-                })),
-                PlaylistItemId: `feishin-${now}-${currentIndex}`,
-                PositionTicks: query.positionMs !== undefined ? query.positionMs * 1000 : undefined,
-            },
-        });
-
-        if (res.status !== 204) {
-            throw new Error('Failed to save play queue');
-        }
+    savePlayQueue: async () => {
+        throw new Error('Not supported');
     },
     scrobble: async (args) => {
         const { apiClientProps, query } = args;
