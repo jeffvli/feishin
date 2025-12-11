@@ -232,7 +232,6 @@ export type Artist = {
     createdAt: string;
     id: string;
     name: string;
-    remoteCreatedAt: null | string;
     updatedAt: string;
 };
 

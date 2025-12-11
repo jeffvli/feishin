@@ -280,7 +280,13 @@ const normalizeAlbum = (
         participants: getParticipants(item),
         playCount: null,
         recordLabels: item.recordLabels?.map((item) => item.name) || [],
-        releaseDate: item.year ? new Date(Date.UTC(item.year, 0, 1)).toISOString() : null,
+        releaseDate: item.releaseDate
+            ? new Date(
+                  item.releaseDate.year,
+                  item.releaseDate.month - 1,
+                  item.releaseDate.day,
+              ).toISOString()
+            : null,
         releaseTypes: item.releaseTypes || [],
         releaseYear: item.year || null,
         size: null,

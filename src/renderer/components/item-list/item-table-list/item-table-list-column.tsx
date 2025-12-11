@@ -28,6 +28,7 @@ import { AlbumColumn } from '/@/renderer/components/item-list/item-table-list/co
 import { ArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/artists-column';
 import { CountColumn } from '/@/renderer/components/item-list/item-table-list/columns/count-column';
 import {
+    AbsoluteDateColumn,
     DateColumn,
     RelativeDateColumn,
 } from '/@/renderer/components/item-list/item-table-list/columns/date-column';
@@ -490,7 +491,6 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
                 return <NumericColumn {...props} {...dragProps} controls={controls} type={type} />;
 
             case TableColumn.DATE_ADDED:
-            case TableColumn.RELEASE_DATE:
                 return <DateColumn {...props} {...dragProps} controls={controls} type={type} />;
 
             case TableColumn.DURATION:
@@ -517,6 +517,11 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
 
             case TableColumn.PLAYLIST_REORDER:
                 return <PlaylistReorderColumn {...props} controls={controls} type={type} />;
+
+            case TableColumn.RELEASE_DATE:
+                return (
+                    <AbsoluteDateColumn {...props} {...dragProps} controls={controls} type={type} />
+                );
 
             case TableColumn.ROW_INDEX:
                 return <RowIndexColumn {...props} {...dragProps} controls={controls} type={type} />;

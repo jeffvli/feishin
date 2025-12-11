@@ -112,13 +112,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     });
 
     // server lock for web is only true if lock is true *and* all other properties are set
-    const serverLock =
-        (localSettings
-            ? !!localSettings.env.SERVER_LOCK
-            : !!window.SERVER_LOCK &&
-              window.SERVER_TYPE &&
-              window.SERVER_NAME &&
-              window.SERVER_URL) || false;
+    const isServerLock = Boolean(window.SERVER_LOCK) || false;
 
     const isSubmitDisabled = !form.values.name || !form.values.url || !form.values.username;
 
@@ -227,7 +221,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 <Stack m={5} ref={focusTrapRef}>
                     <SegmentedControl
                         data={ALL_SERVERS}
-                        disabled={Boolean(serverLock)}
+                        disabled={isServerLock}
                         p="md"
                         withItemsBorders={false}
                         {...form.getInputProps('type')}
@@ -235,7 +229,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     <Group grow>
                         <TextInput
                             data-autofocus
-                            disabled={Boolean(serverLock)}
+                            disabled={isServerLock}
                             label={t('form.addServer.input', {
                                 context: 'name',
                                 postProcess: 'titleCase',
@@ -244,7 +238,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             {...form.getInputProps('name')}
                         />
                         <TextInput
-                            disabled={Boolean(serverLock)}
+                            disabled={isServerLock}
                             label={t('form.addServer.input', {
                                 context: 'url',
                                 postProcess: 'titleCase',

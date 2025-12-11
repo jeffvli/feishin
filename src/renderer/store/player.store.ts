@@ -1411,12 +1411,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 mediaStop: () => {
                     set((state) => {
                         state.player.status = PlayerStatus.PAUSED;
+                        state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
                         setTimestampStore(0);
-                        state.player.index = -1;
-                        state.queue.default = [];
-                        state.queue.priority = [];
-                        state.queue.shuffled = [];
-                        state.queue.songs = {};
                     });
                 },
                 mediaToggleMute: () => {

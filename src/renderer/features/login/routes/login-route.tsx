@@ -48,18 +48,16 @@ const LoginRoute = () => {
     const currentServer = useCurrentServer();
 
     // Check if server lock is configured
-    const serverLock = localSettings?.env.SERVER_LOCK || false;
-    const serverType = localSettings?.env.SERVER_TYPE
-        ? toServerType(localSettings.env.SERVER_TYPE)
-        : null;
-    const serverName = localSettings?.env.SERVER_NAME || '';
-    const serverUrl = localSettings?.env.SERVER_URL || '';
+    const isServerLock = Boolean(window.SERVER_LOCK) || false;
+    const serverType = window.SERVER_TYPE ? toServerType(window.SERVER_TYPE) : null;
+    const serverName = window.SERVER_NAME || '';
+    const serverUrl = window.SERVER_URL || '';
 
     const config = [
         {
             isValid: true,
             key: 'SERVER_LOCK',
-            value: serverLock,
+            value: isServerLock,
         },
         {
             isValid: serverType !== null,

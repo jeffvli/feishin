@@ -162,7 +162,7 @@ const normalizeSong = (
         comment: item.comment ? item.comment : null,
         compilation: item.compilation,
         container: item.suffix,
-        createdAt: item.createdAt.split('T')[0],
+        createdAt: item.createdAt,
         discNumber: item.discNumber,
         discSubtitle: item.discSubtitle ? item.discSubtitle : null,
         duration: item.duration * 1000,
@@ -287,7 +287,7 @@ const normalizeAlbum = (
         albumArtist: item.albumArtist,
         backdropImageUrl: imageBackdropUrl,
         comment: item.comment || null,
-        createdAt: item.createdAt.split('T')[0],
+        createdAt: item.createdAt,
         duration: item.duration !== undefined ? item.duration * 1000 : null,
         explicitStatus:
             item.explicitStatus === 'e'
@@ -308,21 +308,13 @@ const normalizeAlbum = (
         id: item.id,
         imagePlaceholderUrl,
         imageUrl,
-
         isCompilation: item.compilation,
         lastPlayedAt: normalizePlayDate(item),
         mbzId: item.mbzAlbumId || null,
         name: item.name,
-        originalDate: item.originalDate
-            ? new Date(item.originalDate).toISOString()
-            : item.originalYear
-              ? new Date(Date.UTC(item.originalYear, 0, 1)).toISOString()
-              : null,
+        originalDate: item.originalDate ? new Date(item.originalDate).toISOString() : null,
         playCount: item.playCount || 0,
-        releaseDate: (item.releaseDate
-            ? new Date(item.releaseDate)
-            : new Date(Date.UTC(item.minYear, 0, 1))
-        ).toISOString(),
+        releaseDate: item.releaseDate ? new Date(item.releaseDate).toISOString() : null,
         releaseYear: item.minYear || null,
         size: item.size,
         songCount: item.songCount,

@@ -13,8 +13,6 @@ import { DropdownMenu, MenuItemProps } from '/@/shared/components/dropdown-menu/
 import { Icon } from '/@/shared/components/icon/icon';
 import { toast } from '/@/shared/components/toast/toast';
 
-const localSettings = isElectron() ? window.api.localSettings : null;
-
 const browser = isElectron() ? window.api.browser : null;
 
 interface BaseMenuItem {
@@ -177,7 +175,7 @@ export const AppMenu = () => {
             type: 'divider',
         },
         {
-            condition: !localSettings?.env.SERVER_LOCK,
+            condition: !window.SERVER_LOCK,
             id: 'manage-servers',
             item: {
                 label: t('page.appMenu.manageServers', { postProcess: 'sentenceCase' }),

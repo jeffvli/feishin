@@ -46,11 +46,6 @@ export const useAutoDJ = () => {
                     return;
                 }
 
-                // If the player is fetching, don't autoplay
-                if (isFetching) {
-                    return;
-                }
-
                 // If no current song, don't autoplay
                 if (!properties.song?.id) {
                     return;

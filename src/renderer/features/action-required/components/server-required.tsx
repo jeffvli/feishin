@@ -28,20 +28,14 @@ const localSettings = isElectron() ? window.api.localSettings : null;
 export const ServerRequired = () => {
     const serverList = useServerList();
 
-    const serverLock =
-        (localSettings
-            ? !!localSettings.env.SERVER_LOCK
-            : !!window.SERVER_LOCK &&
-              window.SERVER_TYPE &&
-              window.SERVER_NAME &&
-              window.SERVER_URL) || false;
+    const isServerLock = Boolean(window.SERVER_LOCK) || false;
 
-    if (Object.keys(serverList).length > 0) {
+    if (Object.keys(serverList).length > 1) {
         return (
             <ScrollArea>
                 <Stack miw="300px">
                     <ServerSelector />
-                    {!serverLock && (
+                    {!isServerLock && (
                         <>
                             <Divider my="lg" />
                             <AddServerForm onCancel={null} />

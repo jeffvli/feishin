@@ -84,7 +84,8 @@ interface FolderListViewProps {
 }
 
 export const FolderListView = ({ folderQuery }: FolderListViewProps) => {
-    const { display, table } = useListSettings(ItemListKey.SONG);
+    const { table } = useListSettings(ItemListKey.SONG);
+    const display = ListDisplayType.TABLE;
     const { setItemCount } = useListContext();
     const { currentFolderId, navigateToFolder } = useFolderListFilters();
     const serverId = useCurrentServerId();
