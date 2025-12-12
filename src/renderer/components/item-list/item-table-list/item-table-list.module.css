@@ -191,6 +191,15 @@
         rgb(0 0 0 / 5%) 50%,
         transparent 100%
     );
+
+    @mixin light {
+        background: linear-gradient(
+            to bottom,
+            var(--theme-colors-background) 0%,
+            alpha(var(--theme-colors-background), 0.05) 50%,
+            transparent 100%
+        );
+    }
 }
 
 .item-table-left-scroll-shadow {
@@ -207,6 +216,15 @@
         rgb(0 0 0 / 5%) 50%,
         transparent 100%
     );
+
+    @mixin light {
+        background: linear-gradient(
+            to right,
+            var(--theme-colors-background) 0%,
+            alpha(var(--theme-colors-background), 0.05) 50%,
+            transparent 100%
+        );
+    }
 }
 
 .item-table-right-scroll-shadow {
@@ -223,6 +241,15 @@
         rgb(0 0 0 / 5%) 50%,
         transparent 100%
     );
+
+    @mixin light {
+        background: linear-gradient(
+            to left,
+            var(--theme-colors-background) 0%,
+            alpha(var(--theme-colors-background), 0.05) 50%,
+            transparent 100%
+        );
+    }
 }
 
 .item-table-top-scroll-shadow {
@@ -239,4 +266,13 @@
         rgb(0 0 0 / 5%) 50%,
         transparent 100%
     );
+
+    @mixin light {
+        background: linear-gradient(
+            to bottom,
+            var(--theme-colors-background) 0%,
+            alpha(var(--theme-colors-background), 0.05) 50%,
+            transparent 100%
+        );
+    }
 }
