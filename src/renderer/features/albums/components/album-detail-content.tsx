@@ -622,6 +622,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
         <Stack gap="md">
             <Group gap="sm" w="100%">
                 <TextInput
+                    classNames={{ input: styles.searchTextInput }}
                     flex={1}
                     leftSection={<Icon icon="search" />}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -638,12 +639,6 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                             />
                         ) : null
                     }
-                    styles={{
-                        input: {
-                            background: 'transparent',
-                            border: '1px solid rgba(255, 255, 255, 0.05)',
-                        },
-                    }}
                     value={searchTerm}
                 />
                 <ListSortByDropdownControlled
