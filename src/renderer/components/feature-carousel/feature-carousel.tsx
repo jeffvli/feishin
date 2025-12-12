@@ -130,6 +130,7 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
                             <Group gap="xs" justify="center" wrap="wrap">
                                 {album.genres?.slice(0, 2).map((genre) => (
                                     <Badge
+                                        classNames={{ label: styles.badge }}
                                         key={`genre-${genre.id}`}
                                         size="sm"
                                         variant="transparent"
@@ -138,7 +139,11 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
                                     </Badge>
                                 ))}
                                 {album.releaseYear && (
-                                    <Badge size="sm" variant="transparent">
+                                    <Badge
+                                        classNames={{ label: styles.badge }}
+                                        size="sm"
+                                        variant="transparent"
+                                    >
                                         {album.releaseYear}
                                     </Badge>
                                 )}
@@ -248,6 +253,12 @@ export const FeatureCarousel = ({ data, onNearEnd }: FeatureCarouselProps) => {
                         onClick={handlePrevious}
                         radius="50%"
                         size="md"
+                        styles={{
+                            icon: {
+                                color: 'white',
+                                fill: 'white',
+                            },
+                        }}
                         variant="subtle"
                     />
                     <ActionIcon
@@ -257,6 +268,12 @@ export const FeatureCarousel = ({ data, onNearEnd }: FeatureCarouselProps) => {
                         onClick={handleNext}
                         radius="50%"
                         size="md"
+                        styles={{
+                            icon: {
+                                color: 'white',
+                                fill: 'white',
+                            },
+                        }}
                         variant="subtle"
                     />
                 </>

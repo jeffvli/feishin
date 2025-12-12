@@ -181,6 +181,11 @@
     text-shadow: 0 0 8px rgb(0 0 0 / 50%);
 }
 
+.badge {
+    color: white;
+    text-shadow: 0 0 8px rgb(0 0 0 / 50%);
+}
+
 .nav-arrow-left,
 .nav-arrow-right {
     position: absolute;
