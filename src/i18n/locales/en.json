@@ -208,6 +208,7 @@
         "remoteEnableError": "an error occurred when trying to $t(common.enable) the remote server",
         "remotePortError": "an error occurred when trying to set the remote server port",
         "remotePortWarning": "restart the server to apply the new port",
+        "saveQueueFailed": "failed to save queue",
         "serverNotSelectedError": "no server selected",
         "serverRequired": "server required",
         "sessionExpiredError": "your session has expired",
@@ -339,6 +340,9 @@
             "removeRuleGroup": "remove rule group",
             "resetToDefault": "reset to default",
             "clearFilters": "clear filters"
+        },
+        "saveQueue": {
+            "success": "saved play queue to server"
         },
         "shareItem": {
             "allowDownloading": "allow downloading",
