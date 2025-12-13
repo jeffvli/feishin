@@ -55,6 +55,11 @@ export const formatDurationString = (duration: number) => {
     return string;
 };
 
+export const formatDurationStringShort = (duration: number) => {
+    const rawDuration = formatDuration(duration).split(':');
+    return `${rawDuration[0]}h ${rawDuration[1]}m`;
+};
+
 export const formatRating = (item: Album | AlbumArtist | Song) =>
     item.userRating !== null ? <Rating readOnly value={item.userRating} /> : null;
 

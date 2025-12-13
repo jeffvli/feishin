@@ -371,16 +371,6 @@ ipcMain.on('player-set-queue', async (_event, current?: string, next?: string, p
 // Replaces the queue in position 1 to the given data
 ipcMain.on('player-set-queue-next', async (_event, url?: string) => {
     try {
-        const size = await getMpvInstance()?.getPlaylistSize();
-
-        if (!size) {
-            return;
-        }
-
-        if (size > 1) {
-            await getMpvInstance()?.playlistRemove(1);
-        }
-
         if (url) {
             await getMpvInstance()?.load(url, 'append');
         }
@@ -394,6 +384,7 @@ ipcMain.on('player-auto-next', async (_event, url?: string) => {
     // Always keep the current song as position 0 in the mpv queue
     // This allows us to easily set update the next song in the queue without
     // disturbing the currently playing song
+
     try {
         await getMpvInstance()
             ?.playlistRemove(0)

@@ -35,7 +35,8 @@
         "addNextShuffled": "ajouter ensuite (mélangé)",
         "queueType": "type de file d'attente",
         "queueType_default": "défaut",
-        "queueType_priority": "priorité"
+        "queueType_priority": "priorité",
+        "holdToShuffle": "maintenir pour mélanger"
     },
     "action": {
         "editPlaylist": "éditer $t(entity.playlist_one)",
@@ -65,7 +66,11 @@
         "shuffle": "mélanger",
         "shuffleAll": "mélanger tout",
         "shuffleSelected": "mélanger la sélection",
-        "viewMore": "voir plus"
+        "viewMore": "voir plus",
+        "moveUp": "monter",
+        "moveDown": "descendre",
+        "holdToMoveToTop": "Maintenir pour déplacer en haut",
+        "holdToMoveToBottom": "Maintenir pour déplacer en bas"
     },
     "common": {
         "backward": "en arrière",
@@ -183,7 +188,9 @@
         "sort": "trier",
         "gridRows": "lignes de la grille",
         "tableColumns": "colonnes du tableau",
-        "itemsMore": "plus {{count}}"
+        "itemsMore": "plus {{count}}",
+        "view": "vue",
+        "noFilters": "aucun filtre configuré"
     },
     "error": {
         "remotePortWarning": "redémarrer le serveur pour appliquer le nouveau port",
@@ -320,7 +327,8 @@
             "explore": "Explorer depuis la bibliothèque",
             "recentlyPlayed": "Joués récemment",
             "title": "$t(common.home)",
-            "recentlyReleased": "Sortis récemment"
+            "recentlyReleased": "Sortis récemment",
+            "genres": "$t(entity.genre_other)"
         },
         "albumDetail": {
             "moreFromArtist": "plus de $t(entity.artist_one)",
@@ -347,7 +355,9 @@
             "audio": "audio",
             "lyrics": "paroles",
             "transcoding": "transcodage",
-            "discord": "discord"
+            "discord": "discord",
+            "logger": "logger",
+            "playerFilters": "filtres du lecteur"
         },
         "globalSearch": {
             "commands": {
@@ -699,7 +709,7 @@
         "exportImportSettings_importBtn": "paramètres d'importation",
         "exportImportSettings_importSuccess": "les paramètres ont été importés avec succès !",
         "exportImportSettings_notValidJSON": "le fichier transmis n'est pas un JSON valide",
-        "exportImportSettings_offendingKeyError": "\"{{offendingKey}}\" est incorrecte - {{reason}}",
+        "exportImportSettings_offendingKeyError": "la clé \"{{offendingKey}}\" est incorrecte - {{reason}}",
         "exportImportSettings_importModalTitle": "paramètres d'importation feishin",
         "crossfadeStyle": "style de fondu enchaîné",
         "discordRichPresence": "{{discord}} Rich Presence",
@@ -712,13 +722,13 @@
         "playerbarSlider": "curseur de la barre de lecture",
         "playerbarSliderType_optionSlider": "curseur",
         "playerbarSliderType_optionWaveform": "forme d'onde",
-        "playerbarWaveformAlign": "forme d'onde aligné",
+        "playerbarWaveformAlign": "forme d'onde alignée",
         "playerbarWaveformAlign_optionTop": "haut",
         "playerbarWaveformAlign_optionCenter": "centre",
         "playerbarWaveformAlign_optionBottom": "bas",
-        "playerbarWaveformBarWidth": "largeur de la bar en forme d'onde",
+        "playerbarWaveformBarWidth": "largeur de la barre en forme d'onde",
         "playerbarWaveformGap": "écart de la forme d'onde",
-        "playerbarWaveformRadius": "rayon de forme d'onde",
+        "playerbarWaveformRadius": "rayon de la forme d'onde",
         "showLyricsInSidebar_description": "un panneau sera attaché à la file d'attente de lecture, qui affichera les paroles",
         "showLyricsInSidebar": "afficher les paroles dans la barre de lecture latérale",
         "showVisualizerInSidebar_description": "un panneau sera ajouté à la barre de lecture latérale qui affiche le visualiseur",
@@ -729,7 +739,24 @@
         "queryBuilderCustomFields_inputLabel": "label",
         "queryBuilderCustomFields_inputTag": "tag",
         "queryBuilderCustomFields": "champs personnalisé",
-        "queryBuilderCustomFields_description": "ajouter un champ personnalisé à utiliser dans les constructeurs de requêtes"
+        "queryBuilderCustomFields_description": "ajouter un champ personnalisé à utiliser dans les constructeurs de requêtes",
+        "autoDJ": "DJ auto",
+        "autoDJ_description": "ajouter automatiquement des titres similaire à la file d'attente",
+        "autoDJ_itemCount": "nombre d'entrée",
+        "autoDJ_itemCount_description": "le nombre d'entrées tentées d'être ajoutées à la file d'attente lorsque le DJ auto est activé",
+        "autoDJ_timing": "timing",
+        "autoDJ_timing_description": "le nombre de titres restant dans la file d'attente avant le déclenchement du DJ auto",
+        "followCurrentSong_description": "défiler automatiquement jusqu'au titre en cours de lecture dans la file d'attente",
+        "followCurrentSong": "suivre le titre en cours",
+        "logLevel": "niveau de log",
+        "logLevel_description": "définis le niveau minimum de log à afficher. débogage affiche tous les logs, erreur affiche seulement les erreurs",
+        "logLevel_optionDebug": "débogage",
+        "logLevel_optionError": "erreur",
+        "logLevel_optionInfo": "info",
+        "logLevel_optionWarn": "avertissement",
+        "playerFilters": "filtrer les tires de la file d'attente",
+        "playerFilters_description": "exclure les titres de la file d'attente selon les critères suivants",
+        "playerbarSlider_description": "la forme d'onde n'est pas recommandée sur une connexion lente ou limitée"
     },
     "form": {
         "deletePlaylist": {
@@ -784,7 +811,8 @@
         "editPlaylist": {
             "title": "modifier $t(entity.playlist_one)",
             "publicJellyfinNote": "Jellyfin n'indique pas si une liste de lecture est publique ou non. Si vous souhaitez que cette liste de lecture reste publique, veuillez sélectionner l'entrée suivante",
-            "success": "$t(entity.playlist_one) mis à jour avec succès"
+            "success": "$t(entity.playlist_one) mis à jour avec succès",
+            "editNote": "les modifications manuelles ne sont pas recommandées pour les listes de lecture volumineuses. êtes-vous sûre d'accepter le risque d'une perte de données en écrasant la liste de lecture existante ?"
         },
         "lyricSearch": {
             "title": "recherche de paroles",
@@ -943,7 +971,9 @@
                 "codec": "$t(common.codec)",
                 "albumCount": "$t(entity.album_other)",
                 "genreBadge": "$t(entity.genre_one) (badges)",
-                "image": "image"
+                "image": "image",
+                "bitDepth": "$t(common.bitDepth)",
+                "sampleRate": "$t(common.sampleRate)"
             }
         },
         "column": {
@@ -971,7 +1001,9 @@
             "channels": "$t(common.channel_other)",
             "size": "$t(common.size)",
             "codec": "$t(common.codec)",
-            "owner": "propriétaire"
+            "owner": "propriétaire",
+            "bitDepth": "$t(common.bitDepth)",
+            "sampleRate": "$t(common.sampleRate)"
         }
     },
     "dragDropZone": {
@@ -991,11 +1023,11 @@
             "audiobook": "livre audio",
             "audioDrama": "dramatique radio",
             "compilation": "compilation",
-            "djMix": "dj mix",
+            "djMix": "mix dj",
             "demo": "démo",
             "fieldRecording": "prise de son en extérieur",
             "interview": "interview",
-            "live": "directe",
+            "live": "live",
             "mixtape": "mixtape",
             "remix": "remix",
             "soundtrack": "bande son",
@@ -1005,5 +1037,26 @@
     "queryBuilder": {
         "standardTags": "tags standard",
         "customTags": "tags personnalisées"
+    },
+    "filterOperator": {
+        "after": "est après",
+        "afterDate": "est après (date)",
+        "before": "est avant",
+        "beforeDate": "est avant (date)",
+        "contains": "contient",
+        "endsWith": "se termine par",
+        "inPlaylist": "est dans",
+        "inTheLast": "est dans le dernier",
+        "inTheRange": "est dans la plage",
+        "inTheRangeDate": "est dans la plage (date)",
+        "is": "est",
+        "isNot": "n'est pas",
+        "isGreaterThan": "est plus grand que",
+        "isLessThan": "est plus petit que",
+        "matchesRegex": "correspond à l'expression régulière",
+        "notContains": "ne contient pas",
+        "notInPlaylist": "n'est pas dans",
+        "notInTheLast": "n'est pas dans le dernier",
+        "startsWith": "commence par"
     }
 }

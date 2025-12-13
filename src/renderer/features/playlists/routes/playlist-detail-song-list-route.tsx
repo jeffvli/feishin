@@ -159,7 +159,7 @@ const PlaylistQueryEditor = ({
 
     return (
         <div className="query-editor-container">
-            <Stack gap={0} h="100%" mah="50dvh" p="md" w="100%">
+            <Stack gap={0} h="100%" mah="30dvh" p="md" w="100%">
                 <Group justify="space-between" pb="md" wrap="nowrap">
                     <Group gap="sm" wrap="nowrap">
                         <Button
@@ -178,12 +178,7 @@ const PlaylistQueryEditor = ({
                         </Button>
                     </Group>
                     <Group gap="xs">
-                        <Button
-                            disabled={!isQueryBuilderExpanded}
-                            onClick={openPreviewModal}
-                            size="sm"
-                            variant="subtle"
-                        >
+                        <Button onClick={openPreviewModal} size="sm" variant="subtle">
                             {t('common.preview', { postProcess: 'titleCase' })}
                         </Button>
                         <Button

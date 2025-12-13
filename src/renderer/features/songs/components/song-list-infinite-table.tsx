@@ -9,6 +9,7 @@ import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemListTableComponentProps } from '/@/renderer/components/item-list/types';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
+import { usePlayerSong } from '/@/renderer/store';
 import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -60,8 +61,11 @@ export const SongListInfiniteTable = ({
         itemListKey: ItemListKey.SONG,
     });
 
+    const currentSong = usePlayerSong();
+
     return (
         <ItemTableList
+            activeRowId={currentSong?.id}
             autoFitColumns={autoFitColumns}
             CellComponent={ItemTableListColumn}
             columns={columns}

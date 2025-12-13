@@ -5,6 +5,7 @@ import { immer } from 'zustand/middleware/immer';
 import { useShallow } from 'zustand/react/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { createSelectors } from '/@/renderer/lib/zustand';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import {
@@ -40,6 +41,7 @@ interface Actions {
     clearSelected: (items: QueueSong[]) => void;
     decreaseVolume: (value: number) => void;
     getCurrentSong: () => QueueSong | undefined;
+    getPlayerData: () => PlayerData;
     getQueue: (groupBy?: QueueGroupingProperty) => GroupedQueue;
     getQueueOrder: () => {
         groups: { count: number; name: string }[];
@@ -463,12 +465,58 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                             state.player.shuffle === PlayerShuffle.TRACK &&
                                             state.player.queueType !== PlayerQueueType.PRIORITY
                                         ) {
-                                            state.queue.shuffled = generateShuffledIndexes(
-                                                newUniqueIds.length,
-                                            );
+                                            // If targetSongUniqueId is provided, ensure it's at position 0 in shuffled array
+                                            if (targetSongUniqueId) {
+                                                const initialIndex = newUniqueIds.findIndex(
+                                                    (id) => id === targetSongUniqueId,
+                                                );
+                                                if (initialIndex !== -1) {
+                                                    const allIndexes = Array.from(
+                                                        { length: newUniqueIds.length },
+                                                        (_, i) => i,
+                                                    );
+
+                                                    const remainingIndexes = allIndexes.filter(
+                                                        (idx) => idx !== initialIndex,
+                                                    );
+
+                                                    const shuffledRemaining = shuffleInPlace([
+                                                        ...remainingIndexes,
+                                                    ]);
+
+                                                    state.queue.shuffled = [
+                                                        initialIndex,
+                                                        ...shuffledRemaining,
+                                                    ];
+                                                } else {
+                                                    // Fallback: if initial song not found, generate normally
+                                                    state.queue.shuffled = generateShuffledIndexes(
+                                                        newUniqueIds.length,
+                                                    );
+                                                }
+                                            } else {
+                                                state.queue.shuffled = generateShuffledIndexes(
+                                                    newUniqueIds.length,
+                                                );
+                                            }
                                         }
                                     });
 
+                                    const currentState = get();
+                                    const queue = currentState.getQueue();
+                                    const currentIndex = currentState.player.index;
+                                    const currentSong = queue.items[currentIndex];
+
+                                    if (
+                                        currentSong &&
+                                        currentIndex !== undefined &&
+                                        currentIndex >= 0
+                                    ) {
+                                        eventEmitter.emit('PLAYER_PLAY', {
+                                            id: currentSong._uniqueId,
+                                            index: currentIndex,
+                                        });
+                                    }
                                     break;
                                 }
                                 case Play.SHUFFLE: {
@@ -495,6 +543,22 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                         }
                                     });
 
+                                    // Emit PLAYER_PLAY event after state is updated
+                                    const currentState = get();
+                                    const queue = currentState.getQueue();
+                                    const currentIndex = currentState.player.index;
+                                    const currentSong = queue.items[currentIndex];
+
+                                    if (
+                                        currentSong &&
+                                        currentIndex !== undefined &&
+                                        currentIndex >= 0
+                                    ) {
+                                        eventEmitter.emit('PLAYER_PLAY', {
+                                            id: currentSong._uniqueId,
+                                            index: currentIndex,
+                                        });
+                                    }
                                     break;
                                 }
                             }
@@ -737,6 +801,22 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                                 generateShuffledIndexes(combinedLength);
                                         }
                                     });
+
+                                    const currentState = get();
+                                    const queue = currentState.getQueue();
+                                    const currentIndex = currentState.player.index;
+                                    const currentSong = queue.items[currentIndex];
+
+                                    if (
+                                        currentSong &&
+                                        currentIndex !== undefined &&
+                                        currentIndex >= 0
+                                    ) {
+                                        eventEmitter.emit('PLAYER_PLAY', {
+                                            id: currentSong._uniqueId,
+                                            index: currentIndex,
+                                        });
+                                    }
                                     break;
                                 }
                                 case Play.SHUFFLE: {
@@ -765,6 +845,18 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                             shuffledIds.length,
                                         );
                                     });
+
+                                    // Emit PLAYER_PLAY event after state is updated
+                                    const currentState = get();
+                                    const queue = currentState.getQueue();
+                                    const currentIndex = currentState.player.index;
+                                    const currentSong = queue.items[currentIndex];
+                                    if (currentSong && currentIndex !== undefined) {
+                                        eventEmitter.emit('PLAYER_PLAY', {
+                                            id: currentSong._uniqueId,
+                                            index: currentIndex,
+                                        });
+                                    }
                                     break;
                                 }
                             }
@@ -774,6 +866,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                     // If playSongId is provided, find the song and start playback on it
                     if (targetSongUniqueId) {
+                        let playIndex: number | undefined;
                         set((state) => {
                             const queue = state.getQueue();
                             const queueIndex = queue.items.findIndex(
@@ -791,16 +884,27 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                     );
                                     if (shuffledPosition !== -1) {
                                         state.player.index = shuffledPosition;
+                                        playIndex = shuffledPosition;
                                     } else {
                                         state.player.index = queueIndex;
+                                        playIndex = queueIndex;
                                     }
                                 } else {
                                     state.player.index = queueIndex;
+                                    playIndex = queueIndex;
                                 }
                                 state.player.status = PlayerStatus.PLAYING;
                                 setTimestampStore(0);
                             }
                         });
+
+                        // Emit PLAYER_PLAY event if playback was started
+                        if (playIndex !== undefined) {
+                            eventEmitter.emit('PLAYER_PLAY', {
+                                id: targetSongUniqueId,
+                                index: playIndex,
+                            });
+                        }
                     }
                 },
                 addToQueueByUniqueId: (items, uniqueId, edge, playSongId) => {
@@ -997,6 +1101,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                     // If playSongId is provided, find the song and start playback on it
                     if (targetSongUniqueId) {
+                        let playIndex: number | undefined;
                         set((state) => {
                             const queue = state.getQueue();
                             const queueIndex = queue.items.findIndex(
@@ -1014,16 +1119,27 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                     );
                                     if (shuffledPosition !== -1) {
                                         state.player.index = shuffledPosition;
+                                        playIndex = shuffledPosition;
                                     } else {
                                         state.player.index = queueIndex;
+                                        playIndex = queueIndex;
                                     }
                                 } else {
                                     state.player.index = queueIndex;
+                                    playIndex = queueIndex;
                                 }
                                 state.player.status = PlayerStatus.PLAYING;
                                 setTimestampStore(0);
                             }
                         });
+
+                        // Emit PLAYER_PLAY event if playback was started
+                        if (playIndex !== undefined) {
+                            eventEmitter.emit('PLAYER_PLAY', {
+                                id: targetSongUniqueId,
+                                index: playIndex,
+                            });
+                        }
                     }
                 },
                 clearQueue: () => {
@@ -1099,6 +1215,74 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     }
 
                     return queue.items[index];
+                },
+                getPlayerData: () => {
+                    const state = get();
+                    const queue = state.getQueue();
+                    const index = state.player.index;
+
+                    // If shuffle is enabled and not in priority mode, map shuffled position to actual queue position for display
+                    let queueIndex = index;
+                    if (isShuffleEnabled(state)) {
+                        queueIndex = mapShuffledToQueueIndex(index, state.queue.shuffled);
+                    }
+
+                    const currentSong = queue.items[queueIndex];
+                    const repeat = state.player.repeat;
+
+                    // For previousSong calculation, we need to consider the shuffled order (only if not in priority mode)
+                    let previousSong: QueueSong | undefined;
+                    if (isShuffleEnabled(state)) {
+                        // Calculate previous in shuffled order
+                        const previousShuffledIndex = index - 1;
+                        if (previousShuffledIndex >= 0) {
+                            const previousQueueIndex = state.queue.shuffled[previousShuffledIndex];
+                            previousSong = queue.items[previousQueueIndex];
+                        } else if (repeat === PlayerRepeat.ALL) {
+                            // Wrap to last in shuffled order
+                            const lastShuffledIndex = state.queue.shuffled.length - 1;
+                            const lastQueueIndex = state.queue.shuffled[lastShuffledIndex];
+                            previousSong = queue.items[lastQueueIndex];
+                        }
+                    } else {
+                        previousSong = queueIndex > 0 ? queue.items[queueIndex - 1] : undefined;
+                    }
+
+                    // For nextSong calculation, we need to consider the shuffled order (only if not in priority mode)
+                    let nextSong: QueueSong | undefined;
+                    if (isShuffleEnabled(state)) {
+                        // Calculate next in shuffled order
+                        const nextShuffledIndex = index + 1;
+                        if (nextShuffledIndex < state.queue.shuffled.length) {
+                            const nextQueueIndex = state.queue.shuffled[nextShuffledIndex];
+                            nextSong = queue.items[nextQueueIndex];
+                        } else if (repeat === PlayerRepeat.ALL) {
+                            // Wrap to first in shuffled order
+                            const firstQueueIndex = state.queue.shuffled[0];
+                            nextSong = queue.items[firstQueueIndex];
+                        }
+                    } else {
+                        nextSong = calculateNextSong(queueIndex, queue.items, repeat);
+                    }
+
+                    return {
+                        currentSong,
+                        index: queueIndex, // Return the actual queue position for display
+                        muted: state.player.muted,
+                        nextSong,
+                        num: state.player.playerNum,
+                        player1: state.player.playerNum === 1 ? currentSong : nextSong,
+                        player2: state.player.playerNum === 2 ? currentSong : nextSong,
+                        previousSong,
+                        queue: state.queue,
+                        queueLength: state.queue.default.length + state.queue.priority.length,
+                        repeat: state.player.repeat,
+                        shuffle: state.player.shuffle,
+                        speed: state.player.speed,
+                        status: state.player.status,
+                        transitionType: state.player.transitionType,
+                        volume: state.player.volume,
+                    };
                 },
                 getQueue: (groupBy?: QueueGroupingProperty) => {
                     const queue = get().getQueueOrder();
@@ -1271,6 +1455,11 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.playerNum = 1;
                         setTimestampStore(0);
                     });
+
+                    eventEmitter.emit('MEDIA_NEXT', {
+                        currentIndex,
+                        nextIndex,
+                    });
                 },
                 mediaPause: () => {
                     set((state) => {
@@ -1278,6 +1467,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     });
                 },
                 mediaPlay: (id?: string) => {
+                    let playIndex: number | undefined;
+
                     set((state) => {
                         if (id) {
                             const queue = state.getQueue();
@@ -1298,11 +1489,14 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                     );
                                     if (shuffledPosition !== -1) {
                                         state.player.index = shuffledPosition;
+                                        playIndex = shuffledPosition;
                                     } else {
                                         state.player.index = queueIndex;
+                                        playIndex = queueIndex;
                                     }
                                 } else {
                                     state.player.index = queueIndex;
+                                    playIndex = queueIndex;
                                 }
                                 setTimestampStore(0);
                             }
@@ -1310,14 +1504,30 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                         state.player.status = PlayerStatus.PLAYING;
                     });
+
+                    if (id && playIndex !== undefined) {
+                        eventEmitter.emit('PLAYER_PLAY', {
+                            id,
+                            index: playIndex,
+                        });
+                    }
                 },
                 mediaPlayByIndex: (index: number) => {
+                    let playIndex: number | undefined;
+                    let songId: string | undefined;
+
                     set((state) => {
                         const queue = state.getQueue();
 
                         if (index === -1 || index >= queue.items.length) {
                             state.player.status = PlayerStatus.PAUSED;
                             return;
+                        }
+
+                        // Get the song's unique ID from the queue
+                        const song = queue.items[index];
+                        if (song) {
+                            songId = song._uniqueId;
                         }
 
                         // index is the position in the original queue
@@ -1327,15 +1537,23 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 index,
                                 state.queue.shuffled,
                             );
-                            state.player.index =
-                                shuffledPosition !== undefined ? shuffledPosition : index;
+                            playIndex = shuffledPosition !== undefined ? shuffledPosition : index;
+                            state.player.index = playIndex;
                         } else {
+                            playIndex = index;
                             state.player.index = index;
                         }
                         setTimestampStore(0);
 
                         state.player.status = PlayerStatus.PLAYING;
                     });
+
+                    if (songId && playIndex !== undefined) {
+                        eventEmitter.emit('PLAYER_PLAY', {
+                            id: songId,
+                            index: playIndex,
+                        });
+                    }
                 },
                 mediaPrevious: () => {
                     const currentIndex = get().player.index;
@@ -1369,6 +1587,11 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.index = previousIndex;
                         state.player.playerNum = 1;
                         setTimestampStore(0);
+                    });
+
+                    eventEmitter.emit('MEDIA_PREV', {
+                        currentIndex,
+                        prevIndex: previousIndex,
                     });
                 },
                 mediaSeekToTimestamp: (timestamp: number) => {

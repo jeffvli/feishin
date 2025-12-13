@@ -27,7 +27,11 @@
         "shuffle": "odtwarzaj losowo",
         "shuffleAll": "odtwarzaj wszystkie losowo",
         "shuffleSelected": "odtwarzaj losowo wybrane",
-        "viewMore": "wyświetl więcej"
+        "viewMore": "wyświetl więcej",
+        "moveUp": "przenieś wyżej",
+        "moveDown": "przenieś niżej",
+        "holdToMoveToTop": "przytrzymaj aby, przesunąć na górę",
+        "holdToMoveToBottom": "przytrzymaj aby, przesunąć na dół"
     },
     "common": {
         "increase": "zwiększ",
@@ -143,7 +147,8 @@
         "gridRows": "siatka wierszy",
         "tableColumns": "tabela kolumn",
         "itemsMore": "{{count}} więcej",
-        "noFilters": "nie skonfigurowano filtrów"
+        "noFilters": "nie skonfigurowano filtrów",
+        "view": "wyświetl"
     },
     "entity": {
         "genre_one": "gatunek",
@@ -328,7 +333,8 @@
         "editPlaylist": {
             "title": "edytuj $t(entity.playlist_one)",
             "success": "$t(entity.playlist_one) zaktualizowana pomyślnie",
-            "publicJellyfinNote": "Z jakiegoś powodu Jellyfin nie udostępnia informacji na temat publiczności playlisty. Jeżeli chcesz, aby ta pozostała publiczna, mniej wybraną poniższą opcję"
+            "publicJellyfinNote": "Z jakiegoś powodu Jellyfin nie udostępnia informacji na temat publiczności playlisty. Jeżeli chcesz, aby ta pozostała publiczna, mniej wybraną poniższą opcję",
+            "editNote": "manualne edytowanie nie jest zalecane dla dużych playlist. czy na pewno zgadzasz się na ryzyko utraty danych wywołane przez nadpisanie istniejącej playlisty?"
         },
         "shareItem": {
             "allowDownloading": "zezwól na pobieranie",
@@ -493,7 +499,8 @@
             "lyrics": "tekst",
             "transcoding": "transkodowanie",
             "discord": "discord",
-            "playerFilters": "filtry odtwarzacza"
+            "playerFilters": "filtry odtwarzacza",
+            "logger": "logger"
         },
         "trackList": {
             "title": "$t(entity.track_other)",
@@ -878,7 +885,19 @@
         "playerFilters_description": "nie dodawaj piosenek do kolejki na podstawie poniższych kryteriów",
         "playerbarSlider_description": "krzywe nie są zalecane w przypadku wolnego lub ograniczonego połączenia internetowego",
         "audioFadeOnStatusChange": "przenikanie dźwięku przy zmianie statusu",
-        "audioFadeOnStatusChange_description": "umożliwia zanikanie lub pojawianie się dźwięku gdy zmieni się status play/pauza"
+        "audioFadeOnStatusChange_description": "umożliwia zanikanie lub pojawianie się dźwięku gdy zmieni się status play/pauza",
+        "autoDJ": "automatyczny DJ",
+        "autoDJ_description": "automatycznie dodawaj podobne piosenki do kolejki",
+        "autoDJ_itemCount": "liczba elementów",
+        "autoDJ_itemCount_description": "liczba elementów, które będzie próbować dodać do kolejki kiedy automatyczny DJ jest włączony",
+        "autoDJ_timing": "czas dodawania",
+        "autoDJ_timing_description": "ilość piosenek pozostałych w kolejce przed tym gdy zostanie włączony automatyczny DJ",
+        "logLevel": "poziom logów",
+        "logLevel_description": "ustawia minimalny poziom logów do wyświetlenia. debugowanie wyświetla wszystkie logi błędy wyświetla tylko błędy",
+        "logLevel_optionDebug": "debugowanie",
+        "logLevel_optionError": "błędy",
+        "logLevel_optionInfo": "info",
+        "logLevel_optionWarn": "ostrzeżenia"
     },
     "table": {
         "config": {
@@ -949,7 +968,9 @@
                 "songCount": "$t(entity.track_other)",
                 "albumCount": "$t(entity.album_other)",
                 "genreBadge": "$t(entity.genre_one) (znaczki)",
-                "image": "obraz"
+                "image": "obraz",
+                "bitDepth": "$t(common.bitDepth)",
+                "sampleRate": "$t(common.sampleRate)"
             }
         },
         "column": {
@@ -977,7 +998,9 @@
             "channels": "$t(common.channel_other)",
             "size": "$t(common.size)",
             "codec": "$t(common.codec)",
-            "owner": "właściciel"
+            "owner": "właściciel",
+            "bitDepth": "$t(common.bitDepth)",
+            "sampleRate": "$t(common.sampleRate)"
         }
     },
     "queryBuilder": {

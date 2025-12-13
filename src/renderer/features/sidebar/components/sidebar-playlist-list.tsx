@@ -1,7 +1,7 @@
 import { closeAllModals, openContextModal, openModal } from '@mantine/modals';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { MouseEvent, useCallback, useMemo, useState } from 'react';
+import { memo, MouseEvent, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 
@@ -17,14 +17,16 @@ import {
     PlayTooltip,
 } from '/@/renderer/features/shared/components/play-button-group';
 import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-button-click';
-import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useCurrentServerId } from '/@/renderer/store';
+import { formatDurationStringShort } from '/@/renderer/utils';
 import { Accordion } from '/@/shared/components/accordion/accordion';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { ButtonProps } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
+import { Image } from '/@/shared/components/image/image';
 import { Text } from '/@/shared/components/text/text';
 import {
     LibraryItem,
@@ -44,7 +46,7 @@ interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'on
     to: string;
 }
 
-const PlaylistRowButton = ({ item, name, onContextMenu, to }: PlaylistRowButtonProps) => {
+const PlaylistRowButton = memo(({ item, name, onContextMenu, to }: PlaylistRowButtonProps) => {
     const url = {
         pathname: generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: to }),
         state: { item },
@@ -53,7 +55,7 @@ const PlaylistRowButton = ({ item, name, onContextMenu, to }: PlaylistRowButtonP
 
     const [isHovered, setIsHovered] = useState(false);
 
-    const { isDraggedOver, isDragging, ref } = useDragDrop<HTMLDivElement>({
+    const { isDraggedOver, isDragging, ref } = useDragDrop<HTMLAnchorElement>({
         drag: {
             getId: () => {
                 const draggedItems = getDraggedItems(item, undefined);
@@ -158,31 +160,47 @@ const PlaylistRowButton = ({ item, name, onContextMenu, to }: PlaylistRowButtonP
     );
 
     return (
-        <div
+        <Link
             className={clsx(styles.row, {
                 [styles.rowDraggedOver]: isDraggedOver,
+                [styles.rowHover]: isHovered,
             })}
+            onContextMenu={(e: unknown) => onContextMenu(e as MouseEvent<HTMLButtonElement>, item)}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             ref={ref}
             style={{
                 opacity: isDragging ? 0.5 : 1,
             }}
+            to={url}
         >
-            <SidebarItem
-                className={clsx({
-                    [styles.rowHover]: isHovered,
-                })}
-                onContextMenu={(e) => onContextMenu(e, item)}
-                to={url}
-                variant="subtle"
-            >
-                {name}
-            </SidebarItem>
+            <div className={styles.rowGroup}>
+                <Image containerClassName={styles.imageContainer} src={item.imageUrl || ''} />
+                <div className={styles.metadata}>
+                    <Text className={styles.name} size="md">
+                        {name}
+                    </Text>
+                    <div className={styles.metadataGroup}>
+                        <div className={styles.metadataGroupItem}>
+                            <Icon color="muted" icon="track" size="sm" />
+                            <Text isMuted size="sm">
+                                {item.songCount || 0}
+                            </Text>
+                        </div>
+                        <div className={styles.metadataGroupItem}>
+                            <Icon color="muted" icon="duration" size="sm" />
+                            <Text isMuted size="sm">
+                                {formatDurationStringShort(item.duration ?? 0)}
+                            </Text>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {isHovered && <RowControls id={to} onPlay={handlePlay} />}
-        </div>
+        </Link>
     );
-};
+});
 
 const RowControls = ({
     id,

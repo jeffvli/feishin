@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { MpvPlayerEngine, MpvPlayerEngineHandle } from './engine/mpv-player-engine';
 
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
-import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import {
     usePlaybackSettings,
     usePlayerActions,
@@ -22,12 +21,12 @@ const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 
 export function MpvPlayer() {
     const playerRef = useRef<MpvPlayerEngineHandle>(null);
-    const { currentSong, nextSong, status } = usePlayerData();
+    const { status } = usePlayerData();
     const { mediaAutoNext, setTimestamp } = usePlayerActions();
     const { speed } = usePlayerProperties();
     const isMuted = usePlayerMuted();
     const volume = usePlayerVolume();
-    const { audioFadeOnStatusChange, transcode } = usePlaybackSettings();
+    const { audioFadeOnStatusChange } = usePlaybackSettings();
 
     const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(status);
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -163,15 +162,10 @@ export function MpvPlayer() {
         return () => clearInterval(interval);
     }, [localPlayerStatus, setTimestamp]);
 
-    const currentUrl = useSongUrl(currentSong, true, transcode);
-    const nextUrl = useSongUrl(nextSong, false, transcode);
-
     return (
         <MpvPlayerEngine
-            currentSrc={currentUrl}
             isMuted={isMuted}
             isTransitioning={isTransitioning}
-            nextSrc={nextUrl}
             onEnded={handleOnEnded}
             onProgress={onProgress}
             playerRef={playerRef}

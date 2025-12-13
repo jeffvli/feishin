@@ -27,7 +27,11 @@
         "shuffle": "keverés",
         "shuffleAll": "összes keverése",
         "shuffleSelected": "kiválasztottak keverése",
-        "viewMore": "további információ"
+        "viewMore": "további információ",
+        "moveUp": "ugrás fel",
+        "moveDown": "ugrás le",
+        "holdToMoveToTop": "hosszan nyomva felülre mozgat",
+        "holdToMoveToBottom": "hosszan nyomva lejjebb mozgat"
     },
     "common": {
         "collapse": "összecsukás",
@@ -139,7 +143,9 @@
         "sort": "rendezés",
         "gridRows": "rács sorok",
         "tableColumns": "táblázat oszlopok",
-        "itemsMore": "{{count}} még több"
+        "itemsMore": "{{count}} még több",
+        "view": "nézet",
+        "noFilters": "nincs konfigurált szűrő"
     },
     "entity": {
         "albumArtist_one": "Zenész",
@@ -289,7 +295,8 @@
         "editPlaylist": {
             "success": "$t(entity.playlist_one) sikeresen módosítva",
             "publicJellyfinNote": "A Jellyfin valamiért nem teszi közzé, hogy egy lejátszási lista publikus-e vagy sem. Amennyiben azt szeretnéd, hogy publikus maradjon, válaszd ki az alábbi beviteli mezőt",
-            "title": "szerkesztés $t(entity.playlist_one)"
+            "title": "szerkesztés $t(entity.playlist_one)",
+            "editNote": "A kézi szerkesztés nem ajánlott nagy lejátszási listák esetén. Biztosan vállalod a meglévő lejátszási lista felülírásával járó adatvesztés kockázatát?"
         },
         "lyricSearch": {
             "input_artist": "$t(entity.artist_one)",
@@ -383,7 +390,8 @@
             "version": "verzió {{version}}",
             "selectMusicFolder": "zene mappa kiválasztása",
             "noMusicFolder": "nincs zene mappa kiválasztva",
-            "multipleMusicFolders": "{{count}} kiválasztott zene mappák"
+            "multipleMusicFolders": "{{count}} kiválasztott zene mappák",
+            "commandPalette": "nyisd meg a parancspalettát"
         },
         "manageServers": {
             "title": "Szerverek kezelés",
@@ -463,7 +471,8 @@
             "newlyAdded": "újonnan hozzáadott megjelenések",
             "recentlyPlayed": "nemrég játszott",
             "recentlyReleased": "nemrég megjelent",
-            "title": "$t(common.home)"
+            "title": "$t(common.home)",
+            "genres": "$t(entity.genre_other)"
         },
         "itemDetail": {
             "copyPath": "másolja az útvonalat a vágólapra",
@@ -496,7 +505,9 @@
             "lyrics": "dalszöveg",
             "transcoding": "átkódolás",
             "discord": "discord",
-            "queryBuilder": "lekérdezés-építő"
+            "queryBuilder": "lekérdezés-építő",
+            "playerFilters": "lejátszó szűrők",
+            "logger": "naplózó"
         },
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist_other)",
@@ -521,6 +532,9 @@
         },
         "favorites": {
             "title": "$t(entity.favorite_other)"
+        },
+        "folderList": {
+            "title": "$t(entity.folder_other)"
         }
     },
     "player": {
@@ -559,7 +573,8 @@
         "addNextShuffled": "Hozzáadás következőnek (keverve)",
         "queueType": "lekérdezés típus",
         "queueType_default": "alapértelmezett",
-        "queueType_priority": "prioritás"
+        "queueType_priority": "prioritás",
+        "holdToShuffle": "tartsd lenyomva a keveréshez"
     },
     "releaseType": {
         "primary": {
@@ -625,10 +640,10 @@
         "customCssNotice": "Figyelem: bár van némi tisztítás (az url() és a content: használata nem engedélyezett), az egyéni css használata továbbra is kockázatot jelenthet, mivel megváltoztatja a felületet",
         "customFontPath_description": "beállítja az alkalmazáshoz használandó egyéni betűtípus elérési útját",
         "contextMenu": "kontextusmenü (jobb klikk) beállítás",
-        "crossfadeDuration_description": "beállítja a crossfade effekt időtartamát",
-        "crossfadeDuration": "crossfade időtartam",
-        "crossfadeStyle": "crossfade stílus",
-        "crossfadeStyle_description": "válaszd ki az audiolejátszóhoz használni kívánt crossfade stílust",
+        "crossfadeDuration_description": "beállítja áthúzás effekt időtartamát",
+        "crossfadeDuration": "áthúzás időtartam",
+        "crossfadeStyle": "áthúzás stílus",
+        "crossfadeStyle_description": "válaszd ki az audiolejátszóhoz használni kívánt áthúzás stílust",
         "releaseChannel_description": "válassz a stabil kiadás vagy a béta kiadás közül az automatikus frissítésekhez",
         "disableLibraryUpdateOnStartup": "új verziók ellenőrzését indításkor letiltása",
         "discordDisplayType_artistname": "előadó név",
@@ -779,7 +794,7 @@
         "remoteUsername": "távoli vezérlő szerver felhasználónév",
         "passwordStore_description": "jelszó/titkos tároló kiválasztása. Módosítsd, ha problémát tapasztalsz a jelszavak tárolásánál",
         "passwordStore": "jelszó/titkos tároló",
-        "playbackStyle_optionCrossFade": "crossfade",
+        "playbackStyle_optionCrossFade": "áthúzás",
         "replayGainMode_optionAlbum": "$t(entity.album_one)",
         "replayGainMode_optionNone": "$t(common.none)",
         "replayGainMode_optionTrack": "$t(entity.track_one)",
@@ -871,7 +886,26 @@
         "queryBuilderCustomFields_inputLabel": "címke",
         "queryBuilderCustomFields_inputTag": "jelölés",
         "queryBuilderCustomFields": "egyéni mezők",
-        "queryBuilderCustomFields_description": "egyéni mezők hozzáadása a lekérdezés-építőhöz"
+        "queryBuilderCustomFields_description": "egyéni mezők hozzáadása a lekérdezés-építőhöz",
+        "autoDJ": "auto DJ",
+        "autoDJ_timing": "időzítés",
+        "autoDJ_description": "hasonló dalokat automatikusan hozzáad a műsorlistához",
+        "autoDJ_itemCount": "elem szám",
+        "autoDJ_itemCount_description": "az auto DJ engedélyezésekor a műsorsorba felvenni kívánt elemek száma",
+        "autoDJ_timing_description": "az auto DJ elindulása előtt a műsorlistában maradt dalok száma",
+        "followCurrentSong_description": "automatikusan görgesse a műsorlistát az aktuálisan lejátszott dalra",
+        "followCurrentSong": "kövesd az aktuális dalt",
+        "logLevel": "naplózási szint",
+        "logLevel_description": "beállítja a megjelenítendő minimális naplószintet. A debug minden naplót megjeleníti, az error csak a hibákat",
+        "logLevel_optionDebug": "debug",
+        "logLevel_optionError": "error",
+        "logLevel_optionInfo": "info",
+        "logLevel_optionWarn": "figyelmeztetés",
+        "playerFilters": "Szűrje a dalokat a műsorlistából",
+        "playerFilters_description": "a következő kritériumok alapján kihagyja a dalokat a műsorlistából",
+        "playerbarSlider_description": "a hullámforma nem ajánlott lassú vagy korlátozott internetkapcsolat esetén",
+        "audioFadeOnStatusChange": "audio behúzás állapotváltozáskor",
+        "audioFadeOnStatusChange_description": "lehetővé teszi a lehúzást és a behúzást, amikor a lejátszás/szünet állapot megváltozik"
     },
     "table": {
         "config": {
@@ -906,7 +940,9 @@
                 "album": "$t(entity.album_one)",
                 "albumCount": "$t(entity.album_other)",
                 "genreBadge": "$t(entity.genre_one) (jelvények)",
-                "image": "kép"
+                "image": "kép",
+                "bitDepth": "$t(common.bitDepth)",
+                "sampleRate": "$t(common.sampleRate)"
             },
             "view": {
                 "grid": "rács",
@@ -970,11 +1006,34 @@
             "trackNumber": "sáv",
             "album": "album",
             "albumArtist": "album előadó",
-            "owner": "tulajdonos"
+            "owner": "tulajdonos",
+            "bitDepth": "$t(common.bitDepth)",
+            "sampleRate": "$t(common.sampleRate)"
         }
     },
     "queryBuilder": {
         "standardTags": "általános címkék",
         "customTags": "egyedi címkék"
+    },
+    "filterOperator": {
+        "after": "után",
+        "afterDate": "(dátum) után",
+        "before": "előtt",
+        "beforeDate": "(dátum) előtt",
+        "contains": "tartalmaz",
+        "inPlaylist": "benne",
+        "endsWith": "végződik",
+        "inTheLast": "elmúlt",
+        "inTheRange": "tartományban",
+        "inTheRangeDate": "(dátum) tartományban",
+        "isGreaterThan": "nagyobb mint",
+        "isLessThan": "kisebb mint",
+        "notContains": "nem tartalmazza",
+        "notInPlaylist": "nincs benne",
+        "startsWith": "kezdődik",
+        "notInTheLast": "nem az elmúlt",
+        "matchesRegex": "illeszkedik a regexre",
+        "is": "van",
+        "isNot": "nincs"
     }
 }

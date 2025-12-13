@@ -332,7 +332,19 @@
         "followCurrentSong": "Seguir la canción actual",
         "playerFilters": "Filtrar las canciones de la cola",
         "playerFilters_description": "Omite la adición de canciones a la cola basado en los siguientes criterios",
-        "playerbarSlider_description": "La forma de onda no es recomendable en una conexión a Internet lenta o medida"
+        "playerbarSlider_description": "La forma de onda no es recomendable en una conexión a Internet lenta o medida",
+        "autoDJ": "DJ automático",
+        "autoDJ_description": "Añade canciones similares a las de la cola automáticamente",
+        "autoDJ_itemCount": "Recuento de elementos",
+        "autoDJ_itemCount_description": "El número de elementos que se ha intentado añadir a la cola cuando DJ automático está activado",
+        "autoDJ_timing_description": "El número de canciones restantes en la cola antes de que DJ automático se dispare",
+        "autoDJ_timing": "Tiempo",
+        "logLevel": "Nivel de registro",
+        "logLevel_description": "Establece el mínimo nivel de registro a mostrar. Depuración muestra todos los registros, error solo muestra errores",
+        "logLevel_optionDebug": "Depuración",
+        "logLevel_optionError": "Error",
+        "logLevel_optionInfo": "Información",
+        "logLevel_optionWarn": "Advertencia"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -362,7 +374,11 @@
         "shuffle": "Mezclar",
         "shuffleAll": "Mezclar todo",
         "shuffleSelected": "Mezclar seleccionados",
-        "viewMore": "Ver más"
+        "viewMore": "Ver más",
+        "holdToMoveToBottom": "Mantener pulsado para desplazar hacia abajo",
+        "holdToMoveToTop": "Mantener pulsado para desplazar hacia arriba",
+        "moveUp": "Desplazar hacia arriba",
+        "moveDown": "Desplazar hacia abajo"
     },
     "common": {
         "backward": "hacia atrás",
@@ -478,7 +494,8 @@
         "gridRows": "Filas de la cuadrícula",
         "tableColumns": "Columnas de la tabla",
         "itemsMore": "{{count}} más",
-        "noFilters": "Ningún filtro configurado"
+        "noFilters": "Ningún filtro configurado",
+        "view": "Vista"
     },
     "error": {
         "remotePortWarning": "reiniciar el servidor para aplicar el nuevo puerto",
@@ -672,7 +689,8 @@
             "transcoding": "Transcodificación",
             "discord": "Discord",
             "sidebar": "Barra lateral",
-            "playerFilters": "Filtros del reproductor"
+            "playerFilters": "Filtros del reproductor",
+            "logger": "Registrador"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
@@ -786,7 +804,8 @@
         "editPlaylist": {
             "title": "editar $t(entity.playlist_one)",
             "success": "$t(entity.playlist_one) actualizada correctamente",
-            "publicJellyfinNote": "Jellyfin por alguna razón no expone si una lista de reproducción es pública o no. Si deseas que ésta siga siendo pública, por favor ten seleccionada la siguiente entrada"
+            "publicJellyfinNote": "Jellyfin por alguna razón no expone si una lista de reproducción es pública o no. Si deseas que ésta siga siendo pública, por favor ten seleccionada la siguiente entrada",
+            "editNote": "No se recomiendan las ediciones manuales para grandes listas de reproducción. ¿Seguro que aceptas el riesgo de pérdida de información incurrido por sobrescribir la lista de reproducción existente?"
         },
         "queryEditor": {
             "input_optionMatchAll": "coincidir todos",
@@ -852,7 +871,9 @@
             "channels": "$t(common.channel_other)",
             "size": "$t(common.size)",
             "codec": "$t(common.codec)",
-            "owner": "Propietario"
+            "owner": "Propietario",
+            "bitDepth": "$t(common.bitDepth)",
+            "sampleRate": "$t(common.sampleRate)"
         },
         "config": {
             "label": {
@@ -886,7 +907,9 @@
                 "songCount": "$t(entity.track_other)",
                 "albumCount": "$t(entity.album_other)",
                 "genreBadge": "$t(entity.genre_one) (insignias)",
-                "image": "Imagen"
+                "image": "Imagen",
+                "bitDepth": "$t(common.bitDepth)",
+                "sampleRate": "$t(common.sampleRate)"
             },
             "general": {
                 "gap": "$t(common.gap)",

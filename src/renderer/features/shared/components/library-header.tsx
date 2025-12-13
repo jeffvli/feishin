@@ -1,4 +1,5 @@
 import { closeAllModals, openModal } from '@mantine/modals';
+import clsx from 'clsx';
 import { forwardRef, ReactNode, Ref, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -22,6 +23,7 @@ import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface LibraryHeaderProps {
     children?: ReactNode;
+    containerClassName?: string;
     imagePlaceholderUrl?: null | string;
     imageUrl?: null | string;
     item: { route: string; type: LibraryItem };
@@ -30,7 +32,10 @@ interface LibraryHeaderProps {
 }
 
 export const LibraryHeader = forwardRef(
-    ({ children, imageUrl, item, title }: LibraryHeaderProps, ref: Ref<HTMLDivElement>) => {
+    (
+        { children, containerClassName, imageUrl, item, title }: LibraryHeaderProps,
+        ref: Ref<HTMLDivElement>,
+    ) => {
         const { t } = useTranslation();
         const [isImageError, setIsImageError] = useState<boolean | null>(false);
 
@@ -85,7 +90,7 @@ export const LibraryHeader = forwardRef(
         }, [imageUrl, isImageError]);
 
         return (
-            <div className={styles.libraryHeader} ref={ref}>
+            <div className={clsx(styles.libraryHeader, containerClassName)} ref={ref}>
                 <div
                     className={styles.imageSection}
                     onClick={() => openImage()}

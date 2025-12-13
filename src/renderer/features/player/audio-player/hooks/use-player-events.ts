@@ -22,10 +22,13 @@ interface PlayerEvents {
 
 interface PlayerEventsCallbacks {
     onCurrentSongChange?: (
-        properties: { index: number; remaining: number; song: QueueSong | undefined },
-        prev: { index: number; remaining: number; song: QueueSong | undefined },
+        properties: { index: number; song: QueueSong | undefined },
+        prev: { index: number; song: QueueSong | undefined },
     ) => void;
+    onMediaNext?: (properties: { currentIndex: number; nextIndex: number }) => void;
+    onMediaPrev?: (properties: { currentIndex: number; prevIndex: number }) => void;
     onPlayerMute?: (properties: { muted: boolean }, prev: { muted: boolean }) => void;
+    onPlayerPlay?: (properties: { id: string; index: number }) => void;
     onPlayerProgress?: (properties: { timestamp: number }, prev: { timestamp: number }) => void;
     onPlayerQueueChange?: (queue: QueueData, prev: QueueData) => void;
     onPlayerRepeat?: (properties: { repeat: PlayerRepeat }, prev: { repeat: PlayerRepeat }) => void;
@@ -129,22 +132,43 @@ function createPlayerEvents(callbacks: PlayerEventsCallbacks): PlayerEvents {
         unsubscribers.push(unsubscribe);
     }
 
-    if (callbacks.onUserRating) {
-        eventEmitter.on('USER_RATING', callbacks.onUserRating);
+    if (callbacks.onMediaNext) {
+        eventEmitter.on('MEDIA_NEXT', callbacks.onMediaNext);
+    }
+
+    if (callbacks.onMediaPrev) {
+        eventEmitter.on('MEDIA_PREV', callbacks.onMediaPrev);
+    }
+
+    if (callbacks.onPlayerPlay) {
+        eventEmitter.on('PLAYER_PLAY', callbacks.onPlayerPlay);
     }
 
     if (callbacks.onUserFavorite) {
         eventEmitter.on('USER_FAVORITE', callbacks.onUserFavorite);
     }
 
+    if (callbacks.onUserRating) {
+        eventEmitter.on('USER_RATING', callbacks.onUserRating);
+    }
+
     return {
         cleanup: () => {
             unsubscribers.forEach((unsubscribe) => unsubscribe());
-            if (callbacks.onUserRating) {
-                eventEmitter.off('USER_RATING', callbacks.onUserRating);
+            if (callbacks.onMediaNext) {
+                eventEmitter.off('MEDIA_NEXT', callbacks.onMediaNext);
+            }
+            if (callbacks.onMediaPrev) {
+                eventEmitter.off('MEDIA_PREV', callbacks.onMediaPrev);
+            }
+            if (callbacks.onPlayerPlay) {
+                eventEmitter.off('PLAYER_PLAY', callbacks.onPlayerPlay);
             }
             if (callbacks.onUserFavorite) {
                 eventEmitter.off('USER_FAVORITE', callbacks.onUserFavorite);
+            }
+            if (callbacks.onUserRating) {
+                eventEmitter.off('USER_RATING', callbacks.onUserRating);
             }
         },
     };

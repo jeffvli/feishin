@@ -14,6 +14,7 @@ import {
     useAppStoreActions,
     useAutoDJSettings,
     useCurrentServer,
+    useFullScreenPlayerStore,
     useGeneralSettings,
     useHotkeySettings,
     usePlayerData,
@@ -21,11 +22,13 @@ import {
     usePlayerSong,
     usePlayerStore,
     usePlayerVolume,
+    useSetFullScreenPlayerStore,
     useSettingsStore,
     useSettingsStoreActions,
     useSidebarRightExpanded,
     useTimestampStoreBase,
 } from '/@/renderer/store';
+import { useFullScreenPlayerStoreActions } from '/@/renderer/store/full-screen-player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
@@ -72,6 +75,7 @@ export const RightControls = () => {
                 <PlayerConfig />
                 <SaveQueueButton />
                 <RestoreQueueButton />
+                <LyricsButton />
                 <FavoriteButton />
                 <QueueButton />
                 <VolumeButton />
@@ -151,6 +155,40 @@ const QueueButton = () => {
     }
 
     return <PopoverPlayQueue />;
+};
+
+const LyricsButton = () => {
+    const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
+    const activeTab = useFullScreenPlayerStore((state) => state.activeTab);
+
+    const { setStore } = useFullScreenPlayerStoreActions();
+    const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
+
+    const expandFullScreenPlayer = () => {
+        setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
+    };
+
+    return (
+        <ActionIcon
+            icon="microphone"
+            iconProps={{
+                color: activeTab === 'lyrics' && isFullScreenPlayerExpanded ? 'primary' : undefined,
+                size: 'lg',
+            }}
+            onClick={(e) => {
+                e.stopPropagation();
+                if (!isFullScreenPlayerExpanded) setStore({ activeTab: 'lyrics' });
+                expandFullScreenPlayer();
+            }}
+            role="button"
+            size="sm"
+            tooltip={{
+                label: t('player.lyrics', { postProcess: 'titleCase' }),
+                openDelay: 0,
+            }}
+            variant="subtle"
+        />
+    );
 };
 
 const FavoriteButton = () => {

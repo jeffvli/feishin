@@ -3,6 +3,9 @@ import { LibraryItem } from '/@/shared/types/domain-types';
 export type EventMap = {
     ITEM_LIST_REFRESH: ItemListRefreshEventPayload;
     ITEM_LIST_UPDATE_ITEM: ItemListUpdateItemEventPayload;
+    MEDIA_NEXT: MediaNextEventPayload;
+    MEDIA_PREV: MediaPrevEventPayload;
+    PLAYER_PLAY: PlayerPlayEventPayload;
     PLAYLIST_MOVE_DOWN: PlaylistMoveEventPayload;
     PLAYLIST_MOVE_TO_BOTTOM: PlaylistMoveEventPayload;
     PLAYLIST_MOVE_TO_TOP: PlaylistMoveEventPayload;
@@ -20,6 +23,21 @@ export type ItemListUpdateItemEventPayload = {
     index: number;
     item: unknown;
     key: string;
+};
+
+export type MediaNextEventPayload = {
+    currentIndex: number;
+    nextIndex: number;
+};
+
+export type MediaPrevEventPayload = {
+    currentIndex: number;
+    prevIndex: number;
+};
+
+export type PlayerPlayEventPayload = {
+    id: string;
+    index: number;
 };
 
 export type PlaylistMoveEventPayload = {

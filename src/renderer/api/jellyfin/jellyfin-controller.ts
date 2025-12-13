@@ -1042,20 +1042,22 @@ export const JellyfinController: InternalControllerEndpoint = {
         const { bitrate, format, id, transcode } = query;
         const deviceId = '';
 
-        let url =
-            `${server?.url}/audio` +
-            `/${id}/universal` +
-            `?userId=${server?.userId}` +
-            `&deviceId=${deviceId}` +
-            '&audioCodec=aac' +
-            `&apiKey=${server?.credential}` +
-            `&playPlaySessionId=${deviceId}` +
-            '&container=opus,mp3,aac,m4a,m4b,flac,wav,ogg';
+        let url = `${server?.url}/Items/${id}/Download?api_key=${server?.credential}&playSessionId=${deviceId}`;
 
         if (transcode) {
             // Some format appears to be required. Fall back to trusty MP3 if not specified
             // Otherwise, ffmpeg appears to crash
             const realFormat = format || 'mp3';
+
+            url =
+                `${server?.url}/audio` +
+                `/${id}/universal` +
+                `?userId=${server?.userId}` +
+                `&deviceId=${deviceId}` +
+                '&audioCodec=aac' +
+                `&apiKey=${server?.credential}` +
+                `&playSessionId=${deviceId}` +
+                '&container=opus,mp3,aac,m4a,m4b,flac,wav,ogg';
 
             url += `&transcodingProtocol=http&transcodingContainer=${realFormat}`;
             url = url.replace('audioCodec=aac', `audioCodec=${realFormat}`);

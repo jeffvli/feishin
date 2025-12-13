@@ -47,3 +47,15 @@ export function useSongUrl(
         transcode.enabled,
     ]);
 }
+
+export const getSongUrl = (song: QueueSong, transcode: TranscodingConfig) => {
+    return api.controller.getStreamUrl({
+        apiClientProps: { serverId: song._serverId },
+        query: {
+            bitrate: transcode.bitrate,
+            format: transcode.format,
+            id: song.id,
+            transcode: transcode.enabled,
+        },
+    });
+};

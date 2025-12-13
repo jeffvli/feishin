@@ -177,7 +177,8 @@
             "title": "$t(common.home)",
             "mostPlayed": "最多播放",
             "newlyAdded": "最近新增的發行",
-            "recentlyReleased": "最近發佈"
+            "recentlyReleased": "最近發佈",
+            "genres": "$t(entity.genre_other)"
         },
         "appMenu": {
             "openBrowserDevtools": "打開瀏覽器開發者工具",
@@ -244,7 +245,8 @@
             "transcoding": "轉碼",
             "discord": "Discord",
             "queryBuilder": "查詢建構器",
-            "playerFilters": "播放過濾器"
+            "playerFilters": "播放過濾器",
+            "logger": "日誌記錄器"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
@@ -652,7 +654,19 @@
         "followCurrentSong": "跟隨當前歌曲",
         "playerbarSlider_description": "不建議在網路速度緩慢或計費的網路下使用波形",
         "playerFilters": "從佇列中過濾歌曲",
-        "playerFilters_description": "根據以下條件，排除要新增至佇列中的歌曲"
+        "playerFilters_description": "根據以下條件，排除要新增至佇列中的歌曲",
+        "autoDJ": "Auto DJ",
+        "autoDJ_description": "自動將相似的歌曲加入到播放佇列",
+        "autoDJ_itemCount": "項目數量",
+        "autoDJ_itemCount_description": "在啟用Auto DJ時嘗試加入佇列的項目數量",
+        "autoDJ_timing_description": "佇列中剩餘多少歌曲時啟動 Auto DJ",
+        "autoDJ_timing": "觸發時機",
+        "logLevel": "log等級",
+        "logLevel_description": "設定要顯示的最低日誌等級。Debug 會顯示所有日誌，Error 僅會顯示錯誤訊息",
+        "logLevel_optionDebug": "Debug",
+        "logLevel_optionError": "Error",
+        "logLevel_optionInfo": "Info",
+        "logLevel_optionWarn": "Warn"
     },
     "table": {
         "config": {
@@ -718,7 +732,9 @@
                 "songCount": "$t(entity.track_other)",
                 "albumCount": "$t(entity.album_other)",
                 "genreBadge": "$t(entity.genre_one) (徽章)",
-                "image": "圖片"
+                "image": "圖片",
+                "bitDepth": "$t(common.bitDepth)",
+                "sampleRate": "$t(common.sampleRate)"
             },
             "view": {
                 "table": "表格",
@@ -751,7 +767,9 @@
             "trackNumber": "曲目編號",
             "size": "$t(common.size)",
             "codec": "$t(common.codec)",
-            "owner": "擁有者"
+            "owner": "擁有者",
+            "bitDepth": "$t(common.bitDepth)",
+            "sampleRate": "$t(common.sampleRate)"
         }
     },
     "action": {
@@ -782,7 +800,11 @@
         "shuffle": "隨機播放",
         "shuffleAll": "全部隨機播放",
         "shuffleSelected": "隨機播放選取項目",
-        "viewMore": "查看更多"
+        "viewMore": "查看更多",
+        "moveUp": "向上移動",
+        "moveDown": "向下移動",
+        "holdToMoveToTop": "按住以移動至頂部",
+        "holdToMoveToBottom": "按住以移動至底部"
     },
     "entity": {
         "album_other": "專輯",
@@ -907,7 +929,8 @@
         "editPlaylist": {
             "title": "編輯$t(entity.playlist_one)",
             "publicJellyfinNote": "Jellyfin 出於某種原因，不會顯示播放清單是否公開。如果您希望保持公開狀態，請選擇以下輸入",
-            "success": "$t(entity.playlist_one) 更新成功"
+            "success": "$t(entity.playlist_one) 更新成功",
+            "editNote": "不建議手動編輯大型播放清單，你確定要承擔覆寫現有播放清單可能造成的資料遺失風險嗎？"
         },
         "shareItem": {
             "allowDownloading": "允許下載",

@@ -11,16 +11,20 @@ import { ContextMenuController } from '/@/renderer/features/context-menu/context
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
+import { ListSearchInput } from '/@/renderer/features/shared/components/list-search-input';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButton } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
 import { MoreButton } from '/@/renderer/features/shared/components/more-button';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useCurrentServerId } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
+import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { LibraryItem, SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 
@@ -55,6 +59,11 @@ export const PlaylistDetailSongListHeaderFilters = ({
     const isViewEditMode = !isSmartPlaylist && breakpoints.isSm;
     const isEditMode = mode === 'edit';
 
+    const [collapsed, setCollapsed] = useLocalStorage<boolean>({
+        defaultValue: false,
+        key: 'playlist-header-collapsed',
+    });
+
     return (
         <Flex justify="space-between" ref={containerRef}>
             <Group gap="sm" w="100%">
@@ -70,6 +79,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                     disabled={isEditMode}
                     listKey={ItemListKey.PLAYLIST_SONG}
                 />
+                {!collapsed && <ListSearchInput />}
                 <ListRefreshButton disabled={isEditMode} listKey={ItemListKey.PLAYLIST_SONG} />
                 <MoreButton onClick={handleMore} />
             </Group>
@@ -86,6 +96,18 @@ export const PlaylistDetailSongListHeaderFilters = ({
                             : t('common.edit', { postProcess: 'titleCase' })}
                     </Button>
                 )}
+                <Tooltip
+                    label={t(`common.${collapsed ? 'expand' : 'collapse'}`, {
+                        postProcess: 'titleCase',
+                    })}
+                >
+                    <ActionIcon
+                        icon={collapsed ? 'arrowDownS' : 'arrowUpS'}
+                        iconProps={{ size: 'xl' }}
+                        onClick={() => setCollapsed((prev) => !prev)}
+                        variant="subtle"
+                    />
+                </Tooltip>
                 <ListConfigMenu
                     displayTypes={[
                         {

@@ -13,7 +13,8 @@
             "settings": "$t(common.setting_other)",
             "tracks": "$t(entity.track_other)",
             "nowPlaying": "ara sona",
-            "shared": "$t(entity.playlist_other) compartida"
+            "shared": "$t(entity.playlist_other) compartida",
+            "favorites": "$t(entity.favorite_other)"
         },
         "albumArtistDetail": {
             "relatedArtists": "$t(entity.artist_other) similars",
@@ -51,7 +52,11 @@
             "version": "versió {{version}}",
             "openBrowserDevtools": "obre les eines de desenvolupament del navegador",
             "privateModeOff": "desactiva el mode privat",
-            "privateModeOn": "activa el mode privat"
+            "privateModeOn": "activa el mode privat",
+            "commandPalette": "obre la paleta d'ordres",
+            "selectMusicFolder": "selecciona una carpeta de música",
+            "noMusicFolder": "no s'ha seleccionat cap carpeta de música",
+            "multipleMusicFolders": "{{count}} carpetes de música seleccionades"
         },
         "contextMenu": {
             "addFavorite": "$t(action.addToFavorites)",
@@ -77,7 +82,9 @@
             "numberSelected": "{{count}} seleccionat",
             "shareItem": "comparteix l'element",
             "goToAlbumArtist": "Ves a $t(entity.albumArtist_one)",
-            "goToAlbum": "ves a $t(entity.album_one)"
+            "goToAlbum": "ves a $t(entity.album_one)",
+            "moveItems": "$t(action.moveItems)",
+            "goTo": "ves a"
         },
         "genreList": {
             "title": "$t(entity.genre_other)",
@@ -90,7 +97,8 @@
             "newlyAdded": "afegits recentment",
             "mostPlayed": "els més reproduïts",
             "recentlyPlayed": "reproduït recentment",
-            "recentlyReleased": "estrenat fa poc"
+            "recentlyReleased": "estrenat fa poc",
+            "genres": "$t(entity.genre_other)"
         },
         "playlistList": {
             "title": "$t(entity.playlist_other)"
@@ -136,7 +144,24 @@
             "generalTab": "general",
             "hotkeysTab": "tecles d'accés ràpid",
             "playbackTab": "reproducció",
-            "windowTab": "finestra"
+            "windowTab": "finestra",
+            "analytics": "analítiques",
+            "updates": "actualitza",
+            "cache": "memòria cau",
+            "application": "aplicació",
+            "queryBuilder": "constructor de consultes",
+            "theme": "tema",
+            "controls": "controls",
+            "sidebar": "barra lateral",
+            "remote": "remot",
+            "exportImport": "importa/exporta",
+            "scrobble": "scrobble",
+            "audio": "àudio",
+            "lyrics": "lletra",
+            "transcoding": "transcodificació",
+            "discord": "discord",
+            "logger": "registres",
+            "playerFilters": "filtres de reproducció"
         },
         "globalSearch": {
             "commands": {
@@ -153,6 +178,12 @@
         },
         "playlist": {
             "reorder": "el reordenament només s'activa quan s'ordena per id"
+        },
+        "favorites": {
+            "title": "$t(entity.favorite_other)"
+        },
+        "folderList": {
+            "title": "$t(entity.folder_other)"
         }
     },
     "common": {
@@ -260,7 +291,17 @@
         "private": "privat",
         "public": "públic",
         "recordLabel": "segell discogràfic",
-        "releaseType": "tipus de llançament"
+        "releaseType": "tipus de llançament",
+        "doNotShowAgain": "no tornis a mostrar això",
+        "view": "mostra",
+        "externalLinks": "enllaços externs",
+        "faster": "més ràpid",
+        "noFilters": "cap filtre configurat",
+        "slower": "més lent",
+        "sort": "ordre",
+        "gridRows": "files de la quadrícula",
+        "tableColumns": "columnes de la taula",
+        "itemsMore": "{{count}} més"
     },
     "entity": {
         "album_one": "àlbum",
@@ -341,7 +382,8 @@
         "editPlaylist": {
             "success": "$t(entity.playlist_one) s'ha actualitzat amb èxit",
             "title": "editar la $t(entity.playlist_one)",
-            "publicJellyfinNote": "Per algun motiu, Jellyfin no exposa si una llista de reproducció és pública o no. Si voleu que es mantingui pública, seleccioneu la següent entrada"
+            "publicJellyfinNote": "Per algun motiu, Jellyfin no exposa si una llista de reproducció és pública o no. Si voleu que es mantingui pública, seleccioneu la següent entrada",
+            "editNote": "es recomana no editar manualment les llistes de reproducció grans. segur que accepteu el risc de perdre dades si sobreescriviu la llista de reproducció existent?"
         },
         "lyricSearch": {
             "input_artist": "$t(entity.artist_one)",
@@ -378,24 +420,43 @@
         "queryEditor": {
             "title": "editor de consultes",
             "input_optionMatchAll": "coincidències totals",
-            "input_optionMatchAny": "coincidències parcials"
+            "input_optionMatchAny": "coincidències parcials",
+            "addRuleGroup": "afegeix el grup de regles",
+            "removeRuleGroup": "elimina el grup de regles",
+            "resetToDefault": "reestableix als valors predeterminats",
+            "clearFilters": "neteja els filtres"
         },
         "privateMode": {
             "enabled": "mode privat actiu; l'estat de reproducció ara està ocult d'integracions externes",
             "disabled": "mode privat inactiu; l'estat de reproducció ara és visible per les integracions externes",
             "title": "mode privat"
+        },
+        "largeFetchConfirmation": {
+            "title": "afegeix elements a la cua",
+            "description": "Aquesta acció afegirà tots els elements a la vista filtrada actual"
+        },
+        "shuffleAll": {
+            "title": "reprodueix a l'atzar",
+            "input_genre": "$t(entity.genre_one)",
+            "input_limit": "quantes cançons?",
+            "input_minYear": "de l'any",
+            "input_maxYear": "fins a l'any",
+            "input_played": "reprodueix el filtre",
+            "input_played_optionAll": "totes les pistes",
+            "input_played_optionUnplayed": "només les pistes sense reproduir",
+            "input_played_optionPlayed": "només les pistes reproduïdes"
         }
     },
     "action": {
-        "addToFavorites": "afegir als $t(entity.favorite_other)",
-        "addToPlaylist": "afegir a $t(entity.playlist_one)",
-        "createPlaylist": "crear $t(entity.playlist_one)",
+        "addToFavorites": "afegeix a $t(entity.favorite_other)",
+        "addToPlaylist": "afegeix a $t(entity.playlist_one)",
+        "createPlaylist": "crea $t(entity.playlist_one)",
         "deletePlaylist": "elimina la $t(entity.playlist_one)",
         "editPlaylist": "edita la $t(entity.playlist_one)",
         "refresh": "$t(common.refresh)",
         "removeFromFavorites": "elimina dels $t(entity.favorite_other)",
         "removeFromPlaylist": "elimina de $t(entity.playlist_one)",
-        "clearQueue": "buidar la cua",
+        "clearQueue": "buida la cua",
         "removeFromQueue": "treure de la cua",
         "goToPage": "anar a la pàgina",
         "openIn": {
@@ -408,7 +469,17 @@
         "moveToBottom": "anar al final",
         "moveToTop": "anar al principi",
         "setRating": "Qualifica",
-        "toggleSmartPlaylistEditor": "canvia l'editor $t(entity.smartPlaylist)"
+        "toggleSmartPlaylistEditor": "canvia l'editor $t(entity.smartPlaylist)",
+        "downloadStarted": "s'ha iniciat la descàrrega de {{count}} elements",
+        "moveUp": "mou amunt",
+        "moveDown": "mou avall",
+        "holdToMoveToTop": "mantingueu premut per moure al capdamunt",
+        "holdToMoveToBottom": "mantingueu premut per moure al capdavall",
+        "moveItems": "mou elements",
+        "shuffle": "mescla",
+        "shuffleAll": "mescla-ho tot",
+        "shuffleSelected": "mescla els seleccionats",
+        "viewMore": "mostra'n més"
     },
     "setting": {
         "language_description": "estableix l'idioma de l'aplicació ($t(common.restartRequired))",
@@ -676,7 +747,47 @@
         "language": "llengua",
         "notify": "activa les notificacions de cançons",
         "notify_description": "mostra notificacions quan la cançó actual canviï",
-        "transcode": "activa la transcodificació"
+        "transcode": "activa la transcodificació",
+        "autoDJ": "DJ automàtic",
+        "autoDJ_description": "afegeix cançons similars a la cua automàticament",
+        "autoDJ_itemCount": "número d'elements",
+        "autoDJ_itemCount_description": "el nombre d'elements que s'intenten afegir a la cua quan el DJ automàtic està activat",
+        "autoDJ_timing": "temps",
+        "autoDJ_timing_description": "el nombre de cançons que han de quedar a la cua per activar el DJ automàtic",
+        "analyticsDisable": "Desactiva les analítiques basades en l'ús",
+        "analyticsDisable_description": "S'envien dades d'ús anonimitzades al desenvolupador per ajudar a millorar l'aplicació",
+        "followCurrentSong_description": "desplaça automàticament la cua de reproducció a la cançó en reproducció",
+        "followCurrentSong": "segueix la cançó actual",
+        "logLevel": "nivell de registre",
+        "logLevel_description": "estableix el nivell mínim de registre que s'ha de mostrar. debug mostra tots els missatges, error mostra només els errors",
+        "logLevel_optionDebug": "debug",
+        "logLevel_optionError": "error",
+        "logLevel_optionInfo": "info",
+        "logLevel_optionWarn": "avís",
+        "playerFilters": "filtra les cançons de la cua",
+        "playerFilters_description": "evita afegir cançons a la cua segons els següents criteris",
+        "playerbarSlider": "barra lliscadora de reproducció",
+        "playerbarSlider_description": "la forma d'ona no es recomana si utilitzeu una connexió d'internet lenta o mesurada",
+        "playerbarSliderType_optionSlider": "lliscador",
+        "playerbarSliderType_optionWaveform": "forma d'ona",
+        "playerbarWaveformAlign": "alineament de la forma d'ona",
+        "playerbarWaveformAlign_optionTop": "superior",
+        "playerbarWaveformAlign_optionCenter": "centrat",
+        "playerbarWaveformAlign_optionBottom": "inferior",
+        "playerbarWaveformBarWidth": "amplada de la forma d'ona",
+        "playerbarWaveformGap": "buits de la forma d'ona",
+        "playerbarWaveformRadius": "radi de la forma d'ona",
+        "showLyricsInSidebar_description": "s'afegirà un tauler a la cua de reproducció que mostra la lletra",
+        "showLyricsInSidebar": "mostra la lletra a la barra lateral del reproductor",
+        "showVisualizerInSidebar_description": "s'afegirà un tauler a la barra lateral de reproducció que mostra el visualitzador",
+        "showVisualizerInSidebar": "mostra el visualitzador a la barra laterla de reproducció",
+        "audioFadeOnStatusChange": "fosa d'àudio en canviar d'estat",
+        "audioFadeOnStatusChange_description": "activa la fosa de sortida i entrada en reproduir o pausar",
+        "queryBuilder": "constructor de consultes",
+        "queryBuilderCustomFields_inputLabel": "discogràfica",
+        "queryBuilderCustomFields_inputTag": "etiqueta",
+        "queryBuilderCustomFields": "camps personalitzats",
+        "queryBuilderCustomFields_description": "afegeix camps personalitzats pel constructor de consultes"
     },
     "table": {
         "column": {
@@ -703,7 +814,10 @@
             "lastPlayed": "última reproducció",
             "path": "ruta",
             "rating": "qualificació",
-            "title": "títol"
+            "title": "títol",
+            "bitDepth": "$t(common.bitDepth)",
+            "sampleRate": "$t(common.sampleRate)",
+            "owner": "propietari"
         },
         "config": {
             "general": {
@@ -714,7 +828,28 @@
                 "displayType": "tipus de visualització",
                 "itemGap": "espai entre elements (px)",
                 "itemSize": "mida dels elements (px)",
-                "tableColumns": "columnes de la taula"
+                "tableColumns": "columnes de la taula",
+                "advancedSettings": "opcions avançades",
+                "autosize": "dimensions automàtiques",
+                "moveUp": "mou amunt",
+                "moveDown": "mou avall",
+                "pinToLeft": "ancora a l'esquerra",
+                "pinToRight": "ancora a la dreta",
+                "alignLeft": "alinea a l'esquerra",
+                "alignCenter": "alinea al centre",
+                "alignRight": "alinea a la dreta",
+                "itemsPerRow": "elements per fila",
+                "size_default": "predeterminat",
+                "size_compact": "compacte",
+                "size_large": "gran",
+                "pagination": "paginació",
+                "pagination_itemsPerPage": "elements per pàgina",
+                "pagination_infinite": "infinita",
+                "pagination_paginate": "paginada",
+                "alternateRowColors": "colors de fila alternants",
+                "horizontalBorders": "vores de fila",
+                "rowHoverHighlight": "ressalta en passar el cursor per la fila",
+                "verticalBorders": "vores de columna"
             },
             "label": {
                 "actions": "$t(common.action_other)",
@@ -744,7 +879,12 @@
                 "discNumber": "número de disc",
                 "lastPlayed": "última reproducció",
                 "rowIndex": "índex de files",
-                "titleCombined": "$t(common.title) (combinat)"
+                "titleCombined": "$t(common.title) (combinat)",
+                "albumCount": "$t(entity.album_other)",
+                "bitDepth": "$t(common.bitDepth)",
+                "genreBadge": "$t(entity.genre_one) (insígnies)",
+                "image": "imatge",
+                "sampleRate": "$t(common.sampleRate)"
             },
             "view": {
                 "table": "taula",
@@ -811,7 +951,7 @@
         "playSimilarSongs": "reproduir cançons similars",
         "repeat_off": "repetició desactivada",
         "repeat_all": "repetició",
-        "shuffle": "reproducció aleatòria",
+        "shuffle": "reprodueix (mesclat)",
         "shuffle_off": "reproducció aleatòria desactivada",
         "addLast": "afegeix al final",
         "addNext": "afegeix a continuació",
@@ -829,7 +969,13 @@
         "skip_forward": "salta endavant",
         "toggleFullscreenPlayer": "activa el reproductor de pantalla completa",
         "unfavorite": "elimina de preferits",
-        "pause": "pausa"
+        "pause": "pausa",
+        "addLastShuffled": "afegeix al final (mesclat)",
+        "addNextShuffled": "afegeix a continuació (mesclat)",
+        "holdToShuffle": "mantén premut per mesclar",
+        "queueType": "tipus de cua",
+        "queueType_default": "predeterminat",
+        "queueType_priority": "prioritat"
     },
     "error": {
         "credentialsRequired": "credencials requerides",
@@ -884,5 +1030,30 @@
         "error_oneFileOnly": "Seleccioneu un sol fitxer",
         "error_readingFile": "hi ha hagut un error en llegir el fitxer: {{errorMessage}}",
         "mainText": "deixeu anar un fitxer aquí"
+    },
+    "filterOperator": {
+        "after": "és posterior",
+        "afterDate": "és posterior a (data)",
+        "before": "és anterior",
+        "beforeDate": "és anterior a (data)",
+        "contains": "conté",
+        "endsWith": "acaba en",
+        "inPlaylist": "és a",
+        "inTheLast": "és a l'últim",
+        "inTheRange": "és entre",
+        "inTheRangeDate": "és entre (data)",
+        "is": "és",
+        "isNot": "no és",
+        "isGreaterThan": "és més gran que",
+        "isLessThan": "és més petit que",
+        "matchesRegex": "coincideix amb l'expressió regular",
+        "notContains": "no conté",
+        "notInPlaylist": "no és a",
+        "notInTheLast": "no és a l'últim",
+        "startsWith": "comença amb"
+    },
+    "queryBuilder": {
+        "standardTags": "etiquetes estàndard",
+        "customTags": "etiquetes personalitzades"
     }
 }

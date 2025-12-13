@@ -1,27 +1,37 @@
 {
     "action": {
-        "editPlaylist": "编辑$t(entity.playlist_one)",
+        "editPlaylist": "编辑 $t(entity.playlist_one)",
         "moveToTop": "移至顶部",
         "clearQueue": "清空播放队列",
         "addToFavorites": "添加到 $t(entity.favorite_other)",
         "addToPlaylist": "添加到 $t(entity.playlist_one)",
-        "createPlaylist": "创建$t(entity.playlist_one)",
-        "removeFromPlaylist": "从$t(entity.playlist_one)移除",
-        "viewPlaylists": "查看$t(entity.playlist_other)",
+        "createPlaylist": "创建 $t(entity.playlist_one)",
+        "removeFromPlaylist": "从 $t(entity.playlist_one) 移除",
+        "viewPlaylists": "查看 $t(entity.playlist_other)",
         "refresh": "$t(common.refresh)",
-        "deletePlaylist": "删除$t(entity.playlist_one)",
+        "deletePlaylist": "删除 $t(entity.playlist_one)",
         "removeFromQueue": "从播放队列中移除",
         "deselectAll": "取消全选",
         "moveToBottom": "移至底部",
         "setRating": "评分",
-        "toggleSmartPlaylistEditor": "切换$t(entity.smartPlaylist)编辑器",
-        "removeFromFavorites": "从$t(entity.favorite_other)移除",
+        "toggleSmartPlaylistEditor": "切换 $t(entity.smartPlaylist) 编辑器",
+        "removeFromFavorites": "从 $t(entity.favorite_other) 移除",
         "goToPage": "前往页面",
         "openIn": {
             "lastfm": "在 Last.fm 中打开",
             "musicbrainz": "在 MusicBrainz 中打开"
         },
-        "moveToNext": "移至下一首"
+        "moveToNext": "移至下一首",
+        "downloadStarted": "开始下载 {{count}} 个项目",
+        "moveUp": "向上移动",
+        "moveDown": "向下移动",
+        "holdToMoveToTop": "按住即可移至到顶部",
+        "holdToMoveToBottom": "按住即可移动到底部",
+        "moveItems": "移动项目",
+        "shuffle": "随机播放",
+        "shuffleAll": "随机播放全部",
+        "shuffleSelected": "随机播放选定的内容",
+        "viewMore": "查看更多"
     },
     "common": {
         "increase": "增高",
@@ -122,7 +132,17 @@
         "private": "私人",
         "public": "公开",
         "recordLabel": "唱片公司",
-        "releaseType": "发布类型"
+        "releaseType": "发布类型",
+        "doNotShowAgain": "不要再显示此内容",
+        "view": "查看",
+        "externalLinks": "外部链接",
+        "faster": "更快",
+        "noFilters": "未配置任何筛选器",
+        "slower": "更慢",
+        "sort": "排序",
+        "gridRows": "网格行",
+        "tableColumns": "表格列",
+        "itemsMore": "{{count}} 更多"
     },
     "entity": {
         "albumArtist_other": "专辑艺术家",
@@ -821,5 +841,12 @@
             "album": "$t(entity.album_one)",
             "broadcast": "播送"
         }
+    },
+    "filterOperator": {
+        "after": "之后",
+        "afterDate": "晚于（日期）",
+        "before": "之前",
+        "beforeDate": "早于（日期）",
+        "contains": "包含"
     }
 }

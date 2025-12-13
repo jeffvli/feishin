@@ -332,7 +332,19 @@
         "followCurrentSong": "následovat aktuální skladbu",
         "playerFilters": "Filtrovat skladby z fronty",
         "playerFilters_description": "vynechat skladby z přidání do fronty na základě následujících kritérií",
-        "playerbarSlider_description": "vlnová křivka není doporučena, pokud se nacházíte na pomalém nebo měřeném internetovém připojení"
+        "playerbarSlider_description": "vlnová křivka není doporučena, pokud se nacházíte na pomalém nebo měřeném internetovém připojení",
+        "autoDJ": "automatický DJ",
+        "autoDJ_description": "automaticky přidávat podobné skladby do fronty",
+        "autoDJ_itemCount": "počet položek",
+        "autoDJ_itemCount_description": "počet položek, které se pokusíme přidat do fronty po povolení automatického DJ",
+        "autoDJ_timing": "časování",
+        "autoDJ_timing_description": "počet skladeb zbývajících ve frontě před spuštěním automatického DJ",
+        "logLevel": "úroveň protokolu",
+        "logLevel_description": "nastaví minimální úroveň protokolu k zobrazení. ladění zobrazuje vše, možnost chyba zobrazí pouze chyby",
+        "logLevel_optionDebug": "ladění",
+        "logLevel_optionError": "chyba",
+        "logLevel_optionInfo": "informace",
+        "logLevel_optionWarn": "varování"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -362,7 +374,11 @@
         "shuffle": "náhodně",
         "shuffleAll": "vše náhodně",
         "shuffleSelected": "vybrané náhodně",
-        "viewMore": "zobrazit více"
+        "viewMore": "zobrazit více",
+        "moveUp": "posunout nahoru",
+        "moveDown": "posunout dolů",
+        "holdToMoveToTop": "podržte pro přesunutí nahoru",
+        "holdToMoveToBottom": "podržte pro přesunutí dolů"
     },
     "common": {
         "backward": "zpátky",
@@ -478,7 +494,8 @@
         "gridRows": "řádky mřížky",
         "tableColumns": "sloupce tabulky",
         "itemsMore": "{{count}} dalších",
-        "noFilters": "nejsou nastaveny žádné filtry"
+        "noFilters": "nejsou nastaveny žádné filtry",
+        "view": "zobrazit"
     },
     "table": {
         "config": {
@@ -549,7 +566,9 @@
                 "songCount": "$t(entity.track_other)",
                 "albumCount": "$t(entity.album_other)",
                 "genreBadge": "$t(entity.genre_one) (značky)",
-                "image": "obrázek"
+                "image": "obrázek",
+                "bitDepth": "$t(common.bitDepth)",
+                "sampleRate": "$t(common.sampleRate)"
             }
         },
         "column": {
@@ -577,7 +596,9 @@
             "channels": "$t(common.channel_other)",
             "size": "$t(common.size)",
             "codec": "$t(common.codec)",
-            "owner": "majitel"
+            "owner": "majitel",
+            "bitDepth": "$t(common.bitDepth)",
+            "sampleRate": "$t(common.sampleRate)"
         }
     },
     "error": {
@@ -772,7 +793,8 @@
             "lyrics": "texty",
             "transcoding": "překódování",
             "discord": "discord",
-            "playerFilters": "filtry přehrávače"
+            "playerFilters": "filtry přehrávače",
+            "logger": "protokol"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
@@ -895,7 +917,8 @@
         "editPlaylist": {
             "title": "upravit $t(entity.playlist_one)",
             "success": "$t(entity.playlist_one) úspěšně aktualizován",
-            "publicJellyfinNote": "Jellyfin z nějakého důvodu neukazuje, zda je seznam skladeb veřejný, nebo ne. Pokud si přejete, aby zůstal veřejný, zvolte prosím následující vstup"
+            "publicJellyfinNote": "Jellyfin z nějakého důvodu neukazuje, zda je seznam skladeb veřejný, nebo ne. Pokud si přejete, aby zůstal veřejný, zvolte prosím následující vstup",
+            "editNote": "ruční úpravy velkých seznamů skladeb nejsou doporučeny. opravdu přijímáte riziko ztráty dat, které může vzniknout přepsáním existujícího seznamu skladeb?"
         },
         "shareItem": {
             "allowDownloading": "umožnit stahování",

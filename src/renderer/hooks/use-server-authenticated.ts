@@ -48,6 +48,7 @@ export const useServerAuthenticated = () => {
                         },
                         query: {
                             id: userId,
+                            username: serverWithAuth.username,
                         },
                     });
 
