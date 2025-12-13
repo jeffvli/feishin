@@ -141,6 +141,7 @@ export const NavidromeController: InternalControllerEndpoint = {
         };
     },
     createFavorite: SubsonicController.createFavorite,
+    createInternetRadioStation: SubsonicController.createInternetRadioStation,
     createPlaylist: async (args) => {
         const { apiClientProps, body } = args;
 
@@ -164,6 +165,7 @@ export const NavidromeController: InternalControllerEndpoint = {
         };
     },
     deleteFavorite: SubsonicController.deleteFavorite,
+    deleteInternetRadioStation: SubsonicController.deleteInternetRadioStation,
     deletePlaylist: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -459,6 +461,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
     },
+    getInternetRadioStations: SubsonicController.getInternetRadioStations,
     getLyrics: SubsonicController.getLyrics,
     getMusicFolderList: SubsonicController.getMusicFolderList,
     getPlaylistDetail: async (args) => {
@@ -931,6 +934,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             id: res.body.data.id,
         };
     },
+    updateInternetRadioStation: SubsonicController.updateInternetRadioStation,
     updatePlaylist: async (args) => {
         const { apiClientProps, body, query } = args;
 

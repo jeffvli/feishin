@@ -116,6 +116,9 @@ importers:
       i18next:
         specifier: ^25.6.2
         version: 25.6.2(typescript@5.8.3)
+      icecast-metadata-js:
+        specifier: ^1.2.9
+        version: 1.2.9
       idb-keyval:
         specifier: ^6.2.2
         version: 6.2.2
@@ -2473,6 +2476,9 @@ packages:
       react: ^18 || ^19 || ^19.0.0-rc
       react-dom: ^18 || ^19 || ^19.0.0-rc
 
+  codec-parser@2.5.0:
+    resolution: {integrity: sha512-Ru9t80fV8B0ZiixQl8xhMTLru+dzuis/KQld32/x5T/+3LwZb0/YvQdSKytX9JqCnRdiupvAvyYJINKrXieziQ==}
+
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
     engines: {node: '>=7.0.0'}
@@ -3442,6 +3448,9 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  icecast-metadata-js@1.2.9:
+    resolution: {integrity: sha512-8YqPrJ4AjM64O28xF9TSUUFczxnTKwXwnIPmZKRxdbaZb6hn0nP+ke1OGNA+UsIfLpNRW4acDDBkIkbynYVQig==}
 
   iconv-corefoundation@1.1.7:
     resolution: {integrity: sha512-T10qvkw0zz4wnm560lOEg0PovVqUXuOFhhHAkixw8/sycy7TJt7v/RrkEKEQnAw2viPSJu6iAkErxnzR0g8PpQ==}
@@ -8274,6 +8283,8 @@ snapshots:
       - '@types/react'
       - '@types/react-dom'
 
+  codec-parser@2.5.0: {}
+
   color-convert@2.0.1:
     dependencies:
       color-name: 1.1.4
@@ -9520,6 +9531,10 @@ snapshots:
       '@babel/runtime': 7.28.4
     optionalDependencies:
       typescript: 5.8.3
+
+  icecast-metadata-js@1.2.9:
+    dependencies:
+      codec-parser: 2.5.0
 
   iconv-corefoundation@1.1.7:
     dependencies:

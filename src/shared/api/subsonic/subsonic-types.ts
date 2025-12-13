@@ -654,6 +654,44 @@ const playQueueByIndex = z.object({
     }),
 });
 
+const internetRadioStation = z.object({
+    homepageUrl: z.string().optional(),
+    id: z.string(),
+    name: z.string(),
+    streamUrl: z.string(),
+});
+
+const deleteInternetRadioStationParameters = z.object({
+    id: z.string(),
+});
+
+const deleteInternetRadioStation = z.null();
+
+const createInternetRadioStationParameters = z.object({
+    homepageUrl: z.string().optional(),
+    name: z.string(),
+    streamUrl: z.string(),
+});
+
+const createInternetRadioStation = z.null();
+
+const updateInternetRadioStationParameters = z.object({
+    homepageUrl: z.string().optional(),
+    id: z.string(),
+    name: z.string(),
+    streamUrl: z.string(),
+});
+
+const updateInternetRadioStation = z.null();
+
+const getInternetRadioStations = z.object({
+    internetRadioStations: z
+        .object({
+            internetRadioStation: z.array(internetRadioStation),
+        })
+        .optional(),
+});
+
 export const ssType = {
     _parameters: {
         albumInfo: albumInfoParameters,
@@ -661,7 +699,9 @@ export const ssType = {
         artistInfo: artistInfoParameters,
         authenticate: authenticateParameters,
         createFavorite: createFavoriteParameters,
+        createInternetRadioStation: createInternetRadioStationParameters,
         createPlaylist: createPlaylistParameters,
+        deleteInternetRadioStation: deleteInternetRadioStationParameters,
         deletePlaylist: deletePlaylistParameters,
         getAlbum: getAlbumParameters,
         getAlbumList2: getAlbumList2Parameters,
@@ -686,6 +726,7 @@ export const ssType = {
         similarSongs: similarSongsParameters,
         structuredLyrics: structuredLyricsParameters,
         topSongsList: topSongsListParameters,
+        updateInternetRadioStation: updateInternetRadioStationParameters,
         updatePlaylist: updatePlaylistParameters,
         user: userParameters,
     },
@@ -701,7 +742,9 @@ export const ssType = {
         authenticate,
         baseResponse,
         createFavorite,
+        createInternetRadioStation,
         createPlaylist,
+        deleteInternetRadioStation,
         directory,
         genre,
         getAlbum,
@@ -710,12 +753,14 @@ export const ssType = {
         getArtists,
         getGenres,
         getIndexes,
+        getInternetRadioStations,
         getMusicDirectory,
         getPlaylist,
         getPlaylists,
         getSong,
         getSongsByGenre,
         getStarred,
+        internetRadioStation,
         musicFolderList,
         ping,
         playlist,
@@ -733,6 +778,7 @@ export const ssType = {
         song,
         structuredLyrics,
         topSongsList,
+        updateInternetRadioStation,
         user,
     },
 };

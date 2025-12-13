@@ -1012,6 +1012,57 @@ export type UpdatePlaylistQuery = {
 // Update Playlist
 export type UpdatePlaylistResponse = null | undefined;
 
+// Internet Radio Stations
+export type InternetRadioStation = {
+    homepageUrl?: string | null;
+    id: string;
+    name: string;
+    streamUrl: string;
+};
+
+export type CreateInternetRadioStationArgs = BaseEndpointArgs & {
+    body: CreateInternetRadioStationBody;
+};
+
+export type CreateInternetRadioStationBody = {
+    homepageUrl?: string;
+    name: string;
+    streamUrl: string;
+};
+
+export type CreateInternetRadioStationResponse = null | undefined;
+
+export type DeleteInternetRadioStationArgs = BaseEndpointArgs & {
+    query: DeleteInternetRadioStationQuery;
+};
+
+export type DeleteInternetRadioStationQuery = {
+    id: string;
+};
+
+export type DeleteInternetRadioStationResponse = null | undefined;
+
+export type GetInternetRadioStationsArgs = BaseEndpointArgs;
+
+export type GetInternetRadioStationsResponse = InternetRadioStation[];
+
+export type UpdateInternetRadioStationArgs = BaseEndpointArgs & {
+    body: UpdateInternetRadioStationBody;
+    query: UpdateInternetRadioStationQuery;
+};
+
+export type UpdateInternetRadioStationBody = {
+    homepageUrl?: string;
+    name: string;
+    streamUrl: string;
+};
+
+export type UpdateInternetRadioStationQuery = {
+    id: string;
+};
+
+export type UpdateInternetRadioStationResponse = null | undefined;
+
 type PlaylistListSortMap = {
     jellyfin: Record<PlaylistListSort, JFPlaylistListSort | undefined>;
     navidrome: Record<PlaylistListSort, NDPlaylistListSort | undefined>;
@@ -1265,8 +1316,14 @@ export type ControllerEndpoint = {
         body: { legacy?: boolean; password: string; username: string },
     ) => Promise<AuthenticationResponse>;
     createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
+    createInternetRadioStation: (
+        args: CreateInternetRadioStationArgs,
+    ) => Promise<CreateInternetRadioStationResponse>;
     createPlaylist: (args: CreatePlaylistArgs) => Promise<CreatePlaylistResponse>;
     deleteFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
+    deleteInternetRadioStation: (
+        args: DeleteInternetRadioStationArgs,
+    ) => Promise<DeleteInternetRadioStationResponse>;
     deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse>;
     getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<AlbumArtistDetailResponse>;
     getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse>;
@@ -1280,6 +1337,9 @@ export type ControllerEndpoint = {
     getDownloadUrl: (args: DownloadArgs) => string;
     getFolder: (args: FolderArgs) => Promise<FolderResponse>;
     getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
+    getInternetRadioStations: (
+        args: GetInternetRadioStationsArgs,
+    ) => Promise<GetInternetRadioStationsResponse>;
     getLyrics?: (args: LyricsArgs) => Promise<LyricsResponse>;
     getMusicFolderList: (args: MusicFolderListArgs) => Promise<MusicFolderListResponse>;
     getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
@@ -1309,6 +1369,9 @@ export type ControllerEndpoint = {
     search: (args: SearchArgs) => Promise<SearchResponse>;
     setRating?: (args: SetRatingArgs) => Promise<RatingResponse>;
     shareItem?: (args: ShareItemArgs) => Promise<ShareItemResponse>;
+    updateInternetRadioStation: (
+        args: UpdateInternetRadioStationArgs,
+    ) => Promise<UpdateInternetRadioStationResponse>;
     updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse>;
 };
 
@@ -1351,10 +1414,16 @@ export type InternalControllerEndpoint = {
         body: { legacy?: boolean; password: string; username: string },
     ) => Promise<AuthenticationResponse>;
     createFavorite: (args: ReplaceApiClientProps<FavoriteArgs>) => Promise<FavoriteResponse>;
+    createInternetRadioStation: (
+        args: ReplaceApiClientProps<CreateInternetRadioStationArgs>,
+    ) => Promise<CreateInternetRadioStationResponse>;
     createPlaylist: (
         args: ReplaceApiClientProps<CreatePlaylistArgs>,
     ) => Promise<CreatePlaylistResponse>;
     deleteFavorite: (args: ReplaceApiClientProps<FavoriteArgs>) => Promise<FavoriteResponse>;
+    deleteInternetRadioStation: (
+        args: ReplaceApiClientProps<DeleteInternetRadioStationArgs>,
+    ) => Promise<DeleteInternetRadioStationResponse>;
     deletePlaylist: (
         args: ReplaceApiClientProps<DeletePlaylistArgs>,
     ) => Promise<DeletePlaylistResponse>;
@@ -1377,6 +1446,9 @@ export type InternalControllerEndpoint = {
     getDownloadUrl: (args: ReplaceApiClientProps<DownloadArgs>) => string;
     getFolder: (args: ReplaceApiClientProps<FolderArgs>) => Promise<FolderResponse>;
     getGenreList: (args: ReplaceApiClientProps<GenreListArgs>) => Promise<GenreListResponse>;
+    getInternetRadioStations: (
+        args: ReplaceApiClientProps<GetInternetRadioStationsArgs>,
+    ) => Promise<GetInternetRadioStationsResponse>;
     getLyrics?: (args: ReplaceApiClientProps<LyricsArgs>) => Promise<LyricsResponse>;
     getMusicFolderList: (
         args: ReplaceApiClientProps<MusicFolderListArgs>,
@@ -1423,6 +1495,9 @@ export type InternalControllerEndpoint = {
     search: (args: ReplaceApiClientProps<SearchArgs>) => Promise<SearchResponse>;
     setRating?: (args: ReplaceApiClientProps<SetRatingArgs>) => Promise<RatingResponse>;
     shareItem?: (args: ReplaceApiClientProps<ShareItemArgs>) => Promise<ShareItemResponse>;
+    updateInternetRadioStation: (
+        args: ReplaceApiClientProps<UpdateInternetRadioStationArgs>,
+    ) => Promise<UpdateInternetRadioStationResponse>;
     updatePlaylist: (
         args: ReplaceApiClientProps<UpdatePlaylistArgs>,
     ) => Promise<UpdatePlaylistResponse>;

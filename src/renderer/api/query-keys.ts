@@ -322,6 +322,10 @@ export const queryKeys: Record<
             return [serverId, 'playlists', 'songList'] as const;
         },
     },
+    radio: {
+        list: (serverId: string) => [serverId, 'radio', 'list'] as const,
+        root: (serverId: string) => [serverId, 'radio'] as const,
+    },
     roles: {
         list: (serverId: string) => [serverId, 'roles'] as const,
     },

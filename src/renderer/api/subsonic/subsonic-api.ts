@@ -30,12 +30,28 @@ export const contract = c.router({
             200: ssType._response.createFavorite,
         },
     },
+    createInternetRadioStation: {
+        method: 'GET',
+        path: 'createInternetRadioStation.view',
+        query: ssType._parameters.createInternetRadioStation,
+        responses: {
+            200: ssType._response.createInternetRadioStation,
+        },
+    },
     createPlaylist: {
         method: 'GET',
         path: 'createPlaylist.view',
         query: ssType._parameters.createPlaylist,
         responses: {
             200: ssType._response.createPlaylist,
+        },
+    },
+    deleteInternetRadioStation: {
+        method: 'GET',
+        path: 'deleteInternetRadioStation.view',
+        query: ssType._parameters.deleteInternetRadioStation,
+        responses: {
+            200: ssType._response.deleteInternetRadioStation,
         },
     },
     deletePlaylist: {
@@ -108,6 +124,13 @@ export const contract = c.router({
         query: ssType._parameters.getIndexes,
         responses: {
             200: ssType._response.getIndexes,
+        },
+    },
+    getInternetRadioStations: {
+        method: 'GET',
+        path: 'getInternetRadioStations.view',
+        responses: {
+            200: ssType._response.getInternetRadioStations,
         },
     },
     getMusicDirectory: {
@@ -279,6 +302,14 @@ export const contract = c.router({
         query: ssType._parameters.setRating,
         responses: {
             200: ssType._response.setRating,
+        },
+    },
+    updateInternetRadioStation: {
+        method: 'GET',
+        path: 'updateInternetRadioStation.view',
+        query: ssType._parameters.updateInternetRadioStation,
+        responses: {
+            200: ssType._response.updateInternetRadioStation,
         },
     },
     updatePlaylist: {

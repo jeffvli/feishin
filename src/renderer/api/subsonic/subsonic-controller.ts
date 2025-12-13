@@ -166,6 +166,23 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return null;
     },
+    createInternetRadioStation: async (args) => {
+        const { apiClientProps, body } = args;
+
+        const res = await ssApiClient(apiClientProps).createInternetRadioStation({
+            query: {
+                homepageUrl: body.homepageUrl,
+                name: body.name,
+                streamUrl: body.streamUrl,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to create internet radio station');
+        }
+
+        return null;
+    },
     createPlaylist: async ({ apiClientProps, body }) => {
         const res = await ssApiClient(apiClientProps).createPlaylist({
             query: {
@@ -195,6 +212,21 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         if (res.status !== 200) {
             throw new Error('Failed to delete favorite');
+        }
+
+        return null;
+    },
+    deleteInternetRadioStation: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const res = await ssApiClient(apiClientProps).deleteInternetRadioStation({
+            query: {
+                id: query.id,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to delete internet radio station');
         }
 
         return null;
@@ -789,6 +821,17 @@ export const SubsonicController: InternalControllerEndpoint = {
             startIndex: query.startIndex,
         });
     },
+    getInternetRadioStations: async (args) => {
+        const { apiClientProps } = args;
+
+        const res = await ssApiClient(apiClientProps).getInternetRadioStations();
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get internet radio stations');
+        }
+
+        return res.body.internetRadioStations?.internetRadioStation || [];
+    },
     getMusicFolderList: async (args) => {
         const { apiClientProps } = args;
 
@@ -822,6 +865,7 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return ssNormalize.playlist(res.body.playlist, apiClientProps.server);
     },
+
     getPlaylistList: async ({ apiClientProps, query }) => {
         const sortOrder = query.sortOrder.toLowerCase() as 'asc' | 'desc';
 
@@ -1005,7 +1049,6 @@ export const SubsonicController: InternalControllerEndpoint = {
         final.splice(0, 0, { label: 'all artists', value: '' });
         return final;
     },
-
     getServerInfo: async (args) => {
         const { apiClientProps } = args;
 
@@ -1718,6 +1761,24 @@ export const SubsonicController: InternalControllerEndpoint = {
                     rating: query.rating,
                 },
             });
+        }
+
+        return null;
+    },
+    updateInternetRadioStation: async (args) => {
+        const { apiClientProps, body, query } = args;
+
+        const res = await ssApiClient(apiClientProps).updateInternetRadioStation({
+            query: {
+                homepageUrl: body.homepageUrl,
+                id: query.id,
+                name: body.name,
+                streamUrl: body.streamUrl,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to update internet radio station');
         }
 
         return null;
