@@ -13,7 +13,7 @@ import {
     subscribePlayerStatus,
     subscribePlayerVolume,
 } from '/@/renderer/store';
-import { LibraryItem, QueueData, QueueSong } from '/@/shared/types/domain-types';
+import { LibraryItem, QueueData, QueueSong, Song } from '/@/shared/types/domain-types';
 import { PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
 interface PlayerEvents {
@@ -44,6 +44,7 @@ interface PlayerEventsCallbacks {
     onPlayerSpeed?: (properties: { speed: number }, prev: { speed: number }) => void;
     onPlayerStatus?: (properties: { status: PlayerStatus }, prev: { status: PlayerStatus }) => void;
     onPlayerVolume?: (properties: { volume: number }, prev: { volume: number }) => void;
+    onQueueRestored?: (properties: { data: Song[]; index: number; position: number }) => void;
     onUserFavorite?: (properties: {
         favorite: boolean;
         id: string[];
@@ -144,6 +145,10 @@ function createPlayerEvents(callbacks: PlayerEventsCallbacks): PlayerEvents {
         eventEmitter.on('PLAYER_PLAY', callbacks.onPlayerPlay);
     }
 
+    if (callbacks.onQueueRestored) {
+        eventEmitter.on('QUEUE_RESTORED', callbacks.onQueueRestored);
+    }
+
     if (callbacks.onUserFavorite) {
         eventEmitter.on('USER_FAVORITE', callbacks.onUserFavorite);
     }
@@ -163,6 +168,9 @@ function createPlayerEvents(callbacks: PlayerEventsCallbacks): PlayerEvents {
             }
             if (callbacks.onPlayerPlay) {
                 eventEmitter.off('PLAYER_PLAY', callbacks.onPlayerPlay);
+            }
+            if (callbacks.onQueueRestored) {
+                eventEmitter.off('QUEUE_RESTORED', callbacks.onQueueRestored);
             }
             if (callbacks.onUserFavorite) {
                 eventEmitter.off('USER_FAVORITE', callbacks.onUserFavorite);

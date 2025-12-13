@@ -12,6 +12,7 @@ import { useMediaSession } from '/@/renderer/features/player/hooks/use-media-ses
 import { useMPRIS } from '/@/renderer/features/player/hooks/use-mpris';
 import { usePlaybackHotkeys } from '/@/renderer/features/player/hooks/use-playback-hotkeys';
 import { usePowerSaveBlocker } from '/@/renderer/features/player/hooks/use-power-save-blocker';
+import { useQueueRestore } from '/@/renderer/features/player/hooks/use-queue-restore';
 import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import {
@@ -46,6 +47,7 @@ export const AudioPlayers = () => {
     useMediaSession();
     usePlaybackHotkeys();
     useAutoDJ();
+    useQueueRestore();
 
     useEffect(() => {
         if (webAudio && 'AudioContext' in window) {

@@ -1956,8 +1956,13 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.index = index ?? 0;
                         state.player.status = PlayerStatus.PLAYING;
                         state.player.playerNum = 1;
-                        state.player.seekToTimestamp = uniqueSeekToTimestamp(position ?? 0);
                         state.queue.default = newUniqueIds;
+                    });
+
+                    eventEmitter.emit('QUEUE_RESTORED', {
+                        data: items,
+                        index: index ?? 0,
+                        position: position ?? 0,
                     });
                 },
                 ...initialState,

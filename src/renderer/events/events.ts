@@ -1,4 +1,4 @@
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { LibraryItem, Song } from '/@/shared/types/domain-types';
 
 export type EventMap = {
     ITEM_LIST_REFRESH: ItemListRefreshEventPayload;
@@ -11,6 +11,7 @@ export type EventMap = {
     PLAYLIST_MOVE_TO_TOP: PlaylistMoveEventPayload;
     PLAYLIST_MOVE_UP: PlaylistMoveEventPayload;
     PLAYLIST_REORDER: PlaylistReorderEventPayload;
+    QUEUE_RESTORED: QueueRestoredEventPayload;
     USER_FAVORITE: UserFavoriteEventPayload;
     USER_RATING: UserRatingEventPayload;
 };
@@ -50,6 +51,12 @@ export type PlaylistReorderEventPayload = {
     playlistId: string;
     sourceIds: string[];
     targetId: string;
+};
+
+export type QueueRestoredEventPayload = {
+    data: Song[];
+    index: number;
+    position: number;
 };
 
 export type UserFavoriteEventPayload = {
