@@ -902,6 +902,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             if (res.status !== 200) {
                 throw new Error('Failed to save play queue');
             }
+            return;
         }
 
         return SubsonicController.savePlayQueue(args);
