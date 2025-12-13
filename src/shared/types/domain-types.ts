@@ -1331,6 +1331,8 @@ export type FontData = {
 
 export type GetQueueArgs = BaseEndpointArgs;
 
+export interface GetQueueQuery {}
+
 export type GetQueueResponse = {
     changed: string;
     changedBy: string;

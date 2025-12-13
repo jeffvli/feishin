@@ -5,6 +5,7 @@ import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
 import {
+    GetQueueQuery,
     ListCountQuery,
     RandomSongListQuery,
     SimilarSongsQuery,
@@ -12,6 +13,16 @@ import {
 } from '/@/shared/types/domain-types';
 
 export const songsQueries = {
+    getQueue: (args: QueryHookArgs<GetQueueQuery>) => {
+        return queryOptions({
+            queryFn: ({ signal }) => {
+                return api.controller.getPlayQueue({
+                    apiClientProps: { serverId: args.serverId, signal },
+                });
+            },
+            queryKey: queryKeys.player.fetch({ type: 'queue' }),
+        });
+    },
     list: (args: QueryHookArgs<SongListQuery>, imageSize?: number) => {
         return queryOptions({
             queryFn: ({ signal }) => {

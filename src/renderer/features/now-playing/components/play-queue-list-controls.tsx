@@ -1,16 +1,15 @@
-import { useCallback } from 'react';
+import { t } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-import { api } from '/@/renderer/api';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
-import { usePlayer } from '/@/renderer/features/player/context/player-context';
+import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/context/player-context';
+import { useRestoreQueue, useSaveQueue } from '/@/renderer/features/player/hooks/use-queue-restore';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
-import { useCurrentServer, usePlayerStore, useTimestampStoreBase } from '/@/renderer/store';
+import { useCurrentServer } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
-import { toast } from '/@/shared/components/toast/toast';
 import { ServerFeature } from '/@/shared/types/features-types';
 import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 
@@ -27,10 +26,6 @@ export const PlayQueueListControls = ({
 }: PlayQueueListOptionsProps) => {
     const { t } = useTranslation();
     const player = usePlayer();
-    const server = useCurrentServer();
-
-    const supportsQueue = hasFeature(server, ServerFeature.SERVER_PLAY_QUEUE);
-    const serverId = server?.id;
 
     const handleClearQueue = () => {
         player.clearQueue();
@@ -40,115 +35,10 @@ export const PlayQueueListControls = ({
         player.shuffleAll();
     };
 
-    const handleSaveQueue = useCallback(() => {
-        if (!serverId) return;
-
-        const { player, queue } = usePlayerStore.getState();
-        let uniqueIds: string[] = [];
-
-        if (queue.shuffled.length > 0) {
-            for (const shuffledIndex of queue.shuffled) {
-                uniqueIds.push(queue.default[shuffledIndex]);
-            }
-        } else {
-            uniqueIds = queue.default;
-        }
-
-        const songs: string[] = [];
-
-        if (uniqueIds.length > 0) {
-            for (const song of uniqueIds) {
-                if (queue.songs[song]._serverId !== serverId) {
-                    toast.error({
-                        message: t('error.multipleServerSaveQueueError', {
-                            postProcess: 'sentenceCase',
-                        }),
-                        title: t('error.genericError', { postProcess: 'sentenceCase' }),
-                    });
-
-                    return;
-                }
-
-                songs?.push(queue.songs[song].id);
-            }
-        }
-
-        api.controller
-            .savePlayQueue({
-                apiClientProps: { serverId },
-                query: {
-                    currentIndex: queue.default.length > 0 ? player.index : undefined,
-                    positionMs: useTimestampStoreBase.getState().timestamp * 1000,
-                    songs,
-                },
-            })
-            .then(() => {
-                return toast.success({
-                    message: '',
-                    title: t('form.saveQueue.success', { postProcess: 'sentenceCase' }),
-                });
-            })
-            .catch((error) => {
-                toast.error({
-                    message: error.message,
-                    title: t('error.saveQueueFailed', { postProcess: 'sentenceCase' }),
-                });
-                console.error(error);
-            });
-    }, [serverId, t]);
-
-    const handleRestoreQueue = useCallback(async () => {
-        if (!serverId) return;
-
-        try {
-            const queue = await api.controller.getPlayQueue({
-                apiClientProps: { serverId },
-            });
-
-            if (queue) {
-                player.setQueue(
-                    queue.entry,
-                    queue.currentIndex,
-                    queue.positionMs !== undefined ? queue.positionMs / 1000 : undefined,
-                );
-            }
-        } catch (error) {
-            toast.error({
-                message: (error as Error).message,
-                title: t('error.genericError', { postProcess: 'sentenceCase' }),
-            });
-        }
-    }, [player, serverId, t]);
-
     return (
         <Group justify="space-between" px="1rem" py="1rem" w="100%">
             <Group gap="xs">
-                {supportsQueue && (
-                    <>
-                        <ActionIcon
-                            icon="upload"
-                            iconProps={{ size: 'lg' }}
-                            onClick={handleSaveQueue}
-                            tooltip={{
-                                label: t('player.saveQueueToServer', {
-                                    postProcess: 'sentenceCase',
-                                }),
-                            }}
-                            variant="subtle"
-                        />
-                        <ActionIcon
-                            icon="download"
-                            iconProps={{ size: 'lg' }}
-                            onClick={handleRestoreQueue}
-                            tooltip={{
-                                label: t('player.restoreQueueFromServer', {
-                                    postProcess: 'sentenceCase',
-                                }),
-                            }}
-                            variant="subtle"
-                        />
-                    </>
-                )}
+                <QueueRestoreActions />
                 <ActionIcon
                     icon="mediaShuffle"
                     iconProps={{ size: 'lg' }}
@@ -188,5 +78,51 @@ export const PlayQueueListControls = ({
                 />
             </Group>
         </Group>
+    );
+};
+
+const QueueRestoreActions = () => {
+    const server = useCurrentServer();
+    const supportsQueue = hasFeature(server, ServerFeature.SERVER_PLAY_QUEUE);
+
+    const isFetching = useIsPlayerFetching();
+
+    const { isPending: isSavingQueue, mutate: handleSaveQueue } = useSaveQueue();
+
+    const handleRestoreQueue = useRestoreQueue();
+
+    if (!supportsQueue) {
+        return null;
+    }
+
+    return (
+        <>
+            <ActionIcon
+                disabled={isFetching}
+                icon="upload"
+                iconProps={{ size: 'lg' }}
+                loading={isSavingQueue}
+                onClick={() => handleSaveQueue()}
+                tooltip={{
+                    label: t('player.saveQueueToServer', {
+                        postProcess: 'sentenceCase',
+                    }),
+                }}
+                variant="subtle"
+            />
+            <ActionIcon
+                disabled={isSavingQueue}
+                icon="download"
+                iconProps={{ size: 'lg' }}
+                loading={isFetching}
+                onClick={handleRestoreQueue}
+                tooltip={{
+                    label: t('player.restoreQueueFromServer', {
+                        postProcess: 'sentenceCase',
+                    }),
+                }}
+                variant="subtle"
+            />
+        </>
     );
 };
