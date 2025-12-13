@@ -127,7 +127,9 @@ export const PlayQueueListControls = ({
                             iconProps={{ size: 'lg' }}
                             onClick={handleSaveQueue}
                             tooltip={{
-                                label: t('player.saveQueue', { postProcess: 'titleCase' }),
+                                label: t('player.saveQueueToServer', {
+                                    postProcess: 'sentenceCase',
+                                }),
                             }}
                             variant="subtle"
                         />
@@ -136,7 +138,9 @@ export const PlayQueueListControls = ({
                             iconProps={{ size: 'lg' }}
                             onClick={handleRestoreQueue}
                             tooltip={{
-                                label: t('player.restoreQueue', { postProcess: 'titleCase' }),
+                                label: t('player.restoreQueueFromServer', {
+                                    postProcess: 'sentenceCase',
+                                }),
                             }}
                             variant="subtle"
                         />
