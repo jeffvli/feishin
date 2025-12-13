@@ -41,7 +41,7 @@ export const PlayQueueListControls = ({
     };
 
     const handleSaveQueue = useCallback(() => {
-        if (serverId) return;
+        if (!serverId) return;
 
         const { player, queue } = usePlayerStore.getState();
         let uniqueIds: string[] = [];
@@ -120,6 +120,28 @@ export const PlayQueueListControls = ({
     return (
         <Group justify="space-between" px="1rem" py="1rem" w="100%">
             <Group gap="xs">
+                {supportsQueue && (
+                    <>
+                        <ActionIcon
+                            icon="upload"
+                            iconProps={{ size: 'lg' }}
+                            onClick={handleSaveQueue}
+                            tooltip={{
+                                label: t('player.saveQueue', { postProcess: 'titleCase' }),
+                            }}
+                            variant="subtle"
+                        />
+                        <ActionIcon
+                            icon="download"
+                            iconProps={{ size: 'lg' }}
+                            onClick={handleRestoreQueue}
+                            tooltip={{
+                                label: t('player.restoreQueue', { postProcess: 'titleCase' }),
+                            }}
+                            variant="subtle"
+                        />
+                    </>
+                )}
                 <ActionIcon
                     icon="mediaShuffle"
                     iconProps={{ size: 'lg' }}
@@ -134,30 +156,6 @@ export const PlayQueueListControls = ({
                     tooltip={{ label: t('action.clearQueue', { postProcess: 'sentenceCase' }) }}
                     variant="subtle"
                 />
-                {supportsQueue && (
-                    <>
-                        <ActionIcon
-                            icon="upload"
-                            onClick={handleSaveQueue}
-                            size="sm"
-                            tooltip={{
-                                label: t('player.saveQueue', { postProcess: 'titleCase' }),
-                                openDelay: 0,
-                            }}
-                            variant="subtle"
-                        />
-                        <ActionIcon
-                            icon="download"
-                            onClick={handleRestoreQueue}
-                            size="sm"
-                            tooltip={{
-                                label: t('player.restoreQueue', { postProcess: 'titleCase' }),
-                                openDelay: 0,
-                            }}
-                            variant="subtle"
-                        />
-                    </>
-                )}
             </Group>
             <Group gap="xs">
                 <SearchInput
