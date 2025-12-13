@@ -21,7 +21,6 @@ export const DrawerPlayQueue = () => {
                 <PlayQueueListControls
                     handleSearch={setSearch}
                     searchTerm={search}
-                    tableRef={queueRef}
                     type={ItemListKey.SIDE_QUEUE}
                 />
             </div>

@@ -43,7 +43,7 @@ const VERSION_INFO: VersionInfo = [
             [ServerFeature.PUBLIC_PLAYLIST]: [1],
         },
     ],
-    ['10.0.0', { [ServerFeature.SERVER_PLAY_QUEUE]: [1], [ServerFeature.TAGS]: [1] }],
+    ['10.0.0', { [ServerFeature.TAGS]: [1] }],
 ];
 
 export const JellyfinController: InternalControllerEndpoint = {
