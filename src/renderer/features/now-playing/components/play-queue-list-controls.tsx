@@ -83,12 +83,15 @@ export const PlayQueueListControls = ({
                 },
             })
             .then(() => {
-                return toast.success({ message: '', title: 'Saved play queue' });
+                return toast.success({
+                    message: '',
+                    title: t('form.saveQueue.success', { postProcess: 'sentenceCase' }),
+                });
             })
             .catch((error) => {
                 toast.error({
-                    message: 'This is most likely because your queue is too large (> 1000 tracks)',
-                    title: 'Failed to save play queue',
+                    message: error.message,
+                    title: t('error.saveQueueFailed', { postProcess: 'sentenceCase' }),
                 });
                 console.error(error);
             });
@@ -112,10 +115,10 @@ export const PlayQueueListControls = ({
         } catch (error) {
             toast.error({
                 message: (error as Error).message,
-                title: 'Failed to get play queue',
+                title: t('error.genericError', { postProcess: 'sentenceCase' }),
             });
         }
-    }, [player, serverId]);
+    }, [player, serverId, t]);
 
     return (
         <Group justify="space-between" px="1rem" py="1rem" w="100%">
