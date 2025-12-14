@@ -12,6 +12,7 @@ import macMinHover from './assets/min-mac-hover.png';
 import macMin from './assets/min-mac.png';
 import styles from './window-bar.module.css';
 
+import { useRadioPlayer } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { useAppStore, usePlayerData, usePlayerStatus, useWindowSettings } from '/@/renderer/store';
 import { Text } from '/@/shared/components/text/text';
 import { Platform, PlayerStatus } from '/@/shared/types/types';
@@ -128,6 +129,8 @@ export const WindowBar = () => {
     const handleMinimize = () => minimize();
 
     const { currentSong, index, queueLength } = usePlayerData();
+    const { isPlaying: isRadioPlaying, metadata, stationName } = useRadioPlayer();
+    const isRadioActive = Boolean(stationName || metadata);
     const [max, setMax] = useState(localSettings?.env.START_MAXIMIZED || false);
 
     const handleMaximize = useCallback(() => {
@@ -142,16 +145,37 @@ export const WindowBar = () => {
     const handleClose = useCallback(() => close(), []);
 
     const title = useMemo(() => {
+        const privateModeString = privateMode ? '(Private mode)' : '';
+
+        // Show radio information if radio is active
+        if (isRadioActive) {
+            const radioStatusString = !isRadioPlaying ? '(Paused) ' : '';
+            const radioTitle = stationName || 'Radio';
+            const radioMetadata = metadata ? ` — ${metadata}` : '';
+            return `${radioStatusString}${radioTitle}${radioMetadata} — Feishin${privateMode ? ` ${privateModeString}` : ''}`;
+        }
+
+        // Show regular song information
         const statusString = playerStatus === PlayerStatus.PAUSED ? '(Paused) ' : '';
         const queueString = queueLength ? `(${index + 1} / ${queueLength}) ` : '';
-        const privateModeString = privateMode ? '(Private mode)' : '';
         const title = `${
             queueLength
                 ? `${statusString}${queueString}${currentSong?.name}${currentSong?.artistName ? ` — ${currentSong?.artistName} — Feishin` : ''}`
                 : 'Feishin'
         }${privateMode ? ` ${privateModeString}` : ''}`;
         return title;
-    }, [currentSong?.artistName, currentSong?.name, index, playerStatus, privateMode, queueLength]);
+    }, [
+        currentSong?.artistName,
+        currentSong?.name,
+        index,
+        isRadioActive,
+        isRadioPlaying,
+        metadata,
+        playerStatus,
+        privateMode,
+        queueLength,
+        stationName,
+    ]);
 
     useEffect(() => {
         document.title = title;
