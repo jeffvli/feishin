@@ -10,6 +10,8 @@ import { getMainWindow, sendToastToRenderer } from '../../../index';
 import { createLog, isWindows } from '../../../utils';
 import { store } from '../settings';
 
+import { PlayerData } from '/@/shared/types/domain-types';
+
 declare module 'node-mpv';
 
 // function wait(timeout: number) {
@@ -21,6 +23,7 @@ declare module 'node-mpv';
 // }
 
 let mpvInstance: MpvAPI | null = null;
+let currentPlayerData: null | PlayerData = null;
 const socketPath = isWindows() ? `\\\\.\\pipe\\mpvserver-${pid}` : `/tmp/node-mpv-${pid}.sock`;
 
 const NodeMpvErrorCode = {
@@ -434,6 +437,37 @@ ipcMain.handle('player-get-time', async (): Promise<number | undefined> => {
     } catch (err: any | NodeMpvError) {
         mpvLog({ action: `Failed to get current time` }, err);
         return 0;
+    }
+});
+
+// Updates the current player metadata (song data)
+ipcMain.on('player-update-metadata', (_event, data: PlayerData) => {
+    currentPlayerData = data;
+});
+
+// Returns the current player metadata (song data)
+ipcMain.handle('player-metadata', async (): Promise<null | PlayerData> => {
+    return currentPlayerData;
+});
+
+// Returns the stream metadata from mpv (for radio streams)
+ipcMain.handle('player-stream-metadata', async (): Promise<null | string> => {
+    try {
+        const metadata = await getMpvInstance()?.getProperty('metadata');
+        if (metadata && typeof metadata === 'object') {
+            // MPV metadata can have various keys, try common ones for stream title
+            const streamTitle =
+                metadata['icy-title'] ||
+                metadata['StreamTitle'] ||
+                metadata['title'] ||
+                metadata['TITLE'] ||
+                null;
+            return streamTitle;
+        }
+        return null;
+    } catch (err: any | NodeMpvError) {
+        mpvLog({ action: `Failed to get stream metadata` }, err);
+        return null;
     }
 });
 

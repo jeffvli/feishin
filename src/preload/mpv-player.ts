@@ -86,6 +86,18 @@ const getCurrentTime = async () => {
     return ipcRenderer.invoke('player-get-time');
 };
 
+const updateMetadata = (data: PlayerData) => {
+    ipcRenderer.send('player-update-metadata', data);
+};
+
+const getMetadata = async () => {
+    return ipcRenderer.invoke('player-metadata');
+};
+
+const getStreamMetadata = async () => {
+    return ipcRenderer.invoke('player-stream-metadata');
+};
+
 const rendererAutoNext = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
     ipcRenderer.on('renderer-player-auto-next', cb);
 };
@@ -163,6 +175,8 @@ export const mpvPlayer = {
     cleanup,
     currentTime,
     getCurrentTime,
+    getMetadata,
+    getStreamMetadata,
     initialize,
     isRunning,
     mute,
@@ -178,6 +192,7 @@ export const mpvPlayer = {
     setQueue,
     setQueueNext,
     stop,
+    updateMetadata,
     volume,
 };
 

@@ -18,7 +18,7 @@ interface RadioListTableProps {
 export const RadioListTable = ({ data }: RadioListTableProps) => {
     const { t } = useTranslation();
     const { currentStreamUrl, isPlaying, metadata } = useRadioPlayer();
-    const { play, stop } = useRadioControls();
+    const { pause, play } = useRadioControls();
 
     const rows = useMemo(
         () =>
@@ -32,7 +32,7 @@ export const RadioListTable = ({ data }: RadioListTableProps) => {
                             {stationIsPlaying ? (
                                 <ActionIcon
                                     icon="mediaPause"
-                                    onClick={() => stop()}
+                                    onClick={() => pause()}
                                     size="sm"
                                     variant="subtle"
                                 />
@@ -66,7 +66,7 @@ export const RadioListTable = ({ data }: RadioListTableProps) => {
                     streamUrl: <Text c="dimmed">{station.streamUrl}</Text>,
                 };
             }),
-        [currentStreamUrl, data, isPlaying, metadata, play, stop],
+        [currentStreamUrl, data, isPlaying, metadata, pause, play],
     );
 
     return (

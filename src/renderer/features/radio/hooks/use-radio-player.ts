@@ -10,7 +10,8 @@ import { PlayerType } from '/@/shared/types/types';
 
 interface RadioStore {
     actions: {
-        play: (streamUrl: string, stationName?: string) => void;
+        pause: () => void;
+        play: (streamUrl?: string, stationName?: string) => void;
         setCurrentStreamUrl: (currentStreamUrl: null | string) => void;
         setIsPlaying: (isPlaying: boolean) => void;
         setMetadata: (metadata: null | string) => void;
@@ -25,11 +26,23 @@ interface RadioStore {
 
 export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
     actions: {
-        play: (streamUrl: string, stationName?: string) => {
-            set({
-                currentStreamUrl: streamUrl,
-                isPlaying: true,
-                stationName: stationName || null,
+        pause: () => {
+            set({ isPlaying: false });
+        },
+        play: (streamUrl?: string, stationName?: string) => {
+            set((state) => {
+                const newStreamUrl = streamUrl ?? state.currentStreamUrl;
+                const newStationName = stationName ?? state.stationName;
+
+                if (!newStreamUrl) {
+                    return state;
+                }
+
+                return {
+                    currentStreamUrl: newStreamUrl,
+                    isPlaying: true,
+                    stationName: newStationName,
+                };
             });
         },
         setCurrentStreamUrl: (currentStreamUrl) => set({ currentStreamUrl }),
@@ -70,9 +83,10 @@ export const useRadioPlayer = () => {
 };
 
 export const useRadioControls = () => {
-    const { play, stop } = useRadioStore((state) => state.actions);
+    const { pause, play, stop } = useRadioStore((state) => state.actions);
 
     return {
+        pause,
         play,
         stop,
     };
@@ -235,6 +249,8 @@ export const useRadioAudioInstance = () => {
 export const useRadioMetadata = () => {
     const { actions, currentStreamUrl } = useRadioStore();
     const { setMetadata } = actions;
+    const playbackType = usePlaybackType();
+    const isUsingMpv = playbackType === PlayerType.LOCAL && mpvPlayer;
 
     useEffect(() => {
         if (!currentStreamUrl) {
@@ -242,6 +258,32 @@ export const useRadioMetadata = () => {
             return;
         }
 
+        // If using mpv, fetch metadata from mpv periodically
+        if (isUsingMpv && mpvPlayer) {
+            let intervalId: NodeJS.Timeout | null = null;
+
+            const fetchMpvMetadata = async () => {
+                try {
+                    const streamTitle = await mpvPlayer.getStreamMetadata();
+                    setMetadata(streamTitle);
+                } catch {
+                    // Ignore error
+                }
+            };
+
+            // Fetch immediately and then periodically (every 5 seconds)
+            fetchMpvMetadata();
+            intervalId = setInterval(fetchMpvMetadata, 5000);
+
+            return () => {
+                if (intervalId) {
+                    clearInterval(intervalId);
+                }
+                setMetadata(null);
+            };
+        }
+
+        // Otherwise, use IcecastMetadataStats for web player
         let statsListener: IcecastMetadataStats | null = null;
 
         try {
@@ -274,5 +316,5 @@ export const useRadioMetadata = () => {
             }
             setMetadata(null);
         };
-    }, [currentStreamUrl, setMetadata]);
+    }, [currentStreamUrl, setMetadata, isUsingMpv]);
 };

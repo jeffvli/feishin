@@ -9,7 +9,7 @@ import styles from './left-controls.module.css';
 
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { RadioMetadataDisplay } from '/@/renderer/features/player/components/radio-metadata-display';
-import { useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { useIsRadioActive } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useAppStore,
@@ -44,10 +44,10 @@ export const LeftControls = () => {
     );
 
     const currentSong = usePlayerSong();
-    const isRadioPlaying = useRadioStore((state) => state.isPlaying);
+    const isRadioActive = useIsRadioActive();
     const { bindings } = useHotkeySettings();
 
-    const isRadioMode = isRadioPlaying;
+    const isRadioMode = isRadioActive;
     const hideImage = (image && !collapsed) || isRadioMode;
     const isSongDefined = Boolean(currentSong?.id) && !isRadioMode;
     const title = currentSong?.name;

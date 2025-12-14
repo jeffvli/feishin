@@ -3,7 +3,7 @@ import React from 'react';
 
 import styles from './left-controls.module.css';
 
-import { useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { useIsRadioActive, useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
@@ -23,10 +23,11 @@ export const RadioMetadataDisplay = ({
     const stationName = useRadioStore((state) => state.stationName);
 
     const isRadioMode = isRadioPlaying;
+    const isRadioActive = useIsRadioActive();
 
     const title = isRadioMode ? radioMetadata || '—' : '—';
 
-    if (!isRadioMode) {
+    if (!isRadioActive) {
         return null;
     }
 

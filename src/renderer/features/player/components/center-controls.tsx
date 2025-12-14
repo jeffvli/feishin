@@ -8,6 +8,7 @@ import { openShuffleAllModal } from '/@/renderer/features/player/components/shuf
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     useIsPlayingRadio,
+    useIsRadioActive,
     useRadioControls,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
@@ -24,22 +25,22 @@ import { PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types
 export const CenterControls = () => {
     const skip = useSettingsStore((state) => state.general.skipButtons);
 
-    const isPlayingRadio = useIsPlayingRadio();
+    const isRadioActive = useIsRadioActive();
 
-    if (isPlayingRadio) {
+    if (isRadioActive) {
         return (
             <>
                 <div className={styles.controlsContainer}>
                     <div className={styles.buttonsContainer}>
-                        <StopButton disabled={isPlayingRadio} />
-                        <ShuffleButton disabled={isPlayingRadio} />
-                        <PreviousButton disabled={isPlayingRadio} />
-                        {skip?.enabled && <SkipBackwardButton disabled={isPlayingRadio} />}
+                        <RadioStopButton />
+                        <ShuffleButton disabled={isRadioActive} />
+                        <PreviousButton disabled={isRadioActive} />
+                        {skip?.enabled && <SkipBackwardButton disabled={isRadioActive} />}
                         <RadioCenterPlayButton />
-                        {skip?.enabled && <SkipForwardButton disabled={isPlayingRadio} />}
-                        <NextButton disabled={isPlayingRadio} />
-                        <RepeatButton disabled={isPlayingRadio} />
-                        <ShuffleAllButton disabled={isPlayingRadio} />
+                        {skip?.enabled && <SkipForwardButton disabled={isRadioActive} />}
+                        <NextButton disabled={isRadioActive} />
+                        <RepeatButton disabled={isRadioActive} />
+                        <ShuffleAllButton disabled={isRadioActive} />
                     </div>
                 </div>
             </>
@@ -69,17 +70,36 @@ export const CenterControls = () => {
 const RadioCenterPlayButton = ({ disabled }: { disabled?: boolean }) => {
     const { currentStreamUrl } = useRadioPlayer();
     const isPlayingRadio = useIsPlayingRadio();
-    const { play, stop } = useRadioControls();
+    const { pause, play } = useRadioControls();
 
     const handleClick = () => {
         if (isPlayingRadio) {
-            stop();
+            pause();
         } else if (currentStreamUrl) {
-            play(currentStreamUrl);
+            play();
         }
     };
 
-    return <MainPlayButton disabled={disabled} isPaused={false} onClick={handleClick} />;
+    return <MainPlayButton disabled={disabled} isPaused={!isPlayingRadio} onClick={handleClick} />;
+};
+
+const RadioStopButton = ({ disabled }: { disabled?: boolean }) => {
+    const { t } = useTranslation();
+    const buttonSize = useSettingsStore((state) => state.general.buttonSize);
+    const { stop } = useRadioControls();
+
+    return (
+        <PlayerButton
+            disabled={disabled}
+            icon={<Icon fill="default" icon="mediaStop" size={buttonSize - 2} />}
+            onClick={stop}
+            tooltip={{
+                label: t('player.stop', { postProcess: 'sentenceCase' }),
+                openDelay: 0,
+            }}
+            variant="tertiary"
+        />
+    );
 };
 
 const StopButton = ({ disabled }: { disabled?: boolean }) => {

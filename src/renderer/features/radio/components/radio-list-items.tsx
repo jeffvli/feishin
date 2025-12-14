@@ -33,7 +33,7 @@ interface RadioListItemsProps {
 const RadioListItem = ({ station }: RadioListItemProps) => {
     const { t } = useTranslation();
     const { currentStreamUrl, isPlaying } = useRadioPlayer();
-    const { play, stop } = useRadioControls();
+    const { pause, play, stop } = useRadioControls();
     const server = useCurrentServer();
     const deleteRadioStationMutation = useDeleteRadioStation({});
 
@@ -42,7 +42,7 @@ const RadioListItem = ({ station }: RadioListItemProps) => {
 
     const handleClick = () => {
         if (stationIsPlaying) {
-            stop();
+            pause();
         } else {
             play(station.streamUrl, station.name);
         }
