@@ -3,10 +3,11 @@ import isElectron from 'is-electron';
 import { useEffect, useRef } from 'react';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { convertToLogVolume } from '/@/renderer/features/player/audio-player/utils/player-utils';
 import { usePlaybackType, usePlayerMuted, usePlayerVolume } from '/@/renderer/store';
 import { toast } from '/@/shared/components/toast/toast';
-import { PlayerType } from '/@/shared/types/types';
+import { PlayerStatus, PlayerType } from '/@/shared/types/types';
 
 export interface RadioMetadata {
     artist: null | string;
@@ -252,6 +253,31 @@ export const useRadioAudioInstance = () => {
         audioRef.current.volume = logVolume;
         audioRef.current.muted = isMuted;
     }, [volume, isMuted, isUsingMpv]);
+
+    usePlayerEvents(
+        {
+            onPlayerStatus: (properties, prev) => {
+                const radioState = useRadioStore.getState();
+                if (!radioState.currentStreamUrl) {
+                    return;
+                }
+
+                const { status } = properties;
+                const { status: prevStatus } = prev;
+
+                if (status === prevStatus) {
+                    return;
+                }
+
+                if (status === PlayerStatus.PLAYING && prevStatus === PlayerStatus.PAUSED) {
+                    actions.play();
+                } else if (status === PlayerStatus.PAUSED && prevStatus === PlayerStatus.PLAYING) {
+                    actions.pause();
+                }
+            },
+        },
+        [actions],
+    );
 };
 
 export const useRadioMetadata = () => {
