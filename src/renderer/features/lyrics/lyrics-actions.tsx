@@ -16,6 +16,7 @@ interface LyricsActionsProps {
     index: number;
     languages: { label: string; value: string }[];
     offsetMs: number;
+    onExportLyrics: () => void;
     onRemoveLyric: () => void;
     onSearchOverride: (params: LyricsOverride) => void;
     onTranslateLyric?: () => void;
@@ -28,6 +29,7 @@ export const LyricsActions = ({
     index,
     languages,
     offsetMs,
+    onExportLyrics,
     onRemoveLyric,
     onSearchOverride,
     onTranslateLyric,
@@ -46,92 +48,99 @@ export const LyricsActions = ({
     const isDesktop = isElectron();
 
     return (
-        <div style={{ position: 'relative', width: '100%' }}>
-            {languages.length > 1 && (
-                <Center>
-                    <Select
-                        clearable={false}
-                        data={languages}
-                        onChange={(value) => setIndex(parseInt(value!, 10))}
-                        style={{ bottom: 30, position: 'absolute' }}
-                        value={index.toString()}
-                    />
-                </Center>
-            )}
+        <>
+            <div style={{ position: 'relative', width: '100%' }}>
+                {languages.length > 0 && (
+                    <Center>
+                        {languages.length > 1 && (
+                            <Select
+                                clearable={false}
+                                data={languages}
+                                onChange={(value) => setIndex(parseInt(value!, 10))}
+                                style={{ bottom: 30, position: 'absolute' }}
+                                value={index.toString()}
+                            />
+                        )}
+                        <Button onClick={onExportLyrics} uppercase variant="subtle">
+                            Export
+                        </Button>
+                    </Center>
+                )}
 
-            <Group justify="center">
-                {isDesktop && sources.length ? (
-                    <Button
-                        disabled={isActionsDisabled}
-                        onClick={() =>
-                            openLyricSearchModal({
-                                artist: currentSong?.artistName,
-                                name: currentSong?.name,
-                                onSearchOverride,
-                            })
-                        }
-                        uppercase
+                <Group justify="center">
+                    {isDesktop && sources.length ? (
+                        <Button
+                            disabled={isActionsDisabled}
+                            onClick={() =>
+                                openLyricSearchModal({
+                                    artist: currentSong?.artistName,
+                                    name: currentSong?.name,
+                                    onSearchOverride,
+                                })
+                            }
+                            uppercase
+                            variant="subtle"
+                        >
+                            {t('common.search', { postProcess: 'titleCase' })}
+                        </Button>
+                    ) : null}
+                    <ActionIcon
+                        aria-label="Decrease lyric offset"
+                        icon="minus"
+                        onClick={() => handleLyricOffset(offsetMs - 50)}
+                        tooltip={{
+                            label: t('common.slower', { postProcess: 'sentenceCase' }),
+                            openDelay: 0,
+                        }}
                         variant="subtle"
-                    >
-                        {t('common.search', { postProcess: 'titleCase' })}
-                    </Button>
-                ) : null}
-                <ActionIcon
-                    aria-label="Decrease lyric offset"
-                    icon="minus"
-                    onClick={() => handleLyricOffset(offsetMs - 50)}
-                    tooltip={{
-                        label: t('common.slower', { postProcess: 'sentenceCase' }),
-                        openDelay: 0,
-                    }}
-                    variant="subtle"
-                />
-                <Tooltip
-                    label={t('setting.lyricOffset', { postProcess: 'sentenceCase' })}
-                    openDelay={0}
-                >
-                    <NumberInput
-                        aria-label="Lyric offset"
-                        onChange={handleLyricOffset}
-                        styles={{ input: { textAlign: 'center' } }}
-                        value={offsetMs || 0}
-                        width={70}
                     />
-                </Tooltip>
-                <ActionIcon
-                    aria-label="Increase lyric offset"
-                    icon="plus"
-                    onClick={() => handleLyricOffset(offsetMs + 50)}
-                    tooltip={{
-                        label: t('common.faster', { postProcess: 'sentenceCase' }),
-                        openDelay: 0,
-                    }}
-                    variant="subtle"
-                />
-                {isDesktop && sources.length ? (
-                    <Button
-                        disabled={isActionsDisabled}
-                        onClick={onRemoveLyric}
-                        uppercase
-                        variant="subtle"
+                    <Tooltip
+                        label={t('setting.lyricOffset', { postProcess: 'sentenceCase' })}
+                        openDelay={0}
                     >
-                        {t('common.clear', { postProcess: 'sentenceCase' })}
-                    </Button>
-                ) : null}
-            </Group>
+                        <NumberInput
+                            aria-label="Lyric offset"
+                            onChange={handleLyricOffset}
+                            styles={{ input: { textAlign: 'center' } }}
+                            value={offsetMs || 0}
+                            width={70}
+                        />
+                    </Tooltip>
+                    <ActionIcon
+                        aria-label="Increase lyric offset"
+                        icon="plus"
+                        onClick={() => handleLyricOffset(offsetMs + 50)}
+                        tooltip={{
+                            label: t('common.faster', { postProcess: 'sentenceCase' }),
+                            openDelay: 0,
+                        }}
+                        variant="subtle"
+                    />
+                    {isDesktop && sources.length ? (
+                        <Button
+                            disabled={isActionsDisabled}
+                            onClick={onRemoveLyric}
+                            uppercase
+                            variant="subtle"
+                        >
+                            {t('common.clear', { postProcess: 'sentenceCase' })}
+                        </Button>
+                    ) : null}
+                </Group>
 
-            <div style={{ position: 'absolute', right: 0, top: -50 }}>
-                {isDesktop && sources.length && onTranslateLyric ? (
-                    <Button
-                        disabled={isActionsDisabled}
-                        onClick={onTranslateLyric}
-                        uppercase
-                        variant="subtle"
-                    >
-                        {t('common.translation', { postProcess: 'sentenceCase' })}
-                    </Button>
-                ) : null}
+                <div style={{ position: 'absolute', right: 0, top: -50 }}>
+                    {isDesktop && sources.length && onTranslateLyric ? (
+                        <Button
+                            disabled={isActionsDisabled}
+                            onClick={onTranslateLyric}
+                            uppercase
+                            variant="subtle"
+                        >
+                            {t('common.translation', { postProcess: 'sentenceCase' })}
+                        </Button>
+                    ) : null}
+                </div>
             </div>
-        </div>
+        </>
     );
 };

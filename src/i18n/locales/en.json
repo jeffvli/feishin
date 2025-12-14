@@ -327,6 +327,10 @@
             "success": "$t(entity.playlist_one) updated successfully",
             "title": "edit $t(entity.playlist_one)"
         },
+        "lyricsExport": {
+            "input_synced": "export synced lyrics",
+            "input_offset": "$t(setting.lyricOffset)"
+        },
         "lyricSearch": {
             "input_artist": "$t(entity.artist_one)",
             "input_name": "$t(common.name)",

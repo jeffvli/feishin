@@ -8,6 +8,7 @@ import styles from './lyrics.module.css';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { translateLyrics } from '/@/renderer/features/lyrics/api/lyric-translate';
 import { lyricsQueries } from '/@/renderer/features/lyrics/api/lyrics-api';
+import { openLyricsExportModal } from '/@/renderer/features/lyrics/components/lyrics-export-form';
 import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 import {
     SynchronizedLyrics,
@@ -281,6 +282,12 @@ export const Lyrics = () => {
         return undefined;
     }, [isLoadingLyrics, hasNoLyrics]);
 
+    const handleExportLyrics = useCallback(() => {
+        if (lyrics) {
+            openLyricsExportModal({ lyrics, offsetMs: currentOffsetMs, synced });
+        }
+    }, [currentOffsetMs, lyrics, synced]);
+
     return (
         <ComponentErrorBoundary>
             <div className={styles.lyricsContainer}>
@@ -332,6 +339,7 @@ export const Lyrics = () => {
                         index={index}
                         languages={languages}
                         offsetMs={currentOffsetMs}
+                        onExportLyrics={handleExportLyrics}
                         onRemoveLyric={handleOnRemoveLyric}
                         onSearchOverride={handleOnSearchOverride}
                         onTranslateLyric={
