@@ -6,6 +6,7 @@ import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { getSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { AudioPlayer, PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
+import { useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-settings';
 import {
     usePlaybackSettings,
@@ -100,17 +101,22 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             isInitializedRef.current = true;
 
             // After initialization, populate the queue if currentSrc is available
-            const playerData = usePlayerStore.getState().getPlayerData();
-            const currentSongUrl = playerData.currentSong
-                ? getSongUrl(playerData.currentSong, transcode)
-                : undefined;
-            const nextSongUrl = playerData.nextSong
-                ? getSongUrl(playerData.nextSong, transcode)
-                : undefined;
+            // Don't override queue if radio is active
+            const radioState = useRadioStore.getState();
 
-            if (currentSongUrl && nextSongUrl && !hasPopulatedQueueRef.current && mpvPlayer) {
-                mpvPlayer.setQueue(currentSongUrl, nextSongUrl, true);
-                hasPopulatedQueueRef.current = true;
+            if (!radioState.currentStreamUrl) {
+                const playerData = usePlayerStore.getState().getPlayerData();
+                const currentSongUrl = playerData.currentSong
+                    ? getSongUrl(playerData.currentSong, transcode)
+                    : undefined;
+                const nextSongUrl = playerData.nextSong
+                    ? getSongUrl(playerData.nextSong, transcode)
+                    : undefined;
+
+                if (currentSongUrl && nextSongUrl && !hasPopulatedQueueRef.current && mpvPlayer) {
+                    mpvPlayer.setQueue(currentSongUrl, nextSongUrl, true);
+                    hasPopulatedQueueRef.current = true;
+                }
             }
         };
 
@@ -243,6 +249,12 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
                 replaceMpvQueue(transcode);
             },
             onNextSongInsertion: (song) => {
+                const radioState = useRadioStore.getState();
+
+                if (radioState.currentStreamUrl) {
+                    return;
+                }
+
                 const nextSongUrl = song ? getSongUrl(song, transcode) : undefined;
                 mpvPlayer?.setQueueNext(nextSongUrl);
             },
@@ -317,6 +329,13 @@ function replaceMpvQueue(transcode: {
     enabled: boolean;
     format?: string | undefined;
 }) {
+    // Don't override queue if radio is active
+    const radioState = useRadioStore.getState();
+
+    if (radioState.currentStreamUrl) {
+        return;
+    }
+
     const playerData = usePlayerStore.getState().getPlayerData();
     const currentSongUrl = playerData.currentSong
         ? getSongUrl(playerData.currentSong, transcode)
