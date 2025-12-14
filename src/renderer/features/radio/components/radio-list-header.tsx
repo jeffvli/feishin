@@ -24,7 +24,7 @@ export const RadioListHeader = ({ title }: RadioListHeaderProps) => {
             <PageHeader>
                 <LibraryHeaderBar ignoreMaxWidth>
                     <LibraryHeaderBar.Title>{pageTitle}</LibraryHeaderBar.Title>
-                    <LibraryHeaderBar.Badge isLoading={!itemCount}>
+                    <LibraryHeaderBar.Badge isLoading={itemCount === undefined}>
                         {itemCount}
                     </LibraryHeaderBar.Badge>
                 </LibraryHeaderBar>
