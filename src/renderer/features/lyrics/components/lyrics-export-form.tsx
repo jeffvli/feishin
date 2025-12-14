@@ -33,7 +33,10 @@ export const LyricsExportForm = ({ lyrics, offsetMs, synced }: LyricsExportFormP
     const displayedLyrics = useMemo(() => {
         if (form.values.synced && Array.isArray(lyrics.lyrics)) {
             const contents = lyrics.lyrics
-                .map((lyric) => `[${formatDuration(lyric[0], { ms: true })}] ${lyric[1]}`)
+                .map(
+                    (lyric) =>
+                        `[${formatDuration(lyric[0], { leading: true, ms: true })}]${lyric[1]}`,
+                )
                 .join('\n');
 
             return `[ar:${lyrics.artist}]
