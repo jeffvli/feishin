@@ -279,8 +279,6 @@ export const useRadioMetadata = () => {
                 }
             };
 
-            // Fetch immediately and then periodically (every 5 seconds)
-            fetchMpvMetadata();
             intervalId = setInterval(fetchMpvMetadata, 5000);
 
             return () => {
@@ -329,8 +327,7 @@ export const useRadioMetadata = () => {
             });
 
             statsListener.start();
-        } catch (error) {
-            console.error('Failed to initialize metadata listener:', error);
+        } catch {
             setMetadata(null);
         }
 
