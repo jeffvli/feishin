@@ -255,6 +255,10 @@ export const Lyrics = () => {
     const languages = useMemo(() => {
         if (Array.isArray(data)) {
             return data.map((lyric, idx) => ({ label: lyric.lang, value: idx.toString() }));
+        } else if (data?.lyrics) {
+            // xxx denotes undefined lyrics language. If it's a single lyric (from a remote source)
+            // the language is most likely not available, so leave it undefined
+            return [{ label: 'xxx', value: '0' }];
         }
         return [];
     }, [data]);
