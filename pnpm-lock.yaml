@@ -116,9 +116,9 @@ importers:
       i18next:
         specifier: ^25.6.2
         version: 25.6.2(typescript@5.8.3)
-      icecast-metadata-js:
-        specifier: ^1.2.9
-        version: 1.2.9
+      icecast-metadata-stats:
+        specifier: ^0.1.12
+        version: 0.1.12
       idb-keyval:
         specifier: ^6.2.2
         version: 6.2.2
@@ -3451,6 +3451,10 @@ packages:
 
   icecast-metadata-js@1.2.9:
     resolution: {integrity: sha512-8YqPrJ4AjM64O28xF9TSUUFczxnTKwXwnIPmZKRxdbaZb6hn0nP+ke1OGNA+UsIfLpNRW4acDDBkIkbynYVQig==}
+
+  icecast-metadata-stats@0.1.12:
+    resolution: {integrity: sha512-qywYIIvxjAmZIFNUXMVZ/IgIJh87z0W6oOmJ5htPw3SUauXcYoY6rRexvzN5Ibct8hXsqoTcB+k8m6Wa53bfJg==}
+    engines: {node: '>=18.0.0'}
 
   iconv-corefoundation@1.1.7:
     resolution: {integrity: sha512-T10qvkw0zz4wnm560lOEg0PovVqUXuOFhhHAkixw8/sycy7TJt7v/RrkEKEQnAw2viPSJu6iAkErxnzR0g8PpQ==}
@@ -9535,6 +9539,10 @@ snapshots:
   icecast-metadata-js@1.2.9:
     dependencies:
       codec-parser: 2.5.0
+
+  icecast-metadata-stats@0.1.12:
+    dependencies:
+      icecast-metadata-js: 1.2.9
 
   iconv-corefoundation@1.1.7:
     dependencies:

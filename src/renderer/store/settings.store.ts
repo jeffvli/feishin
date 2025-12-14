@@ -640,6 +640,12 @@ export const sidebarItems: SidebarItemType[] = [
         route: AppRoute.PLAYLISTS,
     },
     {
+        disabled: false,
+        id: 'Radio',
+        label: i18n.t('page.sidebar.radio'),
+        route: AppRoute.RADIO,
+    },
+    {
         disabled: true,
         id: 'Settings',
         label: i18n.t('page.sidebar.settings'),
@@ -1500,10 +1506,19 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     state.lists['sidequeue']?.table.columns.push(...columns);
                 }
 
+                if (version <= 15) {
+                    state.general.sidebarItems.push({
+                        disabled: false,
+                        id: 'Radio',
+                        label: i18n.t('page.sidebar.radio'),
+                        route: AppRoute.RADIO,
+                    });
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 15,
+            version: 16,
         },
     ),
 );

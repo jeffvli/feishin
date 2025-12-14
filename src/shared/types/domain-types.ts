@@ -29,6 +29,7 @@ export enum LibraryItem {
     PLAYLIST = 'playlist',
     PLAYLIST_SONG = 'playlistSong',
     QUEUE_SONG = 'queueSong',
+    RADIO_STATION = 'radioStation',
     SONG = 'song',
 }
 
@@ -861,8 +862,6 @@ export const artistListSortMap: ArtistListSortMap = {
     },
 };
 
-// Artist Detail
-
 export enum PlaylistListSort {
     DURATION = 'duration',
     NAME = 'name',
@@ -870,6 +869,11 @@ export enum PlaylistListSort {
     PUBLIC = 'public',
     SONG_COUNT = 'songCount',
     UPDATED_AT = 'updatedAt',
+}
+
+export enum RadioListSort {
+    ID = 'id',
+    NAME = 'name',
 }
 
 export type AddToPlaylistArgs = BaseEndpointArgs & {
@@ -888,6 +892,18 @@ export type AddToPlaylistQuery = {
 // Add to playlist
 export type AddToPlaylistResponse = null | undefined;
 
+export type CreateInternetRadioStationArgs = BaseEndpointArgs & {
+    body: CreateInternetRadioStationBody;
+};
+
+export type CreateInternetRadioStationBody = {
+    homepageUrl?: string;
+    name: string;
+    streamUrl: string;
+};
+
+export type CreateInternetRadioStationResponse = null | undefined;
+
 export type CreatePlaylistArgs = BaseEndpointArgs & { body: CreatePlaylistBody };
 
 export type CreatePlaylistBody = {
@@ -902,6 +918,16 @@ export type CreatePlaylistBody = {
 
 // Create Playlist
 export type CreatePlaylistResponse = undefined | { id: string };
+
+export type DeleteInternetRadioStationArgs = BaseEndpointArgs & {
+    query: DeleteInternetRadioStationQuery;
+};
+
+export type DeleteInternetRadioStationQuery = {
+    id: string;
+};
+
+export type DeleteInternetRadioStationResponse = null | undefined;
 
 export type DeletePlaylistArgs = BaseEndpointArgs & {
     query: DeletePlaylistQuery;
@@ -921,6 +947,17 @@ export type FavoriteQuery = {
 
 // Favorite
 export type FavoriteResponse = null | undefined;
+
+export type GetInternetRadioStationsArgs = BaseEndpointArgs;
+
+export type GetInternetRadioStationsResponse = InternetRadioStation[];
+
+export type InternetRadioStation = {
+    homepageUrl?: null | string;
+    id: string;
+    name: string;
+    streamUrl: string;
+};
 
 export type PlaylistListArgs = BaseEndpointArgs & { query: PlaylistListQuery };
 
@@ -989,6 +1026,23 @@ export type ShareItemBody = {
 // Sharing
 export type ShareItemResponse = undefined | { id: string };
 
+export type UpdateInternetRadioStationArgs = BaseEndpointArgs & {
+    body: UpdateInternetRadioStationBody;
+    query: UpdateInternetRadioStationQuery;
+};
+
+export type UpdateInternetRadioStationBody = {
+    homepageUrl?: string;
+    name: string;
+    streamUrl: string;
+};
+
+export type UpdateInternetRadioStationQuery = {
+    id: string;
+};
+
+export type UpdateInternetRadioStationResponse = null | undefined;
+
 export type UpdatePlaylistArgs = BaseEndpointArgs & {
     body: UpdatePlaylistBody;
     query: UpdatePlaylistQuery;
@@ -1011,57 +1065,6 @@ export type UpdatePlaylistQuery = {
 
 // Update Playlist
 export type UpdatePlaylistResponse = null | undefined;
-
-// Internet Radio Stations
-export type InternetRadioStation = {
-    homepageUrl?: string | null;
-    id: string;
-    name: string;
-    streamUrl: string;
-};
-
-export type CreateInternetRadioStationArgs = BaseEndpointArgs & {
-    body: CreateInternetRadioStationBody;
-};
-
-export type CreateInternetRadioStationBody = {
-    homepageUrl?: string;
-    name: string;
-    streamUrl: string;
-};
-
-export type CreateInternetRadioStationResponse = null | undefined;
-
-export type DeleteInternetRadioStationArgs = BaseEndpointArgs & {
-    query: DeleteInternetRadioStationQuery;
-};
-
-export type DeleteInternetRadioStationQuery = {
-    id: string;
-};
-
-export type DeleteInternetRadioStationResponse = null | undefined;
-
-export type GetInternetRadioStationsArgs = BaseEndpointArgs;
-
-export type GetInternetRadioStationsResponse = InternetRadioStation[];
-
-export type UpdateInternetRadioStationArgs = BaseEndpointArgs & {
-    body: UpdateInternetRadioStationBody;
-    query: UpdateInternetRadioStationQuery;
-};
-
-export type UpdateInternetRadioStationBody = {
-    homepageUrl?: string;
-    name: string;
-    streamUrl: string;
-};
-
-export type UpdateInternetRadioStationQuery = {
-    id: string;
-};
-
-export type UpdateInternetRadioStationResponse = null | undefined;
 
 type PlaylistListSortMap = {
     jellyfin: Record<PlaylistListSort, JFPlaylistListSort | undefined>;

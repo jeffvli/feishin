@@ -16,6 +16,11 @@ import { useQueueRestoreTimestamp } from '/@/renderer/features/player/hooks/use-
 import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import {
+    useIsPlayingRadio,
+    useRadioAudioInstance,
+    useRadioMetadata,
+} from '/@/renderer/features/radio/hooks/use-radio-player';
+import {
     updateQueueFavorites,
     updateQueueRatings,
     useCurrentServerId,
@@ -48,6 +53,10 @@ export const AudioPlayers = () => {
     usePlaybackHotkeys();
     useAutoDJ();
     useQueueRestoreTimestamp();
+
+    // Initialize radio player globally
+    useRadioAudioInstance();
+    useRadioMetadata();
 
     useEffect(() => {
         if (webAudio && 'AudioContext' in window) {
@@ -123,6 +132,13 @@ export const AudioPlayers = () => {
             eventEmitter.off('USER_RATING', handleRating);
         };
     }, [serverId]);
+
+    const isPlayingRadio = useIsPlayingRadio();
+
+    // Disable the default audio players if radio is playing
+    if (isPlayingRadio) {
+        return null;
+    }
 
     return (
         <>

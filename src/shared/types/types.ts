@@ -28,6 +28,7 @@ export enum ItemListKey {
     PLAYLIST = LibraryItem.PLAYLIST,
     PLAYLIST_SONG = LibraryItem.PLAYLIST_SONG,
     QUEUE_SONG = LibraryItem.QUEUE_SONG,
+    RADIO = 'radio',
     SIDE_QUEUE = 'sideQueue',
     SONG = LibraryItem.SONG,
 }

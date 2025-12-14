@@ -17,6 +17,7 @@ const SIDEBAR_ITEMS: Array<[string, string]> = [
     ['Home', 'page.sidebar.home'],
     ['Now Playing', 'page.sidebar.nowPlaying'],
     ['Playlists', 'page.sidebar.playlists'],
+    ['Radio', 'page.sidebar.radio'],
     ['Search', 'page.sidebar.search'],
     ['Settings', 'page.sidebar.settings'],
     ['Tracks', 'page.sidebar.tracks'],

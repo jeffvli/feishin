@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './sidebar.module.css';
 
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
+import { useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { ServerSelector } from '/@/renderer/features/sidebar/components/server-selector';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
@@ -52,6 +53,7 @@ export const Sidebar = () => {
             Home: t('page.sidebar.home', { postProcess: 'titleCase' }),
             'Now Playing': t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
             Playlists: t('page.sidebar.playlists', { postProcess: 'titleCase' }),
+            Radio: t('page.sidebar.radio', { postProcess: 'titleCase' }),
             Search: t('page.sidebar.search', { postProcess: 'titleCase' }),
             Settings: t('page.sidebar.settings', { postProcess: 'titleCase' }),
             Tracks: t('page.sidebar.tracks', { postProcess: 'titleCase' }),
@@ -61,7 +63,9 @@ export const Sidebar = () => {
 
     const { sidebarItems } = useGeneralSettings();
     const { windowBarStyle } = useWindowSettings();
-    const showImage = useAppStore((state) => state.sidebar.image);
+    const sidebarImageEnabled = useAppStore((state) => state.sidebar.image);
+    const isRadioPlaying = useRadioStore((state) => state.isPlaying);
+    const showImage = sidebarImageEnabled && !isRadioPlaying;
 
     const sidebarItemsWithRoute: SidebarItemType[] = useMemo(() => {
         if (!sidebarItems) return [];

@@ -830,7 +830,9 @@ export const SubsonicController: InternalControllerEndpoint = {
             throw new Error('Failed to get internet radio stations');
         }
 
-        return res.body.internetRadioStations?.internetRadioStation || [];
+        const stations = res.body.internetRadioStations?.internetRadioStation || [];
+
+        return stations.map((station) => ssNormalize.internetRadioStation(station));
     },
     getMusicFolderList: async (args) => {
         const { apiClientProps } = args;

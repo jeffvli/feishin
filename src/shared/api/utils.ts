@@ -12,7 +12,9 @@ import {
     AlbumArtistListSort,
     AlbumListSort,
     ArtistListSort,
+    InternetRadioStation,
     LibraryItem,
+    RadioListSort,
     ServerListItem,
     Song,
     SongListSort,
@@ -365,6 +367,7 @@ export const sortAlbumArtistList = (
 
     return results;
 };
+
 export const sortAlbumList = (albums: Album[], sortBy: AlbumListSort, sortOrder: SortOrder) => {
     let results = albums;
 
@@ -407,6 +410,32 @@ export const sortAlbumList = (albums: Album[], sortBy: AlbumListSort, sortOrder:
             break;
         case AlbumListSort.YEAR:
             results = orderBy(results, ['releaseYear'], [order]);
+            break;
+        default:
+            break;
+    }
+
+    return results;
+};
+
+export const sortRadioList = (
+    stations: InternetRadioStation[],
+    sortBy: RadioListSort,
+    sortOrder: SortOrder,
+) => {
+    let results = stations;
+
+    const order = sortOrder === SortOrder.ASC ? 'asc' : 'desc';
+
+    switch (sortBy) {
+        case RadioListSort.ID:
+            results = [...results];
+            if (order === 'desc') {
+                results.reverse();
+            }
+            break;
+        case RadioListSort.NAME:
+            results = orderBy(results, [(v) => v.name.toLowerCase()], [order]);
             break;
         default:
             break;

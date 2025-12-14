@@ -4,7 +4,9 @@
         "addToPlaylist": "add to $t(entity.playlist_one)",
         "clearQueue": "clear queue",
         "createPlaylist": "create $t(entity.playlist_one)",
+        "createRadioStation": "create $t(entity.radioStation_one)",
         "deletePlaylist": "delete $t(entity.playlist_one)",
+        "deleteRadioStation": "delete $t(entity.radioStation_one)",
         "deselectAll": "deselect all",
         "downloadStarted": "started download of {{count}} items",
         "editPlaylist": "edit $t(entity.playlist_one)",
@@ -158,6 +160,10 @@
         "albumArtistCount_other": "{{count}} album artists",
         "albumWithCount_one": "{{count}} album",
         "albumWithCount_other": "{{count}} albums",
+        "radioStation_one": "radio station",
+        "radioStation_other": "radio stations",
+        "radioStationWithCount_one": "{{count}} radio station",
+        "radioStationWithCount_other": "{{count}} radio stations",
         "artist_one": "artist",
         "artist_other": "artists",
         "artistWithCount_one": "{{count}} artist",
@@ -316,6 +322,13 @@
             "success": "$t(entity.playlist_one) created successfully",
             "title": "create $t(entity.playlist_one)"
         },
+        "createRadioStation": {
+            "success": "radio station created successfully",
+            "title": "create radio station",
+            "input_homepageUrl": "homepage url",
+            "input_name": "name",
+            "input_streamUrl": "stream url"
+        },
         "deletePlaylist": {
             "input_confirm": "type the name of the $t(entity.playlist_one) to confirm",
             "success": "$t(entity.playlist_one) deleted successfully",
@@ -397,6 +410,9 @@
             "artistAlbums": "albums by {{artist}}",
             "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
             "title": "$t(entity.album_other)"
+        },
+        "radioList": {
+            "title": "radio stations"
         },
         "favorites": {
             "title": "$t(entity.favorite_other)"
@@ -546,6 +562,7 @@
             "folders": "$t(entity.folder_other)",
             "genres": "$t(entity.genre_other)",
             "home": "$t(common.home)",
+            "radio": "$t(entity.radioStation_other)",
             "myLibrary": "my library",
             "nowPlaying": "now playing",
             "playlists": "$t(entity.playlist_other)",
