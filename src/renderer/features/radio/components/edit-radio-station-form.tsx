@@ -121,6 +121,6 @@ export const openEditRadioStationModal = (
 
     openModal({
         children: <EditRadioStationForm onCancel={closeAllModals} station={station} />,
-        title: t('action.editRadioStation', { postProcess: 'titleCase' }) as string,
+        title: t('common.edit', { postProcess: 'titleCase' }) as string,
     });
 };
