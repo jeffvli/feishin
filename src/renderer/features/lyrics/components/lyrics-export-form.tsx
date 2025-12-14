@@ -1,6 +1,6 @@
 import { closeAllModals, openModal } from '@mantine/modals';
 import formatDuration from 'format-duration';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
@@ -39,10 +39,11 @@ export const LyricsExportForm = ({ lyrics, offsetMs, synced }: LyricsExportFormP
             return `[ar:${lyrics.artist}]
 [ti:${lyrics.name}]
 [offset:${form.values.offsetMs + (lyrics.offsetMs ?? 0)}]
-${contents}`;
+${contents}
+`;
         } else {
             if (Array.isArray(lyrics.lyrics)) {
-                return lyrics.lyrics.map((lyric) => lyric[1]).join('\n');
+                return lyrics.lyrics.map((lyric) => lyric[1]).join('\n') + '\n';
             }
             return lyrics.lyrics;
         }
@@ -54,6 +55,23 @@ ${contents}`;
         lyrics.name,
         lyrics.offsetMs,
     ]);
+
+    const exportLyrics = useCallback(() => {
+        const extension = form.values.synced ? '.lrc' : '.txt';
+        const lyricFile = new File([displayedLyrics], lyrics.name + extension, {
+            type: 'text/plain',
+        });
+
+        const lyricsFileLink = document.createElement('a');
+        const lyricsFileUrl = URL.createObjectURL(lyricFile);
+        lyricsFileLink.href = lyricsFileUrl;
+        lyricsFileLink.download = lyricFile.name;
+        lyricsFileLink.click();
+
+        URL.revokeObjectURL(lyricsFileUrl);
+
+        closeAllModals();
+    }, [displayedLyrics, form.values.synced, lyrics.name]);
 
     return (
         <Stack h="100%" w="100%">
@@ -83,11 +101,11 @@ ${contents}`;
             <Divider />
             <Group justify="flex-end">
                 <Button onClick={() => closeAllModals()} variant="default">
-                    {t('common.cancel', { postProcess: 'titleCase' })}
+                    {t('common.close', { postProcess: 'titleCase' })}
                 </Button>
-                {/* <Button disabled={!selectedResult} onClick={handleApply} variant="filled">
-                    {t('common.confirm', { postProcess: 'titleCase' })}
-                </Button> */}
+                <Button onClick={exportLyrics} variant="filled">
+                    {t('form.lyricsExport.export', { postProcess: 'titleCase' })}
+                </Button>
             </Group>
         </Stack>
     );
