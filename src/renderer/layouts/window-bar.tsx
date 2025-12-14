@@ -151,7 +151,19 @@ export const WindowBar = () => {
         if (isRadioActive) {
             const radioStatusString = !isRadioPlaying ? '(Paused) ' : '';
             const radioTitle = stationName || 'Radio';
-            const radioMetadata = metadata ? ` — ${metadata}` : '';
+
+            // Format metadata: show title, or combine artist and title if both available
+            let radioMetadata = '';
+            if (metadata) {
+                if (metadata.title && metadata.artist) {
+                    radioMetadata = ` — ${metadata.artist} — ${metadata.title}`;
+                } else if (metadata.title) {
+                    radioMetadata = ` — ${metadata.title}`;
+                } else if (metadata.artist) {
+                    radioMetadata = ` — ${metadata.artist}`;
+                }
+            }
+
             return `${radioStatusString}${radioTitle}${radioMetadata} — Feishin${privateMode ? ` ${privateModeString}` : ''}`;
         }
 

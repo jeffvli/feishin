@@ -8,19 +8,24 @@ import { usePlaybackType, usePlayerMuted, usePlayerVolume } from '/@/renderer/st
 import { toast } from '/@/shared/components/toast/toast';
 import { PlayerType } from '/@/shared/types/types';
 
+export interface RadioMetadata {
+    artist: null | string;
+    title: null | string;
+}
+
 interface RadioStore {
     actions: {
         pause: () => void;
         play: (streamUrl?: string, stationName?: string) => void;
         setCurrentStreamUrl: (currentStreamUrl: null | string) => void;
         setIsPlaying: (isPlaying: boolean) => void;
-        setMetadata: (metadata: null | string) => void;
+        setMetadata: (metadata: null | RadioMetadata) => void;
         setStationName: (stationName: null | string) => void;
         stop: () => void;
     };
     currentStreamUrl: null | string;
     isPlaying: boolean;
-    metadata: null | string;
+    metadata: null | RadioMetadata;
     stationName: null | string;
 }
 
@@ -38,9 +43,13 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
                     return state;
                 }
 
+                // Reset metadata when switching stations (streamUrl changes)
+                const isSwitchingStation = newStreamUrl !== state.currentStreamUrl;
+
                 return {
                     currentStreamUrl: newStreamUrl,
                     isPlaying: true,
+                    metadata: isSwitchingStation ? null : state.metadata,
                     stationName: newStationName,
                 };
             });
@@ -182,7 +191,6 @@ export const useRadioAudioInstance = () => {
             audio.volume = logVolume;
             audio.muted = isMuted;
 
-            // Set up event listeners
             audio.addEventListener('play', () => {
                 setIsPlaying(true);
             });
@@ -264,8 +272,8 @@ export const useRadioMetadata = () => {
 
             const fetchMpvMetadata = async () => {
                 try {
-                    const streamTitle = await mpvPlayer.getStreamMetadata();
-                    setMetadata(streamTitle);
+                    const metadata = await mpvPlayer.getStreamMetadata();
+                    setMetadata(metadata);
                 } catch {
                     // Ignore error
                 }
@@ -299,7 +307,23 @@ export const useRadioMetadata = () => {
                         streamTitle = stats.icy.StreamTitle;
                     }
 
-                    setMetadata(streamTitle);
+                    // Parse the combined format into title and artist
+                    let artist: null | string = null;
+                    let title: null | string = null;
+
+                    if (streamTitle) {
+                        // Try to parse "Artist - Title" format
+                        const match = streamTitle.match(/^(.*?)\s*[-–—]\s*(.+)$/);
+                        if (match) {
+                            artist = match[1].trim() || null;
+                            title = match[2].trim() || null;
+                        } else {
+                            // If no separator found, treat the whole thing as title
+                            title = streamTitle;
+                        }
+                    }
+
+                    setMetadata(title || artist ? { artist, title } : null);
                 },
                 sources: ['icy'],
             });

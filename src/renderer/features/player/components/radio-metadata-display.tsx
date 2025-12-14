@@ -1,9 +1,11 @@
 import clsx from 'clsx';
 import React from 'react';
+import { Link } from 'react-router';
 
 import styles from './left-controls.module.css';
 
 import { useIsRadioActive, useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { AppRoute } from '/@/renderer/router/routes';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
@@ -18,14 +20,10 @@ export const RadioMetadataDisplay = ({
     onStopPropagation,
     onToggleContextMenu,
 }: RadioMetadataDisplayProps) => {
-    const isRadioPlaying = useRadioStore((state) => state.isPlaying);
     const radioMetadata = useRadioStore((state) => state.metadata);
     const stationName = useRadioStore((state) => state.stationName);
 
-    const isRadioMode = isRadioPlaying;
     const isRadioActive = useIsRadioActive();
-
-    const title = isRadioMode ? radioMetadata || '—' : '—';
 
     if (!isRadioActive) {
         return null;
@@ -41,16 +39,33 @@ export const RadioMetadataDisplay = ({
                     onContextMenu={onToggleContextMenu}
                     overflow="hidden"
                 >
-                    {title || '—'}
+                    {radioMetadata?.title || '—'}
                 </Text>
             </div>
             <div
                 className={clsx(styles.lineItem, styles.secondary, PlaybackSelectors.songArtist)}
                 onClick={onStopPropagation}
             >
+                <Text isMuted isNoSelect overflow="hidden" size="md">
+                    {radioMetadata?.artist || '—'}
+                </Text>
+            </div>
+            <div
+                className={clsx(styles.lineItem, styles.secondary, PlaybackSelectors.songAlbum)}
+                onClick={onStopPropagation}
+            >
                 <Group align="center" gap="xs" wrap="nowrap">
                     <Icon color="muted" icon="radio" size="sm" />
-                    <Text isMuted isNoSelect overflow="hidden" size="sm">
+                    <Text
+                        component={Link}
+                        fw={500}
+                        isLink
+                        isMuted
+                        isNoSelect
+                        overflow="hidden"
+                        size="md"
+                        to={AppRoute.RADIO}
+                    >
                         {stationName || '—'}
                     </Text>
                 </Group>
