@@ -42,17 +42,12 @@ export const CreateRadioStationForm = ({ onCancel }: CreateRadioStationFormProps
                 onError: (error) => {
                     toast.error({
                         message: (error as Error).message,
-                        title: t('action.createRadioStation.error', {
+                        title: t('error.genericError', {
                             postProcess: 'sentenceCase',
                         }) as string,
                     });
                 },
                 onSuccess: () => {
-                    toast.success({
-                        message: t('action.createRadioStation.success', {
-                            postProcess: 'sentenceCase',
-                        }) as string,
-                    });
                     closeAllModals();
                 },
             },

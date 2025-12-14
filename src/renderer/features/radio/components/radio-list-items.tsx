@@ -10,7 +10,7 @@ import {
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { useDeleteRadioStation } from '/@/renderer/features/radio/mutations/delete-radio-station-mutation';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServer, usePermissions } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
@@ -35,6 +35,7 @@ const RadioListItem = ({ station }: RadioListItemProps) => {
     const { currentStreamUrl, isPlaying } = useRadioPlayer();
     const { pause, play, stop } = useRadioControls();
     const server = useCurrentServer();
+    const permissions = usePermissions();
     const deleteRadioStationMutation = useDeleteRadioStation({});
 
     const isCurrentStation = currentStreamUrl === station.streamUrl;
@@ -125,22 +126,33 @@ const RadioListItem = ({ station }: RadioListItemProps) => {
                         )}
                     </Stack>
                 </button>
-                <Group gap="xs">
-                    <ActionIcon
-                        icon="edit"
-                        onClick={handleEditClick}
-                        size="sm"
-                        tooltip={{ label: t('common.edit', { postProcess: 'sentenceCase' }) }}
-                        variant="subtle"
-                    />
-                    <ActionIcon
-                        icon="delete"
-                        onClick={handleDeleteClick}
-                        size="sm"
-                        tooltip={{ label: t('common.delete', { postProcess: 'sentenceCase' }) }}
-                        variant="subtle"
-                    />
-                </Group>
+                {(permissions.radio.edit || permissions.radio.delete) && (
+                    <Group gap="xs">
+                        {permissions.radio.edit && (
+                            <ActionIcon
+                                icon="edit"
+                                onClick={handleEditClick}
+                                size="sm"
+                                tooltip={{
+                                    label: t('common.edit', { postProcess: 'sentenceCase' }),
+                                }}
+                                variant="subtle"
+                            />
+                        )}
+                        {permissions.radio.delete && (
+                            <ActionIcon
+                                icon="delete"
+                                iconProps={{ color: 'error' }}
+                                onClick={handleDeleteClick}
+                                size="sm"
+                                tooltip={{
+                                    label: t('common.delete', { postProcess: 'sentenceCase' }),
+                                }}
+                                variant="subtle"
+                            />
+                        )}
+                    </Group>
+                )}
             </Flex>
         </Paper>
     );

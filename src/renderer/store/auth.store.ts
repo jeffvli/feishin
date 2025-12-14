@@ -163,6 +163,11 @@ export const usePermissions = () => {
         playlists: {
             editPublic: isAdmin,
         },
+        radio: {
+            create: isAdmin,
+            delete: isAdmin,
+            edit: isAdmin,
+        },
         userId: userId,
     };
 };
