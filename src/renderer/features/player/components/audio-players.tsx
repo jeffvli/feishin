@@ -16,7 +16,7 @@ import { useQueueRestoreTimestamp } from '/@/renderer/features/player/hooks/use-
 import { useScrobble } from '/@/renderer/features/player/hooks/use-scrobble';
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import {
-    useIsPlayingRadio,
+    useIsRadioActive,
     useRadioAudioInstance,
     useRadioMetadata,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
@@ -54,7 +54,6 @@ export const AudioPlayers = () => {
     useAutoDJ();
     useQueueRestoreTimestamp();
 
-    // Initialize radio player globally
     useRadioAudioInstance();
     useRadioMetadata();
 
@@ -133,10 +132,13 @@ export const AudioPlayers = () => {
         };
     }, [serverId]);
 
-    const isPlayingRadio = useIsPlayingRadio();
+    const isRadioActive = useIsRadioActive();
 
-    // Disable the default audio players if radio is playing
-    if (isPlayingRadio) {
+    if (isRadioActive && playbackType === PlayerType.LOCAL) {
+        return <MpvPlayer />;
+    }
+
+    if (isRadioActive && playbackType === PlayerType.WEB) {
         return null;
     }
 
