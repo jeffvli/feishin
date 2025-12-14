@@ -5,7 +5,12 @@ import { createWithEqualityFn } from 'zustand/traditional';
 
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { convertToLogVolume } from '/@/renderer/features/player/audio-player/utils/player-utils';
-import { usePlaybackType, usePlayerMuted, usePlayerVolume } from '/@/renderer/store';
+import {
+    usePlaybackType,
+    usePlayerMuted,
+    usePlayerStoreBase,
+    usePlayerVolume,
+} from '/@/renderer/store';
 import { toast } from '/@/shared/components/toast/toast';
 import { PlayerStatus, PlayerType } from '/@/shared/types/types';
 
@@ -34,6 +39,7 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
     actions: {
         pause: () => {
             set({ isPlaying: false });
+            usePlayerStoreBase.getState().mediaPause();
         },
         play: (streamUrl?: string, stationName?: string) => {
             set((state) => {
@@ -46,6 +52,8 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
 
                 // Reset metadata when switching stations (streamUrl changes)
                 const isSwitchingStation = newStreamUrl !== state.currentStreamUrl;
+
+                usePlayerStoreBase.getState().mediaPlay();
 
                 return {
                     currentStreamUrl: newStreamUrl,
@@ -66,6 +74,7 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
                 metadata: null,
                 stationName: null,
             });
+            usePlayerStoreBase.getState().mediaStop();
         },
     },
     currentStreamUrl: null,
