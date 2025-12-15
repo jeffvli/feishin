@@ -17,6 +17,7 @@ export const THEME_DATA = [
     { label: 'Solarized Light', type: 'light', value: AppTheme.SOLARIZED_LIGHT },
     { label: 'GitHub Dark', type: 'dark', value: AppTheme.GITHUB_DARK },
     { label: 'GitHub Light', type: 'light', value: AppTheme.GITHUB_LIGHT },
+    { label: 'Glassy Dark', type: 'dark', value: AppTheme.GLASSY_DARK },
     { label: 'Monokai', type: 'dark', value: AppTheme.MONOKAI },
     { label: 'High Contrast Dark', type: 'dark', value: AppTheme.HIGH_CONTRAST_DARK },
     { label: 'High Contrast Light', type: 'light', value: AppTheme.HIGH_CONTRAST_LIGHT },

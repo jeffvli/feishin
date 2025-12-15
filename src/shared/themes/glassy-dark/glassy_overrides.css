@@ -1,0 +1,247 @@
+.fs-player-bar-module-container {
+    background: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(2rem);
+}
+
+.fs-poster-card-module-image {
+    border-radius: 18px !important;
+}
+
+.fs-grid-card-controls-module-grid-card-controls-container {
+    backdrop-filter: blur(5px);
+    border-radius: 18px;
+}
+
+.fsplayer-text {
+    font-size: 45px;
+    text-align: left;
+}
+
+.fs-full-screen-player-image-module-metadata-container {
+    width: 100%;
+}
+
+.fs-full-screen-player-queue-module-grid-container::before {
+    border-radius: 18px !important;
+}
+
+.mantine-Modal-overlay {
+    backdrop-filter: blur(3px);
+}
+
+.fs-modal-module-content,
+.fs-select-module-dropdown,
+.fs-popover-module-dropdown,
+.fs-dialog-module-root,
+.fs-context-menu-module-content,
+.fs-dropdown-menu-module-menu-dropdown,
+.fs-accordion-module-panel {
+    background: rgba(4, 4, 9, .5) !important;
+    backdrop-filter: blur(2rem);
+
+    button,
+    input,
+    .fs-multi-select-module-input,
+    a {
+        border-radius: 12px;
+    }
+}
+
+.fs-context-menu-module-content,
+.fs-dropdown-menu-module-menu-dropdown {
+    border-radius: 18px;
+}
+
+.fs-accordion-module-panel {
+    border-radius: 18px;
+    backdrop-filter: none !important;
+}
+
+.fs-accordion-module-control {
+    background-color: transparent;
+}
+
+.fs-modal-module-header {
+    background: rgba(4, 4, 9, .8) !important;
+    border-radius: 18px;
+}
+
+.fs-select-module-dropdown,
+.fs-popover-module-dropdown {
+    border-radius: 18px;
+}
+
+.mantine-Center-root img {
+    border-radius: 18px
+}
+
+.ag-header {
+    border-radius: 8px 8px 0px 0px;
+    background-color: transparent !important;
+}
+
+.fs-left-controls-module-playerbar-image {
+    border-radius: 8px !important;
+}
+
+.favorite_icon .mantine-ActionIcon-icon {
+    justify-content: left;
+}
+
+.fork-header svg {
+    margin-left: 5px;
+    padding-left: 2px;
+}
+
+.fs-button-module-root[data-variant='outline'] {
+    border-radius: 1rem;
+}
+
+.fs-poster-card-module-image-container {
+    /* clipping in the event of a favorite album */
+    border-radius: 8px !important
+}
+
+.mantine-Table-th {
+    background-color: transparent !important;
+}
+
+table {
+    border: 0px !important
+}
+
+.fs-sidebar-module-accordion-content a {
+    border-radius: 8px;
+}
+
+.fs-main-content-module-main-content-container {
+    height: 100vh
+}
+
+.mantine-Tabs-root {
+    input {
+        border-radius: 18px;
+    }
+
+    button:not(.mantine-focus-never) {
+        border-radius: 8px;
+    }
+}
+
+.mantine-Slider-track::before {
+    background-color: var(--theme-colors-surface);
+}
+
+.fs-image-module-image:not(.ag-cell .fs-image-module-image):not(.fs-left-controls-module-image .fs-image-module-image):not(.fs-sidebar-playlist-list-module-row-group .fs-image-module-image) {
+    border-radius: 18px !important;
+}
+
+.fs-left-controls-module-image {
+    border-radius: 12px;
+}
+
+.fork-server-selector {
+
+    .mantine-SegmentedControl-indicator,
+    .fs-segmented-control-module-root,
+    input,
+    button {
+        border-radius: 12px;
+    }
+}
+
+.fs-text-input-module-input,
+.fs-text-input-module-input,
+[cmdk-item][data-selected] {
+    background: rgba(4, 4, 9, .5) !important;
+    border-radius: 18px;
+    border: 0px;
+}
+
+.fs-modal-module-content [cmdk-separator] {
+    display: none
+}
+
+/* Button fixes */
+.fs-button-module-root[data-variant='filled'] {
+    border-radius: 12px;
+}
+
+.mantine-Accordion-label {
+
+    button,
+    a {
+        border-radius: 8px
+    }
+}
+
+.mantine-Grid-col button {
+    border-radius: 8px;
+}
+
+/* share dialog */
+.fs-modal-module-body {
+    .fs-textarea-module-input {
+        border-radius: 12px;
+    }
+
+    .fs-accordion-module-panel {
+        background-color: transparent;
+    }
+}
+
+.fs-feature-carousel-module-image-column {
+    align-items: normal !important;
+}
+
+.mantine-Badge-root {
+    background: #01010573;
+}
+
+.fs-sidebar-module-image-container img {
+    border-radius: 18px;
+}
+
+.fs-expanded-list-item-module-container {
+    bottom: 90px;
+    position: relative;
+
+    border-radius: 18px;
+}
+
+.fs-sidebar-play-queue-module-lyrics-section {
+    bottom: 90px;
+}
+
+.fs-page-header-module-container {
+    background-color: transparent;
+}
+
+.fs-tabs-module-tab {
+    border-radius: 0px !important;
+}
+
+.fs-full-screen-player-module-container .mantine-Group-root button {
+    border-radius: 100%;
+}
+
+.fs-full-screen-player-image-module-image {
+    border-radius: 18px;
+}
+
+.fs-segmented-control-module-root {
+    border-radius: 18px;
+}
+
+.fs-segmented-control-module-label[data-active='true'],
+.mantine-SegmentedControl-control {
+    border-radius: 8px;
+}
+
+.fs-table-config-module-group {
+    border-radius: 8px;
+}
+
+.fs-server-selector-module-button-group {
+    border-radius: 18px;
+}
