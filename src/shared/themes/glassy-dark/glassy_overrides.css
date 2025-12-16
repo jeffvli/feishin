@@ -1,5 +1,5 @@
 .fs-player-bar-module-container {
-    background: rgba(0, 0, 0, 0.4) !important;
+    background: rgb(0 0 0 / 40%) !important;
     backdrop-filter: blur(2rem);
 }
 
@@ -8,8 +8,8 @@
 }
 
 .fs-grid-card-controls-module-grid-card-controls-container {
-    backdrop-filter: blur(5px);
     border-radius: 18px;
+    backdrop-filter: blur(5px);
 }
 
 .fsplayer-text {
@@ -25,9 +25,11 @@
     border-radius: 18px !important;
 }
 
+/* stylelint-disable selector-class-pattern */
 .mantine-Modal-overlay {
     backdrop-filter: blur(3px);
 }
+/* stylelint-enable selector-class-pattern */
 
 .fs-modal-module-content,
 .fs-select-module-dropdown,
@@ -36,7 +38,7 @@
 .fs-context-menu-module-content,
 .fs-dropdown-menu-module-menu-dropdown,
 .fs-accordion-module-panel {
-    background: rgba(4, 4, 9, .5) !important;
+    background: rgb(4 4 9 / 50%) !important;
     backdrop-filter: blur(2rem);
 
     button,
@@ -62,7 +64,7 @@
 }
 
 .fs-modal-module-header {
-    background: rgba(4, 4, 9, .8) !important;
+    background: rgb(4 4 9 / 80%) !important;
     border-radius: 18px;
 }
 
@@ -71,26 +73,30 @@
     border-radius: 18px;
 }
 
+/* stylelint-disable selector-class-pattern */
 .mantine-Center-root img {
-    border-radius: 18px
+    border-radius: 18px;
 }
+/* stylelint-enable selector-class-pattern */
 
 .ag-header {
-    border-radius: 8px 8px 0px 0px;
     background-color: transparent !important;
+    border-radius: 8px 8px 0 0;
 }
 
 .fs-left-controls-module-playerbar-image {
     border-radius: 8px !important;
 }
 
+/* stylelint-disable selector-class-pattern */
 .favorite_icon .mantine-ActionIcon-icon {
     justify-content: left;
 }
+/* stylelint-enable selector-class-pattern */
 
 .fork-header svg {
-    margin-left: 5px;
     padding-left: 2px;
+    margin-left: 5px;
 }
 
 .fs-button-module-root[data-variant='outline'] {
@@ -98,16 +104,17 @@
 }
 
 .fs-poster-card-module-image-container {
-    /* clipping in the event of a favorite album */
-    border-radius: 8px !important
+    border-radius: 8px !important;
 }
 
+/* stylelint-disable selector-class-pattern */
 .mantine-Table-th {
     background-color: transparent !important;
 }
+/* stylelint-enable selector-class-pattern */
 
 table {
-    border: 0px !important
+    border: 0 !important;
 }
 
 .fs-sidebar-module-accordion-content a {
@@ -115,9 +122,10 @@ table {
 }
 
 .fs-main-content-module-main-content-container {
-    height: 100vh
+    height: 100vh;
 }
 
+/* stylelint-disable selector-class-pattern */
 .mantine-Tabs-root {
     input {
         border-radius: 18px;
@@ -127,22 +135,30 @@ table {
         border-radius: 8px;
     }
 }
+/* stylelint-enable selector-class-pattern */
 
+/* stylelint-disable selector-class-pattern */
 .mantine-Slider-track::before {
     background-color: var(--theme-colors-surface);
 }
+/* stylelint-enable selector-class-pattern */
 
-.fs-image-module-image:not(.ag-cell .fs-image-module-image):not(.fs-left-controls-module-image .fs-image-module-image):not(.fs-sidebar-playlist-list-module-row-group .fs-image-module-image) {
+/* stylelint-disable selector-not-notation */
+.fs-image-module-image:not(.ag-cell *)
+:not(.fs-left-controls-module-image *)
+:not(.fs-sidebar-playlist-list-module-row-group *) {
     border-radius: 18px !important;
 }
+/* stylelint-enable selector-not-notation */
 
 .fs-left-controls-module-image {
     border-radius: 12px;
 }
 
 .fork-server-selector {
-
+    /* stylelint-disable selector-class-pattern */
     .mantine-SegmentedControl-indicator,
+    /* stylelint-enable selector-class-pattern */
     .fs-segmented-control-module-root,
     input,
     button {
@@ -151,15 +167,14 @@ table {
 }
 
 .fs-text-input-module-input,
-.fs-text-input-module-input,
 [cmdk-item][data-selected] {
-    background: rgba(4, 4, 9, .5) !important;
+    background: rgb(4 4 9 / 50%) !important;
+    border: 0;
     border-radius: 18px;
-    border: 0px;
 }
 
 .fs-modal-module-content [cmdk-separator] {
-    display: none
+    display: none;
 }
 
 /* Button fixes */
@@ -167,17 +182,20 @@ table {
     border-radius: 12px;
 }
 
+/* stylelint-disable selector-class-pattern */
 .mantine-Accordion-label {
-
     button,
     a {
-        border-radius: 8px
+        border-radius: 8px;
     }
 }
+/* stylelint-enable selector-class-pattern */
 
+/* stylelint-disable selector-class-pattern */
 .mantine-Grid-col button {
     border-radius: 8px;
 }
+/* stylelint-enable selector-class-pattern */
 
 /* share dialog */
 .fs-modal-module-body {
@@ -194,18 +212,19 @@ table {
     align-items: normal !important;
 }
 
+/* stylelint-disable selector-class-pattern */
 .mantine-Badge-root {
-    background: #01010573;
+    background: rgb(1 1 5 / 45%);
 }
+/* stylelint-enable selector-class-pattern */
 
 .fs-sidebar-module-image-container img {
     border-radius: 18px;
 }
 
 .fs-expanded-list-item-module-container {
-    bottom: 90px;
     position: relative;
-
+    bottom: 90px;
     border-radius: 18px;
 }
 
@@ -218,12 +237,14 @@ table {
 }
 
 .fs-tabs-module-tab {
-    border-radius: 0px !important;
+    border-radius: 0 !important;
 }
 
+/* stylelint-disable selector-class-pattern */
 .fs-full-screen-player-module-container .mantine-Group-root button {
     border-radius: 100%;
 }
+/* stylelint-enable selector-class-pattern */
 
 .fs-full-screen-player-image-module-image {
     border-radius: 18px;
@@ -234,9 +255,11 @@ table {
 }
 
 .fs-segmented-control-module-label[data-active='true'],
+/* stylelint-disable selector-class-pattern */
 .mantine-SegmentedControl-control {
     border-radius: 8px;
 }
+/* stylelint-enable selector-class-pattern */
 
 .fs-table-config-module-group {
     border-radius: 8px;
