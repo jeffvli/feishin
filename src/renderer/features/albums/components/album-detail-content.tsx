@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import clsx from 'clsx';
 import { ReactNode, Suspense, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
@@ -403,7 +402,7 @@ export const AlbumDetailContent = () => {
                 {labels && (
                     <Stack gap="xs">
                         {labels.map((label) => (
-                            <Text className={clsx(styles.releaseLabel)} key={`label-${label}`}>
+                            <Text isMuted key={`label-${label}`} size="sm">
                                 ℗{releaseYear ? ` ${releaseYear}` : ''} {label}
                             </Text>
                         ))}
