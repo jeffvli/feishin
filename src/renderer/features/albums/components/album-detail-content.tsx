@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import clsx from 'clsx';
 import { ReactNode, Suspense, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
@@ -362,6 +363,9 @@ export const AlbumDetailContent = () => {
 
     const comment = detailQuery?.data?.comment;
 
+    const releaseYear = detailQuery?.data?.releaseYear;
+    const labels = detailQuery?.data?.recordLabels;
+
     const mbzId = detailQuery?.data?.mbzId;
 
     return (
@@ -396,7 +400,14 @@ export const AlbumDetailContent = () => {
                         </Stack>
                     </div>
                 </div>
-
+                <Stack gap="xs">
+                    {labels &&
+                        labels.map((label) => (
+                            <Text className={clsx(styles.releaseLabel)} key={`label-${label}`}>
+                                ©{releaseYear ? ` ${releaseYear}` : ''} {label}
+                            </Text>
+                        ))}
+                </Stack>
                 <Stack gap="lg" mt="3rem">
                     {cq.height || cq.width ? (
                         <Suspense fallback={<Spinner container />}>

@@ -79,3 +79,8 @@
         overflow-y: auto;
     }
 }
+
+.release-label {
+    font-size: var(--theme-font-size-sm);
+    color: var(--theme-colors-foreground-muted);
+}
