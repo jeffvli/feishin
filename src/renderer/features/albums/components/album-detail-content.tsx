@@ -400,14 +400,15 @@ export const AlbumDetailContent = () => {
                         </Stack>
                     </div>
                 </div>
-                <Stack gap="xs">
-                    {labels &&
-                        labels.map((label) => (
+                {labels && (
+                    <Stack gap="xs">
+                        {labels.map((label) => (
                             <Text className={clsx(styles.releaseLabel)} key={`label-${label}`}>
                                 ©{releaseYear ? ` ${releaseYear}` : ''} {label}
                             </Text>
                         ))}
-                </Stack>
+                    </Stack>
+                )}
                 <Stack gap="lg" mt="3rem">
                     {cq.height || cq.width ? (
                         <Suspense fallback={<Spinner container />}>
