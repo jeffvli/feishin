@@ -404,7 +404,7 @@ export const AlbumDetailContent = () => {
                     <Stack gap="xs">
                         {labels.map((label) => (
                             <Text className={clsx(styles.releaseLabel)} key={`label-${label}`}>
-                                ©{releaseYear ? ` ${releaseYear}` : ''} {label}
+                                ℗{releaseYear ? ` ${releaseYear}` : ''} {label}
                             </Text>
                         ))}
                     </Stack>
