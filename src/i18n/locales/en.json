@@ -328,7 +328,7 @@
             "title": "edit $t(entity.playlist_one)"
         },
         "lyricsExport": {
-            "export": "export file",
+            "export": "export lyrics",
             "input_synced": "export synced lyrics",
             "input_offset": "$t(setting.lyricOffset)"
         },
