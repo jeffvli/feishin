@@ -7,7 +7,7 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { PlaylistDetailSongListEditTable } from '/@/renderer/features/playlists/components/playlist-detail-song-list-table';
-import { useCurrentServer, useListSettings } from '/@/renderer/store';
+import { useCurrentServer, useGeneralSettings, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { PlaylistSongListQuery, PlaylistSongListResponse } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, TableColumn } from '/@/shared/types/types';
@@ -80,13 +80,22 @@ export type OverridePlaylistSongListQuery = Omit<Partial<PlaylistSongListQuery>,
 export const PlaylistDetailSongListView = ({ data }: { data: PlaylistSongListResponse }) => {
     const server = useCurrentServer();
     const { display, table } = useListSettings(ItemListKey.PLAYLIST_SONG);
+    const { showRatings } = useGeneralSettings();
+
+    const columns = useMemo(() => {
+        if (showRatings) {
+            return table.columns;
+        } else {
+            return table.columns.filter((column) => column.id !== 'userRating');
+        }
+    }, [table, showRatings]);
 
     switch (display) {
         case ListDisplayType.TABLE: {
             return (
                 <PlaylistDetailSongListTable
                     autoFitColumns={table.autoFitColumns}
-                    columns={table.columns}
+                    columns={columns}
                     data={data}
                     enableAlternateRowColors={table.enableAlternateRowColors}
                     enableHorizontalBorders={table.enableHorizontalBorders}

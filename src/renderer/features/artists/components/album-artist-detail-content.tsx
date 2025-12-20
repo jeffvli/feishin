@@ -155,11 +155,13 @@ const AlbumArtistMetadataBiography = ({
 
 interface AlbumArtistMetadataTopSongsProps {
     routeId: string;
+    showRatings: boolean;
     topSongsQuery: ReturnType<typeof useQuery<TopSongListResponse>>;
 }
 
 const AlbumArtistMetadataTopSongs = ({
     routeId,
+    showRatings,
     topSongsQuery,
 }: AlbumArtistMetadataTopSongsProps) => {
     const { t } = useTranslation();
@@ -172,8 +174,13 @@ const AlbumArtistMetadataTopSongs = ({
     const songs = useMemo(() => topSongsQuery?.data?.items || [], [topSongsQuery?.data?.items]);
 
     const columns = useMemo(() => {
-        return tableConfig?.columns || [];
-    }, [tableConfig?.columns]);
+        const tableColumns = tableConfig?.columns || [];
+        if (showRatings) {
+            return tableColumns;
+        } else {
+            return tableColumns.filter((column) => column.id !== 'userRating');
+        }
+    }, [tableConfig?.columns, showRatings]);
 
     const filteredSongs = useMemo(() => {
         const filtered = searchLibraryItems(songs, searchTerm, LibraryItem.SONG);
@@ -405,7 +412,7 @@ const AlbumArtistMetadataExternalLinks = ({
 
 export const AlbumArtistDetailContent = () => {
     const { t } = useTranslation();
-    const { artistItems, externalLinks, lastFM, musicBrainz } = useGeneralSettings();
+    const { artistItems, externalLinks, lastFM, musicBrainz, showRatings } = useGeneralSettings();
     const { albumArtistId, artistId } = useParams() as {
         albumArtistId?: string;
         artistId?: string;
@@ -579,6 +586,7 @@ export const AlbumArtistDetailContent = () => {
                         <Grid.Col order={itemOrder.topSongs} span={12}>
                             <AlbumArtistMetadataTopSongs
                                 routeId={routeId}
+                                showRatings={showRatings}
                                 topSongsQuery={topSongsQuery}
                             />
                         </Grid.Col>

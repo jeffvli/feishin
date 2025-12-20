@@ -4,7 +4,12 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { ListFilters, ListFiltersTitle } from '/@/renderer/features/shared/components/list-filters';
 import { ListWithSidebarContainer } from '/@/renderer/features/shared/components/list-with-sidebar-container';
 import { useSongListFilters } from '/@/renderer/features/songs/hooks/use-song-list-filters';
-import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
+import {
+    ItemListSettings,
+    useCurrentServer,
+    useGeneralSettings,
+    useListSettings,
+} from '/@/renderer/store';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -85,6 +90,7 @@ export const SongListView = ({
 }: ItemListSettings & { overrideQuery?: OverrideSongListQuery }) => {
     const server = useCurrentServer();
     const { pageKey } = useListContext();
+    const { showRatings } = useGeneralSettings();
 
     const { query } = useSongListFilters(pageKey as ItemListKey);
 
@@ -100,6 +106,14 @@ export const SongListView = ({
             sortOrder: overrideQuery.sortOrder || query.sortOrder,
         };
     }, [query, overrideQuery]);
+
+    const columns = useMemo(() => {
+        if (showRatings) {
+            return table.columns;
+        } else {
+            return table.columns.filter((column) => column.id !== 'userRating');
+        }
+    }, [table, showRatings]);
 
     switch (display) {
         case ListDisplayType.GRID: {
@@ -134,7 +148,7 @@ export const SongListView = ({
                     return (
                         <SongListInfiniteTable
                             autoFitColumns={table.autoFitColumns}
-                            columns={table.columns}
+                            columns={columns}
                             enableAlternateRowColors={table.enableAlternateRowColors}
                             enableHorizontalBorders={table.enableHorizontalBorders}
                             enableRowHoverHighlight={table.enableRowHoverHighlight}
@@ -149,7 +163,7 @@ export const SongListView = ({
                     return (
                         <SongListPaginatedTable
                             autoFitColumns={table.autoFitColumns}
-                            columns={table.columns}
+                            columns={columns}
                             enableAlternateRowColors={table.enableAlternateRowColors}
                             enableHorizontalBorders={table.enableHorizontalBorders}
                             enableRowHoverHighlight={table.enableRowHoverHighlight}

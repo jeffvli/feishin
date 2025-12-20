@@ -14,7 +14,12 @@ import { useFolderListFilters } from '/@/renderer/features/folders/hooks/use-fol
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { ListWithSidebarContainer } from '/@/renderer/features/shared/components/list-with-sidebar-container';
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
-import { useCurrentServerId, useListSettings, usePlayerSong } from '/@/renderer/store';
+import {
+    useCurrentServerId,
+    useGeneralSettings,
+    useListSettings,
+    usePlayerSong,
+} from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Folder, LibraryItem, Song, SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, Play } from '/@/shared/types/types';
@@ -89,6 +94,7 @@ export const FolderListView = ({ folderQuery }: FolderListViewProps) => {
     const { setItemCount } = useListContext();
     const { currentFolderId, navigateToFolder } = useFolderListFilters();
     const serverId = useCurrentServerId();
+    const { showRatings } = useGeneralSettings();
 
     const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
         enabled: true,
@@ -151,6 +157,14 @@ export const FolderListView = ({ folderQuery }: FolderListViewProps) => {
         };
     }, [navigateToFolder, player]);
 
+    const columns = useMemo(() => {
+        if (showRatings) {
+            return table.columns;
+        } else {
+            return table.columns.filter((column) => column.id !== 'userRating');
+        }
+    }, [table, showRatings]);
+
     const currentSong = usePlayerSong();
 
     switch (display) {
@@ -176,7 +190,7 @@ export const FolderListView = ({ folderQuery }: FolderListViewProps) => {
                     activeRowId={currentSong?.id}
                     autoFitColumns={table.autoFitColumns}
                     CellComponent={ItemTableListColumn}
-                    columns={table.columns}
+                    columns={columns}
                     data={allItems}
                     enableAlternateRowColors={table.enableAlternateRowColors}
                     enableDrag={true}

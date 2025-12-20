@@ -556,6 +556,27 @@ export const ApplicationSettings = () => {
         {
             control: (
                 <Switch
+                    defaultChecked={settings.showRatings}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                showRatings: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.showRatings', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.showRatings', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
                     aria-label={t('setting.playerbarOpenDrawer', { postProcess: 'sentenceCase' })}
                     defaultChecked={settings.playerbarOpenDrawer}
                     onChange={(e) =>

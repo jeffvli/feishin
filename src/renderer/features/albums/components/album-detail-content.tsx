@@ -324,7 +324,7 @@ export const AlbumDetailContent = () => {
     );
 
     const { ref, ...cq } = useContainerQuery();
-    const { externalLinks, lastFM, musicBrainz } = useGeneralSettings();
+    const { externalLinks, lastFM, musicBrainz, showRatings } = useGeneralSettings();
 
     const carousels = [
         {
@@ -380,7 +380,10 @@ export const AlbumDetailContent = () => {
                 <div className={styles.contentLayout}>
                     <div className={styles.songsColumn}>
                         {detailQuery?.data?.songs && detailQuery.data.songs.length > 0 && (
-                            <AlbumDetailSongsTable songs={detailQuery.data.songs} />
+                            <AlbumDetailSongsTable
+                                showRatings={showRatings}
+                                songs={detailQuery.data.songs}
+                            />
                         )}
                     </div>
                     <div className={styles.metadataColumn}>
@@ -433,10 +436,11 @@ export const AlbumDetailContent = () => {
 };
 
 interface AlbumDetailSongsTableProps {
+    showRatings: boolean;
     songs: Song[];
 }
 
-const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
+const AlbumDetailSongsTable = ({ showRatings, songs }: AlbumDetailSongsTableProps) => {
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
     const tableConfig = useSettingsStore((state) => state.lists[ItemListKey.ALBUM_DETAIL]?.table);
@@ -447,8 +451,13 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
     const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
 
     const columns = useMemo(() => {
-        return tableConfig?.columns || [];
-    }, [tableConfig?.columns]);
+        const tableColumns = tableConfig?.columns || [];
+        if (showRatings) {
+            return tableColumns;
+        } else {
+            return tableColumns.filter((column) => column.id !== 'userRating');
+        }
+    }, [tableConfig?.columns, showRatings]);
 
     const filteredSongs = useMemo(() => {
         return sortSongList(

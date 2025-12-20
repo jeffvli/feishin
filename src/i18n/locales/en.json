@@ -879,6 +879,8 @@
         "preferLocalLyrics": "prefer local lyrics",
         "showLyricsInSidebar_description": "a panel will be added to the attached play queue that displays the lyrics",
         "showLyricsInSidebar": "show lyrics in player sidebar",
+        "showRatings_description": "controls if the ratings feature shows up in the interface",
+        "showRatings": "show arist/album ratings",
         "showVisualizerInSidebar_description": "a panel will be added to the player sidebar that displays the visualizer",
         "showVisualizerInSidebar": "show visualizer in player sidebar",
         "preservePitch_description": "preserves pitch when modifying playback speed",
