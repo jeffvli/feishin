@@ -38,7 +38,7 @@ const MAX_ITEMS_PER_PLAYLIST_ADD = 50;
 
 const VERSION_INFO: VersionInfo = [
     [
-        '10.11.0',
+        '10.12.0',
         {
             [ServerFeature.API_KEY_CAMELCASE]: [1],
         },
