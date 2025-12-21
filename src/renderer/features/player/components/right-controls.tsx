@@ -1,3 +1,4 @@
+import { Menu } from '@mantine/core';
 import { t } from 'i18next';
 import { useCallback, useEffect, useState, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +16,7 @@ import {
     useCurrentServer,
     useFullScreenPlayerStore,
     useHotkeySettings,
+    usePlaybackSettings,
     usePlayerData,
     usePlayerMuted,
     usePlayerSong,
@@ -31,6 +33,7 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Rating } from '/@/shared/components/rating/rating';
 import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { useMediaQuery } from '/@/shared/hooks/use-media-query';
@@ -74,6 +77,7 @@ export const RightControls = () => {
                 <LyricsButton />
                 <FavoriteButton />
                 <QueueButton />
+                <CastButton />
                 <VolumeButton />
             </Group>
             <Group h="calc(100% / 3)" />
@@ -358,6 +362,102 @@ const RatingButton = () => {
                 />
             )}
         </>
+    );
+};
+
+interface DlnaDevice {
+    name: string;
+    url: string;
+}
+
+const CastButton = () => {
+    const { t } = useTranslation();
+    const { selectedDlnaDevice } = usePlaybackSettings();
+    const [devices, setDevices] = useState<DlnaDevice[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+
+    const discoverDevices = async () => {
+        setIsSearching(true);
+        try {
+            // This invokes the SSDP discovery in the Main process
+            const foundDevices = await window.api.ipc.invoke('dlna-discover');
+            setDevices(foundDevices);
+        } catch (error) {
+            console.error('Failed to discover DLNA devices:', error);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    const handleSelectDevice = (device: DlnaDevice | null) => {
+        // TODO: handle device change
+        console.log('handling device', JSON.stringify(device));
+    };
+    return (
+        <Menu position="top-end" shadow="md" width={200} withArrow>
+            <Menu.Target>
+                <ActionIcon
+                    icon="cast"
+                    iconProps={{
+                        color: selectedDlnaDevice ? 'primary' : undefined,
+                        size: 'xl',
+                    }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        discoverDevices();
+                    }}
+                    size="sm"
+                    tooltip={{
+                        label: selectedDlnaDevice
+                            ? `${t('player.castingTo')}: ${selectedDlnaDevice.name}`
+                            : t('player.cast', { postProcess: 'titleCase' }),
+                        openDelay: 0,
+                    }}
+                    variant="subtle"
+                />
+            </Menu.Target>
+
+            <Menu.Dropdown>
+                <Menu.Label>{t('player.castToDevice')}</Menu.Label>
+
+                <Menu.Item
+                    color={!selectedDlnaDevice ? 'blue' : undefined}
+                    leftSection={<Icon icon="appWindow" size="sm" />}
+                    onClick={() => handleSelectDevice(null)}
+                >
+                    {t('player.thisComputer')}
+                </Menu.Item>
+
+                <Menu.Divider />
+
+                {devices.map((device) => (
+                    <Menu.Item
+                        color={selectedDlnaDevice?.url === device.url ? 'blue' : undefined}
+                        key={device.url}
+                        leftSection={<Icon icon="cast" size="sm" />}
+                        onClick={() => handleSelectDevice(device)}
+                    >
+                        {device.name}
+                    </Menu.Item>
+                ))}
+
+                {devices.length === 0 && !isSearching && (
+                    <Menu.Item disabled>{t('player.noDevicesFound')}</Menu.Item>
+                )}
+
+                <Menu.Divider />
+
+                <Menu.Item
+                    disabled={isSearching}
+                    leftSection={
+                        <Icon animate={isSearching ? 'spin' : undefined} icon="refresh" size="sm" />
+                    }
+                    onClick={discoverDevices}
+                >
+                    {t('action.refresh', { postProcess: 'titleCase' })}
+                </Menu.Item>
+            </Menu.Dropdown>
+        </Menu>
     );
 };
 

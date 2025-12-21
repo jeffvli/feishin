@@ -151,6 +151,7 @@ export enum PlayerStyle {
 }
 
 export enum PlayerType {
+    DLNA = 'dlna',
     LOCAL = 'local',
     WEB = 'web',
 }

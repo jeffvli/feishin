@@ -7,6 +7,7 @@ import { DiscordRpcHook } from '/@/renderer/features/discord-rpc/use-discord-rpc
 import { MainPlayerListenerHook } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
+import { DlnaPlayer } from '/@/renderer/features/player/components/dlna-player/dlna-player';
 import { AutoDJHook } from '/@/renderer/features/player/hooks/use-auto-dj';
 import { MediaSessionHook } from '/@/renderer/features/player/hooks/use-media-session';
 import { MPRISHook } from '/@/renderer/features/player/hooks/use-mpris';
@@ -190,6 +191,7 @@ const AudioPlayersContent = ({
         <>
             {playbackType === PlayerType.WEB && <WebPlayer />}
             {playbackType === PlayerType.LOCAL && <MpvPlayer />}
+            {playbackType === PlayerType.DLNA && <DlnaPlayer />}
         </>
     );
 };
