@@ -486,7 +486,10 @@ const TableColumnConfig = ({
 
     const handleReorder = useCallback(
         (idFrom: string, idTo: string, edge: Edge | null) => {
-            const idList = value.map((item) => item.id);
+            const currentValue = useSettingsStore.getState().lists[listKey]?.table.columns;
+            if (!currentValue) return;
+
+            const idList = currentValue.map((item) => item.id);
             const newIdOrder = dndUtils.reorderById({
                 edge,
                 idFrom,
@@ -495,10 +498,10 @@ const TableColumnConfig = ({
             });
 
             // Map the new ID order back to full items
-            const newOrder = newIdOrder.map((id) => value.find((item) => item.id === id)!);
+            const newOrder = newIdOrder.map((id) => currentValue.find((item) => item.id === id)!);
             onChange(newOrder);
         },
-        [onChange, value],
+        [listKey, onChange],
     );
 
     return (
@@ -721,7 +724,7 @@ const TableColumnItem = memo(
                                     postProcess: 'sentenceCase',
                                 }),
                             }}
-                            variant={item.pinned === 'left' ? 'filled' : 'subtle'}
+                            variant={item.pinned === 'left' ? 'outline' : 'subtle'}
                         />
                         <ActionIcon
                             icon="arrowRightToLine"
@@ -733,7 +736,7 @@ const TableColumnItem = memo(
                                     postProcess: 'sentenceCase',
                                 }),
                             }}
-                            variant={item.pinned === 'right' ? 'filled' : 'subtle'}
+                            variant={item.pinned === 'right' ? 'outline' : 'subtle'}
                         />
                     </ActionIconGroup>
                     <ActionIconGroup className={styles.group}>
@@ -747,7 +750,7 @@ const TableColumnItem = memo(
                                     postProcess: 'sentenceCase',
                                 }),
                             }}
-                            variant={item.align === 'start' ? 'filled' : 'subtle'}
+                            variant={item.align === 'start' ? 'outline' : 'subtle'}
                         />
                         <ActionIcon
                             icon="alignCenter"
@@ -759,7 +762,7 @@ const TableColumnItem = memo(
                                     postProcess: 'sentenceCase',
                                 }),
                             }}
-                            variant={item.align === 'center' ? 'filled' : 'subtle'}
+                            variant={item.align === 'center' ? 'outline' : 'subtle'}
                         />
                         <ActionIcon
                             icon="alignRight"
@@ -771,7 +774,7 @@ const TableColumnItem = memo(
                                     postProcess: 'sentenceCase',
                                 }),
                             }}
-                            variant={item.align === 'end' ? 'filled' : 'subtle'}
+                            variant={item.align === 'end' ? 'outline' : 'subtle'}
                         />
                     </ActionIconGroup>
                     <NumberInput

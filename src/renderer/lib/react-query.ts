@@ -20,7 +20,7 @@ const queryCache = new QueryCache({
 
 const queryConfig: DefaultOptions = {
     mutations: {
-        retry: process.env.NODE_ENV === 'production',
+        retry: process.env.NODE_ENV === 'production' ? 3 : false,
     },
     queries: {
         gcTime: 1000 * 5, // 5 seconds

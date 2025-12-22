@@ -494,10 +494,8 @@
             },
             "view": {
                 "table": "tabell",
-                "card": "kort",
                 "grid": "rutenett",
-                "list": "liste",
-                "poster": "plakat"
+                "list": "liste"
             },
             "general": {
                 "autoFitColumns": "automatisk kolonnetilpasning",

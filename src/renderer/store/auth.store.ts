@@ -120,6 +120,7 @@ export const useCurrentServer = () =>
         return {
             features: state.currentServer?.features,
             id: state.currentServer?.id,
+            isAdmin: state.currentServer?.isAdmin,
             musicFolderId: state.currentServer?.musicFolderId,
             name: state.currentServer?.name,
             preferInstantMix: state.currentServer?.preferInstantMix,
@@ -131,6 +132,14 @@ export const useCurrentServer = () =>
             version: state.currentServer?.version,
         };
     }, shallow) as ServerListItem;
+
+export const useIsAdmin = () =>
+    useAuthStore((state) => {
+        return {
+            isAdmin: state.currentServer?.isAdmin ?? false,
+            userId: state.currentServer?.userId,
+        };
+    }, shallow);
 
 export const useCurrentServerWithCredential = () =>
     useAuthStore((state) => state.currentServer) as ServerListItemWithCredential;
@@ -145,4 +154,21 @@ export const getServerById = (id?: string) => {
     }
 
     return useAuthStore.getState().actions.getServer(id);
+};
+
+export const usePermissions = () => {
+    const { isAdmin, userId } = useIsAdmin();
+
+    return {
+        playlists: {
+            editOwner: isAdmin,
+            editPublic: isAdmin,
+        },
+        radio: {
+            create: isAdmin,
+            delete: isAdmin,
+            edit: isAdmin,
+        },
+        userId: userId,
+    };
 };

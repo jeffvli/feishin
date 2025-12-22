@@ -2,13 +2,18 @@ import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
+import { useListContext } from '/@/renderer/context/list-context';
 import { useAlbumListFilters } from '/@/renderer/features/albums/hooks/use-album-list-filters';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { ListDisplayTypeToggleButton } from '/@/renderer/features/shared/components/list-display-type-toggle-button';
-import { ListFiltersModal } from '/@/renderer/features/shared/components/list-filters';
+import {
+    isFilterValueSet,
+    ListFiltersModal,
+} from '/@/renderer/features/shared/components/list-filters';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButton } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
+import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
 import { useSongListFilters } from '/@/renderer/features/songs/hooks/use-song-list-filters';
 import { GenreTarget, useGenreTarget, useSettingsStoreActions } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
@@ -26,6 +31,8 @@ export const SongListHeaderFilters = ({ toggleGenreTarget }: { toggleGenreTarget
     const albumFilters = useAlbumListFilters();
     const songFilters = useSongListFilters();
 
+    const { pageKey } = useListContext();
+
     const handleToggleGenreTarget = useCallback(() => {
         // Clear all filter query states
         albumFilters.clear();
@@ -40,6 +47,20 @@ export const SongListHeaderFilters = ({ toggleGenreTarget }: { toggleGenreTarget
             ? t('entity.album_other', { postProcess: 'titleCase' })
             : t('entity.track_other', { postProcess: 'titleCase' });
     }, [target, t]);
+
+    const hasActiveFilters = useMemo(() => {
+        const query = songFilters.query;
+        return Boolean(
+            isFilterValueSet(query[FILTER_KEYS.SONG._CUSTOM]) ||
+                isFilterValueSet(query[FILTER_KEYS.SONG.ALBUM_IDS]) ||
+                isFilterValueSet(query[FILTER_KEYS.SONG.ARTIST_IDS]) ||
+                query[FILTER_KEYS.SONG.FAVORITE] !== undefined ||
+                isFilterValueSet(query[FILTER_KEYS.SONG.GENRE_ID]) ||
+                isFilterValueSet(query[FILTER_KEYS.SONG.MAX_YEAR]) ||
+                isFilterValueSet(query[FILTER_KEYS.SONG.MIN_YEAR]) ||
+                isFilterValueSet(query[FILTER_KEYS.SHARED.SEARCH_TERM]),
+        );
+    }, [songFilters.query]);
 
     return (
         <Flex justify="space-between">
@@ -59,15 +80,15 @@ export const SongListHeaderFilters = ({ toggleGenreTarget }: { toggleGenreTarget
                 <ListSortByDropdown
                     defaultSortByValue={SongListSort.NAME}
                     itemType={LibraryItem.SONG}
-                    listKey={ItemListKey.SONG}
+                    listKey={pageKey as ItemListKey}
                 />
                 <Divider orientation="vertical" />
                 <ListSortOrderToggleButton
                     defaultSortOrder={SortOrder.ASC}
-                    listKey={ItemListKey.SONG}
+                    listKey={pageKey as ItemListKey}
                 />
-                <ListFiltersModal itemType={LibraryItem.SONG} />
-                <ListRefreshButton listKey={ItemListKey.SONG} />
+                <ListFiltersModal isActive={hasActiveFilters} itemType={LibraryItem.SONG} />
+                <ListRefreshButton listKey={pageKey as ItemListKey} />
             </Group>
             <Group gap="sm" wrap="nowrap">
                 <ListDisplayTypeToggleButton listKey={ItemListKey.SONG} />

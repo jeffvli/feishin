@@ -1,4 +1,5 @@
 .item-table-list-container {
+    position: relative;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -187,8 +188,8 @@
     pointer-events: none;
     background: linear-gradient(
         to bottom,
-        rgb(0 0 0 / 50%) 0%,
-        rgb(0 0 0 / 5%) 50%,
+        darken(var(--theme-colors-background), 10%) 0%,
+        darken(var(--theme-colors-background), 5%) 50%,
         transparent 100%
     );
 }
@@ -201,12 +202,24 @@
     z-index: 1;
     width: 8px;
     pointer-events: none;
-    background: linear-gradient(
-        to right,
-        rgb(0 0 0 / 50%) 0%,
-        rgb(0 0 0 / 5%) 50%,
-        transparent 100%
-    );
+
+    @mixin dark {
+        background: linear-gradient(
+            to right,
+            darken(var(--theme-colors-background), 10%) 0%,
+            darken(var(--theme-colors-background), 5%) 50%,
+            transparent 100%
+        );
+    }
+
+    @mixin light {
+        background: linear-gradient(
+            to right,
+            darken(var(--theme-colors-background), 5%) 0%,
+            darken(var(--theme-colors-background), 3%) 50%,
+            transparent 100%
+        );
+    }
 }
 
 .item-table-right-scroll-shadow {
@@ -217,12 +230,24 @@
     z-index: 1;
     width: 8px;
     pointer-events: none;
-    background: linear-gradient(
-        to left,
-        rgb(0 0 0 / 50%) 0%,
-        rgb(0 0 0 / 5%) 50%,
-        transparent 100%
-    );
+
+    @mixin dark {
+        background: linear-gradient(
+            to left,
+            darken(var(--theme-colors-background), 10%) 0%,
+            darken(var(--theme-colors-background), 5%) 50%,
+            transparent 100%
+        );
+    }
+
+    @mixin light {
+        background: linear-gradient(
+            to left,
+            darken(var(--theme-colors-background), 5%) 0%,
+            darken(var(--theme-colors-background), 3%) 50%,
+            transparent 100%
+        );
+    }
 }
 
 .item-table-top-scroll-shadow {
@@ -233,10 +258,22 @@
     z-index: 1;
     height: 8px;
     pointer-events: none;
-    background: linear-gradient(
-        to bottom,
-        rgb(0 0 0 / 50%) 0%,
-        rgb(0 0 0 / 5%) 50%,
-        transparent 100%
-    );
+
+    @mixin dark {
+        background: linear-gradient(
+            to bottom,
+            darken(var(--theme-colors-background), 10%) 0%,
+            darken(var(--theme-colors-background), 5%) 50%,
+            transparent 100%
+        );
+    }
+
+    @mixin light {
+        background: linear-gradient(
+            to bottom,
+            darken(var(--theme-colors-background), 5%) 0%,
+            darken(var(--theme-colors-background), 3%) 50%,
+            transparent 100%
+        );
+    }
 }

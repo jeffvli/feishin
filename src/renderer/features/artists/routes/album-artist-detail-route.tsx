@@ -14,7 +14,7 @@ import {
 import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
-import { useFastAverageColor } from '/@/renderer/hooks';
+import { useFastAverageColor, useWaitForColorCalculation } from '/@/renderer/hooks';
 import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
@@ -39,7 +39,7 @@ const AlbumArtistDetailRoute = () => {
         staleTime: 0,
     });
 
-    const { background: backgroundColor } = useFastAverageColor({
+    const { background: backgroundColor, isLoading: isColorLoading } = useFastAverageColor({
         id: artistId,
         src: detailQuery.data?.imageUrl,
         srcLoaded: !detailQuery.isLoading,
@@ -47,7 +47,18 @@ const AlbumArtistDetailRoute = () => {
 
     const background = backgroundColor;
 
-    const showBlurredImage = Boolean(detailQuery.data?.imageUrl) && artistBackground;
+    const showBlurredImage = artistBackground;
+
+    const { isReady } = useWaitForColorCalculation({
+        hasImage: !!detailQuery.data?.imageUrl,
+        isLoading: isColorLoading,
+        routeId,
+        showBlurredImage,
+    });
+
+    if (!isReady) {
+        return null;
+    }
 
     return (
         <AnimatedPage key={`album-artist-detail-${routeId}`}>

@@ -50,10 +50,26 @@
     padding-left: var(--theme-spacing-xl);
     background: white;
     border-radius: var(--theme-radius-xl);
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out !important;
+
+    &[data-variant='subtle'] {
+        transition: background-color 0.2s ease-in-out !important;
+
+        &:hover,
+        &:active,
+        &:focus-visible {
+            transition: background-color 0.2s ease-in-out !important;
+        }
+    }
 }
 
 .wide-text-button.unthemed {
+    transition: background-color 0.2s ease-in-out !important;
+
+    &[data-variant='subtle'] {
+        transition: background-color 0.2s ease-in-out !important;
+    }
+
     @mixin light {
         background: black;
 
@@ -62,8 +78,11 @@
             fill: white;
         }
 
-        &:hover {
-            background: lighten(black, 10%);
+        &[data-variant='subtle']:hover,
+        &[data-variant='subtle']:active,
+        &[data-variant='subtle']:focus-visible {
+            background: lighten(black, 10%) !important;
+            transition: background-color 0.2s ease-in-out !important;
         }
     }
 
@@ -75,8 +94,11 @@
             fill: black;
         }
 
-        &:hover {
-            background: darken(white, 20%);
+        &[data-variant='subtle']:hover,
+        &[data-variant='subtle']:active,
+        &[data-variant='subtle']:focus-visible {
+            background: darken(white, 20%) !important;
+            transition: background-color 0.2s ease-in-out !important;
         }
     }
 }
@@ -86,10 +108,18 @@
     font-weight: 600;
     color: black;
 
+    @mixin light {
+        color: white;
+    }
+
     svg {
         color: black;
         fill: black;
     }
+}
+
+.no-fill {
+    fill: none !important;
 }
 
 .play-button {

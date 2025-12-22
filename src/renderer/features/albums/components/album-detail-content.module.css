@@ -38,6 +38,21 @@
     overflow-x: hidden;
 }
 
+.search-text-input {
+    background: transparent;
+    border-color: rgb(255 255 255 / 5%);
+    border-style: solid;
+    border-width: 1px;
+
+    @mixin light {
+        border-color: rgb(0 0 0 / 5%);
+    }
+
+    @mixin dark {
+        border-color: rgb(255 255 255 / 5%);
+    }
+}
+
 @container (min-width: $mantine-breakpoint-lg) {
     .content-layout {
         grid-template-areas: 'songs metadata';

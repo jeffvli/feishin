@@ -7,7 +7,30 @@ const baseResponse = z.object({
     }),
 });
 
-const authenticate = z.null();
+const userParameters = z.object({
+    username: z.string(),
+});
+
+const user = z.object({
+    user: z.object({
+        adminRole: z.boolean(),
+        commentRole: z.boolean(),
+        coverArtRole: z.boolean(),
+        downloadRole: z.boolean(),
+        folder: z.string().array(),
+        jukeboxRole: z.boolean(),
+        playlistRole: z.boolean(),
+        podcastRole: z.boolean(),
+        scrobblingEnabled: z.boolean(),
+        settingsRole: z.boolean(),
+        shareRole: z.boolean(),
+        streamRole: z.boolean(),
+        uploadRole: z.boolean(),
+        username: z.string(),
+    }),
+});
+
+const authenticate = user;
 
 const authenticateParameters = z.object({
     c: z.string(),
@@ -16,6 +39,7 @@ const authenticateParameters = z.object({
     s: z.string().optional(),
     t: z.string().optional(),
     u: z.string(),
+    username: z.string(),
     v: z.string(),
 });
 
@@ -140,6 +164,7 @@ const album = z.object({
     name: z.string(),
     parent: z.string(),
     recordLabels: z.array(recordLabel).optional(),
+    releaseDate: z.object({ day: z.number(), month: z.number(), year: z.number() }).optional(),
     releaseTypes: z.array(z.string()).optional(),
     song: z.array(song),
     songCount: z.number(),
@@ -331,6 +356,7 @@ const similarSongs = z.object({
 
 export enum SubsonicExtensions {
     FORM_POST = 'formPost',
+    INDEX_BASED_QUEUE = 'indexBasedQueue',
     SONG_LYRICS = 'songLyrics',
     TRANSCODE_OFFSET = 'transcodeOffset',
 }
@@ -548,6 +574,124 @@ const albumInfo = z.object({
     }),
 });
 
+const getMusicDirectoryParameters = z.object({
+    id: z.string(),
+});
+
+const directory = z.object({
+    artist: z.string().optional(),
+    child: z.array(song).optional(),
+    coverArt: z.string().optional(),
+    id,
+    isDir: z.boolean(),
+    parent: z.string().optional(),
+    title: z.string(),
+});
+
+const getMusicDirectory = z.object({
+    directory,
+});
+
+const getIndexes = z.object({
+    indexes: z.object({
+        child: z.array(song),
+        index: z
+            .object({
+                artist: z
+                    .object({
+                        id: z.string(),
+                        name: z.string(),
+                    })
+                    .array(),
+            })
+            .array(),
+        shortcut: z
+            .object({
+                id: z.string(),
+                name: z.string(),
+            })
+            .array(),
+    }),
+});
+
+const getIndexesParameters = z.object({
+    musicFolderId: z.string().optional(),
+});
+
+const saveQueueParameters = z.object({
+    current: z.string().optional(),
+    id: z.string().array(),
+    position: z.number().optional(),
+});
+
+const savePlayQueueByIndexParameters = z.object({
+    currentIndex: z.number().optional(),
+    id: z.string().array().optional(),
+    position: z.number().optional(),
+});
+
+const saveQueue = z.null();
+
+const playQueue = z.object({
+    playQueue: z.object({
+        changed: z.string(),
+        changedBy: z.string(),
+        current: z.string().optional(),
+        entry: song.array(),
+        position: z.number().optional(),
+        username: z.string(),
+    }),
+});
+
+const playQueueByIndex = z.object({
+    playQueueByIndex: z.object({
+        changed: z.string(),
+        changedBy: z.string(),
+        currentIndex: z.number().optional(),
+        entry: song.array().optional(),
+        position: z.number().optional(),
+        username: z.string(),
+    }),
+});
+
+const internetRadioStation = z.object({
+    homepageUrl: z.string().optional(),
+    id: z.string(),
+    name: z.string(),
+    streamUrl: z.string(),
+});
+
+const deleteInternetRadioStationParameters = z.object({
+    id: z.string(),
+});
+
+const deleteInternetRadioStation = z.null();
+
+const createInternetRadioStationParameters = z.object({
+    homepageUrl: z.string().optional(),
+    name: z.string(),
+    streamUrl: z.string(),
+});
+
+const createInternetRadioStation = z.null();
+
+const updateInternetRadioStationParameters = z.object({
+    homepageUrl: z.string().optional(),
+    id: z.string(),
+    name: z.string(),
+    streamUrl: z.string(),
+});
+
+const updateInternetRadioStation = z.null();
+
+const getInternetRadioStations = z.object({
+    internetRadioStations: z
+        .object({
+            internetRadioStation: z.array(internetRadioStation),
+        })
+        .optional(),
+});
+
 export const ssType = {
     _parameters: {
         albumInfo: albumInfoParameters,
@@ -555,7 +699,9 @@ export const ssType = {
         artistInfo: artistInfoParameters,
         authenticate: authenticateParameters,
         createFavorite: createFavoriteParameters,
+        createInternetRadioStation: createInternetRadioStationParameters,
         createPlaylist: createPlaylistParameters,
+        deleteInternetRadioStation: deleteInternetRadioStationParameters,
         deletePlaylist: deletePlaylistParameters,
         getAlbum: getAlbumParameters,
         getAlbumList2: getAlbumList2Parameters,
@@ -563,6 +709,8 @@ export const ssType = {
         getArtists: getArtistsParameters,
         getGenre: getGenresParameters,
         getGenres: getGenresParameters,
+        getIndexes: getIndexesParameters,
+        getMusicDirectory: getMusicDirectoryParameters,
         getPlaylist: getPlaylistParameters,
         getPlaylists: getPlaylistsParameters,
         getSong: getSongParameters,
@@ -570,13 +718,17 @@ export const ssType = {
         getStarred: getStarredParameters,
         randomSongList: randomSongListParameters,
         removeFavorite: removeFavoriteParameters,
+        savePlayQueueByIndex: savePlayQueueByIndexParameters,
+        saveQueue: saveQueueParameters,
         scrobble: scrobbleParameters,
         search3: search3Parameters,
         setRating: setRatingParameters,
         similarSongs: similarSongsParameters,
         structuredLyrics: structuredLyricsParameters,
         topSongsList: topSongsListParameters,
+        updateInternetRadioStation: updateInternetRadioStationParameters,
         updatePlaylist: updatePlaylistParameters,
+        user: userParameters,
     },
     _response: {
         album,
@@ -590,24 +742,34 @@ export const ssType = {
         authenticate,
         baseResponse,
         createFavorite,
+        createInternetRadioStation,
         createPlaylist,
+        deleteInternetRadioStation,
+        directory,
         genre,
         getAlbum,
         getAlbumList2,
         getArtist,
         getArtists,
         getGenres,
+        getIndexes,
+        getInternetRadioStations,
+        getMusicDirectory,
         getPlaylist,
         getPlaylists,
         getSong,
         getSongsByGenre,
         getStarred,
+        internetRadioStation,
         musicFolderList,
         ping,
         playlist,
         playlistListEntry,
+        playQueue,
+        playQueueByIndex,
         randomSongList,
         removeFavorite,
+        saveQueue,
         scrobble,
         search3,
         serverInfo,
@@ -616,5 +778,7 @@ export const ssType = {
         song,
         structuredLyrics,
         topSongsList,
+        updateInternetRadioStation,
+        user,
     },
 };

@@ -21,6 +21,7 @@ import {
     usePlayerActions,
     usePlayerQueueType,
     usePlayerSong,
+    useSettingsStore,
 } from '/@/renderer/store';
 import { Flex } from '/@/shared/components/flex/flex';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
@@ -29,7 +30,7 @@ import { useDebouncedValue } from '/@/shared/hooks/use-debounced-value';
 import { useFocusWithin } from '/@/shared/hooks/use-focus-within';
 import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
-import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
+import { Folder, LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 import { DragTarget } from '/@/shared/types/drag-and-drop';
 import { ItemListKey, Play, PlayerQueueType } from '/@/shared/types/types';
 
@@ -46,6 +47,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
     const mergedRef = useMergedRef(ref, tableRef);
     const { getQueue } = usePlayerActions();
     const queueType = usePlayerQueueType();
+    const followCurrentSong = useSettingsStore((state) => state.general.followCurrentSong);
 
     const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
 
@@ -91,10 +93,10 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
         });
 
         const unsubCurrentTrack = subscribeCurrentTrack((e) => {
-            if (e.index !== -1) {
+            if (followCurrentSong && e.index !== -1) {
                 tableRef.current?.scrollToIndex(e.index, {
-                    align: 'top',
-                    behavior: 'smooth',
+                    align: 'center',
+                    behavior: 'auto',
                 });
             }
         });
@@ -105,7 +107,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
             unsub();
             unsubCurrentTrack();
         };
-    }, [getQueue, queueType, tableRef]);
+    }, [getQueue, queueType, tableRef, followCurrentSong]);
 
     const filteredData: QueueSong[] = useMemo(() => {
         if (debouncedSearchTerm) {
@@ -127,6 +129,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
     });
 
     const currentSong = usePlayerSong();
+
     const currentSongUniqueId = currentSong?._uniqueId;
 
     const { focused, ref: containerFocusRef } = useFocusWithin();
@@ -166,6 +169,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(({ listKey, sear
                 enableHorizontalBorders={table.enableHorizontalBorders}
                 enableRowHoverHighlight={table.enableRowHoverHighlight}
                 enableSelection
+                enableSelectionDialog={false}
                 enableVerticalBorders={table.enableVerticalBorders}
                 getRowId="_uniqueId"
                 groups={groups.length > 0 ? groups : undefined}
@@ -246,6 +250,45 @@ const EmptyQueueDropZone = () => {
                                     Play.NOW,
                                 );
                             }
+                            break;
+                        }
+                        case DragTarget.FOLDER: {
+                            const items = args.source.item;
+
+                            const { folders, songs } = (items || []).reduce<{
+                                folders: Folder[];
+                                songs: Song[];
+                            }>(
+                                (acc, item) => {
+                                    if ((item as unknown as Song)._itemType === LibraryItem.SONG) {
+                                        acc.songs.push(item as unknown as Song);
+                                    } else if (
+                                        (item as unknown as Folder)._itemType === LibraryItem.FOLDER
+                                    ) {
+                                        acc.folders.push(item as unknown as Folder);
+                                    }
+                                    return acc;
+                                },
+                                { folders: [], songs: [] },
+                            );
+
+                            const folderIds = folders.map((folder) => folder.id);
+
+                            // Handle folders: fetch and add to queue
+                            if (folderIds.length > 0) {
+                                playerContext.addToQueueByFetch(
+                                    sourceServerId,
+                                    folderIds,
+                                    LibraryItem.FOLDER,
+                                    Play.NOW,
+                                );
+                            }
+
+                            // Handle songs: add directly to queue
+                            if (songs.length > 0) {
+                                playerContext.addToQueueByData(songs, Play.NOW);
+                            }
+
                             break;
                         }
                         case DragTarget.GENRE: {

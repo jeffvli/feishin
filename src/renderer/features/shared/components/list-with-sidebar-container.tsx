@@ -3,6 +3,7 @@ import { createContext, ReactNode, useContext, useMemo, useRef } from 'react';
 
 import styles from './list-with-sidebar-container.module.css';
 
+import { useListContext } from '/@/renderer/context/list-context';
 import { animationProps } from '/@/shared/components/animations/animation-props';
 import { Portal } from '/@/shared/components/portal/portal';
 
@@ -17,6 +18,7 @@ const ListWithSidebarContainerContext = createContext<ListWithSidebarContainerCo
 interface ListWithSidebarContainerProps {
     children: ReactNode;
     sidebarBreakpoint?: number;
+    useBreakpoint?: boolean;
 }
 
 interface SidebarPortalProps {
@@ -63,9 +65,10 @@ function SidebarPortal({ children }: SidebarPortalProps) {
 
 export const ListWithSidebarContainer = ({
     children,
-    sidebarBreakpoint = 1200,
+    useBreakpoint = false,
 }: ListWithSidebarContainerProps) => {
     const sidebarRef = useRef<HTMLDivElement>(null);
+    const { isSidebarOpen = false } = useListContext();
 
     const contextValue = useMemo(
         () => ({
@@ -76,7 +79,11 @@ export const ListWithSidebarContainer = ({
 
     return (
         <ListWithSidebarContainerContext.Provider value={contextValue}>
-            <div className={styles.container} data-sidebar-breakpoint={sidebarBreakpoint}>
+            <div
+                className={styles.container}
+                data-sidebar-open={useBreakpoint ? undefined : isSidebarOpen}
+                data-use-breakpoint={useBreakpoint}
+            >
                 <div className={styles.sidebarContainer} ref={sidebarRef} />
                 <div className={styles.contentContainer}>{children}</div>
             </div>

@@ -12,7 +12,7 @@ interface DragDropZoneProps {
 }
 
 export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZoneProps) => {
-    const zoneFileInput = useRef<HTMLInputElement | null>();
+    const zoneFileInput = useRef<HTMLInputElement | null>(null);
     const [error, setError] = useState<string>('');
 
     const processItem = useCallback(
@@ -122,7 +122,9 @@ export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZon
             ) : null}
             <input
                 onChange={onZoneInputChange}
-                ref={(self) => (zoneFileInput.current = self)}
+                ref={(self) => {
+                    zoneFileInput.current = self;
+                }}
                 style={{ display: 'none' }}
                 type="file"
             />

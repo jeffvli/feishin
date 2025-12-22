@@ -10,7 +10,6 @@ import {
     parseBooleanParam,
     parseCustomFiltersParam,
     parseIntParam,
-    setJsonSearchParam,
     setSearchParam,
 } from '/@/renderer/utils/query-params';
 import { SongListSort, SortOrder } from '/@/shared/types/domain-types';
@@ -115,28 +114,28 @@ export const usePlaylistSongListFilters = () => {
     );
 
     const setCustom = useCallback(
-        (
-            value:
-                | ((prev: null | Record<string, any>) => null | Record<string, any>)
-                | null
-                | Record<string, any>,
-        ) => {
+        (value: null | Record<string, any>) => {
             setSearchParams(
                 (prev) => {
-                    const currentCustom = parseCustomFiltersParam(prev, FILTER_KEYS.SONG._CUSTOM);
-                    let newValue =
-                        typeof value === 'function' ? value(currentCustom ?? null) : value;
-                    // Convert empty objects to null to clear them from URL
-                    if (
-                        newValue &&
-                        typeof newValue === 'object' &&
-                        Object.keys(newValue).length === 0
-                    ) {
-                        newValue = null;
-                    }
-                    return setJsonSearchParam(prev, FILTER_KEYS.SONG._CUSTOM, newValue);
+                    const previousValue = prev.get(FILTER_KEYS.ALBUM._CUSTOM);
+
+                    const newCustom = {
+                        ...(previousValue ? JSON.parse(previousValue) : {}),
+                        ...value,
+                    };
+
+                    const filteredNewCustom = Object.fromEntries(
+                        Object.entries(newCustom).filter(
+                            ([, value]) => value !== null && value !== undefined,
+                        ),
+                    );
+
+                    prev.set(FILTER_KEYS.ALBUM._CUSTOM, JSON.stringify(filteredNewCustom));
+                    return prev;
                 },
-                { replace: true },
+                {
+                    replace: true,
+                },
             );
         },
         [setSearchParams],

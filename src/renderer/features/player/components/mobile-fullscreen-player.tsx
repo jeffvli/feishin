@@ -1,5 +1,15 @@
-import { motion } from 'motion/react';
-import { CSSProperties, MouseEvent, useCallback, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { Variants } from 'motion/react';
+import {
+    CSSProperties,
+    memo,
+    MouseEvent,
+    ReactNode,
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './mobile-fullscreen-player.module.css';
@@ -32,6 +42,323 @@ import { ItemListKey } from '/@/shared/types/types';
 
 const mainBackground = 'var(--theme-colors-background)';
 
+const backgroundImageVariants: Variants = {
+    closed: {
+        opacity: 0,
+        transition: {
+            duration: 0.8,
+            ease: 'linear',
+        },
+    },
+    initial: {
+        opacity: 0,
+    },
+    open: (custom) => {
+        const { isOpen } = custom;
+        return {
+            opacity: isOpen ? 1 : 0,
+            transition: {
+                duration: 0.4,
+                ease: 'linear',
+            },
+        };
+    },
+};
+
+interface BackgroundImageProps {
+    dynamicBackground: boolean | undefined;
+    dynamicIsImage: boolean | undefined;
+}
+
+const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundImageProps) => {
+    const currentSong = usePlayerSong();
+    const { nextSong } = usePlayerData();
+
+    const [imageState, setImageState] = useState({
+        bottomImage: nextSong?.imageUrl
+            ? nextSong.imageUrl.replace(/size=\d+/g, 'size=500')
+            : undefined,
+        current: 0,
+        topImage: currentSong?.imageUrl
+            ? currentSong.imageUrl.replace(/size=\d+/g, 'size=500')
+            : undefined,
+    });
+
+    const previousSongRef = useRef<string | undefined>(currentSong?._uniqueId);
+    const imageStateRef = useRef(imageState);
+
+    useEffect(() => {
+        imageStateRef.current = imageState;
+    }, [imageState]);
+
+    // Update images when song changes
+    useEffect(() => {
+        if (currentSong?._uniqueId === previousSongRef.current) {
+            return;
+        }
+
+        const isTop = imageStateRef.current.current === 0;
+        const currentImageUrl = currentSong?.imageUrl
+            ? currentSong.imageUrl.replace(/size=\d+/g, 'size=500')
+            : undefined;
+        const nextImageUrl = nextSong?.imageUrl
+            ? nextSong.imageUrl.replace(/size=\d+/g, 'size=500')
+            : undefined;
+
+        setImageState({
+            bottomImage: isTop ? currentImageUrl : nextImageUrl,
+            current: isTop ? 1 : 0,
+            topImage: isTop ? nextImageUrl : currentImageUrl,
+        });
+
+        previousSongRef.current = currentSong?._uniqueId;
+    }, [currentSong?._uniqueId, currentSong?.imageUrl, nextSong?._uniqueId, nextSong?.imageUrl]);
+
+    if (!dynamicBackground || !dynamicIsImage) {
+        return null;
+    }
+
+    const getBackgroundImageUrl = (
+        imageUrl: string | undefined,
+        songId: string | undefined,
+        albumId: string | undefined,
+    ) => {
+        if (!imageUrl || !songId || !albumId) {
+            return imageUrl;
+        }
+        return imageUrl.replace(songId, albumId);
+    };
+
+    // Determine which song IDs to use for keys and image URLs
+    const topSongId = imageState.current === 0 ? currentSong?._uniqueId : nextSong?._uniqueId;
+    const bottomSongId = imageState.current === 0 ? nextSong?._uniqueId : currentSong?._uniqueId;
+    const topSong = imageState.current === 0 ? currentSong : nextSong;
+    const bottomSong = imageState.current === 0 ? nextSong : currentSong;
+
+    return (
+        <AnimatePresence initial={false} mode="sync">
+            {imageState.current === 0 && imageState.topImage && (
+                <motion.div
+                    animate="open"
+                    className={styles.backgroundImage}
+                    custom={{ isOpen: imageState.current === 0 }}
+                    exit="closed"
+                    initial="open"
+                    key={`top-${topSongId || 'none'}`}
+                    style={
+                        {
+                            backgroundImage: imageState.topImage
+                                ? `url("${getBackgroundImageUrl(
+                                      imageState.topImage,
+                                      topSong?.id,
+                                      topSong?.albumId,
+                                  )}"), url("${imageState.topImage}")`
+                                : undefined,
+                        } as CSSProperties
+                    }
+                    variants={backgroundImageVariants}
+                />
+            )}
+
+            {imageState.current === 1 && imageState.bottomImage && (
+                <motion.div
+                    animate="open"
+                    className={styles.backgroundImage}
+                    custom={{ isOpen: imageState.current === 1 }}
+                    exit="closed"
+                    initial="open"
+                    key={`bottom-${bottomSongId || 'none'}`}
+                    style={
+                        {
+                            backgroundImage: imageState.bottomImage
+                                ? `url("${getBackgroundImageUrl(
+                                      imageState.bottomImage,
+                                      bottomSong?.id,
+                                      bottomSong?.albumId,
+                                  )}"), url("${imageState.bottomImage}")`
+                                : undefined,
+                        } as CSSProperties
+                    }
+                    variants={backgroundImageVariants}
+                />
+            )}
+        </AnimatePresence>
+    );
+});
+
+BackgroundImage.displayName = 'BackgroundImage';
+
+const overlayVariants: Variants = {
+    closed: {
+        opacity: 0,
+        transition: {
+            duration: 0,
+        },
+    },
+    initial: {
+        opacity: 1,
+    },
+    open: {
+        opacity: 1,
+        transition: {
+            duration: 0,
+        },
+    },
+};
+
+interface BackgroundImageOverlayProps {
+    dynamicBackground: boolean | undefined;
+    dynamicImageBlur: number | undefined;
+}
+
+const BackgroundImageOverlay = memo(
+    ({ dynamicBackground, dynamicImageBlur }: BackgroundImageOverlayProps) => {
+        const currentSong = usePlayerSong();
+        const { nextSong } = usePlayerData();
+
+        const [overlayState, setOverlayState] = useState({
+            bottomSongId: nextSong?._uniqueId,
+            current: 0,
+            topSongId: currentSong?._uniqueId,
+        });
+
+        const previousSongRef = useRef<string | undefined>(currentSong?._uniqueId);
+        const overlayStateRef = useRef(overlayState);
+
+        useEffect(() => {
+            overlayStateRef.current = overlayState;
+        }, [overlayState]);
+
+        // Update overlays when song changes
+        useEffect(() => {
+            if (currentSong?._uniqueId === previousSongRef.current) {
+                return;
+            }
+
+            const isTop = overlayStateRef.current.current === 0;
+
+            setOverlayState({
+                bottomSongId: isTop ? currentSong?._uniqueId : nextSong?._uniqueId,
+                current: isTop ? 1 : 0,
+                topSongId: isTop ? nextSong?._uniqueId : currentSong?._uniqueId,
+            });
+
+            previousSongRef.current = currentSong?._uniqueId;
+        }, [currentSong?._uniqueId, nextSong?._uniqueId]);
+
+        if (!dynamicBackground) {
+            return null;
+        }
+
+        return (
+            <AnimatePresence initial={false} mode="sync">
+                {overlayState.current === 0 && (
+                    <motion.div
+                        animate="open"
+                        className={styles.backgroundImageOverlay}
+                        exit="closed"
+                        initial="open"
+                        key={`top-${overlayState.topSongId || 'none'}`}
+                        style={
+                            {
+                                '--image-blur': `${dynamicImageBlur ?? 0}rem`,
+                            } as CSSProperties
+                        }
+                        variants={overlayVariants}
+                    />
+                )}
+
+                {overlayState.current === 1 && (
+                    <motion.div
+                        animate="open"
+                        className={styles.backgroundImageOverlay}
+                        exit="closed"
+                        initial="open"
+                        key={`bottom-${overlayState.bottomSongId || 'none'}`}
+                        style={
+                            {
+                                '--image-blur': `${dynamicImageBlur ?? 0}rem`,
+                            } as CSSProperties
+                        }
+                        variants={overlayVariants}
+                    />
+                )}
+            </AnimatePresence>
+        );
+    },
+);
+
+BackgroundImageOverlay.displayName = 'BackgroundImageOverlay';
+
+interface MobilePlayerContainerProps {
+    children: ReactNode;
+    dynamicBackground: boolean | undefined;
+    dynamicIsImage: boolean | undefined;
+}
+
+const MobilePlayerContainer = memo(
+    ({ children, dynamicBackground, dynamicIsImage }: MobilePlayerContainerProps) => {
+        const currentSong = usePlayerSong();
+        const { background } = useFastAverageColor({
+            algorithm: 'dominant',
+            src: currentSong?.imageUrl,
+            srcLoaded: true,
+        });
+
+        let backgroundColor = mainBackground;
+        if (dynamicBackground) {
+            if (dynamicIsImage && background) {
+                const rgbMatch = background.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+                if (rgbMatch) {
+                    backgroundColor = `rgba(${rgbMatch[1]}, ${rgbMatch[2]}, ${rgbMatch[3]}, 0.3)`;
+                } else {
+                    backgroundColor = background;
+                }
+            } else {
+                backgroundColor = background || mainBackground;
+            }
+        }
+
+        return (
+            <motion.div
+                animate="open"
+                className={styles.container}
+                exit="closed"
+                initial="closed"
+                style={{
+                    backgroundColor,
+                }}
+                variants={mobileContainerVariants}
+            >
+                <BackgroundImage
+                    dynamicBackground={dynamicBackground}
+                    dynamicIsImage={dynamicIsImage}
+                />
+                {children}
+            </motion.div>
+        );
+    },
+);
+
+MobilePlayerContainer.displayName = 'MobilePlayerContainer';
+
+const mobileContainerVariants: Variants = {
+    closed: {
+        transition: {
+            duration: 0.5,
+            ease: 'easeInOut',
+        },
+        y: '100%',
+    },
+    open: {
+        transition: {
+            duration: 0.5,
+            ease: 'easeInOut',
+        },
+        y: 0,
+    },
+};
+
 export const MobileFullscreenPlayer = () => {
     const { t } = useTranslation();
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
@@ -46,18 +373,6 @@ export const MobileFullscreenPlayer = () => {
     const updateRatingMutation = useSetRating({});
 
     const [isPageHovered, setIsPageHovered] = useState(false);
-
-    const { background } = useFastAverageColor({
-        algorithm: 'dominant',
-        src: currentSong?.imageUrl,
-        srcLoaded: true,
-    });
-
-    const imageUrl = currentSong?.imageUrl && currentSong.imageUrl.replace(/size=\d+/g, 'size=500');
-    const backgroundImage =
-        imageUrl && dynamicIsImage
-            ? `url("${imageUrl.replace(currentSong.id, currentSong.albumId)}"), url("${imageUrl}")`
-            : mainBackground;
 
     const handleToggleFullScreenPlayer = useCallback(() => {
         setFullScreenPlayerStore({ expanded: false });
@@ -140,26 +455,14 @@ export const MobileFullscreenPlayer = () => {
         (server?.type === ServerType.NAVIDROME || server?.type === ServerType.SUBSONIC);
 
     return (
-        <div
-            className={styles.container}
-            style={{
-                background: dynamicBackground ? backgroundImage : mainBackground,
-                backgroundColor: dynamicBackground ? background : mainBackground,
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                backgroundSize: 'cover',
-            }}
+        <MobilePlayerContainer
+            dynamicBackground={dynamicBackground}
+            dynamicIsImage={dynamicIsImage}
         >
-            {dynamicBackground && (
-                <div
-                    className={styles.backgroundImageOverlay}
-                    style={
-                        {
-                            '--image-blur': `${dynamicImageBlur}rem`,
-                        } as CSSProperties
-                    }
-                />
-            )}
+            <BackgroundImageOverlay
+                dynamicBackground={dynamicBackground}
+                dynamicImageBlur={dynamicImageBlur}
+            />
             <motion.div
                 animate={{
                     opacity: isPlayerState ? 1 : 0,
@@ -175,7 +478,7 @@ export const MobileFullscreenPlayer = () => {
                     isPageHovered={isPageHovered}
                     onClose={handleToggleFullScreenPlayer}
                 />
-                <MobileFullscreenPlayerAlbumArt currentSong={currentSong} />
+                <MobileFullscreenPlayerAlbumArt />
                 <MobileFullscreenPlayerMetadata
                     currentSong={currentSong}
                     onToggleFavorite={handleToggleFavorite}
@@ -247,10 +550,8 @@ export const MobileFullscreenPlayer = () => {
                         variant={isPageHovered ? 'default' : 'subtle'}
                     />
                 </div>
-                <div className={styles.lyricsContent}>
-                    <Lyrics />
-                </div>
+                <div className={styles.lyricsContent}>{isLyricsState && <Lyrics />}</div>
             </motion.div>
-        </div>
+        </MobilePlayerContainer>
     );
 };

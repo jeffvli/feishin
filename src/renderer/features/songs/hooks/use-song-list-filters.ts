@@ -16,13 +16,12 @@ import {
 import { SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
-export const useSongListFilters = () => {
-    const { setSortBy, sortBy } = useSortByFilter<SongListSort>(
-        SongListSort.NAME,
-        ItemListKey.SONG,
-    );
+export const useSongListFilters = (listKey?: ItemListKey) => {
+    const resolvedListKey = listKey ?? ItemListKey.SONG;
 
-    const { setSortOrder, sortOrder } = useSortOrderFilter(SortOrder.ASC, ItemListKey.SONG);
+    const { setSortBy, sortBy } = useSortByFilter<SongListSort>(SongListSort.NAME, resolvedListKey);
+
+    const { setSortOrder, sortOrder } = useSortOrderFilter(SortOrder.ASC, resolvedListKey);
 
     const { searchTerm, setSearchTerm } = useSearchTermFilter('');
 

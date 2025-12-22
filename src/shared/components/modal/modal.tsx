@@ -1,8 +1,10 @@
 import { Modal as MantineModal, ModalProps as MantineModalProps } from '@mantine/core';
-import { closeAllModals, ContextModalProps } from '@mantine/modals';
 import {
+    closeAllModals as closeAllModalsMantine,
+    ContextModalProps,
     ModalsProvider as MantineModalsProvider,
     ModalsProviderProps as MantineModalsProviderProps,
+    openModal as openModalMantine,
 } from '@mantine/modals';
 import React, { ReactNode } from 'react';
 
@@ -14,6 +16,10 @@ import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Stack } from '/@/shared/components/stack/stack';
+
+export const openModal = openModalMantine;
+
+export const closeAllModals = closeAllModalsMantine;
 
 export interface ModalProps extends Omit<MantineModalProps, 'onClose'> {
     children?: ReactNode;
@@ -106,7 +112,7 @@ export const ConfirmModal = ({
         <Stack>
             <Flex>{children}</Flex>
             <Group justify="flex-end">
-                <Button onClick={handleCancel} variant="default">
+                <Button disabled={loading} onClick={handleCancel} variant="default">
                     {labels?.cancel ? labels.cancel : 'Cancel'}
                 </Button>
                 <Button

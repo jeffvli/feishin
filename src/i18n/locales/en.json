@@ -2,17 +2,25 @@
     "action": {
         "addToFavorites": "add to $t(entity.favorite_other)",
         "addToPlaylist": "add to $t(entity.playlist_one)",
+        "addOrRemoveFromSelection": "add or remove from selection",
+        "selectRangeOfItems": "select a range of items",
         "clearQueue": "clear queue",
         "createPlaylist": "create $t(entity.playlist_one)",
+        "createRadioStation": "create $t(entity.radioStation_one)",
         "deletePlaylist": "delete $t(entity.playlist_one)",
+        "deleteRadioStation": "delete $t(entity.radioStation_one)",
+        "selectAll": "select all",
         "deselectAll": "deselect all",
         "downloadStarted": "started download of {{count}} items",
         "editPlaylist": "edit $t(entity.playlist_one)",
         "goToPage": "go to page",
-        "largeFetch": "this action will attempt to fetch {{count}} items from your server",
         "moveToNext": "move to next",
         "moveToBottom": "move to bottom",
         "moveToTop": "move to top",
+        "moveUp": "move up",
+        "moveDown": "move down",
+        "holdToMoveToTop": "hold to move to top",
+        "holdToMoveToBottom": "hold to move to bottom",
         "moveItems": "move items",
         "shuffle": "shuffle",
         "shuffleAll": "shuffle all",
@@ -25,12 +33,14 @@
         "toggleSmartPlaylistEditor": "toggle $t(entity.smartPlaylist) editor",
         "viewPlaylists": "view $t(entity.playlist_other)",
         "viewMore": "view more",
+        "openApplicationDirectory": "open application directory",
         "openIn": {
             "lastfm": "Open in Last.fm",
             "musicbrainz": "Open in MusicBrainz"
         }
     },
     "common": {
+        "countSelected": "{{count}} selected",
         "explicitStatus": "explicit status",
         "action_one": "action",
         "action_other": "actions",
@@ -69,6 +79,7 @@
         "dismiss": "dismiss",
         "doNotShowAgain": "do not show this again",
         "duration": "duration",
+        "view": "view",
         "edit": "edit",
         "enable": "enable",
         "expand": "expand",
@@ -95,6 +106,7 @@
         "no": "no",
         "none": "none",
         "noResultsFromQuery": "the query returned no results",
+        "noFilters": "no filters configured",
         "note": "note",
         "ok": "ok",
         "owner": "owner",
@@ -153,6 +165,10 @@
         "albumArtistCount_other": "{{count}} album artists",
         "albumWithCount_one": "{{count}} album",
         "albumWithCount_other": "{{count}} albums",
+        "radioStation_one": "radio station",
+        "radioStation_other": "radio stations",
+        "radioStationWithCount_one": "{{count}} radio station",
+        "radioStationWithCount_other": "{{count}} radio stations",
         "artist_one": "artist",
         "artist_other": "artists",
         "artistWithCount_one": "{{count}} artist",
@@ -194,6 +210,7 @@
         "localFontAccessDenied": "access denied to local fonts",
         "loginRateError": "too many login attempts, please try again in a few seconds",
         "mpvRequired": "MPV required",
+        "multipleServerSaveQueueError": "the play queue has one or more songs which are not from the current server. this is not supported",
         "networkError": "a network error occurred",
         "notificationDenied": "permissions for notifications were denied. this setting has no effect",
         "openError": "could not open file",
@@ -202,10 +219,12 @@
         "remoteEnableError": "an error occurred when trying to $t(common.enable) the remote server",
         "remotePortError": "an error occurred when trying to set the remote server port",
         "remotePortWarning": "restart the server to apply the new port",
+        "saveQueueFailed": "failed to save queue",
         "serverNotSelectedError": "no server selected",
         "serverRequired": "server required",
         "sessionExpiredError": "your session has expired",
-        "systemFontError": "an error occurred when trying to get system fonts"
+        "systemFontError": "an error occurred when trying to get system fonts",
+        "settingsSyncError": "discrepancies were found between the settings in the renderer and the main process. restart the application to apply the changes"
     },
     "filter": {
         "album": "$t(entity.album_one)",
@@ -252,6 +271,33 @@
         "trackNumber": "track",
         "explicitStatus": "$t(common.explicitStatus)"
     },
+    "datetime": {
+        "minuteShort": "min",
+        "secondShort": "sec",
+        "hourShort": "hr",
+        "dayShort": "day"
+    },
+    "filterOperator": {
+        "after": "is after",
+        "afterDate": "is after (date)",
+        "before": "is before",
+        "beforeDate": "is before (date)",
+        "contains": "contains",
+        "endsWith": "ends with",
+        "inPlaylist": "is in",
+        "inTheLast": "is in the last",
+        "inTheRange": "is in the range",
+        "inTheRangeDate": "is in the range (date)",
+        "is": "is",
+        "isNot": "is not",
+        "isGreaterThan": "is greater than",
+        "isLessThan": "is less than",
+        "matchesRegex": "matches regex",
+        "notContains": "does not contain",
+        "notInPlaylist": "is not in",
+        "notInTheLast": "is not in the last",
+        "startsWith": "starts with"
+    },
     "form": {
         "addServer": {
             "error_savePassword": "an error occurred when trying to save the password",
@@ -270,7 +316,7 @@
         },
         "largeFetchConfirmation": {
             "title": "add items to the queue",
-            "description": "This request will attempt to fetch {{count}} items from the server"
+            "description": "This action will add all items in the current filtered view"
         },
         "addToPlaylist": {
             "create": "create $t(entity.playlist_one) {{playlist}}",
@@ -288,6 +334,13 @@
             "success": "$t(entity.playlist_one) created successfully",
             "title": "create $t(entity.playlist_one)"
         },
+        "createRadioStation": {
+            "success": "radio station created successfully",
+            "title": "create radio station",
+            "input_homepageUrl": "homepage url",
+            "input_name": "name",
+            "input_streamUrl": "stream url"
+        },
         "deletePlaylist": {
             "input_confirm": "type the name of the $t(entity.playlist_one) to confirm",
             "success": "$t(entity.playlist_one) deleted successfully",
@@ -295,6 +348,7 @@
         },
         "editPlaylist": {
             "publicJellyfinNote": "Jellyfin for some reason does not expose whether a playlist is public or not. If you wish for this to remain public, please have the following input selected",
+            "editNote": "manual edits are not recommended for large playlists. are you sure you accept the risk of data loss incurred by overwriting the existing playlist?",
             "success": "$t(entity.playlist_one) updated successfully",
             "title": "edit $t(entity.playlist_one)"
         },
@@ -311,6 +365,9 @@
             "removeRuleGroup": "remove rule group",
             "resetToDefault": "reset to default",
             "clearFilters": "clear filters"
+        },
+        "saveQueue": {
+            "success": "saved play queue to server"
         },
         "shareItem": {
             "allowDownloading": "allow downloading",
@@ -366,11 +423,15 @@
             "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
             "title": "$t(entity.album_other)"
         },
+        "radioList": {
+            "title": "radio stations"
+        },
         "favorites": {
             "title": "$t(entity.favorite_other)"
         },
         "appMenu": {
             "collapseSidebar": "collapse sidebar",
+            "commandPalette": "open command palette",
             "expandSidebar": "expand sidebar",
             "goBack": "go back",
             "goForward": "go forward",
@@ -450,6 +511,9 @@
             "showTracks": "show $t(entity.genre_one) $t(entity.track_other)",
             "title": "$t(entity.genre_other)"
         },
+        "folderList": {
+            "title": "$t(entity.folder_other)"
+        },
         "globalSearch": {
             "commands": {
                 "goToPage": "go to page",
@@ -460,6 +524,7 @@
         },
         "home": {
             "explore": "explore from your library",
+            "genres": "$t(entity.genre_other)",
             "mostPlayed": "most played",
             "newlyAdded": "newly added releases",
             "recentlyPlayed": "recently played",
@@ -497,7 +562,9 @@
             "audio": "audio",
             "lyrics": "lyrics",
             "transcoding": "transcoding",
-            "discord": "discord"
+            "discord": "discord",
+            "logger": "logger",
+            "playerFilters": "player filters"
         },
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist_other)",
@@ -507,6 +574,7 @@
             "folders": "$t(entity.folder_other)",
             "genres": "$t(entity.genre_other)",
             "home": "$t(common.home)",
+            "radio": "$t(entity.radioStation_other)",
             "myLibrary": "my library",
             "nowPlaying": "now playing",
             "playlists": "$t(entity.playlist_other)",
@@ -522,11 +590,13 @@
         }
     },
     "player": {
-        "addLast": "add last",
-        "addNext": "add next",
-        "addLastShuffled": "add last (shuffled)",
-        "addNextShuffled": "add next (shuffled)",
+        "addLast": "last",
+        "addNext": "next",
+        "addLastShuffled": "last (shuffled)",
+        "addNextShuffled": "next (shuffled)",
+        "holdToShuffle": "hold to shuffle",
         "favorite": "favorite",
+        "lyrics": "lyrics",
         "mute": "mute",
         "muted": "muted",
         "next": "next",
@@ -550,6 +620,8 @@
         "repeat_off": "repeat disabled",
         "repeat_one": "repeat one",
         "repeat_other": "",
+        "restoreQueueFromServer": "restore queue from server",
+        "saveQueueToServer": "save queue to server",
         "shuffle": "play (shuffled)",
         "shuffle_off": "shuffle disabled",
         "skip": "skip",
@@ -589,8 +661,16 @@
         }
     },
     "setting": {
+        "autoDJ": "auto DJ",
+        "autoDJ_description": "automatically add similar songs to the queue",
+        "autoDJ_itemCount": "item count",
+        "autoDJ_itemCount_description": "the number of items attempted to be added to the queue when auto DJ is enabled",
+        "autoDJ_timing": "timing",
+        "autoDJ_timing_description": "the number of songs remaining in the queue before auto DJ is triggered",
         "accentColor_description": "sets the accent color for the application",
         "accentColor": "accent color",
+        "useThemeAccentColor": "use theme accent color",
+        "useThemeAccentColor_description": "use the primary color defined in the selected theme instead of the custom accent color",
         "albumBackground_description": "adds a background image for album pages containing the album art",
         "albumBackground": "album background image",
         "albumBackgroundBlur_description": "adjusts the amount of blur applied to the album background image",
@@ -677,6 +757,8 @@
         "exportImportSettings_offendingKeyError": "\"{{offendingKey}}\" is incorrect - {{reason}}",
         "externalLinks_description": "enables showing external links (Last.fm, MusicBrainz) on artist/album pages",
         "externalLinks": "show external links",
+        "followCurrentSong_description": "automatically scroll the play queue to the current playing song",
+        "followCurrentSong": "follow current song",
         "followLyric_description": "scroll the lyric to the current playing position",
         "followLyric": "follow current lyric",
         "font_description": "sets the font to use for the application",
@@ -689,8 +771,6 @@
         "gaplessAudio_description": "sets the gapless audio setting for mpv",
         "gaplessAudio_optionWeak": "weak (recommended)",
         "gaplessAudio": "gapless audio",
-        "genreBehavior_description": "determines whether clicking on a genre opens by default in track or album list",
-        "genreBehavior": "genre page default behavior",
         "globalMediaHotkeys_description": "enable or disable the usage of your system media hotkeys to control playback",
         "globalMediaHotkeys": "global media hotkeys",
         "homeConfiguration_description": "configure what items are shown, and in what order, on the home page",
@@ -745,6 +825,12 @@
         "lyricFetchProvider": "providers to fetch lyrics from",
         "lyricOffset_description": "offset the lyric by the specified amount of milliseconds",
         "lyricOffset": "lyric offset (ms)",
+        "logLevel": "log level",
+        "logLevel_description": "sets the minimum log level to display. debug shows all logs, error only shows errors",
+        "logLevel_optionDebug": "debug",
+        "logLevel_optionError": "error",
+        "logLevel_optionInfo": "info",
+        "logLevel_optionWarn": "warn",
         "minimizeToTray_description": "minimize the application to the system tray",
         "minimizeToTray": "minimize to tray",
         "minimumScrobblePercentage_description": "the minimum percentage of the song that must be played before it is scrobbled",
@@ -762,6 +848,8 @@
         "notify_description": "show notifications when changing the current song",
         "passwordStore_description": "what password/secret store to use. change this if you are having issues storing passwords",
         "passwordStore": "passwords/secret store",
+        "playerFilters": "Filter songs from the queue",
+        "playerFilters_description": "omit songs from being added to the queue based on the following criteria",
         "playbackStyle_description": "select the playback style to use for the audio player",
         "playbackStyle_optionCrossFade": "crossfade",
         "playbackStyle_optionNormal": "normal",
@@ -777,6 +865,7 @@
         "playerbarOpenDrawer_description": "allows clicking of the playerbar to open the full screen player",
         "playerbarOpenDrawer": "playerbar fullscreen toggle",
         "playerbarSlider": "playerbar slider",
+        "playerbarSlider_description": "the waveform is not recommended if on a slow or metered internet connection",
         "playerbarSliderType_optionSlider": "slider",
         "playerbarSliderType_optionWaveform": "waveform",
         "playerbarWaveformAlign": "waveform align",
@@ -794,6 +883,8 @@
         "showVisualizerInSidebar": "show visualizer in player sidebar",
         "preservePitch_description": "preserves pitch when modifying playback speed",
         "preservePitch": "preserve pitch",
+        "audioFadeOnStatusChange": "audio fade on status change",
+        "audioFadeOnStatusChange_description": "enables fade out and fade in when play/pause status changes",
         "preventSleepOnPlayback_description": "prevent the display from sleeping while music is playing",
         "preventSleepOnPlayback": "prevent sleep on playback",
         "remotePassword_description": "sets the password for the remote control server. These credentials are by default transferred insecurely, so you should use a unique password that you do not care about",
@@ -886,6 +977,7 @@
             "albumCount": "$t(entity.album_other)",
             "artist": "$t(entity.artist_one)",
             "biography": "biography",
+            "bitDepth": "$t(common.bitDepth)",
             "bitrate": "bitrate",
             "bpm": "bpm",
             "channels": "$t(common.channel_other)",
@@ -901,6 +993,7 @@
             "rating": "rating",
             "releaseDate": "release date",
             "releaseYear": "year",
+            "sampleRate": "$t(common.sampleRate)",
             "size": "$t(common.size)",
             "songCount": "$t(entity.track_other)",
             "title": "title",
@@ -946,6 +1039,7 @@
                 "albumArtist": "$t(entity.albumArtist_one)",
                 "artist": "$t(entity.artist_one)",
                 "biography": "$t(common.biography)",
+                "bitDepth": "$t(common.bitDepth)",
                 "bitrate": "$t(common.bitrate)",
                 "bpm": "$t(common.bpm)",
                 "channels": "$t(common.channel_other)",
@@ -965,6 +1059,7 @@
                 "rating": "$t(common.rating)",
                 "releaseDate": "release date",
                 "rowIndex": "row index",
+                "sampleRate": "$t(common.sampleRate)",
                 "size": "$t(common.size)",
                 "songCount": "$t(entity.track_other)",
                 "title": "$t(common.title)",

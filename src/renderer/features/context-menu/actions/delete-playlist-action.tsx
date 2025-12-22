@@ -13,10 +13,11 @@ import { toast } from '/@/shared/components/toast/toast';
 import { Playlist } from '/@/shared/types/domain-types';
 
 interface DeletePlaylistActionProps {
+    disabled?: boolean;
     items: Playlist[];
 }
 
-export const DeletePlaylistAction = ({ items }: DeletePlaylistActionProps) => {
+export const DeletePlaylistAction = ({ disabled, items }: DeletePlaylistActionProps) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const serverId = useCurrentServerId();
@@ -65,7 +66,7 @@ export const DeletePlaylistAction = ({ items }: DeletePlaylistActionProps) => {
     if (items.length === 0) return null;
 
     return (
-        <ContextMenu.Item leftIcon="remove" onSelect={openDeletePlaylistModal}>
+        <ContextMenu.Item disabled={disabled} leftIcon="remove" onSelect={openDeletePlaylistModal}>
             {t('action.deletePlaylist', { postProcess: 'sentenceCase' })}
         </ContextMenu.Item>
     );

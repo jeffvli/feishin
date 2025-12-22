@@ -14,6 +14,11 @@
     background: var(--theme-colors-background);
 }
 
+.windows,
+.macos {
+    grid-template-rows: 30px calc(100vh - 120px) 90px;
+}
+
 .drawer-button {
     position: absolute;
     bottom: calc(90px + 0.75rem);
@@ -39,17 +44,5 @@
     bottom: 0;
     left: 0;
     z-index: 200;
-    visibility: hidden;
-    pointer-events: none;
-    background: var(--theme-colors-background);
-    opacity: 0;
-    transition:
-        opacity 0.3s ease-in-out,
-        visibility 0.3s ease-in-out;
-}
-
-.full-screen-player-visible {
-    visibility: visible;
-    pointer-events: auto;
-    opacity: 1;
+    overflow: hidden;
 }

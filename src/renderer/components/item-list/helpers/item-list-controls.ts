@@ -6,7 +6,7 @@ import { ItemListStateItemWithRequiredProperties } from '/@/renderer/components/
 import { DefaultItemControlProps, ItemControls } from '/@/renderer/components/item-list/types';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
+import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 import { Play, TableColumn } from '/@/shared/types/types';
 
 interface UseDefaultItemListControlsArgs {
@@ -212,6 +212,43 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                     }
                 }
 
+                if (itemType === LibraryItem.SONG) {
+                    const data = internalState.getData();
+                    const validSongs = data.filter((d): d is Song => {
+                        if (!d || typeof d !== 'object') {
+                            return false;
+                        }
+                        if (!('_itemType' in d)) {
+                            return false;
+                        }
+                        return (d as { _itemType: LibraryItem })._itemType === LibraryItem.SONG;
+                    });
+
+                    if (validSongs.length === 0) {
+                        return;
+                    }
+
+                    const clickedSongId = item.id;
+                    const clickedIndex = validSongs.findIndex((song) => song.id === clickedSongId);
+
+                    if (clickedIndex === -1) {
+                        return;
+                    }
+
+                    const songsBefore = 100;
+                    const songsAfter = 100;
+                    const startIndex = Math.max(0, clickedIndex - songsBefore);
+                    const endIndex = Math.min(validSongs.length, clickedIndex + songsAfter + 1);
+                    const songsToAdd = validSongs.slice(startIndex, endIndex);
+
+                    if (songsToAdd.length === 0) {
+                        return;
+                    }
+
+                    player.addToQueueByData(songsToAdd, Play.NOW, item.id);
+                    return;
+                }
+
                 if (itemType === LibraryItem.QUEUE_SONG) {
                     const queueSong = item as QueueSong;
                     if (queueSong._uniqueId) {
@@ -258,10 +295,18 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                     return;
                 }
 
+                // For context menus, prioritize the itemType prop when it's PLAYLIST_SONG or QUEUE_SONG
+                // This is because playlist/queue songs are Song objects (_itemType: SONG) but need special context menus
+                // Otherwise, use the item's _itemType if available, or fall back to the mapped itemType
+                const actualItemType =
+                    itemType === LibraryItem.PLAYLIST_SONG || itemType === LibraryItem.QUEUE_SONG
+                        ? itemType
+                        : (item as any)?._itemType || itemTypeMapping[itemType] || itemType;
+
                 // If no internalState, call ContextMenuController directly
                 if (!internalState) {
                     return ContextMenuController.call({
-                        cmd: { items: [item] as any[], type: itemType as any },
+                        cmd: { items: [item] as any[], type: actualItemType as any },
                         event,
                     });
                 }
@@ -274,7 +319,7 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                 if (internalState.getSelected().length === 0) {
                     internalState.setSelected([item]);
                     return ContextMenuController.call({
-                        cmd: { items: [item] as any[], type: itemType as any },
+                        cmd: { items: [item] as any[], type: actualItemType as any },
                         event,
                     });
                 }
@@ -282,15 +327,24 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                 else if (!internalState.isSelected(rowId)) {
                     internalState.setSelected([item]);
                     return ContextMenuController.call({
-                        cmd: { items: [item] as any[], type: itemType as any },
+                        cmd: { items: [item] as any[], type: actualItemType as any },
                         event,
                     });
                 }
 
                 const selectedItems = internalState.getSelected();
 
+                // For multiple selected items, prioritize the itemType prop for PLAYLIST_SONG/QUEUE_SONG
+                // Otherwise use the first item's _itemType or the mapped type
+                const selectedItemType =
+                    itemType === LibraryItem.PLAYLIST_SONG || itemType === LibraryItem.QUEUE_SONG
+                        ? itemType
+                        : selectedItems.length > 0 && (selectedItems[0] as any)?._itemType
+                          ? (selectedItems[0] as any)._itemType
+                          : itemTypeMapping[itemType] || itemType;
+
                 return ContextMenuController.call({
-                    cmd: { items: selectedItems as any[], type: itemType as any },
+                    cmd: { items: selectedItems as any[], type: selectedItemType as any },
                     event,
                 });
             },

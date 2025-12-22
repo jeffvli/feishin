@@ -41,7 +41,7 @@ export const ActionBar = () => {
                     <Group gap="sm" grow wrap="nowrap">
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
-                                <Button p="0.5rem">
+                                <Button p="0">
                                     <Icon icon="menu" size="lg" />
                                 </Button>
                             </DropdownMenu.Target>
@@ -62,10 +62,10 @@ const NavigateButtons = () => {
 
     return (
         <>
-            <Button onClick={() => navigate(-1)} p="0.5rem">
+            <Button onClick={() => navigate(-1)} p="0">
                 <Icon icon="arrowLeftS" size="lg" />
             </Button>
-            <Button onClick={() => navigate(1)} p="0.5rem">
+            <Button onClick={() => navigate(1)} p="0">
                 <Icon icon="arrowRightS" size="lg" />
             </Button>
         </>

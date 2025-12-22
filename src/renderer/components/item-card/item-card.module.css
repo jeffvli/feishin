@@ -41,8 +41,16 @@
     }
 
     &:hover {
-        &::before {
-            opacity: 0.7;
+        @mixin dark {
+            &::before {
+                opacity: 0.7;
+            }
+        }
+
+        @mixin light {
+            &::before {
+                opacity: 0.5;
+            }
         }
     }
 }

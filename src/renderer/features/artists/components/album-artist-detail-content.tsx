@@ -14,20 +14,14 @@ import { ItemControls } from '/@/renderer/components/item-list/types';
 import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistGridCarousel } from '/@/renderer/features/artists/components/album-artist-grid-carousel';
-import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
-import { DefaultPlayButton } from '/@/renderer/features/shared/components/play-button';
 import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { AppRoute } from '/@/renderer/router/routes';
 import { ArtistItem, useCurrentServer, usePlayerSong } from '/@/renderer/store';
-import {
-    useGeneralSettings,
-    usePlayButtonBehavior,
-    useSettingsStore,
-} from '/@/renderer/store/settings.store';
+import { useGeneralSettings, useSettingsStore } from '/@/renderer/store/settings.store';
 import { sanitize } from '/@/renderer/utils/sanitize';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
@@ -52,58 +46,35 @@ import {
 import { ItemListKey, ListDisplayType, Play } from '/@/shared/types/types';
 
 interface AlbumArtistActionButtonsProps {
-    albumCount: null | number | undefined;
     artistDiscographyLink: string;
     artistSongsLink: string;
-    onFavorite: () => void;
-    onMoreOptions: (e: React.MouseEvent<HTMLButtonElement>) => void;
-    onPlay: () => void;
-    userFavorite?: boolean;
 }
 
 const AlbumArtistActionButtons = ({
-    albumCount,
     artistDiscographyLink,
     artistSongsLink,
-    onFavorite,
-    onMoreOptions,
-    onPlay,
-    userFavorite,
 }: AlbumArtistActionButtonsProps) => {
     const { t } = useTranslation();
 
     return (
         <>
-            <Group gap="md">
-                <DefaultPlayButton disabled={albumCount === 0} onClick={onPlay} />
-                <Group gap="xs">
-                    <ActionIcon
-                        icon="favorite"
-                        iconProps={{
-                            fill: userFavorite ? 'primary' : undefined,
-                        }}
-                        onClick={onFavorite}
-                        size="lg"
-                        variant="transparent"
-                    />
-                    <ActionIcon
-                        icon="ellipsisHorizontal"
-                        onClick={onMoreOptions}
-                        size="lg"
-                        variant="transparent"
-                    />
-                </Group>
-            </Group>
-            <Group gap="md">
+            <Group gap="lg">
                 <Button
                     component={Link}
+                    p={0}
                     size="compact-md"
                     to={artistDiscographyLink}
-                    variant="subtle"
+                    variant="transparent"
                 >
                     {String(t('page.albumArtistDetail.viewDiscography')).toUpperCase()}
                 </Button>
-                <Button component={Link} size="compact-md" to={artistSongsLink} variant="subtle">
+                <Button
+                    component={Link}
+                    p={0}
+                    size="compact-md"
+                    to={artistSongsLink}
+                    variant="transparent"
+                >
                     {String(t('page.albumArtistDetail.viewAllTracks')).toUpperCase()}
                 </Button>
             </Group>
@@ -175,7 +146,9 @@ const AlbumArtistMetadataBiography = ({
                     artist: artistName,
                 })}
             </TextTitle>
-            <Spoiler dangerouslySetInnerHTML={{ __html: sanitizedBiography }} />
+            <Spoiler>
+                <Text dangerouslySetInnerHTML={{ __html: sanitizedBiography }} />
+            </Spoiler>
         </section>
     );
 };
@@ -221,16 +194,16 @@ const AlbumArtistMetadataTopSongs = ({
 
     const overrideControls: Partial<ItemControls> = useMemo(() => {
         return {
-            onDoubleClick: ({ index, internalState, item }) => {
+            onDoubleClick: ({ index, internalState, item, meta }) => {
                 if (!item) {
                     return;
                 }
 
+                const playType = (meta?.playType as Play) || Play.NOW;
                 const items = internalState?.getData() as Song[];
 
                 if (index !== undefined) {
-                    player.addToQueueByData(items, Play.NOW);
-                    player.mediaPlayByIndex(index);
+                    player.addToQueueByData(items, playType, item.id);
                 }
             },
         };
@@ -344,6 +317,7 @@ const AlbumArtistMetadataTopSongs = ({
                     enableHorizontalBorders={tableConfig.enableHorizontalBorders}
                     enableRowHoverHighlight={tableConfig.enableRowHoverHighlight}
                     enableSelection
+                    enableSelectionDialog={false}
                     enableVerticalBorders={tableConfig.enableVerticalBorders}
                     itemType={LibraryItem.SONG}
                     onColumnReordered={handleColumnReordered}
@@ -438,7 +412,6 @@ export const AlbumArtistDetailContent = () => {
     };
     const routeId = (artistId || albumArtistId) as string;
     const { ref, ...cq } = useContainerQuery();
-    const { addToQueueByFetch, setFavorite } = usePlayer();
     const server = useCurrentServer();
 
     const [enabledItem, itemOrder] = useMemo(() => {
@@ -504,21 +477,11 @@ export const AlbumArtistDetailContent = () => {
                 sortBy: AlbumListSort.RELEASE_DATE,
                 sortOrder: SortOrder.DESC,
                 title: (
-                    <Group align="flex-end">
-                        <TextTitle fw={700} order={2}>
-                            {t('page.albumArtistDetail.recentReleases', {
-                                postProcess: 'sentenceCase',
-                            })}
-                        </TextTitle>
-                        <Button
-                            component={Link}
-                            size="compact-md"
-                            to={artistDiscographyLink}
-                            variant="subtle"
-                        >
-                            {String(t('page.albumArtistDetail.viewDiscography')).toUpperCase()}
-                        </Button>
-                    </Group>
+                    <TextTitle fw={700} order={2}>
+                        {t('page.albumArtistDetail.recentReleases', {
+                            postProcess: 'sentenceCase',
+                        })}
+                    </TextTitle>
                 ),
                 uniqueId: 'recentReleases',
             },
@@ -558,7 +521,6 @@ export const AlbumArtistDetailContent = () => {
             },
         ];
     }, [
-        artistDiscographyLink,
         detailQuery.data?.similarArtists,
         enabledItem.compilations,
         enabledItem.recentAlbums,
@@ -571,37 +533,6 @@ export const AlbumArtistDetailContent = () => {
         t,
     ]);
 
-    const playButtonBehavior = usePlayButtonBehavior();
-
-    const handlePlay = async (playType?: Play) => {
-        if (!server?.id) return;
-        addToQueueByFetch(
-            server.id,
-            [routeId],
-            albumArtistId ? LibraryItem.ALBUM_ARTIST : LibraryItem.ARTIST,
-            playType || playButtonBehavior,
-        );
-    };
-
-    const handleFavorite = () => {
-        if (!detailQuery.data) return;
-        setFavorite(
-            detailQuery.data._serverId,
-            [detailQuery.data.id],
-            LibraryItem.ALBUM_ARTIST,
-            !detailQuery.data.userFavorite,
-        );
-    };
-
-    const handleMoreOptions = (e: React.MouseEvent<HTMLButtonElement>) => {
-        if (!detailQuery.data) return;
-        ContextMenuController.call({
-            cmd: { items: [detailQuery.data], type: LibraryItem.ALBUM_ARTIST },
-            event: e,
-        });
-    };
-
-    const albumCount = detailQuery.data?.albumCount;
     const biography =
         detailQuery.data?.biography && enabledItem.biography ? detailQuery.data.biography : null;
     const showGenres = detailQuery.data?.genres ? detailQuery.data.genres.length !== 0 : false;
@@ -616,13 +547,8 @@ export const AlbumArtistDetailContent = () => {
         <div className={styles.contentContainer} ref={ref}>
             <div className={styles.detailContainer}>
                 <AlbumArtistActionButtons
-                    albumCount={albumCount}
                     artistDiscographyLink={artistDiscographyLink}
                     artistSongsLink={artistSongsLink}
-                    onFavorite={handleFavorite}
-                    onMoreOptions={handleMoreOptions}
-                    onPlay={() => handlePlay(playButtonBehavior)}
-                    userFavorite={detailQuery.data?.userFavorite}
                 />
                 <Grid gutter="xl">
                     {showGenres && (

@@ -13,6 +13,7 @@ import { useGenreList } from '/@/renderer/features/genres/api/genres-api';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { useCurrentServer, useCurrentServerId } from '/@/renderer/store';
 import { titleCase } from '/@/renderer/utils';
+import { NDSongQueryFieldsLabelMap } from '/@/shared/api/navidrome/navidrome-types';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
@@ -151,7 +152,7 @@ export const NavidromeAlbumFilters = ({ disableArtistFilter }: NavidromeAlbumFil
     const debouncedHandleYearFilter = useDebouncedCallback(handleYearFilter, 300);
 
     return (
-        <Stack p="md">
+        <Stack px="md" py="md">
             {yesNoUndefinedFilters.map((filter) => (
                 <YesNoSelect
                     clearable
@@ -243,7 +244,7 @@ const TagFilters = () => {
     const serverId = useCurrentServerId();
 
     const tagsQuery = useSuspenseQuery(
-        sharedQueries.tags({
+        sharedQueries.tagList({
             options: {
                 gcTime: 1000 * 60 * 60,
                 staleTime: 1000 * 60 * 60,
@@ -269,7 +270,7 @@ const TagFilters = () => {
         for (const tag of tagsQuery.data?.enumTags || []) {
             if (!tagsQuery.data?.excluded.album.includes(tag.name)) {
                 results.push({
-                    label: titleCase(tag.name),
+                    label: NDSongQueryFieldsLabelMap[tag.name] ?? titleCase(tag.name),
                     options: tag.options,
                     value: tag.name,
                 });

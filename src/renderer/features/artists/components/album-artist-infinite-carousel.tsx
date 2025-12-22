@@ -34,6 +34,7 @@ export const BaseAlbumArtistInfiniteCarousel = (props: AlbumArtistCarouselProps)
         data: albumArtists,
         fetchNextPage,
         hasNextPage,
+        refetch,
     } = useAlbumArtistListInfinite(sortBy, sortOrder, 20, additionalQuery);
 
     const controls = useDefaultItemListControls();
@@ -65,6 +66,10 @@ export const BaseAlbumArtistInfiniteCarousel = (props: AlbumArtistCarouselProps)
 
     const handlePrevPage = useCallback(() => {}, []);
 
+    const handleRefresh = useCallback(() => {
+        refetch();
+    }, [refetch]);
+
     const firstPageItems = excludeIds
         ? albumArtists.pages[0]?.items.filter(
               (albumArtist) => !excludeIds.includes(albumArtist.id),
@@ -82,6 +87,7 @@ export const BaseAlbumArtistInfiniteCarousel = (props: AlbumArtistCarouselProps)
             loadNextPage={fetchNextPage}
             onNextPage={handleNextPage}
             onPrevPage={handlePrevPage}
+            onRefresh={handleRefresh}
             rowCount={rowCount}
             title={title}
         />

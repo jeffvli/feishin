@@ -10,6 +10,29 @@ import { FontType } from '/@/shared/types/types';
 export const THEME_DATA = [
     { label: 'Default Dark', type: 'dark', value: AppTheme.DEFAULT_DARK },
     { label: 'Default Light', type: 'light', value: AppTheme.DEFAULT_LIGHT },
+    { label: 'Nord', type: 'dark', value: AppTheme.NORD },
+    { label: 'Dracula', type: 'dark', value: AppTheme.DRACULA },
+    { label: 'One Dark', type: 'dark', value: AppTheme.ONE_DARK },
+    { label: 'Solarized Dark', type: 'dark', value: AppTheme.SOLARIZED_DARK },
+    { label: 'Solarized Light', type: 'light', value: AppTheme.SOLARIZED_LIGHT },
+    { label: 'GitHub Dark', type: 'dark', value: AppTheme.GITHUB_DARK },
+    { label: 'GitHub Light', type: 'light', value: AppTheme.GITHUB_LIGHT },
+    { label: 'Monokai', type: 'dark', value: AppTheme.MONOKAI },
+    { label: 'High Contrast Dark', type: 'dark', value: AppTheme.HIGH_CONTRAST_DARK },
+    { label: 'High Contrast Light', type: 'light', value: AppTheme.HIGH_CONTRAST_LIGHT },
+    { label: 'Tokyo Night', type: 'dark', value: AppTheme.TOKYO_NIGHT },
+    { label: 'Catppuccin Mocha', type: 'dark', value: AppTheme.CATPPUCCIN_MOCHA },
+    { label: 'Catppuccin Latte', type: 'light', value: AppTheme.CATPPUCCIN_LATTE },
+    { label: 'Gruvbox Dark', type: 'dark', value: AppTheme.GRUVBOX_DARK },
+    { label: 'Gruvbox Light', type: 'light', value: AppTheme.GRUVBOX_LIGHT },
+    { label: 'Night Owl', type: 'dark', value: AppTheme.NIGHT_OWL },
+    { label: 'Material Dark', type: 'dark', value: AppTheme.MATERIAL_DARK },
+    { label: 'Material Light', type: 'light', value: AppTheme.MATERIAL_LIGHT },
+    { label: 'Ayu Dark', type: 'dark', value: AppTheme.AYU_DARK },
+    { label: 'Ayu Light', type: 'light', value: AppTheme.AYU_LIGHT },
+    { label: 'Shades of Purple', type: 'dark', value: AppTheme.SHADES_OF_PURPLE },
+    { label: 'VS Code Dark+', type: 'dark', value: AppTheme.VSCODE_DARK_PLUS },
+    { label: 'VS Code Light+', type: 'light', value: AppTheme.VSCODE_LIGHT_PLUS },
 ];
 
 export const useAppTheme = (overrideTheme?: AppTheme) => {
@@ -20,9 +43,8 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
     const loadedStylesheetsRef = useRef<Set<string>>(new Set());
     const getCurrentTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
     const [isDarkTheme, setIsDarkTheme] = useState(getCurrentTheme());
-    const { followSystemTheme, theme, themeDark, themeLight } = useSettingsStore(
-        (state) => state.general,
-    );
+    const { followSystemTheme, theme, themeDark, themeLight, useThemeAccentColor } =
+        useSettingsStore((state) => state.general);
 
     const mqListener = (e: any) => {
         setIsDarkTheme(e.matches);
@@ -145,19 +167,28 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
     const appTheme: AppThemeConfiguration = useMemo(() => {
         const themeProperties = getAppTheme(selectedTheme);
 
+        // Use theme's primary color if useThemeAccentColor is enabled, otherwise use custom accent
+        const primaryColor = useThemeAccentColor
+            ? themeProperties.colors?.primary || themeProperties.colors?.['state-info'] || accent
+            : accent;
+
         return {
             ...themeProperties,
             colors: {
                 ...themeProperties.colors,
-                primary: accent,
+                primary: primaryColor,
             },
         };
-    }, [accent, selectedTheme]);
+    }, [accent, selectedTheme, useThemeAccentColor]);
 
     useEffect(() => {
         const root = document.documentElement;
-        root.style.setProperty('--theme-colors-primary', accent);
-    }, [accent]);
+        const themeProperties = getAppTheme(selectedTheme);
+        const primaryColor = useThemeAccentColor
+            ? themeProperties.colors?.primary || themeProperties.colors?.['state-info'] || accent
+            : accent;
+        root.style.setProperty('--theme-colors-primary', primaryColor);
+    }, [accent, selectedTheme, useThemeAccentColor]);
 
     useEffect(() => {
         const root = document.documentElement;
@@ -235,9 +266,8 @@ export const useAppThemeColors = () => {
     const accent = useSettingsStore((store) => store.general.accent);
     const getCurrentTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
     const [isDarkTheme] = useState(getCurrentTheme());
-    const { followSystemTheme, theme, themeDark, themeLight } = useSettingsStore(
-        (state) => state.general,
-    );
+    const { followSystemTheme, theme, themeDark, themeLight, useThemeAccentColor } =
+        useSettingsStore((state) => state.general);
 
     const getSelectedTheme = () => {
         if (followSystemTheme) {
@@ -252,14 +282,19 @@ export const useAppThemeColors = () => {
     const appTheme: AppThemeConfiguration = useMemo(() => {
         const themeProperties = getAppTheme(selectedTheme);
 
+        // Use theme's primary color if useThemeAccentColor is enabled, otherwise use custom accent
+        const primaryColor = useThemeAccentColor
+            ? themeProperties.colors?.primary || themeProperties.colors?.['state-info'] || accent
+            : accent;
+
         return {
             ...themeProperties,
             colors: {
                 ...themeProperties.colors,
-                primary: accent,
+                primary: primaryColor,
             },
         };
-    }, [accent, selectedTheme]);
+    }, [accent, selectedTheme, useThemeAccentColor]);
 
     const themeVars = useMemo(() => {
         return Object.entries(appTheme?.app ?? {})

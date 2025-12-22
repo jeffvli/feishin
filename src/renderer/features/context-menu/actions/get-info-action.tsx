@@ -11,25 +11,35 @@ import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 
 interface GetInfoActionProps {
     disabled?: boolean;
-    item: ItemDetailsModalProps['item'];
+    items: ItemDetailsModalProps['item'][];
 }
 
-export const GetInfoAction = ({ disabled, item }: GetInfoActionProps) => {
+export const GetInfoAction = ({ disabled, items }: GetInfoActionProps) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
 
     const onSelect = useCallback(async () => {
-        if (!server) return;
+        if (!server || items.length === 0) return;
+
+        const filteredItems = items.filter(
+            (item): item is NonNullable<typeof item> => item !== undefined,
+        );
+
+        if (filteredItems.length === 0) return;
 
         openModal({
-            children: <ItemDetailsModal item={item} />,
+            children: <ItemDetailsModal items={filteredItems} />,
             size: 'lg',
             styles: {
                 body: { paddingBottom: 'var(--theme-spacing-xl)' },
             },
-            title: item.name || t('page.contextMenu.showDetails', { postProcess: 'sentenceCase' }),
+            title:
+                filteredItems.length === 1
+                    ? filteredItems[0]?.name ||
+                      t('page.contextMenu.showDetails', { postProcess: 'sentenceCase' })
+                    : t('page.contextMenu.showDetails', { postProcess: 'sentenceCase' }),
         });
-    }, [item, server, t]);
+    }, [items, server, t]);
 
     return (
         <ContextMenu.Item disabled={disabled} leftIcon="info" onSelect={onSelect}>

@@ -16,6 +16,7 @@ export const defaultLight: AppThemeConfiguration = {
         black: 'rgb(0, 0, 0)',
         foreground: 'rgb(25, 25, 25)',
         'foreground-muted': 'rgb(80, 80, 80)',
+        primary: 'rgb(0, 122, 255)',
         'state-error': 'rgb(255, 59, 48)',
         'state-info': 'rgb(0, 122, 255)',
         'state-success': 'rgb(48, 209, 88)',

@@ -11,10 +11,10 @@
         "skip_back": "retroceder",
         "favorite": "favorito",
         "next": "siguiente",
-        "shuffle": "Reproducir aleatoriamente",
+        "shuffle": "Reproducir (mezclado)",
         "playbackFetchNoResults": "ninguna canción encontrada",
         "playbackFetchInProgress": "cargando canciones…",
-        "addNext": "añadir siguiente",
+        "addNext": "Siguiente",
         "playbackSpeed": "velocidad de reproducción",
         "playbackFetchCancel": "esto está tomando un tiempo... cierra la notificación para cancelar",
         "play": "reproducir",
@@ -25,12 +25,21 @@
         "queue_moveToTop": "mover seleccionado al final",
         "queue_moveToBottom": "mover seleccionado al principio",
         "shuffle_off": "mezclar desactivado",
-        "addLast": "añadir último",
+        "addLast": "Al final",
         "mute": "silencio",
         "skip_forward": "saltar hacia delante",
         "pause": "pausa",
         "playSimilarSongs": "Reproducir canciones similares",
-        "viewQueue": "ver cola"
+        "viewQueue": "ver cola",
+        "addLastShuffled": "Al final (mezclado)",
+        "addNextShuffled": "Al siguiente (mezclado)",
+        "queueType": "Tipo de cola",
+        "queueType_default": "Predeterminado",
+        "queueType_priority": "Prioridad",
+        "holdToShuffle": "Mantener para mezclar",
+        "lyrics": "Letras",
+        "restoreQueueFromServer": "Restaurar cola del servidor",
+        "saveQueueToServer": "Guardar cola en el servidor"
     },
     "setting": {
         "crossfadeStyle_description": "selecciona el estilo de crossfade a usar por el reproductor de audio",
@@ -135,7 +144,6 @@
         "sidePlayQueueStyle_description": "establece el estilo de la cola de reproducción lateral",
         "replayGainMode": "modo de {{ReplayGain}}",
         "playbackStyle_optionNormal": "normal",
-        "floatingQueueArea": "mostrar área flotante de cola",
         "replayGainFallback_description": "ganancia en db a aplicar si el archivo no tiene etiquetas de {{ReplayGain}}",
         "replayGainPreamp_description": "ajusta la ganancia del preamplificador aplicada a los valores de {{ReplayGain}}",
         "hotkey_toggleRepeat": "alterna repetir",
@@ -161,7 +169,6 @@
         "hotkey_rate0": "Limpiar calificación",
         "discordApplicationId": "id de aplicación {{discord}}",
         "applicationHotkeys_description": "configura las teclas de acceso rápido de la aplicación. marca la casilla para establecerlas como teclas de acceso rápido globales (solo escritorio)",
-        "floatingQueueArea_description": "muestra un icono flotante en el lado derecho de la pantalla para ver la cola de reproducción",
         "hotkey_volumeMute": "silenciar volumen",
         "hotkey_toggleCurrentSongFavorite": "$t(common.currentSong) cambia a favorita",
         "remoteUsername": "nombre de usuario del control remoto del servidor",
@@ -203,9 +210,7 @@
         "playerAlbumArtResolution": "resolución de la carátula del álbum del reproductor",
         "homeConfiguration": "Configuración de la página de inicio",
         "mpvExtraParameters_help": "Uno por línea",
-        "genreBehavior": "Comportamiento predeterminado de la página de géneros",
         "externalLinks_description": "Permite mostrar enlaces externos (Last.fm, MusicBrainz) en las páginas del artista/álbum",
-        "genreBehavior_description": "Determina si al hacer clic en un género se abre por defecto la lista de pistas o de álbumes",
         "homeConfiguration_description": "Configura qué elementos son mostrados y en qué orden en la página de inicio",
         "clearCacheSuccess": "Caché limpiada correctamente",
         "externalLinks": "Mostrar enlaces externos",
@@ -213,8 +218,6 @@
         "homeFeature_description": "Controla si se muestra el gran carrusel destacado en la página de inicio",
         "imageAspectRatio_description": "Si está habilitado, la portada será mostrada usando su relación de aspecto nativa. Para arte que no es 1:1, el espacio restante estará vacío",
         "imageAspectRatio": "Usar relación de aspecto nativa de portada",
-        "doubleClickBehavior": "poner en cola todas las pistas buscadas al hacer doble clic",
-        "doubleClickBehavior_description": "si está activado, se pondrán en cola todas las pistas que coincidan en una búsqueda de pistas. De lo contrario, solo se pondrán en cola las pistas seleccionadas",
         "volumeWidth": "Ancho del deslizador de volumen",
         "volumeWidth_description": "La anchura del deslizador de volumen",
         "discordListening_description": "muestra el estado como Escuchando en lugar de Jugando a",
@@ -304,7 +307,49 @@
         "language": "Idioma",
         "notify": "Activar notificaciones de canciones",
         "notify_description": "Muestra notificaciones cuando se cambia la canción actual",
-        "transcode": "Activar transcodificación"
+        "transcode": "Activar transcodificación",
+        "analyticsDisable": "Exclusión voluntaria de analíticas basadas en el uso",
+        "analyticsDisable_description": "Se envía el uso de datos anónimos al desarrollador para ayudar a mejorar la aplicación",
+        "playerbarSlider": "Barra de reproducción deslizante",
+        "playerbarSliderType_optionWaveform": "Forma de onda",
+        "playerbarWaveformAlign": "Alineación de la forma de onda",
+        "playerbarSliderType_optionSlider": "Deslizador",
+        "playerbarWaveformAlign_optionTop": "Superior",
+        "playerbarWaveformAlign_optionCenter": "Centrado",
+        "playerbarWaveformAlign_optionBottom": "Inferior",
+        "playerbarWaveformBarWidth": "Ancho de barra de la forma de onda",
+        "playerbarWaveformGap": "Brecha de la forma de onda",
+        "playerbarWaveformRadius": "Radio de la forma de onda",
+        "showLyricsInSidebar_description": "Se añadirá un panel a la cola de reproducción acoplada que muestra las letras",
+        "showLyricsInSidebar": "Mostrar letras en la barra lateral del reproductor",
+        "showVisualizerInSidebar_description": "Se añadirá un panel a la barra lateral de reproducción que muestra el visualizador",
+        "showVisualizerInSidebar": "Mostrar visualizador en la barra lateral de reproducción",
+        "queryBuilder": "Generador de consultas",
+        "queryBuilderCustomFields_inputTag": "Etiqueta",
+        "queryBuilderCustomFields": "Campos personalizados",
+        "queryBuilderCustomFields_description": "Añade campos personalizados a usar en los generadores de consultas",
+        "queryBuilderCustomFields_inputLabel": "Rótulo",
+        "audioFadeOnStatusChange": "Fundido del audio al cambiar de estado",
+        "audioFadeOnStatusChange_description": "Activa el fundido de salida y el de entrada cuando cambia el estado al reproducir/pausar",
+        "followCurrentSong_description": "Desplaza automáticamente la cola de reproducción a la canción en reproducción actual",
+        "followCurrentSong": "Seguir la canción actual",
+        "playerFilters": "Filtrar las canciones de la cola",
+        "playerFilters_description": "Omite la adición de canciones a la cola basado en los siguientes criterios",
+        "playerbarSlider_description": "La forma de onda no es recomendable en una conexión a Internet lenta o medida",
+        "autoDJ": "DJ automático",
+        "autoDJ_description": "Añade canciones similares a las de la cola automáticamente",
+        "autoDJ_itemCount": "Recuento de elementos",
+        "autoDJ_itemCount_description": "El número de elementos que se ha intentado añadir a la cola cuando DJ automático está activado",
+        "autoDJ_timing_description": "El número de canciones restantes en la cola antes de que DJ automático se dispare",
+        "autoDJ_timing": "Tiempo",
+        "logLevel": "Nivel de registro",
+        "logLevel_description": "Establece el mínimo nivel de registro a mostrar. Depuración muestra todos los registros, error solo muestra errores",
+        "logLevel_optionDebug": "Depuración",
+        "logLevel_optionError": "Error",
+        "logLevel_optionInfo": "Información",
+        "logLevel_optionWarn": "Advertencia",
+        "useThemeAccentColor": "Usar color de acentuación de tema",
+        "useThemeAccentColor_description": "Usa el color principal definido en el tema seleccionado en lugar del color de acentuación personalizado"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -328,7 +373,19 @@
             "lastfm": "Abrir en Last.fm",
             "musicbrainz": "Abrir en MusicBrainz"
         },
-        "moveToNext": "pasar al siguiente"
+        "moveToNext": "pasar al siguiente",
+        "downloadStarted": "Iniciada descarga de {{count}} elementos",
+        "moveItems": "Mover elementos",
+        "shuffle": "Mezclar",
+        "shuffleAll": "Mezclar todo",
+        "shuffleSelected": "Mezclar seleccionados",
+        "viewMore": "Ver más",
+        "holdToMoveToBottom": "Mantener pulsado para desplazar hacia abajo",
+        "holdToMoveToTop": "Mantener pulsado para desplazar hacia arriba",
+        "moveUp": "Desplazar hacia arriba",
+        "moveDown": "Desplazar hacia abajo",
+        "createRadioStation": "Crear $t(entity.radioStation_one)",
+        "deleteRadioStation": "Borrar $t(entity.radioStation_one)"
     },
     "common": {
         "backward": "hacia atrás",
@@ -435,7 +492,17 @@
         "private": "Privado",
         "public": "Público",
         "recordLabel": "Sello discográfico",
-        "releaseType": "Tipo de lanzamiento"
+        "releaseType": "Tipo de lanzamiento",
+        "doNotShowAgain": "No mostrar esto de nuevo",
+        "externalLinks": "Enlaces externos",
+        "faster": "Más rápido",
+        "slower": "Más lento",
+        "sort": "Ordenar",
+        "gridRows": "Filas de la cuadrícula",
+        "tableColumns": "Columnas de la tabla",
+        "itemsMore": "{{count}} más",
+        "noFilters": "Ningún filtro configurado",
+        "view": "Vista"
     },
     "error": {
         "remotePortWarning": "reiniciar el servidor para aplicar el nuevo puerto",
@@ -461,7 +528,9 @@
         "networkError": "Ocurrió un error de red",
         "openError": "No se pudo abrir el archivo",
         "badValue": "Opción inválida \"{{value}}\". Este valor ya no existe",
-        "notificationDenied": "Se denegaron los permisos para notificaciones. Esta configuración no tiene efecto"
+        "notificationDenied": "Se denegaron los permisos para notificaciones. Esta configuración no tiene efecto",
+        "saveQueueFailed": "Error al guardar la cola",
+        "multipleServerSaveQueueError": "La cola de reproducción tiene una o más canciones que no son del servidor actual. Esto no está soportado"
     },
     "filter": {
         "mostPlayed": "más reproducido",
@@ -522,7 +591,9 @@
             "artists": "$t(entity.artist_other)",
             "albumArtists": "$t(entity.albumArtist_other)",
             "shared": "compartido $t(entity.playlist_other)",
-            "myLibrary": "Mi biblioteca"
+            "myLibrary": "Mi biblioteca",
+            "favorites": "$t(entity.favorite_other)",
+            "radio": "$t(entity.radioStation_other)"
         },
         "appMenu": {
             "selectServer": "seleccionar servidor",
@@ -536,7 +607,11 @@
             "goBack": "retroceder",
             "goForward": "avanzar",
             "privateModeOff": "Desactivar modo privado",
-            "privateModeOn": "Activar modo privado"
+            "privateModeOn": "Activar modo privado",
+            "selectMusicFolder": "Seleccionar carpeta de música",
+            "noMusicFolder": "Ninguna carpeta de música seleccionada",
+            "multipleMusicFolders": "{{count}} carpetas de música seleccionadas",
+            "commandPalette": "Abrir paleta de comandos"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -562,7 +637,9 @@
             "playShuffled": "$t(player.shuffle)",
             "moveToNext": "$t(action.moveToNext)",
             "goToAlbum": "Ir a $t(entity.album_one)",
-            "goToAlbumArtist": "Ir a $t(entity.albumArtist_one)"
+            "goToAlbumArtist": "Ir a $t(entity.albumArtist_one)",
+            "moveItems": "$t(action.moveItems)",
+            "goTo": "Ir a"
         },
         "home": {
             "mostPlayed": "más reproducidos",
@@ -570,7 +647,8 @@
             "title": "$t(common.home)",
             "explore": "explora desde tu biblioteca",
             "recentlyPlayed": "reproducidos recientemente",
-            "recentlyReleased": "Lanzado recientemente"
+            "recentlyReleased": "Lanzado recientemente",
+            "genres": "$t(entity.genre_other)"
         },
         "fullscreenPlayer": {
             "upNext": "siguiente",
@@ -605,7 +683,24 @@
             "generalTab": "general",
             "hotkeysTab": "teclas de acceso rápido",
             "windowTab": "ventana",
-            "advanced": "Avanzado"
+            "advanced": "Avanzado",
+            "analytics": "Analíticas",
+            "updates": "Actualización",
+            "cache": "Caché",
+            "application": "Aplicación",
+            "queryBuilder": "Generador de consultas",
+            "theme": "Tema",
+            "controls": "Controles",
+            "remote": "Remoto",
+            "exportImport": "Importar/Exportar",
+            "scrobble": "Scrobble",
+            "audio": "Audio",
+            "lyrics": "Letras",
+            "transcoding": "Transcodificación",
+            "discord": "Discord",
+            "sidebar": "Barra lateral",
+            "playerFilters": "Filtros del reproductor",
+            "logger": "Registrador"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
@@ -662,6 +757,15 @@
             "username": "nombre de usuario",
             "editServerDetailsTooltip": "editar detalles del servidor",
             "url": "URL"
+        },
+        "favorites": {
+            "title": "$t(entity.favorite_other)"
+        },
+        "folderList": {
+            "title": "$t(entity.folder_other)"
+        },
+        "radioList": {
+            "title": "Estaciones de radio"
         }
     },
     "form": {
@@ -713,12 +817,17 @@
         "editPlaylist": {
             "title": "editar $t(entity.playlist_one)",
             "success": "$t(entity.playlist_one) actualizada correctamente",
-            "publicJellyfinNote": "Jellyfin por alguna razón no expone si una lista de reproducción es pública o no. Si deseas que ésta siga siendo pública, por favor ten seleccionada la siguiente entrada"
+            "publicJellyfinNote": "Jellyfin por alguna razón no expone si una lista de reproducción es pública o no. Si deseas que ésta siga siendo pública, por favor ten seleccionada la siguiente entrada",
+            "editNote": "No se recomiendan las ediciones manuales para grandes listas de reproducción. ¿Seguro que aceptas el riesgo de pérdida de información incurrido por sobrescribir la lista de reproducción existente?"
         },
         "queryEditor": {
             "input_optionMatchAll": "coincidir todos",
             "input_optionMatchAny": "coincidir cualquiera",
-            "title": "Editor de consultas"
+            "title": "Editor de consultas",
+            "addRuleGroup": "Añadir regla de grupo",
+            "removeRuleGroup": "Eliminar regla de grupo",
+            "resetToDefault": "Restablecer al valor predeterminado",
+            "clearFilters": "Limpiar filtros"
         },
         "shareItem": {
             "createFailed": "No se pudo crear el recurso compartido (¿está habilitado el uso compartido?)",
@@ -732,6 +841,31 @@
             "enabled": "Modo privado activado, el estado de reproducción ahora está oculto de integraciones externas",
             "disabled": "Modo privado desactivado, el estado de reproducción ahora es visible a las integraciones externas habilitadas",
             "title": "Modo privado"
+        },
+        "largeFetchConfirmation": {
+            "title": "Añadir elementos a la cola",
+            "description": "Esta acción agregará todos los elementos en la vista filtrada actual"
+        },
+        "shuffleAll": {
+            "title": "Reproducir aleatorio",
+            "input_genre": "$t(entity.genre_one)",
+            "input_limit": "¿Cuántas canciones?",
+            "input_minYear": "Del año",
+            "input_maxYear": "Hasta el año",
+            "input_played": "Reproducir filtro",
+            "input_played_optionAll": "Todas las pistas",
+            "input_played_optionUnplayed": "Solo las pistas sin reproducir",
+            "input_played_optionPlayed": "Solo las pistas reproducidas"
+        },
+        "saveQueue": {
+            "success": "Cola de reproducción guardada en el servidor"
+        },
+        "createRadioStation": {
+            "success": "Estación de radio creada con éxito",
+            "title": "Crear estación de radio",
+            "input_homepageUrl": "URL de la página de inicio",
+            "input_name": "Nombre",
+            "input_streamUrl": "URL de la transmisión"
         }
     },
     "table": {
@@ -759,7 +893,10 @@
             "discNumber": "disco",
             "channels": "$t(common.channel_other)",
             "size": "$t(common.size)",
-            "codec": "$t(common.codec)"
+            "codec": "$t(common.codec)",
+            "owner": "Propietario",
+            "bitDepth": "$t(common.bitDepth)",
+            "sampleRate": "$t(common.sampleRate)"
         },
         "config": {
             "label": {
@@ -790,7 +927,12 @@
                 "favorite": "$t(common.favorite)",
                 "year": "$t(common.year)",
                 "codec": "$t(common.codec)",
-                "songCount": "$t(entity.track_other)"
+                "songCount": "$t(entity.track_other)",
+                "albumCount": "$t(entity.album_other)",
+                "genreBadge": "$t(entity.genre_one) (insignias)",
+                "image": "Imagen",
+                "bitDepth": "$t(common.bitDepth)",
+                "sampleRate": "$t(common.sampleRate)"
             },
             "general": {
                 "gap": "$t(common.gap)",
@@ -800,12 +942,31 @@
                 "displayType": "tipo de visualización",
                 "itemGap": "espacio entre elementos (px)",
                 "itemSize": "tamaño del elemento (px)",
-                "followCurrentSong": "seguir la canción actual"
+                "followCurrentSong": "seguir la canción actual",
+                "advancedSettings": "Opciones avanzadas",
+                "autosize": "Autodimensionar",
+                "moveUp": "Ascender",
+                "moveDown": "Descender",
+                "pinToLeft": "Anclar a la izquierda",
+                "pinToRight": "Anclar a la derecha",
+                "alignLeft": "Alinear a la izquierda",
+                "alignCenter": "Alinear al centro",
+                "alignRight": "Alinear a la derecha",
+                "itemsPerRow": "Elementos por fila",
+                "size_default": "Predeterminado",
+                "size_compact": "Compacto",
+                "size_large": "Grande",
+                "pagination": "Paginación",
+                "pagination_itemsPerPage": "Elementos por página",
+                "pagination_infinite": "Infinita",
+                "pagination_paginate": "Paginada",
+                "alternateRowColors": "Colores de fila alternativos",
+                "horizontalBorders": "Bordes de fila",
+                "verticalBorders": "Bordes de columna",
+                "rowHoverHighlight": "Resaltar al pasar el cursor por la fila"
             },
             "view": {
-                "card": "tarjeta",
                 "table": "tabla",
-                "poster": "cartel",
                 "list": "Lista",
                 "grid": "Cuadrícula"
             }
@@ -863,7 +1024,13 @@
         "play_other": "{{count}} reproducciones",
         "song_one": "canción",
         "song_many": "canciones",
-        "song_other": "canciones"
+        "song_other": "canciones",
+        "radioStation_one": "Estación de radio",
+        "radioStation_many": "Estaciones de radio",
+        "radioStation_other": "Estaciones de radio",
+        "radioStationWithCount_one": "{{count}} estación de radio",
+        "radioStationWithCount_many": "{{count}} estaciones de radio",
+        "radioStationWithCount_other": "{{count}} estaciones de radio"
     },
     "dragDropZone": {
         "error_oneFileOnly": "Por favor selecciona un solo archivo",
@@ -892,5 +1059,30 @@
             "spokenWord": "Palabra hablada",
             "demo": "Maqueta"
         }
+    },
+    "queryBuilder": {
+        "standardTags": "Etiquetas estándar",
+        "customTags": "Etiquetas personalizadas"
+    },
+    "filterOperator": {
+        "after": "es después",
+        "afterDate": "es después (fecha)",
+        "before": "es antes",
+        "beforeDate": "es antes (fecha)",
+        "contains": "contiene",
+        "endsWith": "termina con",
+        "inPlaylist": "está en",
+        "inTheLast": "está en el último",
+        "inTheRange": "está en el rango",
+        "inTheRangeDate": "está en el rango (fecha)",
+        "is": "es",
+        "isNot": "no es",
+        "isGreaterThan": "es mayor que",
+        "isLessThan": "es menor que",
+        "notContains": "no contiene",
+        "notInPlaylist": "no está en",
+        "notInTheLast": "no está en el último",
+        "startsWith": "empieza con",
+        "matchesRegex": "coincide con expresión regular"
     }
 }

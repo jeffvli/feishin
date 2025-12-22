@@ -409,8 +409,6 @@
                 "dateAdded": "추가된 날짜"
             },
             "view": {
-                "card": "카드",
-                "poster": "포스터",
                 "table": "표"
             }
         }

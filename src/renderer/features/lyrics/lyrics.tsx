@@ -32,7 +32,11 @@ import {
     StructuredLyric,
 } from '/@/shared/types/domain-types';
 
-export const Lyrics = () => {
+type LyricsProps = {
+    fadeOutNoLyricsMessage?: boolean;
+};
+
+export const Lyrics = ({ fadeOutNoLyricsMessage = true }: LyricsProps) => {
     const currentSong = usePlayerSong();
     const {
         enableAutoTranslation,
@@ -178,10 +182,17 @@ export const Lyrics = () => {
     // }, [currentSong?.id, currentSong?._serverId]);
 
     const handleOnRemoveLyric = useCallback(() => {
+        setOverride(undefined);
+
+        // Clear the main lyrics query cache
         queryClient.setQueryData(
             queryKeys.songs.lyrics(currentSong?._serverId, { songId: currentSong?.id }),
-            (prev: FullLyricsMetadata | undefined) => {
+            (prev: FullLyricsMetadata | StructuredLyric[] | undefined) => {
                 if (!prev) {
+                    return undefined;
+                }
+
+                if (Array.isArray(prev)) {
                     return undefined;
                 }
 
@@ -191,7 +202,17 @@ export const Lyrics = () => {
                 };
             },
         );
-    }, [currentSong?.id, currentSong?._serverId]);
+
+        // Clear the override query cache if it exists
+        if (override) {
+            queryClient.removeQueries({
+                queryKey: queryKeys.songs.lyricsByRemoteId({
+                    remoteSongId: override.id,
+                    remoteSource: override.source,
+                }),
+            });
+        }
+    }, [currentSong?.id, currentSong?._serverId, override]);
 
     const fetchTranslation = useCallback(async () => {
         if (!lyrics) return;
@@ -248,6 +269,11 @@ export const Lyrics = () => {
 
     // Trigger fade out after a few seconds when no lyrics are found
     useEffect(() => {
+        if (!fadeOutNoLyricsMessage) {
+            setShouldFadeOut(false);
+            return undefined;
+        }
+
         if (!isLoadingLyrics && hasNoLyrics) {
             // Start fade out after 3 seconds (message visible for 3s, then 0.5s fade)
             const timer = setTimeout(() => {
@@ -262,13 +288,13 @@ export const Lyrics = () => {
         }
 
         return undefined;
-    }, [isLoadingLyrics, hasNoLyrics]);
+    }, [isLoadingLyrics, hasNoLyrics, fadeOutNoLyricsMessage]);
 
     return (
         <ComponentErrorBoundary>
             <div className={styles.lyricsContainer}>
                 {isLoadingLyrics ? (
-                    <Spinner container size={25} />
+                    <Spinner container />
                 ) : (
                     <AnimatePresence mode="sync">
                         {hasNoLyrics ? (
@@ -279,7 +305,7 @@ export const Lyrics = () => {
                                     transition={{ duration: 0.5 }}
                                 >
                                     <Group>
-                                        <Text fw={500}>
+                                        <Text fw={500} isMuted isNoSelect>
                                             {t('page.fullscreenPlayer.noLyrics', {
                                                 postProcess: 'sentenceCase',
                                             })}

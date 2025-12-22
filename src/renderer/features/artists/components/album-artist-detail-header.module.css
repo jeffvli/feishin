@@ -1,0 +1,8 @@
+.metadata-group {
+    justify-content: center;
+    width: 100%;
+
+    @container (min-width: $mantine-breakpoint-sm) {
+        justify-content: flex-start;
+    }
+}

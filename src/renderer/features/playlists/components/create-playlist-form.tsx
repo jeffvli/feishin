@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react';
+import { t } from 'i18next';
+import { MouseEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -10,6 +11,7 @@ import { convertQueryGroupToNDQuery } from '/@/renderer/features/playlists/utils
 import { useCurrentServer } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
 import { Group } from '/@/shared/components/group/group';
+import { closeAllModals, openModal } from '/@/shared/components/modal/modal';
 import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
@@ -18,7 +20,12 @@ import { Text } from '/@/shared/components/text/text';
 import { Textarea } from '/@/shared/components/textarea/textarea';
 import { toast } from '/@/shared/components/toast/toast';
 import { useForm } from '/@/shared/hooks/use-form';
-import { CreatePlaylistBody, ServerType, SongListSort } from '/@/shared/types/domain-types';
+import {
+    CreatePlaylistBody,
+    ServerListItem,
+    ServerType,
+    SongListSort,
+} from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 
 interface CreatePlaylistFormProps {
@@ -33,13 +40,9 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
 
     const form = useForm<CreatePlaylistBody>({
         initialValues: {
-            _custom: {
-                navidrome: {
-                    rules: undefined,
-                },
-            },
             comment: '',
             name: '',
+            queryBuilderRules: undefined,
         },
     });
     const [isSmartPlaylist, setIsSmartPlaylist] = useState(false);
@@ -79,14 +82,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                 apiClientProps: { serverId: server.id },
                 body: {
                     ...values,
-                    _custom: {
-                        navidrome: {
-                            ...values._custom?.navidrome,
-                            rules,
-                        },
-                        // Top-level rules field is what Navidrome expects for smart playlists.
-                        ...(rules ? { rules } : {}),
-                    },
+                    ...(rules ? { queryBuilderRules: rules } : {}),
                 },
             },
             {
@@ -200,4 +196,17 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
             </Stack>
         </form>
     );
+};
+
+export const openCreatePlaylistModal = (
+    server?: ServerListItem,
+    e?: MouseEvent<HTMLButtonElement>,
+) => {
+    e?.stopPropagation();
+
+    openModal({
+        children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
+        size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
+        title: t('form.createPlaylist.title', { postProcess: 'titleCase' }),
+    });
 };

@@ -21,7 +21,6 @@ import { JsonPreview } from '/@/renderer/features/shared/components/json-preview
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -160,30 +159,26 @@ const PlaylistQueryEditor = ({
 
     return (
         <div className="query-editor-container">
-            <Stack gap={0} h="100%" mah="50dvh" p="md" w="100%">
+            <Stack gap={0} h="100%" mah="30dvh" p="md" w="100%">
                 <Group justify="space-between" pb="md" wrap="nowrap">
                     <Group gap="sm" wrap="nowrap">
-                        <ActionIcon
-                            icon={isQueryBuilderExpanded ? 'arrowUpS' : 'arrowDownS'}
-                            iconProps={{
-                                size: 'md',
-                            }}
+                        <Button
+                            leftSection={
+                                <Icon
+                                    icon={isQueryBuilderExpanded ? 'arrowUpS' : 'arrowDownS'}
+                                    size="lg"
+                                />
+                            }
                             onClick={onToggleExpand}
-                            size="xs"
-                        />
-                        <Text>
+                            size="compact-md"
+                        >
                             {t('form.queryEditor.title', {
                                 postProcess: 'titleCase',
                             })}
-                        </Text>
+                        </Button>
                     </Group>
                     <Group gap="xs">
-                        <Button
-                            disabled={!isQueryBuilderExpanded}
-                            onClick={openPreviewModal}
-                            size="sm"
-                            variant="subtle"
-                        >
+                        <Button onClick={openPreviewModal} size="sm" variant="subtle">
                             {t('common.preview', { postProcess: 'titleCase' })}
                         </Button>
                         <Button
@@ -280,15 +275,12 @@ const PlaylistDetailSongListRoute = () => {
             {
                 apiClientProps: { serverId: detailQuery?.data?._serverId },
                 body: {
-                    _custom: {
-                        owner: detailQuery?.data?.owner || '',
-                        ownerId: detailQuery?.data?.ownerId || '',
-                        rules,
-                        sync: detailQuery?.data?.sync || false,
-                    },
                     comment: detailQuery?.data?.description || '',
                     name: detailQuery?.data?.name,
+                    ownerId: detailQuery?.data?.ownerId || '',
                     public: detailQuery?.data?.public || false,
+                    queryBuilderRules: rules,
+                    sync: detailQuery?.data?.sync || false,
                 },
             },
             {
@@ -332,19 +324,12 @@ const PlaylistDetailSongListRoute = () => {
             children: (
                 <SaveAsPlaylistForm
                     body={{
-                        _custom: {
-                            navidrome: {
-                                owner: detailQuery?.data?.owner || '',
-                                ownerId: detailQuery?.data?.ownerId || '',
-                                rules,
-                                sync: detailQuery?.data?.sync || false,
-                            },
-                            rules,
-                            sync: detailQuery?.data?.sync || false,
-                        },
                         comment: detailQuery?.data?.description || '',
                         name: detailQuery?.data?.name,
+                        ownerId: detailQuery?.data?.ownerId || '',
                         public: detailQuery?.data?.public || false,
+                        queryBuilderRules: rules,
+                        sync: detailQuery?.data?.sync || false,
                     }}
                     onCancel={closeAllModals}
                     onSuccess={(data) =>
@@ -396,10 +381,11 @@ const PlaylistDetailSongListRoute = () => {
         });
     };
 
-    const isSmartPlaylist =
+    const isSmartPlaylist = Boolean(
         !detailQuery?.isLoading &&
-        detailQuery?.data?.rules &&
-        server?.type === ServerType.NAVIDROME;
+            detailQuery?.data?.rules &&
+            server?.type === ServerType.NAVIDROME,
+    );
 
     const [showQueryBuilder, setShowQueryBuilder] = useState(false);
     const [isQueryBuilderExpanded, setIsQueryBuilderExpanded] = useState(false);
@@ -415,16 +401,23 @@ const PlaylistDetailSongListRoute = () => {
     };
 
     const [itemCount, setItemCount] = useState<number | undefined>(undefined);
+    const [listData, setListData] = useState<unknown[]>([]);
+    const [mode, setMode] = useState<'edit' | 'view'>('view');
 
     const providerValue = useMemo(() => {
         return {
             customFilters: undefined,
             id: playlistId,
+            isSmartPlaylist,
             itemCount,
+            listData,
+            mode,
             pageKey: ItemListKey.PLAYLIST_SONG,
             setItemCount,
+            setListData,
+            setMode,
         };
-    }, [playlistId, itemCount]);
+    }, [playlistId, isSmartPlaylist, itemCount, listData, mode]);
 
     return (
         <AnimatedPage key={`playlist-detail-songList-${playlistId}`}>

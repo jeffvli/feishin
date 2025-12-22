@@ -259,16 +259,12 @@
         "discordLinkType_description": "Adiciona links externos para {{lastfm}} ou {{musicbrainz}} aos campos de música e artista no Rich Presence do {{discord}}. {{musicbrainz}} é o mais preciso, mas requer tags e não fornece links de artistas, enquanto {{lastfm}} deve sempre fornecer um link. Não realiza requisições de rede adicionais",
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} com alternativa para {{lastfm}}",
-        "doubleClickBehavior": "Adicionar todas as faixas pesquisadas à fila ao clicar duas vezes",
-        "doubleClickBehavior_description": "Se verdadeiro, todas as faixas correspondentes em uma pesquisa serão adicionadas à fila. Caso contrário, apenas a faixa clicada será adicionada",
         "enableRemote": "Ativar servidor de controle remoto",
         "enableRemote_description": "Ativa o servidor de controle remoto para permitir que outros dispositivos controlem o aplicativo",
         "externalLinks": "Mostrar links externos",
         "externalLinks_description": "Ativa a exibição de links externos (Last.fm, MusicBrainz) nas páginas de artista/álbum",
         "exitToTray": "Minimizar para a bandeja",
         "exitToTray_description": "Fechar o aplicativo para a bandeja do sistema",
-        "floatingQueueArea": "Exibir painel flutuante da fila",
-        "floatingQueueArea_description": "Exibir um ícone flutuante no lado direito da tela para visualizar a fila de reprodução",
         "followLyric": "Seguir a letra atual",
         "followLyric_description": "Mover a letra até o ponto atual da música",
         "preferLocalLyrics": "Preferir letras locais",
@@ -283,8 +279,6 @@
         "gaplessAudio": "Áudio sem intervalos",
         "gaplessAudio_description": "Define a configuração de áudio sem intervalos para o MPV",
         "gaplessAudio_optionWeak": "Fraco (recomendado)",
-        "genreBehavior": "Comportamento padrão da página de gênero",
-        "genreBehavior_description": "Determina se ao clicar em um gênero ele é aberto por padrão na lista de faixas ou de álbuns",
         "globalMediaHotkeys": "Teclas de atalho globais de mídia",
         "globalMediaHotkeys_description": "Ativar ou desativar o uso das teclas de atalho de mídia do sistema para controlar a reprodução",
         "homeConfiguration": "Configuração da página inicial",
@@ -490,10 +484,8 @@
                 "tableColumns": "Colunas da tabela"
             },
             "view": {
-                "card": "Cartão",
                 "grid": "Grade",
                 "list": "Lista",
-                "poster": "Poster",
                 "table": "Tabela"
             }
         },

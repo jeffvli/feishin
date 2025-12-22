@@ -12,6 +12,7 @@ import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { useSongListFilters } from '/@/renderer/features/songs/hooks/use-song-list-filters';
 import { useCurrentServerId } from '/@/renderer/store';
 import { titleCase } from '/@/renderer/utils';
+import { NDSongQueryFieldsLabelMap } from '/@/shared/api/navidrome/navidrome-types';
 import { Divider } from '/@/shared/components/divider/divider';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -76,7 +77,7 @@ export const NavidromeSongFilters = () => {
     const debouncedHandleYearFilter = useDebouncedCallback(handleYearFilter, 300);
 
     return (
-        <Stack p="md">
+        <Stack px="md" py="md">
             {yesNoUndefinedFilters.map((filter) => (
                 <YesNoSelect
                     clearable
@@ -151,7 +152,7 @@ const TagFilters = () => {
     const serverId = useCurrentServerId();
 
     const tagsQuery = useSuspenseQuery(
-        sharedQueries.tags({
+        sharedQueries.tagList({
             query: { type: LibraryItem.SONG },
             serverId,
         }),
@@ -171,7 +172,7 @@ const TagFilters = () => {
         for (const tag of tagsQuery.data?.enumTags || []) {
             if (!tagsQuery.data?.excluded.song.includes(tag.name)) {
                 results.push({
-                    label: titleCase(tag.name),
+                    label: NDSongQueryFieldsLabelMap[tag.name] ?? titleCase(tag.name),
                     options: tag.options,
                     value: tag.name,
                 });

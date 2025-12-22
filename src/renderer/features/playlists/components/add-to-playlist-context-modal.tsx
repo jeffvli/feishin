@@ -7,11 +7,17 @@ import styles from './add-to-playlist-context-modal.module.css';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
-import { getGenreSongsById } from '/@/renderer/features/player/utils';
+import {
+    getAlbumSongsById,
+    getArtistSongsById,
+    getGenreSongsById,
+    getPlaylistSongsById,
+    getSongsByFolder,
+} from '/@/renderer/features/player/utils';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { useAddToPlaylist } from '/@/renderer/features/playlists/mutations/add-to-playlist-mutation';
 import { queryClient } from '/@/renderer/lib/react-query';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { formatDurationString } from '/@/renderer/utils';
 import { Box } from '/@/shared/components/box/box';
 import { Button } from '/@/shared/components/button/button';
@@ -31,13 +37,8 @@ import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { useForm } from '/@/shared/hooks/use-form';
-import {
-    Playlist,
-    PlaylistListSort,
-    SongListQuery,
-    SongListSort,
-    SortOrder,
-} from '/@/shared/types/domain-types';
+import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
+import { Playlist, PlaylistListSort, SortOrder } from '/@/shared/types/domain-types';
 
 export const AddToPlaylistContextModal = ({
     id,
@@ -45,26 +46,37 @@ export const AddToPlaylistContextModal = ({
 }: ContextModalProps<{
     albumId?: string[];
     artistId?: string[];
+    folderId?: string[];
     genreId?: string[];
     initialSelectedIds?: string[];
     playlistId?: string[];
     songId?: string[];
 }>) => {
     const { t } = useTranslation();
-    const { albumId, artistId, genreId, initialSelectedIds, playlistId, songId } = innerProps;
-    const server = useCurrentServer();
+    const { albumId, artistId, folderId, genreId, initialSelectedIds, playlistId, songId } =
+        innerProps;
+    const serverId = useCurrentServerId();
     const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState<string>('');
     const [focusedRowIndex, setFocusedRowIndex] = useState<null | number>(null);
     const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
     const formRef = useRef<HTMLFormElement>(null);
 
+    const [skipDuplicates, setSkipDuplicates] = useLocalStorage({
+        defaultValue: true,
+        key: 'playlist-skip-duplicate',
+    });
+
     const form = useForm({
         initialValues: {
             newPlaylists: [] as string[],
             selectedPlaylistIds: initialSelectedIds || [],
-            skipDuplicates: true,
+            skipDuplicates: skipDuplicates,
         },
+    });
+
+    form.watch('skipDuplicates', (event) => {
+        setSkipDuplicates(event.value);
     });
 
     const addToPlaylistMutation = useAddToPlaylist({});
@@ -72,16 +84,12 @@ export const AddToPlaylistContextModal = ({
     const playlistList = useQuery(
         playlistsQueries.list({
             query: {
-                _custom: {
-                    navidrome: {
-                        smart: false,
-                    },
-                },
+                excludeSmartPlaylists: true,
                 sortBy: PlaylistListSort.NAME,
                 sortOrder: SortOrder.ASC,
                 startIndex: 0,
             },
-            serverId: server?.id,
+            serverId,
         }),
     );
 
@@ -109,78 +117,35 @@ export const AddToPlaylistContextModal = ({
 
     const getSongsByAlbum = useCallback(
         async (albumId: string) => {
-            const query: SongListQuery = {
-                albumIds: [albumId],
-                sortBy: SongListSort.ALBUM,
-                sortOrder: SortOrder.ASC,
-                startIndex: 0,
-            };
-
-            const queryKey = queryKeys.songs.list(server?.id || '', query);
-
-            const songsRes = await queryClient.fetchQuery({
-                queryFn: ({ signal }) => {
-                    if (!server) throw new Error('No server');
-                    return api.controller.getSongList({
-                        apiClientProps: { serverId: server?.id || '', signal },
-                        query,
-                    });
-                },
-                queryKey,
+            return getAlbumSongsById({
+                id: [albumId],
+                queryClient,
+                serverId,
             });
-
-            return songsRes;
         },
-        [server],
+        [serverId],
     );
 
     const getSongsByArtist = useCallback(
         async (artistId: string) => {
-            const query: SongListQuery = {
-                artistIds: [artistId],
-                sortBy: SongListSort.ARTIST,
-                sortOrder: SortOrder.ASC,
-                startIndex: 0,
-            };
-
-            const queryKey = queryKeys.songs.list(server?.id || '', query);
-
-            const songsRes = await queryClient.fetchQuery({
-                queryFn: ({ signal }) => {
-                    if (!server) throw new Error('No server');
-                    return api.controller.getSongList({
-                        apiClientProps: { serverId: server?.id || '', signal },
-                        query,
-                    });
-                },
-                queryKey,
+            return getArtistSongsById({
+                id: [artistId],
+                queryClient,
+                serverId,
             });
-
-            return songsRes;
         },
-        [server],
+        [serverId],
     );
 
     const getSongsByPlaylist = useCallback(
         async (playlistId: string) => {
-            const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId);
-
-            const songsRes = await queryClient.fetchQuery({
-                queryFn: ({ signal }) => {
-                    if (!server) throw new Error('No server');
-                    return api.controller.getPlaylistSongList({
-                        apiClientProps: { serverId: server?.id || '', signal },
-                        query: {
-                            id: playlistId,
-                        },
-                    });
-                },
-                queryKey,
+            return getPlaylistSongsById({
+                id: playlistId,
+                queryClient,
+                serverId,
             });
-
-            return songsRes;
         },
-        [server],
+        [serverId],
     );
 
     const handleSubmit = form.onSubmit(async (values) => {
@@ -211,9 +176,18 @@ export const AddToPlaylistContextModal = ({
                 const songs = await getGenreSongsById({
                     id: genreId,
                     queryClient,
-                    server,
+                    serverId,
                 });
 
+                allSongIds.push(...(songs?.items?.map((song) => song.id) || []));
+            }
+
+            if (folderId && folderId.length > 0) {
+                const songs = await getSongsByFolder({
+                    id: folderId,
+                    queryClient,
+                    serverId,
+                });
                 allSongIds.push(...(songs?.items?.map((song) => song.id) || []));
             }
 
@@ -234,7 +208,7 @@ export const AddToPlaylistContextModal = ({
                 for (const playlist of values.newPlaylists) {
                     try {
                         const response = await api.controller.createPlaylist({
-                            apiClientProps: { serverId: server?.id || '' },
+                            apiClientProps: { serverId },
                             body: {
                                 name: playlist,
                                 public: false,
@@ -257,19 +231,13 @@ export const AddToPlaylistContextModal = ({
                 const uniqueSongIds: string[] = [];
 
                 if (values.skipDuplicates) {
-                    const queryKey = queryKeys.playlists.songList(server?.id || '', playlistId);
+                    const queryKey = queryKeys.playlists.songList(serverId, playlistId);
 
                     const playlistSongsRes = await queryClient.fetchQuery({
                         queryFn: ({ signal }) => {
-                            if (!server)
-                                throw new Error(
-                                    t('error.serverNotSelectedError', {
-                                        postProcess: 'sentenceCase',
-                                    }),
-                                );
                             return api.controller.getPlaylistSongList({
                                 apiClientProps: {
-                                    serverId: server?.id || '',
+                                    serverId,
                                     signal,
                                 },
                                 query: {
@@ -291,13 +259,9 @@ export const AddToPlaylistContextModal = ({
                 }
 
                 if (values.skipDuplicates ? uniqueSongIds.length > 0 : allSongIds.length > 0) {
-                    if (!server) {
-                        setIsLoading(false);
-                        return;
-                    }
                     addToPlaylistMutation.mutate(
                         {
-                            apiClientProps: { serverId: server.id },
+                            apiClientProps: { serverId },
                             body: { songId: values.skipDuplicates ? uniqueSongIds : allSongIds },
                             query: { id: playlistId },
                         },

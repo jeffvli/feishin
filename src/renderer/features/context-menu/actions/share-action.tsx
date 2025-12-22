@@ -19,6 +19,8 @@ export const ShareAction = ({ ids, itemType }: ShareActionProps) => {
                 return 'album';
             case LibraryItem.ALBUM_ARTIST:
                 return 'albumArtist';
+            case LibraryItem.FOLDER:
+                return 'folder';
             case LibraryItem.PLAYLIST:
                 return 'playlist';
             case LibraryItem.SONG:

@@ -1,15 +1,13 @@
-import { closeAllModals, openModal } from '@mantine/modals';
 import { nanoid } from 'nanoid/non-secure';
 import { Dispatch, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router';
-import { createSearchParams } from 'react-router';
+import { createSearchParams, generatePath, useNavigate } from 'react-router';
 
-import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
+import { openCreatePlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
-import { LibraryItem, ServerType } from '/@/shared/types/domain-types';
+import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface HomeCommandsProps {
     handleClose: () => void;
@@ -32,13 +30,8 @@ export const HomeCommands = ({
 
     const handleCreatePlaylistModal = useCallback(() => {
         handleClose();
-
-        openModal({
-            children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
-            size: server?.type === ServerType?.NAVIDROME ? 'lg' : 'sm',
-            title: t('form.createPlaylist.title', { postProcess: 'sentenceCase' }),
-        });
-    }, [handleClose, server?.type, t]);
+        openCreatePlaylistModal(server);
+    }, [handleClose, server]);
 
     const handleSearch = () => {
         navigate(

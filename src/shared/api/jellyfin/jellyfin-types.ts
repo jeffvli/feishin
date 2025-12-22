@@ -253,6 +253,7 @@ const sessionInfo = z.object({
         CanSeek: z.boolean(),
         IsMuted: z.boolean(),
         IsPaused: z.boolean(),
+        PositionTicks: z.number().optional(),
         RepeatMode: z.string(),
     }),
     RemoteEndPoint: z.string(),
@@ -487,6 +488,7 @@ const song = z.object({
     MediaType: z.string(),
     Name: z.string(),
     NormalizationGain: z.number().optional(),
+    ParentId: z.string().optional(),
     ParentIndexNumber: z.number(),
     People: participant.array().optional(),
     PlaylistItemId: z.string().optional(),
@@ -495,7 +497,7 @@ const song = z.object({
     ProviderIds: providerIds.optional(),
     RunTimeTicks: z.number(),
     ServerId: z.string(),
-    SortName: z.string(),
+    SortName: z.string().optional(),
     Tags: z.string().array().optional(),
     Type: z.string(),
     UserData: userData.optional(),
@@ -772,6 +774,56 @@ const filters = z.object({
     Years: z.number().array().optional(),
 });
 
+const folder = z.object({
+    BackdropImageTags: z.array(z.string()),
+    ChannelId: z.null(),
+    CollectionType: z.string(),
+    Id: z.string(),
+    ImageBlurHashes: imageBlurHashes,
+    ImageTags: imageTags,
+    IsFolder: z.boolean(),
+    LocationType: z.string(),
+    MediaType: z.string(),
+    Name: z.string(),
+    ParentId: z.string().optional(),
+    ServerId: z.string(),
+    Type: z.string(),
+    UserData: userData.optional(),
+});
+
+const folderList = pagination.extend({
+    Items: z.array(folder),
+});
+
+const folderParameters = z.object({
+    Fields: z.string().optional(),
+    ParentId: z.string().optional(),
+    SortBy: z.string().optional(),
+    SortOrder: z.enum(sortOrderValues).optional(),
+});
+
+const queueItem = z.object({
+    Id: z.string(),
+    PlaylistItemId: z.string().optional(),
+});
+
+const saveQueueParameters = scrobbleParameters.merge(
+    z.object({
+        NowPlayingQueue: z.array(queueItem),
+        PlaylistItemId: z.string().optional(),
+    }),
+);
+
+const getQueueParameters = z.object({});
+
+const getSessions = z.array(
+    sessionInfo.merge(
+        z.object({
+            PlaylistItemId: z.string().optional(),
+        }),
+    ),
+);
+
 export const jfType = {
     _enum: {
         albumArtistList: albumArtistListSort,
@@ -794,11 +846,14 @@ export const jfType = {
         deletePlaylist: deletePlaylistParameters,
         favorite: favoriteParameters,
         filterList: filterListParameters,
+        folder: folderParameters,
         genreList: genreListParameters,
+        getQueue: getQueueParameters,
         musicFolderList: musicFolderListParameters,
         playlistDetail: playlistDetailParameters,
         playlistList: playlistListParameters,
         removeFromPlaylist: removeFromPlaylistParameters,
+        saveQueue: saveQueueParameters,
         scrobble: scrobbleParameters,
         search: searchParameters,
         similarArtistList: similarArtistListParameters,
@@ -819,8 +874,11 @@ export const jfType = {
         error,
         favorite,
         filters,
+        folder,
+        folderList,
         genre,
         genreList,
+        getSessions,
         lyrics,
         moveItem,
         musicFolder,

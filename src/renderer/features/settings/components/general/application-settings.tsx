@@ -494,6 +494,26 @@ export const ApplicationSettings = () => {
         {
             control: (
                 <Switch
+                    defaultChecked={settings.externalLinks}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                externalLinks: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.externalLinks', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.externalLinks', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
                     defaultChecked={settings.lastFM}
                     onChange={(e) => {
                         setSettings({

@@ -20,6 +20,7 @@ export const useShareItem = (args: MutationHookArgs) => {
                 apiClientProps: { serverId: args.apiClientProps.serverId },
             });
         },
+        retry: false,
         ...options,
     });
 };

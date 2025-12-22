@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from 'react';
+
 import i18n from '/@/i18n/i18n';
 import { useSortByFilter } from '/@/renderer/features/shared/hooks/use-sort-by-filter';
 import { useCurrentServer } from '/@/renderer/store';
@@ -10,6 +12,7 @@ import {
     GenreListSort,
     LibraryItem,
     PlaylistListSort,
+    RadioListSort,
     ServerType,
     SongListSort,
     SortOrder,
@@ -18,6 +21,8 @@ import { ItemListKey } from '/@/shared/types/types';
 
 interface ListSortByDropdownProps {
     defaultSortByValue: string;
+    disabled?: boolean;
+    includeId?: boolean;
     itemType: LibraryItem;
     listKey: ItemListKey;
     onChange?: (value: string) => void;
@@ -26,6 +31,7 @@ interface ListSortByDropdownProps {
 
 export const ListSortByDropdown = ({
     defaultSortByValue,
+    disabled,
     itemType,
     listKey,
     onChange,
@@ -44,9 +50,66 @@ export const ListSortByDropdown = ({
     };
 
     return (
-        <DropdownMenu position="bottom-start">
+        <DropdownMenu disabled={disabled} position="bottom-start">
             <DropdownMenu.Target>
-                {target ? target : <Button variant="subtle">{sortByLabel}</Button>}
+                {target ? (
+                    target
+                ) : (
+                    <Button disabled={disabled} variant="subtle">
+                        {sortByLabel}
+                    </Button>
+                )}
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+                {FILTERS[itemType][server.type].map((f) => (
+                    <DropdownMenu.Item
+                        isSelected={f.value === sortBy}
+                        key={`filter-${f.name}`}
+                        onClick={() => handleSortByChange(f.value)}
+                        value={f.value}
+                    >
+                        {f.name}
+                    </DropdownMenu.Item>
+                ))}
+            </DropdownMenu.Dropdown>
+        </DropdownMenu>
+    );
+};
+
+interface ListSortByDropdownControlledProps {
+    disabled?: boolean;
+    itemType: LibraryItem;
+    setSortBy: Dispatch<SetStateAction<string>>;
+    sortBy: string;
+    target?: React.ReactNode;
+}
+
+export const ListSortByDropdownControlled = ({
+    disabled,
+    itemType,
+    setSortBy,
+    sortBy,
+    target,
+}: ListSortByDropdownControlledProps) => {
+    const server = useCurrentServer();
+
+    const sortByLabel =
+        (itemType && FILTERS[itemType][server.type].find((f) => f.value === sortBy)?.name) || '—';
+
+    const handleSortByChange = (sortBy: string) => {
+        setSortBy(sortBy);
+    };
+
+    return (
+        <DropdownMenu disabled={disabled} position="bottom-start">
+            <DropdownMenu.Target>
+                {target ? (
+                    target
+                ) : (
+                    <Button disabled={disabled} variant="subtle">
+                        {sortByLabel}
+                    </Button>
+                )}
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
                 {FILTERS[itemType][server.type].map((f) => (
@@ -444,6 +507,35 @@ const SONG_LIST_FILTERS: Partial<
     ],
 };
 
+const FOLDER_LIST_FILTERS: Partial<
+    Record<ServerType, Array<{ defaultOrder: SortOrder; name: string; value: string }>>
+> = {
+    [ServerType.JELLYFIN]: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+            value: SongListSort.ID,
+        },
+        ...(SONG_LIST_FILTERS[ServerType.JELLYFIN] || []),
+    ],
+    [ServerType.NAVIDROME]: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+            value: SongListSort.ID,
+        },
+        ...(SONG_LIST_FILTERS[ServerType.NAVIDROME] || []),
+    ],
+    [ServerType.SUBSONIC]: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+            value: SongListSort.ID,
+        },
+        ...(SONG_LIST_FILTERS[ServerType.SUBSONIC] || []),
+    ],
+};
+
 const PLAYLIST_SONG_LIST_FILTERS: Partial<
     Record<ServerType, Array<{ defaultOrder: SortOrder; name: string; value: string }>>
 > = {
@@ -711,12 +803,55 @@ const PLAYLIST_LIST_FILTERS: Partial<
     ],
 };
 
+const RADIO_LIST_FILTERS: Partial<
+    Record<ServerType, Array<{ defaultOrder: SortOrder; name: string; value: string }>>
+> = {
+    [ServerType.JELLYFIN]: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+            value: RadioListSort.ID,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: RadioListSort.NAME,
+        },
+    ],
+    [ServerType.NAVIDROME]: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+            value: RadioListSort.ID,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: RadioListSort.NAME,
+        },
+    ],
+    [ServerType.SUBSONIC]: [
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+            value: RadioListSort.ID,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+            value: RadioListSort.NAME,
+        },
+    ],
+};
+
 const FILTERS: Partial<Record<LibraryItem, any>> = {
     [LibraryItem.ALBUM]: ALBUM_LIST_FILTERS,
     [LibraryItem.ALBUM_ARTIST]: ALBUM_ARTIST_LIST_FILTERS,
     [LibraryItem.ARTIST]: ARTIST_LIST_FILTERS,
+    [LibraryItem.FOLDER]: FOLDER_LIST_FILTERS,
     [LibraryItem.GENRE]: GENRE_LIST_FILTERS,
     [LibraryItem.PLAYLIST]: PLAYLIST_LIST_FILTERS,
     [LibraryItem.PLAYLIST_SONG]: PLAYLIST_SONG_LIST_FILTERS,
+    [LibraryItem.RADIO_STATION]: RADIO_LIST_FILTERS,
     [LibraryItem.SONG]: SONG_LIST_FILTERS,
 };

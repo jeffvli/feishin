@@ -1,7 +1,6 @@
 import { AxiosHeaders } from 'axios';
 import isElectron from 'is-electron';
 import orderBy from 'lodash/orderBy';
-import reverse from 'lodash/reverse';
 import shuffle from 'lodash/shuffle';
 import semverCoerce from 'semver/functions/coerce';
 import semverGte from 'semver/functions/gte';
@@ -13,7 +12,9 @@ import {
     AlbumArtistListSort,
     AlbumListSort,
     ArtistListSort,
+    InternetRadioStation,
     LibraryItem,
+    RadioListSort,
     ServerListItem,
     Song,
     SongListSort,
@@ -48,6 +49,18 @@ export const hasFeature = (server: null | ServerListItem, feature: ServerFeature
     }
 
     return (server.features[feature]?.length || 0) > 0;
+};
+
+export const hasFeatureWithVersion = (
+    server: null | ServerListItem,
+    feature: ServerFeature,
+    version: number,
+): boolean => {
+    if (!server || !server.features) {
+        return false;
+    }
+
+    return (server.features[feature] ?? []).includes(version);
 };
 
 export type VersionInfo = ReadonlyArray<
@@ -129,7 +142,7 @@ export const getClientType = (): string => {
 export const SEPARATOR_STRING = ' · ';
 
 export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: SortOrder) => {
-    let results = songs;
+    let results: Song[] = songs;
 
     const order = sortOrder === SortOrder.ASC ? 'asc' : 'desc';
 
@@ -192,8 +205,10 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
             break;
 
         case SongListSort.ID:
+            results = [...results];
+
             if (order === 'desc') {
-                results = reverse(results as any);
+                results.reverse();
             }
             break;
 
@@ -245,6 +260,11 @@ export const sortSongsByFetchedOrder = (
     fetchedIds: string[],
     itemType: LibraryItem,
 ): Song[] => {
+    // For folders, songs are already in the correct order
+    if (itemType === LibraryItem.FOLDER) {
+        return songs;
+    }
+
     // Group songs by the fetched ID they belong to
     const songsByFetchedId = new Map<string, Song[]>();
 
@@ -286,7 +306,11 @@ export const sortSongsByFetchedOrder = (
     }
 
     // Sort each group by discNumber and trackNumber
+    // Skip sorting for ALBUM_ARTIST as songs are already sorted by the API
     for (const [fetchedId, groupSongs] of songsByFetchedId.entries()) {
+        if (itemType === LibraryItem.ALBUM_ARTIST) {
+            continue;
+        }
         const sortedGroup = orderBy(groupSongs, ['discNumber', 'trackNumber'], ['asc', 'asc']);
         songsByFetchedId.set(fetchedId, sortedGroup);
     }
@@ -304,12 +328,17 @@ export const sortSongsByFetchedOrder = (
     const matchedIds = new Set(result.map((s) => s.id));
     const unmatchedSongs = songs.filter((s) => !matchedIds.has(s.id));
     if (unmatchedSongs.length > 0) {
-        const sortedUnmatched = orderBy(
-            unmatchedSongs,
-            ['discNumber', 'trackNumber'],
-            ['asc', 'asc'],
-        );
-        result.push(...sortedUnmatched);
+        // Skip sorting for ALBUM_ARTIST as songs are already sorted by the API
+        if (itemType === LibraryItem.ALBUM_ARTIST) {
+            result.push(...unmatchedSongs);
+        } else {
+            const sortedUnmatched = orderBy(
+                unmatchedSongs,
+                ['discNumber', 'trackNumber'],
+                ['asc', 'asc'],
+            );
+            result.push(...sortedUnmatched);
+        }
     }
 
     return result;
@@ -347,6 +376,7 @@ export const sortAlbumArtistList = (
 
     return results;
 };
+
 export const sortAlbumList = (albums: Album[], sortBy: AlbumListSort, sortOrder: SortOrder) => {
     let results = albums;
 
@@ -389,6 +419,32 @@ export const sortAlbumList = (albums: Album[], sortBy: AlbumListSort, sortOrder:
             break;
         case AlbumListSort.YEAR:
             results = orderBy(results, ['releaseYear'], [order]);
+            break;
+        default:
+            break;
+    }
+
+    return results;
+};
+
+export const sortRadioList = (
+    stations: InternetRadioStation[],
+    sortBy: RadioListSort,
+    sortOrder: SortOrder,
+) => {
+    let results = stations;
+
+    const order = sortOrder === SortOrder.ASC ? 'asc' : 'desc';
+
+    switch (sortBy) {
+        case RadioListSort.ID:
+            results = [...results];
+            if (order === 'desc') {
+                results.reverse();
+            }
+            break;
+        case RadioListSort.NAME:
+            results = orderBy(results, [(v) => v.name.toLowerCase()], [order]);
             break;
         default:
             break;

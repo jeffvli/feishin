@@ -11,7 +11,7 @@
         "skip_back": "reculer",
         "favorite": "favori",
         "next": "suivant",
-        "shuffle": "lecture aléatoire",
+        "shuffle": "lecture (mélangé)",
         "playbackFetchNoResults": "aucun titre trouvé",
         "playbackFetchInProgress": "chargement des titres…",
         "addNext": "ajouter ensuite",
@@ -30,7 +30,16 @@
         "pause": "pause",
         "unfavorite": "retirer des favoris",
         "playSimilarSongs": "jouer des titres similaires",
-        "viewQueue": "voir la file d'attente"
+        "viewQueue": "voir la file d'attente",
+        "addLastShuffled": "ajouter en dernier (mélangé)",
+        "addNextShuffled": "ajouter ensuite (mélangé)",
+        "queueType": "type de file d'attente",
+        "queueType_default": "défaut",
+        "queueType_priority": "priorité",
+        "holdToShuffle": "maintenir pour mélanger",
+        "lyrics": "paroles",
+        "restoreQueueFromServer": "restaurer la file d'attente depuis le serveur",
+        "saveQueueToServer": "enregistrer la file d'attente sur le serveur"
     },
     "action": {
         "editPlaylist": "éditer $t(entity.playlist_one)",
@@ -54,7 +63,19 @@
             "lastfm": "Ouvrir dans Last.fm",
             "musicbrainz": "Ouvrir dans MusicBrainz"
         },
-        "moveToNext": "passer au suivant"
+        "moveToNext": "passer au suivant",
+        "downloadStarted": "téléchargement de {{count}} éléments en cours",
+        "moveItems": "déplacer les entrées",
+        "shuffle": "mélanger",
+        "shuffleAll": "mélanger tout",
+        "shuffleSelected": "mélanger la sélection",
+        "viewMore": "voir plus",
+        "moveUp": "monter",
+        "moveDown": "descendre",
+        "holdToMoveToTop": "Maintenir pour déplacer en haut",
+        "holdToMoveToBottom": "Maintenir pour déplacer en bas",
+        "createRadioStation": "créer $t(entity.radioStation_one)",
+        "deleteRadioStation": "supprimer $t(entity.radioStation_one)"
     },
     "common": {
         "backward": "en arrière",
@@ -164,7 +185,17 @@
         "private": "privé",
         "public": "publique",
         "recordLabel": "label de discographie",
-        "releaseType": "type de sortie"
+        "releaseType": "type de sortie",
+        "doNotShowAgain": "ne plus afficher",
+        "externalLinks": "liens externe",
+        "faster": "plus rapide",
+        "slower": "ralentir",
+        "sort": "trier",
+        "gridRows": "lignes de la grille",
+        "tableColumns": "colonnes du tableau",
+        "itemsMore": "plus {{count}}",
+        "view": "vue",
+        "noFilters": "aucun filtre configuré"
     },
     "error": {
         "remotePortWarning": "redémarrer le serveur pour appliquer le nouveau port",
@@ -190,7 +221,9 @@
         "networkError": "une erreur de réseau est survenue",
         "badAlbum": "vous voyez cette page parce que cette chanson ne fait pas parti d'un album. vous rencontrez probablement cette erreur si vous avez une chanson qui n'est pas dans votre répertoire de musique. Jellyfin gère les chansons uniquement si elles sont dans un sous-dossier, qui est lui-même dans un dossier \"Musique(s)\"",
         "badValue": "option {{value}} invalide. Cette valeur n'existe plus",
-        "notificationDenied": "les autorisations pour les notifications ont été refusées. ce paramètre n'a aucun effet"
+        "notificationDenied": "les autorisations pour les notifications ont été refusées. ce paramètre n'a aucun effet",
+        "multipleServerSaveQueueError": "la file d'attente de lecture contient un ou plusieurs morceaux qui ne proviennent pas du serveur actuel. Ceci n'est pas prise en charge",
+        "saveQueueFailed": "échec de l'enregistrement de la file d'attente"
     },
     "filter": {
         "mostPlayed": "plus joués",
@@ -251,7 +284,9 @@
             "artists": "$t(entity.artist_other)",
             "albumArtists": "$t(entity.albumArtist_other)",
             "shared": "partagé $t(entity.playlist_other)",
-            "myLibrary": "Bibliothèque"
+            "myLibrary": "Bibliothèque",
+            "favorites": "$t(entity.favorite_other)",
+            "radio": "$t(entity.radioStation_other)"
         },
         "fullscreenPlayer": {
             "config": {
@@ -288,7 +323,11 @@
             "settings": "$t(common.setting_other)",
             "quit": "$t(common.quit)",
             "privateModeOff": "désactiver le mode privé",
-            "privateModeOn": "activer le mode privé"
+            "privateModeOn": "activer le mode privé",
+            "commandPalette": "ouvrir la palette de commandes",
+            "selectMusicFolder": "sélectionner le dossier musique",
+            "noMusicFolder": "aucun dossier musique de sélectionner",
+            "multipleMusicFolders": "{{count}} dossiers musique sélectionner"
         },
         "home": {
             "mostPlayed": "Les plus joués",
@@ -296,7 +335,8 @@
             "explore": "Explorer depuis la bibliothèque",
             "recentlyPlayed": "Joués récemment",
             "title": "$t(common.home)",
-            "recentlyReleased": "Sortis récemment"
+            "recentlyReleased": "Sortis récemment",
+            "genres": "$t(entity.genre_other)"
         },
         "albumDetail": {
             "moreFromArtist": "plus de $t(entity.artist_one)",
@@ -308,7 +348,24 @@
             "hotkeysTab": "raccourcis",
             "windowTab": "fenêtre",
             "playbackTab": "lecteur",
-            "advanced": "avancé"
+            "advanced": "avancé",
+            "analytics": "analytique",
+            "updates": "mise à jour",
+            "cache": "cache",
+            "application": "application",
+            "queryBuilder": "constructeur de requêtes",
+            "theme": "thème",
+            "controls": "contrôles",
+            "sidebar": "barre latérale",
+            "remote": "distant",
+            "exportImport": "importer/exporter",
+            "scrobble": "scrobble",
+            "audio": "audio",
+            "lyrics": "paroles",
+            "transcoding": "transcodage",
+            "discord": "discord",
+            "logger": "logger",
+            "playerFilters": "filtres du lecteur"
         },
         "globalSearch": {
             "commands": {
@@ -342,7 +399,9 @@
             "playShuffled": "$t(player.shuffle)",
             "moveToNext": "$t(action.moveToNext)",
             "goToAlbumArtist": "aller à l'$t(entity.albumArtist_one)",
-            "goToAlbum": "aller à l'$t(entity.album_one)"
+            "goToAlbum": "aller à l'$t(entity.album_one)",
+            "moveItems": "$t(action.moveItems)",
+            "goTo": "aller à"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist_other)"
@@ -391,6 +450,15 @@
             "title": "gérer les serveurs",
             "username": "nom d'utilisateur",
             "editServerDetailsTooltip": "modifier les détails du serveur"
+        },
+        "favorites": {
+            "title": "$t(entity.favorite_other)"
+        },
+        "folderList": {
+            "title": "$t(entity.folder_other)"
+        },
+        "radioList": {
+            "title": "stations radio"
         }
     },
     "setting": {
@@ -479,7 +547,6 @@
         "fontType_description": "La police intégrée vous permet de sélectionner une des polices fourni par feishin. La police système vous permet de sélectionner une des polices fourni par votre système d'exploitation. L'option personnalisée vous permet d'importer votre propre police",
         "playButtonBehavior": "comportement du bouton play",
         "playbackStyle_optionNormal": "normale",
-        "floatingQueueArea": "afficher le zone de file d'attente flottante",
         "hotkey_toggleRepeat": "basculer la répétition",
         "lyricOffset_description": "décale les paroles par le nombre de millisecondes spécifiées",
         "fontType": "type de police",
@@ -535,7 +602,6 @@
         "discordApplicationId_description": "l'identifiant de l'application pour le statut d'activité {{discord}} (par défaut à {{defaultId}})",
         "audioExclusiveMode": "mode de sortie audio exclusif",
         "discordApplicationId": "identifiant d'application {{discord}}",
-        "floatingQueueArea_description": "afficher une icon flottante sur le côté droit de l'écran pour afficher la liste d'attente",
         "playButtonBehavior_optionPlay": "$t(player.play)",
         "replayGainMode_optionNone": "$t(common.none)",
         "playButtonBehavior_optionAddLast": "$t(player.addLast)",
@@ -558,7 +624,6 @@
         "buttonSize": "taille des boutons du lecteur",
         "clearCacheSuccess": "le cache a été vidé",
         "externalLinks_description": "activer l'affichage de liens externes (Last.fm, MusicBrainz) sur la page de l'artiste/album",
-        "genreBehavior": "comportement par défaut de la page des genres",
         "startMinimized_description": "démarrer l'application dans la barre des tâches",
         "externalLinks": "afficher les liens externes",
         "homeConfiguration": "configuration de la page d'accueil",
@@ -573,7 +638,6 @@
         "playerAlbumArtResolution_description": "résolution pour l'aperçu de la pochette d'album agrandie du lecteur. plus grand le rend plus net, mais peut ralentir le chargement. la valeur par défaut est 0 (automatique)",
         "homeConfiguration_description": "configurer quels éléments sont affichés sur la page d'accueil, et dans quel ordre",
         "startMinimized": "démarrer l'application en mode réduit",
-        "genreBehavior_description": "détermine si cliquer sur un genre ouvre par défaut la liste des pistes ou des albums",
         "transcode_description": "permet le transcodage vers différents formats",
         "transcodeBitrate_description": "sélectionne le débit du transcodage. 0 signifie que le serveur choisit",
         "transcodeFormat_description": "sélectionne le format du transcodage. laisser vide pour laisser le serveur décider",
@@ -589,7 +653,6 @@
         "webAudio_description": "utiliser l'audio web. cela permet d'utiliser des fonctions avancées comme le replaygain. désactivez si vous rencontrez d'autres problèmes",
         "artistConfiguration": "page de configuration de l'artiste de l'album",
         "artistConfiguration_description": "configurer les éléments et l'ordre à afficher, sur la page de l'artiste de l'album",
-        "doubleClickBehavior": "mettre en file d'attente toutes les pistes recherchées lors d'un double clic",
         "contextMenu": "configuration du menu contextuel (clic droit)",
         "contextMenu_description": "permet de masquer les éléments qui s'affichent dans le menu lorsque vous cliquez avec le bouton droit de la souris sur un élément. les éléments qui ne sont pas cochés seront masqués",
         "albumBackground": "image d'arrière-plan de l'album",
@@ -609,7 +672,6 @@
         "translationApiKey": "clé api de traduction",
         "translationTargetLanguage_description": "langue cible pour la traduction des paroles",
         "trayEnabled_description": "afficher ou masquer l'icône et le menu de la barre d'état système. si désactivé, désactive également la réduction et la sortie vers la barre d'état système",
-        "doubleClickBehavior_description": "si vrai, toutes les pistes correspondantes dans une recherche de piste seront mises en file d'attente. sinon, seule celle sur laquelle vous avez cliqué sera mise en file d'attente",
         "albumBackgroundBlur": "intensité du flou de l'image d'arrière-plan de l'album",
         "lastfmApiKey": "clé API {{lastfm}}",
         "lastfmApiKey_description": "la clé API pour {{lastfm}}. requise pour la pochette d'album",
@@ -658,14 +720,56 @@
         "exportImportSettings_importBtn": "paramètres d'importation",
         "exportImportSettings_importSuccess": "les paramètres ont été importés avec succès !",
         "exportImportSettings_notValidJSON": "le fichier transmis n'est pas un JSON valide",
-        "exportImportSettings_offendingKeyError": "\"{{offendingKey}}\" est incorrecte - {{reason}}",
+        "exportImportSettings_offendingKeyError": "la clé \"{{offendingKey}}\" est incorrecte - {{reason}}",
         "exportImportSettings_importModalTitle": "paramètres d'importation feishin",
         "crossfadeStyle": "style de fondu enchaîné",
         "discordRichPresence": "{{discord}} Rich Presence",
         "language": "langage",
         "notify_description": "affiche une notification lorsque la chanson en cours change",
         "transcode": "activer le transcodage",
-        "notify": "activer les notifications de chansons"
+        "notify": "activer les notifications de chansons",
+        "analyticsDisable": "Désactiver l'analytique basée sur l'utilisation",
+        "analyticsDisable_description": "les données d'utilisation anonymisées sont envoyées au développeur afin de contribuer à l'amélioration de l'application",
+        "playerbarSlider": "curseur de la barre de lecture",
+        "playerbarSliderType_optionSlider": "curseur",
+        "playerbarSliderType_optionWaveform": "forme d'onde",
+        "playerbarWaveformAlign": "forme d'onde alignée",
+        "playerbarWaveformAlign_optionTop": "haut",
+        "playerbarWaveformAlign_optionCenter": "centre",
+        "playerbarWaveformAlign_optionBottom": "bas",
+        "playerbarWaveformBarWidth": "largeur de la barre en forme d'onde",
+        "playerbarWaveformGap": "écart de la forme d'onde",
+        "playerbarWaveformRadius": "rayon de la forme d'onde",
+        "showLyricsInSidebar_description": "un panneau sera attaché à la file d'attente de lecture, qui affichera les paroles",
+        "showLyricsInSidebar": "afficher les paroles dans la barre de lecture latérale",
+        "showVisualizerInSidebar_description": "un panneau sera ajouté à la barre de lecture latérale qui affiche le visualiseur",
+        "showVisualizerInSidebar": "afficher le visualiseur dans la barre de lecture latérale",
+        "audioFadeOnStatusChange": "diminution du volume sonore lors du changement d'état",
+        "audioFadeOnStatusChange_description": "permet le fondu enchaîné et le fondu au noir quand la lecture/pause change d'états",
+        "queryBuilder": "constructeur de requêtes",
+        "queryBuilderCustomFields_inputLabel": "label",
+        "queryBuilderCustomFields_inputTag": "tag",
+        "queryBuilderCustomFields": "champs personnalisé",
+        "queryBuilderCustomFields_description": "ajouter un champ personnalisé à utiliser dans les constructeurs de requêtes",
+        "autoDJ": "DJ auto",
+        "autoDJ_description": "ajouter automatiquement des titres similaire à la file d'attente",
+        "autoDJ_itemCount": "nombre d'entrée",
+        "autoDJ_itemCount_description": "le nombre d'entrées tentées d'être ajoutées à la file d'attente lorsque le DJ auto est activé",
+        "autoDJ_timing": "timing",
+        "autoDJ_timing_description": "le nombre de titres restant dans la file d'attente avant le déclenchement du DJ auto",
+        "followCurrentSong_description": "défiler automatiquement jusqu'au titre en cours de lecture dans la file d'attente",
+        "followCurrentSong": "suivre le titre en cours",
+        "logLevel": "niveau de log",
+        "logLevel_description": "définis le niveau minimum de log à afficher. débogage affiche tous les logs, erreur affiche seulement les erreurs",
+        "logLevel_optionDebug": "débogage",
+        "logLevel_optionError": "erreur",
+        "logLevel_optionInfo": "info",
+        "logLevel_optionWarn": "avertissement",
+        "playerFilters": "filtrer les tires de la file d'attente",
+        "playerFilters_description": "exclure les titres de la file d'attente selon les critères suivants",
+        "playerbarSlider_description": "la forme d'onde n'est pas recommandée sur une connexion lente ou limitée",
+        "useThemeAccentColor": "utiliser la couleur d'accent du thème",
+        "useThemeAccentColor_description": "utiliser la couleur principale définie dans le thème sélectionné au lieu de la couleur d'accent personnalisée"
     },
     "form": {
         "deletePlaylist": {
@@ -711,12 +815,17 @@
         "queryEditor": {
             "input_optionMatchAll": "correspondre à tous",
             "input_optionMatchAny": "correspondre à n'importe quel",
-            "title": "éditeur de requête"
+            "title": "éditeur de requête",
+            "addRuleGroup": "ajouter un groupe de règles",
+            "removeRuleGroup": "supprimer un groupe de règles",
+            "resetToDefault": "réinitialiser par défaut",
+            "clearFilters": "réinitialiser les filtres"
         },
         "editPlaylist": {
             "title": "modifier $t(entity.playlist_one)",
             "publicJellyfinNote": "Jellyfin n'indique pas si une liste de lecture est publique ou non. Si vous souhaitez que cette liste de lecture reste publique, veuillez sélectionner l'entrée suivante",
-            "success": "$t(entity.playlist_one) mis à jour avec succès"
+            "success": "$t(entity.playlist_one) mis à jour avec succès",
+            "editNote": "les modifications manuelles ne sont pas recommandées pour les listes de lecture volumineuses. êtes-vous sûre d'accepter le risque d'une perte de données en écrasant la liste de lecture existante ?"
         },
         "lyricSearch": {
             "title": "recherche de paroles",
@@ -735,6 +844,31 @@
             "enabled": "le mode privé est activé, le statut de lecture est maintenant caché des intégrations externes",
             "disabled": "le mode privé est désactivé, le statut de lecture est maintenant visible des intégrations externes",
             "title": "mode privé"
+        },
+        "largeFetchConfirmation": {
+            "title": "ajouter des entrées à la file d'attente",
+            "description": "Cette action ajoutera tous les éléments dans la vue filtrée actuelle"
+        },
+        "shuffleAll": {
+            "title": "jouer aléatoirement",
+            "input_genre": "$t(entity.genre_one)",
+            "input_limit": "combien de titres ?",
+            "input_minYear": "à partir de l'année",
+            "input_maxYear": "à l'année",
+            "input_played": "filtre de lecture",
+            "input_played_optionAll": "toutes les pistes",
+            "input_played_optionUnplayed": "seulement les pistes non jouées",
+            "input_played_optionPlayed": "seulement les pistes jouées"
+        },
+        "createRadioStation": {
+            "success": "station radio créée avec succès",
+            "title": "créer une station radio",
+            "input_homepageUrl": "lien de la page d'accueil",
+            "input_name": "nom",
+            "input_streamUrl": "lien du flux en direct"
+        },
+        "saveQueue": {
+            "success": "file d'attente de lecture enregistrée sur le serveur"
         }
     },
     "entity": {
@@ -789,7 +923,13 @@
         "play_other": "{{count}} écoutes",
         "song_one": "titre",
         "song_many": "titres",
-        "song_other": "titres"
+        "song_other": "titres",
+        "radioStation_one": "station radio",
+        "radioStation_many": "stations radios",
+        "radioStation_other": "",
+        "radioStationWithCount_one": "{{count}} station radio",
+        "radioStationWithCount_many": "{{count}} stations radios",
+        "radioStationWithCount_other": ""
     },
     "table": {
         "config": {
@@ -801,12 +941,31 @@
                 "size": "$t(common.size)",
                 "itemGap": "écart entre les éléments (en pixel)",
                 "itemSize": "taille des élements (en pixel)",
-                "followCurrentSong": "suivre la chanson actuelle"
+                "followCurrentSong": "suivre la chanson actuelle",
+                "advancedSettings": "paramètres avancés",
+                "autosize": "taille automatique",
+                "moveUp": "monter",
+                "moveDown": "descendre",
+                "pinToLeft": "épingler à gauche",
+                "pinToRight": "épingler à droite",
+                "alignLeft": "aligner à gauche",
+                "alignCenter": "centrer",
+                "alignRight": "aligner à droite",
+                "itemsPerRow": "entrées par ligne",
+                "size_default": "défaut",
+                "size_compact": "compacte",
+                "size_large": "large",
+                "pagination": "pagination",
+                "pagination_itemsPerPage": "entrées par page",
+                "pagination_infinite": "infini",
+                "pagination_paginate": "paginé",
+                "alternateRowColors": "alterner les couleurs des lignes",
+                "horizontalBorders": "bordures de ligne",
+                "rowHoverHighlight": "surligner les lignes au survol",
+                "verticalBorders": "bordure de colonne"
             },
             "view": {
                 "table": "liste",
-                "poster": "affiche",
-                "card": "Carte",
                 "grid": "grille",
                 "list": "liste"
             },
@@ -838,7 +997,12 @@
                 "genre": "$t(entity.genre_one)",
                 "year": "$t(common.year)",
                 "songCount": "$t(entity.track_other)",
-                "codec": "$t(common.codec)"
+                "codec": "$t(common.codec)",
+                "albumCount": "$t(entity.album_other)",
+                "genreBadge": "$t(entity.genre_one) (badges)",
+                "image": "image",
+                "bitDepth": "$t(common.bitDepth)",
+                "sampleRate": "$t(common.sampleRate)"
             }
         },
         "column": {
@@ -865,7 +1029,10 @@
             "songCount": "$t(entity.track_other)",
             "channels": "$t(common.channel_other)",
             "size": "$t(common.size)",
-            "codec": "$t(common.codec)"
+            "codec": "$t(common.codec)",
+            "owner": "propriétaire",
+            "bitDepth": "$t(common.bitDepth)",
+            "sampleRate": "$t(common.sampleRate)"
         }
     },
     "dragDropZone": {
@@ -885,15 +1052,40 @@
             "audiobook": "livre audio",
             "audioDrama": "dramatique radio",
             "compilation": "compilation",
-            "djMix": "dj mix",
+            "djMix": "mix dj",
             "demo": "démo",
             "fieldRecording": "prise de son en extérieur",
             "interview": "interview",
-            "live": "directe",
+            "live": "live",
             "mixtape": "mixtape",
             "remix": "remix",
             "soundtrack": "bande son",
             "spokenWord": "spoken word"
         }
+    },
+    "queryBuilder": {
+        "standardTags": "tags standard",
+        "customTags": "tags personnalisées"
+    },
+    "filterOperator": {
+        "after": "est après",
+        "afterDate": "est après (date)",
+        "before": "est avant",
+        "beforeDate": "est avant (date)",
+        "contains": "contient",
+        "endsWith": "se termine par",
+        "inPlaylist": "est dans",
+        "inTheLast": "est dans le dernier",
+        "inTheRange": "est dans la plage",
+        "inTheRangeDate": "est dans la plage (date)",
+        "is": "est",
+        "isNot": "n'est pas",
+        "isGreaterThan": "est plus grand que",
+        "isLessThan": "est plus petit que",
+        "matchesRegex": "correspond à l'expression régulière",
+        "notContains": "ne contient pas",
+        "notInPlaylist": "n'est pas dans",
+        "notInTheLast": "n'est pas dans le dernier",
+        "startsWith": "commence par"
     }
 }

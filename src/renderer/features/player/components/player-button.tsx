@@ -83,6 +83,7 @@ export const MainPlayButton = forwardRef<HTMLButtonElement, PlayButtonProps>(
                     label: isPaused
                         ? (t('player.play', { postProcess: 'sentenceCase' }) as string)
                         : (t('player.pause', { postProcess: 'sentenceCase' }) as string),
+                    openDelay: 0,
                 }}
                 {...props}
             />

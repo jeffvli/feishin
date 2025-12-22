@@ -240,6 +240,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                                             imageUrl={song.imageUrl}
                                             isHighlighted={isHighlighted}
                                             itemType={LibraryItem.SONG}
+                                            song={song}
                                             subtitle={song.artists
                                                 .map((artist) => artist.name)
                                                 .join(', ')}

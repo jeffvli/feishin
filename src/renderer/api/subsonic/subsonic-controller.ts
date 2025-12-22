@@ -1,6 +1,7 @@
 import type { ServerInferResponses } from '@ts-rest/core';
 
 import dayjs from 'dayjs';
+import { set } from 'idb-keyval';
 import filter from 'lodash/filter';
 import orderBy from 'lodash/orderBy';
 import md5 from 'md5';
@@ -14,17 +15,19 @@ import {
     ssType,
     SubsonicExtensions,
 } from '/@/shared/api/subsonic/subsonic-types';
-import { sortAlbumArtistList, sortAlbumList, sortSongList } from '/@/shared/api/utils';
+import { hasFeature, sortAlbumArtistList, sortAlbumList, sortSongList } from '/@/shared/api/utils';
 import {
     AlbumListSort,
     GenreListSort,
     InternalControllerEndpoint,
     LibraryItem,
     PlaylistListSort,
+    ServerType,
     Song,
+    SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { ServerFeatures } from '/@/shared/types/features-types';
+import { ServerFeature, ServerFeatures } from '/@/shared/types/features-types';
 
 const ALBUM_LIST_SORT_MAPPING: Record<AlbumListSort, AlbumListSortType | undefined> = {
     [AlbumListSort.ALBUM_ARTIST]: AlbumListSortType.ALPHABETICAL_BY_ARTIST,
@@ -129,6 +132,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             query: {
                 c: 'Feishin',
                 f: 'json',
+                username: body.username,
                 v: '1.13.0',
                 ...credentialParams,
             },
@@ -140,7 +144,8 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return {
             credential,
-            userId: null,
+            isAdmin: Boolean(resp.body.user.adminRole),
+            userId: resp.body.user.username,
             username: body.username,
         };
     },
@@ -150,13 +155,33 @@ export const SubsonicController: InternalControllerEndpoint = {
         const res = await ssApiClient(apiClientProps).createFavorite({
             query: {
                 albumId: query.type === LibraryItem.ALBUM ? query.id : undefined,
-                artistId: query.type === LibraryItem.ALBUM_ARTIST ? query.id : undefined,
+                artistId:
+                    query.type === LibraryItem.ALBUM_ARTIST || query.type === LibraryItem.ARTIST
+                        ? query.id
+                        : undefined,
                 id: query.type === LibraryItem.SONG ? query.id : undefined,
             },
         });
 
         if (res.status !== 200) {
             throw new Error('Failed to create favorite');
+        }
+
+        return null;
+    },
+    createInternetRadioStation: async (args) => {
+        const { apiClientProps, body } = args;
+
+        const res = await ssApiClient(apiClientProps).createInternetRadioStation({
+            query: {
+                homepageUrl: body.homepageUrl,
+                name: body.name,
+                streamUrl: body.streamUrl,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to create internet radio station');
         }
 
         return null;
@@ -183,13 +208,31 @@ export const SubsonicController: InternalControllerEndpoint = {
         const res = await ssApiClient(apiClientProps).removeFavorite({
             query: {
                 albumId: query.type === LibraryItem.ALBUM ? query.id : undefined,
-                artistId: query.type === LibraryItem.ALBUM_ARTIST ? query.id : undefined,
+                artistId:
+                    query.type === LibraryItem.ALBUM_ARTIST || query.type === LibraryItem.ARTIST
+                        ? query.id
+                        : undefined,
                 id: query.type === LibraryItem.SONG ? query.id : undefined,
             },
         });
 
         if (res.status !== 200) {
             throw new Error('Failed to delete favorite');
+        }
+
+        return null;
+    },
+    deleteInternetRadioStation: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const res = await ssApiClient(apiClientProps).deleteInternetRadioStation({
+            query: {
+                id: query.id,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to delete internet radio station');
         }
 
         return null;
@@ -650,6 +693,106 @@ export const SubsonicController: InternalControllerEndpoint = {
             '&c=Feishin'
         );
     },
+    getFolder: async ({ apiClientProps, query }) => {
+        const sortOrder = (query.sortOrder?.toLowerCase() ?? 'asc') as 'asc' | 'desc';
+
+        const isRootFolderId = /^\d+$/.test(query.id);
+
+        if (isRootFolderId) {
+            const res = await ssApiClient(apiClientProps).getIndexes({
+                query: {
+                    musicFolderId: getLibraryId(query.musicFolderId),
+                },
+            });
+
+            if (res.status !== 200) {
+                throw new Error(`Failed to get folder list: ${JSON.stringify(res.body)}`);
+            }
+
+            let items =
+                res.body.indexes?.index?.flatMap((idx) =>
+                    idx.artist.map((artist) => ({
+                        artist: artist.name,
+                        id: artist.id.toString(),
+                        isDir: true,
+                        title: artist.name,
+                    })),
+                ) || [];
+
+            if (query.searchTerm) {
+                items = filter(items, (item) => {
+                    return item.title.toLowerCase().includes(query.searchTerm!.toLowerCase());
+                });
+            }
+
+            let folders = items.map((item) => ssNormalize.folder(item, apiClientProps.server));
+
+            folders = orderBy(folders, [(v) => v.name.toLowerCase()], [sortOrder]);
+
+            return {
+                _itemType: LibraryItem.FOLDER,
+                _serverId: apiClientProps.server?.id || 'unknown',
+                _serverType: ServerType.SUBSONIC,
+                children: {
+                    folders,
+                    songs: [],
+                },
+                id: query.id,
+                name: '~',
+                parentId: undefined,
+            };
+        }
+
+        const directoryRes = await ssApiClient(apiClientProps).getMusicDirectory({
+            query: {
+                id: query.id,
+            },
+        });
+
+        if (directoryRes.status !== 200) {
+            throw new Error('Failed to get folder');
+        }
+
+        const folder = ssNormalize.folder(directoryRes.body.directory, apiClientProps.server);
+
+        let filteredFolders = folder.children?.folders || [];
+        let filteredSongs = folder.children?.songs || [];
+
+        if (query.searchTerm) {
+            const searchTermLower = query.searchTerm.toLowerCase();
+            filteredFolders = filter(filteredFolders, (f) =>
+                f.name.toLowerCase().includes(searchTermLower),
+            );
+            filteredSongs = filter(filteredSongs, (s) => {
+                const name = s.name?.toLowerCase() || '';
+                const album = s.album?.toLowerCase() || '';
+                const artist = s.artistName?.toLowerCase() || '';
+                return (
+                    name.includes(searchTermLower) ||
+                    album.includes(searchTermLower) ||
+                    artist.includes(searchTermLower)
+                );
+            });
+        }
+
+        filteredFolders = orderBy(filteredFolders, [(v) => v.name.toLowerCase()], [sortOrder]);
+
+        if (filteredSongs.length > 0) {
+            filteredSongs = sortSongList(
+                filteredSongs,
+                query.sortBy || SongListSort.NAME,
+                query.sortOrder || SortOrder.ASC,
+            );
+        }
+
+        return {
+            ...folder,
+            children: {
+                folders: filteredFolders,
+                songs: filteredSongs,
+            },
+        };
+    },
     getGenreList: async ({ apiClientProps, query }) => {
         const sortOrder = (query.sortOrder?.toLowerCase() ?? 'asc') as 'asc' | 'desc';
 
@@ -684,6 +827,19 @@ export const SubsonicController: InternalControllerEndpoint = {
             startIndex: query.startIndex,
         });
     },
+    getInternetRadioStations: async (args) => {
+        const { apiClientProps } = args;
+
+        const res = await ssApiClient(apiClientProps).getInternetRadioStations();
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get internet radio stations');
+        }
+
+        const stations = res.body.internetRadioStations?.internetRadioStation || [];
+
+        return stations.map((station) => ssNormalize.internetRadioStation(station));
+    },
     getMusicFolderList: async (args) => {
         const { apiClientProps } = args;
 
@@ -717,6 +873,7 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return ssNormalize.playlist(res.body.playlist, apiClientProps.server);
     },
+
     getPlaylistList: async ({ apiClientProps, query }) => {
         const sortOrder = query.sortOrder.toLowerCase() as 'asc' | 'desc';
 
@@ -808,6 +965,44 @@ export const SubsonicController: InternalControllerEndpoint = {
             totalRecordCount: items.length,
         };
     },
+    getPlayQueue: async ({ apiClientProps }) => {
+        if (hasFeature(apiClientProps.server, ServerFeature.SERVER_PLAY_QUEUE)) {
+            const res = await ssApiClient(apiClientProps).getPlayQueueByIndex();
+
+            if (res.status !== 200) {
+                throw new Error('Failed to get random songs');
+            }
+
+            const { changed, changedBy, currentIndex, entry, position, username } =
+                res.body.playQueueByIndex;
+
+            return {
+                changed,
+                changedBy,
+                currentIndex: currentIndex ?? 0,
+                entry: entry?.map((song) => ssNormalize.song(song, apiClientProps.server)) || [],
+                positionMs: position ?? 0,
+                username,
+            };
+        } else {
+            const res = await ssApiClient(apiClientProps).getPlayQueue();
+
+            if (res.status !== 200) {
+                throw new Error('Failed to get random songs');
+            }
+
+            const { changed, changedBy, current, entry, position, username } = res.body.playQueue;
+
+            return {
+                changed,
+                changedBy,
+                currentIndex: current ? entry.findIndex((item) => item.id === current) : 0,
+                entry: entry?.map((song) => ssNormalize.song(song, apiClientProps.server)) || [],
+                positionMs: position ?? 0,
+                username,
+            };
+        }
+    },
     getRandomSongList: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -892,6 +1087,14 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         if (subsonicFeatures[SubsonicExtensions.SONG_LYRICS]) {
             features.lyricsMultipleStructured = [1];
+        }
+
+        if (subsonicFeatures[SubsonicExtensions.FORM_POST]) {
+            features.osFormPost = [1];
+        }
+
+        if (subsonicFeatures[SubsonicExtensions.INDEX_BASED_QUEUE]) {
+            features.serverPlayQueue = [1];
         }
 
         return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };
@@ -1363,6 +1566,25 @@ export const SubsonicController: InternalControllerEndpoint = {
             totalRecordCount: res.body.topSongs?.song?.length || 0,
         };
     },
+    getUserInfo: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const res = await ssApiClient(apiClientProps).getUser({
+            query: {
+                username: query.username,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get user info');
+        }
+
+        return {
+            id: res.body.user.username,
+            isAdmin: Boolean(res.body.user.adminRole),
+            name: res.body.user.username,
+        };
+    },
     removeFromPlaylist: async ({ apiClientProps, query }) => {
         const res = await ssApiClient(apiClientProps).updatePlaylist({
             query: {
@@ -1376,6 +1598,117 @@ export const SubsonicController: InternalControllerEndpoint = {
         }
 
         return null;
+    },
+    replacePlaylist: async (args) => {
+        const { apiClientProps, body, query } = args;
+
+        // 1. Fetch existing songs from the playlist
+        const existingSongsRes = await ssApiClient(apiClientProps).getPlaylist({
+            query: {
+                id: query.id,
+            },
+        });
+
+        if (existingSongsRes.status !== 200) {
+            throw new Error('Failed to fetch existing playlist songs');
+        }
+
+        const existingSongs =
+            existingSongsRes.body.playlist.entry?.map((song) =>
+                ssNormalize.song(song, apiClientProps.server),
+            ) || [];
+
+        // 2. Get playlist detail to get the name
+        const playlistDetailRes = await ssApiClient(apiClientProps).getPlaylist({
+            query: {
+                id: query.id,
+            },
+        });
+
+        if (playlistDetailRes.status !== 200) {
+            throw new Error('Failed to get playlist detail');
+        }
+
+        const playlist = ssNormalize.playlist(
+            playlistDetailRes.body.playlist,
+            apiClientProps.server,
+        );
+
+        // 3. Make a backup of the playlist ids and their order, along with the id of the playlist and name
+        const backup = {
+            id: query.id,
+            name: playlist.name,
+            songIds: existingSongs.map((song) => song.id),
+            timestamp: Date.now(),
+        };
+
+        // Store backup in IndexedDB using idb-keyval
+        const backupKey = `playlist-backup-${query.id}`;
+        await set(backupKey, backup);
+
+        // 4. Remove all songs from the playlist (Subsonic uses indices, not IDs)
+        if (existingSongs.length > 0) {
+            // Get indices of all songs (0-based)
+            // Remove in reverse order to avoid index shifting issues
+            const songIndices = existingSongs.map((_, index) => index).reverse();
+
+            const removeRes = await ssApiClient(apiClientProps).updatePlaylist({
+                query: {
+                    playlistId: query.id,
+                    songIndexToRemove: songIndices.map((index) => index.toString()),
+                },
+            });
+
+            if (removeRes.status !== 200) {
+                throw new Error('Failed to remove songs from playlist');
+            }
+        }
+
+        // 5. Add the new song ids to the playlist
+        if (body.songId.length > 0) {
+            const addRes = await ssApiClient(apiClientProps).updatePlaylist({
+                query: {
+                    playlistId: query.id,
+                    songIdToAdd: body.songId,
+                },
+            });
+
+            if (addRes.status !== 200) {
+                throw new Error('Failed to add songs to playlist');
+            }
+        }
+
+        return null;
+    },
+    savePlayQueue: async ({ apiClientProps, query }) => {
+        if (hasFeature(apiClientProps.server, ServerFeature.SERVER_PLAY_QUEUE)) {
+            const res = await ssApiClient(apiClientProps).savePlayQueueByIndex({
+                query: {
+                    currentIndex: query.currentIndex !== undefined ? query.currentIndex : undefined,
+                    id: query.songs,
+                    position: query.positionMs,
+                },
+            });
+
+            if (res.status !== 200) {
+                throw new Error('Failed to save play queue');
+            }
+        } else {
+            const res = await ssApiClient(apiClientProps).savePlayQueue({
+                query: {
+                    current:
+                        query.currentIndex !== undefined && query.currentIndex < query.songs.length
+                            ? query.songs[query.currentIndex]
+                            : undefined,
+                    id: query.songs,
+                    position: query.positionMs,
+                },
+            });
+
+            if (res.status !== 200) {
+                throw new Error('Failed to save play queue');
+            }
+        }
     },
     scrobble: async (args) => {
         const { apiClientProps, query } = args;
@@ -1393,7 +1726,6 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return null;
     },
-
     search: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -1437,6 +1769,24 @@ export const SubsonicController: InternalControllerEndpoint = {
                     rating: query.rating,
                 },
             });
+        }
+
+        return null;
+    },
+    updateInternetRadioStation: async (args) => {
+        const { apiClientProps, body, query } = args;
+
+        const res = await ssApiClient(apiClientProps).updateInternetRadioStation({
+            query: {
+                homepageUrl: body.homepageUrl,
+                id: query.id,
+                name: body.name,
+                streamUrl: body.streamUrl,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to update internet radio station');
         }
 
         return null;

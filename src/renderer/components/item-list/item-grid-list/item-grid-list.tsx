@@ -41,6 +41,7 @@ import {
     useItemListState,
     useItemListStateSubscription,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
+import { SelectionDialog } from '/@/renderer/components/item-list/selection-dialog';
 import { ItemControls, ItemListHandle } from '/@/renderer/components/item-list/types';
 import { animationProps } from '/@/shared/components/animations/animation-props';
 import { useElementSize } from '/@/shared/hooks/use-element-size';
@@ -99,6 +100,7 @@ const VirtualizedGridList = React.memo(
         width,
     }: VirtualizedGridListProps) => {
         const tableMeta = tableMetaRef.current;
+        const scrollEndTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
         const itemData: GridItemProps = useMemo(() => {
             return {
@@ -130,10 +132,26 @@ const VirtualizedGridList = React.memo(
         const handleOnScroll = useCallback(
             ({ scrollDirection, scrollOffset }: ListOnScrollProps) => {
                 onScroll?.(scrollOffset, scrollDirection === 'forward' ? 'down' : 'up');
-                onScrollEnd?.(scrollOffset, scrollDirection === 'forward' ? 'down' : 'up');
+
+                if (scrollEndTimeoutRef.current) {
+                    clearTimeout(scrollEndTimeoutRef.current);
+                }
+
+                scrollEndTimeoutRef.current = setTimeout(() => {
+                    onScrollEnd?.(scrollOffset, scrollDirection === 'forward' ? 'down' : 'up');
+                    scrollEndTimeoutRef.current = null;
+                }, 150);
             },
             [onScroll, onScrollEnd],
         );
+
+        useEffect(() => {
+            return () => {
+                if (scrollEndTimeoutRef.current) {
+                    clearTimeout(scrollEndTimeoutRef.current);
+                }
+            };
+        }, []);
 
         const handleOnItemsRendered = useCallback(
             (items: ListOnItemsRenderedProps) => {
@@ -269,6 +287,7 @@ export interface ItemGridListProps {
     enableDrag?: boolean;
     enableExpansion?: boolean;
     enableSelection?: boolean;
+    enableSelectionDialog?: boolean;
     gap?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     getRowId?: ((item: unknown) => string) | string;
     initialTop?: {
@@ -291,6 +310,7 @@ const BaseItemGridList = ({
     enableDrag = true,
     enableExpansion = false,
     enableSelection = true,
+    enableSelectionDialog = true,
     gap = 'sm',
     getRowId,
     initialTop,
@@ -725,7 +745,10 @@ const BaseItemGridList = ({
                     />
                 )}
             </AutoSizer>
-            <ExpandedContainer internalState={internalState} itemType={itemType} />
+            <AnimatePresence presenceAffectsLayout>
+                <ExpandedContainer internalState={internalState} itemType={itemType} />
+                {enableSelectionDialog && <SelectionDialog internalState={internalState} />}
+            </AnimatePresence>
         </motion.div>
     );
 };

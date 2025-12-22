@@ -11,6 +11,9 @@ export const store = new Store({
         '>=0.21.2': (store) => {
             store.set('window_bar_style', 'linux');
         },
+        '>=1.0.0': (store) => {
+            store.clear();
+        },
     },
 });
 

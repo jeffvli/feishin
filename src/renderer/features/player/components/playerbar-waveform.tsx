@@ -14,9 +14,8 @@ import {
     usePlaybackSettings,
     usePlayerSong,
     usePlayerTimestamp,
-    usePrimaryColor,
 } from '/@/renderer/store';
-import { useColorScheme } from '/@/renderer/themes/use-app-theme';
+import { useAppThemeColors, useColorScheme } from '/@/renderer/themes/use-app-theme';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Text } from '/@/shared/components/text/text';
 
@@ -39,7 +38,8 @@ export const PlayerbarWaveform = () => {
 
     const streamUrl = useSongUrl(currentSong, true, transcode);
 
-    const primaryColor = usePrimaryColor();
+    const { color } = useAppThemeColors();
+    const primaryColor = (color['--theme-colors-primary'] as string) || 'rgb(53, 116, 252)';
 
     const colorScheme = useColorScheme();
 

@@ -13,8 +13,10 @@
     flex-direction: column;
     min-height: 200px;
     max-height: 400px;
+    padding: var(--theme-spacing-md);
     overflow: hidden;
     background: var(--theme-colors-background);
+    background-color: var(--theme-colors-background-alternate);
 }
 
 .lyrics-section :global(.synchronized-lyrics) {
@@ -43,6 +45,8 @@
     flex-direction: column;
     min-height: 200px;
     max-height: 400px;
+    padding: var(--theme-spacing-md);
     overflow: hidden;
     background: var(--theme-colors-background);
+    background-color: var(--theme-colors-background-alternate);
 }

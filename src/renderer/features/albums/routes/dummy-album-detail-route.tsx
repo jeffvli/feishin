@@ -211,7 +211,13 @@ const DummyAlbumDetailRoute = () => {
                     )}
                     {comment && (
                         <section>
-                            <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>
+                            <Spoiler maxHeight={75}>
+                                <Text
+                                    dangerouslySetInnerHTML={{
+                                        __html: replaceURLWithHTMLLinks(comment),
+                                    }}
+                                />
+                            </Spoiler>
                         </section>
                     )}
                     <section>

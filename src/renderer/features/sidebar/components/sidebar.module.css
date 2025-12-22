@@ -50,7 +50,6 @@
     width: 100%;
     height: 100%;
     object-fit: var(--theme-image-fit);
-    background: var(--theme-colors-foreground-muted);
     border-radius: var(--theme-radius-md);
 }
 

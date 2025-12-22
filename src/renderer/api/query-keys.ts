@@ -4,6 +4,7 @@ import type {
     AlbumDetailQuery,
     AlbumListQuery,
     ArtistListQuery,
+    FolderQuery,
     GenreListQuery,
     LyricSearchQuery,
     LyricsQuery,
@@ -224,6 +225,15 @@ export const queryKeys: Record<
         },
         root: (serverId: string) => [serverId, 'artists'] as const,
     },
+    folders: {
+        folder: (serverId: string, query?: FolderQuery) => {
+            if (query) {
+                return [serverId, 'folders', 'folder', query] as const;
+            }
+
+            return [serverId, 'folders', 'folder'] as const;
+        },
+    },
     genres: {
         count: (serverId: string, query?: GenreListQuery) => {
             const { filter, pagination } = splitPaginatedQuery(query);
@@ -256,7 +266,11 @@ export const queryKeys: Record<
         list: (serverId: string) => [serverId, 'musicFolders', 'list'] as const,
     },
     player: {
-        fetch: () => {
+        fetch: (meta?: any) => {
+            if (meta) {
+                return ['player', 'fetch', meta] as const;
+            }
+
             return ['player', 'fetch'] as const;
         },
     },
@@ -307,6 +321,10 @@ export const queryKeys: Record<
 
             return [serverId, 'playlists', 'songList'] as const;
         },
+    },
+    radio: {
+        list: (serverId: string) => [serverId, 'radio', 'list'] as const,
+        root: (serverId: string) => [serverId, 'radio'] as const,
     },
     roles: {
         list: (serverId: string) => [serverId, 'roles'] as const,

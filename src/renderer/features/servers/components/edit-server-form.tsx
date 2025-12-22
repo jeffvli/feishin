@@ -50,6 +50,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
     const form = useForm({
         initialValues: {
+            isAdmin: server?.isAdmin,
             legacyAuth: false,
             name: server?.name,
             password: password || '',
@@ -94,6 +95,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
             const serverItem: ServerListItemWithCredential = {
                 credential: data.credential,
                 id: server.id,
+                isAdmin: data.isAdmin,
                 name: values.name,
                 type: values.type,
                 url: values.url,

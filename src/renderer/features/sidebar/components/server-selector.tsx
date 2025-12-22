@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './server-selector.module.css';
 
+import { useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
@@ -23,7 +24,9 @@ import { ServerFeature } from '/@/shared/types/features-types';
 export const ServerSelector = () => {
     const { t } = useTranslation();
     const currentServer = useCurrentServer();
-    const showImage = useAppStore((state) => state.sidebar.image);
+    const sidebarImageEnabled = useAppStore((state) => state.sidebar.image);
+    const isRadioPlaying = useRadioStore((state) => state.isPlaying);
+    const showImage = sidebarImageEnabled && !isRadioPlaying;
 
     const { data: musicFolders } = useQuery(
         currentServer

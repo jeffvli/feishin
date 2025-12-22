@@ -15,13 +15,15 @@ import {
 import { AlbumListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
-export const useAlbumListFilters = () => {
+export const useAlbumListFilters = (listKey?: ItemListKey) => {
+    const resolvedListKey = listKey ?? ItemListKey.ALBUM;
+
     const { setSortBy, sortBy } = useSortByFilter<AlbumListSort>(
         AlbumListSort.NAME,
-        ItemListKey.ALBUM,
+        resolvedListKey,
     );
 
-    const { setSortOrder, sortOrder } = useSortOrderFilter(SortOrder.ASC, ItemListKey.ALBUM);
+    const { setSortOrder, sortOrder } = useSortOrderFilter(SortOrder.ASC, resolvedListKey);
 
     const { searchTerm, setSearchTerm } = useSearchTermFilter('');
 
@@ -155,23 +157,28 @@ export const useAlbumListFilters = () => {
 
     const setCustom = useCallback(
         (value: null | Record<string, any>) => {
-            setSearchParams((prev) => {
-                const previousValue = prev.get(FILTER_KEYS.ALBUM._CUSTOM);
+            setSearchParams(
+                (prev) => {
+                    const previousValue = prev.get(FILTER_KEYS.ALBUM._CUSTOM);
 
-                const newCustom = {
-                    ...(previousValue ? JSON.parse(previousValue) : {}),
-                    ...value,
-                };
+                    const newCustom = {
+                        ...(previousValue ? JSON.parse(previousValue) : {}),
+                        ...value,
+                    };
 
-                const filteredNewCustom = Object.fromEntries(
-                    Object.entries(newCustom).filter(
-                        ([, value]) => value !== null && value !== undefined,
-                    ),
-                );
+                    const filteredNewCustom = Object.fromEntries(
+                        Object.entries(newCustom).filter(
+                            ([, value]) => value !== null && value !== undefined,
+                        ),
+                    );
 
-                prev.set(FILTER_KEYS.ALBUM._CUSTOM, JSON.stringify(filteredNewCustom));
-                return prev;
-            });
+                    prev.set(FILTER_KEYS.ALBUM._CUSTOM, JSON.stringify(filteredNewCustom));
+                    return prev;
+                },
+                {
+                    replace: true,
+                },
+            );
         },
         [setSearchParams],
     );

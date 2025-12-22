@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { MpvPlayerEngine, MpvPlayerEngineHandle } from './engine/mpv-player-engine';
 
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
-import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     usePlaybackSettings,
     usePlayerActions,
@@ -22,12 +22,12 @@ const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 
 export function MpvPlayer() {
     const playerRef = useRef<MpvPlayerEngineHandle>(null);
-    const { currentSong, nextSong, status } = usePlayerData();
+    const { status } = usePlayerData();
     const { mediaAutoNext, setTimestamp } = usePlayerActions();
     const { speed } = usePlayerProperties();
     const isMuted = usePlayerMuted();
     const volume = usePlayerVolume();
-    const { transcode } = usePlaybackSettings();
+    const { audioFadeOnStatusChange } = usePlaybackSettings();
 
     const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(status);
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -98,6 +98,8 @@ export function MpvPlayer() {
         return playerData;
     }, [mediaAutoNext, volume, setIsTransitioning]);
 
+    const player = usePlayer();
+
     usePlayerEvents(
         {
             onPlayerSeekToTimestamp: (properties) => {
@@ -106,18 +108,31 @@ export function MpvPlayer() {
             },
             onPlayerStatus: async (properties) => {
                 const status = properties.status;
-                if (status === PlayerStatus.PAUSED) {
-                    fadeAndSetStatus(volume, 0, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PAUSED);
-                } else if (status === PlayerStatus.PLAYING) {
-                    fadeAndSetStatus(0, volume, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PLAYING);
+                if (audioFadeOnStatusChange) {
+                    if (status === PlayerStatus.PAUSED) {
+                        fadeAndSetStatus(volume, 0, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PAUSED);
+                    } else if (status === PlayerStatus.PLAYING) {
+                        fadeAndSetStatus(0, volume, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PLAYING);
+                    }
+                } else {
+                    if (status === PlayerStatus.PAUSED) {
+                        playerRef.current?.setVolume(0);
+                        setLocalPlayerStatus(PlayerStatus.PAUSED);
+                    } else if (status === PlayerStatus.PLAYING) {
+                        playerRef.current?.setVolume(volume);
+                        setLocalPlayerStatus(PlayerStatus.PLAYING);
+                    }
                 }
             },
             onPlayerVolume: (properties) => {
                 const volume = properties.volume;
                 playerRef.current?.setVolume(volume);
             },
+            onQueueCleared: () => {
+                player.mediaStop();
+            },
         },
-        [volume, fadeAndSetStatus],
+        [volume, fadeAndSetStatus, audioFadeOnStatusChange],
     );
 
     // Cleanup fade interval on unmount
@@ -153,15 +168,10 @@ export function MpvPlayer() {
         return () => clearInterval(interval);
     }, [localPlayerStatus, setTimestamp]);
 
-    const currentUrl = useSongUrl(currentSong, true, transcode);
-    const nextUrl = useSongUrl(nextSong, false, transcode);
-
     return (
         <MpvPlayerEngine
-            currentSrc={currentUrl}
             isMuted={isMuted}
             isTransitioning={isTransitioning}
-            nextSrc={nextUrl}
             onEnded={handleOnEnded}
             onProgress={onProgress}
             playerRef={playerRef}

@@ -90,6 +90,9 @@ export async function query(
 
     try {
         result = await axios.get<LrcLibTrackResponse>(FETCH_URL, {
+            headers: {
+                'User-Agent': 'LRCGET v0.2.0 (https://github.com/jeffvli/feishin)',
+            },
             params: {
                 album_name: params.album,
                 artist_name: params.artist,

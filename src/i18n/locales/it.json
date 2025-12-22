@@ -249,7 +249,6 @@
         "accentColor_description": "imposta colore d'accento per l'applicazione",
         "playbackStyle_optionNormal": "normale",
         "windowBarStyle": "stile barra della finestra",
-        "floatingQueueArea": "mostra l'area di passaggio della coda fluttante",
         "hotkey_toggleRepeat": "attiva/disattiva ripeti",
         "lyricOffset_description": "aumenta/dimuisce l'offset del testo di una specifica quantità di millisecondi",
         "sidebarConfiguration_description": "seleziona gli elementi e l'ordine in cui appaiono nella barra laterale",
@@ -271,7 +270,6 @@
         "hotkey_rate0": "rimuovi voto",
         "discordApplicationId": "application id {{discord}}",
         "applicationHotkeys_description": "configura tasti a scelta rapida dell'applicazione. attiva/disattiva la casella per impostare un tasto a scelta rapida globale (solo desktop)",
-        "floatingQueueArea_description": "visualizza l'icona di passaggio sul lato destro dello schermo per mostrare la coda di riproduzione",
         "hotkey_volumeMute": "silenzia volume",
         "remoteUsername": "username server di controllo remoto",
         "sidebarPlaylistList": "lista playlist nella barra laterale",
@@ -335,14 +333,10 @@
         "discordListening_description": "mostra lo stato come in ascolto invece che in riproduzione",
         "discordServeImage": "recupera le immagini di {{discord}} dal server",
         "discordServeImage_description": "condividi la copertina per lo stato attività di {{discord}} direttamente dal server, disponibile solo per Jellyfin e Navidrome",
-        "doubleClickBehavior": "aggiungi alla coda tutte le tracce cercate, con un doppio clic",
-        "doubleClickBehavior_description": "se attivato, tutte le tracce corrispondenti alla ricerca verranno aggiunte alla coda. altrimenti, verrà aggiunta alla coda solo la traccia selezionata",
         "externalLinks": "mostra link esterni",
         "externalLinks_description": "consente di visualizzare link esterni (Last.fm, MusicBrainz) sulle pagine di artista/album",
         "preferLocalLyrics": "utilizza i testi locali",
         "preferLocalLyrics_description": "usa i testi locali anziché quelli online, quando disponibili",
-        "genreBehavior": "comportamento predefinito della pagina genere",
-        "genreBehavior_description": "determina se cliccando su un genere si apre di default la lista dei brani o degli album",
         "homeConfiguration": "configurazione della home page",
         "homeConfiguration_description": "configura quali elementi vengono mostrati e in quale ordine nella home page",
         "homeFeature": "carosello in evidenza nella home page",
@@ -710,10 +704,8 @@
             },
             "view": {
                 "table": "tabella",
-                "card": "Scheda",
                 "grid": "griglia",
-                "list": "lista",
-                "poster": "poster"
+                "list": "lista"
             },
             "label": {
                 "releaseDate": "data rilascio",

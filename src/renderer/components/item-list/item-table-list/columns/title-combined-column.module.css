@@ -18,6 +18,9 @@
 }
 
 .title {
+    display: inline-block;
+    width: fit-content;
+    max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -31,4 +34,39 @@
     color: var(--theme-colors-foreground-muted);
     white-space: nowrap;
     user-select: none;
+}
+
+.folder-icon {
+    color: black;
+    fill: rgb(255 215 100);
+}
+
+.image-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.play-button-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 10;
+    opacity: 0.6;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.2s ease-in-out;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.play-button-overlay button {
+    width: 32px;
+    height: 32px;
+}
+
+.compact-play-button-overlay button {
+    width: 24px;
+    height: 24px;
 }

@@ -4,10 +4,13 @@ import { rm } from 'fs/promises';
 import uniq from 'lodash/uniq';
 import MpvAPI from 'node-mpv';
 import { pid } from 'node:process';
+import process from 'process';
 
 import { getMainWindow, sendToastToRenderer } from '../../../index';
 import { createLog, isWindows } from '../../../utils';
 import { store } from '../settings';
+
+import { PlayerData } from '/@/shared/types/domain-types';
 
 declare module 'node-mpv';
 
@@ -20,6 +23,7 @@ declare module 'node-mpv';
 // }
 
 let mpvInstance: MpvAPI | null = null;
+let currentPlayerData: null | PlayerData = null;
 const socketPath = isWindows() ? `\\\\.\\pipe\\mpvserver-${pid}` : `/tmp/node-mpv-${pid}.sock`;
 
 const NodeMpvErrorCode = {
@@ -113,7 +117,7 @@ const createMpv = async (data: {
     mpv.on('status', (status) => {
         if (status.property === 'playlist-pos') {
             if (status.value === -1) {
-                mpv?.stop();
+                mpv?.pause();
             }
 
             if (status.value !== 0) {
@@ -149,12 +153,28 @@ export const getMpvInstance = () => {
     return mpvInstance;
 };
 
-const quit = async () => {
-    const instance = getMpvInstance();
-    if (instance) {
-        await instance.quit();
+const quit = async (instance?: MpvAPI | null) => {
+    const mpv = instance || getMpvInstance();
+    if (mpv) {
+        try {
+            await mpv.quit();
+        } catch {
+            // If quit() fails, try to kill the process directly
+            const mpvProcess = (mpv as any).process || (mpv as any).mpvProcess;
+            if (mpvProcess && typeof mpvProcess.kill === 'function') {
+                try {
+                    mpvProcess.kill('SIGTERM');
+                } catch (killErr) {
+                    mpvLog({ action: 'Failed to kill mpv process' }, killErr as NodeMpvError);
+                }
+            }
+        }
         if (!isWindows()) {
-            await rm(socketPath);
+            try {
+                await rm(socketPath);
+            } catch {
+                // Ignore errors when removing socket file
+            }
         }
     }
 };
@@ -356,16 +376,12 @@ ipcMain.on('player-set-queue-next', async (_event, url?: string) => {
     try {
         const size = await getMpvInstance()?.getPlaylistSize();
 
-        if (!size) {
-            return;
-        }
-
-        if (size > 1) {
+        if (size && size > 1) {
             await getMpvInstance()?.playlistRemove(1);
         }
 
         if (url) {
-            await getMpvInstance()?.load(url, 'append');
+            getMpvInstance()?.load(url, 'append');
         }
     } catch (err: any | NodeMpvError) {
         mpvLog({ action: `Failed to set play queue` }, err);
@@ -377,6 +393,7 @@ ipcMain.on('player-auto-next', async (_event, url?: string) => {
     // Always keep the current song as position 0 in the mpv queue
     // This allows us to easily set update the next song in the queue without
     // disturbing the currently playing song
+
     try {
         await getMpvInstance()
             ?.playlistRemove(0)
@@ -423,6 +440,91 @@ ipcMain.handle('player-get-time', async (): Promise<number | undefined> => {
     }
 });
 
+// Updates the current player metadata (song data)
+ipcMain.on('player-update-metadata', (_event, data: PlayerData) => {
+    currentPlayerData = data;
+});
+
+// Returns the current player metadata (song data)
+ipcMain.handle('player-metadata', async (): Promise<null | PlayerData> => {
+    return currentPlayerData;
+});
+
+// Returns the stream metadata from mpv (for radio streams)
+ipcMain.handle(
+    'player-stream-metadata',
+    async (): Promise<null | { artist: null | string; title: null | string }> => {
+        try {
+            const metadata = await getMpvInstance()?.getProperty('metadata');
+            if (metadata && typeof metadata === 'object') {
+                // Try to get separate title and artist fields first
+                let artist: null | string =
+                    (metadata['artist'] as string) ||
+                    (metadata['ARTIST'] as string) ||
+                    (metadata['icy-artist'] as string) ||
+                    null;
+                let title: null | string =
+                    (metadata['title'] as string) || (metadata['TITLE'] as string) || null;
+
+                // If we don't have separate fields, try to parse from combined formats
+                if (!title && !artist) {
+                    const combinedTitle =
+                        (metadata['icy-title'] as string) ||
+                        (metadata['StreamTitle'] as string) ||
+                        (metadata['stream-title'] as string) ||
+                        null;
+
+                    if (combinedTitle && typeof combinedTitle === 'string') {
+                        // Try to parse "Artist - Title" format
+                        const match = combinedTitle.match(/^(.*?)\s*[-–—]\s*(.+)$/);
+                        if (match) {
+                            artist = match[1].trim() || null;
+                            title = match[2].trim() || null;
+                        } else {
+                            // If no separator found, treat the whole thing as title
+                            title = combinedTitle;
+                        }
+                    }
+                } else if (!title) {
+                    // If we have artist but no title, try to get from combined format
+                    const combinedTitle =
+                        (metadata['icy-title'] as string) ||
+                        (metadata['StreamTitle'] as string) ||
+                        (metadata['stream-title'] as string) ||
+                        null;
+                    if (combinedTitle && typeof combinedTitle === 'string') {
+                        title = combinedTitle;
+                    }
+                } else if (!artist) {
+                    // If we have title but no artist, try to get from combined format
+                    const combinedTitle =
+                        (metadata['icy-title'] as string) ||
+                        (metadata['StreamTitle'] as string) ||
+                        (metadata['stream-title'] as string) ||
+                        null;
+                    if (
+                        combinedTitle &&
+                        typeof combinedTitle === 'string' &&
+                        combinedTitle !== title
+                    ) {
+                        // Try to parse artist from combined format
+                        const match = combinedTitle.match(/^(.*?)\s*[-–—]\s*(.+)$/);
+                        if (match && match[2].trim() === title) {
+                            artist = match[1].trim() || null;
+                        }
+                    }
+                }
+
+                return { artist, title };
+            }
+            return null;
+        } catch (err: any | NodeMpvError) {
+            mpvLog({ action: `Failed to get stream metadata` }, err);
+            return null;
+        }
+    },
+);
+
 enum MpvState {
     STARTED,
     IN_PROGRESS,
@@ -430,6 +532,36 @@ enum MpvState {
 }
 
 let mpvState = MpvState.STARTED;
+
+// Cleanup function that can be called from multiple places
+const cleanupMpv = async (force = false) => {
+    if (mpvState === MpvState.DONE && !force) {
+        return;
+    }
+
+    const instance = getMpvInstance();
+    if (instance) {
+        try {
+            if (!force) {
+                await instance.stop();
+            }
+            await quit(instance);
+        } catch (err: any | NodeMpvError) {
+            mpvLog({ action: `Failed to cleanup mpv` }, err);
+            // Force kill as fallback
+            const mpvProcess = (instance as any).process || (instance as any).mpvProcess;
+            if (mpvProcess && typeof mpvProcess.kill === 'function') {
+                try {
+                    mpvProcess.kill('SIGKILL');
+                } catch {
+                    // Ignore kill errors
+                }
+            }
+        } finally {
+            mpvInstance = null;
+        }
+    }
+};
 
 app.on('before-quit', async (event) => {
     switch (mpvState) {
@@ -442,8 +574,7 @@ app.on('before-quit', async (event) => {
             try {
                 mpvState = MpvState.IN_PROGRESS;
                 event.preventDefault();
-                await getMpvInstance()?.stop();
-                await quit();
+                await cleanupMpv();
             } catch (err: any | NodeMpvError) {
                 mpvLog({ action: `Failed to cleanly before-quit` }, err);
             } finally {
@@ -453,4 +584,47 @@ app.on('before-quit', async (event) => {
             break;
         }
     }
+});
+
+// Handle process exit events to ensure mpv is killed even if app crashes
+process.on('exit', () => {
+    const instance = getMpvInstance();
+    if (instance) {
+        // Try to access and kill the process directly
+        const mpvProcess = (instance as any).process || (instance as any).mpvProcess;
+        if (mpvProcess && typeof mpvProcess.kill === 'function') {
+            try {
+                mpvProcess.kill('SIGKILL');
+            } catch {
+                // Ignore errors during exit
+            }
+        }
+    }
+});
+
+// Handle signals that can terminate the process
+process.on('SIGINT', async () => {
+    await cleanupMpv(true);
+    process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+    await cleanupMpv(true);
+    process.exit(0);
+});
+
+// Handle uncaught exceptions - cleanup mpv before crashing
+process.on('uncaughtException', async (error) => {
+    console.error('Uncaught exception:', error);
+    await cleanupMpv(true).catch(() => {
+        // Ignore cleanup errors during crash
+    });
+});
+
+// Handle unhandled rejections - cleanup mpv
+process.on('unhandledRejection', async (reason) => {
+    console.error('Unhandled rejection:', reason);
+    await cleanupMpv(true).catch(() => {
+        // Ignore cleanup errors
+    });
 });

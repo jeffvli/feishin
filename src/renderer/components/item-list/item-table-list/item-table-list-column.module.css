@@ -87,7 +87,7 @@
 }
 
 .container.alternate-row-even {
-    background-color: initial;
+    background-color: var(--theme-colors-background);
 }
 
 .container.alternate-row-odd {
@@ -129,7 +129,7 @@
     }
 
     @mixin light {
-        background-color: var(--theme-colors-surface);
+        background-color: darken(var(--theme-colors-surface), 5%);
     }
 }
 

@@ -26,7 +26,7 @@
         grid-template-areas: 'image info';
         grid-template-rows: auto;
         grid-template-columns: 225px minmax(0, 1fr);
-        align-items: center;
+        align-items: flex-end;
         justify-items: start;
         height: auto;
         min-height: 340px;
@@ -98,7 +98,7 @@
 .title {
     display: flex;
     margin: var(--theme-spacing-sm) 0;
-    font-size: clamp(2rem, 3.5dvw, 3.25rem);
+    font-size: clamp(1.75rem, 3dvw, 2.75rem);
     line-height: 1.2;
 }
 

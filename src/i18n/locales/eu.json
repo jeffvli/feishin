@@ -164,9 +164,7 @@
             "view": {
                 "table": "taula",
                 "list": "zerrenda",
-                "card": "txartela",
-                "grid": "sareta",
-                "poster": "kartela"
+                "grid": "sareta"
             },
             "general": {
                 "gap": "$t(common.gap)",
@@ -448,7 +446,6 @@
         "discordDisplayType_description": "zure egoeran entzuten ari zarena aldatzen du",
         "discordLinkType": "{{discord}} egoera estekak",
         "fontType_description": "barneko letra-tipoa feishinek eskaintzen dituen letra-tipoetako bat aukeratzen du. sistemaren letra-tipoa zure sistema eragileak eskaintzen duen edozein letra-tipo hautatzeko aukera ematen dizu. pertsonalizatua zure letra-tipoa eskaintzeko aukera ematen dizu",
-        "genreBehavior": "genero orriaren portaera lehenetsia",
         "homeConfiguration_description": "konfiguratu zein elementu erakusten diren hasierako orrian eta zein ordenatan",
         "homeFeature": "etxeko karrusela nabarmendua",
         "homeFeature_description": "hasierako orrian karrusel nabarmen handia erakutsi behar den ala ez kontrolatzen du",
@@ -496,7 +493,6 @@
         "accentColor": "azentu-kolorea",
         "clearCache_description": "feishinen 'garbiketa gogorra'. feishinen katxea garbitzeaz gain, hustu nabigatzailearen katxea (gordetako irudiak eta bestelako aktiboak). zerbitzari-kredentzialak eta ezarpenak gorde egiten dira",
         "clearQueryCache_description": "feishinen 'garbiketa ahula'. honek erreprodukzio-zerrendak eta pisten metadatuak freskatuko ditu eta gordetako letrak berrezarriko ditu. ezarpenak, zerbitzari-kredentzialak eta katxetutako irudiak gorde egiten dira",
-        "doubleClickBehavior": "jarri ilaran bilatutako pista guztiak klik bikoitza egitean",
         "exitToTray_description": "irten aplikaziotik sistemaren erretilura",
         "followLyric_description": "mugitu letra uneko erreprodukzio-posiziora",
         "preferLocalLyrics": "nahiago izan letra lokalak",
@@ -526,7 +522,6 @@
         "playerAlbumArtResolution": "erreproduzitzailearen albumaren arte-azalaren erresoluzioa",
         "gaplessAudio": "hutsune gabeko audioa",
         "gaplessAudio_description": "ezartzen du hutsunik gabeko audio ezarpena mpv-rako",
-        "genreBehavior_description": "genero batean klik egiteak abestien edo albumen zerrendan lehenespenez irekitzen den zehazten du",
         "passwordStore": "pasahitzak/biltegi sekretua",
         "playerbarOpenDrawer": "txandakatu erreproduzitzailearen barra pantaila osora",
         "playerbarOpenDrawer_description": "aukera ematen du erreproduzitzailearen barran klik egiteak pantaila osoko erreproduzitzailea irekitzeko",
@@ -534,7 +529,6 @@
         "customCss_description": "css eduki pertsonalizatua. Oharra: edukia eta urruneko URLak debekatutako propietateak dira. Zure edukiaren aurrebista erakusten da behean. Ezarri ez dituzun eremu gehigarriak daude garbiketa dela eta",
         "enableRemote": "gaitu urruneko kontrol zerbitzaria",
         "enableRemote_description": "urruneko kontrol zerbitzariari beste gailu batzuei aplikazioa kontrolatzeko aukera ematen dio",
-        "doubleClickBehavior_description": "egia bada, bilaketa batean bat datozen pista guztiak ilaran jarriko dira. bestela, klikatutakoak bakarrik jarriko dira ilaran",
         "imageAspectRatio_description": "gaituta badago, azaleko artea jatorrizko aspektu-erlazioa erabiliz erakutsiko da. 1:1 ez den arterako, gainerako espazioa hutsik egongo da",
         "crossfadeStyle": "crossfade estiloa",
         "discordRichPresence": "{{discord}}-en jarduera-egoera",

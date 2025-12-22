@@ -38,7 +38,7 @@ export const JellyfinSongFilters = () => {
     }, [genreListQuery.data]);
 
     const tagsQuery = useQuery(
-        sharedQueries.tags({
+        sharedQueries.tagList({
             query: {
                 type: LibraryItem.SONG,
             },
@@ -137,7 +137,7 @@ export const JellyfinSongFilters = () => {
     );
 
     return (
-        <Stack p="md">
+        <Stack px="md" py="md">
             {yesNoFilters.map((filter) => (
                 <YesNoSelect
                     defaultValue={filter.value ? filter.value.toString() : undefined}

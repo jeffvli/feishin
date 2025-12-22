@@ -1,3 +1,4 @@
+import i18n from 'i18next';
 import { z } from 'zod';
 
 export enum NDAlbumArtistListSort {
@@ -179,46 +180,135 @@ export const NDSongQueryFields = [
     { label: 'Year', type: 'number', value: 'year' },
 ];
 
+export const NDSongQueryFieldsLabelMap: Record<string, string> = NDSongQueryFields.reduce(
+    (acc, field) => {
+        acc[field.value] = field.label;
+        return acc;
+    },
+    {} as Record<string, string>,
+);
+
 export const NDSongQueryPlaylistOperators = [
-    { label: 'is in', value: 'inPlaylist' },
-    { label: 'is not in', value: 'notInPlaylist' },
+    {
+        label: i18n.t('filterOperator.inPlaylist', { postProcess: 'titleCase' }),
+        value: 'inPlaylist',
+    },
+    {
+        label: i18n.t('filterOperator.notInPlaylist', { postProcess: 'titleCase' }),
+        value: 'notInPlaylist',
+    },
 ];
 
 export const NDSongQueryDateOperators = [
-    { label: 'is', value: 'is' },
-    { label: 'is not', value: 'isNot' },
-    { label: 'is before', value: 'before' },
-    { label: 'is after', value: 'after' },
-    { label: 'is in the last', value: 'inTheLast' },
-    { label: 'is not in the last', value: 'notInTheLast' },
-    { label: 'is in the range', value: 'inTheRange' },
-    { label: 'is before (date)', value: 'beforeDate' },
-    { label: 'is after (date)', value: 'afterDate' },
-    { label: 'is in the range (date)', value: 'inTheRangeDate' },
+    {
+        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        value: 'is',
+    },
+    {
+        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        value: 'isNot',
+    },
+    {
+        label: i18n.t('filterOperator.before', { postProcess: 'titleCase' }),
+        value: 'before',
+    },
+    {
+        label: i18n.t('filterOperator.after', { postProcess: 'titleCase' }),
+        value: 'after',
+    },
+    {
+        label: i18n.t('filterOperator.inTheLast', { postProcess: 'titleCase' }),
+        value: 'inTheLast',
+    },
+    {
+        label: i18n.t('filterOperator.notInTheLast', { postProcess: 'titleCase' }),
+        value: 'notInTheLast',
+    },
+    {
+        label: i18n.t('filterOperator.inTheRange', { postProcess: 'titleCase' }),
+        value: 'inTheRange',
+    },
+    {
+        label: i18n.t('filterOperator.beforeDate', { postProcess: 'titleCase' }),
+        value: 'beforeDate',
+    },
+    {
+        label: i18n.t('filterOperator.afterDate', { postProcess: 'titleCase' }),
+        value: 'afterDate',
+    },
+    {
+        label: i18n.t('filterOperator.inTheRangeDate', { postProcess: 'titleCase' }),
+        value: 'inTheRangeDate',
+    },
 ];
 
 export const NDSongQueryStringOperators = [
-    { label: 'is', value: 'is' },
-    { label: 'is not', value: 'isNot' },
-    { label: 'contains', value: 'contains' },
-    { label: 'does not contain', value: 'notContains' },
-    { label: 'starts with', value: 'startsWith' },
-    { label: 'ends with', value: 'endsWith' },
+    {
+        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        value: 'is',
+    },
+    {
+        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        value: 'isNot',
+    },
+    {
+        label: i18n.t('filterOperator.contains', { postProcess: 'titleCase' }),
+        value: 'contains',
+    },
+    {
+        label: i18n.t('filterOperator.notContains', { postProcess: 'titleCase' }),
+        value: 'notContains',
+    },
+    {
+        label: i18n.t('filterOperator.startsWith', { postProcess: 'titleCase' }),
+        value: 'startsWith',
+    },
+    {
+        label: i18n.t('filterOperator.endsWith', { postProcess: 'titleCase' }),
+        value: 'endsWith',
+    },
 ];
 
 export const NDSongQueryBooleanOperators = [
-    { label: 'is', value: 'is' },
-    { label: 'is not', value: 'isNot' },
+    {
+        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        value: 'is',
+    },
+    {
+        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        value: 'isNot',
+    },
 ];
 
 export const NDSongQueryNumberOperators = [
-    { label: 'is', value: 'is' },
-    { label: 'is not', value: 'isNot' },
-    { label: 'contains', value: 'contains' },
-    { label: 'does not contain', value: 'notContains' },
-    { label: 'is greater than', value: 'gt' },
-    { label: 'is less than', value: 'lt' },
-    { label: 'is in the range', value: 'inTheRange' },
+    {
+        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        value: 'is',
+    },
+    {
+        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        value: 'isNot',
+    },
+    {
+        label: i18n.t('filterOperator.contains', { postProcess: 'titleCase' }),
+        value: 'contains',
+    },
+    {
+        label: i18n.t('filterOperator.notContains', { postProcess: 'titleCase' }),
+        value: 'notContains',
+    },
+    {
+        label: i18n.t('filterOperator.isGreaterThan', { postProcess: 'titleCase' }),
+        value: 'gt',
+    },
+    {
+        label: i18n.t('filterOperator.isLessThan', { postProcess: 'titleCase' }),
+        value: 'lt',
+    },
+    {
+        label: i18n.t('filterOperator.inTheRange', { postProcess: 'titleCase' }),
+        value: 'inTheRange',
+    },
 ];
 
 export enum NDUserListSort {
@@ -234,6 +324,8 @@ const paginationParameters = z.object({
     _order: z.enum(sortOrderValues),
     _start: z.number().optional(),
 });
+
+const optionalPaginationParameters = paginationParameters.partial();
 
 const authenticate = z.object({
     id: z.string(),
@@ -525,6 +617,7 @@ const createPlaylist = playlist.pick({
 const createPlaylistParameters = z.object({
     comment: z.string().optional(),
     name: z.string(),
+    ownerId: z.string().optional(),
     public: z.boolean().optional(),
     rules: z.record(z.any()).optional(),
     sync: z.boolean().optional(),
@@ -578,7 +671,37 @@ const tag = z.object({
     tagValue: z.string(),
 });
 
-const tags = z.array(tag);
+const tagList = z.array(tag);
+
+export enum NDTagListSort {
+    TAG_VALUE = 'tagValue',
+}
+
+const tagListParameters = optionalPaginationParameters.extend({
+    _sort: z.nativeEnum(NDTagListSort).optional(),
+    library_id: z.array(z.string()).optional(),
+    tag_name: z.string().optional(),
+    tag_value: z.string().optional(), // Search
+});
+
+const saveQueueParameters = z.object({
+    current: z.number().optional(),
+    ids: z.array(z.string()).optional(),
+    position: z.number().optional(),
+});
+
+const saveQueue = z.null();
+
+const queue = z.object({
+    changedBy: z.string(),
+    createdAt: z.string(),
+    current: z.number(),
+    id: z.string(),
+    items: z.array(song),
+    position: z.number(),
+    updatedAt: z.string(),
+    userId: z.string(),
+});
 
 export const ndType = {
     _enum: {
@@ -587,6 +710,7 @@ export const ndType = {
         genreList: genreListSort,
         playlistList: NDPlaylistListSort,
         songList: NDSongListSort,
+        tagList: NDTagListSort,
         userList: ndUserListSort,
     },
     _parameters: {
@@ -599,8 +723,10 @@ export const ndType = {
         moveItem: moveItemParameters,
         playlistList: playlistListParameters,
         removeFromPlaylist: removeFromPlaylistParameters,
+        saveQueue: saveQueueParameters,
         shareItem: shareItemParameters,
         songList: songListParameters,
+        tagList: tagListParameters,
         updatePlaylist: updatePlaylistParameters,
         userList: userListParameters,
     },
@@ -621,11 +747,13 @@ export const ndType = {
         playlistList,
         playlistSong,
         playlistSongList,
+        queue,
         removeFromPlaylist,
+        saveQueue,
         shareItem,
         song,
         songList,
-        tags,
+        tagList,
         updatePlaylist,
         user,
         userList,

@@ -1,6 +1,5 @@
 import { openModal } from '@mantine/modals';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
@@ -16,8 +15,6 @@ import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Icon } from '/@/shared/components/icon/icon';
 import { ServerListItemWithCredential, ServerType } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
-
-const localSettings = isElectron() ? window.api.localSettings : null;
 
 export const ServerSelectorItems = () => {
     const { t } = useTranslation();
@@ -41,6 +38,7 @@ export const ServerSelectorItems = () => {
     const supportsMultiSelect = hasFeature(currentServer, ServerFeature.MUSIC_FOLDER_MULTISELECT);
 
     const queryClient = useQueryClient();
+
     const handleToggleMusicFolder = (musicFolderId: string) => {
         if (supportsMultiSelect) {
             const currentIds = currentServer.musicFolderId || [];
@@ -67,12 +65,12 @@ export const ServerSelectorItems = () => {
             }
         }
 
-        queryClient.resetQueries();
+        queryClient.removeQueries();
     };
 
     const handleClearMusicFolders = () => {
         setMusicFolderId(undefined);
-        queryClient.resetQueries();
+        queryClient.removeQueries();
     };
 
     if (!currentServer) {
@@ -90,7 +88,7 @@ export const ServerSelectorItems = () => {
         });
     };
 
-    const serverLock = localSettings?.env.SERVER_LOCK || false;
+    const isServerLock = Boolean(window.SERVER_LOCK) || false;
 
     return (
         <>
@@ -125,7 +123,7 @@ export const ServerSelectorItems = () => {
                     </DropdownMenu.Item>
                 );
             })}
-            {!serverLock && (
+            {!isServerLock && (
                 <DropdownMenu.Item
                     leftSection={<Icon icon="edit" />}
                     onClick={handleManageServersModal}

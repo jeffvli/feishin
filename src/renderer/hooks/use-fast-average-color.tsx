@@ -155,3 +155,36 @@ export const useFastAverageColor = (args: {
         isLoading,
     };
 };
+
+export const useWaitForColorCalculation = (args: {
+    hasImage: boolean;
+    isLoading: boolean;
+    routeId: string;
+    showBlurredImage: boolean;
+    timeoutMs?: number;
+}) => {
+    const { hasImage, isLoading, routeId, showBlurredImage, timeoutMs = 1000 } = args;
+    const [timeoutReached, setTimeoutReached] = useState(false);
+
+    const shouldWaitForColor = hasImage && !showBlurredImage;
+
+    useEffect(() => {
+        setTimeoutReached(false);
+
+        if (!shouldWaitForColor) {
+            return;
+        }
+
+        const timeoutId = setTimeout(() => {
+            setTimeoutReached(true);
+        }, timeoutMs);
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [shouldWaitForColor, routeId, timeoutMs]);
+
+    const isReady = !shouldWaitForColor || !isLoading || timeoutReached;
+
+    return { isReady };
+};

@@ -85,7 +85,7 @@ export const MobilePlayerbar = () => {
                                         label={t('player.toggleFullscreenPlayer', {
                                             postProcess: 'sentenceCase',
                                         })}
-                                        openDelay={500}
+                                        openDelay={0}
                                     >
                                         <Image
                                             className={clsx(

@@ -7,6 +7,7 @@ import {
     AlbumArtist,
     Artist,
     Genre,
+    InternetRadioStation,
     LibraryItem,
     Playlist,
     QueueSong,
@@ -73,6 +74,10 @@ const PaginationFilterKeys = {
     SCROLL_OFFSET: 'scrollOffset',
 };
 
+enum FolderFilterKeys {
+    FOLDER_PATH = 'folderPath',
+}
+
 enum PlaylistFilterKeys {
     CUSTOM = '_custom',
 }
@@ -80,6 +85,7 @@ enum PlaylistFilterKeys {
 export const FILTER_KEYS = {
     ALBUM: AlbumFilterKeys,
     ARTIST: ArtistFilterKeys,
+    FOLDER: FolderFilterKeys,
     PAGINATION: PaginationFilterKeys,
     PLAYLIST: PlaylistFilterKeys,
     SHARED: SharedFilterKeys,
@@ -92,7 +98,15 @@ interface CreateFuseOptions {
     threshold?: number;
 }
 
-type FuseSearchableItem = Album | AlbumArtist | Artist | Genre | Playlist | QueueSong | Song;
+type FuseSearchableItem =
+    | Album
+    | AlbumArtist
+    | Artist
+    | Genre
+    | InternetRadioStation
+    | Playlist
+    | QueueSong
+    | Song;
 
 export const createFuseForLibraryItem = <T extends FuseSearchableItem>(
     items: T[],
@@ -166,6 +180,7 @@ export const createFuseForLibraryItem = <T extends FuseSearchableItem>(
 
         case LibraryItem.ARTIST:
         case LibraryItem.GENRE:
+        case LibraryItem.RADIO_STATION:
             break;
 
         case LibraryItem.PLAYLIST: {

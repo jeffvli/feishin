@@ -143,11 +143,11 @@
             background-color: transparent;
 
             @mixin dark {
-                color: lighten(var(--theme-colors-foreground), 10%);
+                color: darken(var(--theme-colors-foreground), 15%);
             }
 
             @mixin light {
-                color: darken(var(--theme-colors-foreground), 10%);
+                color: lighten(var(--theme-colors-foreground), 10%);
             }
         }
 

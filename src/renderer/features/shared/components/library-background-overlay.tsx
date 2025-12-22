@@ -69,11 +69,11 @@ export const BackgroundOverlay = ({
 interface LibraryBackgroundProps {
     blur?: number;
     headerRef: React.RefObject<HTMLDivElement | null>;
-    imageUrl?: string;
+    imageUrl: null | string;
 }
 
 export const LibraryBackgroundImage = ({ blur, headerRef, imageUrl }: LibraryBackgroundProps) => {
-    const url = `url(${imageUrl})`;
+    const url = imageUrl ? `url(${imageUrl})` : undefined;
     const height = useHeaderHeight(headerRef);
     return (
         <>

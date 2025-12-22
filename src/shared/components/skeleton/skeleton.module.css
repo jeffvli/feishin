@@ -5,8 +5,8 @@
     }
 
     @mixin light {
-        --base-color: var(--theme-colors-foreground-muted) !important;
-        --highlight-color: darken(var(--theme-colors-foreground-muted), 40%) !important;
+        --base-color: darken(var(--theme-colors-surface), 10%) !important;
+        --highlight-color: darken(var(--theme-colors-surface), 15%) !important;
     }
 
     --animation-duration: 1.5s !important;

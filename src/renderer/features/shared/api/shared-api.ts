@@ -3,7 +3,7 @@ import { queryOptions } from '@tanstack/react-query';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
-import { MusicFolderListQuery, TagQuery, UserListQuery } from '/@/shared/types/domain-types';
+import { MusicFolderListQuery, TagListQuery, UserListQuery } from '/@/shared/types/domain-types';
 
 export const sharedQueries = {
     musicFolders: (args: QueryHookArgs<MusicFolderListQuery>) => {
@@ -28,11 +28,11 @@ export const sharedQueries = {
             ...args.options,
         });
     },
-    tags: (args: QueryHookArgs<TagQuery>) => {
+    tagList: (args: QueryHookArgs<TagListQuery>) => {
         return queryOptions({
             gcTime: 1000 * 60,
             queryFn: ({ signal }) => {
-                return api.controller.getTags({
+                return api.controller.getTagList({
                     apiClientProps: { serverId: args.serverId, signal },
                     query: args.query,
                 });

@@ -77,10 +77,6 @@ export const useMainPlayerListener = () => {
             mediaSkipBackward();
         });
 
-        mpvPlayerListener.rendererAutoNext(() => {
-            mediaAutoNext();
-        });
-
         mpvPlayerListener.rendererToggleShuffle(() => {
             toggleShuffle();
         });
@@ -114,7 +110,6 @@ export const useMainPlayerListener = () => {
             ipc?.removeAllListeners('renderer-player-stop');
             ipc?.removeAllListeners('renderer-player-skip-forward');
             ipc?.removeAllListeners('renderer-player-skip-backward');
-            ipc?.removeAllListeners('renderer-player-auto-next');
             ipc?.removeAllListeners('renderer-player-toggle-shuffle');
             ipc?.removeAllListeners('renderer-player-toggle-repeat');
             ipc?.removeAllListeners('renderer-player-volume-mute');

@@ -144,7 +144,6 @@
         "replayGainMode": "{{ReplayGain}} モード",
         "playbackStyle_optionNormal": "通常",
         "windowBarStyle": "ウィンドウバースタイル",
-        "floatingQueueArea": "フローティング再生キューエリアの表示",
         "replayGainFallback_description": "ファイルに {{ReplayGain}} タグがない場合に適用するゲイン (dB 単位)",
         "replayGainPreamp_description": "{{ReplayGain}} の値に適用されるプリアンプゲインを調整します",
         "hotkey_toggleRepeat": "リピートの切り替え",
@@ -170,7 +169,6 @@
         "hotkey_rate0": "評価をクリア",
         "discordApplicationId": "{{discord}} アプリケーション ID",
         "applicationHotkeys_description": "アプリケーションのホットキーを設定します。チェックボックスを切り替えて、グローバルホットキーとして設定します (デスクトップのみ)",
-        "floatingQueueArea_description": "画面右側に、再生キューをフローティング表示するためのホバーアイコンが表示されます",
         "hotkey_volumeMute": "音量をミュート",
         "hotkey_toggleCurrentSongFavorite": "$t(common.currentSong) をお気に入り登録/解除",
         "remoteUsername": "リモートコントロールサーバーのユーザー名",
@@ -225,18 +223,15 @@
         "imageAspectRatio": "ネイティブのカバーアートの縦横比を使用する",
         "language": "言語",
         "imageAspectRatio_description": "有効にすると、カバーアートはネイティブの縦横比で表示されます。縦横比が 1:1 でない場合、残りのスペースは空白になります",
-        "lastfm_description": "アーティスト/アルバムページに Last.fm へのリンクを表示する",
+        "lastfm_description": "アーティスト/アルバムページに Last.fm へのリンクを表示します",
         "lastfm": "Last.fm リンクを表示する",
         "lastfmApiKey": "{{lastfm}} API キー",
         "homeConfiguration_description": "ホーム画面に表示する項目と表示順序を設定します",
         "homeConfiguration": "ホーム画面の設定",
         "externalLinks": "外部リンクを表示する",
         "externalLinks_description": "アーティスト/アルバムページで外部リンク (Last.fm、MusicBrainz) を表示できるようにします",
-        "doubleClickBehavior_description": "true の場合、トラック検索で一致するすべてのトラックがキューに入ります。そうでない場合は、クリックされたトラックのみがキューに入ります",
         "enableAutoTranslation": "自動翻訳を有効にする",
         "enableAutoTranslation_description": "歌詞が読み込まれたときに自動的に翻訳を有効にします",
-        "genreBehavior_description": "ジャンルをクリックした際に、デフォルトでトラックリストまたはアルバムリストのどちらを開くか決定します",
-        "genreBehavior": "ジャンルページのデフォルトの動作",
         "albumBackground_description": "アルバムアートを含むアルバムページに背景画像を追加します",
         "albumBackground": "アルバムの背景画像",
         "albumBackgroundBlur": "アルバムの背景画像のぼかしサイズ",
@@ -262,7 +257,7 @@
         "customCssEnable_description": "カスタム CSS の記述を許可します",
         "customCssEnable": "カスタム CSS を有効にする",
         "customCssNotice": "警告: ある程度のサニタイズ (url() と content: の禁止) はありますが、カスタム CSS を使用するとインターフェースの変更によりリスクが生じる可能性があります",
-        "releaseChannel_optionBeta": "beta",
+        "releaseChannel_optionBeta": "ベータ",
         "releaseChannel_optionLatest": "最新",
         "releaseChannel": "リリースチャンネル",
         "releaseChannel_description": "自動更新のために安定版リリースまたはベータ版リリースを選択してください",
@@ -297,7 +292,6 @@
         "discordPausedStatus_description": "有効にすると、プレーヤーが一時停止されているときにもステータスを表示します",
         "discordDisplayType_description": "ステータスで聴いている内容を変更します",
         "discordLinkType": "{{discord}} Presence リンク",
-        "doubleClickBehavior": "ダブルクリック時に検索した全トラックをキューに追加する",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} と {{lastfm}} のフォールバック",
         "homeFeature": "ホーム画面の注目カルーセル",
         "homeFeature_description": "ホーム画面に大きな注目カルーセルを表示するかどうかを制御します",
@@ -328,7 +322,13 @@
             "lastfm": "Last.fm で開く",
             "musicbrainz": "MusicBrainz で開く"
         },
-        "moveToNext": "次"
+        "moveToNext": "次",
+        "downloadStarted": "{{count}} 曲のダウンロードを開始しました",
+        "moveItems": "曲を移動",
+        "shuffle": "シャッフル",
+        "shuffleAll": "すべてシャッフル",
+        "shuffleSelected": "選択した曲をシャッフル",
+        "viewMore": "さらに表示"
     },
     "common": {
         "backward": "戻る",
@@ -427,14 +427,16 @@
         "explicit": "明示的",
         "albumGain": "アルバムゲイン",
         "albumPeak": "アルバムピーク",
-        "releaseType": "リリースタイプ"
+        "releaseType": "リリースタイプ",
+        "doNotShowAgain": "再度表示しない",
+        "externalLinks": "外部リンク",
+        "sort": "分類",
+        "gridRows": "グリッド行"
     },
     "table": {
         "config": {
             "view": {
-                "card": "カード",
                 "table": "テーブル",
-                "poster": "ポスター",
                 "grid": "グリッド",
                 "list": "リスト"
             },
@@ -666,7 +668,7 @@
         },
         "albumDetail": {
             "moreFromArtist": "$t(entity.artist_one) の他の項目",
-            "moreFromGeneric": "{{item}} の他の項目",
+            "moreFromGeneric": "{{item}} の他の作品",
             "released": "リリース"
         },
         "setting": {
@@ -801,6 +803,10 @@
             "enabled": "プライベートモードが有効になりました。再生ステータスは外部連携から非表示になっています",
             "disabled": "プライベートモードが無効になりました。再生ステータスは有効になっている外部連携に表示されています",
             "title": "プライベートモード"
+        },
+        "largeFetchConfirmation": {
+            "title": "キューにアイテムを追加する",
+            "description": "このアクションは、現在のフィルターされたビュー内のすべてのアイテムを追加します"
         }
     },
     "entity": {

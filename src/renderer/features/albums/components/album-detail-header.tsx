@@ -89,7 +89,7 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
                 item={{ route: AppRoute.LIBRARY_ALBUMS, type: LibraryItem.ALBUM }}
                 title={detailQuery?.data?.name || ''}
             >
-                <Stack gap="xl" w="100%">
+                <Stack gap="md" w="100%">
                     {(firstAlbumArtist || releaseYear) && (
                         <Group className={styles.metadataGroup}>
                             {firstAlbumArtist && (
@@ -121,7 +121,7 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
                         favorite={detailQuery?.data?.userFavorite}
                         onFavorite={handleFavorite}
                         onMore={handleMoreOptions}
-                        onPlay={() => handlePlay(Play.NOW)}
+                        onPlay={(type) => handlePlay(type)}
                         onRating={handleUpdateRating}
                         onShuffle={() => handlePlay(Play.SHUFFLE)}
                         rating={detailQuery?.data?.userRating || 0}
