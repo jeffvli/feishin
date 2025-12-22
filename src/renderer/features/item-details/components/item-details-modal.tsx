@@ -1,5 +1,5 @@
 import { TFunction } from 'i18next';
-import { ReactNode } from 'react';
+import { ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 
@@ -12,8 +12,10 @@ import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types
 import { sanitize } from '/@/renderer/utils/sanitize';
 import { SEPARATOR_STRING } from '/@/shared/api/utils';
 import { Icon } from '/@/shared/components/icon/icon';
+import { Select } from '/@/shared/components/select/select';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
+import { Stack } from '/@/shared/components/stack/stack';
 import { Table } from '/@/shared/components/table/table';
 import { Text } from '/@/shared/components/text/text';
 import {
@@ -29,7 +31,8 @@ import {
 } from '/@/shared/types/domain-types';
 
 export type ItemDetailsModalProps = {
-    item: Album | AlbumArtist | Artist | Playlist | Song;
+    item?: Album | AlbumArtist | Artist | Playlist | Song;
+    items?: (Album | AlbumArtist | Artist | Playlist | Song)[];
 };
 
 type ItemDetailRow<T> = {
@@ -225,10 +228,9 @@ const AlbumArtistPropertyMapping: ItemDetailRow<AlbumArtist>[] = [
         label: 'common.biography',
         render: (artist) =>
             artist.biography ? (
-                <Spoiler
-                    dangerouslySetInnerHTML={{ __html: sanitize(artist.biography) }}
-                    maxHeight={50}
-                />
+                <Spoiler>
+                    <Text dangerouslySetInnerHTML={{ __html: sanitize(artist.biography) }} />
+                </Spoiler>
             ) : null,
     },
     { key: 'id', label: 'filter.id' },
@@ -404,48 +406,81 @@ const handleParticipants = (item: Album | Song, t: TFunction) => {
     return [];
 };
 
-export const ItemDetailsModal = ({ item }: ItemDetailsModalProps) => {
+export const ItemDetailsModal = ({ item, items }: ItemDetailsModalProps) => {
     const { t } = useTranslation();
+    const allItems = useMemo(() => items || (item ? [item] : []), [item, items]);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    const selectedItem = useMemo(() => {
+        return allItems[selectedIndex] || null;
+    }, [allItems, selectedIndex]);
+
+    const selectData = useMemo(() => {
+        return allItems.map((it, index) => ({
+            label:
+                it.name ||
+                `${t('common.item', { defaultValue: 'Item', postProcess: 'sentenceCase' })} ${index + 1}`,
+            value: String(index),
+        }));
+    }, [allItems, t]);
+
+    if (!selectedItem) {
+        return null;
+    }
+
     let body: ReactNode[] = [];
 
-    switch (item._itemType) {
+    switch (selectedItem._itemType) {
         case LibraryItem.ALBUM:
-            body = AlbumPropertyMapping.map((rule) => handleRow(t, item, rule));
-            body.push(...handleParticipants(item, t));
-            body.push(...handleTags(item, t));
+            body = AlbumPropertyMapping.map((rule) => handleRow(t, selectedItem, rule));
+            body.push(...handleParticipants(selectedItem, t));
+            body.push(...handleTags(selectedItem, t));
             break;
         case LibraryItem.ALBUM_ARTIST:
-            body = AlbumArtistPropertyMapping.map((rule) => handleRow(t, item, rule));
+            body = AlbumArtistPropertyMapping.map((rule) => handleRow(t, selectedItem, rule));
             break;
         case LibraryItem.PLAYLIST:
-            body = PlaylistPropertyMapping.map((rule) => handleRow(t, item, rule));
+            body = PlaylistPropertyMapping.map((rule) => handleRow(t, selectedItem, rule));
             break;
         case LibraryItem.SONG:
-            body = SongPropertyMapping.map((rule) => handleRow(t, item, rule));
-            body.push(...handleParticipants(item, t));
-            body.push(...handleTags(item, t));
+            body = SongPropertyMapping.map((rule) => handleRow(t, selectedItem, rule));
+            body.push(...handleParticipants(selectedItem, t));
+            body.push(...handleTags(selectedItem, t));
             break;
         default:
             body = [];
     }
 
     return (
-        <Table
-            highlightOnHover={false}
-            styles={{
-                th: {
-                    color: 'var(--theme-colors-foreground-muted)',
-                    fontWeight: 500,
-                    padding: 'var(--theme-spacing-sm)',
-                },
-                tr: {
-                    color: 'var(--theme-colors-foreground-muted)',
-                    padding: 'var(--theme-spacing-xl)',
-                },
-            }}
-            withRowBorders={true}
-        >
-            <Table.Tbody>{body}</Table.Tbody>
-        </Table>
+        <Stack gap="md">
+            {allItems.length > 1 && (
+                <Select
+                    data={selectData}
+                    onChange={(value) => {
+                        if (value) {
+                            setSelectedIndex(Number(value));
+                        }
+                    }}
+                    value={String(selectedIndex)}
+                />
+            )}
+            <Table
+                highlightOnHover={false}
+                styles={{
+                    th: {
+                        color: 'var(--theme-colors-foreground-muted)',
+                        fontWeight: 500,
+                        padding: 'var(--theme-spacing-sm)',
+                    },
+                    tr: {
+                        color: 'var(--theme-colors-foreground-muted)',
+                        padding: 'var(--theme-spacing-xl)',
+                    },
+                }}
+                withRowBorders={true}
+            >
+                <Table.Tbody>{body}</Table.Tbody>
+            </Table>
+        </Stack>
     );
 };

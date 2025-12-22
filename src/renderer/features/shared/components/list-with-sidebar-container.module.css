@@ -21,9 +21,15 @@
     border-right: 1px solid var(--theme-colors-border);
 }
 
-@container (min-width: $mantine-breakpoint-lg) {
-    .sidebar-container {
+@container (min-width: $mantine-breakpoint-xs) {
+    .container[data-sidebar-open='true'] .sidebar-container {
         display: block;
+    }
+
+    @container (min-width: $mantine-breakpoint-lg) {
+        .container[data-use-breakpoint='true'] .sidebar-container {
+            display: block;
+        }
     }
 }
 

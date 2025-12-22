@@ -1,42 +1,28 @@
-import clsx from 'clsx';
-import { HTMLAttributes, ReactNode, useRef, useState } from 'react';
+import { Spoiler as MantineSpoiler, SpoilerProps as MantineSpoilerProps } from '@mantine/core';
+import { ReactNode, useState } from 'react';
 
 import styles from './spoiler.module.css';
 
-import { Text } from '/@/shared/components/text/text';
-import { useIsOverflow } from '/@/shared/hooks/use-is-overflow';
+import { Icon } from '/@/shared/components/icon/icon';
 
-interface SpoilerProps extends HTMLAttributes<HTMLDivElement> {
+interface SpoilerProps extends Omit<MantineSpoilerProps, 'hideLabel' | 'showLabel'> {
     children?: ReactNode;
-    defaultOpened?: boolean;
-    maxHeight?: number;
 }
 
-export const Spoiler = ({ children, defaultOpened, maxHeight, ...props }: SpoilerProps) => {
-    const ref = useRef(null);
-    const isOverflow = useIsOverflow(ref);
-    const [isExpanded, setIsExpanded] = useState(!!defaultOpened);
-
-    const spoilerClassNames = clsx(styles.spoiler, {
-        [styles.canExpand]: isOverflow,
-        [styles.isExpanded]: isExpanded,
-    });
-
-    const handleToggleExpand = () => {
-        setIsExpanded((val) => !val);
-    };
+export const Spoiler = ({ children, maxHeight = 56, ...props }: SpoilerProps) => {
+    const [expanded, setExpanded] = useState(false);
 
     return (
-        <Text
-            className={spoilerClassNames}
-            onClick={handleToggleExpand}
-            ref={ref}
-            role="button"
-            style={{ maxHeight: maxHeight ?? '100px', whiteSpace: 'pre-wrap' }}
-            tabIndex={-1}
+        <MantineSpoiler
+            classNames={{ content: styles.spoiler, control: styles.control }}
+            expanded={expanded}
+            maxHeight={maxHeight}
             {...props}
+            hideLabel={<Icon icon="arrowUpS" size="lg" />}
+            onClick={() => setExpanded(!expanded)}
+            showLabel={<Icon icon="arrowDownS" size="lg" />}
         >
             {children}
-        </Text>
+        </MantineSpoiler>
     );
 };

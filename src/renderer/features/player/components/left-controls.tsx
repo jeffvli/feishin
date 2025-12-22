@@ -8,6 +8,8 @@ import { shallow } from 'zustand/shallow';
 import styles from './left-controls.module.css';
 
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
+import { RadioMetadataDisplay } from '/@/renderer/features/player/components/radio-metadata-display';
+import { useIsRadioActive } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useAppStore,
@@ -41,13 +43,15 @@ export const LeftControls = () => {
         shallow,
     );
 
-    const hideImage = image && !collapsed;
     const currentSong = usePlayerSong();
-    const title = currentSong?.name;
-    const artists = currentSong?.artists;
+    const isRadioActive = useIsRadioActive();
     const { bindings } = useHotkeySettings();
 
-    const isSongDefined = Boolean(currentSong?.id);
+    const isRadioMode = isRadioActive;
+    const hideImage = (image && !collapsed) || isRadioMode;
+    const isSongDefined = Boolean(currentSong?.id) && !isRadioMode;
+    const title = currentSong?.name;
+    const artists = currentSong?.artists;
 
     const handleToggleFullScreenPlayer = (e?: KeyboardEvent | MouseEvent<HTMLDivElement>) => {
         // don't toggle if right click
@@ -110,7 +114,7 @@ export const LeftControls = () => {
                                     label={t('player.toggleFullscreenPlayer', {
                                         postProcess: 'sentenceCase',
                                     })}
-                                    openDelay={500}
+                                    openDelay={0}
                                 >
                                     <Image
                                         className={clsx(
@@ -118,7 +122,7 @@ export const LeftControls = () => {
                                             PlaybackSelectors.playerCoverArt,
                                         )}
                                         loading="eager"
-                                        src={currentSong?.imageUrl ?? ''}
+                                        src={isRadioMode ? '' : (currentSong?.imageUrl ?? '')}
                                     />
                                 </Tooltip>
                                 {!collapsed && (
@@ -139,7 +143,7 @@ export const LeftControls = () => {
                                             label: t('common.expand', {
                                                 postProcess: 'titleCase',
                                             }),
-                                            openDelay: 500,
+                                            openDelay: 0,
                                         }}
                                     />
                                 )}
@@ -148,101 +152,113 @@ export const LeftControls = () => {
                     )}
                 </AnimatePresence>
                 <motion.div className={styles.metadataStack} layout="position">
-                    <div className={styles.lineItem} onClick={stopPropagation}>
-                        <Group align="center" gap="xs" wrap="nowrap">
-                            <Text
-                                className={PlaybackSelectors.songTitle}
-                                component={Link}
-                                fw={500}
-                                isLink
-                                onContextMenu={handleToggleContextMenu} // Ajout du clic droit
-                                overflow="hidden"
-                                to={AppRoute.NOW_PLAYING}
-                            >
-                                {title || '—'}
-                            </Text>
-                            {isSongDefined && (
-                                <ActionIcon
-                                    icon="ellipsisVertical"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        if (currentSong) {
-                                            ContextMenuController.call({
-                                                cmd: {
-                                                    items: [currentSong],
-                                                    type: LibraryItem.SONG,
+                    {isRadioMode ? (
+                        <RadioMetadataDisplay
+                            onStopPropagation={stopPropagation}
+                            onToggleContextMenu={handleToggleContextMenu}
+                        />
+                    ) : (
+                        <>
+                            <div className={styles.lineItem} onClick={stopPropagation}>
+                                <Group align="center" gap="xs" wrap="nowrap">
+                                    <Text
+                                        className={PlaybackSelectors.songTitle}
+                                        component={Link}
+                                        fw={500}
+                                        isLink
+                                        onContextMenu={handleToggleContextMenu}
+                                        overflow="hidden"
+                                        to={AppRoute.NOW_PLAYING}
+                                    >
+                                        {title || '—'}
+                                    </Text>
+                                    {isSongDefined && (
+                                        <ActionIcon
+                                            icon="ellipsisVertical"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                if (currentSong) {
+                                                    ContextMenuController.call({
+                                                        cmd: {
+                                                            items: [currentSong],
+                                                            type: LibraryItem.SONG,
+                                                        },
+                                                        event: e,
+                                                    });
+                                                }
+                                            }}
+                                            size="xs"
+                                            styles={{
+                                                root: {
+                                                    '--ai-size-xs': '1.15rem',
                                                 },
-                                                event: e,
-                                            });
-                                        }
-                                    }}
-                                    size="xs"
-                                    styles={{
-                                        root: {
-                                            '--ai-size-xs': '1.15rem',
-                                        },
-                                    }}
-                                    variant="subtle"
-                                />
-                            )}
-                        </Group>
-                    </div>
-                    <div
-                        className={clsx(
-                            styles.lineItem,
-                            styles.secondary,
-                            PlaybackSelectors.songArtist,
-                        )}
-                        onClick={stopPropagation}
-                    >
-                        {artists?.map((artist, index) => (
-                            <React.Fragment key={`bar-${artist.id}`}>
-                                {index > 0 && <Separator />}
+                                            }}
+                                            variant="subtle"
+                                        />
+                                    )}
+                                </Group>
+                            </div>
+                            <div
+                                className={clsx(
+                                    styles.lineItem,
+                                    styles.secondary,
+                                    PlaybackSelectors.songArtist,
+                                )}
+                                onClick={stopPropagation}
+                            >
+                                {artists?.map((artist, index) => (
+                                    <React.Fragment key={`bar-${artist.id}`}>
+                                        {index > 0 && <Separator />}
+                                        <Text
+                                            component={artist.id ? Link : undefined}
+                                            fw={500}
+                                            isLink={artist.id !== ''}
+                                            overflow="hidden"
+                                            size="md"
+                                            to={
+                                                artist.id
+                                                    ? generatePath(
+                                                          AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
+                                                          {
+                                                              albumArtistId: artist.id,
+                                                          },
+                                                      )
+                                                    : undefined
+                                            }
+                                        >
+                                            {artist.name || '—'}
+                                        </Text>
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                            <div
+                                className={clsx(
+                                    styles.lineItem,
+                                    styles.secondary,
+                                    PlaybackSelectors.songAlbum,
+                                )}
+                                onClick={stopPropagation}
+                            >
                                 <Text
-                                    component={artist.id ? Link : undefined}
+                                    component={Link}
                                     fw={500}
-                                    isLink={artist.id !== ''}
+                                    isLink
                                     overflow="hidden"
                                     size="md"
                                     to={
-                                        artist.id
-                                            ? generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
-                                                  albumArtistId: artist.id,
+                                        currentSong?.albumId
+                                            ? generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+                                                  albumId: currentSong.albumId,
                                               })
-                                            : undefined
+                                            : ''
                                     }
                                 >
-                                    {artist.name || '—'}
+                                    {currentSong?.album || '—'}
                                 </Text>
-                            </React.Fragment>
-                        ))}
-                    </div>
-                    <div
-                        className={clsx(
-                            styles.lineItem,
-                            styles.secondary,
-                            PlaybackSelectors.songAlbum,
-                        )}
-                        onClick={stopPropagation}
-                    >
-                        <Text
-                            component={Link}
-                            fw={500}
-                            isLink
-                            overflow="hidden"
-                            size="md"
-                            to={
-                                currentSong?.albumId
-                                    ? generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
-                                          albumId: currentSong.albumId,
-                                      })
-                                    : ''
-                            }
-                        >
-                            {currentSong?.album || '—'}
-                        </Text>
-                    </div>
+                            </div>
+                        </>
+                    )}
                 </motion.div>
             </LayoutGroup>
         </div>

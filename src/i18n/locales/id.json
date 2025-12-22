@@ -492,16 +492,12 @@
         "discordRichPresence_description": "aktifkan status pemutaran di status aktivitas {{discord}}. Gambar tombol adalah: {{icon}}, {{playing}}, dan {{paused}}",
         "discordUpdateInterval": "interval pembaruan status aktivitas {{discord}}",
         "discordUpdateInterval_description": "waktu dalam detik antara setiap pembaruan (minimal 15 detik)",
-        "doubleClickBehavior": "masukkan semua lagu yang dicari saat mengklik dua kali",
-        "doubleClickBehavior_description": "jika true, semua lagu yang cocok dalam pencarian lagu akan dimasukkan ke dalam antrean. Jika tidak, hanya lagu yang dipilih yang akan dimasukkan ke dalam antrean",
         "enableRemote": "aktifkan kontrol jarak jauh server",
         "enableRemote_description": "aktifkan kontrol jarak jauh server untuk memungkinkan perangkat lain mengontrol aplikasi",
         "externalLinks": "Tampilkan tautan eksternal",
         "externalLinks_description": "Izinkan untuk menampilkan tautan eksternal (Last.fm, MusicBrainz) di halaman artis/album",
         "exitToTray": "keluar ke baki",
         "exitToTray_description": "keluar dari aplikasi ke baki sistem",
-        "floatingQueueArea": "tampilkan area antrean mengambang",
-        "floatingQueueArea_description": "menampilkan ikon mengambang di sisi kanan layar untuk melihat antrean pemutaran",
         "followLyric": "ikuti lirik saat ini",
         "followLyric_description": "gulir lirik ke posisi pemutaran saat ini",
         "font": "font",
@@ -514,8 +510,6 @@
         "gaplessAudio": "audio tanpa jeda",
         "gaplessAudio_description": "tentukan pengaturan audio tanpa jeda untuk mpv",
         "gaplessAudio_optionWeak": "lemah (disarankan)",
-        "genreBehavior": "Perilaku default halaman genre",
-        "genreBehavior_description": "Menentukan apakah klik pada genre akan membuka daftar lagu atau album secara default",
         "globalMediaHotkeys": "tombol pintasan media global",
         "globalMediaHotkeys_description": "aktifkan atau nonaktifkan penggunaan tombol pintasan sistem media untuk mengontrol pemutaran",
         "homeConfiguration": "Pengaturan halaman beranda",
@@ -732,8 +726,6 @@
                 "year": "$t(common.year)"
             },
             "view": {
-                "card": "kartu",
-                "poster": "poster",
                 "table": "tabel"
             }
         }

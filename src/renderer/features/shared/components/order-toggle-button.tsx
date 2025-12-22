@@ -5,15 +5,22 @@ import { SortOrder } from '/@/shared/types/domain-types';
 
 interface OrderToggleButtonProps {
     buttonProps?: Partial<ActionIconProps>;
+    disabled?: boolean;
     onToggle: () => void;
     sortOrder: SortOrder;
 }
 
-export const OrderToggleButton = ({ buttonProps, onToggle, sortOrder }: OrderToggleButtonProps) => {
+export const OrderToggleButton = ({
+    buttonProps,
+    disabled,
+    onToggle,
+    sortOrder,
+}: OrderToggleButtonProps) => {
     const { t } = useTranslation();
 
     return (
         <ActionIcon
+            disabled={disabled}
             icon={sortOrder === SortOrder.ASC ? 'sortAsc' : 'sortDesc'}
             iconProps={{
                 size: 'lg',

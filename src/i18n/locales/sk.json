@@ -557,16 +557,12 @@
         "discordDisplayType_description": "mení vo vašom statuse info, čo počúvate",
         "discordDisplayType_songname": "názov skladby",
         "discordDisplayType_artistname": "názov interpreta(-ov)",
-        "doubleClickBehavior": "po dvojkliku zaradí do fronty všetky vyhľadané skladby",
-        "doubleClickBehavior_description": "ak je povolené, všetky nájdené skladby budú zaradené do fronty. inak budú skladby zaradené iba po kliknutí",
         "enableRemote": "povoliť vzdialené ovládanie servera",
         "enableRemote_description": "pomocou vzdialeného servera umožňuje ovládanie aplikácie prostredníctvom iných zariadení",
         "externalLinks": "zobraziť externé odkazy",
         "externalLinks_description": "umožňuje zobrazovať externé odkazy (Last.fm, MusicBrainz) na stránkach umelca/albumu",
         "exitToTray": "ukončiť do lišty",
         "exitToTray_description": "po zavretí sa aplikácia minimalizuje do lišty a beží ďalej",
-        "floatingQueueArea": "zobraziť ikonu výsuvnej fronty prehrávania",
-        "floatingQueueArea_description": "zobraziť ikonu výsuvnej fronty prehrávania na pravej strane obrazovky",
         "followLyric": "nasleduj aktuálny text skladby",
         "followLyric_description": "posunúť sa v texte skladby na aktuálne prehrávanú pozíciu",
         "preferLocalLyrics": "uprednostniť lokálne texty skladieb",
@@ -581,8 +577,6 @@
         "gaplessAudio": "prehrávanie bez prerušení",
         "gaplessAudio_description": "nastaví prehrávanie bez prerušení pre mpv",
         "gaplessAudio_optionWeak": "slabo (odporúčané)",
-        "genreBehavior": "predvolené správanie stránky žánru",
-        "genreBehavior_description": "určuje, či kliknutie na žáner otvorí zoznam skladieb alebo zoznam albumov",
         "globalMediaHotkeys": "globálne klávesové skratky médií",
         "globalMediaHotkeys_description": "povoliť alebo zakázať použitie vašich klávesových skratiek médií na ovládanie prehrávania",
         "homeConfiguration": "konfigurácia domovskej stránky",
@@ -812,10 +806,8 @@
                 "year": "$t(common.year)"
             },
             "view": {
-                "card": "karta",
                 "grid": "mriežka",
                 "list": "zoznam",
-                "poster": "plagát",
                 "table": "tabuľka"
             }
         }

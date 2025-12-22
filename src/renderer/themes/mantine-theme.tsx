@@ -1,7 +1,7 @@
 import type { MantineColorsTuple, MantineThemeOverride } from '@mantine/core';
 
 import { generateColors } from '@mantine/colors-generator';
-import { createTheme, Loader, rem } from '@mantine/core';
+import { createTheme, Loader, rem, Tooltip } from '@mantine/core';
 import merge from 'lodash/merge';
 
 import { Spinner } from '/@/shared/components/spinner/spinner';
@@ -49,6 +49,11 @@ const mantineTheme: MantineThemeOverride = createTheme({
             defaultProps: {
                 loaders: { ...Loader.defaultLoaders, spinner: Spinner as any },
                 type: 'spinner',
+            },
+        }),
+        TooltipGroup: Tooltip.Group.extend({
+            defaultProps: {
+                openDelay: 500,
             },
         }),
     },

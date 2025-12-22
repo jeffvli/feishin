@@ -1,27 +1,37 @@
 {
     "action": {
-        "editPlaylist": "编辑$t(entity.playlist_one)",
+        "editPlaylist": "编辑 $t(entity.playlist_one)",
         "moveToTop": "移至顶部",
         "clearQueue": "清空播放队列",
         "addToFavorites": "添加到 $t(entity.favorite_other)",
         "addToPlaylist": "添加到 $t(entity.playlist_one)",
-        "createPlaylist": "创建$t(entity.playlist_one)",
-        "removeFromPlaylist": "从$t(entity.playlist_one)移除",
-        "viewPlaylists": "查看$t(entity.playlist_other)",
+        "createPlaylist": "创建 $t(entity.playlist_one)",
+        "removeFromPlaylist": "从 $t(entity.playlist_one) 移除",
+        "viewPlaylists": "查看 $t(entity.playlist_other)",
         "refresh": "$t(common.refresh)",
-        "deletePlaylist": "删除$t(entity.playlist_one)",
+        "deletePlaylist": "删除 $t(entity.playlist_one)",
         "removeFromQueue": "从播放队列中移除",
         "deselectAll": "取消全选",
         "moveToBottom": "移至底部",
         "setRating": "评分",
-        "toggleSmartPlaylistEditor": "切换$t(entity.smartPlaylist)编辑器",
-        "removeFromFavorites": "从$t(entity.favorite_other)移除",
+        "toggleSmartPlaylistEditor": "切换 $t(entity.smartPlaylist) 编辑器",
+        "removeFromFavorites": "从 $t(entity.favorite_other) 移除",
         "goToPage": "前往页面",
         "openIn": {
             "lastfm": "在 Last.fm 中打开",
             "musicbrainz": "在 MusicBrainz 中打开"
         },
-        "moveToNext": "移至下一首"
+        "moveToNext": "移至下一首",
+        "downloadStarted": "开始下载 {{count}} 个项目",
+        "moveUp": "向上移动",
+        "moveDown": "向下移动",
+        "holdToMoveToTop": "按住即可移至到顶部",
+        "holdToMoveToBottom": "按住即可移动到底部",
+        "moveItems": "移动项目",
+        "shuffle": "随机播放",
+        "shuffleAll": "随机播放全部",
+        "shuffleSelected": "随机播放选定的内容",
+        "viewMore": "查看更多"
     },
     "common": {
         "increase": "增高",
@@ -122,7 +132,17 @@
         "private": "私人",
         "public": "公开",
         "recordLabel": "唱片公司",
-        "releaseType": "发布类型"
+        "releaseType": "发布类型",
+        "doNotShowAgain": "不要再显示此内容",
+        "view": "查看",
+        "externalLinks": "外部链接",
+        "faster": "更快",
+        "noFilters": "未配置任何筛选器",
+        "slower": "更慢",
+        "sort": "排序",
+        "gridRows": "网格行",
+        "tableColumns": "表格列",
+        "itemsMore": "{{count}} 更多"
     },
     "entity": {
         "albumArtist_other": "专辑艺术家",
@@ -293,7 +313,6 @@
         "replayGainMode": "{{ReplayGain}}模式",
         "playbackStyle_optionNormal": "正常",
         "windowBarStyle": "窗口顶栏风格",
-        "floatingQueueArea": "显示浮动队列悬停区域",
         "replayGainFallback_description": "如果文件没有 {{ReplayGain}} 标签，则在数据库中应用增益",
         "hotkey_toggleRepeat": "切换循环",
         "lyricOffset_description": "将歌词偏移指定的毫秒数",
@@ -308,7 +327,6 @@
         "hotkey_zoomOut": "缩小",
         "hotkey_unfavoriteCurrentSong": "取消收藏$t(common.currentSong)",
         "hotkey_rate0": "清除评分",
-        "floatingQueueArea_description": "在屏幕右侧显示一个悬停图标，以查看播放队列",
         "hotkey_volumeMute": "静音",
         "hotkey_toggleCurrentSongFavorite": "切换收藏$t(common.currentSong)",
         "remoteUsername": "远程控制服务器用户名",
@@ -351,8 +369,6 @@
         "clearCacheSuccess": "缓存清除成功",
         "playerAlbumArtResolution": "播放器专辑封面分辨率",
         "playerAlbumArtResolution_description": "大型播放器专辑封面预览的分辨率。较大使其看起来更清晰，但可能会减慢加载速度。默认为0，表示自动",
-        "genreBehavior": "类型页面默认行为",
-        "genreBehavior_description": "确定单击流派是否默认在曲目或专辑列表中打开",
         "homeConfiguration": "主页配置",
         "homeConfiguration_description": "配置主页上显示的项目以及显示顺序",
         "passwordStore": "密码/密钥存储",
@@ -360,8 +376,6 @@
         "homeFeature": "首页 精选 轮播",
         "imageAspectRatio": "保留封面图像纵横比",
         "imageAspectRatio_description": "如果启用，封面图像将保留纵横比显示。对于不是1:1的图像，剩余的空间将是空的",
-        "doubleClickBehavior_description": "如果为真，则曲目搜索中所有匹配的曲目都将被加入播放队列。否则，只有单击的曲目才会被加入播放队列",
-        "doubleClickBehavior": "双击时将所有搜索到的曲目加入播放队列",
         "volumeWidth": "音量滑块宽度",
         "volumeWidth_description": "音量滑块的宽度",
         "discordListening": "显示状态为正在监听",
@@ -756,8 +770,6 @@
             },
             "view": {
                 "table": "表格",
-                "poster": "海报",
-                "card": "卡片",
                 "grid": "网格",
                 "list": "列表"
             },
@@ -829,5 +841,12 @@
             "album": "$t(entity.album_one)",
             "broadcast": "播送"
         }
+    },
+    "filterOperator": {
+        "after": "之后",
+        "afterDate": "晚于（日期）",
+        "before": "之前",
+        "beforeDate": "早于（日期）",
+        "contains": "包含"
     }
 }

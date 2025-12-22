@@ -1,0 +1,96 @@
+.container {
+    width: 100%;
+    height: 100%;
+    padding: var(--theme-spacing-sm);
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 var(--theme-spacing-sm);
+    cursor: pointer;
+    user-select: none;
+    border-radius: var(--theme-radius-md);
+    transition: background-color 0.15s ease-in-out;
+}
+
+.row:hover {
+    background-color: var(--theme-colors-surface);
+}
+
+.row.active {
+    color: var(--theme-colors-primary-filled);
+}
+
+.row.dragging {
+    opacity: 0.5;
+}
+
+.row-content {
+    display: flex;
+    gap: var(--theme-spacing-xs);
+    align-items: center;
+    width: 100%;
+}
+
+.expand-icon-container {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.expand-icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    color: var(--theme-colors-foreground);
+    transition: transform 0.2s ease-in-out;
+}
+
+.expand-icon.expanded {
+    transform: rotate(90deg);
+}
+
+.expand-icon-placeholder {
+    display: flex;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+}
+
+.folder-icon-container {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.folder-icon {
+    flex-shrink: 0;
+    color: var(--theme-colors-foreground);
+}
+
+.folder-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: var(--theme-font-size-md);
+    color: var(--theme-colors-foreground);
+    white-space: nowrap;
+}
+
+.row.active .folder-name {
+    font-weight: 500;
+    color: var(--theme-colors-primary-filled);
+}
+
+.tooltip {
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md) var(--theme-spacing-sm) 0;
+    font-size: var(--theme-font-size-lg);
+    font-weight: 500;
+}

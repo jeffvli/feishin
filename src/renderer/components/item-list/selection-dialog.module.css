@@ -1,0 +1,22 @@
+.selection-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    z-index: 100;
+    min-width: 320px;
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+    color: var(--theme-colors-surface-foreground);
+    background: color-mix(in srgb, var(--theme-colors-surface) 85%, transparent);
+    border: 1px solid color-mix(in srgb, var(--theme-colors-border) 50%, transparent);
+    border-radius: var(--theme-radius-md);
+    box-shadow:
+        2px 2px 10px 2px rgb(0 0 0 / 40%),
+        0 0 0 1px rgb(255 255 255 / 5%);
+    backdrop-filter: blur(12px) saturate(180%);
+    transform: translateX(-50%);
+}
+
+.info-icon {
+    display: flex;
+    cursor: pointer;
+}

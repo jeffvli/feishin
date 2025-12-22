@@ -10,6 +10,8 @@
 }
 
 .root {
+    padding-right: var(--theme-spacing-md);
+    padding-left: var(--theme-spacing-md);
     cursor: default;
 }
 

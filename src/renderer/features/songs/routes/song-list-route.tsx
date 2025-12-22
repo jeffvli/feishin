@@ -7,6 +7,7 @@ import { ListWithSidebarContainer } from '/@/renderer/features/shared/components
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { SongListContent } from '/@/renderer/features/songs/components/song-list-content';
 import { SongListHeader } from '/@/renderer/features/songs/components/song-list-header';
+import { usePageSidebar } from '/@/renderer/store/app.store';
 import { SongListQuery } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -27,6 +28,7 @@ const SongListRoute = () => {
     const pageKey = getPageKey({ albumArtistId, genreId });
 
     const [itemCount, setItemCount] = useState<number | undefined>(undefined);
+    const [isSidebarOpen, setIsSidebarOpen] = usePageSidebar(pageKey);
 
     const customFilters: Partial<SongListQuery> = useMemo(() => {
         if (albumArtistId) {
@@ -48,11 +50,21 @@ const SongListRoute = () => {
         return {
             customFilters,
             id: albumArtistId ?? genreId,
+            isSidebarOpen,
             itemCount,
             pageKey,
+            setIsSidebarOpen,
             setItemCount,
         };
-    }, [albumArtistId, customFilters, genreId, itemCount, pageKey]);
+    }, [
+        albumArtistId,
+        customFilters,
+        genreId,
+        isSidebarOpen,
+        itemCount,
+        pageKey,
+        setIsSidebarOpen,
+    ]);
 
     return (
         <AnimatedPage>

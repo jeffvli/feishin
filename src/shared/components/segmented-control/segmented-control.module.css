@@ -1,3 +1,15 @@
 .root {
     background: var(--theme-colors-surface);
 }
+
+.label {
+    &[data-active='true'] {
+        @mixin dark {
+            background-color: lighten(var(--theme-colors-surface), 10%);
+        }
+
+        @mixin light {
+            background-color: darken(var(--theme-colors-surface), 10%);
+        }
+    }
+}

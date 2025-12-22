@@ -41,6 +41,11 @@
         &:focus-visible {
             border: 1px solid lighten(var(--theme-colors-border), 10%);
         }
+
+        svg {
+            color: var(--theme-colors-primary);
+            fill: var(--theme-colors-primary);
+        }
     }
 
     &[data-variant='filled'] {

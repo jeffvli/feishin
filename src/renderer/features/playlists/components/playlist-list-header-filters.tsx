@@ -1,14 +1,15 @@
-import { closeAllModals, openModal } from '@mantine/modals';
+import { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PLAYLIST_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
-import { CreatePlaylistForm } from '/@/renderer/features/playlists/components/create-playlist-form';
+import { openCreatePlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { ListDisplayTypeToggleButton } from '/@/renderer/features/shared/components/list-display-type-toggle-button';
 import { ListFiltersModal } from '/@/renderer/features/shared/components/list-filters';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButton } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
+import { useCurrentServer } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Flex } from '/@/shared/components/flex/flex';
@@ -19,12 +20,10 @@ import { ItemListKey } from '/@/shared/types/types';
 export const PlaylistListHeaderFilters = () => {
     const { t } = useTranslation();
 
-    const handleCreatePlaylistModal = () => {
-        openModal({
-            children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
-            size: 'lg',
-            title: t('form.createPlaylist.title', { postProcess: 'sentenceCase' }),
-        });
+    const server = useCurrentServer();
+
+    const handleCreatePlaylistModal = (e: MouseEvent<HTMLButtonElement>) => {
+        openCreatePlaylistModal(server, e);
     };
 
     return (

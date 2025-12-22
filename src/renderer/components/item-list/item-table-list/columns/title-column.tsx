@@ -17,6 +17,7 @@ export const TitleColumn = (props: ItemTableListInnerColumn) => {
     const { itemType } = props;
 
     switch (itemType) {
+        case LibraryItem.FOLDER:
         case LibraryItem.PLAYLIST_SONG:
         case LibraryItem.QUEUE_SONG:
         case LibraryItem.SONG:

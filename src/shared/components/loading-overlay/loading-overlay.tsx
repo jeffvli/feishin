@@ -18,6 +18,11 @@ export const LoadingOverlay = ({ ...props }: LoadingOverlayProps) => {
                 color: 'var(--theme-colors-background)',
                 opacity: 0.5,
             }}
+            styles={{
+                root: {
+                    zIndex: 150,
+                },
+            }}
             transitionProps={{
                 duration: 0.5,
                 transition: 'fade',

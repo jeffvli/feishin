@@ -1,20 +1,22 @@
 import { initClient, initContract } from '@ts-rest/core';
-import axios, { AxiosError, AxiosResponse, isAxiosError, Method } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, isAxiosError } from 'axios';
 import omitBy from 'lodash/omitBy';
 import qs from 'qs';
 import { z } from 'zod';
 
 import i18n from '/@/i18n/i18n';
 import { ssType } from '/@/shared/api/subsonic/subsonic-types';
+import { hasFeature } from '/@/shared/api/utils';
 import { toast } from '/@/shared/components/toast/toast';
 import { ServerListItemWithCredential } from '/@/shared/types/domain-types';
+import { ServerFeature } from '/@/shared/types/features-types';
 
 const c = initContract();
 
 export const contract = c.router({
     authenticate: {
         method: 'GET',
-        path: 'ping.view',
+        path: 'getUser.view',
         query: ssType._parameters.authenticate,
         responses: {
             200: ssType._response.authenticate,
@@ -28,12 +30,28 @@ export const contract = c.router({
             200: ssType._response.createFavorite,
         },
     },
+    createInternetRadioStation: {
+        method: 'GET',
+        path: 'createInternetRadioStation.view',
+        query: ssType._parameters.createInternetRadioStation,
+        responses: {
+            200: ssType._response.createInternetRadioStation,
+        },
+    },
     createPlaylist: {
         method: 'GET',
         path: 'createPlaylist.view',
         query: ssType._parameters.createPlaylist,
         responses: {
             200: ssType._response.createPlaylist,
+        },
+    },
+    deleteInternetRadioStation: {
+        method: 'GET',
+        path: 'deleteInternetRadioStation.view',
+        query: ssType._parameters.deleteInternetRadioStation,
+        responses: {
+            200: ssType._response.deleteInternetRadioStation,
         },
     },
     deletePlaylist: {
@@ -100,6 +118,29 @@ export const contract = c.router({
             200: ssType._response.getGenres,
         },
     },
+    getIndexes: {
+        method: 'GET',
+        path: 'getIndexes.view',
+        query: ssType._parameters.getIndexes,
+        responses: {
+            200: ssType._response.getIndexes,
+        },
+    },
+    getInternetRadioStations: {
+        method: 'GET',
+        path: 'getInternetRadioStations.view',
+        responses: {
+            200: ssType._response.getInternetRadioStations,
+        },
+    },
+    getMusicDirectory: {
+        method: 'GET',
+        path: 'getMusicDirectory.view',
+        query: ssType._parameters.getMusicDirectory,
+        responses: {
+            200: ssType._response.getMusicDirectory,
+        },
+    },
     getMusicFolderList: {
         method: 'GET',
         path: 'getMusicFolders.view',
@@ -121,6 +162,20 @@ export const contract = c.router({
         query: ssType._parameters.getPlaylists,
         responses: {
             200: ssType._response.getPlaylists,
+        },
+    },
+    getPlayQueue: {
+        method: 'GET',
+        path: 'getPlayQueue.view',
+        responses: {
+            200: ssType._response.playQueue,
+        },
+    },
+    getPlayQueueByIndex: {
+        method: 'GET',
+        path: 'getPlayQueueByIndex.view',
+        responses: {
+            200: ssType._response.playQueueByIndex,
         },
     },
     getRandomSongList: {
@@ -194,6 +249,14 @@ export const contract = c.router({
             200: ssType._response.topSongsList,
         },
     },
+    getUser: {
+        method: 'GET',
+        path: 'getUser.view',
+        query: ssType._parameters.user,
+        responses: {
+            200: ssType._response.user,
+        },
+    },
     ping: {
         method: 'GET',
         path: 'ping.view',
@@ -207,6 +270,22 @@ export const contract = c.router({
         query: ssType._parameters.removeFavorite,
         responses: {
             200: ssType._response.removeFavorite,
+        },
+    },
+    savePlayQueue: {
+        method: 'GET',
+        path: 'savePlayQueue.view',
+        query: ssType._parameters.saveQueue,
+        responses: {
+            200: ssType._response.saveQueue,
+        },
+    },
+    savePlayQueueByIndex: {
+        method: 'GET',
+        path: 'savePlayQueueByIndex.view',
+        query: ssType._parameters.savePlayQueueByIndex,
+        responses: {
+            200: ssType._response.saveQueue,
         },
     },
     scrobble: {
@@ -231,6 +310,14 @@ export const contract = c.router({
         query: ssType._parameters.setRating,
         responses: {
             200: ssType._response.setRating,
+        },
+    },
+    updateInternetRadioStation: {
+        method: 'GET',
+        path: 'updateInternetRadioStation.view',
+        query: ssType._parameters.updateInternetRadioStation,
+        responses: {
+            200: ssType._response.updateInternetRadioStation,
         },
     },
     updatePlaylist: {
@@ -304,7 +391,7 @@ export const ssApiClient = (args: {
     const { server, signal, silent, url } = args;
 
     return initClient(contract, {
-        api: async ({ body, headers, method, path }) => {
+        api: async ({ headers, method, path }) => {
             let baseUrl: string | undefined;
             const authParams: Record<string, any> = {};
 
@@ -326,25 +413,36 @@ export const ssApiClient = (args: {
                 baseUrl = url;
             }
 
+            const request: AxiosRequestConfig = {
+                headers,
+                signal,
+                // In cases where we have a fallback, don't notify the error
+                transformResponse: silent ? silentlyTransformResponse : undefined,
+                url: `${baseUrl}/${api}`,
+            };
+
+            const data = {
+                c: 'Feishin',
+                f: 'json',
+                v: '1.13.0',
+                ...authParams,
+                ...params,
+            };
+
+            if (hasFeature(server, ServerFeature.OS_FORM_POST)) {
+                headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                request.method = 'POST';
+                request.data = qs.stringify(data, { arrayFormat: 'repeat' });
+            } else {
+                request.method = method;
+                request.params = data;
+            }
+
             try {
-                const result = await axiosClient.request<
-                    z.infer<typeof ssType._response.baseResponse>
-                >({
-                    data: body,
-                    headers,
-                    method: method as Method,
-                    params: {
-                        c: 'Feishin',
-                        f: 'json',
-                        v: '1.13.0',
-                        ...authParams,
-                        ...params,
-                    },
-                    signal,
-                    // In cases where we have a fallback, don't notify the error
-                    transformResponse: silent ? silentlyTransformResponse : undefined,
-                    url: `${baseUrl}/${api}`,
-                });
+                const result =
+                    await axiosClient.request<z.infer<typeof ssType._response.baseResponse>>(
+                        request,
+                    );
 
                 return {
                     body: result.data['subsonic-response'],

@@ -67,6 +67,7 @@ export const ContextMenuPreview = memo(({ items, itemType }: ContextMenuPreviewP
                                 <Icon icon="playlist" size="md" />
                             )}
                             {itemType === LibraryItem.GENRE && <Icon icon="genre" size="md" />}
+                            {itemType === LibraryItem.FOLDER && <Icon icon="folder" size="md" />}
                             {!itemType && <Icon icon="library" size="md" />}
                         </div>
                     )}

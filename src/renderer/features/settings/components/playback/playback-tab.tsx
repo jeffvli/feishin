@@ -2,6 +2,8 @@ import isElectron from 'is-electron';
 import { lazy, Suspense, useMemo } from 'react';
 
 import { AudioSettings } from '/@/renderer/features/settings/components/playback/audio-settings';
+import { AutoDJSettings } from '/@/renderer/features/settings/components/playback/auto-dj-settings';
+import { PlayerFilterSettings } from '/@/renderer/features/settings/components/playback/player-filter-settings';
 import { TranscodeSettings } from '/@/renderer/features/settings/components/playback/transcode-settings';
 import { useSettingsStore } from '/@/renderer/store';
 import { Divider } from '/@/shared/components/divider/divider';
@@ -31,6 +33,10 @@ export const PlaybackTab = () => {
             <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
             <Divider />
             <TranscodeSettings />
+            <Divider />
+            <PlayerFilterSettings />
+            <Divider />
+            <AutoDJSettings />
         </Stack>
     );
 };

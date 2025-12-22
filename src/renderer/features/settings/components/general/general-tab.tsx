@@ -20,8 +20,8 @@ export const GeneralTab = () => {
 
     const sections = useMemo(() => {
         const baseSections = [
-            { component: ApplicationSettings, key: 'application' },
             { component: ThemeSettings, key: 'theme' },
+            { component: ApplicationSettings, key: 'application' },
             { component: ControlSettings, key: 'control' },
             { component: SidebarSettings, key: 'sidebar' },
             { component: ScrobbleSettings, key: 'scrobble' },

@@ -135,6 +135,28 @@ export const AudioSettings = () => {
                 postProcess: 'sentenceCase',
             }),
         },
+        {
+            control: (
+                <Switch
+                    defaultChecked={settings.audioFadeOnStatusChange}
+                    onChange={(e) => {
+                        setSettings({
+                            playback: {
+                                ...settings,
+                                audioFadeOnStatusChange: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.audioFadeOnStatusChange', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.audioFadeOnStatusChange', {
+                postProcess: 'sentenceCase',
+            }),
+        },
     ];
 
     return (

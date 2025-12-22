@@ -8,6 +8,7 @@ import { Platform } from '/@/shared/types/types';
 export interface AppSlice extends AppState {
     actions: {
         setAppStore: (data: Partial<AppSlice>) => void;
+        setPageSidebar: (key: string, value: boolean) => void;
         setPrivateMode: (enabled: boolean) => void;
         setShowTimeRemaining: (enabled: boolean) => void;
         setSideBar: (options: Partial<SidebarProps>) => void;
@@ -18,6 +19,7 @@ export interface AppSlice extends AppState {
 export interface AppState {
     commandPalette: CommandPaletteProps;
     isReorderingQueue: boolean;
+    pageSidebar: Record<string, boolean>;
     platform: Platform;
     privateMode: boolean;
     showTimeRemaining: boolean;
@@ -53,6 +55,15 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                 actions: {
                     setAppStore: (data) => {
                         set({ ...get(), ...data });
+                    },
+                    setPageSidebar: (key, value) => {
+                        set((state) => {
+                            if (value) {
+                                state.pageSidebar[key] = value;
+                            } else {
+                                delete state.pageSidebar[key];
+                            }
+                        });
                     },
                     setPrivateMode: (privateMode) => {
                         set((state) => {
@@ -94,6 +105,7 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                     },
                 },
                 isReorderingQueue: false,
+                pageSidebar: {},
                 platform: Platform.WINDOWS,
                 privateMode: false,
                 showTimeRemaining: false,
@@ -140,3 +152,14 @@ export const useSetTitlebar = () => useAppStore((state) => state.actions.setTitl
 export const useTitlebarStore = () => useAppStore((state) => state.titlebar);
 
 export const useCommandPalette = () => useAppStore((state) => state.commandPalette);
+
+export const usePageSidebar = (key: string): [boolean, (value: boolean) => void] => {
+    const isOpen = useAppStore((state) => state.pageSidebar[key] ?? false);
+    const setPageSidebar = useAppStore((state) => state.actions.setPageSidebar);
+
+    const setIsOpen = (value: boolean) => {
+        setPageSidebar(key, value);
+    };
+
+    return [isOpen, setIsOpen];
+};

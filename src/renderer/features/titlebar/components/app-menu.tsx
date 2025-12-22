@@ -1,3 +1,4 @@
+import { openModal } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { Fragment, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -5,8 +6,9 @@ import { Link, useNavigate } from 'react-router';
 
 import packageJson from '../../../../../package.json';
 
-import { AppRoute } from '/@/renderer/router/routes';
-import { useAppStore, useAppStoreActions } from '/@/renderer/store';
+import { ServerList } from '/@/renderer/features/servers/components/server-list';
+import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
+import { useAppStore, useAppStoreActions, useCommandPalette } from '/@/renderer/store';
 import { DropdownMenu, MenuItemProps } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Icon } from '/@/shared/components/icon/icon';
 import { toast } from '/@/shared/components/toast/toast';
@@ -70,6 +72,7 @@ export const AppMenu = () => {
     const collapsed = useAppStore((state) => state.sidebar.collapsed);
     const privateMode = useAppStore((state) => state.privateMode);
     const { setPrivateMode, setSideBar } = useAppStoreActions();
+    const { open: openCommandPalette } = useCommandPalette();
 
     const handleBrowserDevTools = () => {
         browser?.devtools();
@@ -99,33 +102,24 @@ export const AppMenu = () => {
         });
     };
 
+    const handleManageServersModal = () => {
+        openModal({
+            children: <ServerList />,
+            title: t('page.manageServers.title', { postProcess: 'titleCase' }),
+        });
+    };
+
     const handleQuit = () => {
         browser?.quit();
     };
 
     const menuConfig: MenuItem[] = [
         {
-            condition: privateMode,
-            id: 'private-mode-off',
-            item: {
-                icon: 'lock',
-                iconColor: 'error',
-                label: t('page.appMenu.privateModeOff', { postProcess: 'sentenceCase' }),
-                onClick: handlePrivateModeOff,
-                type: 'item',
-            },
-            type: 'conditional-item',
-        },
-        {
-            condition: !privateMode,
-            id: 'private-mode-on',
-            item: {
-                icon: 'lockOpen',
-                label: t('page.appMenu.privateModeOn', { postProcess: 'sentenceCase' }),
-                onClick: handlePrivateModeOn,
-                type: 'item',
-            },
-            type: 'conditional-item',
+            icon: 'search',
+            id: 'command-palette',
+            label: t('page.appMenu.commandPalette', { postProcess: 'sentenceCase' }),
+            onClick: openCommandPalette,
+            type: 'item',
         },
         {
             id: 'divider-1',
@@ -181,14 +175,52 @@ export const AppMenu = () => {
             type: 'divider',
         },
         {
-            icon: 'settings',
-            id: 'settings',
-            label: t('page.appMenu.settings', { postProcess: 'sentenceCase' }),
-            onClick: () => navigate(AppRoute.SETTINGS),
-            type: 'item',
+            condition: !window.SERVER_LOCK,
+            id: 'manage-servers',
+            item: {
+                label: t('page.appMenu.manageServers', { postProcess: 'sentenceCase' }),
+                leftSection: <Icon icon="edit" />,
+                onClick: handleManageServersModal,
+                type: 'item',
+            },
+            type: 'conditional-item',
         },
         {
             id: 'divider-3',
+            type: 'divider',
+        },
+        {
+            icon: 'settings',
+            id: 'settings',
+            label: t('page.appMenu.settings', { postProcess: 'sentenceCase' }),
+            onClick: () => openSettingsModal(),
+            type: 'item',
+        },
+        {
+            condition: privateMode,
+            id: 'private-mode-off',
+            item: {
+                icon: 'lock',
+                iconColor: 'error',
+                label: t('page.appMenu.privateModeOff', { postProcess: 'sentenceCase' }),
+                onClick: handlePrivateModeOff,
+                type: 'item',
+            },
+            type: 'conditional-item',
+        },
+        {
+            condition: !privateMode,
+            id: 'private-mode-on',
+            item: {
+                icon: 'lockOpen',
+                label: t('page.appMenu.privateModeOn', { postProcess: 'sentenceCase' }),
+                onClick: handlePrivateModeOn,
+                type: 'item',
+            },
+            type: 'conditional-item',
+        },
+        {
+            id: 'divider-4',
             type: 'divider',
         },
         {

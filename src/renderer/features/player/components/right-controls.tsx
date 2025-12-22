@@ -11,26 +11,33 @@ import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-
 import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import {
     useAppStoreActions,
+    useAutoDJSettings,
     useCurrentServer,
+    useFullScreenPlayerStore,
     useGeneralSettings,
     useHotkeySettings,
     usePlayerData,
     usePlayerMuted,
     usePlayerSong,
     usePlayerVolume,
+    useSetFullScreenPlayerStore,
     useSettingsStore,
+    useSettingsStoreActions,
     useSidebarRightExpanded,
 } from '/@/renderer/store';
+import { useFullScreenPlayerStoreActions } from '/@/renderer/store/full-screen-player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Rating } from '/@/shared/components/rating/rating';
 import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { useMediaQuery } from '/@/shared/hooks/use-media-query';
+import { useThrottledCallback } from '/@/shared/hooks/use-throttled-callback';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 
 const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {
-    let volumeToSet;
+    let volumeToSet: number;
     const newVolumeGreaterThanHundred = volume + volumeWheelStep > 100;
     if (newVolumeGreaterThanHundred) {
         volumeToSet = 100;
@@ -42,7 +49,7 @@ const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {
 };
 
 const calculateVolumeDown = (volume: number, volumeWheelStep: number) => {
-    let volumeToSet;
+    let volumeToSet: number;
     const newVolumeLessThanZero = volume - volumeWheelStep < 0;
     if (newVolumeLessThanZero) {
         volumeToSet = 0;
@@ -58,15 +65,44 @@ export const RightControls = () => {
         <Flex align="flex-end" direction="column" h="100%" px="1rem" py="0.5rem">
             <Group h="calc(100% / 3)">
                 <RatingButton />
+                <AutoDJButton />
             </Group>
             <Group align="center" gap="xs" wrap="nowrap">
                 <PlayerConfig />
+                <LyricsButton />
                 <FavoriteButton />
                 <QueueButton />
                 <VolumeButton />
             </Group>
             <Group h="calc(100% / 3)" />
         </Flex>
+    );
+};
+
+const AutoDJButton = () => {
+    const { t } = useTranslation();
+    const settings = useAutoDJSettings();
+    const { setSettings } = useSettingsStoreActions();
+
+    const toggleAutoDJ = () => {
+        setSettings({
+            autoDJ: {
+                ...settings,
+                enabled: !settings.enabled,
+            },
+        });
+    };
+
+    return (
+        <Button
+            onClick={toggleAutoDJ}
+            size="compact-xs"
+            style={{ color: settings.enabled ? 'var(--theme-colors-primary)' : undefined }}
+            uppercase
+            variant="transparent"
+        >
+            {t('setting.autoDJ')}
+        </Button>
     );
 };
 
@@ -113,6 +149,40 @@ const QueueButton = () => {
     }
 
     return <PopoverPlayQueue />;
+};
+
+const LyricsButton = () => {
+    const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
+    const activeTab = useFullScreenPlayerStore((state) => state.activeTab);
+
+    const { setStore } = useFullScreenPlayerStoreActions();
+    const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
+
+    const expandFullScreenPlayer = () => {
+        setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
+    };
+
+    return (
+        <ActionIcon
+            icon="microphone"
+            iconProps={{
+                color: activeTab === 'lyrics' && isFullScreenPlayerExpanded ? 'primary' : undefined,
+                size: 'lg',
+            }}
+            onClick={(e) => {
+                e.stopPropagation();
+                if (!isFullScreenPlayerExpanded) setStore({ activeTab: 'lyrics' });
+                expandFullScreenPlayer();
+            }}
+            role="button"
+            size="sm"
+            tooltip={{
+                label: t('player.lyrics', { postProcess: 'titleCase' }),
+                openDelay: 0,
+            }}
+            variant="subtle"
+        />
+    );
 };
 
 const FavoriteButton = () => {
@@ -287,11 +357,11 @@ const VolumeButton = () => {
     const isMinWidth = useMediaQuery('(max-width: 480px)');
 
     const handleVolumeDown = useCallback(() => {
-        setVolume(volume - 1);
+        setVolume(Math.max(0, volume - 1));
     }, [setVolume, volume]);
 
     const handleVolumeUp = useCallback(() => {
-        setVolume(volume + 1);
+        setVolume(Math.min(100, volume + 1));
     }, [setVolume, volume]);
 
     const handleVolumeSlider = useCallback(
@@ -318,9 +388,13 @@ const VolumeButton = () => {
         },
         [setVolume, volume, volumeWheelStep],
     );
+
+    const handleVolumeDownThrottled = useThrottledCallback(handleVolumeDown, 50);
+    const handleVolumeUpThrottled = useThrottledCallback(handleVolumeUp, 50);
+
     useHotkeys([
-        [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDown],
-        [bindings.volumeUp.isGlobal ? '' : bindings.volumeUp.hotkey, handleVolumeUp],
+        [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDownThrottled],
+        [bindings.volumeUp.isGlobal ? '' : bindings.volumeUp.hotkey, handleVolumeUpThrottled],
         [bindings.volumeMute.isGlobal ? '' : bindings.volumeMute.hotkey, handleMute],
     ]);
 

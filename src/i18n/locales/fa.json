@@ -608,9 +608,6 @@
                 "gap": "$t(common.gap)",
                 "itemGap": "فاصله‌ی آیتم (px)"
             },
-            "view": {
-                "card": "کارت"
-            },
             "label": {
                 "playCount": "تعداد پخش",
                 "dateAdded": "تاریخ افزوده شدن",

@@ -20,12 +20,7 @@ Scrobble Events:
 
   - When the song changes (or is completed):
     - Current song: Sends the 'playing' scrobble event
-    - Previous song (if exists): Sends the 'submission' scrobble event if conditions are met AND the 'isCurrentSongScrobbled' state is false
     - Resets the 'isCurrentSongScrobbled' state to false
-
-  - When the song is paused:
-    - Sends the 'submission' scrobble event if conditions are met AND the 'isCurrentSongScrobbled' state is false
-    - Sends the 'pause' scrobble event (Jellyfin only)
 
   - When the song is restarted:
     - Sends the 'submission' scrobble event if conditions are met AND the 'isCurrentSongScrobbled' state is false
@@ -69,6 +64,7 @@ export const useScrobble = () => {
     const previousSongRef = useRef<QueueSong | undefined>(undefined);
     const previousTimestampRef = useRef<number>(0);
     const lastProgressEventRef = useRef<number>(0);
+    const lastSeekEventRef = useRef<number>(0);
     const songChangeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     const notifyTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -84,39 +80,12 @@ export const useScrobble = () => {
             const currentTime = properties.timestamp;
             const previousTime = prev.timestamp;
 
-            // Detect song restart: timestamp resets to 0 (or goes backwards significantly) while song stays the same
-            // This happens when pressing "Previous Track" and the song restarts (if >= 10 seconds)
+            // Detect song restart: when timestamp resets to near 0 and was playing for at least 10 seconds
             if (
                 currentTime < previousTime &&
                 currentTime < 5 && // Reset to near 0
-                previousTime >= 10 && // Was playing for at least 10 seconds
-                currentSong._uniqueId === previousSongRef.current?._uniqueId
+                previousTime >= 10 // Was playing for at least 10 seconds
             ) {
-                // Send start event for Jellyfin on restart
-                if (currentSong._serverType === ServerType.JELLYFIN) {
-                    sendScrobble.mutate(
-                        {
-                            apiClientProps: { serverId: currentSong._serverId || '' },
-                            query: {
-                                event: 'start',
-                                id: currentSong.id,
-                                position: 0,
-                                submission: false,
-                            },
-                        },
-                        {
-                            onSuccess: () => {
-                                logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledStart, {
-                                    category: LogCategory.SCROBBLE,
-                                    meta: {
-                                        id: currentSong.id,
-                                    },
-                                });
-                            },
-                        },
-                    );
-                }
-
                 setIsCurrentSongScrobbled(false);
                 lastProgressEventRef.current = 0;
                 previousTimestampRef.current = 0;
@@ -163,9 +132,11 @@ export const useScrobble = () => {
                 });
 
                 if (shouldSubmitScrobble) {
+                    // Since jellyfin-plugin-lastfm uses the submission Position to determine if the song should actually scrobble
+                    // we just send the full duration of the song when it matches the local scrobble conditions
                     const position =
                         currentSong._serverType === ServerType.JELLYFIN
-                            ? currentTime * 1e7
+                            ? currentSong.duration * 1e7
                             : undefined;
 
                     sendScrobble.mutate(
@@ -211,7 +182,6 @@ export const useScrobble = () => {
         ) => {
             const currentSong = properties.song;
             const previousSong = previousSongRef.current;
-            const previousTimestamp = previousTimestampRef.current;
 
             // Handle notifications
             if (scrobbleSettings?.notify && currentSong?.id) {
@@ -239,48 +209,6 @@ export const useScrobble = () => {
                 previousSongRef.current = currentSong;
                 previousTimestampRef.current = 0;
                 return;
-            }
-
-            // Send completion scrobble for previous song
-            if (previousSong?.id) {
-                const shouldSubmitScrobble = checkScrobbleConditions({
-                    scrobbleAtDurationMs: (scrobbleSettings?.scrobbleAtDuration ?? 0) * 1000,
-                    scrobbleAtPercentage: scrobbleSettings?.scrobbleAtPercentage,
-                    songCompletedDurationMs: previousTimestamp * 1000,
-                    songDurationMs: previousSong.duration,
-                });
-
-                if (
-                    (!isCurrentSongScrobbled && shouldSubmitScrobble) ||
-                    previousSong._serverType === ServerType.JELLYFIN
-                ) {
-                    const position =
-                        previousSong._serverType === ServerType.JELLYFIN
-                            ? previousTimestamp * 1e7
-                            : undefined;
-
-                    sendScrobble.mutate(
-                        {
-                            apiClientProps: { serverId: previousSong._serverId || '' },
-                            query: {
-                                id: previousSong.id,
-                                position,
-                                submission: true,
-                            },
-                        },
-                        {
-                            onSuccess: () => {
-                                logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledStart, {
-                                    category: LogCategory.SCROBBLE,
-                                    meta: {
-                                        id: previousSong.id,
-                                        reason: 'from song change',
-                                    },
-                                });
-                            },
-                        },
-                    );
-                }
             }
 
             setIsCurrentSongScrobbled(false);
@@ -320,145 +248,39 @@ export const useScrobble = () => {
             previousSongRef.current = currentSong;
             previousTimestampRef.current = 0;
         },
-        [
-            scrobbleSettings?.notify,
-            scrobbleSettings?.scrobbleAtDuration,
-            scrobbleSettings?.scrobbleAtPercentage,
-            isScrobbleEnabled,
-            isPrivateModeEnabled,
-            isCurrentSongScrobbled,
-            sendScrobble,
-        ],
-    );
-
-    const handleScrobbleFromStatusChange = useCallback(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (properties: { status: PlayerStatus }, _prev: { status: PlayerStatus }) => {
-            if (!isScrobbleEnabled || isPrivateModeEnabled) return;
-
-            const currentSong = usePlayerStore.getState().getCurrentSong();
-            const currentTimestamp =
-                usePlayerStore.getState().player.index >= 0 ? previousTimestampRef.current : 0;
-
-            if (!currentSong?.id) return;
-
-            const position =
-                currentSong._serverType === ServerType.JELLYFIN
-                    ? currentTimestamp * 1e7
-                    : undefined;
-
-            const currentStatus = properties.status;
-
-            if (currentStatus === PlayerStatus.PLAYING) {
-                // Send unpause event
-                sendScrobble.mutate(
-                    {
-                        apiClientProps: { serverId: currentSong._serverId || '' },
-                        query: {
-                            event: 'unpause',
-                            id: currentSong.id,
-                            position,
-                            submission: false,
-                        },
-                    },
-                    {
-                        onSuccess: () => {
-                            logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledUnpause, {
-                                category: LogCategory.SCROBBLE,
-                                meta: {
-                                    id: currentSong.id,
-                                },
-                            });
-                        },
-                    },
-                );
-            } else if (currentSong._serverType === ServerType.JELLYFIN) {
-                // Send pause event for Jellyfin
-                sendScrobble.mutate(
-                    {
-                        apiClientProps: { serverId: currentSong._serverId || '' },
-                        query: {
-                            event: 'pause',
-                            id: currentSong.id,
-                            position,
-                            submission: false,
-                        },
-                    },
-                    {
-                        onSuccess: () => {
-                            logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledPause, {
-                                category: LogCategory.SCROBBLE,
-                                meta: {
-                                    id: currentSong.id,
-                                },
-                            });
-                        },
-                    },
-                );
-            } else {
-                // For non-Jellyfin servers, check scrobble conditions on pause
-                const isLastTrackInQueue = usePlayerStore.getState().isLastTrackInQueue();
-                const isFirstTrackInQueue = usePlayerStore.getState().isFirstTrackInQueue();
-                const previousTimestamp = previousTimestampRef.current;
-
-                const shouldSubmitScrobble = checkScrobbleConditions({
-                    scrobbleAtDurationMs: (scrobbleSettings?.scrobbleAtDuration ?? 0) * 1000,
-                    scrobbleAtPercentage: scrobbleSettings?.scrobbleAtPercentage,
-                    // If scrobbling the last song in the queue, use the previous time
-                    // Note: if queue has one item (both first and last), use current time
-                    songCompletedDurationMs:
-                        (isLastTrackInQueue && !isFirstTrackInQueue
-                            ? previousTimestamp
-                            : currentTimestamp) * 1000,
-                    songDurationMs: currentSong.duration,
-                });
-
-                if (!isCurrentSongScrobbled && shouldSubmitScrobble) {
-                    sendScrobble.mutate(
-                        {
-                            apiClientProps: { serverId: currentSong._serverId || '' },
-                            query: {
-                                id: currentSong.id,
-                                submission: true,
-                            },
-                        },
-                        {
-                            onSuccess: () => {
-                                logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledSubmission, {
-                                    category: LogCategory.SCROBBLE,
-                                    meta: {
-                                        id: currentSong.id,
-                                        reason: 'from status change',
-                                    },
-                                });
-                            },
-                        },
-                    );
-
-                    setIsCurrentSongScrobbled(true);
-                }
-            }
-        },
-        [
-            isScrobbleEnabled,
-            isPrivateModeEnabled,
-            scrobbleSettings?.scrobbleAtDuration,
-            scrobbleSettings?.scrobbleAtPercentage,
-            isCurrentSongScrobbled,
-            sendScrobble,
-        ],
+        [scrobbleSettings?.notify, isScrobbleEnabled, isPrivateModeEnabled, sendScrobble],
     );
 
     const handleScrobbleFromSeek = useCallback(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (properties: { timestamp: number }, _prev: { timestamp: number }) => {
-            if (!isScrobbleEnabled || isPrivateModeEnabled) return;
+            if (!isScrobbleEnabled || isPrivateModeEnabled) {
+                return;
+            }
 
             const currentSong = usePlayerStore.getState().getCurrentSong();
 
-            if (!currentSong?.id || currentSong._serverType !== ServerType.JELLYFIN) return;
+            if (!currentSong?.id) {
+                return;
+            }
+
+            // Position scrobbles are only relevant for Jellyfin
+            if (currentSong._serverType !== ServerType.JELLYFIN) {
+                return;
+            }
+
+            const now = Date.now();
+            const timeSinceLastSeek = now - lastSeekEventRef.current;
+
+            // Only allow seek scrobble once per second
+            if (timeSinceLastSeek < 1000) {
+                return;
+            }
 
             const position = properties.timestamp * 1e7;
+
+            lastProgressEventRef.current = properties.timestamp;
+            lastSeekEventRef.current = now;
 
             sendScrobble.mutate(
                 {
@@ -499,13 +321,7 @@ export const useScrobble = () => {
             onCurrentSongChange: handleScrobbleFromSongChange,
             onPlayerProgress: handleProgressUpdate,
             onPlayerSeekToTimestamp: handleScrobbleFromSeek,
-            onPlayerStatus: handleScrobbleFromStatusChange,
         },
-        [
-            handleScrobbleFromSongChange,
-            handleProgressUpdate,
-            handleScrobbleFromSeek,
-            handleScrobbleFromStatusChange,
-        ],
+        [handleScrobbleFromSongChange, handleProgressUpdate, handleScrobbleFromSeek],
     );
 };

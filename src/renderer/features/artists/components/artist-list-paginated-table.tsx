@@ -1,5 +1,4 @@
 import { UseSuspenseQueryOptions } from '@tanstack/react-query';
-import { forwardRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
@@ -22,93 +21,87 @@ import { ItemListKey } from '/@/shared/types/types';
 
 interface ArtistListPaginatedTableProps extends ItemListTableComponentProps<ArtistListQuery> {}
 
-export const ArtistListPaginatedTable = forwardRef<any, ArtistListPaginatedTableProps>(
-    (
-        {
-            autoFitColumns = false,
-            columns,
-            enableAlternateRowColors = false,
-            enableHorizontalBorders = false,
-            enableRowHoverHighlight = true,
-            enableSelection = true,
-            enableVerticalBorders = false,
-            itemsPerPage = 100,
-            query = {
-                sortBy: ArtistListSort.NAME,
-                sortOrder: SortOrder.ASC,
-            },
-            saveScrollOffset = true,
-            serverId,
-            size = 'default',
-        },
-        ref,
-    ) => {
-        const listCountQuery = artistsQueries.artistListCount({
-            query: { ...query },
-            serverId: serverId,
-        }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
-
-        const listQueryFn = api.controller.getArtistList;
-
-        const { currentPage, onChange } = useItemListPagination();
-
-        const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
-            currentPage,
-            eventKey: ItemListKey.ARTIST,
-            itemsPerPage,
-            itemType: LibraryItem.ARTIST,
-            listCountQuery,
-            listQueryFn,
-            query,
-            serverId,
-        });
-
-        const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
-            enabled: saveScrollOffset,
-        });
-
-        const { handleColumnReordered } = useItemListColumnReorder({
-            itemListKey: ItemListKey.ARTIST,
-        });
-
-        const { handleColumnResized } = useItemListColumnResize({
-            itemListKey: ItemListKey.ARTIST,
-        });
-
-        const startRowIndex = currentPage * itemsPerPage;
-
-        return (
-            <ItemListWithPagination
-                currentPage={currentPage}
-                itemsPerPage={itemsPerPage}
-                onChange={onChange}
-                pageCount={pageCount}
-                totalItemCount={totalItemCount}
-            >
-                <ItemTableList
-                    autoFitColumns={autoFitColumns}
-                    CellComponent={ItemTableListColumn}
-                    columns={columns}
-                    data={data || []}
-                    enableAlternateRowColors={enableAlternateRowColors}
-                    enableExpansion={false}
-                    enableHorizontalBorders={enableHorizontalBorders}
-                    enableRowHoverHighlight={enableRowHoverHighlight}
-                    enableSelection={enableSelection}
-                    enableVerticalBorders={enableVerticalBorders}
-                    initialTop={{
-                        to: scrollOffset ?? 0,
-                        type: 'offset',
-                    }}
-                    itemType={LibraryItem.ARTIST}
-                    onColumnReordered={handleColumnReordered}
-                    onColumnResized={handleColumnResized}
-                    onScrollEnd={handleOnScrollEnd}
-                    ref={ref}
-                    size={size}
-                    startRowIndex={startRowIndex}
-                />
-            </ItemListWithPagination>
-        );
+export const ArtistListPaginatedTable = ({
+    autoFitColumns = false,
+    columns,
+    enableAlternateRowColors = false,
+    enableHorizontalBorders = false,
+    enableRowHoverHighlight = true,
+    enableSelection = true,
+    enableVerticalBorders = false,
+    itemsPerPage = 100,
+    query = {
+        sortBy: ArtistListSort.NAME,
+        sortOrder: SortOrder.ASC,
     },
-);
+    saveScrollOffset = true,
+    serverId,
+    size = 'default',
+}: ArtistListPaginatedTableProps) => {
+    const listCountQuery = artistsQueries.artistListCount({
+        query: { ...query },
+        serverId: serverId,
+    }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
+
+    const listQueryFn = api.controller.getArtistList;
+
+    const { currentPage, onChange } = useItemListPagination();
+
+    const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
+        currentPage,
+        eventKey: ItemListKey.ARTIST,
+        itemsPerPage,
+        itemType: LibraryItem.ARTIST,
+        listCountQuery,
+        listQueryFn,
+        query,
+        serverId,
+    });
+
+    const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
+        enabled: saveScrollOffset,
+    });
+
+    const { handleColumnReordered } = useItemListColumnReorder({
+        itemListKey: ItemListKey.ARTIST,
+    });
+
+    const { handleColumnResized } = useItemListColumnResize({
+        itemListKey: ItemListKey.ARTIST,
+    });
+
+    const startRowIndex = currentPage * itemsPerPage;
+
+    return (
+        <ItemListWithPagination
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            onChange={onChange}
+            pageCount={pageCount}
+            totalItemCount={totalItemCount}
+        >
+            <ItemTableList
+                autoFitColumns={autoFitColumns}
+                CellComponent={ItemTableListColumn}
+                columns={columns}
+                data={data || []}
+                enableAlternateRowColors={enableAlternateRowColors}
+                enableExpansion={false}
+                enableHorizontalBorders={enableHorizontalBorders}
+                enableRowHoverHighlight={enableRowHoverHighlight}
+                enableSelection={enableSelection}
+                enableVerticalBorders={enableVerticalBorders}
+                initialTop={{
+                    to: scrollOffset ?? 0,
+                    type: 'offset',
+                }}
+                itemType={LibraryItem.ARTIST}
+                onColumnReordered={handleColumnReordered}
+                onColumnResized={handleColumnResized}
+                onScrollEnd={handleOnScrollEnd}
+                size={size}
+                startRowIndex={startRowIndex}
+            />
+        </ItemListWithPagination>
+    );
+};

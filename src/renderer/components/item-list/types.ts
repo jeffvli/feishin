@@ -3,6 +3,7 @@ import {
     Album,
     AlbumArtist,
     Artist,
+    Folder,
     LibraryItem,
     Playlist,
     Song,
@@ -15,6 +16,7 @@ export interface DefaultItemControlProps {
     internalState?: ItemListStateActions;
     item: ItemListItem | undefined;
     itemType: LibraryItem;
+    meta?: Record<string, any>;
 }
 
 export interface ItemControls {
@@ -75,7 +77,7 @@ export interface ItemListHandle {
     scrollToOffset: (offset: number, options?: { behavior?: 'auto' | 'smooth' }) => void;
 }
 
-export type ItemListItem = Album | AlbumArtist | Artist | Playlist | Song | undefined;
+export type ItemListItem = Album | AlbumArtist | Artist | Folder | Playlist | Song | undefined;
 
 export interface ItemListTableComponentProps<TQuery> extends ItemListComponentProps<TQuery> {
     autoFitColumns?: boolean;

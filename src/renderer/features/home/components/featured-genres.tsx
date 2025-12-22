@@ -75,7 +75,7 @@ export const FeaturedGenres = () => {
             },
             serverId: server?.id,
         }),
-        queryKey: ['home', 'featured-genres'],
+        queryKey: [server.id, 'home', 'featured-genres'],
     });
 
     const randomGenres = useMemo(() => {

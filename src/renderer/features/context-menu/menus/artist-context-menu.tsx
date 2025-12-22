@@ -39,7 +39,7 @@ export const ArtistContextMenu = ({ items, type }: ArtistContextMenuProps) => {
             <ContextMenu.Divider />
             <GoToAction items={items} />
             <ContextMenu.Divider />
-            <GetInfoAction disabled={items.length === 0} item={items[0]} />
+            <GetInfoAction disabled={items.length === 0} items={items} />
         </ContextMenu.Content>
     );
 };

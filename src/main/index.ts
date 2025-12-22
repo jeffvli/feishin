@@ -477,10 +477,15 @@ async function createWindow(first = true): Promise<void> {
     }
 }
 
-const enableWindowsMediaSession = store.get('mediaSession', false) as boolean;
+// Only allow hardware media key handling if:
+// 1. The "Enable Media Session" setting is enabled
+// 2. The playback type is WEB (mpv not supported)
+// 3. The platform is not Linux (because we are using mpris instead)
+const enableMediaSession = store.get('mediaSession', false) as boolean;
 const playbackType = store.get('playbackType', PlayerType.WEB) as PlayerType;
 const shouldDisableMediaFeatures =
-    !isWindows() || !enableWindowsMediaSession || playbackType !== PlayerType.WEB;
+    isLinux() || !enableMediaSession || playbackType !== PlayerType.WEB;
+
 if (shouldDisableMediaFeatures) {
     app.commandLine.appendSwitch(
         'disable-features',
@@ -695,5 +700,13 @@ if (!ipcMain.eventNames().includes('open-item')) {
                 resolve();
             });
         });
+    });
+}
+
+// Register 'open-application-directory' handler globally, ensuring it is only registered once
+if (!ipcMain.eventNames().includes('open-application-directory')) {
+    ipcMain.handle('open-application-directory', async () => {
+        const userDataPath = app.getPath('userData');
+        shell.openPath(userDataPath);
     });
 }

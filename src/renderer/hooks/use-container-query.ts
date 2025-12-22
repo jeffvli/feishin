@@ -7,13 +7,14 @@ interface UseContainerQueryProps {
     md?: number;
     sm?: number;
     xl?: number;
+    xs?: number;
 }
 
 export const useContainerQuery = (props?: UseContainerQueryProps) => {
-    const { '2xl': xxl, '3xl': xxxl, lg, md, sm, xl } = props || {};
+    const { '2xl': xxl, '3xl': xxxl, lg, md, sm, xl, xs } = props || {};
     const { height, ref, width } = useElementSize();
 
-    const isXs = width >= 0;
+    const isXs = width >= (xs || 360);
     const isSm = width >= (sm || 600);
     const isMd = width >= (md || 768);
     const isLg = width >= (lg || 1200);

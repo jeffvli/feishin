@@ -1,12 +1,13 @@
 import { lazy, Suspense, useMemo } from 'react';
 
 import { useListContext } from '/@/renderer/context/list-context';
-import { ListFilters } from '/@/renderer/features/shared/components/list-filters';
+import { ListFilters, ListFiltersTitle } from '/@/renderer/features/shared/components/list-filters';
 import { ListWithSidebarContainer } from '/@/renderer/features/shared/components/list-with-sidebar-container';
 import { useSongListFilters } from '/@/renderer/features/songs/hooks/use-song-list-filters';
 import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Spinner } from '/@/shared/components/spinner/spinner';
+import { Stack } from '/@/shared/components/stack/stack';
 import { LibraryItem, SongListQuery } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, ListPaginationType } from '/@/shared/types/types';
 
@@ -43,9 +44,12 @@ export const SongListContent = () => {
 const SongListFilters = () => {
     return (
         <ListWithSidebarContainer.SidebarPortal>
-            <ScrollArea>
-                <ListFilters itemType={LibraryItem.SONG} />
-            </ScrollArea>
+            <Stack h="100%">
+                <ListFiltersTitle />
+                <ScrollArea>
+                    <ListFilters itemType={LibraryItem.SONG} />
+                </ScrollArea>
+            </Stack>
         </ListWithSidebarContainer.SidebarPortal>
     );
 };
@@ -80,8 +84,9 @@ export const SongListView = ({
     table,
 }: ItemListSettings & { overrideQuery?: OverrideSongListQuery }) => {
     const server = useCurrentServer();
+    const { pageKey } = useListContext();
 
-    const { query } = useSongListFilters();
+    const { query } = useSongListFilters(pageKey as ItemListKey);
 
     const mergedQuery = useMemo(() => {
         if (!overrideQuery) {

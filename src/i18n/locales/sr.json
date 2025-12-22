@@ -142,7 +142,6 @@
         "replayGainMode": "{{ReplayGain}} režim",
         "playbackStyle_optionNormal": "normalno",
         "windowBarStyle": "stil trake prozora",
-        "floatingQueueArea": "prikaži područje plutajuće liste za reprodukciju",
         "replayGainFallback_description": "jačina u dB koja će se primeniti ako datoteka nema {{ReplayGain}} oznake",
         "replayGainPreamp_description": "prilagođava pojačalo za {{ReplayGain}} vrednosti",
         "hotkey_toggleRepeat": "promeni ponavljanje",
@@ -168,7 +167,6 @@
         "hotkey_rate0": "obrisati ocenu",
         "discordApplicationId": "{{discord}} ID aplikacije",
         "applicationHotkeys_description": "konfiguriši prečice za aplikaciju. uključite opciju za postavljanje kao globalne prečice (samo na radnoj površini)",
-        "floatingQueueArea_description": "prikaz ikone na desnoj strani ekrana za pregled liste za reprodukciju",
         "hotkey_volumeMute": "isključi zvuk",
         "hotkey_toggleCurrentSongFavorite": "promeni omiljenu pesmu $t(common.currentSong)",
         "remoteUsername": "korisničko ime za daljinsku kontrolu servera",
@@ -297,9 +295,7 @@
     "table": {
         "config": {
             "view": {
-                "card": "kartica",
-                "table": "tabela",
-                "poster": "poster"
+                "table": "tabela"
             },
             "general": {
                 "displayType": "tip prikaza",

@@ -7,18 +7,21 @@ import styles from './item-card-controls.module.css';
 import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls } from '/@/renderer/components/item-list/types';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
+import { PlayTooltip } from '/@/renderer/features/shared/components/play-button-group';
 import { useIsMutatingCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useIsMutatingDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useIsMutatingRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { animationVariants } from '/@/shared/components/animations/animation-variants';
 import { AppIcon, Icon, IconProps } from '/@/shared/components/icon/icon';
 import { Rating } from '/@/shared/components/rating/rating';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import {
     Album,
     AlbumArtist,
     Artist,
     LibraryItem,
     Playlist,
+    ServerType,
     Song,
 } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
@@ -234,35 +237,43 @@ export const ItemCardControls = ({
     return (
         <motion.div className={clsx(styles.container)} {...containerProps[type]}>
             {controls?.onPlay && (
-                <>
-                    <PlayButton
-                        classNames={clsx(styles.playButton, styles.primary)}
-                        onClick={playNowHandler}
-                        onLongPress={playShuffleHandler}
-                    />
-                    <PlayButton
-                        classNames={clsx(styles.playButton, styles.secondary, styles.left)}
-                        icon="mediaPlayNext"
-                        onClick={playNextHandler}
-                        onLongPress={playNextShuffleHandler}
-                    />
-                    <PlayButton
-                        classNames={clsx(styles.playButton, styles.secondary, styles.right)}
-                        icon="mediaPlayLast"
-                        onClick={playLastHandler}
-                        onLongPress={playLastShuffleHandler}
-                    />
-                </>
+                <Tooltip.Group>
+                    <PlayTooltip type={Play.NOW}>
+                        <PlayButton
+                            classNames={clsx(styles.playButton, styles.primary)}
+                            onClick={playNowHandler}
+                            onLongPress={playShuffleHandler}
+                        />
+                    </PlayTooltip>
+                    <PlayTooltip type={Play.NEXT}>
+                        <PlayButton
+                            classNames={clsx(styles.playButton, styles.secondary, styles.left)}
+                            icon="mediaPlayNext"
+                            onClick={playNextHandler}
+                            onLongPress={playNextShuffleHandler}
+                        />
+                    </PlayTooltip>
+                    <PlayTooltip type={Play.LAST}>
+                        <PlayButton
+                            classNames={clsx(styles.playButton, styles.secondary, styles.right)}
+                            icon="mediaPlayLast"
+                            onClick={playLastHandler}
+                            onLongPress={playLastShuffleHandler}
+                        />
+                    </PlayTooltip>
+                </Tooltip.Group>
             )}
             {controls?.onFavorite && (
                 <FavoriteButton isFavorite={isFavorite} onClick={favoriteHandler} />
             )}
-            {controls?.onRating && (
-                <RatingButton
-                    onChange={ratingChangeHandler}
-                    rating={(item as { userRating: number }).userRating}
-                />
-            )}
+            {controls?.onRating &&
+                (item?._serverType === ServerType.NAVIDROME ||
+                    item?._serverType === ServerType.SUBSONIC) && (
+                    <RatingButton
+                        onChange={ratingChangeHandler}
+                        rating={(item as { userRating: number }).userRating}
+                    />
+                )}
             {controls?.onMore && (
                 <SecondaryButton
                     className={styles.options}

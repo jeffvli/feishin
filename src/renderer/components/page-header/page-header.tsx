@@ -5,9 +5,9 @@ import { CSSProperties, memo, ReactNode, RefObject, useEffect, useRef } from 're
 
 import styles from './page-header.module.css';
 
+import { LibraryBackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { useShouldPadTitlebar } from '/@/renderer/hooks';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
-import { useAppTheme } from '/@/renderer/themes/use-app-theme';
 import { Flex, FlexProps } from '/@/shared/components/flex/flex';
 import { Platform } from '/@/shared/types/types';
 
@@ -49,7 +49,6 @@ const BasePageHeader = ({
     const ref = useRef(null);
     const padRight = useShouldPadTitlebar();
     const { windowBarStyle } = useWindowSettings();
-    const { mode } = useAppTheme();
 
     const isInView = useInView({
         current: target?.current || null,
@@ -125,20 +124,7 @@ const BasePageHeader = ({
                     </AnimatePresence>
                 </div>
                 {backgroundColor && (
-                    <>
-                        <div
-                            className={styles.backgroundImage}
-                            style={{
-                                background: backgroundColor,
-                            }}
-                        />
-                        <div
-                            className={clsx(styles.backgroundImageOverlay, {
-                                [styles.dark]: backgroundColor && mode === 'dark',
-                                [styles.light]: backgroundColor && mode === 'light',
-                            })}
-                        />
-                    </>
+                    <LibraryBackgroundOverlay backgroundColor={backgroundColor} headerRef={ref} />
                 )}
             </Flex>
         </>

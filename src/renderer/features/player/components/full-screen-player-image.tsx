@@ -6,14 +6,8 @@ import { Link } from 'react-router';
 
 import styles from './full-screen-player-image.module.css';
 
-import { useFastAverageColor } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
-import {
-    calculateNextSong,
-    subscribeCurrentTrack,
-    usePlayerData,
-    usePlayerStoreBase,
-} from '/@/renderer/store';
+import { usePlayerData, usePlayerSong } from '/@/renderer/store';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Center } from '/@/shared/components/center/center';
@@ -95,13 +89,9 @@ export const FullScreenPlayerImage = () => {
 
     const albumArtRes = useSettingsStore((store) => store.general.albumArtRes);
 
-    const { currentSong, nextSong } = usePlayerData();
-    const { background } = useFastAverageColor({
-        algorithm: 'dominant',
-        src: currentSong?.imageUrl,
-        srcLoaded: true,
-    });
-    const imageKey = `image-${background}`;
+    const currentSong = usePlayerSong();
+    const { nextSong } = usePlayerData();
+
     const [imageState, setImageState] = useSetState({
         bottomImage: scaleImageUrl(mainImageDimensions.idealSize, nextSong?.imageUrl),
         current: 0,
@@ -110,12 +100,6 @@ export const FullScreenPlayerImage = () => {
 
     const updateImageSize = useCallback(() => {
         if (mainImageRef.current) {
-            const state = usePlayerStoreBase.getState();
-            const playerData = state.getQueue();
-            const currentIndex = state.player.index;
-            const current = playerData.items[currentIndex];
-            const next = calculateNextSong(currentIndex, playerData.items, state.player.repeat);
-
             setMainImageDimensions({
                 idealSize:
                     albumArtRes ||
@@ -123,54 +107,56 @@ export const FullScreenPlayerImage = () => {
             });
 
             setImageState({
-                bottomImage: scaleImageUrl(mainImageDimensions.idealSize, next?.imageUrl),
+                bottomImage: scaleImageUrl(mainImageDimensions.idealSize, nextSong?.imageUrl),
                 current: 0,
-                topImage: scaleImageUrl(mainImageDimensions.idealSize, current?.imageUrl),
+                topImage: scaleImageUrl(mainImageDimensions.idealSize, currentSong?.imageUrl),
             });
         }
-    }, [mainImageDimensions.idealSize, setImageState, albumArtRes]);
+    }, [
+        mainImageDimensions.idealSize,
+        setImageState,
+        albumArtRes,
+        currentSong?.imageUrl,
+        nextSong?.imageUrl,
+    ]);
 
     useLayoutEffect(() => {
         updateImageSize();
     }, [updateImageSize]);
 
-    // Use ref to track current image state to avoid recreating subscription
+    // Track previous song to detect changes
+    const previousSongRef = useRef<string | undefined>(currentSong?._uniqueId);
     const imageStateRef = useRef(imageState);
+
+    // Keep ref in sync
     useEffect(() => {
         imageStateRef.current = imageState;
     }, [imageState]);
 
+    // Update images when song changes
     useEffect(() => {
-        const unsubSongChange = subscribeCurrentTrack(({ index, song }, prev) => {
-            // Only update if the song actually changed
-            if (song?._uniqueId === prev.song?._uniqueId) {
-                return;
-            }
+        if (currentSong?._uniqueId === previousSongRef.current) {
+            return;
+        }
 
-            // Use ref to get current state without causing dependency issues
-            const isTop = imageStateRef.current.current === 0;
-            const state = usePlayerStoreBase.getState();
-            const queue = state.getQueue();
-            const currentSong = queue.items[index];
-            const nextSong = calculateNextSong(index, queue.items, state.player.repeat);
+        const isTop = imageStateRef.current.current === 0;
+        const currentImageUrl = scaleImageUrl(mainImageDimensions.idealSize, currentSong?.imageUrl);
+        const nextImageUrl = scaleImageUrl(mainImageDimensions.idealSize, nextSong?.imageUrl);
 
-            const currentImageUrl = scaleImageUrl(
-                mainImageDimensions.idealSize,
-                currentSong?.imageUrl,
-            );
-            const nextImageUrl = scaleImageUrl(mainImageDimensions.idealSize, nextSong?.imageUrl);
-
-            setImageState({
-                bottomImage: isTop ? currentImageUrl : nextImageUrl,
-                current: isTop ? 1 : 0,
-                topImage: isTop ? nextImageUrl : currentImageUrl,
-            });
+        setImageState({
+            bottomImage: isTop ? currentImageUrl : nextImageUrl,
+            current: isTop ? 1 : 0,
+            topImage: isTop ? nextImageUrl : currentImageUrl,
         });
 
-        return () => {
-            unsubSongChange();
-        };
-    }, [mainImageDimensions.idealSize, setImageState]);
+        previousSongRef.current = currentSong?._uniqueId;
+    }, [
+        currentSong?._uniqueId,
+        currentSong?.imageUrl,
+        nextSong?.imageUrl,
+        mainImageDimensions.idealSize,
+        setImageState,
+    ]);
 
     return (
         <Flex
@@ -190,7 +176,7 @@ export const FullScreenPlayerImage = () => {
                             draggable={false}
                             exit="closed"
                             initial="closed"
-                            key={imageKey}
+                            key={`top-${currentSong?._uniqueId || 'none'}`}
                             placeholder="var(--theme-colors-foreground-muted)"
                             src={imageState.topImage || ''}
                             variants={imageVariants}
@@ -205,7 +191,7 @@ export const FullScreenPlayerImage = () => {
                             draggable={false}
                             exit="closed"
                             initial="closed"
-                            key={imageKey}
+                            key={`bottom-${currentSong?._uniqueId || 'none'}`}
                             placeholder="var(--theme-colors-foreground-muted)"
                             src={imageState.bottomImage || ''}
                             variants={imageVariants}

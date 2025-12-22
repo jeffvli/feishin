@@ -7,6 +7,7 @@ import { AlbumListHeader } from '/@/renderer/features/albums/components/album-li
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { ListWithSidebarContainer } from '/@/renderer/features/shared/components/list-with-sidebar-container';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
+import { usePageSidebar } from '/@/renderer/store/app.store';
 import { AlbumListQuery } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -27,6 +28,7 @@ const AlbumListRoute = () => {
     const pageKey = getPageKey({ albumArtistId, genreId });
 
     const [itemCount, setItemCount] = useState<number | undefined>(undefined);
+    const [isSidebarOpen, setIsSidebarOpen] = usePageSidebar(pageKey);
 
     const customFilters: Partial<AlbumListQuery> = useMemo(() => {
         if (albumArtistId) {
@@ -48,11 +50,21 @@ const AlbumListRoute = () => {
         return {
             customFilters,
             id: albumArtistId ?? genreId,
+            isSidebarOpen,
             itemCount,
             pageKey,
+            setIsSidebarOpen,
             setItemCount,
         };
-    }, [albumArtistId, customFilters, genreId, itemCount, pageKey]);
+    }, [
+        albumArtistId,
+        customFilters,
+        genreId,
+        isSidebarOpen,
+        itemCount,
+        pageKey,
+        setIsSidebarOpen,
+    ]);
 
     return (
         <AnimatedPage>

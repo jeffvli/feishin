@@ -5,7 +5,7 @@ import {
     UseSuspenseQueryOptions,
 } from '@tanstack/react-query';
 import throttle from 'lodash/throttle';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { useListContext } from '/@/renderer/context/list-context';
@@ -75,6 +75,10 @@ export const useItemListInfiniteLoader = ({
     const queryClient = useQueryClient();
     const lastFetchedPageRef = useRef<number>(-1);
     const currentVisibleRangeRef = useRef<null | { startIndex: number; stopIndex: number }>(null);
+    const [isRefetching, setIsRefetching] = useState(false);
+    const refetchPromiseRef = useRef<null | Promise<void>>(null);
+    const previousDataQueryKeyRef = useRef<string>('');
+    const isRefetchingRef = useRef<boolean>(false);
 
     const { data: totalItemCount } = useSuspenseQuery<number, any, number, any>(listCountQuery);
 
@@ -145,6 +149,15 @@ export const useItemListInfiniteLoader = ({
 
     // Reset the loaded pages and refetch current page when the query changes
     useEffect(() => {
+        const currentDataQueryKey = JSON.stringify(dataQueryKey);
+
+        if (previousDataQueryKeyRef.current === currentDataQueryKey || isRefetchingRef.current) {
+            return;
+        }
+
+        previousDataQueryKeyRef.current = currentDataQueryKey;
+        isRefetchingRef.current = true;
+
         // Capture the current visible range before resetting
         const visibleRange = currentVisibleRangeRef.current;
 
@@ -154,20 +167,50 @@ export const useItemListInfiniteLoader = ({
             pageToFetch = Math.floor(visibleRange.startIndex / itemsPerPage);
         }
 
-        // Reset the loaded pages
-        queryClient.setQueryData(dataQueryKey, (oldData: any) => {
-            if (!oldData) return oldData;
-            return {
-                ...oldData,
-                pagesLoaded: {},
-            };
+        // Invalidate and refetch the count query to trigger Suspense
+        const countQueryKey = listCountQuery.queryKey;
+
+        // Set refetching state and create a promise to suspend
+        setIsRefetching(true);
+        const refetchPromise = (async () => {
+            try {
+                // Reset the loaded pages
+                queryClient.setQueryData(dataQueryKey, (oldData: any) => {
+                    if (!oldData) return oldData;
+                    return {
+                        ...oldData,
+                        pagesLoaded: {},
+                    };
+                });
+
+                lastFetchedPageRef.current = -1;
+                currentVisibleRangeRef.current = null;
+
+                // Invalidate and wait for count query to refetch (this will suspend via useSuspenseQuery)
+                await queryClient.refetchQueries({
+                    queryKey: countQueryKey,
+                    type: 'active',
+                });
+
+                // Fetch the first page after count is refetched
+                await fetchPage(pageToFetch);
+            } finally {
+                setIsRefetching(false);
+                isRefetchingRef.current = false;
+                refetchPromiseRef.current = null;
+            }
+        })();
+
+        refetchPromiseRef.current = refetchPromise;
+
+        refetchPromise.catch(() => {
+            setIsRefetching(false);
+            isRefetchingRef.current = false;
+            refetchPromiseRef.current = null;
         });
 
-        lastFetchedPageRef.current = -1;
-        currentVisibleRangeRef.current = null;
-
-        fetchPage(pageToFetch);
-    }, [query, queryClient, dataQueryKey, fetchPage, itemsPerPage]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dataQueryKey, queryClient, fetchPage, itemsPerPage]);
 
     const { data } = useQuery<{ data: unknown[]; pagesLoaded: Record<string, boolean> }>({
         enabled: false,
@@ -177,6 +220,11 @@ export const useItemListInfiniteLoader = ({
         },
         queryKey: dataQueryKey,
     });
+
+    // Suspend if refetching
+    if (isRefetching && refetchPromiseRef.current) {
+        throw refetchPromiseRef.current;
+    }
 
     const onRangeChangedBase = useCallback(
         async (range: { startIndex: number; stopIndex: number }) => {

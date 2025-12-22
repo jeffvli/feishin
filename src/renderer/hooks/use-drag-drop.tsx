@@ -27,6 +27,7 @@ interface UseDraggableProps {
         getId: () => string[];
         getItem: () => unknown[];
         itemType?: LibraryItem;
+        metadata?: Record<string, unknown>;
         onDragStart?: () => void;
         onDrop?: () => void;
         onGenerateDragPreview?: (data: BaseEventPayload<ElementDragType>) => void;
@@ -66,13 +67,16 @@ export const useDragDrop = <TElement extends HTMLElement>({
                         const id = drag.getId();
                         const item = drag.getItem();
 
-                        const data = dndUtils.generateDragData({
-                            id,
-                            item,
-                            itemType: drag.itemType,
-                            operation: drag.operation,
-                            type: drag.target,
-                        });
+                        const data = dndUtils.generateDragData(
+                            {
+                                id,
+                                item,
+                                itemType: drag.itemType,
+                                operation: drag.operation,
+                                type: drag.target,
+                            },
+                            drag.metadata,
+                        );
                         return data;
                     },
                     onDragStart: () => {
@@ -88,13 +92,16 @@ export const useDragDrop = <TElement extends HTMLElement>({
                             return drag.onGenerateDragPreview(data);
                         }
 
-                        const dragData = dndUtils.generateDragData({
-                            id: drag.getId(),
-                            item: drag.getItem(),
-                            itemType: drag.itemType,
-                            operation: drag.operation,
-                            type: drag.target,
-                        }) as DragData;
+                        const dragData = dndUtils.generateDragData(
+                            {
+                                id: drag.getId(),
+                                item: drag.getItem(),
+                                itemType: drag.itemType,
+                                operation: drag.operation,
+                                type: drag.target,
+                            },
+                            drag.metadata,
+                        ) as DragData;
 
                         disableNativeDragPreview({ nativeSetDragImage: data.nativeSetDragImage });
                         setCustomNativeDragPreview({

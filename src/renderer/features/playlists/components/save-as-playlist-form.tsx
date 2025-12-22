@@ -36,15 +36,10 @@ export const SaveAsPlaylistForm = ({
 
     const form = useForm<CreatePlaylistBody>({
         initialValues: {
-            _custom: {
-                navidrome: {
-                    rules: undefined,
-                    ...body?._custom?.navidrome,
-                },
-            },
             comment: body.comment || '',
             name: body.name || '',
             public: body.public,
+            queryBuilderRules: body.queryBuilderRules,
         },
     });
 

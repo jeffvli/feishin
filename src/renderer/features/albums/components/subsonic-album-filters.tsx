@@ -143,7 +143,7 @@ export const SubsonicAlbumFilters = ({ disableArtistFilter }: SubsonicAlbumFilte
     const debouncedHandleMaxYearFilter = useDebouncedCallback(handleMaxYearFilter, 300);
 
     return (
-        <Stack p="md">
+        <Stack px="md" py="md">
             {toggleFilters.map((filter) => (
                 <Group justify="space-between" key={`ss-filter-${filter.label}`}>
                     <Text>{filter.label}</Text>

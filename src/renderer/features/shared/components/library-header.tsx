@@ -1,4 +1,5 @@
 import { closeAllModals, openModal } from '@mantine/modals';
+import clsx from 'clsx';
 import { forwardRef, ReactNode, Ref, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -6,22 +7,29 @@ import { Link } from 'react-router';
 import styles from './library-header.module.css';
 
 import {
+    PlayLastTextButton,
+    PlayNextTextButton,
     PlayTextButton,
-    WideShuffleButton,
 } from '/@/renderer/features/shared/components/play-button';
+import { LONG_PRESS_PLAY_BEHAVIOR } from '/@/renderer/features/shared/components/play-button-group';
+import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-button-click';
 import { useIsMutatingCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useIsMutatingDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useIsMutatingRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Button } from '/@/shared/components/button/button';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Image } from '/@/shared/components/image/image';
 import { Rating } from '/@/shared/components/rating/rating';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem } from '/@/shared/types/domain-types';
+import { Play } from '/@/shared/types/types';
 
 interface LibraryHeaderProps {
     children?: ReactNode;
+    containerClassName?: string;
     imagePlaceholderUrl?: null | string;
     imageUrl?: null | string;
     item: { route: string; type: LibraryItem };
@@ -30,7 +38,10 @@ interface LibraryHeaderProps {
 }
 
 export const LibraryHeader = forwardRef(
-    ({ children, imageUrl, item, title }: LibraryHeaderProps, ref: Ref<HTMLDivElement>) => {
+    (
+        { children, containerClassName, imageUrl, item, title }: LibraryHeaderProps,
+        ref: Ref<HTMLDivElement>,
+    ) => {
         const { t } = useTranslation();
         const [isImageError, setIsImageError] = useState<boolean | null>(false);
 
@@ -85,7 +96,7 @@ export const LibraryHeader = forwardRef(
         }, [imageUrl, isImageError]);
 
         return (
-            <div className={styles.libraryHeader} ref={ref}>
+            <div className={clsx(styles.libraryHeader, containerClassName)} ref={ref}>
                 <div
                     className={styles.imageSection}
                     onClick={() => openImage()}
@@ -140,36 +151,37 @@ export const LibraryHeader = forwardRef(
 
 const calculateTitleSize = (title: string) => {
     const titleLength = title.length;
-    let baseSize = '3.5dvw';
+    let baseSize = '3dvw';
 
     if (titleLength > 20) {
-        baseSize = '3dvw';
-    }
-
-    if (titleLength > 30) {
-        baseSize = '2.75dvw';
-    }
-
-    if (titleLength > 40) {
         baseSize = '2.5dvw';
     }
 
-    if (titleLength > 50) {
+    if (titleLength > 30) {
         baseSize = '2.25dvw';
     }
 
-    if (titleLength > 60) {
+    if (titleLength > 40) {
         baseSize = '2dvw';
     }
 
-    return `clamp(2rem, ${baseSize}, 3.25rem)`;
+    if (titleLength > 50) {
+        baseSize = '1.875dvw';
+    }
+
+    if (titleLength > 60) {
+        baseSize = '1.75dvw';
+    }
+
+    return `clamp(1.75rem, ${baseSize}, 2.75rem)`;
 };
 
 interface LibraryHeaderMenuProps {
     favorite?: boolean;
+    onArtistRadio: () => void;
     onFavorite?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     onMore?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-    onPlay?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    onPlay?: (type: Play) => void;
     onRating?: (rating: number) => void;
     onShuffle?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     rating?: number;
@@ -177,23 +189,71 @@ interface LibraryHeaderMenuProps {
 
 export const LibraryHeaderMenu = ({
     favorite,
+    onArtistRadio,
     onFavorite,
     onMore,
     onPlay,
     onRating,
-    onShuffle,
     rating,
 }: LibraryHeaderMenuProps) => {
+    const { t } = useTranslation();
     const isMutatingRating = useIsMutatingRating();
     const isMutatingCreateFavorite = useIsMutatingCreateFavorite();
     const isMutatingDeleteFavorite = useIsMutatingDeleteFavorite();
     const isMutatingFavorite = isMutatingCreateFavorite || isMutatingDeleteFavorite;
 
+    const handlePlayNow = usePlayButtonClick({
+        onClick: () => {
+            onPlay?.(Play.NOW);
+        },
+        onLongPress: () => {
+            onPlay?.(LONG_PRESS_PLAY_BEHAVIOR[Play.NOW]);
+        },
+    });
+
+    const handlePlayNext = usePlayButtonClick({
+        onClick: () => {
+            onPlay?.(Play.NEXT);
+        },
+        onLongPress: () => {
+            onPlay?.(LONG_PRESS_PLAY_BEHAVIOR[Play.NEXT]);
+        },
+    });
+
+    const handlePlayLast = usePlayButtonClick({
+        onClick: () => {
+            onPlay?.(Play.LAST);
+        },
+        onLongPress: () => {
+            onPlay?.(LONG_PRESS_PLAY_BEHAVIOR[Play.LAST]);
+        },
+    });
+
     return (
         <div className={styles.libraryHeaderMenu}>
             <Group wrap="nowrap">
-                {onPlay && <PlayTextButton onClick={onPlay} />}
-                {onShuffle && <WideShuffleButton onClick={onShuffle} />}
+                {onPlay && <PlayTextButton {...handlePlayNow.handlers} {...handlePlayNow.props} />}
+                {onPlay && (
+                    <PlayNextTextButton {...handlePlayNext.handlers} {...handlePlayNext.props} />
+                )}
+                {onPlay && (
+                    <PlayLastTextButton {...handlePlayLast.handlers} {...handlePlayLast.props} />
+                )}
+                {onArtistRadio && (
+                    <Button
+                        className={clsx(styles.wideTextButton, styles.unthemed)}
+                        classNames={{
+                            label: styles.wideTextButtonLabel,
+                            root: styles.wideTextButton,
+                        }}
+                        leftSection={<Icon icon="radio" />}
+                        onClick={onArtistRadio}
+                        size="md"
+                        variant="subtle"
+                    >
+                        {t('page.albumArtistDetail.artistRadio', { postProcess: 'sentenceCase' })}
+                    </Button>
+                )}
             </Group>
             <Group gap="sm" wrap="nowrap">
                 {onRating && (

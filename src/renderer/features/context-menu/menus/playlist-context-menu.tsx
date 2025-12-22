@@ -5,6 +5,7 @@ import { DeletePlaylistAction } from '/@/renderer/features/context-menu/actions/
 import { EditPlaylistAction } from '/@/renderer/features/context-menu/actions/edit-playlist-action';
 import { GetInfoAction } from '/@/renderer/features/context-menu/actions/get-info-action';
 import { PlayAction } from '/@/renderer/features/context-menu/actions/play-action';
+import { usePermissions } from '/@/renderer/store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { ContextMenuPreview } from '/@/shared/components/context-menu/context-menu-preview';
 import { LibraryItem, Playlist } from '/@/shared/types/domain-types';
@@ -20,18 +21,27 @@ export const PlaylistContextMenu = ({ items, type }: PlaylistContextMenuProps) =
         return { ids };
     }, [items]);
 
+    const { userId, ...permissions } = usePermissions();
+
+    const canEditPublic = permissions.playlists.editPublic;
+
+    const includesNonOwnedPublic = items.some((item) => item.public && item.ownerId !== userId);
+
+    const canEditPlaylist = canEditPublic || !includesNonOwnedPublic;
+    const canDeletePlaylist = canEditPublic || !includesNonOwnedPublic;
+
     return (
         <ContextMenu.Content
             bottomStickyContent={<ContextMenuPreview items={items} itemType={type} />}
         >
-            <PlayAction ids={ids} itemType={LibraryItem.ALBUM} />
+            <PlayAction ids={ids} itemType={LibraryItem.PLAYLIST} />
             <ContextMenu.Divider />
-            <AddToPlaylistAction items={ids} itemType={LibraryItem.ALBUM} />
+            <AddToPlaylistAction items={ids} itemType={LibraryItem.PLAYLIST} />
             <ContextMenu.Divider />
-            <GetInfoAction disabled={items.length === 0} item={items[0]} />
+            <GetInfoAction disabled={items.length === 0} items={items} />
             <ContextMenu.Divider />
-            <EditPlaylistAction items={items} />
-            <DeletePlaylistAction items={items} />
+            <EditPlaylistAction disabled={!canEditPlaylist} items={items} />
+            <DeletePlaylistAction disabled={!canDeletePlaylist} items={items} />
         </ContextMenu.Content>
     );
 };

@@ -5,7 +5,9 @@ import {
     Album,
     AlbumArtist,
     ExplicitStatus,
+    Folder,
     Genre,
+    InternetRadioStation,
     LibraryItem,
     Playlist,
     RelatedArtist,
@@ -279,7 +281,17 @@ const normalizeAlbum = (
         participants: getParticipants(item),
         playCount: null,
         recordLabels: item.recordLabels?.map((item) => item.name) || [],
-        releaseDate: item.year ? new Date(Date.UTC(item.year, 0, 1)).toISOString() : null,
+        releaseDate:
+            item.releaseDate &&
+            typeof item.releaseDate.year === 'number' &&
+            typeof item.releaseDate.month === 'number' &&
+            typeof item.releaseDate.day === 'number'
+                ? new Date(
+                      item.releaseDate.year,
+                      item.releaseDate.month - 1,
+                      item.releaseDate.day,
+                  ).toISOString()
+                : null,
         releaseTypes: item.releaseTypes || [],
         releaseYear: item.year || null,
         size: null,
@@ -342,10 +354,61 @@ const normalizeGenre = (
     };
 };
 
+const normalizeFolder = (
+    item: z.infer<typeof ssType._response.directory>,
+    server?: null | ServerListItemWithCredential,
+): Folder => {
+    const results = item.child?.reduce(
+        (acc: { folders: Folder[]; songs: Song[] }, item) => {
+            const isDirectory = item.isDir === true;
+
+            if (isDirectory) {
+                const folder = normalizeFolder(item, server);
+                acc.folders.push(folder);
+            } else {
+                const song = normalizeSong(item, server);
+                acc.songs.push(song);
+            }
+
+            return acc;
+        },
+        {
+            folders: [],
+            songs: [],
+        },
+    );
+
+    return {
+        _itemType: LibraryItem.FOLDER,
+        _serverId: server?.id || 'unknown',
+        _serverType: ServerType.SUBSONIC,
+        children: {
+            folders: results?.folders || [],
+            songs: results?.songs || [],
+        },
+        id: item.id.toString(),
+        name: item.title,
+        parentId: item.parent,
+    };
+};
+
+const normalizeInternetRadioStation = (
+    item: z.infer<typeof ssType._response.internetRadioStation>,
+): InternetRadioStation => {
+    return {
+        homepageUrl: item.homepageUrl || null,
+        id: item.id,
+        name: item.name,
+        streamUrl: item.streamUrl,
+    };
+};
+
 export const ssNormalize = {
     album: normalizeAlbum,
     albumArtist: normalizeAlbumArtist,
+    folder: normalizeFolder,
     genre: normalizeGenre,
+    internetRadioStation: normalizeInternetRadioStation,
     playlist: normalizePlaylist,
     song: normalizeSong,
 };

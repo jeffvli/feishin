@@ -321,7 +321,11 @@ export const SynchronizedLyrics = ({
                     fontSize={settings.fontSize}
                     id={`lyric-${idx}`}
                     key={idx}
-                    onClick={() => handleSeek(time / 1000)}
+                    onClick={() => {
+                        if (time > 0 && Number.isFinite(time)) {
+                            handleSeek(time / 1000);
+                        }
+                    }}
                     text={
                         text +
                         (translatedLyrics ? `_BREAK_${translatedLyrics.split('\n')[idx]}` : '')

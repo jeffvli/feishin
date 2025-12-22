@@ -67,7 +67,7 @@ export const JellyfinAlbumFilters = ({ disableArtistFilter }: JellyfinAlbumFilte
     }, [genreListQuery.data]);
 
     const tagsQuery = useQuery(
-        sharedQueries.tags({
+        sharedQueries.tagList({
             options: {
                 gcTime: 1000 * 60 * 2,
                 staleTime: 1000 * 60 * 1,
@@ -193,7 +193,7 @@ export const JellyfinAlbumFilters = ({ disableArtistFilter }: JellyfinAlbumFilte
     const debouncedHandleMaxYearFilter = useDebouncedCallback(handleMaxYearFilter, 300);
 
     return (
-        <Stack p="md">
+        <Stack px="md" py="md">
             {yesNoFilter.map((filter) => (
                 <YesNoSelect
                     defaultValue={filter.value ? filter.value.toString() : undefined}

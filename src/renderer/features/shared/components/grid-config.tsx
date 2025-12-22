@@ -404,7 +404,10 @@ const GridRowConfig = ({
 
     const handleReorder = useCallback(
         (idFrom: string, idTo: string, edge: Edge | null) => {
-            const idList = value.map((item) => item.id);
+            const currentValue = useSettingsStore.getState().lists[listKey]?.grid.rows;
+            if (!currentValue) return;
+
+            const idList = currentValue.map((item) => item.id);
             const newIdOrder = dndUtils.reorderById({
                 edge,
                 idFrom,
@@ -413,10 +416,10 @@ const GridRowConfig = ({
             });
 
             // Map the new ID order back to full items
-            const newOrder = newIdOrder.map((id) => value.find((item) => item.id === id)!);
+            const newOrder = newIdOrder.map((id) => currentValue.find((item) => item.id === id)!);
             onChange(newOrder);
         },
-        [onChange, value],
+        [listKey, onChange],
     );
 
     return (

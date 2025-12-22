@@ -1,0 +1,30 @@
+.radio-item {
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background-color 0.15s ease;
+}
+
+.radio-item:hover {
+    @mixin dark {
+        background-color: lighten(var(--theme-colors-surface), 1%);
+    }
+
+    @mixin light {
+        background-color: darken(var(--theme-colors-surface), 1%);
+    }
+}
+
+.radio-item-active {
+    border-left: 3px solid var(--theme-colors-primary);
+}
+
+.radio-item-button {
+    all: unset;
+    flex: 1;
+    width: 100%;
+}
+
+.radio-item-link {
+    color: inherit;
+    text-decoration: underline;
+}

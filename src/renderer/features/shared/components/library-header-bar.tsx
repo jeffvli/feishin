@@ -1,11 +1,12 @@
-import { closeAllModals, openModal } from '@mantine/modals';
-import { CSSProperties, memo, ReactNode, useCallback } from 'react';
+import { closeAllModals } from '@mantine/modals';
+import { AnimatePresence } from 'motion/react';
+import { CSSProperties, memo, ReactNode, useCallback, useRef, useState } from 'react';
 
 import styles from './library-header-bar.module.css';
 
-import { usePlayer } from '/@/renderer/features/player/context/player-context';
+import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/context/player-context';
 import { DefaultPlayButton } from '/@/renderer/features/shared/components/play-button';
-import { PlayButtonGroup } from '/@/renderer/features/shared/components/play-button-group';
+import { PlayButtonGroupPopover } from '/@/renderer/features/shared/components/play-button-group';
 import { useCurrentServerId } from '/@/renderer/store';
 import { Badge, BadgeProps } from '/@/shared/components/badge/badge';
 import { Spinner } from '/@/shared/components/spinner/spinner';
@@ -69,31 +70,32 @@ const HeaderPlayButton = ({
         [listQuery, ids, songs, player, serverId, itemType],
     );
 
-    const openPlayTypeModal = useCallback(() => {
-        if (!serverId) return;
+    const isPlayerFetching = useIsPlayerFetching();
 
-        openModal({
-            children: <PlayButtonGroup onPlay={handlePlay} />,
-            size: 'xs',
-            styles: {
-                body: {
-                    padding: 'var(--theme-spacing-md)',
-                },
-                header: {
-                    display: 'none',
-                },
-            },
-        });
-    }, [serverId, handlePlay]);
+    const [isOpen, setIsOpen] = useState(false);
+    const buttonRef = useRef<HTMLButtonElement>(null);
 
     return (
         <div className={styles.playButtonContainer}>
             <DefaultPlayButton
                 className={className}
-                onClick={openPlayTypeModal}
+                loading={isPlayerFetching}
+                onClick={() => setIsOpen((prev) => !prev)}
+                ref={buttonRef}
                 variant={variant}
                 {...props}
             />
+            <AnimatePresence>
+                {isOpen && (
+                    <PlayButtonGroupPopover
+                        loading={isPlayerFetching}
+                        onClose={() => setIsOpen(false)}
+                        onPlay={handlePlay}
+                        position="bottom"
+                        triggerRef={buttonRef}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 };

@@ -536,12 +536,9 @@
         "discordServeImage_description": "sunucudan {{discord}} Rich Presence için kapak resmi paylaşın, yalnızca Jellyfin ve Navidrome için kullanılabilir",
         "discordUpdateInterval": "{{discord}} Rich Presence güncelleme aralığı",
         "discordUpdateInterval_description": "her güncelleme arasındaki saniye cinsinden süre (minimum 15 saniye)",
-        "doubleClickBehavior": "çift tıklandığında aranan tüm parçaları sıraya koyma",
         "gaplessAudio": "aralıksız ses",
         "gaplessAudio_description": "mpv için aralıksız ses ayarını belirler",
         "gaplessAudio_optionWeak": "zayıf (tavsiye edilen)",
-        "genreBehavior": "tür sayfası varsayılan davranışı",
-        "genreBehavior_description": "bir türe tıklandığında varsayılan olarak parça mı yoksa albüm listesinde mi açılacağını belirler",
         "globalMediaHotkeys": "evrensel medya kısayol tuşları",
         "globalMediaHotkeys_description": "oynatmayı kontrol etmek için sistem medya kısayol tuşlarınızın kullanımını etkinleştirin veya devre dışı bırakın",
         "homeConfiguration": "ana sayfa yapılandırma",
@@ -669,15 +666,12 @@
         "windowBarStyle_description": "pencere çubuğunun stilini seçin",
         "zoom": "yakınlaştırma yüzdesi",
         "zoom_description": "uygulama için yakınlaştırma yüzdesini ayarlar",
-        "doubleClickBehavior_description": "evet ise, bir parça aramasında eşleşen tüm parçalar sıraya alınır. aksi takdirde, yalnızca tıklanan parça sıraya alınır",
         "enableRemote": "uzaktan kontrol sunucusunu etkinleştir",
         "enableRemote_description": "uzaktan kumanda sunucusunun diğer cihazların uygulamayı kontrol etmesine izin vermesini sağlar",
         "externalLinks": "harici bağlantıları göster",
         "externalLinks_description": "sanatçı/albüm sayfalarında dış bağlantıların (Last.fm, MusicBrainz) gösterilmesini sağlar",
         "exitToTray": "tepsiye çıkış",
         "exitToTray_description": "uygulamadan sistem tepsisine çıkma",
-        "floatingQueueArea": "kayan liste üzerine gelinen alanı göster",
-        "floatingQueueArea_description": "oynatma kuyruğunu görüntülemek için ekranın sağ tarafında fareyle üzerine gelinen bir simge görüntüleyin",
         "followLyric": "güncel şarkı sözlerini takip et",
         "followLyric_description": "şarkı sözünü geçerli çalma konumuna kaydırma",
         "preferLocalLyrics": "yerel sözleri tercih edin",
@@ -800,10 +794,8 @@
                 "year": "$t(common.year)"
             },
             "view": {
-                "card": "kart",
                 "grid": "ızgara",
                 "list": "liste",
-                "poster": "poster",
                 "table": "tablo"
             }
         }

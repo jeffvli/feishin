@@ -29,7 +29,6 @@ export const SidebarPlayQueue = () => {
             <PlayQueueListControls
                 handleSearch={setSearch}
                 searchTerm={search}
-                tableRef={tableRef}
                 type={ItemListKey.SIDE_QUEUE}
             />
             <Flex direction="column" style={{ flex: 1, minHeight: 0 }}>
@@ -54,6 +53,9 @@ const BottomPanel = () => {
     const { data: lyricsData } = useQuery(
         lyricsQueries.songLyrics(
             {
+                options: {
+                    enabled: showLyricsInSidebar && !!currentSong?.id,
+                },
                 query: { songId: currentSong?.id || '' },
                 serverId: currentSong?._serverId || '',
             },
@@ -91,7 +93,7 @@ const BottomPanel = () => {
             <Divider />
             {showLyricsInSidebar ? (
                 <div className={styles.lyricsSection}>
-                    <Lyrics />
+                    <Lyrics fadeOutNoLyricsMessage={showVisualizer} />
                     {showVisualizer && (
                         <div
                             className={styles.visualizerOverlay}

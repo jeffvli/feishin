@@ -1,13 +1,22 @@
+.window-bar {
+    grid-area: window-bar;
+    height: 30px;
+}
+
 .windows-container {
     display: flex;
+    gap: 0.5rem;
     align-items: center;
-    justify-content: space-between;
-    width: 100vw;
+    width: 100%;
+    height: 100%;
+    background: var(--theme-colors-background);
+    border-bottom: 1px solid alpha(var(--theme-colors-border), 0.5);
     -webkit-app-region: drag;
 }
 
 .windows-button-group {
     display: flex;
+    flex-shrink: 0;
     width: 130px;
     height: 100%;
     -webkit-app-region: no-drag;
@@ -40,20 +49,67 @@
 
 .player-status-container {
     display: flex;
+    flex: 1;
     gap: 0.5rem;
-    max-width: 45vw;
+    align-items: center;
+    min-width: 0;
     padding-left: 1rem;
+    overflow: hidden;
+}
+
+.player-status-container > img {
+    flex-shrink: 0;
+}
+
+.player-status-text {
+    flex: 1;
+    width: 0;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
+.macos-container .player-status-text {
+    flex: 0 1 auto;
+    width: auto;
+    max-width: 100%;
+    text-align: center;
+}
+
+@media only screen and (width < 768px) {
+    .player-status-container {
+        padding-left: 0.5rem;
+    }
+
+    .windows-button-group {
+        flex-shrink: 0;
+        width: 120px;
+    }
+}
+
 .macos-container {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100vw;
+    width: 100%;
+    height: 100%;
+    background: var(--theme-colors-background);
+    border-bottom: 1px solid alpha(var(--theme-colors-border), 0.5);
     -webkit-app-region: drag;
+}
+
+.macos-container .player-status-container {
+    display: flex;
+    gap: 0;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    max-width: calc(100% - 140px);
+    padding: 0 0.5rem;
+    margin: 0 auto;
+    overflow: hidden;
 }
 
 .macos-button-group {

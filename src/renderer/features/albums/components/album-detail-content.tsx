@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ReactNode, Suspense, useMemo, useState } from 'react';
+import { ReactNode, Suspense, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
 
@@ -15,6 +15,8 @@ import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
+import { ListSortByDropdownControlled } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
+import { ListSortOrderToggleButtonControlled } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
 import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -28,6 +30,7 @@ import {
 } from '/@/renderer/utils';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
+import { sortSongList } from '/@/shared/api/utils';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Flex } from '/@/shared/components/flex/flex';
@@ -39,12 +42,14 @@ import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
+import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import {
     Album,
     AlbumListSort,
     ExplicitStatus,
     LibraryItem,
     Song,
+    SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, Play } from '/@/shared/types/types';
@@ -133,10 +138,9 @@ const AlbumMetadataTags = ({ album }: AlbumMetadataTagsProps) => {
             },
             {
                 id: 'isCompilation',
-                value:
-                    album.isCompilation !== null
-                        ? t('filter.isCompilation', { postProcess: 'sentenceCase' })
-                        : undefined,
+                value: album?.isCompilation
+                    ? t('filter.isCompilation', { postProcess: 'sentenceCase' })
+                    : undefined,
             },
             {
                 id: 'recordLabels',
@@ -327,11 +331,6 @@ export const AlbumDetailContent = () => {
             excludeIds: detailQuery?.data?.id ? [detailQuery.data.id] : undefined,
             isHidden: !detailQuery?.data?.albumArtists?.[0]?.id,
             query: {
-                _custom: {
-                    jellyfin: {
-                        ExcludeItemIds: detailQuery?.data?.id,
-                    },
-                },
                 artistIds: detailQuery?.data?.albumArtists.length
                     ? [detailQuery?.data?.albumArtists[0].id]
                     : undefined,
@@ -346,11 +345,11 @@ export const AlbumDetailContent = () => {
             excludeIds: detailQuery?.data?.id ? [detailQuery.data.id] : undefined,
             isHidden: !detailQuery?.data?.genres?.[0],
             query: {
-                genres: detailQuery?.data?.genres.length
+                genreIds: detailQuery?.data?.genres.length
                     ? [detailQuery?.data?.genres[0].id]
                     : undefined,
             },
-            rowCount: 2,
+            rowCount: 1,
             sortBy: AlbumListSort.RANDOM,
             sortOrder: SortOrder.ASC,
             title: `${t('page.albumDetail.moreFromGeneric', {
@@ -368,7 +367,13 @@ export const AlbumDetailContent = () => {
     return (
         <div className={styles.contentContainer} ref={ref}>
             <div className={styles.detailContainer}>
-                {comment && <Spoiler maxHeight={75}>{replaceURLWithHTMLLinks(comment)}</Spoiler>}
+                {comment && (
+                    <Spoiler maxHeight={75}>
+                        <Text
+                            dangerouslySetInnerHTML={{ __html: replaceURLWithHTMLLinks(comment) }}
+                        />
+                    </Spoiler>
+                )}
                 <div className={styles.contentLayout}>
                     <div className={styles.songsColumn}>
                         {detailQuery?.data?.songs && detailQuery.data.songs.length > 0 && (
@@ -427,13 +432,20 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
 
     const currentSong = usePlayerSong();
 
+    const [sortBy, setSortBy] = useState<SongListSort>(SongListSort.ID);
+    const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
+
     const columns = useMemo(() => {
         return tableConfig?.columns || [];
     }, [tableConfig?.columns]);
 
     const filteredSongs = useMemo(() => {
-        return searchLibraryItems(songs, searchTerm, LibraryItem.SONG);
-    }, [songs, searchTerm]);
+        return sortSongList(
+            searchLibraryItems(songs, searchTerm, LibraryItem.SONG),
+            sortBy,
+            sortOrder,
+        );
+    }, [songs, searchTerm, sortBy, sortOrder]);
 
     const { handleColumnReordered } = useItemListColumnReorder({
         itemListKey: ItemListKey.ALBUM_DETAIL,
@@ -482,6 +494,11 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
     const groups = useMemo(() => {
         // Remove groups when filtering
         if (searchTerm.trim()) {
+            return undefined;
+        }
+
+        // Remove groups when sorting
+        if (sortBy !== SongListSort.ID) {
             return undefined;
         }
 
@@ -562,26 +579,40 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
             },
             rowHeight: 40,
         }));
-    }, [discGroups, t, searchTerm]);
+    }, [searchTerm, sortBy, discGroups, t]);
 
     const player = usePlayer();
 
     const overrideControls: Partial<ItemControls> = useMemo(() => {
         return {
-            onDoubleClick: ({ index, internalState, item }) => {
+            onDoubleClick: ({ index, internalState, item, meta }) => {
                 if (!item) {
                     return;
                 }
 
+                const playType = (meta?.playType as Play) || Play.NOW;
+
                 const items = internalState?.getData() as Song[];
 
                 if (index !== undefined) {
-                    player.addToQueueByData(items, Play.NOW);
-                    player.mediaPlayByIndex(index);
+                    player.addToQueueByData(items, playType, item.id);
                 }
             },
         };
     }, [player]);
+
+    const binding = useSettingsStore((state) => state.hotkeys.bindings.localSearch);
+
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
+    useHotkeys([
+        [
+            binding.hotkey,
+            () => {
+                searchInputRef.current?.focus();
+            },
+        ],
+    ]);
 
     if (!tableConfig || columns.length === 0) {
         return null;
@@ -593,11 +624,13 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
         <Stack gap="md">
             <Group gap="sm" w="100%">
                 <TextInput
+                    classNames={{ input: styles.searchTextInput }}
                     flex={1}
                     leftSection={<Icon icon="search" />}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder={t('common.search', { postProcess: 'sentenceCase' })}
                     radius="xl"
+                    ref={searchInputRef}
                     rightSection={
                         searchTerm ? (
                             <ActionIcon
@@ -608,13 +641,16 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                             />
                         ) : null
                     }
-                    styles={{
-                        input: {
-                            background: 'transparent',
-                            border: '1px solid rgba(255, 255, 255, 0.05)',
-                        },
-                    }}
                     value={searchTerm}
+                />
+                <ListSortByDropdownControlled
+                    itemType={LibraryItem.PLAYLIST_SONG}
+                    setSortBy={(value) => setSortBy(value as SongListSort)}
+                    sortBy={sortBy}
+                />
+                <ListSortOrderToggleButtonControlled
+                    setSortOrder={(value) => setSortOrder(value as SortOrder)}
+                    sortOrder={sortOrder}
                 />
                 <ListConfigMenu
                     displayTypes={[{ hidden: true, value: ListDisplayType.GRID }]}
@@ -641,6 +677,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                 enableHorizontalBorders={tableConfig.enableHorizontalBorders}
                 enableRowHoverHighlight={tableConfig.enableRowHoverHighlight}
                 enableSelection
+                enableSelectionDialog={false}
                 enableStickyGroupRows
                 enableStickyHeader
                 enableVerticalBorders={tableConfig.enableVerticalBorders}

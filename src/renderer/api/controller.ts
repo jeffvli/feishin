@@ -100,6 +100,20 @@ export const controller: GeneralController = {
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },
+    createInternetRadioStation(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: createInternetRadioStation`,
+            );
+        }
+
+        return apiController(
+            'createInternetRadioStation',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
+    },
     createPlaylist(args) {
         const server = getServerById(args.apiClientProps.serverId);
 
@@ -125,6 +139,20 @@ export const controller: GeneralController = {
 
         return apiController(
             'deleteFavorite',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
+    },
+    deleteInternetRadioStation(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: deleteInternetRadioStation`,
+            );
+        }
+
+        return apiController(
+            'deleteInternetRadioStation',
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },
@@ -306,6 +334,24 @@ export const controller: GeneralController = {
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },
+    getFolder(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getFolder`,
+            );
+        }
+
+        return apiController(
+            'getFolder',
+            server.type,
+        )?.({
+            ...args,
+            apiClientProps: { ...args.apiClientProps, server },
+            query: mergeMusicFolderId(args.query, server),
+        });
+    },
     getGenreList(args) {
         const server = getServerById(args.apiClientProps.serverId);
 
@@ -323,6 +369,19 @@ export const controller: GeneralController = {
             apiClientProps: { ...args.apiClientProps, server },
             query: mergeMusicFolderId(args.query, server),
         });
+    },
+    getInternetRadioStations(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getInternetRadioStations`,
+            );
+        }
+        return apiController(
+            'getInternetRadioStations',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },
     getLyrics(args) {
         const server = getServerById(args.apiClientProps.serverId);
@@ -405,6 +464,20 @@ export const controller: GeneralController = {
 
         return apiController(
             'getPlaylistSongList',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
+    },
+    getPlayQueue(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getPlayQueue`,
+            );
+        }
+
+        return apiController(
+            'getPlayQueue',
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },
@@ -554,7 +627,7 @@ export const controller: GeneralController = {
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },
-    getTags(args) {
+    getTagList(args) {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
@@ -564,7 +637,7 @@ export const controller: GeneralController = {
         }
 
         return apiController(
-            'getTags',
+            'getTagList',
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },
@@ -579,6 +652,20 @@ export const controller: GeneralController = {
 
         return apiController(
             'getTopSongs',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
+    },
+    getUserInfo(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getUserInfo`,
+            );
+        }
+
+        return apiController(
+            'getUserInfo',
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },
@@ -621,6 +708,34 @@ export const controller: GeneralController = {
 
         return apiController(
             'removeFromPlaylist',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
+    },
+    replacePlaylist(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: replacePlaylist`,
+            );
+        }
+
+        return apiController(
+            'replacePlaylist',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
+    },
+    savePlayQueue(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: savePlayQueue`,
+            );
+        }
+
+        return apiController(
+            'savePlayQueue',
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },
@@ -681,6 +796,20 @@ export const controller: GeneralController = {
 
         return apiController(
             'shareItem',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
+    },
+    updateInternetRadioStation(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: updateInternetRadioStation`,
+            );
+        }
+
+        return apiController(
+            'updateInternetRadioStation',
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },

@@ -116,6 +116,15 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    getFolder: {
+        method: 'GET',
+        path: 'users/:userId/items',
+        query: jfType._parameters.folder,
+        responses: {
+            200: jfType._response.folderList,
+            400: jfType._response.error,
+        },
+    },
     getGenreList: {
         method: 'GET',
         path: 'musicgenres',
@@ -166,6 +175,15 @@ export const contract = c.router({
         query: jfType._parameters.songList,
         responses: {
             200: jfType._response.playlistSongList,
+            400: jfType._response.error,
+        },
+    },
+    getPlayQueue: {
+        method: 'GET',
+        path: 'sessions',
+        query: jfType._parameters.getQueue,
+        responses: {
+            200: jfType._response.getSessions,
             400: jfType._response.error,
         },
     },
@@ -238,6 +256,14 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    getUser: {
+        method: 'GET',
+        path: 'users/:id',
+        responses: {
+            200: jfType._response.user,
+            400: jfType._response.error,
+        },
+    },
     movePlaylistItem: {
         body: null,
         method: 'POST',
@@ -263,6 +289,15 @@ export const contract = c.router({
         query: jfType._parameters.removeFromPlaylist,
         responses: {
             200: jfType._response.removeFromPlaylist,
+            400: jfType._response.error,
+        },
+    },
+    savePlayQueue: {
+        body: jfType._parameters.saveQueue,
+        method: 'POST',
+        path: 'sessions/playing',
+        responses: {
+            200: jfType._response.scrobble,
             400: jfType._response.error,
         },
     },

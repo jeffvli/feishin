@@ -24,6 +24,7 @@ export const defaultTheme: AppThemeConfiguration = {
         black: 'rgb(0, 0, 0)',
         foreground: 'rgb(225, 225, 225)',
         'foreground-muted': 'rgb(150, 150, 150)',
+        primary: 'rgb(53, 116, 252)',
         'state-error': 'rgb(204, 50, 50)',
         'state-info': 'rgb(53, 116, 252)',
         'state-success': 'rgb(50, 204, 50)',

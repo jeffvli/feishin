@@ -56,19 +56,10 @@ interface TrackRowProps {
     player: ReturnType<typeof usePlayer>;
     serverId: string;
     song: NonNullable<AlbumTracksTableProps['songs']>[0];
-    songIndex: number;
     songs: Song[];
 }
 
-const TrackRow = ({
-    controls,
-    internalState,
-    player,
-    serverId,
-    song,
-    songIndex,
-    songs,
-}: TrackRowProps) => {
+const TrackRow = ({ controls, internalState, player, serverId, song, songs }: TrackRowProps) => {
     const rowId = internalState.extractRowId(song);
     const isSelected = useItemSelectionState(internalState, rowId);
     const isDraggingState = useItemDraggingState(internalState, rowId);
@@ -122,11 +113,10 @@ const TrackRow = ({
     const mergedRef = useMergedRef(containerRef, dragRef);
 
     const handleDoubleClick = useCallback(() => {
-        if (songs && songIndex !== undefined) {
-            player.addToQueueByData(songs, Play.NOW);
-            player.mediaPlayByIndex(songIndex);
+        if (songs && song.id) {
+            player.addToQueueByData(songs, Play.NOW, song.id);
         }
-    }, [player, songs, songIndex]);
+    }, [player, songs, song.id]);
 
     return (
         <Text
@@ -180,7 +170,7 @@ const AlbumTracksTable = ({ isDark, serverId, songs }: AlbumTracksTableProps) =>
         <div className={clsx(styles.tracks, { [styles.dark]: isDark })}>
             <ScrollArea>
                 <div className={styles['tracks-list']}>
-                    {songs?.map((song, index) => (
+                    {songs?.map((song) => (
                         <TrackRow
                             controls={controls}
                             internalState={internalState}
@@ -188,7 +178,6 @@ const AlbumTracksTable = ({ isDark, serverId, songs }: AlbumTracksTableProps) =>
                             player={player}
                             serverId={serverId}
                             song={song}
-                            songIndex={index}
                             songs={fullSongs || []}
                         />
                     ))}

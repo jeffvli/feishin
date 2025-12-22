@@ -63,17 +63,19 @@ const HomeRoute = () => {
         },
     };
 
-    const sortedCarousel = homeItems
-        .filter((item) => {
-            if (item.disabled) {
-                return false;
-            }
-            if (isJellyfin && item.id === HomeItem.RECENTLY_PLAYED) {
-                return false;
-            }
+    const sortedItems = homeItems.filter((item) => {
+        if (item.disabled) {
+            return false;
+        }
+        if (isJellyfin && item.id === HomeItem.RECENTLY_PLAYED) {
+            return false;
+        }
 
-            return true;
-        })
+        return true;
+    });
+
+    const sortedCarousel = sortedItems
+        .filter((item) => item.id !== HomeItem.GENRES)
         .map((item) => ({
             ...carousels[item.id],
             uniqueId: item.id,
@@ -103,8 +105,16 @@ const HomeRoute = () => {
                         px="2rem"
                     >
                         {homeFeature && <AlbumInfiniteFeatureCarousel />}
-                        <FeaturedGenres />
-                        {sortedCarousel.map((carousel) => {
+                        {sortedItems.map((item) => {
+                            if (item.id === HomeItem.GENRES) {
+                                return <FeaturedGenres key="featured-genres" />;
+                            }
+
+                            const carousel = sortedCarousel.find((c) => c.uniqueId === item.id);
+                            if (!carousel) {
+                                return null;
+                            }
+
                             if (carousel.itemType === LibraryItem.ALBUM) {
                                 return (
                                     <AlbumInfiniteCarousel

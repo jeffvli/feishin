@@ -17,31 +17,14 @@ import { Badge } from '/@/shared/components/badge/badge';
 import { Group } from '/@/shared/components/group/group';
 import { Image } from '/@/shared/components/image/image';
 import { Stack } from '/@/shared/components/stack/stack';
-import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { Text } from '/@/shared/components/text/text';
 import { Album, LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 const containerVariants = {
-    animate: (custom: { isNext: boolean }) => ({
-        transition: {
-            delayChildren: 0.1,
-            staggerChildren: 0.3,
-            staggerDirection: custom.isNext ? 1 : -1,
-        },
-    }),
-    exit: (custom: { isNext: boolean }) => ({
-        transition: {
-            staggerChildren: 0.3,
-            staggerDirection: custom.isNext ? 1 : -1,
-        },
-    }),
-    initial: (custom: { isNext: boolean }) => ({
-        transition: {
-            staggerChildren: 0.3,
-            staggerDirection: custom.isNext ? -1 : 1,
-        },
-    }),
+    animate: {},
+    exit: {},
+    initial: {},
 };
 
 const itemVariants = {
@@ -49,23 +32,22 @@ const itemVariants = {
         opacity: 1,
         scale: 1,
         transition: {
-            duration: 0.4,
+            duration: 0.2,
             ease: 'easeOut' as const,
         },
         y: 0,
     },
     exit: {
         opacity: 0,
-        scale: 0.8,
         transition: {
             duration: 0.3,
             ease: 'easeIn' as const,
         },
-        y: -20,
+        y: 0,
     },
     initial: {
         opacity: 0,
-        y: 20,
+        y: 0,
     },
 };
 
@@ -122,9 +104,9 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
             >
                 <div className={styles.content}>
                     <div className={styles.titleSection}>
-                        <TextTitle className={styles.title} fw={800} lineClamp={2} order={3}>
+                        <Text className={styles.title} fw={700} lineClamp={2} size="lg" ta="center">
                             {album.name}
-                        </TextTitle>
+                        </Text>
                     </div>
 
                     <div className={styles.imageSection}>
@@ -140,28 +122,28 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
 
                     <div className={styles.metadataSection}>
                         <Stack gap="sm">
-                            {album.albumArtists.slice(0, 1).map((artist) => (
-                                <Text
-                                    className={styles.artist}
-                                    fw={600}
-                                    key={`artist-${artist.id}`}
-                                    size="xl"
-                                >
-                                    {artist.name}
+                            {album.albumArtists?.[0] && (
+                                <Text className={styles.artist} fw={500} size="md">
+                                    {album.albumArtists[0].name}
                                 </Text>
-                            ))}
-                            <Group gap="sm" justify="center" wrap="wrap">
+                            )}
+                            <Group gap="xs" justify="center" wrap="wrap">
                                 {album.genres?.slice(0, 2).map((genre) => (
                                     <Badge
+                                        classNames={{ label: styles.badge }}
                                         key={`genre-${genre.id}`}
-                                        size="lg"
+                                        size="sm"
                                         variant="transparent"
                                     >
                                         {genre.name}
                                     </Badge>
                                 ))}
                                 {album.releaseYear && (
-                                    <Badge size="lg" variant="transparent">
+                                    <Badge
+                                        classNames={{ label: styles.badge }}
+                                        size="sm"
+                                        variant="transparent"
+                                    >
                                         {album.releaseYear}
                                     </Badge>
                                 )}
@@ -245,7 +227,6 @@ export const FeatureCarousel = ({ data, onNearEnd }: FeatureCarouselProps) => {
                 <motion.div
                     animate="animate"
                     className={styles.carousel}
-                    custom={directionRef.current}
                     exit="exit"
                     initial="initial"
                     key={`carousel-${startIndex}`}
@@ -272,6 +253,12 @@ export const FeatureCarousel = ({ data, onNearEnd }: FeatureCarouselProps) => {
                         onClick={handlePrevious}
                         radius="50%"
                         size="md"
+                        styles={{
+                            icon: {
+                                color: 'white',
+                                fill: 'white',
+                            },
+                        }}
                         variant="subtle"
                     />
                     <ActionIcon
@@ -281,6 +268,12 @@ export const FeatureCarousel = ({ data, onNearEnd }: FeatureCarouselProps) => {
                         onClick={handleNext}
                         radius="50%"
                         size="md"
+                        styles={{
+                            icon: {
+                                color: 'white',
+                                fill: 'white',
+                            },
+                        }}
                         variant="subtle"
                     />
                 </>

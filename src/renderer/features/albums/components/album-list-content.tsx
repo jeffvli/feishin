@@ -2,11 +2,12 @@ import { lazy, Suspense, useMemo } from 'react';
 
 import { useListContext } from '/@/renderer/context/list-context';
 import { useAlbumListFilters } from '/@/renderer/features/albums/hooks/use-album-list-filters';
-import { ListFilters } from '/@/renderer/features/shared/components/list-filters';
+import { ListFilters, ListFiltersTitle } from '/@/renderer/features/shared/components/list-filters';
 import { ListWithSidebarContainer } from '/@/renderer/features/shared/components/list-with-sidebar-container';
 import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Spinner } from '/@/shared/components/spinner/spinner';
+import { Stack } from '/@/shared/components/stack/stack';
 import { AlbumListQuery, LibraryItem } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, ListPaginationType } from '/@/shared/types/types';
 
@@ -37,9 +38,12 @@ const AlbumListPaginatedTable = lazy(() =>
 const AlbumListFilters = () => {
     return (
         <ListWithSidebarContainer.SidebarPortal>
-            <ScrollArea>
-                <ListFilters itemType={LibraryItem.ALBUM} />
-            </ScrollArea>
+            <Stack h="100%">
+                <ListFiltersTitle />
+                <ScrollArea>
+                    <ListFilters itemType={LibraryItem.ALBUM} />
+                </ScrollArea>
+            </Stack>
         </ListWithSidebarContainer.SidebarPortal>
     );
 };
@@ -83,8 +87,9 @@ export const AlbumListView = ({
     table,
 }: ItemListSettings & { overrideQuery?: OverrideAlbumListQuery }) => {
     const server = useCurrentServer();
+    const { pageKey } = useListContext();
 
-    const { query } = useAlbumListFilters();
+    const { query } = useAlbumListFilters(pageKey as ItemListKey);
 
     const mergedQuery = useMemo(() => {
         if (!overrideQuery) {

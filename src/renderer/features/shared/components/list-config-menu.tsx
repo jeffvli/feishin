@@ -128,7 +128,7 @@ export const ListConfigMenu = (props: ListConfigMenuProps) => {
             <Modal
                 handlers={handlers}
                 opened={isOpen}
-                size="lg"
+                size="xl"
                 title={t('common.configure', { postProcess: 'sentenceCase' })}
             >
                 <Stack gap="xs">

@@ -5,13 +5,14 @@ import { RefreshButton } from '/@/renderer/features/shared/components/refresh-bu
 import { ItemListKey } from '/@/shared/types/types';
 
 interface ListRefreshButtonProps {
+    disabled?: boolean;
     listKey: ItemListKey;
 }
 
-export const ListRefreshButton = ({ listKey }: ListRefreshButtonProps) => {
+export const ListRefreshButton = ({ disabled, listKey }: ListRefreshButtonProps) => {
     const handleRefresh = useCallback(() => {
         eventEmitter.emit('ITEM_LIST_REFRESH', { key: listKey });
     }, [listKey]);
 
-    return <RefreshButton onClick={handleRefresh} />;
+    return <RefreshButton disabled={disabled} onClick={handleRefresh} />;
 };

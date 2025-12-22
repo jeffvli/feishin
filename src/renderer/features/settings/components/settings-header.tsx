@@ -41,7 +41,7 @@ export const SettingsHeader = ({ setSearch }: SettingsHeaderProps) => {
     return (
         <Flex>
             <PageHeader>
-                <LibraryHeaderBar ignoreMaxWidth>
+                <LibraryHeaderBar>
                     <Flex align="center" justify="space-between" w="100%">
                         <Group wrap="nowrap">
                             <Icon icon="settings" size="5xl" />

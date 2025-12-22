@@ -10,7 +10,6 @@ import { AddServerForm } from '/@/renderer/features/servers/components/add-serve
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAuthStoreActions, useCurrentServer, useServerList } from '/@/renderer/store';
-import { Accordion } from '/@/shared/components/accordion/accordion';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -27,35 +26,19 @@ import {
 const localSettings = isElectron() ? window.api.localSettings : null;
 
 export const ServerRequired = () => {
-    const { t } = useTranslation();
     const serverList = useServerList();
 
-    const serverLock =
-        (localSettings
-            ? !!localSettings.env.SERVER_LOCK
-            : !!window.SERVER_LOCK &&
-              window.SERVER_TYPE &&
-              window.SERVER_NAME &&
-              window.SERVER_URL) || false;
+    const isServerLock = Boolean(window.SERVER_LOCK) || false;
 
-    if (Object.keys(serverList).length > 0) {
+    if (Object.keys(serverList).length > 1) {
         return (
             <ScrollArea>
                 <Stack miw="300px">
                     <ServerSelector />
-                    {serverLock && (
+                    {!isServerLock && (
                         <>
                             <Divider my="lg" />
-                            <Accordion>
-                                <Accordion.Item value="add-server">
-                                    <Accordion.Control>
-                                        {t('form.addServer.title', { postProcess: 'titleCase' })}
-                                    </Accordion.Control>
-                                    <Accordion.Panel>
-                                        <AddServerForm onCancel={null} />
-                                    </Accordion.Panel>
-                                </Accordion.Item>
-                            </Accordion>
+                            <AddServerForm onCancel={null} />
                         </>
                     )}
                 </Stack>

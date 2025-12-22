@@ -6,6 +6,10 @@ const openItem = async (path: string) => {
     return ipcRenderer.invoke('open-item', path);
 };
 
+const openApplicationDirectory = async () => {
+    return ipcRenderer.invoke('open-application-directory');
+};
+
 const playerErrorListener = (cb: (event: IpcRendererEvent, data: { code: number }) => void) => {
     ipcRenderer.on('player-error-listener', cb);
 };
@@ -42,6 +46,7 @@ export const utils = {
     isWindows,
     logger,
     mainMessageListener,
+    openApplicationDirectory,
     openItem,
     playerErrorListener,
 };

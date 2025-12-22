@@ -2,7 +2,7 @@ import {
     ItemListStateActions,
     ItemListStateItemWithRequiredProperties,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
-import { Album, AlbumArtist, Artist, Playlist, Song } from '/@/shared/types/domain-types';
+import { Album, AlbumArtist, Artist, Folder, Playlist, Song } from '/@/shared/types/domain-types';
 
 /**
  * Type guard to assert that an item has the required properties for dragging
@@ -28,13 +28,13 @@ const hasRequiredDragProperties = (
  * Otherwise, select and drag only the current item.
  * If internalState is not provided, returns the single item wrapped in an array.
  *
- * @param data - The item data to drag (Album, AlbumArtist, Artist, Playlist, or Song)
+ * @param data - The item data to drag (Album, AlbumArtist, Artist, Folder, Playlist, or Song)
  * @param internalState - The item list state actions (optional)
  * @param updateSelection - Whether to update the selection state (default: true)
  * @returns Array of items that should be dragged (with original values, asserting id, itemType, and _serverId)
  */
 export const getDraggedItems = (
-    data: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+    data: Album | AlbumArtist | Artist | Folder | Playlist | Song | undefined,
     internalState?: ItemListStateActions,
     updateSelection: boolean = true,
 ): ItemListStateItemWithRequiredProperties[] => {

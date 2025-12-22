@@ -34,6 +34,7 @@ const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps) => {
         data: albums,
         fetchNextPage,
         hasNextPage,
+        refetch,
     } = useAlbumListInfinite(sortBy, sortOrder, 20, additionalQuery);
 
     const controls = useDefaultItemListControls();
@@ -65,6 +66,10 @@ const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps) => {
 
     const handlePrevPage = useCallback(() => {}, []);
 
+    const handleRefresh = useCallback(() => {
+        refetch();
+    }, [refetch]);
+
     const firstPageItems = excludeIds
         ? albums.pages[0]?.items.filter((album) => !excludeIds.includes(album.id)) || []
         : albums.pages[0]?.items || [];
@@ -80,6 +85,7 @@ const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps) => {
             loadNextPage={fetchNextPage}
             onNextPage={handleNextPage}
             onPrevPage={handlePrevPage}
+            onRefresh={handleRefresh}
             rowCount={rowCount}
             title={title}
         />

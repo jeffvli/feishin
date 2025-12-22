@@ -134,7 +134,7 @@ export function ImageLoader({ className }: ImageLoaderProps) {
 export function ImageUnloader({ className }: ImageUnloaderProps) {
     return (
         <div className={clsx(styles.unloader, className)}>
-            <Icon color="default" icon="emptyImage" size="xl" />
+            <Icon color="default" icon="emptyImage" size="25%" />
         </div>
     );
 }

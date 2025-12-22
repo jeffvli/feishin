@@ -6,12 +6,39 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
 import {
     ArtistRadioQuery,
+    GetQueueQuery,
     ListCountQuery,
+    RandomSongListQuery,
     SimilarSongsQuery,
     SongListQuery,
 } from '/@/shared/types/domain-types';
 
 export const songsQueries = {
+    artistRadio: (args: QueryHookArgs<ArtistRadioQuery>) => {
+        return queryOptions({
+            queryFn: ({ signal }) => {
+                return api.controller.getArtistRadio({
+                    apiClientProps: { serverId: args.serverId, signal },
+                    query: {
+                        artistId: args.query.artistId,
+                        count: args.query.count ?? 20,
+                    },
+                });
+            },
+            queryKey: queryKeys.songs.artistRadio(args.serverId, args.query),
+            ...args.options,
+        });
+    },
+    getQueue: (args: QueryHookArgs<GetQueueQuery>) => {
+        return queryOptions({
+            queryFn: ({ signal }) => {
+                return api.controller.getPlayQueue({
+                    apiClientProps: { serverId: args.serverId, signal },
+                });
+            },
+            queryKey: queryKeys.player.fetch({ type: 'queue' }),
+        });
+    },
     list: (args: QueryHookArgs<SongListQuery>, imageSize?: number) => {
         return queryOptions({
             queryFn: ({ signal }) => {
@@ -41,34 +68,30 @@ export const songsQueries = {
             ...args.options,
         });
     },
+    random: (args: QueryHookArgs<RandomSongListQuery>) => {
+        return queryOptions({
+            queryFn: ({ signal }) => {
+                return api.controller.getRandomSongList({
+                    apiClientProps: { serverId: args.serverId, signal },
+                    query: args.query,
+                });
+            },
+            queryKey: queryKeys.songs.randomSongList(args.serverId, args.query),
+            ...args.options,
+        });
+    },
     similar: (args: QueryHookArgs<SimilarSongsQuery>) => {
         return queryOptions({
             queryFn: ({ signal }) => {
                 return api.controller.getSimilarSongs({
                     apiClientProps: { serverId: args.serverId, signal },
                     query: {
-                        albumArtistIds: args.query.albumArtistIds,
                         count: args.query.count ?? 50,
                         songId: args.query.songId,
                     },
                 });
             },
             queryKey: queryKeys.songs.similar(args.serverId, args.query),
-            ...args.options,
-        });
-    },
-    artistRadio: (args: QueryHookArgs<ArtistRadioQuery>) => {
-        return queryOptions({
-            queryFn: ({ signal }) => {
-                return api.controller.getArtistRadio({
-                    apiClientProps: { serverId: args.serverId, signal },
-                    query: {
-                        artistId: args.query.artistId,
-                        count: args.query.count ?? 20,
-                    },
-                });
-            },
-            queryKey: queryKeys.songs.artistRadio(args.serverId, args.query),
             ...args.options,
         });
     },
