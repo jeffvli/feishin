@@ -80,7 +80,7 @@ const AlbumArtistActionButtons = ({
             <Group gap="md">
                 <DefaultPlayButton disabled={albumCount === 0} onClick={onPlay} />
                 <Button
-                    leftSection={<Icon icon="mediaShuffle" />}
+                    leftSection={<Icon icon="radio" />}
                     onClick={onArtistRadio}
                     size="md"
                     variant="outline"

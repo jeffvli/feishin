@@ -43,8 +43,6 @@ export const PlayTrackRadioAction = ({ song }: PlayTrackRadioActionProps) => {
         }
     }, [artistRadioCount, player, queryClient, serverId, song]);
 
-    if (!song) return null;
-
     return (
         <ContextMenu.Item leftIcon="radio" onSelect={handlePlayTrackRadio}>
             {t('player.trackRadio', { postProcess: 'sentenceCase' })}
