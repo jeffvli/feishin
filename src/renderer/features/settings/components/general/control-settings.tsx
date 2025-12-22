@@ -188,6 +188,34 @@ export const ControlSettings = () => {
         },
         {
             control: (
+                <NumberInput
+                    defaultValue={settings.artistRadioCount}
+                    min={10}
+                    max={100}
+                    onBlur={(e) => {
+                        if (!e) return;
+                        const newVal = e.currentTarget.value
+                            ? Math.min(Math.max(Number(e.currentTarget.value), 10), 100)
+                            : settings.artistRadioCount;
+                        setSettings({
+                            general: {
+                                ...settings,
+                                artistRadioCount: newVal,
+                            },
+                        });
+                    }}
+                    width={75}
+                />
+            ),
+            description: t('setting.artistRadioCount', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.artistRadioCount', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
                 <Slider
                     defaultValue={settings.volumeWheelStep}
                     max={20}

@@ -345,6 +345,7 @@
         "albumArtistDetail": {
             "about": "About {{artist}}",
             "appearsOn": "appears on",
+            "artistRadio": "artist radio",
             "recentReleases": "recent releases",
             "viewDiscography": "view discography",
             "relatedArtists": "related $t(entity.artist_other)",
@@ -557,6 +558,7 @@
         "skip_forward": "skip forwards",
         "stop": "stop",
         "toggleFullscreenPlayer": "toggle fullscreen player",
+        "trackRadio": "track radio",
         "unfavorite": "unfavorite",
         "pause": "pause",
         "viewQueue": "view queue"
@@ -772,6 +774,8 @@
         "playButtonBehavior_optionPlay": "$t(player.play)",
         "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
         "playButtonBehavior": "play button behavior",
+        "artistRadioCount_description": "sets the number of songs to fetch for artist radio and track radio",
+        "artistRadioCount": "artist/track radio count",
         "playerAlbumArtResolution_description": "the resolution for the large player's album art preview. larger makes it look more crisp, but may slow loading down. defaults to 0, meaning auto",
         "playerAlbumArtResolution": "player album art resolution",
         "playerbarOpenDrawer_description": "allows clicking of the playerbar to open the full screen player",
