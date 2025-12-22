@@ -211,6 +211,8 @@ export const AppRouter = () => {
                                     path={AppRoute.ACTION_REQUIRED}
                                 />
                                 <Route element={<LoginRoute />} path={AppRoute.LOGIN} />
+                            </Route>
+                            <Route element={<ResponsiveLayout />}>
                                 <Route element={<NoNetworkRoute />} path={AppRoute.NO_NETWORK} />
                             </Route>
                         </Route>
