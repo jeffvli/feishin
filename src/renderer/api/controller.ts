@@ -320,6 +320,20 @@ export const controller: GeneralController = {
             query: mergeMusicFolderId(args.query, server),
         });
     },
+    getArtistRadio(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getArtistRadio`,
+            );
+        }
+
+        return apiController(
+            'getArtistRadio',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
+    },
     getDownloadUrl(args) {
         const server = getServerById(args.apiClientProps.serverId);
 
@@ -520,20 +534,6 @@ export const controller: GeneralController = {
 
         return apiController(
             'getServerInfo',
-            server.type,
-        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
-    },
-    getArtistRadio(args) {
-        const server = getServerById(args.apiClientProps.serverId);
-
-        if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getArtistRadio`,
-            );
-        }
-
-        return apiController(
-            'getArtistRadio',
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },

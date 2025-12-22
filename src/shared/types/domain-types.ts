@@ -1312,6 +1312,15 @@ export enum LyricSource {
     NETEASE = 'NetEase',
 }
 
+export type ArtistRadioArgs = BaseEndpointArgs & {
+    query: ArtistRadioQuery;
+};
+
+export type ArtistRadioQuery = {
+    artistId: string;
+    count?: number;
+};
+
 export type ControllerEndpoint = {
     addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
     authenticate: (
@@ -1337,6 +1346,7 @@ export type ControllerEndpoint = {
     getAlbumListCount: (args: AlbumListCountArgs) => Promise<number>;
     getArtistList: (args: ArtistListArgs) => Promise<ArtistListResponse>;
     getArtistListCount: (args: ArtistListCountArgs) => Promise<number>;
+    getArtistRadio: (args: ArtistRadioArgs) => Promise<Song[]>;
     getDownloadUrl: (args: DownloadArgs) => string;
     getFolder: (args: FolderArgs) => Promise<FolderResponse>;
     getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
@@ -1353,7 +1363,6 @@ export type ControllerEndpoint = {
     getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
     getRoles: (args: BaseEndpointArgs) => Promise<Array<string | { label: string; value: string }>>;
     getServerInfo: (args: ServerInfoArgs) => Promise<ServerInfo>;
-    getArtistRadio: (args: ArtistRadioArgs) => Promise<Song[]>;
     getSimilarSongs: (args: SimilarSongsArgs) => Promise<Song[]>;
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
@@ -1447,6 +1456,7 @@ export type InternalControllerEndpoint = {
     // getArtistInfo?: (args: any) => void;
     getArtistList: (args: ReplaceApiClientProps<ArtistListArgs>) => Promise<ArtistListResponse>;
     getArtistListCount: (args: ReplaceApiClientProps<ArtistListCountArgs>) => Promise<number>;
+    getArtistRadio: (args: ReplaceApiClientProps<ArtistRadioArgs>) => Promise<Song[]>;
     getDownloadUrl: (args: ReplaceApiClientProps<DownloadArgs>) => string;
     getFolder: (args: ReplaceApiClientProps<FolderArgs>) => Promise<FolderResponse>;
     getGenreList: (args: ReplaceApiClientProps<GenreListArgs>) => Promise<GenreListResponse>;
@@ -1475,7 +1485,6 @@ export type InternalControllerEndpoint = {
         args: ReplaceApiClientProps<BaseEndpointArgs>,
     ) => Promise<Array<string | { label: string; value: string }>>;
     getServerInfo: (args: ReplaceApiClientProps<ServerInfoArgs>) => Promise<ServerInfo>;
-    getArtistRadio: (args: ReplaceApiClientProps<ArtistRadioArgs>) => Promise<Song[]>;
     getSimilarSongs: (args: ReplaceApiClientProps<SimilarSongsArgs>) => Promise<Song[]>;
     getSongDetail: (args: ReplaceApiClientProps<SongDetailArgs>) => Promise<SongDetailResponse>;
     getSongList: (args: ReplaceApiClientProps<SongListArgs>) => Promise<SongListResponse>;
@@ -1561,15 +1570,6 @@ export type SimilarSongsArgs = BaseEndpointArgs & {
 export type SimilarSongsQuery = {
     count?: number;
     songId: string;
-};
-
-export type ArtistRadioArgs = BaseEndpointArgs & {
-    query: ArtistRadioQuery;
-};
-
-export type ArtistRadioQuery = {
-    artistId: string;
-    count?: number;
 };
 
 export type StreamArgs = BaseEndpointArgs & {
