@@ -4,6 +4,7 @@ import type {
     AlbumDetailQuery,
     AlbumListQuery,
     ArtistListQuery,
+    ArtistRadioQuery,
     GenreListQuery,
     LyricSearchQuery,
     LyricsQuery,
@@ -369,6 +370,10 @@ export const queryKeys: Record<
             return [serverId, 'songs', 'randomSongList'] as const;
         },
         root: (serverId: string) => [serverId, 'songs'] as const,
+        artistRadio: (serverId: string, query?: ArtistRadioQuery) => {
+            if (query) return [serverId, 'songs', 'artistRadio', query] as const;
+            return [serverId, 'songs', 'artistRadio'] as const;
+        },
         similar: (serverId: string, query?: SimilarSongsQuery) => {
             if (query) return [serverId, 'song', 'similar', query] as const;
             return [serverId, 'song', 'similar'] as const;

@@ -329,6 +329,19 @@ const similarSongs = z.object({
         .optional(),
 });
 
+const similarSongs2Parameters = z.object({
+    count: z.number().optional(),
+    id: z.string(),
+});
+
+const similarSongs2 = z.object({
+    similarSongs2: z
+        .object({
+            song: z.array(song),
+        })
+        .optional(),
+});
+
 export enum SubsonicExtensions {
     FORM_POST = 'formPost',
     SONG_LYRICS = 'songLyrics',
@@ -574,6 +587,7 @@ export const ssType = {
         search3: search3Parameters,
         setRating: setRatingParameters,
         similarSongs: similarSongsParameters,
+        similarSongs2: similarSongs2Parameters,
         structuredLyrics: structuredLyricsParameters,
         topSongsList: topSongsListParameters,
         updatePlaylist: updatePlaylistParameters,
@@ -613,6 +627,7 @@ export const ssType = {
         serverInfo,
         setRating,
         similarSongs,
+        similarSongs2,
         song,
         structuredLyrics,
         topSongsList,

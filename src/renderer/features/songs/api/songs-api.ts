@@ -4,7 +4,12 @@ import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
-import { ListCountQuery, SimilarSongsQuery, SongListQuery } from '/@/shared/types/domain-types';
+import {
+    ArtistRadioQuery,
+    ListCountQuery,
+    SimilarSongsQuery,
+    SongListQuery,
+} from '/@/shared/types/domain-types';
 
 export const songsQueries = {
     list: (args: QueryHookArgs<SongListQuery>, imageSize?: number) => {
@@ -49,6 +54,21 @@ export const songsQueries = {
                 });
             },
             queryKey: queryKeys.songs.similar(args.serverId, args.query),
+            ...args.options,
+        });
+    },
+    artistRadio: (args: QueryHookArgs<ArtistRadioQuery>) => {
+        return queryOptions({
+            queryFn: ({ signal }) => {
+                return api.controller.getArtistRadio({
+                    apiClientProps: { serverId: args.serverId, signal },
+                    query: {
+                        artistId: args.query.artistId,
+                        count: args.query.count ?? 20,
+                    },
+                });
+            },
+            queryKey: queryKeys.songs.artistRadio(args.serverId, args.query),
             ...args.options,
         });
     },

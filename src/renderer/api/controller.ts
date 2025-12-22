@@ -450,6 +450,20 @@ export const controller: GeneralController = {
             server.type,
         )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
     },
+    getArtistRadio(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getArtistRadio`,
+            );
+        }
+
+        return apiController(
+            'getArtistRadio',
+            server.type,
+        )?.({ ...args, apiClientProps: { ...args.apiClientProps, server } });
+    },
     getSimilarSongs(args) {
         const server = getServerById(args.apiClientProps.serverId);
 

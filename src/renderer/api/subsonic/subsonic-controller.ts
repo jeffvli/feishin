@@ -896,6 +896,28 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };
     },
+    getArtistRadio: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const res = await ssApiClient(apiClientProps).getSimilarSongs2({
+            query: {
+                count: query.count,
+                id: query.artistId,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get artist radio songs');
+        }
+
+        if (!res.body.similarSongs2?.song) {
+            return [];
+        }
+
+        return res.body.similarSongs2.song.map((song) =>
+            ssNormalize.song(song, apiClientProps.server),
+        );
+    },
     getSimilarSongs: async (args) => {
         const { apiClientProps, query } = args;
 

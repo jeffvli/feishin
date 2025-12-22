@@ -1218,6 +1218,7 @@ export type ControllerEndpoint = {
     getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
     getRoles: (args: BaseEndpointArgs) => Promise<Array<string | { label: string; value: string }>>;
     getServerInfo: (args: ServerInfoArgs) => Promise<ServerInfo>;
+    getArtistRadio: (args: ArtistRadioArgs) => Promise<Song[]>;
     getSimilarSongs: (args: SimilarSongsArgs) => Promise<Song[]>;
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
@@ -1308,6 +1309,7 @@ export type InternalControllerEndpoint = {
         args: ReplaceApiClientProps<BaseEndpointArgs>,
     ) => Promise<Array<string | { label: string; value: string }>>;
     getServerInfo: (args: ReplaceApiClientProps<ServerInfoArgs>) => Promise<ServerInfo>;
+    getArtistRadio: (args: ReplaceApiClientProps<ArtistRadioArgs>) => Promise<Song[]>;
     getSimilarSongs: (args: ReplaceApiClientProps<SimilarSongsArgs>) => Promise<Song[]>;
     getSongDetail: (args: ReplaceApiClientProps<SongDetailArgs>) => Promise<SongDetailResponse>;
     getSongList: (args: ReplaceApiClientProps<SongListArgs>) => Promise<SongListResponse>;
@@ -1376,6 +1378,15 @@ export type SimilarSongsQuery = {
     albumArtistIds: string[];
     count?: number;
     songId: string;
+};
+
+export type ArtistRadioArgs = BaseEndpointArgs & {
+    query: ArtistRadioQuery;
+};
+
+export type ArtistRadioQuery = {
+    artistId: string;
+    count?: number;
 };
 
 export type StreamArgs = BaseEndpointArgs & {

@@ -1,5 +1,5 @@
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { Suspense, useMemo, useState } from 'react';
+import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createSearchParams, generatePath, Link, useParams } from 'react-router';
 
@@ -18,6 +18,7 @@ import { ContextMenuController } from '/@/renderer/features/context-menu/context
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
 import { DefaultPlayButton } from '/@/renderer/features/shared/components/play-button';
+import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
@@ -55,6 +56,7 @@ interface AlbumArtistActionButtonsProps {
     albumCount: null | number | undefined;
     artistDiscographyLink: string;
     artistSongsLink: string;
+    onArtistRadio: () => void;
     onFavorite: () => void;
     onMoreOptions: (e: React.MouseEvent<HTMLButtonElement>) => void;
     onPlay: () => void;
@@ -65,6 +67,7 @@ const AlbumArtistActionButtons = ({
     albumCount,
     artistDiscographyLink,
     artistSongsLink,
+    onArtistRadio,
     onFavorite,
     onMoreOptions,
     onPlay,
@@ -76,6 +79,14 @@ const AlbumArtistActionButtons = ({
         <>
             <Group gap="md">
                 <DefaultPlayButton disabled={albumCount === 0} onClick={onPlay} />
+                <Button
+                    leftSection={<Icon icon="mediaShuffle" />}
+                    onClick={onArtistRadio}
+                    size="md"
+                    variant="outline"
+                >
+                    {t('page.albumArtistDetail.artistRadio', { postProcess: 'sentenceCase' })}
+                </Button>
                 <Group gap="xs">
                     <ActionIcon
                         icon="favorite"
@@ -431,15 +442,17 @@ const AlbumArtistMetadataExternalLinks = ({
 
 export const AlbumArtistDetailContent = () => {
     const { t } = useTranslation();
-    const { artistItems, externalLinks, lastFM, musicBrainz } = useGeneralSettings();
+    const { artistItems, artistRadioCount, externalLinks, lastFM, musicBrainz } =
+        useGeneralSettings();
     const { albumArtistId, artistId } = useParams() as {
         albumArtistId?: string;
         artistId?: string;
     };
     const routeId = (artistId || albumArtistId) as string;
     const { ref, ...cq } = useContainerQuery();
-    const { addToQueueByFetch, setFavorite } = usePlayer();
+    const { addToQueueByData, addToQueueByFetch, setFavorite } = usePlayer();
     const server = useCurrentServer();
+    const queryClient = useQueryClient();
 
     const [enabledItem, itemOrder] = useMemo(() => {
         const enabled: { [key in ArtistItem]?: boolean } = {};
@@ -583,6 +596,28 @@ export const AlbumArtistDetailContent = () => {
         );
     };
 
+    const handleArtistRadio = useCallback(async () => {
+        if (!server?.id || !routeId) return;
+
+        try {
+            const artistRadioSongs = await queryClient.fetchQuery(
+                songsQueries.artistRadio({
+                    query: {
+                        artistId: routeId,
+                        count: artistRadioCount,
+                    },
+                    serverId: server.id,
+                }),
+            );
+
+            if (artistRadioSongs && artistRadioSongs.length > 0) {
+                addToQueueByData(artistRadioSongs, Play.NOW);
+            }
+        } catch (error) {
+            console.error('Failed to load artist radio:', error);
+        }
+    }, [addToQueueByData, artistRadioCount, queryClient, routeId, server?.id]);
+
     const handleFavorite = () => {
         if (!detailQuery.data) return;
         setFavorite(
@@ -619,6 +654,7 @@ export const AlbumArtistDetailContent = () => {
                     albumCount={albumCount}
                     artistDiscographyLink={artistDiscographyLink}
                     artistSongsLink={artistSongsLink}
+                    onArtistRadio={handleArtistRadio}
                     onFavorite={handleFavorite}
                     onMoreOptions={handleMoreOptions}
                     onPlay={() => handlePlay(playButtonBehavior)}

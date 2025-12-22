@@ -625,6 +625,27 @@ export const JellyfinController: InternalControllerEndpoint = {
             version: res.body.Version,
         };
     },
+    getArtistRadio: async (args) => {
+        const { apiClientProps, query } = args;
+
+        // For Jellyfin, use instant mix for artist radio
+        const res = await jfApiClient(apiClientProps).getInstantMix({
+            params: {
+                itemId: query.artistId,
+            },
+            query: {
+                Fields: 'Genres, DateCreated, MediaSources, ParentId',
+                Limit: query.count,
+                UserId: apiClientProps.server?.userId || undefined,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get artist radio songs');
+        }
+
+        return res.body.Items.map((song) => jfNormalize.song(song, apiClientProps.server));
+    },
     getSimilarSongs: async (args) => {
         const { apiClientProps, query } = args;
 
