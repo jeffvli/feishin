@@ -11,10 +11,11 @@ import { Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface PlayTrackRadioActionProps {
+    disabled?: boolean;
     song: Song;
 }
 
-export const PlayTrackRadioAction = ({ song }: PlayTrackRadioActionProps) => {
+export const PlayTrackRadioAction = ({ disabled, song }: PlayTrackRadioActionProps) => {
     const { t } = useTranslation();
     const player = usePlayer();
     const serverId = useCurrentServerId();
@@ -42,7 +43,7 @@ export const PlayTrackRadioAction = ({ song }: PlayTrackRadioActionProps) => {
     }, [player, queryClient, serverId, song]);
 
     return (
-        <ContextMenu.Item leftIcon="radio" onSelect={handlePlayTrackRadio}>
+        <ContextMenu.Item disabled={disabled} leftIcon="radio" onSelect={handlePlayTrackRadio}>
             {t('player.trackRadio', { postProcess: 'sentenceCase' })}
         </ContextMenu.Item>
     );

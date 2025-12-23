@@ -246,7 +246,7 @@ export const LibraryHeaderMenu = ({
                         size="md"
                         variant="transparent"
                     >
-                        {t('page.albumArtistDetail.artistRadio', { postProcess: 'sentenceCase' })}
+                        {t('player.artistRadio', { postProcess: 'sentenceCase' })}
                     </Button>
                 )}
             </Group>

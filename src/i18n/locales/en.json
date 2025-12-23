@@ -402,7 +402,6 @@
         "albumArtistDetail": {
             "about": "About {{artist}}",
             "appearsOn": "appears on",
-            "artistRadio": "artist radio",
             "recentReleases": "recent releases",
             "viewDiscography": "view discography",
             "relatedArtists": "related $t(entity.artist_other)",
@@ -595,6 +594,7 @@
         "addNext": "next",
         "addLastShuffled": "last (shuffled)",
         "addNextShuffled": "next (shuffled)",
+        "artistRadio": "artist radio",
         "holdToShuffle": "hold to shuffle",
         "favorite": "favorite",
         "lyrics": "lyrics",
