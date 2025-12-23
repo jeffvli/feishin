@@ -7,11 +7,11 @@ import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { useCurrentServerId, useGeneralSettings } from '/@/renderer/store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
-import { Artist } from '/@/shared/types/domain-types';
+import { AlbumArtist, Artist } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface PlayArtistRadioActionProps {
-    artist: Artist;
+    artist: AlbumArtist | Artist;
     disabled?: boolean;
 }
 
