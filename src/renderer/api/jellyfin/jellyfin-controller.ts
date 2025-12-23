@@ -38,12 +38,6 @@ const MAX_ITEMS_PER_PLAYLIST_ADD = 50;
 
 const VERSION_INFO: VersionInfo = [
     [
-        '10.12.0',
-        {
-            [ServerFeature.API_KEY_CAMELCASE]: [1],
-        },
-    ],
-    [
         '10.9.0',
         {
             [ServerFeature.LYRICS_SINGLE_STRUCTURED]: [1],
@@ -52,13 +46,6 @@ const VERSION_INFO: VersionInfo = [
     ],
     ['10.0.0', { [ServerFeature.TAGS]: [1] }],
 ];
-
-const getApiKeyParam = (server: any): string => {
-    if (hasFeature(server, ServerFeature.API_KEY_CAMELCASE)) {
-        return 'ApiKey';
-    }
-    return 'api_key';
-};
 
 export const JellyfinController: InternalControllerEndpoint = {
     addToPlaylist: async (args) => {
@@ -441,9 +428,8 @@ export const JellyfinController: InternalControllerEndpoint = {
         }).then((result) => result!.totalRecordCount!),
     getDownloadUrl: (args) => {
         const { apiClientProps, query } = args;
-        const apiKeyParam = getApiKeyParam(apiClientProps.server);
 
-        return `${apiClientProps.server?.url}/items/${query.id}/download?${apiKeyParam}=${apiClientProps.server?.credential}`;
+        return `${apiClientProps.server?.url}/items/${query.id}/download?apiKey=${apiClientProps.server?.credential}`;
     },
     getFolder: async ({ apiClientProps, query }) => {
         const userId = apiClientProps.server?.userId;
@@ -1106,9 +1092,8 @@ export const JellyfinController: InternalControllerEndpoint = {
     getStreamUrl: ({ apiClientProps: { server }, query }) => {
         const { bitrate, format, id, transcode } = query;
         const deviceId = '';
-        const apiKeyParam = getApiKeyParam(server);
 
-        let url = `${server?.url}/Items/${id}/Download?${apiKeyParam}=${server?.credential}&playSessionId=${deviceId}`;
+        let url = `${server?.url}/Items/${id}/Download?apiKey=${server?.credential}&playSessionId=${deviceId}`;
 
         if (transcode) {
             // Some format appears to be required. Fall back to trusty MP3 if not specified
