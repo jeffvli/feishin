@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 
 import styles from './library-header.module.css';
 
+import { useIsPlayerFetching } from '/@/renderer/features/player/context/player-context';
 import {
     PlayLastTextButton,
     PlayNextTextButton,
@@ -23,6 +24,7 @@ import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Image } from '/@/shared/components/image/image';
 import { Rating } from '/@/shared/components/rating/rating';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
@@ -201,6 +203,7 @@ export const LibraryHeaderMenu = ({
     const isMutatingCreateFavorite = useIsMutatingCreateFavorite();
     const isMutatingDeleteFavorite = useIsMutatingDeleteFavorite();
     const isMutatingFavorite = isMutatingCreateFavorite || isMutatingDeleteFavorite;
+    const isPlayerFetching = useIsPlayerFetching();
 
     const handlePlayNow = usePlayButtonClick({
         onClick: () => {
@@ -241,7 +244,13 @@ export const LibraryHeaderMenu = ({
                 )}
                 {onArtistRadio && (
                     <Button
-                        leftSection={<Icon icon="radio" />}
+                        leftSection={
+                            isPlayerFetching ? (
+                                <Spinner color="white" />
+                            ) : (
+                                <Icon icon="radio" size="lg" />
+                            )
+                        }
                         onClick={onArtistRadio}
                         size="md"
                         variant="transparent"
