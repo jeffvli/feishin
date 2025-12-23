@@ -241,15 +241,10 @@ export const LibraryHeaderMenu = ({
                 )}
                 {onArtistRadio && (
                     <Button
-                        className={clsx(styles.wideTextButton, styles.unthemed)}
-                        classNames={{
-                            label: styles.wideTextButtonLabel,
-                            root: styles.wideTextButton,
-                        }}
                         leftSection={<Icon icon="radio" />}
                         onClick={onArtistRadio}
                         size="md"
-                        variant="subtle"
+                        variant="transparent"
                     >
                         {t('page.albumArtistDetail.artistRadio', { postProcess: 'sentenceCase' })}
                     </Button>

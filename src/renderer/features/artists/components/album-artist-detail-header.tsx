@@ -5,6 +5,7 @@ import { useParams } from 'react-router';
 
 import styles from './album-artist-detail-header.module.css';
 
+import { queryKeys } from '/@/renderer/api/query-keys';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
@@ -73,16 +74,16 @@ export const AlbumArtistDetailHeader = forwardRef((_props, ref: Ref<HTMLDivEleme
         if (!server?.id || !routeId) return;
 
         try {
-            const artistRadioSongs = await queryClient.fetchQuery(
-                songsQueries.artistRadio({
+            const artistRadioSongs = await queryClient.fetchQuery({
+                ...songsQueries.artistRadio({
                     query: {
                         artistId: routeId,
                         count: artistRadioCount,
                     },
                     serverId: server.id,
                 }),
-            );
-
+                queryKey: queryKeys.player.fetch({ artistId: routeId }),
+            });
             if (artistRadioSongs && artistRadioSongs.length > 0) {
                 addToQueueByData(artistRadioSongs, Play.NOW);
             }
