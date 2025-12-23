@@ -383,6 +383,8 @@
         "savePlayQueue_description": "Salvar a fila de reprodução ao fechar a aplicação e restaurá-la ao abrir a aplicação",
         "scrobble": "Scrobblar",
         "scrobble_description": "Scrobblar reproduções para o seu servidor de mídia",
+        "showRatings": "exibir avaliações por estrelas",
+        "showRatings_description": "exibir ou ocultar as avaliações por estrelas",
         "showSkipButton": "Exibir botões de pular",
         "showSkipButton_description": "Exibir ou ocultar os botões de pular na barra do reprodutor",
         "showSkipButtons": "Exibir botões de pular",
