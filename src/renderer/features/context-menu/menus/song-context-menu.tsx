@@ -29,7 +29,7 @@ export const SongContextMenu = ({ items, type }: SongContextMenuProps) => {
             bottomStickyContent={<ContextMenuPreview items={items} itemType={type} />}
         >
             <PlayAction ids={ids} itemType={LibraryItem.SONG} songs={items} />
-            <PlayTrackRadioAction song={items[0]} />
+            <PlayTrackRadioAction disabled={items.length > 1} song={items[0]} />
             <ContextMenu.Divider />
             <AddToPlaylistAction items={ids} itemType={LibraryItem.SONG} />
             <ContextMenu.Divider />
