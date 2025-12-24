@@ -37,6 +37,18 @@
     input {
         -webkit-app-region: no-drag;
     }
+
+    [role='button'] {
+        -webkit-app-region: no-drag;
+    }
+
+    a {
+        -webkit-app-region: no-drag;
+    }
+
+    [style*='cursor: pointer'] {
+        -webkit-app-region: no-drag;
+    }
 }
 
 .header.pad-right {

@@ -1,9 +1,16 @@
 import isElectron from 'is-electron';
 import { useEffect, useMemo } from 'react';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { usePlaybackSettings, useSettingsStore, useTimestampStoreBase } from '/@/renderer/store';
+import {
+    usePlaybackSettings,
+    usePlayerSong,
+    useSettingsStore,
+    useTimestampStoreBase,
+} from '/@/renderer/store';
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerStatus, PlayerType } from '/@/shared/types/types';
 
 const mediaSession = navigator.mediaSession;
@@ -13,6 +20,14 @@ export const useMediaSession = () => {
     const player = usePlayer();
     const skip = useSettingsStore((state) => state.general.skipButtons);
     const playbackType = useSettingsStore((state) => state.playback.type);
+    const currentSong = usePlayerSong();
+
+    const imageUrl = useItemImageUrl({
+        id: currentSong?.id,
+        imageUrl: currentSong?.imageUrl,
+        itemType: LibraryItem.SONG,
+        type: 'itemCard',
+    });
 
     const isMediaSessionEnabled = useMemo(() => {
         // Always enable media session on web
@@ -94,7 +109,7 @@ export const useMediaSession = () => {
                 mediaSession.metadata = new MediaMetadata({
                     album: song?.album ?? '',
                     artist: song?.artistName ?? '',
-                    artwork: song?.imageUrl ? [{ src: song.imageUrl, type: 'image/png' }] : [],
+                    artwork: imageUrl ? [{ src: imageUrl, type: 'image/png' }] : [],
                     title: song?.name ?? '',
                 });
             },
@@ -107,6 +122,6 @@ export const useMediaSession = () => {
                 mediaSession.playbackState = status === PlayerStatus.PLAYING ? 'playing' : 'paused';
             },
         },
-        [isMediaSessionEnabled, mediaSession],
+        [isMediaSessionEnabled, mediaSession, imageUrl],
     );
 };

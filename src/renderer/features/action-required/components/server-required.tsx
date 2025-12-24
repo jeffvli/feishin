@@ -30,7 +30,7 @@ export const ServerRequired = () => {
 
     const isServerLock = Boolean(window.SERVER_LOCK) || false;
 
-    if (Object.keys(serverList).length > 1) {
+    if (Object.keys(serverList).length > 0) {
         return (
             <ScrollArea>
                 <Stack miw="300px">

@@ -23,8 +23,8 @@ const NoNetworkRoute = () => {
     return (
         <AnimatedPage>
             <PageHeader />
-            <Center style={{ height: '100%', width: '100vw' }}>
-                <Stack gap="xl" style={{ maxWidth: '50%', textAlign: 'center' }}>
+            <Center style={{ height: '100%' }}>
+                <Stack align="center" gap="xl" style={{ maxWidth: '50%', textAlign: 'center' }}>
                     <Icon icon="wifiOff" size="4rem" />
                     <Stack gap="md">
                         <Text size="xl" weight={600}>

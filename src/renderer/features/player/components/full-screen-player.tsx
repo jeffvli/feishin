@@ -13,6 +13,7 @@ import { useLocation } from 'react-router';
 
 import styles from './full-screen-player.module.css';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { FullScreenPlayerImage } from '/@/renderer/features/player/components/full-screen-player-image';
 import { FullScreenPlayerQueue } from '/@/renderer/features/player/components/full-screen-player-queue';
@@ -38,6 +39,7 @@ import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Switch } from '/@/shared/components/switch/switch';
 import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, Platform } from '/@/shared/types/types';
 
 const mainBackground = 'var(--theme-colors-background)';
@@ -74,14 +76,22 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();
 
+    const currentImageUrl = useItemImageUrl({
+        id: currentSong?.id,
+        itemType: LibraryItem.SONG,
+        type: 'itemCard',
+    });
+
+    const nextImageUrl = useItemImageUrl({
+        id: nextSong?.id,
+        itemType: LibraryItem.SONG,
+        type: 'itemCard',
+    });
+
     const [imageState, setImageState] = useState({
-        bottomImage: nextSong?.imageUrl
-            ? nextSong.imageUrl.replace(/size=\d+/g, 'size=500')
-            : undefined,
+        bottomImage: nextImageUrl,
         current: 0,
-        topImage: currentSong?.imageUrl
-            ? currentSong.imageUrl.replace(/size=\d+/g, 'size=500')
-            : undefined,
+        topImage: currentImageUrl,
     });
 
     const previousSongRef = useRef<string | undefined>(currentSong?._uniqueId);
@@ -99,12 +109,6 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
         }
 
         const isTop = imageStateRef.current.current === 0;
-        const currentImageUrl = currentSong?.imageUrl
-            ? currentSong.imageUrl.replace(/size=\d+/g, 'size=500')
-            : undefined;
-        const nextImageUrl = nextSong?.imageUrl
-            ? nextSong.imageUrl.replace(/size=\d+/g, 'size=500')
-            : undefined;
 
         setImageState({
             bottomImage: isTop ? currentImageUrl : nextImageUrl,
@@ -113,7 +117,7 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
         });
 
         previousSongRef.current = currentSong?._uniqueId;
-    }, [currentSong?._uniqueId, currentSong?.imageUrl, nextSong?._uniqueId, nextSong?.imageUrl]);
+    }, [currentSong?._uniqueId, currentImageUrl, nextSong?._uniqueId, nextImageUrl]);
 
     if (!dynamicBackground || !dynamicIsImage) {
         return null;
@@ -610,9 +614,15 @@ const PlayerContainer = memo(
         windowBarStyle,
     }: PlayerContainerProps) => {
         const currentSong = usePlayerSong();
+        const imageUrl = useItemImageUrl({
+            id: currentSong?.id,
+            imageUrl: currentSong?.imageUrl,
+            itemType: LibraryItem.SONG,
+            type: 'itemCard',
+        });
         const { background } = useFastAverageColor({
             algorithm: 'dominant',
-            src: currentSong?.imageUrl,
+            src: imageUrl,
             srcLoaded: true,
         });
 

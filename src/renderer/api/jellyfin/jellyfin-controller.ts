@@ -360,7 +360,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             },
             query: {
                 ...artistQuery,
-                Fields: 'People, Tags',
+                Fields: 'People, Tags, Studios',
                 GenreIds: query.genreIds ? query.genreIds.join(',') : undefined,
                 IncludeItemTypes: 'MusicAlbum',
                 IsFavorite: query.favorite,
@@ -450,7 +450,7 @@ export const JellyfinController: InternalControllerEndpoint = {
     getDownloadUrl: (args) => {
         const { apiClientProps, query } = args;
 
-        return `${apiClientProps.server?.url}/items/${query.id}/download?api_key=${apiClientProps.server?.credential}`;
+        return `${apiClientProps.server?.url}/items/${query.id}/download?apiKey=${apiClientProps.server?.credential}`;
     },
     getFolder: async ({ apiClientProps, query }) => {
         const userId = apiClientProps.server?.userId;
@@ -690,6 +690,22 @@ export const JellyfinController: InternalControllerEndpoint = {
             startIndex: query.startIndex || 0,
             totalRecordCount: res.body?.TotalRecordCount || 0,
         };
+    },
+    getImageUrl: ({ apiClientProps: { server }, query }) => {
+        const { id, size } = query;
+        const imageSize = size;
+
+        if (!server?.url) {
+            return null;
+        }
+
+        // For Jellyfin, we construct the URL pattern
+        // The server will return a 404 or placeholder if no image exists
+        const baseUrl = `${server.url}/Items/${id}/Images/Primary?quality=96${imageSize ? `&width=${imageSize}` : ''}`;
+
+        // For songs, we might want to fall back to album art, but we don't have albumId here
+        // The caller can handle this if needed
+        return baseUrl;
     },
     getInternetRadioStations: async (args) => {
         const { apiClientProps } = args;
@@ -1098,9 +1114,7 @@ export const JellyfinController: InternalControllerEndpoint = {
         }
 
         return {
-            items: items.map((item) =>
-                jfNormalize.song(item, apiClientProps.server, query.imageSize),
-            ),
+            items: items.map((item) => jfNormalize.song(item, apiClientProps.server)),
             startIndex: query.startIndex,
             totalRecordCount,
         };
@@ -1114,7 +1128,7 @@ export const JellyfinController: InternalControllerEndpoint = {
         const { bitrate, format, id, transcode } = query;
         const deviceId = '';
 
-        let url = `${server?.url}/Items/${id}/Download?api_key=${server?.credential}&playSessionId=${deviceId}`;
+        let url = `${server?.url}/Items/${id}/Download?apiKey=${server?.credential}&playSessionId=${deviceId}`;
 
         if (transcode) {
             // Some format appears to be required. Fall back to trusty MP3 if not specified

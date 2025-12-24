@@ -5,20 +5,15 @@ import { QueueSong } from '/@/shared/types/domain-types';
 const remote = isElectron() ? window.api.remote : null;
 const mediaSession = navigator.mediaSession;
 
-export const updateSong = (song: QueueSong | undefined) => {
+export const updateSong = (song: QueueSong | undefined, imageUrl?: null | string) => {
     if (mediaSession) {
         let metadata: MediaMetadata;
 
         if (song?.id) {
             let artwork: MediaImage[];
 
-            if (song.imageUrl) {
-                const image300 = song.imageUrl
-                    ?.replace(/&size=\d+/, '&size=300')
-                    .replace(/\?width=\d+/, '?width=300')
-                    .replace(/&height=\d+/, '&height=300');
-
-                artwork = [{ sizes: '300x300', src: image300, type: 'image/png' }];
+            if (imageUrl) {
+                artwork = [{ sizes: '300x300', src: imageUrl, type: 'image/png' }];
             } else {
                 artwork = [];
             }

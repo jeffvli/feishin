@@ -4,6 +4,7 @@ import { generatePath, Link, useParams } from 'react-router';
 
 import styles from './album-detail-header.module.css';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
@@ -82,10 +83,16 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
     const firstAlbumArtist = detailQuery?.data?.albumArtists?.[0];
     const releaseYear = detailQuery?.data?.releaseYear;
 
+    const imageUrl = useItemImageUrl({
+        id: detailQuery?.data?.id,
+        itemType: LibraryItem.ALBUM,
+        type: 'header',
+    });
+
     return (
         <Stack ref={ref}>
             <LibraryHeader
-                imageUrl={detailQuery?.data?.imageUrl}
+                imageUrl={imageUrl}
                 item={{ route: AppRoute.LIBRARY_ALBUMS, type: LibraryItem.ALBUM }}
                 title={detailQuery?.data?.name || ''}
             >

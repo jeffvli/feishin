@@ -1,8 +1,10 @@
 import isElectron from 'is-electron';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
-import { usePlayerStore } from '/@/renderer/store';
+import { usePlayerSong, usePlayerStore } from '/@/renderer/store';
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerShuffle } from '/@/shared/types/types';
 
 const ipc = isElectron() ? window.api.ipc : null;
@@ -11,6 +13,14 @@ const mpris = isElectron() && utils?.isLinux() ? window.api.mpris : null;
 
 export const useMPRIS = () => {
     const player = usePlayerStore();
+    const currentSong = usePlayerSong();
+
+    const imageUrl = useItemImageUrl({
+        id: currentSong?.id,
+        imageUrl: currentSong?.imageUrl,
+        itemType: LibraryItem.SONG,
+        type: 'itemCard',
+    });
 
     useEffect(() => {
         if (!mpris) {
@@ -41,32 +51,19 @@ export const useMPRIS = () => {
         };
     }, [player]);
 
-    const isInitializedRef = useRef(false);
-
+    // Update MPRIS when song or imageUrl changes
     useEffect(() => {
-        if (isInitializedRef.current) {
+        if (!mpris) {
             return;
         }
 
-        isInitializedRef.current = true;
-
-        const currentSong = player.getCurrentSong();
-
-        if (!currentSong) {
-            return;
-        }
-
-        mpris?.updateSong(currentSong);
-    }, [player]);
+        mpris?.updateSong(currentSong, imageUrl);
+    }, [currentSong, imageUrl]);
 
     usePlayerEvents(
         {
-            onCurrentSongChange: (properties) => {
-                if (!mpris) {
-                    return;
-                }
-
-                mpris?.updateSong(properties.song);
+            onCurrentSongChange: () => {
+                // The effect above will handle the update when currentSong changes
             },
             onPlayerProgress: (properties) => {
                 if (!mpris) {

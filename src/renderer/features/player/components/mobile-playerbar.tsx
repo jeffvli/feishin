@@ -6,6 +6,7 @@ import { generatePath, Link } from 'react-router';
 
 import styles from './mobile-playerbar.module.css';
 
+import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { MainPlayButton, PlayerButton } from '/@/renderer/features/player/components/player-button';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
@@ -20,7 +21,6 @@ import {
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
-import { Image } from '/@/shared/components/image/image';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
@@ -68,7 +68,7 @@ export const MobilePlayerbar = () => {
             <div className={styles.contentWrapper}>
                 <LayoutGroup>
                     <AnimatePresence initial={false} mode="popLayout">
-                        {currentSong?.imageUrl && (
+                        {currentSong?.id && (
                             <div className={styles.imageWrapper}>
                                 <motion.div
                                     animate={{ opacity: 1, scale: 1 }}
@@ -87,13 +87,14 @@ export const MobilePlayerbar = () => {
                                         })}
                                         openDelay={0}
                                     >
-                                        <Image
+                                        <ItemImage
                                             className={clsx(
                                                 styles.playerbarImage,
                                                 PlaybackSelectors.playerCoverArt,
                                             )}
+                                            id={currentSong.id}
+                                            itemType={LibraryItem.SONG}
                                             loading="eager"
-                                            src={currentSong.imageUrl}
                                         />
                                     </Tooltip>
                                 </motion.div>

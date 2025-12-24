@@ -2,13 +2,15 @@ import { SetActivity, StatusDisplayType } from '@xhayper/discord-rpc';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { controller } from '/@/renderer/api/controller';
+import { api } from '/@/renderer/api';
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import {
     DiscordDisplayType,
     DiscordLinkType,
     useAppStore,
     useDiscordSettings,
     useGeneralSettings,
+    usePlayerSong,
     usePlayerStore,
     useTimestampStoreBase,
 } from '/@/renderer/store';
@@ -16,7 +18,7 @@ import { sentenceCase } from '/@/renderer/utils';
 import { LogCategory, logFn } from '/@/renderer/utils/logger';
 import { logMsg } from '/@/renderer/utils/logger-message';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
-import { QueueSong, ServerType } from '/@/shared/types/domain-types';
+import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
 const discordRpc = isElectron() ? window.api.discordRpc : null;
@@ -33,9 +35,23 @@ export const useDiscordRpc = () => {
     const privateMode = useAppStore((state) => state.privateMode);
     const [lastUniqueId, setlastUniqueId] = useState('');
 
+    const currentSong = usePlayerSong();
+    const imageUrl = useItemImageUrl({
+        id: currentSong?.id,
+        imageUrl: currentSong?.imageUrl,
+        itemType: LibraryItem.SONG,
+        type: 'table',
+    });
+
+    const imageUrlRef = useRef<null | string | undefined>(imageUrl);
     const previousEnabledRef = useRef<boolean>(discordSettings.enabled);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const previousActivityStateRef = useRef<ActivityState | null>(null);
+
+    // Update imageUrl ref when it changes
+    useEffect(() => {
+        imageUrlRef.current = imageUrl;
+    }, [imageUrl]);
 
     const setActivity = useCallback(
         async (current: ActivityState, previous: ActivityState) => {
@@ -178,20 +194,26 @@ export const useDiscordRpc = () => {
                 }
 
                 if (discordSettings.showServerImage && song) {
-                    if (song._serverType === ServerType.JELLYFIN && song.imageUrl) {
-                        activity.largeImageKey = song.imageUrl;
-                    } else if (song._serverType === ServerType.NAVIDROME) {
-                        try {
-                            const info = await controller.getAlbumInfo({
-                                apiClientProps: { serverId: song._serverId },
-                                query: { id: song.albumId },
-                            });
+                    // Use imageUrl from useItemImageUrl hook if available and song matches current song
+                    if (song._uniqueId === currentSong?._uniqueId && imageUrlRef.current) {
+                        activity.largeImageKey = imageUrlRef.current;
+                    } else {
+                        // Fallback to old logic if song doesn't match (shouldn't happen in normal flow)
+                        if (song._serverType === ServerType.JELLYFIN && song.imageUrl) {
+                            activity.largeImageKey = song.imageUrl;
+                        } else if (song._serverType === ServerType.NAVIDROME) {
+                            try {
+                                const info = await api.controller.getAlbumInfo({
+                                    apiClientProps: { serverId: song._serverId },
+                                    query: { id: song.albumId },
+                                });
 
-                            if (info.imageUrl) {
-                                activity.largeImageKey = info.imageUrl;
+                                if (info.imageUrl) {
+                                    activity.largeImageKey = info.imageUrl;
+                                }
+                            } catch {
+                                /* empty */
                             }
-                        } catch {
-                            /* empty */
                         }
                     }
                 }
@@ -275,6 +297,7 @@ export const useDiscordRpc = () => {
             discordSettings.displayType,
             discordSettings.linkType,
             lastUniqueId,
+            currentSong?._uniqueId,
         ],
     );
 

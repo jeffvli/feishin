@@ -141,48 +141,48 @@ ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
     mprisPlayer.shuffle = shuffle;
 });
 
-ipcMain.on('update-song', (_event, song: QueueSong | undefined) => {
-    try {
-        if (!song?.id) {
-            mprisPlayer.metadata = {};
-            return;
+ipcMain.on(
+    'update-song',
+    (_event, song: QueueSong | undefined, imageUrl: null | string | undefined) => {
+        try {
+            if (!song?.id) {
+                mprisPlayer.metadata = {};
+                return;
+            }
+
+            mprisPlayer.metadata = {
+                'mpris:artUrl': imageUrl || null,
+                'mpris:length': song.duration ? Math.round((song.duration || 0) * 1e3) : null,
+                'mpris:trackid': song.id
+                    ? mprisPlayer.objectPath(`track/${song.id?.replace('-', '')}`)
+                    : '',
+                'xesam:album': song.album || null,
+                'xesam:albumArtist': song.albumArtists?.length
+                    ? song.albumArtists.map((artist) => artist.name)
+                    : null,
+                'xesam:artist': song.artists?.length
+                    ? song.artists.map((artist) => artist.name)
+                    : null,
+                'xesam:audioBpm': song.bpm,
+                // Comment is a `list of strings` type
+                'xesam:comment': song.comment ? [song.comment] : null,
+                'xesam:contentCreated': song.releaseDate,
+                'xesam:discNumber': song.discNumber ? song.discNumber : null,
+                'xesam:genre': song.genres?.length
+                    ? song.genres.map((genre: any) => genre.name)
+                    : null,
+                'xesam:lastUsed': song.lastPlayedAt,
+                'xesam:title': song.name || null,
+                'xesam:trackNumber': song.trackNumber ? song.trackNumber : null,
+                'xesam:useCount':
+                    song.playCount !== null && song.playCount !== undefined ? song.playCount : null,
+                // User ratings are only on Navidrome/Subsonic and are on a scale of 1-5
+                'xesam:userRating': song.userRating ? song.userRating / 5 : null,
+            };
+        } catch (err) {
+            console.error(err);
         }
-
-        const upsizedImageUrl = song.imageUrl
-            ? song.imageUrl
-                  ?.replace(/&size=\d+/, '&size=300')
-                  .replace(/\?width=\d+/, '?width=300')
-                  .replace(/&height=\d+/, '&height=300')
-            : null;
-
-        mprisPlayer.metadata = {
-            'mpris:artUrl': upsizedImageUrl,
-            'mpris:length': song.duration ? Math.round((song.duration || 0) * 1e3) : null,
-            'mpris:trackid': song.id
-                ? mprisPlayer.objectPath(`track/${song.id?.replace('-', '')}`)
-                : '',
-            'xesam:album': song.album || null,
-            'xesam:albumArtist': song.albumArtists?.length
-                ? song.albumArtists.map((artist) => artist.name)
-                : null,
-            'xesam:artist': song.artists?.length ? song.artists.map((artist) => artist.name) : null,
-            'xesam:audioBpm': song.bpm,
-            // Comment is a `list of strings` type
-            'xesam:comment': song.comment ? [song.comment] : null,
-            'xesam:contentCreated': song.releaseDate,
-            'xesam:discNumber': song.discNumber ? song.discNumber : null,
-            'xesam:genre': song.genres?.length ? song.genres.map((genre: any) => genre.name) : null,
-            'xesam:lastUsed': song.lastPlayedAt,
-            'xesam:title': song.name || null,
-            'xesam:trackNumber': song.trackNumber ? song.trackNumber : null,
-            'xesam:useCount':
-                song.playCount !== null && song.playCount !== undefined ? song.playCount : null,
-            // User ratings are only on Navidrome/Subsonic and are on a scale of 1-5
-            'xesam:userRating': song.userRating ? song.userRating / 5 : null,
-        };
-    } catch (err) {
-        console.error(err);
-    }
-});
+    },
+);
 
 export { mprisPlayer };

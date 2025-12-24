@@ -525,6 +525,11 @@ const albumArtist = z.object({
     UserData: userData.optional(),
 });
 
+const studio = z.object({
+    Id: z.string(),
+    Name: z.string(),
+});
+
 const albumDetailParameters = baseParameters;
 
 const album = z.object({
@@ -555,6 +560,7 @@ const album = z.object({
     RunTimeTicks: z.number(),
     ServerId: z.string(),
     Songs: z.array(song).optional(), // This is not a native Jellyfin property -- this is used for combined album detail
+    Studios: z.array(studio),
     Tags: z.string().array().optional(),
     Type: z.string(),
     UserData: userData.optional(),

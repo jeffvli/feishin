@@ -6,6 +6,7 @@ import { generatePath, Link } from 'react-router';
 
 import styles from './feature-carousel.module.css';
 
+import { ItemImage, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { BackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { PlayButtonGroup } from '/@/renderer/features/shared/components/play-button-group';
@@ -15,7 +16,6 @@ import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Group } from '/@/shared/components/group/group';
-import { Image } from '/@/shared/components/image/image';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { Album, LibraryItem } from '/@/shared/types/domain-types';
@@ -78,9 +78,15 @@ interface CarouselItemProps {
 }
 
 const CarouselItem = ({ album }: CarouselItemProps) => {
+    const imageUrl = useItemImageUrl({
+        id: album.id,
+        itemType: LibraryItem.ALBUM,
+        type: 'itemCard',
+    });
+
     const { background: backgroundColor } = useFastAverageColor({
         algorithm: 'dominant',
-        src: album.imageUrl || null,
+        src: imageUrl || null,
         srcLoaded: true,
     });
 
@@ -110,10 +116,12 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
                     </div>
 
                     <div className={styles.imageSection}>
-                        <Image
+                        <ItemImage
                             className={styles.albumImage}
                             containerClassName={styles.albumImageContainer}
-                            src={album.imageUrl || undefined}
+                            id={album.id}
+                            itemType={LibraryItem.ALBUM}
+                            src={imageUrl}
                         />
                         <div className={styles.playButtonOverlay}>
                             <PlayButtonGroup onPlay={handlePlay} />

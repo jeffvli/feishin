@@ -6,6 +6,7 @@ import { Fragment, Suspense, useCallback, useRef } from 'react';
 
 import styles from './expanded-album-list-item.module.css';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
@@ -197,10 +198,16 @@ export const ExpandedAlbumListItem = ({ internalState, item }: ExpandedAlbumList
 
     const player = usePlayer();
 
+    const imageUrl = useItemImageUrl({
+        id: item.id,
+        itemType: LibraryItem.ALBUM,
+        type: 'itemCard',
+    });
+
     const color = useFastAverageColor({
         algorithm: 'sqrt',
         id: item.id,
-        src: data?.imageUrl,
+        src: imageUrl,
         srcLoaded: true,
     });
 
@@ -300,7 +307,7 @@ export const ExpandedAlbumListItem = ({ internalState, item }: ExpandedAlbumList
                             className={styles.backgroundImage}
                             style={{
                                 ['--bg-color' as string]: color?.background,
-                                backgroundImage: `url(${data?.imageUrl})`,
+                                backgroundImage: `url(${imageUrl})`,
                             }}
                         />
                         {data?.songs && data.songs.length > 0 && (

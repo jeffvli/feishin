@@ -362,6 +362,9 @@ export const AlbumDetailContent = () => {
 
     const comment = detailQuery?.data?.comment;
 
+    const releaseYear = detailQuery?.data?.releaseYear;
+    const labels = detailQuery?.data?.recordLabels;
+
     const mbzId = detailQuery?.data?.mbzId;
 
     return (
@@ -369,9 +372,7 @@ export const AlbumDetailContent = () => {
             <div className={styles.detailContainer}>
                 {comment && (
                     <Spoiler maxHeight={75}>
-                        <Text
-                            dangerouslySetInnerHTML={{ __html: replaceURLWithHTMLLinks(comment) }}
-                        />
+                        <Text pb="md">{replaceURLWithHTMLLinks(comment)}</Text>
                     </Spoiler>
                 )}
                 <div className={styles.contentLayout}>
@@ -396,7 +397,15 @@ export const AlbumDetailContent = () => {
                         </Stack>
                     </div>
                 </div>
-
+                {labels && (
+                    <Stack gap="xs">
+                        {labels.map((label) => (
+                            <Text isMuted key={`label-${label}`} size="sm">
+                                ℗{releaseYear ? ` ${releaseYear}` : ''} {label}
+                            </Text>
+                        ))}
+                    </Stack>
+                )}
                 <Stack gap="lg" mt="3rem">
                     {cq.height || cq.width ? (
                         <Suspense fallback={<Spinner container />}>

@@ -1,11 +1,12 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useSendScrobble } from '/@/renderer/features/player/mutations/scrobble-mutation';
-import { useAppStore, usePlaybackSettings, usePlayerStore } from '/@/renderer/store';
+import { useAppStore, usePlaybackSettings, usePlayerSong, usePlayerStore } from '/@/renderer/store';
 import { LogCategory, logFn } from '/@/renderer/utils/logger';
 import { logMsg } from '/@/renderer/utils/logger-message';
-import { QueueSong, ServerType } from '/@/shared/types/domain-types';
+import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
 /*
@@ -59,7 +60,16 @@ export const useScrobble = () => {
     const isScrobbleEnabled = scrobbleSettings?.enabled;
     const isPrivateModeEnabled = useAppStore((state) => state.privateMode);
     const sendScrobble = useSendScrobble();
+    const currentSong = usePlayerSong();
 
+    const imageUrl = useItemImageUrl({
+        id: currentSong?.id,
+        imageUrl: currentSong?.imageUrl,
+        itemType: LibraryItem.SONG,
+        type: 'itemCard',
+    });
+
+    const imageUrlRef = useRef<null | string | undefined>(imageUrl);
     const [isCurrentSongScrobbled, setIsCurrentSongScrobbled] = useState(false);
     const previousSongRef = useRef<QueueSong | undefined>(undefined);
     const previousTimestampRef = useRef<number>(0);
@@ -67,6 +77,10 @@ export const useScrobble = () => {
     const lastSeekEventRef = useRef<number>(0);
     const songChangeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     const notifyTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+    useEffect(() => {
+        imageUrlRef.current = imageUrl;
+    }, [imageUrl]);
 
     const handleScrobbleFromProgress = useCallback(
         (properties: { timestamp: number }, prev: { timestamp: number }) => {
@@ -198,7 +212,7 @@ export const useScrobble = () => {
 
                         new Notification(`${currentSong.name}`, {
                             body: `${artists}\n${currentSong.album}`,
-                            icon: currentSong.imageUrl || undefined,
+                            icon: imageUrlRef.current || undefined,
                             silent: true,
                         });
                     }
