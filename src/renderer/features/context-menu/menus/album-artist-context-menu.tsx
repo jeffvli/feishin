@@ -29,9 +29,9 @@ export const AlbumArtistContextMenu = ({ items, type }: AlbumArtistContextMenuPr
             bottomStickyContent={<ContextMenuPreview items={items} itemType={type} />}
         >
             <PlayAction ids={ids} itemType={LibraryItem.ALBUM_ARTIST} />
+            <PlayArtistRadioAction artist={items[0]} disabled={items.length > 1} />
             <ContextMenu.Divider />
             <AddToPlaylistAction items={ids} itemType={LibraryItem.ALBUM_ARTIST} />
-            <PlayArtistRadioAction artist={items[0]} disabled={items.length > 1} />
             <ContextMenu.Divider />
             <SetFavoriteAction ids={ids} itemType={LibraryItem.ALBUM_ARTIST} />
             <SetRatingAction ids={ids} itemType={LibraryItem.ALBUM_ARTIST} />

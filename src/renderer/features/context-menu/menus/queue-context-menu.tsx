@@ -34,8 +34,9 @@ export const QueueContextMenu = ({ items }: QueueContextMenuProps) => {
             <MoveQueueItemsAction items={items} />
             <ShuffleItemsAction items={items} />
             <ContextMenu.Divider />
-            <AddToPlaylistAction items={ids} itemType={LibraryItem.SONG} />
             <PlayTrackRadioAction disabled={items.length > 1} song={items[0]} />
+            <ContextMenu.Divider />
+            <AddToPlaylistAction items={ids} itemType={LibraryItem.SONG} />
             <ContextMenu.Divider />
             <SetFavoriteAction ids={ids} itemType={LibraryItem.SONG} />
             <SetRatingAction ids={ids} itemType={LibraryItem.SONG} />
