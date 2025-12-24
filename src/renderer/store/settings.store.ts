@@ -216,6 +216,63 @@ const PlayerbarSliderSchema = z.object({
     type: PlayerbarSliderTypeSchema,
 });
 
+const AudioMotionAnalyzerSettingsSchema = z.object({
+    alphaBars: z.boolean(),
+    ansiBands: z.boolean(),
+    barSpace: z.number(),
+    channelLayout: z.enum(['single', 'dual-combined', 'dual-horizontal', 'dual-vertical']),
+    colorMode: z.enum(['gradient', 'bar-index', 'bar-level']),
+    fadePeaks: z.boolean(),
+    fftSize: z.number(),
+    fillAlpha: z.number(),
+    frequencyScale: z.enum(['bark', 'linear', 'log', 'mel']),
+    gradient: z.string(),
+    gradientLeft: z.string().optional(),
+    gradientRight: z.string().optional(),
+    gravity: z.number(),
+    ledBars: z.boolean(),
+    linearAmplitude: z.boolean(),
+    linearBoost: z.number(),
+    lineWidth: z.number(),
+    loRes: z.boolean(),
+    lumiBars: z.boolean(),
+    maxDecibels: z.number(),
+    maxFreq: z.number(),
+    minDecibels: z.number(),
+    minFreq: z.number(),
+    mirror: z.number(),
+    mode: z.number(),
+    noteLabels: z.boolean(),
+    outlineBars: z.boolean(),
+    peakFadeTime: z.number(),
+    peakHoldTime: z.number(),
+    peakLine: z.boolean(),
+    radial: z.boolean(),
+    radialInvert: z.boolean(),
+    radius: z.number(),
+    reflexAlpha: z.number(),
+    reflexBright: z.number(),
+    reflexFit: z.boolean(),
+    reflexRatio: z.number(),
+    roundBars: z.boolean(),
+    showBgColor: z.boolean(),
+    showFPS: z.boolean(),
+    showPeaks: z.boolean(),
+    showScaleX: z.boolean(),
+    showScaleY: z.boolean(),
+    smoothing: z.number(),
+    spinSpeed: z.number(),
+    splitGradient: z.boolean(),
+    trueLeds: z.boolean(),
+    volume: z.number(),
+    weightingFilter: z.enum(['', 'A', 'B', 'C', 'D', 'Z']),
+});
+
+const VisualizerSettingsSchema = z.object({
+    audiomotionanalyzer: AudioMotionAnalyzerSettingsSchema,
+    type: z.enum(['audiomotionanalyzer', 'butterchurn']),
+});
+
 export const GeneralSettingsSchema = z.object({
     accent: z
         .string()
@@ -440,6 +497,7 @@ export const ValidationSettingsStateSchema = z.object({
         z.literal('window'),
         z.string(),
     ]),
+    visualizer: VisualizerSettingsSchema,
     window: WindowSettingsSchema,
 });
 
@@ -1294,6 +1352,60 @@ const initialState: SettingsState = {
         username: 'feishin',
     },
     tab: 'general',
+    visualizer: {
+        audiomotionanalyzer: {
+            alphaBars: false,
+            ansiBands: true,
+            barSpace: 0.2,
+            channelLayout: 'dual-combined',
+            colorMode: 'bar-index',
+            fadePeaks: true,
+            fftSize: 8192,
+            fillAlpha: 0.5,
+            frequencyScale: 'log',
+            gradient: 'prism',
+            gradientLeft: 'prism',
+            gradientRight: 'prism',
+            gravity: 9.8,
+            ledBars: true,
+            linearAmplitude: false,
+            linearBoost: 1.0,
+            lineWidth: 2.0,
+            loRes: false,
+            lumiBars: false,
+            maxDecibels: -30,
+            maxFreq: 20000,
+            minDecibels: -100,
+            minFreq: 20,
+            mirror: 0.0,
+            mode: 8,
+            noteLabels: false,
+            outlineBars: false,
+            peakFadeTime: 1000,
+            peakHoldTime: 500,
+            peakLine: false,
+            radial: false,
+            radialInvert: false,
+            radius: 0.5,
+            reflexAlpha: 0.8,
+            reflexBright: 1.0,
+            reflexFit: false,
+            reflexRatio: 0.5,
+            roundBars: false,
+            showBgColor: false,
+            showFPS: false,
+            showPeaks: false,
+            showScaleX: false,
+            showScaleY: false,
+            smoothing: 0.8,
+            spinSpeed: 0.0,
+            splitGradient: false,
+            trueLeds: false,
+            volume: 1.0,
+            weightingFilter: 'Z',
+        },
+        type: 'audiomotionanalyzer',
+    },
     window: {
         disableAutoUpdate: false,
         exitToTray: false,
@@ -1364,6 +1476,7 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                             state.queryBuilder = resetState.queryBuilder;
                             state.remote = resetState.remote;
                             state.tab = resetState.tab;
+                            state.visualizer = resetState.visualizer;
                             state.window = resetState.window;
                         });
                     },
@@ -1633,3 +1746,5 @@ export const usePlayerbarSlider = () => useSettingsStore((store) => store.genera
 export const useGenreTarget = () => useSettingsStore((store) => store.general.genreTarget);
 
 export const useAutoDJSettings = () => useSettingsStore((store) => store.autoDJ, shallow);
+
+export const useVisualizerSettings = () => useSettingsStore((store) => store.visualizer, shallow);
