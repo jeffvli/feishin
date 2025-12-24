@@ -50,6 +50,7 @@ const ALBUM_LIST_SORT_MAPPING: Record<AlbumListSort, AlbumListSortType | undefin
 
 const MAX_SUBSONIC_ITEMS = 500;
 const SUBSONIC_FAST_BATCH_SIZE = MAX_SUBSONIC_ITEMS * 10;
+const GENRE_CHECK_BATCH_SIZE = 10;
 
 function sortAndPaginate<T>(
     items: T[],
@@ -840,32 +841,46 @@ export const SubsonicController: InternalControllerEndpoint = {
         if (query.musicFolderId) {
             const musicFolderId = getLibraryId(query.musicFolderId);
 
-            // Check each genre to see if it has any albums in the selected music folder
+            // Check each genre to see if it has any songs in the selected music folder
             // We'll use getSongsByGenre with count=1 to efficiently check for content
-            const genreChecks = await Promise.all(
-                results.map(async (genre) => {
-                    try {
-                        const checkRes = await ssApiClient(apiClientProps).getSongsByGenre({
-                            query: {
-                                count: 1,
-                                genre: genre.value,
-                                musicFolderId,
-                                offset: 0,
-                            },
-                        });
+            // Process genres in batches to avoid overwhelming the server
+            const genreChecks: Array<{
+                genre: z.infer<typeof ssType._response.genre>;
+                hasContent: boolean;
+            }> = [];
 
-                        if (checkRes.status !== 200) {
+            for (let i = 0; i < results.length; i += GENRE_CHECK_BATCH_SIZE) {
+                const batch = results.slice(i, i + GENRE_CHECK_BATCH_SIZE);
+                const batchResults = await Promise.all(
+                    batch.map(async (genre) => {
+                        try {
+                            const checkRes = await ssApiClient(apiClientProps).getSongsByGenre({
+                                query: {
+                                    count: 1,
+                                    genre: genre.value,
+                                    musicFolderId,
+                                    offset: 0,
+                                },
+                            });
+
+                            if (checkRes.status !== 200) {
+                                return { genre, hasContent: false };
+                            }
+
+                            const hasContent = (checkRes.body.songsByGenre?.song || []).length > 0;
+                            return { genre, hasContent };
+                        } catch (error) {
+                            // If there's an error checking this genre, log it and exclude the genre
+                            console.error(
+                                `Failed to check genre "${genre.value}" for musicFolderId ${musicFolderId}:`,
+                                error,
+                            );
                             return { genre, hasContent: false };
                         }
-
-                        const hasContent = (checkRes.body.songsByGenre?.song || []).length > 0;
-                        return { genre, hasContent };
-                    } catch {
-                        // If there's an error checking this genre, exclude it to be safe
-                        return { genre, hasContent: false };
-                    }
-                }),
-            );
+                    }),
+                );
+                genreChecks.push(...batchResults);
+            }
 
             // Filter to only genres that have content in the selected music folder
             results = genreChecks.filter((check) => check.hasContent).map((check) => check.genre);
