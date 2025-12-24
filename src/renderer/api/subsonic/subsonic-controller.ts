@@ -834,6 +834,43 @@ export const SubsonicController: InternalControllerEndpoint = {
             results = searchResults;
         }
 
+        // Filter genres by musicFolderId if specified
+        // Since getGenres doesn't support musicFolderId, we need to check each genre
+        // to see if it has any content in the selected music folder
+        if (query.musicFolderId) {
+            const musicFolderId = getLibraryId(query.musicFolderId);
+
+            // Check each genre to see if it has any albums in the selected music folder
+            // We'll use getSongsByGenre with count=1 to efficiently check for content
+            const genreChecks = await Promise.all(
+                results.map(async (genre) => {
+                    try {
+                        const checkRes = await ssApiClient(apiClientProps).getSongsByGenre({
+                            query: {
+                                count: 1,
+                                genre: genre.value,
+                                musicFolderId,
+                                offset: 0,
+                            },
+                        });
+
+                        if (checkRes.status !== 200) {
+                            return { genre, hasContent: false };
+                        }
+
+                        const hasContent = (checkRes.body.songsByGenre?.song || []).length > 0;
+                        return { genre, hasContent };
+                    } catch {
+                        // If there's an error checking this genre, exclude it to be safe
+                        return { genre, hasContent: false };
+                    }
+                }),
+            );
+
+            // Filter to only genres that have content in the selected music folder
+            results = genreChecks.filter((check) => check.hasContent).map((check) => check.genre);
+        }
+
         switch (query.sortBy) {
             case GenreListSort.NAME:
                 results = orderBy(results, [(v) => v.value.toLowerCase()], [sortOrder]);
@@ -1195,6 +1232,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                     albumOffset: 0,
                     artistCount: 0,
                     artistOffset: 0,
+                    musicFolderId: getLibraryId(query.musicFolderId),
                     query: query.searchTerm || '',
                     songCount: query.limit,
                     songOffset: query.startIndex,
@@ -1339,6 +1377,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                 albumOffset: 0,
                 artistCount: 0,
                 artistOffset: 0,
+                musicFolderId: getLibraryId(query.musicFolderId),
                 query: query.searchTerm || '',
                 songCount: query.limit,
                 songOffset: query.startIndex,
@@ -1379,6 +1418,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                         albumOffset: 0,
                         artistCount: 0,
                         artistOffset: 0,
+                        musicFolderId: getLibraryId(query.musicFolderId),
                         query: query.searchTerm || '',
                         songCount: MAX_SUBSONIC_ITEMS,
                         songOffset: startIndex,
@@ -1482,6 +1522,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                     albumOffset: 0,
                     artistCount: 0,
                     artistOffset: 0,
+                    musicFolderId: getLibraryId(query.musicFolderId),
                     query: query.searchTerm || '',
                     songCount: 1,
                     songOffset: sectionIndex,
@@ -1510,6 +1551,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                     albumOffset: 0,
                     artistCount: 0,
                     artistOffset: 0,
+                    musicFolderId: getLibraryId(query.musicFolderId),
                     query: query.searchTerm || '',
                     songCount: MAX_SUBSONIC_ITEMS,
                     songOffset: startIndex,
