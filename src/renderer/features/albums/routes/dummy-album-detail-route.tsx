@@ -114,7 +114,11 @@ const DummyAlbumDetailRoute = () => {
         },
     ];
 
-    const imageUrl = useItemImageUrl({ id: albumId, itemType: LibraryItem.ALBUM, type: 'lg' });
+    const imageUrl = useItemImageUrl({
+        id: albumId,
+        itemType: LibraryItem.ALBUM,
+        type: 'header',
+    });
 
     return (
         <AnimatedPage key={`dummy-album-detail-${albumId}`}>

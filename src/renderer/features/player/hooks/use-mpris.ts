@@ -19,7 +19,7 @@ export const useMPRIS = () => {
         id: currentSong?.id,
         imageUrl: currentSong?.imageUrl,
         itemType: LibraryItem.SONG,
-        type: 'md',
+        type: 'itemCard',
     });
 
     useEffect(() => {

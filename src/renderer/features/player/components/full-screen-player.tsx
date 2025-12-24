@@ -78,16 +78,14 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
 
     const currentImageUrl = useItemImageUrl({
         id: currentSong?.id,
-        imageUrl: currentSong?.imageUrl,
         itemType: LibraryItem.SONG,
-        type: 'lg',
+        type: 'itemCard',
     });
 
     const nextImageUrl = useItemImageUrl({
         id: nextSong?.id,
-        imageUrl: nextSong?.imageUrl,
         itemType: LibraryItem.SONG,
-        type: 'lg',
+        type: 'itemCard',
     });
 
     const [imageState, setImageState] = useState({
@@ -620,7 +618,7 @@ const PlayerContainer = memo(
             id: currentSong?.id,
             imageUrl: currentSong?.imageUrl,
             itemType: LibraryItem.SONG,
-            type: 'lg',
+            type: 'itemCard',
         });
         const { background } = useFastAverageColor({
             algorithm: 'dominant',

@@ -1,7 +1,8 @@
 import { memo, useMemo } from 'react';
+import z from 'zod';
 
 import { api } from '/@/renderer/api';
-import { useCurrentServerId } from '/@/renderer/store';
+import { GeneralSettingsSchema, useCurrentServerId, useSettingsStore } from '/@/renderer/store';
 import { BaseImage, ImageProps } from '/@/shared/components/image/image';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
@@ -27,12 +28,15 @@ interface UseItemImageUrlProps {
     imageUrl?: null | string;
     itemType: LibraryItem;
     size?: number;
-    type?: 'lg' | 'md' | 'original' | 'sm' | 'xl' | 'xs';
+    type?: keyof z.infer<typeof GeneralSettingsSchema>['imageRes'];
 }
 
 export const useItemImageUrl = (args: UseItemImageUrlProps) => {
-    const { id, imageUrl, itemType, size, type = 'md' } = args;
+    const { id, imageUrl, itemType, size, type } = args;
     const serverId = useCurrentServerId();
+
+    const imageRes = useSettingsStore((store) => store.general.imageRes);
+    const sizeByType: number | undefined = type ? imageRes[type] : undefined;
 
     return useMemo(() => {
         if (imageUrl) {
@@ -46,29 +50,8 @@ export const useItemImageUrl = (args: UseItemImageUrlProps) => {
         return (
             api.controller.getImageUrl({
                 apiClientProps: { serverId },
-                query: { id, itemType, size: getSize(type, size) },
+                query: { id, itemType, size: size ?? sizeByType },
             }) || undefined
         );
-    }, [id, imageUrl, itemType, serverId, size, type]);
-};
-
-const getSize = (type: UseItemImageUrlProps['type'], size?: number) => {
-    if (size) {
-        return size;
-    }
-
-    switch (type) {
-        case 'lg':
-            return 500;
-        case 'md':
-            return 300;
-        case 'sm':
-            return 60;
-        case 'xl':
-            return 1000;
-        case 'xs':
-            return 30;
-        default:
-            return undefined;
-    }
+    }, [id, imageUrl, itemType, serverId, size, sizeByType]);
 };

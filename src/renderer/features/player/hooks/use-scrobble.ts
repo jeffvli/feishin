@@ -66,7 +66,7 @@ export const useScrobble = () => {
         id: currentSong?.id,
         imageUrl: currentSong?.imageUrl,
         itemType: LibraryItem.SONG,
-        type: 'md',
+        type: 'itemCard',
     });
 
     const imageUrlRef = useRef<null | string | undefined>(imageUrl);

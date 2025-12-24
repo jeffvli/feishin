@@ -40,7 +40,7 @@ export const useDiscordRpc = () => {
         id: currentSong?.id,
         imageUrl: currentSong?.imageUrl,
         itemType: LibraryItem.SONG,
-        type: 'md',
+        type: 'table',
     });
 
     const imageUrlRef = useRef<null | string | undefined>(imageUrl);

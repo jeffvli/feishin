@@ -26,7 +26,7 @@ export const useMediaSession = () => {
         id: currentSong?.id,
         imageUrl: currentSong?.imageUrl,
         itemType: LibraryItem.SONG,
-        type: 'md',
+        type: 'itemCard',
     });
 
     const isMediaSessionEnabled = useMemo(() => {

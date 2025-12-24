@@ -829,7 +829,7 @@ export const SubsonicController: InternalControllerEndpoint = {
     },
     getImageUrl: ({ apiClientProps: { server }, query }) => {
         const { id, size } = query;
-        const imageSize = size || 300;
+        const imageSize = size;
 
         if (!server?.url || !server?.credential) {
             return null;
@@ -846,7 +846,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             `&${server.credential}` +
             '&v=1.13.0' +
             '&c=Feishin' +
-            `&size=${imageSize}`
+            (imageSize ? `&size=${imageSize}` : '')
         );
     },
     getInternetRadioStations: async (args) => {

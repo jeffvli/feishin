@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n, { languages } from '/@/i18n/i18n';
+import { ImageResolutionSettings } from '/@/renderer/features/settings/components/general/art-resolution-settings';
 import { ArtistSettings } from '/@/renderer/features/settings/components/general/artist-settings';
 import { HomeSettings } from '/@/renderer/features/settings/components/general/home-settings';
 import {
@@ -575,37 +576,13 @@ export const ApplicationSettings = () => {
             isHidden: false,
             title: t('setting.playerbarOpenDrawer', { postProcess: 'sentenceCase' }),
         },
-        {
-            control: (
-                <NumberInput
-                    defaultValue={settings.albumArtRes || undefined}
-                    hideControls={false}
-                    max={2500}
-                    onBlur={(e) => {
-                        const newVal =
-                            e.currentTarget.value !== '0'
-                                ? Math.min(Math.max(Number(e.currentTarget.value), 175), 2500)
-                                : null;
-                        setSettings({ general: { ...settings, albumArtRes: newVal } });
-                    }}
-                    placeholder="0"
-                    value={settings.albumArtRes ?? 0}
-                    width={75}
-                />
-            ),
-            description: t('setting.playerAlbumArtResolution', {
-                context: 'description',
-                postProcess: 'sentenceCase',
-            }),
-            isHidden: false,
-            title: t('setting.playerAlbumArtResolution', { postProcess: 'sentenceCase' }),
-        },
     ];
 
     return (
         <SettingsSection
             extra={
                 <>
+                    <ImageResolutionSettings />
                     <HomeSettings />
                     <ArtistSettings />
                 </>

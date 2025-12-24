@@ -461,30 +461,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
     },
-    getImageUrl: ({ apiClientProps: { server }, query }) => {
-        const { id, size } = query;
-        const imageSize = size || 300;
-
-        if (!server?.url || !server?.credential) {
-            return null;
-        }
-
-        // Check for default placeholder image ID
-        if (id.match('2a96cbd8b46e442fc41c2b86b821562f')) {
-            return null;
-        }
-
-        // Note: We don't have the updated timestamp here for cache invalidation
-        // The URL will still work, just without cache-busting
-        return (
-            `${server.url}/rest/getCoverArt.view` +
-            `?id=${id}` +
-            `&${server.credential}` +
-            '&v=1.13.0' +
-            '&c=Feishin' +
-            `&size=${imageSize}`
-        );
-    },
+    getImageUrl: SubsonicController.getImageUrl,
     getInternetRadioStations: SubsonicController.getInternetRadioStations,
     getLyrics: SubsonicController.getLyrics,
     getMusicFolderList: SubsonicController.getMusicFolderList,

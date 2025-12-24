@@ -198,7 +198,11 @@ export const ExpandedAlbumListItem = ({ internalState, item }: ExpandedAlbumList
 
     const player = usePlayer();
 
-    const imageUrl = useItemImageUrl({ id: item.id, itemType: LibraryItem.ALBUM, type: 'lg' });
+    const imageUrl = useItemImageUrl({
+        id: item.id,
+        itemType: LibraryItem.ALBUM,
+        type: 'itemCard',
+    });
 
     const color = useFastAverageColor({
         algorithm: 'sqrt',

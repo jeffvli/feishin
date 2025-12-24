@@ -1,8 +1,7 @@
 import clsx from 'clsx';
 import { AnimatePresence, HTMLMotionProps, motion, Variants } from 'motion/react';
-import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { generatePath } from 'react-router';
-import { Link } from 'react-router';
+import { Fragment, useEffect, useRef } from 'react';
+import { generatePath, Link } from 'react-router';
 
 import styles from './full-screen-player-image.module.css';
 
@@ -80,25 +79,20 @@ const ImageWithPlaceholder = ({
 
 export const FullScreenPlayerImage = () => {
     const mainImageRef = useRef<HTMLImageElement | null>(null);
-    const [mainImageDimensions, setMainImageDimensions] = useState({ idealSize: 1 });
-
-    const albumArtRes = useSettingsStore((store) => store.general.albumArtRes);
 
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();
 
     const currentImageUrl = useItemImageUrl({
         id: currentSong?.id,
-        imageUrl: currentSong?.imageUrl,
         itemType: LibraryItem.SONG,
-        size: mainImageDimensions.idealSize,
+        type: 'fullScreenPlayer',
     });
 
     const nextImageUrl = useItemImageUrl({
         id: nextSong?.id,
-        imageUrl: nextSong?.imageUrl,
         itemType: LibraryItem.SONG,
-        size: mainImageDimensions.idealSize,
+        type: 'fullScreenPlayer',
     });
 
     const [imageState, setImageState] = useSetState({
@@ -106,20 +100,6 @@ export const FullScreenPlayerImage = () => {
         current: 0,
         topImage: currentImageUrl,
     });
-
-    const updateImageSize = useCallback(() => {
-        if (mainImageRef.current) {
-            setMainImageDimensions({
-                idealSize:
-                    albumArtRes ||
-                    Math.ceil((mainImageRef.current as HTMLDivElement).offsetHeight / 100) * 100,
-            });
-        }
-    }, [albumArtRes]);
-
-    useLayoutEffect(() => {
-        updateImageSize();
-    }, [updateImageSize]);
 
     // Track previous song to detect changes
     const previousSongRef = useRef<string | undefined>(currentSong?._uniqueId);

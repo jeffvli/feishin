@@ -78,7 +78,11 @@ interface CarouselItemProps {
 }
 
 const CarouselItem = ({ album }: CarouselItemProps) => {
-    const imageUrl = useItemImageUrl({ id: album.id, itemType: LibraryItem.ALBUM, type: 'md' });
+    const imageUrl = useItemImageUrl({
+        id: album.id,
+        itemType: LibraryItem.ALBUM,
+        type: 'itemCard',
+    });
 
     const { background: backgroundColor } = useFastAverageColor({
         algorithm: 'dominant',

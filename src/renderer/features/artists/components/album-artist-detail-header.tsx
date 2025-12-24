@@ -120,7 +120,7 @@ export const AlbumArtistDetailHeader = forwardRef((_props, ref: Ref<HTMLDivEleme
     const imageUrl = useItemImageUrl({
         id: detailQuery?.data?.id,
         itemType: LibraryItem.ALBUM_ARTIST,
-        type: 'lg',
+        type: 'itemCard',
     });
 
     return (

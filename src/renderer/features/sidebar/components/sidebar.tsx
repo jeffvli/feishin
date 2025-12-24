@@ -155,7 +155,7 @@ const SidebarImage = () => {
     const imageUrl = useItemImageUrl({
         id: currentSong?.id,
         itemType: LibraryItem.SONG,
-        type: 'xl',
+        type: 'sidebar',
     });
 
     const isSongDefined = Boolean(currentSong?.id);
