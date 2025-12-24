@@ -269,6 +269,7 @@ const CompactItemCard = ({
                             enableExpansion={enableExpansion}
                             item={data}
                             itemType={itemType}
+                            showRating={hasRating}
                             type="compact"
                         />
                     )}

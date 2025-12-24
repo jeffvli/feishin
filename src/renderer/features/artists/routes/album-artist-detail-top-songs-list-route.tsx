@@ -14,7 +14,7 @@ import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
-import { useGeneralSettings, usePlayerSong } from '/@/renderer/store';
+import { usePlayerSong } from '/@/renderer/store';
 import { useCurrentServer } from '/@/renderer/store/auth.store';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import { LibraryItem, Song } from '/@/shared/types/domain-types';
@@ -47,19 +47,13 @@ const AlbumArtistDetailTopSongsListRoute = () => {
     const itemCount = topSongsQuery?.data?.items?.length || 0;
     const songs = useMemo(() => topSongsQuery?.data?.items || [], [topSongsQuery?.data?.items]);
 
-    const { showRatings } = useGeneralSettings();
     const tableConfig = useSettingsStore((state) => state.lists[ItemListKey.SONG]?.table);
     const currentSong = usePlayerSong();
     const player = usePlayer();
 
     const columns = useMemo(() => {
-        const tableColumns = tableConfig?.columns || [];
-        if (showRatings) {
-            return tableColumns;
-        } else {
-            return tableColumns.filter((column) => column.id !== 'userRating');
-        }
-    }, [tableConfig?.columns, showRatings]);
+        return tableConfig?.columns || [];
+    }, [tableConfig?.columns]);
 
     const { handleColumnReordered } = useItemListColumnReorder({
         itemListKey: ItemListKey.SONG,

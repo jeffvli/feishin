@@ -32,6 +32,7 @@ interface ItemCardControlsProps {
     internalState?: ItemListStateActions;
     item: Album | AlbumArtist | Artist | Playlist | Song | undefined;
     itemType: LibraryItem;
+    showRating: boolean;
     type?: 'compact' | 'default' | 'poster';
 }
 
@@ -180,6 +181,7 @@ export const ItemCardControls = ({
     internalState,
     item,
     itemType,
+    showRating,
     type = 'default',
 }: ItemCardControlsProps) => {
     const playNowHandler = useMemo(
@@ -267,6 +269,7 @@ export const ItemCardControls = ({
                 <FavoriteButton isFavorite={isFavorite} onClick={favoriteHandler} />
             )}
             {controls?.onRating &&
+                showRating &&
                 (item?._serverType === ServerType.NAVIDROME ||
                     item?._serverType === ServerType.SUBSONIC) && (
                     <RatingButton

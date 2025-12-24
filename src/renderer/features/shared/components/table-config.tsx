@@ -21,12 +21,7 @@ import {
     ListConfigBooleanControl,
     ListConfigTable,
 } from '/@/renderer/features/shared/components/list-config-menu';
-import {
-    ItemListSettings,
-    useGeneralSettings,
-    useSettingsStore,
-    useSettingsStoreActions,
-} from '/@/renderer/store';
+import { ItemListSettings, useSettingsStore, useSettingsStoreActions } from '/@/renderer/store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
@@ -70,20 +65,6 @@ export const TableConfig = ({
 
     const list = useSettingsStore((state) => state.lists[listKey]) as ItemListSettings;
     const { setList } = useSettingsStoreActions();
-    const { showRatings } = useGeneralSettings();
-    const filteredList = useMemo(() => {
-        if (showRatings) {
-            return list;
-        } else {
-            return {
-                ...list,
-                table: {
-                    ...list.table,
-                    columns: list.table.columns.filter((column) => column.id !== 'userRating'),
-                },
-            };
-        }
-    }, [list, showRatings]);
 
     const advancedSettings = useMemo(() => {
         const allOptions = [
@@ -108,7 +89,7 @@ export const TableConfig = ({
                             setList(listKey, { pagination: value as ListPaginationType })
                         }
                         size="sm"
-                        value={filteredList.pagination}
+                        value={list.pagination}
                         w="100%"
                     />
                 ),
@@ -119,7 +100,7 @@ export const TableConfig = ({
             {
                 component: (
                     <Slider
-                        defaultValue={filteredList.itemsPerPage}
+                        defaultValue={list.itemsPerPage}
                         marks={[
                             { value: 25 },
                             { value: 50 },
@@ -144,7 +125,7 @@ export const TableConfig = ({
                         {t('table.config.general.pagination_itemsPerPage', {
                             postProcess: 'sentenceCase',
                         })}
-                        <Badge>{filteredList.itemsPerPage}</Badge>
+                        <Badge>{list.itemsPerPage}</Badge>
                     </Group>
                 ),
             },
@@ -177,7 +158,7 @@ export const TableConfig = ({
                             })
                         }
                         size="sm"
-                        value={filteredList.table.size}
+                        value={list.table.size}
                         w="100%"
                     />
                 ),
@@ -192,7 +173,7 @@ export const TableConfig = ({
                         onChange={(e) =>
                             setList(listKey, { table: { enableRowHoverHighlight: e } })
                         }
-                        value={filteredList.table.enableRowHoverHighlight}
+                        value={list.table.enableRowHoverHighlight}
                     />
                 ),
                 id: 'enableRowHoverHighlight',
@@ -206,7 +187,7 @@ export const TableConfig = ({
                         onChange={(e) =>
                             setList(listKey, { table: { enableAlternateRowColors: e } })
                         }
-                        value={filteredList.table.enableAlternateRowColors}
+                        value={list.table.enableAlternateRowColors}
                     />
                 ),
                 id: 'enableAlternateRowColors',
@@ -220,7 +201,7 @@ export const TableConfig = ({
                         onChange={(e) =>
                             setList(listKey, { table: { enableHorizontalBorders: e } })
                         }
-                        value={filteredList.table.enableHorizontalBorders}
+                        value={list.table.enableHorizontalBorders}
                     />
                 ),
                 id: 'enableHorizontalBorders',
@@ -232,7 +213,7 @@ export const TableConfig = ({
                 component: (
                     <ListConfigBooleanControl
                         onChange={(e) => setList(listKey, { table: { enableVerticalBorders: e } })}
-                        value={filteredList.table.enableVerticalBorders}
+                        value={list.table.enableVerticalBorders}
                     />
                 ),
                 id: 'enableVerticalBorders',
@@ -244,7 +225,7 @@ export const TableConfig = ({
                 component: (
                     <ListConfigBooleanControl
                         onChange={(e) => setList(listKey, { table: { autoFitColumns: e } })}
-                        value={filteredList.table.autoFitColumns}
+                        value={list.table.autoFitColumns}
                     />
                 ),
                 id: 'autoFitColumns',
@@ -264,7 +245,7 @@ export const TableConfig = ({
                 return option;
             })
             .filter((option): option is NonNullable<typeof option> => option !== null);
-    }, [extraOptions, listKey, optionsConfig, setList, t, filteredList]);
+    }, [extraOptions, listKey, optionsConfig, setList, t, list]);
 
     return (
         <>
@@ -294,7 +275,7 @@ export const TableConfig = ({
                 onChange={(columns) =>
                     setList(listKey, { ...list, table: { ...list.table, columns } })
                 }
-                value={filteredList.table.columns}
+                value={list.table.columns}
             />
         </>
     );

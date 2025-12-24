@@ -6,7 +6,6 @@ import { ItemListStateItemWithRequiredProperties } from '/@/renderer/components/
 import { DefaultItemControlProps, ItemControls } from '/@/renderer/components/item-list/types';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { useGeneralSettings } from '/@/renderer/store';
 import { LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 import { Play, TableColumn } from '/@/shared/types/types';
 
@@ -32,7 +31,6 @@ const itemTypeMapping = {
 
 export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs) => {
     const player = usePlayer();
-    const { showRatings } = useGeneralSettings();
     const navigate = useNavigate();
     const navigateRef = useRef(navigate);
 
@@ -363,33 +361,35 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                 player.addToQueueByFetch(item._serverId, [item.id], itemType, playType);
             },
 
-            onRating: showRatings
-                ? ({ item, itemType, rating }: DefaultItemControlProps & { rating: number }) => {
-                      if (!item) {
-                          return;
-                      }
+            onRating: ({
+                item,
+                itemType,
+                rating,
+            }: DefaultItemControlProps & { rating: number }) => {
+                if (!item) {
+                    return;
+                }
 
-                      const apiItemType = itemTypeMapping[itemType] || itemType;
+                const apiItemType = itemTypeMapping[itemType] || itemType;
 
-                      if (!item.id || !item._serverId) {
-                          return;
-                      }
+                if (!item.id || !item._serverId) {
+                    return;
+                }
 
-                      const previousRating = (item as { userRating: number }).userRating || 0;
+                const previousRating = (item as { userRating: number }).userRating || 0;
 
-                      let newRating = rating;
+                let newRating = rating;
 
-                      if (previousRating === rating) {
-                          newRating = 0;
-                      }
+                if (previousRating === rating) {
+                    newRating = 0;
+                }
 
-                      player.setRating(item._serverId, [item.id], apiItemType, newRating);
-                  }
-                : undefined,
+                player.setRating(item._serverId, [item.id], apiItemType, newRating);
+            },
 
             ...overrides,
         };
-    }, [onColumnReordered, onColumnResized, overrides, player, showRatings]);
+    }, [onColumnReordered, onColumnResized, overrides, player]);
 
     return controls;
 };
