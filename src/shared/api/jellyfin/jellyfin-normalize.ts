@@ -65,6 +65,44 @@ const getTags = (item: AlbumOrSong): null | Record<string, string[]> => {
     return null;
 };
 
+const getSongImageId = (item: z.infer<typeof jfType._response.song>): null | string => {
+    if (item.ImageTags?.Primary) {
+        return item.Id;
+    }
+
+    if (item.AlbumPrimaryImageTag && item.AlbumId) {
+        return item.AlbumId;
+    }
+
+    return null;
+};
+
+const getAlbumImageId = (item: z.infer<typeof jfType._response.album>): null | string => {
+    if (item.ImageTags?.Primary) {
+        return item.Id;
+    }
+
+    return null;
+};
+
+const getAlbumArtistImageId = (
+    item: z.infer<typeof jfType._response.albumArtist>,
+): null | string => {
+    if (item.ImageTags?.Primary) {
+        return item.Id;
+    }
+
+    return null;
+};
+
+const getPlaylistImageId = (item: z.infer<typeof jfType._response.playlist>): null | string => {
+    if (item.ImageTags?.Primary) {
+        return item.Id;
+    }
+
+    return null;
+};
+
 const normalizeSong = (
     item: z.infer<typeof jfType._response.song>,
     server: null | ServerListItem,
@@ -149,13 +187,13 @@ const normalizeSong = (
             _serverType: ServerType.JELLYFIN,
             albumCount: null,
             id: entry.Id,
-            imageId: entry.Id,
+            imageId: null,
             imageUrl: null,
             name: entry.Name,
             songCount: null,
         })),
         id: item.Id,
-        imageId: item.Id,
+        imageId: getSongImageId(item),
         imageUrl: null,
         lastPlayedAt: null,
         lyrics: null,
@@ -214,13 +252,13 @@ const normalizeAlbum = (
                 _serverType: ServerType.JELLYFIN,
                 albumCount: null,
                 id: entry.Id,
-                imageId: entry.Id,
+                imageId: null,
                 imageUrl: null,
                 name: entry.Name,
                 songCount: null,
             })) || [],
         id: item.Id,
-        imageId: item.Id,
+        imageId: getAlbumImageId(item),
         imageUrl: null,
         isCompilation: null,
         lastPlayedAt: null,
@@ -273,13 +311,13 @@ const normalizeAlbumArtist = (
             _serverType: ServerType.JELLYFIN,
             albumCount: null,
             id: entry.Id,
-            imageId: entry.Id,
+            imageId: null,
             imageUrl: null,
             name: entry.Name,
             songCount: null,
         })),
         id: item.Id,
-        imageId: item.Id,
+        imageId: getAlbumArtistImageId(item),
         imageUrl: null,
         lastPlayedAt: null,
         mbz: item.ProviderIds?.MusicBrainzArtist || null,
@@ -308,13 +346,13 @@ const normalizePlaylist = (
             _serverType: ServerType.JELLYFIN,
             albumCount: null,
             id: entry.Id,
-            imageId: entry.Id,
+            imageId: null,
             imageUrl: null,
             name: entry.Name,
             songCount: null,
         })),
         id: item.Id,
-        imageId: item.Id,
+        imageId: getPlaylistImageId(item),
         imageUrl: null,
         name: item.Name,
         owner: null,
