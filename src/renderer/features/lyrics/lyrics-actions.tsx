@@ -51,7 +51,7 @@ export const LyricsActions = ({
         <>
             <div style={{ position: 'relative', width: '100%' }}>
                 {languages.length > 0 && (
-                    <Center>
+                    <Center pb="md">
                         {languages.length > 1 && (
                             <Select
                                 clearable={false}
