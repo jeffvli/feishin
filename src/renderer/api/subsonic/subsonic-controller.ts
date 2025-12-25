@@ -50,7 +50,6 @@ const ALBUM_LIST_SORT_MAPPING: Record<AlbumListSort, AlbumListSortType | undefin
 
 const MAX_SUBSONIC_ITEMS = 500;
 const SUBSONIC_FAST_BATCH_SIZE = MAX_SUBSONIC_ITEMS * 10;
-const GENRE_CHECK_BATCH_SIZE = 10;
 
 function sortAndPaginate<T>(
     items: T[],
