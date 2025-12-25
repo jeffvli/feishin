@@ -19,6 +19,8 @@ import { Slider, SliderProps } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
+import { Textarea } from '/@/shared/components/textarea/textarea';
+import { toast } from '/@/shared/components/toast/toast';
 
 const modeOptions: { label: string; value: ConstructorOptions['mode'] | string }[] = [
     { label: '[0] Bars', value: '0' },
@@ -129,6 +131,7 @@ const useUpdateAudioMotionAnalyzer = () => {
 export const VisualizerSettingsForm = () => {
     return (
         <div className={styles.container}>
+            <PresetSettings />
             <GeneralSettings />
             <ColorSettings />
             <FFTSettings />
@@ -305,6 +308,469 @@ const VisualizerToggle = (props: {
         >
             {label}
         </Button>
+    );
+};
+
+const PresetSettings = () => {
+    const { t } = useTranslation();
+    const visualizer = useVisualizerSettings();
+    const { setSettings } = useSettingsStoreActions();
+    const [selectedPreset, setSelectedPreset] = useState<null | string>(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const [newPresetName, setNewPresetName] = useState('');
+    const [isPasting, setIsPasting] = useState(false);
+    const [pasteValue, setPasteValue] = useState('');
+
+    const applyPreset = (presetName: null | string) => {
+        if (!presetName) return;
+
+        const preset = visualizer.audiomotionanalyzer.presets.find((p) => p.name === presetName);
+
+        if (!preset) return;
+
+        const initialDefaults = {
+            alphaBars: false,
+            ansiBands: false,
+            barSpace: 0.1,
+            channelLayout: 'single' as const,
+            colorMode: 'gradient' as const,
+            customGradients: [],
+            fadePeaks: false,
+            fftSize: 8192,
+            fillAlpha: 1,
+            frequencyScale: 'log' as const,
+            gradient: 'classic',
+            gradientLeft: undefined,
+            gradientRight: undefined,
+            gravity: 3.8,
+            ledBars: true,
+            linearAmplitude: false,
+            linearBoost: 1.0,
+            lineWidth: 0,
+            loRes: false,
+            lumiBars: false,
+            maxDecibels: -25,
+            maxFPS: 0,
+            maxFreq: 22000,
+            minDecibels: -85,
+            minFreq: 20,
+            mirror: 0.0,
+            mode: 0,
+            noteLabels: false,
+            outlineBars: false,
+            peakFadeTime: 750,
+            peakHoldTime: 500,
+            peakLine: false,
+            radial: false,
+            radialInvert: false,
+            radius: 0.3,
+            reflexAlpha: 0.15,
+            reflexBright: 1.0,
+            reflexFit: true,
+            reflexRatio: 0,
+            roundBars: false,
+            showFPS: false,
+            showPeaks: true,
+            showScaleX: false,
+            showScaleY: false,
+            smoothing: 0.5,
+            spinSpeed: 0.0,
+            splitGradient: false,
+            trueLeds: false,
+            volume: 1.0,
+            weightingFilter: '' as const,
+        };
+
+        // Merge preset values with initial defaults to ensure all properties are included
+        const presetValue = {
+            ...initialDefaults,
+            ...preset.value,
+        };
+
+        setSettings({
+            visualizer: {
+                ...visualizer,
+                audiomotionanalyzer: {
+                    ...visualizer.audiomotionanalyzer,
+                    ...presetValue,
+                },
+            },
+        });
+    };
+
+    const handlePresetChange = (value: null | string) => {
+        setSelectedPreset(value);
+        if (value) {
+            applyPreset(value);
+        }
+    };
+
+    const handleSavePreset = () => {
+        if (!newPresetName.trim()) return;
+
+        // Check if preset name already exists
+        const existingPreset = visualizer.audiomotionanalyzer.presets.find(
+            (p) => p.name === newPresetName.trim(),
+        );
+
+        if (existingPreset) {
+            // Update existing preset
+            const updatedPresets = visualizer.audiomotionanalyzer.presets.map((p) =>
+                p.name === newPresetName.trim()
+                    ? {
+                          ...p,
+                          value: getCurrentSettingsAsPresetValue(),
+                      }
+                    : p,
+            );
+
+            setSettings({
+                visualizer: {
+                    ...visualizer,
+                    audiomotionanalyzer: {
+                        ...visualizer.audiomotionanalyzer,
+                        presets: updatedPresets,
+                    },
+                },
+            });
+        } else {
+            // Add new preset
+            const newPreset = {
+                name: newPresetName.trim(),
+                value: getCurrentSettingsAsPresetValue(),
+            };
+
+            setSettings({
+                visualizer: {
+                    ...visualizer,
+                    audiomotionanalyzer: {
+                        ...visualizer.audiomotionanalyzer,
+                        presets: [...visualizer.audiomotionanalyzer.presets, newPreset],
+                    },
+                },
+            });
+        }
+
+        setNewPresetName('');
+        setIsSaving(false);
+        setSelectedPreset(newPresetName.trim());
+    };
+
+    const getCurrentSettingsAsPresetValue = () => {
+        return {
+            alphaBars: visualizer.audiomotionanalyzer.alphaBars,
+            ansiBands: visualizer.audiomotionanalyzer.ansiBands,
+            barSpace: visualizer.audiomotionanalyzer.barSpace,
+            channelLayout: visualizer.audiomotionanalyzer.channelLayout,
+            colorMode: visualizer.audiomotionanalyzer.colorMode,
+            fadePeaks: visualizer.audiomotionanalyzer.fadePeaks,
+            fftSize: visualizer.audiomotionanalyzer.fftSize,
+            fillAlpha: visualizer.audiomotionanalyzer.fillAlpha,
+            frequencyScale: visualizer.audiomotionanalyzer.frequencyScale,
+            gradient: visualizer.audiomotionanalyzer.gradient,
+            gradientLeft: visualizer.audiomotionanalyzer.gradientLeft,
+            gradientRight: visualizer.audiomotionanalyzer.gradientRight,
+            gravity: visualizer.audiomotionanalyzer.gravity,
+            ledBars: visualizer.audiomotionanalyzer.ledBars,
+            linearAmplitude: visualizer.audiomotionanalyzer.linearAmplitude,
+            linearBoost: visualizer.audiomotionanalyzer.linearBoost,
+            lineWidth: visualizer.audiomotionanalyzer.lineWidth,
+            loRes: visualizer.audiomotionanalyzer.loRes,
+            lumiBars: visualizer.audiomotionanalyzer.lumiBars,
+            maxDecibels: visualizer.audiomotionanalyzer.maxDecibels,
+            maxFPS: visualizer.audiomotionanalyzer.maxFPS,
+            maxFreq: visualizer.audiomotionanalyzer.maxFreq,
+            minDecibels: visualizer.audiomotionanalyzer.minDecibels,
+            minFreq: visualizer.audiomotionanalyzer.minFreq,
+            mirror: visualizer.audiomotionanalyzer.mirror,
+            mode: visualizer.audiomotionanalyzer.mode,
+            noteLabels: visualizer.audiomotionanalyzer.noteLabels,
+            outlineBars: visualizer.audiomotionanalyzer.outlineBars,
+            peakFadeTime: visualizer.audiomotionanalyzer.peakFadeTime,
+            peakHoldTime: visualizer.audiomotionanalyzer.peakHoldTime,
+            peakLine: visualizer.audiomotionanalyzer.peakLine,
+            radial: visualizer.audiomotionanalyzer.radial,
+            radialInvert: visualizer.audiomotionanalyzer.radialInvert,
+            radius: visualizer.audiomotionanalyzer.radius,
+            reflexAlpha: visualizer.audiomotionanalyzer.reflexAlpha,
+            reflexBright: visualizer.audiomotionanalyzer.reflexBright,
+            reflexFit: visualizer.audiomotionanalyzer.reflexFit,
+            reflexRatio: visualizer.audiomotionanalyzer.reflexRatio,
+            roundBars: visualizer.audiomotionanalyzer.roundBars,
+            showFPS: visualizer.audiomotionanalyzer.showFPS,
+            showPeaks: visualizer.audiomotionanalyzer.showPeaks,
+            showScaleX: visualizer.audiomotionanalyzer.showScaleX,
+            showScaleY: visualizer.audiomotionanalyzer.showScaleY,
+            smoothing: visualizer.audiomotionanalyzer.smoothing,
+            spinSpeed: visualizer.audiomotionanalyzer.spinSpeed,
+            splitGradient: visualizer.audiomotionanalyzer.splitGradient,
+            trueLeds: visualizer.audiomotionanalyzer.trueLeds,
+            volume: visualizer.audiomotionanalyzer.volume,
+            weightingFilter: visualizer.audiomotionanalyzer.weightingFilter,
+        };
+    };
+
+    const handleUpdatePreset = () => {
+        if (!selectedPreset) return;
+
+        const updatedPresets = visualizer.audiomotionanalyzer.presets.map((p) =>
+            p.name === selectedPreset
+                ? {
+                      ...p,
+                      value: getCurrentSettingsAsPresetValue(),
+                  }
+                : p,
+        );
+
+        setSettings({
+            visualizer: {
+                ...visualizer,
+                audiomotionanalyzer: {
+                    ...visualizer.audiomotionanalyzer,
+                    presets: updatedPresets,
+                },
+            },
+        });
+    };
+
+    const handleDeletePreset = () => {
+        if (!selectedPreset) return;
+
+        const updatedPresets = visualizer.audiomotionanalyzer.presets.filter(
+            (p) => p.name !== selectedPreset,
+        );
+
+        setSettings({
+            visualizer: {
+                ...visualizer,
+                audiomotionanalyzer: {
+                    ...visualizer.audiomotionanalyzer,
+                    presets: updatedPresets,
+                },
+            },
+        });
+
+        setSelectedPreset(null);
+    };
+
+    const handleCopyConfiguration = async () => {
+        try {
+            const config = getCurrentSettingsAsPresetValue();
+            const configJson = JSON.stringify(config, null, 2);
+            await navigator.clipboard.writeText(configJson);
+            toast.success({
+                message: t('visualizer.configCopied', { postProcess: 'sentenceCase' }),
+            });
+        } catch {
+            toast.error({
+                message: t('visualizer.configCopyFailed', { postProcess: 'sentenceCase' }),
+            });
+        }
+    };
+
+    const handlePasteConfiguration = () => {
+        if (!pasteValue.trim()) return;
+
+        try {
+            const parsed = JSON.parse(pasteValue.trim());
+
+            // Validate that it's an object with expected properties
+            if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+                throw new Error('Invalid configuration format');
+            }
+
+            // Merge with initial defaults to ensure all properties are set
+            const initialDefaults = {
+                alphaBars: false,
+                ansiBands: false,
+                barSpace: 0.1,
+                channelLayout: 'single' as const,
+                colorMode: 'gradient' as const,
+                customGradients: [],
+                fadePeaks: false,
+                fftSize: 8192,
+                fillAlpha: 1,
+                frequencyScale: 'log' as const,
+                gradient: 'classic',
+                gradientLeft: undefined,
+                gradientRight: undefined,
+                gravity: 3.8,
+                ledBars: true,
+                linearAmplitude: false,
+                linearBoost: 1.0,
+                lineWidth: 0,
+                loRes: false,
+                lumiBars: false,
+                maxDecibels: -25,
+                maxFPS: 0,
+                maxFreq: 22000,
+                minDecibels: -85,
+                minFreq: 20,
+                mirror: 0.0,
+                mode: 0,
+                noteLabels: false,
+                outlineBars: false,
+                peakFadeTime: 750,
+                peakHoldTime: 500,
+                peakLine: false,
+                radial: false,
+                radialInvert: false,
+                radius: 0.3,
+                reflexAlpha: 0.15,
+                reflexBright: 1.0,
+                reflexFit: true,
+                reflexRatio: 0,
+                roundBars: false,
+                showFPS: false,
+                showPeaks: true,
+                showScaleX: false,
+                showScaleY: false,
+                smoothing: 0.5,
+                spinSpeed: 0.0,
+                splitGradient: false,
+                trueLeds: false,
+                volume: 1.0,
+                weightingFilter: '' as const,
+            };
+
+            const configValue = {
+                ...initialDefaults,
+                ...parsed,
+            };
+
+            setSettings({
+                visualizer: {
+                    ...visualizer,
+                    audiomotionanalyzer: {
+                        ...visualizer.audiomotionanalyzer,
+                        ...configValue,
+                    },
+                },
+            });
+
+            toast.success({
+                message: t('visualizer.configPasted', { postProcess: 'sentenceCase' }),
+            });
+
+            setPasteValue('');
+            setIsPasting(false);
+        } catch {
+            toast.error({
+                message: t('visualizer.configPasteFailed', { postProcess: 'sentenceCase' }),
+            });
+        }
+    };
+
+    const handlePasteFromClipboard = async () => {
+        try {
+            const text = await navigator.clipboard.readText();
+            setPasteValue(text);
+            setIsPasting(true);
+        } catch {
+            toast.error({
+                message: t('visualizer.configPasteReadFailed', { postProcess: 'sentenceCase' }),
+            });
+        }
+    };
+
+    const presetOptions = useMemo(() => {
+        return visualizer.audiomotionanalyzer.presets.map((preset) => ({
+            label: preset.name,
+            value: preset.name,
+        }));
+    }, [visualizer.audiomotionanalyzer.presets]);
+
+    return (
+        <Fieldset legend={t('visualizer.presets')}>
+            <Stack>
+                <VisualizerSelect
+                    data={presetOptions}
+                    label={t('visualizer.selectPreset')}
+                    onChange={handlePresetChange}
+                    value={selectedPreset || undefined}
+                />
+                {isSaving ? (
+                    <Group grow>
+                        <TextInput
+                            autoFocus
+                            label={t('visualizer.presetName')}
+                            onChange={(e) => setNewPresetName(e.currentTarget.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleSavePreset();
+                                } else if (e.key === 'Escape') {
+                                    setIsSaving(false);
+                                    setNewPresetName('');
+                                }
+                            }}
+                            placeholder={t('visualizer.presetNamePlaceholder')}
+                            value={newPresetName}
+                        />
+                        <Group style={{ alignSelf: 'flex-end' }}>
+                            <Button onClick={() => setIsSaving(false)} variant="subtle">
+                                {t('common.cancel', { postProcess: 'titleCase' })}
+                            </Button>
+                            <Button
+                                disabled={!newPresetName.trim()}
+                                onClick={handleSavePreset}
+                                variant="filled"
+                            >
+                                {t('common.save', { postProcess: 'titleCase' })}
+                            </Button>
+                        </Group>
+                    </Group>
+                ) : isPasting ? (
+                    <Stack>
+                        <Textarea
+                            autosize
+                            label={t('visualizer.pasteConfiguration')}
+                            maxRows={10}
+                            minRows={5}
+                            onChange={(e) => setPasteValue(e.currentTarget.value)}
+                            placeholder={t('visualizer.pasteConfigurationPlaceholder')}
+                            value={pasteValue}
+                        />
+                        <Group>
+                            <Button onClick={handlePasteFromClipboard} variant="subtle">
+                                {t('visualizer.pasteFromClipboard')}
+                            </Button>
+                            <Button onClick={() => setIsPasting(false)} variant="subtle">
+                                {t('common.cancel', { postProcess: 'titleCase' })}
+                            </Button>
+                            <Button
+                                disabled={!pasteValue.trim()}
+                                onClick={handlePasteConfiguration}
+                                variant="filled"
+                            >
+                                {t('visualizer.applyConfiguration')}
+                            </Button>
+                        </Group>
+                    </Stack>
+                ) : (
+                    <Group>
+                        <Button onClick={() => setIsSaving(true)} variant="default">
+                            {t('visualizer.saveAsPreset')}
+                        </Button>
+                        {selectedPreset && (
+                            <>
+                                <Button onClick={handleUpdatePreset} variant="default">
+                                    {t('visualizer.updatePreset')}
+                                </Button>
+                                <Button onClick={handleDeletePreset} variant="subtle">
+                                    {t('common.delete', { postProcess: 'titleCase' })}
+                                </Button>
+                            </>
+                        )}
+                        <Button onClick={handleCopyConfiguration} variant="default">
+                            {t('visualizer.copyConfiguration')}
+                        </Button>
+                        <Button onClick={() => setIsPasting(true)} variant="default">
+                            {t('visualizer.pasteConfiguration')}
+                        </Button>
+                    </Group>
+                )}
+            </Stack>
+        </Fieldset>
     );
 };
 
