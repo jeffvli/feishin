@@ -1097,6 +1097,13 @@
         "mainText": "drop a file here"
     },
     "visualizer": {
+        "visualizerType": "Visualizer Type",
+        "cyclePresets": "Cycle Presets",
+        "cycleTime": "Cycle Time (seconds)",
+        "includeAllPresets": "Include All Presets",
+        "selectedPresets": "Selected Presets",
+        "randomizeNextPreset": "Randomize Next Preset",
+        "blendTime": "Blend Time",
         "presets": "Presets",
         "selectPreset": "Select Preset",
         "applyPreset": "Apply Preset",

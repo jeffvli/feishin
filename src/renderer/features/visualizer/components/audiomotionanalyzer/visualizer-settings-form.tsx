@@ -1,4 +1,5 @@
 import { ConstructorOptions } from 'audiomotion-analyzer';
+import butterchurnPresets from 'butterchurn-presets';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -12,6 +13,7 @@ import { ColorInput } from '/@/shared/components/color-input/color-input';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Fieldset } from '/@/shared/components/fieldset/fieldset';
 import { Group } from '/@/shared/components/group/group';
+import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Select, SelectProps } from '/@/shared/components/select/select';
@@ -128,20 +130,82 @@ const useUpdateAudioMotionAnalyzer = () => {
     return { updateProperty, visualizer };
 };
 
+const useUpdateButterchurn = () => {
+    const visualizer = useVisualizerSettings();
+    const { setSettings } = useSettingsStoreActions();
+
+    const updateProperty = <K extends keyof typeof visualizer.butterchurn>(
+        property: K,
+        value: (typeof visualizer.butterchurn)[K],
+    ) => {
+        setSettings({
+            visualizer: {
+                ...visualizer,
+                butterchurn: {
+                    ...visualizer.butterchurn,
+                    [property]: value,
+                },
+            },
+        });
+    };
+
+    return { updateProperty, visualizer };
+};
+
 export const VisualizerSettingsForm = () => {
+    const { t } = useTranslation();
+    const visualizer = useVisualizerSettings();
+    const { setSettings } = useSettingsStoreActions();
+
+    const visualizerTypeOptions = useMemo(
+        () => [
+            { label: 'AudioMotion Analyzer', value: 'audiomotionanalyzer' },
+            { label: 'Butterchurn', value: 'butterchurn' },
+        ],
+        [],
+    );
+
+    const handleTypeChange = (value: string) => {
+        setSettings({
+            visualizer: {
+                ...visualizer,
+                type: value as 'audiomotionanalyzer' | 'butterchurn',
+            },
+        });
+    };
+
     return (
         <div className={styles.container}>
-            <PresetSettings />
-            <GeneralSettings />
-            <ColorSettings />
-            <FFTSettings />
-            <FrequencySettings />
-            <SensitivitySettings />
-            <LinearAmplitudeSettings />
-            <PeakBehaviorSettings />
-            <RadialSpectrumSettings />
-            <ReflexMirrorSettings />
-            <ToggleSettings />
+            <Fieldset legend={t('visualizer.visualizerType')}>
+                <Stack>
+                    <SegmentedControl
+                        data={visualizerTypeOptions}
+                        onChange={handleTypeChange}
+                        value={visualizer.type}
+                    />
+                </Stack>
+            </Fieldset>
+            {visualizer.type === 'audiomotionanalyzer' && (
+                <>
+                    <PresetSettings />
+                    <GeneralSettings />
+                    <ColorSettings />
+                    <FFTSettings />
+                    <FrequencySettings />
+                    <SensitivitySettings />
+                    <LinearAmplitudeSettings />
+                    <PeakBehaviorSettings />
+                    <RadialSpectrumSettings />
+                    <ReflexMirrorSettings />
+                    <ToggleSettings />
+                </>
+            )}
+            {visualizer.type === 'butterchurn' && (
+                <>
+                    <ButterchurnGeneralSettings />
+                    <ButterChurnCycleSettings />
+                </>
+            )}
         </div>
     );
 };
@@ -1862,6 +1926,116 @@ const ToggleSettings = () => {
                     />
                 ))}
             </Group>
+        </Fieldset>
+    );
+};
+
+const ButterchurnGeneralSettings = () => {
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateButterchurn();
+
+    const presetOptions = useMemo(() => {
+        const presets = butterchurnPresets.getPresets();
+        return Object.keys(presets).map((presetName) => ({
+            label: presetName,
+            value: presetName,
+        }));
+    }, []);
+
+    return (
+        <Fieldset legend={t('visualizer.general')}>
+            <Stack>
+                <Group grow>
+                    <VisualizerSelect
+                        data={presetOptions}
+                        label={t('visualizer.selectPreset')}
+                        onChange={(value) => {
+                            updateProperty('currentPreset', value || undefined);
+                        }}
+                        value={visualizer.butterchurn.currentPreset}
+                    />
+                </Group>
+                <Group grow>
+                    <VisualizerSlider
+                        defaultValue={visualizer.butterchurn.maxFPS}
+                        label={t('visualizer.maxFPS')}
+                        max={120}
+                        min={0}
+                        onChangeEnd={(e) => updateProperty('maxFPS', e)}
+                        step={1}
+                    />
+                </Group>
+            </Stack>
+        </Fieldset>
+    );
+};
+
+const ButterChurnCycleSettings = () => {
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateButterchurn();
+
+    const presetOptions = useMemo(() => {
+        const presets = butterchurnPresets.getPresets();
+        return Object.keys(presets).map((presetName) => ({
+            label: presetName,
+            value: presetName,
+        }));
+    }, []);
+
+    return (
+        <Fieldset legend={t('visualizer.cyclePresets')}>
+            <Stack>
+                <Group grow>
+                    <VisualizerToggle
+                        label={t('visualizer.cyclePresets')}
+                        onChange={(checked) => updateProperty('cyclePresets', checked)}
+                        value={visualizer.butterchurn.cyclePresets}
+                    />
+                    <VisualizerToggle
+                        disabled={!visualizer.butterchurn.cyclePresets}
+                        label={t('visualizer.includeAllPresets')}
+                        onChange={(checked) => updateProperty('includeAllPresets', checked)}
+                        value={visualizer.butterchurn.includeAllPresets}
+                    />
+                    <VisualizerToggle
+                        disabled={!visualizer.butterchurn.cyclePresets}
+                        label={t('visualizer.randomizeNextPreset')}
+                        onChange={(checked) => updateProperty('randomizeNextPreset', checked)}
+                        value={visualizer.butterchurn.randomizeNextPreset}
+                    />
+                </Group>
+                <MultiSelect
+                    data={presetOptions}
+                    disabled={
+                        !visualizer.butterchurn.cyclePresets ||
+                        visualizer.butterchurn.includeAllPresets
+                    }
+                    label={t('visualizer.selectedPresets')}
+                    onChange={(values) => updateProperty('selectedPresets', values)}
+                    value={visualizer.butterchurn.selectedPresets}
+                />
+
+                <Group grow>
+                    <VisualizerSlider
+                        defaultValue={visualizer.butterchurn.blendTime}
+                        disabled={!visualizer.butterchurn.cyclePresets}
+                        label={t('visualizer.blendTime')}
+                        max={10}
+                        min={0}
+                        onChangeEnd={(e) => updateProperty('blendTime', e)}
+                        step={0.1}
+                    />
+                    <VisualizerSlider
+                        defaultValue={visualizer.butterchurn.cycleTime}
+                        disabled={!visualizer.butterchurn.cyclePresets}
+                        label={t('visualizer.cycleTime')}
+                        max={300}
+                        min={1}
+                        onChangeEnd={(e) => updateProperty('cycleTime', e)}
+                        step={1}
+                    />
+                </Group>
+            </Stack>
         </Fieldset>
     );
 };

@@ -8,14 +8,25 @@ import { lyricsQueries } from '/@/renderer/features/lyrics/api/lyrics-api';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
-import { useGeneralSettings, usePlaybackSettings, usePlayerSong } from '/@/renderer/store';
+import {
+    useGeneralSettings,
+    usePlaybackSettings,
+    usePlayerSong,
+    useSettingsStore,
+} from '/@/renderer/store';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Stack } from '/@/shared/components/stack/stack';
 import { ItemListKey, PlayerType } from '/@/shared/types/types';
 
-const Visualizer = lazy(() =>
+const AudioMotionAnalyzerVisualizer = lazy(() =>
     import('../../visualizer/components/audiomotionanalyzer/visualizer').then((module) => ({
+        default: module.Visualizer,
+    })),
+);
+
+const ButterchurnVisualizer = lazy(() =>
+    import('../../visualizer/components/butternchurn/visualizer').then((module) => ({
         default: module.Visualizer,
     })),
 );
@@ -48,6 +59,7 @@ export const SidebarPlayQueue = () => {
 const BottomPanel = () => {
     const { showLyricsInSidebar, showVisualizerInSidebar } = useGeneralSettings();
     const { type, webAudio } = usePlaybackSettings();
+    const visualizerType = useSettingsStore((store) => store.visualizer.type);
     const currentSong = usePlayerSong();
 
     const { data: lyricsData } = useQuery(
@@ -102,7 +114,11 @@ const BottomPanel = () => {
                             }}
                         >
                             <Suspense fallback={<></>}>
-                                <Visualizer />
+                                {visualizerType === 'butterchurn' ? (
+                                    <ButterchurnVisualizer />
+                                ) : (
+                                    <AudioMotionAnalyzerVisualizer />
+                                )}
                             </Suspense>
                         </div>
                     )}
@@ -111,7 +127,11 @@ const BottomPanel = () => {
                 showVisualizer && (
                     <div className={styles.visualizerSection}>
                         <Suspense fallback={<></>}>
-                            <Visualizer />
+                            {visualizerType === 'butterchurn' ? (
+                                <ButterchurnVisualizer />
+                            ) : (
+                                <AudioMotionAnalyzerVisualizer />
+                            )}
                         </Suspense>
                     </div>
                 )

@@ -313,8 +313,20 @@ const AudioMotionAnalyzerSettingsSchema = z.object({
     weightingFilter: z.enum(['', 'A', 'B', 'C', 'D', 'Z']),
 });
 
+const ButterchurnSettingsSchema = z.object({
+    blendTime: z.number().min(0).max(10),
+    currentPreset: z.string().optional(),
+    cyclePresets: z.boolean(),
+    cycleTime: z.number().min(1).max(300),
+    includeAllPresets: z.boolean(),
+    maxFPS: z.number().min(0),
+    randomizeNextPreset: z.boolean(),
+    selectedPresets: z.array(z.string()),
+});
+
 const VisualizerSettingsSchema = z.object({
     audiomotionanalyzer: AudioMotionAnalyzerSettingsSchema,
+    butterchurn: ButterchurnSettingsSchema,
     type: z.enum(['audiomotionanalyzer', 'butterchurn']),
 });
 
@@ -1448,6 +1460,16 @@ const initialState: SettingsState = {
             trueLeds: false,
             volume: 1,
             weightingFilter: '',
+        },
+        butterchurn: {
+            blendTime: 2.5,
+            currentPreset: undefined,
+            cyclePresets: true,
+            cycleTime: 30,
+            includeAllPresets: true,
+            maxFPS: 0,
+            randomizeNextPreset: true,
+            selectedPresets: [],
         },
         type: 'audiomotionanalyzer',
     },
