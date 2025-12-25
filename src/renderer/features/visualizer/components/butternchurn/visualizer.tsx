@@ -253,8 +253,15 @@ const VisualizerInner = () => {
     useEffect(() => {
         if (!visualizer) return;
 
-        const render = () => {
-            visualizer.render();
+        let lastFrameTime = 0;
+        const maxFPS = butterchurnSettings.maxFPS;
+        const minFrameInterval = maxFPS > 0 ? 1000 / maxFPS : 0;
+
+        const render = (currentTime: number) => {
+            if (maxFPS === 0 || currentTime - lastFrameTime >= minFrameInterval) {
+                visualizer.render();
+                lastFrameTime = currentTime;
+            }
             animationFrameRef.current = requestAnimationFrame(render);
         };
 
@@ -265,7 +272,7 @@ const VisualizerInner = () => {
                 cancelAnimationFrame(animationFrameRef.current);
             }
         };
-    }, [visualizer]);
+    }, [visualizer, butterchurnSettings.maxFPS]);
 
     return (
         <div className={styles.container} ref={containerRef}>

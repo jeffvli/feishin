@@ -1957,9 +1957,17 @@ const ButterchurnGeneralSettings = () => {
                 </Group>
                 <Group grow>
                     <VisualizerSlider
+                        defaultValue={visualizer.butterchurn.blendTime}
+                        label={t('visualizer.blendTime')}
+                        max={10}
+                        min={0}
+                        onChangeEnd={(e) => updateProperty('blendTime', e)}
+                        step={0.1}
+                    />
+                    <VisualizerSlider
                         defaultValue={visualizer.butterchurn.maxFPS}
                         label={t('visualizer.maxFPS')}
-                        max={120}
+                        max={144}
                         min={0}
                         onChangeEnd={(e) => updateProperty('maxFPS', e)}
                         step={1}
@@ -2016,15 +2024,6 @@ const ButterChurnCycleSettings = () => {
                 />
 
                 <Group grow>
-                    <VisualizerSlider
-                        defaultValue={visualizer.butterchurn.blendTime}
-                        disabled={!visualizer.butterchurn.cyclePresets}
-                        label={t('visualizer.blendTime')}
-                        max={10}
-                        min={0}
-                        onChangeEnd={(e) => updateProperty('blendTime', e)}
-                        step={0.1}
-                    />
                     <VisualizerSlider
                         defaultValue={visualizer.butterchurn.cycleTime}
                         disabled={!visualizer.butterchurn.cyclePresets}
