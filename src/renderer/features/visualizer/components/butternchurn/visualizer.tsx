@@ -10,6 +10,7 @@ import { ComponentErrorBoundary } from '/@/renderer/features/shared/components/c
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store';
 import { usePlayerStatus } from '/@/renderer/store/player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Text } from '/@/shared/components/text/text';
 import { PlayerStatus } from '/@/shared/types/types';
 
 type ButterchurnVisualizer = {
@@ -287,6 +288,11 @@ const VisualizerInner = () => {
                 variant="transparent"
             />
             <canvas className={styles.canvas} ref={canvasRef} />
+            {butterchurnSettings.currentPreset && (
+                <Text className={styles['preset-overlay']} isNoSelect size="sm">
+                    {butterchurnSettings.currentPreset}
+                </Text>
+            )}
         </div>
     );
 };
