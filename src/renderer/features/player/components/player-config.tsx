@@ -356,6 +356,23 @@ export const PlayerConfig = () => {
                 id: 'showVisualizerInSidebar',
                 label: t('setting.showVisualizerInSidebar', { postProcess: 'titleCase' }),
             },
+            {
+                component: (
+                    <Switch
+                        defaultChecked={generalSettings.combinedLyricsAndVisualizer}
+                        onChange={(e) => {
+                            setSettings({
+                                general: {
+                                    ...generalSettings,
+                                    combinedLyricsAndVisualizer: e.currentTarget.checked,
+                                },
+                            });
+                        }}
+                    />
+                ),
+                id: 'combinedLyricsAndVisualizer',
+                label: t('setting.combinedLyricsAndVisualizer', { postProcess: 'titleCase' }),
+            },
         ];
 
         return allOptions;

@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { lazy, Suspense, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Group, Panel, Separator } from 'react-resizable-panels';
 
 import styles from './sidebar-play-queue.module.css';
 
@@ -8,14 +10,29 @@ import { lyricsQueries } from '/@/renderer/features/lyrics/api/lyrics-api';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
-import { useGeneralSettings, usePlaybackSettings, usePlayerSong } from '/@/renderer/store';
-import { Divider } from '/@/shared/components/divider/divider';
+import {
+    useGeneralSettings,
+    usePlaybackSettings,
+    usePlayerSong,
+    useSettingsStore,
+    useSettingsStoreActions,
+} from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Stack } from '/@/shared/components/stack/stack';
 import { ItemListKey, PlayerType } from '/@/shared/types/types';
 
-const Visualizer = lazy(() =>
-    import('/@/renderer/features/player/components/visualizer').then((module) => ({
+type SidebarPanelType = 'lyrics' | 'queue' | 'visualizer';
+
+const AudioMotionAnalyzerVisualizer = lazy(() =>
+    import('../../visualizer/components/audiomotionanalyzer/visualizer').then((module) => ({
+        default: module.Visualizer,
+    })),
+);
+
+const ButterchurnVisualizer = lazy(() =>
+    import('../../visualizer/components/butternchurn/visualizer').then((module) => ({
         default: module.Visualizer,
     })),
 );
@@ -23,6 +40,91 @@ const Visualizer = lazy(() =>
 export const SidebarPlayQueue = () => {
     const tableRef = useRef<ItemListHandle | null>(null);
     const [search, setSearch] = useState<string | undefined>(undefined);
+    const {
+        combinedLyricsAndVisualizer,
+        showLyricsInSidebar,
+        showVisualizerInSidebar,
+        sidebarPanelOrder,
+    } = useGeneralSettings();
+    const { type, webAudio } = usePlaybackSettings();
+    const showVisualizer = showVisualizerInSidebar && type === PlayerType.WEB && webAudio;
+    const showPanel = showLyricsInSidebar || showVisualizer;
+
+    // Filter and order panels based on what's enabled
+    const orderedPanels = useMemo(() => {
+        if (combinedLyricsAndVisualizer) {
+            // When combined, use the order from settings but filter to only show queue and lyrics (combined)
+            const visiblePanels = sidebarPanelOrder.filter((panel) => {
+                if (panel === 'queue') return true;
+                if (panel === 'lyrics') return showLyricsInSidebar || showVisualizer;
+                return false;
+            });
+            return visiblePanels;
+        }
+
+        const visiblePanels = sidebarPanelOrder.filter((panel) => {
+            if (panel === 'queue') return true;
+            if (panel === 'lyrics') return showLyricsInSidebar;
+            if (panel === 'visualizer') return showVisualizer;
+            return false;
+        });
+
+        return visiblePanels;
+    }, [combinedLyricsAndVisualizer, showLyricsInSidebar, showVisualizer, sidebarPanelOrder]);
+
+    const renderPanel = (panelType: SidebarPanelType, index: number, totalPanels: number) => {
+        if (panelType === 'queue') {
+            return (
+                <>
+                    {index > 0 && <Separator className={styles.resizeHandle} />}
+                    <Panel defaultSize={50} key="queue" minSize={20}>
+                        <div className={styles.playQueueSection}>
+                            <PlayQueue
+                                listKey={ItemListKey.SIDE_QUEUE}
+                                ref={tableRef}
+                                searchTerm={search}
+                            />
+                        </div>
+                    </Panel>
+                </>
+            );
+        }
+
+        if (combinedLyricsAndVisualizer && (panelType === 'lyrics' || panelType === 'visualizer')) {
+            return (
+                <>
+                    {index > 0 && <Separator className={styles.resizeHandle} />}
+                    <Panel defaultSize={50} key="combined" minSize={20}>
+                        <CombinedLyricsAndVisualizerPanel />
+                    </Panel>
+                </>
+            );
+        }
+
+        if (panelType === 'lyrics') {
+            return (
+                <>
+                    {index > 0 && <Separator className={styles.resizeHandle} />}
+                    <Panel defaultSize={totalPanels > 2 ? 25 : 50} key="lyrics" minSize={15}>
+                        <LyricsPanel />
+                    </Panel>
+                </>
+            );
+        }
+
+        if (panelType === 'visualizer') {
+            return (
+                <>
+                    {index > 0 && <Separator className={styles.resizeHandle} />}
+                    <Panel defaultSize={totalPanels > 2 ? 25 : 50} key="visualizer" minSize={15}>
+                        <VisualizerPanel />
+                    </Panel>
+                </>
+            );
+        }
+
+        return null;
+    };
 
     return (
         <Stack gap={0} h="100%" id="sidebar-play-queue-container" pos="relative" w="100%">
@@ -31,30 +133,174 @@ export const SidebarPlayQueue = () => {
                 searchTerm={search}
                 type={ItemListKey.SIDE_QUEUE}
             />
-            <Flex direction="column" style={{ flex: 1, minHeight: 0 }}>
-                <div className={styles.playQueueSection}>
-                    <PlayQueue
-                        listKey={ItemListKey.SIDE_QUEUE}
-                        ref={tableRef}
-                        searchTerm={search}
-                    />
-                </div>
-            </Flex>
-            <BottomPanel />
+            {showPanel ? (
+                <Group orientation="vertical" style={{ flex: 1, minHeight: 0 }}>
+                    {orderedPanels.map((panel, index) =>
+                        renderPanel(panel, index, orderedPanels.length),
+                    )}
+                </Group>
+            ) : (
+                <Flex direction="column" style={{ flex: 1, minHeight: 0 }}>
+                    <div className={styles.playQueueSection}>
+                        <PlayQueue
+                            listKey={ItemListKey.SIDE_QUEUE}
+                            ref={tableRef}
+                            searchTerm={search}
+                        />
+                    </div>
+                </Flex>
+            )}
         </Stack>
     );
 };
 
-const BottomPanel = () => {
-    const { showLyricsInSidebar, showVisualizerInSidebar } = useGeneralSettings();
-    const { type, webAudio } = usePlaybackSettings();
+const PanelReorderControls = ({ panelType }: { panelType: 'lyrics' | 'visualizer' }) => {
+    const { t } = useTranslation();
+    const generalSettings = useGeneralSettings();
+    const { combinedLyricsAndVisualizer, sidebarPanelOrder } = generalSettings;
+    const { setSettings } = useSettingsStoreActions();
+
+    const currentIndex = sidebarPanelOrder.indexOf(panelType);
+    const canMoveUp = currentIndex > 0;
+    const canMoveDown = currentIndex < sidebarPanelOrder.length - 1;
+
+    const handleMoveUp = useCallback(() => {
+        if (!canMoveUp) return;
+
+        const newOrder = [...sidebarPanelOrder];
+        const targetIndex = currentIndex - 1;
+
+        [newOrder[currentIndex], newOrder[targetIndex]] = [
+            newOrder[targetIndex],
+            newOrder[currentIndex],
+        ];
+
+        setSettings({
+            general: {
+                ...generalSettings,
+                sidebarPanelOrder: newOrder,
+            },
+        });
+    }, [canMoveUp, currentIndex, generalSettings, sidebarPanelOrder, setSettings]);
+
+    const handleMoveDown = useCallback(() => {
+        if (!canMoveDown) return;
+
+        const newOrder = [...sidebarPanelOrder];
+        [newOrder[currentIndex], newOrder[currentIndex + 1]] = [
+            newOrder[currentIndex + 1],
+            newOrder[currentIndex],
+        ];
+
+        setSettings({
+            general: {
+                ...generalSettings,
+                sidebarPanelOrder: newOrder,
+            },
+        });
+    }, [canMoveDown, currentIndex, generalSettings, sidebarPanelOrder, setSettings]);
+
+    const handleClose = useCallback(() => {
+        if (combinedLyricsAndVisualizer && panelType === 'lyrics') {
+            setSettings({
+                general: {
+                    ...generalSettings,
+                    showLyricsInSidebar: false,
+                    showVisualizerInSidebar: false,
+                },
+            });
+        } else if (panelType === 'lyrics') {
+            setSettings({
+                general: {
+                    ...generalSettings,
+                    showLyricsInSidebar: false,
+                },
+            });
+        } else if (panelType === 'visualizer') {
+            setSettings({
+                general: {
+                    ...generalSettings,
+                    showVisualizerInSidebar: false,
+                },
+            });
+        }
+    }, [combinedLyricsAndVisualizer, generalSettings, panelType, setSettings]);
+
+    return (
+        <div className={styles.panelReorderControls}>
+            <ActionIconGroup>
+                <ActionIcon
+                    disabled={!canMoveUp}
+                    icon="arrowUp"
+                    iconProps={{ size: 'sm' }}
+                    onClick={handleMoveUp}
+                    size="xs"
+                    tooltip={{
+                        label: t('action.moveUp', { postProcess: 'sentenceCase' }),
+                    }}
+                    variant="subtle"
+                />
+                <ActionIcon
+                    disabled={!canMoveDown}
+                    icon="arrowDown"
+                    iconProps={{ size: 'sm' }}
+                    onClick={handleMoveDown}
+                    size="xs"
+                    tooltip={{
+                        label: t('action.moveDown', { postProcess: 'sentenceCase' }),
+                    }}
+                    variant="subtle"
+                />
+                <ActionIcon
+                    icon="x"
+                    iconProps={{ size: 'sm' }}
+                    onClick={handleClose}
+                    size="xs"
+                    tooltip={{
+                        label: t('common.close', { postProcess: 'sentenceCase' }),
+                    }}
+                    variant="subtle"
+                />
+            </ActionIconGroup>
+        </div>
+    );
+};
+
+const LyricsPanel = () => {
+    return (
+        <div className={styles.lyricsSection}>
+            <PanelReorderControls panelType="lyrics" />
+            <Lyrics fadeOutNoLyricsMessage={false} settingsKey="sidebar" />
+        </div>
+    );
+};
+
+const VisualizerPanel = () => {
+    const visualizerType = useSettingsStore((store) => store.visualizer.type);
+
+    return (
+        <div className={styles.visualizerSection}>
+            <PanelReorderControls panelType="visualizer" />
+            <Suspense fallback={<></>}>
+                {visualizerType === 'butterchurn' ? (
+                    <ButterchurnVisualizer />
+                ) : (
+                    <AudioMotionAnalyzerVisualizer />
+                )}
+            </Suspense>
+        </div>
+    );
+};
+
+const CombinedLyricsAndVisualizerPanel = () => {
     const currentSong = usePlayerSong();
+    const visualizerType = useSettingsStore((store) => store.visualizer.type);
 
     const { data: lyricsData } = useQuery(
         lyricsQueries.songLyrics(
             {
                 options: {
-                    enabled: showLyricsInSidebar && !!currentSong?.id,
+                    enabled: !!currentSong?.id,
                 },
                 query: { songId: currentSong?.id || '' },
                 serverId: currentSong?._serverId || '',
@@ -81,41 +327,24 @@ const BottomPanel = () => {
         return false;
     }, [lyricsData]);
 
-    const showVisualizer = showVisualizerInSidebar && type === PlayerType.WEB && webAudio;
-    const showPanel = showLyricsInSidebar || showVisualizer;
-
-    if (!showPanel) {
-        return null;
-    }
-
     return (
-        <>
-            <Divider />
-            {showLyricsInSidebar ? (
-                <div className={styles.lyricsSection}>
-                    <Lyrics fadeOutNoLyricsMessage={showVisualizer} />
-                    {showVisualizer && (
-                        <div
-                            className={styles.visualizerOverlay}
-                            style={{
-                                opacity: hasLyrics ? 0.2 : 1,
-                            }}
-                        >
-                            <Suspense fallback={<></>}>
-                                <Visualizer />
-                            </Suspense>
-                        </div>
+        <div className={styles.lyricsSection}>
+            <PanelReorderControls panelType="lyrics" />
+            <Lyrics fadeOutNoLyricsMessage={true} settingsKey="sidebar" />
+            <div
+                className={styles.visualizerOverlay}
+                style={{
+                    opacity: hasLyrics ? 0.2 : 1,
+                }}
+            >
+                <Suspense fallback={<></>}>
+                    {visualizerType === 'butterchurn' ? (
+                        <ButterchurnVisualizer />
+                    ) : (
+                        <AudioMotionAnalyzerVisualizer />
                     )}
-                </div>
-            ) : (
-                showVisualizer && (
-                    <div className={styles.visualizerSection}>
-                        <Suspense fallback={<></>}>
-                            <Visualizer />
-                        </Suspense>
-                    </div>
-                )
-            )}
-        </>
+                </Suspense>
+            </div>
+        </div>
     );
 };

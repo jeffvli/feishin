@@ -18,10 +18,12 @@ import {
     UnsynchronizedLyrics,
     UnsynchronizedLyricsProps,
 } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
+import { openLyricsSettingsModal } from '/@/renderer/features/lyrics/utils/open-lyrics-settings-modal';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { ComponentErrorBoundary } from '/@/renderer/features/shared/components/component-error-boundary';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useLyricsSettings, usePlayerSong } from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
 import { Spinner } from '/@/shared/components/spinner/spinner';
@@ -35,9 +37,10 @@ import {
 
 type LyricsProps = {
     fadeOutNoLyricsMessage?: boolean;
+    settingsKey?: string;
 };
 
-export const Lyrics = ({ fadeOutNoLyricsMessage = true }: LyricsProps) => {
+export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' }: LyricsProps) => {
     const currentSong = usePlayerSong();
     const {
         enableAutoTranslation,
@@ -301,9 +304,23 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true }: LyricsProps) => {
         }
     }, [currentOffsetMs, lyrics, synced]);
 
+    const handleOpenSettings = () => {
+        openLyricsSettingsModal(settingsKey);
+    };
+
     return (
         <ComponentErrorBoundary>
             <div className={styles.lyricsContainer}>
+                <ActionIcon
+                    className={styles.settingsIcon}
+                    icon="settings2"
+                    iconProps={{ size: 'lg' }}
+                    onClick={handleOpenSettings}
+                    pos="absolute"
+                    right={0}
+                    top={0}
+                    variant="transparent"
+                />
                 {isLoadingLyrics ? (
                     <Spinner container />
                 ) : (
@@ -335,11 +352,13 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true }: LyricsProps) => {
                                     <SynchronizedLyrics
                                         {...(lyrics as SynchronizedLyricsProps)}
                                         offsetMs={currentOffsetMs}
+                                        settingsKey={settingsKey}
                                         translatedLyrics={showTranslation ? translatedLyrics : null}
                                     />
                                 ) : (
                                     <UnsynchronizedLyrics
                                         {...(lyrics as UnsynchronizedLyricsProps)}
+                                        settingsKey={settingsKey}
                                         translatedLyrics={showTranslation ? translatedLyrics : null}
                                     />
                                 )}
@@ -362,6 +381,7 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true }: LyricsProps) => {
                         }
                         onUpdateOffset={handleUpdateOffset}
                         setIndex={setIndex}
+                        settingsKey={settingsKey}
                     />
                 </div>
             </div>

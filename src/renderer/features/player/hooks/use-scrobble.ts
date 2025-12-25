@@ -3,7 +3,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useSendScrobble } from '/@/renderer/features/player/mutations/scrobble-mutation';
-import { useAppStore, usePlaybackSettings, usePlayerSong, usePlayerStore } from '/@/renderer/store';
+import {
+    useAppStore,
+    usePlaybackSettings,
+    usePlayerSong,
+    usePlayerStore,
+    useTimestampStoreBase,
+} from '/@/renderer/store';
 import { LogCategory, logFn } from '/@/renderer/utils/logger';
 import { logMsg } from '/@/renderer/utils/logger-message';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
@@ -321,6 +327,79 @@ export const useScrobble = () => {
         [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble],
     );
 
+    const handleScrobbleFromStatus = useCallback(
+        (properties: { status: PlayerStatus }, prev: { status: PlayerStatus }) => {
+            if (!isScrobbleEnabled || isPrivateModeEnabled) {
+                return;
+            }
+
+            const currentSong = usePlayerStore.getState().getCurrentSong();
+
+            if (!currentSong?.id) {
+                return;
+            }
+
+            // Only apply to Jellyfin controller scrobble
+            if (currentSong._serverType !== ServerType.JELLYFIN) {
+                return;
+            }
+
+            const currentTimestamp = useTimestampStoreBase.getState().timestamp;
+            const position = currentTimestamp * 1e7;
+
+            // Send pause event when status changes to paused
+            if (properties.status === PlayerStatus.PAUSED && prev.status === PlayerStatus.PLAYING) {
+                sendScrobble.mutate(
+                    {
+                        apiClientProps: { serverId: currentSong._serverId || '' },
+                        query: {
+                            event: 'pause',
+                            id: currentSong.id,
+                            position,
+                            submission: false,
+                        },
+                    },
+                    {
+                        onSuccess: () => {
+                            logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledPause, {
+                                category: LogCategory.SCROBBLE,
+                                meta: {
+                                    id: currentSong.id,
+                                },
+                            });
+                        },
+                    },
+                );
+            }
+
+            // Send unpause event when status changes to playing (from paused)
+            if (properties.status === PlayerStatus.PLAYING && prev.status === PlayerStatus.PAUSED) {
+                sendScrobble.mutate(
+                    {
+                        apiClientProps: { serverId: currentSong._serverId || '' },
+                        query: {
+                            event: 'unpause',
+                            id: currentSong.id,
+                            position,
+                            submission: false,
+                        },
+                    },
+                    {
+                        onSuccess: () => {
+                            logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledUnpause, {
+                                category: LogCategory.SCROBBLE,
+                                meta: {
+                                    id: currentSong.id,
+                                },
+                            });
+                        },
+                    },
+                );
+            }
+        },
+        [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble],
+    );
+
     // Update previous timestamp on progress for use in status change handler
     const handleProgressUpdate = useCallback(
         (properties: { timestamp: number }, prev: { timestamp: number }) => {
@@ -335,6 +414,7 @@ export const useScrobble = () => {
             onCurrentSongChange: handleScrobbleFromSongChange,
             onPlayerProgress: handleProgressUpdate,
             onPlayerSeekToTimestamp: handleScrobbleFromSeek,
+            onPlayerStatus: handleScrobbleFromStatus,
         },
         [handleScrobbleFromSongChange, handleProgressUpdate, handleScrobbleFromSeek],
     );

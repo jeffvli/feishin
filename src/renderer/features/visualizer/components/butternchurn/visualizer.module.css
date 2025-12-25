@@ -1,0 +1,43 @@
+.container {
+    position: relative;
+    z-index: 50;
+    width: 100%;
+    height: 100%;
+    margin: auto;
+
+    &:hover {
+        .settings-icon {
+            opacity: 1;
+        }
+    }
+}
+
+.container .settings-icon {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.preset-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
+    font-weight: 500;
+    color: var(--theme-colors-foreground);
+    pointer-events: none;
+    background-color: rgb(0 0 0 / 50%);
+    border-radius: 0 var(--theme-radius-md) 0 0;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.container:hover .preset-overlay {
+    opacity: 1;
+}

@@ -1,7 +1,9 @@
 .play-queue-section {
+    position: relative;
     display: flex;
     flex: 1;
     flex-direction: column;
+    height: 100%;
     min-height: 0;
     overflow: hidden;
 }
@@ -9,10 +11,9 @@
 .lyrics-section {
     position: relative;
     display: flex;
-    flex: 0 0 300px;
     flex-direction: column;
-    min-height: 200px;
-    max-height: 400px;
+    height: 100%;
+    min-height: 0;
     padding: var(--theme-spacing-md);
     overflow: hidden;
     background: var(--theme-colors-background);
@@ -41,12 +42,38 @@
 .visualizer-section {
     position: relative;
     display: flex;
-    flex: 0 0 300px;
     flex-direction: column;
-    min-height: 200px;
-    max-height: 400px;
+    height: 100%;
+    min-height: 0;
     padding: var(--theme-spacing-md);
     overflow: hidden;
     background: var(--theme-colors-background);
     background-color: var(--theme-colors-background-alternate);
+}
+
+.resize-handle {
+    position: relative;
+    flex-shrink: 0;
+    width: 100%;
+    height: 1px;
+    cursor: row-resize;
+    background-color: var(--theme-colors-border);
+    transition:
+        background-color 0.2s ease,
+        height 0.2s ease;
+}
+
+.panel-reorder-controls {
+    position: absolute;
+    top: var(--theme-spacing-md);
+    left: var(--theme-spacing-md);
+    z-index: 100;
+    pointer-events: auto;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.lyrics-section:hover .panel-reorder-controls,
+.visualizer-section:hover .panel-reorder-controls {
+    opacity: 1;
 }

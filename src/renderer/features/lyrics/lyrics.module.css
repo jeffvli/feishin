@@ -8,6 +8,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+    pointer-events: none;
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
 
@@ -17,6 +18,20 @@
 
     &:focus-within {
         opacity: 1 !important;
+    }
+
+    :global(> *),
+    :global(> * > *),
+    :global(div) {
+        pointer-events: none;
+    }
+
+    :global(button),
+    :global(input),
+    :global([role='button']),
+    :global([role='combobox']),
+    :global([role='textbox']) {
+        pointer-events: auto;
     }
 }
 
@@ -48,4 +63,14 @@
         rgb(0 0 0 / 100%) 85%,
         transparent 95%
     );
+}
+
+.settings-icon {
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.lyrics-container:hover .settings-icon {
+    opacity: 1;
 }

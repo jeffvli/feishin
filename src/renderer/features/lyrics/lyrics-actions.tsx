@@ -22,6 +22,7 @@ interface LyricsActionsProps {
     onTranslateLyric?: () => void;
     onUpdateOffset: (offsetMs: number) => void;
     setIndex: (idx: number) => void;
+    settingsKey?: string;
     synced?: boolean;
 }
 
