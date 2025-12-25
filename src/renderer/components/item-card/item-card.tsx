@@ -483,6 +483,7 @@ const DefaultItemCard = ({
                             enableExpansion={enableExpansion}
                             item={data}
                             itemType={itemType}
+                            showRating={showRating}
                             type="default"
                         />
                     )}
@@ -744,6 +745,7 @@ const PosterItemCard = ({
                             internalState={internalState}
                             item={data}
                             itemType={itemType}
+                            showRating={showRating}
                             type="poster"
                         />
                     )}
