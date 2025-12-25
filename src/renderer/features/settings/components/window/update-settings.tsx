@@ -10,6 +10,11 @@ import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
+const utils = isElectron() ? window.api.utils : null;
+
+function disableAutoUpdates(): boolean {
+    return !isElectron() || utils?.disableAutoUpdates();
+}
 
 export const UpdateSettings = () => {
     const { t } = useTranslation();
@@ -55,7 +60,7 @@ export const UpdateSettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: !isElectron(),
+            isHidden: disableAutoUpdates(),
             title: t('setting.releaseChannel', { postProcess: 'sentenceCase' }),
         },
         {
@@ -63,7 +68,7 @@ export const UpdateSettings = () => {
                 <Switch
                     aria-label="Disable automatic updates"
                     defaultChecked={settings.disableAutoUpdate}
-                    disabled={!isElectron()}
+                    disabled={disableAutoUpdates()}
                     onChange={(e) => {
                         if (!e) return;
                         localSettings?.set('disable_auto_updates', e.currentTarget.checked);
@@ -80,7 +85,7 @@ export const UpdateSettings = () => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: !isElectron(),
+            isHidden: disableAutoUpdates(),
             title: t('setting.disableAutomaticUpdates', { postProcess: 'sentenceCase' }),
         },
     ];

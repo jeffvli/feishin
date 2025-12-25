@@ -18,6 +18,10 @@ if (process.env.NODE_ENV === 'development') {
     };
 }
 
+export const disableAutoUpdates = () => {
+    return process.env['DISABLE_AUTO_UPDATES'];
+};
+
 export const isMacOS = () => {
     return process.platform === 'darwin';
 };

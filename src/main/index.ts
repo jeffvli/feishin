@@ -30,6 +30,7 @@ import MenuBuilder from './menu';
 import {
     autoUpdaterLogInterface,
     createLog,
+    disableAutoUpdates,
     hotkeyToElectronAccelerator,
     isLinux,
     isMacOS,
@@ -456,7 +457,7 @@ async function createWindow(first = true): Promise<void> {
         return { action: 'deny' };
     });
 
-    if (store.get('disable_auto_updates') !== true) {
+    if (!disableAutoUpdates() && store.get('disable_auto_updates') !== true) {
         new AppUpdater();
     }
 
