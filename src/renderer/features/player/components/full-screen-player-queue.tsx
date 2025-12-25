@@ -18,7 +18,7 @@ import { Group } from '/@/shared/components/group/group';
 import { ItemListKey, PlayerType } from '/@/shared/types/types';
 
 const Visualizer = lazy(() =>
-    import('/@/renderer/features/player/components/visualizer').then((module) => ({
+    import('../../visualizer/components/audiomotionanalyzer/visualizer').then((module) => ({
         default: module.Visualizer,
     })),
 );
