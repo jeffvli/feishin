@@ -111,15 +111,8 @@ const VisualizerInner = () => {
         }
 
         return () => {};
-    }, [
-        webAudio,
-        canvasRef,
-        containerRef,
-        visualizer,
-        butterchurnSettings.currentPreset,
-        butterchurnSettings.blendTime,
-        isPlaying,
-    ]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [webAudio, canvasRef, containerRef, visualizer, isPlaying]);
 
     // Handle resize
     useEffect(() => {
@@ -149,9 +142,17 @@ const VisualizerInner = () => {
         };
     }, [visualizer, containerRef, canvasRef]);
 
-    // Update preset when currentPreset or blendTime changes
+    // Update preset when currentPreset or blendTime changes (but not when cycling)
+    const isCyclingRef = useRef(false);
+
     useEffect(() => {
         if (!visualizer || !butterchurnSettings.currentPreset) return;
+
+        // Skip if we're currently cycling (to avoid recreating the visualizer)
+        if (isCyclingRef.current) {
+            isCyclingRef.current = false;
+            return;
+        }
 
         const presets = butterchurnPresets.getPresets();
         const preset = presets[butterchurnSettings.currentPreset];
@@ -215,18 +216,27 @@ const VisualizerInner = () => {
 
             const nextPreset = presets[nextPresetName];
             if (nextPreset) {
-                visualizer.loadPreset(nextPreset, butterchurnSettings.blendTime || 0.0);
+                // Get current settings to ensure we use the latest blendTime
+                const currentSettings = useSettingsStore.getState().visualizer.butterchurn;
+
+                // Mark that we're cycling to prevent the preset change effect from running
+                isCyclingRef.current = true;
+
+                // Load the preset with blending
+                visualizer.loadPreset(nextPreset, currentSettings.blendTime || 0.0);
+
                 // Update currentPreset in settings
                 const currentVisualizer = useSettingsStore.getState().visualizer;
                 setSettings({
                     visualizer: {
                         ...currentVisualizer,
                         butterchurn: {
-                            ...butterchurnSettings,
+                            ...currentVisualizer.butterchurn,
                             currentPreset: nextPresetName,
                         },
                     },
                 });
+
                 cycleStartTimeRef.current = Date.now();
             }
         };
