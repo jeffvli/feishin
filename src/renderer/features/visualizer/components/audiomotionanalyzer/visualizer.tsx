@@ -5,10 +5,11 @@ import styles from './visualizer.module.css';
 
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import { openVisualizerSettingsModal } from '/@/renderer/features/player/utils/open-visualizer-settings-modal';
+import { ComponentErrorBoundary } from '/@/renderer/features/shared/components/component-error-boundary';
 import { useSettingsStore } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 
-export const Visualizer = () => {
+const VisualizerInner = () => {
     const { webAudio } = useWebAudio();
     const canvasRef = createRef<HTMLDivElement>();
     const accent = useSettingsStore((store) => store.general.accent);
@@ -230,5 +231,13 @@ export const Visualizer = () => {
             />
             <div className={styles.visualizer} ref={canvasRef} />
         </div>
+    );
+};
+
+export const Visualizer = () => {
+    return (
+        <ComponentErrorBoundary>
+            <VisualizerInner />
+        </ComponentErrorBoundary>
     );
 };

@@ -6,6 +6,7 @@ import styles from './visualizer.module.css';
 
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import { openVisualizerSettingsModal } from '/@/renderer/features/player/utils/open-visualizer-settings-modal';
+import { ComponentErrorBoundary } from '/@/renderer/features/shared/components/component-error-boundary';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store';
 import { usePlayerStatus } from '/@/renderer/store/player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
@@ -18,7 +19,7 @@ type ButterchurnVisualizer = {
     setRendererSize: (width: number, height: number) => void;
 };
 
-export const Visualizer = () => {
+const VisualizerInner = () => {
     const { webAudio } = useWebAudio();
     const canvasRef = createRef<HTMLCanvasElement>();
     const containerRef = createRef<HTMLDivElement>();
@@ -280,5 +281,13 @@ export const Visualizer = () => {
             />
             <canvas className={styles.canvas} ref={canvasRef} />
         </div>
+    );
+};
+
+export const Visualizer = () => {
+    return (
+        <ComponentErrorBoundary>
+            <VisualizerInner />
+        </ComponentErrorBoundary>
     );
 };
