@@ -217,13 +217,52 @@ const PlayerbarSliderSchema = z.object({
 });
 
 const AudioMotionAnalyzerSettingsSchema = z.object({
-    alphaBars: z.boolean(),
-    ansiBands: z.boolean(),
-    barSpace: z.number(),
-    channelLayout: z.enum(['single', 'dual-combined', 'dual-horizontal', 'dual-vertical']),
-    colorMode: z.enum(['gradient', 'bar-index', 'bar-level']),
-    fadePeaks: z.boolean(),
-    fftSize: z.number(),
+    alphaBars: z
+        .boolean()
+        .describe(
+            'When set to true each bar’s amplitude affects its opacity, i.e., higher bars are rendered more opaque while shorter bars are more transparent. This is similar to the lumiBars effect, but bars’ amplitudes are preserved and it also works on Discrete mode and radial spectrum.',
+        ),
+    ansiBands: z
+        .boolean()
+        .describe(
+            'When set to true, ANSI/IEC preferred frequencies are used to generate the bands for octave bands modes (see mode). The preferred base-10 scale is used to compute the center and bandedge frequencies, as specified in the ANSI S1.11-2004 standard. When false, bands are based on the equal-tempered scale, so that in 1/12 octave bands the center of each band is perfectly tuned to a musical note.',
+        ),
+    barSpace: z
+        .number()
+        .describe(
+            'Customize the spacing between bars in frequency bands modes (see mode). Use a value between 0 and 1 for spacing proportional to the band width. Values >= 1 will be considered as a literal number of pixels.',
+        ),
+    channelLayout: z
+        .enum(['single', 'dual-combined', 'dual-horizontal', 'dual-vertical'])
+        .describe('Defines the number and layout of analyzer channels.'),
+    colorMode: z
+        .enum(['gradient', 'bar-index', 'bar-level'])
+        .describe('Selects the desired mode for coloring the analyzer bars.'),
+    customGradients: z.array(
+        z.object({
+            colorStops: z.array(
+                z.string().or(
+                    z.object({
+                        color: z.string(),
+                        level: z.number().min(0).max(1).optional(),
+                        pos: z.number().min(0).max(1).optional(),
+                    }),
+                ),
+            ),
+            dir: z.string().optional(),
+            name: z.string(),
+        }),
+    ),
+    fadePeaks: z
+        .boolean()
+        .describe(
+            'When true, peaks fade out instead of falling down. It has no effect when peakLine is active.',
+        ),
+    fftSize: z
+        .number()
+        .describe(
+            'Number of samples used for the FFT performed by the AnalyzerNode. It must be a power of 2 between 32 and 32768, so valid values are: 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, and 32768. Higher values provide more detail in the frequency domain, but less detail in the time domain (slower response), so you may need to adjust smoothing accordingly.',
+        ),
     fillAlpha: z.number(),
     frequencyScale: z.enum(['bark', 'linear', 'log', 'mel']),
     gradient: z.string(),
@@ -237,6 +276,7 @@ const AudioMotionAnalyzerSettingsSchema = z.object({
     loRes: z.boolean(),
     lumiBars: z.boolean(),
     maxDecibels: z.number(),
+    maxFPS: z.number(),
     maxFreq: z.number(),
     minDecibels: z.number(),
     minFreq: z.number(),
@@ -247,6 +287,12 @@ const AudioMotionAnalyzerSettingsSchema = z.object({
     peakFadeTime: z.number(),
     peakHoldTime: z.number(),
     peakLine: z.boolean(),
+    presets: z.array(
+        z.object({
+            name: z.string(),
+            value: z.any(),
+        }),
+    ),
     radial: z.boolean(),
     radialInvert: z.boolean(),
     radius: z.number(),
@@ -255,7 +301,6 @@ const AudioMotionAnalyzerSettingsSchema = z.object({
     reflexFit: z.boolean(),
     reflexRatio: z.number(),
     roundBars: z.boolean(),
-    showBgColor: z.boolean(),
     showFPS: z.boolean(),
     showPeaks: z.boolean(),
     showScaleX: z.boolean(),
@@ -1355,54 +1400,56 @@ const initialState: SettingsState = {
     visualizer: {
         audiomotionanalyzer: {
             alphaBars: false,
-            ansiBands: true,
-            barSpace: 0.2,
-            channelLayout: 'dual-combined',
-            colorMode: 'bar-index',
-            fadePeaks: true,
+            ansiBands: false,
+            barSpace: 0.1,
+            channelLayout: 'single',
+            colorMode: 'gradient',
+            customGradients: [],
+            fadePeaks: false,
             fftSize: 8192,
-            fillAlpha: 0.5,
+            fillAlpha: 1,
             frequencyScale: 'log',
-            gradient: 'prism',
-            gradientLeft: 'prism',
-            gradientRight: 'prism',
-            gravity: 9.8,
+            gradient: 'classic',
+            gradientLeft: undefined,
+            gradientRight: undefined,
+            gravity: 3.8,
             ledBars: true,
             linearAmplitude: false,
             linearBoost: 1.0,
-            lineWidth: 2.0,
+            lineWidth: 0,
             loRes: false,
             lumiBars: false,
-            maxDecibels: -30,
-            maxFreq: 20000,
-            minDecibels: -100,
+            maxDecibels: -25,
+            maxFPS: 0,
+            maxFreq: 22000,
+            minDecibels: -85,
             minFreq: 20,
             mirror: 0.0,
-            mode: 8,
+            mode: 0,
             noteLabels: false,
             outlineBars: false,
-            peakFadeTime: 1000,
+            peakFadeTime: 750,
             peakHoldTime: 500,
             peakLine: false,
+            presets: [],
             radial: false,
             radialInvert: false,
-            radius: 0.5,
-            reflexAlpha: 0.8,
+            radius: 0.3,
+            reflexAlpha: 0.15,
             reflexBright: 1.0,
-            reflexFit: false,
-            reflexRatio: 0.5,
+            reflexFit: true,
+            reflexRatio: 0,
             roundBars: false,
-            showBgColor: false,
             showFPS: false,
-            showPeaks: false,
+            showPeaks: true,
             showScaleX: false,
             showScaleY: false,
-            smoothing: 0.8,
+            smoothing: 0.5,
             spinSpeed: 0.0,
             splitGradient: false,
             trueLeds: false,
             volume: 1.0,
-            weightingFilter: 'Z',
+            weightingFilter: '',
         },
         type: 'audiomotionanalyzer',
     },

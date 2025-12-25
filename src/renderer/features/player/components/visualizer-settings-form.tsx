@@ -1,15 +1,23 @@
 import { ConstructorOptions } from 'audiomotion-analyzer';
-import { useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import styles from './visualizer-settings-form.module.css';
 
 import { useSettingsStoreActions, useVisualizerSettings } from '/@/renderer/store/settings.store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
+import { Checkbox } from '/@/shared/components/checkbox/checkbox';
+import { ColorInput } from '/@/shared/components/color-input/color-input';
+import { Divider } from '/@/shared/components/divider/divider';
 import { Fieldset } from '/@/shared/components/fieldset/fieldset';
 import { Group } from '/@/shared/components/group/group';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Select, SelectProps } from '/@/shared/components/select/select';
 import { Slider, SliderProps } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
+import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 
 const modeOptions: { label: string; value: ConstructorOptions['mode'] | string }[] = [
@@ -96,6 +104,28 @@ const barSpaceOptions = [
     { label: '1.0', value: '1.0' },
 ];
 
+const useUpdateAudioMotionAnalyzer = () => {
+    const visualizer = useVisualizerSettings();
+    const { setSettings } = useSettingsStoreActions();
+
+    const updateProperty = <K extends keyof typeof visualizer.audiomotionanalyzer>(
+        property: K,
+        value: (typeof visualizer.audiomotionanalyzer)[K],
+    ) => {
+        setSettings({
+            visualizer: {
+                ...visualizer,
+                audiomotionanalyzer: {
+                    ...visualizer.audiomotionanalyzer,
+                    [property]: value,
+                },
+            },
+        });
+    };
+
+    return { updateProperty, visualizer };
+};
+
 export const VisualizerSettingsForm = () => {
     return (
         <div className={styles.container}>
@@ -117,68 +147,248 @@ const VisualizerSelect = (props: SelectProps) => {
     return <Select styles={{ label: { display: 'flex', justifyContent: 'center' } }} {...props} />;
 };
 
-const VisualizerSlider = (props: SliderProps) => {
-    const { label, ...rest } = props;
+const VisualizerSlider = (props: SliderProps & { label?: React.ReactNode }) => {
+    const { defaultValue, label, max, min, onChange, onChangeEnd, step, ...rest } = props;
 
     const sliderRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [value, setValue] = useState<number>((defaultValue as number) ?? 0);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editValue, setEditValue] = useState<number>((defaultValue as number) ?? 0);
+
+    // Update local state when defaultValue changes externally
+    useEffect(() => {
+        if (defaultValue !== undefined) {
+            setValue(defaultValue as number);
+            setEditValue(defaultValue as number);
+        }
+    }, [defaultValue]);
+
+    // Auto-focus input when entering edit mode
+    useEffect(() => {
+        if (isEditing && inputRef.current) {
+            inputRef.current.focus();
+            inputRef.current.select();
+        }
+    }, [isEditing]);
+
+    const handleChange = (val: number) => {
+        setValue(val);
+        onChange?.(val);
+    };
+
+    const handleTextClick = () => {
+        setEditValue(value);
+        setIsEditing(true);
+    };
+
+    const handleInputChange = (val: number | string) => {
+        const numVal = typeof val === 'number' ? val : parseFloat(val) || 0;
+        setEditValue(numVal);
+
+        // Update slider value in real-time as user types (clamped to bounds)
+        let clampedValue = numVal;
+        if (min !== undefined && clampedValue < min) {
+            clampedValue = min;
+        }
+        if (max !== undefined && clampedValue > max) {
+            clampedValue = max;
+        }
+        setValue(clampedValue);
+        onChange?.(clampedValue);
+    };
+
+    const handleInputBlur = () => {
+        applyEditValue();
+    };
+
+    const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            applyEditValue();
+        } else if (e.key === 'Escape') {
+            setIsEditing(false);
+            setEditValue(value);
+        }
+    };
+
+    const applyEditValue = () => {
+        let finalValue = editValue;
+
+        // Clamp value to min/max bounds
+        if (min !== undefined && finalValue < min) {
+            finalValue = min;
+        }
+        if (max !== undefined && finalValue > max) {
+            finalValue = max;
+        }
+
+        setValue(finalValue);
+        setEditValue(finalValue);
+        setIsEditing(false);
+
+        // Update slider and trigger onChangeEnd to save
+        onChange?.(finalValue);
+        onChangeEnd?.(finalValue);
+    };
 
     return (
-        <Stack>
-            <Text fw="500" size="sm" ta="center">
-                {label as string}
-            </Text>
+        <Stack gap="sm">
+            {label && (
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    {typeof label === 'string' ? (
+                        <Text fw="500" size="sm" ta="center">
+                            {label}
+                        </Text>
+                    ) : (
+                        label
+                    )}
+                </div>
+            )}
             <Slider
+                label={null}
+                max={max}
+                min={min}
+                onChange={handleChange}
+                onChangeEnd={onChangeEnd}
                 ref={sliderRef}
+                step={step}
                 styles={{
                     root: { alignSelf: 'center', display: 'flex' },
                 }}
+                value={value}
                 w="100px"
                 {...rest}
             />
+            {isEditing ? (
+                <NumberInput
+                    max={max}
+                    min={min}
+                    onBlur={handleInputBlur}
+                    onChange={handleInputChange}
+                    onKeyDown={handleInputKeyDown}
+                    ref={inputRef}
+                    size="xs"
+                    step={step}
+                    style={{ alignSelf: 'center', width: '80px' }}
+                    styles={{ input: { textAlign: 'center' } }}
+                    value={editValue}
+                />
+            ) : (
+                <Text
+                    fw="500"
+                    onClick={handleTextClick}
+                    size="sm"
+                    style={{ cursor: 'pointer', userSelect: 'none' }}
+                    ta="center"
+                >
+                    {value.toFixed(step && step < 1 ? 1 : 0)}
+                </Text>
+            )}
         </Stack>
     );
 };
 
 const VisualizerToggle = (props: {
+    disabled?: boolean;
     label: string;
     onChange: (value: boolean) => void;
     value: boolean;
 }) => {
-    const { label, onChange, value } = props;
+    const { disabled, label, onChange, value } = props;
 
     return (
-        <Button onClick={() => onChange(!value)} variant={value ? 'filled' : 'default'}>
+        <Button
+            disabled={disabled}
+            onClick={() => onChange(!value)}
+            variant={value ? 'filled' : 'default'}
+        >
             {label}
         </Button>
     );
 };
 
 const GeneralSettings = () => {
-    const visualizer = useVisualizerSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateAudioMotionAnalyzer();
+
+    const isMode18Disabled = visualizer.audiomotionanalyzer.mode > 8;
+    const isMode10Disabled = visualizer.audiomotionanalyzer.mode !== 10;
+
+    const getModeKey = (value: string) => {
+        const modeMap: Record<string, string> = {
+            '0': 'bars',
+            '1': 'circle',
+            '2': 'wave',
+            '3': 'rainbow',
+            '4': 'rings',
+            '5': 'mirror',
+            '6': 'line',
+            '7': 'particles',
+            '8': 'fullOctave',
+            '10': 'outlineBars',
+        };
+        return modeMap[value] || 'bars';
+    };
+
+    const translatedModeOptions = useMemo(
+        () =>
+            modeOptions.map((option) => {
+                const value = option.value as string;
+                return {
+                    label: t(`visualizer.options.mode.${getModeKey(value)}`),
+                    value,
+                };
+            }),
+        [t],
+    );
+
+    const getChannelLayoutKey = (value: string) => {
+        const layoutMap: Record<string, string> = {
+            'dual-combined': 'dualCombined',
+            'dual-horizontal': 'dualHorizontal',
+            'dual-vertical': 'dualVertical',
+            single: 'single',
+        };
+        return layoutMap[value] || 'single';
+    };
+
+    const translatedChannelLayoutOptions = useMemo(
+        () =>
+            channelLayoutOptions.map((option) => {
+                const value = option.value || 'single';
+                return {
+                    label: t(`visualizer.options.channelLayout.${getChannelLayoutKey(value)}`),
+                    value: value as string,
+                };
+            }),
+        [t],
+    );
 
     return (
-        <Fieldset legend="General">
+        <Fieldset
+            legend={
+                <Group gap="xs">
+                    {t('visualizer.general')}
+                    <ActionIcon
+                        component="a"
+                        href="https://audiomotion.dev/#/?id=constructor-specific-options"
+                        icon="externalLink"
+                        iconProps={{ color: 'info' }}
+                        size="xs"
+                        target="_blank"
+                        variant="transparent"
+                    />
+                </Group>
+            }
+        >
             <Stack>
                 <Group grow>
                     <VisualizerSelect
-                        data={modeOptions.map((option) => ({
-                            label: option.label,
-                            value: option.value as string,
-                        }))}
+                        data={translatedModeOptions}
                         defaultValue={visualizer.audiomotionanalyzer.mode.toString()}
-                        label="Mode"
-                        onChange={(e) =>
-                            setSettings({
-                                visualizer: {
-                                    ...visualizer,
-                                    audiomotionanalyzer: {
-                                        ...visualizer.audiomotionanalyzer,
-                                        mode: Number(e),
-                                    },
-                                },
-                            })
-                        }
+                        label={t('visualizer.mode')}
+                        onChange={(e) => updateProperty('mode', Number(e))}
                     />
                 </Group>
                 <div
@@ -187,7 +397,7 @@ const GeneralSettings = () => {
                         gap: 'var(--theme-spacing-md)',
                     }}
                 >
-                    <Fieldset legend="Mode 1 - 8" style={{ flex: 1, flexGrow: 1 }}>
+                    <Fieldset legend={t('visualizer.mode1To8')} style={{ flex: 1, flexGrow: 1 }}>
                         <Group grow>
                             <VisualizerSelect
                                 data={barSpaceOptions.map((option) => ({
@@ -195,57 +405,30 @@ const GeneralSettings = () => {
                                     value: option.value,
                                 }))}
                                 defaultValue={visualizer.audiomotionanalyzer.barSpace.toString()}
-                                label="Bar Space"
-                                onChange={(e) =>
-                                    setSettings({
-                                        visualizer: {
-                                            ...visualizer,
-                                            audiomotionanalyzer: {
-                                                ...visualizer.audiomotionanalyzer,
-                                                mode: Number(e),
-                                            },
-                                        },
-                                    })
-                                }
+                                disabled={isMode18Disabled}
+                                label={t('visualizer.barSpace')}
+                                onChange={(e) => updateProperty('barSpace', Number(e))}
                             />
                         </Group>
                     </Fieldset>
-                    <Fieldset legend="Mode 10" style={{ flex: 1, flexGrow: 1 }}>
+                    <Fieldset legend={t('visualizer.mode10')} style={{ flex: 1, flexGrow: 1 }}>
                         <Group grow>
                             <VisualizerSlider
                                 defaultValue={visualizer.audiomotionanalyzer.lineWidth}
-                                label="Line Width"
+                                disabled={isMode10Disabled}
+                                label={t('visualizer.lineWidth')}
                                 max={4}
                                 min={0}
-                                onChangeEnd={(e) =>
-                                    setSettings({
-                                        visualizer: {
-                                            ...visualizer,
-                                            audiomotionanalyzer: {
-                                                ...visualizer.audiomotionanalyzer,
-                                                lineWidth: e,
-                                            },
-                                        },
-                                    })
-                                }
+                                onChangeEnd={(e) => updateProperty('lineWidth', e)}
                                 step={0.1}
                             />
                             <VisualizerSlider
-                                defaultValue={visualizer.audiomotionanalyzer.lineWidth}
-                                label="Fill Alpha"
+                                defaultValue={visualizer.audiomotionanalyzer.fillAlpha}
+                                disabled={isMode10Disabled}
+                                label={t('visualizer.fillAlpha')}
                                 max={1}
                                 min={0}
-                                onChangeEnd={(e) =>
-                                    setSettings({
-                                        visualizer: {
-                                            ...visualizer,
-                                            audiomotionanalyzer: {
-                                                ...visualizer.audiomotionanalyzer,
-                                                fillAlpha: e,
-                                            },
-                                        },
-                                    })
-                                }
+                                onChangeEnd={(e) => updateProperty('fillAlpha', e)}
                                 step={0.1}
                             />
                         </Group>
@@ -254,135 +437,583 @@ const GeneralSettings = () => {
 
                 <Group grow>
                     <VisualizerSelect
-                        data={channelLayoutOptions.map((option) => ({
-                            label: option.label,
-                            value: option.value as string,
-                        }))}
+                        data={translatedChannelLayoutOptions}
                         defaultValue={visualizer.audiomotionanalyzer.channelLayout}
-                        label="Channel Layout"
+                        label={t('visualizer.channelLayout')}
                         onChange={(e) =>
-                            setSettings({
-                                visualizer: {
-                                    ...visualizer,
-                                    audiomotionanalyzer: {
-                                        ...visualizer.audiomotionanalyzer,
-                                        channelLayout: e as
-                                            | 'dual-combined'
-                                            | 'dual-horizontal'
-                                            | 'dual-vertical'
-                                            | 'single',
-                                    },
-                                },
-                            })
+                            updateProperty(
+                                'channelLayout',
+                                e as
+                                    | 'dual-combined'
+                                    | 'dual-horizontal'
+                                    | 'dual-vertical'
+                                    | 'single',
+                            )
                         }
                     />
+                    <VisualizerSlider
+                        defaultValue={visualizer.audiomotionanalyzer.maxFPS}
+                        label={t('visualizer.maxFPS')}
+                        max={144}
+                        min={0}
+                        onChangeEnd={(e) => updateProperty('maxFPS', e)}
+                    />
                 </Group>
+            </Stack>
+        </Fieldset>
+    );
+};
+
+type CustomGradient = {
+    colorStops: (string | { color: string; level?: number; pos?: number })[];
+    dir?: string;
+    name: string;
+};
+
+const CustomGradientsManager = () => {
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateAudioMotionAnalyzer();
+    const [isAdding, setIsAdding] = useState(false);
+    const [editingIndex, setEditingIndex] = useState<null | number>(null);
+    const [newGradient, setNewGradient] = useState<CustomGradient>({
+        colorStops: ['#ff0000'],
+        dir: 'v',
+        name: '',
+    });
+    // Track which checkboxes are enabled for each color stop
+    const [colorStopOptions, setColorStopOptions] = useState<
+        Array<{ enableLevel: boolean; enablePos: boolean }>
+    >([{ enableLevel: false, enablePos: false }]);
+
+    const customGradients = visualizer.audiomotionanalyzer.customGradients || [];
+
+    const handleAddGradient = () => {
+        if (!newGradient.name.trim()) return;
+
+        const updatedGradients = [...customGradients, newGradient];
+        updateProperty('customGradients', updatedGradients);
+        setNewGradient({ colorStops: ['#ff0000'], dir: 'v', name: '' });
+        setColorStopOptions([{ enableLevel: false, enablePos: false }]);
+        setIsAdding(false);
+    };
+
+    const handleDeleteGradient = (index: number) => {
+        const updatedGradients = customGradients.filter((_, i) => i !== index);
+        updateProperty('customGradients', updatedGradients);
+    };
+
+    const handleEditGradient = (index: number) => {
+        const gradient = customGradients[index];
+        setNewGradient(gradient);
+        // Initialize checkbox states based on existing color stops
+        const options = gradient.colorStops.map((stop) => ({
+            enableLevel: typeof stop !== 'string' && stop.level !== undefined,
+            enablePos: typeof stop !== 'string' && stop.pos !== undefined,
+        }));
+        setColorStopOptions(options);
+        setEditingIndex(index);
+        setIsAdding(true);
+    };
+
+    const handleSaveEdit = () => {
+        if (!newGradient.name.trim() || editingIndex === null) return;
+
+        const updatedGradients = [...customGradients];
+        updatedGradients[editingIndex] = newGradient;
+        updateProperty('customGradients', updatedGradients);
+        setNewGradient({ colorStops: ['#ff0000'], dir: 'v', name: '' });
+        setColorStopOptions([{ enableLevel: false, enablePos: false }]);
+        setEditingIndex(null);
+        setIsAdding(false);
+    };
+
+    const handleCancel = () => {
+        setNewGradient({ colorStops: ['#ff0000'], dir: 'v', name: '' });
+        setColorStopOptions([{ enableLevel: false, enablePos: false }]);
+        setEditingIndex(null);
+        setIsAdding(false);
+    };
+
+    const handleAddColorStop = () => {
+        setNewGradient({
+            ...newGradient,
+            colorStops: [...newGradient.colorStops, '#00ff00'],
+        });
+        setColorStopOptions([...colorStopOptions, { enableLevel: false, enablePos: false }]);
+    };
+
+    const handleRemoveColorStop = (index: number) => {
+        if (newGradient.colorStops.length <= 1) return;
+        setNewGradient({
+            ...newGradient,
+            colorStops: newGradient.colorStops.filter((_, i) => i !== index),
+        });
+        setColorStopOptions(colorStopOptions.filter((_, i) => i !== index));
+    };
+
+    const handleColorStopChange = (index: number, color: string) => {
+        const updatedColorStops = [...newGradient.colorStops];
+        const currentStop = updatedColorStops[index];
+        const options = colorStopOptions[index];
+
+        // If neither checkbox is enabled, store as string
+        if (!options.enablePos && !options.enableLevel) {
+            updatedColorStops[index] = color;
+        } else {
+            // Otherwise, store as object with enabled properties
+            updatedColorStops[index] = {
+                color,
+                ...(options.enablePos &&
+                typeof currentStop !== 'string' &&
+                currentStop.pos !== undefined
+                    ? { pos: currentStop.pos }
+                    : {}),
+                ...(options.enableLevel &&
+                typeof currentStop !== 'string' &&
+                currentStop.level !== undefined
+                    ? { level: currentStop.level }
+                    : {}),
+            };
+        }
+
+        setNewGradient({ ...newGradient, colorStops: updatedColorStops });
+    };
+
+    const handleColorStopPosChange = (index: number, pos: number | string) => {
+        const updatedColorStops = [...newGradient.colorStops];
+        const currentStop = updatedColorStops[index];
+        const posValue = typeof pos === 'number' ? pos : parseFloat(pos) || undefined;
+        const options = colorStopOptions[index];
+
+        const color = typeof currentStop === 'string' ? currentStop : currentStop.color;
+
+        updatedColorStops[index] = {
+            color,
+            ...(options.enablePos && posValue !== undefined ? { pos: posValue } : {}),
+            ...(options.enableLevel &&
+            typeof currentStop !== 'string' &&
+            currentStop.level !== undefined
+                ? { level: currentStop.level }
+                : {}),
+        };
+
+        setNewGradient({ ...newGradient, colorStops: updatedColorStops });
+    };
+
+    const handleColorStopLevelChange = (index: number, level: number | string) => {
+        const updatedColorStops = [...newGradient.colorStops];
+        const currentStop = updatedColorStops[index];
+        const levelValue = typeof level === 'number' ? level : parseFloat(level) || undefined;
+        const options = colorStopOptions[index];
+
+        const color = typeof currentStop === 'string' ? currentStop : currentStop.color;
+
+        updatedColorStops[index] = {
+            color,
+            ...(options.enablePos &&
+            typeof currentStop !== 'string' &&
+            currentStop.pos !== undefined
+                ? { pos: currentStop.pos }
+                : {}),
+            ...(options.enableLevel && levelValue !== undefined ? { level: levelValue } : {}),
+        };
+
+        setNewGradient({ ...newGradient, colorStops: updatedColorStops });
+    };
+
+    const handleTogglePos = (index: number, enabled: boolean) => {
+        const updatedOptions = [...colorStopOptions];
+        updatedOptions[index] = { ...updatedOptions[index], enablePos: enabled };
+        setColorStopOptions(updatedOptions);
+
+        // If both are now disabled, convert to string
+        if (!enabled && !updatedOptions[index].enableLevel) {
+            const updatedColorStops = [...newGradient.colorStops];
+            const currentStop = updatedColorStops[index];
+            const color = typeof currentStop === 'string' ? currentStop : currentStop.color;
+            updatedColorStops[index] = color;
+            setNewGradient({ ...newGradient, colorStops: updatedColorStops });
+        } else {
+            // Otherwise, ensure it's an object
+            const updatedColorStops = [...newGradient.colorStops];
+            const currentStop = updatedColorStops[index];
+            const color = typeof currentStop === 'string' ? currentStop : currentStop.color;
+
+            updatedColorStops[index] = {
+                color,
+                ...(enabled && typeof currentStop !== 'string' && currentStop.pos !== undefined
+                    ? { pos: currentStop.pos }
+                    : {}),
+                ...(updatedOptions[index].enableLevel &&
+                typeof currentStop !== 'string' &&
+                currentStop.level !== undefined
+                    ? { level: currentStop.level }
+                    : {}),
+            };
+            setNewGradient({ ...newGradient, colorStops: updatedColorStops });
+        }
+    };
+
+    const handleToggleLevel = (index: number, enabled: boolean) => {
+        const updatedOptions = [...colorStopOptions];
+        updatedOptions[index] = { ...updatedOptions[index], enableLevel: enabled };
+        setColorStopOptions(updatedOptions);
+
+        // If both are now disabled, convert to string
+        if (!enabled && !updatedOptions[index].enablePos) {
+            const updatedColorStops = [...newGradient.colorStops];
+            const currentStop = updatedColorStops[index];
+            const color = typeof currentStop === 'string' ? currentStop : currentStop.color;
+            updatedColorStops[index] = color;
+            setNewGradient({ ...newGradient, colorStops: updatedColorStops });
+        } else {
+            // Otherwise, ensure it's an object
+            const updatedColorStops = [...newGradient.colorStops];
+            const currentStop = updatedColorStops[index];
+            const color = typeof currentStop === 'string' ? currentStop : currentStop.color;
+
+            updatedColorStops[index] = {
+                color,
+                ...(updatedOptions[index].enablePos &&
+                typeof currentStop !== 'string' &&
+                currentStop.pos !== undefined
+                    ? { pos: currentStop.pos }
+                    : {}),
+                ...(enabled && typeof currentStop !== 'string' && currentStop.level !== undefined
+                    ? { level: currentStop.level }
+                    : {}),
+            };
+            setNewGradient({ ...newGradient, colorStops: updatedColorStops });
+        }
+    };
+
+    return (
+        <Fieldset
+            legend={
+                <Group gap="xs">
+                    {t('visualizer.customGradients')}
+                    <ActionIcon
+                        component="a"
+                        href="https://audiomotion.dev/#/?id=registergradient-name-options-"
+                        icon="externalLink"
+                        iconProps={{ color: 'info' }}
+                        size="xs"
+                        target="_blank"
+                        variant="transparent"
+                    />
+                </Group>
+            }
+        >
+            <Stack gap="md">
+                {customGradients.length > 0 && (
+                    <Stack gap="sm">
+                        {customGradients.map((gradient, index) => (
+                            <Group grow key={index}>
+                                <Text size="sm" style={{ flex: 1 }}>
+                                    {gradient.name}
+                                </Text>
+                                <Button
+                                    onClick={() => handleEditGradient(index)}
+                                    size="xs"
+                                    variant="default"
+                                >
+                                    {t('common.edit', { postProcess: 'titleCase' })}
+                                </Button>
+                                <Button
+                                    onClick={() => handleDeleteGradient(index)}
+                                    size="xs"
+                                    variant="subtle"
+                                >
+                                    {t('common.delete', { postProcess: 'titleCase' })}
+                                </Button>
+                            </Group>
+                        ))}
+                    </Stack>
+                )}
+
+                {!isAdding ? (
+                    <Button onClick={() => setIsAdding(true)} size="sm" variant="outline">
+                        {t('visualizer.addCustomGradient')}
+                    </Button>
+                ) : (
+                    <>
+                        <Divider />
+                        <Stack gap="sm">
+                            <TextInput
+                                onChange={(e) =>
+                                    setNewGradient({ ...newGradient, name: e.currentTarget.value })
+                                }
+                                placeholder={t('visualizer.gradientNamePlaceholder')}
+                                size="sm"
+                                value={newGradient.name}
+                            />
+                            <SegmentedControl
+                                data={[
+                                    { label: t('visualizer.vertical'), value: 'v' },
+                                    { label: t('visualizer.horizontal'), value: 'h' },
+                                ]}
+                                onChange={(value) =>
+                                    setNewGradient({
+                                        ...newGradient,
+                                        dir: value,
+                                    })
+                                }
+                                size="sm"
+                                value={newGradient.dir || 'v'}
+                            />
+                            <Stack gap="xl">
+                                <Group justify="space-between">
+                                    <Text>{t('visualizer.colorStops')}</Text>
+                                    <Button
+                                        onClick={handleAddColorStop}
+                                        size="xs"
+                                        variant="outline"
+                                    >
+                                        {t('visualizer.addColor')}
+                                    </Button>
+                                </Group>
+                                {newGradient.colorStops.map((stop, index) => {
+                                    const options = colorStopOptions[index] || {
+                                        enableLevel: false,
+                                        enablePos: false,
+                                    };
+                                    return (
+                                        <Group grow key={index}>
+                                            <ColorInput
+                                                format="hex"
+                                                onChangeEnd={(color) =>
+                                                    handleColorStopChange(index, color)
+                                                }
+                                                size="sm"
+                                                value={typeof stop === 'string' ? stop : stop.color}
+                                            />
+                                            <VisualizerSlider
+                                                defaultValue={
+                                                    typeof stop === 'string' ? undefined : stop.pos
+                                                }
+                                                disabled={!options.enablePos}
+                                                label={
+                                                    <Group
+                                                        gap="xs"
+                                                        style={{ alignItems: 'center' }}
+                                                    >
+                                                        <Checkbox
+                                                            checked={options.enablePos}
+                                                            onChange={(e) =>
+                                                                handleTogglePos(
+                                                                    index,
+                                                                    e.currentTarget.checked,
+                                                                )
+                                                            }
+                                                            size="xs"
+                                                        />
+                                                        <Text fw={500} size="sm">
+                                                            {t('visualizer.position')}
+                                                        </Text>
+                                                    </Group>
+                                                }
+                                                max={1}
+                                                min={0}
+                                                onChangeEnd={(e) =>
+                                                    handleColorStopPosChange(index, e)
+                                                }
+                                                step={0.1}
+                                            />
+                                            <VisualizerSlider
+                                                defaultValue={
+                                                    typeof stop === 'string'
+                                                        ? undefined
+                                                        : stop.level
+                                                }
+                                                disabled={!options.enableLevel}
+                                                label={
+                                                    <Group
+                                                        gap="xs"
+                                                        style={{ alignItems: 'center' }}
+                                                    >
+                                                        <Checkbox
+                                                            checked={options.enableLevel}
+                                                            onChange={(e) =>
+                                                                handleToggleLevel(
+                                                                    index,
+                                                                    e.currentTarget.checked,
+                                                                )
+                                                            }
+                                                            size="xs"
+                                                        />
+                                                        <Text fw={500} size="sm">
+                                                            {t('visualizer.level')}
+                                                        </Text>
+                                                    </Group>
+                                                }
+                                                max={1}
+                                                min={0}
+                                                onChangeEnd={(e) =>
+                                                    handleColorStopLevelChange(index, e)
+                                                }
+                                                step={0.1}
+                                            />
+                                            {newGradient.colorStops.length > 1 && (
+                                                <Button
+                                                    onClick={() => handleRemoveColorStop(index)}
+                                                    size="xs"
+                                                    variant="subtle"
+                                                >
+                                                    {t('visualizer.remove')}
+                                                </Button>
+                                            )}
+                                        </Group>
+                                    );
+                                })}
+                            </Stack>
+                            <Group grow>
+                                <Button onClick={handleCancel} size="sm" variant="subtle">
+                                    {t('common.cancel', { postProcess: 'titleCase' })}
+                                </Button>
+                                <Button
+                                    disabled={!newGradient.name.trim()}
+                                    onClick={
+                                        editingIndex !== null ? handleSaveEdit : handleAddGradient
+                                    }
+                                    size="sm"
+                                    variant="filled"
+                                >
+                                    {editingIndex !== null
+                                        ? t('common.save', { postProcess: 'titleCase' })
+                                        : t('common.add', { postProcess: 'titleCase' })}
+                                </Button>
+                            </Group>
+                        </Stack>
+                    </>
+                )}
             </Stack>
         </Fieldset>
     );
 };
 
 const ColorSettings = () => {
-    const visualizer = useVisualizerSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateAudioMotionAnalyzer();
+
+    const isGradientDisabled = visualizer.audiomotionanalyzer.channelLayout !== 'single';
+    const isGradientLeftDisabled = visualizer.audiomotionanalyzer.channelLayout === 'single';
+    const isGradientRightDisabled = visualizer.audiomotionanalyzer.channelLayout === 'single';
+
+    const getColorModeKey = (value: string) => {
+        const colorModeMap: Record<string, string> = {
+            'bar-index': 'barIndex',
+            'bar-level': 'barLevel',
+            gradient: 'gradient',
+        };
+        return colorModeMap[value] || 'gradient';
+    };
+
+    const translatedColorModeOptions = useMemo(
+        () =>
+            colorModeOptions.map((option) => {
+                const value = option.value || 'gradient';
+                return {
+                    label: t(`visualizer.options.colorMode.${getColorModeKey(value)}`),
+                    value: value as string,
+                };
+            }),
+        [t],
+    );
+
+    const translatedGradientOptions = useMemo(
+        () =>
+            gradientOptions.map((option) => ({
+                label: t(`visualizer.options.gradient.${option.value}`),
+                value: option.value as string,
+            })),
+        [t],
+    );
+
+    const allGradientOptions = useMemo(
+        () => [
+            {
+                group: t('visualizer.custom'),
+                items: (visualizer.audiomotionanalyzer.customGradients || []).map((gradient) => ({
+                    label: gradient.name,
+                    value: gradient.name,
+                })),
+            },
+            {
+                group: t('visualizer.builtIn'),
+                items: translatedGradientOptions,
+            },
+        ],
+        [t, translatedGradientOptions, visualizer.audiomotionanalyzer.customGradients],
+    );
 
     return (
-        <Fieldset legend="Colors">
+        <Fieldset legend={t('visualizer.colors')}>
             <Stack>
                 <Group grow>
                     <VisualizerSelect
-                        data={colorModeOptions.map((option) => ({
-                            label: option.label,
-                            value: option.value as string,
-                        }))}
+                        data={translatedColorModeOptions}
                         defaultValue={visualizer.audiomotionanalyzer.colorMode}
-                        label="Color Mode"
+                        label={t('visualizer.colorMode')}
                         onChange={(e) =>
-                            setSettings({
-                                visualizer: {
-                                    ...visualizer,
-                                    audiomotionanalyzer: {
-                                        ...visualizer.audiomotionanalyzer,
-                                        colorMode: (e || 'gradient') as
-                                            | 'bar-index'
-                                            | 'bar-level'
-                                            | 'gradient',
-                                    },
-                                },
-                            })
+                            updateProperty(
+                                'colorMode',
+                                (e || 'gradient') as 'bar-index' | 'bar-level' | 'gradient',
+                            )
                         }
                     />
                     <VisualizerSelect
-                        data={gradientOptions.map((option) => ({
-                            label: option.label,
-                            value: option.value as string,
-                        }))}
+                        data={allGradientOptions}
                         defaultValue={visualizer.audiomotionanalyzer.gradient}
-                        label="Gradient"
+                        disabled={isGradientDisabled}
+                        label={t('visualizer.gradient')}
                         onChange={(e) =>
-                            setSettings({
-                                visualizer: {
-                                    ...visualizer,
-                                    audiomotionanalyzer: {
-                                        ...visualizer.audiomotionanalyzer,
-                                        gradient: e || 'classic',
-                                    },
-                                },
-                            })
+                            updateProperty(
+                                'gradient',
+                                (e || 'classic') as typeof visualizer.audiomotionanalyzer.gradient,
+                            )
                         }
                     />
                 </Group>
                 <Group grow>
                     <VisualizerSelect
-                        data={gradientOptions.map((option) => ({
-                            label: option.label,
-                            value: option.value as string,
-                        }))}
+                        data={allGradientOptions}
                         defaultValue={visualizer.audiomotionanalyzer.gradientLeft}
-                        label="Gradient Left"
+                        disabled={isGradientLeftDisabled}
+                        label={t('visualizer.gradientLeft')}
                         onChange={(e) =>
-                            setSettings({
-                                visualizer: {
-                                    ...visualizer,
-                                    audiomotionanalyzer: {
-                                        ...visualizer.audiomotionanalyzer,
-                                        gradientLeft: e || 'classic',
-                                    },
-                                },
-                            })
+                            updateProperty(
+                                'gradientLeft',
+                                (e ||
+                                    'classic') as typeof visualizer.audiomotionanalyzer.gradientLeft,
+                            )
                         }
                     />
                     <VisualizerSelect
-                        data={gradientOptions.map((option) => ({
-                            label: option.label,
-                            value: option.value as string,
-                        }))}
+                        data={allGradientOptions}
                         defaultValue={visualizer.audiomotionanalyzer.gradientRight}
-                        label="Gradient Right"
+                        disabled={isGradientRightDisabled}
+                        label={t('visualizer.gradientRight')}
                         onChange={(e) =>
-                            setSettings({
-                                visualizer: {
-                                    ...visualizer,
-                                    audiomotionanalyzer: {
-                                        ...visualizer.audiomotionanalyzer,
-                                        gradientRight: e || 'classic',
-                                    },
-                                },
-                            })
+                            updateProperty(
+                                'gradientRight',
+                                (e ||
+                                    'classic') as typeof visualizer.audiomotionanalyzer.gradientRight,
+                            )
                         }
                     />
                 </Group>
+                <CustomGradientsManager />
             </Stack>
         </Fieldset>
     );
 };
 
 const FFTSettings = () => {
-    const visualizer = useVisualizerSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateAudioMotionAnalyzer();
 
     return (
-        <Fieldset legend="FFT">
+        <Fieldset legend={t('visualizer.fft')}>
             <Group grow>
                 <VisualizerSelect
                     data={fftSizeOptions.map((option) => ({
@@ -390,35 +1021,15 @@ const FFTSettings = () => {
                         value: option.value as string,
                     }))}
                     defaultValue={visualizer.audiomotionanalyzer.fftSize.toString()}
-                    label="FFT Size"
-                    onChange={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    fftSize: Number(e),
-                                },
-                            },
-                        })
-                    }
+                    label={t('visualizer.fftSize')}
+                    onChange={(e) => updateProperty('fftSize', Number(e))}
                 />
                 <VisualizerSlider
                     defaultValue={visualizer.audiomotionanalyzer.smoothing}
-                    label="Smoothing"
+                    label={t('visualizer.smoothing')}
                     max={1}
                     min={0}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    smoothing: e,
-                                },
-                            },
-                        })
-                    }
+                    onChangeEnd={(e) => updateProperty('smoothing', e)}
                     step={0.1}
                 />
             </Group>
@@ -427,11 +1038,20 @@ const FFTSettings = () => {
 };
 
 const FrequencySettings = () => {
-    const visualizer = useVisualizerSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateAudioMotionAnalyzer();
+
+    const translatedFrequencyScaleOptions = useMemo(
+        () =>
+            frequencyScaleOptions.map((option) => ({
+                label: t(`visualizer.options.frequencyScale.${option.value}`),
+                value: option.value as string,
+            })),
+        [t],
+    );
 
     return (
-        <Fieldset legend="Frequency range and scaling">
+        <Fieldset legend={t('visualizer.frequencyRangeAndScaling')}>
             <Group grow wrap="nowrap">
                 <VisualizerSelect
                     data={minFreqOptions.map((option) => ({
@@ -439,18 +1059,8 @@ const FrequencySettings = () => {
                         value: option.value as string,
                     }))}
                     defaultValue={visualizer.audiomotionanalyzer.minFreq.toString()}
-                    label="Minimum Frequency"
-                    onChange={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    minFreq: Number(e),
-                                },
-                            },
-                        })
-                    }
+                    label={t('visualizer.minimumFrequency')}
+                    onChange={(e) => updateProperty('minFreq', Number(e))}
                 />
                 <VisualizerSelect
                     data={maxFreqOptions.map((option) => ({
@@ -458,40 +1068,18 @@ const FrequencySettings = () => {
                         value: option.value as string,
                     }))}
                     defaultValue={visualizer.audiomotionanalyzer.maxFreq.toString()}
-                    label="Maximum Frequency"
-                    onChange={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    maxFreq: Number(e),
-                                },
-                            },
-                        })
-                    }
+                    label={t('visualizer.maximumFrequency')}
+                    onChange={(e) => updateProperty('maxFreq', Number(e))}
                 />
                 <VisualizerSelect
-                    data={frequencyScaleOptions.map((option) => ({
-                        label: option.label,
-                        value: option.value as string,
-                    }))}
+                    data={translatedFrequencyScaleOptions}
                     defaultValue={visualizer.audiomotionanalyzer.frequencyScale}
-                    label="Frequency Scale"
+                    label={t('visualizer.frequencyScale')}
                     onChange={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    frequencyScale: (e || 'log') as
-                                        | 'bark'
-                                        | 'linear'
-                                        | 'log'
-                                        | 'mel',
-                                },
-                            },
-                        })
+                        updateProperty(
+                            'frequencyScale',
+                            (e || 'log') as 'bark' | 'linear' | 'log' | 'mel',
+                        )
                     }
                 />
             </Group>
@@ -500,65 +1088,49 @@ const FrequencySettings = () => {
 };
 
 const SensitivitySettings = () => {
-    const visualizer = useVisualizerSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateAudioMotionAnalyzer();
+
+    const getWeightingFilterKey = (value: string) => {
+        return value === '' ? 'none' : value.toLowerCase();
+    };
+
+    const translatedWeightingFilterOptions = useMemo(
+        () =>
+            weightingFilterOptions.map((option) => ({
+                label: t(
+                    `visualizer.options.weightingFilter.${getWeightingFilterKey(option.value)}`,
+                ),
+                value: option.value as string,
+            })),
+        [t],
+    );
 
     return (
-        <Fieldset legend="Sensitivity">
+        <Fieldset legend={t('visualizer.sensitivity')}>
             <Group grow>
                 <VisualizerSelect
-                    data={weightingFilterOptions.map((option) => ({
-                        label: option.label,
-                        value: option.value as string,
-                    }))}
+                    data={translatedWeightingFilterOptions}
                     defaultValue={visualizer.audiomotionanalyzer.weightingFilter}
-                    label="Weighting Filter"
+                    label={t('visualizer.weightingFilter')}
                     onChange={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    weightingFilter: e as 'A' | 'B' | 'C' | 'D' | 'Z',
-                                },
-                            },
-                        })
+                        updateProperty('weightingFilter', e as 'A' | 'B' | 'C' | 'D' | 'Z')
                     }
                 />
                 <VisualizerSlider
                     defaultValue={visualizer.audiomotionanalyzer.minDecibels}
-                    label="Minimum Decibels"
+                    label={t('visualizer.minimumDecibels')}
                     max={-60}
                     min={-120}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    minDecibels: e,
-                                },
-                            },
-                        })
-                    }
+                    onChangeEnd={(e) => updateProperty('minDecibels', e)}
                     step={1}
                 />
                 <VisualizerSlider
                     defaultValue={visualizer.audiomotionanalyzer.maxDecibels}
-                    label="Maximum Decibels"
+                    label={t('visualizer.maximumDecibels')}
                     max={0}
                     min={-40}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    maxDecibels: e,
-                                },
-                            },
-                        })
-                    }
+                    onChangeEnd={(e) => updateProperty('maxDecibels', e)}
                     step={1}
                 />
             </Group>
@@ -567,43 +1139,26 @@ const SensitivitySettings = () => {
 };
 
 const LinearAmplitudeSettings = () => {
-    const visualizer = useVisualizerSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateAudioMotionAnalyzer();
+
+    const isLinearBoostDisabled = !visualizer.audiomotionanalyzer.linearAmplitude;
 
     return (
-        <Fieldset legend="Linear Amplitude">
+        <Fieldset legend={t('visualizer.linearAmplitude')}>
             <Group grow>
                 <VisualizerToggle
-                    label="Linear Amplitude"
-                    onChange={(value) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    linearAmplitude: value,
-                                },
-                            },
-                        })
-                    }
+                    label={t('visualizer.linearAmplitude')}
+                    onChange={(value) => updateProperty('linearAmplitude', value)}
                     value={visualizer.audiomotionanalyzer.linearAmplitude}
                 />
                 <VisualizerSlider
                     defaultValue={visualizer.audiomotionanalyzer.linearBoost}
-                    label="Linear Boost"
+                    disabled={isLinearBoostDisabled}
+                    label={t('visualizer.linearBoost')}
                     max={4}
                     min={1}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    linearBoost: e,
-                                },
-                            },
-                        })
-                    }
+                    onChangeEnd={(e) => updateProperty('linearBoost', e)}
                     step={0.1}
                 />
             </Group>
@@ -612,141 +1167,121 @@ const LinearAmplitudeSettings = () => {
 };
 
 const PeakBehaviorSettings = () => {
-    const visualizer = useVisualizerSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateAudioMotionAnalyzer();
+
+    const peakToggles = useMemo(
+        () => [
+            { label: t('visualizer.showPeaks'), value: 'showPeaks' },
+            { label: t('visualizer.fadePeaks'), value: 'fadePeaks' },
+            { label: t('visualizer.peakLine'), value: 'peakLine' },
+        ],
+        [t],
+    );
+
+    const isFadePeaksDisabled = !visualizer.audiomotionanalyzer.showPeaks;
+    const isPeakLineDisabled = !visualizer.audiomotionanalyzer.showPeaks;
+    const isGravityDisabled = !visualizer.audiomotionanalyzer.showPeaks;
+    const isPeakFadeTimeDisabled =
+        !visualizer.audiomotionanalyzer.showPeaks || !visualizer.audiomotionanalyzer.fadePeaks;
+    const isPeakHoldTimeDisabled = !visualizer.audiomotionanalyzer.showPeaks;
+
+    const isToggleDisabled = (toggle: (typeof peakToggles)[number]) => {
+        if (toggle.value === 'fadePeaks') return isFadePeaksDisabled;
+        if (toggle.value === 'peakLine') return isPeakLineDisabled;
+        return false;
+    };
 
     return (
-        <Fieldset legend="Peak Behavior">
-            <Group grow>
-                <VisualizerSlider
-                    defaultValue={visualizer.audiomotionanalyzer.gravity}
-                    label="Gravity"
-                    max={20}
-                    min={0.1}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    gravity: e,
-                                },
-                            },
-                        })
-                    }
-                />
-                <VisualizerSlider
-                    defaultValue={visualizer.audiomotionanalyzer.peakFadeTime}
-                    label="Peak Fade Time (ms)"
-                    max={2000}
-                    min={0}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    peakFadeTime: e,
-                                },
-                            },
-                        })
-                    }
-                    step={1}
-                />
-                <VisualizerSlider
-                    defaultValue={visualizer.audiomotionanalyzer.peakHoldTime}
-                    label="Peak Hold Time (ms)"
-                    max={1000}
-                    min={0}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    peakHoldTime: e,
-                                },
-                            },
-                        })
-                    }
-                    step={1}
-                />
-            </Group>
+        <Fieldset legend={t('visualizer.peakBehavior')}>
+            <Stack>
+                <Group grow>
+                    {peakToggles.map((toggle) => (
+                        <VisualizerToggle
+                            disabled={isToggleDisabled(toggle)}
+                            key={toggle.value}
+                            label={toggle.label}
+                            onChange={(value) =>
+                                updateProperty(
+                                    toggle.value as keyof typeof visualizer.audiomotionanalyzer,
+                                    value,
+                                )
+                            }
+                            value={visualizer.audiomotionanalyzer[toggle.value]}
+                        />
+                    ))}
+                </Group>
+                <Group grow>
+                    <VisualizerSlider
+                        defaultValue={visualizer.audiomotionanalyzer.gravity}
+                        disabled={isGravityDisabled}
+                        label={t('visualizer.gravity')}
+                        max={20}
+                        min={0.1}
+                        onChangeEnd={(e) => updateProperty('gravity', e)}
+                    />
+                    <VisualizerSlider
+                        defaultValue={visualizer.audiomotionanalyzer.peakFadeTime}
+                        disabled={isPeakFadeTimeDisabled}
+                        label={t('visualizer.peakFadeTime')}
+                        max={2000}
+                        min={0}
+                        onChangeEnd={(e) => updateProperty('peakFadeTime', e)}
+                        step={1}
+                    />
+                    <VisualizerSlider
+                        defaultValue={visualizer.audiomotionanalyzer.peakHoldTime}
+                        disabled={isPeakHoldTimeDisabled}
+                        label={t('visualizer.peakHoldTime')}
+                        max={1000}
+                        min={0}
+                        onChangeEnd={(e) => updateProperty('peakHoldTime', e)}
+                        step={1}
+                    />
+                </Group>
+            </Stack>
         </Fieldset>
     );
 };
 
 const RadialSpectrumSettings = () => {
-    const visualizer = useVisualizerSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateAudioMotionAnalyzer();
+
+    const isRadialInvertDisabled = !visualizer.audiomotionanalyzer.radial;
+    const isRadiusDisabled = !visualizer.audiomotionanalyzer.radial;
+    const isReflexAlphaDisabled = !visualizer.audiomotionanalyzer.radial;
 
     return (
-        <Fieldset legend="Radial Spectrum">
+        <Fieldset legend={t('visualizer.radialSpectrum')}>
             <Group grow>
                 <VisualizerToggle
-                    label="Radial"
-                    onChange={(value) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    radial: value,
-                                },
-                            },
-                        })
-                    }
+                    label={t('visualizer.radial')}
+                    onChange={(value) => updateProperty('radial', value)}
                     value={visualizer.audiomotionanalyzer.radial}
                 />
                 <VisualizerToggle
-                    label="Radial Invert"
-                    onChange={(value) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    radialInvert: value,
-                                },
-                            },
-                        })
-                    }
+                    disabled={isRadialInvertDisabled}
+                    label={t('visualizer.radialInvert')}
+                    onChange={(value) => updateProperty('radialInvert', value)}
                     value={visualizer.audiomotionanalyzer.radialInvert}
                 />
                 <VisualizerSlider
                     defaultValue={visualizer.audiomotionanalyzer.radius}
-                    label="Radius"
+                    disabled={isRadiusDisabled}
+                    label={t('visualizer.radius')}
                     max={1}
                     min={0}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    radius: e,
-                                },
-                            },
-                        })
-                    }
+                    onChangeEnd={(e) => updateProperty('radius', e)}
                     step={0.05}
                 />
                 <VisualizerSlider
                     defaultValue={visualizer.audiomotionanalyzer.reflexAlpha}
-                    label="Reflex Alpha"
+                    disabled={isReflexAlphaDisabled}
+                    label={t('visualizer.reflexAlpha')}
                     max={5}
                     min={-5}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    reflexAlpha: e,
-                                },
-                            },
-                        })
-                    }
+                    onChangeEnd={(e) => updateProperty('reflexAlpha', e)}
                     step={0.1}
                 />
             </Group>
@@ -755,97 +1290,47 @@ const RadialSpectrumSettings = () => {
 };
 
 const ReflexMirrorSettings = () => {
-    const visualizer = useVisualizerSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateAudioMotionAnalyzer();
 
     return (
-        <Fieldset legend="Reflex Mirror">
+        <Fieldset legend={t('visualizer.reflexMirror')}>
             <Group grow>
                 <VisualizerToggle
-                    label="Reflex Fit"
-                    onChange={(value) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    reflexFit: value,
-                                },
-                            },
-                        })
-                    }
+                    label={t('visualizer.reflexFit')}
+                    onChange={(value) => updateProperty('reflexFit', value)}
                     value={visualizer.audiomotionanalyzer.reflexFit}
                 />
                 <VisualizerSlider
                     defaultValue={visualizer.audiomotionanalyzer.reflexRatio}
-                    label="Reflex Ratio"
+                    label={t('visualizer.reflexRatio')}
                     max={1}
                     min={0}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    reflexRatio: e,
-                                },
-                            },
-                        })
-                    }
+                    onChangeEnd={(e) => updateProperty('reflexRatio', e)}
                     step={0.1}
                 />
                 <VisualizerSlider
                     defaultValue={visualizer.audiomotionanalyzer.reflexAlpha}
-                    label="Reflex Alpha"
+                    label={t('visualizer.reflexAlpha')}
                     max={1}
                     min={0}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    reflexAlpha: e,
-                                },
-                            },
-                        })
-                    }
+                    onChangeEnd={(e) => updateProperty('reflexAlpha', e)}
                     step={0.05}
                 />
                 <VisualizerSlider
                     defaultValue={visualizer.audiomotionanalyzer.reflexBright}
-                    label="Reflex Brightness"
+                    label={t('visualizer.reflexBrightness')}
                     max={2}
                     min={0}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    reflexBright: e,
-                                },
-                            },
-                        })
-                    }
+                    onChangeEnd={(e) => updateProperty('reflexBright', e)}
                     step={0.1}
                 />
                 <VisualizerSlider
                     defaultValue={visualizer.audiomotionanalyzer.mirror}
-                    label="Mirror"
+                    label={t('visualizer.mirror')}
                     max={1}
                     min={-1}
-                    onChangeEnd={(e) =>
-                        setSettings({
-                            visualizer: {
-                                ...visualizer,
-                                audiomotionanalyzer: {
-                                    ...visualizer.audiomotionanalyzer,
-                                    mirror: e,
-                                },
-                            },
-                        })
-                    }
+                    onChangeEnd={(e) => updateProperty('mirror', e)}
                     step={1}
                 />
             </Group>
@@ -853,47 +1338,55 @@ const ReflexMirrorSettings = () => {
     );
 };
 
-const AMA_TOGGLES = [
-    { label: 'Alpha Bars', value: 'alphaBars' },
-    { label: 'ANSI Bands', value: 'ansiBands' },
-    { label: 'Fade Peaks', value: 'fadePeaks' },
-    { label: 'LED Bars', value: 'ledBars' },
-    { label: 'Lumi Bars', value: 'lumiBars' },
-    { label: 'Note Labels', value: 'noteLabels' },
-    { label: 'Outline Bars', value: 'outlineBars' },
-    { label: 'Peak Line', value: 'peakLine' },
-    { label: 'Round Bars', value: 'roundBars' },
-    { label: 'Low Resolution', value: 'loRes' },
-    { label: 'Split Gradient', value: 'splitGradient' },
-    { label: 'True LEDs', value: 'trueLeds' },
-    { label: 'Show Background Color', value: 'showBgColor' },
-    { label: 'Show FPS', value: 'showFPS' },
-    { label: 'Show Peaks', value: 'showPeaks' },
-    { label: 'Show Scale X', value: 'showScaleX' },
-    { label: 'Show Scale Y', value: 'showScaleY' },
-];
-
 const ToggleSettings = () => {
-    const visualizer = useVisualizerSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { t } = useTranslation();
+    const { updateProperty, visualizer } = useUpdateAudioMotionAnalyzer();
+
+    const AMA_TOGGLES = useMemo(
+        () => [
+            { label: t('visualizer.alphaBars'), value: 'alphaBars' },
+            { label: t('visualizer.ansiBands'), value: 'ansiBands' },
+            { label: t('visualizer.ledBars'), value: 'ledBars' },
+            { label: t('visualizer.trueLeds'), value: 'trueLeds' },
+            { label: t('visualizer.lumiBars'), value: 'lumiBars' },
+            { label: t('visualizer.outlineBars'), value: 'outlineBars' },
+            { label: t('visualizer.roundBars'), value: 'roundBars' },
+            { label: t('visualizer.lowResolution'), value: 'loRes' },
+            { label: t('visualizer.splitGradient'), value: 'splitGradient' },
+            { label: t('visualizer.showFPS'), value: 'showFPS' },
+            { label: t('visualizer.showScaleX'), value: 'showScaleX' },
+            { label: t('visualizer.noteLabels'), value: 'noteLabels' },
+            { label: t('visualizer.showScaleY'), value: 'showScaleY' },
+        ],
+        [t],
+    );
+
+    const isToggleDisabled = (toggle: (typeof AMA_TOGGLES)[number]) => {
+        if (toggle.value === 'ledBars') return visualizer.audiomotionanalyzer.radial;
+        if (toggle.value === 'trueLeds') return visualizer.audiomotionanalyzer.radial;
+        if (toggle.value === 'lumiBars') return visualizer.audiomotionanalyzer.radial;
+        if (toggle.value === 'noteLabels') return !visualizer.audiomotionanalyzer.showScaleX;
+        if (toggle.value === 'outlineBars') return visualizer.audiomotionanalyzer.radial;
+        if (toggle.value === 'roundBars') return visualizer.audiomotionanalyzer.radial;
+        if (toggle.value === 'loRes') return visualizer.audiomotionanalyzer.radial;
+        if (toggle.value === 'splitGradient') return visualizer.audiomotionanalyzer.radial;
+        if (toggle.value === 'showFPS') return visualizer.audiomotionanalyzer.radial;
+        return false;
+    };
 
     return (
-        <Fieldset legend="Miscellaneous Settings">
+        <Fieldset legend={t('visualizer.miscellaneousSettings')}>
             <Group>
                 {AMA_TOGGLES.map((toggle) => (
                     <VisualizerToggle
+                        disabled={isToggleDisabled(toggle)}
                         key={toggle.value}
                         label={toggle.label}
                         onChange={(value) =>
-                            setSettings({
-                                visualizer: {
-                                    ...visualizer,
-                                    audiomotionanalyzer: {
-                                        ...visualizer.audiomotionanalyzer,
-                                        [toggle.value]: value,
-                                    },
-                                },
-                            })
+                            updateProperty(
+                                toggle.value as keyof typeof visualizer.audiomotionanalyzer,
+                                value,
+                            )
                         }
                         value={
                             visualizer.audiomotionanalyzer[
