@@ -27,6 +27,30 @@ import { useForm } from '/@/shared/hooks/use-form';
 import { AuthenticationResponse, ServerListItemWithCredential } from '/@/shared/types/domain-types';
 import { ServerType, toServerType } from '/@/shared/types/types';
 
+/* -------------------------------------------------------------------------- */
+/* BRIDGE START                                */
+/* -------------------------------------------------------------------------- */
+// This block maps your Vercel Env Vars to the global Window object
+// so the rest of the app knows it is in "Locked" mode.
+if (!isElectron()) {
+    // Force the lock to true if the env var is set
+    if (import.meta.env.VITE_SERVER_LOCK === 'true') {
+        (window as any).SERVER_LOCK = true;
+    }
+    if (import.meta.env.VITE_SERVER_URL) {
+        (window as any).SERVER_URL = import.meta.env.VITE_SERVER_URL;
+    }
+    if (import.meta.env.VITE_SERVER_TYPE) {
+        (window as any).SERVER_TYPE = import.meta.env.VITE_SERVER_TYPE;
+    }
+    if (import.meta.env.VITE_SERVER_NAME) {
+        (window as any).SERVER_NAME = import.meta.env.VITE_SERVER_NAME;
+    }
+}
+/* -------------------------------------------------------------------------- */
+/* BRIDGE END                                 */
+/* -------------------------------------------------------------------------- */
+
 const localSettings = isElectron() ? window.api.localSettings : null;
 
 const SERVER_ICONS: Record<ServerType, string> = {
@@ -47,11 +71,16 @@ const LoginRoute = () => {
     const { addServer, setCurrentServer } = useAuthStoreActions();
     const currentServer = useCurrentServer();
 
-    // Check if server lock is configured
-    const isServerLock = Boolean(window.SERVER_LOCK) || false;
-    const serverType = window.SERVER_TYPE ? toServerType(window.SERVER_TYPE) : null;
-    const serverName = window.SERVER_NAME || '';
-    const serverUrl = window.SERVER_URL || '';
+    // UPDATED: Check window object OR import.meta.env directly
+    const isServerLock = Boolean(window.SERVER_LOCK) || import.meta.env.VITE_SERVER_LOCK === 'true';
+
+    // UPDATED: Get server type from window OR env
+    const rawServerType = window.SERVER_TYPE || import.meta.env.VITE_SERVER_TYPE;
+    const serverType = rawServerType ? toServerType(rawServerType) : null;
+
+    // UPDATED: Get URL and Name from window OR env
+    const serverName = window.SERVER_NAME || import.meta.env.VITE_SERVER_NAME || '';
+    const serverUrl = window.SERVER_URL || import.meta.env.VITE_SERVER_URL || '';
 
     const config = [
         {
