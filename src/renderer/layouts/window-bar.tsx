@@ -168,7 +168,7 @@ export const WindowBar = () => {
                 }
             }
 
-            return `${radioStatusString}${radioTitle}${radioMetadata} — Feishin${privateMode ? ` ${privateModeString}` : ''}`;
+            return `${radioStatusString}${radioTitle}${radioMetadata} — XMS${privateMode ? ` ${privateModeString}` : ''}`;
         }
 
         // Show regular song information
@@ -176,8 +176,8 @@ export const WindowBar = () => {
         const queueString = queueLength ? `(${index + 1} / ${queueLength}) ` : '';
         const title = `${
             queueLength
-                ? `${statusString}${queueString}${currentSong?.name}${currentSong?.artistName ? ` — ${currentSong?.artistName} — Feishin` : ''}`
-                : 'Feishin'
+                ? `${statusString}${queueString}${currentSong?.name}${currentSong?.artistName ? ` — ${currentSong?.artistName} — XMS` : ''}`
+                : 'XMS'
         }${privateMode ? ` ${privateModeString}` : ''}`;
         return title;
     }, [

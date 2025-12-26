@@ -1,4 +1,4 @@
-/* eslint-disable perfectionist/sort-imports */
+document.title; /* eslint-disable perfectionist/sort-imports */
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import 'overlayscrollbars/overlayscrollbars.css';

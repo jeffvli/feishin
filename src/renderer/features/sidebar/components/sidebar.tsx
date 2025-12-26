@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { AnimatePresence, motion } from 'motion/react';
 import { CSSProperties, MouseEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiLogOut } from 'react-icons/bi';
 
 import styles from './sidebar.module.css';
 
@@ -19,6 +20,8 @@ import {
 import {
     useAppStore,
     useAppStoreActions,
+    useAuthStoreActions,
+    useCurrentServer,
     useFullScreenPlayerStore,
     usePlayerSong,
     useSetFullScreenPlayerStore,
@@ -40,6 +43,9 @@ import { Platform } from '/@/shared/types/types';
 
 export const Sidebar = () => {
     const { t } = useTranslation();
+    // FIXED: Changed 'removeServer' to 'deleteServer'
+    const { deleteServer } = useAuthStoreActions();
+    const currentServer = useCurrentServer();
 
     const { sidebarPlaylistList } = useGeneralSettings();
 
@@ -85,6 +91,13 @@ export const Sidebar = () => {
 
     const isCustomWindowBar =
         windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS;
+
+    const handleLogout = () => {
+        if (currentServer) {
+            // FIXED: Using deleteServer here
+            deleteServer(currentServer.id);
+        }
+    };
 
     return (
         <div
@@ -138,7 +151,33 @@ export const Sidebar = () => {
             </ScrollArea>
             <AnimatePresence initial={false} mode="popLayout">
                 <motion.div className={styles.serverSelectorWrapper} key="server-selector" layout>
-                    <ServerSelector />
+                    <div
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}
+                    >
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            <ServerSelector />
+                        </div>
+
+                        <Tooltip label={t('common.logout', { defaultValue: 'Log Out' })}>
+                            <div
+                                onClick={handleLogout}
+                                role="button"
+                                style={{
+                                    cursor: 'pointer',
+                                    padding: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    opacity: 0.7,
+                                    transition: 'opacity 0.2s',
+                                }}
+                                onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                                onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.7')}
+                            >
+                                <BiLogOut size={20} />
+                            </div>
+                        </Tooltip>
+                    </div>
                 </motion.div>
                 {showImage && <SidebarImage />}
             </AnimatePresence>
