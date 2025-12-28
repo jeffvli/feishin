@@ -125,8 +125,6 @@ export const AlbumArtistDetailHeader = forwardRef((_props, ref: Ref<HTMLDivEleme
         [detailQuery.data],
     );
 
-    const showRating = detailQuery.data?._serverType === ServerType.NAVIDROME;
-
     const imageUrl = useItemImageUrl({
         id: detailQuery.data?.imageId || undefined,
         imageUrl: detailQuery.data?.imageUrl,
