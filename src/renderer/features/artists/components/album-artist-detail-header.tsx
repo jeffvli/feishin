@@ -133,7 +133,7 @@ export const AlbumArtistDetailHeader = forwardRef((_props, ref: Ref<HTMLDivEleme
     });
 
     const showRating = showRatings && detailQuery?.data?._serverType === ServerType.NAVIDROME;
-  
+
     const selectedImageUrl = useMemo(() => {
         return detailQuery.data?.imageUrl || imageUrl;
     }, [detailQuery.data?.imageUrl, imageUrl]);
