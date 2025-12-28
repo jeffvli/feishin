@@ -6,6 +6,7 @@ import styles from './synchronized-lyrics.module.css';
 
 import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
 import {
+    useLyricsDisplaySettings,
     useLyricsSettings,
     usePlaybackType,
     usePlayerActions,
@@ -22,6 +23,7 @@ const mpris = isElectron() && utils?.isLinux() ? window.api.mpris : null;
 export interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     lyrics: SynchronizedLyricsArray;
     offsetMs?: number;
+    settingsKey?: string;
     style?: React.CSSProperties;
     translatedLyrics?: null | string;
 }
@@ -32,12 +34,22 @@ export const SynchronizedLyrics = ({
     name,
     offsetMs,
     remote,
+    settingsKey = 'default',
     source,
     style,
     translatedLyrics,
 }: SynchronizedLyricsProps) => {
     const playbackType = usePlaybackType();
-    const settings = useLyricsSettings();
+    const lyricsSettings = useLyricsSettings();
+    const displaySettings = useLyricsDisplaySettings(settingsKey);
+    const settings = {
+        ...lyricsSettings,
+        fontSize:
+            displaySettings.fontSize && displaySettings.fontSize !== 0
+                ? displaySettings.fontSize
+                : 24,
+        gap: displaySettings.gap && displaySettings.gap !== 0 ? displaySettings.gap : 24,
+    };
     const { mediaSeekToTimestamp } = usePlayerActions();
     const status = usePlayerStatus();
     const timestamp = usePlayerTimestamp();

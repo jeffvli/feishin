@@ -19,6 +19,7 @@ import {
 import { ItemListKey } from '/@/shared/types/types';
 
 interface AlbumCarouselProps {
+    enableRefresh?: boolean;
     excludeIds?: string[];
     query?: Partial<Omit<AlbumListQuery, 'startIndex'>>;
     rowCount?: number;
@@ -28,7 +29,15 @@ interface AlbumCarouselProps {
 }
 
 const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps) => {
-    const { excludeIds, query: additionalQuery, rowCount = 1, sortBy, sortOrder, title } = props;
+    const {
+        enableRefresh,
+        excludeIds,
+        query: additionalQuery,
+        rowCount = 1,
+        sortBy,
+        sortOrder,
+        title,
+    } = props;
     const rows = useGridRows(LibraryItem.ALBUM, ItemListKey.ALBUM);
     const {
         data: albums,
@@ -81,6 +90,7 @@ const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps) => {
     return (
         <GridCarousel
             cards={cards}
+            enableRefresh={enableRefresh}
             hasNextPage={hasNextPage}
             loadNextPage={fetchNextPage}
             onNextPage={handleNextPage}

@@ -11,6 +11,7 @@ import {
     usePlayerData,
     usePlayerMuted,
     usePlayerProperties,
+    usePlayerStore,
     usePlayerVolume,
 } from '/@/renderer/store';
 import { PlayerStatus } from '/@/shared/types/types';
@@ -108,6 +109,7 @@ export function MpvPlayer() {
             },
             onPlayerStatus: async (properties) => {
                 const status = properties.status;
+                const volume = usePlayerStore.getState().player.volume;
                 if (audioFadeOnStatusChange) {
                     if (status === PlayerStatus.PAUSED) {
                         fadeAndSetStatus(volume, 0, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PAUSED);

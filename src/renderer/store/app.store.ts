@@ -3,10 +3,13 @@ import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+import { AlbumListSort, SortOrder } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
 
 export interface AppSlice extends AppState {
     actions: {
+        setAlbumArtistDetailGroupingType: (groupingType: 'all' | 'primary') => void;
+        setAlbumArtistDetailSort: (sortBy: AlbumListSort, sortOrder: SortOrder) => void;
         setAppStore: (data: Partial<AppSlice>) => void;
         setPageSidebar: (key: string, value: boolean) => void;
         setPrivateMode: (enabled: boolean) => void;
@@ -17,6 +20,11 @@ export interface AppSlice extends AppState {
 }
 
 export interface AppState {
+    albumArtistDetailSort: {
+        groupingType: 'all' | 'primary';
+        sortBy: AlbumListSort;
+        sortOrder: SortOrder;
+    };
     commandPalette: CommandPaletteProps;
     isReorderingQueue: boolean;
     pageSidebar: Record<string, boolean>;
@@ -53,6 +61,20 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
         devtools(
             immer((set, get) => ({
                 actions: {
+                    setAlbumArtistDetailGroupingType: (groupingType) => {
+                        set((state) => {
+                            state.albumArtistDetailSort.groupingType = groupingType;
+                        });
+                    },
+                    setAlbumArtistDetailSort: (sortBy, sortOrder) => {
+                        set((state) => {
+                            state.albumArtistDetailSort = {
+                                ...state.albumArtistDetailSort,
+                                sortBy,
+                                sortOrder,
+                            };
+                        });
+                    },
                     setAppStore: (data) => {
                         set({ ...get(), ...data });
                     },
@@ -85,6 +107,11 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                             state.titlebar = { ...state.titlebar, ...options };
                         });
                     },
+                },
+                albumArtistDetailSort: {
+                    groupingType: 'primary',
+                    sortBy: AlbumListSort.RELEASE_DATE,
+                    sortOrder: SortOrder.DESC,
                 },
                 commandPalette: {
                     close: () => {

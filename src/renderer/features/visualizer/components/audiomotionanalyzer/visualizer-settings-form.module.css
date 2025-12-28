@@ -1,0 +1,11 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-md);
+    width: 100%;
+    margin: 0 auto;
+}
+
+.select-label {
+    text-align: center;
+}

@@ -30,6 +30,7 @@ export const AlbumArtistListPaginatedGrid = ({
     },
     saveScrollOffset = true,
     serverId,
+    size,
 }: AlbumArtistListPaginatedGridProps) => {
     const listCountQuery = artistsQueries.albumArtistListCount({
         query: { ...query },
@@ -77,6 +78,7 @@ export const AlbumArtistListPaginatedGrid = ({
                 itemType={LibraryItem.ALBUM_ARTIST}
                 onScrollEnd={handleOnScrollEnd}
                 rows={rows}
+                size={size}
             />
         </ItemListWithPagination>
     );

@@ -66,7 +66,7 @@ export const AutoDJSettings = () => {
     return (
         <SettingsSection
             options={autoDJOptions}
-            title={t('setting.autoDJ', { postProcess: 'upperCase' })}
+            title={t('setting.autoDJ', { postProcess: 'titleCase' })}
         />
     );
 };

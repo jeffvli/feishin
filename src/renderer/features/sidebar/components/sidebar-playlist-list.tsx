@@ -7,6 +7,7 @@ import { generatePath, Link } from 'react-router';
 
 import styles from './sidebar-playlist-list.module.css';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
@@ -160,6 +161,12 @@ const PlaylistRowButton = memo(({ item, name, onContextMenu, to }: PlaylistRowBu
         [player, serverId],
     );
 
+    const imageUrl = useItemImageUrl({
+        id: item.imageId || undefined,
+        itemType: LibraryItem.PLAYLIST,
+        type: 'table',
+    });
+
     return (
         <Link
             className={clsx(styles.row, {
@@ -179,7 +186,7 @@ const PlaylistRowButton = memo(({ item, name, onContextMenu, to }: PlaylistRowBu
             to={url}
         >
             <div className={styles.rowGroup}>
-                <Image containerClassName={styles.imageContainer} src={item.imageUrl || ''} />
+                <Image containerClassName={styles.imageContainer} src={imageUrl} />
                 <div className={styles.metadata}>
                     <Text className={styles.name} fw={500} size="md">
                         {name}

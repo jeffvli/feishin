@@ -41,7 +41,6 @@ import {
     useItemListState,
     useItemListStateSubscription,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
-import { SelectionDialog } from '/@/renderer/components/item-list/selection-dialog';
 import { ItemControls, ItemListHandle } from '/@/renderer/components/item-list/types';
 import { animationProps } from '/@/shared/components/animations/animation-props';
 import { useElementSize } from '/@/shared/hooks/use-element-size';
@@ -69,6 +68,7 @@ interface VirtualizedGridListProps {
     outerRef: RefObject<any>;
     ref: RefObject<FixedSizeList<GridItemProps> | null>;
     rows?: ItemCardProps['rows'];
+    size?: 'compact' | 'default' | 'large';
     tableMetaRef: RefObject<null | {
         columnCount: number;
         itemHeight: number;
@@ -96,6 +96,7 @@ const VirtualizedGridList = React.memo(
         outerRef,
         ref,
         rows,
+        size,
         tableMetaRef,
         width,
     }: VirtualizedGridListProps) => {
@@ -114,6 +115,7 @@ const VirtualizedGridList = React.memo(
                 internalState,
                 itemType,
                 rows,
+                size,
                 tableMeta,
             };
         }, [
@@ -127,6 +129,7 @@ const VirtualizedGridList = React.memo(
             gap,
             internalState,
             itemType,
+            size,
         ]);
 
         const handleOnScroll = useCallback(
@@ -216,7 +219,11 @@ const VirtualizedGridList = React.memo(
 
 VirtualizedGridList.displayName = 'VirtualizedGridList';
 
-const createThrottledSetTableMeta = (itemsPerRow?: number, rowsCount?: number) => {
+const createThrottledSetTableMeta = (
+    itemsPerRow?: number,
+    rowsCount?: number,
+    size?: 'compact' | 'default' | 'large',
+) => {
     return throttle((width: number, dataLength: number, setTableMeta: (meta: any) => void) => {
         const isSm = width >= 600;
         const isMd = width >= 768;
@@ -229,11 +236,11 @@ const createThrottledSetTableMeta = (itemsPerRow?: number, rowsCount?: number) =
         let dynamicItemsPerRow = 2;
 
         if (is4xl) {
-            dynamicItemsPerRow = 12;
-        } else if (is3xl) {
             dynamicItemsPerRow = 10;
-        } else if (is2xl) {
+        } else if (is3xl) {
             dynamicItemsPerRow = 8;
+        } else if (is2xl) {
+            dynamicItemsPerRow = 7;
         } else if (isXl) {
             dynamicItemsPerRow = 6;
         } else if (isLg) {
@@ -246,10 +253,22 @@ const createThrottledSetTableMeta = (itemsPerRow?: number, rowsCount?: number) =
             dynamicItemsPerRow = 2;
         }
 
+        if (size === 'large') {
+            dynamicItemsPerRow = Math.round(dynamicItemsPerRow * 0.75);
+            if (dynamicItemsPerRow < 1) {
+                dynamicItemsPerRow = 1;
+            }
+        }
+
         const setItemsPerRow = itemsPerRow || dynamicItemsPerRow;
 
         const widthPerItem = Number(width) / setItemsPerRow;
-        const itemHeight = widthPerItem + (rowsCount || getDataRowsCount()) * 26;
+        // For compact size, don't include text lines in height calculation
+        // CompactItemCard has a different layout that doesn't need the extra space
+        const itemHeight =
+            size === 'compact'
+                ? widthPerItem
+                : widthPerItem + (rowsCount || getDataRowsCount()) * 26;
 
         if (widthPerItem === 0) {
             return;
@@ -274,6 +293,7 @@ export interface GridItemProps {
     internalState: ItemListStateActions;
     itemType: LibraryItem;
     rows?: ItemCardProps['rows'];
+    size?: 'compact' | 'default' | 'large';
     tableMeta: null | {
         columnCount: number;
         itemHeight: number;
@@ -302,6 +322,7 @@ export interface ItemGridListProps {
     overrideControls?: Partial<ItemControls>;
     ref?: Ref<ItemListHandle>;
     rows?: ItemCardProps['rows'];
+    size?: 'compact' | 'default' | 'large';
 }
 
 const BaseItemGridList = ({
@@ -310,7 +331,6 @@ const BaseItemGridList = ({
     enableDrag = true,
     enableExpansion = false,
     enableSelection = true,
-    enableSelectionDialog = true,
     gap = 'sm',
     getRowId,
     initialTop,
@@ -322,6 +342,7 @@ const BaseItemGridList = ({
     overrideControls,
     ref,
     rows,
+    size = 'default',
 }: ItemGridListProps) => {
     const rootRef = useRef(null);
     const outerRef = useRef(null);
@@ -412,8 +433,8 @@ const BaseItemGridList = ({
     }, [osInstance]);
 
     const throttledSetTableMeta = useMemo(() => {
-        return createThrottledSetTableMeta(itemsPerRow, rows?.length);
-    }, [itemsPerRow, rows?.length]);
+        return createThrottledSetTableMeta(itemsPerRow, rows?.length, size);
+    }, [itemsPerRow, rows?.length, size]);
 
     useLayoutEffect(() => {
         const { current: container } = containerRef;
@@ -740,6 +761,7 @@ const BaseItemGridList = ({
                         outerRef={outerRef}
                         ref={listRef}
                         rows={rows}
+                        size={size}
                         tableMetaRef={tableMetaRef}
                         width={width}
                     />
@@ -747,7 +769,7 @@ const BaseItemGridList = ({
             </AutoSizer>
             <AnimatePresence presenceAffectsLayout>
                 <ExpandedContainer internalState={internalState} itemType={itemType} />
-                {enableSelectionDialog && <SelectionDialog internalState={internalState} />}
+                {/* {enableSelectionDialog && <SelectionDialog internalState={internalState} />} */}
             </AnimatePresence>
         </motion.div>
     );
@@ -755,7 +777,7 @@ const BaseItemGridList = ({
 
 const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
     const { index, style } = props;
-    const { columns, controls, data, enableDrag, gap, itemType, rows } = props.data;
+    const { columns, controls, data, enableDrag, gap, itemType, rows, size } = props.data;
 
     const items: ReactNode[] = [];
     const itemCount = data.length;
@@ -786,6 +808,7 @@ const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
                         internalState={props.data.internalState}
                         itemType={itemType}
                         rows={rows}
+                        type={size === 'compact' ? 'compact' : 'poster'}
                         withControls
                     />
                 </div>,

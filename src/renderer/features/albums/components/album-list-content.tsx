@@ -115,6 +115,7 @@ export const AlbumListView = ({
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
                             serverId={server.id}
+                            size={grid.size}
                         />
                     );
                 }
@@ -126,6 +127,7 @@ export const AlbumListView = ({
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
                             serverId={server.id}
+                            size={grid.size}
                         />
                     );
                 }

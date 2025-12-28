@@ -6,6 +6,7 @@ import styles from './native-scroll-area.module.css';
 import { PageHeader, PageHeaderProps } from '/@/renderer/components/page-header/page-header';
 import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
+import { useThrottledCallback } from '/@/shared/hooks/use-throttled-callback';
 import { Platform } from '/@/shared/types/types';
 
 interface NativeScrollAreaProps {
@@ -26,35 +27,31 @@ const BaseNativeScrollArea = forwardRef(
         const { windowBarStyle } = useWindowSettings();
         const containerRef = useRef<HTMLDivElement | null>(null);
 
-        const scrollHandlerRef = useRef<null | number>(null);
+        const scrollHandler = useThrottledCallback((e: Event) => {
+            if (noHeader || !pageHeaderProps) {
+                return;
+            }
+
+            const scrollElement = e?.target as HTMLDivElement;
+            if (!scrollElement || !containerRef.current) {
+                return;
+            }
+
+            const offset = pageHeaderProps.offset || 0;
+            const scrollTop = scrollElement.scrollTop;
+
+            if (scrollTop > offset) {
+                containerRef.current.setAttribute('data-scrolled', 'true');
+            } else {
+                containerRef.current.setAttribute('data-scrolled', 'false');
+            }
+        }, 100);
 
         const [initialize] = useOverlayScrollbars({
             defer: false,
             events: {
                 scroll: (_instance, e) => {
-                    if (scrollHandlerRef.current) {
-                        cancelAnimationFrame(scrollHandlerRef.current);
-                    }
-
-                    scrollHandlerRef.current = requestAnimationFrame(() => {
-                        if (noHeader || !pageHeaderProps) {
-                            return;
-                        }
-
-                        const scrollElement = e?.target as HTMLDivElement;
-                        if (!scrollElement || !containerRef.current) {
-                            return;
-                        }
-
-                        const offset = pageHeaderProps.offset || 0;
-                        const scrollTop = scrollElement.scrollTop;
-
-                        if (scrollTop > offset) {
-                            containerRef.current.setAttribute('data-scrolled', 'true');
-                        } else {
-                            containerRef.current.setAttribute('data-scrolled', 'false');
-                        }
-                    });
+                    scrollHandler(e);
                 },
             },
             options: {

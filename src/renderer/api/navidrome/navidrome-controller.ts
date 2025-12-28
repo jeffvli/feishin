@@ -401,6 +401,32 @@ export const NavidromeController: InternalControllerEndpoint = {
             apiClientProps,
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
+    getArtistRadio: async (args) => {
+        const { apiClientProps, query } = args;
+
+        // Use getSimilarSongs2 API for artist radio
+        const res = await ssApiClient({
+            ...apiClientProps,
+            silent: true,
+        }).getSimilarSongs2({
+            query: {
+                count: query.count,
+                id: query.artistId,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get artist radio songs');
+        }
+
+        if (!res.body.similarSongs2?.song) {
+            return [];
+        }
+
+        return res.body.similarSongs2.song.map((song) =>
+            ssNormalize.song(song, apiClientProps.server),
+        );
+    },
     getDownloadUrl: SubsonicController.getDownloadUrl,
     getFolder: SubsonicController.getFolder,
     getGenreList: async (args) => {
@@ -461,6 +487,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
     },
+    getImageUrl: SubsonicController.getImageUrl,
     getInternetRadioStations: SubsonicController.getInternetRadioStations,
     getLyrics: SubsonicController.getLyrics,
     getMusicFolderList: SubsonicController.getMusicFolderList,
@@ -664,9 +691,7 @@ export const NavidromeController: InternalControllerEndpoint = {
         }
 
         return {
-            items: res.body.data.map((song) =>
-                ndNormalize.song(song, apiClientProps.server, query.imageSize),
-            ),
+            items: res.body.data.map((song) => ndNormalize.song(song, apiClientProps.server)),
             startIndex: query?.startIndex || 0,
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };

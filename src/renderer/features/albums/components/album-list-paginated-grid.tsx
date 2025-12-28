@@ -29,6 +29,7 @@ export const AlbumListPaginatedGrid = ({
     },
     saveScrollOffset = true,
     serverId,
+    size,
 }: AlbumListPaginatedGridProps) => {
     const listCountQuery = albumQueries.listCount({
         query: { ...query },
@@ -77,6 +78,7 @@ export const AlbumListPaginatedGrid = ({
                 itemType={LibraryItem.ALBUM}
                 onScrollEnd={handleOnScrollEnd}
                 rows={rows}
+                size={size}
             />
         </ItemListWithPagination>
     );

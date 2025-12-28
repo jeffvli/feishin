@@ -52,7 +52,7 @@ export const AlbumInfiniteFeatureCarousel = ({
         // Filter for albums with images and remove duplicates by ID
         const uniqueAlbums = new Map<string, Album>();
         for (const album of allAlbums) {
-            if (album.imageUrl && !uniqueAlbums.has(album.id)) {
+            if (album.imageId && !uniqueAlbums.has(album.id)) {
                 uniqueAlbums.set(album.id, album);
             }
         }

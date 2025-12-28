@@ -29,6 +29,7 @@ export const GenreListPaginatedGrid = ({
     },
     saveScrollOffset = true,
     serverId,
+    size,
 }: GenreListPaginatedGridProps) => {
     const listCountQuery = genresQueries.listCount({
         query: { ...query },
@@ -76,6 +77,7 @@ export const GenreListPaginatedGrid = ({
                 itemType={LibraryItem.GENRE}
                 onScrollEnd={handleOnScrollEnd}
                 rows={rows}
+                size={size}
             />
         </ItemListWithPagination>
     );

@@ -1,8 +1,8 @@
-import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './context-menu-preview.module.css';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem } from '/@/shared/types/domain-types';
@@ -26,6 +26,10 @@ const getItemName = (item: unknown): string => {
 
 const getItemImage = (item: unknown): null | string => {
     if (item && typeof item === 'object') {
+        if ('imageId' in item && typeof item.imageId === 'string') {
+            return item.imageId;
+        }
+
         if ('imageUrl' in item && typeof item.imageUrl === 'string') {
             return item.imageUrl;
         }
@@ -33,13 +37,19 @@ const getItemImage = (item: unknown): null | string => {
     return null;
 };
 
-export const ContextMenuPreview = memo(({ items, itemType }: ContextMenuPreviewProps) => {
+export const ContextMenuPreview = ({ items, itemType }: ContextMenuPreviewProps) => {
     const { t } = useTranslation();
     const itemCount = items.length;
     const firstItem = items[0];
     const itemName = firstItem ? getItemName(firstItem) : 'Item';
     const itemImage = firstItem ? getItemImage(firstItem) : null;
     const isMultiple = itemCount > 1;
+
+    const imageUrl = useItemImageUrl({
+        id: (firstItem as { imageId?: string })?.imageId,
+        itemType: itemType || LibraryItem.SONG,
+        type: 'table',
+    });
 
     if (itemCount === 0) {
         return null;
@@ -52,7 +62,7 @@ export const ContextMenuPreview = memo(({ items, itemType }: ContextMenuPreviewP
                 <div className={styles.content}>
                     {itemImage ? (
                         <div className={styles.imageContainer}>
-                            <img alt={itemName} className={styles.image} src={itemImage} />
+                            <img alt={itemName} className={styles.image} src={imageUrl} />
                             <div className={styles.imageOverlay} />
                         </div>
                     ) : (
@@ -85,6 +95,6 @@ export const ContextMenuPreview = memo(({ items, itemType }: ContextMenuPreviewP
             </div>
         </div>
     );
-});
+};
 
 ContextMenuPreview.displayName = 'ContextMenuPreview';

@@ -6,8 +6,8 @@ export const vscodeLightPlus: AppThemeConfiguration = {
             'linear-gradient(rgb(255 255 255 / 50%) 0%, rgb(255 255 255 / 80%)), var(--theme-background-noise)',
         'overlay-subheader':
             'linear-gradient(180deg, rgba(255, 255, 255, 5%) 0%, var(--theme-colors-background)), var(--theme-background-noise)',
-        'scrollbar-handle-background': 'rgba(0, 122, 204, 30%)',
-        'scrollbar-handle-hover-background': 'rgba(0, 122, 204, 60%)',
+        'scrollbar-handle-background': 'rgba(140, 140, 140, 30%)',
+        'scrollbar-handle-hover-background': 'rgba(140, 140, 140, 60%)',
     },
     colors: {
         background: 'rgb(255, 255, 255)',

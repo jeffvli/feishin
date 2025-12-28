@@ -17,17 +17,23 @@ import { AuthState } from '/@/shared/types/types';
 const localSettings = isElectron() ? window.api.localSettings : null;
 
 const MIN_AUTH_DELAY_MS = 1000;
-const MAX_NETWORK_RETRIES = 3;
-const NETWORK_RETRY_DELAY_MS = 2000;
+const MAX_NETWORK_RETRIES = 1;
+const NETWORK_RETRY_DELAY_MS = 500;
 
 const isNetworkError = (error: any): boolean => {
+    const message =
+        error.message && typeof error.message === 'string' ? (error.message as string) : null;
+    const messageLower = message?.toLowerCase();
+
+    if (messageLower?.includes('network') || messageLower?.includes('timeout')) {
+        return true;
+    }
+
     return (
         isAxiosError(error) &&
         (error.code === 'ERR_NETWORK' ||
             error.code === 'ECONNABORTED' ||
             error.code === 'ETIMEDOUT' ||
-            error.message?.toLowerCase().includes('network') ||
-            error.message?.toLowerCase().includes('timeout') ||
             !navigator.onLine)
     );
 };

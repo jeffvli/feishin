@@ -105,18 +105,15 @@ services:
     feishin:
         container_name: feishin
         image: 'ghcr.io/jeffvli/feishin:latest'
+        restart: unless-stopped
         environment:
-            - SERVER_NAME=jellyfin # pre defined server name
+            - SERVER_NAME=jellyfin # pre-defined server name
             - SERVER_LOCK=true # When true AND name/type/url are set, only username/password can be toggled
-            - SERVER_TYPE=jellyfin # navidrome also works
-            - SERVER_URL= # http://address:port
-            - PUID=1000
-            - PGID=1000
-            - UMASK=002
-            - TZ=America/Los_Angeles
+            - SERVER_TYPE=jellyfin # the allowed types are: jellyfin, navidrome, subsonic. These values are case insensitive
+            - SERVER_URL= # http://address:port or https://address:port
         ports:
             - 9180:9180
-        restart: unless-stopped
+            # Alternatively, to restrict to only localhost, - 127.0.0.1:9180:8190
 ```
 
 ### Configuration

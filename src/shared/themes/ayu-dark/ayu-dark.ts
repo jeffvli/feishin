@@ -6,8 +6,8 @@ export const ayuDark: AppThemeConfiguration = {
             'linear-gradient(transparent 0%, rgb(31 36 48 / 85%) 100%), var(--theme-background-noise)',
         'overlay-subheader':
             'linear-gradient(180deg, rgb(31 36 48 / 5%) 0%, var(--theme-colors-background) 100%), var(--theme-background-noise)',
-        'scrollbar-handle-background': 'rgba(115, 192, 203, 20%)',
-        'scrollbar-handle-hover-background': 'rgba(115, 192, 203, 40%)',
+        'scrollbar-handle-background': 'rgba(160, 160, 160, 20%)',
+        'scrollbar-handle-hover-background': 'rgba(160, 160, 160, 40%)',
     },
     colors: {
         background: 'rgb(31, 36, 48)',

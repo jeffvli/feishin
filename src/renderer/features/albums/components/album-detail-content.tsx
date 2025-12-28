@@ -42,6 +42,7 @@ import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
+import { useDebouncedValue } from '/@/shared/hooks/use-debounced-value';
 import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import {
     Album,
@@ -342,6 +343,7 @@ export const AlbumDetailContent = () => {
             uniqueId: 'moreFromArtist',
         },
         {
+            enableRefresh: true,
             excludeIds: detailQuery?.data?.id ? [detailQuery.data.id] : undefined,
             isHidden: !detailQuery?.data?.genres?.[0],
             query: {
@@ -372,9 +374,7 @@ export const AlbumDetailContent = () => {
             <div className={styles.detailContainer}>
                 {comment && (
                     <Spoiler maxHeight={75}>
-                        <Text
-                            dangerouslySetInnerHTML={{ __html: replaceURLWithHTMLLinks(comment) }}
-                        />
+                        <Text pb="md">{replaceURLWithHTMLLinks(comment)}</Text>
                     </Spoiler>
                 )}
                 <div className={styles.contentLayout}>
@@ -415,6 +415,7 @@ export const AlbumDetailContent = () => {
                                 .filter((c) => !c.isHidden)
                                 .map((carousel) => (
                                     <AlbumInfiniteCarousel
+                                        enableRefresh={carousel.enableRefresh}
                                         excludeIds={carousel.excludeIds}
                                         key={`carousel-${carousel.uniqueId}`}
                                         query={carousel.query}
@@ -439,6 +440,7 @@ interface AlbumDetailSongsTableProps {
 const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 300);
     const tableConfig = useSettingsStore((state) => state.lists[ItemListKey.ALBUM_DETAIL]?.table);
 
     const currentSong = usePlayerSong();
@@ -452,11 +454,11 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
 
     const filteredSongs = useMemo(() => {
         return sortSongList(
-            searchLibraryItems(songs, searchTerm, LibraryItem.SONG),
+            searchLibraryItems(songs, debouncedSearchTerm, LibraryItem.SONG),
             sortBy,
             sortOrder,
         );
-    }, [songs, searchTerm, sortBy, sortOrder]);
+    }, [songs, debouncedSearchTerm, sortBy, sortOrder]);
 
     const { handleColumnReordered } = useItemListColumnReorder({
         itemListKey: ItemListKey.ALBUM_DETAIL,
@@ -504,7 +506,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
 
     const groups = useMemo(() => {
         // Remove groups when filtering
-        if (searchTerm.trim()) {
+        if (debouncedSearchTerm.trim()) {
             return undefined;
         }
 
@@ -590,7 +592,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
             },
             rowHeight: 40,
         }));
-    }, [searchTerm, sortBy, discGroups, t]);
+    }, [debouncedSearchTerm, sortBy, discGroups, t]);
 
     const player = usePlayer();
 

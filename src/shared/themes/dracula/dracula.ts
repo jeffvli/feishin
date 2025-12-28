@@ -6,8 +6,8 @@ export const dracula: AppThemeConfiguration = {
             'linear-gradient(transparent 0%, rgb(40 42 54 / 85%) 100%), var(--theme-background-noise)',
         'overlay-subheader':
             'linear-gradient(180deg, rgb(40 42 54 / 5%) 0%, var(--theme-colors-background) 100%), var(--theme-background-noise)',
-        'scrollbar-handle-background': 'rgba(189, 147, 249, 20%)',
-        'scrollbar-handle-hover-background': 'rgba(189, 147, 249, 40%)',
+        'scrollbar-handle-background': 'rgba(160, 160, 160, 20%)',
+        'scrollbar-handle-hover-background': 'rgba(160, 160, 160, 40%)',
     },
     colors: {
         background: 'rgb(40, 42, 54)',

@@ -38,7 +38,7 @@ export const PlayQueueListControls = ({
     };
 
     return (
-        <Group justify="space-between" px="1rem" py="1rem" w="100%">
+        <Group h="65px" justify="space-between" px="1rem" py="1rem" w="100%">
             <Group gap="xs">
                 <QueueRestoreActions />
                 <ActionIcon

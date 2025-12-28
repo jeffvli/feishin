@@ -1,7 +1,8 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { useRef } from 'react';
-import { useLocation, useParams } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
+import { Suspense, useRef } from 'react';
+import { useParams } from 'react-router';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistDetailContent } from '/@/renderer/features/artists/components/album-artist-detail-content';
@@ -16,6 +17,7 @@ import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { useFastAverageColor, useWaitForColorCalculation } from '/@/renderer/hooks';
 import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const AlbumArtistDetailRoute = () => {
@@ -31,17 +33,29 @@ const AlbumArtistDetailRoute = () => {
 
     const routeId = (artistId || albumArtistId) as string;
 
-    const location = useLocation();
-
-    const detailQuery = useSuspenseQuery({
+    const detailQuery = useQuery({
         ...artistsQueries.albumArtistDetail({ query: { id: routeId }, serverId: server?.id }),
-        initialData: location.state?.item,
         staleTime: 0,
     });
 
+    const imageUrl = useItemImageUrl({
+        id: detailQuery?.data?.imageId || undefined,
+        imageUrl: detailQuery.data?.imageUrl,
+        itemType: LibraryItem.ALBUM_ARTIST,
+        type: 'header',
+    });
+
+    const libraryBackgroundImageUrl = useItemImageUrl({
+        id: detailQuery?.data?.imageId || undefined,
+        itemType: LibraryItem.ALBUM_ARTIST,
+        type: 'itemCard',
+    });
+
+    const selectedImageUrl = imageUrl || detailQuery.data?.imageUrl;
+
     const { background: backgroundColor, isLoading: isColorLoading } = useFastAverageColor({
         id: artistId,
-        src: detailQuery.data?.imageUrl,
+        src: selectedImageUrl,
         srcLoaded: !detailQuery.isLoading,
     });
 
@@ -50,14 +64,14 @@ const AlbumArtistDetailRoute = () => {
     const showBlurredImage = artistBackground;
 
     const { isReady } = useWaitForColorCalculation({
-        hasImage: !!detailQuery.data?.imageUrl,
+        hasImage: !!selectedImageUrl,
         isLoading: isColorLoading,
         routeId,
         showBlurredImage,
     });
 
-    if (!isReady) {
-        return null;
+    if (detailQuery.isLoading || !isReady) {
+        return <Spinner container />;
     }
 
     return (
@@ -86,14 +100,16 @@ const AlbumArtistDetailRoute = () => {
                     <LibraryBackgroundImage
                         blur={artistBackgroundBlur}
                         headerRef={headerRef}
-                        imageUrl={detailQuery.data?.imageUrl || ''}
+                        imageUrl={libraryBackgroundImageUrl || ''}
                     />
                 ) : (
                     <LibraryBackgroundOverlay backgroundColor={background} headerRef={headerRef} />
                 )}
                 <LibraryContainer>
                     <AlbumArtistDetailHeader ref={headerRef as React.Ref<HTMLDivElement>} />
-                    <AlbumArtistDetailContent />
+                    <Suspense fallback={<Spinner container />}>
+                        <AlbumArtistDetailContent />
+                    </Suspense>
                 </LibraryContainer>
             </NativeScrollArea>
         </AnimatedPage>

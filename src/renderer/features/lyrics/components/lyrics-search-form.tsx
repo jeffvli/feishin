@@ -9,6 +9,7 @@ import styles from './lyrics-search-form.module.css';
 
 import i18n from '/@/i18n/i18n';
 import { lyricsQueries } from '/@/renderer/features/lyrics/api/lyrics-api';
+import { openLyricsExportModal } from '/@/renderer/features/lyrics/components/lyrics-export-form';
 import {
     SynchronizedLyrics,
     SynchronizedLyricsProps,
@@ -30,6 +31,7 @@ import { Text } from '/@/shared/components/text/text';
 import { useDebouncedValue } from '/@/shared/hooks/use-debounced-value';
 import { useForm } from '/@/shared/hooks/use-form';
 import {
+    FullLyricsMetadata,
     InternetProviderLyricSearchResponse,
     LyricSource,
     LyricsOverride,
@@ -144,6 +146,21 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
         }
     };
 
+    const handleExport = () => {
+        if (selectedResult && previewData) {
+            const lyricsMetadata: FullLyricsMetadata = {
+                artist: selectedResult.artist,
+                lyrics: previewData,
+                name: selectedResult.name,
+                offsetMs: 0,
+                remote: true,
+                source: selectedResult.source,
+            };
+            const synced = Array.isArray(previewData);
+            openLyricsExportModal({ lyrics: lyricsMetadata, offsetMs: 0, synced });
+        }
+    };
+
     return (
         <Stack h="100%" w="100%">
             <form>
@@ -236,6 +253,13 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
             <Group justify="flex-end">
                 <Button onClick={() => closeAllModals()} variant="default">
                     {t('common.cancel', { postProcess: 'titleCase' })}
+                </Button>
+                <Button
+                    disabled={!selectedResult || !previewData}
+                    onClick={handleExport}
+                    variant="default"
+                >
+                    {t('form.lyricsExport.export', { postProcess: 'titleCase' })}
                 </Button>
                 <Button disabled={!selectedResult} onClick={handleApply} variant="filled">
                     {t('common.confirm', { postProcess: 'titleCase' })}

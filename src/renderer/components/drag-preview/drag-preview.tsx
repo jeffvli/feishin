@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './drag-preview.module.css';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { Icon } from '/@/shared/components/icon/icon';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { DragData } from '/@/shared/types/drag-and-drop';
@@ -23,22 +24,19 @@ const getItemName = (item: unknown): string => {
     return 'Item';
 };
 
-const getItemImage = (item: unknown): null | string => {
-    if (item && typeof item === 'object') {
-        if ('imageUrl' in item && typeof item.imageUrl === 'string') {
-            return item.imageUrl;
-        }
-    }
-    return null;
-};
-
 export const DragPreview = memo(({ data }: DragPreviewProps) => {
     const items = data.item || [];
     const { t } = useTranslation();
     const itemCount = items.length;
     const firstItem = items[0];
     const itemName = firstItem ? getItemName(firstItem) : 'Item';
-    const itemImage = firstItem ? getItemImage(firstItem) : null;
+
+    const itemImage = useItemImageUrl({
+        id: (firstItem as { id: string })?.id,
+        itemType: data.itemType || LibraryItem.SONG,
+        type: 'table',
+    });
+
     const isMultiple = itemCount > 1;
 
     return (

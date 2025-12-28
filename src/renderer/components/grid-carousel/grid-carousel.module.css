@@ -14,6 +14,19 @@
     justify-content: space-between;
 }
 
+.custom-title-container {
+    display: flex;
+    gap: var(--theme-spacing-sm);
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.custom-title-content {
+    flex: 1;
+    min-width: 0;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(var(--cards-to-show, 2), minmax(0, 1fr));

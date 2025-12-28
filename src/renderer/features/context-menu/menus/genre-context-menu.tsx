@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 
 import { AddToPlaylistAction } from '/@/renderer/features/context-menu/actions/add-to-playlist-action';
 import { PlayAction } from '/@/renderer/features/context-menu/actions/play-action';
+import { ContextMenuPreview } from '/@/renderer/features/context-menu/components/context-menu-preview';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
-import { ContextMenuPreview } from '/@/shared/components/context-menu/context-menu-preview';
 import { Genre, LibraryItem } from '/@/shared/types/domain-types';
 
 interface GenreContextMenuProps {

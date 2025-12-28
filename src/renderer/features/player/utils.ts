@@ -407,6 +407,7 @@ export const filterSongsByPlayerFilters = (songs: Song[], filters: PlayerFilter[
     // Filter out invalid filters (missing field, operator, or value)
     const validFilters = filters.filter(
         (filter) =>
+            Boolean(filter.isEnabled) &&
             filter.field &&
             filter.operator &&
             filter.value !== undefined &&

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { useListContext } from '/@/renderer/context/list-context';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
@@ -56,6 +57,12 @@ export const PlaylistDetailSongListHeader = ({
         player.addToQueueByData(listData as Song[], type || Play.NOW);
     };
 
+    const imageUrl = useItemImageUrl({
+        id: detailQuery?.data?.imageId || undefined,
+        itemType: LibraryItem.PLAYLIST,
+        type: 'header',
+    });
+
     return (
         <Stack gap={0}>
             {collapsed ? (
@@ -86,7 +93,7 @@ export const PlaylistDetailSongListHeader = ({
                 </PageHeader>
             ) : (
                 <LibraryHeader
-                    imageUrl={detailQuery?.data?.imageUrl}
+                    imageUrl={imageUrl}
                     item={{ route: AppRoute.PLAYLISTS, type: LibraryItem.PLAYLIST }}
                     title={detailQuery?.data?.name}
                 >

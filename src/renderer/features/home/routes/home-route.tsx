@@ -38,6 +38,7 @@ const HomeRoute = () => {
             title: t('page.home.mostPlayed', { postProcess: 'sentenceCase' }),
         },
         [HomeItem.RANDOM]: {
+            enableRefresh: true,
             itemType: LibraryItem.ALBUM,
             sortBy: AlbumListSort.RANDOM,
             sortOrder: SortOrder.ASC,
@@ -118,6 +119,7 @@ const HomeRoute = () => {
                             if (carousel.itemType === LibraryItem.ALBUM) {
                                 return (
                                     <AlbumInfiniteCarousel
+                                        enableRefresh={carousel.enableRefresh}
                                         key={`carousel-${carousel.uniqueId}`}
                                         rowCount={1}
                                         sortBy={carousel.sortBy}

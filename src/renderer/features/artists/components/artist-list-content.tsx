@@ -86,6 +86,7 @@ export const ArtistListView = ({
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
                             serverId={server.id}
+                            size={grid.size}
                         />
                     );
                 }
@@ -97,6 +98,7 @@ export const ArtistListView = ({
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
                             serverId={server.id}
+                            size={grid.size}
                         />
                     );
                 }

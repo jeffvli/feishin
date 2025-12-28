@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { useLocation, useParams } from 'react-router';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumDetailContent } from '/@/renderer/features/albums/components/album-detail-content';
@@ -34,9 +35,16 @@ const AlbumDetailRoute = () => {
         staleTime: 0,
     });
 
+    const imageUrl =
+        useItemImageUrl({
+            id: detailQuery?.data?.imageId || undefined,
+            itemType: LibraryItem.ALBUM,
+            type: 'itemCard',
+        }) || '';
+
     const { background: backgroundColor, isLoading: isColorLoading } = useFastAverageColor({
         id: albumId,
-        src: detailQuery.data?.imageUrl,
+        src: imageUrl,
         srcLoaded: !detailQuery.isLoading,
     });
 
@@ -45,7 +53,7 @@ const AlbumDetailRoute = () => {
     const showBlurredImage = albumBackground;
 
     const { isReady } = useWaitForColorCalculation({
-        hasImage: !!detailQuery.data?.imageUrl,
+        hasImage: !!imageUrl,
         isLoading: isColorLoading,
         routeId: albumId,
         showBlurredImage,
@@ -81,7 +89,7 @@ const AlbumDetailRoute = () => {
                     <LibraryBackgroundImage
                         blur={albumBackgroundBlur}
                         headerRef={headerRef}
-                        imageUrl={detailQuery.data?.imageUrl}
+                        imageUrl={imageUrl}
                     />
                 ) : (
                     <LibraryBackgroundOverlay backgroundColor={background} headerRef={headerRef} />

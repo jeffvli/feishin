@@ -10,3 +10,41 @@
     gap: var(--theme-spacing-2xl);
     padding: 1rem 2rem 5rem;
 }
+
+.album-section-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-4xl);
+    width: 100%;
+    min-width: 0;
+}
+
+.album-section-title {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--theme-spacing-md);
+    align-items: center;
+    margin-bottom: var(--theme-spacing-md);
+}
+
+.album-section-divider-container {
+    display: flex;
+    gap: var(--theme-spacing-md);
+    align-items: center;
+    width: 100%;
+}
+
+.album-section-divider {
+    flex: 1;
+    height: 2px;
+    background: var(--theme-colors-border);
+}
+
+.similar-artists-title {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--theme-spacing-md);
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+}

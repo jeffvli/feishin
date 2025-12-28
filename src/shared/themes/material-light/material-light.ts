@@ -6,8 +6,8 @@ export const materialLight: AppThemeConfiguration = {
             'linear-gradient(rgb(250 250 250 / 50%) 0%, rgb(250 250 250 / 80%)), var(--theme-background-noise)',
         'overlay-subheader':
             'linear-gradient(180deg, rgba(250, 250, 250, 5%) 0%, var(--theme-colors-background)), var(--theme-background-noise)',
-        'scrollbar-handle-background': 'rgba(33, 150, 243, 30%)',
-        'scrollbar-handle-hover-background': 'rgba(33, 150, 243, 60%)',
+        'scrollbar-handle-background': 'rgba(140, 140, 140, 30%)',
+        'scrollbar-handle-hover-background': 'rgba(140, 140, 140, 60%)',
     },
     colors: {
         background: 'rgb(250, 250, 250)',

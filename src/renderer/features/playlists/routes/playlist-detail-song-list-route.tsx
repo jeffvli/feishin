@@ -62,10 +62,6 @@ const PlaylistQueryEditor = ({
     const { t } = useTranslation();
 
     const openPreviewModal = useCallback(() => {
-        if (!isQueryBuilderExpanded) {
-            return;
-        }
-
         const filters = queryBuilderRef.current?.getFilters();
 
         if (!filters) {
@@ -86,7 +82,7 @@ const PlaylistQueryEditor = ({
             size: 'xl',
             title: t('common.preview', { postProcess: 'titleCase' }),
         });
-    }, [isQueryBuilderExpanded, queryBuilderRef, t]);
+    }, [queryBuilderRef, t]);
 
     const openSaveAndReplaceModal = useCallback(() => {
         if (!isQueryBuilderExpanded) {
@@ -170,7 +166,8 @@ const PlaylistQueryEditor = ({
                                 />
                             }
                             onClick={onToggleExpand}
-                            size="compact-md"
+                            size="sm"
+                            variant="subtle"
                         >
                             {t('form.queryEditor.title', {
                                 postProcess: 'titleCase',

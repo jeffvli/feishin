@@ -169,7 +169,7 @@ export const useAutoDJ = () => {
             },
             {
                 equalityFn: (a, b) => {
-                    return a.song?._uniqueId === b.song?._uniqueId;
+                    return a.song?._uniqueId === b.song?._uniqueId && a.remaining === b.remaining;
                 },
             },
         );

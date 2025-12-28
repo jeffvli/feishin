@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import styles from './image-column.module.css';
 
+import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import {
     ItemTableListInnerColumn,
     TableColumnContainer,
@@ -14,17 +15,14 @@ import {
 } from '/@/renderer/features/shared/components/play-button-group';
 import { usePlayButtonBehavior } from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
-import { Image } from '/@/shared/components/image/image';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Folder, LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 export const ImageColumn = (props: ItemTableListInnerColumn) => {
-    const row: string | undefined = (props.data as (any | undefined)[])[props.rowIndex]?.[
-        props.columns[props.columnIndex].id
-    ];
-    const playButtonBehavior = usePlayButtonBehavior();
+    const row: string | undefined = (props.data as (any | undefined)[])[props.rowIndex]?.id;
     const item = props.data[props.rowIndex] as any;
+    const playButtonBehavior = usePlayButtonBehavior();
     const internalState = (props as any).internalState;
     const [isHovered, setIsHovered] = useState(false);
 
@@ -80,12 +78,14 @@ export const ImageColumn = (props: ItemTableListInnerColumn) => {
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
-                    <Image
+                    <ItemImage
                         containerClassName={clsx({
                             [styles.imageContainerWithAspectRatio]:
                                 props.size === 'default' || props.size === 'large',
                         })}
-                        src={row}
+                        id={item?.id}
+                        itemType={item?._itemType}
+                        src={item?.imageUrl}
                     />
                     {isHovered && (
                         <div

@@ -24,7 +24,6 @@ import {
     useSettingsStore,
     useSettingsStoreActions,
 } from '/@/renderer/store';
-import { Accordion } from '/@/shared/components/accordion/accordion';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
@@ -223,6 +222,43 @@ export const GridConfig = ({
                     </Group>
                 ),
             },
+            {
+                component: (
+                    <SegmentedControl
+                        data={[
+                            {
+                                label: t('table.config.general.size_compact', {
+                                    postProcess: 'titleCase',
+                                }),
+                                value: 'compact',
+                            },
+                            {
+                                label: t('table.config.general.size_default', {
+                                    postProcess: 'titleCase',
+                                }),
+                                value: 'default',
+                            },
+                            {
+                                label: t('table.config.general.size_large', {
+                                    postProcess: 'titleCase',
+                                }),
+                                value: 'large',
+                            },
+                        ]}
+                        onChange={(value) =>
+                            setList(listKey, {
+                                grid: { size: value as 'compact' | 'default' | 'large' },
+                            })
+                        }
+                        size="sm"
+                        value={grid.size || 'default'}
+                        w="100%"
+                    />
+                ),
+                id: 'size',
+                label: t('table.config.general.size', { postProcess: 'sentenceCase' }),
+                size: 'sm',
+            },
 
             ...(extraOptions || []),
         ];
@@ -247,25 +283,7 @@ export const GridConfig = ({
 
     return (
         <>
-            <Accordion
-                styles={{
-                    control: { padding: '0' },
-                    item: { border: 'none' },
-                }}
-            >
-                <Accordion.Item value="grid">
-                    <Accordion.Control>
-                        <Text size="sm">
-                            {t('table.config.general.advancedSettings', {
-                                postProcess: 'sentenceCase',
-                            })}
-                        </Text>
-                    </Accordion.Control>
-                    <Accordion.Panel>
-                        <ListConfigTable options={options} />
-                    </Accordion.Panel>
-                </Accordion.Item>
-            </Accordion>
+            <ListConfigTable options={options} />
             <Divider />
             <GridRowConfig
                 data={gridRowsData}

@@ -16,28 +16,6 @@ import {
     Song,
 } from '/@/shared/types/domain-types';
 
-const getCoverArtUrl = (args: {
-    baseUrl: string | undefined;
-    coverArtId?: string;
-    credential: string | undefined;
-    size: number;
-}) => {
-    const size = args.size ? args.size : 250;
-
-    if (!args.coverArtId || args.coverArtId.match('2a96cbd8b46e442fc41c2b86b821562f')) {
-        return null;
-    }
-
-    return (
-        `${args.baseUrl}/rest/getCoverArt.view` +
-        `?id=${args.coverArtId}` +
-        `&${args.credential}` +
-        '&v=1.13.0' +
-        '&c=Feishin' +
-        `&size=${size}`
-    );
-};
-
 const getArtistList = (
     artists?: typeof ssType._response.song._type.artists,
     artistId?: number | string,
@@ -46,12 +24,14 @@ const getArtistList = (
     return artists
         ? artists.map((item) => ({
               id: item.id.toString(),
+              imageId: null,
               imageUrl: null,
               name: item.name,
           }))
         : [
               {
                   id: artistId?.toString() || '',
+                  imageId: null,
                   imageUrl: null,
                   name: artistName || '',
               },
@@ -72,6 +52,7 @@ const getParticipants = (
         for (const contributor of item.contributors) {
             const artist = {
                 id: contributor.artist.id?.toString() || '',
+                imageId: null,
                 imageUrl: null,
                 name: contributor.artist.name || '',
             };
@@ -105,6 +86,7 @@ const getGenres = (
               _serverType: ServerType.SUBSONIC,
               albumCount: null,
               id: genre.name,
+              imageId: null,
               imageUrl: null,
               name: genre.name,
               songCount: null,
@@ -117,6 +99,7 @@ const getGenres = (
                     _serverType: ServerType.SUBSONIC,
                     albumCount: null,
                     id: item.genre,
+                    imageId: null,
                     imageUrl: null,
                     name: item.genre,
                     songCount: null,
@@ -128,16 +111,7 @@ const getGenres = (
 const normalizeSong = (
     item: z.infer<typeof ssType._response.song>,
     server?: null | ServerListItemWithCredential,
-    size?: number,
 ): Song => {
-    const imageUrl =
-        getCoverArtUrl({
-            baseUrl: server?.url,
-            coverArtId: item.coverArt?.toString(),
-            credential: server?.credential,
-            size: size || 300,
-        }) || null;
-
     return {
         _itemType: LibraryItem.SONG,
         _serverId: server?.id || 'unknown',
@@ -173,8 +147,8 @@ const normalizeSong = (
                 : null,
         genres: getGenres(item, server),
         id: item.id.toString(),
-        imagePlaceholderUrl: null,
-        imageUrl,
+        imageId: item.coverArt?.toString() || null,
+        imageUrl: null,
         lastPlayedAt: null,
         lyrics: null,
         mbzRecordingId: item.musicBrainzId || null,
@@ -207,27 +181,18 @@ const normalizeAlbumArtist = (
         | z.infer<typeof ssType._response.albumArtist>
         | z.infer<typeof ssType._response.artistListEntry>,
     server?: null | ServerListItemWithCredential,
-    imageSize?: number,
 ): AlbumArtist => {
-    const imageUrl =
-        getCoverArtUrl({
-            baseUrl: server?.url,
-            coverArtId: item.coverArt?.toString(),
-            credential: server?.credential,
-            size: imageSize || 100,
-        }) || null;
-
     return {
         _itemType: LibraryItem.ALBUM_ARTIST,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.SUBSONIC,
         albumCount: item.albumCount ? Number(item.albumCount) : 0,
-        backgroundImageUrl: null,
         biography: null,
         duration: null,
         genres: [],
         id: item.id.toString(),
-        imageUrl,
+        imageId: item.coverArt?.toString() || null,
+        imageUrl: null,
         lastPlayedAt: null,
         mbz: null,
         name: item.name,
@@ -242,16 +207,7 @@ const normalizeAlbumArtist = (
 const normalizeAlbum = (
     item: z.infer<typeof ssType._response.album> | z.infer<typeof ssType._response.albumListEntry>,
     server?: null | ServerListItemWithCredential,
-    imageSize?: number,
 ): Album => {
-    const imageUrl =
-        getCoverArtUrl({
-            baseUrl: server?.url,
-            coverArtId: item.coverArt?.toString(),
-            credential: server?.credential,
-            size: imageSize || 300,
-        }) || null;
-
     return {
         _itemType: LibraryItem.ALBUM,
         _serverId: server?.id || 'unknown',
@@ -259,7 +215,6 @@ const normalizeAlbum = (
         albumArtist: item.artist,
         albumArtists: getArtistList(item.artists, item.artistId, item.artist),
         artists: [],
-        backdropImageUrl: null,
         comment: null,
         createdAt: item.created,
         duration: item.duration * 1000,
@@ -271,8 +226,8 @@ const normalizeAlbum = (
                   : null,
         genres: getGenres(item, server),
         id: item.id.toString(),
-        imagePlaceholderUrl: null,
-        imageUrl,
+        imageId: item.coverArt?.toString() || null,
+        imageUrl: null,
         isCompilation: null,
         lastPlayedAt: null,
         mbzId: null,
@@ -322,13 +277,8 @@ const normalizePlaylist = (
         duration: item.duration * 1000,
         genres: [],
         id: item.id.toString(),
-        imagePlaceholderUrl: null,
-        imageUrl: getCoverArtUrl({
-            baseUrl: server?.url,
-            coverArtId: item.coverArt?.toString(),
-            credential: server?.credential,
-            size: 300,
-        }),
+        imageId: item.coverArt?.toString() || null,
+        imageUrl: null,
         name: item.name,
         owner: item.owner,
         ownerId: item.owner,
@@ -348,6 +298,7 @@ const normalizeGenre = (
         _serverType: ServerType.SUBSONIC,
         albumCount: item.albumCount,
         id: item.value,
+        imageId: null,
         imageUrl: null,
         name: item.value,
         songCount: item.songCount,

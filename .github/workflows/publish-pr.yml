@@ -4,9 +4,24 @@ on:
     pull_request:
         branches:
             - development
+        paths:
+            - 'src/**'
 
 jobs:
+    wait-for-lint:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Wait for Test workflow to complete
+              uses: lewagon/wait-on-check-action@v1.4.1
+              with:
+                  ref: ${{ github.event.pull_request.head.sha }}
+                  check-name: 'lint'
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  wait-interval: 10
+                  allowed-conclusions: success
+
     publish:
+        needs: wait-for-lint
         runs-on: ${{ matrix.os }}
 
         strategy:

@@ -9,7 +9,7 @@ interface JsonPreviewProps {
 export const JsonPreview = ({ value }: JsonPreviewProps) => {
     return (
         <Code block className={styles.preview} lang="json" p="md">
-            {JSON.stringify(value, null, 4)}
+            {JSON.stringify(value, null, 2)}
         </Code>
     );
 };

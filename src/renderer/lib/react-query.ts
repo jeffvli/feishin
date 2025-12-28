@@ -13,6 +13,7 @@ import { toast } from '/@/shared/components/toast/toast';
 const queryCache = new QueryCache({
     onError: (error: any, query) => {
         if (query.state.data !== undefined) {
+            console.error(error);
             toast.show({ message: `${error.message}`, type: 'error' });
         }
     },

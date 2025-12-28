@@ -18,7 +18,7 @@ import { setCustomNativeDragPreview } from '@atlaskit/pragmatic-drag-and-drop/el
 import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { DragPreview } from '/@/shared/components/drag-preview/drag-preview';
+import { DragPreview } from '/@/renderer/components/drag-preview/drag-preview';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { dndUtils, DragData, DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
 

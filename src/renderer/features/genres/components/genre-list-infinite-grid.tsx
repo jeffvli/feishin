@@ -27,6 +27,7 @@ export const GenreListInfiniteGrid = ({
     },
     saveScrollOffset = true,
     serverId,
+    size,
 }: GenreListInfiniteGridProps) => {
     const listCountQuery = genresQueries.listCount({
         query: { ...query },
@@ -64,6 +65,7 @@ export const GenreListInfiniteGrid = ({
             onRangeChanged={onRangeChanged}
             onScrollEnd={handleOnScrollEnd}
             rows={rows}
+            size={size}
         />
     );
 };

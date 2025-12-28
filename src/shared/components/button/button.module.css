@@ -154,6 +154,10 @@
         &:focus-visible {
             border: 1px solid lighten(var(--theme-colors-border), 10%);
         }
+
+        &[data-disabled='true'] {
+            background-color: transparent;
+        }
     }
 }
 

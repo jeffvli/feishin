@@ -6,8 +6,8 @@ export const catppuccinLatte: AppThemeConfiguration = {
             'linear-gradient(rgb(239 241 245 / 50%) 0%, rgb(239 241 245 / 80%)), var(--theme-background-noise)',
         'overlay-subheader':
             'linear-gradient(180deg, rgba(239, 241, 245, 5%) 0%, var(--theme-colors-background)), var(--theme-background-noise)',
-        'scrollbar-handle-background': 'rgba(30, 102, 245, 30%)',
-        'scrollbar-handle-hover-background': 'rgba(30, 102, 245, 60%)',
+        'scrollbar-handle-background': 'rgba(140, 140, 140, 30%)',
+        'scrollbar-handle-hover-background': 'rgba(140, 140, 140, 60%)',
     },
     colors: {
         background: 'rgb(239, 241, 245)',

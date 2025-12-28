@@ -27,6 +27,7 @@ export const ArtistListInfiniteGrid = ({
     },
     saveScrollOffset = true,
     serverId,
+    size,
 }: ArtistListInfiniteGridProps) => {
     const listCountQuery = artistsQueries.artistListCount({
         query: { ...query },
@@ -64,6 +65,7 @@ export const ArtistListInfiniteGrid = ({
             onRangeChanged={onRangeChanged}
             onScrollEnd={handleOnScrollEnd}
             rows={rows}
+            size={size}
         />
     );
 };

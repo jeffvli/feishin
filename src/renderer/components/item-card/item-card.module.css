@@ -179,8 +179,7 @@
     left: 0;
     width: 100%;
     padding: var(--theme-spacing-xs);
-    text-shadow: 0 1px 2px rgb(0 0 0 / 80%);
-    background-color: rgb(0 0 0 / 50%);
+    background-color: alpha(var(--theme-colors-background), 0.5);
     backdrop-filter: blur(2px);
     transform: translateY(0);
     transition:

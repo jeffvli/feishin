@@ -201,6 +201,14 @@ export const contract = c.router({
             200: ssType._response.similarSongs,
         },
     },
+    getSimilarSongs2: {
+        method: 'GET',
+        path: 'getSimilarSongs2',
+        query: ssType._parameters.similarSongs2,
+        responses: {
+            200: ssType._response.similarSongs2,
+        },
+    },
     getSong: {
         method: 'GET',
         path: 'getSong.view',

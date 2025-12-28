@@ -6,8 +6,8 @@ export const solarizedLight: AppThemeConfiguration = {
             'linear-gradient(rgb(253 246 227 / 50%) 0%, rgb(253 246 227 / 80%)), var(--theme-background-noise)',
         'overlay-subheader':
             'linear-gradient(180deg, rgba(253, 246, 227, 5%) 0%, var(--theme-colors-background)), var(--theme-background-noise)',
-        'scrollbar-handle-background': 'rgba(38, 139, 210, 30%)',
-        'scrollbar-handle-hover-background': 'rgba(38, 139, 210, 60%)',
+        'scrollbar-handle-background': 'rgba(140, 140, 140, 30%)',
+        'scrollbar-handle-hover-background': 'rgba(140, 140, 140, 60%)',
     },
     colors: {
         background: 'rgb(253, 246, 227)',

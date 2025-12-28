@@ -31,6 +31,7 @@ export function AlbumArtistGridCarousel(props: AlbumArtistGridCarouselProps) {
                     controls={controls}
                     data={albumArtist}
                     enableDrag
+                    isRound
                     itemType={LibraryItem.ALBUM_ARTIST}
                     rows={rows}
                     type="poster"

@@ -21,6 +21,7 @@ import {
 } from '/@/shared/api/navidrome/navidrome-types';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
+import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { DateInput } from '/@/shared/components/date-picker/date-picker';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
@@ -165,12 +166,14 @@ const getOperatorsForFieldType = (
 };
 
 const FilterValueInput = ({
+    disabled,
     field,
     filterFields,
     onChange,
     operator,
     value,
 }: {
+    disabled?: boolean;
     field: PlayerFilterField;
     filterFields: FilterFieldConfig[];
     onChange: (value: (number | string)[] | boolean | number | string) => void;
@@ -203,6 +206,7 @@ const FilterValueInput = ({
                         { label: 'true', value: 'true' },
                         { label: 'false', value: 'false' },
                     ]}
+                    disabled={disabled}
                     onChange={(e) => onChange(e === 'true')}
                     value={value?.toString() || 'false'}
                     width="30%"
@@ -215,6 +219,7 @@ const FilterValueInput = ({
                     <DateInput
                         clearable
                         defaultLevel="year"
+                        disabled={disabled}
                         maxWidth={170}
                         onChange={(date) => onChange(date || '')}
                         size="sm"
@@ -226,6 +231,7 @@ const FilterValueInput = ({
             }
             return (
                 <TextInput
+                    disabled={disabled}
                     onChange={(e) => onChange(e.currentTarget.value)}
                     size="sm"
                     value={(value as string) || ''}
@@ -235,6 +241,7 @@ const FilterValueInput = ({
         case 'number':
             return (
                 <NumberInput
+                    disabled={disabled}
                     onChange={(e) => onChange(Number(e) || 0)}
                     size="sm"
                     value={value !== undefined && value !== null ? Number(value) : undefined}
@@ -245,6 +252,7 @@ const FilterValueInput = ({
         default:
             return (
                 <TextInput
+                    disabled={disabled}
                     onChange={(e) => onChange(e.currentTarget.value)}
                     size="sm"
                     value={(value as string) || ''}
@@ -265,6 +273,7 @@ export const PlayerFilterSettings = () => {
         const newFilter: PlayerFilter = {
             field: 'name',
             id: nanoid(),
+            isEnabled: true,
             operator: 'is',
             value: '',
         };
@@ -322,6 +331,13 @@ export const PlayerFilterSettings = () => {
         [filters, setPlaybackFilters],
     );
 
+    const handleToggleEnabled = useCallback(
+        (id: string, isEnabled: boolean) => {
+            setPlaybackFilters(filters.map((f) => (f.id === id ? { ...f, isEnabled } : f)));
+        },
+        [filters, setPlaybackFilters],
+    );
+
     const fieldOptions = useMemo(
         () => filterFields.map((f) => ({ label: f.label, value: f.value })),
         [filterFields],
@@ -344,8 +360,18 @@ export const PlayerFilterSettings = () => {
 
                                 return (
                                     <Group gap="sm" key={filter.id}>
+                                        <Checkbox
+                                            checked={filter.isEnabled ?? true}
+                                            onChange={(e) =>
+                                                handleToggleEnabled(
+                                                    filter.id,
+                                                    e.currentTarget.checked,
+                                                )
+                                            }
+                                        />
                                         <Select
                                             data={fieldOptions}
+                                            disabled={!filter.isEnabled}
                                             onChange={(e) =>
                                                 handleFieldChange(filter.id, e as PlayerFilterField)
                                             }
@@ -354,6 +380,7 @@ export const PlayerFilterSettings = () => {
                                         />
                                         <Select
                                             data={operators}
+                                            disabled={!filter.isEnabled}
                                             onChange={(e) =>
                                                 handleOperatorChange(
                                                     filter.id,
@@ -364,6 +391,7 @@ export const PlayerFilterSettings = () => {
                                             width="25%"
                                         />
                                         <FilterValueInput
+                                            disabled={!filter.isEnabled}
                                             field={filter.field}
                                             filterFields={filterFields}
                                             onChange={(value) =>

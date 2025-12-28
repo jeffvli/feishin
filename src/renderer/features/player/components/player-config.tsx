@@ -12,6 +12,7 @@ import {
     usePlayerStatus,
 } from '/@/renderer/store';
 import {
+    useGeneralSettings,
     usePlaybackSettings,
     useSettingsStore,
     useSettingsStoreActions,
@@ -48,6 +49,7 @@ export const PlayerConfig = () => {
     const { setCrossfadeDuration, setCrossfadeStyle, setQueueType, setSpeed, setTransitionType } =
         usePlayerActions();
     const preservePitch = useSettingsStore((state) => state.playback.preservePitch);
+    const generalSettings = useGeneralSettings();
 
     const playbackSettings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -314,6 +316,63 @@ export const PlayerConfig = () => {
                 id: 'preservePitch',
                 label: t('setting.preservePitch', { postProcess: 'titleCase' }),
             },
+            {
+                component: null,
+                id: 'divider-3',
+                isDivider: true,
+                label: '',
+            },
+            {
+                component: (
+                    <Switch
+                        defaultChecked={generalSettings.showLyricsInSidebar}
+                        onChange={(e) => {
+                            setSettings({
+                                general: {
+                                    ...generalSettings,
+                                    showLyricsInSidebar: e.currentTarget.checked,
+                                },
+                            });
+                        }}
+                    />
+                ),
+                id: 'showLyricsInSidebar',
+                label: t('setting.showLyricsInSidebar', { postProcess: 'titleCase' }),
+            },
+            {
+                component: (
+                    <Switch
+                        defaultChecked={generalSettings.showVisualizerInSidebar}
+                        onChange={(e) => {
+                            setSettings({
+                                general: {
+                                    ...generalSettings,
+                                    showVisualizerInSidebar: e.currentTarget.checked,
+                                },
+                            });
+                        }}
+                    />
+                ),
+                id: 'showVisualizerInSidebar',
+                label: t('setting.showVisualizerInSidebar', { postProcess: 'titleCase' }),
+            },
+            {
+                component: (
+                    <Switch
+                        defaultChecked={generalSettings.combinedLyricsAndVisualizer}
+                        onChange={(e) => {
+                            setSettings({
+                                general: {
+                                    ...generalSettings,
+                                    combinedLyricsAndVisualizer: e.currentTarget.checked,
+                                },
+                            });
+                        }}
+                    />
+                ),
+                id: 'combinedLyricsAndVisualizer',
+                label: t('setting.combinedLyricsAndVisualizer', { postProcess: 'titleCase' }),
+            },
         ];
 
         return allOptions;
@@ -336,6 +395,7 @@ export const PlayerConfig = () => {
         setTransitionType,
         setCrossfadeStyle,
         setPreservePitch,
+        generalSettings,
     ]);
 
     return (

@@ -14,7 +14,11 @@ interface AnimatedPageProps {
 export const AnimatedPage = forwardRef(
     ({ children }: AnimatedPageProps, ref: Ref<HTMLDivElement>) => {
         return (
-            <motion.main className={styles.animatedPage} ref={ref} {...animationProps.fadeIn}>
+            <motion.main
+                className={styles.animatedPage}
+                ref={ref}
+                {...{ ...animationProps.fadeIn, transition: { duration: 1, ease: 'anticipate' } }}
+            >
                 {children}
             </motion.main>
         );

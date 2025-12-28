@@ -101,6 +101,27 @@ export const SidebarSettings = () => {
             }),
             title: t('setting.showVisualizerInSidebar', { postProcess: 'sentenceCase' }),
         },
+        {
+            control: (
+                <Switch
+                    aria-label="Combine lyrics and visualizer"
+                    defaultChecked={settings.combinedLyricsAndVisualizer}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                combinedLyricsAndVisualizer: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.combinedLyricsAndVisualizer', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.combinedLyricsAndVisualizer', { postProcess: 'sentenceCase' }),
+        },
     ];
 
     return (

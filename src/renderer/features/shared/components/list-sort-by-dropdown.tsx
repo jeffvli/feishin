@@ -78,6 +78,7 @@ export const ListSortByDropdown = ({
 
 interface ListSortByDropdownControlledProps {
     disabled?: boolean;
+    filters?: Array<{ defaultOrder: SortOrder; name: string; value: string }>;
     itemType: LibraryItem;
     setSortBy: Dispatch<SetStateAction<string>>;
     sortBy: string;
@@ -86,6 +87,7 @@ interface ListSortByDropdownControlledProps {
 
 export const ListSortByDropdownControlled = ({
     disabled,
+    filters,
     itemType,
     setSortBy,
     sortBy,
@@ -93,8 +95,9 @@ export const ListSortByDropdownControlled = ({
 }: ListSortByDropdownControlledProps) => {
     const server = useCurrentServer();
 
-    const sortByLabel =
-        (itemType && FILTERS[itemType][server.type].find((f) => f.value === sortBy)?.name) || '—';
+    const availableFilters = filters || (itemType && FILTERS[itemType]?.[server.type]) || [];
+
+    const sortByLabel = availableFilters.find((f) => f.value === sortBy)?.name || '—';
 
     const handleSortByChange = (sortBy: string) => {
         setSortBy(sortBy);
@@ -112,7 +115,7 @@ export const ListSortByDropdownControlled = ({
                 )}
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
-                {FILTERS[itemType][server.type].map((f) => (
+                {availableFilters.map((f) => (
                     <DropdownMenu.Item
                         isSelected={f.value === sortBy}
                         key={`filter-${f.name}`}
@@ -207,6 +210,69 @@ const CLIENT_SIDE_SONG_FILTERS = [
         defaultOrder: SortOrder.DESC,
         name: i18n.t('filter.releaseYear', { postProcess: 'titleCase' }),
         value: SongListSort.YEAR,
+    },
+];
+
+export const CLIENT_SIDE_ALBUM_FILTERS = [
+    {
+        defaultOrder: SortOrder.ASC,
+        name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
+        value: AlbumListSort.ALBUM_ARTIST,
+    },
+    {
+        defaultOrder: SortOrder.DESC,
+        name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
+        value: AlbumListSort.DURATION,
+    },
+    {
+        defaultOrder: SortOrder.DESC,
+        name: i18n.t('filter.favorited', { postProcess: 'titleCase' }),
+        value: AlbumListSort.FAVORITED,
+    },
+    {
+        defaultOrder: SortOrder.ASC,
+        name: i18n.t('filter.name', { postProcess: 'titleCase' }),
+        value: AlbumListSort.NAME,
+    },
+    {
+        defaultOrder: SortOrder.DESC,
+        name: i18n.t('filter.playCount', { postProcess: 'titleCase' }),
+        value: AlbumListSort.PLAY_COUNT,
+    },
+    {
+        defaultOrder: SortOrder.ASC,
+        name: i18n.t('filter.random', { postProcess: 'titleCase' }),
+        value: AlbumListSort.RANDOM,
+    },
+    {
+        defaultOrder: SortOrder.DESC,
+        name: i18n.t('filter.rating', { postProcess: 'titleCase' }),
+        value: AlbumListSort.RATING,
+    },
+    {
+        defaultOrder: SortOrder.DESC,
+        name: i18n.t('filter.recentlyAdded', { postProcess: 'titleCase' }),
+        value: AlbumListSort.RECENTLY_ADDED,
+    },
+    {
+        defaultOrder: SortOrder.DESC,
+        name: i18n.t('filter.recentlyPlayed', { postProcess: 'titleCase' }),
+        value: AlbumListSort.RECENTLY_PLAYED,
+    },
+    {
+        defaultOrder: SortOrder.DESC,
+        name: i18n.t('filter.releaseDate', { postProcess: 'titleCase' }),
+        value: AlbumListSort.RELEASE_DATE,
+    },
+    {
+        defaultOrder: SortOrder.DESC,
+        name: i18n.t('filter.releaseYear', { postProcess: 'titleCase' }),
+        value: AlbumListSort.YEAR,
+    },
+    {
+        defaultOrder: SortOrder.DESC,
+        name: i18n.t('filter.songCount', { postProcess: 'titleCase' }),
+        value: AlbumListSort.SONG_COUNT,
     },
 ];
 

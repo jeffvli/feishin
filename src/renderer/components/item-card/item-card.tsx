@@ -7,6 +7,7 @@ import { generatePath, Link } from 'react-router';
 import styles from './item-card.module.css';
 
 import { ItemCardControls } from '/@/renderer/components/item-card/item-card-controls';
+import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
 import { getTitlePath } from '/@/renderer/components/item-list/helpers/get-title-path';
 import {
@@ -19,7 +20,6 @@ import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useGeneralSettings } from '/@/renderer/store';
 import { formatDateAbsolute, formatDateRelative, formatRating } from '/@/renderer/utils/format';
-import { Image } from '/@/shared/components/image/image';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
@@ -141,9 +141,9 @@ export interface ItemCardDerivativeProps extends Omit<ItemCardProps, 'type'> {
 const CompactItemCard = ({
     controls,
     data,
+    enableDrag,
     enableExpansion,
     enableNavigation,
-    imageUrl,
     internalState,
     isRound,
     itemType,
@@ -157,6 +157,53 @@ const CompactItemCard = ({
             ? internalState.extractRowId(data)
             : undefined;
     const isSelected = useItemSelectionState(internalState, itemRowId || undefined);
+
+    const { isDragging: isDraggingLocal, ref } = useDragDrop<HTMLDivElement>({
+        drag: {
+            getId: () => {
+                if (!data) {
+                    return [];
+                }
+
+                const draggedItems = getDraggedItems(data, internalState);
+                return draggedItems.map((item) => item.id);
+            },
+            getItem: () => {
+                if (!data) {
+                    return [];
+                }
+
+                const draggedItems = getDraggedItems(data, internalState);
+                return draggedItems;
+            },
+            itemType,
+            onDragStart: () => {
+                if (!data) {
+                    return;
+                }
+
+                const draggedItems = getDraggedItems(data, internalState);
+                if (internalState) {
+                    internalState.setDragging(draggedItems);
+                }
+            },
+            onDrop: () => {
+                if (internalState) {
+                    internalState.setDragging([]);
+                }
+            },
+            operation:
+                itemType === LibraryItem.QUEUE_SONG
+                    ? [DragOperation.REORDER, DragOperation.ADD]
+                    : [DragOperation.ADD],
+            target: DragTarget.ALBUM,
+        },
+        isEnabled: !!enableDrag && !!data,
+    });
+
+    const itemId = data && internalState ? data.id : undefined;
+    const isDraggingState = useItemDraggingState(internalState, itemId);
+    const isDragging = isDraggingState || isDraggingLocal;
 
     const handleClick = useDoubleClick({
         onDoubleClick: (e: React.MouseEvent<HTMLDivElement>) => {
@@ -254,19 +301,22 @@ const CompactItemCard = ({
 
         const imageContainerContent = (
             <>
-                <Image
+                <ItemImage
                     className={clsx(styles.image, {
                         [styles.isRound]: isRound,
                     })}
-                    src={imageUrl}
+                    id={data?.id}
+                    itemType={itemType}
+                    src={(data as Album | AlbumArtist | Playlist | Song)?.imageUrl}
                 />
                 {isFavorite && <div className={styles.favoriteBadge} />}
                 {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
                 <AnimatePresence>
-                    {withControls && showControls && (
+                    {withControls && showControls && data && (
                         <ItemCardControls
                             controls={controls}
                             enableExpansion={enableExpansion}
+                            internalState={internalState}
                             item={data}
                             itemType={itemType}
                             showRating={hasRating}
@@ -296,8 +346,10 @@ const CompactItemCard = ({
         return (
             <div
                 className={clsx(styles.container, styles.compact, {
+                    [styles.dragging]: isDragging,
                     [styles.selected]: isSelected,
                 })}
+                ref={ref}
             >
                 {enableNavigation && navigationPath && !internalState ? (
                     <Link
@@ -359,7 +411,6 @@ const DefaultItemCard = ({
     data,
     enableExpansion,
     enableNavigation,
-    imageUrl,
     internalState,
     isRound,
     itemType,
@@ -470,9 +521,11 @@ const DefaultItemCard = ({
 
         const imageContainerContent = (
             <>
-                <Image
+                <ItemImage
                     className={clsx(styles.image, { [styles.isRound]: isRound })}
-                    src={imageUrl}
+                    id={data?.id}
+                    itemType={itemType}
+                    src={(data as Album | AlbumArtist | Playlist | Song)?.imageUrl}
                 />
                 {isFavorite && <div className={styles.favoriteBadge} />}
                 {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
@@ -573,7 +626,6 @@ const PosterItemCard = ({
     enableDrag,
     enableExpansion,
     enableNavigation,
-    imageUrl,
     internalState,
     isRound,
     itemType,
@@ -731,9 +783,11 @@ const PosterItemCard = ({
 
         const imageContainerContent = (
             <>
-                <Image
+                <ItemImage
                     className={clsx(styles.image, { [styles.isRound]: isRound })}
-                    src={imageUrl}
+                    id={data?.id}
+                    itemType={itemType}
+                    src={(data as Album | AlbumArtist | Playlist | Song)?.imageUrl}
                 />
                 {isFavorite && <div className={styles.favoriteBadge} />}
                 {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}

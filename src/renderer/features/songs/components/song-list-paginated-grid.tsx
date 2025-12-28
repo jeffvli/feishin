@@ -22,6 +22,7 @@ export const SongListPaginatedGrid = ({
         sortOrder: SortOrder.ASC,
     },
     serverId,
+    size,
 }: SongListPaginatedGridProps) => {
     const listCountQuery = songsQueries.listCount({
         query: { ...query },
@@ -60,6 +61,7 @@ export const SongListPaginatedGrid = ({
                 itemsPerRow={itemsPerRow}
                 itemType={LibraryItem.SONG}
                 rows={rows}
+                size={size}
             />
         </ItemListWithPagination>
     );

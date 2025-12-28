@@ -8,7 +8,7 @@ import styles from './full-screen-player-queue.module.css';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { FullScreenSimilarSongs } from '/@/renderer/features/player/components/full-screen-similar-songs';
-import { usePlaybackSettings } from '/@/renderer/store';
+import { usePlaybackSettings, useSettingsStore } from '/@/renderer/store';
 import {
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
@@ -17,8 +17,14 @@ import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { ItemListKey, PlayerType } from '/@/shared/types/types';
 
-const Visualizer = lazy(() =>
-    import('/@/renderer/features/player/components/visualizer').then((module) => ({
+const AudioMotionAnalyzerVisualizer = lazy(() =>
+    import('../../visualizer/components/audiomotionanalyzer/visualizer').then((module) => ({
+        default: module.Visualizer,
+    })),
+);
+
+const ButterchurnVisualizer = lazy(() =>
+    import('../../visualizer/components/butternchurn/visualizer').then((module) => ({
         default: module.Visualizer,
     })),
 );
@@ -28,6 +34,7 @@ export const FullScreenPlayerQueue = () => {
     const { activeTab, opacity } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { type, webAudio } = usePlaybackSettings();
+    const visualizerType = useSettingsStore((store) => store.visualizer.type);
 
     const headerItems = useMemo(() => {
         const items = [
@@ -109,7 +116,11 @@ export const FullScreenPlayerQueue = () => {
                 <Lyrics />
             ) : activeTab === 'visualizer' && type === PlayerType.WEB && webAudio ? (
                 <Suspense fallback={<></>}>
-                    <Visualizer />
+                    {visualizerType === 'butterchurn' ? (
+                        <ButterchurnVisualizer />
+                    ) : (
+                        <AudioMotionAnalyzerVisualizer />
+                    )}
                 </Suspense>
             ) : null}
         </div>

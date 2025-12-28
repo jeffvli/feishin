@@ -6,8 +6,8 @@ export const gruvboxLight: AppThemeConfiguration = {
             'linear-gradient(rgb(251 241 199 / 50%) 0%, rgb(251 241 199 / 80%)), var(--theme-background-noise)',
         'overlay-subheader':
             'linear-gradient(180deg, rgba(251, 241, 199, 5%) 0%, var(--theme-colors-background)), var(--theme-background-noise)',
-        'scrollbar-handle-background': 'rgba(121, 116, 14, 30%)',
-        'scrollbar-handle-hover-background': 'rgba(121, 116, 14, 60%)',
+        'scrollbar-handle-background': 'rgba(140, 140, 140, 30%)',
+        'scrollbar-handle-hover-background': 'rgba(140, 140, 140, 60%)',
     },
     colors: {
         background: 'rgb(251, 241, 199)',

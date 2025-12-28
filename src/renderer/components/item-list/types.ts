@@ -66,6 +66,7 @@ export interface ItemListComponentProps<TQuery> {
 export interface ItemListGridComponentProps<TQuery> extends ItemListComponentProps<TQuery> {
     gap?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     itemsPerRow?: number;
+    size?: 'compact' | 'default' | 'large';
 }
 
 export interface ItemListHandle {

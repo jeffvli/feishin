@@ -5,13 +5,14 @@ import { DownloadAction } from '/@/renderer/features/context-menu/actions/downlo
 import { GetInfoAction } from '/@/renderer/features/context-menu/actions/get-info-action';
 import { GoToAction } from '/@/renderer/features/context-menu/actions/go-to-action';
 import { MoveQueueItemsAction } from '/@/renderer/features/context-menu/actions/move-queue-items-action';
+import { PlayTrackRadioAction } from '/@/renderer/features/context-menu/actions/play-track-radio-action';
 import { RemoveFromQueueAction } from '/@/renderer/features/context-menu/actions/remove-from-queue-action';
 import { SetFavoriteAction } from '/@/renderer/features/context-menu/actions/set-favorite-action';
 import { SetRatingAction } from '/@/renderer/features/context-menu/actions/set-rating-action';
 import { ShareAction } from '/@/renderer/features/context-menu/actions/share-action';
 import { ShuffleItemsAction } from '/@/renderer/features/context-menu/actions/shuffle-items-action';
+import { ContextMenuPreview } from '/@/renderer/features/context-menu/components/context-menu-preview';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
-import { ContextMenuPreview } from '/@/shared/components/context-menu/context-menu-preview';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 
 interface QueueContextMenuProps {
@@ -32,6 +33,8 @@ export const QueueContextMenu = ({ items }: QueueContextMenuProps) => {
             <ContextMenu.Divider />
             <MoveQueueItemsAction items={items} />
             <ShuffleItemsAction items={items} />
+            <ContextMenu.Divider />
+            <PlayTrackRadioAction disabled={items.length > 1} song={items[0]} />
             <ContextMenu.Divider />
             <AddToPlaylistAction items={ids} itemType={LibraryItem.SONG} />
             <ContextMenu.Divider />

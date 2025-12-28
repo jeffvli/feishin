@@ -29,6 +29,7 @@ export const ArtistListPaginatedGrid = ({
     },
     saveScrollOffset = true,
     serverId,
+    size,
 }: ArtistListPaginatedGridProps) => {
     const listCountQuery = artistsQueries.artistListCount({
         query: { ...query },
@@ -76,6 +77,7 @@ export const ArtistListPaginatedGrid = ({
                 itemType={LibraryItem.ARTIST}
                 onScrollEnd={handleOnScrollEnd}
                 rows={rows}
+                size={size}
             />
         </ItemListWithPagination>
     );

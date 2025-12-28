@@ -1,11 +1,12 @@
 import type { MouseEvent } from 'react';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath, Link } from 'react-router';
 
 import styles from './feature-carousel.module.css';
 
+import { ItemImage, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { BackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { PlayButtonGroup } from '/@/renderer/features/shared/components/play-button-group';
@@ -15,7 +16,6 @@ import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Group } from '/@/shared/components/group/group';
-import { Image } from '/@/shared/components/image/image';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { Album, LibraryItem } from '/@/shared/types/domain-types';
@@ -78,9 +78,15 @@ interface CarouselItemProps {
 }
 
 const CarouselItem = ({ album }: CarouselItemProps) => {
+    const imageUrl = useItemImageUrl({
+        id: album.imageId || undefined,
+        itemType: LibraryItem.ALBUM,
+        type: 'itemCard',
+    });
+
     const { background: backgroundColor } = useFastAverageColor({
         algorithm: 'dominant',
-        src: album.imageUrl || null,
+        src: imageUrl || null,
         srcLoaded: true,
     });
 
@@ -110,10 +116,12 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
                     </div>
 
                     <div className={styles.imageSection}>
-                        <Image
+                        <ItemImage
                             className={styles.albumImage}
                             containerClassName={styles.albumImageContainer}
-                            src={album.imageUrl || undefined}
+                            id={album.id}
+                            itemType={LibraryItem.ALBUM}
+                            src={imageUrl}
                         />
                         <div className={styles.playButtonOverlay}>
                             <PlayButtonGroup onPlay={handlePlay} />
@@ -201,28 +209,70 @@ export const FeatureCarousel = ({ data, onNearEnd }: FeatureCarouselProps) => {
         }
     }, [data, startIndex, itemsPerRow, onNearEnd]);
 
-    const handleNext = (e?: MouseEvent<HTMLButtonElement>) => {
-        e?.preventDefault();
-        e?.stopPropagation();
-        if (!data) return;
-        directionRef.current = { isNext: true };
-        setStartIndex((prev) => (prev + itemsPerRow) % data.length);
-    };
+    const handleNext = useCallback(
+        (e?: MouseEvent<HTMLButtonElement>) => {
+            e?.preventDefault();
+            e?.stopPropagation();
+            if (!data) return;
+            directionRef.current = { isNext: true };
+            setStartIndex((prev) => (prev + itemsPerRow) % data.length);
+        },
+        [data, itemsPerRow],
+    );
 
-    const handlePrevious = (e?: MouseEvent<HTMLButtonElement>) => {
-        e?.preventDefault();
-        e?.stopPropagation();
-        if (!data) return;
-        directionRef.current = { isNext: false };
-        setStartIndex((prev) => (prev - itemsPerRow + data.length) % data.length);
-    };
+    const handlePrevious = useCallback(
+        (e?: MouseEvent<HTMLButtonElement>) => {
+            e?.preventDefault();
+            e?.stopPropagation();
+            if (!data) return;
+            directionRef.current = { isNext: false };
+            setStartIndex((prev) => (prev - itemsPerRow + data.length) % data.length);
+        },
+        [data, itemsPerRow],
+    );
+
+    const canNavigate = data && data.length > itemsPerRow;
+
+    const wheelCooldownRef = useRef(0);
+    const wheelThreshold = 10;
+    const wheelCooldownMs = 250;
+
+    const handleWheel = useCallback(
+        (event: React.WheelEvent<HTMLDivElement>) => {
+            if (!canNavigate || !data) {
+                return;
+            }
+
+            if (!event.shiftKey) {
+                return;
+            }
+
+            const now = Date.now();
+            const elapsed = now - wheelCooldownRef.current;
+
+            const horizontalDelta = Math.abs(event.deltaY);
+
+            if (horizontalDelta < wheelThreshold || elapsed < wheelCooldownMs) {
+                return;
+            }
+
+            if (event.deltaY > 0) {
+                wheelCooldownRef.current = now;
+                handleNext();
+            } else if (event.deltaY < 0) {
+                wheelCooldownRef.current = now;
+                handlePrevious();
+            }
+        },
+        [canNavigate, data, handleNext, handlePrevious, wheelCooldownMs, wheelThreshold],
+    );
 
     if (!data || data.length === 0) {
         return null;
     }
 
     return (
-        <div className={styles.carouselContainer} ref={containerRef}>
+        <div className={styles.carouselContainer} onWheel={handleWheel} ref={containerRef}>
             <AnimatePresence initial={false} mode="popLayout">
                 <motion.div
                     animate="animate"

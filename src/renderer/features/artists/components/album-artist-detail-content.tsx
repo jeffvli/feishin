@@ -1,30 +1,56 @@
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { Suspense, useMemo, useState } from 'react';
+import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { LayoutGroup, motion } from 'motion/react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createSearchParams, generatePath, Link, useParams } from 'react-router';
 
 import styles from './album-artist-detail-content.module.css';
 
+import { queryKeys } from '/@/renderer/api/query-keys';
+import { DataRow, MemoizedItemCard } from '/@/renderer/components/item-card/item-card';
+import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
+import { useGridRows } from '/@/renderer/components/item-list/helpers/use-grid-rows';
 import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
 import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemControls } from '/@/renderer/components/item-list/types';
-import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
+import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistGridCarousel } from '/@/renderer/features/artists/components/album-artist-grid-carousel';
-import { usePlayer } from '/@/renderer/features/player/context/player-context';
+import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/context/player-context';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
+import {
+    CLIENT_SIDE_ALBUM_FILTERS,
+    ListSortByDropdownControlled,
+} from '/@/renderer/features/shared/components/list-sort-by-dropdown';
+import { ListSortOrderToggleButtonControlled } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
+import {
+    LONG_PRESS_PLAY_BEHAVIOR,
+    PlayTooltip,
+} from '/@/renderer/features/shared/components/play-button-group';
+import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-button-click';
 import { searchLibraryItems } from '/@/renderer/features/shared/utils';
+import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { AppRoute } from '/@/renderer/router/routes';
-import { ArtistItem, useCurrentServer, usePlayerSong } from '/@/renderer/store';
+import {
+    ArtistItem,
+    useAppStore,
+    useCurrentServer,
+    useCurrentServerId,
+    usePlayerSong,
+} from '/@/renderer/store';
 import { useGeneralSettings, useSettingsStore } from '/@/renderer/store/settings.store';
+import { titleCase } from '/@/renderer/utils';
 import { sanitize } from '/@/renderer/utils/sanitize';
-import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { sortAlbumList } from '/@/shared/api/utils';
+import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
+import { Badge } from '/@/shared/components/badge/badge';
 import { Button } from '/@/shared/components/button/button';
+import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Grid } from '/@/shared/components/grid/grid';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -34,27 +60,34 @@ import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { Text } from '/@/shared/components/text/text';
+import { useDebouncedValue } from '/@/shared/hooks/use-debounced-value';
+import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import {
+    Album,
     AlbumArtist,
+    AlbumArtistDetailResponse,
     AlbumListSort,
     LibraryItem,
+    RelatedArtist,
     ServerType,
     Song,
     SortOrder,
-    TopSongListResponse,
 } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, Play } from '/@/shared/types/types';
 
 interface AlbumArtistActionButtonsProps {
     artistDiscographyLink: string;
     artistSongsLink: string;
+    onArtistRadio?: () => void;
 }
 
 const AlbumArtistActionButtons = ({
     artistDiscographyLink,
     artistSongsLink,
+    onArtistRadio,
 }: AlbumArtistActionButtonsProps) => {
     const { t } = useTranslation();
+    const isPlayerFetching = useIsPlayerFetching();
 
     return (
         <>
@@ -77,6 +110,28 @@ const AlbumArtistActionButtons = ({
                 >
                     {String(t('page.albumArtistDetail.viewAllTracks')).toUpperCase()}
                 </Button>
+                {onArtistRadio && (
+                    <Button
+                        disabled={isPlayerFetching}
+                        leftSection={
+                            isPlayerFetching ? (
+                                <Spinner color="white" size={16} />
+                            ) : (
+                                <Icon icon="radio" size="lg" />
+                            )
+                        }
+                        onClick={onArtistRadio}
+                        p={0}
+                        size="compact-md"
+                        variant="transparent"
+                    >
+                        {String(
+                            t('player.artistRadio', {
+                                postProcess: 'sentenceCase',
+                            }),
+                        ).toUpperCase()}
+                    </Button>
+                )}
             </Group>
         </>
     );
@@ -141,7 +196,7 @@ const AlbumArtistMetadataBiography = ({
 
     return (
         <section style={{ maxWidth: '1280px' }}>
-            <TextTitle fw={700} order={2}>
+            <TextTitle fw={700} order={3}>
                 {t('page.albumArtistDetail.about', {
                     artist: artistName,
                 })}
@@ -154,20 +209,29 @@ const AlbumArtistMetadataBiography = ({
 };
 
 interface AlbumArtistMetadataTopSongsProps {
+    detailQuery: ReturnType<typeof useSuspenseQuery<AlbumArtistDetailResponse>>;
     routeId: string;
-    topSongsQuery: ReturnType<typeof useQuery<TopSongListResponse>>;
 }
 
 const AlbumArtistMetadataTopSongs = ({
+    detailQuery,
     routeId,
-    topSongsQuery,
 }: AlbumArtistMetadataTopSongsProps) => {
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 300);
     const [showAll, setShowAll] = useState(false);
     const tableConfig = useSettingsStore((state) => state.lists[ItemListKey.SONG]?.table);
     const currentSong = usePlayerSong();
     const player = usePlayer();
+    const serverId = useCurrentServerId();
+
+    const topSongsQuery = useQuery(
+        artistsQueries.topSongs({
+            query: { artist: detailQuery.data?.name || '', artistId: routeId },
+            serverId: serverId,
+        }),
+    );
 
     const songs = useMemo(() => topSongsQuery?.data?.items || [], [topSongsQuery?.data?.items]);
 
@@ -176,13 +240,13 @@ const AlbumArtistMetadataTopSongs = ({
     }, [tableConfig?.columns]);
 
     const filteredSongs = useMemo(() => {
-        const filtered = searchLibraryItems(songs, searchTerm, LibraryItem.SONG);
+        const filtered = searchLibraryItems(songs, debouncedSearchTerm, LibraryItem.SONG);
         // When searching, show all results. Otherwise, limit to 5 if not showing all
-        if (searchTerm.trim() || showAll) {
+        if (debouncedSearchTerm.trim() || showAll) {
             return filtered;
         }
         return filtered.slice(0, 5);
-    }, [songs, searchTerm, showAll]);
+    }, [songs, debouncedSearchTerm, showAll]);
 
     const { handleColumnReordered } = useItemListColumnReorder({
         itemListKey: ItemListKey.SONG,
@@ -214,13 +278,14 @@ const AlbumArtistMetadataTopSongs = ({
     if (!tableConfig || columns.length === 0) {
         return (
             <section>
-                <Group justify="space-between" wrap="nowrap">
-                    <Group align="flex-end" wrap="nowrap">
-                        <TextTitle fw={700} order={2}>
-                            {t('page.albumArtistDetail.topSongs', {
-                                postProcess: 'sentenceCase',
-                            })}
-                        </TextTitle>
+                <div className={styles.albumSectionTitle}>
+                    <TextTitle fw={700} order={3}>
+                        {t('page.albumArtistDetail.topSongs', {
+                            postProcess: 'sentenceCase',
+                        })}
+                    </TextTitle>
+                    <div className={styles.albumSectionDividerContainer}>
+                        <div className={styles.albumSectionDivider} />
                         <Button
                             component={Link}
                             size="compact-md"
@@ -234,8 +299,8 @@ const AlbumArtistMetadataTopSongs = ({
                                 postProcess: 'sentenceCase',
                             })}
                         </Button>
-                    </Group>
-                </Group>
+                    </div>
+                </div>
             </section>
         );
     }
@@ -245,13 +310,14 @@ const AlbumArtistMetadataTopSongs = ({
     return (
         <section>
             <Stack gap="md">
-                <Group justify="space-between" wrap="nowrap">
-                    <Group align="flex-end" wrap="nowrap">
-                        <TextTitle fw={700} order={2}>
-                            {t('page.albumArtistDetail.topSongs', {
-                                postProcess: 'sentenceCase',
-                            })}
-                        </TextTitle>
+                <div className={styles.albumSectionTitle}>
+                    <TextTitle fw={700} order={3}>
+                        {t('page.albumArtistDetail.topSongs', {
+                            postProcess: 'sentenceCase',
+                        })}
+                    </TextTitle>
+                    <div className={styles.albumSectionDividerContainer}>
+                        <div className={styles.albumSectionDivider} />
                         <Button
                             component={Link}
                             size="compact-md"
@@ -265,8 +331,8 @@ const AlbumArtistMetadataTopSongs = ({
                                 postProcess: 'sentenceCase',
                             })}
                         </Button>
-                    </Group>
-                </Group>
+                    </div>
+                </div>
                 <Group gap="sm" w="100%">
                     <TextInput
                         flex={1}
@@ -403,16 +469,90 @@ const AlbumArtistMetadataExternalLinks = ({
     );
 };
 
-export const AlbumArtistDetailContent = () => {
+interface AlbumArtistMetadataSimilarArtistsProps {
+    detailQuery: ReturnType<typeof useSuspenseQuery<AlbumArtistDetailResponse>>;
+    routeId: string;
+}
+
+const AlbumArtistMetadataSimilarArtists = ({
+    detailQuery,
+    routeId,
+}: AlbumArtistMetadataSimilarArtistsProps) => {
     const { t } = useTranslation();
-    const { artistItems, externalLinks, lastFM, musicBrainz } = useGeneralSettings();
+    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
+
+    const similarArtists = useMemo(() => {
+        const relatedArtists = detailQuery.data?.similarArtists;
+        if (!relatedArtists || relatedArtists.length === 0) {
+            return [];
+        }
+
+        return relatedArtists.map(
+            (relatedArtist: RelatedArtist): AlbumArtist => ({
+                _itemType: LibraryItem.ALBUM_ARTIST,
+                _serverId: serverId || '',
+                _serverType: (server?.type as ServerType) || ServerType.JELLYFIN,
+                albumCount: null,
+                biography: null,
+                duration: null,
+                genres: [],
+                id: relatedArtist.id,
+                imageId: relatedArtist.imageId,
+                imageUrl: relatedArtist.imageUrl,
+                lastPlayedAt: null,
+                mbz: null,
+                name: relatedArtist.name,
+                playCount: null,
+                similarArtists: null,
+                songCount: null,
+                userFavorite: false,
+                userRating: null,
+            }),
+        );
+    }, [detailQuery.data?.similarArtists, server?.type, serverId]);
+
+    const carouselTitle = useMemo(
+        () => (
+            <div className={styles.similarArtistsTitle}>
+                <TextTitle fw={700} order={3}>
+                    {t('page.albumArtistDetail.relatedArtists', {
+                        postProcess: 'sentenceCase',
+                    })}
+                </TextTitle>
+                <div className={styles.albumSectionDividerContainer}>
+                    <div className={styles.albumSectionDivider} />
+                </div>
+            </div>
+        ),
+        [t],
+    );
+
+    if (similarArtists.length === 0) {
+        return null;
+    }
+
+    return (
+        <AlbumArtistGridCarousel
+            data={similarArtists}
+            excludeIds={[routeId]}
+            rowCount={1}
+            title={carouselTitle}
+        />
+    );
+};
+
+export const AlbumArtistDetailContent = () => {
+    const { artistItems, artistRadioCount, externalLinks, lastFM, musicBrainz } =
+        useGeneralSettings();
     const { albumArtistId, artistId } = useParams() as {
         albumArtistId?: string;
         artistId?: string;
     };
     const routeId = (artistId || albumArtistId) as string;
-    const { ref, ...cq } = useContainerQuery();
     const server = useCurrentServer();
+    const { addToQueueByData } = usePlayer();
+    const queryClient = useQueryClient();
 
     const [enabledItem, itemOrder] = useMemo(() => {
         const enabled: { [key in ArtistItem]?: boolean } = {};
@@ -433,110 +573,54 @@ export const AlbumArtistDetailContent = () => {
         }),
     );
 
-    const artistDiscographyLink = `${generatePath(
-        AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY,
-        {
-            albumArtistId: routeId,
-        },
-    )}?${createSearchParams({
-        artistId: routeId,
-        artistName: detailQuery.data?.name || '',
-    })}`;
-
-    const artistSongsLink = `${generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_SONGS, {
-        albumArtistId: routeId,
-    })}?${createSearchParams({
-        artistId: routeId,
-        artistName: detailQuery.data?.name || '',
-    })}`;
-
-    const topSongsQuery = useQuery(
-        artistsQueries.topSongs({
-            options: {
-                enabled: !!detailQuery.data?.name && enabledItem.topSongs,
-            },
-            query: {
-                artist: detailQuery.data?.name || '',
+    const artistDiscographyLink = useMemo(
+        () =>
+            `${generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_DISCOGRAPHY, {
+                albumArtistId: routeId,
+            })}?${createSearchParams({
                 artistId: routeId,
-            },
-            serverId: server?.id,
-        }),
+                artistName: detailQuery.data?.name || '',
+            })}`,
+        [routeId, detailQuery.data?.name],
     );
 
-    const carousels = useMemo(() => {
-        return [
-            {
-                isHidden: !enabledItem.recentAlbums || !routeId,
-                itemType: LibraryItem.ALBUM,
-                order: itemOrder.recentAlbums,
-                query: {
-                    artistIds: routeId ? [routeId] : undefined,
-                    compilation: false,
-                },
-                rowCount: 2,
-                sortBy: AlbumListSort.RELEASE_DATE,
-                sortOrder: SortOrder.DESC,
-                title: (
-                    <TextTitle fw={700} order={2}>
-                        {t('page.albumArtistDetail.recentReleases', {
-                            postProcess: 'sentenceCase',
-                        })}
-                    </TextTitle>
-                ),
-                uniqueId: 'recentReleases',
-            },
-            {
-                isHidden:
-                    !enabledItem.compilations || server?.type === ServerType.SUBSONIC || !routeId,
-                itemType: LibraryItem.ALBUM,
-                order: itemOrder.compilations,
-                query: {
-                    artistIds: routeId ? [routeId] : undefined,
-                    compilation: true,
-                },
-                rowCount: 1,
-                sortBy: AlbumListSort.RELEASE_DATE,
-                sortOrder: SortOrder.DESC,
-                title: (
-                    <TextTitle fw={700} order={2}>
-                        {t('page.albumArtistDetail.appearsOn', { postProcess: 'sentenceCase' })}
-                    </TextTitle>
-                ),
-                uniqueId: 'compilationAlbums',
-            },
-            {
-                data: (detailQuery.data?.similarArtists || []) as AlbumArtist[],
-                isHidden: !detailQuery.data?.similarArtists || !enabledItem.similarArtists,
-                itemType: LibraryItem.ALBUM_ARTIST,
-                order: itemOrder.similarArtists,
-                rowCount: 1,
-                title: (
-                    <TextTitle fw={700} order={2}>
-                        {t('page.albumArtistDetail.relatedArtists', {
-                            postProcess: 'sentenceCase',
-                        })}
-                    </TextTitle>
-                ),
-                uniqueId: 'similarArtists',
-            },
-        ];
-    }, [
-        detailQuery.data?.similarArtists,
-        enabledItem.compilations,
-        enabledItem.recentAlbums,
-        enabledItem.similarArtists,
-        itemOrder.compilations,
-        itemOrder.recentAlbums,
-        itemOrder.similarArtists,
-        routeId,
-        server?.type,
-        t,
-    ]);
+    const artistSongsLink = useMemo(
+        () =>
+            `${generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_SONGS, {
+                albumArtistId: routeId,
+            })}?${createSearchParams({
+                artistId: routeId,
+                artistName: detailQuery.data?.name || '',
+            })}`,
+        [routeId, detailQuery.data?.name],
+    );
 
     const biography =
         detailQuery.data?.biography && enabledItem.biography ? detailQuery.data.biography : null;
     const showGenres = detailQuery.data?.genres ? detailQuery.data.genres.length !== 0 : false;
     const mbzId = detailQuery.data?.mbz;
+
+    const handleArtistRadio = useCallback(async () => {
+        if (!server?.id || !routeId) return;
+
+        try {
+            const artistRadioSongs = await queryClient.fetchQuery({
+                ...songsQueries.artistRadio({
+                    query: {
+                        artistId: routeId,
+                        count: artistRadioCount,
+                    },
+                    serverId: server.id,
+                }),
+                queryKey: queryKeys.player.fetch({ artistId: routeId }),
+            });
+            if (artistRadioSongs && artistRadioSongs.length > 0) {
+                addToQueueByData(artistRadioSongs, Play.NOW);
+            }
+        } catch (error) {
+            console.error('Failed to load artist radio:', error);
+        }
+    }, [addToQueueByData, artistRadioCount, queryClient, routeId, server.id]);
 
     // Calculate order for genres and external links (show before other sections)
     // Use a very low order number to ensure they appear first
@@ -544,13 +628,14 @@ export const AlbumArtistDetailContent = () => {
     const externalLinksOrder = 0.5;
 
     return (
-        <div className={styles.contentContainer} ref={ref}>
+        <div className={styles.contentContainer}>
             <div className={styles.detailContainer}>
                 <AlbumArtistActionButtons
                     artistDiscographyLink={artistDiscographyLink}
                     artistSongsLink={artistSongsLink}
+                    onArtistRadio={handleArtistRadio}
                 />
-                <Grid gutter="xl">
+                <Grid gutter="2xl">
                     {showGenres && (
                         <Grid.Col order={genresOrder} span={12}>
                             <AlbumArtistMetadataGenres genres={detailQuery.data?.genres} />
@@ -575,52 +660,608 @@ export const AlbumArtistDetailContent = () => {
                             />
                         </Grid.Col>
                     )}
-                    {Boolean(topSongsQuery?.data?.items?.length) && enabledItem.topSongs && (
-                        <Grid.Col order={itemOrder.topSongs} span={12}>
-                            <AlbumArtistMetadataTopSongs
+                    <Grid.Col order={itemOrder.recentAlbums} span={12}>
+                        <ArtistAlbums />
+                    </Grid.Col>
+                    {enabledItem.similarArtists && (
+                        <Grid.Col order={itemOrder.similarArtists} span={12}>
+                            <AlbumArtistMetadataSimilarArtists
+                                detailQuery={detailQuery}
                                 routeId={routeId}
-                                topSongsQuery={topSongsQuery}
                             />
                         </Grid.Col>
                     )}
-                    {cq.height || cq.width
-                        ? carousels
-                              .filter((c) => !c.isHidden)
-                              .map((carousel) => (
-                                  <Grid.Col
-                                      key={`carousel-${carousel.uniqueId}`}
-                                      order={carousel.order}
-                                      span={12}
-                                  >
-                                      <Suspense fallback={<Spinner container />}>
-                                          {carousel.itemType === LibraryItem.ALBUM ? (
-                                              'query' in carousel &&
-                                              carousel.query &&
-                                              carousel.sortBy &&
-                                              carousel.sortOrder ? (
-                                                  <AlbumInfiniteCarousel
-                                                      query={carousel.query}
-                                                      rowCount={carousel.rowCount}
-                                                      sortBy={carousel.sortBy}
-                                                      sortOrder={carousel.sortOrder}
-                                                      title={carousel.title}
-                                                  />
-                                              ) : null
-                                          ) : carousel.itemType === LibraryItem.ALBUM_ARTIST ? (
-                                              'data' in carousel && carousel.data ? (
-                                                  <AlbumArtistGridCarousel
-                                                      data={carousel.data}
-                                                      rowCount={carousel.rowCount}
-                                                      title={carousel.title}
-                                                  />
-                                              ) : null
-                                          ) : null}
-                                      </Suspense>
-                                  </Grid.Col>
-                              ))
-                        : null}
+                    {enabledItem.topSongs && (
+                        <Grid.Col order={itemOrder.topSongs} span={12}>
+                            <AlbumArtistMetadataTopSongs
+                                detailQuery={detailQuery}
+                                routeId={routeId}
+                            />
+                        </Grid.Col>
+                    )}
                 </Grid>
             </div>
         </div>
     );
 };
+
+interface AlbumSectionProps {
+    albums: Album[];
+    controls: ItemControls;
+    cq: ReturnType<typeof useContainerQuery>;
+    releaseType: string;
+    rows: DataRow[] | undefined;
+    title: React.ReactNode | string;
+}
+
+const MAX_SECTION_CARDS = 20;
+
+const getSpan = (cq: ReturnType<typeof useContainerQuery>) => {
+    if (cq.is4xl) return 6;
+    if (cq.is3xl) return 7;
+    if (cq.is2xl) return 8;
+    if (cq.isXl) return 9;
+    if (cq.isLg) return 12;
+    if (cq.isMd) return 12;
+    if (cq.isSm) return 16;
+    if (cq.isXs) return 24;
+    return 24;
+};
+
+const AlbumSection = ({ albums, controls, cq, releaseType, rows, title }: AlbumSectionProps) => {
+    const { t } = useTranslation();
+
+    const span = getSpan(cq);
+    const albumCount = albums.length;
+    const [showAll, setShowAll] = useState(false);
+    const player = usePlayer();
+    const serverId = useCurrentServerId();
+
+    const displayedAlbums = showAll ? albums : albums.slice(0, MAX_SECTION_CARDS);
+    const hasMoreAlbums = albums.length > MAX_SECTION_CARDS;
+
+    const handlePlay = useCallback(
+        (playType: Play) => {
+            if (albums.length === 0) return;
+            const albumIds = albums.map((album) => album.id);
+            player.addToQueueByFetch(serverId, albumIds, LibraryItem.ALBUM, playType);
+        },
+        [albums, player, serverId],
+    );
+
+    const handlePlayNext = usePlayButtonClick({
+        onClick: () => {
+            handlePlay(Play.NEXT);
+        },
+        onLongPress: () => {
+            handlePlay(LONG_PRESS_PLAY_BEHAVIOR[Play.NEXT]);
+        },
+    });
+
+    const handlePlayNow = usePlayButtonClick({
+        onClick: () => {
+            handlePlay(Play.NOW);
+        },
+        onLongPress: () => {
+            handlePlay(LONG_PRESS_PLAY_BEHAVIOR[Play.NOW]);
+        },
+    });
+
+    const handlePlayLast = usePlayButtonClick({
+        onClick: () => {
+            handlePlay(Play.LAST);
+        },
+        onLongPress: () => {
+            handlePlay(LONG_PRESS_PLAY_BEHAVIOR[Play.LAST]);
+        },
+    });
+
+    return (
+        <Stack gap="md">
+            <div className={styles.albumSectionTitle}>
+                <Group gap="md">
+                    <TextTitle fw={700} order={3}>
+                        {title}
+                    </TextTitle>
+                    <Badge variant="default">{albumCount}</Badge>
+                </Group>
+                <div className={styles.albumSectionDividerContainer}>
+                    <div className={styles.albumSectionDivider} />
+                    {albumCount > 0 && (
+                        <ActionIconGroup>
+                            <PlayTooltip type={Play.NOW}>
+                                <ActionIcon
+                                    icon="mediaPlay"
+                                    iconProps={{
+                                        size: 'md',
+                                    }}
+                                    size="xs"
+                                    variant="subtle"
+                                    {...handlePlayNow.handlers}
+                                    {...handlePlayNow.props}
+                                />
+                            </PlayTooltip>
+                            <PlayTooltip type={Play.NEXT}>
+                                <ActionIcon
+                                    icon="mediaPlayNext"
+                                    iconProps={{
+                                        size: 'md',
+                                    }}
+                                    size="xs"
+                                    variant="subtle"
+                                    {...handlePlayNext.handlers}
+                                    {...handlePlayNext.props}
+                                />
+                            </PlayTooltip>
+                            <PlayTooltip type={Play.LAST}>
+                                <ActionIcon
+                                    icon="mediaPlayLast"
+                                    iconProps={{
+                                        size: 'md',
+                                    }}
+                                    size="xs"
+                                    variant="subtle"
+                                    {...handlePlayLast.handlers}
+                                    {...handlePlayLast.props}
+                                />
+                            </PlayTooltip>
+                        </ActionIconGroup>
+                    )}
+                </div>
+            </div>
+            <Grid columns={48} gutter="md" type="container">
+                {displayedAlbums.map((album) => (
+                    <Grid.Col key={album.id} span={span}>
+                        <motion.div
+                            layout
+                            layoutId={`${releaseType}-${album.id}`}
+                            transition={{
+                                duration: 0.5,
+                                ease: 'easeInOut',
+                                layout: { duration: 0.5, ease: 'easeInOut' },
+                            }}
+                        >
+                            <MemoizedItemCard
+                                controls={controls}
+                                data={album}
+                                enableDrag
+                                itemType={LibraryItem.ALBUM}
+                                rows={rows}
+                                type="poster"
+                                withControls
+                            />
+                        </motion.div>
+                    </Grid.Col>
+                ))}
+            </Grid>
+            {hasMoreAlbums && !showAll && (
+                <Group justify="center" w="100%">
+                    <Button onClick={() => setShowAll(true)} variant="subtle">
+                        {t('action.viewMore', { postProcess: 'sentenceCase' })}
+                    </Button>
+                </Group>
+            )}
+        </Stack>
+    );
+};
+
+type GroupingType = 'all' | 'primary';
+
+const groupAlbumsByReleaseType = (
+    albums: Album[],
+    routeId: string,
+    groupingType: GroupingType = 'primary',
+): Record<string, Album[]> => {
+    if (groupingType === 'all') {
+        // Group by all individual release types
+        const grouped = albums.reduce(
+            (acc, album) => {
+                // Priority 1: Appears on - artist is not an album artist
+                const isAlbumArtist = album.albumArtists?.some((artist) => artist.id === routeId);
+                if (!isAlbumArtist) {
+                    const appearsOnKey = 'appears-on';
+                    if (!acc[appearsOnKey]) {
+                        acc[appearsOnKey] = [];
+                    }
+                    acc[appearsOnKey].push(album);
+                    return acc;
+                }
+
+                // Priority 2: Compilations
+                if (album.isCompilation) {
+                    const compilationKey = 'compilation';
+                    if (!acc[compilationKey]) {
+                        acc[compilationKey] = [];
+                    }
+                    acc[compilationKey].push(album);
+                    return acc;
+                }
+
+                // Group by all release types
+                const releaseTypes = album.releaseTypes || [];
+                if (releaseTypes.length > 0) {
+                    releaseTypes.forEach((type) => {
+                        const normalizedType = type.toLowerCase();
+                        if (!acc[normalizedType]) {
+                            acc[normalizedType] = [];
+                        }
+                        acc[normalizedType].push(album);
+                    });
+                } else {
+                    // If no release types, use "other" as fallback
+                    const otherKey = 'other';
+                    if (!acc[otherKey]) {
+                        acc[otherKey] = [];
+                    }
+                    acc[otherKey].push(album);
+                }
+
+                return acc;
+            },
+            {} as Record<string, Album[]>,
+        );
+
+        return grouped;
+    }
+
+    // Primary grouping (original behavior)
+    const grouped = albums.reduce(
+        (acc, album) => {
+            // Priority 1: Appears on - artist is not an album artist
+            const isAlbumArtist = album.albumArtists?.some((artist) => artist.id === routeId);
+            if (!isAlbumArtist) {
+                const appearsOnKey = 'appears-on';
+                if (!acc[appearsOnKey]) {
+                    acc[appearsOnKey] = [];
+                }
+                acc[appearsOnKey].push(album);
+                return acc;
+            }
+
+            // Priority 2: Compilations
+            if (album.isCompilation) {
+                const compilationKey = 'compilation';
+                if (!acc[compilationKey]) {
+                    acc[compilationKey] = [];
+                }
+                acc[compilationKey].push(album);
+                return acc;
+            }
+
+            // Priority 3: EP
+            const hasEPType = album.releaseTypes?.some((type) => type.toLowerCase() === 'ep');
+            if (hasEPType) {
+                const epKey = 'ep';
+                if (!acc[epKey]) {
+                    acc[epKey] = [];
+                }
+                acc[epKey].push(album);
+                return acc;
+            }
+
+            // Priority 4: Single (other non-album types)
+            const hasSingleType = album.releaseTypes?.some(
+                (type) => type.toLowerCase() === 'single',
+            );
+            if (hasSingleType) {
+                const singleKey = 'single';
+                if (!acc[singleKey]) {
+                    acc[singleKey] = [];
+                }
+                acc[singleKey].push(album);
+                return acc;
+            }
+
+            // Priority 5: Broadcast (if has album type)
+            const hasBroadcastType = album.releaseTypes?.some(
+                (type) => type.toLowerCase() === 'broadcast',
+            );
+
+            if (hasBroadcastType) {
+                const broadcastKey = 'broadcast';
+                if (!acc[broadcastKey]) {
+                    acc[broadcastKey] = [];
+                }
+                acc[broadcastKey].push(album);
+                return acc;
+            }
+
+            // Priority 6: Album
+            const hasAlbumType = album.releaseTypes?.some((type) => type.toLowerCase() === 'album');
+            if (hasAlbumType) {
+                const albumKey = 'album';
+                if (!acc[albumKey]) {
+                    acc[albumKey] = [];
+                }
+                acc[albumKey].push(album);
+                return acc;
+            }
+
+            // Priority 7: Other (catch all for unknown release types or specifically other release types)
+            const otherKey = 'other';
+            if (!acc[otherKey]) {
+                acc[otherKey] = [];
+            }
+            acc[otherKey].push(album);
+            return acc;
+        },
+        {} as Record<string, Album[]>,
+    );
+
+    return grouped;
+};
+
+const ArtistAlbums = () => {
+    const { t } = useTranslation();
+    const serverId = useCurrentServerId();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 300);
+    const albumArtistDetailSort = useAppStore((state) => state.albumArtistDetailSort);
+    const setAlbumArtistDetailSort = useAppStore((state) => state.actions.setAlbumArtistDetailSort);
+    const sortBy = albumArtistDetailSort.sortBy;
+    const sortOrder = albumArtistDetailSort.sortOrder;
+    const groupingType = albumArtistDetailSort.groupingType;
+
+    const { albumArtistId, artistId } = useParams() as {
+        albumArtistId?: string;
+        artistId?: string;
+    };
+    const routeId = (artistId || albumArtistId) as string;
+
+    const albumsQuery = useSuspenseQuery(
+        albumQueries.list({
+            query: {
+                artistIds: [routeId],
+                limit: -1,
+                sortBy: AlbumListSort.RELEASE_DATE,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
+
+    const rows = useGridRows(LibraryItem.ALBUM, ItemListKey.ALBUM);
+    const controls = useDefaultItemListControls();
+
+    const filteredAndSortedAlbums = useMemo(() => {
+        const albums = albumsQuery.data?.items || [];
+        const searched = searchLibraryItems(albums, debouncedSearchTerm, LibraryItem.ALBUM);
+        return sortAlbumList(searched, sortBy, sortOrder);
+    }, [albumsQuery.data?.items, debouncedSearchTerm, sortBy, sortOrder]);
+
+    const albumsByReleaseType = useMemo(() => {
+        return groupAlbumsByReleaseType(filteredAndSortedAlbums, routeId, groupingType);
+    }, [filteredAndSortedAlbums, routeId, groupingType]);
+
+    const releaseTypeEntries = useMemo(() => {
+        const priorityOrder = [
+            'album',
+            'ep',
+            'single',
+            'broadcast',
+            'other',
+            'compilation',
+            'appears-on',
+        ];
+        const getPriority = (releaseType: string) => {
+            const index = priorityOrder.indexOf(releaseType);
+            return index === -1 ? 999 : index;
+        };
+
+        return Object.entries(albumsByReleaseType)
+            .map(([releaseType, albums]) => {
+                let displayName: React.ReactNode | string;
+                switch (releaseType) {
+                    case 'album':
+                        displayName = t('releaseType.primary.album', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'appears-on':
+                        displayName = t('page.albumArtistDetail.appearsOn', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'audiobook':
+                        displayName = t('releaseType.secondary.audiobook', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'audio drama':
+                        displayName = t('releaseType.secondary.audioDrama', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'broadcast':
+                        displayName = t('releaseType.primary.broadcast', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'compilation':
+                        displayName = t('releaseType.secondary.compilation', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'demo':
+                        displayName = t('releaseType.secondary.demo', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'dj-mix':
+                        displayName = t('releaseType.secondary.djMix', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'ep':
+                        displayName = t('releaseType.primary.ep', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'field recording':
+                        displayName = t('releaseType.secondary.fieldRecording', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'interview':
+                        displayName = t('releaseType.secondary.interview', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'live':
+                        displayName = t('releaseType.secondary.live', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'mixtape/street':
+                        displayName = t('releaseType.secondary.mixtape', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'other':
+                        displayName = t('releaseType.primary.other', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'remix':
+                        displayName = t('releaseType.secondary.remix', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'single':
+                        displayName = t('releaseType.primary.single', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'soundtrack':
+                        displayName = t('releaseType.secondary.soundtrack', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    case 'spokenword':
+                        displayName = t('releaseType.secondary.spokenWord', {
+                            postProcess: 'sentenceCase',
+                        });
+                        break;
+                    default:
+                        displayName = titleCase(releaseType);
+                }
+                return { albums, displayName, releaseType };
+            })
+            .sort((a, b) => getPriority(a.releaseType) - getPriority(b.releaseType));
+    }, [albumsByReleaseType, t]);
+
+    const cq = useContainerQuery();
+
+    const binding = useSettingsStore((state) => state.hotkeys.bindings.localSearch);
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
+    useHotkeys([
+        [
+            binding.hotkey,
+            () => {
+                searchInputRef.current?.focus();
+            },
+        ],
+    ]);
+
+    if (releaseTypeEntries.length === 0) {
+        return null;
+    }
+
+    return (
+        <Stack gap="md">
+            <Group gap="sm" w="100%">
+                <TextInput
+                    flex={1}
+                    leftSection={<Icon icon="search" />}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder={t('common.search', { postProcess: 'sentenceCase' })}
+                    radius="xl"
+                    ref={searchInputRef}
+                    rightSection={
+                        searchTerm ? (
+                            <ActionIcon
+                                icon="x"
+                                onClick={() => setSearchTerm('')}
+                                size="sm"
+                                variant="transparent"
+                            />
+                        ) : null
+                    }
+                    styles={{
+                        input: {
+                            background: 'transparent',
+                            border: '1px solid rgba(255, 255, 255, 0.05)',
+                        },
+                    }}
+                    value={searchTerm}
+                />
+                <ListSortByDropdownControlled
+                    filters={CLIENT_SIDE_ALBUM_FILTERS}
+                    itemType={LibraryItem.ALBUM}
+                    setSortBy={(value) =>
+                        setAlbumArtistDetailSort(value as AlbumListSort, sortOrder)
+                    }
+                    sortBy={sortBy}
+                />
+                <ListSortOrderToggleButtonControlled
+                    setSortOrder={(value) => setAlbumArtistDetailSort(sortBy, value as SortOrder)}
+                    sortOrder={sortOrder}
+                />
+                <GroupingTypeSelector />
+            </Group>
+            <div className={styles.albumSectionContainer} ref={cq.ref}>
+                {cq.isCalculated && (
+                    <LayoutGroup>
+                        {releaseTypeEntries.map(({ albums, displayName, releaseType }) => (
+                            <AlbumSection
+                                albums={albums}
+                                controls={controls}
+                                cq={cq}
+                                key={releaseType}
+                                releaseType={releaseType}
+                                rows={rows}
+                                title={displayName}
+                            />
+                        ))}
+                    </LayoutGroup>
+                )}
+            </div>
+        </Stack>
+    );
+};
+
+function GroupingTypeSelector() {
+    const { t } = useTranslation();
+    const groupingType = useAppStore((state) => state.albumArtistDetailSort.groupingType);
+    const setAlbumArtistDetailGroupingType = useAppStore(
+        (state) => state.actions.setAlbumArtistDetailGroupingType,
+    );
+
+    return (
+        <DropdownMenu>
+            <DropdownMenu.Target>
+                <ActionIcon icon="settings" variant="subtle" />
+            </DropdownMenu.Target>
+            <DropdownMenu.Dropdown>
+                <DropdownMenu.Item
+                    isSelected={groupingType === 'all'}
+                    onClick={() => setAlbumArtistDetailGroupingType('all')}
+                >
+                    {t('page.albumArtistDetail.groupingTypeAll', {
+                        postProcess: 'sentenceCase',
+                    })}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item
+                    isSelected={groupingType === 'primary'}
+                    onClick={() => setAlbumArtistDetailGroupingType('primary')}
+                >
+                    {t('page.albumArtistDetail.groupingTypePrimary', {
+                        postProcess: 'sentenceCase',
+                    })}
+                </DropdownMenu.Item>
+            </DropdownMenu.Dropdown>
+        </DropdownMenu>
+    );
+}

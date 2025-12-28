@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 
 import styles from './library-header.module.css';
 
+import { useIsPlayerFetching } from '/@/renderer/features/player/context/player-context';
 import {
     PlayLastTextButton,
     PlayNextTextButton,
@@ -17,10 +18,13 @@ import { useIsMutatingCreateFavorite } from '/@/renderer/features/shared/mutatio
 import { useIsMutatingDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useIsMutatingRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Button } from '/@/shared/components/button/button';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { Image } from '/@/shared/components/image/image';
 import { Rating } from '/@/shared/components/rating/rating';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
@@ -176,6 +180,7 @@ const calculateTitleSize = (title: string) => {
 
 interface LibraryHeaderMenuProps {
     favorite?: boolean;
+    onArtistRadio?: () => void;
     onFavorite?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     onMore?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     onPlay?: (type: Play) => void;
@@ -186,16 +191,19 @@ interface LibraryHeaderMenuProps {
 
 export const LibraryHeaderMenu = ({
     favorite,
+    onArtistRadio,
     onFavorite,
     onMore,
     onPlay,
     onRating,
     rating,
 }: LibraryHeaderMenuProps) => {
+    const { t } = useTranslation();
     const isMutatingRating = useIsMutatingRating();
     const isMutatingCreateFavorite = useIsMutatingCreateFavorite();
     const isMutatingDeleteFavorite = useIsMutatingDeleteFavorite();
     const isMutatingFavorite = isMutatingCreateFavorite || isMutatingDeleteFavorite;
+    const isPlayerFetching = useIsPlayerFetching();
 
     const handlePlayNow = usePlayButtonClick({
         onClick: () => {
@@ -233,6 +241,22 @@ export const LibraryHeaderMenu = ({
                 )}
                 {onPlay && (
                     <PlayLastTextButton {...handlePlayLast.handlers} {...handlePlayLast.props} />
+                )}
+                {onArtistRadio && (
+                    <Button
+                        leftSection={
+                            isPlayerFetching ? (
+                                <Spinner color="white" />
+                            ) : (
+                                <Icon icon="radio" size="lg" />
+                            )
+                        }
+                        onClick={onArtistRadio}
+                        size="md"
+                        variant="transparent"
+                    >
+                        {t('player.artistRadio', { postProcess: 'sentenceCase' })}
+                    </Button>
                 )}
             </Group>
             <Group gap="sm" wrap="nowrap">

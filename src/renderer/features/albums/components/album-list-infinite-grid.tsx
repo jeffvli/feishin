@@ -27,6 +27,7 @@ export const AlbumListInfiniteGrid = ({
     },
     saveScrollOffset = true,
     serverId,
+    size,
 }: AlbumListInfiniteGridProps) => {
     const listCountQuery = albumQueries.listCount({
         query: { ...query },
@@ -65,6 +66,7 @@ export const AlbumListInfiniteGrid = ({
             onRangeChanged={onRangeChanged}
             onScrollEnd={handleOnScrollEnd}
             rows={rows}
+            size={size}
         />
     );
 };

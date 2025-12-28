@@ -29,6 +29,7 @@ export const PlaylistListPaginatedGrid = ({
     },
     saveScrollOffset = true,
     serverId,
+    size,
 }: PlaylistListPaginatedGridProps) => {
     const listCountQuery = playlistsQueries.listCount({
         query: { ...query },
@@ -76,6 +77,7 @@ export const PlaylistListPaginatedGrid = ({
                 itemType={LibraryItem.PLAYLIST}
                 onScrollEnd={handleOnScrollEnd}
                 rows={rows}
+                size={size}
             />
         </ItemListWithPagination>
     );

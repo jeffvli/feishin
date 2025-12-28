@@ -6,8 +6,8 @@ export const shadesOfPurple: AppThemeConfiguration = {
             'linear-gradient(transparent 0%, rgb(45 43 85 / 85%) 100%), var(--theme-background-noise)',
         'overlay-subheader':
             'linear-gradient(180deg, rgb(45 43 85 / 5%) 0%, var(--theme-colors-background) 100%), var(--theme-background-noise)',
-        'scrollbar-handle-background': 'rgba(167, 129, 255, 20%)',
-        'scrollbar-handle-hover-background': 'rgba(167, 129, 255, 40%)',
+        'scrollbar-handle-background': 'rgba(160, 160, 160, 20%)',
+        'scrollbar-handle-hover-background': 'rgba(160, 160, 160, 40%)',
     },
     colors: {
         background: 'rgb(45, 43, 85)',

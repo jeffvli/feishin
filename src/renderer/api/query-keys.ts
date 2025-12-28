@@ -4,6 +4,7 @@ import type {
     AlbumDetailQuery,
     AlbumListQuery,
     ArtistListQuery,
+    ArtistRadioQuery,
     FolderQuery,
     GenreListQuery,
     LyricSearchQuery,
@@ -340,6 +341,10 @@ export const queryKeys: Record<
         root: (serverId: string) => [serverId] as const,
     },
     songs: {
+        artistRadio: (serverId: string, query?: ArtistRadioQuery) => {
+            if (query) return [serverId, 'songs', 'artistRadio', query] as const;
+            return [serverId, 'songs', 'artistRadio'] as const;
+        },
         count: (serverId: string, query?: SongListQuery) => {
             const { filter, pagination } = splitPaginatedQuery(query);
             if (query && pagination) {

@@ -8,8 +8,8 @@ import { PlayAction } from '/@/renderer/features/context-menu/actions/play-actio
 import { SetFavoriteAction } from '/@/renderer/features/context-menu/actions/set-favorite-action';
 import { SetRatingAction } from '/@/renderer/features/context-menu/actions/set-rating-action';
 import { ShareAction } from '/@/renderer/features/context-menu/actions/share-action';
+import { ContextMenuPreview } from '/@/renderer/features/context-menu/components/context-menu-preview';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
-import { ContextMenuPreview } from '/@/shared/components/context-menu/context-menu-preview';
 import { Album, LibraryItem } from '/@/shared/types/domain-types';
 
 interface AlbumContextMenuProps {

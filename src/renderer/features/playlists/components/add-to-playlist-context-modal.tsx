@@ -7,6 +7,7 @@ import styles from './add-to-playlist-context-modal.module.css';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import {
     getAlbumSongsById,
     getArtistSongsById,
@@ -26,7 +27,6 @@ import { Flex } from '/@/shared/components/flex/flex';
 import { Grid } from '/@/shared/components/grid/grid';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
-import { Image } from '/@/shared/components/image/image';
 import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { Pill } from '/@/shared/components/pill/pill';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
@@ -38,7 +38,7 @@ import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { useForm } from '/@/shared/hooks/use-form';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
-import { Playlist, PlaylistListSort, SortOrder } from '/@/shared/types/domain-types';
+import { LibraryItem, Playlist, PlaylistListSort, SortOrder } from '/@/shared/types/domain-types';
 
 export const AddToPlaylistContextModal = ({
     id,
@@ -555,14 +555,13 @@ const PlaylistTableItem = memo(
                 <Grid align="center" gutter="xs" w="100%">
                     <Grid.Col span="content">
                         <Flex align="center" justify="center" px="sm">
-                            {item.imageUrl && (
-                                <Image
-                                    imageContainerProps={{
-                                        className: styles.imageContainer,
-                                    }}
-                                    src={item.imageUrl}
-                                />
-                            )}
+                            <ItemImage
+                                id={item.id}
+                                imageContainerProps={{
+                                    className: styles.imageContainer,
+                                }}
+                                itemType={LibraryItem.PLAYLIST}
+                            />
                         </Flex>
                     </Grid.Col>
                     <Grid.Col className={styles.gridCol} span="auto">
