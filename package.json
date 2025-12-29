@@ -150,7 +150,7 @@
         "@vitejs/plugin-react": "^5.1.1",
         "concurrently": "^9.2.1",
         "cross-env": "^10.1.0",
-        "electron": "^38.5.0",
+        "electron": "^39.2.7",
         "electron-builder": "^26.0.12",
         "electron-devtools-installer": "^4.0.0",
         "electron-vite": "^4.0.1",
