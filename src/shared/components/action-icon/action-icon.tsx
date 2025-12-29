@@ -27,10 +27,10 @@ const _ActionIcon = forwardRef<HTMLButtonElement, ActionIconProps>(
             classNames,
             icon,
             iconProps,
+            onClick,
             size = 'sm',
             stopsPropagation,
             tooltip,
-            onClick,
             variant = 'default',
             ...props
         },
