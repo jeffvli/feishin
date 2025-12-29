@@ -207,8 +207,8 @@ export const ListConfigTable = ({
             variant="vertical"
             withColumnBorders={false}
             withRowBorders={false}
-            withTableBorder={false}
             onClick={(e) => e.stopPropagation()}
+            withTableBorder={false}
         >
             <Table.Tbody>
                 {options.map((option) => {

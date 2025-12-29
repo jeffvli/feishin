@@ -16,8 +16,8 @@ export interface ActionIconProps
         MantineActionIconProps {
     icon?: keyof typeof AppIcon;
     iconProps?: Omit<IconProps, 'icon'>;
-    tooltip?: Omit<TooltipProps, 'children'>;
     stopsPropagation?: boolean;
+    tooltip?: Omit<TooltipProps, 'children'>;
 }
 
 const _ActionIcon = forwardRef<HTMLButtonElement, ActionIconProps>(
@@ -28,10 +28,10 @@ const _ActionIcon = forwardRef<HTMLButtonElement, ActionIconProps>(
             icon,
             iconProps,
             size = 'sm',
-            tooltip,
             stopsPropagation,
-            variant = 'default',
+            tooltip,
             onClick,
+            variant = 'default',
             ...props
         },
         ref,
