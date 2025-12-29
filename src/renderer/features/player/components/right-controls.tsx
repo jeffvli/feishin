@@ -95,7 +95,10 @@ const AutoDJButton = () => {
 
     return (
         <Button
-            onClick={toggleAutoDJ}
+            onClick={(e) => {
+                e.stopPropagation();
+                toggleAutoDJ();
+            }}
             size="compact-xs"
             style={{ color: settings.enabled ? 'var(--theme-colors-primary)' : undefined }}
             uppercase

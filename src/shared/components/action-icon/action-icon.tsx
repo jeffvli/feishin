@@ -17,6 +17,7 @@ export interface ActionIconProps
     icon?: keyof typeof AppIcon;
     iconProps?: Omit<IconProps, 'icon'>;
     tooltip?: Omit<TooltipProps, 'children'>;
+    stopsPropagation?: boolean;
 }
 
 const _ActionIcon = forwardRef<HTMLButtonElement, ActionIconProps>(
@@ -28,11 +29,18 @@ const _ActionIcon = forwardRef<HTMLButtonElement, ActionIconProps>(
             iconProps,
             size = 'sm',
             tooltip,
+            stopsPropagation,
             variant = 'default',
+            onClick,
             ...props
         },
         ref,
     ) => {
+        const handleClick = (e: any) => {
+            if (stopsPropagation) e.stopPropagation();
+            if (onClick) onClick(e);
+        };
+
         const actionIconProps: ActionIconProps = {
             classNames: {
                 root: styles.root,
@@ -41,6 +49,7 @@ const _ActionIcon = forwardRef<HTMLButtonElement, ActionIconProps>(
             size,
             variant,
             ...props,
+            onClick: handleClick,
         };
 
         if (tooltip && icon) {
