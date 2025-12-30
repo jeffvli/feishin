@@ -85,6 +85,7 @@
         "butterchurn": "^2.6.7",
         "butterchurn-presets": "^2.4.7",
         "cheerio": "^1.1.2",
+        "chroma-js": "^3.2.0",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
         "dayjs": "^1.11.19",
