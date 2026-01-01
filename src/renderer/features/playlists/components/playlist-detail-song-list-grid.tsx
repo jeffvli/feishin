@@ -24,7 +24,7 @@ interface PlaylistDetailSongListGridProps
 }
 
 export const PlaylistDetailSongListGrid = forwardRef<any, PlaylistDetailSongListGridProps>(
-    ({ data, saveScrollOffset = true, size = 'default' }) => {
+    ({ data, saveScrollOffset = true }) => {
         const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
             enabled: saveScrollOffset,
         });
@@ -49,9 +49,9 @@ export const PlaylistDetailSongListGrid = forwardRef<any, PlaylistDetailSongList
             }
         }, [songData, setListData]);
 
-        const rows = useGridRows(LibraryItem.SONG, ItemListKey.SONG, size);
-
         const gridProps = useListSettings(ItemListKey.PLAYLIST_SONG).grid;
+
+        const rows = useGridRows(LibraryItem.SONG, ItemListKey.SONG, gridProps.size);
 
         return (
             <ItemGridList
@@ -65,7 +65,7 @@ export const PlaylistDetailSongListGrid = forwardRef<any, PlaylistDetailSongList
                 itemType={LibraryItem.SONG}
                 onScrollEnd={handleOnScrollEnd}
                 rows={rows}
-                size={size}
+                size={gridProps.size}
             />
         );
     },

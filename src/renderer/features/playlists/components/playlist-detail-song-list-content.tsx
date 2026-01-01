@@ -92,9 +92,7 @@ export const PlaylistDetailSongListView = ({ data }: { data: PlaylistSongListRes
 
     switch (display) {
         case ListDisplayType.GRID: {
-            return (
-                <PlaylistDetailSongListGrid data={data} serverId={server.id} size={table.size} />
-            );
+            return <PlaylistDetailSongListGrid data={data} serverId={server.id} />;
         }
         case ListDisplayType.TABLE: {
             return (
