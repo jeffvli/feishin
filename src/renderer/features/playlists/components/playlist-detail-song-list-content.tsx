@@ -2,11 +2,12 @@ import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 
+import { PlaylistDetailSongListEditTable } from './playlist-detail-song-list-table';
+
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
-import { PlaylistDetailSongListEditTable } from './playlist-detail-song-list-table';
 import { useCurrentServer, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { PlaylistSongListQuery, PlaylistSongListResponse } from '/@/shared/types/domain-types';
@@ -90,6 +91,11 @@ export const PlaylistDetailSongListView = ({ data }: { data: PlaylistSongListRes
     const { display, table } = useListSettings(ItemListKey.PLAYLIST_SONG);
 
     switch (display) {
+        case ListDisplayType.GRID: {
+            return (
+                <PlaylistDetailSongListGrid data={data} serverId={server.id} size={table.size} />
+            );
+        }
         case ListDisplayType.TABLE: {
             return (
                 <PlaylistDetailSongListTable
@@ -103,11 +109,6 @@ export const PlaylistDetailSongListView = ({ data }: { data: PlaylistSongListRes
                     serverId={server.id}
                     size={table.size}
                 />
-            );
-        }
-        case ListDisplayType.GRID: {
-            return (
-                <PlaylistDetailSongListGrid data={data} serverId={server.id} size={table.size} />
             );
         }
         default:

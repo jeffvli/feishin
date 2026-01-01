@@ -10,6 +10,7 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
+import { ListDisplayTypeToggleButton } from '/@/renderer/features/shared/components/list-display-type-toggle-button';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
 import { ListSearchInput } from '/@/renderer/features/shared/components/list-search-input';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
@@ -27,7 +28,6 @@ import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { LibraryItem, SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
-import { ListDisplayTypeToggleButton } from '/@/renderer/features/shared/components/list-display-type-toggle-button';
 
 interface PlaylistDetailSongListHeaderFiltersProps {
     isSmartPlaylist?: boolean;
