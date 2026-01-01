@@ -111,7 +111,8 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 </Tooltip>
                 <ListDisplayTypeToggleButton listKey={ItemListKey.PLAYLIST_SONG} />
                 <ListConfigMenu
-                    listKey={ItemListKey.PLAYLIST_SONG}
+                    // For some reason using PLAYLIST_SONG here results in no rows being shown in the row toggle config menu
+                    listKey={ItemListKey.SONG}
                     tableColumnsData={PLAYLIST_SONG_TABLE_COLUMNS}
                 />
             </Group>
