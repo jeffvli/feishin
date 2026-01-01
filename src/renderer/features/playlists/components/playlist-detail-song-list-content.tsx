@@ -6,7 +6,7 @@ import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
-import { PlaylistDetailSongListEditTable } from '/@/renderer/features/playlists/components/playlist-detail-song-list-table';
+import { PlaylistDetailSongListEditTable } from './playlist-detail-song-list-table';
 import { useCurrentServer, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { PlaylistSongListQuery, PlaylistSongListResponse } from '/@/shared/types/domain-types';
@@ -16,6 +16,14 @@ const PlaylistDetailSongListTable = lazy(() =>
     import('/@/renderer/features/playlists/components/playlist-detail-song-list-table').then(
         (module) => ({
             default: module.PlaylistDetailSongListTable,
+        }),
+    ),
+);
+
+const PlaylistDetailSongListGrid = lazy(() =>
+    import('/@/renderer/features/playlists/components/playlist-detail-song-list-grid').then(
+        (module) => ({
+            default: module.PlaylistDetailSongListGrid,
         }),
     ),
 );
@@ -95,6 +103,11 @@ export const PlaylistDetailSongListView = ({ data }: { data: PlaylistSongListRes
                     serverId={server.id}
                     size={table.size}
                 />
+            );
+        }
+        case ListDisplayType.GRID: {
+            return (
+                <PlaylistDetailSongListGrid data={data} serverId={server.id} size={table.size} />
             );
         }
         default:
@@ -210,6 +223,8 @@ export const PlaylistDetailSongListEdit = ({ data }: { data: PlaylistSongListRes
     }, [localData, setListData]);
 
     switch (display) {
+        // Would a grid edit mode make sense here? For now I think it's best to just use the same edit mode for both
+        case ListDisplayType.GRID:
         case ListDisplayType.TABLE: {
             return (
                 <PlaylistDetailSongListEditTable

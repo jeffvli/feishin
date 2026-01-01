@@ -26,7 +26,8 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { LibraryItem, SongListSort, SortOrder } from '/@/shared/types/domain-types';
-import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
+import { ItemListKey } from '/@/shared/types/types';
+import { ListDisplayTypeToggleButton } from '/@/renderer/features/shared/components/list-display-type-toggle-button';
 
 interface PlaylistDetailSongListHeaderFiltersProps {
     isSmartPlaylist?: boolean;
@@ -108,13 +109,8 @@ export const PlaylistDetailSongListHeaderFilters = ({
                         variant="subtle"
                     />
                 </Tooltip>
+                <ListDisplayTypeToggleButton listKey={ItemListKey.PLAYLIST_SONG} />
                 <ListConfigMenu
-                    displayTypes={[
-                        {
-                            hidden: true,
-                            value: ListDisplayType.GRID,
-                        },
-                    ]}
                     listKey={ItemListKey.PLAYLIST_SONG}
                     tableColumnsData={PLAYLIST_SONG_TABLE_COLUMNS}
                 />
