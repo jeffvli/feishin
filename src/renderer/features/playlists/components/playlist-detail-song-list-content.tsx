@@ -222,7 +222,6 @@ export const PlaylistDetailSongListEdit = ({ data }: { data: PlaylistSongListRes
     }, [localData, setListData]);
 
     switch (display) {
-        // Would a grid edit mode make sense here? For now I think it's best to just use the same edit mode for both
         case ListDisplayType.GRID:
         case ListDisplayType.TABLE: {
             return (
