@@ -1165,7 +1165,7 @@ const ArtistAlbums = ({ albumsQuery }: ArtistAlbumsProps) => {
                         break;
                     case 'ep':
                         displayName = t('releaseType.primary.ep', {
-                            postProcess: 'sentenceCase',
+                            postProcess: 'upperCase',
                         });
                         break;
                     case 'field recording':
