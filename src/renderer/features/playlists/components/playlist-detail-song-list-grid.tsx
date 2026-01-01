@@ -51,7 +51,11 @@ export const PlaylistDetailSongListGrid = forwardRef<any, PlaylistDetailSongList
 
         const gridProps = useListSettings(ItemListKey.PLAYLIST_SONG).grid;
 
-        const rows = useGridRows(LibraryItem.SONG, ItemListKey.SONG, gridProps.size);
+        const rows = useGridRows(
+            LibraryItem.PLAYLIST_SONG,
+            ItemListKey.PLAYLIST_SONG,
+            gridProps.size,
+        );
 
         return (
             <ItemGridList
