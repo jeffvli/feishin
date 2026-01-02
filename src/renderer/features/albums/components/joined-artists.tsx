@@ -35,7 +35,7 @@ export const JoinedArtists = ({
     }> = [];
 
     for (const artist of artists) {
-        const rawName = artist?.name ?? "";
+        const rawName = artist?.name ?? '';
         const name = rawName.trim();
         // Avoid an infinite loop when `artist.name` is an empty string.
         if (!name) continue;
