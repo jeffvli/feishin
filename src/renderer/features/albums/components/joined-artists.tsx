@@ -35,7 +35,10 @@ export const JoinedArtists = ({
     }> = [];
 
     for (const artist of artists) {
-        const name = artist.name;
+        const rawName = artist?.name ?? "";
+        const name = rawName.trim();
+        // Avoid an infinite loop when `artist.name` is an empty string.
+        if (!name) continue;
         const regex = new RegExp(escapeRegex(name), 'gi');
         let match: null | RegExpExecArray = null;
         while ((match = regex.exec(artistName)) !== null) {
