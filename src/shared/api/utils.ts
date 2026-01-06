@@ -180,7 +180,11 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
             break;
 
         case SongListSort.COMMENT:
-            results = orderBy(results, ['comment'], [order]);
+            results = orderBy(
+                results,
+                ['comment', 'discNumber', 'trackNumber'],
+                [order, order, 'asc', 'asc'],
+            );
             break;
 
         case SongListSort.DURATION:
