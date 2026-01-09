@@ -211,11 +211,17 @@ export const FullScreenPlayerImage = () => {
                     ))}
                 </Text>
                 <Group justify="center" mt="sm">
-                    {(currentSong?.container && currentSong?.bitRate) && (
-                        <Badge variant="transparent">{currentSong?.container.replace("audio/", "")} {Math.round(currentSong.bitRate / 100) * 100}</Badge>
-                    ) || currentSong?.container && (
-                        <Badge variant="transparent">{currentSong?.container.replace("audio/", "")}</Badge>
-                    )}
+                    {(currentSong?.container && currentSong?.bitRate && (
+                        <Badge variant="transparent">
+                            {currentSong?.container.replace('audio/', '')}{' '}
+                            {Math.round(currentSong.bitRate / 100) * 100}
+                        </Badge>
+                    )) ||
+                        (currentSong?.container && (
+                            <Badge variant="transparent">
+                                {currentSong?.container.replace('audio/', '')}
+                            </Badge>
+                        ))}
                     {currentSong?.releaseYear && (
                         <Badge variant="transparent">{currentSong?.releaseYear}</Badge>
                     )}
