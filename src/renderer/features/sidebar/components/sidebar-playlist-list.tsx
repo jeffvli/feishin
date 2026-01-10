@@ -8,9 +8,6 @@ import { generatePath, Link } from 'react-router';
 import styles from './sidebar-playlist-list.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
-// getDraggedItems not needed here; sidebar rows use the playlist id directly for dragging
-import { DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
-import { Play } from '/@/shared/types/types';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
@@ -38,6 +35,8 @@ import {
     Song,
     SortOrder,
 } from '/@/shared/types/domain-types';
+import { DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
+import { Play } from '/@/shared/types/types';
 
 const getPlaylistOrderKey = (serverId: string | undefined, scope: 'owned' | 'shared') => {
     const sid = serverId || 'local';
@@ -56,7 +55,11 @@ const loadSavedOrderForServer = (serverId: string | undefined, scope: 'owned' | 
     }
 };
 
-const saveOrderForServer = (serverId: string | undefined, ids: string[], scope: 'owned' | 'shared') => {
+const saveOrderForServer = (
+    serverId: string | undefined,
+    ids: string[],
+    scope: 'owned' | 'shared',
+) => {
     try {
         localStorage.setItem(getPlaylistOrderKey(serverId, scope), JSON.stringify(ids));
     } catch {
@@ -68,225 +71,227 @@ interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'on
     item: Playlist;
     name: string;
     onContextMenu: (e: MouseEvent<HTMLAnchorElement>, item: Playlist) => void;
+    onReorder?: (sourceIds: string[], targetId: string, edge: 'bottom' | 'top' | null) => void;
     to: string;
-    onReorder?: (sourceIds: string[], targetId: string, edge: 'top' | 'bottom' | null) => void;
 }
 
-const PlaylistRowButton = memo(({ item, name, onContextMenu, to, onReorder }: PlaylistRowButtonProps) => {
-    const url = {
-        pathname: generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: to }),
-        state: { item },
-    };
-    const { t } = useTranslation();
+const PlaylistRowButton = memo(
+    ({ item, name, onContextMenu, onReorder, to }: PlaylistRowButtonProps) => {
+        const url = {
+            pathname: generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: to }),
+            state: { item },
+        };
+        const { t } = useTranslation();
 
-    const [isHovered, setIsHovered] = useState(false);
+        const [isHovered, setIsHovered] = useState(false);
 
-    const { isDraggedOver, isDragging, ref } = useDragDrop<HTMLAnchorElement>({
-        drag: {
-            getId: () => {
-                return item && item.id ? [item.id] : [];
+        const { isDraggedOver, isDragging, ref } = useDragDrop<HTMLAnchorElement>({
+            drag: {
+                getId: () => {
+                    return item && item.id ? [item.id] : [];
+                },
+                getItem: () => {
+                    return item ? [item] : [];
+                },
+                itemType: LibraryItem.PLAYLIST,
+                operation: [DragOperation.ADD, DragOperation.REORDER],
+                target: DragTarget.PLAYLIST,
             },
-            getItem: () => {
-                return item ? [item] : [];
-            },
-            itemType: LibraryItem.PLAYLIST,
-            operation: [DragOperation.ADD, DragOperation.REORDER],
-            target: DragTarget.PLAYLIST,
-        },
-        drop: {
-            canDrop: (args) => {
-                // Allow dropping items into a playlist (ADD)
-                const canAdd =
-                    args.source.itemType !== undefined &&
-                    args.source.type !== DragTarget.PLAYLIST &&
-                    (args.source.operation?.includes(DragOperation.ADD) ?? false);
+            drop: {
+                canDrop: (args) => {
+                    // Allow dropping items into a playlist (ADD)
+                    const canAdd =
+                        args.source.itemType !== undefined &&
+                        args.source.type !== DragTarget.PLAYLIST &&
+                        (args.source.operation?.includes(DragOperation.ADD) ?? false);
 
-                // Allow reordering playlists when source is playlist and operation includes REORDER
-                // do not allow cross-scope reorders
-                const canReorder =
-                    args.source.itemType === LibraryItem.PLAYLIST &&
-                    args.source.type === DragTarget.PLAYLIST &&
-                    (args.source.operation?.includes(DragOperation.REORDER) ?? false);
-                return canAdd || canReorder;
-            },
-            getData: () => {
-                return {
-                    id: [to],
-                    item: [],
-                    itemType: LibraryItem.PLAYLIST,
-                    type: DragTarget.PLAYLIST,
-                };
-            },
-            onDrag: () => {
-                return;
-            },
-            onDragLeave: () => {
-                return;
-            },
-            onDrop: (args) => {
-                const sourceItemType = args.source.itemType as LibraryItem;
-                const sourceIds = args.source.id;
+                    // Allow reordering playlists when source is playlist and operation includes REORDER
+                    // do not allow cross-scope reorders
+                    const canReorder =
+                        args.source.itemType === LibraryItem.PLAYLIST &&
+                        args.source.type === DragTarget.PLAYLIST &&
+                        (args.source.operation?.includes(DragOperation.REORDER) ?? false);
+                    return canAdd || canReorder;
+                },
+                getData: () => {
+                    return {
+                        id: [to],
+                        item: [],
+                        itemType: LibraryItem.PLAYLIST,
+                        type: DragTarget.PLAYLIST,
+                    };
+                },
+                onDrag: () => {
+                    return;
+                },
+                onDragLeave: () => {
+                    return;
+                },
+                onDrop: (args) => {
+                    const sourceItemType = args.source.itemType as LibraryItem;
+                    const sourceIds = args.source.id;
 
-                // Handle playlist reordering locally
-                if (
-                    sourceItemType === LibraryItem.PLAYLIST &&
-                    (args.source.operation?.includes(DragOperation.REORDER) ?? false) &&
-                    args.edge &&
-                    (args.edge === 'top' || args.edge === 'bottom') &&
-                    onReorder
-                ) {
-                    const sourceItems = Array.isArray(args.source.item)
-                    ? (args.source.item as Playlist[])
-                    : undefined;
-                    
-                    // Prevent cross-scope reorders (owned <-> shared)
-                    if (sourceItems && sourceItems.length > 0) {
-                        if (sourceItems.some((si) => (si.ownerId !== item.ownerId))) {
-                            return;
+                    // Handle playlist reordering locally
+                    if (
+                        sourceItemType === LibraryItem.PLAYLIST &&
+                        (args.source.operation?.includes(DragOperation.REORDER) ?? false) &&
+                        args.edge &&
+                        (args.edge === 'top' || args.edge === 'bottom') &&
+                        onReorder
+                    ) {
+                        const sourceItems = Array.isArray(args.source.item)
+                            ? (args.source.item as Playlist[])
+                            : undefined;
+
+                        // Prevent cross-scope reorders (owned <-> shared)
+                        if (sourceItems && sourceItems.length > 0) {
+                            if (sourceItems.some((si) => si.ownerId !== item.ownerId)) {
+                                return;
+                            }
                         }
+
+                        onReorder(sourceIds, to, args.edge);
+                        return;
                     }
 
-                    onReorder(sourceIds, to, args.edge);
-                    return;
-                }
+                    const modalProps: {
+                        albumId?: string[];
+                        artistId?: string[];
+                        folderId?: string[];
+                        genreId?: string[];
+                        initialSelectedIds?: string[];
+                        playlistId?: string[];
+                        songId?: string[];
+                    } = {
+                        initialSelectedIds: [to],
+                    };
 
-                const modalProps: {
-                    albumId?: string[];
-                    artistId?: string[];
-                    folderId?: string[];
-                    genreId?: string[];
-                    initialSelectedIds?: string[];
-                    playlistId?: string[];
-                    songId?: string[];
-                } = {
-                    initialSelectedIds: [to],
-                };
+                    switch (sourceItemType) {
+                        case LibraryItem.ALBUM:
+                            modalProps.albumId = sourceIds;
+                            break;
+                        case LibraryItem.ALBUM_ARTIST:
+                        case LibraryItem.ARTIST:
+                            modalProps.artistId = sourceIds;
+                            break;
+                        case LibraryItem.FOLDER:
+                            modalProps.folderId = sourceIds;
+                            break;
+                        case LibraryItem.GENRE:
+                            modalProps.genreId = sourceIds;
+                            break;
+                        case LibraryItem.PLAYLIST:
+                            modalProps.playlistId = sourceIds;
+                            break;
+                        case LibraryItem.PLAYLIST_SONG:
+                        case LibraryItem.QUEUE_SONG:
+                        case LibraryItem.SONG:
+                            if (args.source.item && Array.isArray(args.source.item)) {
+                                const songs = args.source.item as Song[];
+                                modalProps.songId = songs.map((song) => song.id);
+                            } else {
+                                modalProps.songId = sourceIds;
+                            }
+                            break;
+                        default:
+                            return;
+                    }
 
-                switch (sourceItemType) {
-                    case LibraryItem.ALBUM:
-                        modalProps.albumId = sourceIds;
-                        break;
-                    case LibraryItem.ALBUM_ARTIST:
-                    case LibraryItem.ARTIST:
-                        modalProps.artistId = sourceIds;
-                        break;
-                    case LibraryItem.FOLDER:
-                        modalProps.folderId = sourceIds;
-                        break;
-                    case LibraryItem.GENRE:
-                        modalProps.genreId = sourceIds;
-                        break;
-                    case LibraryItem.PLAYLIST:
-                        modalProps.playlistId = sourceIds;
-                        break;
-                    case LibraryItem.PLAYLIST_SONG:
-                    case LibraryItem.QUEUE_SONG:
-                    case LibraryItem.SONG:
-                        if (args.source.item && Array.isArray(args.source.item)) {
-                            const songs = args.source.item as Song[];
-                            modalProps.songId = songs.map((song) => song.id);
-                        } else {
-                            modalProps.songId = sourceIds;
-                        }
-                        break;
-                    default:
-                        return;
-                }
-
-                openContextModal({
-                    innerProps: modalProps,
-                    modalKey: 'addToPlaylist',
-                    size: 'lg',
-                    title: t('form.addToPlaylist.title', { postProcess: 'titleCase' }),
-                });
+                    openContextModal({
+                        innerProps: modalProps,
+                        modalKey: 'addToPlaylist',
+                        size: 'lg',
+                        title: t('form.addToPlaylist.title', { postProcess: 'titleCase' }),
+                    });
+                },
             },
-        },
-        isEnabled: true,
-    });
+            isEnabled: true,
+        });
 
-    const player = usePlayer();
-    const serverId = useCurrentServerId();
+        const player = usePlayer();
+        const serverId = useCurrentServerId();
 
-    const permissions = usePermissions();
+        const permissions = usePermissions();
 
-    const handlePlay = useCallback(
-        (id: string, type: Play) => {
-            player.addToQueueByFetch(serverId, [id], LibraryItem.PLAYLIST, type);
-        },
-        [player, serverId],
-    );
+        const handlePlay = useCallback(
+            (id: string, type: Play) => {
+                player.addToQueueByFetch(serverId, [id], LibraryItem.PLAYLIST, type);
+            },
+            [player, serverId],
+        );
 
-    const imageUrl = useItemImageUrl({
-        id: item.imageId || undefined,
-        itemType: LibraryItem.PLAYLIST,
-        type: 'table',
-    });
+        const imageUrl = useItemImageUrl({
+            id: item.imageId || undefined,
+            itemType: LibraryItem.PLAYLIST,
+            type: 'table',
+        });
 
-    return (
-        <Link
-            className={clsx(styles.row, {
-                [styles.rowDraggedOver]: isDraggedOver,
-                [styles.rowHover]: isHovered,
-            })}
-            onContextMenu={(e: MouseEvent<HTMLAnchorElement>) => {
-                e.preventDefault();
-                onContextMenu(e, item);
-            }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            ref={ref}
-            style={{
-                opacity: isDragging ? 0.5 : 1,
-            }}
-            to={url}
-        >
-            <div className={styles.rowGroup}>
-                <Image containerClassName={styles.imageContainer} src={imageUrl} />
-                <div className={styles.metadata}>
-                    <Text className={styles.name} fw={500} size="md">
-                        {name}
-                    </Text>
-                    <div className={styles.metadataGroup}>
-                        <div
-                            className={clsx(
-                                styles.metadataGroupItem,
-                                styles.metadataGroupItemNoShrink,
+        return (
+            <Link
+                className={clsx(styles.row, {
+                    [styles.rowDraggedOver]: isDraggedOver,
+                    [styles.rowHover]: isHovered,
+                })}
+                onContextMenu={(e: MouseEvent<HTMLAnchorElement>) => {
+                    e.preventDefault();
+                    onContextMenu(e, item);
+                }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                ref={ref}
+                style={{
+                    opacity: isDragging ? 0.5 : 1,
+                }}
+                to={url}
+            >
+                <div className={styles.rowGroup}>
+                    <Image containerClassName={styles.imageContainer} src={imageUrl} />
+                    <div className={styles.metadata}>
+                        <Text className={styles.name} fw={500} size="md">
+                            {name}
+                        </Text>
+                        <div className={styles.metadataGroup}>
+                            <div
+                                className={clsx(
+                                    styles.metadataGroupItem,
+                                    styles.metadataGroupItemNoShrink,
+                                )}
+                            >
+                                <Icon color="muted" icon="itemSong" size="sm" />
+                                <Text isMuted size="sm">
+                                    {item.songCount || 0}
+                                </Text>
+                            </div>
+                            <div className={styles.metadataGroupItem}>
+                                <Icon color="muted" icon="duration" size="sm" />
+                                <Text isMuted size="sm">
+                                    {formatDurationString(item.duration ?? 0)}
+                                </Text>
+                            </div>
+                            {item.ownerId === permissions.userId && Boolean(item.public) && (
+                                <div className={styles.metadataGroupItem}>
+                                    <Text isMuted size="sm">
+                                        {t('common.public', { postProcess: 'titleCase' })}
+                                    </Text>
+                                </div>
                             )}
-                        >
-                            <Icon color="muted" icon="itemSong" size="sm" />
-                            <Text isMuted size="sm">
-                                {item.songCount || 0}
-                            </Text>
+                            {item.ownerId !== permissions.userId && (
+                                <div className={styles.metadataGroupItem}>
+                                    <Icon color="muted" icon="user" size="sm" />
+                                    <Text isMuted size="sm">
+                                        {item.owner}
+                                    </Text>
+                                </div>
+                            )}
                         </div>
-                        <div className={styles.metadataGroupItem}>
-                            <Icon color="muted" icon="duration" size="sm" />
-                            <Text isMuted size="sm">
-                                {formatDurationString(item.duration ?? 0)}
-                            </Text>
-                        </div>
-                        {item.ownerId === permissions.userId && Boolean(item.public) && (
-                            <div className={styles.metadataGroupItem}>
-                                <Text isMuted size="sm">
-                                    {t('common.public', { postProcess: 'titleCase' })}
-                                </Text>
-                            </div>
-                        )}
-                        {item.ownerId !== permissions.userId && (
-                            <div className={styles.metadataGroupItem}>
-                                <Icon color="muted" icon="user" size="sm" />
-                                <Text isMuted size="sm">
-                                    {item.owner}
-                                </Text>
-                            </div>
-                        )}
                     </div>
                 </div>
-            </div>
 
-            {isHovered && <RowControls id={to} onPlay={handlePlay} />}
-        </Link>
-    );
-});
+                {isHovered && <RowControls id={to} onPlay={handlePlay} />}
+            </Link>
+        );
+    },
+);
 
 const RowControls = ({
     id,
@@ -445,10 +450,18 @@ export const SidebarPlaylistList = () => {
         const new_order = [...ordered, ...remaining];
 
         setDisplayItems(new_order);
-        saveOrderForServer(server?.id, new_order.map(playlist => playlist.id), 'owned');
+        saveOrderForServer(
+            server?.id,
+            new_order.map((playlist) => playlist.id),
+            'owned',
+        );
     }, [memoizedItemData.items]);
 
-    const handleReorder = (sourceIds: string[], targetId: string, edge: 'top' | 'bottom' | null) => {
+    const handleReorder = (
+        sourceIds: string[],
+        targetId: string,
+        edge: 'bottom' | 'top' | null,
+    ) => {
         if (!displayItems || !edge) return;
 
         const prev = displayItems;
@@ -464,7 +477,9 @@ export const SidebarPlaylistList = () => {
         }).length;
 
         const insertIndexInFiltered =
-            edge === 'top' ? targetIndex - sourcesBeforeTarget : targetIndex - sourcesBeforeTarget + 1;
+            edge === 'top'
+                ? targetIndex - sourcesBeforeTarget
+                : targetIndex - sourcesBeforeTarget + 1;
 
         const insertIndex = Math.max(0, Math.min(insertIndexInFiltered, idsWithoutSources.length));
 
@@ -538,8 +553,8 @@ export const SidebarPlaylistList = () => {
                         key={index}
                         name={item.name}
                         onContextMenu={handleContextMenu}
-                        to={item.id}
                         onReorder={handleReorder}
+                        to={item.id}
                     />
                 ))}
             </Accordion.Panel>
@@ -632,10 +647,18 @@ export const SidebarSharedPlaylistList = () => {
         const new_order = [...ordered, ...remaining];
 
         setDisplayItems(new_order);
-        saveOrderForServer(server?.id, new_order.map(playlist => playlist.id), 'shared');
+        saveOrderForServer(
+            server?.id,
+            new_order.map((playlist) => playlist.id),
+            'shared',
+        );
     }, [memoizedItemData.items]);
 
-    const handleReorder = (sourceIds: string[], targetId: string, edge: 'top' | 'bottom' | null) => {
+    const handleReorder = (
+        sourceIds: string[],
+        targetId: string,
+        edge: 'bottom' | 'top' | null,
+    ) => {
         if (!displayItems || !edge) return;
 
         const prev = displayItems;
@@ -651,7 +674,9 @@ export const SidebarSharedPlaylistList = () => {
         }).length;
 
         const insertIndexInFiltered =
-            edge === 'top' ? targetIndex - sourcesBeforeTarget : targetIndex - sourcesBeforeTarget + 1;
+            edge === 'top'
+                ? targetIndex - sourcesBeforeTarget
+                : targetIndex - sourcesBeforeTarget + 1;
 
         const insertIndex = Math.max(0, Math.min(insertIndexInFiltered, idsWithoutSources.length));
 
@@ -691,8 +716,8 @@ export const SidebarSharedPlaylistList = () => {
                         key={index}
                         name={item.name}
                         onContextMenu={handleContextMenu}
-                        to={item.id}
                         onReorder={handleReorder}
+                        to={item.id}
                     />
                 ))}
             </Accordion.Panel>
