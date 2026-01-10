@@ -455,7 +455,7 @@ export const SidebarPlaylistList = () => {
             new_order.map((playlist) => playlist.id),
             'owned',
         );
-    }, [memoizedItemData.items]);
+    }, [memoizedItemData.items, server?.id]);
 
     const handleReorder = (
         sourceIds: string[],
@@ -652,7 +652,7 @@ export const SidebarSharedPlaylistList = () => {
             new_order.map((playlist) => playlist.id),
             'shared',
         );
-    }, [memoizedItemData.items]);
+    }, [memoizedItemData.items, server?.id]);
 
     const handleReorder = (
         sourceIds: string[],
