@@ -135,6 +135,16 @@ const PlaylistRowButton = memo(({ item, name, onContextMenu, to, onReorder }: Pl
                     (args.edge === 'top' || args.edge === 'bottom') &&
                     onReorder
                 ) {
+                    const sourceItems = Array.isArray(args.source.item)
+                    ? (args.source.item as Playlist[])
+                    : undefined;
+                    
+                    // Prevent cross-scope reorders (owned <-> shared)
+                    if (sourceItems && sourceItems.length > 0) {
+                        if (sourceItems.some((si) => (si.ownerId !== item.ownerId))) {
+                            return;
+                        }
+                    }
 
                     onReorder(sourceIds, to, args.edge);
                     return;
