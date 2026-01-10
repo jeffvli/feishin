@@ -1,6 +1,6 @@
 import { openModal } from '@mantine/modals';
 import { t } from 'i18next';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 
 import { ExportImportSettingsModal } from '/@/renderer/components/export-import-settings-modal/export-import-settings-modal';
 import {
@@ -10,7 +10,7 @@ import {
 import { useSettingsForExport } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 
-export const ExportImportSettings = () => {
+export const ExportImportSettings = memo(() => {
     const settingForExport = useSettingsForExport();
 
     const onExportSettings = useCallback(() => {
@@ -68,4 +68,4 @@ export const ExportImportSettings = () => {
             title={t('page.setting.exportImport', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

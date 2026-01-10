@@ -36,6 +36,10 @@ export const JoinedArtists = ({
 
     for (const artist of artists) {
         const name = artist.name;
+
+        // Avoid an infinite loop when `artist.name` is an empty string.
+        if (!name) continue;
+
         const regex = new RegExp(escapeRegex(name), 'gi');
         let match: null | RegExpExecArray = null;
         while ((match = regex.exec(artistName)) !== null) {
@@ -92,24 +96,38 @@ export const JoinedArtists = ({
 
     const hasArtistMatches = parts.some((part) => typeof part !== 'string');
 
+    // Find artists that were matched
+    const matchedArtistIds = new Set(nonOverlappingMatches.map((match) => match.artist.id));
+
+    // Find artists that are not present in the artist name
+    const unmatchedArtists = artists.filter(
+        (artist) => artist.name && !matchedArtistIds.has(artist.id),
+    );
+
     // If no matches found and there are album artists, return the album artists
     if (!hasArtistMatches && artists.length > 0) {
         return (
             <Text component="span" {...rootTextProps}>
                 {artists.map((artist, index) => (
-                    <Fragment key={artist.id}>
+                    <Fragment key={artist.id || `artist-${index}`}>
                         {index > 0 && ', '}
-                        <Text
-                            component={Link}
-                            fw={600}
-                            isLink
-                            to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
-                                albumArtistId: artist.id,
-                            })}
-                            {...linkProps}
-                        >
-                            {artist.name}
-                        </Text>
+                        {artist.id ? (
+                            <Text
+                                component={Link}
+                                fw={600}
+                                isLink
+                                to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                                    albumArtistId: artist.id,
+                                })}
+                                {...linkProps}
+                            >
+                                {artist.name}
+                            </Text>
+                        ) : (
+                            <Text fw={600} {...linkProps}>
+                                {artist.name}
+                            </Text>
+                        )}
                     </Fragment>
                 ))}
             </Text>
@@ -133,21 +151,56 @@ export const JoinedArtists = ({
                 }
 
                 const { artist, text } = part;
+
+                if (artist.id) {
+                    return (
+                        <Text
+                            component={Link}
+                            fw={600}
+                            isLink
+                            key={`${artist.id}-${index}`}
+                            to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                                albumArtistId: artist.id,
+                            })}
+                            {...linkProps}
+                        >
+                            {text}
+                        </Text>
+                    );
+                }
                 return (
-                    <Text
-                        component={Link}
-                        fw={600}
-                        isLink
-                        key={`${artist.id}-${index}`}
-                        to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
-                            albumArtistId: artist.id,
-                        })}
-                        {...linkProps}
-                    >
+                    <Text fw={600} key={`${artist.name}-${index}`} {...linkProps}>
                         {text}
                     </Text>
                 );
             })}
+            {unmatchedArtists.length > 0 && (
+                <>
+                    {', '}
+                    {unmatchedArtists.map((artist, index) => (
+                        <Fragment key={artist.id}>
+                            {index > 0 && ', '}
+                            {artist.id ? (
+                                <Text
+                                    component={Link}
+                                    fw={600}
+                                    isLink
+                                    to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
+                                        albumArtistId: artist.id,
+                                    })}
+                                    {...linkProps}
+                                >
+                                    {artist.name}
+                                </Text>
+                            ) : (
+                                <Text component="span" isMuted>
+                                    {artist.name}
+                                </Text>
+                            )}
+                        </Fragment>
+                    ))}
+                </>
+            )}
         </Text>
     );
 };

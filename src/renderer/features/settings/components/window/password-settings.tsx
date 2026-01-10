@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -17,7 +18,7 @@ const PASSWORD_SETTINGS: { label: string; value: string }[] = [
     { label: 'KDE 6 (kwallet6)', value: 'kwallet6' },
 ];
 
-export const PasswordSettings = () => {
+export const PasswordSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -53,4 +54,4 @@ export const PasswordSettings = () => {
     ];
 
     return <SettingsSection divider={false} options={updateOptions} />;
-};
+});

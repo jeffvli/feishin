@@ -1,5 +1,8 @@
+import { nanoid } from 'nanoid';
+
 export const audiomotionanalyzerPresets = [
     {
+        id: nanoid(),
         name: 'Preset 1',
         value: {
             alphaBars: false,
@@ -52,6 +55,7 @@ export const audiomotionanalyzerPresets = [
         },
     },
     {
+        id: nanoid(),
         name: 'Preset 2',
         value: {
             alphaBars: false,
@@ -104,6 +108,7 @@ export const audiomotionanalyzerPresets = [
         },
     },
     {
+        id: nanoid(),
         name: 'Preset 3',
         value: {
             alphaBars: false,
@@ -158,6 +163,7 @@ export const audiomotionanalyzerPresets = [
         },
     },
     {
+        id: nanoid(),
         name: 'Preset 4',
         value: {
             alphaBars: false,

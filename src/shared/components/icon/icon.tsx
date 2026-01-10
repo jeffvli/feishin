@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { motion } from 'motion/react';
-import { type ComponentType, forwardRef } from 'react';
+import { type ComponentType, forwardRef, memo, useMemo } from 'react';
 import { IconBaseProps } from 'react-icons';
 import { FaLastfmSquare } from 'react-icons/fa';
 import {
@@ -278,19 +278,23 @@ type IconColor =
     | 'success'
     | 'warn';
 
-export const Icon = forwardRef<HTMLDivElement, IconProps>((props, ref) => {
+const _Icon = forwardRef<HTMLDivElement, IconProps>((props, ref) => {
     const { animate, className, color, fill, icon, size = 'md' } = props;
 
     const IconComponent: ComponentType<any> = AppIcon[icon];
 
-    const classNames = clsx(className, {
-        [styles.fill]: true,
-        [styles.pulse]: animate === 'pulse',
-        [styles.spin]: animate === 'spin',
-        [styles[`color-${color || fill}`]]: color || fill,
-        [styles[`fill-${fill}`]]: fill,
-        [styles[`size-${size}`]]: true,
-    });
+    const classNames = useMemo(
+        () =>
+            clsx(className, {
+                [styles.fill]: true,
+                [styles.pulse]: animate === 'pulse',
+                [styles.spin]: animate === 'spin',
+                [styles[`color-${color || fill}`]]: color || fill,
+                [styles[`fill-${fill}`]]: fill,
+                [styles[`size-${size}`]]: true,
+            }),
+        [animate, className, color, fill, size],
+    );
 
     return (
         <IconComponent
@@ -301,6 +305,10 @@ export const Icon = forwardRef<HTMLDivElement, IconProps>((props, ref) => {
         />
     );
 });
+
+_Icon.displayName = 'Icon';
+
+export const Icon = memo(_Icon);
 
 Icon.displayName = 'Icon';
 

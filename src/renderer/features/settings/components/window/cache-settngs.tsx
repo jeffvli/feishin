@@ -1,7 +1,7 @@
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import isElectron from 'is-electron';
-import { useCallback, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -14,7 +14,7 @@ import { toast } from '/@/shared/components/toast/toast';
 
 const browser = isElectron() ? window.api.browser : null;
 
-export const CacheSettings = () => {
+export const CacheSettings = memo(() => {
     const [isClearing, setIsClearing] = useState(false);
     const queryClient = useQueryClient();
     const { t } = useTranslation();
@@ -115,4 +115,4 @@ export const CacheSettings = () => {
             )}
         </>
     );
-};
+});

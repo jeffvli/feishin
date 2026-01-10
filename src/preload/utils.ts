@@ -1,4 +1,4 @@
-import { ipcRenderer, IpcRendererEvent } from 'electron';
+import { ipcRenderer, IpcRendererEvent, webFrame } from 'electron';
 
 import { disableAutoUpdates, isLinux, isMacOS, isWindows } from '../main/utils';
 
@@ -39,9 +39,28 @@ const download = (url: string) => {
     ipcRenderer.send('download-url', url);
 };
 
+const forceGarbageCollection = (): boolean => {
+    try {
+        if (typeof global.gc === 'function') {
+            global.gc();
+            webFrame.clearCache();
+            return true;
+        }
+        if (typeof window.gc === 'function') {
+            window.gc();
+            webFrame.clearCache();
+            return true;
+        }
+        return false;
+    } catch {
+        return false;
+    }
+};
+
 export const utils = {
     disableAutoUpdates,
     download,
+    forceGarbageCollection,
     isLinux,
     isMacOS,
     isWindows,

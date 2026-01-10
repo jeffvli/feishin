@@ -9,11 +9,11 @@ import { MobilePlayerbar } from '/@/renderer/features/player/components/mobile-p
 import { RightControls } from '/@/renderer/features/player/components/right-controls';
 import { useIsMobile } from '/@/renderer/hooks/use-is-mobile';
 import { useFullScreenPlayerStore, useSetFullScreenPlayerStore } from '/@/renderer/store';
-import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { usePlayerbarOpenDrawer } from '/@/renderer/store';
 import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
 
 export const Playerbar = () => {
-    const { playerbarOpenDrawer } = useGeneralSettings();
+    const playerbarOpenDrawer = usePlayerbarOpenDrawer();
     const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
     const isMobile = useIsMobile();

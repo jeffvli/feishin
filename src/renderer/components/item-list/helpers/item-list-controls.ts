@@ -191,7 +191,7 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                 onColumnResized?.(columnId, width);
             },
 
-            onDoubleClick: ({ internalState, item, itemType }: DefaultItemControlProps) => {
+            onDoubleClick: ({ internalState, item, itemType, meta }: DefaultItemControlProps) => {
                 if (!item || !internalState) {
                     return;
                 }
@@ -212,7 +212,7 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                     }
                 }
 
-                if (itemType === LibraryItem.SONG) {
+                if (itemType === LibraryItem.SONG || itemType === LibraryItem.PLAYLIST_SONG) {
                     const data = internalState.getData();
                     const validSongs = data.filter((d): d is Song => {
                         if (!d || typeof d !== 'object') {
@@ -235,17 +235,31 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                         return;
                     }
 
-                    const songsBefore = 100;
-                    const songsAfter = 100;
-                    const startIndex = Math.max(0, clickedIndex - songsBefore);
-                    const endIndex = Math.min(validSongs.length, clickedIndex + songsAfter + 1);
-                    const songsToAdd = validSongs.slice(startIndex, endIndex);
+                    const playType = (meta?.playType as Play) || Play.NOW;
+
+                    // For NEXT, LAST, NEXT_SHUFFLE, and LAST_SHUFFLE, only add the clicked song
+                    // For NOW and SHUFFLE, add a range of songs around the clicked song
+                    let songsToAdd: Song[];
+                    if (
+                        playType === Play.NEXT ||
+                        playType === Play.LAST ||
+                        playType === Play.NEXT_SHUFFLE ||
+                        playType === Play.LAST_SHUFFLE
+                    ) {
+                        songsToAdd = [item as Song];
+                    } else {
+                        const songsBefore = 50;
+                        const songsAfter = 50;
+                        const startIndex = Math.max(0, clickedIndex - songsBefore);
+                        const endIndex = Math.min(validSongs.length, clickedIndex + songsAfter + 1);
+                        songsToAdd = validSongs.slice(startIndex, endIndex);
+                    }
 
                     if (songsToAdd.length === 0) {
                         return;
                     }
 
-                    player.addToQueueByData(songsToAdd, Play.NOW, item.id);
+                    player.addToQueueByData(songsToAdd, playType, item.id);
                     return;
                 }
 

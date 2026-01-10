@@ -7,8 +7,7 @@ import styles from './full-screen-player-image.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { AppRoute } from '/@/renderer/router/routes';
-import { usePlayerData, usePlayerSong } from '/@/renderer/store';
-import { useSettingsStore } from '/@/renderer/store/settings.store';
+import { useNativeAspectRatio, usePlayerData, usePlayerSong } from '/@/renderer/store';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Center } from '/@/shared/components/center/center';
 import { Flex } from '/@/shared/components/flex/flex';
@@ -48,7 +47,7 @@ const ImageWithPlaceholder = ({
     className,
     ...props
 }: HTMLMotionProps<'img'> & { placeholder?: string }) => {
-    const nativeAspectRatio = useSettingsStore((store) => store.general.nativeAspectRatio);
+    const nativeAspectRatio = useNativeAspectRatio();
 
     if (!props.src) {
         return (
@@ -86,12 +85,14 @@ export const FullScreenPlayerImage = () => {
     const currentImageUrl = useItemImageUrl({
         id: currentSong?.imageId || undefined,
         itemType: LibraryItem.SONG,
+        serverId: currentSong?._serverId,
         type: 'fullScreenPlayer',
     });
 
     const nextImageUrl = useItemImageUrl({
         id: nextSong?.imageId || undefined,
         itemType: LibraryItem.SONG,
+        serverId: nextSong?._serverId,
         type: 'fullScreenPlayer',
     });
 

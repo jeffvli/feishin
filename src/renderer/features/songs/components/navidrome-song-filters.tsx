@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { MultiSelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
@@ -73,6 +73,17 @@ export const NavidromeSongFilters = () => {
 
     const debouncedHandleYearFilter = useDebouncedCallback(handleYearFilter, 300);
 
+    const handleGenreChange = useCallback(
+        (e: null | string[]) => {
+            if (e && e.length > 0) {
+                setGenreId(e);
+            } else {
+                setGenreId(null);
+            }
+        },
+        [setGenreId],
+    );
+
     return (
         <Stack px="md" py="md">
             {yesNoUndefinedFilters.map((filter) => (
@@ -99,7 +110,7 @@ export const NavidromeSongFilters = () => {
                     data={genreList}
                     defaultValue={query.genreIds || []}
                     label={t('entity.genre', { count: 2, postProcess: 'sentenceCase' })}
-                    onChange={(e) => (e && e.length > 0 ? setGenreId(e) : setGenreId(null))}
+                    onChange={handleGenreChange}
                     searchable
                 />
             )}
@@ -132,6 +143,17 @@ const TagFilterItem = ({ label, onChange, options, tagValue, value }: TagFilterI
         return Array.isArray(value) ? value : [value];
     }, [value]);
 
+    const handleChange = useCallback(
+        (e: null | string[]) => {
+            if (e && e.length > 0) {
+                onChange(e);
+            } else {
+                onChange(null);
+            }
+        },
+        [onChange],
+    );
+
     return (
         <MultiSelectWithInvalidData
             clearable
@@ -140,7 +162,7 @@ const TagFilterItem = ({ label, onChange, options, tagValue, value }: TagFilterI
             key={tagValue}
             label={label}
             limit={100}
-            onChange={(e) => (e && e.length > 0 ? onChange(e) : onChange(null))}
+            onChange={handleChange}
             searchable
         />
     );

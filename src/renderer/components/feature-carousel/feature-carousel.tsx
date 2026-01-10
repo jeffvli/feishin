@@ -122,6 +122,7 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
                             id={album.imageId}
                             itemType={LibraryItem.ALBUM}
                             src={imageUrl}
+                            type="itemCard"
                         />
                         <div className={styles.playButtonOverlay}>
                             <PlayButtonGroup onPlay={handlePlay} />

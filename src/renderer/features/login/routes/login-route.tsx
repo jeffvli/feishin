@@ -6,6 +6,10 @@ import { Navigate } from 'react-router';
 
 import { api } from '/@/renderer/api';
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
+import {
+    isLegacyAuth,
+    isServerLock,
+} from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
@@ -48,16 +52,17 @@ const LoginRoute = () => {
     const currentServer = useCurrentServer();
 
     // Check if server lock is configured
-    const isServerLock = Boolean(window.SERVER_LOCK) || false;
+    const serverLock = isServerLock();
     const serverType = window.SERVER_TYPE ? toServerType(window.SERVER_TYPE) : null;
     const serverName = window.SERVER_NAME || '';
     const serverUrl = window.SERVER_URL || '';
+    const legacyAuth = serverLock && isLegacyAuth();
 
     const config = [
         {
             isValid: true,
             key: 'SERVER_LOCK',
-            value: isServerLock,
+            value: serverLock,
         },
         {
             isValid: serverType !== null,
@@ -122,7 +127,7 @@ const LoginRoute = () => {
             const data: AuthenticationResponse | undefined = await authFunction(
                 serverUrl,
                 {
-                    legacy: false,
+                    legacy: legacyAuth,
                     password: values.password,
                     username: values.username,
                 },

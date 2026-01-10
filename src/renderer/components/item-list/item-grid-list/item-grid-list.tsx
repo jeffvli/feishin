@@ -41,11 +41,11 @@ import {
     useItemListState,
     useItemListStateSubscription,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
+import { useListHotkeys } from '/@/renderer/components/item-list/helpers/use-list-hotkeys';
 import { ItemControls, ItemListHandle } from '/@/renderer/components/item-list/types';
 import { animationProps } from '/@/shared/components/animations/animation-props';
 import { useElementSize } from '/@/shared/hooks/use-element-size';
 import { useFocusWithin } from '/@/shared/hooks/use-focus-within';
-import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
@@ -714,20 +714,12 @@ const BaseItemGridList = ({
 
     useImperativeHandle(ref, () => imperativeHandle, [imperativeHandle]);
 
-    useHotkeys([
-        [
-            'mod+a',
-            () => {
-                if (focused) {
-                    if (internalState.isAllSelected()) {
-                        internalState.deselectAll();
-                    } else {
-                        internalState.selectAll();
-                    }
-                }
-            },
-        ],
-    ]);
+    useListHotkeys({
+        controls,
+        focused,
+        internalState,
+        itemType,
+    });
 
     return (
         <motion.div

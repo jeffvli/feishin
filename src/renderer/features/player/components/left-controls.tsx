@@ -124,6 +124,8 @@ export const LeftControls = () => {
                                         id={currentSong?.imageId}
                                         itemType={LibraryItem.SONG}
                                         loading="eager"
+                                        serverId={currentSong?._serverId}
+                                        type="table"
                                     />
                                 </Tooltip>
                                 {!collapsed && (
@@ -172,6 +174,13 @@ export const LeftControls = () => {
                                         to={AppRoute.NOW_PLAYING}
                                     >
                                         {title || '—'}
+                                        {currentSong?.trackSubtitle && (
+                                            <Text component="span" isMuted size="sm">
+                                                {' ('}
+                                                {currentSong.trackSubtitle}
+                                                {')'}
+                                            </Text>
+                                        )}
                                     </Text>
                                     {isSongDefined && (
                                         <ActionIcon

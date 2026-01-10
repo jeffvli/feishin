@@ -13,6 +13,7 @@ import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { LyricsOverride } from '/@/shared/types/domain-types';
 
 interface LyricsActionsProps {
+    hasLyrics: boolean;
     index: number;
     languages: { label: string; value: string }[];
     offsetMs: number;
@@ -27,6 +28,7 @@ interface LyricsActionsProps {
 }
 
 export const LyricsActions = ({
+    hasLyrics,
     index,
     languages,
     offsetMs,
@@ -51,7 +53,7 @@ export const LyricsActions = ({
     return (
         <>
             <div style={{ position: 'relative', width: '100%' }}>
-                {languages.length > 0 && (
+                {hasLyrics && (
                     <Center pb="md">
                         {languages.length > 1 && (
                             <Select

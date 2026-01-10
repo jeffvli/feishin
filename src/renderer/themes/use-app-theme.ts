@@ -1,7 +1,12 @@
 import { useMantineColorScheme } from '@mantine/core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { useSettingsStore } from '/@/renderer/store/settings.store';
+import {
+    useAccent,
+    useFontSettings,
+    useNativeAspectRatio,
+    useThemeSettings,
+} from '/@/renderer/store/settings.store';
 import { createMantineTheme } from '/@/renderer/themes/mantine-theme';
 import { getAppTheme } from '/@/shared/themes/app-theme';
 import { AppTheme, AppThemeConfiguration } from '/@/shared/themes/app-theme-types';
@@ -36,15 +41,15 @@ export const THEME_DATA = [
 ];
 
 export const useAppTheme = (overrideTheme?: AppTheme) => {
-    const accent = useSettingsStore((store) => store.general.accent);
-    const nativeImageAspect = useSettingsStore((store) => store.general.nativeAspectRatio);
-    const { builtIn, custom, system, type } = useSettingsStore((state) => state.font);
+    const accent = useAccent();
+    const nativeImageAspect = useNativeAspectRatio();
+    const { builtIn, custom, system, type } = useFontSettings();
     const textStyleRef = useRef<HTMLStyleElement | null>(null);
     const loadedStylesheetsRef = useRef<Set<string>>(new Set());
     const getCurrentTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
     const [isDarkTheme, setIsDarkTheme] = useState(getCurrentTheme());
     const { followSystemTheme, theme, themeDark, themeLight, useThemeAccentColor } =
-        useSettingsStore((state) => state.general);
+        useThemeSettings();
 
     const mqListener = (e: any) => {
         setIsDarkTheme(e.matches);
@@ -244,9 +249,14 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
         }
     }, [colorVars, selectedTheme, themeVars]);
 
+    const mantineTheme = useMemo(
+        () => createMantineTheme(appTheme as AppThemeConfiguration),
+        [appTheme],
+    );
+
     return {
         mode: appTheme?.mode || 'dark',
-        theme: createMantineTheme(appTheme as AppThemeConfiguration),
+        theme: mantineTheme,
     };
 };
 
@@ -263,11 +273,11 @@ export const useColorScheme = () => {
 };
 
 export const useAppThemeColors = () => {
-    const accent = useSettingsStore((store) => store.general.accent);
+    const accent = useAccent();
     const getCurrentTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
     const [isDarkTheme] = useState(getCurrentTheme());
     const { followSystemTheme, theme, themeDark, themeLight, useThemeAccentColor } =
-        useSettingsStore((state) => state.general);
+        useThemeSettings();
 
     const getSelectedTheme = () => {
         if (followSystemTheme) {

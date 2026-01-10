@@ -1,7 +1,7 @@
 .name-container {
     display: -webkit-inline-box;
     align-self: flex-start;
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -15,4 +15,8 @@
 
 .name-container.large {
     -webkit-line-clamp: 3;
+}
+
+.active {
+    color: var(--theme-colors-primary);
 }

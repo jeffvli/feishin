@@ -25,7 +25,8 @@ import {
 } from '/@/renderer/store';
 import {
     SidebarItemType,
-    useGeneralSettings,
+    useSidebarItems,
+    useSidebarPlaylistList,
     useWindowSettings,
 } from '/@/renderer/store/settings.store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
@@ -41,7 +42,7 @@ import { Platform } from '/@/shared/types/types';
 export const Sidebar = () => {
     const { t } = useTranslation();
 
-    const { sidebarPlaylistList } = useGeneralSettings();
+    const sidebarPlaylistList = useSidebarPlaylistList();
 
     const translatedSidebarItemMap = useMemo(
         () => ({
@@ -62,7 +63,7 @@ export const Sidebar = () => {
         [t],
     );
 
-    const { sidebarItems } = useGeneralSettings();
+    const sidebarItems = useSidebarItems();
     const { windowBarStyle } = useWindowSettings();
     const sidebarImageEnabled = useAppStore((state) => state.sidebar.image);
     const isRadioPlaying = useRadioStore((state) => state.isPlaying);
@@ -207,7 +208,7 @@ const SidebarImage = () => {
                 {imageUrl ? (
                     <img className={styles.sidebarImage} loading="eager" src={imageUrl} />
                 ) : (
-                    <ImageUnloader />
+                    <ImageUnloader icon="emptySongImage" />
                 )}
             </Tooltip>
             <ActionIcon

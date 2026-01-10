@@ -1,5 +1,6 @@
 import isElectron from 'is-electron';
 import debounce from 'lodash/debounce';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SettingsSection } from '/@/renderer/features/settings/components/settings-section';
@@ -12,7 +13,7 @@ import { toast } from '/@/shared/components/toast/toast';
 
 const remote = isElectron() ? window.api.remote : null;
 
-export const RemoteSettings = () => {
+export const RemoteSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useRemoteSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -25,7 +26,6 @@ export const RemoteSettings = () => {
         if (errorMsg === null) {
             setSettings({
                 remote: {
-                    ...settings,
                     enabled,
                 },
             });
@@ -44,7 +44,6 @@ export const RemoteSettings = () => {
         if (!errorMsg) {
             setSettings({
                 remote: {
-                    ...settings,
                     port,
                 },
             });
@@ -115,7 +114,6 @@ export const RemoteSettings = () => {
                         remote!.updateUsername(username);
                         setSettings({
                             remote: {
-                                ...settings,
                                 username,
                             },
                         });
@@ -139,7 +137,6 @@ export const RemoteSettings = () => {
                         remote!.updatePassword(password);
                         setSettings({
                             remote: {
-                                ...settings,
                                 password,
                             },
                         });
@@ -161,4 +158,4 @@ export const RemoteSettings = () => {
             title={t('page.setting.remote', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

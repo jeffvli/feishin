@@ -14,7 +14,7 @@ import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-co
 import { useSyncSettingsToMain } from '/@/renderer/hooks/use-sync-settings-to-main';
 import { ReleaseNotesModal } from './release-notes-modal';
 import { AppRouter } from '/@/renderer/router/app-router';
-import { useCssSettings, useHotkeySettings, useSettingsStore } from '/@/renderer/store';
+import { useCssSettings, useHotkeySettings, useLanguage } from '/@/renderer/store';
 import { useAppTheme } from '/@/renderer/themes/use-app-theme';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { WebAudio } from '/@/shared/types/types';
@@ -26,7 +26,7 @@ const ipc = isElectron() ? window.api.ipc : null;
 
 export const App = () => {
     const { mode, theme } = useAppTheme();
-    const language = useSettingsStore((store) => store.general.language);
+    const language = useLanguage();
 
     const { content, enabled } = useCssSettings();
     const { bindings } = useHotkeySettings();
@@ -72,16 +72,21 @@ export const App = () => {
         }
     }, [language]);
 
+    const notificationStyles = useMemo(
+        () => ({
+            root: {
+                marginBottom: 90,
+            },
+        }),
+        [],
+    );
+
     return (
         <MantineProvider forceColorScheme={mode} theme={theme}>
             <Notifications
                 containerWidth="300px"
                 position="bottom-center"
-                styles={{
-                    root: {
-                        marginBottom: 90,
-                    },
-                }}
+                styles={notificationStyles}
                 zIndex={50000}
             />
             <WebAudioContext.Provider value={webAudioProvider}>

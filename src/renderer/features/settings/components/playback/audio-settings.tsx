@@ -1,5 +1,5 @@
 import isElectron from 'is-electron';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -20,7 +20,7 @@ const getAudioDevice = async () => {
     return (devices || []).filter((dev: MediaDeviceInfo) => dev.kind === 'audiooutput');
 };
 
-export const AudioSettings = () => {
+export const AudioSettings = memo(() => {
     const { t } = useTranslation();
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -61,7 +61,7 @@ export const AudioSettings = () => {
                     defaultValue={settings.type}
                     disabled={status === PlayerStatus.PLAYING}
                     onChange={(e) => {
-                        setSettings({ playback: { ...settings, type: e as PlayerType } });
+                        setSettings({ playback: { type: e as PlayerType } });
                         ipc?.send('settings-set', { property: 'playbackType', value: e });
                     }}
                 />
@@ -84,7 +84,7 @@ export const AudioSettings = () => {
                     data={audioDevices}
                     defaultValue={settings.audioDeviceId}
                     disabled={settings.type !== PlayerType.WEB}
-                    onChange={(e) => setSettings({ playback: { ...settings, audioDeviceId: e } })}
+                    onChange={(e) => setSettings({ playback: { audioDeviceId: e } })}
                 />
             ),
             description: t('setting.audioDevice', {
@@ -100,7 +100,7 @@ export const AudioSettings = () => {
                     defaultChecked={settings.webAudio}
                     onChange={(e) => {
                         setSettings({
-                            playback: { ...settings, webAudio: e.currentTarget.checked },
+                            playback: { webAudio: e.currentTarget.checked },
                         });
                     }}
                 />
@@ -121,7 +121,7 @@ export const AudioSettings = () => {
                     defaultChecked={settings.preservePitch}
                     onChange={(e) => {
                         setSettings({
-                            playback: { ...settings, preservePitch: e.currentTarget.checked },
+                            playback: { preservePitch: e.currentTarget.checked },
                         });
                     }}
                 />
@@ -142,7 +142,6 @@ export const AudioSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             playback: {
-                                ...settings,
                                 audioFadeOnStatusChange: e.currentTarget.checked,
                             },
                         });
@@ -165,4 +164,4 @@ export const AudioSettings = () => {
             title={t('page.setting.audio', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

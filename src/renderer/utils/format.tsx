@@ -87,12 +87,12 @@ updateDayjsLocale();
 // Listen for i18n language changes
 i18n.on('languageChanged', updateDayjsLocale);
 
-export const formatDateAbsolute = (key: null | string) => (key ? dayjs(key).format('LL') : '');
+export const formatDateAbsolute = (key: null | string) => (key ? dayjs(key).format('ll') : '');
 
 export const formatDateAbsoluteUTC = (key: null | string) =>
-    key ? dayjs.utc(key).format('LL') : '';
+    key ? dayjs.utc(key).format('ll') : '';
 
-export const formatHrDateTime = (key: null | string) => (key ? dayjs(key).format('LLL') : '');
+export const formatHrDateTime = (key: null | string) => (key ? dayjs(key).format('lll') : '');
 
 export const formatDateRelative = (key: null | string) => (key ? dayjs(key).fromNow() : '');
 

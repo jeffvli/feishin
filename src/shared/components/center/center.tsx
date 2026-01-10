@@ -1,18 +1,21 @@
 import { Center as MantineCenter, CenterProps as MantineCenterProps } from '@mantine/core';
-import { forwardRef, MouseEvent } from 'react';
+import { forwardRef, memo, MouseEvent, useMemo } from 'react';
 
 export interface CenterProps extends MantineCenterProps {
     onClick?: (e: MouseEvent<HTMLDivElement>) => void;
 }
 
-export const Center = forwardRef<HTMLDivElement, CenterProps>(
+const _Center = forwardRef<HTMLDivElement, CenterProps>(
     ({ children, classNames, onClick, style, ...props }, ref) => {
+        const memoizedClassNames = useMemo(() => ({ ...classNames }), [classNames]);
+        const memoizedStyle = useMemo(() => ({ ...style }), [style]);
+
         return (
             <MantineCenter
-                classNames={{ ...classNames }}
+                classNames={memoizedClassNames}
                 onClick={onClick}
                 ref={ref}
-                style={{ ...style }}
+                style={memoizedStyle}
                 {...props}
             >
                 {children}
@@ -20,3 +23,7 @@ export const Center = forwardRef<HTMLDivElement, CenterProps>(
         );
     },
 );
+
+_Center.displayName = 'Center';
+
+export const Center = memo(_Center);

@@ -13,17 +13,18 @@ import {
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
 import {
+    useButtonSize,
     usePlayerRepeat,
     usePlayerShuffle,
     usePlayerSong,
     usePlayerStatus,
-    useSettingsStore,
+    useSkipButtons,
 } from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
 import { PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
 export const CenterControls = () => {
-    const skip = useSettingsStore((state) => state.general.skipButtons);
+    const skip = useSkipButtons();
 
     const isRadioActive = useIsRadioActive();
 
@@ -85,7 +86,7 @@ const RadioCenterPlayButton = ({ disabled }: { disabled?: boolean }) => {
 
 const RadioStopButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
-    const buttonSize = useSettingsStore((state) => state.general.buttonSize);
+    const buttonSize = useButtonSize();
     const { stop } = useRadioControls();
 
     return (
@@ -104,7 +105,7 @@ const RadioStopButton = ({ disabled }: { disabled?: boolean }) => {
 
 const StopButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
-    const buttonSize = useSettingsStore((state) => state.general.buttonSize);
+    const buttonSize = useButtonSize();
     const { mediaStop } = usePlayer();
 
     return (
@@ -123,7 +124,7 @@ const StopButton = ({ disabled }: { disabled?: boolean }) => {
 
 const ShuffleButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
-    const buttonSize = useSettingsStore((state) => state.general.buttonSize);
+    const buttonSize = useButtonSize();
     const shuffle = usePlayerShuffle();
     const { toggleShuffle } = usePlayer();
 
@@ -156,7 +157,7 @@ const ShuffleButton = ({ disabled }: { disabled?: boolean }) => {
 
 const PreviousButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
-    const buttonSize = useSettingsStore((state) => state.general.buttonSize);
+    const buttonSize = useButtonSize();
     const { mediaPrevious } = usePlayer();
 
     return (
@@ -175,7 +176,7 @@ const PreviousButton = ({ disabled }: { disabled?: boolean }) => {
 
 const SkipBackwardButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
-    const buttonSize = useSettingsStore((state) => state.general.buttonSize);
+    const buttonSize = useButtonSize();
     const { mediaSkipBackward } = usePlayer();
 
     return (
@@ -211,7 +212,7 @@ const CenterPlayButton = ({ disabled }: { disabled?: boolean }) => {
 
 const SkipForwardButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
-    const buttonSize = useSettingsStore((state) => state.general.buttonSize);
+    const buttonSize = useButtonSize();
     const { mediaSkipForward } = usePlayer();
 
     return (
@@ -233,7 +234,7 @@ const SkipForwardButton = ({ disabled }: { disabled?: boolean }) => {
 
 const NextButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
-    const buttonSize = useSettingsStore((state) => state.general.buttonSize);
+    const buttonSize = useButtonSize();
     const { mediaNext } = usePlayer();
 
     return (
@@ -252,7 +253,7 @@ const NextButton = ({ disabled }: { disabled?: boolean }) => {
 
 const RepeatButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
-    const buttonSize = useSettingsStore((state) => state.general.buttonSize);
+    const buttonSize = useButtonSize();
     const repeat = usePlayerRepeat();
     const { toggleRepeat } = usePlayer();
 
@@ -298,7 +299,7 @@ const RepeatButton = ({ disabled }: { disabled?: boolean }) => {
 
 const ShuffleAllButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
-    const buttonSize = useSettingsStore((state) => state.general.buttonSize);
+    const buttonSize = useButtonSize();
 
     return (
         <PlayerButton

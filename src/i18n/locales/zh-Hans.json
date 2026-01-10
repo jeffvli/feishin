@@ -153,23 +153,40 @@
         "retry": "重试"
     },
     "entity": {
+        "albumArtist_one": "专辑艺术家",
         "albumArtist_other": "专辑艺术家",
+        "albumArtistCount_one": "{{count}} 位专辑艺术家",
         "albumArtistCount_other": "{{count}} 位专辑艺术家",
+        "albumWithCount_one": "{{count}} 张专辑",
         "albumWithCount_other": "{{count}} 张专辑",
+        "album_one": "专辑",
         "album_other": "专辑",
+        "genre_one": "流派",
         "genre_other": "流派",
+        "playlistWithCount_one": "{{count}} 个播放列表",
         "playlistWithCount_other": "{{count}} 个播放列表",
+        "playlist_one": "播放列表",
         "playlist_other": "播放列表",
+        "artist_one": "艺术家",
         "artist_other": "艺术家",
+        "folderWithCount_one": "{{count}} 个文件夹",
         "folderWithCount_other": "{{count}} 个文件夹",
+        "track_one": "曲目",
         "track_other": "曲目",
+        "favorite_one": "收藏",
         "favorite_other": "收藏",
+        "artistWithCount_one": "{{count}} 位艺术家",
         "artistWithCount_other": "{{count}} 位艺术家",
+        "folder_one": "文件夹",
         "folder_other": "文件夹",
         "smartPlaylist": "智能$t(entity.playlist_one)",
+        "genreWithCount_one": "{{count}} 种流派",
         "genreWithCount_other": "{{count}} 种流派",
+        "trackWithCount_one": "{{count}} 首曲目",
         "trackWithCount_other": "{{count}} 首曲目",
+        "play_one": "{{count}} 次播放",
         "play_other": "{{count}} 次播放",
+        "song_one": "歌曲",
         "song_other": "歌曲"
     },
     "player": {
@@ -184,7 +201,7 @@
         "skip_back": "向后跳过",
         "favorite": "收藏",
         "next": "下一首",
-        "shuffle": "随机播放",
+        "shuffle": "播放（随机）",
         "playbackFetchNoResults": "未找到歌曲",
         "playbackFetchInProgress": "正在加载歌曲…",
         "addNext": "下一首播放",
@@ -511,7 +528,13 @@
         "imageResolution": "图像分辨率",
         "imageResolution_optionTable": "表格",
         "imageResolution_optionFullScreenPlayer": "全屏播放器",
-        "playerbarSlider": "播放进度条"
+        "playerbarSlider": "播放进度条",
+        "playerbarSliderType_optionSlider": "滑块",
+        "playerbarSliderType_optionWaveform": "波形",
+        "playerbarWaveformAlign": "波形对齐方式",
+        "playerbarWaveformBarWidth": "波形宽度",
+        "playerbarWaveformGap": "波形间距",
+        "transcode": "启用转码功能"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
@@ -796,7 +819,10 @@
             "error_savePassword": "保存密码时出现错误",
             "input_url": "url",
             "input_preferInstantMixDescription": "仅使用即时混音来获取类似的歌曲。如果您有修改此行为的插件，则很有用",
-            "input_preferInstantMix": "首选即时混音"
+            "input_preferInstantMix": "首选即时混音",
+            "input_preferRemoteUrl": "首选公共 URL",
+            "input_remoteUrl": "公共 URL",
+            "input_remoteUrlPlaceholder": "可选：对外功能的公共 URL"
         },
         "addToPlaylist": {
             "success": "添加$t(entity.trackWithCount, {\"count\": {{message}} })到$t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -823,7 +849,9 @@
             "input_optionMatchAny": "匹配任何",
             "title": "查询编辑器",
             "resetToDefault": "恢复默认值",
-            "clearFilters": "清除筛选"
+            "clearFilters": "清除筛选",
+            "addRuleGroup": "添加规则组",
+            "removeRuleGroup": "移除规则组"
         },
         "editPlaylist": {
             "title": "编辑$t(entity.playlist_one)",
@@ -871,7 +899,9 @@
             "input_genre": "$t(entity.genre_one)",
             "input_played_optionAll": "所有曲目",
             "input_maxYear": "截止年份",
-            "input_minYear": "起始年份"
+            "input_minYear": "起始年份",
+            "input_played_optionUnplayed": "仅未播放的曲目",
+            "input_played_optionPlayed": "仅已播放的曲目"
         }
     },
     "table": {
@@ -901,7 +931,11 @@
                 "alignLeft": "左对齐",
                 "alignCenter": "居中对齐",
                 "alignRight": "右对齐",
-                "alternateRowColors": "隔行填色"
+                "alternateRowColors": "隔行填色",
+                "advancedSettings": "高级设置",
+                "autosize": "自动调整大小",
+                "horizontalBorders": "行边框",
+                "verticalBorders": "列边框"
             },
             "view": {
                 "table": "表格",
@@ -995,7 +1029,8 @@
             "live": "现场表演（Live）",
             "mixtape": "混音专辑",
             "remix": "再混音（Remix）",
-            "soundtrack": "原声带"
+            "soundtrack": "原声带",
+            "audioDrama": "广播剧"
         }
     },
     "filterOperator": {
@@ -1059,6 +1094,16 @@
         "vertical": "垂直",
         "horizontal": "水平",
         "addColor": "添加颜色",
-        "position": "位置"
+        "position": "位置",
+        "cycleTime": "循环时间（秒）",
+        "channelLayout": "声道布局",
+        "remove": "移除",
+        "pasteGradientPlaceholder": "在此处粘贴颜色渐变的配置JSON…",
+        "pasteGradient": "粘贴颜色渐变配置",
+        "custom": "自定义",
+        "builtIn": "内置",
+        "colors": "颜色",
+        "gradient": "渐变",
+        "miscellaneousSettings": "杂项设置"
     }
 }

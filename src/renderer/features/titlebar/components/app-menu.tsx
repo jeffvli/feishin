@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router';
 
 import packageJson from '../../../../../package.json';
 
+import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import { ServerList } from '/@/renderer/features/servers/components/server-list';
 import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
 import { useAppStore, useAppStoreActions, useCommandPalette } from '/@/renderer/store';
@@ -175,7 +176,7 @@ export const AppMenu = () => {
             type: 'divider',
         },
         {
-            condition: !window.SERVER_LOCK,
+            condition: !isServerLock(),
             id: 'manage-servers',
             item: {
                 label: t('page.appMenu.manageServers', { postProcess: 'sentenceCase' }),

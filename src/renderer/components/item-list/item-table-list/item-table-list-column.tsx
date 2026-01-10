@@ -47,6 +47,7 @@ import { SizeColumn } from '/@/renderer/components/item-list/item-table-list/col
 import { TextColumn } from '/@/renderer/components/item-list/item-table-list/columns/text-column';
 import { TitleColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-column';
 import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-combined-column';
+import { YearColumn } from '/@/renderer/components/item-list/item-table-list/columns/year-column';
 import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemControls, ItemListItem } from '/@/renderer/components/item-list/types';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
@@ -487,7 +488,6 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
             case TableColumn.DISC_NUMBER:
             case TableColumn.SAMPLE_RATE:
             case TableColumn.TRACK_NUMBER:
-            case TableColumn.YEAR:
                 return <NumericColumn {...props} {...dragProps} controls={controls} type={type} />;
 
             case TableColumn.DATE_ADDED:
@@ -547,6 +547,9 @@ export const ItemTableListColumn = (props: ItemTableListColumn) => {
 
             case TableColumn.USER_RATING:
                 return <RatingColumn {...props} {...dragProps} controls={controls} type={type} />;
+
+            case TableColumn.YEAR:
+                return <YearColumn {...props} {...dragProps} controls={controls} type={type} />;
 
             default:
                 return <DefaultColumn {...props} {...dragProps} controls={controls} type={type} />;
@@ -611,33 +614,52 @@ export const TableColumnTextContainer = (
             : props.rowIndex === props.data.length - 1);
 
     useEffect(() => {
-        if (!isDataRow || !containerRef.current) return;
+        if (!isDataRow || !containerRef.current || !props.enableRowHoverHighlight) return;
 
         const container = containerRef.current;
         const rowIndex = props.rowIndex;
+        const rowSelector = `[data-row-index="${props.tableId}-${rowIndex}"]`;
+        let rafId: null | number = null;
+        let cachedCells: NodeListOf<Element> | null = null;
+
+        const getCells = () => {
+            if (!cachedCells) {
+                cachedCells = document.querySelectorAll(rowSelector);
+            }
+            return cachedCells;
+        };
 
         const handleMouseEnter = () => {
-            // Find all cells in the same row and add hover class
-            const allCells = document.querySelectorAll(
-                `[data-row-index="${props.tableId}-${rowIndex}"]`,
-            );
-            allCells.forEach((cell) => cell.classList.add(styles.rowHovered));
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+            }
+            rafId = requestAnimationFrame(() => {
+                const cells = getCells();
+                cells.forEach((cell) => cell.classList.add(styles.rowHovered));
+            });
         };
 
         const handleMouseLeave = () => {
-            // Remove hover class from all cells in the same row
-            const allCells = document.querySelectorAll(
-                `[data-row-index="${props.tableId}-${rowIndex}"]`,
-            );
-            allCells.forEach((cell) => cell.classList.remove(styles.rowHovered));
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+            }
+            rafId = requestAnimationFrame(() => {
+                const cells = getCells();
+                cells.forEach((cell) => cell.classList.remove(styles.rowHovered));
+                cachedCells = null;
+            });
         };
 
         container.addEventListener('mouseenter', handleMouseEnter);
         container.addEventListener('mouseleave', handleMouseLeave);
 
         return () => {
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+            }
             container.removeEventListener('mouseenter', handleMouseEnter);
             container.removeEventListener('mouseleave', handleMouseLeave);
+            cachedCells = null;
         };
     }, [isDataRow, props.rowIndex, props.enableRowHoverHighlight, props.tableId]);
 
@@ -647,44 +669,64 @@ export const TableColumnTextContainer = (
 
         const rowIndex = props.rowIndex;
         const draggedOverState = props.isDraggedOver;
+        const rowSelector = `[data-row-index="${props.tableId}-${rowIndex}"]`;
+        let rafId: null | number = null;
+        let cachedCells: NodeListOf<Element> | null = null;
 
-        if (draggedOverState) {
-            // Find all cells in the same row and add dragged over class
-            const allCells = document.querySelectorAll(
-                `[data-row-index="${props.tableId}-${rowIndex}"]`,
-            );
-            allCells.forEach((cell, index) => {
-                if (draggedOverState === 'top') {
-                    cell.classList.add(styles.draggedOverTop);
-                    cell.classList.remove(styles.draggedOverBottom);
-                    // Mark first cell so border can span full width
-                    if (index === 0) {
-                        cell.classList.add(styles.draggedOverFirstCell);
-                    } else {
-                        cell.classList.remove(styles.draggedOverFirstCell);
-                    }
-                } else if (draggedOverState === 'bottom') {
-                    cell.classList.add(styles.draggedOverBottom);
-                    cell.classList.remove(styles.draggedOverTop);
-                    // Mark first cell so border can span full width
-                    if (index === 0) {
-                        cell.classList.add(styles.draggedOverFirstCell);
-                    } else {
-                        cell.classList.remove(styles.draggedOverFirstCell);
-                    }
-                }
-            });
-        } else {
-            // Remove dragged over classes from all cells in the same row
-            const allCells = document.querySelectorAll(
-                `[data-row-index="${props.tableId}-${rowIndex}"]`,
-            );
-            allCells.forEach((cell) => {
-                cell.classList.remove(styles.draggedOverTop);
-                cell.classList.remove(styles.draggedOverBottom);
-                cell.classList.remove(styles.draggedOverFirstCell);
-            });
+        const getCells = () => {
+            if (!cachedCells) {
+                cachedCells = document.querySelectorAll(rowSelector);
+            }
+            return cachedCells;
+        };
+
+        if (rafId !== null) {
+            cancelAnimationFrame(rafId);
         }
+
+        rafId = requestAnimationFrame(() => {
+            const cells = getCells();
+
+            if (draggedOverState) {
+                cells.forEach((cell, index) => {
+                    if (draggedOverState === 'top') {
+                        cell.classList.add(styles.draggedOverTop);
+                        cell.classList.remove(styles.draggedOverBottom);
+                        // Mark first cell so border can span full width
+                        if (index === 0) {
+                            cell.classList.add(styles.draggedOverFirstCell);
+                        } else {
+                            cell.classList.remove(styles.draggedOverFirstCell);
+                        }
+                    } else if (draggedOverState === 'bottom') {
+                        cell.classList.add(styles.draggedOverBottom);
+                        cell.classList.remove(styles.draggedOverTop);
+                        // Mark first cell so border can span full width
+                        if (index === 0) {
+                            cell.classList.add(styles.draggedOverFirstCell);
+                        } else {
+                            cell.classList.remove(styles.draggedOverFirstCell);
+                        }
+                    }
+                });
+            } else {
+                // Remove dragged over classes from all cells in the same row
+                cells.forEach((cell) => {
+                    cell.classList.remove(styles.draggedOverTop);
+                    cell.classList.remove(styles.draggedOverBottom);
+                    cell.classList.remove(styles.draggedOverFirstCell);
+                });
+                // Clear cache when state is cleared
+                cachedCells = null;
+            }
+        });
+
+        return () => {
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+            }
+            cachedCells = null;
+        };
     }, [isDataRow, props.rowIndex, props.isDraggedOver, props.tableId]);
 
     const handleClick = useDoubleClick({
@@ -824,33 +866,52 @@ export const TableColumnContainer = (
             : props.rowIndex === props.data.length - 1);
 
     useEffect(() => {
-        if (!isDataRow || !containerRef.current) return;
+        if (!isDataRow || !containerRef.current || !props.enableRowHoverHighlight) return;
 
         const container = containerRef.current;
         const rowIndex = props.rowIndex;
+        const rowSelector = `[data-row-index="${props.tableId}-${rowIndex}"]`;
+        let rafId: null | number = null;
+        let cachedCells: NodeListOf<Element> | null = null;
+
+        const getCells = () => {
+            if (!cachedCells) {
+                cachedCells = document.querySelectorAll(rowSelector);
+            }
+            return cachedCells;
+        };
 
         const handleMouseEnter = () => {
-            // Find all cells in the same row and add hover class
-            const allCells = document.querySelectorAll(
-                `[data-row-index="${props.tableId}-${rowIndex}"]`,
-            );
-            allCells.forEach((cell) => cell.classList.add(styles.rowHovered));
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+            }
+            rafId = requestAnimationFrame(() => {
+                const cells = getCells();
+                cells.forEach((cell) => cell.classList.add(styles.rowHovered));
+            });
         };
 
         const handleMouseLeave = () => {
-            // Remove hover class from all cells in the same row
-            const allCells = document.querySelectorAll(
-                `[data-row-index="${props.tableId}-${rowIndex}"]`,
-            );
-            allCells.forEach((cell) => cell.classList.remove(styles.rowHovered));
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+            }
+            rafId = requestAnimationFrame(() => {
+                const cells = getCells();
+                cells.forEach((cell) => cell.classList.remove(styles.rowHovered));
+                cachedCells = null;
+            });
         };
 
         container.addEventListener('mouseenter', handleMouseEnter);
         container.addEventListener('mouseleave', handleMouseLeave);
 
         return () => {
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+            }
             container.removeEventListener('mouseenter', handleMouseEnter);
             container.removeEventListener('mouseleave', handleMouseLeave);
+            cachedCells = null;
         };
     }, [isDataRow, props.rowIndex, props.enableRowHoverHighlight, props.tableId]);
 
@@ -860,44 +921,64 @@ export const TableColumnContainer = (
 
         const rowIndex = props.rowIndex;
         const draggedOverState = props.isDraggedOver;
+        const rowSelector = `[data-row-index="${props.tableId}-${rowIndex}"]`;
+        let rafId: null | number = null;
+        let cachedCells: NodeListOf<Element> | null = null;
 
-        if (draggedOverState) {
-            // Find all cells in the same row and add dragged over class
-            const allCells = document.querySelectorAll(
-                `[data-row-index="${props.tableId}-${rowIndex}"]`,
-            );
-            allCells.forEach((cell, index) => {
-                if (draggedOverState === 'top') {
-                    cell.classList.add(styles.draggedOverTop);
-                    cell.classList.remove(styles.draggedOverBottom);
-                    // Mark first cell so border can span full width
-                    if (index === 0) {
-                        cell.classList.add(styles.draggedOverFirstCell);
-                    } else {
-                        cell.classList.remove(styles.draggedOverFirstCell);
-                    }
-                } else if (draggedOverState === 'bottom') {
-                    cell.classList.add(styles.draggedOverBottom);
-                    cell.classList.remove(styles.draggedOverTop);
-                    // Mark first cell so border can span full width
-                    if (index === 0) {
-                        cell.classList.add(styles.draggedOverFirstCell);
-                    } else {
-                        cell.classList.remove(styles.draggedOverFirstCell);
-                    }
-                }
-            });
-        } else {
-            // Remove dragged over classes from all cells in the same row
-            const allCells = document.querySelectorAll(
-                `[data-row-index="${props.tableId}-${rowIndex}"]`,
-            );
-            allCells.forEach((cell) => {
-                cell.classList.remove(styles.draggedOverTop);
-                cell.classList.remove(styles.draggedOverBottom);
-                cell.classList.remove(styles.draggedOverFirstCell);
-            });
+        const getCells = () => {
+            if (!cachedCells) {
+                cachedCells = document.querySelectorAll(rowSelector);
+            }
+            return cachedCells;
+        };
+
+        if (rafId !== null) {
+            cancelAnimationFrame(rafId);
         }
+
+        rafId = requestAnimationFrame(() => {
+            const cells = getCells();
+
+            if (draggedOverState) {
+                cells.forEach((cell, index) => {
+                    if (draggedOverState === 'top') {
+                        cell.classList.add(styles.draggedOverTop);
+                        cell.classList.remove(styles.draggedOverBottom);
+                        // Mark first cell so border can span full width
+                        if (index === 0) {
+                            cell.classList.add(styles.draggedOverFirstCell);
+                        } else {
+                            cell.classList.remove(styles.draggedOverFirstCell);
+                        }
+                    } else if (draggedOverState === 'bottom') {
+                        cell.classList.add(styles.draggedOverBottom);
+                        cell.classList.remove(styles.draggedOverTop);
+                        // Mark first cell so border can span full width
+                        if (index === 0) {
+                            cell.classList.add(styles.draggedOverFirstCell);
+                        } else {
+                            cell.classList.remove(styles.draggedOverFirstCell);
+                        }
+                    }
+                });
+            } else {
+                // Remove dragged over classes from all cells in the same row
+                cells.forEach((cell) => {
+                    cell.classList.remove(styles.draggedOverTop);
+                    cell.classList.remove(styles.draggedOverBottom);
+                    cell.classList.remove(styles.draggedOverFirstCell);
+                });
+                // Clear cache when state is cleared
+                cachedCells = null;
+            }
+        });
+
+        return () => {
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+            }
+            cachedCells = null;
+        };
     }, [isDataRow, props.rowIndex, props.isDraggedOver, props.tableId]);
 
     const handleClick = useDoubleClick({

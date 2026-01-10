@@ -88,3 +88,10 @@
 .visualizer-section:hover .panel-reorder-controls {
     opacity: 1;
 }
+
+.draggable-region {
+    flex-shrink: 0;
+    width: 100%;
+    height: 65px;
+    -webkit-app-region: drag;
+}

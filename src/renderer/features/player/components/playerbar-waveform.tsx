@@ -10,8 +10,8 @@ import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-s
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     BarAlign,
-    useGeneralSettings,
     usePlaybackSettings,
+    usePlayerbarSlider,
     usePlayerSong,
     usePlayerTimestamp,
 } from '/@/renderer/store';
@@ -22,7 +22,7 @@ import { Text } from '/@/shared/components/text/text';
 export const PlayerbarWaveform = () => {
     const currentSong = usePlayerSong();
     const { transcode } = usePlaybackSettings();
-    const { playerbarSlider } = useGeneralSettings();
+    const playerbarSlider = usePlayerbarSlider();
     const currentTime = usePlayerTimestamp();
     const containerRef = useRef<HTMLDivElement>(null);
     const { mediaSeekToTimestamp } = usePlayer();

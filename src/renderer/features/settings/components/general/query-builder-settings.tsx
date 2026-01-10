@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -21,7 +22,7 @@ const QUERY_VALUE_INPUT_TYPES = [
     { label: 'String', value: 'string' },
 ] as const;
 
-export const QueryBuilderSettings = () => {
+export const QueryBuilderSettings = memo(() => {
     const { t } = useTranslation();
     const queryBuilder = useQueryBuilderSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -148,4 +149,4 @@ export const QueryBuilderSettings = () => {
             })}
         />
     );
-};
+});

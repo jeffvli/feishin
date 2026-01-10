@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import { DraggableItems } from '/@/renderer/features/settings/components/general/draggable-items';
 import {
     ArtistItem,
@@ -14,7 +16,7 @@ const ARTIST_ITEMS: Array<[ArtistItem, string]> = [
     [ArtistItem.SIMILAR_ARTISTS, 'page.albumArtistDetail.relatedArtists'],
 ];
 
-export const ArtistSettings = () => {
+export const ArtistSettings = memo(() => {
     const { artistItems } = useGeneralSettings();
     const { setArtistItems } = useSettingsStoreActions();
 
@@ -27,7 +29,7 @@ export const ArtistSettings = () => {
             title="setting.artistConfiguration"
         />
     );
-};
+});
 
 const ARTIST_RELEASE_TYPE_ITEMS: Array<[ArtistReleaseTypeItem, string]> = [
     [ArtistReleaseTypeItem.APPEARS_ON, 'page.albumArtistDetail.appearsOn'],
@@ -50,7 +52,7 @@ const ARTIST_RELEASE_TYPE_ITEMS: Array<[ArtistReleaseTypeItem, string]> = [
     [ArtistReleaseTypeItem.RELEASE_TYPE_SPOKENWORD, 'releaseType.secondary.spokenWord'],
 ];
 
-export const ArtistReleaseTypeSettings = () => {
+export const ArtistReleaseTypeSettings = memo(() => {
     const { artistReleaseTypeItems } = useGeneralSettings();
     const { setArtistReleaseTypeItems } = useSettingsStoreActions();
 
@@ -63,4 +65,4 @@ export const ArtistReleaseTypeSettings = () => {
             title="setting.artistReleaseTypeConfiguration"
         />
     );
-};
+});

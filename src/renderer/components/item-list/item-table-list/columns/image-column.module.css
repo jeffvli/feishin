@@ -4,6 +4,15 @@
     border-radius: 0;
 }
 
+.image-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
 .compact-image-container .skeleton {
     border-radius: 0;
 }
@@ -24,11 +33,9 @@
 }
 
 .image-container-with-aspect-ratio {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
+    width: auto;
     height: 100%;
+    aspect-ratio: 1 / 1;
     border-radius: var(--theme-radius-md);
 }
 
@@ -40,10 +47,10 @@
     object-position: center;
 }
 
-.image-container {
-    position: relative;
-    width: 100%;
+.skeleton-with-aspect-ratio {
+    width: auto;
     height: 100%;
+    aspect-ratio: 1 / 1;
 }
 
 .play-button-overlay {

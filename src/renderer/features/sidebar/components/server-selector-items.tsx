@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
@@ -88,8 +89,6 @@ export const ServerSelectorItems = () => {
         });
     };
 
-    const isServerLock = Boolean(window.SERVER_LOCK) || false;
-
     return (
         <>
             <DropdownMenu.Label>
@@ -123,7 +122,7 @@ export const ServerSelectorItems = () => {
                     </DropdownMenu.Item>
                 );
             })}
-            {!isServerLock && (
+            {!isServerLock() && (
                 <DropdownMenu.Item
                     leftSection={<Icon icon="edit" />}
                     onClick={handleManageServersModal}

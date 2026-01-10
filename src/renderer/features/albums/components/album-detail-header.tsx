@@ -14,7 +14,7 @@ import {
     LibraryHeaderMenu,
 } from '/@/renderer/features/shared/components/library-header';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
+import { useCurrentServer, useShowRatings } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDateAbsoluteUTC, formatDurationString } from '/@/renderer/utils';
 import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
@@ -29,7 +29,7 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
     const { albumId } = useParams() as { albumId: string };
     const { t } = useTranslation();
     const server = useCurrentServer();
-    const { showRatings } = useGeneralSettings();
+    const showRatings = useShowRatings();
     const detailQuery = useQuery(
         albumQueries.detail({ query: { id: albumId }, serverId: server?.id }),
     );
@@ -100,27 +100,55 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
         const originalDifferentFromRelease =
             album?.originalDate && album?.originalDate !== album?.releaseDate;
 
+        const originalYearDifferentFromRelease = album?.originalYear !== album?.releaseYear;
+
         const playCount = album?.playCount;
 
         const releasePrefix = originalDifferentFromRelease
             ? t('page.albumDetail.released', { postProcess: 'sentenceCase' })
             : '♫';
 
-        if (originalDifferentFromRelease && album.originalDate) {
-            items.push({
-                id: 'originalDate',
-                value: `♫ ${formatDateAbsoluteUTC(album.originalDate)}`,
-            });
+        const releaseYearPrefix = originalYearDifferentFromRelease
+            ? t('page.albumDetail.released', { postProcess: 'sentenceCase' })
+            : '♫';
+
+        if (album.originalDate) {
+            if (originalDifferentFromRelease) {
+                items.push({
+                    id: 'originalDate',
+                    value: `♫ ${formatDateAbsoluteUTC(album.originalDate)}`,
+                });
+            }
+
+            if (releaseDate) {
+                items.push({
+                    id: 'releaseDate',
+                    value: `${releasePrefix} ${formatDateAbsoluteUTC(releaseDate)}`,
+                });
+            }
+        } else if (album.originalYear) {
+            if (originalYearDifferentFromRelease) {
+                items.push({
+                    id: 'originalYear',
+                    value: `♫ ${album.originalYear}`,
+                });
+            }
+
+            if (releaseDate) {
+                items.push({
+                    id: 'releaseDate',
+                    value: `${releaseYearPrefix} ${formatDateAbsoluteUTC(releaseDate)}`,
+                });
+            } else if (releaseYear) {
+                items.push({
+                    id: 'releaseYear',
+                    value: `${releaseYearPrefix} ${releaseYear}`,
+                });
+            }
         }
 
         items.push(
             ...[
-                {
-                    id: 'releaseDate',
-                    value: releaseDate
-                        ? `${releasePrefix} ${formatDateAbsoluteUTC(releaseDate)}`
-                        : releaseYear,
-                },
                 {
                     id: 'songCount',
                     value: t('entity.trackWithCount', { count: detailQuery?.data?.songCount || 0 }),

@@ -5,6 +5,10 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '/@/renderer/api';
+import {
+    isLegacyAuth,
+    isServerLock,
+} from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
@@ -94,9 +98,11 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const { addServer, setCurrentServer } = useAuthStoreActions();
     const { servers: discovered } = useAutodiscovery();
 
+    const serverLock = isServerLock();
+
     const form = useForm({
         initialValues: {
-            legacyAuth: false,
+            legacyAuth: isLegacyAuth(),
             name:
                 (localSettings ? localSettings.env.SERVER_NAME : window.SERVER_NAME) || 'My Server',
             password: '',
@@ -112,9 +118,6 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             username: '',
         },
     });
-
-    // server lock for web is only true if lock is true *and* all other properties are set
-    const isServerLock = Boolean(window.SERVER_LOCK) || false;
 
     const isSubmitDisabled = !form.values.name || !form.values.url || !form.values.username;
 
@@ -231,7 +234,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 <Stack m={5} ref={focusTrapRef}>
                     <SegmentedControl
                         data={ALL_SERVERS}
-                        disabled={isServerLock}
+                        disabled={serverLock}
                         p="md"
                         withItemsBorders={false}
                         {...form.getInputProps('type')}
@@ -239,7 +242,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     <Group grow>
                         <TextInput
                             data-autofocus
-                            disabled={isServerLock}
+                            disabled={serverLock}
                             label={t('form.addServer.input', {
                                 context: 'name',
                                 postProcess: 'titleCase',
@@ -248,7 +251,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             {...form.getInputProps('name')}
                         />
                         <TextInput
-                            disabled={isServerLock}
+                            disabled={serverLock}
                             label={t('form.addServer.input', {
                                 context: 'url',
                                 postProcess: 'titleCase',
@@ -258,7 +261,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                         />
                     </Group>
                     <TextInput
-                        disabled={isServerLock}
+                        disabled={serverLock}
                         label={t('form.addServer.input', {
                             context: 'remoteUrl',
                             postProcess: 'titleCase',
@@ -308,6 +311,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     )}
                     {form.values.type === ServerType.SUBSONIC && (
                         <Checkbox
+                            disabled={serverLock}
                             label={t('form.addServer.input', {
                                 context: 'legacyAuthentication',
                                 postProcess: 'titleCase',

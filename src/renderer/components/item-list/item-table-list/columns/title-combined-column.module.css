@@ -19,7 +19,7 @@
 
 .title {
     display: inline-block;
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -69,4 +69,8 @@
 .compact-play-button-overlay button {
     width: 24px;
     height: 24px;
+}
+
+.active {
+    color: var(--theme-colors-primary);
 }

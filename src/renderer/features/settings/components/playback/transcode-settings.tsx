@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -9,7 +10,7 @@ import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Switch } from '/@/shared/components/switch/switch';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 
-export const TranscodeSettings = () => {
+export const TranscodeSettings = memo(() => {
     const { t } = useTranslation();
     const { transcode } = usePlaybackSettings();
     const { setTranscodingConfig } = useSettingsStoreActions();
@@ -92,4 +93,4 @@ export const TranscodeSettings = () => {
             title={t('page.setting.transcoding', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

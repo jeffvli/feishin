@@ -1,5 +1,5 @@
 import isElectron from 'is-electron';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
@@ -85,7 +85,7 @@ const renderThemeOption = ({ option }: { option: { label: string; value: string 
     );
 };
 
-export const ThemeSettings = () => {
+export const ThemeSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -101,7 +101,6 @@ export const ThemeSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             general: {
-                                ...settings,
                                 followSystemTheme: e.currentTarget.checked,
                             },
                         });
@@ -135,7 +134,6 @@ export const ThemeSettings = () => {
 
                         setSettings({
                             general: {
-                                ...settings,
                                 theme,
                             },
                         });
@@ -167,7 +165,6 @@ export const ThemeSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             general: {
-                                ...settings,
                                 themeDark: e as AppTheme,
                             },
                         });
@@ -191,7 +188,6 @@ export const ThemeSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             general: {
-                                ...settings,
                                 themeLight: e as AppTheme,
                             },
                         });
@@ -214,7 +210,6 @@ export const ThemeSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             general: {
-                                ...settings,
                                 useThemeAccentColor: e.currentTarget.checked,
                             },
                         });
@@ -238,7 +233,6 @@ export const ThemeSettings = () => {
                         onChangeEnd={(e) => {
                             setSettings({
                                 general: {
-                                    ...settings,
                                     accent: e,
                                 },
                             });
@@ -270,4 +264,4 @@ export const ThemeSettings = () => {
             title={t('page.setting.theme', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

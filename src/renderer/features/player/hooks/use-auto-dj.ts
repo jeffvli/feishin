@@ -73,7 +73,8 @@ export const useAutoDJ = () => {
                     let uniqueSimilarSongs: Song[] = [];
 
                     const hasMusicFolder = server?.musicFolderId && server.musicFolderId.length > 0;
-                    const trySimilarSongs = hasMusicFolder && hasSimilarSongsMusicFolder;
+                    const trySimilarSongs =
+                        !hasMusicFolder || (hasMusicFolder && hasSimilarSongsMusicFolder);
 
                     // Skip similar songs fetch if a music folder is selected and does not support musicFolderId on similar songs
                     if (trySimilarSongs) {

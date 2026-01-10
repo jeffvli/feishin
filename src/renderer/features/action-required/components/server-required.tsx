@@ -3,6 +3,7 @@ import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
@@ -28,14 +29,12 @@ const localSettings = isElectron() ? window.api.localSettings : null;
 export const ServerRequired = () => {
     const serverList = useServerList();
 
-    const isServerLock = Boolean(window.SERVER_LOCK) || false;
-
     if (Object.keys(serverList).length > 0) {
         return (
             <ScrollArea>
                 <Stack miw="300px">
                     <ServerSelector />
-                    {!isServerLock && (
+                    {!isServerLock() && (
                         <>
                             <Divider my="lg" />
                             <AddServerForm onCancel={null} />

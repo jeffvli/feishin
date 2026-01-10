@@ -13,7 +13,8 @@ import { SongInfiniteCarousel } from '/@/renderer/features/songs/components/song
 import {
     HomeItem,
     useCurrentServer,
-    useGeneralSettings,
+    useHomeFeature,
+    useHomeItems,
     useWindowSettings,
 } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
@@ -32,7 +33,8 @@ const HomeRoute = () => {
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const server = useCurrentServer();
     const { windowBarStyle } = useWindowSettings();
-    const { homeFeature, homeItems } = useGeneralSettings();
+    const homeFeature = useHomeFeature();
+    const homeItems = useHomeItems();
 
     const isJellyfin = server?.type === ServerType.JELLYFIN;
 

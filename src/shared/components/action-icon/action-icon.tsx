@@ -3,7 +3,7 @@ import {
     ActionIcon as MantineActionIcon,
     ActionIconProps as MantineActionIconProps,
 } from '@mantine/core';
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 
 import styles from './action-icon.module.css';
 
@@ -41,11 +41,16 @@ const _ActionIcon = forwardRef<HTMLButtonElement, ActionIconProps>(
             if (onClick) onClick(e);
         };
 
-        const actionIconProps: ActionIconProps = {
-            classNames: {
+        const memoizedClassNames = useMemo(
+            () => ({
                 root: styles.root,
                 ...classNames,
-            },
+            }),
+            [classNames],
+        );
+
+        const actionIconProps: ActionIconProps = {
+            classNames: memoizedClassNames,
             size,
             variant,
             ...props,

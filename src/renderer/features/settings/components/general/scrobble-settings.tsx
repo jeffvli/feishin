@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -10,7 +11,7 @@ import { Slider } from '/@/shared/components/slider/slider';
 import { Switch } from '/@/shared/components/switch/switch';
 import { toast } from '/@/shared/components/toast/toast';
 
-export const ScrobbleSettings = () => {
+export const ScrobbleSettings = memo(() => {
     const { t } = useTranslation();
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -24,9 +25,7 @@ export const ScrobbleSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             playback: {
-                                ...settings,
                                 scrobble: {
-                                    ...settings.scrobble,
                                     enabled: e.currentTarget.checked,
                                 },
                             },
@@ -51,9 +50,7 @@ export const ScrobbleSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             playback: {
-                                ...settings,
                                 scrobble: {
-                                    ...settings.scrobble,
                                     scrobbleAtPercentage: e,
                                 },
                             },
@@ -79,9 +76,7 @@ export const ScrobbleSettings = () => {
                         if (e === '') return;
                         setSettings({
                             playback: {
-                                ...settings,
                                 scrobble: {
-                                    ...settings.scrobble,
                                     scrobbleAtDuration: Number(e),
                                 },
                             },
@@ -125,9 +120,7 @@ export const ScrobbleSettings = () => {
 
                         setSettings({
                             playback: {
-                                ...settings,
                                 scrobble: {
-                                    ...settings.scrobble,
                                     notify: e.currentTarget.checked,
                                 },
                             },
@@ -150,4 +143,4 @@ export const ScrobbleSettings = () => {
             title={t('page.setting.scrobble', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

@@ -16,13 +16,13 @@ import { LibraryContainer } from '/@/renderer/features/shared/components/library
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { useFastAverageColor, useWaitForColorCalculation } from '/@/renderer/hooks';
-import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
+import { useAlbumBackground, useCurrentServer } from '/@/renderer/store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const AlbumDetailRoute = () => {
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
-    const { albumBackground, albumBackgroundBlur } = useGeneralSettings();
+    const { albumBackground, albumBackgroundBlur } = useAlbumBackground();
 
     const { albumId } = useParams() as { albumId: string };
     const server = useCurrentServer();

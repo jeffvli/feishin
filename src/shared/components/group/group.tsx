@@ -1,17 +1,26 @@
 import { Group as MantineGroup, GroupProps as MantineGroupProps } from '@mantine/core';
-import { forwardRef } from 'react';
+import { forwardRef, memo, useMemo } from 'react';
 
 export interface GroupProps extends MantineGroupProps {}
 
-export const Group = forwardRef<HTMLDivElement, GroupProps>(({ children, ...props }, ref) => {
-    return (
-        <MantineGroup
-            classNames={{ ...props.classNames }}
-            ref={ref}
-            style={{ ...props.style }}
-            {...props}
-        >
-            {children}
-        </MantineGroup>
-    );
-});
+const _Group = forwardRef<HTMLDivElement, GroupProps>(
+    ({ children, classNames, style, ...props }, ref) => {
+        const memoizedClassNames = useMemo(() => ({ ...classNames }), [classNames]);
+        const memoizedStyle = useMemo(() => ({ ...style }), [style]);
+
+        return (
+            <MantineGroup
+                classNames={memoizedClassNames}
+                ref={ref}
+                style={memoizedStyle}
+                {...props}
+            >
+                {children}
+            </MantineGroup>
+        );
+    },
+);
+
+_Group.displayName = 'Group';
+
+export const Group = memo(_Group);

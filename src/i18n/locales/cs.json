@@ -366,7 +366,16 @@
         "artistReleaseTypeConfiguration": "nastavení typu vydání umělce",
         "artistReleaseTypeConfiguration_description": "nastavit, jaké typy vydání a v jakém pořadí jsou zobrazeny na stránce umělce alba",
         "mpvExtraParameters": "extra parametry mpv",
-        "mpvExtraParameters_description": "další argumenty, které předat přehrávači mpv"
+        "mpvExtraParameters_description": "další argumenty, které předat přehrávači mpv",
+        "hotkey_listNavigateToPage": "navigace na stránku položky v seznamu",
+        "hotkey_listPlayDefault": "přehrání v seznamu",
+        "hotkey_listPlayLast": "přehrání poslední položky v seznamu",
+        "hotkey_listPlayNext": "přehrání další položky v seznamu",
+        "hotkey_listPlayNow": "okamžité přehrání v seznamu",
+        "pathReplace": "nahrazení cesty k souborům",
+        "pathReplace_description": "nahradit výchozí cestu k souborům vašeho serveru",
+        "pathReplace_optionRemovePrefix": "odstranit předponu",
+        "pathReplace_optionAddPrefix": "přidat předponu"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist_one)",
@@ -526,7 +535,8 @@
         "view": "zobrazit",
         "countSelected": "vybráno {{count}}",
         "retry": "zkusit znovu",
-        "mood": "nálada"
+        "mood": "nálada",
+        "example": "příklad"
     },
     "table": {
         "config": {
@@ -929,7 +939,10 @@
             "ignoreCors": "ignorovat CORS $t(common.restartRequired)",
             "error_savePassword": "při ukládání hesla se vyskytla chyba",
             "input_preferInstantMix": "preferovat instantní mix",
-            "input_preferInstantMixDescription": "pro získání podobných skladeb použít pouze instantní mix. užitečné, pokud máte doplňky, které upravují toto chování"
+            "input_preferInstantMixDescription": "pro získání podobných skladeb použít pouze instantní mix. užitečné, pokud máte doplňky, které upravují toto chování",
+            "input_preferRemoteUrl": "preferovat veřejnou adresu url",
+            "input_remoteUrl": "veřejná adresa url",
+            "input_remoteUrlPlaceholder": "volitelné: veřejná adresa url pro externí funkce"
         },
         "addToPlaylist": {
             "success": "přidáno $t(entity.trackWithCount, {\"count\": {{message}} }) do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -1134,7 +1147,7 @@
         "ignoredPresets": "Ignorované předvolby",
         "selectedPresets": "Vybrané předvolby",
         "randomizeNextPreset": "Náhodně vybrat další předvolbu",
-        "blendTime": "Prolnout čas",
+        "blendTime": "Čas prolnutí",
         "presets": "Předvolby",
         "selectPreset": "Vybrat předvolbu",
         "applyPreset": "Použít předvolbu",
@@ -1271,6 +1284,8 @@
                 "8": "[8] Celá oktáva / 10 pásem",
                 "10": "[10] Linka / Graf oblasti"
             }
-        }
+        },
+        "pasteGradient": "Vložit přechod",
+        "pasteGradientPlaceholder": "Sem vložte JSON přechodu…"
     }
 }

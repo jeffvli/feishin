@@ -186,12 +186,24 @@
     z-index: 1;
     height: 8px;
     pointer-events: none;
-    background: linear-gradient(
-        to bottom,
-        darken(var(--theme-colors-background), 10%) 0%,
-        darken(var(--theme-colors-background), 5%) 50%,
-        transparent 100%
-    );
+
+    @mixin dark {
+        background: linear-gradient(
+            to bottom,
+            color-mix(in srgb, var(--theme-colors-background) 85%, black) 0%,
+            color-mix(in srgb, var(--theme-colors-background) 92%, black) 50%,
+            transparent 100%
+        );
+    }
+
+    @mixin light {
+        background: linear-gradient(
+            to bottom,
+            color-mix(in srgb, var(--theme-colors-background) 92%, black) 0%,
+            color-mix(in srgb, var(--theme-colors-background) 96%, black) 50%,
+            transparent 100%
+        );
+    }
 }
 
 .item-table-left-scroll-shadow {
@@ -206,8 +218,8 @@
     @mixin dark {
         background: linear-gradient(
             to right,
-            darken(var(--theme-colors-background), 10%) 0%,
-            darken(var(--theme-colors-background), 5%) 50%,
+            color-mix(in srgb, var(--theme-colors-background) 85%, black) 0%,
+            color-mix(in srgb, var(--theme-colors-background) 92%, black) 50%,
             transparent 100%
         );
     }
@@ -215,8 +227,8 @@
     @mixin light {
         background: linear-gradient(
             to right,
-            darken(var(--theme-colors-background), 5%) 0%,
-            darken(var(--theme-colors-background), 3%) 50%,
+            color-mix(in srgb, var(--theme-colors-background) 92%, black) 0%,
+            color-mix(in srgb, var(--theme-colors-background) 96%, black) 50%,
             transparent 100%
         );
     }
@@ -234,8 +246,8 @@
     @mixin dark {
         background: linear-gradient(
             to left,
-            darken(var(--theme-colors-background), 10%) 0%,
-            darken(var(--theme-colors-background), 5%) 50%,
+            color-mix(in srgb, var(--theme-colors-background) 85%, black) 0%,
+            color-mix(in srgb, var(--theme-colors-background) 92%, black) 50%,
             transparent 100%
         );
     }
@@ -243,8 +255,8 @@
     @mixin light {
         background: linear-gradient(
             to left,
-            darken(var(--theme-colors-background), 5%) 0%,
-            darken(var(--theme-colors-background), 3%) 50%,
+            color-mix(in srgb, var(--theme-colors-background) 92%, black) 0%,
+            color-mix(in srgb, var(--theme-colors-background) 96%, black) 50%,
             transparent 100%
         );
     }
@@ -262,8 +274,8 @@
     @mixin dark {
         background: linear-gradient(
             to bottom,
-            darken(var(--theme-colors-background), 10%) 0%,
-            darken(var(--theme-colors-background), 5%) 50%,
+            color-mix(in srgb, var(--theme-colors-background) 85%, black) 0%,
+            color-mix(in srgb, var(--theme-colors-background) 92%, black) 50%,
             transparent 100%
         );
     }
@@ -271,8 +283,8 @@
     @mixin light {
         background: linear-gradient(
             to bottom,
-            darken(var(--theme-colors-background), 5%) 0%,
-            darken(var(--theme-colors-background), 3%) 50%,
+            color-mix(in srgb, var(--theme-colors-background) 92%, black) 0%,
+            color-mix(in srgb, var(--theme-colors-background) 96%, black) 50%,
             transparent 100%
         );
     }

@@ -4,5 +4,9 @@ import { usePlayerSong } from '/@/renderer/store';
 export const FullScreenSimilarSongs = () => {
     const currentSong = usePlayerSong();
 
-    return currentSong?.id ? <SimilarSongsList fullScreen song={currentSong} /> : null;
+    return currentSong?.id ? (
+        <div style={{ height: '100%', width: '100%' }}>
+            <SimilarSongsList fullScreen song={currentSong} />
+        </div>
+    ) : null;
 };

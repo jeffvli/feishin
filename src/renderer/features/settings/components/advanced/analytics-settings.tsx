@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -6,7 +7,7 @@ import {
 } from '/@/renderer/features/settings/components/settings-section';
 import { Switch } from '/@/shared/components/switch/switch';
 
-export const AnalyticsSettings = () => {
+export const AnalyticsSettings = memo(() => {
     const { t } = useTranslation();
 
     const handleToggleAnalytics = (disable: boolean) => {
@@ -36,4 +37,4 @@ export const AnalyticsSettings = () => {
             title={t('page.setting.analytics', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

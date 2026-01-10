@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -21,7 +22,7 @@ import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { Play } from '/@/shared/types/types';
 
-export const ControlSettings = () => {
+export const ControlSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useGeneralSettings();
     const playerbarSlider = usePlayerbarSlider();
@@ -486,4 +487,4 @@ export const ControlSettings = () => {
             title={t('page.setting.controls', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

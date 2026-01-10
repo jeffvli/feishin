@@ -1,4 +1,4 @@
-import { ChangeEvent, useMemo } from 'react';
+import { ChangeEvent, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
@@ -29,8 +29,8 @@ export const SubsonicSongFilters = () => {
         }));
     }, [genreListQuery.data]);
 
-    const handleGenresFilter = useMemo(
-        () => (e: null | string) => {
+    const handleGenresFilter = useCallback(
+        (e: null | string) => {
             setGenreId(e ? [e] : null);
         },
         [setGenreId],

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
@@ -34,7 +34,7 @@ const options = [
     },
 ];
 
-export const ImageResolutionSettings = () => {
+export const ImageResolutionSettings = memo(() => {
     const { t } = useTranslation();
     const { setSettings } = useSettingsStoreActions();
     const settings = useGeneralSettings();
@@ -108,4 +108,4 @@ export const ImageResolutionSettings = () => {
             )}
         </>
     );
-};
+});

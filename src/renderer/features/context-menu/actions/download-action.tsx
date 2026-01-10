@@ -43,6 +43,10 @@ export const DownloadAction = ({ ids }: DownloadActionProps) => {
         }
     }, [ids, server, t]);
 
+    if (!utils) {
+        return null;
+    }
+
     return (
         <ContextMenu.Item disabled={ids.length > 1} leftIcon="download" onSelect={onSelect}>
             {t('page.contextMenu.download', { postProcess: 'sentenceCase' })}

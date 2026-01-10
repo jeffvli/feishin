@@ -322,7 +322,10 @@
             "ignoreCors": "zignoruj cors ($t(common.restartRequired))",
             "error_savePassword": "wystąpił błąd podczas próby zapisania hasła",
             "input_preferInstantMix": "preferuj natychmiastowy mix",
-            "input_preferInstantMixDescription": "używaj tylko natychmiastowego mixu, by otrzymać podobne piosenki. przydatne gdy masz wtyczki które zmieniają to zachowanie"
+            "input_preferInstantMixDescription": "używaj tylko natychmiastowego mixu, by otrzymać podobne piosenki. przydatne gdy masz wtyczki które zmieniają to zachowanie",
+            "input_preferRemoteUrl": "preferuj publiczny url",
+            "input_remoteUrl": "publiczny url",
+            "input_remoteUrlPlaceholder": "opcjonalne: publiczny url dla funkcji zewnętrznych"
         },
         "addToPlaylist": {
             "success": "dodano $t(entity.trackWithCount, {\"count\": {{message}} }) do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -959,7 +962,9 @@
         "artistReleaseTypeConfiguration": "konfiguracja typu wydań wykonawcy",
         "artistReleaseTypeConfiguration_description": "skonfiguruj jakie typy wydań są pokazywane i w jakiej kolejności na stronie albumów wykonawcy",
         "showRatings_description": "kontroluje czy funkcja oceniania gwiazdkami jest pokazywana w interfejsie",
-        "showRatings": "pokaż ocenianie gwiazdkami"
+        "showRatings": "pokaż ocenianie gwiazdkami",
+        "mpvExtraParameters": "dodatkowe parametry mpv",
+        "mpvExtraParameters_description": "dodatkowe argumenty do przekazania mpv"
     },
     "table": {
         "config": {
@@ -1242,7 +1247,11 @@
                 "dualVertical": "Podwójne-Pionowe"
             },
             "frequencyScale": {
-                "linear": "Linearne"
+                "linear": "Skala linearna",
+                "none": "Żadna",
+                "bark": "Skala bark",
+                "log": "Skala log",
+                "mel": "Skala Mel"
             },
             "weightingFilter": {
                 "none": "Żadne",
@@ -1251,7 +1260,22 @@
                 "c": "C",
                 "d": "D",
                 "z": "Z"
+            },
+            "mode": {
+                "0": "[0] Dyskretne częstotliwości",
+                "1": "[1] 1/24 oktawy / 240 pasm",
+                "2": "[2] 1/12 oktawy / 120 pasm",
+                "3": "[3] 1/8 oktawy / 80 pasm",
+                "4": "[4] 1/6 oktawy / 60 pasm",
+                "5": "[5] 1/4 oktawy / 40 pasm",
+                "6": "[6] 1/3 oktawy / 30 pasm",
+                "7": "[7] Pół oktawy / 20 pasm",
+                "8": "[8] Pełna oktawa / 10 pasm",
+                "10": "[10] Linia / Wykres miejscowy"
             }
-        }
+        },
+        "pasteGradient": "Wklej Gradient",
+        "pasteGradientPlaceholder": "Wklej tutaj JSON gradientu...",
+        "ansiBands": "Paski ANSI"
     }
 }

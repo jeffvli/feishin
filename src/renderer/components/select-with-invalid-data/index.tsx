@@ -67,16 +67,13 @@ export const MultiSelectWithInvalidData = ({ data, defaultValue, ...props }: Mul
         return [data, []];
     }, [data, defaultValue]);
 
-    return (
-        <MultiSelect
-            data={fullData}
-            defaultValue={defaultValue}
-            error={
-                missing.length
-                    ? t('error.badValue', { postProcess: 'sentenceCase', value: missing })
-                    : undefined
-            }
-            {...props}
-        />
+    const error = useMemo(
+        () =>
+            missing.length
+                ? t('error.badValue', { postProcess: 'sentenceCase', value: missing })
+                : undefined,
+        [missing, t],
     );
+
+    return <MultiSelect data={fullData} defaultValue={defaultValue} error={error} {...props} />;
 };

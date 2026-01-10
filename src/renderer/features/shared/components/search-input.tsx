@@ -1,4 +1,12 @@
-import { ChangeEvent, CSSProperties, KeyboardEvent, useEffect, useRef, useState } from 'react';
+import {
+    ChangeEvent,
+    CSSProperties,
+    KeyboardEvent,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { shallow } from 'zustand/shallow';
 
 import { useSettingsStore } from '/@/renderer/store';
@@ -90,29 +98,38 @@ export const SearchInput = ({
     const shouldShowInput = isInputMode || hasValue;
     const shouldExpand = isInputMode || hasValue;
 
-    const containerStyle: CSSProperties = {
-        display: 'inline-flex',
-        overflow: 'hidden',
-        position: 'relative',
-        transition: 'width 0.3s ease-in-out',
-        width: shouldExpand ? '200px' : '36px',
-    };
+    const containerStyle: CSSProperties = useMemo(
+        () => ({
+            display: 'inline-flex',
+            overflow: 'hidden',
+            position: 'relative',
+            transition: 'width 0.3s ease-in-out',
+            width: shouldExpand ? '200px' : '36px',
+        }),
+        [shouldExpand],
+    );
 
-    const buttonStyle: CSSProperties = {
-        left: 0,
-        opacity: shouldShowInput ? 0 : 1,
-        pointerEvents: shouldShowInput ? 'none' : 'auto',
-        position: 'absolute',
-        top: 0,
-        transition: 'opacity 0.2s ease-in-out',
-        zIndex: 10,
-    };
+    const buttonStyle: CSSProperties = useMemo(
+        () => ({
+            left: 0,
+            opacity: shouldShowInput ? 0 : 1,
+            pointerEvents: shouldShowInput ? 'none' : 'auto',
+            position: 'absolute',
+            top: 0,
+            transition: 'opacity 0.2s ease-in-out',
+            zIndex: 10,
+        }),
+        [shouldShowInput],
+    );
 
-    const inputStyle: CSSProperties = {
-        opacity: shouldShowInput ? 1 : 0,
-        transition: 'opacity 0.2s ease-in-out',
-        width: '100%',
-    };
+    const inputStyle: CSSProperties = useMemo(
+        () => ({
+            opacity: shouldShowInput ? 1 : 0,
+            transition: 'opacity 0.2s ease-in-out',
+            width: '100%',
+        }),
+        [shouldShowInput],
+    );
 
     return (
         <Box style={containerStyle}>

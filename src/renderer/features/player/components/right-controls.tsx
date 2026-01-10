@@ -1,5 +1,5 @@
 import { t } from 'i18next';
-import { useCallback, WheelEvent } from 'react';
+import { useCallback, useEffect, useState, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PopoverPlayQueue } from '/@/renderer/features/now-playing/components/popover-play-queue';
@@ -14,16 +14,17 @@ import {
     useAutoDJSettings,
     useCurrentServer,
     useFullScreenPlayerStore,
-    useGeneralSettings,
     useHotkeySettings,
     usePlayerData,
     usePlayerMuted,
     usePlayerSong,
     usePlayerVolume,
     useSetFullScreenPlayerStore,
-    useSettingsStore,
     useSettingsStoreActions,
     useSidebarRightExpanded,
+    useSideQueueType,
+    useVolumeWheelStep,
+    useVolumeWidth,
 } from '/@/renderer/store';
 import { useFullScreenPlayerStoreActions } from '/@/renderer/store/full-screen-player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
@@ -34,6 +35,7 @@ import { Rating } from '/@/shared/components/rating/rating';
 import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { useMediaQuery } from '/@/shared/hooks/use-media-query';
 import { useThrottledCallback } from '/@/shared/hooks/use-throttled-callback';
+import { useThrottledValue } from '/@/shared/hooks/use-throttled-value';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 
 const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {
@@ -113,7 +115,7 @@ const QueueButton = () => {
     const { t } = useTranslation();
     const isSidebarRightExpanded = useSidebarRightExpanded();
     const { setSideBar } = useAppStoreActions();
-    const { sideQueueType } = useGeneralSettings();
+    const sideQueueType = useSideQueueType();
 
     const { bindings } = useHotkeySettings();
 
@@ -354,25 +356,36 @@ const VolumeButton = () => {
     const { bindings } = useHotkeySettings();
     const volume = usePlayerVolume();
     const muted = usePlayerMuted();
-    const { volumeWheelStep } = useGeneralSettings();
-    const volumeWidth = useSettingsStore((state) => state.general.volumeWidth);
-    const { mediaToggleMute, setVolume } = usePlayer();
+    const volumeWheelStep = useVolumeWheelStep();
+    const volumeWidth = useVolumeWidth();
+    const { decreaseVolume, increaseVolume, mediaToggleMute, setVolume } = usePlayer();
     const isMinWidth = useMediaQuery('(max-width: 480px)');
 
+    const [sliderValue, setSliderValue] = useState(volume);
+
+    const throttledVolume = useThrottledValue(sliderValue, 100);
+
+    // Sync throttled value to actual volume
+    useEffect(() => {
+        setVolume(throttledVolume);
+    }, [throttledVolume, setVolume]);
+
+    // Sync external volume changes to local state
+    useEffect(() => {
+        setSliderValue(volume);
+    }, [volume]);
+
     const handleVolumeDown = useCallback(() => {
-        setVolume(Math.max(0, volume - 1));
-    }, [setVolume, volume]);
+        decreaseVolume(volumeWheelStep);
+    }, [decreaseVolume, volumeWheelStep]);
 
     const handleVolumeUp = useCallback(() => {
-        setVolume(Math.min(100, volume + 1));
-    }, [setVolume, volume]);
+        increaseVolume(volumeWheelStep);
+    }, [increaseVolume, volumeWheelStep]);
 
-    const handleVolumeSlider = useCallback(
-        (e: number) => {
-            setVolume(e);
-        },
-        [setVolume],
-    );
+    const handleVolumeSlider = useCallback((e: number) => {
+        setSliderValue(e);
+    }, []);
 
     const handleMute = useCallback(() => {
         mediaToggleMute();
@@ -392,8 +405,8 @@ const VolumeButton = () => {
         [setVolume, volume, volumeWheelStep],
     );
 
-    const handleVolumeDownThrottled = useThrottledCallback(handleVolumeDown, 50);
-    const handleVolumeUpThrottled = useThrottledCallback(handleVolumeUp, 50);
+    const handleVolumeDownThrottled = useThrottledCallback(handleVolumeDown, 100);
+    const handleVolumeUpThrottled = useThrottledCallback(handleVolumeUp, 100);
 
     useHotkeys([
         [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDownThrottled],
@@ -428,7 +441,7 @@ const VolumeButton = () => {
                     onChange={handleVolumeSlider}
                     onWheel={handleVolumeWheel}
                     size={6}
-                    value={volume}
+                    value={sliderValue}
                     w={volumeWidth}
                 />
             ) : null}

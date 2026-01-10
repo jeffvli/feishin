@@ -24,97 +24,121 @@ const VisualizerInner = () => {
     const { webAudio } = useWebAudio();
     const canvasRef = createRef<HTMLCanvasElement>();
     const containerRef = createRef<HTMLDivElement>();
-    const [visualizer, setVisualizer] = useState<ButterchurnVisualizer>();
+    const visualizerRef = useRef<ButterchurnVisualizer | undefined>(undefined);
+    const isInitializedRef = useRef(false);
+    const [isVisualizerReady, setIsVisualizerReady] = useState(false);
     const animationFrameRef = useRef<number | undefined>(undefined);
     const resizeObserverRef = useRef<ResizeObserver | undefined>(undefined);
     const cycleTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const cycleStartTimeRef = useRef<number | undefined>(undefined);
     const pauseTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
+    const initialPresetLoadedRef = useRef(false);
     const butterchurnSettings = useSettingsStore((store) => store.visualizer.butterchurn);
     const opacity = useSettingsStore((store) => store.visualizer.butterchurn.opacity);
     const { setSettings } = useSettingsStoreActions();
     const playerStatus = usePlayerStatus();
     const isPlaying = playerStatus === PlayerStatus.PLAYING;
 
+    const cleanupVisualizer = () => {
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+            animationFrameRef.current = undefined;
+        }
+
+        if (cycleTimerRef.current) {
+            clearInterval(cycleTimerRef.current);
+            cycleTimerRef.current = undefined;
+        }
+
+        if (pauseTimerRef.current) {
+            clearTimeout(pauseTimerRef.current);
+            pauseTimerRef.current = undefined;
+        }
+
+        if (resizeObserverRef.current) {
+            resizeObserverRef.current.disconnect();
+            resizeObserverRef.current = undefined;
+        }
+
+        visualizerRef.current = undefined;
+        isInitializedRef.current = false;
+        initialPresetLoadedRef.current = false;
+        setIsVisualizerReady(false);
+    };
+
+    // Initialize butterchurn instance
     useEffect(() => {
         const { context, gains } = webAudio || {};
-        if (
+        const canvas = canvasRef.current;
+        const container = containerRef.current;
+
+        const needsInitialization =
             context &&
             gains &&
-            canvasRef.current &&
-            containerRef.current &&
-            !visualizer &&
-            isPlaying
-        ) {
-            const canvas = canvasRef.current;
-            const container = containerRef.current;
+            gains.length > 0 &&
+            canvas &&
+            container &&
+            isPlaying &&
+            (!isInitializedRef.current || !visualizerRef.current);
 
-            const getDimensions = () => {
-                const rect = container.getBoundingClientRect();
-                return {
-                    height: rect.height || 600,
-                    width: rect.width || 800,
-                };
+        if (!needsInitialization) {
+            return;
+        }
+
+        const getDimensions = () => {
+            const rect = container.getBoundingClientRect();
+            return {
+                height: rect.height || 600,
+                width: rect.width || 800,
             };
+        };
 
-            let dimensions = getDimensions();
+        let dimensions = getDimensions();
 
-            // If dimensions are 0, wait for next frame
-            if (dimensions.width === 0 || dimensions.height === 0) {
-                requestAnimationFrame(() => {
-                    dimensions = getDimensions();
-                    if (dimensions.width > 0 && dimensions.height > 0) {
-                        initializeVisualizer(dimensions.width, dimensions.height);
-                    }
-                });
-            } else {
-                initializeVisualizer(dimensions.width, dimensions.height);
-            }
-
-            function initializeVisualizer(width: number, height: number) {
-                if (!gains || gains.length === 0) return;
-
-                canvas.width = width;
-                canvas.height = height;
-
-                try {
-                    const butterchurnInstance = butterchurn.createVisualizer(context, canvas, {
-                        height,
-                        width,
-                    }) as ButterchurnVisualizer;
-
-                    // Connect to audio gains (use the first gain node)
-                    butterchurnInstance.connectAudio(gains[0]);
-
-                    // Load preset from settings or default
-                    const presets = butterchurnPresets.getPresets();
-                    const presetNames = Object.keys(presets);
-
-                    if (presetNames.length > 0) {
-                        const presetName =
-                            butterchurnSettings.currentPreset &&
-                            presets[butterchurnSettings.currentPreset]
-                                ? butterchurnSettings.currentPreset
-                                : presetNames[0];
-                        const preset = presets[presetName];
-                        butterchurnInstance.loadPreset(
-                            preset,
-                            butterchurnSettings.blendTime || 0.0,
-                        );
-                        // Initialize cycle timer
-                        cycleStartTimeRef.current = Date.now();
-                    }
-
-                    setVisualizer(butterchurnInstance);
-                } catch (error) {
-                    console.error('Failed to create butterchurn visualizer:', error);
+        // If dimensions are 0, wait for next frame
+        if (dimensions.width === 0 || dimensions.height === 0) {
+            requestAnimationFrame(() => {
+                dimensions = getDimensions();
+                if (dimensions.width > 0 && dimensions.height > 0) {
+                    initializeVisualizer(dimensions.width, dimensions.height);
                 }
+            });
+        } else {
+            initializeVisualizer(dimensions.width, dimensions.height);
+        }
+
+        function initializeVisualizer(width: number, height: number) {
+            if (!gains || gains.length === 0 || !canvas || !context) return;
+
+            canvas.width = width;
+            canvas.height = height;
+
+            try {
+                const butterchurnInstance = butterchurn.createVisualizer(context, canvas, {
+                    height,
+                    width,
+                }) as ButterchurnVisualizer;
+
+                for (const gain of gains) {
+                    butterchurnInstance.connectAudio(gain);
+                }
+
+                visualizerRef.current = butterchurnInstance;
+                isInitializedRef.current = true;
+                setIsVisualizerReady(true);
+            } catch (error) {
+                console.error('Failed to create butterchurn visualizer:', error);
+                isInitializedRef.current = false;
+                visualizerRef.current = undefined;
             }
         }
 
-        return () => {};
+        return () => {
+            // Cleanup on unmount or when webAudio changes
+            cleanupVisualizer();
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [webAudio, canvasRef, containerRef, visualizer, isPlaying]);
+    }, [webAudio, isPlaying]);
 
     // Kill visualizer after 5 seconds of pause
     useEffect(() => {
@@ -128,25 +152,11 @@ const VisualizerInner = () => {
         }
 
         // Player is paused
-        if (!visualizer) return;
+        if (!visualizerRef.current) return;
 
         // Start 5-second timer
         pauseTimerRef.current = setTimeout(() => {
-            if (animationFrameRef.current) {
-                cancelAnimationFrame(animationFrameRef.current);
-                animationFrameRef.current = undefined;
-            }
-            if (cycleTimerRef.current) {
-                clearInterval(cycleTimerRef.current);
-                cycleTimerRef.current = undefined;
-            }
-            if (resizeObserverRef.current) {
-                resizeObserverRef.current.disconnect();
-                resizeObserverRef.current = undefined;
-            }
-
-            // Destroy visualizer
-            setVisualizer(undefined);
+            cleanupVisualizer();
             pauseTimerRef.current = undefined;
         }, 5000);
 
@@ -156,11 +166,12 @@ const VisualizerInner = () => {
                 pauseTimerRef.current = undefined;
             }
         };
-    }, [isPlaying, visualizer]);
+    }, [isPlaying]);
 
     // Handle resize
     useEffect(() => {
         const container = containerRef.current;
+        const visualizer = visualizerRef.current;
         if (!container || !visualizer) return;
 
         const handleResize = () => {
@@ -183,22 +194,51 @@ const VisualizerInner = () => {
 
         return () => {
             window.removeEventListener('resize', handleResize);
+            if (resizeObserverRef.current) {
+                resizeObserverRef.current.disconnect();
+                resizeObserverRef.current = undefined;
+            }
         };
-    }, [visualizer, containerRef, canvasRef]);
+    }, [isVisualizerReady, canvasRef, containerRef]);
+
+    // Load initial preset when visualizer is ready
+    useEffect(() => {
+        const visualizer = visualizerRef.current;
+        if (!visualizer || !isVisualizerReady || initialPresetLoadedRef.current) return;
+
+        const presets = butterchurnPresets;
+        const presetNames = Object.keys(presets);
+
+        if (presetNames.length > 0) {
+            const presetName =
+                butterchurnSettings.currentPreset && presets[butterchurnSettings.currentPreset]
+                    ? butterchurnSettings.currentPreset
+                    : presetNames[0];
+            const preset = presets[presetName];
+
+            if (preset) {
+                visualizer.loadPreset(preset, butterchurnSettings.blendTime || 0.0);
+                cycleStartTimeRef.current = Date.now();
+                initialPresetLoadedRef.current = true;
+            }
+        }
+    }, [isVisualizerReady, butterchurnSettings.currentPreset, butterchurnSettings.blendTime]);
 
     // Update preset when currentPreset or blendTime changes (but not when cycling)
     const isCyclingRef = useRef(false);
 
     useEffect(() => {
-        if (!visualizer || !butterchurnSettings.currentPreset) return;
+        const visualizer = visualizerRef.current;
+        if (!visualizer || !butterchurnSettings.currentPreset || !initialPresetLoadedRef.current)
+            return;
 
-        // Skip if we're currently cycling (to avoid recreating the visualizer)
+        // Skip if we're currently cycling (to avoid reloading preset)
         if (isCyclingRef.current) {
             isCyclingRef.current = false;
             return;
         }
 
-        const presets = butterchurnPresets.getPresets();
+        const presets = butterchurnPresets;
         const preset = presets[butterchurnSettings.currentPreset];
 
         if (preset) {
@@ -206,12 +246,13 @@ const VisualizerInner = () => {
             // Reset cycle timer when preset changes manually
             cycleStartTimeRef.current = Date.now();
         }
-    }, [visualizer, butterchurnSettings.currentPreset, butterchurnSettings.blendTime]);
+    }, [butterchurnSettings.currentPreset, butterchurnSettings.blendTime]);
 
     // Handle preset cycling
     useEffect(() => {
-        if (!visualizer || !butterchurnSettings.cyclePresets) {
-            // Clear cycle timer if cycling is disabled
+        const visualizer = visualizerRef.current;
+        if (!visualizer || !butterchurnSettings.cyclePresets || !initialPresetLoadedRef.current) {
+            // Clear cycle timer if cycling is disabled or visualizer not ready
             if (cycleTimerRef.current) {
                 clearInterval(cycleTimerRef.current);
                 cycleTimerRef.current = undefined;
@@ -219,7 +260,7 @@ const VisualizerInner = () => {
             return;
         }
 
-        const presets = butterchurnPresets.getPresets();
+        const presets = butterchurnPresets;
         const allPresetNames = Object.keys(presets);
 
         // Get the list of presets to cycle through
@@ -242,7 +283,8 @@ const VisualizerInner = () => {
         cycleStartTimeRef.current = Date.now();
 
         const cycleToNextPreset = () => {
-            if (!visualizer) return;
+            const currentVisualizer = visualizerRef.current;
+            if (!currentVisualizer) return;
 
             const currentPresetName = butterchurnSettings.currentPreset;
             let nextPresetName: string;
@@ -274,15 +316,12 @@ const VisualizerInner = () => {
                 isCyclingRef.current = true;
 
                 // Load the preset with blending
-                visualizer.loadPreset(nextPreset, currentSettings.blendTime || 0.0);
+                currentVisualizer.loadPreset(nextPreset, currentSettings.blendTime || 0.0);
 
                 // Update currentPreset in settings
-                const currentVisualizer = useSettingsStore.getState().visualizer;
                 setSettings({
                     visualizer: {
-                        ...currentVisualizer,
                         butterchurn: {
-                            ...currentVisualizer.butterchurn,
                             currentPreset: nextPresetName,
                         },
                     },
@@ -310,18 +349,38 @@ const VisualizerInner = () => {
                 cycleTimerRef.current = undefined;
             }
         };
-    }, [visualizer, butterchurnSettings, setSettings]);
+    }, [
+        isVisualizerReady,
+        butterchurnSettings.cyclePresets,
+        butterchurnSettings.cycleTime,
+        butterchurnSettings.includeAllPresets,
+        butterchurnSettings.selectedPresets,
+        butterchurnSettings.ignoredPresets,
+        butterchurnSettings.randomizeNextPreset,
+        butterchurnSettings.currentPreset,
+        setSettings,
+    ]);
 
     useEffect(() => {
-        if (!visualizer) return;
+        const visualizer = visualizerRef.current;
+        if (!visualizer || !isVisualizerReady) return;
 
         let lastFrameTime = 0;
         const maxFPS = butterchurnSettings.maxFPS;
         const minFrameInterval = maxFPS > 0 ? 1000 / maxFPS : 0;
 
         const render = (currentTime: number) => {
+            const currentVisualizer = visualizerRef.current;
+            if (!currentVisualizer) {
+                if (animationFrameRef.current) {
+                    cancelAnimationFrame(animationFrameRef.current);
+                    animationFrameRef.current = undefined;
+                }
+                return;
+            }
+
             if (maxFPS === 0 || currentTime - lastFrameTime >= minFrameInterval) {
-                visualizer.render();
+                currentVisualizer.render();
                 lastFrameTime = currentTime;
             }
             animationFrameRef.current = requestAnimationFrame(render);
@@ -332,13 +391,14 @@ const VisualizerInner = () => {
         return () => {
             if (animationFrameRef.current) {
                 cancelAnimationFrame(animationFrameRef.current);
+                animationFrameRef.current = undefined;
             }
         };
-    }, [visualizer, butterchurnSettings.maxFPS]);
+    }, [isVisualizerReady, butterchurnSettings.maxFPS]);
 
     // Render container when playing (for initialization) or when visualizer exists
     // Canvas must always be rendered when container is rendered so refs are available
-    const shouldRenderContainer = isPlaying || visualizer;
+    const shouldRenderContainer = isPlaying || isVisualizerReady;
 
     if (!shouldRenderContainer) {
         return null;
@@ -348,10 +408,10 @@ const VisualizerInner = () => {
         <div
             className={styles.container}
             ref={containerRef}
-            style={{ opacity: visualizer ? opacity : 0 }}
+            style={{ opacity: isVisualizerReady ? opacity : 0 }}
         >
             <canvas className={styles.canvas} ref={canvasRef} />
-            {visualizer && butterchurnSettings.currentPreset && (
+            {isVisualizerReady && butterchurnSettings.currentPreset && (
                 <Text className={styles['preset-overlay']} isNoSelect size="sm">
                     {butterchurnSettings.currentPreset}
                 </Text>

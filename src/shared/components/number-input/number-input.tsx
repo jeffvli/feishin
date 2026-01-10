@@ -39,6 +39,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
                     wrapper: styles.wrapper,
                     ...classNames,
                 }}
+                defaultValue={defaultValue}
                 hideControls
                 onChange={
                     onChange

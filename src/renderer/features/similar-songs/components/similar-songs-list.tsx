@@ -64,6 +64,7 @@ export const SimilarSongsList = ({ count, song }: SimilarSongsListProps) => {
                 enableHeader
                 enableHorizontalBorders={fullScreenTable?.enableHorizontalBorders}
                 enableRowHoverHighlight={fullScreenTable?.enableRowHoverHighlight}
+                enableScrollShadow={false}
                 enableSelection
                 enableSelectionDialog={false}
                 enableVerticalBorders={fullScreenTable?.enableVerticalBorders}

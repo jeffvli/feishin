@@ -519,6 +519,7 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
                 )}
                 <div className={styles.actionsContainer}>
                     <LyricsActions
+                        hasLyrics={!!lyrics}
                         index={index}
                         languages={languages}
                         offsetMs={currentOffsetMs}

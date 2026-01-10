@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -9,7 +10,7 @@ import { Select } from '/@/shared/components/select/select';
 
 const DEFAULT_LOG_LEVEL: LogLevel = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
 
-export const LoggerSettings = () => {
+export const LoggerSettings = memo(() => {
     const { t } = useTranslation();
 
     const getCurrentLogLevel = (): LogLevel => {
@@ -84,4 +85,4 @@ export const LoggerSettings = () => {
             title={t('page.setting.logger', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

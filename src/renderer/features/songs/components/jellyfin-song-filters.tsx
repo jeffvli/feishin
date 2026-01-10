@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { MultiSelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
@@ -105,8 +105,8 @@ export const JellyfinSongFilters = () => {
     const debouncedHandleMinYearFilter = useDebouncedCallback(handleMinYearFilter, 300);
     const debouncedHandleMaxYearFilter = useDebouncedCallback(handleMaxYearFilter, 300);
 
-    const handleGenresFilter = useMemo(
-        () => (e: string[] | undefined) => {
+    const handleGenresFilter = useCallback(
+        (e: null | string[]) => {
             setCustom((prev) => {
                 const current = prev ?? {};
 
@@ -129,9 +129,9 @@ export const JellyfinSongFilters = () => {
         [setCustom],
     );
 
-    const handleTagFilter = useMemo(
-        () => (e: string[] | undefined) => {
-            setCustom({ Tags: e?.join('|') ?? null });
+    const handleTagFilter = useCallback(
+        (e: null | string[]) => {
+            setCustom({ Tags: e && e.length > 0 ? e.join('|') : null });
         },
         [setCustom],
     );
@@ -173,7 +173,7 @@ export const JellyfinSongFilters = () => {
                     data={genreList}
                     defaultValue={selectedGenres}
                     label={t('entity.genre', { count: 1, postProcess: 'sentenceCase' })}
-                    onChange={(e) => handleGenresFilter(e)}
+                    onChange={handleGenresFilter}
                     searchable
                 />
             )}
@@ -183,7 +183,7 @@ export const JellyfinSongFilters = () => {
                     data={tagsQuery.data.boolTags}
                     defaultValue={selectedTags}
                     label={t('common.tags', { postProcess: 'sentenceCase' })}
-                    onChange={(e) => handleTagFilter(e)}
+                    onChange={handleTagFilter}
                     searchable
                 />
             )}

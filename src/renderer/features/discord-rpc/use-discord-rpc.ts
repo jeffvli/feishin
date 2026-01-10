@@ -9,7 +9,7 @@ import {
     DiscordLinkType,
     useAppStore,
     useDiscordSettings,
-    useGeneralSettings,
+    useLastfmApiKey,
     usePlayerSong,
     usePlayerStore,
     useTimestampStoreBase,
@@ -31,7 +31,7 @@ const truncate = (field: string) =>
 
 export const useDiscordRpc = () => {
     const discordSettings = useDiscordSettings();
-    const generalSettings = useGeneralSettings();
+    const lastfmApiKey = useLastfmApiKey();
     const privateMode = useAppStore((state) => state.privateMode);
     const [lastUniqueId, setlastUniqueId] = useState('');
 
@@ -220,12 +220,12 @@ export const useDiscordRpc = () => {
 
                 if (
                     activity.largeImageKey === undefined &&
-                    generalSettings.lastfmApiKey &&
+                    lastfmApiKey &&
                     song?.album &&
                     song?.albumArtists.length
                 ) {
                     const albumInfo = await fetch(
-                        `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${generalSettings.lastfmApiKey}&artist=${encodeURIComponent(song.albumArtists[0].name)}&album=${encodeURIComponent(song.album)}&format=json`,
+                        `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${lastfmApiKey}&artist=${encodeURIComponent(song.albumArtists[0].name)}&album=${encodeURIComponent(song.album)}&format=json`,
                     );
 
                     const albumInfoJson = await albumInfo.json();
@@ -292,7 +292,7 @@ export const useDiscordRpc = () => {
             discordSettings.showAsListening,
             discordSettings.showServerImage,
             discordSettings.showPaused,
-            generalSettings.lastfmApiKey,
+            lastfmApiKey,
             discordSettings.clientId,
             discordSettings.displayType,
             discordSettings.linkType,

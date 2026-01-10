@@ -21,7 +21,7 @@ import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, usePlayerSong } from '/@/renderer/store';
-import { useGeneralSettings, useSettingsStore } from '/@/renderer/store/settings.store';
+import { useExternalLinks, useSettingsStore } from '/@/renderer/store/settings.store';
 import { sentenceCase, titleCase } from '/@/renderer/utils';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
@@ -312,7 +312,7 @@ export const AlbumDetailContent = () => {
     );
 
     const { ref, ...cq } = useContainerQuery();
-    const { externalLinks, lastFM, musicBrainz } = useGeneralSettings();
+    const { externalLinks, lastFM, musicBrainz } = useExternalLinks();
 
     const genreCarousels = useMemo(() => {
         const genreLimit = 2;

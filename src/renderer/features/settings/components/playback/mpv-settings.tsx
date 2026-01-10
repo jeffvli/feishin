@@ -1,7 +1,9 @@
 import isElectron from 'is-electron';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { eventEmitter } from '/@/renderer/events/event-emitter';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     SettingOption,
     SettingsSection,
@@ -68,7 +70,7 @@ export const getMpvProperties = (settings: SettingsState['playback']['mpvPropert
     return properties;
 };
 
-export const MpvSettings = () => {
+export const MpvSettings = memo(() => {
     const { t } = useTranslation();
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -114,9 +116,7 @@ export const MpvSettings = () => {
     ) => {
         setSettings({
             playback: {
-                ...settings,
                 mpvProperties: {
-                    ...settings.mpvProperties,
                     [setting]: value,
                 },
             },
@@ -127,26 +127,16 @@ export const MpvSettings = () => {
         mpvPlayer?.setProperties(mpvSetting);
     };
 
-    // const handleReloadMpv = () => {
-    //     pause();
-    //     clearQueue();
+    const player = usePlayer();
 
-    //     const extraParameters = useSettingsStore.getState().playback.mpvExtraParameters;
-    //     const properties: Record<string, any> = {
-    //         speed: usePlayerStore.getState().speed,
-    //         ...getMpvProperties(useSettingsStore.getState().playback.mpvProperties),
-    //     };
-    //     mpvPlayer?.restart({
-    //         binaryPath: mpvPath || undefined,
-    //         extraParameters,
-    //         properties,
-    //     });
-    // };
+    const handleReloadMpv = () => {
+        player.mediaStop();
+        eventEmitter.emit('MPV_RELOAD', {});
+    };
 
     const handleSetExtraParameters = (data: string[]) => {
         setSettings({
             playback: {
-                ...settings,
                 mpvExtraParameters: data,
             },
         });
@@ -158,7 +148,7 @@ export const MpvSettings = () => {
                 <Group gap="sm">
                     <ActionIcon
                         icon="refresh"
-                        // onClick={handleReloadMpv}
+                        onClick={handleReloadMpv}
                         tooltip={{
                             label: t('common.reload', { postProcess: 'titleCase' }),
                             openDelay: 0,
@@ -421,4 +411,4 @@ export const MpvSettings = () => {
             <SettingsSection options={replayGainOptions} />
         </>
     );
-};
+});

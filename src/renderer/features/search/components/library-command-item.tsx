@@ -104,6 +104,7 @@ export const LibraryCommandItem = ({
                         id={imageId}
                         itemType={itemType}
                         src={imageUrl}
+                        type="table"
                         width={40}
                     />
                 </div>

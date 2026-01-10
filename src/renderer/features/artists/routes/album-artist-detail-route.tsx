@@ -17,7 +17,7 @@ import { LibraryContainer } from '/@/renderer/features/shared/components/library
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { useFastAverageColor, useWaitForColorCalculation } from '/@/renderer/hooks';
-import { useCurrentServer, useCurrentServerId, useGeneralSettings } from '/@/renderer/store';
+import { useArtistBackground, useCurrentServer, useCurrentServerId } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { AlbumListSort, LibraryItem, SortOrder } from '/@/shared/types/domain-types';
 
@@ -26,7 +26,7 @@ const AlbumArtistDetailRouteContent = () => {
     const headerRef = useRef<HTMLDivElement>(null);
     const server = useCurrentServer();
     const serverId = useCurrentServerId();
-    const { artistBackground, artistBackgroundBlur } = useGeneralSettings();
+    const { artistBackground, artistBackgroundBlur } = useArtistBackground();
 
     const { albumArtistId, artistId } = useParams() as {
         albumArtistId?: string;

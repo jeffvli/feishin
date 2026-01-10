@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { ChangeEvent, useMemo, useState } from 'react';
+import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { MultiSelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
@@ -63,8 +63,8 @@ export const SubsonicAlbumFilters = ({ disableArtistFilter }: SubsonicAlbumFilte
         }));
     }, [items]);
 
-    const handleAlbumArtistFilter = useMemo(
-        () => (e: null | string[]) => {
+    const handleAlbumArtistFilter = useCallback(
+        (e: null | string[]) => {
             setAlbumArtist(e ?? null);
         },
         [setAlbumArtist],
@@ -80,8 +80,8 @@ export const SubsonicAlbumFilters = ({ disableArtistFilter }: SubsonicAlbumFilte
         }));
     }, [genreListQuery.data]);
 
-    const handleGenresFilter = useMemo(
-        () => (e: null | string) => {
+    const handleGenresFilter = useCallback(
+        (e: null | string) => {
             setGenreId(e ? [e] : null);
         },
         [setGenreId],
@@ -178,7 +178,7 @@ export const SubsonicAlbumFilters = ({ disableArtistFilter }: SubsonicAlbumFilte
                     defaultValue={query.genreIds?.[0] ?? undefined}
                     disabled={Boolean(query.minYear || query.maxYear)}
                     label={t('entity.genre', { count: 1, postProcess: 'titleCase' })}
-                    onChange={(e) => handleGenresFilter(e)}
+                    onChange={handleGenresFilter}
                     searchable
                 />
             )}

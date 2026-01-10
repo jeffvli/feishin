@@ -1,4 +1,5 @@
 import butterchurnPresets from 'butterchurn-presets';
+import { nanoid } from 'nanoid';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -127,9 +128,7 @@ const useUpdateAudioMotionAnalyzer = () => {
     ) => {
         setSettings({
             visualizer: {
-                ...visualizer,
                 audiomotionanalyzer: {
-                    ...visualizer.audiomotionanalyzer,
                     [property]: value,
                 },
             },
@@ -149,9 +148,7 @@ const useUpdateButterchurn = () => {
     ) => {
         setSettings({
             visualizer: {
-                ...visualizer,
                 butterchurn: {
-                    ...visualizer.butterchurn,
                     [property]: value,
                 },
             },
@@ -177,7 +174,6 @@ export const VisualizerSettingsForm = () => {
     const handleTypeChange = (value: string) => {
         setSettings({
             visualizer: {
-                ...visualizer,
                 type: value as 'audiomotionanalyzer' | 'butterchurn',
             },
         });
@@ -395,10 +391,10 @@ const PresetSettings = () => {
     const [isPasting, setIsPasting] = useState(false);
     const [pasteValue, setPasteValue] = useState('');
 
-    const applyPreset = (presetName: null | string) => {
-        if (!presetName) return;
+    const applyPreset = (presetId: null | string) => {
+        if (!presetId) return;
 
-        const preset = visualizer.audiomotionanalyzer.presets.find((p) => p.name === presetName);
+        const preset = visualizer.audiomotionanalyzer.presets.find((p) => p.id === presetId);
 
         if (!preset) return;
 
@@ -464,9 +460,7 @@ const PresetSettings = () => {
 
         setSettings({
             visualizer: {
-                ...visualizer,
                 audiomotionanalyzer: {
-                    ...visualizer.audiomotionanalyzer,
                     ...presetValue,
                 },
             },
@@ -491,7 +485,7 @@ const PresetSettings = () => {
         if (existingPreset) {
             // Update existing preset
             const updatedPresets = visualizer.audiomotionanalyzer.presets.map((p) =>
-                p.name === newPresetName.trim()
+                p.id === existingPreset.id
                     ? {
                           ...p,
                           value: getCurrentSettingsAsPresetValue(),
@@ -501,34 +495,34 @@ const PresetSettings = () => {
 
             setSettings({
                 visualizer: {
-                    ...visualizer,
                     audiomotionanalyzer: {
-                        ...visualizer.audiomotionanalyzer,
                         presets: updatedPresets,
                     },
                 },
             });
+
+            setSelectedPreset(existingPreset.id);
         } else {
             // Add new preset
             const newPreset = {
+                id: nanoid(),
                 name: newPresetName.trim(),
                 value: getCurrentSettingsAsPresetValue(),
             };
 
             setSettings({
                 visualizer: {
-                    ...visualizer,
                     audiomotionanalyzer: {
-                        ...visualizer.audiomotionanalyzer,
                         presets: [...visualizer.audiomotionanalyzer.presets, newPreset],
                     },
                 },
             });
+
+            setSelectedPreset(newPreset.id);
         }
 
         setNewPresetName('');
         setIsSaving(false);
-        setSelectedPreset(newPresetName.trim());
     };
 
     const getCurrentSettingsAsPresetValue = () => {
@@ -590,12 +584,17 @@ const PresetSettings = () => {
     const handleUpdatePreset = () => {
         if (!selectedPreset || !newPresetName.trim()) return;
 
+        const selectedPresetObj = visualizer.audiomotionanalyzer.presets.find(
+            (p) => p.id === selectedPreset,
+        );
+        if (!selectedPresetObj) return;
+
         let trimmedName = newPresetName.trim();
-        const isRenaming = trimmedName !== selectedPreset;
+        const isRenaming = trimmedName !== selectedPresetObj.name;
 
         if (isRenaming) {
             const existingNames = visualizer.audiomotionanalyzer.presets
-                .filter((p) => p.name !== selectedPreset)
+                .filter((p) => p.id !== selectedPreset)
                 .map((p) => p.name);
 
             if (existingNames.includes(trimmedName)) {
@@ -611,7 +610,7 @@ const PresetSettings = () => {
         }
 
         const updatedPresets = visualizer.audiomotionanalyzer.presets.map((p) =>
-            p.name === selectedPreset
+            p.id === selectedPreset
                 ? {
                       ...p,
                       name: trimmedName,
@@ -632,21 +631,18 @@ const PresetSettings = () => {
 
         setNewPresetName('');
         setIsRenaming(false);
-        setSelectedPreset(trimmedName);
     };
 
     const handleDeletePreset = () => {
         if (!selectedPreset) return;
 
         const updatedPresets = visualizer.audiomotionanalyzer.presets.filter(
-            (p) => p.name !== selectedPreset,
+            (p) => p.id !== selectedPreset,
         );
 
         setSettings({
             visualizer: {
-                ...visualizer,
                 audiomotionanalyzer: {
-                    ...visualizer.audiomotionanalyzer,
                     presets: updatedPresets,
                 },
             },
@@ -776,9 +772,7 @@ const PresetSettings = () => {
 
             setSettings({
                 visualizer: {
-                    ...visualizer,
                     audiomotionanalyzer: {
-                        ...visualizer.audiomotionanalyzer,
                         ...configValue,
                     },
                 },
@@ -812,7 +806,7 @@ const PresetSettings = () => {
     const presetOptions = useMemo(() => {
         return visualizer.audiomotionanalyzer.presets.map((preset) => ({
             label: preset.name,
-            value: preset.name,
+            value: preset.id,
         }));
     }, [visualizer.audiomotionanalyzer.presets]);
 
@@ -922,8 +916,13 @@ const PresetSettings = () => {
                             <>
                                 <Button
                                     onClick={() => {
-                                        setNewPresetName(selectedPreset);
-                                        setIsRenaming(true);
+                                        const preset = visualizer.audiomotionanalyzer.presets.find(
+                                            (p) => p.id === selectedPreset,
+                                        );
+                                        if (preset) {
+                                            setNewPresetName(preset.name);
+                                            setIsRenaming(true);
+                                        }
                                     }}
                                     variant="default"
                                 >
@@ -2070,7 +2069,7 @@ const ButterchurnGeneralSettings = () => {
     const { updateProperty, visualizer } = useUpdateButterchurn();
 
     const presetOptions = useMemo(() => {
-        const presets = butterchurnPresets.getPresets();
+        const presets = butterchurnPresets;
         return Object.keys(presets).map((presetName) => ({
             label: presetName,
             value: presetName,
@@ -2126,7 +2125,7 @@ const ButterChurnCycleSettings = () => {
     const { updateProperty, visualizer } = useUpdateButterchurn();
 
     const presetOptions = useMemo(() => {
-        const presets = butterchurnPresets.getPresets();
+        const presets = butterchurnPresets;
         return Object.keys(presets).map((presetName) => ({
             label: presetName,
             value: presetName,

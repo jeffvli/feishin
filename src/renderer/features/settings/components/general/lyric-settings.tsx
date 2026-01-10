@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { languages } from '/@/i18n/i18n';
@@ -16,7 +17,7 @@ import { LyricSource } from '/@/shared/types/domain-types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
-export const LyricSettings = () => {
+export const LyricSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useLyricsSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -210,4 +211,4 @@ export const LyricSettings = () => {
             title={t('page.setting.lyrics', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
 import { ApplicationSettings } from '/@/renderer/features/settings/components/general/application-settings';
@@ -14,7 +14,7 @@ import { Divider } from '/@/shared/components/divider/divider';
 import { Stack } from '/@/shared/components/stack/stack';
 import { ServerFeature } from '/@/shared/types/features-types';
 
-export const GeneralTab = () => {
+export const GeneralTab = memo(() => {
     const server = useCurrentServer();
     const supportsSmartPlaylists = hasFeature(server, ServerFeature.PLAYLISTS_SMART);
 
@@ -45,4 +45,4 @@ export const GeneralTab = () => {
             ))}
         </Stack>
     );
-};
+});

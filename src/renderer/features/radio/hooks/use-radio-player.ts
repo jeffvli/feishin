@@ -1,3 +1,4 @@
+import console from 'console';
 import IcecastMetadataStats from 'icecast-metadata-stats';
 import isElectron from 'is-electron';
 import { useEffect, useRef } from 'react';
@@ -134,6 +135,7 @@ export const useRadioAudioInstance = () => {
     const volume = usePlayerVolume();
     const isMuted = usePlayerMuted();
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const activeAudioRef = useRef<HTMLAudioElement | null>(null);
     const isUsingMpv = playbackType === PlayerType.LOCAL && mpvPlayer;
 
     // Handle mpv playback
@@ -205,6 +207,7 @@ export const useRadioAudioInstance = () => {
 
             const audio = new Audio(currentStreamUrl);
             audioRef.current = audio;
+            activeAudioRef.current = audio;
 
             const linearVolume = volume / 100;
             const logVolume = convertToLogVolume(linearVolume);
@@ -231,6 +234,10 @@ export const useRadioAudioInstance = () => {
 
             // Attempt to play
             audio.play().catch((error) => {
+                if (activeAudioRef.current !== audio) {
+                    return;
+                }
+
                 console.error('Failed to play audio:', error);
                 setIsPlaying(false);
                 setCurrentStreamUrl(null);
@@ -243,10 +250,14 @@ export const useRadioAudioInstance = () => {
                 audioRef.current.src = '';
                 audioRef.current = null;
             }
+            activeAudioRef.current = null;
         }
 
         return () => {
             if (audioRef.current) {
+                if (activeAudioRef.current === audioRef.current) {
+                    activeAudioRef.current = null;
+                }
                 audioRef.current.pause();
                 audioRef.current.src = '';
                 audioRef.current = null;

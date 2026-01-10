@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -16,7 +17,7 @@ import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 
-export const DiscordSettings = () => {
+export const DiscordSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useDiscordSettings();
     const generalSettings = useGeneralSettings();
@@ -30,7 +31,6 @@ export const DiscordSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             discord: {
-                                ...settings,
                                 enabled: e.currentTarget.checked,
                             },
                         });
@@ -58,7 +58,6 @@ export const DiscordSettings = () => {
                     onBlur={(e) => {
                         setSettings({
                             discord: {
-                                ...settings,
                                 clientId: e.currentTarget.value,
                             },
                         });
@@ -84,7 +83,6 @@ export const DiscordSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             discord: {
-                                ...settings,
                                 showPaused: e.currentTarget.checked,
                             },
                         });
@@ -107,7 +105,6 @@ export const DiscordSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             discord: {
-                                ...settings,
                                 showAsListening: e.currentTarget.checked,
                             },
                         });
@@ -150,7 +147,6 @@ export const DiscordSettings = () => {
                         if (!e) return;
                         setSettings({
                             discord: {
-                                ...settings,
                                 displayType: e as DiscordDisplayType,
                             },
                         });
@@ -195,7 +191,6 @@ export const DiscordSettings = () => {
                         if (!e) return;
                         setSettings({
                             discord: {
-                                ...settings,
                                 linkType: e as DiscordLinkType,
                             },
                         });
@@ -222,7 +217,6 @@ export const DiscordSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             discord: {
-                                ...settings,
                                 showServerImage: e.currentTarget.checked,
                             },
                         });
@@ -248,7 +242,6 @@ export const DiscordSettings = () => {
                     onBlur={(e) => {
                         setSettings({
                             general: {
-                                ...generalSettings,
                                 lastfmApiKey: e.currentTarget.value,
                             },
                         });
@@ -274,4 +267,4 @@ export const DiscordSettings = () => {
             title={t('page.setting.discord', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

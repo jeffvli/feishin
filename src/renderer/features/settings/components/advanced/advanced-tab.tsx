@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
 import { AnalyticsSettings } from '/@/renderer/features/settings/components/advanced/analytics-settings';
@@ -16,7 +17,7 @@ const sections = [
     { component: CacheSettings, key: 'cache' },
 ];
 
-export const AdvancedTab = () => {
+export const AdvancedTab = memo(() => {
     return (
         <Stack gap="md">
             {sections.map(({ component: Section, key }, index) => (
@@ -27,4 +28,4 @@ export const AdvancedTab = () => {
             ))}
         </Stack>
     );
-};
+});

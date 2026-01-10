@@ -12,10 +12,12 @@ import {
     usePlayerStatus,
 } from '/@/renderer/store';
 import {
-    useGeneralSettings,
+    useCombinedLyricsAndVisualizer,
     usePlaybackSettings,
     useSettingsStore,
     useSettingsStoreActions,
+    useShowLyricsInSidebar,
+    useShowVisualizerInSidebar,
 } from '/@/renderer/store/settings.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Popover } from '/@/shared/components/popover/popover';
@@ -49,7 +51,9 @@ export const PlayerConfig = () => {
     const { setCrossfadeDuration, setCrossfadeStyle, setQueueType, setSpeed, setTransitionType } =
         usePlayerActions();
     const preservePitch = useSettingsStore((state) => state.playback.preservePitch);
-    const generalSettings = useGeneralSettings();
+    const showLyricsInSidebar = useShowLyricsInSidebar();
+    const showVisualizerInSidebar = useShowVisualizerInSidebar();
+    const combinedLyricsAndVisualizer = useCombinedLyricsAndVisualizer();
 
     const playbackSettings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -325,11 +329,10 @@ export const PlayerConfig = () => {
             {
                 component: (
                     <Switch
-                        defaultChecked={generalSettings.showLyricsInSidebar}
+                        defaultChecked={showLyricsInSidebar}
                         onChange={(e) => {
                             setSettings({
                                 general: {
-                                    ...generalSettings,
                                     showLyricsInSidebar: e.currentTarget.checked,
                                 },
                             });
@@ -342,11 +345,10 @@ export const PlayerConfig = () => {
             {
                 component: (
                     <Switch
-                        defaultChecked={generalSettings.showVisualizerInSidebar}
+                        defaultChecked={showVisualizerInSidebar}
                         onChange={(e) => {
                             setSettings({
                                 general: {
-                                    ...generalSettings,
                                     showVisualizerInSidebar: e.currentTarget.checked,
                                 },
                             });
@@ -359,11 +361,10 @@ export const PlayerConfig = () => {
             {
                 component: (
                     <Switch
-                        defaultChecked={generalSettings.combinedLyricsAndVisualizer}
+                        defaultChecked={combinedLyricsAndVisualizer}
                         onChange={(e) => {
                             setSettings({
                                 general: {
-                                    ...generalSettings,
                                     combinedLyricsAndVisualizer: e.currentTarget.checked,
                                 },
                             });
@@ -395,7 +396,9 @@ export const PlayerConfig = () => {
         setTransitionType,
         setCrossfadeStyle,
         setPreservePitch,
-        generalSettings,
+        showLyricsInSidebar,
+        showVisualizerInSidebar,
+        combinedLyricsAndVisualizer,
     ]);
 
     return (

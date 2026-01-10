@@ -3,6 +3,7 @@ import { Dispatch, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
 import { ServerList } from '/@/renderer/features/servers/components/server-list';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -42,8 +43,6 @@ export const ServerCommands = ({ handleClose, setPages, setQuery }: ServerComman
         [handleClose, navigate, setCurrentServer, setPages, setQuery],
     );
 
-    const isServerLock = Boolean(window.SERVER_LOCK) || false;
-
     return (
         <>
             <Command.Group
@@ -56,7 +55,7 @@ export const ServerCommands = ({ handleClose, setPages, setQuery }: ServerComman
                     >{`${serverList[key].name}...`}</Command.Item>
                 ))}
             </Command.Group>
-            {!isServerLock && (
+            {!isServerLock() && (
                 <Command.Group heading={t('common.manage', { postProcess: 'sentenceCase' })}>
                     <Command.Item onSelect={handleManageServersModal}>
                         {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}...

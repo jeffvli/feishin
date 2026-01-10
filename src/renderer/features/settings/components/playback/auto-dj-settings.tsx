@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -7,7 +8,7 @@ import {
 import { useAutoDJSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 
-export const AutoDJSettings = () => {
+export const AutoDJSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useAutoDJSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -23,7 +24,6 @@ export const AutoDJSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             autoDJ: {
-                                ...settings,
                                 itemCount: Number(e),
                             },
                         });
@@ -47,7 +47,6 @@ export const AutoDJSettings = () => {
                     onChange={(e) => {
                         setSettings({
                             autoDJ: {
-                                ...settings,
                                 timing: Number(e),
                             },
                         });
@@ -69,4 +68,4 @@ export const AutoDJSettings = () => {
             title={t('setting.autoDJ', { postProcess: 'titleCase' })}
         />
     );
-};
+});

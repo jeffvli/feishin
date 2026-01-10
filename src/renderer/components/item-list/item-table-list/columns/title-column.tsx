@@ -83,8 +83,6 @@ function QueueSongTitleColumn(props: ItemTableListInnerColumn) {
         const path = getTitlePath(props.itemType, (props.data[props.rowIndex] as any).id as string);
         const item = props.data[props.rowIndex] as any;
 
-        const textStyles = isActive ? { color: 'var(--theme-colors-primary)' } : {};
-
         const titleLinkProps = path
             ? {
                   component: Link,
@@ -98,15 +96,29 @@ function QueueSongTitleColumn(props: ItemTableListInnerColumn) {
             <TableColumnContainer {...props}>
                 <Text
                     className={clsx({
+                        [styles.active]: isActive,
                         [styles.compact]: props.size === 'compact',
                         [styles.large]: props.size === 'large',
                         [styles.nameContainer]: true,
                     })}
                     isNoSelect
                     {...titleLinkProps}
-                    style={textStyles}
                 >
                     {row}
+                    {song?.trackSubtitle && props.itemType !== LibraryItem.QUEUE_SONG && (
+                        <Text
+                            className={clsx({
+                                [styles.active]: isActive,
+                            })}
+                            component="span"
+                            isMuted
+                            size="sm"
+                        >
+                            {' ('}
+                            {song.trackSubtitle}
+                            {')'}
+                        </Text>
+                    )}
                 </Text>
             </TableColumnContainer>
         );

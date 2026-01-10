@@ -362,7 +362,20 @@
         "showRatings_description": "Controla si la característica de calificación de estrellas aparece en la interfaz",
         "showRatings": "Mostrar calificación de estrellas",
         "combinedLyricsAndVisualizer_description": "Combina letras y visualizador en el mismo panel",
-        "combinedLyricsAndVisualizer": "Combinar letras y visualizador en la barra lateral del reproductor"
+        "combinedLyricsAndVisualizer": "Combinar letras y visualizador en la barra lateral del reproductor",
+        "artistReleaseTypeConfiguration": "Configuración de tipo de lanzamiento de artista",
+        "artistReleaseTypeConfiguration_description": "Configura qué tipos de lanzamiento son mostrados, y en qué orden, en la página del artista del álbum",
+        "mpvExtraParameters": "Parámetros adicionales de MPV",
+        "mpvExtraParameters_description": "Argumentos adicionales a pasar a MPV",
+        "hotkey_listPlayDefault": "Reproducir lista",
+        "hotkey_listPlayLast": "Reproducir lista al final",
+        "hotkey_listPlayNext": "Reproducir lista a continuación",
+        "hotkey_listPlayNow": "Reproducir lista ahora",
+        "hotkey_listNavigateToPage": "Navegar por la lista hasta la página del elemento",
+        "pathReplace_description": "Reemplaza la ruta de archivo predeterminada de tu servidor",
+        "pathReplace": "Reemplazo de la ruta de archivo",
+        "pathReplace_optionRemovePrefix": "Eliminar prefijo",
+        "pathReplace_optionAddPrefix": "Añadir prefijo"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist_one)",
@@ -521,7 +534,9 @@
         "noFilters": "Ningún filtro configurado",
         "view": "Vista",
         "countSelected": "{{count}} seleccionados",
-        "retry": "Reintentar"
+        "retry": "Reintentar",
+        "mood": "Estado de ánimo",
+        "example": "Ejemplo"
     },
     "error": {
         "remotePortWarning": "reiniciar el servidor para aplicar el nuevo puerto",
@@ -820,7 +835,10 @@
             "ignoreCors": "ignorar cors ($t(common.restartRequired))",
             "error_savePassword": "un error ocurrió cuando se intentó guardar la contraseña",
             "input_preferInstantMix": "Preferir mix instantáneo",
-            "input_preferInstantMixDescription": "Usa solo el mix instantáneo para obtener canciones similares. Útil si tienes complementos que modifican este comportamiento"
+            "input_preferInstantMixDescription": "Usa solo el mix instantáneo para obtener canciones similares. Útil si tienes complementos que modifican este comportamiento",
+            "input_remoteUrl": "URL pública",
+            "input_preferRemoteUrl": "Preferir URL pública",
+            "input_remoteUrlPlaceholder": "Opcional: URL pública para características externas"
         },
         "addToPlaylist": {
             "success": "añadido $t(entity.trackWithCount, {\"count\": {{message}} }) a $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -1199,18 +1217,29 @@
         "trueLeds": "True LED",
         "options": {
             "colorMode": {
-                "gradient": "Degradado"
+                "gradient": "Degradado",
+                "barLevel": "Nivel de barra",
+                "barIndex": "Índice de barra"
             },
             "gradient": {
                 "classic": "Clásico",
                 "prism": "Prisma",
-                "rainbow": "Arcoíris"
+                "rainbow": "Arcoíris",
+                "steelblue": "Azul acero",
+                "orangered": "Naranja rojizo"
             },
             "channelLayout": {
-                "single": "Sencillo"
+                "single": "Sencillo",
+                "dualCombined": "Doble combinado",
+                "dualHorizontal": "Doble horizontal",
+                "dualVertical": "Doble vertical"
             },
             "frequencyScale": {
-                "linear": "Lineal"
+                "linear": "Escala lineal",
+                "none": "Ninguna",
+                "log": "Escala de registro",
+                "bark": "Escala Bark",
+                "mel": "Escala Mel"
             },
             "weightingFilter": {
                 "none": "Ninguno",
@@ -1219,7 +1248,44 @@
                 "c": "C",
                 "d": "D",
                 "z": "Z"
+            },
+            "mode": {
+                "0": "[0] Frecuencias discretas",
+                "1": "[1] 1/24ª octava / 240 bandas",
+                "2": "[1] 1/12ª octava / 120 bandas",
+                "3": "[3] 1/8ª octava / 80 bandas",
+                "4": "[4] 1/6ª octava / 60 bandas",
+                "5": "[5] 1/4ª octava / 40 bandas",
+                "6": "[6] 1/3ª octava / 30 bandas",
+                "7": "[7] Media octava / 20 bandas",
+                "8": "[8] Octava completa / 10 bandas",
+                "10": "[10] Línea / Gráfico de área"
             }
-        }
+        },
+        "showFPS": "Mostrar FPS",
+        "showScaleX": "Mostrar escala X",
+        "showScaleY": "Mostrar escala Y",
+        "cyclePresets": "Ajustes preestablecidos del ciclo",
+        "cycleTime": "Tiempo del ciclo (segundos)",
+        "includeAllPresets": "Incluir todos los ajustes preestablecidos",
+        "ignoredPresets": "Ajustes preestablecidos ignorados",
+        "selectedPresets": "Ajustes preestablecidos seleccionados",
+        "randomizeNextPreset": "Aleatorizar el siguiente ajuste preestablecido",
+        "blendTime": "Tiempo de mezcla",
+        "presets": "Ajustes preestablecidos",
+        "selectPreset": "Seleccionar ajuste preestablecido",
+        "applyPreset": "Aplicar ajuste preestablecido",
+        "saveAsPreset": "Guardar como ajuste preestablecido",
+        "updatePreset": "Actualizar ajuste preestablecido",
+        "presetName": "Nombre del ajuste preestablecido",
+        "presetNamePlaceholder": "Introduce el nombre del ajuste preestablecido",
+        "pasteGradient": "Pegar degradado",
+        "pasteGradientPlaceholder": "Pegar JSON del degradado aquí...",
+        "outlineBars": "Barras de contorno",
+        "roundBars": "Barras redondeadas",
+        "lowResolution": "Baja resolución",
+        "splitGradient": "Dividir degradado",
+        "noteLabels": "Etiquetas de notas",
+        "lumiBars": "Barras luminiscentes"
     }
 }

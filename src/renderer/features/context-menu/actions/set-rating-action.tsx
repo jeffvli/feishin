@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useSetRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
-import { useCurrentServer, useCurrentServerId, useGeneralSettings } from '/@/renderer/store';
+import { useCurrentServer, useCurrentServerId, useShowRatings } from '/@/renderer/store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { Rating } from '/@/shared/components/rating/rating';
 import { LibraryItem } from '/@/shared/types/domain-types';
@@ -17,7 +17,7 @@ export const SetRatingAction = ({ ids, itemType }: SetRatingActionProps) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
     const serverId = useCurrentServerId();
-    const { showRatings } = useGeneralSettings();
+    const showRatings = useShowRatings();
 
     const setRatingMutation = useSetRating({});
 

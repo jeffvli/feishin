@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { ComponentPropsWithoutRef } from 'react';
+import { ComponentPropsWithoutRef, memo, useMemo } from 'react';
 
 import styles from './lyric-line.module.css';
 
@@ -12,23 +12,28 @@ interface LyricLineProps extends ComponentPropsWithoutRef<'div'> {
     text: string;
 }
 
-export const LyricLine = ({ alignment, className, fontSize, text, ...props }: LyricLineProps) => {
-    const lines = text.split('_BREAK_');
+export const LyricLine = memo(
+    ({ alignment, className, fontSize, text, ...props }: LyricLineProps) => {
+        const lines = useMemo(() => text.split('_BREAK_'), [text]);
 
-    return (
-        <Box
-            className={clsx(styles.lyricLine, className)}
-            style={{
+        const style = useMemo(
+            () => ({
                 fontSize,
                 textAlign: alignment,
-            }}
-            {...props}
-        >
-            <Stack gap={0}>
-                {lines.map((line, index) => (
-                    <span key={index}>{line}</span>
-                ))}
-            </Stack>
-        </Box>
-    );
-};
+            }),
+            [fontSize, alignment],
+        );
+
+        return (
+            <Box className={clsx(styles.lyricLine, className)} style={style} {...props}>
+                <Stack gap={0}>
+                    {lines.map((line, index) => (
+                        <span key={index}>{line}</span>
+                    ))}
+                </Stack>
+            </Box>
+        );
+    },
+);
+
+LyricLine.displayName = 'LyricLine';

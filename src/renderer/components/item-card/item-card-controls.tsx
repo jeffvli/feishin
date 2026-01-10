@@ -73,6 +73,29 @@ const createPlayHandler =
             return;
         }
 
+        const isSongItem =
+            itemType === LibraryItem.SONG ||
+            itemType === LibraryItem.PLAYLIST_SONG ||
+            (item as { _itemType: LibraryItem })._itemType === LibraryItem.SONG;
+
+        if (isSongItem && controls?.onDoubleClick && internalState) {
+            const rowId = internalState.extractRowId(item);
+
+            if (rowId) {
+                const index = internalState.findItemIndex(rowId);
+                return controls.onDoubleClick({
+                    event: null,
+                    index,
+                    internalState,
+                    item,
+                    itemType,
+                    meta: {
+                        playType,
+                    },
+                });
+            }
+        }
+
         controls?.onPlay?.({
             event: e,
             internalState,

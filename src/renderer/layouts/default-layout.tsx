@@ -13,7 +13,6 @@ import { Platform, PlayerType } from '/@/shared/types/types';
 if (!isElectron()) {
     useSettingsStore.getState().actions.setSettings({
         playback: {
-            ...useSettingsStore.getState().playback,
             type: PlayerType.WEB,
         },
     });

@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -13,10 +14,10 @@ const localSettings = isElectron() ? window.api.localSettings : null;
 const utils = isElectron() ? window.api.utils : null;
 
 function disableAutoUpdates(): boolean {
-    return !isElectron() || utils?.disableAutoUpdates();
+    return Boolean(!isElectron() || utils?.disableAutoUpdates());
 }
 
-export const UpdateSettings = () => {
+export const UpdateSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useWindowSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -49,7 +50,6 @@ export const UpdateSettings = () => {
                         localSettings?.set('release_channel', value);
                         setSettings({
                             window: {
-                                ...settings,
                                 releaseChannel: value as 'beta' | 'latest',
                             },
                         });
@@ -74,7 +74,6 @@ export const UpdateSettings = () => {
                         localSettings?.set('disable_auto_updates', e.currentTarget.checked);
                         setSettings({
                             window: {
-                                ...settings,
                                 disableAutoUpdate: e.currentTarget.checked,
                             },
                         });
@@ -96,4 +95,4 @@ export const UpdateSettings = () => {
             title={t('page.setting.updates', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

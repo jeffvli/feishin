@@ -268,7 +268,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
     getAlbumDetail: async (args) => {
-        const { apiClientProps, query } = args;
+        const { apiClientProps, context, query } = args;
 
         const albumRes = await ndApiClient(apiClientProps).getAlbumDetail({
             params: {
@@ -294,6 +294,8 @@ export const NavidromeController: InternalControllerEndpoint = {
         return ndNormalize.album(
             { ...albumRes.body.data, songs: songsData.body.data },
             apiClientProps.server,
+            context?.pathReplace,
+            context?.pathReplaceWith,
         );
     },
     getAlbumInfo: async (args) => {
@@ -317,7 +319,7 @@ export const NavidromeController: InternalControllerEndpoint = {
         };
     },
     getAlbumList: async (args) => {
-        const { apiClientProps, query } = args;
+        const { apiClientProps, context, query } = args;
 
         const genres = hasFeature(apiClientProps.server, ServerFeature.BFR)
             ? query.genreIds
@@ -352,7 +354,14 @@ export const NavidromeController: InternalControllerEndpoint = {
         }
 
         return {
-            items: res.body.data.map((album) => ndNormalize.album(album, apiClientProps.server)),
+            items: res.body.data.map((album) =>
+                ndNormalize.album(
+                    album,
+                    apiClientProps.server,
+                    context?.pathReplace,
+                    context?.pathReplaceWith,
+                ),
+            ),
             startIndex: query?.startIndex || 0,
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
@@ -560,7 +569,14 @@ export const NavidromeController: InternalControllerEndpoint = {
         }
 
         return {
-            items: res.body.data.map((item) => ndNormalize.song(item, apiClientProps.server)),
+            items: res.body.data.map((item) =>
+                ndNormalize.song(
+                    item,
+                    apiClientProps.server,
+                    args.context?.pathReplace,
+                    args.context?.pathReplaceWith,
+                ),
+            ),
             startIndex: 0,
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
@@ -577,7 +593,14 @@ export const NavidromeController: InternalControllerEndpoint = {
 
             const { changedBy, current, items, position, updatedAt } = res.body.data;
 
-            const entries = items.map((song) => ndNormalize.song(song, apiClientProps.server));
+            const entries = items.map((song) =>
+                ndNormalize.song(
+                    song,
+                    apiClientProps.server,
+                    args.context?.pathReplace,
+                    args.context?.pathReplaceWith,
+                ),
+            );
 
             return {
                 changed: updatedAt,
@@ -668,7 +691,12 @@ export const NavidromeController: InternalControllerEndpoint = {
             throw new Error('Failed to get song detail');
         }
 
-        return ndNormalize.song(res.body.data, apiClientProps.server);
+        return ndNormalize.song(
+            res.body.data,
+            apiClientProps.server,
+            args.context?.pathReplace,
+            args.context?.pathReplaceWith,
+        );
     },
     getSongList: async (args) => {
         const { apiClientProps, query } = args;
@@ -696,7 +724,14 @@ export const NavidromeController: InternalControllerEndpoint = {
         }
 
         return {
-            items: res.body.data.map((song) => ndNormalize.song(song, apiClientProps.server)),
+            items: res.body.data.map((song) =>
+                ndNormalize.song(
+                    song,
+                    apiClientProps.server,
+                    args.context?.pathReplace,
+                    args.context?.pathReplaceWith,
+                ),
+            ),
             startIndex: query?.startIndex || 0,
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
@@ -847,7 +882,12 @@ export const NavidromeController: InternalControllerEndpoint = {
         }
 
         const existingSongs = existingSongsRes.body.data.map((item) =>
-            ndNormalize.song(item, apiClientProps.server),
+            ndNormalize.song(
+                item,
+                apiClientProps.server,
+                args.context?.pathReplace,
+                args.context?.pathReplaceWith,
+            ),
         );
 
         // 2. Get playlist detail to get the name

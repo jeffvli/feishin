@@ -103,7 +103,6 @@ const ReleaseNotesContent = ({ onDismiss, version }: ReleaseNotesContentProps) =
     if (isError || !releaseData) {
         return (
             <Stack gap="md">
-                <Text>{t('common.newVersion', { postProcess: 'sentenceCase', version })}</Text>
                 <Text size="sm">{t('error.genericError', { postProcess: 'sentenceCase' })}</Text>
                 <Group justify="flex-end">
                     <Button
@@ -131,7 +130,12 @@ const ReleaseNotesContent = ({ onDismiss, version }: ReleaseNotesContentProps) =
                     height: '400px',
                 }}
             >
-                <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
+                <Text
+                    dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+                    fw={400}
+                    lh="1.5"
+                    size="md"
+                />
             </ScrollArea>
             <Group justify="flex-end">
                 <Button
@@ -152,11 +156,13 @@ const ReleaseNotesContent = ({ onDismiss, version }: ReleaseNotesContentProps) =
     );
 };
 
+const WAIT_FOR_LOCAL_STORAGE = 1000 * 2;
+
 export const ReleaseNotesModal = () => {
     const { version } = packageJson;
     const { t } = useTranslation();
 
-    const [value, setValue] = useLocalStorage({ key: 'version' });
+    const [, setValue] = useLocalStorage({ key: 'version' });
 
     const handleDismiss = useCallback(() => {
         setValue(version);
@@ -164,25 +170,28 @@ export const ReleaseNotesModal = () => {
     }, [setValue, version]);
 
     useEffect(() => {
-        // If value is undefined, set it to current version but don't show modal
-        if (value === undefined) {
-            setValue(version);
-            return;
-        }
+        const timeoutId = setTimeout(() => {
+            const valueFromLocalStorage = localStorage.getItem('version');
+            const versionString = `"${version}"`;
 
-        // Only show modal if the stored version is different from current version
-        if (value !== version) {
-            openModal({
-                children: <ReleaseNotesContent onDismiss={handleDismiss} version={version} />,
-                onClose: handleDismiss,
-                size: 'xl',
-                title: t('common.newVersion', {
-                    postProcess: 'sentenceCase',
-                    version,
-                }) as string,
-            });
-        }
-    }, [handleDismiss, value, version, t, setValue]);
+            // Only show modal if the stored version is different from current version
+            if (valueFromLocalStorage !== versionString) {
+                openModal({
+                    children: <ReleaseNotesContent onDismiss={handleDismiss} version={version} />,
+                    onClose: handleDismiss,
+                    size: 'xl',
+                    title: t('common.newVersion', {
+                        postProcess: 'sentenceCase',
+                        version,
+                    }) as string,
+                });
+            }
+        }, WAIT_FOR_LOCAL_STORAGE);
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [handleDismiss, t, version]);
 
     return null;
 };

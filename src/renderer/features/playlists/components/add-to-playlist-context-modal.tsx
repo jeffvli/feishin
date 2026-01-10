@@ -561,6 +561,7 @@ const PlaylistTableItem = memo(
                                     className: styles.imageContainer,
                                 }}
                                 itemType={LibraryItem.PLAYLIST}
+                                type="table"
                             />
                         </Flex>
                     </Grid.Col>

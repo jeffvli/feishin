@@ -1,6 +1,7 @@
 import isElectron from 'is-electron';
 import { useEffect, useRef } from 'react';
 
+import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
@@ -162,7 +163,17 @@ export const useRemote = () => {
                     name: currentSong.name,
                 },
             });
-            remote.updateSong(currentSong);
+
+            const imageUrl =
+                getItemImageUrl({
+                    id: currentSong.id,
+                    imageUrl: currentSong.imageUrl,
+                    itemType: LibraryItem.SONG,
+                    serverId: currentSong._serverId,
+                    type: 'itemCard',
+                    useRemoteUrl: true,
+                }) || null;
+            remote.updateSong({ ...currentSong, imageUrl });
         }
     }, [isRemoteEnabled, player]);
 
@@ -182,7 +193,21 @@ export const useRemote = () => {
                         name: properties.song?.name,
                     },
                 });
-                remote.updateSong(properties.song);
+                if (properties.song) {
+                    const song = properties.song;
+                    const imageUrl =
+                        getItemImageUrl({
+                            id: song.id,
+                            imageUrl: song.imageUrl,
+                            itemType: LibraryItem.SONG,
+                            serverId: song._serverId,
+                            type: 'itemCard',
+                            useRemoteUrl: true,
+                        }) || null;
+                    remote.updateSong({ ...song, imageUrl });
+                } else {
+                    remote.updateSong(undefined);
+                }
             },
             onPlayerProgress: (properties) => {
                 if (!isRemoteEnabled || !remote) {

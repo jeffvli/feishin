@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { MultiSelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
@@ -147,8 +147,8 @@ export const JellyfinAlbumFilters = ({ disableArtistFilter }: JellyfinAlbumFilte
         [setMaxYear],
     );
 
-    const handleGenresFilter = useMemo(
-        () => (e: string[] | undefined) => {
+    const handleGenresFilter = useCallback(
+        (e: null | string[]) => {
             setGenreId(e && e.length > 0 ? e : null);
         },
         [setGenreId],
@@ -178,13 +178,16 @@ export const JellyfinAlbumFilters = ({ disableArtistFilter }: JellyfinAlbumFilte
         }));
     }, [albumArtistListQuery.data?.items]);
 
-    const handleAlbumArtistFilter = (e: null | string[]) => {
-        setAlbumArtist(e ?? null);
-    };
+    const handleAlbumArtistFilter = useCallback(
+        (e: null | string[]) => {
+            setAlbumArtist(e ?? null);
+        },
+        [setAlbumArtist],
+    );
 
-    const handleTagFilter = useMemo(
-        () => (e: string[] | undefined) => {
-            setCustom({ Tags: e?.join('|') ?? null });
+    const handleTagFilter = useCallback(
+        (e: null | string[]) => {
+            setCustom({ Tags: e && e.length > 0 ? e.join('|') : null });
         },
         [setCustom],
     );

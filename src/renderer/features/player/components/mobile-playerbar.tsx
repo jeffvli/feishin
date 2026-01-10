@@ -95,6 +95,7 @@ export const MobilePlayerbar = () => {
                                             id={currentSong.imageId}
                                             itemType={LibraryItem.SONG}
                                             loading="eager"
+                                            type="table"
                                         />
                                     </Tooltip>
                                 </motion.div>

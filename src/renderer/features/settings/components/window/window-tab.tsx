@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { memo } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
 import { DiscordSettings } from '/@/renderer/features/settings/components/window/discord-settings';
@@ -17,7 +18,7 @@ const sections = [
     { component: PasswordSettings, hidden: !utils?.isLinux(), key: 'password' },
 ];
 
-export const WindowTab = () => {
+export const WindowTab = memo(() => {
     return (
         <Stack gap="md">
             {sections.map(({ component: Section, hidden, key }, index) => (
@@ -28,4 +29,4 @@ export const WindowTab = () => {
             ))}
         </Stack>
     );
-};
+});

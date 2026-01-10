@@ -142,6 +142,7 @@ export const LibraryHeader = forwardRef(
                             itemType={item.type as LibraryItem}
                             onError={onImageError}
                             src={imageUrl || ''}
+                            type="header"
                         />
                     )}
                 </div>

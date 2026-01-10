@@ -16,6 +16,7 @@ import { Box } from '/@/shared/components/box/box';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
+import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { ServerType } from '/@/shared/types/domain-types';
@@ -94,7 +95,9 @@ export const ServerSelector = () => {
                 </div>
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown style={{ width: `${widthOfTarget}px` }}>
-                <ServerSelectorItems />
+                <ScrollArea style={{ maxHeight: 'calc(100vh - 200px)' }}>
+                    <ServerSelectorItems />
+                </ScrollArea>
             </DropdownMenu.Dropdown>
         </DropdownMenu>
     );

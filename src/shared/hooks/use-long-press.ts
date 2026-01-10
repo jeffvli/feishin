@@ -56,6 +56,9 @@ export const useLongPress = <T extends HTMLElement = HTMLElement>({
 
     const handleMouseDown = useCallback(
         (event: React.MouseEvent) => {
+            if (event.button !== 0) {
+                return;
+            }
             event.preventDefault();
             start(event as React.MouseEvent<T>);
         },

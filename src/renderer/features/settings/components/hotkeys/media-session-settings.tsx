@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -6,11 +7,7 @@ import {
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { openRestartRequiredToast } from '/@/renderer/features/settings/restart-toast';
-import {
-    useHotkeySettings,
-    usePlaybackSettings,
-    useSettingsStoreActions,
-} from '/@/renderer/store/settings.store';
+import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { Switch } from '/@/shared/components/switch/switch';
 import { PlayerType } from '/@/shared/types/types';
 
@@ -18,11 +15,9 @@ const isLinux = isElectron() ? window.api.utils.isLinux() : false;
 const isDesktop = isElectron();
 const localSettings = isElectron() ? window.api.localSettings : null;
 
-export const MediaSessionSettings = () => {
+export const MediaSessionSettings = memo(() => {
     const { t } = useTranslation();
     const { mediaSession, type: playbackType } = usePlaybackSettings();
-    const playbackSettings = usePlaybackSettings();
-    const hotkeySettings = useHotkeySettings();
     const { setSettings } = useSettingsStoreActions();
 
     function handleMediaSessionChange(e: boolean) {
@@ -31,7 +26,6 @@ export const MediaSessionSettings = () => {
             localSettings!.set('global_media_hotkeys', false);
             setSettings({
                 hotkeys: {
-                    ...hotkeySettings,
                     globalMediaHotkeys: false,
                 },
             });
@@ -40,7 +34,6 @@ export const MediaSessionSettings = () => {
         localSettings!.set('mediaSession', e);
         setSettings({
             playback: {
-                ...playbackSettings,
                 mediaSession: e,
             },
         });
@@ -70,4 +63,4 @@ export const MediaSessionSettings = () => {
     ];
 
     return <SettingsSection options={mediaSessionOptions} />;
-};
+});

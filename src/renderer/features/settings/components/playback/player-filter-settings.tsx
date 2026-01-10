@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid/non-secure';
-import { useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -262,7 +262,7 @@ const FilterValueInput = ({
     }
 };
 
-export const PlayerFilterSettings = () => {
+export const PlayerFilterSettings = memo(() => {
     const { t } = useTranslation();
     const filters = useSettingsStore((state) => state.playback.filters);
     const { setPlaybackFilters } = useSettingsStoreActions();
@@ -432,4 +432,4 @@ export const PlayerFilterSettings = () => {
             title={t('page.setting.playerFilters', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

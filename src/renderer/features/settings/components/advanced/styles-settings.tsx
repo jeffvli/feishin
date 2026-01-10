@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
@@ -10,7 +10,7 @@ import { Switch } from '/@/shared/components/switch/switch';
 import { Text } from '/@/shared/components/text/text';
 import { Textarea } from '/@/shared/components/textarea/textarea';
 
-export const StylesSettings = () => {
+export const StylesSettings = memo(() => {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation();
 
@@ -108,4 +108,4 @@ export const StylesSettings = () => {
             )}
         </>
     );
-};
+});

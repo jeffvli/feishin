@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { memo } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
 import { HotkeyManagerSettings } from '/@/renderer/features/settings/components/hotkeys/hotkey-manager-settings';
@@ -13,7 +14,7 @@ const sections = [
     { component: HotkeyManagerSettings, key: 'hotkey-manager' },
 ];
 
-export const HotkeysTab = () => {
+export const HotkeysTab = memo(() => {
     return (
         <Stack gap="md">
             {sections.map(({ component: Section, hidden, key }, index) => (
@@ -24,4 +25,4 @@ export const HotkeysTab = () => {
             ))}
         </Stack>
     );
-};
+});

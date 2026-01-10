@@ -3,6 +3,7 @@ import type { RefObject } from 'react';
 import isElectron from 'is-electron';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
+import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { getSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { AudioPlayer, PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
@@ -58,6 +59,19 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
     const { transcode } = usePlaybackSettings();
     const mpvExtraParameters = useSettingsStore((store) => store.playback.mpvExtraParameters);
     const mpvProperties = useSettingsStore((store) => store.playback.mpvProperties);
+    const [reloadTrigger, setReloadTrigger] = useState(0);
+
+    useEffect(() => {
+        const handleMpvReload = () => {
+            setReloadTrigger((prev) => prev + 1);
+        };
+
+        eventEmitter.on('MPV_RELOAD', handleMpvReload);
+
+        return () => {
+            eventEmitter.off('MPV_RELOAD', handleMpvReload);
+        };
+    }, []);
 
     // Start the mpv instance on startup
     useEffect(() => {
@@ -132,8 +146,9 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
         // Volume and speed changes are handled by separate useEffects below to avoid
         // reinitializing the entire player. Transcode changes are handled by queue
         // update callbacks in usePlayerEvents.
+        // reloadTrigger is included to allow manual reload via MPV_RELOAD event.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mpvExtraParameters, mpvProperties]);
+    }, [mpvExtraParameters, mpvProperties, reloadTrigger]);
 
     // Update volume
     useEffect(() => {

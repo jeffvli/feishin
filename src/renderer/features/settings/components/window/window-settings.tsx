@@ -1,4 +1,5 @@
 import isElectron from 'is-electron';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -20,7 +21,7 @@ const WINDOW_BAR_OPTIONS = [
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
-export const WindowSettings = () => {
+export const WindowSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useWindowSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -50,7 +51,6 @@ export const WindowSettings = () => {
                         localSettings?.set('window_window_bar_style', e as Platform);
                         setSettings({
                             window: {
-                                ...settings,
                                 windowBarStyle: e as Platform,
                             },
                         });
@@ -77,7 +77,6 @@ export const WindowSettings = () => {
                         if (e.currentTarget.checked) {
                             setSettings({
                                 window: {
-                                    ...settings,
                                     tray: true,
                                 },
                             });
@@ -88,7 +87,6 @@ export const WindowSettings = () => {
 
                             setSettings({
                                 window: {
-                                    ...settings,
                                     exitToTray: false,
                                     minimizeToTray: false,
                                     startMinimized: false,
@@ -120,7 +118,6 @@ export const WindowSettings = () => {
                         localSettings?.set('window_minimize_to_tray', e.currentTarget.checked);
                         setSettings({
                             window: {
-                                ...settings,
                                 minimizeToTray: e.currentTarget.checked,
                             },
                         });
@@ -145,7 +142,6 @@ export const WindowSettings = () => {
                         localSettings?.set('window_exit_to_tray', e.currentTarget.checked);
                         setSettings({
                             window: {
-                                ...settings,
                                 exitToTray: e.currentTarget.checked,
                             },
                         });
@@ -170,7 +166,6 @@ export const WindowSettings = () => {
                         localSettings?.set('window_start_minimized', e.currentTarget.checked);
                         setSettings({
                             window: {
-                                ...settings,
                                 startMinimized: e.currentTarget.checked,
                             },
                         });
@@ -198,7 +193,6 @@ export const WindowSettings = () => {
                         );
                         setSettings({
                             window: {
-                                ...settings,
                                 preventSleepOnPlayback: e.currentTarget.checked,
                             },
                         });
@@ -220,4 +214,4 @@ export const WindowSettings = () => {
             title={t('page.setting.application', { postProcess: 'sentenceCase' })}
         />
     );
-};
+});

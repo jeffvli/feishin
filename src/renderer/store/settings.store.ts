@@ -1,4 +1,6 @@
 import isElectron from 'is-electron';
+import mergeWith from 'lodash/mergeWith';
+import { nanoid } from 'nanoid';
 import { generatePath } from 'react-router';
 import { z } from 'zod';
 import { devtools, persist } from 'zustand/middleware';
@@ -40,6 +42,26 @@ const utils = isElectron() ? window.api.utils : null;
 
 type DeepPartial<T> = {
     [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
+const deepMergeIntoState = <T extends Record<string, any>>(
+    state: T,
+    updates: DeepPartial<T>,
+): void => {
+    // Skip 'actions' property
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { actions, ...updatesWithoutActions } = updates as any;
+
+    // Use mergeWith to replace arrays instead of merging them by index
+    mergeWith(state, updatesWithoutActions, (_objValue, srcValue) => {
+        // If source value is an array, replace the entire array instead of merging
+        if (Array.isArray(srcValue)) {
+            return srcValue;
+        }
+
+        // Default merge behavior
+        return undefined;
+    });
 };
 
 const HomeItemSchema = z.enum([
@@ -115,6 +137,11 @@ const BindingActionsSchema = z.enum([
     'volumeUp',
     'zoomIn',
     'zoomOut',
+    'listPlayDefault',
+    'listPlayNow',
+    'listPlayNext',
+    'listPlayLast',
+    'listNavigateToPage',
 ]);
 
 const DiscordDisplayTypeSchema = z.enum(['artist', 'feishin', 'song']);
@@ -314,6 +341,7 @@ const AudioMotionAnalyzerSettingsSchema = z.object({
     peakLine: z.boolean(),
     presets: z.array(
         z.object({
+            id: z.string(),
             name: z.string(),
             value: z.any(),
         }),
@@ -395,6 +423,8 @@ export const GeneralSettingsSchema = z.object({
     musicBrainz: z.boolean(),
     nativeAspectRatio: z.boolean(),
     passwordStore: z.string().optional(),
+    pathReplace: z.string(),
+    pathReplaceWith: z.string(),
     playButtonBehavior: z.nativeEnum(Play),
     playerbarOpenDrawer: z.boolean(),
     playerbarSlider: PlayerbarSliderSchema,
@@ -647,6 +677,11 @@ export enum BindingActions {
     FAVORITE_PREVIOUS_REMOVE = 'favoritePreviousRemove',
     FAVORITE_PREVIOUS_TOGGLE = 'favoritePreviousToggle',
     GLOBAL_SEARCH = 'globalSearch',
+    LIST_NAVIGATE_TO_PAGE = 'listNavigateToPage',
+    LIST_PLAY_DEFAULT = 'listPlayDefault',
+    LIST_PLAY_LAST = 'listPlayLast',
+    LIST_PLAY_NEXT = 'listPlayNext',
+    LIST_PLAY_NOW = 'listPlayNow',
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
     NAVIGATE_HOME = 'navigateHome',
@@ -755,7 +790,7 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
         setHomeItems: (item: SortableItem<HomeItem>[]) => void;
         setList: (type: ItemListKey, data: DeepPartial<ItemListSettings>) => void;
         setPlaybackFilters: (filters: PlayerFilter[]) => void;
-        setSettings: (data: Partial<SettingsState>) => void;
+        setSettings: (data: DeepPartial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
         setTable: (type: ItemListKey, data: DataTableProps) => void;
         setTranscodingConfig: (config: TranscodingConfig) => void;
@@ -943,6 +978,8 @@ const initialState: SettingsState = {
         musicBrainz: true,
         nativeAspectRatio: false,
         passwordStore: undefined,
+        pathReplace: '',
+        pathReplaceWith: '',
         playButtonBehavior: Play.NOW,
         playerbarOpenDrawer: false,
         playerbarSlider: {
@@ -986,6 +1023,11 @@ const initialState: SettingsState = {
             favoritePreviousRemove: { allowGlobal: true, hotkey: '', isGlobal: false },
             favoritePreviousToggle: { allowGlobal: true, hotkey: '', isGlobal: false },
             globalSearch: { allowGlobal: false, hotkey: 'mod+k', isGlobal: false },
+            listNavigateToPage: { allowGlobal: false, hotkey: 'mod+g', isGlobal: false },
+            listPlayDefault: { allowGlobal: false, hotkey: 'enter', isGlobal: false },
+            listPlayLast: { allowGlobal: false, hotkey: '', isGlobal: false },
+            listPlayNext: { allowGlobal: false, hotkey: '', isGlobal: false },
+            listPlayNow: { allowGlobal: false, hotkey: '', isGlobal: false },
             localSearch: { allowGlobal: false, hotkey: 'mod+f', isGlobal: false },
             navigateHome: { allowGlobal: false, hotkey: '', isGlobal: false },
             next: { allowGlobal: true, hotkey: '', isGlobal: false },
@@ -1300,7 +1342,25 @@ const initialState: SettingsState = {
                 itemGap: 'sm',
                 itemsPerRow: 6,
                 itemsPerRowEnabled: false,
-                rows: [],
+                rows: pickGridRows({
+                    alignLeftColumns: [TableColumn.TITLE, TableColumn.ARTIST],
+                    columns: PLAYLIST_SONG_TABLE_COLUMNS,
+                    enabledColumns: [TableColumn.TITLE, TableColumn.ARTIST],
+                    pickColumns: [
+                        TableColumn.TITLE,
+                        TableColumn.ARTIST,
+                        TableColumn.DURATION,
+                        TableColumn.YEAR,
+                        TableColumn.BIT_RATE,
+                        TableColumn.BPM,
+                        TableColumn.CODEC,
+                        TableColumn.DATE_ADDED,
+                        TableColumn.GENRE,
+                        TableColumn.LAST_PLAYED,
+                        TableColumn.RELEASE_DATE,
+                        TableColumn.TRACK_NUMBER,
+                    ],
+                }),
                 size: 'default',
             },
             itemsPerPage: 100,
@@ -1605,7 +1665,7 @@ const getInitialState = (): SettingsState => {
 export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
     persist(
         devtools(
-            immer((set, get) => ({
+            immer((set) => ({
                 actions: {
                     reset: () => {
                         const freshState = getInitialState();
@@ -1686,7 +1746,9 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                         });
                     },
                     setSettings: (data) => {
-                        set({ ...get(), ...data });
+                        set((state) => {
+                            deepMergeIntoState(state, data);
+                        });
                     },
                     setSidebarItems: (items: SidebarItemType[]) => {
                         set((state) => {
@@ -1877,10 +1939,29 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
+                if (version <= 19) {
+                    // Add IDs to presets that don't have them
+                    if (
+                        state.visualizer?.audiomotionanalyzer?.presets &&
+                        Array.isArray(state.visualizer.audiomotionanalyzer.presets)
+                    ) {
+                        state.visualizer.audiomotionanalyzer.presets =
+                            state.visualizer.audiomotionanalyzer.presets.map((preset) => {
+                                if (!preset.id) {
+                                    return {
+                                        ...preset,
+                                        id: nanoid(),
+                                    };
+                                }
+                                return preset;
+                            });
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 19,
+            version: 20,
         },
     ),
 );
@@ -1943,11 +2024,128 @@ export const useListSettings = (type: ItemListKey) =>
         shallow,
     ) as ItemListSettings;
 
-export const usePrimaryColor = () => useSettingsStore((store) => store.general.accent);
+export const usePrimaryColor = () => useSettingsStore((store) => store.general.accent, shallow);
 
-export const usePlayerbarSlider = () => useSettingsStore((store) => store.general.playerbarSlider);
+export const usePlayerbarSlider = () =>
+    useSettingsStore((store) => store.general.playerbarSlider, shallow);
 
-export const useGenreTarget = () => useSettingsStore((store) => store.general.genreTarget);
+export const useGenreTarget = () => useSettingsStore((store) => store.general.genreTarget, shallow);
+
+export const useLanguage = () => useSettingsStore((state) => state.general.language, shallow);
+
+export const useAccent = () => useSettingsStore((state) => state.general.accent, shallow);
+
+export const useNativeAspectRatio = () =>
+    useSettingsStore((state) => state.general.nativeAspectRatio, shallow);
+
+export const useButtonSize = () => useSettingsStore((state) => state.general.buttonSize, shallow);
+
+export const useSkipButtons = () => useSettingsStore((state) => state.general.skipButtons, shallow);
+
+export const useImageRes = () => useSettingsStore((state) => state.general.imageRes, shallow);
+
+export const useVolumeWidth = () => useSettingsStore((state) => state.general.volumeWidth, shallow);
+
+export const useFollowCurrentSong = () =>
+    useSettingsStore((state) => state.general.followCurrentSong, shallow);
+
+export const useThemeSettings = () =>
+    useSettingsStore(
+        (state) => ({
+            followSystemTheme: state.general.followSystemTheme,
+            theme: state.general.theme,
+            themeDark: state.general.themeDark,
+            themeLight: state.general.themeLight,
+            useThemeAccentColor: state.general.useThemeAccentColor,
+        }),
+        shallow,
+    );
+
+export const useSideQueueType = () =>
+    useSettingsStore((state) => state.general.sideQueueType, shallow);
+
+export const useVolumeWheelStep = () =>
+    useSettingsStore((state) => state.general.volumeWheelStep, shallow);
+
+export const useSidebarPlaylistList = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistList, shallow);
+
+export const useSidebarItems = () =>
+    useSettingsStore((state) => state.general.sidebarItems, shallow);
+
+export const useSidebarCollapsedNavigation = () =>
+    useSettingsStore((state) => state.general.sidebarCollapsedNavigation, shallow);
+
+export const usePlayerbarOpenDrawer = () =>
+    useSettingsStore((state) => state.general.playerbarOpenDrawer, shallow);
+
+export const useShowRatings = () => useSettingsStore((state) => state.general.showRatings, shallow);
+
+export const useArtistRadioCount = () =>
+    useSettingsStore((state) => state.general.artistRadioCount, shallow);
+
+export const useArtistBackground = () =>
+    useSettingsStore(
+        (state) => ({
+            artistBackground: state.general.artistBackground,
+            artistBackgroundBlur: state.general.artistBackgroundBlur,
+        }),
+        shallow,
+    );
+
+export const useAlbumBackground = () =>
+    useSettingsStore(
+        (state) => ({
+            albumBackground: state.general.albumBackground,
+            albumBackgroundBlur: state.general.albumBackgroundBlur,
+        }),
+        shallow,
+    );
+
+export const useExternalLinks = () =>
+    useSettingsStore(
+        (state) => ({
+            externalLinks: state.general.externalLinks,
+            lastFM: state.general.lastFM,
+            musicBrainz: state.general.musicBrainz,
+        }),
+        shallow,
+    );
+
+export const useHomeFeature = () => useSettingsStore((state) => state.general.homeFeature, shallow);
+
+export const useHomeItems = () => useSettingsStore((state) => state.general.homeItems, shallow);
+
+export const useArtistItems = () => useSettingsStore((state) => state.general.artistItems, shallow);
+
+export const useArtistReleaseTypeItems = () =>
+    useSettingsStore((state) => state.general.artistReleaseTypeItems, shallow);
+
+export const useZoomFactor = () => useSettingsStore((state) => state.general.zoomFactor, shallow);
+
+export const usePathReplace = () =>
+    useSettingsStore(
+        (state) => ({
+            pathReplace: state.general.pathReplace,
+            pathReplaceWith: state.general.pathReplaceWith,
+        }),
+        shallow,
+    );
+
+export const useLastfmApiKey = () =>
+    useSettingsStore((state) => state.general.lastfmApiKey, shallow);
+
+export const useSidebarPanelOrder = () =>
+    useSettingsStore((state) => state.general.sidebarPanelOrder, shallow);
+
+export const useCombinedLyricsAndVisualizer = () =>
+    useSettingsStore((state) => state.general.combinedLyricsAndVisualizer, shallow);
+
+export const useShowLyricsInSidebar = () =>
+    useSettingsStore((state) => state.general.showLyricsInSidebar, shallow);
+
+export const useShowVisualizerInSidebar = () =>
+    useSettingsStore((state) => state.general.showVisualizerInSidebar, shallow);
 
 export const useAutoDJSettings = () => useSettingsStore((store) => store.autoDJ, shallow);
 

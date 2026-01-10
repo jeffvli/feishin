@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
-import { useCurrentServerId, useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store';
+import { useArtistRadioCount, useCurrentServerId, usePlayButtonBehavior } from '/@/renderer/store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { AlbumArtist, Artist } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
@@ -16,7 +16,7 @@ interface PlayArtistRadioActionProps {
 }
 
 export const PlayArtistRadioAction = ({ artist, disabled }: PlayArtistRadioActionProps) => {
-    const { artistRadioCount } = useGeneralSettings();
+    const artistRadioCount = useArtistRadioCount();
     const { t } = useTranslation();
     const player = usePlayer();
     const serverId = useCurrentServerId();

@@ -110,7 +110,7 @@ export const SONG_TABLE_COLUMNS: DefaultTableColumn[] = [
         label: i18n.t('table.config.label.year', { postProcess: 'titleCase' }),
         pinned: null,
         value: TableColumn.YEAR,
-        width: 100,
+        width: 200,
     },
     {
         align: 'center',
@@ -119,7 +119,7 @@ export const SONG_TABLE_COLUMNS: DefaultTableColumn[] = [
         label: i18n.t('table.config.label.releaseDate', { postProcess: 'titleCase' }),
         pinned: null,
         value: TableColumn.RELEASE_DATE,
-        width: 120,
+        width: 240,
     },
     {
         align: 'center',
@@ -376,7 +376,7 @@ export const ALBUM_TABLE_COLUMNS: DefaultTableColumn[] = [
         label: i18n.t('table.config.label.year', { postProcess: 'titleCase' }),
         pinned: null,
         value: TableColumn.YEAR,
-        width: 100,
+        width: 200,
     },
     {
         align: 'center',
@@ -385,7 +385,7 @@ export const ALBUM_TABLE_COLUMNS: DefaultTableColumn[] = [
         label: i18n.t('table.config.label.releaseDate', { postProcess: 'titleCase' }),
         pinned: null,
         value: TableColumn.RELEASE_DATE,
-        width: 120,
+        width: 240,
     },
     {
         align: 'center',

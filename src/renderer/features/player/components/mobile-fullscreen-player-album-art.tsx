@@ -7,9 +7,9 @@ import styles from './mobile-fullscreen-player.module.css';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import {
     useFullScreenPlayerStore,
+    useImageRes,
     usePlayerData,
     usePlayerSong,
-    useSettingsStore,
 } from '/@/renderer/store';
 import { Center } from '/@/shared/components/center/center';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -78,7 +78,7 @@ export const MobileFullscreenPlayerAlbumArt = () => {
     const mainImageRef = useRef<HTMLImageElement | null>(null);
     const [mainImageDimensions, setMainImageDimensions] = useState({ idealSize: 1000 });
 
-    const albumArtRes = useSettingsStore((store) => store.general.imageRes.fullScreenPlayer);
+    const { fullScreenPlayer: albumArtRes } = useImageRes();
     const { useImageAspectRatio } = useFullScreenPlayerStore();
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();

@@ -213,7 +213,11 @@ const QueryValueInput = ({
                 <NumberInput
                     onChange={onChange}
                     size="sm"
-                    value={value !== undefined && value !== null ? Number(value) : undefined}
+                    value={
+                        value !== undefined && value !== null && value !== ''
+                            ? Number(value)
+                            : undefined
+                    }
                     {...props}
                 />
             );

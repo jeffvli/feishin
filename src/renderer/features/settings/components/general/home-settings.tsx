@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import { DraggableItems } from '/@/renderer/features/settings/components/general/draggable-items';
 import {
     HomeItem,
@@ -15,7 +17,7 @@ const HOME_ITEMS: Array<[string, string]> = [
     [HomeItem.MOST_PLAYED, 'page.home.mostPlayed'],
 ];
 
-export const HomeSettings = () => {
+export const HomeSettings = memo(() => {
     const { homeItems } = useGeneralSettings();
     const { setHomeItems } = useSettingsStoreActions();
 
@@ -28,4 +30,4 @@ export const HomeSettings = () => {
             title="setting.homeConfiguration"
         />
     );
-};
+});

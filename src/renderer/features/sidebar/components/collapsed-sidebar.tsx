@@ -17,7 +17,8 @@ import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 import {
     SidebarItemType,
     useCurrentServer,
-    useGeneralSettings,
+    useSidebarCollapsedNavigation,
+    useSidebarItems,
     useWindowSettings,
 } from '/@/renderer/store';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
@@ -32,7 +33,8 @@ export const CollapsedSidebar = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { windowBarStyle } = useWindowSettings();
-    const { sidebarCollapsedNavigation, sidebarItems } = useGeneralSettings();
+    const sidebarCollapsedNavigation = useSidebarCollapsedNavigation();
+    const sidebarItems = useSidebarItems();
     const currentServer = useCurrentServer();
 
     const translatedSidebarItemMap = useMemo(
@@ -145,7 +147,9 @@ export const CollapsedSidebar = () => {
                             />
                         </DropdownMenu.Target>
                         <DropdownMenu.Dropdown>
-                            <ServerSelectorItems />
+                            <ScrollArea style={{ maxHeight: '95vh' }}>
+                                <ServerSelectorItems />
+                            </ScrollArea>
                         </DropdownMenu.Dropdown>
                     </DropdownMenu>
                 )}

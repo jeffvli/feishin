@@ -11,7 +11,11 @@ import {
     SidebarPlaylistList,
     SidebarSharedPlaylistList,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
-import { SidebarItemType, useGeneralSettings } from '/@/renderer/store/settings.store';
+import {
+    SidebarItemType,
+    useSidebarItems,
+    useSidebarPlaylistList,
+} from '/@/renderer/store/settings.store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
 import { Group } from '/@/shared/components/group/group';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
@@ -19,7 +23,7 @@ import { Text } from '/@/shared/components/text/text';
 
 export const MobileSidebar = () => {
     const { t } = useTranslation();
-    const { sidebarPlaylistList } = useGeneralSettings();
+    const sidebarPlaylistList = useSidebarPlaylistList();
 
     const translatedSidebarItemMap = useMemo(
         () => ({
@@ -38,7 +42,7 @@ export const MobileSidebar = () => {
         [t],
     );
 
-    const { sidebarItems } = useGeneralSettings();
+    const sidebarItems = useSidebarItems();
 
     const sidebarItemsWithRoute: SidebarItemType[] = useMemo(() => {
         if (!sidebarItems) return [];

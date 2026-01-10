@@ -3,10 +3,10 @@ import clsx from 'clsx';
 import styles from './player-bar.module.css';
 
 import { Playerbar } from '/@/renderer/features/player/components/playerbar';
-import { useGeneralSettings } from '/@/renderer/store/settings.store';
+import { usePlayerbarOpenDrawer } from '/@/renderer/store';
 
 export const PlayerBar = () => {
-    const { playerbarOpenDrawer } = useGeneralSettings();
+    const playerbarOpenDrawer = usePlayerbarOpenDrawer();
 
     return (
         <div
