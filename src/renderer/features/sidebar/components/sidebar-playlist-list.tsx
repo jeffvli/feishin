@@ -1,14 +1,16 @@
 import { openContextModal } from '@mantine/modals';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { memo, MouseEvent, useCallback, useMemo, useState } from 'react';
+import { memo, MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 
 import styles from './sidebar-playlist-list.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
-import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
+// getDraggedItems not needed here; sidebar rows use the playlist id directly for dragging
+import { DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
+import { Play } from '/@/shared/types/types';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
@@ -36,17 +38,41 @@ import {
     Song,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
-import { Play } from '/@/shared/types/types';
+
+const getPlaylistOrderKey = (serverId: string | undefined, scope: 'owned' | 'shared') => {
+    const sid = serverId || 'local';
+    return `playlistOrder:${sid}:${scope}`;
+};
+
+const loadSavedOrderForServer = (serverId: string | undefined, scope: 'owned' | 'shared') => {
+    try {
+        const raw = localStorage.getItem(getPlaylistOrderKey(serverId, scope));
+        if (!raw) return undefined;
+        const parsed = JSON.parse(raw) as string[];
+        if (!Array.isArray(parsed)) return undefined;
+        return parsed;
+    } catch {
+        return undefined;
+    }
+};
+
+const saveOrderForServer = (serverId: string | undefined, ids: string[], scope: 'owned' | 'shared') => {
+    try {
+        localStorage.setItem(getPlaylistOrderKey(serverId, scope), JSON.stringify(ids));
+    } catch {
+        // ignore
+    }
+};
 
 interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'onPlay'> {
     item: Playlist;
     name: string;
     onContextMenu: (e: MouseEvent<HTMLAnchorElement>, item: Playlist) => void;
     to: string;
+    onReorder?: (sourceIds: string[], targetId: string, edge: 'top' | 'bottom' | null) => void;
 }
 
-const PlaylistRowButton = memo(({ item, name, onContextMenu, to }: PlaylistRowButtonProps) => {
+const PlaylistRowButton = memo(({ item, name, onContextMenu, to, onReorder }: PlaylistRowButtonProps) => {
     const url = {
         pathname: generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: to }),
         state: { item },
@@ -58,24 +84,30 @@ const PlaylistRowButton = memo(({ item, name, onContextMenu, to }: PlaylistRowBu
     const { isDraggedOver, isDragging, ref } = useDragDrop<HTMLAnchorElement>({
         drag: {
             getId: () => {
-                const draggedItems = getDraggedItems(item, undefined);
-                return draggedItems.map((draggedItem) => draggedItem.id);
+                return item && item.id ? [item.id] : [];
             },
             getItem: () => {
-                const draggedItems = getDraggedItems(item, undefined);
-                return draggedItems;
+                return item ? [item] : [];
             },
             itemType: LibraryItem.PLAYLIST,
-            operation: [DragOperation.ADD],
+            operation: [DragOperation.ADD, DragOperation.REORDER],
             target: DragTarget.PLAYLIST,
         },
         drop: {
             canDrop: (args) => {
-                return (
+                // Allow dropping items into a playlist (ADD)
+                const canAdd =
                     args.source.itemType !== undefined &&
                     args.source.type !== DragTarget.PLAYLIST &&
-                    (args.source.operation?.includes(DragOperation.ADD) ?? false)
-                );
+                    (args.source.operation?.includes(DragOperation.ADD) ?? false);
+
+                // Allow reordering playlists when source is playlist and operation includes REORDER
+                // do not allow cross-scope reorders
+                const canReorder =
+                    args.source.itemType === LibraryItem.PLAYLIST &&
+                    args.source.type === DragTarget.PLAYLIST &&
+                    (args.source.operation?.includes(DragOperation.REORDER) ?? false);
+                return canAdd || canReorder;
             },
             getData: () => {
                 return {
@@ -94,6 +126,19 @@ const PlaylistRowButton = memo(({ item, name, onContextMenu, to }: PlaylistRowBu
             onDrop: (args) => {
                 const sourceItemType = args.source.itemType as LibraryItem;
                 const sourceIds = args.source.id;
+
+                // Handle playlist reordering locally
+                if (
+                    sourceItemType === LibraryItem.PLAYLIST &&
+                    (args.source.operation?.includes(DragOperation.REORDER) ?? false) &&
+                    args.edge &&
+                    (args.edge === 'top' || args.edge === 'bottom') &&
+                    onReorder
+                ) {
+
+                    onReorder(sourceIds, to, args.edge);
+                    return;
+                }
 
                 const modalProps: {
                     albumId?: string[];
@@ -325,6 +370,10 @@ export const SidebarPlaylistList = () => {
         }),
     );
 
+    const [displayItems, setDisplayItems] = useState<Playlist[] | undefined>(
+        playlistsQuery.data?.items,
+    );
+
     const handlePlayPlaylist = useCallback(
         (id: string, playType: Play) => {
             player.addToQueueByFetch(server.id, [id], LibraryItem.PLAYLIST, playType);
@@ -361,6 +410,69 @@ export const SidebarPlaylistList = () => {
 
         return { ...base, items: owned };
     }, [playlistsQuery.data?.items, handlePlayPlaylist, server?.type, server.username]);
+
+    useEffect(() => {
+        const items = memoizedItemData.items as Playlist[] | undefined;
+        if (!items) {
+            setDisplayItems(items);
+            return;
+        }
+
+        const saved = loadSavedOrderForServer(server?.id, 'owned');
+        if (!saved) {
+            setDisplayItems(items);
+            return;
+        }
+
+        // Apply saved order, include only playlists that still exist
+        const itemMap = new Map(items.map((it) => [it.id, it]));
+        const ordered = saved
+            .map((id) => itemMap.get(id))
+            .filter((it): it is Playlist => it !== undefined);
+
+        // Append any new items that weren't in saved order
+        const remaining = items.filter((it) => !saved.includes(it.id));
+        const new_order = [...ordered, ...remaining];
+
+        setDisplayItems(new_order);
+        saveOrderForServer(server?.id, new_order.map(playlist => playlist.id), 'owned');
+    }, [memoizedItemData.items]);
+
+    const handleReorder = (sourceIds: string[], targetId: string, edge: 'top' | 'bottom' | null) => {
+        if (!displayItems || !edge) return;
+
+        const prev = displayItems;
+        const currentIds = prev.map((p) => p.id);
+        const targetIndex = currentIds.indexOf(targetId);
+        if (targetIndex === -1) return;
+
+        const idsWithoutSources = currentIds.filter((id) => !sourceIds.includes(id));
+
+        const sourcesBeforeTarget = sourceIds.filter((id) => {
+            const sourceIndex = currentIds.indexOf(id);
+            return sourceIndex !== -1 && sourceIndex < targetIndex;
+        }).length;
+
+        const insertIndexInFiltered =
+            edge === 'top' ? targetIndex - sourcesBeforeTarget : targetIndex - sourcesBeforeTarget + 1;
+
+        const insertIndex = Math.max(0, Math.min(insertIndexInFiltered, idsWithoutSources.length));
+
+        const reorderedIds = [
+            ...idsWithoutSources.slice(0, insertIndex),
+            ...sourceIds,
+            ...idsWithoutSources.slice(insertIndex),
+        ];
+
+        const itemMap = new Map(prev.map((item) => [item.id, item]));
+
+        const reorderedItems = reorderedIds
+            .map((id) => itemMap.get(id))
+            .filter((item): item is Playlist => item !== undefined);
+
+        setDisplayItems(reorderedItems);
+        saveOrderForServer(server?.id, reorderedIds, 'owned');
+    };
 
     const handleCreatePlaylistModal = (e: MouseEvent<HTMLButtonElement>) => {
         openCreatePlaylistModal(server, e);
@@ -410,13 +522,14 @@ export const SidebarPlaylistList = () => {
                 </Group>
             </Accordion.Control>
             <Accordion.Panel>
-                {memoizedItemData?.items?.map((item, index) => (
+                {displayItems?.map((item, index) => (
                     <PlaylistRowButton
                         item={item}
                         key={index}
                         name={item.name}
                         onContextMenu={handleContextMenu}
                         to={item.id}
+                        onReorder={handleReorder}
                     />
                 ))}
             </Accordion.Panel>
@@ -438,6 +551,10 @@ export const SidebarSharedPlaylistList = () => {
             },
             serverId: server?.id,
         }),
+    );
+
+    const [displayItems, setDisplayItems] = useState<Playlist[] | undefined>(
+        playlistsQuery.data?.items,
     );
 
     const handlePlayPlaylist = useCallback(
@@ -481,6 +598,69 @@ export const SidebarSharedPlaylistList = () => {
         return { ...base, items: shared };
     }, [handlePlayPlaylist, playlistsQuery.data?.items, server?.type, server.username]);
 
+    useEffect(() => {
+        const items = memoizedItemData.items as Playlist[] | undefined;
+        if (!items) {
+            setDisplayItems(items);
+            return;
+        }
+
+        const saved = loadSavedOrderForServer(server?.id, 'shared');
+        if (!saved) {
+            setDisplayItems(items);
+            return;
+        }
+
+        // Apply saved order, include only playlists that still exist
+        const itemMap = new Map(items.map((it) => [it.id, it]));
+        const ordered = saved
+            .map((id) => itemMap.get(id))
+            .filter((it): it is Playlist => it !== undefined);
+
+        // Append any new items that weren't in saved order
+        const remaining = items.filter((it) => !saved.includes(it.id));
+        const new_order = [...ordered, ...remaining];
+
+        setDisplayItems(new_order);
+        saveOrderForServer(server?.id, new_order.map(playlist => playlist.id), 'shared');
+    }, [memoizedItemData.items]);
+
+    const handleReorder = (sourceIds: string[], targetId: string, edge: 'top' | 'bottom' | null) => {
+        if (!displayItems || !edge) return;
+
+        const prev = displayItems;
+        const currentIds = prev.map((p) => p.id);
+        const targetIndex = currentIds.indexOf(targetId);
+        if (targetIndex === -1) return;
+
+        const idsWithoutSources = currentIds.filter((id) => !sourceIds.includes(id));
+
+        const sourcesBeforeTarget = sourceIds.filter((id) => {
+            const sourceIndex = currentIds.indexOf(id);
+            return sourceIndex !== -1 && sourceIndex < targetIndex;
+        }).length;
+
+        const insertIndexInFiltered =
+            edge === 'top' ? targetIndex - sourcesBeforeTarget : targetIndex - sourcesBeforeTarget + 1;
+
+        const insertIndex = Math.max(0, Math.min(insertIndexInFiltered, idsWithoutSources.length));
+
+        const reorderedIds = [
+            ...idsWithoutSources.slice(0, insertIndex),
+            ...sourceIds,
+            ...idsWithoutSources.slice(insertIndex),
+        ];
+
+        const itemMap = new Map(prev.map((item) => [item.id, item]));
+
+        const reorderedItems = reorderedIds
+            .map((id) => itemMap.get(id))
+            .filter((item): item is Playlist => item !== undefined);
+
+        setDisplayItems(reorderedItems);
+        saveOrderForServer(server?.id, reorderedIds, 'shared');
+    };
+
     if (memoizedItemData?.items?.length === 0) {
         return null;
     }
@@ -495,13 +675,14 @@ export const SidebarSharedPlaylistList = () => {
                 </Text>
             </Accordion.Control>
             <Accordion.Panel>
-                {memoizedItemData?.items?.map((item, index) => (
+                {displayItems?.map((item, index) => (
                     <PlaylistRowButton
                         item={item}
                         key={index}
                         name={item.name}
                         onContextMenu={handleContextMenu}
                         to={item.id}
+                        onReorder={handleReorder}
                     />
                 ))}
             </Accordion.Panel>
