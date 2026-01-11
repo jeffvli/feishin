@@ -15,7 +15,7 @@ win:
     target:
         - zip
         - nsis
-    icon: assets/icons/icon.png
+    icon: assets/icons/icon.ico
 
 nsis:
     allowToChangeInstallationDirectory: true
