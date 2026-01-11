@@ -38,6 +38,9 @@ export const THEME_DATA = [
     { label: 'Shades of Purple', type: 'dark', value: AppTheme.SHADES_OF_PURPLE },
     { label: 'VS Code Dark+', type: 'dark', value: AppTheme.VSCODE_DARK_PLUS },
     { label: 'VS Code Light+', type: 'light', value: AppTheme.VSCODE_LIGHT_PLUS },
+    { label: 'Rosé Pine', type: 'dark', value: AppTheme.ROSE_PINE },
+    { label: 'Rosé Pine Moon', type: 'dark', value: AppTheme.ROSE_PINE_MOON },
+    { label: 'Rosé Pine Dawn', type: 'light', value: AppTheme.ROSE_PINE_DAWN },
 ];
 
 export const useAppTheme = (overrideTheme?: AppTheme) => {

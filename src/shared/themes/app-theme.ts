@@ -29,6 +29,9 @@ import { solarizedLight } from '/@/shared/themes/solarized-light/solarized-light
 import { tokyoNight } from '/@/shared/themes/tokyo-night/tokyo-night';
 import { vscodeDarkPlus } from '/@/shared/themes/vscode-dark-plus/vscode-dark-plus';
 import { vscodeLightPlus } from '/@/shared/themes/vscode-light-plus/vscode-light-plus';
+import { rosePine } from '/@/shared/themes/rose-pine/rose-pine';
+import { rosePineMoon } from '/@/shared/themes/rose-pine-moon/rose-pine-moon';
+import { rosePineDawn } from '/@/shared/themes/rose-pine-dawn/rose-pine-dawn';
 
 export const appTheme: Record<AppTheme, AppThemeConfiguration> = {
     [AppTheme.AYU_DARK]: ayuDark,
@@ -56,6 +59,9 @@ export const appTheme: Record<AppTheme, AppThemeConfiguration> = {
     [AppTheme.TOKYO_NIGHT]: tokyoNight,
     [AppTheme.VSCODE_DARK_PLUS]: vscodeDarkPlus,
     [AppTheme.VSCODE_LIGHT_PLUS]: vscodeLightPlus,
+    [AppTheme.ROSE_PINE]: rosePine,
+    [AppTheme.ROSE_PINE_MOON]: rosePineMoon,
+    [AppTheme.ROSE_PINE_DAWN]: rosePineDawn
 };
 
 export const getAppTheme = (theme: AppTheme): AppThemeConfiguration => {
