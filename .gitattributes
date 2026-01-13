@@ -5,6 +5,7 @@
 *.jpeg  binary
 *.ico   binary
 *.icns  binary
+*.webp  binary
 *.eot   binary
 *.otf   binary
 *.ttf   binary
