@@ -3,7 +3,7 @@ import { AppThemeConfiguration } from '/@/shared/themes/app-theme-types';
 export const rosePineDawn: AppThemeConfiguration = {
     app: {
         'scrollbar-handle-active-background': 'rgba(206, 202, 205, 0.7)',
-        'scrollbar-handle-background': 'rgba(244, 237, 232, 0.5)'
+        'scrollbar-handle-background': 'rgba(244, 237, 232, 0.5)',
     },
     colors: {
         background: '#faf4ed', // base
@@ -18,5 +18,5 @@ export const rosePineDawn: AppThemeConfiguration = {
         surface: '#fffaf3', // surface
         'surface-foreground': '#797593', // subtle
     },
-    mode: 'light'
+    mode: 'light',
 };

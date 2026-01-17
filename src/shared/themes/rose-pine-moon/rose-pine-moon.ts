@@ -3,7 +3,7 @@ import { AppThemeConfiguration } from '/@/shared/themes/app-theme-types';
 export const rosePineMoon: AppThemeConfiguration = {
     app: {
         'scrollbar-handle-active-background': 'rgba(86, 82, 110, 0.7)',
-        'scrollbar-handle-background': 'rgba(42, 40, 62, 0.5)'
+        'scrollbar-handle-background': 'rgba(42, 40, 62, 0.5)',
     },
     colors: {
         background: '#232136', // base
@@ -18,5 +18,5 @@ export const rosePineMoon: AppThemeConfiguration = {
         surface: '#191724', // surface
         'surface-foreground': '#908caa', // subtle
     },
-    mode: 'dark'
+    mode: 'dark',
 };
