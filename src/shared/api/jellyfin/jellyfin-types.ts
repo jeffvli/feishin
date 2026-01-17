@@ -830,6 +830,16 @@ const getSessions = z.array(
     ),
 );
 
+const studioListParameters = paginationParameters.merge(
+    baseParameters.extend({
+        NameStartsWithOrGreater: z.string().optional(),
+    }),
+);
+
+const studioList = z.object({
+    Items: z.array(studio),
+});
+
 export const jfType = {
     _enum: {
         albumArtistList: albumArtistListSort,
@@ -866,6 +876,7 @@ export const jfType = {
         similarSongs: similarSongsParameters,
         songDetail: songDetailParameters,
         songList: songListParameters,
+        studioList: studioListParameters,
         updatePlaylist: updatePlaylistParameters,
     },
     _response: {
@@ -899,6 +910,7 @@ export const jfType = {
         similarSongs,
         song,
         songList,
+        studioList,
         topSongsList,
         updatePlaylist,
         user,

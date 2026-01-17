@@ -1,22 +1,19 @@
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { ChangeEvent, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
-import { MultiSelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
 import { useListContext } from '/@/renderer/context/list-context';
+import { TagFilters } from '/@/renderer/features/albums/components/tag-filter';
 import { useAlbumListFilters } from '/@/renderer/features/albums/hooks/use-album-list-filters';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { useGenreList } from '/@/renderer/features/genres/api/genres-api';
-import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import {
     ArtistMultiSelectRow,
     GenreMultiSelectRow,
 } from '/@/renderer/features/shared/components/multi-select-rows';
-import { useCurrentServer, useCurrentServerId } from '/@/renderer/store';
+import { useCurrentServer } from '/@/renderer/store';
 import { useAppStore, useAppStoreActions } from '/@/renderer/store/app.store';
-import { titleCase } from '/@/renderer/utils';
-import { NDSongQueryFieldsLabelMap } from '/@/shared/api/navidrome/navidrome-types';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -362,113 +359,5 @@ export const NavidromeAlbumFilters = ({ disableArtistFilter }: NavidromeAlbumFil
                 {t('common.reset', { postProcess: 'sentenceCase' })}
             </Button>
         </Stack>
-    );
-};
-
-interface TagFilterItemProps {
-    label: string;
-    onChange: (value: null | string[]) => void;
-    options: Array<{ id: string; name: string }>;
-    tagValue: string;
-    value: string | string[] | undefined;
-}
-
-const TagFilterItem = ({ label, onChange, options, tagValue, value }: TagFilterItemProps) => {
-    const selectData = useMemo(
-        () =>
-            options.map((option) => ({
-                label: option.name,
-                value: option.id,
-            })),
-        [options],
-    );
-
-    const currentValue = useMemo(() => {
-        if (!value) return [];
-        return Array.isArray(value) ? value : [value];
-    }, [value]);
-
-    const handleChange = useCallback(
-        (e: null | string[]) => {
-            if (e && e.length > 0) {
-                onChange(e);
-            } else {
-                onChange(null);
-            }
-        },
-        [onChange],
-    );
-
-    return (
-        <MultiSelectWithInvalidData
-            clearable
-            data={selectData}
-            key={tagValue}
-            label={label}
-            limit={100}
-            onChange={handleChange}
-            searchable
-            value={currentValue}
-        />
-    );
-};
-
-TagFilterItem.displayName = 'TagFilterItem';
-
-const TagFilters = () => {
-    const { query, setCustom } = useAlbumListFilters();
-
-    const serverId = useCurrentServerId();
-
-    const tagsQuery = useSuspenseQuery(
-        sharedQueries.tagList({
-            options: {
-                gcTime: 1000 * 60 * 60,
-                staleTime: 1000 * 60 * 60,
-            },
-            query: {
-                type: LibraryItem.ALBUM,
-            },
-            serverId,
-        }),
-    );
-
-    const handleTagFilter = useMemo(
-        () => (tag: string, e: null | string[]) => {
-            setCustom({ [tag]: e });
-        },
-        [setCustom],
-    );
-
-    const tags = useMemo(() => {
-        const results: { label: string; options: { id: string; name: string }[]; value: string }[] =
-            [];
-
-        for (const tag of tagsQuery.data?.enumTags || []) {
-            if (!tagsQuery.data?.excluded.album.includes(tag.name)) {
-                results.push({
-                    label: NDSongQueryFieldsLabelMap[tag.name] ?? titleCase(tag.name),
-                    options: tag.options,
-                    value: tag.name,
-                });
-            }
-        }
-
-        return results;
-    }, [tagsQuery.data]);
-
-    return (
-        <>
-            {tags.map((tag) => (
-                <TagFilterItem
-                    key={tag.value}
-                    label={tag.label}
-                    onChange={(e) => handleTagFilter(tag.value, e)}
-                    options={tag.options}
-                    tagValue={tag.value}
-                    value={query._custom?.[tag.value] as string | string[] | undefined}
-                />
-            ))}
-        </>
     );
 };

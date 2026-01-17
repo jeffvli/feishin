@@ -248,6 +248,15 @@ export const contract = c.router({
             404: jfType._response.error,
         },
     },
+    getStudioList: {
+        method: 'GET',
+        path: 'studios',
+        query: jfType._parameters.studioList,
+        responses: {
+            200: jfType._response.studioList,
+            400: jfType._response.error,
+        },
+    },
     getTopSongsList: {
         method: 'GET',
         path: 'users/:userId/items',

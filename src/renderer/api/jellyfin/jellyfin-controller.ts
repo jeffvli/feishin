@@ -1233,11 +1233,39 @@ export const JellyfinController: InternalControllerEndpoint = {
             throw new Error('failed to get tags');
         }
 
+        const studioRes = await jfApiClient(apiClientProps).getStudioList({
+            query: {
+                EnableTotalRecordCount: true,
+                IncludeItemTypes: 'MusicAlbum,MusicArtist',
+                ParentId: query.folder,
+            },
+        });
+
+        if (studioRes.status !== 200) {
+            throw new Error('failed to get studios');
+        }
+
+        const boolTags = res.body.Tags?.sort((a, b) =>
+            a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()),
+        );
+
+        const excluded = { album: [], song: [] };
+
+        if (!studioRes.body.Items.length) {
+            return { boolTags, excluded };
+        }
+
         return {
-            boolTags: res.body.Tags?.sort((a, b) =>
-                a.toLocaleLowerCase().localeCompare(b.toLocaleLowerCase()),
-            ),
-            excluded: { album: [], song: [] },
+            boolTags,
+            enumTags: [
+                {
+                    name: 'Studios',
+                    options: studioRes.body.Items.sort((a, b) =>
+                        a.Name.toLocaleLowerCase().localeCompare(b.Name.toLocaleLowerCase()),
+                    ).map((option) => ({ id: option.Name, name: option.Name })),
+                },
+            ],
+            excluded,
         };
     },
     getTopSongs: async (args) => {
