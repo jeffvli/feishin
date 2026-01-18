@@ -352,7 +352,6 @@ export const NavidromeAlbumFilters = ({ disableArtistFilter }: NavidromeAlbumFil
                 onChange={(e) => debouncedHandleYearFilter(e)}
                 value={query.minYear ?? undefined}
             />
-            <Divider my="md" />
             <TagFilters />
             <Divider my="md" />
             <Button fullWidth onClick={clear} variant="subtle">

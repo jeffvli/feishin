@@ -8,6 +8,7 @@ import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { useCurrentServerId } from '/@/renderer/store';
 import { titleCase } from '/@/renderer/utils';
 import { NDSongQueryFieldsLabelMap } from '/@/shared/api/navidrome/navidrome-types';
+import { Divider } from '/@/shared/components/divider/divider';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface TagFilterItemProps {
@@ -110,13 +111,24 @@ export const TagFilters = () => {
         return results;
     }, [tagsQuery.data]);
 
+    const boolTags = useMemo(() => {
+        return tagsQuery.data?.boolTags || [];
+    }, [tagsQuery.data]);
+
+    const hasTagFilters = useMemo(() => {
+        return (
+            (tagsQuery.data?.boolTags && tagsQuery.data.boolTags.length > 0) || enumTags.length > 0
+        );
+    }, [tagsQuery.data, enumTags]);
+
     return (
         <>
-            {tagsQuery.data?.boolTags && tagsQuery.data.boolTags.length > 0 && (
+            {hasTagFilters && <Divider my="md" />}
+            {boolTags.length > 0 && (
                 <MultiSelectWithInvalidData
                     clearable
-                    data={tagsQuery.data.boolTags}
-                    defaultValue={query._custom?.[tagsQuery.data.boolTags.join('|')] || []}
+                    data={boolTags}
+                    defaultValue={query._custom?.[boolTags.join('|')] || []}
                     label={t('common.tags', { postProcess: 'sentenceCase' })}
                     onChange={handleTagsFilter}
                     searchable
