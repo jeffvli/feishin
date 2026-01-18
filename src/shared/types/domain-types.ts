@@ -1616,7 +1616,6 @@ export type StructuredUnsyncedLyric = Omit<FullLyricsMetadata, 'lyrics'> & {
 };
 
 export type Tag = {
-    id: string;
     name: string;
     options: { id: string; name: string }[];
 };
@@ -1632,12 +1631,11 @@ export type TagListQuery = {
 };
 
 export type TagListResponse = {
-    boolTags?: string[];
-    enumTags?: { name: string; options: { id: string; name: string }[] }[];
     excluded: {
         album: string[];
         song: string[];
     };
+    tags?: Tag[];
 };
 
 export type UserInfoArgs = BaseEndpointArgs & { query: UserInfoQuery };

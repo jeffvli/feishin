@@ -48,6 +48,8 @@ export const SongListHeaderFilters = ({ toggleGenreTarget }: { toggleGenreTarget
             : t('entity.track_other', { postProcess: 'titleCase' });
     }, [target, t]);
 
+    console.log(songFilters.query);
+
     const hasActiveFilters = useMemo(() => {
         const query = songFilters.query;
         return Boolean(

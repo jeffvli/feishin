@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { useListContext } from '/@/renderer/context/list-context';
-import { TagFilters } from '/@/renderer/features/albums/components/tag-filter';
 import { useAlbumListFilters } from '/@/renderer/features/albums/hooks/use-album-list-filters';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
@@ -12,6 +11,7 @@ import {
     ArtistMultiSelectRow,
     GenreMultiSelectRow,
 } from '/@/renderer/features/shared/components/multi-select-rows';
+import { TagFilters } from '/@/renderer/features/shared/components/tag-filter';
 import { useCurrentServerId } from '/@/renderer/store';
 import { useAppStore, useAppStoreActions } from '/@/renderer/store/app.store';
 import { Button } from '/@/shared/components/button/button';
@@ -48,6 +48,7 @@ export const JellyfinAlbumFilters = ({ disableArtistFilter }: JellyfinAlbumFilte
         query,
         setAlbumArtist,
         setCompilation,
+        setCustom,
         setFavorite,
         setGenreId,
         setMaxYear,
@@ -336,7 +337,7 @@ export const JellyfinAlbumFilters = ({ disableArtistFilter }: JellyfinAlbumFilte
                     value={query.maxYear ?? undefined}
                 />
             </Group>
-            <TagFilters />
+            <TagFilters query={query} setCustom={setCustom} type={LibraryItem.ALBUM} />
             <Divider my="md" />
             <Button fullWidth onClick={clear} variant="subtle">
                 {t('common.reset', { postProcess: 'sentenceCase' })}

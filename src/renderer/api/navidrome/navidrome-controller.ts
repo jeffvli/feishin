@@ -778,7 +778,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             }
         }
 
-        const enumTags = Array.from(tagsToValues)
+        const tags = Array.from(tagsToValues)
             .map((data) => ({
                 name: data[0],
                 options: data[1]
@@ -793,12 +793,11 @@ export const NavidromeController: InternalControllerEndpoint = {
         const excludedSongTags = Array.from(EXCLUDED_SONG_TAGS.values());
 
         return {
-            boolTags: undefined,
-            enumTags,
             excluded: {
                 album: excludedAlbumTags,
                 song: excludedSongTags,
             },
+            tags,
         };
     },
     getTopSongs: SubsonicController.getTopSongs,

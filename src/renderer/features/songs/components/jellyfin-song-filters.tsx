@@ -1,17 +1,16 @@
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
-import { MultiSelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
 import { useListContext } from '/@/renderer/context/list-context';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { useGenreList } from '/@/renderer/features/genres/api/genres-api';
-import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import {
     ArtistMultiSelectRow,
     GenreMultiSelectRow,
 } from '/@/renderer/features/shared/components/multi-select-rows';
+import { TagFilters } from '/@/renderer/features/shared/components/tag-filter';
 import { useSongListFilters } from '/@/renderer/features/songs/hooks/use-song-list-filters';
 import { useCurrentServer } from '/@/renderer/store';
 import { useAppStore, useAppStoreActions } from '/@/renderer/store/app.store';
@@ -87,24 +86,11 @@ export const JellyfinSongFilters = ({ disableArtistFilter }: JellyfinSongFilters
         }));
     }, [albumArtistListQuery.data?.items]);
 
-    const tagsQuery = useQuery(
-        sharedQueries.tagList({
-            query: {
-                type: LibraryItem.SONG,
-            },
-            serverId,
-        }),
-    );
-
     const selectedArtistIds = useMemo(() => query.artistIds || [], [query.artistIds]);
 
     const selectedGenres = useMemo(() => {
         return query._custom?.GenreIds?.split(',') || [];
     }, [query._custom?.GenreIds]);
-
-    const selectedTags = useMemo(() => {
-        return query._custom?.Tags?.split('|');
-    }, [query._custom?.Tags]);
 
     const yesNoFilters = [
         {
@@ -177,13 +163,6 @@ export const JellyfinSongFilters = ({ disableArtistFilter }: JellyfinSongFilters
                     IncludeItemTypes: 'Audio',
                 };
             });
-        },
-        [setCustom],
-    );
-
-    const handleTagFilter = useCallback(
-        (e: null | string[]) => {
-            setCustom({ Tags: e && e.length > 0 ? e.join('|') : null });
         },
         [setCustom],
     );
@@ -339,16 +318,7 @@ export const JellyfinSongFilters = ({ disableArtistFilter }: JellyfinSongFilters
                     value={query.maxYear ?? undefined}
                 />
             </Group>
-            {tagsQuery.data?.boolTags && tagsQuery.data.boolTags.length > 0 && (
-                <MultiSelectWithInvalidData
-                    clearable
-                    data={tagsQuery.data.boolTags}
-                    label={t('common.tags', { postProcess: 'sentenceCase' })}
-                    onChange={handleTagFilter}
-                    searchable
-                    value={selectedTags}
-                />
-            )}
+            <TagFilters query={query} setCustom={setCustom} type={LibraryItem.SONG} />
             <Divider my="md" />
             <Button fullWidth onClick={clear} variant="subtle">
                 {t('common.reset', { postProcess: 'sentenceCase' })}
