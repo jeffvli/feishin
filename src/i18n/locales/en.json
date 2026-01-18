@@ -962,6 +962,8 @@
         "sidebarConfiguration": "sidebar configuration",
         "sidebarPlaylistList_description": "show or hide the playlist list in the sidebar",
         "sidebarPlaylistList": "sidebar playlist list",
+        "sidebarPlaylistSorting_description": "allows manual playlist sorting in the sidebar using drag and drop instead of the default server order",
+        "sidebarPlaylistSorting": "sidebar playlist sorting",
         "sidePlayQueueStyle_description": "sets the style of the side play queue",
         "sidePlayQueueStyle_optionAttached": "attached",
         "sidePlayQueueStyle_optionDetached": "detached",

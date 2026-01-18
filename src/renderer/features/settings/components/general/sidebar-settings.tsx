@@ -22,6 +22,14 @@ export const SidebarSettings = memo(() => {
         });
     };
 
+    const handleSetSidebarPlaylistSorting = (e: ChangeEvent<HTMLInputElement>) => {
+        setSettings({
+            general: {
+                sidebarPlaylistSorting: e.target.checked,
+            },
+        });
+    };
+
     const handleSetSidebarCollapsedNavigation = (e: ChangeEvent<HTMLInputElement>) => {
         setSettings({
             general: {
@@ -43,6 +51,19 @@ export const SidebarSettings = memo(() => {
                 postProcess: 'sentenceCase',
             }),
             title: t('setting.sidebarPlaylistList', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    checked={settings.sidebarPlaylistSorting}
+                    onChange={handleSetSidebarPlaylistSorting}
+                />
+            ),
+            description: t('setting.sidebarPlaylistSorting', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.sidebarPlaylistSorting', { postProcess: 'sentenceCase' }),
         },
         {
             control: (

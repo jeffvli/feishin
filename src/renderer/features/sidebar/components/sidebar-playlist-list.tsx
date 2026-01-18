@@ -19,7 +19,12 @@ import {
 import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-button-click';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useCurrentServerId, usePermissions } from '/@/renderer/store';
+import {
+    useCurrentServer,
+    useCurrentServerId,
+    usePermissions,
+    useSidebarPlaylistSorting,
+} from '/@/renderer/store';
 import { formatDurationString } from '/@/renderer/utils';
 import { Accordion } from '/@/shared/components/accordion/accordion';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
@@ -82,6 +87,7 @@ const PlaylistRowButton = memo(
             state: { item },
         };
         const { t } = useTranslation();
+        const sidebarPlaylistSorting = useSidebarPlaylistSorting();
 
         const [isHovered, setIsHovered] = useState(false);
 
@@ -111,7 +117,7 @@ const PlaylistRowButton = memo(
                         args.source.itemType === LibraryItem.PLAYLIST &&
                         args.source.type === DragTarget.PLAYLIST &&
                         (args.source.operation?.includes(DragOperation.REORDER) ?? false);
-                    return canAdd || canReorder;
+                    return canAdd || (canReorder && sidebarPlaylistSorting);
                 },
                 getData: () => {
                     return {
@@ -373,6 +379,7 @@ export const SidebarPlaylistList = () => {
     const player = usePlayer();
     const { t } = useTranslation();
     const server = useCurrentServer();
+    const sidebarPlaylistSorting = useSidebarPlaylistSorting();
 
     const playlistsQuery = useQuery(
         playlistsQueries.list({
@@ -428,7 +435,7 @@ export const SidebarPlaylistList = () => {
 
     useEffect(() => {
         const items = memoizedItemData.items as Playlist[] | undefined;
-        if (!items) {
+        if (!items || !sidebarPlaylistSorting) {
             setDisplayItems(items);
             return;
         }
@@ -455,7 +462,7 @@ export const SidebarPlaylistList = () => {
             new_order.map((playlist) => playlist.id),
             'owned',
         );
-    }, [memoizedItemData.items, server?.id]);
+    }, [memoizedItemData.items, server?.id, sidebarPlaylistSorting]);
 
     const handleReorder = (
         sourceIds: string[],
@@ -566,6 +573,7 @@ export const SidebarSharedPlaylistList = () => {
     const player = usePlayer();
     const { t } = useTranslation();
     const server = useCurrentServer();
+    const sidebarPlaylistSorting = useSidebarPlaylistSorting();
 
     const playlistsQuery = useQuery(
         playlistsQueries.list({
@@ -625,7 +633,7 @@ export const SidebarSharedPlaylistList = () => {
 
     useEffect(() => {
         const items = memoizedItemData.items as Playlist[] | undefined;
-        if (!items) {
+        if (!items || !sidebarPlaylistSorting) {
             setDisplayItems(items);
             return;
         }
@@ -652,7 +660,7 @@ export const SidebarSharedPlaylistList = () => {
             new_order.map((playlist) => playlist.id),
             'shared',
         );
-    }, [memoizedItemData.items, server?.id]);
+    }, [memoizedItemData.items, server?.id, sidebarPlaylistSorting]);
 
     const handleReorder = (
         sourceIds: string[],
