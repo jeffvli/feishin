@@ -3,7 +3,6 @@ import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
-import { MultiSelectWithInvalidData } from '/@/renderer/components/select-with-invalid-data';
 import { useListContext } from '/@/renderer/context/list-context';
 import { TagFilters } from '/@/renderer/features/albums/components/tag-filter';
 import { useAlbumListFilters } from '/@/renderer/features/albums/hooks/use-album-list-filters';
@@ -21,7 +20,6 @@ import { Group } from '/@/shared/components/group/group';
 import { VirtualMultiSelect } from '/@/shared/components/multi-select/virtual-multi-select';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
-import { SpinnerIcon } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { YesNoSelect } from '/@/shared/components/yes-no-select/yes-no-select';
@@ -338,27 +336,6 @@ export const JellyfinAlbumFilters = ({ disableArtistFilter }: JellyfinAlbumFilte
                     value={query.maxYear ?? undefined}
                 />
             </Group>
-            {!isGenrePage && (
-                <MultiSelectWithInvalidData
-                    clearable
-                    data={genreList}
-                    defaultValue={query.genreIds || []}
-                    label={t('entity.genre', { count: 2, postProcess: 'sentenceCase' })}
-                    onChange={handleGenresFilter}
-                    searchable
-                />
-            )}
-            <MultiSelectWithInvalidData
-                clearable
-                data={selectableAlbumArtists}
-                defaultValue={query.artistIds || []}
-                disabled={disableArtistFilter}
-                label={t('entity.artist', { count: 2, postProcess: 'sentenceCase' })}
-                limit={300}
-                onChange={handleAlbumArtistFilter}
-                rightSection={albumArtistListQuery.isFetching ? <SpinnerIcon /> : undefined}
-                searchable
-            />
             <TagFilters />
             <Divider my="md" />
             <Button fullWidth onClick={clear} variant="subtle">
