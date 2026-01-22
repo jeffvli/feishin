@@ -187,10 +187,20 @@ const createWinThumbarButtons = () => {
 };
 
 const createTray = () => {
-    tray =
-        isLinux() || isMacOS()
-            ? new Tray(getAssetPath('icons/icon.png'))
-            : new Tray(getAssetPath('icons/icon.ico'));
+    let trayIcon: Electron.NativeImage | string;
+
+    if (isMacOS()) {
+        const iconPath = getAssetPath('icons/32x32.png');
+        const icon = nativeImage.createFromPath(iconPath);
+        icon.setTemplateImage(true);
+        trayIcon = icon;
+    } else if (isLinux()) {
+        trayIcon = getAssetPath('icons/icon.png');
+    } else {
+        trayIcon = getAssetPath('icons/icon.ico');
+    }
+
+    tray = new Tray(trayIcon);
 
     const contextMenu = Menu.buildFromTemplate([
         {
