@@ -190,7 +190,7 @@ const createTray = () => {
     let trayIcon: Electron.NativeImage | string;
 
     if (isMacOS()) {
-        const iconPath = getAssetPath('icons/32x32.png');
+        const iconPath = getAssetPath('icons/IconTemplate.png');
         const icon = nativeImage.createFromPath(iconPath);
         icon.setTemplateImage(true);
         trayIcon = icon;
