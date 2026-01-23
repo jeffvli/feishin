@@ -28,8 +28,7 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const isFolder = (rowItem as unknown as Folder)?._itemType === LibraryItem.FOLDER;
-    const shouldShowFolderIcon =
-        isFolder && !item?.imageId && !item?.imageUrl;
+    const shouldShowFolderIcon = isFolder && !item?.imageId && !item?.imageUrl;
 
     const handlePlay = (playType: Play, event: React.MouseEvent<HTMLButtonElement>) => {
         if (!item) {
@@ -125,7 +124,7 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
             </TableColumnContainer>
         );
     }
-    
+
     return (
         <TableColumnContainer {...props}>
             <div
