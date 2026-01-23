@@ -778,6 +778,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                 res.body.indexes?.index?.flatMap((idx) =>
                     idx.artist.map((artist) => ({
                         artist: artist.name,
+                        coverArt: artist.coverArt,
                         id: artist.id.toString(),
                         isDir: true,
                         title: artist.name,

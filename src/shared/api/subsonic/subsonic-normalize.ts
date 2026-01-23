@@ -399,6 +399,8 @@ const normalizeFolder = (
             songs: results?.songs || [],
         },
         id: item.id.toString(),
+        imageId: item.coverArt?.toString() || null,
+        imageUrl: null,
         name: item.title,
         parentId: item.parent,
     };

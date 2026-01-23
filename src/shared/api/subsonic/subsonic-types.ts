@@ -613,6 +613,7 @@ const getIndexes = z.object({
             .object({
                 artist: z
                     .object({
+                        coverArt: z.string().optional(),
                         id: z.string(),
                         name: z.string(),
                     })

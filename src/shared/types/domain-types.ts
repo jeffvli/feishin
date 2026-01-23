@@ -257,6 +257,8 @@ export type Folder = {
         songs: Song[];
     };
     id: string;
+    imageId?: null | string;
+    imageUrl?: null | string;
     name: string;
     parentId?: string;
 };
