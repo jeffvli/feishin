@@ -45,7 +45,7 @@ import { Play } from '/@/shared/types/types';
 
 const getPlaylistOrderKey = (serverId: string | undefined, scope: 'owned' | 'shared') => {
     const sid = serverId || 'local';
-    return `playlistOrder:${sid}:${scope}`;
+    return `playlist_order:${sid}:${scope}`;
 };
 
 const loadSavedOrderForServer = (serverId: string | undefined, scope: 'owned' | 'shared') => {
