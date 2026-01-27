@@ -26,6 +26,7 @@ const discordRpc = isElectron() ? window.api.discordRpc : null;
 type ActivityState = [QueueSong | undefined, number, PlayerStatus];
 
 const MAX_FIELD_LENGTH = 127;
+const MAX_URL_LENGTH = 256;
 
 const truncate = (field: string) =>
     field.length <= MAX_FIELD_LENGTH ? field : field.substring(0, MAX_FIELD_LENGTH - 1) + '…';
@@ -163,24 +164,35 @@ export const useDiscordRpc = () => {
                 ) {
                     activity.stateUrl =
                         'https://www.last.fm/music/' + encodeURIComponent(song.artists[0].name);
-                    activity.detailsUrl =
+
+                    const detailsUrl =
                         'https://www.last.fm/music/' +
                         encodeURIComponent(song.albumArtists[0].name) +
                         '/' +
                         encodeURIComponent(song.album || '_') +
                         '/' +
                         encodeURIComponent(song.name);
+
+                    // The details URL has a max length, only set it if it doesn't exceed it
+                    if (detailsUrl.length <= MAX_URL_LENGTH) {
+                        activity.detailsUrl = detailsUrl;
+                    }
                 }
 
                 if (
                     discordSettings.linkType == DiscordLinkType.MBZ ||
                     discordSettings.linkType == DiscordLinkType.MBZ_LAST_FM
                 ) {
+                    let detailsUrl: string | undefined = undefined;
                     if (song?.mbzTrackId) {
-                        activity.detailsUrl = 'https://musicbrainz.org/track/' + song.mbzTrackId;
+                        detailsUrl = 'https://musicbrainz.org/track/' + song.mbzTrackId;
                     } else if (song?.mbzRecordingId) {
-                        activity.detailsUrl =
-                            'https://musicbrainz.org/recording/' + song.mbzRecordingId;
+                        detailsUrl = 'https://musicbrainz.org/recording/' + song.mbzRecordingId;
+                    }
+
+                    // The details URL has a max length, only set it if it doesn't exceed it
+                    if (detailsUrl && detailsUrl.length <= MAX_URL_LENGTH) {
+                        activity.detailsUrl = detailsUrl;
                     }
                 }
 
