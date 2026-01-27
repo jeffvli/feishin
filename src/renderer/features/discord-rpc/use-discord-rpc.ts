@@ -183,16 +183,11 @@ export const useDiscordRpc = () => {
                     discordSettings.linkType == DiscordLinkType.MBZ ||
                     discordSettings.linkType == DiscordLinkType.MBZ_LAST_FM
                 ) {
-                    let detailsUrl: string | undefined = undefined;
                     if (song?.mbzTrackId) {
-                        detailsUrl = 'https://musicbrainz.org/track/' + song.mbzTrackId;
+                        activity.detailsUrl = 'https://musicbrainz.org/track/' + song.mbzTrackId;
                     } else if (song?.mbzRecordingId) {
-                        detailsUrl = 'https://musicbrainz.org/recording/' + song.mbzRecordingId;
-                    }
-
-                    // The details URL has a max length, only set it if it doesn't exceed it
-                    if (detailsUrl && detailsUrl.length <= MAX_URL_LENGTH) {
-                        activity.detailsUrl = detailsUrl;
+                        activity.detailsUrl =
+                            'https://musicbrainz.org/recording/' + song.mbzRecordingId;
                     }
                 }
 
