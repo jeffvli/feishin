@@ -1,5 +1,5 @@
-import UpnpMediaRendererClient from 'upnp-mediarenderer-client';
 import et from 'elementtree';
+import UpnpMediaRendererClient from 'upnp-mediarenderer-client';
 
 export class MediaRendererClient extends UpnpMediaRendererClient {
     constructor(url: string) {
@@ -12,47 +12,22 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
         });
     }
 
-    public play(opts?: { speed?: number }, callback?: (error?: any, result?: any) => void) {
-        var params = {
-            InstanceID: this.instanceId,
-            Speed: opts?.speed || 1,
-        };
-        this.callAction('AVTransport', 'Play', params, callback || (() => {}));
-    }
-
-    public getMute(callback?: (error?: any, result?: any) => void) {
-        var params = {
-            InstanceID: this.instanceId,
-            Channel: 'Master',
-        };
-        this.callAction('RenderingControl', 'GetMute', params, callback || (() => {}));
-    }
-
-    public setMute(isMuted: boolean, callback?: (error?: any, result?: any) => void) {
-        var params = {
-            InstanceID: this.instanceId,
-            Channel: 'Master',
-            DesiredMute: isMuted ? 1 : 0,
-        };
-        this.callAction('RenderingControl', 'SetMute', params, callback || (() => {}));
-    }
-
     public enqueue(url: string, options: any, callback: (error?: any, result?: any) => void) {
-        var self = this;
+        const self = this;
 
-        var dlnaFeatures = options.dlnaFeatures || '*';
-        var contentType = options.contentType || 'video/mpeg'; // Default to something generic
-        var protocolInfo = 'http-get:*:' + contentType + ':' + dlnaFeatures;
+        const dlnaFeatures = options.dlnaFeatures || '*';
+        const contentType = options.contentType || 'video/mpeg'; // Default to something generic
+        const protocolInfo = 'http-get:*:' + contentType + ':' + dlnaFeatures;
 
-        var metadata = options.metadata || {};
+        const metadata = options.metadata || {};
         metadata.url = url;
         metadata.protocolInfo = protocolInfo;
 
-        var params = {
-            RemoteProtocolInfo: protocolInfo,
-            PeerConnectionManager: null,
-            PeerConnectionID: -1,
+        const params = {
             Direction: 'Input',
+            PeerConnectionID: -1,
+            PeerConnectionManager: null,
+            RemoteProtocolInfo: protocolInfo,
         };
 
         this.callAction(
@@ -71,7 +46,7 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
                     self.instanceId = result.AVTransportID;
                 }
 
-                var params = {
+                const params = {
                     InstanceID: self.instanceId,
                     NextURI: url,
                     NextURIMetaData: buildMetadata(metadata),
@@ -84,37 +59,62 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
             },
         );
     }
+
+    public getMute(callback?: (error?: any, result?: any) => void) {
+        const params = {
+            Channel: 'Master',
+            InstanceID: this.instanceId,
+        };
+        this.callAction('RenderingControl', 'GetMute', params, callback || (() => {}));
+    }
+
+    public play(opts?: { speed?: number }, callback?: (error?: any, result?: any) => void) {
+        const params = {
+            InstanceID: this.instanceId,
+            Speed: opts?.speed || 1,
+        };
+        this.callAction('AVTransport', 'Play', params, callback || (() => {}));
+    }
+
+    public setMute(isMuted: boolean, callback?: (error?: any, result?: any) => void) {
+        const params = {
+            Channel: 'Master',
+            DesiredMute: isMuted ? 1 : 0,
+            InstanceID: this.instanceId,
+        };
+        this.callAction('RenderingControl', 'SetMute', params, callback || (() => {}));
+    }
 }
 function buildMetadata(metadata: any) {
-    var didl = et.Element('DIDL-Lite');
+    const didl = et.Element('DIDL-Lite');
     didl.set('xmlns', 'urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/');
     didl.set('xmlns:dc', 'http://purl.org/dc/elements/1.1/');
     didl.set('xmlns:upnp', 'urn:schemas-upnp-org:metadata-1-0/upnp/');
     didl.set('xmlns:sec', 'http://www.sec.co.kr/');
 
-    var item = et.SubElement(didl, 'item');
+    const item = et.SubElement(didl, 'item');
     item.set('id', 0);
     item.set('parentID', -1);
     item.set('restricted', false);
 
-    var OBJECT_CLASSES = {
+    const OBJECT_CLASSES = {
         audio: 'object.item.audioItem.musicTrack',
-        video: 'object.item.videoItem.movie',
         image: 'object.item.imageItem.photo',
+        video: 'object.item.videoItem.movie',
     };
 
     if (metadata.type) {
-        var klass = et.SubElement(item, 'upnp:class');
+        const klass = et.SubElement(item, 'upnp:class');
         klass.text = OBJECT_CLASSES[metadata.type];
     }
 
     if (metadata.title) {
-        var title = et.SubElement(item, 'dc:title');
+        const title = et.SubElement(item, 'dc:title');
         title.text = metadata.title;
     }
 
     if (metadata.creator) {
-        var creator = et.SubElement(item, 'dc:creator');
+        const creator = et.SubElement(item, 'dc:creator');
         creator.text = metadata.creator;
     }
 
@@ -125,11 +125,11 @@ function buildMetadata(metadata: any) {
     }
 
     if (metadata.subtitlesUrl) {
-        var captionInfo = et.SubElement(item, 'sec:CaptionInfo');
+        const captionInfo = et.SubElement(item, 'sec:CaptionInfo');
         captionInfo.set('sec:type', 'srt');
         captionInfo.text = metadata.subtitlesUrl;
 
-        var captionInfoEx = et.SubElement(item, 'sec:CaptionInfoEx');
+        const captionInfoEx = et.SubElement(item, 'sec:CaptionInfoEx');
         captionInfoEx.set('sec:type', 'srt');
         captionInfoEx.text = metadata.subtitlesUrl;
 
@@ -139,8 +139,8 @@ function buildMetadata(metadata: any) {
         res.text = metadata.subtitlesUrl;
     }
 
-    var doc = new et.ElementTree(didl);
-    var xml = doc.write({ xml_declaration: false });
+    const doc = new et.ElementTree(didl);
+    const xml = doc.write({ xml_declaration: false });
 
     return xml;
 }

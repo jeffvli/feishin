@@ -202,6 +202,39 @@ export type DiscoveredServerItem = {
     url: string;
 };
 
+export type DlnaChangedTrack = {
+    trackUrl: string;
+};
+
+export type DlnaDevice = {
+    name: string;
+    url: string;
+};
+
+export type DlnaInitialize = {
+    deviceUrl: string;
+    volume: number;
+};
+
+export type DlnaMetadata = {
+    creator?: string;
+    subtitleUrl?: string;
+    title?: string;
+    type?: 'audo' | 'image' | 'music';
+};
+
+export type DlnaQueue = {
+    current: DlnaQueueItem;
+    isPaused: boolean;
+    next?: DlnaQueueItem;
+};
+
+export type DlnaQueueItem = {
+    metadata: DlnaMetadata;
+    mimeType: string;
+    url: string;
+};
+
 export type GridCardData = {
     cardControls: any;
     cardRows: CardRow<Album | AlbumArtist | Artist | Playlist | Song>[];
@@ -281,37 +314,4 @@ export interface UniqueId {
 export type WebAudio = {
     context: AudioContext;
     gains: GainNode[];
-};
-
-export type DlnaDevice = {
-    name: string;
-    url: string;
-};
-
-export type DlnaInitialize = {
-    deviceUrl: string;
-    volume: number;
-};
-
-export type DlnaQueue = {
-    current: DlnaQueueItem;
-    next?: DlnaQueueItem;
-    isPaused: boolean;
-};
-
-export type DlnaQueueItem = {
-    url: string;
-    metadata: DlnaMetadata;
-    mimeType: string;
-};
-
-export type DlnaMetadata = {
-    title?: string;
-    creator?: string;
-    type?: 'music' | 'audo' | 'image';
-    subtitleUrl?: string;
-};
-
-export type DlnaChangedTrack = {
-    trackUrl: string;
 };

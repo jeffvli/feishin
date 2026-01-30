@@ -4,10 +4,10 @@ import { useEffect } from 'react';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { DiscordRpcHook } from '/@/renderer/features/discord-rpc/use-discord-rpc';
+import { DlnaPlayer } from '/@/renderer/features/player/audio-player/dlna-player';
 import { MainPlayerListenerHook } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
-import { DlnaPlayer } from '/@/renderer/features/player/audio-player/dlna-player';
 import { AutoDJHook } from '/@/renderer/features/player/hooks/use-auto-dj';
 import { MediaSessionHook } from '/@/renderer/features/player/hooks/use-media-session';
 import { MPRISHook } from '/@/renderer/features/player/hooks/use-mpris';
@@ -42,9 +42,9 @@ export const AudioPlayers = () => {
 
     const {
         audioDeviceId,
+        dlnaDevice,
         mpvProperties: { audioSampleRateHz },
         webAudio,
-        dlnaDevice,
     } = usePlaybackSettings();
     const { setWebAudio, webAudio: audioContext } = useWebAudio();
 
@@ -66,12 +66,12 @@ export const AudioPlayers = () => {
                 audioContext={audioContext}
                 audioDeviceId={audioDeviceId}
                 audioSampleRateHz={audioSampleRateHz}
+                dlnaDevice={dlnaDevice}
                 playbackType={playbackType}
                 resetSampleRate={resetSampleRate}
                 serverId={serverId}
                 setWebAudio={setWebAudio}
                 webAudio={webAudio}
-                dlnaDevice={dlnaDevice}
             />
         </>
     );
@@ -81,22 +81,22 @@ const AudioPlayersContent = ({
     audioContext,
     audioDeviceId,
     audioSampleRateHz,
+    dlnaDevice,
     playbackType,
     resetSampleRate,
     serverId,
     setWebAudio,
     webAudio,
-    dlnaDevice,
 }: {
     audioContext: ReturnType<typeof useWebAudio>['webAudio'];
     audioDeviceId: null | string | undefined;
     audioSampleRateHz: number | undefined;
+    dlnaDevice?: DlnaDevice | null;
     playbackType: PlayerType;
     resetSampleRate: ReturnType<typeof useSettingsStoreActions>['resetSampleRate'];
     serverId: null | string;
     setWebAudio: ReturnType<typeof useWebAudio>['setWebAudio'];
     webAudio: boolean;
-    dlnaDevice?: DlnaDevice | null;
 }) => {
     const isRadioActive = useIsRadioActive();
 
@@ -191,8 +191,7 @@ const AudioPlayersContent = ({
         return <RadioWebPlayer />;
     }
 
-    if (dlnaDevice)
-        return <DlnaPlayer />;
+    if (dlnaDevice) return <DlnaPlayer />;
 
     return (
         <>

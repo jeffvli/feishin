@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
-import mime from 'mime';
 
 import isElectron from 'is-electron';
+import mime from 'mime';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
@@ -9,8 +9,8 @@ import { getSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-s
 import { AudioPlayer, PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
 import { useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { usePlaybackSettings, usePlayerActions, usePlayerStore } from '/@/renderer/store';
-import { DlnaQueueItem, PlayerStatus } from '/@/shared/types/types';
 import { QueueSong } from '/@/shared/types/domain-types';
+import { DlnaQueueItem, PlayerStatus } from '/@/shared/types/types';
 
 export interface DlnaPlayerEngineHandle extends AudioPlayer {}
 
@@ -51,7 +51,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     const hasPopulatedQueueRef = useRef<boolean>(false);
     const isMountedRef = useRef<boolean>(true);
 
-    const { transcode, dlnaDevice } = usePlaybackSettings();
+    const { dlnaDevice, transcode } = usePlaybackSettings();
 
     // Start the mpv instance on startup
     useEffect(() => {
@@ -66,7 +66,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
 
             await dlnaPlayer?.initialize({
                 deviceUrl: dlnaDevice.url,
-                volume: volume
+                volume: volume,
             });
 
             // After initialization, populate the queue if currentSrc is available
@@ -83,7 +83,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                     : undefined;
 
                 if (current && !hasPopulatedQueueRef.current && dlnaPlayer) {
-                    const queue = { current, next, isPaused: true };
+                    const queue = { current, isPaused: true, next };
                     dlnaPlayer?.setQueue(queue);
                     hasPopulatedQueueRef.current = true;
                 }
@@ -310,7 +310,7 @@ function replaceDlnaQueue(transcode: {
         ? songToDlnaQueueItem(playerData.nextSong, transcode)
         : undefined;
 
-    const queue = { current, next, isPaused: false };
+    const queue = { current, isPaused: false, next };
     dlnaPlayer?.setQueue(queue);
 }
 

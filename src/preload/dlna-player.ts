@@ -1,5 +1,12 @@
 import { ipcRenderer, IpcRendererEvent } from 'electron';
-import { DlnaChangedTrack, DlnaDevice, DlnaInitialize, DlnaQueue, DlnaQueueItem } from '/@/shared/types/types';
+
+import {
+    DlnaChangedTrack,
+    DlnaDevice,
+    DlnaInitialize,
+    DlnaQueue,
+    DlnaQueueItem,
+} from '/@/shared/types/types';
 
 const discover = () => {
     return ipcRenderer.invoke('dlna-discover') as Promise<DlnaDevice[]>;
@@ -33,16 +40,16 @@ const rendererDlnaChangedTrack = (
 
 export const dlnaPlayer = {
     discover,
+    getCurrentTime,
     initialize,
+    pause,
+    play,
+    seekTo,
+    setMute,
     setQueue,
     setQueueNext,
-    play,
-    pause,
-    stop,
-    getCurrentTime,
-    seekTo,
     setVolume,
-    setMute,
+    stop,
 };
 
 export const dlnaPlayerListener = {

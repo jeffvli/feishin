@@ -3,16 +3,6 @@ declare module 'upnp-mediarenderer-client' {
         instanceId: number;
 
         constructor(url: string);
-        pause(callback?: (err: Error, result: any) => void): void;
-        stop(callback?: (err: Error, result: any) => void): void;
-        seek(seconds: number, callback?: (err: Error, result: any) => void): void;
-        load(url: string, options: any, callback?: (err: Error, result: any) => void): void;
-        getVolume(callback?: (err: Error, result: number) => void): void;
-        setVolume(volume: number, callback?: (err: Error, result: any) => void): void;
-        getPosition(callback: (err: Error, result: any) => void): void;
-        getDuration(callback: (err: Error, result: any) => void): void;
-        on(event: EventType, callback: (value: any) => void): void;
-
         callAction(
             serviceType: string,
             actionName: string,
@@ -20,14 +10,24 @@ declare module 'upnp-mediarenderer-client' {
             callback: (error: any, result?: any) => void,
         ): void;
         emit(event: EventType, data?: any): void;
+        getDuration(callback: (err: Error, result: any) => void): void;
+        getPosition(callback: (err: Error, result: any) => void): void;
+        getVolume(callback?: (err: Error, result: number) => void): void;
+        load(url: string, options: any, callback?: (err: Error, result: any) => void): void;
+        on(event: EventType, callback: (value: any) => void): void;
+        pause(callback?: (err: Error, result: any) => void): void;
+        seek(seconds: number, callback?: (err: Error, result: any) => void): void;
+
+        setVolume(volume: number, callback?: (err: Error, result: any) => void): void;
+        stop(callback?: (err: Error, result: any) => void): void;
     }
 
     type EventType =
-        | 'status'
+        | 'changedTrack'
         | 'loading'
-        | 'playing'
         | 'paused'
-        | 'stopped'
+        | 'playing'
         | 'speedChanged'
-        | 'changedTrack';
+        | 'status'
+        | 'stopped';
 }

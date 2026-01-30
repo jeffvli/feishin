@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as dgram from 'dgram';
 import { XMLParser } from 'fast-xml-parser';
 import z from 'zod';
+
 import { DlnaDevice } from '/@/shared/types/types';
 
 const parser = new XMLParser();
@@ -25,10 +26,10 @@ export const discoverDlnaDevices = async () => {
     }
 
     return Array.from(devices.values());
-}
+};
 
 async function* discoverDeviceUrls(): AsyncGenerator<string, void, unknown> {
-    const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
+    const socket = dgram.createSocket({ reuseAddr: true, type: 'udp4' });
 
     const discoveredDevices = new Set<string>();
     const deviceQueue: string[] = [];

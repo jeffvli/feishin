@@ -1,24 +1,20 @@
 import { ipcMain } from 'electron';
+
 import {
-    DlnaChangedTrack,
-    DlnaInitialize,
-    DlnaQueue,
-    DlnaQueueItem,
-} from '/@/shared/types/types';
-import {
+    createClient,
+    enqueue,
     getTime,
     load,
     pause,
     play,
     seekTo,
-    createClient,
+    setMute,
     setVolume,
     stop,
-    enqueue,
-    setMute,
 } from '/@/main/features/core/dlna/controller';
-import { getMainWindow } from '/@/main/index';
 import { discoverDlnaDevices } from '/@/main/features/core/dlna/discovery';
+import { getMainWindow } from '/@/main/index';
+import { DlnaChangedTrack, DlnaInitialize, DlnaQueue, DlnaQueueItem } from '/@/shared/types/types';
 
 ipcMain.handle('dlna-discover', async () => discoverDlnaDevices());
 
