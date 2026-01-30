@@ -39,9 +39,8 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
                     if (err.code !== 'ENOACTION') {
                         return callback(err);
                     }
-                    //
+
                     // If PrepareForConnection is not implemented, we keep the default (0) InstanceID
-                    //
                 } else {
                     self.instanceId = result.AVTransportID;
                 }
@@ -86,13 +85,13 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
     }
 }
 function buildMetadata(metadata: any) {
-    const didl = et.Element('DIDL-Lite');
-    didl.set('xmlns', 'urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/');
-    didl.set('xmlns:dc', 'http://purl.org/dc/elements/1.1/');
-    didl.set('xmlns:upnp', 'urn:schemas-upnp-org:metadata-1-0/upnp/');
-    didl.set('xmlns:sec', 'http://www.sec.co.kr/');
+    const root = et.Element('DIDL-Lite');
+    root.set('xmlns', 'urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/');
+    root.set('xmlns:dc', 'http://purl.org/dc/elements/1.1/');
+    root.set('xmlns:upnp', 'urn:schemas-upnp-org:metadata-1-0/upnp/');
+    root.set('xmlns:sec', 'http://www.sec.co.kr/');
 
-    const item = et.SubElement(didl, 'item');
+    const item = et.SubElement(root, 'item');
     item.set('id', 0);
     item.set('parentID', -1);
     item.set('restricted', false);
@@ -119,7 +118,7 @@ function buildMetadata(metadata: any) {
     }
 
     if (metadata.url && metadata.protocolInfo) {
-        var res = et.SubElement(item, 'res');
+        const res = et.SubElement(item, 'res');
         res.set('protocolInfo', metadata.protocolInfo);
         res.text = metadata.url;
     }
@@ -133,14 +132,12 @@ function buildMetadata(metadata: any) {
         captionInfoEx.set('sec:type', 'srt');
         captionInfoEx.text = metadata.subtitlesUrl;
 
-        // Create a second `res` for the subtitles
-        var res = et.SubElement(item, 'res');
+        // Create a second resource for the subtitles
+        const res = et.SubElement(item, 'res');
         res.set('protocolInfo', 'http-get:*:text/srt:*');
         res.text = metadata.subtitlesUrl;
     }
 
-    const doc = new et.ElementTree(didl);
-    const xml = doc.write({ xml_declaration: false });
-
-    return xml;
+    const doc = new et.ElementTree(root);
+    return doc.write({ xml_declaration: false });;
 }
