@@ -186,6 +186,39 @@ const createWinThumbarButtons = () => {
     }
 };
 
+const createDockMenu = () => {
+    if (!isMacOS() || !app.dock) return;
+
+    const dockMenu = Menu.buildFromTemplate([
+        {
+            click: () => {
+                getMainWindow()?.webContents.send('renderer-player-play-pause');
+            },
+            label: 'Play/Pause',
+        },
+        {
+            click: () => {
+                getMainWindow()?.webContents.send('renderer-player-next');
+            },
+            label: 'Next Track',
+        },
+        {
+            click: () => {
+                getMainWindow()?.webContents.send('renderer-player-previous');
+            },
+            label: 'Previous Track',
+        },
+        {
+            click: () => {
+                getMainWindow()?.webContents.send('renderer-player-stop');
+            },
+            label: 'Stop',
+        },
+    ]);
+
+    app.dock.setMenu(dockMenu);
+};
+
 const createTray = () => {
     let trayIcon: Electron.NativeImage | string;
 
@@ -687,6 +720,7 @@ if (!singleInstance) {
             if (store.get('window_enable_tray', true)) {
                 createTray();
             }
+            createDockMenu();
             app.on('activate', () => {
                 // On macOS it's common to re-create a window in the app when the
                 // dock icon is clicked and there are no other windows open.
