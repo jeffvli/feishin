@@ -4,17 +4,14 @@ import UpnpMediaRendererClient from 'upnp-mediarenderer-client';
 export class MediaRendererClient extends UpnpMediaRendererClient {
     constructor(url: string) {
         super(url);
-
-        const self = this;
         this.on('status', (newStatus) => {
-            if (newStatus.hasOwnProperty('AVTransportURI'))
-                self.emit('changedTrack', newStatus.AVTransportURI);
+            if (Object.prototype.hasOwnProperty.call(newStatus, 'AVTransportURI')) {
+                this.emit('changedTrack', newStatus.AVTransportURI);
+            }
         });
     }
 
     public enqueue(url: string, options: any, callback: (error?: any, result?: any) => void) {
-        const self = this;
-
         const dlnaFeatures = options.dlnaFeatures || '*';
         const contentType = options.contentType || 'video/mpeg'; // Default to something generic
         const protocolInfo = 'http-get:*:' + contentType + ':' + dlnaFeatures;
@@ -42,16 +39,16 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
 
                     // If PrepareForConnection is not implemented, we keep the default (0) InstanceID
                 } else {
-                    self.instanceId = result.AVTransportID;
+                    this.instanceId = result.AVTransportID;
                 }
 
                 const params = {
-                    InstanceID: self.instanceId,
+                    InstanceID: this.instanceId,
                     NextURI: url,
                     NextURIMetaData: buildMetadata(metadata),
                 };
 
-                self.callAction('AVTransport', 'SetNextAVTransportURI', params, function (err) {
+                this.callAction('AVTransport', 'SetNextAVTransportURI', params, function (err) {
                     if (err) return callback(err);
                     callback();
                 });
@@ -139,5 +136,5 @@ function buildMetadata(metadata: any) {
     }
 
     const doc = new et.ElementTree(root);
-    return doc.write({ xml_declaration: false });;
+    return doc.write({ xml_declaration: false });
 }
