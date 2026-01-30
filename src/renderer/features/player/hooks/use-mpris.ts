@@ -102,6 +102,7 @@ export const useMPRIS = () => {
             releaseYear: null,
             sampleRate: null,
             size: 0,
+            sortName: title,
             tags: null,
             trackNumber: 0,
             trackSubtitle: null,
