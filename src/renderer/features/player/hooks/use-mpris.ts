@@ -13,7 +13,7 @@ import { PlayerShuffle, ServerType } from '/@/shared/types/types';
 
 const ipc = isElectron() ? window.api.ipc : null;
 const utils = isElectron() ? window.api.utils : null;
-const mpris = isElectron() && utils?.isLinux() ? window.api.mpris : null;
+const mpris = isElectron() && (utils?.isLinux() || utils?.isMacOS()) ? window.api.mpris : null;
 
 export const useMPRIS = () => {
     const player = usePlayerStore();
@@ -221,7 +221,7 @@ const MPRISHookInner = () => {
 export const MPRISHook = () => {
     const isElectronEnv = isElectron();
     const utils = isElectronEnv ? window.api.utils : null;
-    const mpris = isElectronEnv && utils?.isLinux() ? window.api.mpris : null;
+    const mpris = isElectronEnv && (utils?.isLinux() || utils?.isMacOS()) ? window.api.mpris : null;
 
     if (mpris === null) {
         return null;
