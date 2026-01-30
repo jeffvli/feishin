@@ -31,7 +31,6 @@
     grid-area: metadata;
     gap: var(--theme-spacing-xl);
     align-items: center;
-    scrollbar-gutter: stable;
     text-align: center;
 }
 
@@ -122,6 +121,5 @@
         align-self: start;
         width: 300px;
         max-height: calc(100vh - 90px - var(--theme-spacing-lg) - 4rem);
-        overflow-y: auto;
     }
 }
