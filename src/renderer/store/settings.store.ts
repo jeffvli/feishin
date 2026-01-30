@@ -548,6 +548,11 @@ const PlayerFilterSchema = z.object({
     ]),
 });
 
+const DlnaDeviceSettingsSchema = z.object({
+    name: z.string(),
+    url: z.string(),
+});
+
 const PlaybackSettingsSchema = z.object({
     audioDeviceId: z.string().nullable().optional(),
     audioFadeOnStatusChange: z.boolean(),
@@ -556,6 +561,7 @@ const PlaybackSettingsSchema = z.object({
     mpvExtraParameters: z.array(z.string()),
     mpvProperties: MpvSettingsSchema,
     preservePitch: z.boolean(),
+    dlnaDevice: DlnaDeviceSettingsSchema.nullable().optional(),
     scrobble: ScrobbleSettingsSchema,
     transcode: TranscodingConfigSchema,
     type: z.nativeEnum(PlayerType),

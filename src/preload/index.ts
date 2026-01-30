@@ -9,6 +9,7 @@ import { localSettings } from './local-settings';
 import { lyrics } from './lyrics';
 import { mpris } from './mpris';
 import { mpvPlayer, mpvPlayerListener } from './mpv-player';
+import { dlnaPlayer, dlnaPlayerListener } from './dlna-player';
 import { remote } from './remote';
 import { utils } from './utils';
 
@@ -23,6 +24,8 @@ const api = {
     mpris,
     mpvPlayer,
     mpvPlayerListener,
+    dlnaPlayer,
+    dlnaPlayerListener,
     remote,
     utils,
 };

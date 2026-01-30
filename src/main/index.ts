@@ -23,7 +23,6 @@ import { access, constants } from 'fs';
 import path, { join } from 'path';
 
 import packageJson from '../../package.json';
-import { initializeDlna } from './features/core/dlna/dlna';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
@@ -725,5 +724,3 @@ if (!ipcMain.eventNames().includes('open-application-directory')) {
         shell.openPath(userDataPath);
     });
 }
-
-initializeDlna();

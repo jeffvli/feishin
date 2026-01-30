@@ -623,6 +623,7 @@
         "noDevicesFound": "No devices to cast to could be found",
         "thisComputer": "This computer",
         "castToDevice": "Cast playback to device",
+        "castingTo": "Casting to",
         "next": "next",
         "play": "play",
         "playbackFetchCancel": "this is taking a while… close the notification to cancel",

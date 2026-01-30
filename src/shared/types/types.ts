@@ -151,7 +151,6 @@ export enum PlayerStyle {
 }
 
 export enum PlayerType {
-    DLNA = 'dlna',
     LOCAL = 'local',
     WEB = 'web',
 }
@@ -282,4 +281,37 @@ export interface UniqueId {
 export type WebAudio = {
     context: AudioContext;
     gains: GainNode[];
+};
+
+export type DlnaDevice = {
+    name: string;
+    url: string;
+};
+
+export type DlnaInitialize = {
+    deviceUrl: string;
+    volume: number;
+};
+
+export type DlnaQueue = {
+    current: DlnaQueueItem;
+    next?: DlnaQueueItem;
+    isPaused: boolean;
+};
+
+export type DlnaQueueItem = {
+    url: string;
+    metadata: DlnaMetadata;
+    mimeType: string;
+};
+
+export type DlnaMetadata = {
+    title?: string;
+    creator?: string;
+    type?: 'music' | 'audo' | 'image';
+    subtitleUrl?: string;
+};
+
+export type DlnaChangedTrack = {
+    trackUrl: string;
 };
