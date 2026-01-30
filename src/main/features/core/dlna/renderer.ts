@@ -1,6 +1,8 @@
 import et from 'elementtree';
 import UpnpMediaRendererClient from 'upnp-mediarenderer-client';
 
+import { DlnaMetadata } from '/@/shared/types/types';
+
 export class MediaRendererClient extends UpnpMediaRendererClient {
     constructor(url: string) {
         super(url);
@@ -27,6 +29,8 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
             RemoteProtocolInfo: protocolInfo,
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
         this.callAction(
             'ConnectionManager',
             'PrepareForConnection',
@@ -39,16 +43,16 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
 
                     // If PrepareForConnection is not implemented, we keep the default (0) InstanceID
                 } else {
-                    this.instanceId = result.AVTransportID;
+                    self.instanceId = result.AVTransportID;
                 }
 
                 const params = {
-                    InstanceID: this.instanceId,
+                    InstanceID: self.instanceId,
                     NextURI: url,
                     NextURIMetaData: buildMetadata(metadata),
                 };
 
-                this.callAction('AVTransport', 'SetNextAVTransportURI', params, function (err) {
+                self.callAction('AVTransport', 'SetNextAVTransportURI', params, function (err) {
                     if (err) return callback(err);
                     callback();
                 });
@@ -81,7 +85,10 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
         this.callAction('RenderingControl', 'SetMute', params, callback || (() => {}));
     }
 }
-function buildMetadata(metadata: any) {
+
+/**
+ * Constructs a DIDL-Lite XML representation of media metadata based on the provided object and its properties, handling audio, image, video types with appropriate classifications, titles, creators, URLs for protocol information such as HTTP or RTSP streams*/
+function buildMetadata(metadata: DlnaMetadata & { protocolInfo: string; url: string }) {
     const root = et.Element('DIDL-Lite');
     root.set('xmlns', 'urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/');
     root.set('xmlns:dc', 'http://purl.org/dc/elements/1.1/');
@@ -120,19 +127,19 @@ function buildMetadata(metadata: any) {
         res.text = metadata.url;
     }
 
-    if (metadata.subtitlesUrl) {
+    if (metadata.subtitleUrl) {
         const captionInfo = et.SubElement(item, 'sec:CaptionInfo');
         captionInfo.set('sec:type', 'srt');
-        captionInfo.text = metadata.subtitlesUrl;
+        captionInfo.text = metadata.subtitleUrl;
 
         const captionInfoEx = et.SubElement(item, 'sec:CaptionInfoEx');
         captionInfoEx.set('sec:type', 'srt');
-        captionInfoEx.text = metadata.subtitlesUrl;
+        captionInfoEx.text = metadata.subtitleUrl;
 
         // Create a second resource for the subtitles
         const res = et.SubElement(item, 'res');
         res.set('protocolInfo', 'http-get:*:text/srt:*');
-        res.text = metadata.subtitlesUrl;
+        res.text = metadata.subtitleUrl;
     }
 
     const doc = new et.ElementTree(root);
