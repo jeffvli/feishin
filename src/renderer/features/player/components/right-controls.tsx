@@ -445,7 +445,7 @@ const CastButton = () => {
                     {t('player.thisComputer')}
                 </Menu.Item>
 
-                <Menu.Divider />
+                {devices.length > 0 || (!isSearching && <Menu.Divider />)}
 
                 {devices.map((device) => (
                     <Menu.Item
@@ -465,13 +465,14 @@ const CastButton = () => {
                 <Menu.Divider />
 
                 <Menu.Item
+                    closeMenuOnClick={false}
                     disabled={isSearching}
                     leftSection={
                         <Icon animate={isSearching ? 'spin' : undefined} icon="refresh" size="sm" />
                     }
                     onClick={discoverDevices}
                 >
-                    {t('action.refresh', { postProcess: 'titleCase' })}
+                    {t('action.scanDevices', { postProcess: 'titleCase' })}
                 </Menu.Item>
             </Menu.Dropdown>
         </Menu>
