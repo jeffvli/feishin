@@ -435,7 +435,7 @@ const CastButton = () => {
             </Menu.Target>
 
             <Menu.Dropdown>
-                <Menu.Label>{t('player.castToDevice')}</Menu.Label>
+                <Menu.Label mb={'xs'}>{t('player.castToDevice')}</Menu.Label>
 
                 <Menu.Item
                     color={!dlnaDevice ? 'blue' : undefined}
