@@ -24,7 +24,7 @@ ipcMain.handle('dlna-initialize', async (_event, data: DlnaInitialize) => {
     setVolume(data.volume);
 
     client.on('status', (status) => {
-        return console.log(`DLNA status change: ${JSON.stringify(status)}`);
+        return console.debug(`DLNA status change: ${JSON.stringify(status)}`);
     });
 
     client.on('changedTrack', (trackUrl) => {
