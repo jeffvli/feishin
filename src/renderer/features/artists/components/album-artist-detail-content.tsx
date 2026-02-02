@@ -88,6 +88,8 @@ import {
 } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, Play } from '/@/shared/types/types';
 
+const collator = new Intl.Collator();
+
 interface AlbumArtistActionButtonsProps {
     artistDiscographyLink: string;
     artistSongsLink: string;
@@ -1251,12 +1253,12 @@ const ArtistAlbums = ({ albumsQuery }: ArtistAlbumsProps) => {
                     const secondaryKeyB = getSecondaryTypePriorityKey(b.releaseType);
 
                     if (secondaryKeyA && secondaryKeyB) {
-                        return secondaryKeyA.localeCompare(secondaryKeyB);
+                        return collator.compare(secondaryKeyA, secondaryKeyB);
                     }
                 }
 
                 // Fallback to alphabetical for non-combined types or if weighted comparison isn't applicable
-                return a.releaseType.localeCompare(b.releaseType);
+                return collator.compare(a.releaseType, b.releaseType);
             });
     }, [albumsByReleaseType, artistReleaseTypeItems, t]);
 
