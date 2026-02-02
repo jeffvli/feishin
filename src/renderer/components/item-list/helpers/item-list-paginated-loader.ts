@@ -102,12 +102,12 @@ export const useItemListPaginatedLoader = ({
         async (force?: boolean) => {
             const queryKey = queryKeys[getQueryKeyName(itemType)].list(serverId, queryParams);
 
-            await queryClient.invalidateQueries();
-
             if (force) {
                 queryClient.setQueryData(queryKey, {
                     items: getInitialData(itemsPerPage),
                 });
+            } else {
+                await queryClient.invalidateQueries();
             }
 
             return queryRefetch();
