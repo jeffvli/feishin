@@ -71,6 +71,9 @@ const EXCLUDED_ALBUM_TAGS = new Set<string>([
 
 const EXCLUDED_SONG_TAGS = new Set<string>(['disctotal', 'tracktotal']);
 
+// Defining a re-usable Collator instance for performance reasons.
+const collator = new Intl.Collator(undefined, { numeric: true });
+
 // Tags that use IDs as values as opposed to the tag value
 const ID_TAGS = new Set<string>(['albumversion', 'mood']);
 
@@ -780,13 +783,12 @@ export const NavidromeController: InternalControllerEndpoint = {
             .map((data) => ({
                 name: data[0],
                 options: data[1]
-                    .sort((a, b) =>
-                        a.name
-                            .toLocaleLowerCase()
-                            .localeCompare(b.name.toLocaleLowerCase(), undefined, {
-                                numeric: true,
-                            }),
-                    )
+                    .sort((a, b) => {
+                        return collator.compare(
+                            a.name.toLocaleLowerCase(),
+                            b.name.toLocaleLowerCase(),
+                        );
+                    })
                     .map((option) => ({ id: option.id, name: option.name })),
             }))
             .sort((a, b) => a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase()));

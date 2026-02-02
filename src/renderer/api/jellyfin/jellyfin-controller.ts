@@ -38,6 +38,9 @@ const formatCommaDelimitedString = (value: string[]) => {
 // not the POST body
 const MAX_ITEMS_PER_PLAYLIST_ADD = 50;
 
+// Defining a re-usable Collator instance for performance reasons.
+const collator = new Intl.Collator(undefined, { numeric: true });
+
 const VERSION_INFO: VersionInfo = [
     [
         '10.9.0',
@@ -1250,11 +1253,9 @@ export const JellyfinController: InternalControllerEndpoint = {
         if (res.body.Tags?.length) {
             tags.push({
                 name: 'Tags',
-                options: res.body.Tags.sort((a, b) =>
-                    a
-                        .toLocaleLowerCase()
-                        .localeCompare(b.toLocaleLowerCase(), undefined, { numeric: true }),
-                ).map((tag) => ({ id: tag, name: tag })),
+                options: res.body.Tags.sort((a, b) => {
+                    return collator.compare(a.toLocaleLowerCase(), b.toLocaleLowerCase());
+                }).map((tag) => ({ id: tag, name: tag })),
             });
         }
 
