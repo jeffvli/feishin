@@ -14,6 +14,7 @@ import {
     useAutoDJSettings,
     useCurrentServer,
     useFullScreenPlayerStore,
+    useGeneralSettings,
     useHotkeySettings,
     usePlayerData,
     usePlayerMuted,
@@ -63,10 +64,11 @@ const calculateVolumeDown = (volume: number, volumeWheelStep: number) => {
 };
 
 export const RightControls = () => {
+    const { showRatings } = useGeneralSettings();
     return (
         <Flex align="flex-end" direction="column" h="100%" px="1rem" py="0.5rem">
             <Group h="calc(100% / 3)">
-                <RatingButton />
+                {showRatings && <RatingButton />}
                 <AutoDJButton />
             </Group>
             <Group align="center" gap="xs" wrap="nowrap">
