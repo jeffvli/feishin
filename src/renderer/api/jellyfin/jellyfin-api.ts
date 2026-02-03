@@ -137,7 +137,7 @@ export const contract = c.router({
     },
     getInstantMix: {
         method: 'GET',
-        path: 'songs/:itemId/InstantMix',
+        path: 'items/:itemId/InstantMix',
         query: jfType._parameters.similarSongs,
         responses: {
             200: jfType._response.songList,
