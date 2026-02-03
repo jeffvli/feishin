@@ -52,9 +52,12 @@ export const JellyfinAlbumFilters = ({
         setMinYear,
     } = useAlbumListFilters();
 
-    // TODO - eventually replace with /items/filters endpoint to fetch genres and tags specific to the selected library
     const genreListQuery = useQuery(
         genresQueries.list({
+            options: {
+                gcTime: 1000 * 60 * 2,
+                staleTime: 1000 * 60 * 1,
+            },
             query: {
                 sortBy: GenreListSort.NAME,
                 sortOrder: SortOrder.ASC,

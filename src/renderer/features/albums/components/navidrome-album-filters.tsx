@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { useAlbumListFilters } from '/@/renderer/features/albums/hooks/use-album-list-filters';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
-import { useGenreList } from '/@/renderer/features/genres/api/genres-api';
+import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
 import {
     ArtistMultiSelectRow,
     GenreMultiSelectRow,
@@ -22,7 +22,12 @@ import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
 import { Text } from '/@/shared/components/text/text';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
-import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/shared/types/domain-types';
+import {
+    AlbumArtistListSort,
+    GenreListSort,
+    LibraryItem,
+    SortOrder,
+} from '/@/shared/types/domain-types';
 
 interface NavidromeAlbumFiltersProps {
     disableArtistFilter?: boolean;
@@ -54,7 +59,20 @@ export const NavidromeAlbumFilters = ({
         setRecentlyPlayed,
     } = useAlbumListFilters();
 
-    const genreListQuery = useGenreList();
+    const genreListQuery = useQuery(
+        genresQueries.list({
+            options: {
+                gcTime: 1000 * 60 * 2,
+                staleTime: 1000 * 60 * 1,
+            },
+            query: {
+                sortBy: GenreListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
 
     const genreList = useMemo(() => {
         if (!genreListQuery?.data) return [];
@@ -333,6 +351,7 @@ export const NavidromeAlbumFilters = ({
                     <VirtualMultiSelect
                         displayCountType="album"
                         height={220}
+                        isLoading={genreListQuery.isFetching}
                         label={genreFilterLabel}
                         onChange={handleGenreChange}
                         options={genreList}

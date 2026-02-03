@@ -1,11 +1,11 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { ChangeEvent, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { useAlbumListFilters } from '/@/renderer/features/albums/hooks/use-album-list-filters';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
-import { useGenreList } from '/@/renderer/features/genres/api/genres-api';
+import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
 import {
     ArtistMultiSelectRow,
     GenreMultiSelectRow,
@@ -21,7 +21,12 @@ import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
 import { Text } from '/@/shared/components/text/text';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
-import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/shared/types/domain-types';
+import {
+    AlbumArtistListSort,
+    GenreListSort,
+    LibraryItem,
+    SortOrder,
+} from '/@/shared/types/domain-types';
 
 interface SubsonicAlbumFiltersProps {
     disableArtistFilter?: boolean;
@@ -90,7 +95,20 @@ export const SubsonicAlbumFilters = ({
         [isArtistDisabled, setAlbumArtist],
     );
 
-    const genreListQuery = useGenreList();
+    const genreListQuery = useQuery(
+        genresQueries.list({
+            options: {
+                gcTime: 1000 * 60 * 2,
+                staleTime: 1000 * 60 * 1,
+            },
+            query: {
+                sortBy: GenreListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
 
     const genreList = useMemo(() => {
         if (!genreListQuery?.data) return [];
@@ -252,6 +270,7 @@ export const SubsonicAlbumFilters = ({
                         disabled={isArtistDisabled}
                         displayCountType="album"
                         height={300}
+                        isLoading={albumArtistListQuery.isFetching}
                         label={artistFilterLabel}
                         onChange={handleAlbumArtistFilter}
                         options={selectableAlbumArtists}
@@ -268,6 +287,7 @@ export const SubsonicAlbumFilters = ({
                         disabled={isGenreDisabled}
                         displayCountType="album"
                         height={220}
+                        isLoading={genreListQuery.isFetching}
                         label={genreFilterLabel}
                         onChange={handleGenresFilter}
                         options={genreList}
