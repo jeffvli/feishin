@@ -23,7 +23,7 @@ const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 
 export function MpvPlayer() {
     const playerRef = useRef<MpvPlayerEngineHandle>(null);
-    const { status } = usePlayerData();
+    const { currentSong, status } = usePlayerData();
     const { mediaAutoNext, setTimestamp } = usePlayerActions();
     const { speed } = usePlayerProperties();
     const isMuted = usePlayerMuted();
@@ -147,8 +147,10 @@ export function MpvPlayer() {
         };
     }, []);
 
+    const hasCurrentSong = !!currentSong?.id;
+
     useEffect(() => {
-        if (localPlayerStatus !== PlayerStatus.PLAYING) {
+        if (localPlayerStatus !== PlayerStatus.PLAYING || !hasCurrentSong) {
             return;
         }
 
@@ -168,7 +170,7 @@ export function MpvPlayer() {
         }, 500);
 
         return () => clearInterval(interval);
-    }, [localPlayerStatus, setTimestamp]);
+    }, [hasCurrentSong, localPlayerStatus, setTimestamp]);
 
     return (
         <MpvPlayerEngine

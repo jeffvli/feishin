@@ -12,6 +12,7 @@ import { getMpvProperties } from '/@/renderer/features/settings/components/playb
 import {
     usePlaybackSettings,
     usePlayerActions,
+    usePlayerSong,
     usePlayerStore,
     useSettingsStore,
 } from '/@/renderer/store';
@@ -49,7 +50,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
     } = props;
 
     const [internalVolume, setInternalVolume] = useState(volume / 100 || 0);
-    const [duration] = useState(0);
+    const currentSong = usePlayerSong();
 
     const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const isInitializedRef = useRef<boolean>(false);
@@ -204,10 +205,16 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
         }
     }, [playerStatus]);
 
+    const hasCurrentSong = !!currentSong?.id;
+
     // Set up progress tracking
     useEffect(() => {
         if (progressIntervalRef.current) {
             clearInterval(progressIntervalRef.current);
+        }
+
+        if (!hasCurrentSong) {
+            return;
         }
 
         const updateProgress = async () => {
@@ -219,7 +226,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
                 const time = await mpvPlayer.getCurrentTime();
                 if (time !== undefined && isMountedRef.current) {
                     onProgress({
-                        played: time / (duration || time + 10),
+                        played: time / (time + 10),
                         playedSeconds: time,
                     });
                 }
@@ -239,7 +246,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
                 progressIntervalRef.current = null;
             }
         };
-    }, [isTransitioning, duration, onProgress]);
+    }, [hasCurrentSong, isTransitioning, onProgress]);
 
     const { mediaAutoNext } = usePlayerActions();
 
