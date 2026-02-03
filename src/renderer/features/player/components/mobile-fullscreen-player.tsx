@@ -31,6 +31,7 @@ import {
     useCurrentServer,
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
+    useGeneralSettings,
     usePlayerData,
     usePlayerSong,
     useSetFullScreenPlayerStore,
@@ -377,6 +378,7 @@ export const MobileFullscreenPlayer = () => {
     const { currentSong: currentSongData } = usePlayerData();
     const server = useCurrentServer();
     const setFavorite = useSetFavorite();
+    const { showRatings: showRatingsSetting } = useGeneralSettings();
     const setRating = useSetRating();
 
     const [isPageHovered, setIsPageHovered] = useState(false);
@@ -435,6 +437,7 @@ export const MobileFullscreenPlayer = () => {
     const isLyricsState = activeTab === 'lyrics';
     const isSongDefined = Boolean(currentSong?.id);
     const showRating =
+        showRatingsSetting &&
         isSongDefined &&
         (server?.type === ServerType.NAVIDROME || server?.type === ServerType.SUBSONIC);
 
