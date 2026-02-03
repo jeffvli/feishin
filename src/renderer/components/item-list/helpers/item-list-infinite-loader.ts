@@ -296,7 +296,7 @@ export const useItemListInfiniteLoader = ({
     const refresh = useCallback(
         async (force?: boolean) => {
             // Invalidate all queries to ensure fresh data
-            await queryClient.invalidateQueries();
+            queryClient.invalidateQueries();
 
             // Reset the infinite list data
             const currentData = queryClient.getQueryData<{
