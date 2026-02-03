@@ -62,7 +62,11 @@ export const getOptimizedListCount = async <
         query: pageQuery,
     });
 
-    client.setQueryData(pageQueryKey, pageResult);
+    const keyContainsRandom = JSON.stringify(pageQueryKey).toLowerCase().includes('random');
+
+    if (!keyContainsRandom) {
+        client.setQueryData(pageQueryKey, pageResult);
+    }
 
     return pageResult.totalRecordCount ?? 0;
 };
