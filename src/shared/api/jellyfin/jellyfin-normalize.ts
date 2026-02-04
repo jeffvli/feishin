@@ -139,6 +139,7 @@ const normalizeSong = (
     pathReplace?: string,
     pathReplaceWith?: string,
 ): Song => {
+    let bitDepth: null | number = null;
     let bitRate = 0;
     let channels: null | number = null;
     let container: null | string = null;
@@ -156,6 +157,7 @@ const normalizeSong = (
         if ((source.MediaStreams?.length || 0) > 0) {
             for (const stream of source.MediaStreams) {
                 if (stream.Type === 'Audio') {
+                    bitDepth = stream.BitDepth || null;
                     bitRate =
                         stream.BitRate !== undefined
                             ? Number(Math.trunc(stream.BitRate / 1000))
@@ -191,7 +193,7 @@ const normalizeSong = (
         albumId: item.AlbumId || `dummy/${item.Id}`,
         artistName: item?.ArtistItems?.map((entry) => entry.Name).join(', ') || '',
         artists,
-        bitDepth: null,
+        bitDepth,
         bitRate,
         bpm: null,
         channels,
