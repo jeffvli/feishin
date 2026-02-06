@@ -41,7 +41,7 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
     const nativeImageAspect = useSettingsStore((store) => store.general.nativeAspectRatio);
     const { builtIn, custom, system, type } = useSettingsStore((state) => state.font);
     const textStyleRef = useRef<HTMLStyleElement | null>(null);
-    const loadedStylesheetsRef = useRef<Set<string>>(new Set());
+    const themeInlineStylesRef = useRef<HTMLStyleElement | null>(null);
     const getCurrentTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
     const [isDarkTheme, setIsDarkTheme] = useState(getCurrentTheme());
     const { followSystemTheme, theme, themeDark, themeLight, useThemeAccentColor } =
@@ -51,54 +51,17 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
         setIsDarkTheme(e.matches);
     };
 
-    const loadStylesheet = (href: string): Promise<void> => {
-        return new Promise((resolve, reject) => {
-            if (loadedStylesheetsRef.current.has(href)) {
-                resolve();
-                return;
-            }
+    const applyInlineStylesheets = useCallback((inlineCssStrings: string[] = []) => {
+        const cssText = inlineCssStrings.filter(Boolean).join('\n');
 
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = href;
-            link.onload = () => {
-                loadedStylesheetsRef.current.add(href);
-                resolve();
-            };
-            link.onerror = () => {
-                console.warn(`Failed to load stylesheet: ${href}`);
-                reject(new Error(`Failed to load stylesheet: ${href}`));
-            };
-
-            document.head.appendChild(link);
-        });
-    };
-
-    const unloadStylesheet = (href: string) => {
-        const existingLink = document.querySelector(`link[href="${href}"]`);
-        if (existingLink) {
-            existingLink.remove();
-            loadedStylesheetsRef.current.delete(href);
-        }
-    };
-
-    const loadThemeStylesheets = useCallback(async (stylesheets: string[] = []) => {
-        if (loadedStylesheetsRef.current.size > 0) {
-            loadedStylesheetsRef.current.forEach((href) => unloadStylesheet(href));
-            loadedStylesheetsRef.current.clear();
+        if (!themeInlineStylesRef.current) {
+            const styleEl = document.createElement('style');
+            styleEl.id = 'theme-inline-styles';
+            document.head.appendChild(styleEl);
+            themeInlineStylesRef.current = styleEl;
         }
 
-        if (stylesheets.length === 0) {
-            return;
-        }
-
-        const loadPromises = stylesheets.map((href) =>
-            loadStylesheet(href).catch((error) => {
-                console.warn(`Error loading stylesheet ${href}:`, error);
-            }),
-        );
-
-        await Promise.all(loadPromises);
+        themeInlineStylesRef.current.textContent = cssText;
     }, []);
 
     const getSelectedTheme = () => {
@@ -197,10 +160,8 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
     }, [nativeImageAspect]);
 
     useEffect(() => {
-        if (appTheme?.stylesheets) {
-            loadThemeStylesheets(appTheme.stylesheets);
-        }
-    }, [selectedTheme, appTheme?.stylesheets, loadThemeStylesheets]);
+        applyInlineStylesheets(appTheme?.stylesheets ?? []);
+    }, [selectedTheme, appTheme?.stylesheets, applyInlineStylesheets]);
 
     const themeVars = useMemo(() => {
         return Object.entries(appTheme?.app ?? {})

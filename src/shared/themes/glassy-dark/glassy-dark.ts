@@ -1,3 +1,5 @@
+import glassyOverridesCss from './glassy_overrides.css?inline';
+
 import { AppThemeConfiguration } from '/@/shared/themes/app-theme-types';
 
 export const glassyDark: AppThemeConfiguration = {
@@ -24,5 +26,5 @@ export const glassyDark: AppThemeConfiguration = {
         white: 'rgb(255, 255, 255)',
     },
     mode: 'dark',
-    stylesheets: ['/@/shared/themes/glassy-dark/glassy_overrides.css'],
+    stylesheets: [glassyOverridesCss],
 };
