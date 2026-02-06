@@ -3,7 +3,6 @@ import isElectron from 'is-electron';
 import { useCallback, useEffect } from 'react';
 
 import { useIsRadioActive } from '/@/renderer/features/radio/hooks/use-radio-player';
-import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
 import { usePlayerActions, useVolumeWheelStep } from '/@/renderer/store';
 import { toast } from '/@/shared/components/toast/toast';
 
@@ -117,10 +116,6 @@ export const useMainPlayerListener = () => {
             handleMpvError(message);
         });
 
-        mpvPlayerListener.rendererOpenSettings(() => {
-            openSettingsModal();
-        });
-
         return () => {
             ipc?.removeAllListeners('renderer-player-play-pause');
             ipc?.removeAllListeners('renderer-player-next');
@@ -136,7 +131,6 @@ export const useMainPlayerListener = () => {
             ipc?.removeAllListeners('renderer-player-volume-up');
             ipc?.removeAllListeners('renderer-player-volume-down');
             ipc?.removeAllListeners('renderer-player-error');
-            ipc?.removeAllListeners('renderer-open-settings');
         };
     }, [
         decreaseVolume,

@@ -174,9 +174,6 @@ const rendererPlayerFallback = (cb: (event: IpcRendererEvent, data: boolean) => 
     ipcRenderer.on('renderer-player-fallback', cb);
 };
 
-const rendererOpenSettings = (cb: (event: IpcRendererEvent) => void) => {
-    ipcRenderer.on('renderer-open-settings', cb);
-};
 
 export const mpvPlayer = {
     autoNext,
@@ -210,7 +207,6 @@ export const mpvPlayerListener = {
     rendererCurrentTime,
     rendererError,
     rendererNext,
-    rendererOpenSettings,
     rendererPause,
     rendererPlay,
     rendererPlayerFallback,
