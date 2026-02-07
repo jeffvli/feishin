@@ -155,6 +155,19 @@ jobs:
                       pnpm run publish:win:beta
                   on_retry_command: pnpm cache delete
 
+            - name: Build and Publish releases (Windows ARM64)
+              if: matrix.os == 'windows-latest'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:win-arm64:beta
+                  on_retry_command: pnpm cache delete
+
             - name: Build and Publish releases (macOS)
               if: matrix.os == 'macos-latest'
               env:

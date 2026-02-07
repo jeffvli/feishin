@@ -50,6 +50,16 @@ jobs:
                   command: |
                       pnpm run package:win:pr
 
+            - name: Build for Windows (ARM64)
+              if: ${{ matrix.os == 'windows-latest' }}
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run package:win-arm64:pr
+
             - name: Build for Linux
               if: ${{ matrix.os == 'ubuntu-latest' }}
               uses: nick-invision/retry@v2.8.2

@@ -155,6 +155,17 @@ jobs:
                       pnpm run publish:win:alpha
                   on_retry_command: pnpm cache delete
 
+            - name: Build and Publish to R2 (Windows ARM64)
+              if: matrix.os == 'windows-latest'
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:win-arm64:alpha
+                  on_retry_command: pnpm cache delete
+
             - name: Build and Publish to R2 (macOS)
               if: matrix.os == 'macos-latest'
               uses: nick-invision/retry@v2.8.2
