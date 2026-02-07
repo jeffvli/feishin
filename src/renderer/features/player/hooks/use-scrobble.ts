@@ -407,6 +407,47 @@ export const useScrobble = () => {
         [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble],
     );
 
+    const handleScrobbleFromRepeat = useCallback(() => {
+        if (!isScrobbleEnabled || isPrivateModeEnabled) {
+            return;
+        }
+
+        const currentSong = usePlayerStore.getState().getCurrentSong();
+        const currentStatus = usePlayerStore.getState().player.status;
+
+        if (currentStatus !== PlayerStatus.PLAYING || !currentSong?.id) {
+            return;
+        }
+
+        setIsCurrentSongScrobbled(false);
+        lastProgressEventRef.current = 0;
+        previousTimestampRef.current = 0;
+
+        sendScrobble.mutate(
+            {
+                apiClientProps: { serverId: currentSong._serverId || '' },
+                query: {
+                    albumId: currentSong.albumId,
+                    event: 'start',
+                    id: currentSong.id,
+                    position: 0,
+                    submission: false,
+                },
+            },
+            {
+                onSuccess: () => {
+                    logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledStart, {
+                        category: LogCategory.SCROBBLE,
+                        meta: {
+                            id: currentSong.id,
+                            reason: 'from repeat',
+                        },
+                    });
+                },
+            },
+        );
+    }, [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble]);
+
     // Update previous timestamp on progress for use in status change handler
     const handleProgressUpdate = useCallback(
         (properties: { timestamp: number }, prev: { timestamp: number }) => {
@@ -420,10 +461,17 @@ export const useScrobble = () => {
         {
             onCurrentSongChange: handleScrobbleFromSongChange,
             onPlayerProgress: handleProgressUpdate,
+            onPlayerRepeated: handleScrobbleFromRepeat,
             onPlayerSeekToTimestamp: handleScrobbleFromSeek,
             onPlayerStatus: handleScrobbleFromStatus,
         },
-        [handleScrobbleFromSongChange, handleProgressUpdate, handleScrobbleFromSeek],
+        [
+            handleScrobbleFromSongChange,
+            handleProgressUpdate,
+            handleScrobbleFromRepeat,
+            handleScrobbleFromSeek,
+            handleScrobbleFromStatus,
+        ],
     );
 };
 

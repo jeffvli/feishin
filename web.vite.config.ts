@@ -41,7 +41,7 @@ export default defineConfig({
             '@atlaskit/pragmatic-drag-and-drop',
             '@atlaskit/pragmatic-drag-and-drop-auto-scroll',
             '@atlaskit/pragmatic-drag-and-drop-hitbox',
-            '@tanstack_react-query-persist-client',
+            '@tanstack/react-query-persist-client',
             'idb-keyval',
         ],
     },
