@@ -310,13 +310,11 @@ export const controller: GeneralController = {
     },
     getAlbumRadio(args) {
         const server = getServerById(args.apiClientProps.serverId);
-        
         if (!server) {
             throw new Error(
                 `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getAlbumRadio`,
             );
         }
-        
         return apiController(
             'getAlbumRadio',
             server.type,

@@ -3,7 +3,7 @@ import { openContextModal } from '@mantine/modals';
 export const openSettingsModal = () => {
     openContextModal({
         innerProps: {},
-        modal: 'settings',
+        modalKey: 'settings',
         overlayProps: {
             opacity: 1,
         },

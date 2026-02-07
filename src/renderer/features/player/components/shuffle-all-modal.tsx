@@ -189,7 +189,7 @@ const randomFetchQuery = (args: {
 export const openShuffleAllModal = async () => {
     openContextModal({
         innerProps: {},
-        modal: 'shuffleAll',
+        modalKey: 'shuffleAll',
         size: 'sm',
         title: i18n.t('player.playRandom', { postProcess: 'sentenceCase' }) as string,
     });

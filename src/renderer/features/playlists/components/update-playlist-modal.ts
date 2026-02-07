@@ -19,7 +19,7 @@ export const openUpdatePlaylistModal = async (args: { playlist: Playlist }) => {
             },
             query: { id: playlist?.id },
         },
-        modal: 'updatePlaylist',
+        modalKey: 'updatePlaylist',
         title: i18n.t('form.editPlaylist.title', { postProcess: 'titleCase' }) as string,
     });
 };

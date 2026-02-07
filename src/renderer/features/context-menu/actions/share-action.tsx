@@ -36,7 +36,7 @@ export const ShareAction = ({ ids, itemType }: ShareActionProps) => {
                 itemIds: ids,
                 resourceType,
             },
-            modal: 'shareItem',
+            modalKey: 'shareItem',
             title: t('page.contextMenu.shareItem', { postProcess: 'titleCase' }),
         });
     }, [ids, resourceType, t]);
