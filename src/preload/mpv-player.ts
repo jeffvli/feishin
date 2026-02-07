@@ -174,7 +174,6 @@ const rendererPlayerFallback = (cb: (event: IpcRendererEvent, data: boolean) => 
     ipcRenderer.on('renderer-player-fallback', cb);
 };
 
-
 export const mpvPlayer = {
     autoNext,
     cleanup,
