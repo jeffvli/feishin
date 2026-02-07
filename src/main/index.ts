@@ -95,6 +95,9 @@ let tray: null | Tray = null;
 let exitFromTray = false;
 let forceQuit = false;
 let powerSaveBlockerId: null | number = null;
+let menuBuilder: MenuBuilder | null = null;
+let isPrivateMode = false;
+let isCollapsedSidebar = false;
 
 if (process.env.NODE_ENV === 'production') {
     import('source-map-support').then((sourceMapSupport) => {
@@ -454,12 +457,23 @@ async function createWindow(first = true): Promise<void> {
         });
     }
 
-    const menuBuilder = new MenuBuilder(mainWindow);
-    menuBuilder.buildMenu();
+    menuBuilder = new MenuBuilder(mainWindow);
+    menuBuilder.buildMenu(isPrivateMode, isCollapsedSidebar);
 
-    if (process.platform !== 'darwin') {
-        Menu.setApplicationMenu(null);
-    }
+    // Listen for private mode updates from renderer
+    ipcMain.on('update-private-mode', (_event, privateMode: boolean) => {
+        isPrivateMode = privateMode;
+        if (menuBuilder) {
+            menuBuilder.buildMenu(isPrivateMode, isCollapsedSidebar);
+        }
+    });
+
+    ipcMain.on('update-sidebar-collapsed', (_event, collapsedSidebar: boolean) => {
+        isCollapsedSidebar = collapsedSidebar;
+        if (menuBuilder) {
+            menuBuilder.buildMenu(isPrivateMode, isCollapsedSidebar);
+        }
+    });
 
     // Open URLs in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {

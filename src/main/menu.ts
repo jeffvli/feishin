@@ -1,5 +1,7 @@
 import { app, BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron';
 
+import packageJson from '../../package.json';
+
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
     selector?: string;
     submenu?: DarwinMenuItemConstructorOptions[] | Menu;
@@ -12,13 +14,39 @@ export default class MenuBuilder {
         this.mainWindow = mainWindow;
     }
 
-    buildDarwinTemplate(): MenuItemConstructorOptions[] {
+    buildDarwinTemplate(
+        privateMode: boolean,
+        collapsedSidebar: boolean,
+    ): MenuItemConstructorOptions[] {
         const subMenuAbout: DarwinMenuItemConstructorOptions = {
             label: 'Electron',
             submenu: [
                 {
                     label: 'About Feishin',
                     selector: 'orderFrontStandardAboutPanel:',
+                },
+                { type: 'separator' },
+                {
+                    accelerator: 'Command+,',
+                    click: () => {
+                        this.mainWindow.webContents.send('renderer-open-settings');
+                    },
+                    label: 'Settings',
+                },
+                { type: 'separator' },
+                {
+                    click: () => {
+                        this.mainWindow.webContents.send('renderer-open-manage-servers');
+                    },
+                    label: 'Manage servers',
+                },
+                {
+                    checked: privateMode,
+                    click: () => {
+                        this.mainWindow.webContents.send('renderer-toggle-private-mode');
+                    },
+                    label: 'Private session',
+                    type: 'checkbox',
                 },
                 { type: 'separator' },
                 { label: 'Services', submenu: [] },
@@ -63,6 +91,22 @@ export default class MenuBuilder {
         const subMenuViewDev: MenuItemConstructorOptions = {
             label: 'View',
             submenu: [
+                {
+                    accelerator: 'Command+K',
+                    click: () => {
+                        this.mainWindow.webContents.send('renderer-open-command-palette');
+                    },
+                    label: 'Command Palette…',
+                },
+                {
+                    checked: collapsedSidebar,
+                    click: () => {
+                        this.mainWindow.webContents.send('renderer-toggle-sidebar');
+                    },
+                    label: 'Collapse sidebar',
+                    type: 'checkbox',
+                },
+                { type: 'separator' },
                 {
                     accelerator: 'Command+R',
                     click: () => {
@@ -140,6 +184,12 @@ export default class MenuBuilder {
                     },
                     label: 'Search Issues',
                 },
+                {
+                    click: () => {
+                        this.mainWindow.webContents.send('renderer-open-release-notes');
+                    },
+                    label: 'Version ' + packageJson.version,
+                },
             ],
         };
 
@@ -151,8 +201,11 @@ export default class MenuBuilder {
         return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
     }
 
-    buildDefaultTemplate() {
-        const templateDefault = [
+    buildDefaultTemplate(
+        privateMode: boolean = false,
+        collapsedSidebar: boolean = false,
+    ): MenuItemConstructorOptions[] {
+        const templateDefault: MenuItemConstructorOptions[] = [
             {
                 label: '&File',
                 submenu: [
@@ -160,6 +213,22 @@ export default class MenuBuilder {
                         accelerator: 'Ctrl+O',
                         label: '&Open',
                     },
+                    {
+                        accelerator: 'Ctrl+,',
+                        click: () => {
+                            this.mainWindow.webContents.send('renderer-open-settings');
+                        },
+                        label: '&Settings...',
+                    },
+                    {
+                        checked: privateMode,
+                        click: () => {
+                            this.mainWindow.webContents.send('renderer-toggle-private-mode');
+                        },
+                        label: 'Private &session',
+                        type: 'checkbox',
+                    },
+                    { type: 'separator' },
                     {
                         accelerator: 'Ctrl+W',
                         click: () => {
@@ -174,6 +243,14 @@ export default class MenuBuilder {
                 submenu:
                     process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
                         ? [
+                              {
+                                  checked: collapsedSidebar,
+                                  click: () => {
+                                      this.mainWindow.webContents.send('renderer-toggle-sidebar');
+                                  },
+                                  label: 'Collapse &Sidebar',
+                                  type: 'checkbox',
+                              },
                               {
                                   accelerator: 'Ctrl+R',
                                   click: () => {
@@ -199,6 +276,14 @@ export default class MenuBuilder {
                               },
                           ]
                         : [
+                              {
+                                  checked: collapsedSidebar,
+                                  click: () => {
+                                      this.mainWindow.webContents.send('renderer-toggle-sidebar');
+                                  },
+                                  label: 'Collapse &Sidebar',
+                                  type: 'checkbox',
+                              },
                               {
                                   accelerator: 'F11',
                                   click: () => {
@@ -246,15 +331,15 @@ export default class MenuBuilder {
         return templateDefault;
     }
 
-    buildMenu(): Menu {
+    buildMenu(privateMode: boolean = false, collapsedSidebar: boolean = false): Menu {
         if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
             this.setupDevelopmentEnvironment();
         }
 
         const template =
             process.platform === 'darwin'
-                ? this.buildDarwinTemplate()
-                : this.buildDefaultTemplate();
+                ? this.buildDarwinTemplate(privateMode, collapsedSidebar)
+                : this.buildDefaultTemplate(privateMode, collapsedSidebar);
 
         const menu = Menu.buildFromTemplate(template);
         Menu.setApplicationMenu(menu);

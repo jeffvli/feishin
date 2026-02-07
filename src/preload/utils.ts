@@ -57,6 +57,30 @@ const forceGarbageCollection = (): boolean => {
     }
 };
 
+const rendererOpenSettings = (cb: (event: IpcRendererEvent) => void) => {
+    ipcRenderer.on('renderer-open-settings', cb);
+};
+
+const rendererOpenCommandPalette = (cb: (event: IpcRendererEvent) => void) => {
+    ipcRenderer.on('renderer-open-command-palette', cb);
+};
+
+const rendererOpenManageServers = (cb: (event: IpcRendererEvent) => void) => {
+    ipcRenderer.on('renderer-open-manage-servers', cb);
+};
+
+const rendererTogglePrivateMode = (cb: (event: IpcRendererEvent) => void) => {
+    ipcRenderer.on('renderer-toggle-private-mode', cb);
+};
+
+const rendererToggleSidebar = (cb: (event: IpcRendererEvent) => void) => {
+    ipcRenderer.on('renderer-toggle-sidebar', cb);
+};
+
+const rendererOpenReleaseNotes = (cb: (event: IpcRendererEvent) => void) => {
+    ipcRenderer.on('renderer-open-release-notes', cb);
+};
+
 export const utils = {
     disableAutoUpdates,
     download,
@@ -69,6 +93,12 @@ export const utils = {
     openApplicationDirectory,
     openItem,
     playerErrorListener,
+    rendererOpenCommandPalette,
+    rendererOpenManageServers,
+    rendererOpenReleaseNotes,
+    rendererOpenSettings,
+    rendererTogglePrivateMode,
+    rendererToggleSidebar,
 };
 
 export type Utils = typeof utils;

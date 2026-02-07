@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import isElectron from 'is-electron';
 import { motion } from 'motion/react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -99,23 +100,25 @@ export const CollapsedSidebar = () => {
                         </CollapsedSidebarButton>
                     </Group>
                 )}
-                <DropdownMenu position="right-start">
-                    <DropdownMenu.Target>
-                        <CollapsedSidebarItem
-                            activeIcon={null}
-                            component={Flex}
-                            icon={<Icon fill="muted" icon="menu" size="3xl" />}
-                            label={t('common.menu', { postProcess: 'titleCase' })}
-                            style={{
-                                cursor: 'pointer',
-                                padding: 'var(--theme-spacing-md) 0',
-                            }}
-                        />
-                    </DropdownMenu.Target>
-                    <DropdownMenu.Dropdown>
-                        <AppMenu />
-                    </DropdownMenu.Dropdown>
-                </DropdownMenu>
+                {!isElectron() && (
+                    <DropdownMenu position="right-start">
+                        <DropdownMenu.Target>
+                            <CollapsedSidebarItem
+                                activeIcon={null}
+                                component={Flex}
+                                icon={<Icon fill="muted" icon="menu" size="3xl" />}
+                                label={t('common.menu', { postProcess: 'titleCase' })}
+                                style={{
+                                    cursor: 'pointer',
+                                    padding: 'var(--theme-spacing-md) 0',
+                                }}
+                            />
+                        </DropdownMenu.Target>
+                        <DropdownMenu.Dropdown>
+                            <AppMenu />
+                        </DropdownMenu.Dropdown>
+                    </DropdownMenu>
+                )}
                 {sidebarItemsWithRoute.map((item) =>
                     item.id === 'Collections' ? (
                         collections && collections.length > 0 ? (

@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
@@ -39,16 +40,18 @@ export const ActionBar = () => {
                 </Grid.Col>
                 <Grid.Col span={5}>
                     <Group gap="sm" grow wrap="nowrap">
-                        <DropdownMenu position="bottom-start">
-                            <DropdownMenu.Target>
-                                <Button p="0">
-                                    <Icon icon="menu" size="lg" />
-                                </Button>
-                            </DropdownMenu.Target>
-                            <DropdownMenu.Dropdown>
-                                <AppMenu />
-                            </DropdownMenu.Dropdown>
-                        </DropdownMenu>
+                        {!isElectron() && (
+                            <DropdownMenu position="bottom-start">
+                                <DropdownMenu.Target>
+                                    <Button p="0">
+                                        <Icon icon="menu" size="lg" />
+                                    </Button>
+                                </DropdownMenu.Target>
+                                <DropdownMenu.Dropdown>
+                                    <AppMenu />
+                                </DropdownMenu.Dropdown>
+                            </DropdownMenu>
+                        )}
                         <NavigateButtons />
                     </Group>
                 </Grid.Col>
