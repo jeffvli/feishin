@@ -6,6 +6,7 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { getOptimizedListCount } from '/@/renderer/api/utils-list-count';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
 import {
+    AlbumRadioQuery,
     ArtistRadioQuery,
     GetQueueQuery,
     ListCountQuery,
@@ -15,6 +16,21 @@ import {
 } from '/@/shared/types/domain-types';
 
 export const songsQueries = {
+    albumRadio: (args: QueryHookArgs<AlbumRadioQuery>) => {
+        return queryOptions({
+            queryFn: ({ signal }) => {
+                return api.controller.getAlbumRadio({
+                    apiClientProps: { serverId: args.serverId, signal },
+                    query: {
+                        albumId: args.query.albumId,
+                        count: args.query.count ?? 20,
+                    },
+                });
+            },
+            queryKey: queryKeys.songs.albumRadio(args.serverId, args.query),
+            ...args.options,
+        });
+    },
     artistRadio: (args: QueryHookArgs<ArtistRadioQuery>) => {
         return queryOptions({
             queryFn: ({ signal }) => {

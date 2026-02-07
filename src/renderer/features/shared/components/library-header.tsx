@@ -264,6 +264,7 @@ export const calculateTitleSize = (title: string) => {
 
 interface LibraryHeaderMenuProps {
     favorite?: boolean;
+    onAlbumRadio?: () => void;
     onArtistRadio?: () => void;
     onFavorite?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     onMore?: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -275,6 +276,7 @@ interface LibraryHeaderMenuProps {
 
 export const LibraryHeaderMenu = ({
     favorite,
+    onAlbumRadio,
     onArtistRadio,
     onFavorite,
     onMore,
@@ -326,8 +328,26 @@ export const LibraryHeaderMenu = ({
                 {onPlay && (
                     <PlayLastTextButton {...handlePlayLast.handlers} {...handlePlayLast.props} />
                 )}
+                {onAlbumRadio && (
+                    <Button
+                        disabled={isPlayerFetching}
+                        leftSection={
+                            isPlayerFetching ? (
+                                <Spinner color="white" />
+                            ) : (
+                                <Icon icon="radio" size="lg" />
+                            )
+                        }
+                        onClick={onAlbumRadio}
+                        size="md"
+                        variant="transparent"
+                    >
+                        {t('player.albumRadio', { postProcess: 'sentenceCase' })}
+                    </Button>
+                )}
                 {onArtistRadio && (
                     <Button
+                        disabled={isPlayerFetching}
                         leftSection={
                             isPlayerFetching ? (
                                 <Spinner color="white" />

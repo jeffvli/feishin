@@ -411,6 +411,7 @@ export const GeneralSettingsSchema = z.object({
         ),
     albumBackground: z.boolean(),
     albumBackgroundBlur: z.number(),
+    albumRadioCount: z.number(),
     artistBackground: z.boolean(),
     artistBackgroundBlur: z.number(),
     artistItems: z.array(SortableItemSchema(ArtistItemSchema)),
@@ -984,6 +985,7 @@ const initialState: SettingsState = {
         accent: 'rgb(53, 116, 252)',
         albumBackground: false,
         albumBackgroundBlur: 3,
+        albumRadioCount: 20,
         artistBackground: true,
         artistBackgroundBlur: 3,
         artistItems,
@@ -2229,6 +2231,9 @@ export const useShowRatings = () => useSettingsStore((state) => state.general.sh
 
 export const useArtistRadioCount = () =>
     useSettingsStore((state) => state.general.artistRadioCount, shallow);
+
+export const useAlbumRadioCount = () =>
+    useSettingsStore((state) => state.general.albumRadioCount, shallow);
 
 export const useArtistBackground = () =>
     useSettingsStore(

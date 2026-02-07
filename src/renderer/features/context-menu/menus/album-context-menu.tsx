@@ -5,6 +5,7 @@ import { DownloadAction } from '/@/renderer/features/context-menu/actions/downlo
 import { GetInfoAction } from '/@/renderer/features/context-menu/actions/get-info-action';
 import { GoToAction } from '/@/renderer/features/context-menu/actions/go-to-action';
 import { PlayAction } from '/@/renderer/features/context-menu/actions/play-action';
+import { PlayAlbumRadioAction } from '/@/renderer/features/context-menu/actions/play-album-radio-action';
 import { SetFavoriteAction } from '/@/renderer/features/context-menu/actions/set-favorite-action';
 import { SetRatingAction } from '/@/renderer/features/context-menu/actions/set-rating-action';
 import { ShareAction } from '/@/renderer/features/context-menu/actions/share-action';
@@ -28,6 +29,7 @@ export const AlbumContextMenu = ({ items, type }: AlbumContextMenuProps) => {
             bottomStickyContent={<ContextMenuPreview items={items} itemType={type} />}
         >
             <PlayAction ids={ids} itemType={LibraryItem.ALBUM} />
+            <PlayAlbumRadioAction album={items[0]} disabled={items.length > 1} />
             <ContextMenu.Divider />
             <AddToPlaylistAction items={ids} itemType={LibraryItem.ALBUM} />
             <ContextMenu.Divider />

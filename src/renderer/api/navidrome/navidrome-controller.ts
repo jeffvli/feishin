@@ -420,6 +420,32 @@ export const NavidromeController: InternalControllerEndpoint = {
             apiClientProps,
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
+    getAlbumRadio: async (args) => {
+        const { apiClientProps, query } = args;
+
+        // Use getSimilarSongs2 API for album radio
+        const res = await ssApiClient({
+            ...apiClientProps,
+            silent: true,
+        }).getSimilarSongs2({
+            query: {
+                count: query.count,
+                id: query.albumId,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get album radio songs');
+        }
+
+        if (!res.body.similarSongs2?.song) {
+            return [];
+        }
+
+        return res.body.similarSongs2.song.map((song) =>
+            ssNormalize.song(song, apiClientProps.server),
+        );
+    },
     getArtistRadio: async (args) => {
         const { apiClientProps, query } = args;
 

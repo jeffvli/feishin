@@ -3,6 +3,7 @@ import type {
     AlbumArtistListQuery,
     AlbumDetailQuery,
     AlbumListQuery,
+    AlbumRadioQuery,
     ArtistListQuery,
     ArtistRadioQuery,
     FolderQuery,
@@ -348,6 +349,10 @@ export const queryKeys: Record<
         root: (serverId: string) => [serverId] as const,
     },
     songs: {
+        albumRadio: (serverId: string, query?: AlbumRadioQuery) => {
+            if (query) return [serverId, 'songs', 'albumRadio', query] as const;
+            return [serverId, 'songs', 'albumRadio'] as const;
+        },
         artistRadio: (serverId: string, query?: ArtistRadioQuery) => {
             if (query) return [serverId, 'songs', 'artistRadio', query] as const;
             return [serverId, 'songs', 'artistRadio'] as const;
