@@ -183,7 +183,7 @@ const PlaylistRowButton = memo(
 
                     openContextModal({
                         innerProps: modalProps,
-                        modalKey: 'addToPlaylist',
+                        modal: 'addToPlaylist',
                         size: 'lg',
                         title: t('form.addToPlaylist.title', { postProcess: 'titleCase' }),
                     });

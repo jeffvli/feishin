@@ -5,7 +5,7 @@ import i18n from '/@/i18n/i18n';
 export const openVisualizerSettingsModal = () => {
     openContextModal({
         innerProps: {},
-        modalKey: 'visualizerSettings',
+        modal: 'visualizerSettings',
         overlayProps: {
             blur: 0,
             opacity: 0,

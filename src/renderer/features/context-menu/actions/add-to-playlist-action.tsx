@@ -348,7 +348,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 itemIds: items,
                 resourceType: itemType,
             },
-            modalKey: 'addToPlaylist',
+            modal: 'addToPlaylist',
             size: 'lg',
             title: t('page.contextMenu.addToPlaylist', { postProcess: 'sentenceCase' }),
         });

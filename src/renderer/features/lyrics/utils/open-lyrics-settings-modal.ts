@@ -5,7 +5,7 @@ import i18n from '/@/i18n/i18n';
 export const openLyricsSettingsModal = (settingsKey: string = 'default') => {
     openContextModal({
         innerProps: { settingsKey },
-        modalKey: 'lyricsSettings',
+        modal: 'lyricsSettings',
         overlayProps: {
             blur: 0,
             opacity: 0,
