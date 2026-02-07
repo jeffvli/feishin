@@ -10,13 +10,13 @@ import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import {
     LibraryHeader,
     LibraryHeaderMenu,
 } from '/@/renderer/features/shared/components/library-header';
 import { useSetFavorite } from '/@/renderer/features/shared/hooks/use-set-favorite';
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
+import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useShowRatings } from '/@/renderer/store';
 import { useAlbumRadioCount, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
@@ -116,7 +116,7 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
         } catch (error) {
             console.error('Failed to load album radio:', error);
         }
-    }, [addToQueueByData, albumId, albumRadioCount, queryClient, server?.id]);
+    }, [addToQueueByData, albumId, albumRadioCount, queryClient, server.id]);
 
     const releaseYear = detailQuery?.data?.releaseYear;
     const releaseDate = detailQuery?.data?.releaseDate;
