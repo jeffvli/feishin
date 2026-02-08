@@ -44,10 +44,11 @@ export const enqueue = (item: DlnaQueueItem) =>
         const client = getClient();
         if (!client) return reject(ERR_NOT_INITIALIZED);
 
-        client.enqueue(
+        client.load(
             item.url,
             {
                 contentType: item.mimeType,
+                isNext: true,
                 metadata: item.metadata,
             },
             (err, result) => {

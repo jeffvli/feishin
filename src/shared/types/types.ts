@@ -217,10 +217,21 @@ export type DlnaInitialize = {
 };
 
 export type DlnaMetadata = {
+    album?: string;
+    albumArtMimeType?: string;
+    albumArtSize?: number;
+    albumArtUrl?: string;
+    bitrate?: number;
     creator?: string;
+    date?: string;
+    discNumber?: number;
+    duration?: number;
+    genre?: string;
+    size?: number;
     subtitleUrl?: string;
     title?: string;
-    type?: 'audo' | 'image' | 'music';
+    trackNumber?: number;
+    type?: 'audio' | 'image' | 'image';
 };
 
 export type DlnaQueue = {

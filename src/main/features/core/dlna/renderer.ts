@@ -13,14 +13,30 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
         });
     }
 
-    public enqueue(url: string, options: any, callback: (error?: any, result?: any) => void) {
-        const dlnaFeatures = options.dlnaFeatures || '*';
-        const contentType = options.contentType || 'video/mpeg'; // Default to something generic
-        const protocolInfo = 'http-get:*:' + contentType + ':' + dlnaFeatures;
+    public getMute(callback?: (error?: any, result?: any) => void) {
+        const params = {
+            Channel: 'Master',
+            InstanceID: this.instanceId,
+        };
+        this.callAction('RenderingControl', 'GetMute', params, callback || (() => {}));
+    }
 
-        const metadata = options.metadata || {};
-        metadata.url = url;
-        metadata.protocolInfo = protocolInfo;
+    public load(
+        url: string,
+        options: {
+            autoplay?: boolean;
+            contentType?: string;
+            dlnaFeatures?: string;
+            isNext?: boolean;
+            metadata?: DlnaMetadata;
+        },
+        callback: (error?: any, result?: any) => void,
+    ) {
+        const contentType = options.contentType ?? 'audio/mpeg';
+        const dlnaFeatures = makeAudioDlnaFeatures(contentType);
+        const protocolInfo = makeProtocolInfo({ contentType, dlnaFeatures });
+
+        const metadata = { ...options.metadata, protocolInfo, url };
 
         const params = {
             Direction: 'Input',
@@ -37,35 +53,37 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
             params,
             function (err, result) {
                 if (err) {
-                    if (err.code !== 'ENOACTION') {
-                        return callback(err);
-                    }
+                    if (err.code !== 'ENOACTION') return callback(err);
 
                     // If PrepareForConnection is not implemented, we keep the default (0) InstanceID
                 } else {
                     self.instanceId = result.AVTransportID;
                 }
 
-                const params = {
-                    InstanceID: self.instanceId,
-                    NextURI: url,
-                    NextURIMetaData: buildMetadata(metadata),
-                };
+                const metadataString = buildMetadata(metadata);
+                const params = options.isNext
+                    ? {
+                          InstanceID: self.instanceId,
+                          NextURI: url,
+                          NextURIMetaData: metadataString,
+                      }
+                    : {
+                          CurrentURI: url,
+                          CurrentURIMetaData: metadataString,
+                          InstanceID: self.instanceId,
+                      };
+                const action = options.isNext ? 'SetNextAVTransportURI' : 'SetAVTransportURI';
 
-                self.callAction('AVTransport', 'SetNextAVTransportURI', params, function (err) {
+                self.callAction('AVTransport', action, params, function (err) {
                     if (err) return callback(err);
+                    if (options.autoplay) {
+                        self.play({}, callback);
+                        return;
+                    }
                     callback();
                 });
             },
         );
-    }
-
-    public getMute(callback?: (error?: any, result?: any) => void) {
-        const params = {
-            Channel: 'Master',
-            InstanceID: this.instanceId,
-        };
-        this.callAction('RenderingControl', 'GetMute', params, callback || (() => {}));
     }
 
     public play(opts?: { speed?: number }, callback?: (error?: any, result?: any) => void) {
@@ -100,6 +118,11 @@ function buildMetadata(metadata: DlnaMetadata & { protocolInfo: string; url: str
     item.set('parentID', -1);
     item.set('restricted', false);
 
+    if (metadata.title) {
+        const title = et.SubElement(item, 'dc:title');
+        title.text = metadata.title;
+    }
+
     const OBJECT_CLASSES = {
         audio: 'object.item.audioItem.musicTrack',
         image: 'object.item.imageItem.photo',
@@ -111,9 +134,38 @@ function buildMetadata(metadata: DlnaMetadata & { protocolInfo: string; url: str
         klass.text = OBJECT_CLASSES[metadata.type];
     }
 
-    if (metadata.title) {
-        const title = et.SubElement(item, 'dc:title');
-        title.text = metadata.title;
+    const res = et.SubElement(item, 'res');
+    res.set('protocolInfo', metadata.protocolInfo);
+    if (metadata.duration) res.set('duration', formatDuration(metadata.duration));
+    if (metadata.bitrate) res.set('bitrate', metadata.bitrate * 1000);
+    if (metadata.size) res.set('size', metadata.size);
+    res.text = metadata.url;
+
+    if (metadata.album) {
+        const album = et.SubElement(item, 'upnp:album');
+        album.text = metadata.album;
+    }
+
+    if (metadata.albumArtUrl) {
+        const albumArtURI = et.SubElement(item, 'upnp:albumArtURI');
+        albumArtURI.text = metadata.albumArtUrl;
+
+        if (metadata.albumArtMimeType && metadata.albumArtSize) {
+            const dlnaFeatures = makeImageDlnaFeatures({
+                contentType: metadata.albumArtMimeType,
+                size: metadata.albumArtSize,
+            });
+            const protocolInfo = makeProtocolInfo({
+                contentType: metadata.albumArtMimeType,
+                dlnaFeatures,
+            });
+            const resolution = `${metadata.albumArtSize}x${metadata.albumArtSize}`;
+
+            const res = et.SubElement(item, 'res');
+            res.set('protocolInfo', protocolInfo);
+            res.set('resolution', resolution);
+            res.text = metadata.albumArtUrl;
+        }
     }
 
     if (metadata.creator) {
@@ -121,10 +173,24 @@ function buildMetadata(metadata: DlnaMetadata & { protocolInfo: string; url: str
         creator.text = metadata.creator;
     }
 
-    if (metadata.url && metadata.protocolInfo) {
-        const res = et.SubElement(item, 'res');
-        res.set('protocolInfo', metadata.protocolInfo);
-        res.text = metadata.url;
+    if (metadata.date) {
+        const date = et.SubElement(item, 'dc:date');
+        date.text = metadata.date;
+    }
+
+    if (metadata.genre) {
+        const genre = et.SubElement(item, 'dc:genre');
+        genre.text = metadata.genre;
+    }
+
+    if (metadata.discNumber) {
+        const originalDiscNumber = et.SubElement(item, 'dc:originalDiscNumber');
+        originalDiscNumber.text = metadata.discNumber;
+    }
+
+    if (metadata.trackNumber) {
+        const originalTrackNumber = et.SubElement(item, 'dc:originalTrackNumber');
+        originalTrackNumber.text = metadata.trackNumber;
     }
 
     if (metadata.subtitleUrl) {
@@ -136,7 +202,6 @@ function buildMetadata(metadata: DlnaMetadata & { protocolInfo: string; url: str
         captionInfoEx.set('sec:type', 'srt');
         captionInfoEx.text = metadata.subtitleUrl;
 
-        // Create a second resource for the subtitles
         const res = et.SubElement(item, 'res');
         res.set('protocolInfo', 'http-get:*:text/srt:*');
         res.text = metadata.subtitleUrl;
@@ -144,4 +209,118 @@ function buildMetadata(metadata: DlnaMetadata & { protocolInfo: string; url: str
 
     const doc = new et.ElementTree(root);
     return doc.write({ xml_declaration: false });
+}
+
+function formatDuration(millisecondsTotal: number) {
+    const divideWithRemainder = (a: number, b: number) => [Math.floor(a / b), Math.floor(a % b)];
+
+    const [secondsTotal, milliseconds] = divideWithRemainder(millisecondsTotal, 1000);
+    const [minutesTotal, seconds] = divideWithRemainder(secondsTotal, 60);
+    const [hoursTotal, minutes] = divideWithRemainder(minutesTotal, 60);
+
+    const pad = (value: number, width: number) => value.toString().padStart(width, '0');
+
+    const result = `${hoursTotal}:${pad(minutes, 2)}:${pad(seconds, 2)}.${pad(milliseconds, 3)}`;
+    return result;
+}
+
+function makeProtocolInfo({
+    contentType,
+    dlnaFeatures,
+}: {
+    contentType: string;
+    dlnaFeatures?: Record<string, string>;
+}) {
+    const dlnaFeaturesString = serializeDlnaFeatures(dlnaFeatures ?? {}) ?? '*';
+    return `http-get:*:${contentType}:${dlnaFeaturesString}`;
+}
+
+const DLNA_PROFILE_MAP = {
+    ['audio/flac']: 'LPCM',
+    ['audio/mp4']: 'AAC_ISO_320',
+    ['audio/mpeg']: 'MP3',
+    ['audio/wav']: 'LPCM',
+    ['audio/x-flac']: 'LPCM',
+    ['image/gif']: 'GIF',
+    ['image/jpeg']: 'JPEG',
+    ['image/png']: 'PNG',
+} as const;
+
+const STANDARD_AUDIO_DLNA_FEATURES = {
+    /**
+     * 32-bit hexadecimal flag, with 96 bits of 0-padding appended.
+     *
+     * Meaning of the bits:
+     * * DLNA_ORG_FLAG_SENDER_PACED              = (1 << 31)
+     * * DLNA_ORG_FLAG_TIME_BASED_SEEK           = (1 << 30)
+     * * DLNA_ORG_FLAG_BYTE_BASED_SEEK           = (1 << 29)
+     * * DLNA_ORG_FLAG_PLAY_CONTAINER            = (1 << 28)
+     * * DLNA_ORG_FLAG_S0_INCREASE               = (1 << 27)
+     * * DLNA_ORG_FLAG_SN_INCREASE               = (1 << 26)
+     * * DLNA_ORG_FLAG_RTSP_PAUSE                = (1 << 25)
+     * * DLNA_ORG_FLAG_STREAMING_TRANSFER_MODE   = (1 << 24)
+     * * DLNA_ORG_FLAG_INTERACTIVE_TRANSFER_MODE = (1 << 23)
+     * * DLNA_ORG_FLAG_BACKGROUND_TRANSFER_MODE  = (1 << 22)
+     * * DLNA_ORG_FLAG_CONNECTION_STALL          = (1 << 21)
+     * * DLNA_ORG_FLAG_DLNA_V15                  = (1 << 20)
+     *
+     * Standard combination for music rendering:
+     * DLNA_ORG_FLAG_STREAMING_TRANSFER_MODE
+     * & DLNA_ORG_FLAG_BACKGROUND_TRANSFER_MODE
+     * & DLNA_ORG_FLAG_DLNA_V15
+     * = 0x01500000
+     *
+     * With padding (apply << 96):
+     * = 0x01500000000000000000000000000000
+     *
+     * See: https://stackoverflow.com/a/30807975
+     */
+    ['DLNA.ORG_FLAGS']: '01500000000000000000000000000000',
+    /**
+     * 2-bit binary flag.
+     *
+     * Meaning of the bits:
+     * * DLNA_ORG_OP_RANGE = (1 << 0) => range supported
+     * * DLNA_ORG_OP_TIME  = (1 << 1) => time seek supported
+     *
+     * Standard combination for music rendering:
+     * DLNA_ORG_OP_RANGE = 0b01
+     *
+     * See: https://github.com/da2ce7/libdlna/blob/7f747b51e3860ab6b51ea9ea9dfdb85b9b1a3ed7/include/dlna/dlna.h#L71-L81
+     */
+    ['DLNA.ORG_OP']: '01',
+} as const;
+
+function makeAudioDlnaFeatures(contentType: string) {
+    const dlnaProfile = DLNA_PROFILE_MAP[contentType];
+    if (!dlnaProfile) return {};
+
+    return { ['DLNA.ORG_PN']: dlnaProfile, ...STANDARD_AUDIO_DLNA_FEATURES };
+}
+
+function makeImageDlnaFeatures({
+    contentType,
+    size,
+}: {
+    contentType: string;
+    size: number;
+}): Record<string, string> {
+    const dlnaProfile = DLNA_PROFILE_MAP[contentType];
+    if (!dlnaProfile) return {};
+
+    let suffix: string;
+    if (size > 4096) return {};
+    else if (size > 768) suffix = 'LRG';
+    else if (size > 480) suffix = 'MED';
+    else if (size > 160) suffix = 'SM';
+    else if (size >= 0) suffix = 'TN';
+    else return {};
+
+    return { ['DLNA.ORG_PN']: `${dlnaProfile}_${suffix}` };
+}
+
+function serializeDlnaFeatures(features: Record<string, string>) {
+    return Object.entries(features)
+        .map(([key, value]) => `${key}=${value}`)
+        .join(';');
 }

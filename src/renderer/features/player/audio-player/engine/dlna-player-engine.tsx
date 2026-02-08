@@ -4,13 +4,19 @@ import isElectron from 'is-electron';
 import mime from 'mime';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
+import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { getSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { AudioPlayer, PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
 import { useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
-import { usePlaybackSettings, usePlayerActions, usePlayerStore } from '/@/renderer/store';
-import { QueueSong } from '/@/shared/types/domain-types';
-import { DlnaQueueItem, PlayerStatus } from '/@/shared/types/types';
+import {
+    usePlaybackSettings,
+    usePlayerActions,
+    usePlayerStore,
+    useSettingsStore,
+} from '/@/renderer/store';
+import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
+import { DlnaMetadata, DlnaQueueItem, PlayerStatus } from '/@/shared/types/types';
 
 export interface DlnaPlayerEngineHandle extends AudioPlayer {}
 
@@ -339,10 +345,33 @@ function songToDlnaQueueItem(
         return;
     }
 
-    const dlnaQueueItem: DlnaQueueItem = {
-        metadata: { creator: song.artistName, title: song.name, type: 'music' },
-        mimeType,
-        url: url,
+    const imageType = 'itemCard';
+    const imageRes = useSettingsStore.getState().general.imageRes;
+    const imageSize = imageRes[imageType];
+    const imageUrl = getItemImageUrl({
+        id: song.id,
+        itemType: LibraryItem.SONG,
+        serverId: song._serverId,
+        size: imageSize,
+        type: imageType,
+    });
+
+    const metadata: DlnaMetadata = {
+        album: song.album ?? undefined,
+        albumArtMimeType: 'image/jpeg',
+        albumArtSize: imageSize,
+        albumArtUrl: imageUrl,
+        bitrate: song.bitRate,
+        creator: song.artistName,
+        date: song.releaseDate ?? undefined,
+        discNumber: song.discNumber,
+        duration: song.duration,
+        genre: song.genres[0]?.name,
+        size: song.size,
+        title: song.name,
+        trackNumber: song.trackNumber,
+        type: 'audio',
     };
+    const dlnaQueueItem: DlnaQueueItem = { metadata, mimeType, url };
     return dlnaQueueItem;
 }
