@@ -667,7 +667,16 @@
         "trackRadio": "track radio",
         "unfavorite": "unfavorite",
         "pause": "pause",
-        "viewQueue": "view queue"
+        "viewQueue": "view queue",
+        "sleepTimer": "sleep timer",
+        "sleepTimer_endOfSong": "end of current song",
+        "sleepTimer_minutes": "{{count}} min",
+        "sleepTimer_hours": "{{count}} hr",
+        "sleepTimer_custom": "custom",
+        "sleepTimer_off": "off",
+        "sleepTimer_timeRemaining": "{{time}} remaining",
+        "sleepTimer_setCustom": "set timer",
+        "sleepTimer_cancel": "cancel timer"
     },
     "queryBuilder": {
         "standardTags": "standard tags",
