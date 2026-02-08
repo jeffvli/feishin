@@ -193,20 +193,6 @@ function buildMetadata(metadata: DlnaMetadata & { protocolInfo: string; url: str
         originalTrackNumber.text = metadata.trackNumber;
     }
 
-    if (metadata.subtitleUrl) {
-        const captionInfo = et.SubElement(item, 'sec:CaptionInfo');
-        captionInfo.set('sec:type', 'srt');
-        captionInfo.text = metadata.subtitleUrl;
-
-        const captionInfoEx = et.SubElement(item, 'sec:CaptionInfoEx');
-        captionInfoEx.set('sec:type', 'srt');
-        captionInfoEx.text = metadata.subtitleUrl;
-
-        const res = et.SubElement(item, 'res');
-        res.set('protocolInfo', 'http-get:*:text/srt:*');
-        res.text = metadata.subtitleUrl;
-    }
-
     const doc = new et.ElementTree(root);
     return doc.write({ xml_declaration: false });
 }

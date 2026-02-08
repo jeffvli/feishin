@@ -228,7 +228,6 @@ export type DlnaMetadata = {
     duration?: number;
     genre?: string;
     size?: number;
-    subtitleUrl?: string;
     title?: string;
     trackNumber?: number;
     type?: 'audio' | 'image' | 'image';
