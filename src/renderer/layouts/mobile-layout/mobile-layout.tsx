@@ -8,11 +8,10 @@ import styles from './mobile-layout.module.css';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { FullScreenVisualizer } from '/@/renderer/features/player/components/full-screen-visualizer';
 import { MobileFullscreenPlayer } from '/@/renderer/features/player/components/mobile-fullscreen-player';
-import { CommandPalette } from '/@/renderer/features/search/components/command-palette';
 import { MobileSidebar } from '/@/renderer/features/sidebar/components/mobile-sidebar';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
 import { useFullScreenPlayerStore } from '/@/renderer/store';
-import { useCommandPalette, useWindowSettings } from '/@/renderer/store';
+import { useWindowSettings } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Drawer } from '/@/shared/components/drawer/drawer';
 import { useDisclosure } from '/@/shared/hooks/use-disclosure';
@@ -29,7 +28,6 @@ interface MobileLayoutProps {
 }
 
 export const MobileLayout = ({ shell }: MobileLayoutProps) => {
-    const { opened, ...handlers } = useCommandPalette();
     const [sidebarOpened, { close: closeSidebar, open: openSidebar }] = useDisclosure(false);
     const {
         expanded: isFullScreenPlayerExpanded,
@@ -93,7 +91,6 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
                     </div>
                 )}
             </AnimatePresence>
-            <CommandPalette modalProps={{ handlers, opened }} />
             <ContextMenuController.Root />
         </>
     );
