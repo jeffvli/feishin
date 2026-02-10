@@ -1,30 +1,11 @@
-import { BrowserWindow, globalShortcut, systemPreferences } from 'electron';
+import { BrowserWindow, globalShortcut } from 'electron';
 
-import { isLinux, isMacOS } from '../../../utils';
+import { isLinux } from '../../../utils';
 import { store } from '../settings';
 
 import { PlayerType } from '/@/shared/types/types';
 
 export const enableMediaKeys = (window: BrowserWindow | null) => {
-    if (isMacOS()) {
-        const shouldPrompt = store.get('should_prompt_accessibility', true) as boolean;
-        const shownWarning = store.get('shown_accessibility_warning', false) as boolean;
-        const trusted = systemPreferences.isTrustedAccessibilityClient(shouldPrompt);
-
-        if (shouldPrompt) {
-            store.set('should_prompt_accessibility', false);
-        }
-
-        if (!trusted && !shownWarning) {
-            window?.webContents.send('toast-from-main', {
-                message:
-                    'Feishin is not a trusted accessibility client. Media keys will not work until this setting is changed',
-                type: 'warning',
-            });
-            store.set('shown_accessibility_warning', true);
-        }
-    }
-
     const enableMediaSession = store.get('mediaSession', false) as boolean;
     const playbackType = store.get('playbackType', PlayerType.WEB) as PlayerType;
 

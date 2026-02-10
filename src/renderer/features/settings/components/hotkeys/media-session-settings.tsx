@@ -12,6 +12,7 @@ import { Switch } from '/@/shared/components/switch/switch';
 import { PlayerType } from '/@/shared/types/types';
 
 const isLinux = isElectron() ? window.api.utils.isLinux() : false;
+const isWindows = isElectron() ? window.api.utils.isWindows() : false;
 const isDesktop = isElectron();
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -56,7 +57,7 @@ export const MediaSessionSettings = memo(() => {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            isHidden: isLinux || !isDesktop,
+            isHidden: !isWindows,
             note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
             title: t('setting.mediaSession', { postProcess: 'sentenceCase' }),
         },

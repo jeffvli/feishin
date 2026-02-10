@@ -4,10 +4,10 @@ import { app, dialog, ipcMain, nativeTheme, OpenDialogOptions, safeStorage } fro
 import Store from 'electron-store';
 import path from 'path';
 
-const getFrame = () => {
-    const isWindows = process.platform === 'win32';
-    const isMacOS = process.platform === 'darwin';
+const isWindows = process.platform === 'win32';
+const isMacOS = process.platform === 'darwin';
 
+const getFrame = () => {
     if (isWindows) {
         return 'windows';
     }
@@ -36,10 +36,8 @@ export const store = new Store<any>({
         enableNeteaseTranslation: false,
         global_media_hotkeys: true,
         lyrics: ['NetEase', 'lrclib.net'],
-        mediaSession: false,
+        mediaSession: isMacOS,
         playbackType: 'web',
-        should_prompt_accessibility: true,
-        shown_accessibility_warning: false,
         window_enable_tray: true,
         window_exit_to_tray: false,
         window_minimize_to_tray: false,
