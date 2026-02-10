@@ -109,9 +109,7 @@ export const ThemeSettings = memo(() => {
                             localSettings.themeSet(
                                 e.currentTarget.checked
                                     ? 'system'
-                                    : settings.theme === AppTheme.DEFAULT_DARK
-                                      ? 'dark'
-                                      : 'light',
+                                    : (getAppTheme(settings.theme).mode ?? 'dark'),
                             );
                         }
                     }}
@@ -138,7 +136,7 @@ export const ThemeSettings = memo(() => {
                             },
                         });
 
-                        const colorScheme = theme === AppTheme.DEFAULT_DARK ? 'dark' : 'light';
+                        const colorScheme = getAppTheme(theme).mode ?? 'dark';
 
                         setColorScheme(colorScheme);
 
