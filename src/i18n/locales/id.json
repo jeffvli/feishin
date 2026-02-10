@@ -648,7 +648,6 @@
         "customCss_description": "konten CSS kustom. Catatan: properti content dan URL jarak jauh tidak diizinkan. Pratinjau konten Anda ditampilkan di bawah. Kolom tambahan yang tidak Anda atur ada karena sanitasi",
         "customFontPath": "jalur font kustom",
         "customFontPath_description": "tentukan jalur font kustom yang akan digunakan aplikasi",
-        "disableAutomaticUpdates": "nonaktifkan pembaruan otomatis",
         "discordApplicationId": "ID aplikasi {{discord}}",
         "discordApplicationId_description": "id aplikasi untuk rich presence {{discord}} (default: {{defaultId}})",
         "discordIdleStatus": "tampilkan status tidak aktif dalam status aktivitas",

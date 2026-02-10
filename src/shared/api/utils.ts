@@ -139,7 +139,7 @@ export const getClientType = (): string => {
     }
 };
 
-export const SEPARATOR_STRING = ' · ';
+export const SEPARATOR_STRING = ' • ';
 
 export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: SortOrder) => {
     let results: Song[] = songs;

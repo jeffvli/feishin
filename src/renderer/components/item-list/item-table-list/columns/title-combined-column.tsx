@@ -58,6 +58,7 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                 itemType: props.itemType,
                 meta: {
                     playType,
+                    singleSongOnly: true,
                 },
             });
             return;
@@ -200,6 +201,7 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
                 itemType: props.itemType,
                 meta: {
                     playType,
+                    singleSongOnly: true,
                 },
             });
             return;

@@ -21,7 +21,12 @@ import {
     ListConfigBooleanControl,
     ListConfigTable,
 } from '/@/renderer/features/shared/components/list-config-menu';
-import { ItemListSettings, useSettingsStore, useSettingsStoreActions } from '/@/renderer/store';
+import {
+    type DataTableProps,
+    ItemListSettings,
+    useSettingsStore,
+    useSettingsStoreActions,
+} from '/@/renderer/store';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
@@ -39,6 +44,7 @@ import { dndUtils, DragData, DragOperation, DragTarget } from '/@/shared/types/d
 import { ItemListKey, ListPaginationType } from '/@/shared/types/types';
 
 interface TableConfigProps {
+    enablePinColumnButtons?: boolean;
     extraOptions?: {
         component: React.ReactNode;
         id: string;
@@ -52,18 +58,36 @@ interface TableConfigProps {
         };
     };
     tableColumnsData: { label: string; value: string }[];
+    tableKey?: 'detail' | 'main';
 }
 
 export const TableConfig = ({
+    enablePinColumnButtons = true,
     extraOptions,
     listKey,
     optionsConfig,
     tableColumnsData,
+    tableKey = 'main',
 }: TableConfigProps) => {
     const { t } = useTranslation();
 
     const list = useSettingsStore((state) => state.lists[listKey]) as ItemListSettings;
     const { setList } = useSettingsStoreActions();
+
+    const table = tableKey === 'detail' ? (list?.detail ?? list?.table) : list?.table;
+
+    const setTableUpdate = useCallback(
+        (patch: Partial<DataTableProps>) => {
+            if (tableKey === 'detail') {
+                setList(listKey, { detail: patch } as Parameters<
+                    ReturnType<typeof useSettingsStoreActions>['setList']
+                >[1]);
+            } else {
+                setList(listKey, { table: patch });
+            }
+        },
+        [listKey, setList, tableKey],
+    );
 
     const advancedSettings = useMemo(() => {
         const allOptions = [
@@ -152,12 +176,12 @@ export const TableConfig = ({
                             },
                         ]}
                         onChange={(value) =>
-                            setList(listKey, {
-                                table: { size: value as 'compact' | 'default' },
+                            setTableUpdate({
+                                size: value as 'compact' | 'default' | 'large',
                             })
                         }
                         size="sm"
-                        value={list.table.size}
+                        value={table?.size ?? 'default'}
                         w="100%"
                     />
                 ),
@@ -169,8 +193,8 @@ export const TableConfig = ({
             {
                 component: (
                     <ListConfigBooleanControl
-                        onChange={(e) => setList(listKey, { table: { enableHeader: e } })}
-                        value={list.table.enableHeader}
+                        onChange={(e) => setTableUpdate({ enableHeader: e })}
+                        value={table.enableHeader}
                     />
                 ),
                 id: 'enableHeader',
@@ -181,10 +205,8 @@ export const TableConfig = ({
             {
                 component: (
                     <ListConfigBooleanControl
-                        onChange={(e) =>
-                            setList(listKey, { table: { enableRowHoverHighlight: e } })
-                        }
-                        value={list.table.enableRowHoverHighlight}
+                        onChange={(e) => setTableUpdate({ enableRowHoverHighlight: e })}
+                        value={table.enableRowHoverHighlight}
                     />
                 ),
                 id: 'enableRowHoverHighlight',
@@ -195,10 +217,8 @@ export const TableConfig = ({
             {
                 component: (
                     <ListConfigBooleanControl
-                        onChange={(e) =>
-                            setList(listKey, { table: { enableAlternateRowColors: e } })
-                        }
-                        value={list.table.enableAlternateRowColors}
+                        onChange={(e) => setTableUpdate({ enableAlternateRowColors: e })}
+                        value={table.enableAlternateRowColors}
                     />
                 ),
                 id: 'enableAlternateRowColors',
@@ -209,10 +229,8 @@ export const TableConfig = ({
             {
                 component: (
                     <ListConfigBooleanControl
-                        onChange={(e) =>
-                            setList(listKey, { table: { enableHorizontalBorders: e } })
-                        }
-                        value={list.table.enableHorizontalBorders}
+                        onChange={(e) => setTableUpdate({ enableHorizontalBorders: e })}
+                        value={table.enableHorizontalBorders}
                     />
                 ),
                 id: 'enableHorizontalBorders',
@@ -223,8 +241,8 @@ export const TableConfig = ({
             {
                 component: (
                     <ListConfigBooleanControl
-                        onChange={(e) => setList(listKey, { table: { enableVerticalBorders: e } })}
-                        value={list.table.enableVerticalBorders}
+                        onChange={(e) => setTableUpdate({ enableVerticalBorders: e })}
+                        value={table.enableVerticalBorders}
                     />
                 ),
                 id: 'enableVerticalBorders',
@@ -235,8 +253,10 @@ export const TableConfig = ({
             {
                 component: (
                     <ListConfigBooleanControl
-                        onChange={(e) => setList(listKey, { table: { autoFitColumns: e } })}
-                        value={list.table.autoFitColumns}
+                        onChange={(e) => setTableUpdate({ autoFitColumns: e })}
+                        value={
+                            tableKey === 'main' ? (table as DataTableProps).autoFitColumns : false
+                        }
                     />
                 ),
                 id: 'autoFitColumns',
@@ -256,7 +276,18 @@ export const TableConfig = ({
                 return option;
             })
             .filter((option): option is NonNullable<typeof option> => option !== null);
-    }, [extraOptions, listKey, optionsConfig, setList, t, list]);
+    }, [
+        t,
+        list.pagination,
+        list.itemsPerPage,
+        table,
+        tableKey,
+        extraOptions,
+        setList,
+        listKey,
+        setTableUpdate,
+        optionsConfig,
+    ]);
 
     return (
         <>
@@ -264,8 +295,9 @@ export const TableConfig = ({
             <Divider />
             <TableColumnConfig
                 data={tableColumnsData}
-                onChange={(columns) => setList(listKey, { table: { columns } })}
-                value={list.table.columns}
+                enablePinColumnButtons={enablePinColumnButtons}
+                onChange={(columns) => setTableUpdate({ columns })}
+                value={table.columns}
             />
         </>
     );
@@ -273,10 +305,12 @@ export const TableConfig = ({
 
 const TableColumnConfig = ({
     data,
+    enablePinColumnButtons,
     onChange,
     value,
 }: {
     data: { label: string; value: string }[];
+    enablePinColumnButtons: boolean;
     onChange: (value: ItemTableListColumnConfig[]) => void;
     value: ItemTableListColumnConfig[];
 }) => {
@@ -473,6 +507,7 @@ const TableColumnConfig = ({
             <div style={{ userSelect: 'none' }}>
                 {filteredColumns.map(({ item, matches }) => (
                     <TableColumnItem
+                        enablePinColumnButtons={enablePinColumnButtons}
                         handleAlignCenter={handleAlignCenter}
                         handleAlignLeft={handleAlignLeft}
                         handleAlignRight={handleAlignRight}
@@ -516,6 +551,7 @@ const DragHandle = ({
 
 const TableColumnItem = memo(
     ({
+        enablePinColumnButtons,
         handleAlignCenter,
         handleAlignLeft,
         handleAlignRight,
@@ -531,6 +567,7 @@ const TableColumnItem = memo(
         label,
         matches,
     }: {
+        enablePinColumnButtons: boolean;
         handleAlignCenter: (item: ItemTableListColumnConfig) => void;
         handleAlignLeft: (item: ItemTableListColumnConfig) => void;
         handleAlignRight: (item: ItemTableListColumnConfig) => void;
@@ -667,32 +704,34 @@ const TableColumnItem = memo(
                             variant="subtle"
                         />
                     </ActionIconGroup>
-                    <ActionIconGroup className={styles.group}>
-                        <ActionIcon
-                            icon="arrowLeftToLine"
-                            iconProps={{ size: 'md' }}
-                            onClick={() => handlePinToLeft(item)}
-                            size="xs"
-                            tooltip={{
-                                label: t('table.config.general.pinToLeft', {
-                                    postProcess: 'sentenceCase',
-                                }),
-                            }}
-                            variant={item.pinned === 'left' ? 'filled' : 'subtle'}
-                        />
-                        <ActionIcon
-                            icon="arrowRightToLine"
-                            iconProps={{ size: 'md' }}
-                            onClick={() => handlePinToRight(item)}
-                            size="xs"
-                            tooltip={{
-                                label: t('table.config.general.pinToRight', {
-                                    postProcess: 'sentenceCase',
-                                }),
-                            }}
-                            variant={item.pinned === 'right' ? 'filled' : 'subtle'}
-                        />
-                    </ActionIconGroup>
+                    {enablePinColumnButtons && (
+                        <ActionIconGroup className={styles.group}>
+                            <ActionIcon
+                                icon="arrowLeftToLine"
+                                iconProps={{ size: 'md' }}
+                                onClick={() => handlePinToLeft(item)}
+                                size="xs"
+                                tooltip={{
+                                    label: t('table.config.general.pinToLeft', {
+                                        postProcess: 'sentenceCase',
+                                    }),
+                                }}
+                                variant={item.pinned === 'left' ? 'filled' : 'subtle'}
+                            />
+                            <ActionIcon
+                                icon="arrowRightToLine"
+                                iconProps={{ size: 'md' }}
+                                onClick={() => handlePinToRight(item)}
+                                size="xs"
+                                tooltip={{
+                                    label: t('table.config.general.pinToRight', {
+                                        postProcess: 'sentenceCase',
+                                    }),
+                                }}
+                                variant={item.pinned === 'right' ? 'filled' : 'subtle'}
+                            />
+                        </ActionIconGroup>
+                    )}
                     <ActionIconGroup className={styles.group}>
                         <ActionIcon
                             icon="alignLeft"
@@ -772,6 +811,7 @@ const TableColumnItem = memo(
     (prevProps, nextProps) => {
         // Custom comparison function for better memoization
         return (
+            prevProps.enablePinColumnButtons === nextProps.enablePinColumnButtons &&
             prevProps.item.id === nextProps.item.id &&
             prevProps.item.isEnabled === nextProps.item.isEnabled &&
             prevProps.item.autoSize === nextProps.item.autoSize &&

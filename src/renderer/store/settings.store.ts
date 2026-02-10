@@ -203,10 +203,21 @@ const ItemTableListPropsSchema = z.object({
     enableHorizontalBorders: z.boolean(),
     enableRowHoverHighlight: z.boolean(),
     enableVerticalBorders: z.boolean(),
-    size: z.enum(['compact', 'default']),
+    size: z.enum(['compact', 'default', 'large']),
+});
+
+const ItemDetailListPropsSchema = z.object({
+    columns: z.array(ItemTableListColumnConfigSchema),
+    enableAlternateRowColors: z.boolean(),
+    enableHeader: z.boolean(),
+    enableHorizontalBorders: z.boolean(),
+    enableRowHoverHighlight: z.boolean(),
+    enableVerticalBorders: z.boolean(),
+    size: z.enum(['compact', 'default', 'large']),
 });
 
 const ItemListConfigSchema = z.object({
+    detail: ItemDetailListPropsSchema.optional(),
     display: z.nativeEnum(ListDisplayType),
     grid: z.object({
         itemGap: z.enum(['lg', 'md', 'sm', 'xl', 'xs']),
@@ -790,7 +801,9 @@ export type DataGridProps = {
 };
 
 export type DataTableProps = z.infer<typeof ItemTableListPropsSchema>;
+export type ItemDetailListProps = z.infer<typeof ItemDetailListPropsSchema>;
 export type ItemListSettings = {
+    detail?: ItemDetailListProps;
     display: ListDisplayType;
     grid: DataGridProps;
     itemsPerPage: number;
@@ -975,7 +988,7 @@ const initialState: SettingsState = {
         showServerImage: false,
     },
     font: {
-        builtIn: 'Poppins',
+        builtIn: 'Inter',
         custom: null,
         system: null,
         type: FontType.BUILT_IN,
@@ -1163,6 +1176,32 @@ const initialState: SettingsState = {
             },
         },
         [LibraryItem.ALBUM]: {
+            detail: {
+                columns: pickTableColumns({
+                    autoSizeColumns: [],
+                    columns: SONG_TABLE_COLUMNS,
+                    columnWidths: {
+                        [TableColumn.ACTIONS]: 60,
+                        [TableColumn.DURATION]: 100,
+                        [TableColumn.TITLE]: 400,
+                        [TableColumn.TRACK_NUMBER]: 50,
+                        [TableColumn.USER_FAVORITE]: 60,
+                    },
+                    enabledColumns: [
+                        TableColumn.TRACK_NUMBER,
+                        TableColumn.TITLE,
+                        TableColumn.DURATION,
+                        TableColumn.USER_FAVORITE,
+                        TableColumn.ACTIONS,
+                    ],
+                }),
+                enableAlternateRowColors: false,
+                enableHeader: true,
+                enableHorizontalBorders: false,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'compact',
+            },
             display: ListDisplayType.GRID,
             grid: {
                 itemGap: 'sm',
@@ -1737,6 +1776,23 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                                     delete data.table;
                                 }
 
+                                if (listState && data.detail) {
+                                    if (!listState.detail) {
+                                        const t = listState.table;
+                                        listState.detail = {
+                                            columns: t.columns,
+                                            enableAlternateRowColors: false,
+                                            enableHeader: t.enableHeader,
+                                            enableHorizontalBorders: t.enableHorizontalBorders,
+                                            enableRowHoverHighlight: t.enableRowHoverHighlight,
+                                            enableVerticalBorders: t.enableVerticalBorders,
+                                            size: t.size,
+                                        };
+                                    }
+                                    Object.assign(listState.detail, data.detail);
+                                    delete data.detail;
+                                }
+
                                 if (listState && data.grid) {
                                     Object.assign(listState.grid, data.grid);
                                     delete data.grid;
@@ -2092,7 +2148,7 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                 return persistedState;
             },
             name: 'store_settings',
-            version: 24,
+            version: 25,
         },
     ),
 );

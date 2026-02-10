@@ -192,9 +192,10 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                 onColumnReordered?.(columnIdFrom, columnIdTo, edge);
             },
 
-            onColumnResized: ({ columnId, width }: { columnId: TableColumn; width: number }) => {
-                onColumnResized?.(columnId, width);
-            },
+            onColumnResized: onColumnResized
+                ? ({ columnId, width }: { columnId: TableColumn; width: number }) =>
+                      onColumnResized(columnId, width)
+                : undefined,
 
             onDoubleClick: ({ internalState, item, itemType, meta }: DefaultItemControlProps) => {
                 if (!item || !internalState) {
@@ -241,11 +242,13 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                     }
 
                     const playType = (meta?.playType as Play) || Play.NOW;
+                    const singleSongOnly = meta?.singleSongOnly === true;
 
-                    // For NEXT, LAST, NEXT_SHUFFLE, and LAST_SHUFFLE, only add the clicked song
-                    // For NOW and SHUFFLE, add a range of songs around the clicked song
+                    // For single-song actions (e.g. image play button), or NEXT/LAST/..., only add the clicked song
+                    // For row double-click with NOW/SHUFFLE, add a range of songs around the clicked song
                     let songsToAdd: Song[];
                     if (
+                        singleSongOnly ||
                         playType === Play.NEXT ||
                         playType === Play.LAST ||
                         playType === Play.NEXT_SHUFFLE ||

@@ -375,7 +375,6 @@
         "customCss_description": "mukautettu CSS-sisältö. Huomautus: content- ja etä-URL-osoitteet ovat estettyjä ominaisuuksia. Esikatselu sisällöstäsi on alla. Lisäkenttiä, joita et ole määrittänyt, on näkyvissä puhdistuksen vuoksi",
         "customCssNotice": "Varoitus: vaikka jonkinlainen puhdistus onkin tehty (url()- ja content:-komentojen estäminen), mukautetun css:n käyttäminen voi silti aiheuttaa riskejä muuttamalla käyttöliittymää",
         "disableLibraryUpdateOnStartup": "poista uusimman version tarkistus käynnistyksen yhteydessä käytöstä",
-        "disableAutomaticUpdates": "poista automaattiset päivitykset käytöstä",
         "discordIdleStatus": "näytä rich presencen käyttämätön tila",
         "discordIdleStatus_description": "kun käytössä, päivitä tila kun soitin on käyttämättömänä",
         "discordUpdateInterval_description": "päivitysväli sekunnteina (vähintään 15 sekunttia)",

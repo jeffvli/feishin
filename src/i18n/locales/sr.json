@@ -88,7 +88,6 @@
         "hotkey_globalSearch": "globalno pretraživanje",
         "gaplessAudio_description": "postavlja opciju bez pauze zvuka za mpv (preporučeno: slabo)",
         "remoteUsername_description": "postavlja korisničko ime za daljinsku kontrolu servera. Ako su i korisničko ime i lozinka prazni, autentifikacija će biti onemogućena",
-        "disableAutomaticUpdates": "onemogući automatsko ažuriranje",
         "exitToTray_description": "izlazak aplikacije u sistemsku traku",
         "followLyric_description": "pomera tekst pesme na trenutnu poziciju reprodukcije",
         "hotkey_favoritePreviousSong": "omiljena $t(common.previousSong)",

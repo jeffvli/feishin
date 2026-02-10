@@ -1,26 +1,29 @@
 import { useCallback, useMemo } from 'react';
-import { useSearchParams } from 'react-router';
+import { useLocation, useNavigationType } from 'react-router';
 
-import { parseIntParam, setSearchParam } from '/@/renderer/utils/query-params';
+import { useScrollStore } from '/@/renderer/store/scroll.store';
 
 interface UseItemListScrollPersistProps {
     enabled: boolean;
 }
 
 export const useItemListScrollPersist = ({ enabled }: UseItemListScrollPersistProps) => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const location = useLocation();
+    const navigationType = useNavigationType();
+    const setOffset = useScrollStore((s) => s.setOffset);
+    const getOffset = useScrollStore((s) => s.getOffset);
 
-    const scrollOffset = useMemo(() => parseIntParam(searchParams, 'scrollOffset'), [searchParams]);
+    const scrollOffset = useMemo(() => {
+        if (navigationType !== 'POP') return undefined;
+        return getOffset(location.key);
+    }, [getOffset, location.key, navigationType]);
 
     const handleOnScrollEnd = useCallback(
         (offset: number) => {
             if (!enabled) return;
-
-            setSearchParams((prev) => setSearchParam(prev, 'scrollOffset', offset), {
-                replace: true,
-            });
+            setOffset(location.key, offset);
         },
-        [enabled, setSearchParams],
+        [enabled, location.key, setOffset],
     );
 
     return { handleOnScrollEnd, scrollOffset };

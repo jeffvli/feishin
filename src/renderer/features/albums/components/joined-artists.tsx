@@ -1,21 +1,28 @@
-import { Fragment } from 'react';
+import { Fragment, memo } from 'react';
 import { generatePath, Link } from 'react-router';
 
 import { AppRoute } from '/@/renderer/router/routes';
 import { Text, TextProps } from '/@/shared/components/text/text';
 import { AlbumArtist, RelatedAlbumArtist, RelatedArtist } from '/@/shared/types/domain-types';
 
+export const JOINED_ARTISTS_MUTED_PROPS = {
+    linkProps: { fw: 400, isMuted: true },
+    rootTextProps: { fw: 400, isMuted: true, size: 'sm' as const },
+} as const;
+
 interface JoinedArtistsProps {
     artistName: string;
     artists: AlbumArtist[] | RelatedAlbumArtist[] | RelatedArtist[];
     linkProps?: Partial<Omit<TextProps, 'children' | 'component' | 'to'>>;
+    readOnly?: boolean;
     rootTextProps?: Partial<Omit<TextProps, 'children' | 'component'>>;
 }
 
-export const JoinedArtists = ({
+const JoinedArtistsComponent = ({
     artistName,
     artists,
     linkProps,
+    readOnly = false,
     rootTextProps,
 }: JoinedArtistsProps) => {
     const parts: (
@@ -111,7 +118,7 @@ export const JoinedArtists = ({
                 {artists.map((artist, index) => (
                     <Fragment key={artist.id || `artist-${index}`}>
                         {index > 0 && ', '}
-                        {artist.id ? (
+                        {artist.id && !readOnly ? (
                             <Text
                                 component={Link}
                                 fw={500}
@@ -124,7 +131,7 @@ export const JoinedArtists = ({
                                 {artist.name}
                             </Text>
                         ) : (
-                            <Text fw={500} {...linkProps}>
+                            <Text component="span" fw={500} {...linkProps}>
                                 {artist.name}
                             </Text>
                         )}
@@ -152,7 +159,7 @@ export const JoinedArtists = ({
 
                 const { artist, text } = part;
 
-                if (artist.id) {
+                if (artist.id && !readOnly) {
                     return (
                         <Text
                             component={Link}
@@ -169,7 +176,7 @@ export const JoinedArtists = ({
                     );
                 }
                 return (
-                    <Text fw={500} key={`${artist.name}-${index}`} {...linkProps}>
+                    <Text component="span" fw={500} key={`${artist.name}-${index}`} {...linkProps}>
                         {text}
                     </Text>
                 );
@@ -180,7 +187,7 @@ export const JoinedArtists = ({
                     {unmatchedArtists.map((artist, index) => (
                         <Fragment key={artist.id}>
                             {index > 0 && ', '}
-                            {artist.id ? (
+                            {artist.id && !readOnly ? (
                                 <Text
                                     component={Link}
                                     fw={500}
@@ -190,6 +197,10 @@ export const JoinedArtists = ({
                                     })}
                                     {...linkProps}
                                 >
+                                    {artist.name}
+                                </Text>
+                            ) : artist.id ? (
+                                <Text component="span" fw={500} {...linkProps}>
                                     {artist.name}
                                 </Text>
                             ) : (
@@ -204,6 +215,8 @@ export const JoinedArtists = ({
         </Text>
     );
 };
+
+export const JoinedArtists = memo(JoinedArtistsComponent);
 
 function escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

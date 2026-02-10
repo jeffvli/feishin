@@ -98,7 +98,6 @@
         "hotkey_globalSearch": "globální vyhledávání",
         "gaplessAudio_description": "nastavení přehrávače mpv pro přehrávání bez mezer",
         "remoteUsername_description": "nastavení uživatelského jména pro server vzdáleného ovládání. pokud je jméno i heslo prázdné, bude autentifikace zakázána",
-        "disableAutomaticUpdates": "vypnout automatické aktualizace",
         "exitToTray_description": "ukončit aplikaci do systémové lišty",
         "followLyric_description": "přesouvat texty s aktuální pozicí přehrávání",
         "hotkey_favoritePreviousSong": "oblíbit $t(common.previousSong)",
@@ -284,7 +283,7 @@
         "releaseChannel_optionLatest": "nejnovější",
         "releaseChannel_optionBeta": "beta",
         "releaseChannel": "kanál vydání",
-        "releaseChannel_description": "vyberte si mezi stabilními vydáními nebo beta vydáními pro automatické aktualizace",
+        "releaseChannel_description": "vyberte si mezi stabilními, beta nebo alpha (nočními) vydáními pro automatické aktualizace",
         "mediaSession": "povolit relaci médií",
         "mediaSession_description": "povolí integraci do služby Media Session, což zobrazí ovládání a metadata médií v překrytí systémové hlasitosti a na zamykací obrazovce",
         "exportImportSettings_control_description": "exportovat a importovat nastavení pomocí souboru JSON",
@@ -380,7 +379,13 @@
         "enableGridMultiSelect": "povolit vícenásobný výběr v mřížce",
         "enableGridMultiSelect_description": "pokud je povoleno, umožňuje vybrat několik položek v zobrazení mřížky. pokud je zakázáno, kliknutím na obrázek položky mřížky přejdete na stránku položky",
         "sidebarPlaylistSorting_description": "umožňuje ruční řazení seznamů skladeb v postranní liště pomocí přetažení namísto výchozího pořadí serveru",
-        "sidebarPlaylistSorting": "řazení seznamů skladeb v postranní liště"
+        "sidebarPlaylistSorting": "řazení seznamů skladeb v postranní liště",
+        "blurExplicitImages": "rozostřit explicitní obrázky",
+        "blurExplicitImages_description": "obaly alb a skladeb označené jako explicitní budou rozostřeny",
+        "sidebarPlaylistListFilterRegex_description": "v postranní liště skrýt seznamy skladeb, které odpovídají tomuto regulárnímu výrazu",
+        "sidebarPlaylistListFilterRegex_placeholder": "např. ^Denní mix.*",
+        "sidebarPlaylistListFilterRegex": "regulární výraz filtru seznamů skladeb",
+        "releaseChannel_optionAlpha": "alpha (noční)"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist, {\"count\": 1})",
@@ -899,7 +904,11 @@
             "viewAllTracks": "zobrazit všechny $t(entity.track, {\"count\": 2})",
             "viewAll": "zobrazit vše",
             "groupingTypeAll": "všechny typy vydání",
-            "groupingTypePrimary": "primární typy vydání"
+            "groupingTypePrimary": "primární typy vydání",
+            "favoriteSongs": "oblíbené skladby",
+            "topSongsCommunity": "komunita",
+            "topSongsPersonal": "osobní",
+            "favoriteSongsFrom": "oblíbené skladby od umělce {{title}}"
         },
         "itemDetail": {
             "copiedPath": "cesta úspěšně zkopírována",
@@ -933,6 +942,11 @@
         "collections": {
             "overrideExisting": "nahradit existující",
             "saveAsCollection": "uložit jako sbírku"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "revize od {{stable}}",
+            "noNewCommits": "žádné nové revize v tomto období",
+            "noStableReleaseToCompare": "není dostupné žádné stabilní vydání k porovnání"
         }
     },
     "form": {

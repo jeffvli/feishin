@@ -95,7 +95,6 @@
         "hotkey_globalSearch": "búsqueda global",
         "gaplessAudio_description": "establece la configuración de audio sin pausas para mpv",
         "remoteUsername_description": "establece el nombre de usuario para el control remoto del servidor. si el usuario y la contraseña están vacíos, la autenticación será deshabilitada",
-        "disableAutomaticUpdates": "desactiva las actualizaciones automáticas",
         "exitToTray_description": "sale de la aplicación a la bandeja del sistema",
         "followLyric_description": "desplaza la letra a la posición de reproducción actual",
         "hotkey_favoritePreviousSong": "$t(common.previousSong) favorita",
@@ -283,7 +282,7 @@
         "releaseChannel_optionLatest": "Última versión",
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel": "Canal de lanzamiento",
-        "releaseChannel_description": "Elige entre lanzamientos estables o beta para las actualizaciones automáticas",
+        "releaseChannel_description": "Elige entre lanzamientos estables, beta, o alpha (nightly) para las actualizaciones automáticas",
         "artistBackground_description": "Añade una imagen de fondo para las páginas de artista que contienen el arte del artista",
         "mediaSession": "Activar sesión de medios",
         "mediaSession_description": "Activa la integración de la sesión de medios, mostrando los controles de medios y los metadatos en la superposición del volumen del sistema y en la pantalla de bloqueo",
@@ -380,7 +379,13 @@
         "enableGridMultiSelect": "Activar selección múltiple de rejilla",
         "enableGridMultiSelect_description": "Cuando está activo, permite seleccionar múltiples elementos en las vistas de rejilla. Cuando está desactivado, hacer clic en las imágenes de los elementos de la rejilla navegará a la página del elemento",
         "sidebarPlaylistSorting": "Ordenación de la lista de reproducción de la barra lateral",
-        "sidebarPlaylistSorting_description": "Permite la ordenación manual de la lista de reproducción en la barra lateral usando arrastrar y soltar en lugar del orden predeterminado del servidor"
+        "sidebarPlaylistSorting_description": "Permite la ordenación manual de la lista de reproducción en la barra lateral usando arrastrar y soltar en lugar del orden predeterminado del servidor",
+        "sidebarPlaylistListFilterRegex": "Expresión regular de filtrado de listas de reproducción",
+        "sidebarPlaylistListFilterRegex_description": "Esconde las listas de reproducción en la barra lateral que coincidan con esta expresión regular",
+        "sidebarPlaylistListFilterRegex_placeholder": "p. ej. ^Mezcla diaria.*",
+        "blurExplicitImages": "Desenfocar imágenes explícitas",
+        "blurExplicitImages_description": "El álbum y la carátula de la canción etiquetados como explícitos serán desenfocados",
+        "releaseChannel_optionAlpha": "Alpha (nightly)"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist, {\"count\": 1})",
@@ -792,7 +797,11 @@
             "about": "Sobre {{artist}}",
             "appearsOn": "Aparece en",
             "groupingTypeAll": "Todos los tipos de lanzamiento",
-            "groupingTypePrimary": "Tipos de lanzamiento principales"
+            "groupingTypePrimary": "Tipos de lanzamiento principales",
+            "favoriteSongs": "Canciones favoritas",
+            "favoriteSongsFrom": "Canciones favoritas de {{title}}",
+            "topSongsPersonal": "Personal",
+            "topSongsCommunity": "Comunidad"
         },
         "itemDetail": {
             "copiedPath": "Ruta copiada correctamente",
@@ -826,6 +835,11 @@
         "collections": {
             "overrideExisting": "Sobreescribir existente",
             "saveAsCollection": "Guardar como colección"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "Actualizaciones desde {{stable}}",
+            "noNewCommits": "Ninguna nueva actualización en este rango",
+            "noStableReleaseToCompare": "Ningún lanzamiento estable disponible con el que comparar"
         }
     },
     "form": {

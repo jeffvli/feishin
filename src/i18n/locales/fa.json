@@ -76,7 +76,6 @@
         "hotkey_volumeDown": "کم کردن صدا",
         "audioPlayer_description": "پخش‌کنندهٔ صدا را برای پخش انتخاب کنید",
         "hotkey_globalSearch": "جست و جوی سراسری",
-        "disableAutomaticUpdates": "غیرفعال کردن به‌‌روزرسانی خودکار",
         "exitToTray_description": "خروج از اپلیکیشن به system tray",
         "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
         "discordUpdateInterval_description": "فاصلهٔ بین هر به روزرسانی به ثانیه (حداقل ۱۵ ثانیه)",

@@ -71,26 +71,27 @@ export const UpdateSettings = memo(() => {
         {
             control: (
                 <Switch
-                    aria-label="Disable automatic updates"
-                    defaultChecked={settings.disableAutoUpdate}
+                    aria-label={t('setting.automaticUpdates', { postProcess: 'sentenceCase' })}
+                    defaultChecked={!settings.disableAutoUpdate}
                     disabled={disableAutoUpdates()}
                     onChange={(e) => {
                         if (!e) return;
-                        localSettings?.set('disable_auto_updates', e.currentTarget.checked);
+                        const enabled = e.currentTarget.checked;
+                        localSettings?.set('disable_auto_updates', !enabled);
                         setSettings({
                             window: {
-                                disableAutoUpdate: e.currentTarget.checked,
+                                disableAutoUpdate: !enabled,
                             },
                         });
                     }}
                 />
             ),
-            description: t('setting.disableAutomaticUpdates', {
+            description: t('setting.automaticUpdates', {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
             isHidden: disableAutoUpdates(),
-            title: t('setting.disableAutomaticUpdates', { postProcess: 'sentenceCase' }),
+            title: t('setting.automaticUpdates', { postProcess: 'sentenceCase' }),
         },
     ];
 

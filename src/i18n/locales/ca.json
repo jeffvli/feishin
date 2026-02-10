@@ -15,7 +15,8 @@
             "nowPlaying": "ara sona",
             "shared": "$t(entity.playlist, {\"count\": 2}) compartides",
             "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})"
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "collections": "col·leccions"
         },
         "albumArtistDetail": {
             "relatedArtists": "$t(entity.artist, {\"count\": 2}) similars",
@@ -191,6 +192,14 @@
         },
         "radioList": {
             "title": "emissores de ràdio"
+        },
+        "windowBar": {
+            "paused": "(en pausa) ",
+            "privateMode": "(mode privat)"
+        },
+        "collections": {
+            "overrideExisting": "sobreescriu existents",
+            "saveAsCollection": "desa com a col·lecció"
         }
     },
     "common": {
@@ -289,8 +298,8 @@
         "restartRequired": "cal reiniciar",
         "sampleRate": "freqüència de mostreig",
         "setting_one": "configuració",
-        "setting_many": "",
-        "setting_other": "",
+        "setting_many": "configuracions",
+        "setting_other": "configuracions",
         "trackGain": "guany de pista",
         "trackPeak": "pic de pista",
         "gap": "espera",
@@ -316,7 +325,8 @@
         "example": "exemple",
         "mood": "estat d'ànim",
         "filter_single": "senzill",
-        "filter_multiple": "multi"
+        "filter_multiple": "multi",
+        "rename": "reanomena"
     },
     "entity": {
         "album_one": "àlbum",
@@ -540,7 +550,6 @@
         "fontType_optionBuiltIn": "tipus de lletra integrats",
         "fontType_optionCustom": "tipus de lletra personalitzats",
         "fontType_optionSystem": "tipus de lletra del sistema",
-        "disableAutomaticUpdates": "desactivar les actualitzacions automàtiques",
         "disableLibraryUpdateOnStartup": "desactiva la comprovació de noves versions a l'inici",
         "homeConfiguration": "configuració de la pàgina d'inici",
         "sidebarConfiguration": "configuració de la barra lateral",
@@ -862,7 +871,14 @@
         "homeFeatureStyle_description": "controla l'estil del carrusel de destacats de l'inici",
         "homeFeatureStyle": "estil del carrusel de destacats de l'inici",
         "homeFeatureStyle_optionMultiple": "múltiple",
-        "homeFeatureStyle_optionSingle": "simple"
+        "homeFeatureStyle_optionSingle": "simple",
+        "enableGridMultiSelect": "activa la selecció múltiple de quadrícula",
+        "enableGridMultiSelect_description": "quan està activada, podeu seleccionar més d'un element en la vista de quadrícula; si feu clic en la imatge d'un element de la quadrícula, accedireu a la pàgina de l'element",
+        "sidebarPlaylistSorting_description": "permet ordenar manualment les llistes de reproducció a la barra lateral arrossegant amb el ratolí en comptes de seguir l'ordre predeterminat del servidor",
+        "sidebarPlaylistSorting": "ordenació de llistes de reproducció de la barra lateral",
+        "sidebarPlaylistListFilterRegex_description": "amaga les llistes de reproducció de la barra lateral que coincideixin amb aquesta expressió regular",
+        "sidebarPlaylistListFilterRegex_placeholder": "ex. ^Mescla diària.*",
+        "sidebarPlaylistListFilterRegex": "regex pel filtre de llistes"
     },
     "table": {
         "column": {
@@ -924,7 +940,8 @@
                 "alternateRowColors": "colors de fila alternants",
                 "horizontalBorders": "vores de fila",
                 "rowHoverHighlight": "ressalta en passar el cursor per la fila",
-                "verticalBorders": "vores de columna"
+                "verticalBorders": "vores de columna",
+                "showHeader": "mostra l'encapçalament"
             },
             "label": {
                 "actions": "$t(common.action, {\"count\": 2})",
@@ -1013,7 +1030,8 @@
         "lastPlayed": "última reproducció",
         "path": "ruta",
         "songCount": "nombre de cançons",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "explicitStatus": "$t(common.explicitStatus)",
+        "sortName": "ordena per nom"
     },
     "player": {
         "muted": "silenciat",

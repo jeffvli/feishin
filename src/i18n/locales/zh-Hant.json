@@ -296,7 +296,8 @@
             "myLibrary": "我的媒體庫",
             "shared": "已分享 $t(entity.playlist, {\"count\": 2})",
             "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})"
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "collections": "收藏"
         },
         "trackList": {
             "title": "$t(entity.track, {\"count\": 2})",
@@ -314,7 +315,11 @@
             "viewAll": "檢視所有",
             "viewAllTracks": "檢視所有$t(entity.track, {\"count\": 2})",
             "groupingTypeAll": "所有發佈類型",
-            "groupingTypePrimary": "主要發佈類型"
+            "groupingTypePrimary": "主要發佈類型",
+            "favoriteSongs": "最愛歌曲",
+            "favoriteSongsFrom": "{{title}} 的最愛歌曲",
+            "topSongsCommunity": "社群",
+            "topSongsPersonal": "個人"
         },
         "manageServers": {
             "title": "管理伺服器",
@@ -342,7 +347,17 @@
             "title": "電台"
         },
         "windowBar": {
-            "paused": "(暫停) "
+            "paused": "(暫停) ",
+            "privateMode": "(私人模式)"
+        },
+        "collections": {
+            "overrideExisting": "複寫現有的",
+            "saveAsCollection": "儲存為收藏"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "提交自 {{stable}}",
+            "noNewCommits": "在此區間內沒有新的提交",
+            "noStableReleaseToCompare": "沒有穩定的發行可供比較"
         }
     },
     "player": {
@@ -398,7 +413,7 @@
         "accentColor": "強調色",
         "accentColor_description": "設定應用程式的強調色",
         "applicationHotkeys": "應用程式快捷鍵",
-        "applicationHotkeys_description": "設定應用程式快捷鍵。切換勾選框來設為全局快捷鍵（僅桌面端）",
+        "applicationHotkeys_description": "設定應用程式快捷鍵。切換勾選框來設為全域快捷鍵（僅桌面端）",
         "audioDevice": "音訊設備",
         "audioDevice_description": "選擇用於播放的音訊設備（僅 web 播放器）",
         "audioExclusiveMode": "音訊獨占模式",
@@ -409,7 +424,6 @@
         "crossfadeStyle_description": "選擇用於音訊播放器的淡入淡出風格",
         "customFontPath": "自定字體路徑",
         "customFontPath_description": "設定應用程式使用的自定字體路徑",
-        "disableAutomaticUpdates": "禁用自動更新",
         "disableLibraryUpdateOnStartup": "禁用啟動時檢查新版本",
         "discordApplicationId": "{{discord}} 應用程式 id",
         "discordApplicationId_description": "{{discord}} rich presence 應用程式 id（預設為 {{defaultId}}）",
@@ -431,10 +445,10 @@
         "gaplessAudio": "無間隔音訊",
         "gaplessAudio_description": "調整 mpv 無間隔音訊設定",
         "gaplessAudio_optionWeak": "弱（建議）",
-        "globalMediaHotkeys": "全局媒體快捷鍵",
+        "globalMediaHotkeys": "全域媒體快捷鍵",
         "hotkey_browserForward": "瀏覽器往前",
         "hotkey_favoritePreviousSong": "收藏 $t(common.previousSong)",
-        "hotkey_globalSearch": "全局搜尋",
+        "hotkey_globalSearch": "全域搜尋",
         "hotkey_localSearch": "頁面內搜尋",
         "hotkey_playbackNext": "下一首",
         "hotkey_playbackPause": "暫停",
@@ -558,7 +572,7 @@
         "contextMenu_description": "允許您隱藏在右鍵選單項目時顯示的項目。未選取的項目將被隱藏",
         "customCssEnable": "啟用自訂CSS",
         "customCssEnable_description": "允許撰寫自訂CSS",
-        "customCssNotice": "警告：雖然有一些清理措施（不允許 url() 和 content:），但使用自訂 CSS 仍然會透過更改介面帶來風險",
+        "customCssNotice": "警告：即使已限制某些用法（不允許 url() 和 content:），但使用自訂 CSS 仍然會透過更改介面帶來風險",
         "customCss": "自訂CSS",
         "customCss_description": "自訂 CSS 內容。注意：內容和遠端 URL 是不允許使用的屬性。您的內容預覽如下所示。由於需要進行清理，因此存在一些您未設定的其他欄位",
         "discordPausedStatus": "暫停時顯示 rich presence",
@@ -618,7 +632,7 @@
         "artistBackgroundBlur_description": "調整套用至藝人背景圖片的模糊程度",
         "releaseChannel_optionLatest": "最新版本",
         "releaseChannel_optionBeta": "測試版",
-        "releaseChannel_description": "選擇自動更新時要使用穩定版本或是測試版本",
+        "releaseChannel_description": "選擇自動更新時要使用穩定、測試或是 alpha (每日建構版) 版本",
         "discordDisplayType": "{{discord}} presence 顯示類型",
         "discordDisplayType_description": "變更您在狀態中正在聆聽的內容",
         "discordDisplayType_songname": "歌曲名稱",
@@ -630,8 +644,8 @@
         "hotkey_navigateHome": "導航至首頁",
         "preventSleepOnPlayback": "防止播放時進入睡眠狀態",
         "preventSleepOnPlayback_description": "在音樂播放時防止螢幕進入睡眠狀態",
-        "mediaSession": "啟用Media Session",
-        "mediaSession_description": "啟用 Media Session 整合功能，於系統音量Overlay和鎖定畫面中顯示媒體資料與控制面板",
+        "mediaSession": "啟用 Media Session",
+        "mediaSession_description": "啟用 Media Session 整合功能，於系統音量 Overlay 和鎖定畫面中顯示媒體資料與控制面板",
         "releaseChannel": "發佈通道",
         "analyticsDisable": "選擇退出使用情況分析",
         "analyticsDisable_description": "經過匿名處理的使用情況資料將傳送給開發者，以協助改進應用程式",
@@ -715,7 +729,24 @@
         "pathReplace_description": "替換您伺服器的預設檔案路徑",
         "pathReplace_optionRemovePrefix": "移除前綴",
         "pathReplace_optionAddPrefix": "增加前綴",
-        "sidebarPlaylistSorting": "側邊欄播放清單排序"
+        "sidebarPlaylistSorting": "側邊欄播放清單排序",
+        "homeFeatureStyle_description": "控制首頁輪播的樣式",
+        "homeFeatureStyle": "首頁特色輪播樣式",
+        "homeFeatureStyle_optionMultiple": "多重",
+        "homeFeatureStyle_optionSingle": "單一",
+        "hotkey_listPlayDefault": "清單播放",
+        "hotkey_listPlayLast": "清單尾端播放",
+        "hotkey_listPlayNext": "清單下一項播放",
+        "hotkey_listPlayNow": "清單立即播放",
+        "enableGridMultiSelect": "啟用網格多選",
+        "enableGridMultiSelect_description": "啟用時，允許在網格檢視中選擇多項。停用時，單擊網格項目圖片將導航到項目頁面",
+        "sidebarPlaylistSorting_description": "允許在側邊欄中使用拖放手動對播放清單進行排序，而不是預設的伺服器排序",
+        "sidebarPlaylistListFilterRegex_description": "在側邊欄中隱藏與此正規表達式匹配的播放清單",
+        "sidebarPlaylistListFilterRegex_placeholder": "範例: ^Daily Mix.*",
+        "sidebarPlaylistListFilterRegex": "播放清單過濾器正規表達式",
+        "blurExplicitImages": "模糊露骨圖片",
+        "blurExplicitImages_description": "標記為露骨的專輯和歌曲封面將被模糊",
+        "releaseChannel_optionAlpha": "alpha (每日建構版)"
     },
     "table": {
         "config": {
@@ -748,7 +779,8 @@
                 "alternateRowColors": "隔行上色",
                 "horizontalBorders": "行邊框線",
                 "rowHoverHighlight": "滑鼠懸停Highlight",
-                "verticalBorders": "列邊框線"
+                "verticalBorders": "列邊框線",
+                "showHeader": "顯示標題"
             },
             "label": {
                 "actions": "$t(common.action, {\"count\": 2})",
@@ -783,7 +815,9 @@
                 "genreBadge": "$t(entity.genre, {\"count\": 1}) (徽章)",
                 "image": "圖片",
                 "bitDepth": "$t(common.bitDepth)",
-                "sampleRate": "$t(common.sampleRate)"
+                "sampleRate": "$t(common.sampleRate)",
+                "composer": "作曲者",
+                "titleArtist": "$t(common.title) (藝人)"
             },
             "view": {
                 "table": "表格",
@@ -926,7 +960,8 @@
         "title": "標題",
         "toYear": "從年份",
         "trackNumber": "曲目",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "explicitStatus": "$t(common.explicitStatus)",
+        "sortName": "排序名稱"
     },
     "form": {
         "addServer": {
@@ -1168,6 +1203,80 @@
         "gravity": "重力",
         "peakFadeTime": "峰值淡出時間 (毫秒)",
         "peakHoldTime": "峰值停留時間 (毫秒)",
-        "radialSpectrum": "圓形頻譜"
+        "radialSpectrum": "圓形頻譜",
+        "level": "層級",
+        "pasteGradient": "貼上漸層",
+        "pasteGradientPlaceholder": "在這裡貼上漸層JSON...",
+        "radial": "放射",
+        "radialInvert": "反轉放射",
+        "spinSpeed": "旋轉速度",
+        "radius": "半徑",
+        "reflexMirror": "反射鏡像",
+        "reflexFit": "反射貼齊",
+        "reflexRatio": "反射比例",
+        "reflexAlpha": "反射 Alpha",
+        "reflexBrightness": "反射亮度",
+        "mirror": "鏡像",
+        "miscellaneousSettings": "雜項設定",
+        "alphaBars": "Alpha 條",
+        "ansiBands": "ASNI 波段",
+        "ledBars": "LED 條",
+        "trueLeds": "真實 LED",
+        "lumiBars": "輝光條",
+        "outlineBars": "外框條",
+        "roundBars": "圓角條",
+        "lowResolution": "低解析",
+        "splitGradient": "分割漸層",
+        "showFPS": "顯示 FPS",
+        "showScaleX": "顯示 X 軸比例",
+        "noteLabels": "音符標籤",
+        "showScaleY": "顯示Y軸比例",
+        "options": {
+            "mode": {
+                "0": "[0] 離散頻率",
+                "1": "[1] 1/24th 八度音 / 240 頻段",
+                "2": "[2] 1/12th 八度音 / 120 頻段",
+                "3": "[3] 1/8th 八度音 / 80 頻段",
+                "4": "[4] 1/6th 八度音 / 60 頻段",
+                "5": "[5] 1/4th 八度音 / 40 頻段",
+                "6": "[6] 1/3rd 八度音 / 30 頻段",
+                "7": "[7] 一半八度音 / 20 頻段",
+                "8": "[8] 完整八度音 / 10 頻段",
+                "10": "[10] 線 / 區域圖表"
+            },
+            "colorMode": {
+                "gradient": "梯度",
+                "barIndex": "條-指數",
+                "barLevel": "條-高度"
+            },
+            "gradient": {
+                "classic": "經典",
+                "prism": "菱鏡",
+                "rainbow": "彩虹",
+                "steelblue": "鋼藍",
+                "orangered": "橙紅色"
+            },
+            "channelLayout": {
+                "single": "單一",
+                "dualCombined": "雙重-合併",
+                "dualHorizontal": "雙重-水平",
+                "dualVertical": "雙重-垂直"
+            },
+            "frequencyScale": {
+                "none": "無",
+                "bark": "比例刻度",
+                "linear": "線性比例",
+                "log": "Log 比例",
+                "mel": "Mel 比例"
+            },
+            "weightingFilter": {
+                "none": "無",
+                "a": "A",
+                "b": "B",
+                "c": "C",
+                "d": "D",
+                "z": "Z"
+            }
+        }
     }
 }

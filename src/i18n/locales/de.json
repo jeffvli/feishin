@@ -33,7 +33,8 @@
         "createRadioStation": "$t(entity.radioStation, {\"count\": 1}) erstellen",
         "deleteRadioStation": "$t(entity.radioStation, {\"count\": 1}) löschen",
         "selectAll": "alle auswählen",
-        "openApplicationDirectory": "Anwendungsverzeichnis öffnen"
+        "openApplicationDirectory": "Anwendungsverzeichnis öffnen",
+        "addOrRemoveFromSelection": "Zur Auswahl hinzufügen oder entfernen"
     },
     "common": {
         "backward": "zurück",
@@ -571,7 +572,8 @@
             "shared": "$t(entity.playlist, {\"count\": 2}) geteilt",
             "myLibrary": "meine bibliothek",
             "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})"
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "collections": "Sammlungen"
         },
         "setting": {
             "playbackTab": "Wiedergabe",
@@ -629,7 +631,9 @@
             "topSongs": "Toplieder",
             "relatedArtists": "ähnliche $t(entity.artist, {\"count\": 2})",
             "groupingTypeAll": "alle Veröffentlichungsformate",
-            "groupingTypePrimary": "primäre Veröffentlichungsformate"
+            "groupingTypePrimary": "primäre Veröffentlichungsformate",
+            "favoriteSongs": "Lieblingssongs",
+            "favoriteSongsFrom": "Liebslingssongs von {{title}}"
         },
         "manageServers": {
             "title": "Servers verwalten",
@@ -655,6 +659,13 @@
         },
         "radioList": {
             "title": "Radiosender"
+        },
+        "windowBar": {
+            "paused": "(Pausiert) ",
+            "privateMode": "(Privater Modus)"
+        },
+        "collections": {
+            "saveAsCollection": "Als Sammlung speichern"
         }
     },
     "player": {
@@ -693,7 +704,8 @@
         "addNextShuffled": "als Nächstes (zufällige Wiedergabe)",
         "holdToShuffle": "Halten für Zufallswiedergabe",
         "restoreQueueFromServer": "Wiedergabeliste von Server wiederherstellen",
-        "saveQueueToServer": "Wiedergabeliste auf Server speichern"
+        "saveQueueToServer": "Wiedergabeliste auf Server speichern",
+        "lyrics": "Songtexte"
     },
     "setting": {
         "audioDevice_description": "wählen Sie das Audiogerät aus, das für die Wiedergabe verwendet werden soll (nur Webplayer)",
@@ -709,7 +721,6 @@
         "disableLibraryUpdateOnStartup": "beim Start nicht nach neuen Versionen suchen",
         "discordApplicationId_description": "die Application-ID für {{discord}} Rich Presence (Standard: {{defaultId}})",
         "audioPlayer_description": "Wählen Sie den Audioplayer aus, der für die Wiedergabe verwendet werden soll",
-        "disableAutomaticUpdates": "Automatische Updates deaktivieren",
         "crossfadeDuration_description": "Legt die Dauer der Überblendung fest",
         "customFontPath": "Benutzerdefinierter Pfad für Schriftarten",
         "crossfadeDuration": "Dauer der Überblendung",
@@ -974,7 +985,12 @@
         "translationTargetLanguage_description": "die gewünschte Sprache der Übersetzung",
         "translationTargetLanguage": "Zielsprache der Übersetzung",
         "queryBuilderCustomFields": "benutzerdefiniertes Feld",
-        "queryBuilderCustomFields_inputTag": "Tag"
+        "queryBuilderCustomFields_inputTag": "Tag",
+        "homeFeatureStyle_optionMultiple": "mehrere",
+        "imageResolution": "Bildauflösung",
+        "imageResolution_optionTable": "Tabelle",
+        "imageResolution_optionSidebar": "Seitenleiste",
+        "preservePitch": "Tonhöhe erhalten"
     },
     "dragDropZone": {
         "error_oneFileOnly": "Bitte wähle nur 1 Datei",

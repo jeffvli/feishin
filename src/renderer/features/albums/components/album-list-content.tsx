@@ -36,6 +36,18 @@ const AlbumListPaginatedTable = lazy(() =>
     })),
 );
 
+const AlbumListInfiniteDetail = lazy(() =>
+    import('/@/renderer/features/albums/components/album-list-infinite-detail').then((module) => ({
+        default: module.AlbumListInfiniteDetail,
+    })),
+);
+
+const AlbumListPaginatedDetail = lazy(() =>
+    import('/@/renderer/features/albums/components/album-list-paginated-detail').then((module) => ({
+        default: module.AlbumListPaginatedDetail,
+    })),
+);
+
 const AlbumListFilters = () => {
     return (
         <ListWithSidebarContainer.SidebarPortal>
@@ -62,13 +74,16 @@ export const AlbumListContent = () => {
 };
 
 const AlbumListSuspenseContainer = () => {
-    const { display, grid, itemsPerPage, pagination, table } = useListSettings(ItemListKey.ALBUM);
+    const { detail, display, grid, itemsPerPage, pagination, table } = useListSettings(
+        ItemListKey.ALBUM,
+    );
 
     const { customFilters } = useListContext();
 
     return (
         <Suspense fallback={<Spinner container />}>
             <AlbumListView
+                detail={detail}
                 display={display}
                 grid={grid}
                 itemsPerPage={itemsPerPage}
@@ -83,13 +98,17 @@ const AlbumListSuspenseContainer = () => {
 export type OverrideAlbumListQuery = Omit<Partial<AlbumListQuery>, 'limit' | 'startIndex'>;
 
 export const AlbumListView = ({
+    detail,
     display,
     grid,
     itemsPerPage,
     overrideQuery,
     pagination,
     table,
-}: ItemListSettings & { overrideQuery?: OverrideAlbumListQuery }) => {
+}: ItemListSettings & {
+    detail?: ItemListSettings['detail'];
+    overrideQuery?: OverrideAlbumListQuery;
+}) => {
     const server = useCurrentServer();
     const { pageKey } = useListContext();
 
@@ -172,6 +191,32 @@ export const AlbumListView = ({
                             query={mergedQuery}
                             serverId={server.id}
                             size={table.size}
+                        />
+                    );
+                }
+                default:
+                    return null;
+            }
+        }
+        case ListDisplayType.DETAIL: {
+            switch (pagination) {
+                case ListPaginationType.INFINITE: {
+                    return (
+                        <AlbumListInfiniteDetail
+                            enableHeader={detail?.enableHeader}
+                            itemsPerPage={itemsPerPage}
+                            query={mergedQuery}
+                            serverId={server.id}
+                        />
+                    );
+                }
+                case ListPaginationType.PAGINATED: {
+                    return (
+                        <AlbumListPaginatedDetail
+                            enableHeader={detail?.enableHeader}
+                            itemsPerPage={itemsPerPage}
+                            query={mergedQuery}
+                            serverId={server.id}
                         />
                     );
                 }

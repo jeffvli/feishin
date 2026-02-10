@@ -26,6 +26,11 @@
     padding: var(--theme-spacing-xs) var(--theme-spacing-xl);
 }
 
+.container.no-horizontal-padding {
+    padding-right: 0;
+    padding-left: 0;
+}
+
 .container.center {
     align-items: center;
     text-align: center;
@@ -203,6 +208,11 @@
 
 .header-container.padding-xl {
     padding: 0 var(--theme-spacing-xl);
+}
+
+.header-container.no-horizontal-padding {
+    padding-right: 0;
+    padding-left: 0;
 }
 
 .header-dragging {

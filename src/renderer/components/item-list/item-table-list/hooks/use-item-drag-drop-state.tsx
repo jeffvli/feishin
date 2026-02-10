@@ -7,8 +7,8 @@ import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { Folder, LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 import { DragOperation, DragTarget, DragTargetMap } from '/@/shared/types/drag-and-drop';
 
-interface DragDropState {
-    dragRef: null | React.Ref<HTMLDivElement>;
+interface DragDropState<TElement extends HTMLElement = HTMLDivElement> {
+    dragRef: null | React.Ref<TElement>;
     isDraggedOver: 'bottom' | 'top' | null;
     isDragging: boolean;
 }
@@ -23,7 +23,7 @@ interface UseItemDragDropStateProps {
     playlistId?: string;
 }
 
-export const useItemDragDropState = ({
+export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivElement>({
     enableDrag,
     internalState,
     isDataRow,
@@ -31,14 +31,14 @@ export const useItemDragDropState = ({
     itemType,
     playerContext,
     playlistId,
-}: UseItemDragDropStateProps): DragDropState => {
+}: UseItemDragDropStateProps): DragDropState<TElement> => {
     const shouldEnableDrag = enableDrag && isDataRow && !!item;
 
     const {
         isDraggedOver,
         isDragging: isDraggingLocal,
         ref: dragRef,
-    } = useDragDrop<HTMLDivElement>({
+    } = useDragDrop<TElement>({
         drag: {
             getId: () => {
                 if (!item || !isDataRow) {

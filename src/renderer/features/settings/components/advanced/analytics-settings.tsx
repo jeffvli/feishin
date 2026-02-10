@@ -10,11 +10,11 @@ import { Switch } from '/@/shared/components/switch/switch';
 export const AnalyticsSettings = memo(() => {
     const { t } = useTranslation();
 
-    const handleToggleAnalytics = (disable: boolean) => {
-        if (disable) {
-            localStorage.setItem('umami.disabled', '1');
-        } else {
+    const handleSetSendAnalytics = (send: boolean) => {
+        if (send) {
             localStorage.removeItem('umami.disabled');
+        } else {
+            localStorage.setItem('umami.disabled', '1');
         }
     };
 
@@ -22,12 +22,13 @@ export const AnalyticsSettings = memo(() => {
         {
             control: (
                 <Switch
-                    defaultChecked={localStorage.getItem('umami.disabled') === '1'}
-                    onChange={(e) => handleToggleAnalytics(e.currentTarget.checked)}
+                    aria-label={t('setting.analyticsEnable', { postProcess: 'sentenceCase' })}
+                    defaultChecked={localStorage.getItem('umami.disabled') !== '1'}
+                    onChange={(e) => handleSetSendAnalytics(e.currentTarget.checked)}
                 />
             ),
-            description: t('setting.analyticsDisable_description', { postProcess: 'sentenceCase' }),
-            title: t('setting.analyticsDisable', { postProcess: 'sentenceCase' }),
+            description: t('setting.analyticsEnable_description', { postProcess: 'sentenceCase' }),
+            title: t('setting.analyticsEnable', { postProcess: 'sentenceCase' }),
         },
     ];
 

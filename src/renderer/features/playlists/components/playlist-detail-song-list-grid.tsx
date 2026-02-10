@@ -38,6 +38,7 @@ export const PlaylistDetailSongListGrid = forwardRef<any, PlaylistDetailSongList
 
             if (searchTerm) {
                 items = searchLibraryItems(items, searchTerm, LibraryItem.SONG);
+                return items;
             }
 
             return sortSongList(items, query.sortBy, query.sortOrder);

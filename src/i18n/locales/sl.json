@@ -548,7 +548,6 @@
         "customCss_description": "vsebina css po meri. Opomba: vsebina in oddaljeni url-ji so prepovedane lastnosti. Spodaj je prikazan predogled vaše vsebine. Dodatna polja, ki jih niste nastavili, so prisotna zaradi prečiščevanja",
         "customFontPath": "pot za pisavo po meri",
         "customFontPath_description": "nastavi pot do pisave po meri",
-        "disableAutomaticUpdates": "onemogoči samodejne posodobitve",
         "disableLibraryUpdateOnStartup": "onemogoči prevejranje novih verzij ob zagonu",
         "discordApplicationId": "{{discord}} identifikator aplikacije",
         "discordApplicationId_description": "identifikator aplikacije za {{discord}} bogato prezenco (privzeto {{defaultId}})",

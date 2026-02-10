@@ -519,6 +519,28 @@ export const applyRatingOptimisticUpdates = (
                 }
             });
 
+            const songListQueryKey = queryKeys.songs.list(variables.apiClientProps.serverId);
+            const songListQueries = queryClient.getQueriesData({
+                exact: false,
+                queryKey: songListQueryKey,
+            });
+
+            songListQueries.forEach(([queryKey, data]) => {
+                if (data) {
+                    pendingUpdates.push({
+                        previousData: data,
+                        queryKey,
+                        updater: (prev: undefined | { items: Song[] }) => {
+                            if (!prev) return prev;
+                            const updatedItems = updateItemInArray(prev.items, itemIdSet, (item) =>
+                                createRatingUpdater<Song>(item),
+                            );
+                            return updatedItems ? { ...prev, items: updatedItems } : prev;
+                        },
+                    });
+                }
+            });
+
             const topSongsQueryKey = queryKeys.albumArtists.topSongs(
                 variables.apiClientProps.serverId,
             );
@@ -652,6 +674,7 @@ export const applyRatingOptimisticUpdatesDeferred = (
                 queryKeys.songs.detail(variables.apiClientProps.serverId),
                 'song-detail',
             );
+            collectQueries(queryKeys.songs.list(variables.apiClientProps.serverId), 'song-list');
             collectQueries(
                 queryKeys.albumArtists.topSongs(variables.apiClientProps.serverId),
                 'top-songs',
@@ -712,6 +735,7 @@ export const applyRatingOptimisticUpdatesDeferred = (
                     case 'album-artist-list':
                     case 'album-list':
                     case 'artist-list':
+                    case 'song-list':
                     case 'top-songs': {
                         const updatedItems = updateItemInArray(
                             prev.items || [],

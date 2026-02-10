@@ -73,9 +73,9 @@
         "delete": "usuń",
         "cancel": "anuluj",
         "forceRestartRequired": "zrestartuj aby zastosować zmiany... zamknij powiadomienie aby zrestartować",
-        "setting_one": "ustawienia",
-        "setting_few": "",
-        "setting_many": "",
+        "setting_one": "ustawienie",
+        "setting_few": "ustawienia",
+        "setting_many": "ustawień",
         "version": "wersja",
         "title": "tytuł",
         "filter_one": "filtr",
@@ -176,14 +176,14 @@
         "playlist_few": "playlisty",
         "playlist_many": "playlist",
         "artist_one": "wykonawca",
-        "artist_few": "wykonawców",
+        "artist_few": "wykonawcy",
         "artist_many": "wykonawców",
         "folderWithCount_one": "{{count}} katalog",
         "folderWithCount_few": "{{count}} katalogi",
         "folderWithCount_many": "{{count}} katalogów",
         "albumArtist_one": "wykonawca albumu",
         "albumArtist_few": "wykonawcy albumu",
-        "albumArtist_many": "wykonawców albumu",
+        "albumArtist_many": "wykonawcy albumów",
         "track_one": "utwór",
         "track_few": "utwory",
         "track_many": "utworów",
@@ -428,7 +428,7 @@
                 "dynamicIsImage": "włącz obraz w tle",
                 "lyricOffset": "opóźnienie tekstów (ms)"
             },
-            "upNext": "następny",
+            "upNext": "następne",
             "lyrics": "tekst",
             "related": "powiązane",
             "visualizer": "wizualizer",
@@ -577,7 +577,11 @@
             "appearsOn": "pojawia się na",
             "viewAllTracks": "zobacz wszystko $t(entity.track, {\"count\": 2})",
             "groupingTypeAll": "wszystkie typy wydań",
-            "groupingTypePrimary": "główne typy wydań"
+            "groupingTypePrimary": "główne typy wydań",
+            "favoriteSongs": "ulubione piosenki",
+            "topSongsCommunity": "społeczność",
+            "topSongsPersonal": "osobiste",
+            "favoriteSongsFrom": "ulubione piosenki z {{title}}"
         },
         "itemDetail": {
             "copyPath": "kopiuj ścieżkę do schowka",
@@ -611,6 +615,11 @@
         "collections": {
             "overrideExisting": "nadpisz istniejące",
             "saveAsCollection": "zapisz jako kolekcję"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "commity od {{stable}}",
+            "noNewCommits": "brak nowych commitów w tym zakresie",
+            "noStableReleaseToCompare": "brak dostępnego stabilnego wydania do porównania"
         }
     },
     "player": {
@@ -684,7 +693,6 @@
         "globalMediaHotkeys": "globalne skróty klawiszowe multimediów",
         "hotkey_globalSearch": "globalne wyszukiwanie",
         "gaplessAudio_description": "ustaw dźwięk bez przerw dla mpv",
-        "disableAutomaticUpdates": "wyłącz automatyczne aktualizacje",
         "exitToTray_description": "zamknij aplikację do zasobnika systemowego",
         "followLyric_description": "przewiń tekst do obecnego momentu",
         "hotkey_favoritePreviousSong": "ulubiona $t(common.previousSong)",
@@ -728,7 +736,7 @@
         "hotkey_zoomOut": "oddal",
         "hotkey_unfavoriteCurrentSong": "usuń $t(common.currentSong) z ulubionych",
         "hotkey_rate0": "wyczyść oceny",
-        "discordApplicationId": "ID aplikacji {{discord}}",
+        "discordApplicationId": "id aplikacji {{discord}}",
         "applicationHotkeys_description": "ustaw skróty klawiszowe aplikacji. przełącz pole wyboru aby ustawić skrót globalny (tylko komputery)",
         "hotkey_volumeMute": "wycisz",
         "hotkey_toggleCurrentSongFavorite": "dodaj $t(common.currentSong) do ulubionych",
@@ -997,7 +1005,10 @@
         "sidebarPlaylistSorting": "sortowanie playlist w bocznym pasku",
         "sidebarPlaylistListFilterRegex_description": "ukryj playlisty w pasku bocznym pasujące do wyrażenia regularnego",
         "sidebarPlaylistListFilterRegex_placeholder": "np. ^Miks codzienny.^",
-        "sidebarPlaylistListFilterRegex": "filtr playlist regex"
+        "sidebarPlaylistListFilterRegex": "filtr playlist regex",
+        "blurExplicitImages": "rozmazuj nieodpowiednie obrazy",
+        "blurExplicitImages_description": "obrazy piosenek oraz albumów oznaczone jako nieodpowiednie będą rozmazywane",
+        "releaseChannel_optionAlpha": "alpha (nightly)"
     },
     "table": {
         "config": {

@@ -54,6 +54,7 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
                 itemType: props.itemType,
                 meta: {
                     playType,
+                    singleSongOnly: true,
                 },
             });
             return;

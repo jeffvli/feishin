@@ -98,7 +98,7 @@ export interface ItemListTableComponentProps<TQuery> extends ItemListComponentPr
     enableRowHoverHighlight?: boolean;
     enableSelection?: boolean;
     enableVerticalBorders?: boolean;
-    size?: 'compact' | 'default';
+    size?: 'compact' | 'default' | 'large';
 }
 
 export interface ItemTableListColumnConfig {

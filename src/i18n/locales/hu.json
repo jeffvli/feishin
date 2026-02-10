@@ -666,7 +666,6 @@
         "customCss": "egyéni css",
         "customCssEnable_description": "lehetővé teszi az egyéni css írását",
         "customCssEnable": "egyéni css engedélyezése",
-        "disableAutomaticUpdates": "automatikus frissítés kikapcsolása",
         "customFontPath": "egyéni betűtípus elérési út",
         "customCss_description": "egyéni css tartalom. Megjegyzés: a tartalom és a távoli URL-ek nem megengedett tulajdonságok. A tartalom előnézete az alábbiakban látható. A tisztítás miatt további mezők is megjelennek, amelyeket te nem állítottál be",
         "customCssNotice": "Figyelem: bár van némi tisztítás (az url() és a content: használata nem engedélyezett), az egyéni css használata továbbra is kockázatot jelenthet, mivel megváltoztatja a felületet",

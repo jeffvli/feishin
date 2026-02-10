@@ -1,0 +1,31 @@
+.root {
+    display: inline-flex;
+    gap: 0.125rem;
+    align-items: center;
+    line-height: 1;
+}
+
+.root.interactive {
+    cursor: pointer;
+}
+
+.root.xs {
+    font-size: var(--theme-font-size-xs);
+}
+
+.root.sm {
+    font-size: var(--theme-font-size-sm);
+}
+
+.root.md {
+    font-size: var(--theme-font-size-md);
+}
+
+.filled {
+    color: var(--theme-colors-primary);
+}
+
+.empty {
+    color: var(--theme-colors-foreground-muted);
+    opacity: 0.6;
+}

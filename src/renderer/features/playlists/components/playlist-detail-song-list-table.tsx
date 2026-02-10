@@ -65,6 +65,7 @@ export const PlaylistDetailSongListTable = forwardRef<any, PlaylistDetailSongLis
 
             if (searchTerm) {
                 items = searchLibraryItems(items, searchTerm, LibraryItem.SONG);
+                return items;
             }
 
             return sortSongList(items, query.sortBy, query.sortOrder);

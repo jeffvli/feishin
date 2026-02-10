@@ -104,24 +104,23 @@ export const formatDurationString = (duration: number) => {
         return part.replace(/^0/, '');
     });
 
-    let string: string = '';
+    const parts: string[] = [];
+    const len = rawDuration.length;
 
-    switch (rawDuration.length) {
-        case 1:
-            string = `${formattedDuration[0]}${i18n.t('datetime.secondShort')}`;
-            break;
-        case 2:
-            string = `${formattedDuration[0]}${i18n.t('datetime.minuteShort')} ${formattedDuration[1]}${i18n.t('datetime.secondShort')}`;
-            break;
-        case 3:
-            string = `${formattedDuration[0]}${i18n.t('datetime.hourShort')} ${formattedDuration[1]}${i18n.t('datetime.minuteShort')} ${formattedDuration[2]}${i18n.t('datetime.secondShort')}`;
-            break;
-        case 4:
-            string = `${formattedDuration[0]}${i18n.t('datetime.dayShort')} ${formattedDuration[1]}${i18n.t('datetime.hourShort')} ${formattedDuration[2]}${i18n.t('datetime.minuteShort')} ${formattedDuration[3]}${i18n.t('datetime.secondShort')}`;
-            break;
+    if (len >= 1 && formattedDuration[len - 1] !== undefined) {
+        parts.push(`${formattedDuration[len - 1]}${i18n.t('datetime.secondShort')}`);
+    }
+    if (len >= 2 && formattedDuration[len - 2]) {
+        parts.unshift(`${formattedDuration[len - 2]}${i18n.t('datetime.minuteShort')}`);
+    }
+    if (len >= 3 && formattedDuration[len - 3]) {
+        parts.unshift(`${formattedDuration[len - 3]}${i18n.t('datetime.hourShort')}`);
+    }
+    if (len >= 4 && formattedDuration[len - 4]) {
+        parts.unshift(`${formattedDuration[len - 4]}${i18n.t('datetime.dayShort')}`);
     }
 
-    return string;
+    return parts.join(' ');
 };
 
 export const formatDurationStringShort = (duration: number) => {

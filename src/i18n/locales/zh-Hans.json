@@ -229,7 +229,6 @@
         "audioPlayer_description": "选择用于播放的音频播放器",
         "globalMediaHotkeys": "全局媒体快捷键",
         "gaplessAudio_description": "调整 mpv 无缝音频设置",
-        "disableAutomaticUpdates": "禁用自动更新",
         "followLyric_description": "滚动歌词到当前播放位置",
         "audioExclusiveMode": "音频独占模式",
         "font": "字体",

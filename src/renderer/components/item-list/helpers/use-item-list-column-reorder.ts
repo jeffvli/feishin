@@ -7,14 +7,19 @@ import { ItemListKey, TableColumn } from '/@/shared/types/types';
 
 interface UseItemListColumnReorderProps {
     itemListKey: ItemListKey;
+    tableKey?: 'detail' | 'main';
 }
 
-export const useItemListColumnReorder = ({ itemListKey }: UseItemListColumnReorderProps) => {
+export const useItemListColumnReorder = ({
+    itemListKey,
+    tableKey = 'main',
+}: UseItemListColumnReorderProps) => {
     const { setList } = useSettingsStoreActions();
 
     const handleColumnReordered = useCallback(
         (columnIdFrom: TableColumn, columnIdTo: TableColumn, edge: Edge | null) => {
-            const columns = useSettingsStore.getState().lists[itemListKey]?.table.columns;
+            const list = useSettingsStore.getState().lists[itemListKey];
+            const columns = tableKey === 'detail' ? list?.detail?.columns : list?.table?.columns;
 
             if (!columns) {
                 return;
@@ -83,13 +88,20 @@ export const useItemListColumnReorder = ({ itemListKey }: UseItemListColumnReord
             // Insert the column at the new position
             newColumns.splice(newIndex, 0, updatedMovedColumn);
 
-            setList(itemListKey, {
-                table: {
-                    columns: newColumns,
-                },
-            });
+            if (tableKey === 'detail') {
+                type SetListData = Parameters<
+                    ReturnType<typeof useSettingsStoreActions>['setList']
+                >[1];
+                setList(itemListKey, { detail: { columns: newColumns } } as SetListData);
+            } else {
+                setList(itemListKey, {
+                    table: {
+                        columns: newColumns,
+                    },
+                });
+            }
         },
-        [itemListKey, setList],
+        [itemListKey, setList, tableKey],
     );
 
     return { handleColumnReordered };

@@ -534,7 +534,6 @@
         "customCss_description": "özel css içeriği. Not: içerik ve uzaktan URL'ler izin verilmeyen özelliklerdir. İçeriğinizin önizlemesi aşağıda gösterilmektedir. Ayarlamadığınız ek alanlar sterilleme nedeniyle mevcuttur",
         "customFontPath": "özel yazı tipi yolu",
         "customFontPath_description": "uygulama için kullanılacak özel yazı tipinin yolunu ayarlar",
-        "disableAutomaticUpdates": "otomatik güncellemeleri devre dışı bırak",
         "disableLibraryUpdateOnStartup": "başlangıçta yeni sürümler için denetimi devre dışı bırak",
         "discordApplicationId": "{{discord}} uygulama kimliği",
         "discordApplicationId_description": "{{discord}} \"Rich Presence\" için uygulama kimliği (varsayılan olarak {{defaultId}})",

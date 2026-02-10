@@ -125,7 +125,7 @@
         "forceRestartRequired": "redémarrer pour appliquer les changements… fermer la notification pour redémarrer",
         "setting": "paramètre",
         "setting_one": "paramètre",
-        "setting_many": "",
+        "setting_many": "paramètres",
         "setting_other": "paramètres",
         "version": "version",
         "title": "titre",
@@ -202,7 +202,9 @@
         "countSelected": "{{count}} sélectionnée",
         "example": "exemple",
         "mood": "humeur",
-        "retry": "réessayer"
+        "retry": "réessayer",
+        "filter_single": "unique",
+        "filter_multiple": "multiple"
     },
     "error": {
         "remotePortWarning": "redémarrer le serveur pour appliquer le nouveau port",
@@ -270,7 +272,7 @@
         "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
         "comment": "commentaire",
         "recentlyUpdated": "mis à jour récemment",
-        "channels": "$t(common.channel_other)",
+        "channels": "$t(common.channel, {\"count\": 2})",
         "owner": "$t(common.owner)",
         "genre": "$t(entity.genre, {\"count\": 1})",
         "albumCount": "$t(entity.album, {\"count\": 2}) total",
@@ -425,7 +427,7 @@
         "trackList": {
             "title": "$t(entity.track, {\"count\": 2})",
             "artistTracks": "pistes par {{artist}}",
-            "genreTracks": "'{{genre}}' $t(entity.track, {\"count\": 2})"
+            "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})"
         },
         "playlistList": {
             "title": "$t(entity.playlist, {\"count\": 2})"
@@ -487,7 +489,6 @@
         "applicationHotkeys_description": "configurer les raccourcis clavier d’application. activer la case à cocher pour définir comme raccourci clavier global (bureau uniquement)",
         "crossfadeStyle_description": "sélectionnez le style du fondu enchaîné à utiliser pour le lecteur audio",
         "customFontPath": "chemin de police personnalisé",
-        "disableAutomaticUpdates": "désactiver les mises à jour automatiques",
         "customFontPath_description": "définit le chemin de police personnalisé pour l'application",
         "remotePort_description": "définit le port du serveur de contrôle à distance",
         "hotkey_skipBackward": "reculer",
@@ -717,7 +718,7 @@
         "releaseChannel_optionLatest": "dernière",
         "releaseChannel_optionBeta": "bêta",
         "releaseChannel": "canal de diffusion",
-        "releaseChannel_description": "choisissez entre les versions stables ou les versions bêta pour les mises à jour automatiques",
+        "releaseChannel_description": "choisissez entre les versions stables, bêta, ou alpha (nightly) pour les mises à jour automatiques",
         "mediaSession": "activer media session",
         "mediaSession_description": "active l'intégration Media Session, affichant les commandes multimédias et les métadonnées dans la superposition du volume du système et l'écran de verrouillage",
         "enableAutoTranslation_description": "activer la traduction automatiquement lorsque les paroles sont chargées",
@@ -1022,9 +1023,9 @@
                 "artist": "$t(entity.artist, {\"count\": 1})",
                 "album": "$t(entity.album, {\"count\": 1})",
                 "biography": "$t(common.biography)",
-                "channels": "$t(common.channel_other)",
+                "channels": "$t(common.channel, {\"count\": 2})",
                 "bitrate": "$t(common.bitrate)",
-                "actions": "$t(common.action_other)",
+                "actions": "$t(common.action, {\"count\": 2})",
                 "favorite": "$t(common.favorite)",
                 "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
                 "rating": "$t(common.rating)",
@@ -1066,7 +1067,7 @@
             "artist": "$t(entity.artist, {\"count\": 1})",
             "genre": "$t(entity.genre, {\"count\": 1})",
             "songCount": "$t(entity.track, {\"count\": 2})",
-            "channels": "$t(common.channel_other)",
+            "channels": "$t(common.channel, {\"count\": 2})",
             "size": "$t(common.size)",
             "codec": "$t(common.codec)",
             "owner": "propriétaire",

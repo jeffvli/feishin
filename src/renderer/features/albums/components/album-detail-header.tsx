@@ -233,8 +233,8 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
                         {metadataItems.map((item, index) => (
                             <Fragment key={item.id}>
                                 {index > 0 && (
-                                    <Text fw={400} isMuted isNoSelect>
-                                        •
+                                    <Text isMuted isNoSelect>
+                                        <Separator />
                                     </Text>
                                 )}
                                 <Text fw={400}>{item.value}</Text>

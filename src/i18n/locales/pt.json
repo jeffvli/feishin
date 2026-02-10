@@ -523,7 +523,6 @@
         "customCssEnable_description": "permite escrever css customizado",
         "customCssNotice": "Aviso: apesar de existir alguma higienização (url() e content: não são permitidas), o uso de css personalizado ainda pode representar riscos ao alterar a interface",
         "customCss": "css customizado",
-        "disableAutomaticUpdates": "desativar atualizações automáticas",
         "disableLibraryUpdateOnStartup": "desativar a verificação de novas versões na inicialização",
         "discordApplicationId": "{{discord}} ID da aplicação",
         "discordIdleStatus_description": "quando ativado, atualiza o estado enquanto o player está ocioso",

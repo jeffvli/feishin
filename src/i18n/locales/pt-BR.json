@@ -230,7 +230,6 @@
         "crossfadeDuration_description": "define a duração do efeito crossfade",
         "customCssNotice": "Atenção: embora haja alguma sanitização (proibindo url() e content:), usar CSS personalizado ainda pode representar riscos ao alterar a interface",
         "crossfadeStyle_description": "seleciona qual estilo de crossfade usado no player de áudio",
-        "disableAutomaticUpdates": "desabilitar atualizações automáticas",
         "disableLibraryUpdateOnStartup": "desabilitar a verificação de novas versões na inicialização",
         "artistBackground": "Imagem de fundo do artista",
         "artistBackground_description": "Adiciona uma imagem de fundo às páginas do artista contendo a arte do artista",

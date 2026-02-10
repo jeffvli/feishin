@@ -34,6 +34,7 @@ export enum ItemListKey {
 }
 
 export enum ListDisplayType {
+    DETAIL = 'detail',
     GRID = 'poster',
     LIST = 'list',
     TABLE = 'table',

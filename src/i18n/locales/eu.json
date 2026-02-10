@@ -419,7 +419,6 @@
         "customCss": "css pertsonalizatua",
         "customFontPath": "letra-tipo pertsonalizatuaren bidea",
         "customFontPath_description": "aplikazioan erabiliko den letra-tipo pertsonalizatuaren bidea ezartzen du",
-        "disableAutomaticUpdates": "desgaitu eguneratze automatikoak",
         "discordApplicationId": "{{discord}} aplikazioaren IDa",
         "followLyric": "jarraitu uneko letra",
         "font_description": "aplikazioan erabiliko den letra-tipoa ezartzen du",

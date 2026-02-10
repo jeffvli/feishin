@@ -722,6 +722,8 @@
         "albumBackgroundBlur": "album background image blur size",
         "analyticsDisable": "Opt-out of usage based analytics",
         "analyticsDisable_description": "Anonymized usage data is sent to the developer to help improve the application",
+        "analyticsEnable": "Send usage-based analytics",
+        "analyticsEnable_description": "Anonymized usage data is sent to the developer to help improve the application",
         "applicationHotkeys_description": "configure application hotkeys. toggle the checkbox to set as a global hotkey (desktop only)",
         "applicationHotkeys": "application hotkeys",
         "artistBackground": "artist background image",
@@ -758,7 +760,8 @@
         "customCssNotice": "Warning: while there is some sanitization (disallowing url() and content:), using custom css can still pose risks by changing the interface",
         "customFontPath_description": "sets the path to the custom font to use for the application",
         "customFontPath": "custom font path",
-        "disableAutomaticUpdates": "disable automatic updates",
+        "automaticUpdates": "Automatic updates",
+        "automaticUpdates_description": "Check for and install updates automatically",
         "releaseChannel_optionAlpha": "alpha (nightly)",
         "releaseChannel_optionBeta": "beta",
         "releaseChannel_optionLatest": "latest",
@@ -1154,6 +1157,7 @@
                 "year": "$t(common.year)"
             },
             "view": {
+                "detail": "detail",
                 "grid": "grid",
                 "list": "list",
                 "table": "table"

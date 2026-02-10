@@ -727,7 +727,6 @@
         "disableLibraryUpdateOnStartup": "отключить проверку новых версий при запуске приложения",
         "minimizeToTray_description": "сворачивать приложение в панель уведомлений",
         "audioPlayer_description": "укажите, какой аудиоплеер использовать для воспроизведения",
-        "disableAutomaticUpdates": "отключить проверку обновлений",
         "exitToTray_description": "При закрытии приложения - оно останется в панели уведомлений",
         "fontType_optionCustom": "пользовательский",
         "remotePassword": "пароль к серверу удалённого управления",

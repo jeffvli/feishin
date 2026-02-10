@@ -541,7 +541,6 @@
         "customCss_description": "vlastný css obsah. Poznámka: obsah a vzdialené url linky sú defaultne deaktivované.Náhľad vášho obsahu je zobrazený nižšie. Pridané polia, ktoré ste nenastavovali boli pridané pri sanitizácii",
         "customFontPath": "cesta k vlastným fontom",
         "customFontPath_description": "Nastaví cestu k vlastným fontom na použitie aplikáciou",
-        "disableAutomaticUpdates": "vypnúť automatické aktualizácie",
         "disableLibraryUpdateOnStartup": "vypnúť kontrolu nových verzií pri štarte",
         "discordApplicationId": "id aplikácie {{discord}}",
         "discordApplicationId_description": "aplikačné id pre plnohodnotné prepojenie s {{discord}} (predvolená hodnota {{defaultId}})",
