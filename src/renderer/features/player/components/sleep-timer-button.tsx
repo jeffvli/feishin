@@ -21,14 +21,14 @@ import { Text } from '/@/shared/components/text/text';
 import { PlayerStatus } from '/@/shared/types/types';
 
 const PRESET_OPTIONS = [
-    { labelKey: 'sleepTimer_endOfSong', minutes: 0, mode: 'endOfSong' as const },
-    { labelKey: 'sleepTimer_minutes', minutes: 5, mode: 'timed' as const },
-    { labelKey: 'sleepTimer_minutes', minutes: 10, mode: 'timed' as const },
-    { labelKey: 'sleepTimer_minutes', minutes: 15, mode: 'timed' as const },
-    { labelKey: 'sleepTimer_minutes', minutes: 30, mode: 'timed' as const },
-    { labelKey: 'sleepTimer_minutes', minutes: 45, mode: 'timed' as const },
-    { labelKey: 'sleepTimer_hours', minutes: 60, mode: 'timed' as const },
-    { labelKey: 'sleepTimer_hours', minutes: 120, mode: 'timed' as const },
+    { minutes: 0, mode: 'endOfSong' as const },
+    { minutes: 5, mode: 'timed' as const },
+    { minutes: 10, mode: 'timed' as const },
+    { minutes: 15, mode: 'timed' as const },
+    { minutes: 30, mode: 'timed' as const },
+    { minutes: 45, mode: 'timed' as const },
+    { minutes: 60, mode: 'timed' as const },
+    { minutes: 120, mode: 'timed' as const },
 ];
 
 function formatRemaining(totalSeconds: number): string {
@@ -89,13 +89,15 @@ export const SleepTimerButton = () => {
 
         const initialIndex = usePlayerStoreBase.getState().player.index;
 
-        const unsub = usePlayerStoreBase.subscribe((state) => {
-            if (state.player.index !== initialIndex) {
-                cancelTimer();
-                mediaPauseRef.current();
-                unsub();
-            }
-        });
+        const unsub = usePlayerStoreBase.subscribe(
+            (state) => state.player.index,
+            (index) => {
+                if (index !== initialIndex) {
+                    cancelTimer();
+                    mediaPauseRef.current();
+                }
+            },
+        );
 
         return () => unsub();
     }, [active, mode, cancelTimer]);
