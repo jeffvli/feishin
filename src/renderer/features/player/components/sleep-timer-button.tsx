@@ -93,7 +93,7 @@ const useSleepTimer = () => {
             onCurrentSongChange: handleOnCurrentSongChange,
             onPlayerProgress: handleOnPlayerProgress,
         },
-        [handleOnCurrentSongChange],
+        [handleOnCurrentSongChange, handleOnPlayerProgress],
     );
 
     // End-of-song mode: subscribe to player index changes
