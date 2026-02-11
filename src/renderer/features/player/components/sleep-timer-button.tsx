@@ -237,7 +237,7 @@ export const SleepTimerButton = () => {
                         </Button>
                     ) : (
                         <Stack gap="xs">
-                            <Group gap={4} grow>
+                            <Group gap={4} wrap="nowrap">
                                 <NumberInput
                                     max={23}
                                     min={0}
@@ -246,9 +246,7 @@ export const SleepTimerButton = () => {
                                     size="xs"
                                     value={customHours}
                                 />
-                                <Text size="lg" ta="center">
-                                    :
-                                </Text>
+                                <Text>:</Text>
                                 <NumberInput
                                     max={59}
                                     min={0}
@@ -257,9 +255,7 @@ export const SleepTimerButton = () => {
                                     size="xs"
                                     value={customMinutes}
                                 />
-                                <Text size="lg" ta="center">
-                                    :
-                                </Text>
+                                <Text>:</Text>
                                 <NumberInput
                                     max={59}
                                     min={0}
@@ -269,17 +265,28 @@ export const SleepTimerButton = () => {
                                     value={customSeconds}
                                 />
                             </Group>
-                            <Button
-                                fullWidth
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleCustomStart();
-                                }}
-                                size="xs"
-                                variant="filled"
-                            >
-                                {t('player.sleepTimer_setCustom', { postProcess: 'titleCase' })}
-                            </Button>
+                            <Group gap="xs" grow>
+                                <Button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCustomStart();
+                                    }}
+                                    size="xs"
+                                    variant="filled"
+                                >
+                                    {t('player.sleepTimer_setCustom', { postProcess: 'titleCase' })}
+                                </Button>
+                                <Button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowCustom(false);
+                                    }}
+                                    size="xs"
+                                    variant="default"
+                                >
+                                    {t('common.cancel', { postProcess: 'titleCase' })}
+                                </Button>
+                            </Group>
                         </Stack>
                     )}
                 </Stack>
