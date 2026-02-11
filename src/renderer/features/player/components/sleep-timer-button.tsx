@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
@@ -42,20 +42,11 @@ function formatRemaining(totalSeconds: number): string {
     return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-export const SleepTimerButton = () => {
-    const { t } = useTranslation();
+const useSleepTimer = () => {
     const active = useSleepTimerActive();
     const mode = useSleepTimerMode();
-    const remaining = useSleepTimerRemaining();
-    const { cancelTimer, setRemaining, startEndOfSongTimer, startTimedTimer } =
-        useSleepTimerActions();
+    const { cancelTimer, setRemaining } = useSleepTimerActions();
     const { mediaPause } = usePlayer();
-
-    const [showCustom, setShowCustom] = useState(false);
-    const [customHours, setCustomHours] = useState<number>(0);
-    const [customMinutes, setCustomMinutes] = useState<number>(20);
-    const [customSeconds, setCustomSeconds] = useState<number>(0);
-    const [opened, setOpened] = useState(false);
 
     const mediaPauseRef = useRef(mediaPause);
     mediaPauseRef.current = mediaPause;
@@ -101,6 +92,39 @@ export const SleepTimerButton = () => {
 
         return () => unsub();
     }, [active, mode, cancelTimer]);
+};
+
+export const SleepTimerHookInner = () => {
+    useSleepTimer();
+    return null;
+};
+
+export const SleepTimerHook = () => {
+    const active = useSleepTimerActive();
+
+    if (!active) {
+        return null;
+    }
+
+    return React.createElement(SleepTimerHookInner);
+};
+
+export const SleepTimerButton = () => {
+    const { t } = useTranslation();
+    const active = useSleepTimerActive();
+    const mode = useSleepTimerMode();
+    const remaining = useSleepTimerRemaining();
+    const { cancelTimer, startEndOfSongTimer, startTimedTimer } = useSleepTimerActions();
+    const { mediaPause } = usePlayer();
+
+    const [showCustom, setShowCustom] = useState(false);
+    const [customHours, setCustomHours] = useState<number>(0);
+    const [customMinutes, setCustomMinutes] = useState<number>(20);
+    const [customSeconds, setCustomSeconds] = useState<number>(0);
+    const [opened, setOpened] = useState(false);
+
+    const mediaPauseRef = useRef(mediaPause);
+    mediaPauseRef.current = mediaPause;
 
     const handlePreset = useCallback(
         (option: (typeof PRESET_OPTIONS)[number]) => {
