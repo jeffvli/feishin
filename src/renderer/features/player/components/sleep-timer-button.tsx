@@ -110,6 +110,7 @@ export const SleepTimerButton = () => {
                 startTimedTimer(option.minutes * 60);
             }
             setShowCustom(false);
+            setOpened(false);
         },
         [startEndOfSongTimer, startTimedTimer],
     );
@@ -119,6 +120,7 @@ export const SleepTimerButton = () => {
         if (totalSeconds > 0) {
             startTimedTimer(totalSeconds);
             setShowCustom(false);
+            setOpened(false);
         }
     }, [customHours, customMinutes, customSeconds, startTimedTimer]);
 
