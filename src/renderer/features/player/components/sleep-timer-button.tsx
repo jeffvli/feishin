@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { usePlayerStoreBase } from '/@/renderer/store/player.store';
+import { usePlayerStatus, usePlayerStoreBase } from '/@/renderer/store/player.store';
 import {
     useSleepTimerActions,
     useSleepTimerActive,
@@ -51,28 +52,49 @@ const useSleepTimer = () => {
     const mediaPauseRef = useRef(mediaPause);
     mediaPauseRef.current = mediaPause;
 
-    // Tick interval for timed mode — only counts down while playing
-    useEffect(() => {
-        if (!active || mode !== 'timed') return;
+    const handleOnCurrentSongChange = useCallback(() => {
+        if (!active) {
+            return;
+        }
 
-        const tick = () => {
-            const status = usePlayerStoreBase.getState().player.status;
+        // Cancel and pause on song change in end-of-song mode
+        if (mode === 'endOfSong') {
+            cancelTimer();
+            mediaPauseRef.current();
+        }
+    }, [active, mode, cancelTimer, mediaPauseRef]);
 
-            if (status !== PlayerStatus.PLAYING) return;
+    const status = usePlayerStatus();
 
-            const next = useSleepTimerStore.getState().remaining - 1;
+    const handleOnPlayerProgress = useCallback(() => {
+        if (!active) {
+            return;
+        }
 
-            if (next <= 0) {
+        if (status !== PlayerStatus.PLAYING) {
+            return;
+        }
+
+        // Count down in timed mode
+        if (mode === 'timed') {
+            const remaining = useSleepTimerStore.getState().remaining;
+
+            if (remaining <= 0) {
                 cancelTimer();
                 mediaPauseRef.current();
             } else {
-                setRemaining(next);
+                setRemaining(Math.max(0, remaining - 1));
             }
-        };
+        }
+    }, [active, cancelTimer, mode, setRemaining, status]);
 
-        const interval = setInterval(tick, 1000);
-        return () => clearInterval(interval);
-    }, [active, mode, setRemaining, cancelTimer]);
+    usePlayerEvents(
+        {
+            onCurrentSongChange: handleOnCurrentSongChange,
+            onPlayerProgress: handleOnPlayerProgress,
+        },
+        [handleOnCurrentSongChange],
+    );
 
     // End-of-song mode: subscribe to player index changes
     useEffect(() => {
