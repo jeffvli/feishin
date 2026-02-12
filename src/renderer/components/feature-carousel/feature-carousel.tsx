@@ -18,7 +18,7 @@ import { Badge } from '/@/shared/components/badge/badge';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
-import { Album, ExplicitStatus, LibraryItem } from '/@/shared/types/domain-types';
+import { Album, LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 const containerVariants = {
