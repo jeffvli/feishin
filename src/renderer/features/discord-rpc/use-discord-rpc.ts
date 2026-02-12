@@ -109,14 +109,18 @@ export const useDiscordRpc = () => {
                     instance: false,
                     largeImageKey: 'icon',
                     largeImageText: truncate(stationName || 'Radio'),
-                    smallImageKey: discordSettings.showStateIcon
-                        ? current[2] === PlayerStatus.PLAYING
-                            ? 'playing'
-                            : 'paused'
-                        : undefined,
-                    smallImageText: discordSettings.showStateIcon
-                        ? sentenceCase(current[2])
-                        : undefined,
+                    smallImageKey:
+                        current[2] === PlayerStatus.PLAYING
+                            ? discordSettings.showStateIcon
+                                ? 'playing'
+                                : undefined
+                            : 'paused',
+                    smallImageText:
+                        current[2] === PlayerStatus.PLAYING
+                            ? discordSettings.showStateIcon
+                                ? sentenceCase(current[2])
+                                : undefined
+                            : sentenceCase(current[2]),
                     state: truncate(artist),
                     statusDisplayType: StatusDisplayType.STATE,
                     type: discordSettings.showAsListening ? 2 : 0,
@@ -205,9 +209,7 @@ export const useDiscordRpc = () => {
                         (song?.album && song.album.padEnd(2, ' ')) || 'Unknown album',
                     ),
                     smallImageKey: undefined,
-                    smallImageText: discordSettings.showStateIcon
-                        ? sentenceCase(current[2])
-                        : undefined,
+                    smallImageText: undefined,
                     state: truncate((artists && artists.padEnd(2, ' ')) || 'Unknown artist'),
                     statusDisplayType: statusDisplayMap[discordSettings.displayType],
                     // I would love to use the actual type as opposed to hardcoding to 2,
@@ -257,11 +259,11 @@ export const useDiscordRpc = () => {
 
                     if (discordSettings.showStateIcon) {
                         activity.smallImageKey = 'playing';
+                        activity.smallImageText = sentenceCase(current[2]);
                     }
                 } else {
-                    if (discordSettings.showStateIcon) {
-                        activity.smallImageKey = 'paused';
-                    }
+                    activity.smallImageKey = 'paused';
+                    activity.smallImageText = sentenceCase(current[2]);
                 }
 
                 if (discordSettings.showServerImage && song) {
