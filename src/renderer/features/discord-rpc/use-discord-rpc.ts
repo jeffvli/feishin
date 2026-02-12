@@ -109,8 +109,14 @@ export const useDiscordRpc = () => {
                     instance: false,
                     largeImageKey: 'icon',
                     largeImageText: truncate(stationName || 'Radio'),
-                    smallImageKey: current[2] === PlayerStatus.PLAYING ? 'playing' : 'paused',
-                    smallImageText: sentenceCase(current[2]),
+                    smallImageKey: discordSettings.showStateIcon
+                        ? current[2] === PlayerStatus.PLAYING
+                            ? 'playing'
+                            : 'paused'
+                        : undefined,
+                    smallImageText: discordSettings.showStateIcon
+                        ? sentenceCase(current[2])
+                        : undefined,
                     state: truncate(artist),
                     statusDisplayType: StatusDisplayType.STATE,
                     type: discordSettings.showAsListening ? 2 : 0,
@@ -199,7 +205,9 @@ export const useDiscordRpc = () => {
                         (song?.album && song.album.padEnd(2, ' ')) || 'Unknown album',
                     ),
                     smallImageKey: undefined,
-                    smallImageText: sentenceCase(current[2]),
+                    smallImageText: discordSettings.showStateIcon
+                        ? sentenceCase(current[2])
+                        : undefined,
                     state: truncate((artists && artists.padEnd(2, ' ')) || 'Unknown artist'),
                     statusDisplayType: statusDisplayMap[discordSettings.displayType],
                     // I would love to use the actual type as opposed to hardcoding to 2,
@@ -247,9 +255,13 @@ export const useDiscordRpc = () => {
                         activity.endTimestamp = end;
                     }
 
-                    activity.smallImageKey = 'playing';
+                    if (discordSettings.showStateIcon) {
+                        activity.smallImageKey = 'playing';
+                    }
                 } else {
-                    activity.smallImageKey = 'paused';
+                    if (discordSettings.showStateIcon) {
+                        activity.smallImageKey = 'paused';
+                    }
                 }
 
                 if (discordSettings.showServerImage && song) {
@@ -349,6 +361,7 @@ export const useDiscordRpc = () => {
         [
             discordSettings.showAsListening,
             discordSettings.showServerImage,
+            discordSettings.showStateIcon,
             discordSettings.showPaused,
             lastfmApiKey,
             discordSettings.clientId,

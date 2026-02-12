@@ -261,6 +261,7 @@ const DiscordSettingsSchema = z.object({
     showAsListening: z.boolean(),
     showPaused: z.boolean(),
     showServerImage: z.boolean(),
+    showStateIcon: z.boolean(),
 });
 
 const FontSettingsSchema = z.object({
@@ -986,6 +987,7 @@ const initialState: SettingsState = {
         showAsListening: false,
         showPaused: true,
         showServerImage: false,
+        showStateIcon: true,
     },
     font: {
         builtIn: 'Inter',
