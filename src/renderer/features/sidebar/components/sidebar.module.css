@@ -53,6 +53,10 @@
     border-radius: var(--theme-radius-md);
 }
 
+.censored.sidebar-image {
+    filter: blur(20px);
+}
+
 .accordion-root {
     height: 100%;
 }
