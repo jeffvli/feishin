@@ -1,5 +1,6 @@
 server {
   listen 9180;
+  listen [::]:9180;
   sendfile on;
   default_type application/octet-stream;
 
