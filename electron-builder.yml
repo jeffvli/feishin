@@ -57,6 +57,7 @@ linux:
     artifactName: ${productName}-${os}-${arch}.${ext}
 
 npmRebuild: false
+afterAllArtifactBuild: scripts/after-all-artifact-build.mjs
 publish:
     provider: github
     owner: jeffvli
