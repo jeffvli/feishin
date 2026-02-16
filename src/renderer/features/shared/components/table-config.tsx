@@ -781,9 +781,7 @@ const TableColumnItem = memo(
                                 <Checkbox
                                     checked={item.autoSize}
                                     id={item.id}
-                                    onChange={(e) =>
-                                        handleAutoSize(item, e.currentTarget.checked)
-                                    }
+                                    onChange={(e) => handleAutoSize(item, e.currentTarget.checked)}
                                     size="xs"
                                 />
                             </Tooltip>

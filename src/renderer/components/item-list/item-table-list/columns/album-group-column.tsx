@@ -71,7 +71,11 @@ export const AlbumGroupColumn = (props: ItemTableListInnerColumn) => {
 
     return (
         <TableColumnContainer {...props} enableAlternateRowColors={false}>
-            <AlbumGroupHeader onPlay={handlePlay} size={props.size} song={item} />
+            <AlbumGroupHeader
+                onPlay={handlePlay}
+                size={props.size === 'default' ? 'normal' : props.size}
+                song={item}
+            />
         </TableColumnContainer>
     );
 };

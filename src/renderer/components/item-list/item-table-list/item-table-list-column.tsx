@@ -368,9 +368,7 @@ export const ItemTableListColumn = memo(ItemTableListColumnBase, (prevProps, nex
 
 const NonMutedColumns = [TableColumn.TITLE, TableColumn.TITLE_ARTIST, TableColumn.TITLE_COMBINED];
 
-export function isAlbumGroupingActive(
-    columns: { id: string; isEnabled?: boolean }[],
-): boolean {
+export function isAlbumGroupingActive(columns: { id: string; isEnabled?: boolean }[]): boolean {
     return columns.some((col) => col.id === TableColumn.ALBUM_GROUP && col.isEnabled);
 }
 
@@ -380,14 +378,14 @@ export function isLastInAlbumGroup(
     enableHeader: boolean | undefined,
     dataLength: number,
 ): boolean {
-    const item = getRowItem?.(rowIndex) as { album?: string } | null | undefined;
+    const item = getRowItem?.(rowIndex) as null | undefined | { album?: string };
     if (!item?.album) return true;
 
     const nextRowIndex = rowIndex + 1;
     const maxRow = enableHeader ? dataLength + 1 : dataLength;
     if (nextRowIndex >= maxRow) return true;
 
-    const nextItem = getRowItem?.(nextRowIndex) as { album?: string } | null | undefined;
+    const nextItem = getRowItem?.(nextRowIndex) as null | undefined | { album?: string };
     return !nextItem || nextItem.album !== item.album;
 }
 
