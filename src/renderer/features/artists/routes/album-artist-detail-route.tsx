@@ -17,6 +17,10 @@ import { LibraryContainer } from '/@/renderer/features/shared/components/library
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { useFastAverageColor } from '/@/renderer/hooks';
+import {
+    CoverArtValidatorContext,
+    useCoverArtValidator,
+} from '/@/renderer/hooks/use-artist-album-stack';
 import { useArtistBackground, useCurrentServer, useCurrentServerId } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { AlbumListSort, LibraryItem, SortOrder } from '/@/shared/types/domain-types';
@@ -27,6 +31,7 @@ const AlbumArtistDetailRouteContent = () => {
     const server = useCurrentServer();
     const serverId = useCurrentServerId();
     const { artistBackground, artistBackgroundBlur } = useArtistBackground();
+    const coverArtValidator = useCoverArtValidator();
 
     const { albumArtistId, artistId } = useParams() as {
         albumArtistId?: string;
@@ -82,45 +87,53 @@ const AlbumArtistDetailRouteContent = () => {
     // }
 
     return (
-        <AnimatedPage key={`album-artist-detail-${routeId}`}>
-            <NativeScrollArea
-                pageHeaderProps={{
-                    backgroundColor: backgroundColor || undefined,
-                    children: (
-                        <LibraryHeaderBar>
-                            <LibraryHeaderBar.PlayButton
-                                ids={[routeId]}
-                                itemType={LibraryItem.ALBUM_ARTIST}
-                                variant="default"
-                            />
-                            <LibraryHeaderBar.Title>
-                                {detailQuery.data?.name}
-                            </LibraryHeaderBar.Title>
-                        </LibraryHeaderBar>
-                    ),
-                    offset: 200,
-                    target: headerRef,
-                }}
-                ref={scrollAreaRef}
-            >
-                {showBlurredImage ? (
-                    <LibraryBackgroundImage
-                        blur={artistBackgroundBlur}
-                        headerRef={headerRef}
-                        imageUrl={libraryBackgroundImageUrl || ''}
-                    />
-                ) : (
-                    <LibraryBackgroundOverlay backgroundColor={background} headerRef={headerRef} />
-                )}
-                <LibraryContainer>
-                    <AlbumArtistDetailHeader
-                        albumsQuery={albumsQuery}
-                        ref={headerRef as React.Ref<HTMLDivElement>}
-                    />
-                    <AlbumArtistDetailContent albumsQuery={albumsQuery} detailQuery={detailQuery} />
-                </LibraryContainer>
-            </NativeScrollArea>
-        </AnimatedPage>
+        <CoverArtValidatorContext.Provider value={coverArtValidator}>
+            <AnimatedPage key={`album-artist-detail-${routeId}`}>
+                <NativeScrollArea
+                    pageHeaderProps={{
+                        backgroundColor: backgroundColor || undefined,
+                        children: (
+                            <LibraryHeaderBar>
+                                <LibraryHeaderBar.PlayButton
+                                    ids={[routeId]}
+                                    itemType={LibraryItem.ALBUM_ARTIST}
+                                    variant="default"
+                                />
+                                <LibraryHeaderBar.Title>
+                                    {detailQuery.data?.name}
+                                </LibraryHeaderBar.Title>
+                            </LibraryHeaderBar>
+                        ),
+                        offset: 200,
+                        target: headerRef,
+                    }}
+                    ref={scrollAreaRef}
+                >
+                    {showBlurredImage ? (
+                        <LibraryBackgroundImage
+                            blur={artistBackgroundBlur}
+                            headerRef={headerRef}
+                            imageUrl={libraryBackgroundImageUrl || ''}
+                        />
+                    ) : (
+                        <LibraryBackgroundOverlay
+                            backgroundColor={background}
+                            headerRef={headerRef}
+                        />
+                    )}
+                    <LibraryContainer>
+                        <AlbumArtistDetailHeader
+                            albumsQuery={albumsQuery}
+                            ref={headerRef as React.Ref<HTMLDivElement>}
+                        />
+                        <AlbumArtistDetailContent
+                            albumsQuery={albumsQuery}
+                            detailQuery={detailQuery}
+                        />
+                    </LibraryContainer>
+                </NativeScrollArea>
+            </AnimatedPage>
+        </CoverArtValidatorContext.Provider>
     );
 };
 

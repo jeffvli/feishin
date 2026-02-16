@@ -3,6 +3,12 @@ import { useTranslation } from 'react-i18next';
 import styles from './context-menu-preview.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import {
+    getArtistImageDisplay,
+    StackedCovers,
+} from '/@/renderer/features/artists/components/stacked-covers';
+import { useArtistAlbumStack } from '/@/renderer/hooks/use-artist-album-stack';
+import { useGeneralSettings } from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem } from '/@/shared/types/domain-types';
@@ -39,6 +45,7 @@ const getItemImage = (item: unknown): null | string => {
 
 export const ContextMenuPreview = ({ items, itemType }: ContextMenuPreviewProps) => {
     const { t } = useTranslation();
+    const settings = useGeneralSettings();
     const itemCount = items.length;
     const firstItem = items[0];
     const itemName = firstItem ? getItemName(firstItem) : 'Item';
@@ -52,6 +59,28 @@ export const ContextMenuPreview = ({ items, itemType }: ContextMenuPreviewProps)
         type: 'table',
     });
 
+    // Determine if this is an artist type that might need album stack
+    const isArtistType = itemType === LibraryItem.ALBUM_ARTIST || itemType === LibraryItem.ARTIST;
+    const artistId =
+        isArtistType && firstItem && typeof firstItem === 'object' && 'id' in firstItem
+            ? (firstItem as { id: string }).id
+            : undefined;
+
+    // Fetch album stack data lazily for artists
+    const albumStackData = useArtistAlbumStack(artistId, {
+        enabled: isArtistType && settings.artistCoverStackEnabled && !isMultiple,
+        maxAlbums: settings.artistCoverStackSize,
+        preferArtistCover: settings.artistCoverStackPreferArtistCover,
+        sortBy: settings.artistCoverStackSortBy,
+        sortOrder: settings.artistCoverStackSortOrder,
+    });
+
+    const artistImageDisplay = getArtistImageDisplay(
+        itemType || LibraryItem.SONG,
+        settings,
+        albumStackData,
+    );
+
     if (itemCount === 0) {
         return null;
     }
@@ -61,7 +90,22 @@ export const ContextMenuPreview = ({ items, itemType }: ContextMenuPreviewProps)
             <div className={styles.divider} />
             <div className={styles.preview}>
                 <div className={styles.content}>
-                    {itemImage ? (
+                    {artistImageDisplay.showStackedCovers && artistImageDisplay.albumIds ? (
+                        <div className={styles.imageContainer}>
+                            <StackedCovers
+                                albumIds={artistImageDisplay.albumIds}
+                                className={styles.image}
+                                fitment={artistImageDisplay.fitment}
+                                maxStackSize={artistImageDisplay.maxStackSize}
+                                overfitSize={artistImageDisplay.overfitSize}
+                                spunRotation={artistImageDisplay.spunRotation}
+                                staggerHeight={artistImageDisplay.staggerHeight}
+                                staggerWidth={artistImageDisplay.staggerWidth}
+                                style={artistImageDisplay.stackStyle}
+                            />
+                            <div className={styles.imageOverlay} />
+                        </div>
+                    ) : itemImage ? (
                         <div className={styles.imageContainer}>
                             <img alt={itemName} className={styles.image} src={imageUrl} />
                             <div className={styles.imageOverlay} />

@@ -998,6 +998,11 @@ export const SubsonicController: InternalControllerEndpoint = {
             ),
         );
     },
+    // not implemented (yet)
+    getCoverArtValidator: async () => {
+        const hasImage = async (): Promise<boolean> => true;
+        return { hasImage };
+    },
     getDownloadUrl: (args) => {
         const { apiClientProps, query } = args;
 
@@ -1171,6 +1176,7 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return stations.map((station) => ssNormalize.internetRadioStation(station));
     },
+
     getMusicFolderList: async (args) => {
         const { apiClientProps } = args;
 
@@ -1189,7 +1195,6 @@ export const SubsonicController: InternalControllerEndpoint = {
             totalRecordCount: res.body.musicFolders.musicFolder.length,
         };
     },
-
     getPlaylistDetail: async (args) => {
         const { apiClientProps, query } = args;
 

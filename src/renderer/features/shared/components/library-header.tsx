@@ -2,13 +2,17 @@ import type { KeyboardEvent } from 'react';
 
 import { closeAllModals, openModal } from '@mantine/modals';
 import clsx from 'clsx';
-import { forwardRef, ReactNode, Ref, useCallback } from 'react';
+import { forwardRef, ReactNode, Ref, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import styles from './library-header.module.css';
 
 import { getItemImageUrl, ItemImage } from '/@/renderer/components/item-image/item-image';
+import {
+    getArtistImageDisplay,
+    StackedCovers,
+} from '/@/renderer/features/artists/components/stacked-covers';
 import { useIsPlayerFetching } from '/@/renderer/features/player/context/player-context';
 import {
     PlayLastTextButton,
@@ -20,6 +24,7 @@ import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-b
 import { useIsMutatingCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useIsMutatingDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useIsMutatingRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
+import { useArtistAlbumStack } from '/@/renderer/hooks/use-artist-album-stack';
 import { useGeneralSettings } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
@@ -39,11 +44,11 @@ interface LibraryHeaderProps {
     compact?: boolean;
     containerClassName?: string;
     imageOverlay?: ReactNode;
-    imagePlaceholderUrl?: null | string;
     imageUrl?: null | string;
     item: {
         children?: ReactNode;
         explicitStatus?: ExplicitStatus | null;
+        id?: null | string;
         imageId?: null | string;
         imageUrl?: null | string;
         route: string;
@@ -71,7 +76,33 @@ export const LibraryHeader = forwardRef(
         ref: Ref<HTMLDivElement>,
     ) => {
         const { t } = useTranslation();
-        const { blurExplicitImages } = useGeneralSettings();
+        const settings = useGeneralSettings();
+        const { blurExplicitImages } = settings;
+        const [isImageError, setIsImageError] = useState<boolean | null>(false);
+
+        const onImageError = () => {
+            setIsImageError(true);
+        };
+
+        // Determine if this is an artist type that might need album stack
+        const isArtistType =
+            item.type === LibraryItem.ALBUM_ARTIST || item.type === LibraryItem.ARTIST;
+        const artistId = isArtistType && item.id ? item.id : undefined;
+
+        // Fetch album stack data lazily for artists
+        const albumStackData = useArtistAlbumStack(artistId, {
+            enabled: isArtistType && settings.artistCoverStackEnabled,
+            maxAlbums: settings.artistCoverStackSize,
+            preferArtistCover: settings.artistCoverStackPreferArtistCover,
+            sortBy: settings.artistCoverStackSortBy,
+            sortOrder: settings.artistCoverStackSortOrder,
+        });
+
+        const artistImageDisplay = getArtistImageDisplay(
+            item.type || LibraryItem.ALBUM,
+            settings,
+            albumStackData,
+        );
 
         const itemTypeString = (): string => {
             switch (item.type) {
@@ -170,18 +201,35 @@ export const LibraryHeader = forwardRef(
                         onFileSelected={(file) => void onImageFileDrop(file)}
                         {...imageSectionSharedProps}
                     >
-                        <ItemImage
-                            className={styles.image}
-                            containerClassName={styles.image}
-                            enableDebounce={false}
-                            enableViewport={false}
-                            explicitStatus={item.explicitStatus ?? null}
-                            fetchPriority="high"
-                            id={item.imageId}
-                            itemType={item.type as LibraryItem}
-                            src={imageUrl || ''}
-                            type="header"
-                        />
+                        {artistImageDisplay.showStackedCovers && artistImageDisplay.albumIds ? (
+                            <StackedCovers
+                                albumIds={artistImageDisplay.albumIds}
+                                className={styles.image}
+                                fitment={artistImageDisplay.fitment}
+                                maxStackSize={artistImageDisplay.maxStackSize}
+                                overfitSize={artistImageDisplay.overfitSize}
+                                spunRotation={artistImageDisplay.spunRotation}
+                                staggerHeight={artistImageDisplay.staggerHeight}
+                                staggerWidth={artistImageDisplay.staggerWidth}
+                                style={artistImageDisplay.stackStyle}
+                            />
+                        ) : (
+                            !isImageError && (
+                                <ItemImage
+                                    className={styles.image}
+                                    containerClassName={styles.image}
+                                    enableDebounce={false}
+                                    enableViewport={false}
+                                    explicitStatus={item.explicitStatus ?? null}
+                                    fetchPriority="high"
+                                    id={item.imageId}
+                                    itemType={item.type as LibraryItem}
+                                    onError={onImageError}
+                                    src={imageUrl || ''}
+                                    type="header"
+                                />
+                            )
+                        )}
                         {imageOverlay && (
                             <div
                                 className={styles.imageOverlay}
@@ -195,18 +243,35 @@ export const LibraryHeader = forwardRef(
                     </DragDropZone>
                 ) : (
                     <div className={styles.imageSection} {...imageSectionSharedProps}>
-                        <ItemImage
-                            className={styles.image}
-                            containerClassName={styles.image}
-                            enableDebounce={false}
-                            enableViewport={false}
-                            explicitStatus={item.explicitStatus ?? null}
-                            fetchPriority="high"
-                            id={item.imageId}
-                            itemType={item.type as LibraryItem}
-                            src={imageUrl || ''}
-                            type="header"
-                        />
+                        {artistImageDisplay.showStackedCovers && artistImageDisplay.albumIds ? (
+                            <StackedCovers
+                                albumIds={artistImageDisplay.albumIds}
+                                className={styles.image}
+                                fitment={artistImageDisplay.fitment}
+                                maxStackSize={artistImageDisplay.maxStackSize}
+                                overfitSize={artistImageDisplay.overfitSize}
+                                spunRotation={artistImageDisplay.spunRotation}
+                                staggerHeight={artistImageDisplay.staggerHeight}
+                                staggerWidth={artistImageDisplay.staggerWidth}
+                                style={artistImageDisplay.stackStyle}
+                            />
+                        ) : (
+                            !isImageError && (
+                                <ItemImage
+                                    className={styles.image}
+                                    containerClassName={styles.image}
+                                    enableDebounce={false}
+                                    enableViewport={false}
+                                    explicitStatus={item.explicitStatus ?? null}
+                                    fetchPriority="high"
+                                    id={item.imageId}
+                                    itemType={item.type as LibraryItem}
+                                    onError={onImageError}
+                                    src={imageUrl || ''}
+                                    type="header"
+                                />
+                            )
+                        )}
                         {imageOverlay && (
                             <div
                                 className={styles.imageOverlay}

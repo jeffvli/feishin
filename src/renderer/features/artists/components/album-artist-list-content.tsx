@@ -1,6 +1,10 @@
 import { lazy, Suspense, useMemo } from 'react';
 
 import { useAlbumArtistListFilters } from '/@/renderer/features/artists/hooks/use-album-artist-list-filters';
+import {
+    CoverArtValidatorContext,
+    useCoverArtValidator,
+} from '/@/renderer/hooks/use-artist-album-stack';
 import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { AlbumArtistListQuery } from '/@/shared/types/domain-types';
@@ -42,17 +46,20 @@ export const AlbumArtistListContent = () => {
     const { display, grid, itemsPerPage, pagination, table } = useListSettings(
         ItemListKey.ALBUM_ARTIST,
     );
+    const coverArtValidator = useCoverArtValidator();
 
     return (
-        <Suspense fallback={<Spinner container />}>
-            <AlbumArtistListView
-                display={display}
-                grid={grid}
-                itemsPerPage={itemsPerPage}
-                pagination={pagination}
-                table={table}
-            />
-        </Suspense>
+        <CoverArtValidatorContext.Provider value={coverArtValidator}>
+            <Suspense fallback={<Spinner container />}>
+                <AlbumArtistListView
+                    display={display}
+                    grid={grid}
+                    itemsPerPage={itemsPerPage}
+                    pagination={pagination}
+                    table={table}
+                />
+            </Suspense>
+        </CoverArtValidatorContext.Provider>
     );
 };
 

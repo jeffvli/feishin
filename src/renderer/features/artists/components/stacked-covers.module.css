@@ -1,0 +1,43 @@
+.stacked-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.album-cover {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+/* Spun style - rotated fan */
+.spun-cover {
+    /* width and height set dynamically based on scale factor */
+    transform-origin: center center;
+}
+
+/* Staggered style - diagonal offset from top-left to bottom-right */
+.staggered-cover {
+    /* width, height, top, left set dynamically based on stagger amount and album count */
+}
+
+.album-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+}
+
+.album-image.is-round {
+    border-radius: 50%;
+}
+
+.album-cover.is-round .album-image {
+    border-radius: 50%;
+}

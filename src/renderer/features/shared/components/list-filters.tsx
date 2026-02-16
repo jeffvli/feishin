@@ -13,6 +13,10 @@ import { JellyfinSongFilters } from '/@/renderer/features/songs/components/jelly
 import { NavidromeSongFilters } from '/@/renderer/features/songs/components/navidrome-song-filters';
 import { SubsonicSongFilters } from '/@/renderer/features/songs/components/subsonic-song-filters';
 import { useSongListFilters } from '/@/renderer/features/songs/hooks/use-song-list-filters';
+import {
+    CoverArtValidatorContext,
+    useCoverArtValidator,
+} from '/@/renderer/hooks/use-artist-album-stack';
 import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
@@ -42,6 +46,7 @@ export const ListFiltersModal = ({ isActive, itemType }: ListFiltersProps) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
     const { isSidebarOpen, pageKey, setIsSidebarOpen } = useListContext();
+    const coverArtValidator = useCoverArtValidator();
 
     const serverType = server.type;
 
@@ -101,10 +106,12 @@ export const ListFiltersModal = ({ isActive, itemType }: ListFiltersProps) => {
                     </Group>
                 }
             >
-                <FilterComponent
-                    disableArtistFilter={disableArtistFilter}
-                    disableGenreFilter={disableGenreFilter}
-                />
+                <CoverArtValidatorContext.Provider value={coverArtValidator}>
+                    <FilterComponent
+                        disableArtistFilter={disableArtistFilter}
+                        disableGenreFilter={disableGenreFilter}
+                    />
+                </CoverArtValidatorContext.Provider>
                 <Stack p="md">
                     <SaveAsCollectionButton
                         fullWidth
@@ -121,6 +128,7 @@ export const ListFilters = ({ itemType }: ListFiltersProps) => {
     const serverType = server.type;
     const FilterComponent = FILTERS[serverType][itemType];
     const { pageKey } = useListContext();
+    const coverArtValidator = useCoverArtValidator();
 
     const disableArtistFilter = pageKey === ItemListKey.ALBUM_ARTIST_ALBUM;
     const disableGenreFilter =
@@ -129,10 +137,12 @@ export const ListFilters = ({ itemType }: ListFiltersProps) => {
     return (
         <ComponentErrorBoundary>
             <Suspense fallback={<Spinner container />}>
-                <FilterComponent
-                    disableArtistFilter={disableArtistFilter}
-                    disableGenreFilter={disableGenreFilter}
-                />
+                <CoverArtValidatorContext.Provider value={coverArtValidator}>
+                    <FilterComponent
+                        disableArtistFilter={disableArtistFilter}
+                        disableGenreFilter={disableGenreFilter}
+                    />
+                </CoverArtValidatorContext.Provider>
             </Suspense>
         </ComponentErrorBoundary>
     );

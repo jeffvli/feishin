@@ -1,4 +1,5 @@
 export * from './use-app-focus';
+export * from './use-artist-album-stack';
 export * from './use-check-for-updates';
 export * from './use-container-query';
 export * from './use-fast-average-color';
