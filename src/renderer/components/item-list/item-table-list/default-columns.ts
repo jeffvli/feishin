@@ -14,6 +14,15 @@ export type DefaultTableColumn = {
 
 export const SONG_TABLE_COLUMNS: DefaultTableColumn[] = [
     {
+        align: 'start',
+        autoSize: false,
+        isEnabled: false,
+        label: i18n.t('table.config.label.albumGroup', { postProcess: 'titleCase' }),
+        pinned: 'left',
+        value: TableColumn.ALBUM_GROUP,
+        width: 200,
+    },
+    {
         align: 'center',
         autoSize: false,
         isEnabled: true,

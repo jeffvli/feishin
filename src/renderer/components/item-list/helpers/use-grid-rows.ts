@@ -49,6 +49,7 @@ const getRowIdFromTableColumn = (tableColumn: TableColumn): null | string => {
         [TableColumn.ALBUM]: 'album',
         [TableColumn.ALBUM_ARTIST]: 'albumArtists',
         [TableColumn.ALBUM_COUNT]: 'albumCount',
+        [TableColumn.ALBUM_GROUP]: null,
         [TableColumn.ARTIST]: 'artists',
         [TableColumn.BIOGRAPHY]: null,
         [TableColumn.BIT_DEPTH]: 'bitDepth',

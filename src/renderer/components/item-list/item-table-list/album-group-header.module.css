@@ -1,0 +1,97 @@
+.container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 4px 8px;
+}
+
+.image-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+}
+
+.image {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--theme-radius-md);
+}
+
+.image img {
+    width: 48px;
+    height: 48px;
+    object-fit: var(--theme-image-fit);
+    object-position: center;
+}
+
+.play-button-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 10;
+    opacity: 0.6;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.2s ease-in-out;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.play-button-overlay button {
+    width: 32px;
+    height: 32px;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    justify-content: center;
+    min-width: 0;
+}
+
+.album-name {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13px;
+    font-weight: 600;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.album-name.compact {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+}
+
+.album-name.large {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}
+
+.artist-name {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 11px;
+    opacity: 0.7;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.artist-name.compact {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+}
+
+.artist-name.large {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}

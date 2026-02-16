@@ -1,4 +1,5 @@
 import { UseSuspenseQueryOptions } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListPaginatedLoader } from '/@/renderer/components/item-list/helpers/item-list-paginated-loader';
@@ -14,7 +15,7 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { usePlayerSong } from '/@/renderer/store';
 import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/shared/types/domain-types';
-import { ItemListKey } from '/@/shared/types/types';
+import { ItemListKey, TableColumn } from '/@/shared/types/types';
 
 interface SongListPaginatedTableProps extends ItemListTableComponentProps<SongListQuery> {}
 
@@ -39,8 +40,20 @@ export const SongListPaginatedTable = ({
     const { pageKey } = useListContext();
     const { currentPage, onChange } = useItemListPagination();
 
+    const albumGroupingEnabled = columns.some(
+        (col) => col.id === TableColumn.ALBUM_GROUP && col.isEnabled,
+    );
+
+    const effectiveQuery = useMemo(
+        () =>
+            albumGroupingEnabled
+                ? { ...query, sortBy: SongListSort.ALBUM, sortOrder: SortOrder.ASC }
+                : query,
+        [albumGroupingEnabled, query],
+    );
+
     const listCountQuery = songsQueries.listCount({
-        query: { ...query, limit: itemsPerPage },
+        query: { ...effectiveQuery, limit: itemsPerPage },
         serverId: serverId,
     }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
 
@@ -53,7 +66,7 @@ export const SongListPaginatedTable = ({
         itemType: LibraryItem.SONG,
         listCountQuery,
         listQueryFn,
-        query,
+        query: effectiveQuery,
         serverId,
     });
 
@@ -73,6 +86,11 @@ export const SongListPaginatedTable = ({
 
     const currentSong = usePlayerSong();
 
+    const effectiveColumns = useMemo(() => {
+        if (albumGroupingEnabled) return columns;
+        return columns.filter((col) => col.id !== TableColumn.ALBUM_GROUP);
+    }, [columns, albumGroupingEnabled]);
+
     return (
         <ItemListWithPagination
             currentPage={currentPage}
@@ -85,7 +103,7 @@ export const SongListPaginatedTable = ({
                 activeRowId={currentSong?.id}
                 autoFitColumns={autoFitColumns}
                 CellComponent={ItemTableListColumn}
-                columns={columns}
+                columns={effectiveColumns}
                 data={data || []}
                 enableAlternateRowColors={enableAlternateRowColors}
                 enableExpansion={false}

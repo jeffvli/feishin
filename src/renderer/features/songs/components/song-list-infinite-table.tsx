@@ -1,4 +1,5 @@
 import { UseSuspenseQueryOptions } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 import { api } from '/@/renderer/api';
 import { useItemListInfiniteLoader } from '/@/renderer/components/item-list/helpers/item-list-infinite-loader';
@@ -12,7 +13,7 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { usePlayerSong } from '/@/renderer/store';
 import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/shared/types/domain-types';
-import { ItemListKey } from '/@/shared/types/types';
+import { ItemListKey, TableColumn } from '/@/shared/types/types';
 
 interface SongListInfiniteTableProps extends ItemListTableComponentProps<SongListQuery> {}
 
@@ -34,8 +35,20 @@ export const SongListInfiniteTable = ({
     serverId,
     size = 'default',
 }: SongListInfiniteTableProps) => {
+    const albumGroupingEnabled = columns.some(
+        (col) => col.id === TableColumn.ALBUM_GROUP && col.isEnabled,
+    );
+
+    const effectiveQuery = useMemo(
+        () =>
+            albumGroupingEnabled
+                ? { ...query, sortBy: SongListSort.ALBUM, sortOrder: SortOrder.ASC }
+                : query,
+        [albumGroupingEnabled, query],
+    );
+
     const listCountQuery = songsQueries.listCount({
-        query: { ...query, limit: itemsPerPage },
+        query: { ...effectiveQuery, limit: itemsPerPage },
         serverId: serverId,
     }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
 
@@ -49,7 +62,7 @@ export const SongListInfiniteTable = ({
             itemType: LibraryItem.SONG,
             listCountQuery,
             listQueryFn,
-            query,
+            query: effectiveQuery,
             serverId,
         });
 
@@ -67,12 +80,17 @@ export const SongListInfiniteTable = ({
 
     const currentSong = usePlayerSong();
 
+    const effectiveColumns = useMemo(() => {
+        if (albumGroupingEnabled) return columns;
+        return columns.filter((col) => col.id !== TableColumn.ALBUM_GROUP);
+    }, [columns, albumGroupingEnabled]);
+
     return (
         <ItemTableList
             activeRowId={currentSong?.id}
             autoFitColumns={autoFitColumns}
             CellComponent={ItemTableListColumn}
-            columns={columns}
+            columns={effectiveColumns}
             data={loadedItems}
             enableAlternateRowColors={enableAlternateRowColors}
             enableExpansion={false}

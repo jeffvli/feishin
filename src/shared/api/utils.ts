@@ -158,7 +158,12 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
         case SongListSort.ALBUM_ARTIST:
             results = orderBy(
                 results,
-                [(v) => v.albumArtists[0]?.name.toLowerCase(), 'discNumber', 'trackNumber'],
+                [
+                    (v) => v.albumArtists[0]?.name.toLowerCase(),
+                    (v) => v.album?.toLowerCase(),
+                    'discNumber',
+                    'trackNumber',
+                ],
                 [order, order, order, order],
             );
             break;

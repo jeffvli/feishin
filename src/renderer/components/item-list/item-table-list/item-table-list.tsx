@@ -204,17 +204,6 @@ const VirtualizedTableGrid = ({
         [columnWidth, pinnedLeftColumnCount],
     );
 
-    const rowHeightMemoized = useCallback(
-        (index: number, cellProps: TableItemProps) =>
-            getRowHeight(index + pinnedRowCount, cellProps),
-        [getRowHeight, pinnedRowCount],
-    );
-
-    const pinnedRightColumnWidthMemoized = useCallback(
-        (index: number) => columnWidth(index + pinnedLeftColumnCount + totalColumnCount),
-        [columnWidth, pinnedLeftColumnCount, totalColumnCount],
-    );
-
     const groupHeaderInfoByRowIndex = useMemo(() => {
         if (!groups || groups.length === 0) return undefined;
 
@@ -230,6 +219,19 @@ const VirtualizedTableGrid = ({
 
         return map;
     }, [groups, enableHeader]);
+
+    const rowHeightMemoized = useCallback(
+        (index: number, cellProps: TableItemProps) => {
+            const adjustedIndex = index + pinnedRowCount;
+            return getRowHeight(adjustedIndex, cellProps);
+        },
+        [getRowHeight, pinnedRowCount],
+    );
+
+    const pinnedRightColumnWidthMemoized = useCallback(
+        (index: number) => columnWidth(index + pinnedLeftColumnCount + totalColumnCount),
+        [columnWidth, pinnedLeftColumnCount, totalColumnCount],
+    );
 
     const getGroupRenderData = useCallback(() => data, [data]);
 

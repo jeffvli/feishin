@@ -6,6 +6,10 @@
     height: 100%;
 }
 
+.title-combined.no-image {
+    grid-template-columns: 1fr;
+}
+
 .text-container {
     display: grid;
     grid-template-rows: 1fr 1fr;
