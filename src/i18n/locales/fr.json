@@ -38,7 +38,16 @@
         "restoreQueueFromServer": "restaurer la file d'attente depuis le serveur",
         "saveQueueToServer": "enregistrer la file d'attente sur le serveur",
         "artistRadio": "radio de l'artiste",
-        "trackRadio": "radio du titre"
+        "trackRadio": "radio du titre",
+        "sleepTimer": "minuterie de veille",
+        "sleepTimer_endOfSong": "fin de la chanson en cours",
+        "sleepTimer_minutes": "{{count}} min",
+        "sleepTimer_hours": "{{count}} h",
+        "sleepTimer_custom": "personnalisé",
+        "sleepTimer_off": "éteint",
+        "sleepTimer_timeRemaining": "{{time}} restante(s)",
+        "sleepTimer_setCustom": "définir le minuteur",
+        "sleepTimer_cancel": "annuler le minuteur"
     },
     "action": {
         "editPlaylist": "éditer $t(entity.playlist, {\"count\": 1})",
@@ -236,7 +245,9 @@
         "saveQueueFailed": "échec de l'enregistrement de la file d'attente",
         "settingsSyncError": "des incohérences ont été détectées entre les paramètres du moteur de rendu et ceux du processus principal. redémarrez l'application pour appliquer les modifications",
         "noNetwork": "serveur indisponible",
-        "noNetworkDescription": "impossible de se connecter à ce serveur"
+        "noNetworkDescription": "impossible de se connecter à ce serveur",
+        "invalidJson": "JSON invalide",
+        "serverLockSingleServer": "un seul serveur est autorisé quand le serveur est verrouillé"
     },
     "filter": {
         "mostPlayed": "plus joués",
@@ -282,7 +293,9 @@
         "isPublic": "est public",
         "album": "$t(entity.album, {\"count\": 1})",
         "explicitStatus": "$t(common.explicitStatus)",
-        "sortName": "tri par nom"
+        "sortName": "tri par nom",
+        "matchAnd": "et",
+        "matchOr": "ou"
     },
     "page": {
         "sidebar": {
@@ -300,7 +313,8 @@
             "shared": "partagé $t(entity.playlist, {\"count\": 2})",
             "myLibrary": "Bibliothèque",
             "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})"
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "collections": "collections"
         },
         "fullscreenPlayer": {
             "config": {
@@ -483,11 +497,16 @@
         },
         "releasenotes": {
             "commitsSinceStable": "commits depuis {{stable}}",
-            "noNewCommits": "pas de nouveaux commits dans cette plage"
+            "noNewCommits": "pas de nouveaux commits dans cette plage",
+            "noStableReleaseToCompare": "aucune version stable disponible avec laquelle comparer"
         },
         "windowBar": {
             "paused": "(Pause) ",
             "privateMode": "(Mode Privé)"
+        },
+        "collections": {
+            "overrideExisting": "ignorer l'existant",
+            "saveAsCollection": "enregistrer comme collection"
         }
     },
     "setting": {
@@ -816,7 +835,13 @@
         "showRatings_description": "contrôle si la notation à étoiles s'affiche dans l'interface",
         "showRatings": "affiche la notation à étoiles",
         "combinedLyricsAndVisualizer_description": "combine les paroles et le visualisateur dans le même panneau",
-        "combinedLyricsAndVisualizer": "combine les paroles et le visualisateur dans la barre latérale"
+        "combinedLyricsAndVisualizer": "combine les paroles et le visualisateur dans la barre latérale",
+        "analyticsEnable": "Envoyer des métriques d'utilisation",
+        "analyticsEnable_description": "Des métriques d'utilisation anonymisées sont envoyées au développeur pour aider à améliorer l'application",
+        "automaticUpdates": "Mises à jour automatiques",
+        "automaticUpdates_description": "Vérifier l'existence de mises à jour et les installer automatiquement",
+        "releaseChannel_optionAlpha": "alpha (toutes les nuits)",
+        "discordStateIcon": "afficher l’icône de lecture"
     },
     "form": {
         "deletePlaylist": {
