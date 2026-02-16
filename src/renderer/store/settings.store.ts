@@ -496,6 +496,11 @@ export const GeneralSettingsSchema = z.object({
     homeFeature: z.boolean(),
     homeFeatureStyle: z.nativeEnum(HomeFeatureStyle),
     homeItems: z.array(SortableItemSchema(HomeItemSchema)),
+    imageCacheEnabled: z.boolean(),
+    imageCacheMaxSizeMB: z.number(),
+    imageRateLimitBurst: z.number(),
+    imageRateLimitMaxConcurrent: z.number(),
+    imageRateLimitRefillPerSec: z.number(),
     imageRes: z.object({
         fullScreenPlayer: z.number(),
         header: z.number(),
@@ -1209,6 +1214,11 @@ const initialState: SettingsState = {
         homeFeature: true,
         homeFeatureStyle: HomeFeatureStyle.SINGLE,
         homeItems,
+        imageCacheEnabled: true,
+        imageCacheMaxSizeMB: 1000,
+        imageRateLimitBurst: 10,
+        imageRateLimitMaxConcurrent: 6,
+        imageRateLimitRefillPerSec: 5,
         imageRes: {
             fullScreenPlayer: 0,
             header: 300,

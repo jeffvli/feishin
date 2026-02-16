@@ -3,10 +3,6 @@ import { useEffect, useRef } from 'react';
 import { createCallable } from 'react-call';
 import { useParams } from 'react-router';
 
-import {
-    CoverArtValidatorContext,
-    useCoverArtValidator,
-} from '/@/renderer/hooks/use-artist-album-stack';
 import { AlbumArtistContextMenu } from '/@/renderer/features/context-menu/menus/album-artist-context-menu';
 import { AlbumContextMenu } from '/@/renderer/features/context-menu/menus/album-context-menu';
 import { ArtistContextMenu } from '/@/renderer/features/context-menu/menus/artist-context-menu';
@@ -16,6 +12,10 @@ import { PlaylistContextMenu } from '/@/renderer/features/context-menu/menus/pla
 import { PlaylistSongContextMenu } from '/@/renderer/features/context-menu/menus/playlist-song-context-menu';
 import { QueueContextMenu } from '/@/renderer/features/context-menu/menus/queue-context-menu';
 import { SongContextMenu } from '/@/renderer/features/context-menu/menus/song-context-menu';
+import {
+    CoverArtValidatorContext,
+    useCoverArtValidator,
+} from '/@/renderer/hooks/use-artist-album-stack';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import {
     Album,
@@ -88,16 +88,12 @@ export const ContextMenuController = createCallable<ContextMenuControllerProps, 
                     </ContextMenu.Target>
                     {cmd.type === LibraryItem.QUEUE_SONG && <QueueContextMenu {...cmd} />}
                     {cmd.type === LibraryItem.ALBUM && <AlbumContextMenu {...cmd} />}
-                    {cmd.type === LibraryItem.ALBUM_ARTIST && (
-                        <AlbumArtistContextMenu {...cmd} />
-                    )}
+                    {cmd.type === LibraryItem.ALBUM_ARTIST && <AlbumArtistContextMenu {...cmd} />}
                     {cmd.type === LibraryItem.ARTIST && <ArtistContextMenu {...cmd} />}
                     {cmd.type === LibraryItem.FOLDER && <FolderContextMenu {...cmd} />}
                     {cmd.type === LibraryItem.GENRE && <GenreContextMenu {...cmd} />}
                     {cmd.type === LibraryItem.PLAYLIST && <PlaylistContextMenu {...cmd} />}
-                    {cmd.type === LibraryItem.PLAYLIST_SONG && (
-                        <PlaylistSongContextMenu {...cmd} />
-                    )}
+                    {cmd.type === LibraryItem.PLAYLIST_SONG && <PlaylistSongContextMenu {...cmd} />}
                     {cmd.type === LibraryItem.SONG && <SongContextMenu {...cmd} />}
                 </ContextMenu>
             </CoverArtValidatorContext.Provider>
