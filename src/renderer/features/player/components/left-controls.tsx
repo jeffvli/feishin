@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { AnimatePresence, LayoutGroup, motion } from 'motion/react';
-import React, { MouseEvent } from 'react';
+import { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 import { shallow } from 'zustand/shallow';
@@ -8,6 +8,7 @@ import { shallow } from 'zustand/shallow';
 import styles from './left-controls.module.css';
 
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
+import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { RadioMetadataDisplay } from '/@/renderer/features/player/components/radio-metadata-display';
 import { useIsRadioActive } from '/@/renderer/features/radio/hooks/use-radio-player';
@@ -24,7 +25,6 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
-import { Separator } from '/@/shared/components/separator/separator';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
@@ -233,30 +233,10 @@ export const LeftControls = () => {
                                 )}
                                 onClick={stopPropagation}
                             >
-                                {artists?.map((artist, index) => (
-                                    <React.Fragment key={`bar-${artist.id}`}>
-                                        {index > 0 && <Separator />}
-                                        <Text
-                                            component={artist.id ? Link : undefined}
-                                            fw={500}
-                                            isLink={artist.id !== ''}
-                                            overflow="hidden"
-                                            size="md"
-                                            to={
-                                                artist.id
-                                                    ? generatePath(
-                                                          AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
-                                                          {
-                                                              albumArtistId: artist.id,
-                                                          },
-                                                      )
-                                                    : undefined
-                                            }
-                                        >
-                                            {artist.name || '—'}
-                                        </Text>
-                                    </React.Fragment>
-                                ))}
+                                <JoinedArtists
+                                    artistName={currentSong?.artistName || ''}
+                                    artists={artists || []}
+                                />
                             </div>
                             <div
                                 className={clsx(

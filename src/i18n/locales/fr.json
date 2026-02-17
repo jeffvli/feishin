@@ -80,8 +80,8 @@
         "viewMore": "voir plus",
         "moveUp": "monter",
         "moveDown": "descendre",
-        "holdToMoveToTop": "Maintenir pour déplacer en haut",
-        "holdToMoveToBottom": "Maintenir pour déplacer en bas",
+        "holdToMoveToTop": "maintenir pour déplacer en haut",
+        "holdToMoveToBottom": "maintenir pour déplacer en bas",
         "createRadioStation": "créer $t(entity.radioStation, {\"count\": 1})",
         "deleteRadioStation": "supprimer $t(entity.radioStation, {\"count\": 1})",
         "addOrRemoveFromSelection": "ajouter ou supprimer de la sélection",
@@ -191,7 +191,7 @@
         "viewReleaseNotes": "voir la note de version",
         "sampleRate": "taux d'échantillonnage",
         "bitDepth": "format d'échantillonnage",
-        "explicitStatus": "status explicite",
+        "explicitStatus": "statut explicite",
         "explicit": "explicite",
         "clean": "propre",
         "private": "privé",
@@ -238,8 +238,8 @@
         "loginRateError": "trop de tentative de connexion, merci de réessayer dans quelques secondes",
         "openError": "impossible d'ouvrir le fichier",
         "networkError": "une erreur de réseau est survenue",
-        "badAlbum": "vous voyez cette page parce que cette chanson ne fait pas parti d'un album. vous rencontrez probablement cette erreur si vous avez une chanson qui n'est pas dans votre répertoire de musique. Jellyfin gère les chansons uniquement si elles sont dans un sous-dossier, qui est lui-même dans un dossier \"Musique(s)\"",
-        "badValue": "option {{value}} invalide. Cette valeur n'existe plus",
+        "badAlbum": "vous voyez cette page parce que ce titre ne fait pas parti d'un album. vous rencontrez probablement cette erreur si vous avez un titre à la racine de votre dossier musique. Jellyfin gère les chansons uniquement si elles sont dans un sous-dossier, qui est lui-même dans un dossier \"Musique(s)\"",
+        "badValue": "option {{value}} invalide. cette valeur n'existe plus",
         "notificationDenied": "les autorisations pour les notifications ont été refusées. ce paramètre n'a aucun effet",
         "multipleServerSaveQueueError": "la file d'attente de lecture contient un ou plusieurs morceaux qui ne proviennent pas du serveur actuel. Ceci n'est pas prise en charge",
         "saveQueueFailed": "échec de l'enregistrement de la file d'attente",
@@ -510,7 +510,7 @@
         }
     },
     "setting": {
-        "audioDevice_description": "sélectionnez le périphérique audio à utiliser pour la lecture (lecteur Web uniquement)",
+        "audioDevice_description": "sélectionnez le périphérique audio à utiliser pour la lecture",
         "audioExclusiveMode_description": "activer le mode de sortie exclusif. Dans ce mode, le système est généralement verrouillé et seul mpv pourra émettre de l'audio",
         "audioPlayer_description": "sélectionnez le lecteur audio à utiliser pour la lecture",
         "crossfadeDuration_description": "définit la durée du fondu enchaîné",
@@ -528,7 +528,7 @@
         "hotkey_skipBackward": "reculer",
         "hotkey_playbackPause": "pause",
         "hotkey_volumeUp": "monter le volume",
-        "discordIdleStatus_description": "quand activé, mettre à jour le status pendant que le lecteur est inactif",
+        "discordIdleStatus_description": "quand activé, mettre à jour le statut pendant que le lecteur est inactif",
         "showSkipButtons": "affiche les boutons suivants et précédents",
         "minimumScrobblePercentage": "durée minimal du scobble (pourcentage)",
         "lyricFetch": "récupérer les paroles depuis internet",
@@ -580,7 +580,7 @@
         "playbackStyle": "style de lecture",
         "hotkey_toggleShuffle": "basculer la lecture aléatoire",
         "playbackStyle_description": "sélectionnez le style de lecture à utiliser pour le lecteur audio",
-        "discordRichPresence_description": "active l'état de lecteur dans le status d'activité {{discord}}. Les images clés sont : {{icon}}, {{playing}}, et {{paused}}",
+        "discordRichPresence_description": "active l'état de lecteur dans le statut d'activité {{discord}}. Les images clés sont : {{icon}}, {{playing}}, et {{paused}}",
         "mpvExecutablePath": "chemin de l'exécutable mpv",
         "hotkey_rate2": "noter 2 étoiles",
         "playButtonBehavior_description": "définit le comportement par défaut du bouton Jouer/Pause, lors de l'ajout de titres à la file d'attente",
@@ -731,10 +731,10 @@
         "preferLocalLyrics_description": "privilégier les paroles locales aux paroles distantes lorsqu'elles sont disponibles",
         "preferLocalLyrics": "privilégier les paroles locales",
         "discordPausedStatus_description": "quand activé, le status s'affichera lorsque le lecteur est en pause",
-        "discordPausedStatus": "afficher le status d'activité en pause",
+        "discordPausedStatus": "afficher le statut d’activité en pause",
         "preservePitch": "préserver la hauteur",
         "preservePitch_description": "préserver la hauteur lors du changement de la vitesse de lecture",
-        "discordDisplayType": "type d'affichage du status {{discord}}",
+        "discordDisplayType": "type d'affichage du statut {{discord}}",
         "discordDisplayType_description": "modifie ce que vous écoutez dans votre statut",
         "discordDisplayType_songname": "nom du morceau",
         "discordDisplayType_artistname": "nom(s) d’artiste",
@@ -789,8 +789,8 @@
         "showLyricsInSidebar": "afficher les paroles dans la barre de lecture latérale",
         "showVisualizerInSidebar_description": "un panneau sera ajouté à la barre de lecture latérale qui affiche le visualiseur",
         "showVisualizerInSidebar": "afficher le visualiseur dans la barre de lecture latérale",
-        "audioFadeOnStatusChange": "diminution du volume sonore lors du changement d'état",
-        "audioFadeOnStatusChange_description": "permet le fondu enchaîné et le fondu au noir quand la lecture/pause change d'états",
+        "audioFadeOnStatusChange": "diminution du volume sonore lors du changement d'état du statut",
+        "audioFadeOnStatusChange_description": "permet le fondu enchaîné et le fondu au noir quand la lecture/pause change d'états du statut",
         "queryBuilder": "constructeur de requêtes",
         "queryBuilderCustomFields_inputLabel": "label",
         "queryBuilderCustomFields_inputTag": "tag",
@@ -841,7 +841,21 @@
         "automaticUpdates": "Mises à jour automatiques",
         "automaticUpdates_description": "Vérifier l'existence de mises à jour et les installer automatiquement",
         "releaseChannel_optionAlpha": "alpha (toutes les nuits)",
-        "discordStateIcon": "afficher l’icône de lecture"
+        "discordStateIcon": "afficher l’icône de lecture",
+        "discordStateIcon_description": "affiche une petite icône de lecture dans le statut d'activité. l'icône de pause est toujours affichée lorsque \"Afficher le statut d'activité en pause\" est activé",
+        "homeFeatureStyle_description": "contrôle le style du carousel d'accueil à la une",
+        "homeFeatureStyle": "style de carousel à la une de l'accueil",
+        "homeFeatureStyle_optionMultiple": "multiple",
+        "homeFeatureStyle_optionSingle": "simple",
+        "blurExplicitImages": "flouter les images explicites",
+        "blurExplicitImages_description": "les pochettes d'albums et de chansons étiquetées comme explicites seront floutées",
+        "enableGridMultiSelect": "activer la sélection multiple dans la grille",
+        "enableGridMultiSelect_description": "quand activé, permet la sélection de plusieurs entrées dans la vue en grille. quand désactivé, cliquer sur un item de la grille mène vers la page de l'entrée",
+        "sidebarPlaylistSorting_description": "permet le tri manuel des listes de lecture dans la barre latérale en utilisant le drag and drop plutôt que l'ordre par défaut du serveur",
+        "sidebarPlaylistSorting": "tri des listes de lecture dans la barre latérale",
+        "sidebarPlaylistListFilterRegex_description": "masquer les listes de lecture dans la barre latérale qui correspondent à cette expression régulière",
+        "sidebarPlaylistListFilterRegex_placeholder": "ex. ^Mix Journalier*",
+        "sidebarPlaylistListFilterRegex": "filtre d'expression régulière de liste de lecture"
     },
     "form": {
         "deletePlaylist": {
@@ -1042,12 +1056,14 @@
                 "alternateRowColors": "alterner les couleurs des lignes",
                 "horizontalBorders": "bordures de ligne",
                 "rowHoverHighlight": "surligner les lignes au survol",
-                "verticalBorders": "bordure de colonne"
+                "verticalBorders": "bordure de colonne",
+                "showHeader": "affiche l'en-tête"
             },
             "view": {
                 "table": "liste",
                 "grid": "grille",
-                "list": "liste"
+                "list": "liste",
+                "detail": "détail"
             },
             "label": {
                 "releaseDate": "date de sortie",
@@ -1082,7 +1098,9 @@
                 "genreBadge": "$t(entity.genre, {\"count\": 1}) (badges)",
                 "image": "image",
                 "bitDepth": "$t(common.bitDepth)",
-                "sampleRate": "$t(common.sampleRate)"
+                "sampleRate": "$t(common.sampleRate)",
+                "composer": "compositeur",
+                "titleArtist": "$t(common.title) (artiste)"
             }
         },
         "column": {
@@ -1240,8 +1258,84 @@
         "minimumDecibels": "décibels minimum",
         "maximumDecibels": "décibels maximum",
         "linearAmplitude": "amplitude linéaire",
-        "linearBoost": "boost linéaire",
-        "peakBehavior": "comportement des piques",
-        "showPeaks": "afficher les piques"
+        "linearBoost": "Augmentation Linéaire",
+        "peakBehavior": "Comportement des Crêtes",
+        "showPeaks": "afficher les crêtes",
+        "fft": "FFT",
+        "fftSize": "Taille de la FFT",
+        "fadePeaks": "adoucir les crêtes",
+        "peakLine": "Ligne de Crête",
+        "gravity": "gravité",
+        "peakFadeTime": "temps d'adoucissement des crêtes (ms)",
+        "peakHoldTime": "temps d'attente des crêtes (ms)",
+        "radialSpectrum": "Spectre Radial",
+        "radial": "Radial",
+        "radialInvert": "Inversion Radiale",
+        "spinSpeed": "Vitesse de Rotation",
+        "radius": "Rayon",
+        "reflexMirror": "Miroir Réflexe",
+        "reflexFit": "Ajustement du Réflexe",
+        "reflexRatio": "Rapport de Réflexe",
+        "reflexAlpha": "Alpha du Réflexe",
+        "reflexBrightness": "Luminosité du Réflexe",
+        "mirror": "Mirroir",
+        "miscellaneousSettings": "Paramètres divers",
+        "alphaBars": "Barres alpha",
+        "ansiBands": "Bandes ANSI",
+        "ledBars": "Barres LED",
+        "trueLeds": "True LEDs",
+        "roundBars": "Barres arrondies",
+        "lowResolution": "Basse Résolution",
+        "showFPS": "Afficher les FPS",
+        "showScaleX": "Afficher l’échelle X",
+        "noteLabels": "Étiquettes de notes",
+        "showScaleY": "Afficher l’échelle Y",
+        "options": {
+            "mode": {
+                "0": "[0] Fréquences discrètes",
+                "1": "[1] 1/24ᵉ octave / 240 bandes",
+                "2": "[2] 1/12ᵉ octave / 120 bandes",
+                "3": "[3] 1/8ᵉ octave / 80 bandes",
+                "4": "[4] 1/6ᵉ octave / 60 bandes",
+                "5": "[5] 1/4ᵉ octave / 40 bandes",
+                "6": "[6] 1/3ᵉ octave / 30 bandes",
+                "7": "[7] Demi-octave / 20 bandes",
+                "8": "[8] Octave complète / 10 bandes",
+                "10": "[10] Linéaire / Graphique en aires"
+            },
+            "colorMode": {
+                "gradient": "Dégradé",
+                "barIndex": "Indice de Barre",
+                "barLevel": "Niveau de Barre"
+            },
+            "gradient": {
+                "classic": "Classique",
+                "prism": "Prisme",
+                "rainbow": "Arc-en-ciel",
+                "steelblue": "Bleu Acier",
+                "orangered": "Orange rougeâtre"
+            },
+            "channelLayout": {
+                "single": "Simple",
+                "dualCombined": "Combiné Double",
+                "dualHorizontal": "Double Horizontale",
+                "dualVertical": "Double Verticale"
+            },
+            "frequencyScale": {
+                "none": "Aucun",
+                "bark": "Échelle Bark",
+                "linear": "Échelle Linéaire",
+                "log": "Échelle Logarithmique",
+                "mel": "Échelle Mel"
+            },
+            "weightingFilter": {
+                "none": "Aucun",
+                "a": "A",
+                "b": "B",
+                "c": "C",
+                "d": "D",
+                "z": "Z"
+            }
+        }
     }
 }

@@ -20,9 +20,11 @@ server {
 
   location ${PUBLIC_PATH}settings.js {
     alias /etc/nginx/conf.d/settings.js;
+    add_header Cache-Control "no-store";
   }
 
   location ${PUBLIC_PATH}/settings.js {
     alias /etc/nginx/conf.d/settings.js;
+    add_header Cache-Control "no-store";
   }
 }
