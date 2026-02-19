@@ -54,15 +54,38 @@ const VERSION_INFO: VersionInfo = [
 ];
 
 const JF_FIELDS = {
-    ALBUM_ARTIST_DETAIL: 'Genres, Overview, SortName, ProviderIds',
-    ALBUM_ARTIST_LIST: 'Genres, DateCreated, ExternalUrls, Overview, SortName, ProviderIds',
-    ALBUM_DETAIL: 'Genres, DateCreated, ChildCount, People, Tags, ProviderIds',
-    ALBUM_LIST: 'People, Tags, Studios, SortName, UserData, ProviderIds, ChildCount',
-    FOLDER: 'Genres, DateCreated, MediaSources, UserData, ParentId',
-    GENRE: 'ItemCounts',
-    PLAYLIST_DETAIL: 'Genres, DateCreated, MediaSources, ChildCount, ParentId, SortName',
-    PLAYLIST_LIST: 'ChildCount, Genres, DateCreated, ParentId, Overview',
-    SONG: 'Genres, DateCreated, MediaSources, ParentId, People, Tags, SortName, UserData, ProviderIds',
+    ALBUM_ARTIST_DETAIL: ['Genres', 'Overview', 'SortName', 'ProviderIds'],
+    ALBUM_ARTIST_LIST: [
+        'Genres',
+        'DateCreated',
+        'ExternalUrls',
+        'Overview',
+        'SortName',
+        'ProviderIds',
+    ],
+    ALBUM_DETAIL: ['Genres', 'DateCreated', 'ChildCount', 'People', 'Tags', 'ProviderIds'],
+    ALBUM_LIST: ['People', 'Tags', 'Studios', 'SortName', 'ProviderIds', 'ChildCount'],
+    FOLDER: ['Genres', 'DateCreated', 'MediaSources', 'ParentId'],
+    GENRE: ['ItemCounts'],
+    PLAYLIST_DETAIL: [
+        'Genres',
+        'DateCreated',
+        'MediaSources',
+        'ChildCount',
+        'ParentId',
+        'SortName',
+    ],
+    PLAYLIST_LIST: ['ChildCount', 'Genres', 'DateCreated', 'ParentId', 'Overview'],
+    SONG: [
+        'Genres',
+        'DateCreated',
+        'MediaSources',
+        'ParentId',
+        'People',
+        'Tags',
+        'SortName',
+        'ProviderIds',
+    ],
 } as const;
 
 export const JellyfinController: InternalControllerEndpoint = {

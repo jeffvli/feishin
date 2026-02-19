@@ -15,9 +15,9 @@ const __dirname = path.dirname(__filename);
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export default async function afterAllArtifactBuild(buildResult) {
     // Check if this build includes Linux as a target
-    const isLinux = buildResult.platformToTargets
-        .keys()
-        .some((platform) => platform.name === 'linux');
+    const isLinux = Array.from(buildResult.platformToTargets.keys()).some(
+        (platform) => platform.name === 'linux',
+    );
 
     if (isLinux) {
         const updateScriptPath = path.join(__dirname, 'update-app-stream.mjs');

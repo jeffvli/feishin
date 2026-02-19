@@ -107,7 +107,7 @@ const baseParameters = z.object({
     ExcludeArtistIds: z.string().optional(),
     ExcludeItemIds: z.string().optional(),
     ExcludeItemTypes: z.string().optional(),
-    Fields: z.string().optional(),
+    Fields: z.array(z.string()).readonly().optional(),
     FolderId: z.string().optional(),
     ImageTypeLimit: z.number().optional(),
     IncludeArtists: z.boolean().optional(),
@@ -757,7 +757,7 @@ const serverInfo = z.object({
 });
 
 const similarSongsParameters = z.object({
-    Fields: z.string().optional(),
+    Fields: z.array(z.string()).readonly().optional(),
     Limit: z.number().optional(),
     UserId: z.string().optional(),
 });
@@ -806,7 +806,7 @@ const folderList = pagination.extend({
 });
 
 const folderParameters = z.object({
-    Fields: z.string().optional(),
+    Fields: z.array(z.string()).readonly().optional(),
     ParentId: z.string().optional(),
     SortBy: z.string().optional(),
     SortOrder: z.enum(sortOrderValues).optional(),
