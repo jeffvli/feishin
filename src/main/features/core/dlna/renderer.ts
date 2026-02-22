@@ -26,8 +26,6 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
         this.callAction('AVTransport', 'GetPositionInfo', params, function (err, result) {
             if (err) return callback(err);
 
-            console.log('GetPositionInfo:', JSON.stringify(result));
-
             const positionText =
                 result.AbsTime !== 'NOT_IMPLEMENTED' ? result.AbsTime : result.RelTime;
             const position = parseTime(positionText);
