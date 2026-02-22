@@ -351,6 +351,7 @@ const VirtualizedTableGrid = ({
             controls,
             enableHeader,
             getRowHeight,
+            hasAlbumGroupColumn: parsedColumns.some((col) => col.id === TableColumn.ALBUM_GROUP),
             internalState,
             itemType,
             playerContext,
@@ -804,6 +805,7 @@ export interface TableItemProps {
     getRowItem?: (rowIndex: number) => null | undefined | unknown;
     groupHeaderInfoByRowIndex?: Map<number, { groupIndex: number; startDataIndex: number }>;
     groups?: TableGroupHeader[];
+    hasAlbumGroupColumn?: boolean;
     internalState: ItemListStateActions;
     itemType: ItemTableListProps['itemType'];
     onRowClick?: (item: any, event: React.MouseEvent<HTMLDivElement>) => void;

@@ -81,7 +81,7 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
         const rowHeight = props.getRowHeight(props.rowIndex, props);
         const path = getTitlePath(props.itemType, (rowItem as any).id as string);
         const align = props.columns[props.columnIndex]?.align || 'start';
-        const hasAlbumGroupColumn = props.columns.some((col) => col.id === 'albumGroup');
+        const hasAlbumGroupColumn = props.hasAlbumGroupColumn ?? false;
 
         const item = rowItem as any;
         const titleLinkProps = path
@@ -232,7 +232,7 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
         const rowHeight = props.getRowHeight(props.rowIndex, props);
         const path = getTitlePath(props.itemType, (rowItem as any).id as string);
         const align = props.columns[props.columnIndex]?.align || 'start';
-        const hasAlbumGroupColumn2 = props.columns.some((col) => col.id === 'albumGroup');
+        const hasAlbumGroupColumn = props.hasAlbumGroupColumn ?? false;
 
         const item = rowItem as any;
 
@@ -248,12 +248,12 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
         return (
             <TableColumnContainer
                 className={clsx(styles.titleCombined, {
-                    [styles.noImage]: hasAlbumGroupColumn2,
+                    [styles.noImage]: hasAlbumGroupColumn,
                 })}
                 containerStyle={{ '--row-height': `${rowHeight}px` } as CSSProperties}
                 {...props}
             >
-                {!hasAlbumGroupColumn2 && (
+                {!hasAlbumGroupColumn && (
                     <div
                         className={styles.imageContainer}
                         onMouseEnter={() => setIsHovered(true)}
