@@ -3,7 +3,7 @@ import { ipcMain } from 'electron';
 import {
     createClient,
     enqueue,
-    getTime,
+    getPositionInfo,
     load,
     pause,
     play,
@@ -47,7 +47,7 @@ ipcMain.on('dlna-pause', () => pause());
 
 ipcMain.on('dlna-stop', () => stop());
 
-ipcMain.handle('dlna-get-time', async () => await getTime());
+ipcMain.handle('dlna-get-position-info', async () => await getPositionInfo());
 
 ipcMain.on('dlna-seek-to', (_event, seconds: number) => seekTo(seconds));
 

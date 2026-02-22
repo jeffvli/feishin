@@ -1,5 +1,5 @@
 import { MediaRendererClient } from '/@/main/features/core/dlna/renderer';
-import { DlnaQueueItem } from '/@/shared/types/types';
+import { DlnaPositionInfo, DlnaQueueItem } from '/@/shared/types/types';
 
 const ERR_NOT_INITIALIZED = Error('DLNA client not initialized');
 
@@ -76,13 +76,13 @@ export const stop = () =>
         if (error) console.error('DLNA stop:', error);
     });
 
-export const getTime = async () =>
-    new Promise<number>((resolve, reject) => {
+export const getPositionInfo = async () =>
+    new Promise<DlnaPositionInfo>((resolve, reject) => {
         const client = getClient();
         if (!client) return reject(ERR_NOT_INITIALIZED);
 
-        client.getPosition((err, result) => {
-            if (err) {
+        client.getPositionInfo((err, result) => {
+            if (err || !result) {
                 reject(err);
             } else {
                 resolve(result);

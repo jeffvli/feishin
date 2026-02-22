@@ -233,6 +233,11 @@ export type DlnaMetadata = {
     type?: 'audio' | 'image' | 'image';
 };
 
+export type DlnaPositionInfo = {
+    position: number;
+    trackUrl: string;
+};
+
 export type DlnaQueue = {
     current: DlnaQueueItem;
     isPaused: boolean;

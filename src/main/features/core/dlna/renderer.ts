@@ -1,7 +1,7 @@
 import et from 'elementtree';
 import UpnpMediaRendererClient from 'upnp-mediarenderer-client';
 
-import { DlnaMetadata } from '/@/shared/types/types';
+import { DlnaMetadata, DlnaPositionInfo } from '/@/shared/types/types';
 
 export class MediaRendererClient extends UpnpMediaRendererClient {
     constructor(url: string) {
@@ -19,6 +19,23 @@ export class MediaRendererClient extends UpnpMediaRendererClient {
             InstanceID: this.instanceId,
         };
         this.callAction('RenderingControl', 'GetMute', params, callback || (() => {}));
+    }
+
+    public getPositionInfo(callback: (error: any, result?: DlnaPositionInfo) => void) {
+        const params = { InstanceID: this.instanceId };
+        this.callAction('AVTransport', 'GetPositionInfo', params, function (err, result) {
+            if (err) return callback(err);
+
+            console.log('GetPositionInfo:', JSON.stringify(result));
+
+            const positionText =
+                result.AbsTime !== 'NOT_IMPLEMENTED' ? result.AbsTime : result.RelTime;
+            const position = parseTime(positionText);
+            const trackUrl = xmlUnescape(result.TrackURI);
+            const positionInfo = { position, trackUrl };
+
+            callback(null, positionInfo);
+        });
     }
 
     public load(
@@ -305,8 +322,32 @@ function makeImageDlnaFeatures({
     return { ['DLNA.ORG_PN']: `${dlnaProfile}_${suffix}` };
 }
 
+function parseTime(time: string) {
+    const parts = time.split(':').map(Number);
+    let [hours, minutes, seconds] = [0, 0, 0];
+    switch (parts.length) {
+        case 1:
+            [seconds] = parts;
+            break;
+        case 2:
+            [minutes, seconds] = parts;
+            break;
+        case 3:
+            [hours, minutes, seconds] = parts;
+            break;
+    }
+    return hours * 3600 + minutes * 60 + seconds;
+}
+
 function serializeDlnaFeatures(features: Record<string, string>) {
     return Object.entries(features)
         .map(([key, value]) => `${key}=${value}`)
         .join(';');
+}
+
+const XML_ESCAPE_MAP = { '&amp;': '&', '&apos;': "'", '&gt;': '>', '&lt;': '<', '&quot;': '"' };
+const XML_ESCAPE_REGEX = new RegExp(Object.keys(XML_ESCAPE_MAP).join('|'), 'g');
+
+function xmlUnescape(text: string) {
+    return text.replace(XML_ESCAPE_REGEX, (match) => XML_ESCAPE_MAP[match]);
 }

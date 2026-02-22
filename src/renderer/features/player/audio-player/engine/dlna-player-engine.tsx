@@ -35,7 +35,7 @@ const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const dlnaPlayerListener = isElectron() ? window.api.dlnaPlayerListener : null;
 const ipc = isElectron() ? window.api.ipc : null;
 
-const PROGRESS_UPDATE_INTERVAL = 250;
+const PROGRESS_UPDATE_INTERVAL = 1000;
 
 export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     const {
@@ -59,7 +59,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
 
     const { dlnaDevice, transcode } = usePlaybackSettings();
 
-    // Start the mpv instance on startup
+    // Start the DLNA instance on startup
     useEffect(() => {
         if (!dlnaDevice) throw new Error('No DLNA device selected');
 
@@ -149,27 +149,40 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         }
     }, [playerStatus, speed]);
 
+    const { mediaAutoNext } = usePlayerActions();
+
     // Set up progress tracking
     useEffect(() => {
         if (progressIntervalRef.current) {
             clearInterval(progressIntervalRef.current);
         }
+        if (playerStatus !== PlayerStatus.PLAYING) return;
 
         const updateProgress = async () => {
-            if (!dlnaPlayer || !isMountedRef.current || !onProgress) {
+            if (!dlnaPlayer || !isMountedRef.current) {
                 return;
             }
 
             try {
-                const time = await dlnaPlayer.getCurrentTime();
-                if (time !== undefined && isMountedRef.current) {
-                    onProgress({
-                        played: time / (duration || time + 10),
-                        playedSeconds: time,
-                    });
-                }
-            } catch {
-                // Handle error silently
+                const info = await dlnaPlayer.getPositionInfo();
+                if (!info || !isMountedRef.current) return;
+
+                const time = info.position;
+                onProgress?.call(null, {
+                    played: time / (duration || time + 10),
+                    playedSeconds: time,
+                });
+
+                const playerData = usePlayerStore.getState().getPlayerData();
+                const nextSongUrl = playerData.nextSong
+                    ? getSongUrl(playerData.nextSong, transcode)
+                    : undefined;
+                if (info.trackUrl !== nextSongUrl) return;
+
+                mediaAutoNext();
+                handleDlnaAutoNext(transcode);
+            } catch (error) {
+                console.log('Error on getting updating progress of DLNA player', error);
             }
         };
 
@@ -178,15 +191,12 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         updateProgress();
 
         return () => {
-            isMountedRef.current = false;
             if (progressIntervalRef.current) {
                 clearInterval(progressIntervalRef.current);
                 progressIntervalRef.current = null;
             }
         };
-    }, [isTransitioning, duration, onProgress]);
-
-    const { mediaAutoNext } = usePlayerActions();
+    }, [isTransitioning, duration, onProgress, mediaAutoNext, transcode, onEnded, playerStatus]);
 
     useEffect(() => {
         if (!dlnaPlayerListener) {
@@ -279,6 +289,13 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
 };
 
 DlnaPlayerEngine.displayName = 'DlnaPlayerEngine';
+
+function areTrackUrlsEqual(first: string, second: string) {
+    const firstUrl = new URL(first);
+    const secondUrl = new URL(second);
+
+    const a = firstUrl.searchParams.a;
+}
 
 function handleDlnaAutoNext(transcode: {
     bitrate?: number | undefined;

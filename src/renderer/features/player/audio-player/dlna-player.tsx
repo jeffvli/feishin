@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { DlnaPlayerEngine, DlnaPlayerEngineHandle } from './engine/dlna-player-engine';
 
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
+import { PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     usePlaybackSettings,
@@ -142,37 +143,20 @@ export function DlnaPlayer() {
         };
     }, []);
 
-    useEffect(() => {
-        if (localPlayerStatus !== PlayerStatus.PLAYING) {
-            return;
-        }
-
-        const interval = setInterval(async () => {
-            if (!dlnaPlayer) {
-                return;
-            }
-
-            try {
-                const time = await dlnaPlayer.getCurrentTime();
-                if (time !== undefined) {
-                    setTimestamp(Number(time.toFixed(0)));
-                }
-            } catch {
-                // Do nothing
-            }
-        }, 500);
-
-        return () => clearInterval(interval);
-    }, [localPlayerStatus, setTimestamp]);
+    const onProgress = useCallback(
+        (progress: PlayerOnProgressProps) => {
+            const timestamp = Number(progress.playedSeconds.toFixed(0));
+            setTimestamp(timestamp);
+        },
+        [setTimestamp],
+    );
 
     return (
         <DlnaPlayerEngine
             isMuted={isMuted}
             isTransitioning={isTransitioning}
             onEnded={handleOnEnded}
-            // Progress callback is now only used for transition logic
-            // Timestamp updates are handled separately in useEffect
-            onProgress={undefined}
+            onProgress={onProgress}
             playerRef={playerRef}
             playerStatus={localPlayerStatus}
             speed={speed}

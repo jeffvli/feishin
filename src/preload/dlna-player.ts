@@ -4,6 +4,7 @@ import {
     DlnaChangedTrack,
     DlnaDevice,
     DlnaInitialize,
+    DlnaPositionInfo,
     DlnaQueue,
     DlnaQueueItem,
 } from '/@/shared/types/types';
@@ -24,7 +25,8 @@ const pause = () => ipcRenderer.send('dlna-pause');
 
 const stop = () => ipcRenderer.send('dlna-stop');
 
-const getCurrentTime = () => ipcRenderer.invoke('dlna-get-time') as Promise<number>;
+const getPositionInfo = () =>
+    ipcRenderer.invoke('dlna-get-position-info') as Promise<DlnaPositionInfo>;
 
 const seekTo = (seconds: number) => ipcRenderer.send('dlna-seek-to', seconds);
 
@@ -40,7 +42,7 @@ const rendererDlnaChangedTrack = (
 
 export const dlnaPlayer = {
     discover,
-    getCurrentTime,
+    getPositionInfo,
     initialize,
     pause,
     play,
