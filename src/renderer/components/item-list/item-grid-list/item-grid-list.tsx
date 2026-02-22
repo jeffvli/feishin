@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import throttle from 'lodash/throttle';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
 import React, {
     CSSProperties,
@@ -31,15 +31,12 @@ import {
     ItemCard,
     ItemCardProps,
 } from '/@/renderer/components/item-card/item-card';
-import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded-list-container';
-import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import { createExtractRowId } from '/@/renderer/components/item-list/helpers/extract-row-id';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
     ItemListStateActions,
     ItemListStateItemWithRequiredProperties,
     useItemListState,
-    useItemListStateSubscription,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { useListHotkeys } from '/@/renderer/components/item-list/helpers/use-list-hotkeys';
 import { ItemControls, ItemListHandle } from '/@/renderer/components/item-list/types';
@@ -511,7 +508,10 @@ const BaseItemGridList = ({
         });
     }, [containerWidth, resolvedItemCount, throttledSetTableMeta, containerRef]);
 
-    const controls = useDefaultItemListControls({ overrides: overrideControls });
+    const controls = useDefaultItemListControls({
+        enableMultiSelect,
+        overrides: overrideControls,
+    });
 
     const scrollToIndex = useCallback(
         (
@@ -826,10 +826,6 @@ const BaseItemGridList = ({
                     />
                 )}
             </AutoSizer>
-            <AnimatePresence presenceAffectsLayout>
-                <ExpandedContainer internalState={internalState} itemType={itemType} />
-                {/* {enableSelectionDialog && <SelectionDialog internalState={internalState} />} */}
-            </AnimatePresence>
         </motion.div>
     );
 };
@@ -875,6 +871,7 @@ const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
                         data={item}
                         enableDrag={enableDrag}
                         enableExpansion={props.data.enableExpansion}
+                        enableMultiSelect={enableMultiSelect}
                         imageAsLink={!enableMultiSelect}
                         internalState={props.data.internalState}
                         itemType={itemType}
@@ -899,25 +896,3 @@ const ListComponent = memo((props: ListChildComponentProps<GridItemProps>) => {
 export const ItemGridList = memo(BaseItemGridList);
 
 ItemGridList.displayName = 'ItemGridList';
-
-const ExpandedContainer = ({
-    internalState,
-    itemType,
-}: {
-    internalState: ItemListStateActions;
-    itemType: LibraryItem;
-}) => {
-    const hasExpanded = useItemListStateSubscription(internalState, (state) =>
-        state ? state.expanded.size > 0 : false,
-    );
-
-    return (
-        <AnimatePresence initial={false}>
-            {hasExpanded && (
-                <ExpandedListContainer>
-                    <ExpandedListItem internalState={internalState} itemType={itemType} />
-                </ExpandedListContainer>
-            )}
-        </AnimatePresence>
-    );
-};

@@ -7,6 +7,7 @@ import { ItemGridList } from '/@/renderer/components/item-list/item-grid-list/it
 import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
 import { useItemListPagination } from '/@/renderer/components/item-list/item-list-pagination/use-item-list-pagination';
 import { ItemListGridComponentProps } from '/@/renderer/components/item-list/types';
+import { useListContext } from '/@/renderer/context/list-context';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { useGeneralSettings } from '/@/renderer/store';
 import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/shared/types/domain-types';
@@ -25,6 +26,7 @@ export const SongListPaginatedGrid = ({
     serverId,
     size,
 }: SongListPaginatedGridProps) => {
+    const { pageKey } = useListContext();
     const { currentPage, onChange } = useItemListPagination();
 
     const listCountQuery = songsQueries.listCount({
@@ -36,7 +38,7 @@ export const SongListPaginatedGrid = ({
 
     const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
         currentPage,
-        eventKey: ItemListKey.SONG,
+        eventKey: pageKey || ItemListKey.SONG,
         itemsPerPage,
         itemType: LibraryItem.SONG,
         listCountQuery,

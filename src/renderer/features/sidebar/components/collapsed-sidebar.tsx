@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { motion } from 'motion/react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NavLink, useNavigate } from 'react-router';
+import { Link, NavLink, useNavigate } from 'react-router';
 
 import styles from './collapsed-sidebar.module.css';
 
@@ -12,10 +12,13 @@ import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.p
 import { CollapsedSidebarButton } from '/@/renderer/features/sidebar/components/collapsed-sidebar-button';
 import { CollapsedSidebarItem } from '/@/renderer/features/sidebar/components/collapsed-sidebar-item';
 import { ServerSelectorItems } from '/@/renderer/features/sidebar/components/server-selector-items';
+import { getCollectionTo } from '/@/renderer/features/sidebar/components/sidebar-collection-list';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
+import { AppRoute } from '/@/renderer/router/routes';
 import {
     SidebarItemType,
+    useCollections,
     useCurrentServer,
     useSidebarCollapsedNavigation,
     useSidebarItems,
@@ -26,12 +29,14 @@ import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
-import { ServerType } from '/@/shared/types/domain-types';
+import { Stack } from '/@/shared/components/stack/stack';
+import { LibraryItem, ServerType } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
 
 export const CollapsedSidebar = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const collections = useCollections();
     const { windowBarStyle } = useWindowSettings();
     const sidebarCollapsedNavigation = useSidebarCollapsedNavigation();
     const sidebarItems = useSidebarItems();
@@ -45,6 +50,7 @@ export const CollapsedSidebar = () => {
                 '\n',
             ),
             'Artists-all': t('page.sidebar.artists', { postProcess: 'titleCase' }),
+            Collections: t('page.sidebar.collections', { postProcess: 'titleCase' }),
             Favorites: t('page.sidebar.favorites', { postProcess: 'titleCase' }),
             Folders: t('page.sidebar.folders', { postProcess: 'titleCase' }),
             Genres: t('page.sidebar.genres', { postProcess: 'titleCase' }),
@@ -110,17 +116,64 @@ export const CollapsedSidebar = () => {
                         <AppMenu />
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
-                {sidebarItemsWithRoute.map((item) => (
-                    <CollapsedSidebarItem
-                        activeIcon={<SidebarIcon active route={item.route} size="25" />}
-                        component={NavLink}
-                        icon={<SidebarIcon route={item.route} size="25" />}
-                        key={item.id}
-                        label={item.label}
-                        route={item.route}
-                        to={item.route}
-                    />
-                ))}
+                {sidebarItemsWithRoute.map((item) =>
+                    item.id === 'Collections' ? (
+                        collections && collections.length > 0 ? (
+                            <DropdownMenu key={item.id} offset={0} position="right-end">
+                                <DropdownMenu.Target>
+                                    <CollapsedSidebarItem
+                                        activeIcon={null}
+                                        component={Flex}
+                                        icon={<Icon color="muted" icon="collection" size="3xl" />}
+                                        label={item.label}
+                                        style={{
+                                            cursor: 'pointer',
+                                            padding: 'var(--theme-spacing-md) 0',
+                                        }}
+                                    />
+                                </DropdownMenu.Target>
+                                <DropdownMenu.Dropdown>
+                                    <ScrollArea style={{ maxHeight: '50vh' }}>
+                                        <Stack gap={0} p="xs">
+                                            {collections.map((collection) => {
+                                                const to = getCollectionTo(collection);
+                                                return (
+                                                    <DropdownMenu.Item
+                                                        component={Link}
+                                                        key={collection.id}
+                                                        leftSection={
+                                                            <SidebarIcon
+                                                                route={
+                                                                    collection.type ===
+                                                                    LibraryItem.ALBUM
+                                                                        ? AppRoute.LIBRARY_ALBUMS
+                                                                        : AppRoute.LIBRARY_SONGS
+                                                                }
+                                                            />
+                                                        }
+                                                        to={to}
+                                                    >
+                                                        {collection.name}
+                                                    </DropdownMenu.Item>
+                                                );
+                                            })}
+                                        </Stack>
+                                    </ScrollArea>
+                                </DropdownMenu.Dropdown>
+                            </DropdownMenu>
+                        ) : null
+                    ) : (
+                        <CollapsedSidebarItem
+                            activeIcon={<SidebarIcon active route={item.route} size="25" />}
+                            component={NavLink}
+                            icon={<SidebarIcon route={item.route} size="25" />}
+                            key={item.id}
+                            label={item.label}
+                            route={item.route}
+                            to={item.route}
+                        />
+                    ),
+                )}
                 {currentServer && (
                     <DropdownMenu offset={0} position="right-end" width={240}>
                         <DropdownMenu.Target>

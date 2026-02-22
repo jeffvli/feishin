@@ -1,4 +1,5 @@
 import { set } from 'idb-keyval';
+import orderBy from 'lodash/orderBy';
 
 import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
@@ -17,7 +18,9 @@ import {
     PlaylistSongListArgs,
     PlaylistSongListResponse,
     ServerListItemWithCredential,
+    SongListSort,
     songListSortMap,
+    SortOrder,
     sortOrderMap,
     tagListSortMap,
     userListSortMap,
@@ -70,6 +73,10 @@ const EXCLUDED_ALBUM_TAGS = new Set<string>([
 ]);
 
 const EXCLUDED_SONG_TAGS = new Set<string>(['disctotal', 'tracktotal']);
+
+// Defining a re-usable Collator instance for performance reasons.
+const numericSortCollator = new Intl.Collator(undefined, { numeric: true });
+const collator = new Intl.Collator();
 
 // Tags that use IDs as values as opposed to the tag value
 const ID_TAGS = new Set<string>(['albumversion', 'mood']);
@@ -780,16 +787,17 @@ export const NavidromeController: InternalControllerEndpoint = {
             .map((data) => ({
                 name: data[0],
                 options: data[1]
-                    .sort((a, b) =>
-                        a.name
-                            .toLocaleLowerCase()
-                            .localeCompare(b.name.toLocaleLowerCase(), undefined, {
-                                numeric: true,
-                            }),
-                    )
+                    .sort((a, b) => {
+                        return numericSortCollator.compare(
+                            a.name.toLocaleLowerCase(),
+                            b.name.toLocaleLowerCase(),
+                        );
+                    })
                     .map((option) => ({ id: option.id, name: option.name })),
             }))
-            .sort((a, b) => a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase()));
+            .sort((a, b) =>
+                collator.compare(a.name.toLocaleLowerCase(), b.name.toLocaleLowerCase()),
+            );
 
         const excludedAlbumTags = Array.from(EXCLUDED_ALBUM_TAGS.values());
         const excludedSongTags = Array.from(EXCLUDED_SONG_TAGS.values());
@@ -802,7 +810,59 @@ export const NavidromeController: InternalControllerEndpoint = {
             tags,
         };
     },
-    getTopSongs: SubsonicController.getTopSongs,
+    getTopSongs: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const type = query.type === 'personal' ? 'personal' : 'community';
+
+        if (type === 'community') {
+            const res = await ssApiClient(apiClientProps).getTopSongsList({
+                query: {
+                    artist: query.artist,
+                    count: query.limit,
+                },
+            });
+
+            if (res.status !== 200) {
+                throw new Error('Failed to get top songs');
+            }
+
+            return {
+                items: (res.body.topSongs?.song || []).map((song) =>
+                    ssNormalize.song(
+                        song,
+                        apiClientProps.server,
+                        args.context?.pathReplace,
+                        args.context?.pathReplaceWith,
+                    ),
+                ),
+                startIndex: 0,
+                totalRecordCount: res.body.topSongs?.song?.length || 0,
+            };
+        }
+
+        const res = await NavidromeController.getSongList({
+            apiClientProps,
+            query: {
+                artistIds: [query.artistId],
+                sortBy: SongListSort.PLAY_COUNT,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+        });
+
+        const songsWithPlayCount = orderBy(
+            res.items.filter((song) => song.playCount > 0),
+            ['playCount', 'albumId', 'trackNumber'],
+            ['desc', 'asc', 'asc'],
+        );
+
+        return {
+            items: songsWithPlayCount,
+            startIndex: 0,
+            totalRecordCount: res.totalRecordCount,
+        };
+    },
     getUserInfo: SubsonicController.getUserInfo,
     getUserList: async (args) => {
         const { apiClientProps, query } = args;

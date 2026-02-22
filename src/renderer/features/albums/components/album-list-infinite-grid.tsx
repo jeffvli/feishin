@@ -6,6 +6,7 @@ import { useGridRows } from '/@/renderer/components/item-list/helpers/use-grid-r
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
 import { ItemGridList } from '/@/renderer/components/item-list/item-grid-list/item-grid-list';
 import { ItemListGridComponentProps } from '/@/renderer/components/item-list/types';
+import { useListContext } from '/@/renderer/context/list-context';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { useGeneralSettings } from '/@/renderer/store';
 import {
@@ -37,9 +38,11 @@ export const AlbumListInfiniteGrid = ({
 
     const listQueryFn = api.controller.getAlbumList;
 
+    const { pageKey } = useListContext();
+
     const { dataVersion, getItem, getItemIndex, itemCount, loadedItems, onRangeChanged } =
         useItemListInfiniteLoader({
-            eventKey: ItemListKey.ALBUM,
+            eventKey: pageKey || ItemListKey.ALBUM,
             itemsPerPage,
             itemType: LibraryItem.ALBUM,
             listCountQuery,

@@ -54,7 +54,7 @@ export const Modal = ({ children, classNames, handlers, ...rest }: ModalProps) =
                 backgroundOpacity: 0.5,
                 blur: 1,
             }}
-            radius="xl"
+            radius="md"
             scrollAreaComponent={ScrollArea}
             transitionProps={{
                 duration: 300,

@@ -1,3 +1,5 @@
+import type { UpdateCheckResult } from 'electron-updater';
+
 import { is } from '@electron-toolkit/utils';
 import {
     app,
@@ -18,9 +20,10 @@ import {
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log/main';
-import { autoUpdater } from 'electron-updater';
+import { AppImageUpdater, autoUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
 import { access, constants } from 'fs';
 import path, { join } from 'path';
+import semver from 'semver';
 
 import packageJson from '../../package.json';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
@@ -40,38 +43,193 @@ import './features';
 
 import { PlayerType, TitleTheme } from '/@/shared/types/types';
 
-export default class AppUpdater {
+const ALPHA_UPDATER_CONFIG: {
+    bucket: string;
+    channel: string;
+    endpoint: string;
+    provider: 's3';
+} = {
+    bucket: '',
+    channel: 'alpha',
+    endpoint: 'https://feishin-nightly-bucket.jeffvli.org',
+    provider: 's3',
+};
+
+const GITHUB_UPDATER_CONFIG = {
+    owner: 'jeffvli',
+    provider: 'github' as const,
+    repo: 'feishin',
+};
+
+type UpdaterInstance = AppImageUpdater | MacUpdater | NsisUpdater | typeof autoUpdater;
+
+class AppUpdater {
     constructor() {
-        log.transports.file.level = 'info';
-        autoUpdater.logger = autoUpdaterLogInterface;
-
-        const isBetaVersion = packageJson.version.includes('-beta');
-        const releaseChannel = store.get('release_channel');
-        const isNotConfigured = !releaseChannel;
-
-        console.log('Release channel: ', releaseChannel);
-        console.log('Is beta version: ', isBetaVersion);
-
-        if (isNotConfigured) {
-            console.log(
-                'Release channel not configured, setting to ',
-                isBetaVersion ? 'beta' : 'latest',
-            );
-            store.set('release_channel', isBetaVersion ? 'beta' : 'latest');
+        const effectiveChannel = store.get('release_channel') as string;
+        console.log('Effective update channel:', effectiveChannel);
+        if (effectiveChannel === 'alpha') {
+            checkAllChannelsAndGetBest().then(({ updater: updaterInstance }) => {
+                updaterInstance.autoInstallOnAppQuit = true;
+                updaterInstance.autoRunAppAfterInstall = true;
+                updaterInstance.checkForUpdatesAndNotify();
+            });
+            return;
         }
 
-        if (releaseChannel === 'beta') {
-            autoUpdater.channel = 'beta';
-            autoUpdater.allowPrerelease = true;
-            autoUpdater.disableDifferentialDownload = true;
-        } else if (releaseChannel === 'latest') {
-            autoUpdater.channel = 'latest';
-            autoUpdater.allowDowngrade = true;
-            autoUpdater.allowPrerelease = false;
-        }
-
+        configureAndGetUpdater();
         autoUpdater.checkForUpdatesAndNotify();
     }
+}
+
+// When release channel is alpha, check alpha and latest for updates and return
+// the updater + result for the newest version found (so alpha users can receive
+// latest updates when they are newer than the current alpha).
+async function checkAllChannelsAndGetBest(): Promise<{
+    result: null | UpdateCheckResult;
+    updater: UpdaterInstance;
+}> {
+    const currentVersion = packageJson.version;
+    const candidates: Array<{
+        channel: 'alpha' | 'beta' | 'latest';
+        result: UpdateCheckResult;
+        updater: UpdaterInstance;
+    }> = [];
+
+    const alphaUpdater = createAlphaUpdaterInstance();
+    alphaUpdater.logger = autoUpdaterLogInterface;
+    alphaUpdater.channel = ALPHA_UPDATER_CONFIG.channel;
+    alphaUpdater.allowPrerelease = true;
+    alphaUpdater.disableDifferentialDownload = true;
+    alphaUpdater.allowDowngrade = true;
+
+    try {
+        console.log('Checking for updates on alpha channel');
+        const alphaResult = await alphaUpdater.checkForUpdates();
+        if (
+            alphaResult?.updateInfo?.version &&
+            alphaResult.isUpdateAvailable &&
+            semver.valid(alphaResult.updateInfo.version) &&
+            semver.gt(alphaResult.updateInfo.version, currentVersion)
+        ) {
+            candidates.push({ channel: 'alpha', result: alphaResult, updater: alphaUpdater });
+        }
+    } catch (e) {
+        log.warn('Alpha channel check failed', e);
+    }
+
+    try {
+        autoUpdater.setFeedURL(GITHUB_UPDATER_CONFIG);
+        configureAutoUpdaterForChannel('latest');
+        console.log('Checking for updates on latest channel (GitHub)');
+        const latestResult = await autoUpdater.checkForUpdates();
+        if (
+            latestResult?.updateInfo?.version &&
+            latestResult.isUpdateAvailable &&
+            semver.valid(latestResult.updateInfo.version) &&
+            semver.gt(latestResult.updateInfo.version, currentVersion)
+        ) {
+            candidates.push({ channel: 'latest', result: latestResult, updater: autoUpdater });
+        }
+    } catch (e) {
+        log.warn('Latest channel check failed', e);
+    }
+
+    if (candidates.length === 0) {
+        return { result: null, updater: alphaUpdater };
+    }
+
+    const best = candidates.reduce((a, b) =>
+        semver.gt(a.result.updateInfo.version, b.result.updateInfo.version) ? a : b,
+    );
+
+    if (best.channel === 'latest') {
+        configureAutoUpdaterForChannel('latest');
+    }
+
+    return { result: best.result, updater: best.updater };
+}
+
+function configureAndGetUpdater(): UpdaterInstance {
+    const isBetaVersion = packageJson.version.includes('-beta');
+    const isAlphaVersion = packageJson.version.includes('-alpha');
+    let releaseChannel = store.get('release_channel');
+    const isNotConfigured = !releaseChannel;
+
+    console.log('Release channel:', releaseChannel);
+    console.log('Is beta version:', isBetaVersion);
+    console.log('Is alpha version:', isAlphaVersion);
+    console.log('Is not configured:', isNotConfigured);
+
+    if (isNotConfigured) {
+        console.log('Release channel not configured, setting default channel');
+        const defaultChannel = isAlphaVersion ? 'alpha' : isBetaVersion ? 'beta' : 'latest';
+        store.set('release_channel', defaultChannel);
+        releaseChannel = defaultChannel;
+    }
+
+    const effectiveChannel = store.get('release_channel') as string;
+
+    if (effectiveChannel === 'alpha') {
+        const updater = createAlphaUpdaterInstance();
+        log.transports.file.level = 'info';
+        updater.logger = autoUpdaterLogInterface;
+        updater.channel = ALPHA_UPDATER_CONFIG.channel;
+        updater.allowPrerelease = true;
+        updater.disableDifferentialDownload = true;
+        updater.allowDowngrade = true;
+        updater.autoInstallOnAppQuit = true;
+        updater.autoRunAppAfterInstall = true;
+        return updater;
+    }
+
+    log.transports.file.level = 'info';
+    autoUpdater.logger = autoUpdaterLogInterface;
+    autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.autoRunAppAfterInstall = true;
+
+    if (effectiveChannel === 'beta') {
+        autoUpdater.channel = 'beta';
+        autoUpdater.allowDowngrade = true;
+        autoUpdater.allowPrerelease = true;
+        autoUpdater.disableDifferentialDownload = true;
+    } else {
+        autoUpdater.channel = 'latest';
+        autoUpdater.allowPrerelease = false;
+    }
+
+    return autoUpdater;
+}
+
+/**
+ * Configures the global autoUpdater for a specific GitHub channel (beta or latest).
+ * Used when checking multiple channels or when the winning channel is beta/latest.
+ */
+function configureAutoUpdaterForChannel(channel: 'beta' | 'latest'): void {
+    log.transports.file.level = 'info';
+    autoUpdater.logger = autoUpdaterLogInterface;
+    autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.autoRunAppAfterInstall = true;
+    if (channel === 'beta') {
+        autoUpdater.channel = 'beta';
+        autoUpdater.allowDowngrade = true;
+        autoUpdater.allowPrerelease = true;
+        autoUpdater.disableDifferentialDownload = true;
+    } else {
+        autoUpdater.channel = 'latest';
+        autoUpdater.allowPrerelease = false;
+    }
+}
+
+function createAlphaUpdaterInstance(): AppImageUpdater | MacUpdater | NsisUpdater {
+    if (isMacOS()) {
+        return new MacUpdater(ALPHA_UPDATER_CONFIG);
+    }
+
+    if (isLinux()) {
+        return new AppImageUpdater(ALPHA_UPDATER_CONFIG);
+    }
+
+    return new NsisUpdater(ALPHA_UPDATER_CONFIG);
 }
 
 protocol.registerSchemesAsPrivileged([{ privileges: { bypassCSP: true }, scheme: 'feishin' }]);
@@ -232,8 +390,11 @@ const createTray = () => {
         },
         {
             click: () => {
-                mainWindow?.show();
-                createWinThumbarButtons();
+                if (mainWindow === null) createWindow(false);
+                else {
+                    mainWindow.show();
+                    createWinThumbarButtons();
+                }
             },
             label: 'Open main window',
         },
@@ -359,6 +520,47 @@ async function createWindow(first = true): Promise<void> {
         return mainWindow?.webContents.session.clearCache();
     });
 
+    ipcMain.handle(
+        'app-check-for-updates',
+        async (): Promise<{ updateAvailable: boolean; version?: string }> => {
+            if (disableAutoUpdates()) {
+                console.log('Auto updates are disabled');
+                return { updateAvailable: false };
+            }
+
+            try {
+                console.log('Checking for updates');
+                const effectiveChannel = store.get('release_channel') as string;
+                let result: null | UpdateCheckResult;
+                let updater: UpdaterInstance;
+
+                if (effectiveChannel === 'alpha') {
+                    const best = await checkAllChannelsAndGetBest();
+                    result = best.result;
+                    updater = best.updater;
+                } else {
+                    updater = configureAndGetUpdater();
+                    result = await updater.checkForUpdates();
+                }
+
+                const updateAvailable = result?.isUpdateAvailable ?? false;
+                console.log('Update available:', updateAvailable);
+                if (updateAvailable && store.get('disable_auto_updates') !== true) {
+                    console.log('Downloading update');
+                    updater.downloadUpdate();
+                }
+
+                return {
+                    updateAvailable,
+                    version: result?.updateInfo?.version,
+                };
+            } catch {
+                console.log('Error checking for updates');
+                return { updateAvailable: false };
+            }
+        },
+    );
+
     ipcMain.on('app-restart', () => {
         // Fix for .AppImage
         if (process.env.APPIMAGE) {
@@ -419,6 +621,7 @@ async function createWindow(first = true): Promise<void> {
 
     mainWindow.on('closed', () => {
         ipcMain.removeHandler('window-clear-cache');
+        ipcMain.removeHandler('app-check-for-updates');
         mainWindow = null;
     });
 
@@ -667,7 +870,7 @@ if (!singleInstance) {
     app.whenReady()
         .then(() => {
             protocol.handle('feishin', async (request) => {
-                const filePath = `file://${request.url.slice('feishin://'.length)}`;
+                const filePath = `file:${request.url.slice('feishin:'.length)}`;
                 const response = await net.fetch(filePath);
                 const contentType = response.headers.get('content-type');
 

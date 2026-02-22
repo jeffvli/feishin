@@ -4,6 +4,7 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { useAlbumListFilters } from '/@/renderer/features/albums/hooks/use-album-list-filters';
 import { ListFilters, ListFiltersTitle } from '/@/renderer/features/shared/components/list-filters';
 import { ListWithSidebarContainer } from '/@/renderer/features/shared/components/list-with-sidebar-container';
+import { SaveAsCollectionButton } from '/@/renderer/features/shared/components/save-as-collection-button';
 import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Spinner } from '/@/shared/components/spinner/spinner';
@@ -35,14 +36,29 @@ const AlbumListPaginatedTable = lazy(() =>
     })),
 );
 
+const AlbumListInfiniteDetail = lazy(() =>
+    import('/@/renderer/features/albums/components/album-list-infinite-detail').then((module) => ({
+        default: module.AlbumListInfiniteDetail,
+    })),
+);
+
+const AlbumListPaginatedDetail = lazy(() =>
+    import('/@/renderer/features/albums/components/album-list-paginated-detail').then((module) => ({
+        default: module.AlbumListPaginatedDetail,
+    })),
+);
+
 const AlbumListFilters = () => {
     return (
         <ListWithSidebarContainer.SidebarPortal>
-            <Stack h="100%">
+            <Stack h="100%" style={{ minHeight: 0 }}>
                 <ListFiltersTitle itemType={LibraryItem.ALBUM} />
-                <ScrollArea>
+                <ScrollArea style={{ flex: 1, minHeight: 0 }}>
                     <ListFilters itemType={LibraryItem.ALBUM} />
                 </ScrollArea>
+                <Stack p="sm">
+                    <SaveAsCollectionButton fullWidth itemType={LibraryItem.ALBUM} />
+                </Stack>
             </Stack>
         </ListWithSidebarContainer.SidebarPortal>
     );
@@ -58,13 +74,16 @@ export const AlbumListContent = () => {
 };
 
 const AlbumListSuspenseContainer = () => {
-    const { display, grid, itemsPerPage, pagination, table } = useListSettings(ItemListKey.ALBUM);
+    const { detail, display, grid, itemsPerPage, pagination, table } = useListSettings(
+        ItemListKey.ALBUM,
+    );
 
     const { customFilters } = useListContext();
 
     return (
         <Suspense fallback={<Spinner container />}>
             <AlbumListView
+                detail={detail}
                 display={display}
                 grid={grid}
                 itemsPerPage={itemsPerPage}
@@ -79,13 +98,17 @@ const AlbumListSuspenseContainer = () => {
 export type OverrideAlbumListQuery = Omit<Partial<AlbumListQuery>, 'limit' | 'startIndex'>;
 
 export const AlbumListView = ({
+    detail,
     display,
     grid,
     itemsPerPage,
     overrideQuery,
     pagination,
     table,
-}: ItemListSettings & { overrideQuery?: OverrideAlbumListQuery }) => {
+}: ItemListSettings & {
+    detail?: ItemListSettings['detail'];
+    overrideQuery?: OverrideAlbumListQuery;
+}) => {
     const server = useCurrentServer();
     const { pageKey } = useListContext();
 
@@ -143,6 +166,7 @@ export const AlbumListView = ({
                             autoFitColumns={table.autoFitColumns}
                             columns={table.columns}
                             enableAlternateRowColors={table.enableAlternateRowColors}
+                            enableHeader={table.enableHeader}
                             enableHorizontalBorders={table.enableHorizontalBorders}
                             enableRowHoverHighlight={table.enableRowHoverHighlight}
                             enableVerticalBorders={table.enableVerticalBorders}
@@ -159,6 +183,7 @@ export const AlbumListView = ({
                             autoFitColumns={table.autoFitColumns}
                             columns={table.columns}
                             enableAlternateRowColors={table.enableAlternateRowColors}
+                            enableHeader={table.enableHeader}
                             enableHorizontalBorders={table.enableHorizontalBorders}
                             enableRowHoverHighlight={table.enableRowHoverHighlight}
                             enableVerticalBorders={table.enableVerticalBorders}
@@ -166,6 +191,32 @@ export const AlbumListView = ({
                             query={mergedQuery}
                             serverId={server.id}
                             size={table.size}
+                        />
+                    );
+                }
+                default:
+                    return null;
+            }
+        }
+        case ListDisplayType.DETAIL: {
+            switch (pagination) {
+                case ListPaginationType.INFINITE: {
+                    return (
+                        <AlbumListInfiniteDetail
+                            enableHeader={detail?.enableHeader}
+                            itemsPerPage={itemsPerPage}
+                            query={mergedQuery}
+                            serverId={server.id}
+                        />
+                    );
+                }
+                case ListPaginationType.PAGINATED: {
+                    return (
+                        <AlbumListPaginatedDetail
+                            enableHeader={detail?.enableHeader}
+                            itemsPerPage={itemsPerPage}
+                            query={mergedQuery}
+                            serverId={server.id}
                         />
                     );
                 }

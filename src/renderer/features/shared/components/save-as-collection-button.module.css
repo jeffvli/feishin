@@ -1,0 +1,14 @@
+.list {
+    flex: 0 0 200px;
+    height: 200px;
+    overflow: hidden;
+    border: 1px solid var(--theme-colors-border);
+}
+
+.row {
+    display: flex;
+    gap: var(--theme-spacing-xs);
+    align-items: center;
+    width: 100%;
+    padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
+}

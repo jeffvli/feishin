@@ -6,22 +6,31 @@ import { useGenreList } from '/@/renderer/features/genres/api/genres-api';
 import { GenreDetailContent } from '/@/renderer/features/genres/components/genre-detail-content';
 import { GenreDetailHeader } from '/@/renderer/features/genres/components/genre-detail-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { ListWithSidebarContainer } from '/@/renderer/features/shared/components/list-with-sidebar-container';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
+import { GenreTarget, useGenreTarget } from '/@/renderer/store';
+import { usePageSidebar } from '/@/renderer/store/app.store';
+import { ItemListKey } from '/@/shared/types/types';
 
 const GenreDetailRoute = () => {
     const { genreId } = useParams() as { genreId: string };
-    const pageKey = 'genre';
+    const genreTarget = useGenreTarget();
+    const pageKey =
+        genreTarget === GenreTarget.ALBUM ? ItemListKey.GENRE_ALBUM : ItemListKey.GENRE_SONG;
 
     const [itemCount, setItemCount] = useState<number | undefined>(undefined);
+    const [isSidebarOpen, setIsSidebarOpen] = usePageSidebar(pageKey);
 
     const providerValue = useMemo(() => {
         return {
             id: genreId,
+            isSidebarOpen,
             itemCount,
             pageKey,
+            setIsSidebarOpen,
             setItemCount,
         };
-    }, [genreId, itemCount, pageKey, setItemCount]);
+    }, [genreId, isSidebarOpen, itemCount, pageKey, setIsSidebarOpen, setItemCount]);
 
     const { data: genres } = useGenreList();
 
@@ -33,7 +42,9 @@ const GenreDetailRoute = () => {
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
                 <GenreDetailHeader title={name} />
-                <GenreDetailContent />
+                <ListWithSidebarContainer>
+                    <GenreDetailContent />
+                </ListWithSidebarContainer>
             </ListContext.Provider>
         </AnimatedPage>
     );

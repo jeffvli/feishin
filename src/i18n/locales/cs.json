@@ -38,7 +38,16 @@
         "restoreQueueFromServer": "obnovit frontu ze serveru",
         "saveQueueToServer": "uložit frontu na server",
         "artistRadio": "rádio umělce",
-        "trackRadio": "rádio skladby"
+        "trackRadio": "rádio skladby",
+        "sleepTimer": "časovač spánku",
+        "sleepTimer_endOfSong": "konec aktuální skladby",
+        "sleepTimer_minutes": "{{count}} min.",
+        "sleepTimer_hours": "{{count}} hod.",
+        "sleepTimer_custom": "vlastní",
+        "sleepTimer_off": "vypnuto",
+        "sleepTimer_timeRemaining": "zbývá {{time}}",
+        "sleepTimer_setCustom": "nastavit časovač",
+        "sleepTimer_cancel": "zrušit časovač"
     },
     "setting": {
         "crossfadeStyle_description": "vyberte způsob prolnutí u přehrávače zvuku",
@@ -46,7 +55,7 @@
         "hotkey_skipBackward": "přeskočení zpět",
         "replayGainMode_description": "úprava zesílení hlasitosti podle hodnot {{ReplayGain}} uložených v metadatech souborů",
         "volumeWheelStep_description": "počet procent, o které má být hlasitost posunuta při přejetí kolečkem myši na posuvníku hlasitosti",
-        "audioDevice_description": "vyberte zvukové zařízení k přehrávání (pouze webový přehrávač)",
+        "audioDevice_description": "vyberte zvukové zařízení k přehrávání",
         "theme_description": "nastavení motivu použitého v aplikaci",
         "hotkey_playbackPause": "pozastavení",
         "replayGainFallback": "fallback {{ReplayGain}}",
@@ -98,11 +107,10 @@
         "hotkey_globalSearch": "globální vyhledávání",
         "gaplessAudio_description": "nastavení přehrávače mpv pro přehrávání bez mezer",
         "remoteUsername_description": "nastavení uživatelského jména pro server vzdáleného ovládání. pokud je jméno i heslo prázdné, bude autentifikace zakázána",
-        "disableAutomaticUpdates": "vypnout automatické aktualizace",
         "exitToTray_description": "ukončit aplikaci do systémové lišty",
         "followLyric_description": "přesouvat texty s aktuální pozicí přehrávání",
         "hotkey_favoritePreviousSong": "oblíbit $t(common.previousSong)",
-        "replayGainMode_optionAlbum": "$t(entity.album_one)",
+        "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
         "lyricOffset": "odsazení textů (ms)",
         "discordUpdateInterval_description": "čas v sekundách mezi každou aktualizací (minimálně 15 sekund)",
         "fontType_optionCustom": "vlastní písmo",
@@ -114,7 +122,7 @@
         "playbackStyle_optionCrossFade": "křížové prolnutí",
         "hotkey_rate3": "hodnocení 3 hvězdami",
         "font": "písmo",
-        "replayGainMode_optionTrack": "$t(entity.track_one)",
+        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
         "themeLight_description": "nastavit použití světlého motivu v aplikaci",
         "hotkey_toggleFullScreenPlayer": "přepnutí přehrávače na celou obrazovku",
         "hotkey_localSearch": "vyhledávání na stránce",
@@ -164,7 +172,7 @@
         "useSystemTheme_description": "následovat systémovou předvolbu světlého nebo tmavého motivu",
         "playButtonBehavior_optionAddNext": "$t(player.addNext)",
         "lyricFetch_description": "načtení textů z různých internetových zdrojů",
-        "lyricFetchProvider_description": "vyberte poskytovatele textů. pořadí poskytovatelů je pořadí, ve kterém budou načítány",
+        "lyricFetchProvider_description": "vyberte poskytovatele textů",
         "globalMediaHotkeys_description": "zapnout nebo vypnout použití vašich systémových zkratek médií pro ovládání přehrávače",
         "customFontPath": "vlastní cesta k písmům",
         "followLyric": "zobrazit aktuální texty",
@@ -221,11 +229,11 @@
         "discordListening_description": "zobrazit stav jako „Poslouchá“ namísto „Hraje“",
         "contextMenu": "nastavení kontextové nabídky (kliknutí pravým)",
         "contextMenu_description": "umožňuje skrýt položky, které se zobrazí v nabídce po kliknutí pravým tlačítkem myši na položku. položky, které nejsou zaškrtnuté, se skryjí",
-        "customCssEnable": "povolit vlastní CSS",
-        "customCssEnable_description": "umožnit psaní vlastního CSS",
-        "customCssNotice": "Varování: i když provádíme určitou sanitizaci (zakázáním url() a content:), může používání CSS stále představovat riziko změnami rozhraní",
-        "customCss_description": "vlastní CSS obsah. Upozornění: vlastnosti content a vzdálené url jsou zakázané. Níže je zobrazen náhled vašeho obsahu. Další pole, která jste nenastavili, jsou přítomna z důvodu sanitizace",
-        "customCss": "vlastní CSS",
+        "customCssEnable": "povolit vlastní css",
+        "customCssEnable_description": "umožnit psaní vlastního css",
+        "customCssNotice": "Varování: i když provádíme určitou sanitizaci (zakázáním url() a content:), může používání css stále představovat riziko změnami rozhraní",
+        "customCss_description": "vlastní css obsah. Upozornění: vlastnosti content a vzdálené url jsou zakázané. Níže je zobrazen náhled vašeho obsahu. Další pole, která jste nenastavili, jsou přítomna z důvodu sanitizace",
+        "customCss": "vlastní css",
         "webAudio": "použít webový zvuk",
         "webAudio_description": "použít webový zvuk. tím povolíte pokročilé funkce jako replaygain. zakažte, pokud se objeví problémy",
         "transcode_description": "zapnout překódování do různých formátů",
@@ -262,7 +270,7 @@
         "neteaseTranslation_description": "Pokud je povoleno, načte a zobrazí přeložené texty ze služby NetEase, pokud jsou dostupné",
         "preferLocalLyrics": "preferovat místní texty",
         "preferLocalLyrics_description": "preferovat místní texty před vzdálenými, pokud jsou dostupné",
-        "discordPausedStatus": "zobrazit rich presence při pozastavení",
+        "discordPausedStatus": "zobrazit stav při pozastavení",
         "discordPausedStatus_description": "pokud je povoleno, bude při pozastavení přehrávače zobrazen stav",
         "preservePitch": "zachovat výšku",
         "preservePitch_description": "zachová výšku při úpravě rychlosti přehrávání",
@@ -284,7 +292,7 @@
         "releaseChannel_optionLatest": "nejnovější",
         "releaseChannel_optionBeta": "beta",
         "releaseChannel": "kanál vydání",
-        "releaseChannel_description": "vyberte si mezi stabilními vydáními nebo beta vydáními pro automatické aktualizace",
+        "releaseChannel_description": "vyberte si mezi stabilními, beta nebo alpha (nočními) vydáními pro automatické aktualizace",
         "mediaSession": "povolit relaci médií",
         "mediaSession_description": "povolí integraci do služby Media Session, což zobrazí ovládání a metadata médií v překrytí systémové hlasitosti a na zamykací obrazovce",
         "exportImportSettings_control_description": "exportovat a importovat nastavení pomocí souboru JSON",
@@ -372,26 +380,46 @@
         "pathReplace": "nahrazení cesty k souborům",
         "pathReplace_description": "nahradit výchozí cestu k souborům vašeho serveru",
         "pathReplace_optionRemovePrefix": "odstranit předponu",
-        "pathReplace_optionAddPrefix": "přidat předponu"
+        "pathReplace_optionAddPrefix": "přidat předponu",
+        "homeFeatureStyle_description": "ovládá styl doporučených skladeb na domovské stránce",
+        "homeFeatureStyle": "styl doporučených na domovské stránce",
+        "homeFeatureStyle_optionMultiple": "několik",
+        "homeFeatureStyle_optionSingle": "jeden",
+        "enableGridMultiSelect": "povolit vícenásobný výběr v mřížce",
+        "enableGridMultiSelect_description": "pokud je povoleno, umožňuje vybrat několik položek v zobrazení mřížky. pokud je zakázáno, kliknutím na obrázek položky mřížky přejdete na stránku položky",
+        "sidebarPlaylistSorting_description": "umožňuje ruční řazení seznamů skladeb v postranní liště pomocí přetažení namísto výchozího pořadí serveru",
+        "sidebarPlaylistSorting": "řazení seznamů skladeb v postranní liště",
+        "blurExplicitImages": "rozostřit explicitní obrázky",
+        "blurExplicitImages_description": "obaly alb a skladeb označené jako explicitní budou rozostřeny",
+        "sidebarPlaylistListFilterRegex_description": "v postranní liště skrýt seznamy skladeb, které odpovídají tomuto regulárnímu výrazu",
+        "sidebarPlaylistListFilterRegex_placeholder": "např. ^Denní mix.*",
+        "sidebarPlaylistListFilterRegex": "regulární výraz filtru seznamů skladeb",
+        "releaseChannel_optionAlpha": "alpha (noční)",
+        "analyticsEnable": "Posílat analytiku založenou na využití",
+        "analyticsEnable_description": "Anonymizovaná data o používání jsou odesílána vývojáři za účelem zlepšení aplikace",
+        "automaticUpdates": "Automatické aktualizace",
+        "automaticUpdates_description": "Kontrolovat a automaticky instalovat aktualizace",
+        "discordStateIcon": "zobrazit ikonu přehrávání",
+        "discordStateIcon_description": "zobrazit malou ikonu přehrávání ve stavu na Discordu. ikona pozastavení bude zobrazena vždy, když je povolena možnost „Zobrazit stav při pozastavení“"
     },
     "action": {
-        "editPlaylist": "upravit $t(entity.playlist_one)",
+        "editPlaylist": "upravit $t(entity.playlist, {\"count\": 1})",
         "goToPage": "přejít na stránku",
         "moveToTop": "přesunout nahoru",
         "clearQueue": "vymazat frontu",
-        "addToFavorites": "přidat do $t(entity.favorite_other)",
-        "addToPlaylist": "přidat do $t(entity.playlist_one)",
-        "createPlaylist": "vytvořit $t(entity.playlist_one)",
-        "removeFromPlaylist": "odebrat z $t(entity.playlist_one)",
-        "viewPlaylists": "zobrazit $t(entity.playlist_other)",
+        "addToFavorites": "přidat do $t(entity.favorite, {\"count\": 2})",
+        "addToPlaylist": "přidat do $t(entity.playlist, {\"count\": 1})",
+        "createPlaylist": "vytvořit $t(entity.playlist, {\"count\": 1})",
+        "removeFromPlaylist": "odebrat z $t(entity.playlist, {\"count\": 1})",
+        "viewPlaylists": "zobrazit $t(entity.playlist, {\"count\": 2})",
         "refresh": "$t(common.refresh)",
-        "deletePlaylist": "odstranit $t(entity.playlist_one)",
+        "deletePlaylist": "odstranit $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "odebrat z fronty",
         "deselectAll": "zrušit výběr všeho",
         "moveToBottom": "přesunout dolů",
         "setRating": "nastavit hodnocení",
         "toggleSmartPlaylistEditor": "přepnout editor $t(entity.smartPlaylist)",
-        "removeFromFavorites": "odebrat z $t(entity.favorite_other)",
+        "removeFromFavorites": "odebrat z $t(entity.favorite, {\"count\": 2})",
         "openIn": {
             "lastfm": "Otevřít v Last.fm",
             "musicbrainz": "Otevřít v MusicBrainz"
@@ -407,8 +435,8 @@
         "moveDown": "posunout dolů",
         "holdToMoveToTop": "podržte pro přesunutí nahoru",
         "holdToMoveToBottom": "podržte pro přesunutí dolů",
-        "createRadioStation": "vytvořit $t(entity.radioStation_one)",
-        "deleteRadioStation": "odstranit $t(entity.radioStation_one)",
+        "createRadioStation": "vytvořit $t(entity.radioStation, {\"count\": 1})",
+        "deleteRadioStation": "odstranit $t(entity.radioStation, {\"count\": 1})",
         "openApplicationDirectory": "otevřít adresář aplikace",
         "addOrRemoveFromSelection": "přidat nebo odebrat z výběru",
         "selectRangeOfItems": "vyberte rozsah položek",
@@ -427,7 +455,7 @@
         "left": "vlevo",
         "save": "uložit",
         "right": "vpravo",
-        "currentSong": "aktuální $t(entity.track_one)",
+        "currentSong": "aktuální $t(entity.track, {\"count\": 1})",
         "collapse": "sbalit",
         "trackNumber": "stopa",
         "descending": "sestupně",
@@ -457,7 +485,9 @@
         "delete": "odstranit",
         "cancel": "zrušit",
         "forceRestartRequired": "restartujte pro použití změn… zavřete oznámení pro restartování",
-        "setting": "nastavení",
+        "setting_one": "nastavení",
+        "setting_few": "nastavení",
+        "setting_other": "nastavení",
         "version": "verze",
         "title": "název",
         "filter_one": "filtr",
@@ -484,7 +514,7 @@
         "none": "žádný",
         "menu": "nabídka",
         "restartRequired": "vyžadován restart",
-        "previousSong": "předchozí $t(entity.track_one)",
+        "previousSong": "předchozí $t(entity.track, {\"count\": 1})",
         "noResultsFromQuery": "nebyly nalezeny žádné výsledky",
         "quit": "ukončit",
         "expand": "rozbalit",
@@ -535,14 +565,16 @@
         "mood": "nálada",
         "example": "příklad",
         "filter_single": "jeden",
-        "filter_multiple": "několik"
+        "filter_multiple": "několik",
+        "rename": "přejmenovat"
     },
     "table": {
         "config": {
             "view": {
                 "table": "tabulka",
                 "list": "seznam",
-                "grid": "mřížka"
+                "grid": "mřížka",
+                "detail": "podrobnosti"
             },
             "general": {
                 "displayType": "typ zobrazení",
@@ -573,7 +605,8 @@
                 "alternateRowColors": "střídat barvy řádků",
                 "horizontalBorders": "okraje řádků",
                 "rowHoverHighlight": "zvýraznění řádku při přejetí myší",
-                "verticalBorders": "okraje sloupců"
+                "verticalBorders": "okraje sloupců",
+                "showHeader": "zobrazit záhlaví"
             },
             "label": {
                 "releaseDate": "datum vydání",
@@ -587,25 +620,25 @@
                 "trackNumber": "číslo stopy",
                 "rowIndex": "index řádku",
                 "rating": "$t(common.rating)",
-                "artist": "$t(entity.artist_one)",
-                "album": "$t(entity.album_one)",
+                "artist": "$t(entity.artist, {\"count\": 1})",
+                "album": "$t(entity.album, {\"count\": 1})",
                 "note": "$t(common.note)",
                 "biography": "$t(common.biography)",
                 "owner": "$t(common.owner)",
                 "path": "$t(common.path)",
-                "channels": "$t(common.channel_other)",
+                "channels": "$t(common.channel, {\"count\": 2})",
                 "playCount": "počet přehrání",
                 "bitrate": "$t(common.bitrate)",
-                "actions": "$t(common.action_other)",
-                "genre": "$t(entity.genre_one)",
+                "actions": "$t(common.action, {\"count\": 2})",
+                "genre": "$t(entity.genre, {\"count\": 1})",
                 "discNumber": "číslo disku",
                 "favorite": "$t(common.favorite)",
                 "year": "$t(common.year)",
-                "albumArtist": "$t(entity.albumArtist_one)",
+                "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
                 "codec": "$t(common.codec)",
-                "songCount": "$t(entity.track_other)",
-                "albumCount": "$t(entity.album_other)",
-                "genreBadge": "$t(entity.genre_one) (značky)",
+                "songCount": "$t(entity.track, {\"count\": 2})",
+                "albumCount": "$t(entity.album, {\"count\": 2})",
+                "genreBadge": "$t(entity.genre, {\"count\": 1}) (značky)",
                 "image": "obrázek",
                 "bitDepth": "$t(common.bitDepth)",
                 "sampleRate": "$t(common.sampleRate)",
@@ -619,7 +652,7 @@
             "rating": "hodnocení",
             "favorite": "oblíbené",
             "playCount": "přehrání",
-            "albumCount": "$t(entity.album_other)",
+            "albumCount": "$t(entity.album, {\"count\": 2})",
             "releaseYear": "rok",
             "lastPlayed": "naposledy přehráno",
             "biography": "biografie",
@@ -628,14 +661,14 @@
             "title": "název",
             "bpm": "bpm",
             "dateAdded": "datum přidání",
-            "artist": "$t(entity.artist_one)",
-            "songCount": "$t(entity.track_other)",
+            "artist": "$t(entity.artist, {\"count\": 1})",
+            "songCount": "$t(entity.track, {\"count\": 2})",
             "trackNumber": "skladba",
-            "genre": "$t(entity.genre_one)",
+            "genre": "$t(entity.genre, {\"count\": 1})",
             "albumArtist": "umělec alba",
             "path": "cesta",
             "discNumber": "disk",
-            "channels": "$t(common.channel_other)",
+            "channels": "$t(common.channel, {\"count\": 2})",
             "size": "$t(common.size)",
             "codec": "$t(common.codec)",
             "owner": "majitel",
@@ -672,14 +705,16 @@
         "saveQueueFailed": "nepodařilo se uložit frontu",
         "settingsSyncError": "byly zjištěny nesrovnalosti mezi nastavením v rendereru a hlavním procesem. restartujte aplikaci, aby se změny projevily",
         "noNetwork": "server je nedostupný",
-        "noNetworkDescription": "k tomuto serveru se nepodařilo připojit"
+        "noNetworkDescription": "k tomuto serveru se nepodařilo připojit",
+        "invalidJson": "neplatný JSON",
+        "serverLockSingleServer": "při uzamčení serveru je povolen pouze jeden server"
     },
     "filter": {
         "mostPlayed": "nejvíce přehráváno",
         "comment": "komentář",
         "playCount": "počet přehrání",
         "recentlyUpdated": "nedávno upraveno",
-        "channels": "$t(common.channel_other)",
+        "channels": "$t(common.channel, {\"count\": 2})",
         "isCompilation": "je kompilace",
         "recentlyPlayed": "nedávno přehráno",
         "isRated": "je hodnoceno",
@@ -688,17 +723,17 @@
         "rating": "hodnocení",
         "search": "hledat",
         "bitrate": "datový tok",
-        "genre": "$t(entity.genre_one)",
+        "genre": "$t(entity.genre, {\"count\": 1})",
         "recentlyAdded": "nedávno přidáno",
         "note": "poznámka",
         "name": "název",
         "dateAdded": "datum přidání",
         "releaseDate": "datum vydání",
-        "albumCount": "počet $t(entity.album_other)",
+        "albumCount": "počet $t(entity.album, {\"count\": 2})",
         "communityRating": "komunitní hodnocení",
         "path": "cesta",
         "favorited": "oblíbené",
-        "albumArtist": "$t(entity.albumArtist_one)",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
         "isRecentlyPlayed": "je nedávno přehráno",
         "isFavorited": "je oblíbené",
         "bpm": "bpm",
@@ -707,7 +742,7 @@
         "disc": "disk",
         "biography": "biografie",
         "songCount": "počet skladeb",
-        "artist": "$t(entity.artist_one)",
+        "artist": "$t(entity.artist, {\"count\": 1})",
         "duration": "trvání",
         "isPublic": "je veřejné",
         "random": "náhodně",
@@ -715,27 +750,31 @@
         "toYear": "do roku",
         "fromYear": "z roku",
         "criticRating": "hodnocení kritiků",
-        "album": "$t(entity.album_one)",
+        "album": "$t(entity.album, {\"count\": 1})",
         "trackNumber": "skladba",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "explicitStatus": "$t(common.explicitStatus)",
+        "sortName": "název v řazení",
+        "matchAnd": "a",
+        "matchOr": "nebo"
     },
     "page": {
         "sidebar": {
             "nowPlaying": "právě hraje",
-            "playlists": "$t(entity.playlist_other)",
+            "playlists": "$t(entity.playlist, {\"count\": 2})",
             "search": "$t(common.search)",
-            "tracks": "$t(entity.track_other)",
-            "albums": "$t(entity.album_other)",
-            "genres": "$t(entity.genre_other)",
-            "folders": "$t(entity.folder_other)",
-            "settings": "$t(common.setting_other)",
+            "tracks": "$t(entity.track, {\"count\": 2})",
+            "albums": "$t(entity.album, {\"count\": 2})",
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "folders": "$t(entity.folder, {\"count\": 2})",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "home": "$t(common.home)",
-            "artists": "$t(entity.artist_other)",
-            "albumArtists": "$t(entity.albumArtist_other)",
-            "shared": "$t(entity.playlist_other) sdíleny",
+            "artists": "$t(entity.artist, {\"count\": 2})",
+            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
+            "shared": "$t(entity.playlist, {\"count\": 2}) sdíleny",
             "myLibrary": "moje knihovna",
-            "favorites": "$t(entity.favorite_other)",
-            "radio": "$t(entity.radioStation_other)"
+            "favorites": "$t(entity.favorite, {\"count\": 2})",
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "collections": "sbírky"
         },
         "fullscreenPlayer": {
             "config": {
@@ -763,7 +802,7 @@
         "appMenu": {
             "selectServer": "vybrat server",
             "version": "verze {{version}}",
-            "settings": "$t(common.setting_other)",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "manageServers": "správce serverů",
             "expandSidebar": "rozbalit postranní panel",
             "collapseSidebar": "sbalit postranní panel",
@@ -801,8 +840,8 @@
             "download": "stáhnout",
             "playShuffled": "$t(player.shuffle)",
             "moveToNext": "$t(action.moveToNext)",
-            "goToAlbum": "přejít na $t(entity.album_one)",
-            "goToAlbumArtist": "přejít na $t(entity.albumArtist_one)",
+            "goToAlbum": "přejít na $t(entity.album, {\"count\": 1})",
+            "goToAlbumArtist": "přejít na $t(entity.albumArtist, {\"count\": 1})",
             "moveItems": "$t(action.moveItems)",
             "goTo": "přejít na"
         },
@@ -813,10 +852,10 @@
             "explore": "procházet z vaší knihovny",
             "recentlyPlayed": "nedávno přehráno",
             "recentlyReleased": "nedávno vydáno",
-            "genres": "$t(entity.genre_other)"
+            "genres": "$t(entity.genre, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "více od tohoto $t(entity.artist_one)",
+            "moreFromArtist": "více od tohoto $t(entity.artist, {\"count\": 1})",
             "moreFromGeneric": "více od {{item}}",
             "released": "vydáno"
         },
@@ -846,17 +885,17 @@
             "lyricsDisplay": "zobrazení textů"
         },
         "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "genreList": {
-            "title": "$t(entity.genre_other)",
-            "showTracks": "zobrazit $t(entity.track_other) s žánrem $t(entity.genre_one)",
-            "showAlbums": "zobrazit $t(entity.album_other) s žánrem $t(entity.genre_one)"
+            "title": "$t(entity.genre, {\"count\": 2})",
+            "showTracks": "zobrazit $t(entity.track, {\"count\": 2}) s žánrem $t(entity.genre, {\"count\": 1})",
+            "showAlbums": "zobrazit $t(entity.album, {\"count\": 2}) s žánrem $t(entity.genre, {\"count\": 1})"
         },
         "trackList": {
-            "title": "$t(entity.track_other)",
+            "title": "$t(entity.track, {\"count\": 2})",
             "artistTracks": "skladby od umělce {{artist}}",
-            "genreTracks": "$t(entity.track_other) s žánrem „{{genre}}“"
+            "genreTracks": "$t(entity.track, {\"count\": 2}) s žánrem „{{genre}}“"
         },
         "globalSearch": {
             "commands": {
@@ -867,12 +906,12 @@
             "title": "příkazy"
         },
         "playlistList": {
-            "title": "$t(entity.playlist_other)"
+            "title": "$t(entity.playlist, {\"count\": 2})"
         },
         "albumList": {
-            "title": "$t(entity.album_other)",
+            "title": "$t(entity.album, {\"count\": 2})",
             "artistAlbums": "alba od umělce {{artist}}",
-            "genreAlbums": "$t(entity.album_other) s žánrem „{{genre}}“"
+            "genreAlbums": "$t(entity.album, {\"count\": 2}) s žánrem „{{genre}}“"
         },
         "albumArtistDetail": {
             "recentReleases": "nedávno vydáno",
@@ -881,11 +920,15 @@
             "appearsOn": "také v",
             "topSongs": "nejlepší skladby",
             "topSongsFrom": "nejlepší skladby od umělce {{title}}",
-            "relatedArtists": "podobní $t(entity.artist_other)",
-            "viewAllTracks": "zobrazit všechny $t(entity.track_other)",
+            "relatedArtists": "podobní $t(entity.artist, {\"count\": 2})",
+            "viewAllTracks": "zobrazit všechny $t(entity.track, {\"count\": 2})",
             "viewAll": "zobrazit vše",
             "groupingTypeAll": "všechny typy vydání",
-            "groupingTypePrimary": "primární typy vydání"
+            "groupingTypePrimary": "primární typy vydání",
+            "favoriteSongs": "oblíbené skladby",
+            "topSongsCommunity": "komunita",
+            "topSongsPersonal": "osobní",
+            "favoriteSongsFrom": "oblíbené skladby od umělce {{title}}"
         },
         "itemDetail": {
             "copiedPath": "cesta úspěšně zkopírována",
@@ -904,27 +947,40 @@
             "title": "správa serverů"
         },
         "favorites": {
-            "title": "$t(entity.favorite_other)"
+            "title": "$t(entity.favorite, {\"count\": 2})"
         },
         "folderList": {
-            "title": "$t(entity.folder_other)"
+            "title": "$t(entity.folder, {\"count\": 2})"
         },
         "radioList": {
             "title": "stanice rádia"
+        },
+        "windowBar": {
+            "paused": "(Pozastaveno) ",
+            "privateMode": "(Soukromý režim)"
+        },
+        "collections": {
+            "overrideExisting": "nahradit existující",
+            "saveAsCollection": "uložit jako sbírku"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "revize od {{stable}}",
+            "noNewCommits": "žádné nové revize v tomto období",
+            "noStableReleaseToCompare": "není dostupné žádné stabilní vydání k porovnání"
         }
     },
     "form": {
         "deletePlaylist": {
-            "title": "odstranit $t(entity.playlist_one)",
-            "success": "$t(entity.playlist_one) úspěšně odstraněn",
-            "input_confirm": "pro potvrzení zadejte název $t(entity.playlist_one)u"
+            "title": "odstranit $t(entity.playlist, {\"count\": 1})",
+            "success": "$t(entity.playlist, {\"count\": 1}) úspěšně odstraněn",
+            "input_confirm": "pro potvrzení zadejte název $t(entity.playlist, {\"count\": 1})u"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
-            "title": "vytvořit $t(entity.playlist_one)",
+            "title": "vytvořit $t(entity.playlist, {\"count\": 1})",
             "input_public": "veřejné",
             "input_name": "$t(common.name)",
-            "success": "$t(entity.playlist_one) úspěšně vytvořen",
+            "success": "$t(entity.playlist, {\"count\": 1}) úspěšně vytvořen",
             "input_owner": "$t(common.owner)"
         },
         "addServer": {
@@ -936,8 +992,8 @@
             "input_name": "název serveru",
             "success": "server úspěšně přidán",
             "input_savePassword": "uložit heslo",
-            "ignoreSsl": "ignorovat SSL $t(common.restartRequired)",
-            "ignoreCors": "ignorovat CORS $t(common.restartRequired)",
+            "ignoreSsl": "ignorovat ssl $t(common.restartRequired)",
+            "ignoreCors": "ignorovat cors $t(common.restartRequired)",
             "error_savePassword": "při ukládání hesla se vyskytla chyba",
             "input_preferInstantMix": "preferovat instantní mix",
             "input_preferInstantMixDescription": "pro získání podobných skladeb použít pouze instantní mix. užitečné, pokud máte doplňky, které upravují toto chování",
@@ -947,11 +1003,11 @@
         },
         "addToPlaylist": {
             "success": "přidáno $t(entity.trackWithCount, {\"count\": {{message}} }) do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
-            "title": "přidat do $t(entity.playlist_one)",
+            "title": "přidat do $t(entity.playlist, {\"count\": 1})",
             "input_skipDuplicates": "přeskočit duplicity",
-            "input_playlists": "$t(entity.playlist_other)",
-            "create": "vytvořit $t(entity.playlist_one) {{playlist}}",
-            "searchOrCreate": "vyhledejte $t(entity.playlist_other) nebo pište pro vytvoření nového"
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
+            "create": "vytvořit $t(entity.playlist, {\"count\": 1}) {{playlist}}",
+            "searchOrCreate": "vyhledejte $t(entity.playlist, {\"count\": 2}) nebo pište pro vytvoření nového"
         },
         "updateServer": {
             "title": "upravit server",
@@ -968,12 +1024,12 @@
         },
         "lyricSearch": {
             "input_name": "$t(common.name)",
-            "input_artist": "$t(entity.artist_one)",
+            "input_artist": "$t(entity.artist, {\"count\": 1})",
             "title": "Hledat texty"
         },
         "editPlaylist": {
-            "title": "upravit $t(entity.playlist_one)",
-            "success": "$t(entity.playlist_one) úspěšně aktualizován",
+            "title": "upravit $t(entity.playlist, {\"count\": 1})",
+            "success": "$t(entity.playlist, {\"count\": 1}) úspěšně aktualizován",
             "publicJellyfinNote": "Jellyfin z nějakého důvodu neukazuje, zda je seznam skladeb veřejný, nebo ne. Pokud si přejete, aby zůstal veřejný, zvolte prosím následující vstup",
             "editNote": "ruční úpravy velkých seznamů skladeb nejsou doporučeny. opravdu přijímáte riziko ztráty dat, které může vzniknout přepsáním existujícího seznamu skladeb?"
         },
@@ -983,7 +1039,9 @@
             "description": "popis",
             "expireInvalid": "čas vypršení musí být v budoucnosti",
             "setExpiration": "nastavit vypršení",
-            "createFailed": "nepodařilo se vytvořit sdílení (je sdílení povoleno?)"
+            "createFailed": "nepodařilo se vytvořit sdílení (je sdílení povoleno?)",
+            "copyToClipboard": "Zkopírovat do schránky: Ctrl+C, Enter",
+            "successMustClick": "sdílení úspěšně vytvořeno. klikněte sem pro otevření"
         },
         "privateMode": {
             "enabled": "soukromý režim povolen, stav přehrávání je nyní skryt před externími integracemi",
@@ -996,7 +1054,7 @@
         },
         "shuffleAll": {
             "title": "přehrát náhodně",
-            "input_genre": "$t(entity.genre_one)",
+            "input_genre": "$t(entity.genre, {\"count\": 1})",
             "input_limit": "kolik skladeb?",
             "input_minYear": "od roku",
             "input_maxYear": "do roku",
@@ -1058,7 +1116,7 @@
         "folder_one": "složka",
         "folder_few": "složky",
         "folder_other": "složky",
-        "smartPlaylist": "chytrý $t(entity.playlist_one)",
+        "smartPlaylist": "chytrý $t(entity.playlist, {\"count\": 1})",
         "album_one": "album",
         "album_few": "alba",
         "album_other": "alba",
@@ -1088,7 +1146,7 @@
     },
     "releaseType": {
         "primary": {
-            "album": "$t(entity.album_one)",
+            "album": "$t(entity.album, {\"count\": 1})",
             "broadcast": "vysílání",
             "ep": "ep",
             "other": "jiné",

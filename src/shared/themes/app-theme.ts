@@ -13,6 +13,7 @@ import { defaultLight } from '/@/shared/themes/default-light/default-light';
 import { dracula } from '/@/shared/themes/dracula/dracula';
 import { githubDark } from '/@/shared/themes/github-dark/github-dark';
 import { githubLight } from '/@/shared/themes/github-light/github-light';
+import { glassyDark } from '/@/shared/themes/glassy-dark/glassy-dark';
 import { gruvboxDark } from '/@/shared/themes/gruvbox-dark/gruvbox-dark';
 import { gruvboxLight } from '/@/shared/themes/gruvbox-light/gruvbox-light';
 import { highContrastDark } from '/@/shared/themes/high-contrast-dark/high-contrast-dark';
@@ -43,6 +44,7 @@ export const appTheme: Record<AppTheme, AppThemeConfiguration> = {
     [AppTheme.DRACULA]: dracula,
     [AppTheme.GITHUB_DARK]: githubDark,
     [AppTheme.GITHUB_LIGHT]: githubLight,
+    [AppTheme.GLASSY_DARK]: glassyDark,
     [AppTheme.GRUVBOX_DARK]: gruvboxDark,
     [AppTheme.GRUVBOX_LIGHT]: gruvboxLight,
     [AppTheme.HIGH_CONTRAST_DARK]: highContrastDark,

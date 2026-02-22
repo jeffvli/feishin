@@ -16,6 +16,5 @@ jobs:
       - uses: vedantmgoyal9/winget-releaser@main
         with:
           identifier: jeffvli.Feishin
-          installers-regex: 'Feishin-*-win-x64\.exe'
+          installers-regex: 'Feishin-*-win-(x64|arm64)\.exe'
           token: ${{ secrets.WINGET_ACC_TOKEN }}
-          

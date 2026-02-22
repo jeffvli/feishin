@@ -54,6 +54,7 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
                 itemType: props.itemType,
                 meta: {
                     playType,
+                    singleSongOnly: true,
                 },
             });
             return;
@@ -90,6 +91,7 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
                         })}
                         enableDebounce={true}
                         enableViewport={false}
+                        explicitStatus={item?.explicitStatus}
                         id={item?.imageId}
                         itemType={item?._itemType}
                         src={item?.imageUrl}

@@ -13,10 +13,13 @@ import {
     LibraryHeader,
     LibraryHeaderMenu,
 } from '/@/renderer/features/shared/components/library-header';
+import { useSetFavorite } from '/@/renderer/features/shared/hooks/use-set-favorite';
+import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useShowRatings } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString } from '/@/renderer/utils';
+import { SEPARATOR_STRING } from '/@/shared/api/utils';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
@@ -65,7 +68,9 @@ export const AlbumArtistDetailHeader = forwardRef((_props, ref: Ref<HTMLDivEleme
         },
     ];
 
-    const { addToQueueByFetch, setFavorite, setRating } = usePlayer();
+    const { addToQueueByFetch } = usePlayer();
+    const setFavorite = useSetFavorite();
+    const setRating = useSetRating();
     const playButtonBehavior = usePlayButtonBehavior();
 
     const handlePlay = useCallback(
@@ -156,7 +161,11 @@ export const AlbumArtistDetailHeader = forwardRef((_props, ref: Ref<HTMLDivEleme
                         .filter((i) => i.enabled)
                         .map((item, index) => (
                             <Fragment key={`item-${item.id}-${index}`}>
-                                {index > 0 && <Text isNoSelect>•</Text>}
+                                {index > 0 && (
+                                    <Text isMuted isNoSelect>
+                                        {SEPARATOR_STRING}
+                                    </Text>
+                                )}
                                 <Text isMuted={item.secondary}>{item.value}</Text>
                             </Fragment>
                         ))}

@@ -101,6 +101,28 @@ export const DiscordSettings = memo(() => {
         {
             control: (
                 <Switch
+                    checked={settings.showStateIcon}
+                    onChange={(e) => {
+                        setSettings({
+                            discord: {
+                                showStateIcon: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.discordStateIcon', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.discordStateIcon', {
+                postProcess: 'sentenceCase',
+            }),
+        },
+        {
+            control: (
+                <Switch
                     checked={settings.showAsListening}
                     onChange={(e) => {
                         setSettings({

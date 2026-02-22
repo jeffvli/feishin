@@ -7,9 +7,13 @@ import styles from './sidebar.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
-import { useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
+import {
+    useIsRadioActive,
+    useRadioPlayer,
+} from '/@/renderer/features/radio/hooks/use-radio-player';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { ServerSelector } from '/@/renderer/features/sidebar/components/server-selector';
+import { SidebarCollectionList } from '/@/renderer/features/sidebar/components/sidebar-collection-list';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import {
@@ -20,6 +24,7 @@ import {
     useAppStore,
     useAppStoreActions,
     useFullScreenPlayerStore,
+    useGeneralSettings,
     usePlayerSong,
     useSetFullScreenPlayerStore,
 } from '/@/renderer/store';
@@ -31,12 +36,14 @@ import {
 } from '/@/renderer/store/settings.store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
+import { Icon } from '/@/shared/components/icon/icon';
 import { ImageUnloader } from '/@/shared/components/image/image';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { ExplicitStatus, LibraryItem } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
 
 export const Sidebar = () => {
@@ -49,6 +56,7 @@ export const Sidebar = () => {
             Albums: t('page.sidebar.albums', { postProcess: 'titleCase' }),
             Artists: t('page.sidebar.albumArtists', { postProcess: 'titleCase' }),
             'Artists-all': t('page.sidebar.artists', { postProcess: 'titleCase' }),
+            Collections: t('page.sidebar.collections', { postProcess: 'titleCase' }),
             Favorites: t('page.sidebar.favorites', { postProcess: 'titleCase' }),
             Folders: t('page.sidebar.folders', { postProcess: 'titleCase' }),
             Genres: t('page.sidebar.genres', { postProcess: 'titleCase' }),
@@ -66,8 +74,7 @@ export const Sidebar = () => {
     const sidebarItems = useSidebarItems();
     const { windowBarStyle } = useWindowSettings();
     const sidebarImageEnabled = useAppStore((state) => state.sidebar.image);
-    const isRadioPlaying = useRadioStore((state) => state.isPlaying);
-    const showImage = sidebarImageEnabled && !isRadioPlaying;
+    const showImage = sidebarImageEnabled;
 
     const sidebarItemsWithRoute: SidebarItemType[] = useMemo(() => {
         if (!sidebarItems) return [];
@@ -83,6 +90,12 @@ export const Sidebar = () => {
 
         return items;
     }, [sidebarItems, translatedSidebarItemMap]);
+
+    /* Library accordion: only items with a route (exclude Collections section) */
+    const libraryItemsWithRoute = useMemo(
+        () => sidebarItemsWithRoute.filter((item) => item.id !== 'Collections' && item.route),
+        [sidebarItemsWithRoute],
+    );
 
     const isCustomWindowBar =
         windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS;
@@ -105,7 +118,7 @@ export const Sidebar = () => {
                         item: styles.accordionItem,
                         root: styles.accordionRoot,
                     }}
-                    defaultValue={['library', 'playlists']}
+                    defaultValue={['library', 'collections', 'playlists']}
                     multiple
                 >
                     <Accordion.Item value="library">
@@ -117,7 +130,7 @@ export const Sidebar = () => {
                             </Text>
                         </Accordion.Control>
                         <Accordion.Panel>
-                            {sidebarItemsWithRoute.map((item) => {
+                            {libraryItemsWithRoute.map((item) => {
                                 return (
                                     <SidebarItem key={`sidebar-${item.route}`} to={item.route}>
                                         <Group gap="md">
@@ -129,6 +142,7 @@ export const Sidebar = () => {
                             })}
                         </Accordion.Panel>
                     </Accordion.Item>
+                    <SidebarCollectionList />
                     {sidebarPlaylistList && (
                         <>
                             <SidebarPlaylistList />
@@ -152,6 +166,9 @@ const SidebarImage = () => {
     const leftWidth = useAppStore((state) => state.sidebar.leftWidth);
     const { setSideBar } = useAppStoreActions();
     const currentSong = usePlayerSong();
+    const isRadioActive = useIsRadioActive();
+    const { isPlaying: isRadioPlaying } = useRadioPlayer();
+    const { blurExplicitImages } = useGeneralSettings();
 
     const imageUrl = useItemImageUrl({
         id: currentSong?.imageId || undefined,
@@ -160,6 +177,7 @@ const SidebarImage = () => {
         type: 'sidebar',
     });
 
+    const isPlayingRadio = isRadioActive && isRadioPlaying;
     const isSongDefined = Boolean(currentSong?.id);
 
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
@@ -172,7 +190,7 @@ const SidebarImage = () => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!currentSong) {
+        if (!currentSong || isPlayingRadio) {
             return;
         }
 
@@ -206,8 +224,28 @@ const SidebarImage = () => {
                     postProcess: 'sentenceCase',
                 })}
             >
-                {imageUrl ? (
-                    <img className={styles.sidebarImage} loading="eager" src={imageUrl} />
+                {isPlayingRadio ? (
+                    <Center
+                        className={styles.sidebarImage}
+                        style={{
+                            background: 'var(--theme-colors-surface)',
+                            borderRadius: 'var(--theme-card-default-radius)',
+                            height: '100%',
+                            width: '100%',
+                        }}
+                    >
+                        <Icon color="muted" icon="radio" size="40%" />
+                    </Center>
+                ) : imageUrl ? (
+                    <img
+                        className={clsx(styles.sidebarImage, {
+                            [styles.censored]:
+                                currentSong?.explicitStatus === ExplicitStatus.EXPLICIT &&
+                                blurExplicitImages,
+                        })}
+                        loading="eager"
+                        src={imageUrl}
+                    />
                 ) : (
                     <ImageUnloader icon="emptySongImage" />
                 )}

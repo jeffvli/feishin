@@ -1,14 +1,20 @@
 import { useMemo } from 'react';
 
 import { usePlayerSong } from '/@/renderer/store';
-import { QueueSong } from '/@/shared/types/domain-types';
+import { QueueSong, Song } from '/@/shared/types/domain-types';
 
-export const useIsCurrentSong = (song: QueueSong) => {
+export const useIsCurrentSong = (song: QueueSong | Song) => {
     const currentSong = usePlayerSong();
 
     const isActive = useMemo(() => {
-        return song._uniqueId === currentSong?._uniqueId;
-    }, [song._uniqueId, currentSong?._uniqueId]);
+        const queueSong = song as QueueSong;
+
+        if (queueSong._uniqueId != null && queueSong._uniqueId !== '') {
+            return queueSong._uniqueId === currentSong?._uniqueId;
+        }
+
+        return song.id === currentSong?.id;
+    }, [song, currentSong?.id, currentSong?._uniqueId]);
 
     return { isActive };
 };

@@ -26,6 +26,10 @@ const getDefaultRowsForItemType = (
             return [rowMap.get('name')].filter(
                 (row): row is NonNullable<typeof row> => row !== undefined,
             );
+        case LibraryItem.GENRE:
+            return [rowMap.get('name')].filter(
+                (row): row is NonNullable<typeof row> => row !== undefined,
+            );
         case LibraryItem.PLAYLIST:
             return [rowMap.get('name')].filter(
                 (row): row is NonNullable<typeof row> => row !== undefined,
@@ -53,6 +57,7 @@ const getRowIdFromTableColumn = (tableColumn: TableColumn): null | string => {
         [TableColumn.CHANNELS]: null,
         [TableColumn.CODEC]: null,
         [TableColumn.COMMENT]: null,
+        [TableColumn.COMPOSER]: null,
         [TableColumn.DATE_ADDED]: 'createdAt',
         [TableColumn.DISC_NUMBER]: null,
         [TableColumn.DURATION]: 'duration',

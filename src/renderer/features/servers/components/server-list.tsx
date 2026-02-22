@@ -1,12 +1,13 @@
 import { openContextModal } from '@mantine/modals';
 import isElectron from 'is-electron';
-import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { AddServerForm } from '/@/renderer/features/servers/components/add-server-form';
+import { IgnoreCorsSslSwitches } from '/@/renderer/features/servers/components/ignore-cors-ssl-switches';
 import { ServerListItem } from '/@/renderer/features/servers/components/server-list-item';
 import { useCurrentServer, useServerList } from '/@/renderer/store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
@@ -16,17 +17,14 @@ import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { ContextModalVars } from '/@/shared/components/modal/modal';
 import { Stack } from '/@/shared/components/stack/stack';
-import { Switch } from '/@/shared/components/switch/switch';
 import { Text } from '/@/shared/components/text/text';
-import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { ServerType } from '/@/shared/types/domain-types';
-
-const localSettings = isElectron() ? window.api.localSettings : null;
 
 export const ServerList = () => {
     const { t } = useTranslation();
     const currentServer = useCurrentServer();
     const serverListQuery = useServerList();
+    const serverLock = isServerLock();
 
     const handleAddServerModal = () => {
         openContextModal({
@@ -38,32 +36,6 @@ export const ServerList = () => {
             modalKey: 'base',
             title: t('form.addServer.title', { postProcess: 'titleCase' }),
         });
-    };
-
-    const [ignoreCORS, setIgnoreCORS] = useLocalStorage({
-        defaultValue: 'false',
-        key: 'ignore_cors',
-    });
-
-    const [ignoreSSL, setIgnoreSSL] = useLocalStorage({
-        defaultValue: 'false',
-        key: 'ignore_ssl',
-    });
-
-    const handleUpdateIgnoreCORS = (e: ChangeEvent<HTMLInputElement>) => {
-        setIgnoreCORS(String(e.currentTarget.checked));
-
-        if (isElectron()) {
-            localSettings?.set('ignore_cors', e.currentTarget.checked);
-        }
-    };
-
-    const handleUpdateIgnoreSSL = (e: ChangeEvent<HTMLInputElement>) => {
-        setIgnoreSSL(String(e.currentTarget.checked));
-
-        if (isElectron()) {
-            localSettings?.set('ignore_ssl', e.currentTarget.checked);
-        }
     };
 
     return (
@@ -100,37 +72,22 @@ export const ServerList = () => {
                             </Accordion.Item>
                         );
                     })}
-                    <Group grow pt="md">
-                        <Button
-                            autoFocus
-                            leftSection={<Icon icon="add" />}
-                            onClick={handleAddServerModal}
-                        >
-                            {t('form.addServer.title', { postProcess: 'titleCase' })}
-                        </Button>
-                    </Group>
+                    {!serverLock && (
+                        <Group grow pt="md">
+                            <Button
+                                autoFocus
+                                leftSection={<Icon icon="add" />}
+                                onClick={handleAddServerModal}
+                            >
+                                {t('form.addServer.title', { postProcess: 'titleCase' })}
+                            </Button>
+                        </Group>
+                    )}
                 </Accordion>
                 {isElectron() && (
                     <>
                         <Divider />
-                        <Group>
-                            <Switch
-                                checked={ignoreCORS === 'true'}
-                                label={t('form.addServer.ignoreCors', {
-                                    postProcess: 'sentenceCase',
-                                })}
-                                onChange={handleUpdateIgnoreCORS}
-                            />
-                        </Group>
-                        <Group>
-                            <Switch
-                                checked={ignoreSSL === 'true'}
-                                label={t('form.addServer.ignoreSsl', {
-                                    postProcess: 'sentenceCase',
-                                })}
-                                onChange={handleUpdateIgnoreSSL}
-                            />
-                        </Group>
+                        <IgnoreCorsSslSwitches />
                     </>
                 )}
             </Stack>

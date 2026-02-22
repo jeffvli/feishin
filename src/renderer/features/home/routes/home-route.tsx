@@ -82,16 +82,7 @@ const HomeRoute = () => {
         },
     };
 
-    const sortedItems = homeItems.filter((item) => {
-        if (item.disabled) {
-            return false;
-        }
-        if (isJellyfin && item.id === HomeItem.RECENTLY_PLAYED) {
-            return false;
-        }
-
-        return true;
-    });
+    const sortedItems = homeItems.filter((item) => !item.disabled);
 
     const sortedCarousel = sortedItems
         .filter((item) => item.id !== HomeItem.GENRES)

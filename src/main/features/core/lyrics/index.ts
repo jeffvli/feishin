@@ -78,6 +78,30 @@ const MAX_CACHED_ITEMS = 10;
 
 const lyricCache = new Map<string, CachedLyrics>();
 
+const searchAllSources = async (
+    params: LyricSearchQuery,
+): Promise<InternetProviderLyricSearchResponse[]> => {
+    const sources = store.get('lyrics', []) as LyricSource[];
+
+    const searchPromises = sources.map((source) =>
+        SEARCH_FETCHERS[source](params).then((searchResults) => ({ searchResults, source })),
+    );
+
+    const settled = await Promise.allSettled(searchPromises);
+
+    const allSearchResults: InternetProviderLyricSearchResponse[] = [];
+
+    for (const result of settled) {
+        if (result.status === 'fulfilled' && result.value.searchResults) {
+            allSearchResults.push(...result.value.searchResults);
+        } else if (result.status === 'rejected') {
+            const index = settled.indexOf(result);
+            console.error(`Error searching ${sources[index]} for lyrics:`, result.reason);
+        }
+    }
+    return allSearchResults;
+};
+
 const getRemoteLyrics = async (song: Song) => {
     const sources = store.get('lyrics', []) as LyricSource[];
 
@@ -97,18 +121,7 @@ const getRemoteLyrics = async (song: Song) => {
         name: song.name,
     };
 
-    const allSearchResults: InternetProviderLyricSearchResponse[] = [];
-
-    for (const source of sources) {
-        try {
-            const searchResults = await SEARCH_FETCHERS[source](params);
-            if (searchResults) {
-                allSearchResults.push(...searchResults);
-            }
-        } catch (error) {
-            console.error(`Error searching ${source} for lyrics:`, error);
-        }
-    }
+    const allSearchResults = await searchAllSources(params);
 
     if (allSearchResults.length === 0) {
         return null;
@@ -172,24 +185,16 @@ const getRemoteLyrics = async (song: Song) => {
 };
 
 const searchRemoteLyrics = async (params: LyricSearchQuery) => {
-    const sources = store.get('lyrics', []) as LyricSource[];
+    const allSearchResults = await searchAllSources(params);
 
     const results: Record<LyricSource, InternetProviderLyricSearchResponse[]> = {
         [LyricSource.GENIUS]: [],
         [LyricSource.LRCLIB]: [],
         [LyricSource.NETEASE]: [],
     };
-
-    for (const source of sources) {
-        const response = await SEARCH_FETCHERS[source](params);
-
-        if (response) {
-            response.forEach((result) => {
-                results[source].push(result);
-            });
-        }
+    for (const item of allSearchResults) {
+        results[item.source].push(item);
     }
-
     return results;
 };
 

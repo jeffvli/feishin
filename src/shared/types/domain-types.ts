@@ -76,6 +76,13 @@ export type QueueSong = Song & {
     _uniqueId: string;
 };
 
+export interface SavedCollection {
+    filterQueryString: string;
+    id: string;
+    name: string;
+    type: LibraryItem.ALBUM | LibraryItem.SONG;
+}
+
 export type ServerListItem = {
     features?: ServerFeatures;
     id: string;
@@ -179,6 +186,7 @@ export type Album = {
     isCompilation: boolean | null;
     lastPlayedAt: null | string;
     mbzId: null | string;
+    mbzReleaseGroupId: null | string;
     name: string;
     originalDate: null | string;
     originalYear: null | number;
@@ -458,6 +466,7 @@ export enum AlbumListSort {
     DURATION = 'duration',
     EXPLICIT_STATUS = 'explicitStatus',
     FAVORITED = 'favorited',
+    ID = 'id',
     NAME = 'name',
     PLAY_COUNT = 'playCount',
     RANDOM = 'random',
@@ -513,6 +522,7 @@ export const albumListSortMap: AlbumListSortMap = {
         duration: undefined,
         explicitStatus: undefined,
         favorited: undefined,
+        id: undefined,
         name: JFAlbumListSort.NAME,
         playCount: JFAlbumListSort.PLAY_COUNT,
         random: JFAlbumListSort.RANDOM,
@@ -532,6 +542,7 @@ export const albumListSortMap: AlbumListSortMap = {
         duration: NDAlbumListSort.DURATION,
         explicitStatus: NDAlbumListSort.EXPLICIT_STATUS,
         favorited: NDAlbumListSort.STARRED,
+        id: undefined,
         name: NDAlbumListSort.NAME,
         playCount: NDAlbumListSort.PLAY_COUNT,
         random: NDAlbumListSort.RANDOM,
@@ -552,6 +563,7 @@ export const albumListSortMap: AlbumListSortMap = {
         duration: undefined,
         explicitStatus: undefined,
         favorited: undefined,
+        id: undefined,
         name: undefined,
         playCount: undefined,
         random: undefined,
@@ -1309,6 +1321,7 @@ export type TopSongListQuery = {
     artist: string;
     artistId: string;
     limit?: number;
+    type?: 'community' | 'personal';
 };
 
 // Top Songs List

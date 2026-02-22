@@ -6,11 +6,18 @@ import { shallow } from 'zustand/shallow';
 
 import styles from './main-content.module.css';
 
+import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded-list-container';
+import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import { FullScreenOverlay } from '/@/renderer/layouts/default-layout/full-screen-overlay';
 import { FullScreenVisualizerOverlay } from '/@/renderer/layouts/default-layout/full-screen-visualizer-overlay';
 import { LeftSidebar } from '/@/renderer/layouts/default-layout/left-sidebar';
 import { RightSidebar } from '/@/renderer/layouts/default-layout/right-sidebar';
-import { useAppStore, useAppStoreActions, useSideQueueType } from '/@/renderer/store';
+import {
+    useAppStore,
+    useAppStoreActions,
+    useGlobalExpanded,
+    useSideQueueType,
+} from '/@/renderer/store';
 import { constrainRightSidebarWidth, constrainSidebarWidth } from '/@/renderer/utils';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 
@@ -159,10 +166,27 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
     );
 };
 
+function GlobalExpandedPanel() {
+    const globalExpanded = useGlobalExpanded();
+
+    if (!globalExpanded) return null;
+
+    return (
+        <ExpandedListContainer>
+            <ExpandedListItem item={globalExpanded.item} itemType={globalExpanded.itemType} />
+        </ExpandedListContainer>
+    );
+}
+
 function MainContentBody() {
     return (
-        <Suspense fallback={<Spinner container />}>
-            <Outlet />
-        </Suspense>
+        <div className={styles.mainContentBody}>
+            <div className={styles.mainContentBodyScroll}>
+                <Suspense fallback={<Spinner container />}>
+                    <Outlet />
+                </Suspense>
+            </div>
+            <GlobalExpandedPanel />
+        </div>
     );
 }

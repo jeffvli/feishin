@@ -185,7 +185,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
                     enableAlternateRowColors={table.enableAlternateRowColors}
                     enableDrag
                     enableExpansion={false}
-                    enableHeader
+                    enableHeader={table.enableHeader}
                     enableHorizontalBorders={table.enableHorizontalBorders}
                     enableRowHoverHighlight={table.enableRowHoverHighlight}
                     enableScrollShadow={enableScrollShadow}

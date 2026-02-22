@@ -121,6 +121,5 @@
         align-self: start;
         width: 300px;
         max-height: calc(100vh - 90px - var(--theme-spacing-lg) - 4rem);
-        overflow-y: auto;
     }
 }

@@ -1,23 +1,23 @@
 {
     "action": {
-        "addToFavorites": "pridať do $t(entity.favorite_other)",
-        "addToPlaylist": "pridať do $t(entity.playlist_one)",
+        "addToFavorites": "pridať do $t(entity.favorite, {\"count\": 2})",
+        "addToPlaylist": "pridať do $t(entity.playlist, {\"count\": 1})",
         "clearQueue": "vymazať frontu",
-        "createPlaylist": "vytvoriť $t(entity.playlist_one)",
-        "deletePlaylist": "odstrániť $t(entity.playlist_one)",
+        "createPlaylist": "vytvoriť $t(entity.playlist, {\"count\": 1})",
+        "deletePlaylist": "odstrániť $t(entity.playlist, {\"count\": 1})",
         "deselectAll": "odznačiť všetko",
-        "editPlaylist": "upraviť $t(entity.playlist_one)",
+        "editPlaylist": "upraviť $t(entity.playlist, {\"count\": 1})",
         "goToPage": "ísť na stránku",
         "moveToNext": "prejsť na ďalší",
         "moveToBottom": "presunúť sa na spodok",
         "moveToTop": "presunúť sa navrch",
         "refresh": "$t(common.refresh)",
-        "removeFromFavorites": "odstrániť z $t(entity.favorite_other)",
-        "removeFromPlaylist": "odstrániť z $t(entity.playlist_one)",
+        "removeFromFavorites": "odstrániť z $t(entity.favorite, {\"count\": 2})",
+        "removeFromPlaylist": "odstrániť z $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "odstrániť z fronty",
         "setRating": "ohodnotiť",
         "toggleSmartPlaylistEditor": "prepnúť $t(entity.smartPlaylist) editor",
-        "viewPlaylists": "zobraziť $t(entity.playlist_other)",
+        "viewPlaylists": "zobraziť $t(entity.playlist, {\"count\": 2})",
         "openIn": {
             "lastfm": "Otvoriť v Last.fm",
             "musicbrainz": "Otvoriť v MusicBrainz"
@@ -54,7 +54,7 @@
         "configure": "nastaviť",
         "confirm": "potvrdiť",
         "create": "vytvoriť",
-        "currentSong": "aktuálne $t(entity.track_one)",
+        "currentSong": "aktuálne $t(entity.track, {\"count\": 1})",
         "decrease": "znížiť",
         "delete": "zmazať",
         "descending": "zostupne",
@@ -94,7 +94,7 @@
         "path": "cesta",
         "playerMustBePaused": "prehrávač musí byť pozastavený",
         "preview": "náhľad",
-        "previousSong": "predchádzajúca $t(entity.track_one)",
+        "previousSong": "predchádzajúca $t(entity.track, {\"count\": 1})",
         "quit": "ukončiť",
         "random": "náhodne",
         "rating": "hodnotenie",
@@ -109,7 +109,9 @@
         "saveAndReplace": "uložiť a nahradiť",
         "saveAs": "uložiť ako",
         "search": "vyhľadať",
-        "setting": "nastavenie",
+        "setting_one": "nastavenie",
+        "setting_few": "",
+        "setting_other": "",
         "share": "zdieľať",
         "size": "veľkosť",
         "sortOrder": "poradie",
@@ -126,10 +128,10 @@
     },
     "filter": {
         "name": "meno",
-        "album": "$t(entity.album_one)",
-        "albumArtist": "$t(entity.albumArtist_one)",
-        "albumCount": "$t(entity.album_other) počet",
-        "artist": "$t(entity.artist_one)",
+        "album": "$t(entity.album, {\"count\": 1})",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+        "albumCount": "$t(entity.album, {\"count\": 2}) počet",
+        "artist": "$t(entity.artist, {\"count\": 1})",
         "biography": "životopis",
         "bitrate": "bitrate",
         "bpm": "bpm",
@@ -142,7 +144,7 @@
         "duration": "dĺžka",
         "favorited": "obľúbené",
         "fromYear": "od roku",
-        "genre": "$t(entity.genre_one)",
+        "genre": "$t(entity.genre, {\"count\": 1})",
         "id": "id",
         "isCompilation": "je kompilácia",
         "isFavorited": "je obľúbený",
@@ -183,31 +185,31 @@
             "title": "pridať server"
         },
         "addToPlaylist": {
-            "input_playlists": "$t(entity.playlist_other)",
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "input_skipDuplicates": "preskočiť duplicity",
             "success": "$t(entity.trackWithCount, {\"count\": {{message}} }) pridané do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
-            "title": "pridať do $t(entity.playlist_one)"
+            "title": "pridať do $t(entity.playlist, {\"count\": 1})"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
             "input_name": "$t(common.name)",
             "input_owner": "$t(common.owner)",
             "input_public": "verejný",
-            "success": "$t(entity.playlist_one) úspešne vytvorený",
-            "title": "vytvoriť $t(entity.playlist_one)"
+            "success": "$t(entity.playlist, {\"count\": 1}) úspešne vytvorený",
+            "title": "vytvoriť $t(entity.playlist, {\"count\": 1})"
         },
         "deletePlaylist": {
-            "input_confirm": "pre potvrdenie zadajte názov $t(entity.playlist_one)",
-            "success": "$t(entity.playlist_one) bol úspešne odstránený",
-            "title": "odstrániť $t(entity.playlist_one)"
+            "input_confirm": "pre potvrdenie zadajte názov $t(entity.playlist, {\"count\": 1})",
+            "success": "$t(entity.playlist, {\"count\": 1}) bol úspešne odstránený",
+            "title": "odstrániť $t(entity.playlist, {\"count\": 1})"
         },
         "editPlaylist": {
             "publicJellyfinNote": "Jellyfin z nejakého dôvodu neinformuje, či je playlist verejný alebo nie. Ak si ho želáte ponechať ako verejný, ponechajte nasledujúci vstup ako povolený",
-            "success": "$t(entity.playlist_one) úspešne aktualizovaný",
-            "title": "upraviť $t(entity.playlist_one)"
+            "success": "$t(entity.playlist, {\"count\": 1}) úspešne aktualizovaný",
+            "title": "upraviť $t(entity.playlist, {\"count\": 1})"
         },
         "lyricSearch": {
-            "input_artist": "$t(entity.artist_one)",
+            "input_artist": "$t(entity.artist, {\"count\": 1})",
             "input_name": "$t(common.name)",
             "title": "vyhľadať text skladby"
         },
@@ -277,7 +279,7 @@
         "playlistWithCount_one": "{{count}} playlist",
         "playlistWithCount_few": "{{count}} playlisty",
         "playlistWithCount_other": "{{count}} playlistov",
-        "smartPlaylist": "smart $t(entity.playlist_one)",
+        "smartPlaylist": "smart $t(entity.playlist, {\"count\": 1})",
         "track_one": "stopa",
         "track_few": "stopy",
         "track_other": "stôp",
@@ -320,24 +322,24 @@
             "appearsOn": "vyskytuje sa na",
             "recentReleases": "posledné vydania",
             "viewDiscography": "zobraziť diskografiu",
-            "relatedArtists": "súvisiaci s $t(entity.artist_other)",
+            "relatedArtists": "súvisiaci s $t(entity.artist, {\"count\": 2})",
             "topSongs": "top skladby",
             "topSongsFrom": "top skladby z {{title}}",
             "viewAll": "zobraziť všetko",
-            "viewAllTracks": "zobraziť všetky $t(entity.track_other)"
+            "viewAllTracks": "zobraziť všetky $t(entity.track, {\"count\": 2})"
         },
         "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "viac od $t(entity.artist_one)",
+            "moreFromArtist": "viac od $t(entity.artist, {\"count\": 1})",
             "moreFromGeneric": "viac z {{item}}",
             "released": "vydané"
         },
         "albumList": {
             "artistAlbums": "albumy {{artist}}",
-            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
-            "title": "$t(entity.album_other)"
+            "genreAlbums": "\"{{genre}}\" $t(entity.album, {\"count\": 2})",
+            "title": "$t(entity.album, {\"count\": 2})"
         },
         "appMenu": {
             "collapseSidebar": "zbaliť bočnú lištu",
@@ -350,7 +352,7 @@
             "openBrowserDevtools": "otvoriť vývojárske nástroje prehliadača",
             "quit": "$t(common.quit)",
             "selectServer": "vybrať server",
-            "settings": "$t(common.setting_other)",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "version": "verzia {{version}}"
         },
         "manageServers": {
@@ -384,8 +386,8 @@
             "playShuffled": "$t(player.shuffle)",
             "shareItem": "zdieľať položku",
             "showDetails": "získať informácie",
-            "goToAlbum": "choď na $t(entity.album_one)",
-            "goToAlbumArtist": "choď na $t(entity.albumArtist_one)"
+            "goToAlbum": "choď na $t(entity.album, {\"count\": 1})",
+            "goToAlbumArtist": "choď na $t(entity.albumArtist, {\"count\": 1})"
         },
         "fullscreenPlayer": {
             "config": {
@@ -411,9 +413,9 @@
             "noLyrics": "nenašli sa žiadne texty"
         },
         "genreList": {
-            "showAlbums": "zobraziť $t(entity.genre_one) $t(entity.album_other)",
-            "showTracks": "zobraziť $t(entity.genre_one) $t(entity.track_other)",
-            "title": "$t(entity.genre_other)"
+            "showAlbums": "zobraziť $t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
+            "showTracks": "zobraziť $t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.genre, {\"count\": 2})"
         },
         "globalSearch": {
             "commands": {
@@ -439,7 +441,7 @@
             "reorder": "zmena poradia povolená len pri zoradení podľa id"
         },
         "playlistList": {
-            "title": "$t(entity.playlist_other)"
+            "title": "$t(entity.playlist, {\"count\": 2})"
         },
         "setting": {
             "advanced": "pokročilé",
@@ -449,24 +451,24 @@
             "windowTab": "okno"
         },
         "sidebar": {
-            "albumArtists": "$t(entity.albumArtist_other)",
-            "albums": "$t(entity.album_other)",
-            "artists": "$t(entity.artist_other)",
-            "folders": "$t(entity.folder_other)",
-            "genres": "$t(entity.genre_other)",
+            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
+            "albums": "$t(entity.album, {\"count\": 2})",
+            "artists": "$t(entity.artist, {\"count\": 2})",
+            "folders": "$t(entity.folder, {\"count\": 2})",
+            "genres": "$t(entity.genre, {\"count\": 2})",
             "home": "$t(common.home)",
             "myLibrary": "moja knižnica",
             "nowPlaying": "teraz hrá",
-            "playlists": "$t(entity.playlist_other)",
+            "playlists": "$t(entity.playlist, {\"count\": 2})",
             "search": "$t(common.search)",
-            "settings": "$t(common.setting_other)",
-            "shared": "zdieľaný $t(entity.playlist_other)",
-            "tracks": "$t(entity.track_other)"
+            "settings": "$t(common.setting, {\"count\": 2})",
+            "shared": "zdieľaný $t(entity.playlist, {\"count\": 2})",
+            "tracks": "$t(entity.track, {\"count\": 2})"
         },
         "trackList": {
             "artistTracks": "skladby {{artist}}",
-            "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
-            "title": "$t(entity.track_other)"
+            "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.track, {\"count\": 2})"
         }
     },
     "player": {
@@ -539,7 +541,6 @@
         "customCss_description": "vlastný css obsah. Poznámka: obsah a vzdialené url linky sú defaultne deaktivované.Náhľad vášho obsahu je zobrazený nižšie. Pridané polia, ktoré ste nenastavovali boli pridané pri sanitizácii",
         "customFontPath": "cesta k vlastným fontom",
         "customFontPath_description": "Nastaví cestu k vlastným fontom na použitie aplikáciou",
-        "disableAutomaticUpdates": "vypnúť automatické aktualizácie",
         "disableLibraryUpdateOnStartup": "vypnúť kontrolu nových verzií pri štarte",
         "discordApplicationId": "id aplikácie {{discord}}",
         "discordApplicationId_description": "aplikačné id pre plnohodnotné prepojenie s {{discord}} (predvolená hodnota {{defaultId}})",
@@ -669,9 +670,9 @@
         "replayGainFallback_description": "zosilenie v db, ktoré sa aplikuje, ak súbor nemá {{ReplayGain}} štítky",
         "replayGainMode": "{{ReplayGain}} režim",
         "replayGainMode_description": "pozmení zosilenie hlasitosti podľa hodnôt {{ReplayGain}} uložených v metadátach súboru",
-        "replayGainMode_optionAlbum": "$t(entity.album_one)",
+        "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
         "replayGainMode_optionNone": "$t(common.none)",
-        "replayGainMode_optionTrack": "$t(entity.track_one)",
+        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
         "replayGainPreamp": "predzosilenie {{ReplayGain}} dB",
         "replayGainPreamp_description": "pozmení predzosilenie použité na hodnoty {{ReplayGain}}",
         "sampleRate": "vzorkovacia frekvencia",
@@ -740,8 +741,8 @@
         "column": {
             "album": "album",
             "albumArtist": "interpret albumu",
-            "albumCount": "$t(entity.album_other)",
-            "artist": "$t(entity.artist_one)",
+            "albumCount": "$t(entity.album, {\"count\": 2})",
+            "artist": "$t(entity.artist, {\"count\": 1})",
             "biography": "životopis",
             "bitrate": "bitrate",
             "bpm": "bpm",
@@ -751,7 +752,7 @@
             "dateAdded": "dátum pridania",
             "discNumber": "disk",
             "favorite": "obľúbené",
-            "genre": "$t(entity.genre_one)",
+            "genre": "$t(entity.genre, {\"count\": 1})",
             "lastPlayed": "posledne hraný",
             "path": "cesta",
             "playCount": "prehratí",
@@ -759,7 +760,7 @@
             "releaseDate": "dátum vydania",
             "releaseYear": "rok",
             "size": "$t(common.size)",
-            "songCount": "$t(entity.track_other)",
+            "songCount": "$t(entity.track, {\"count\": 2})",
             "title": "názov",
             "trackNumber": "skladba"
         },
@@ -776,9 +777,9 @@
             },
             "label": {
                 "actions": "$t(common.action_other)",
-                "album": "$t(entity.album_one)",
-                "albumArtist": "$t(entity.albumArtist_one)",
-                "artist": "$t(entity.artist_one)",
+                "album": "$t(entity.album, {\"count\": 1})",
+                "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+                "artist": "$t(entity.artist, {\"count\": 1})",
                 "biography": "$t(common.biography)",
                 "bitrate": "$t(common.bitrate)",
                 "bpm": "$t(common.bpm)",
@@ -788,7 +789,7 @@
                 "discNumber": "číslo disku",
                 "duration": "$t(common.duration)",
                 "favorite": "$t(common.favorite)",
-                "genre": "$t(entity.genre_one)",
+                "genre": "$t(entity.genre, {\"count\": 1})",
                 "lastPlayed": "posledne prehraté",
                 "note": "$t(common.note)",
                 "owner": "$t(common.owner)",
@@ -798,7 +799,7 @@
                 "releaseDate": "dátum vydania",
                 "rowIndex": "číslo riadku",
                 "size": "$t(common.size)",
-                "songCount": "$t(entity.track_other)",
+                "songCount": "$t(entity.track, {\"count\": 2})",
                 "title": "$t(common.title)",
                 "titleCombined": "$t(common.title) (kombinovaný)",
                 "trackNumber": "číslo skladby",

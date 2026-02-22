@@ -2,14 +2,27 @@ import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 
+import { useItemListPagination } from '/@/renderer/components/item-list/item-list-pagination/use-item-list-pagination';
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
+import { PlaylistDetailAlbumView } from '/@/renderer/features/playlists/components/playlist-detail-album-view';
+import { usePlaylistTrackList } from '/@/renderer/features/playlists/hooks/use-playlist-track-list';
 import { useCurrentServer, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
-import { PlaylistSongListQuery, PlaylistSongListResponse } from '/@/shared/types/domain-types';
-import { ItemListKey, ListDisplayType, TableColumn } from '/@/shared/types/types';
+import {
+    LibraryItem,
+    PlaylistSongListQuery,
+    PlaylistSongListResponse,
+    Song,
+} from '/@/shared/types/domain-types';
+import {
+    ItemListKey,
+    ListDisplayType,
+    ListPaginationType,
+    TableColumn,
+} from '/@/shared/types/types';
 
 const PlaylistDetailSongListTable = lazy(() =>
     import('/@/renderer/features/playlists/components/playlist-detail-song-list-table').then(
@@ -38,7 +51,6 @@ const PlaylistDetailSongListGrid = lazy(() =>
 export const PlaylistDetailSongListContent = () => {
     const { playlistId } = useParams() as { playlistId: string };
     const server = useCurrentServer();
-    const { setItemCount } = useListContext();
     const queryClient = useQueryClient();
 
     const playlistSongsQuery = useSuspenseQuery(
@@ -51,17 +63,11 @@ export const PlaylistDetailSongListContent = () => {
     );
 
     useEffect(() => {
-        if (
-            playlistSongsQuery.data?.totalRecordCount !== undefined &&
-            playlistSongsQuery.data.totalRecordCount !== null
-        ) {
-            setItemCount?.(playlistSongsQuery.data.totalRecordCount);
-        }
-    }, [playlistSongsQuery.data?.totalRecordCount, setItemCount]);
-
-    useEffect(() => {
         const handleRefresh = async (payload: { key: string }) => {
-            if (payload.key !== ItemListKey.PLAYLIST_SONG) {
+            if (
+                payload.key !== ItemListKey.PLAYLIST_SONG &&
+                payload.key !== ItemListKey.PLAYLIST_ALBUM
+            ) {
                 return;
             }
 
@@ -81,7 +87,7 @@ export const PlaylistDetailSongListContent = () => {
         return () => {
             eventEmitter.off('ITEM_LIST_REFRESH', handleRefresh);
         };
-    }, [playlistId, queryClient, server.id]);
+    }, [playlistId, queryClient, server?.id]);
 
     return (
         <Suspense fallback={<Spinner container />}>
@@ -92,13 +98,35 @@ export const PlaylistDetailSongListContent = () => {
 
 export type OverridePlaylistSongListQuery = Omit<Partial<PlaylistSongListQuery>, 'id'>;
 
-export const PlaylistDetailSongListView = ({ data }: { data: PlaylistSongListResponse }) => {
+interface PlaylistDetailSongListViewProps {
+    data: PlaylistSongListResponse;
+    items?: Song[];
+}
+
+export const PlaylistDetailSongListView = ({ data, items }: PlaylistDetailSongListViewProps) => {
     const server = useCurrentServer();
-    const { display, table } = useListSettings(ItemListKey.PLAYLIST_SONG);
+    const { display, itemsPerPage, pagination, table } = useListSettings(ItemListKey.PLAYLIST_SONG);
+    const { currentPage, onChange: onPageChange } = useItemListPagination();
+    const isPaginated = pagination === ListPaginationType.PAGINATED;
+
+    const paginationProps = isPaginated
+        ? {
+              currentPage,
+              itemsPerPage,
+              onPageChange,
+          }
+        : undefined;
 
     switch (display) {
         case ListDisplayType.GRID: {
-            return <PlaylistDetailSongListGrid data={data} serverId={server.id} />;
+            return (
+                <PlaylistDetailSongListGrid
+                    data={data}
+                    items={items}
+                    serverId={server.id}
+                    {...paginationProps}
+                />
+            );
         }
         case ListDisplayType.TABLE: {
             return (
@@ -107,11 +135,14 @@ export const PlaylistDetailSongListView = ({ data }: { data: PlaylistSongListRes
                     columns={table.columns}
                     data={data}
                     enableAlternateRowColors={table.enableAlternateRowColors}
+                    enableHeader={table.enableHeader}
                     enableHorizontalBorders={table.enableHorizontalBorders}
                     enableRowHoverHighlight={table.enableRowHoverHighlight}
                     enableVerticalBorders={table.enableVerticalBorders}
+                    items={items}
                     serverId={server.id}
                     size={table.size}
+                    {...paginationProps}
                 />
             );
         }
@@ -236,6 +267,7 @@ export const PlaylistDetailSongListEdit = ({ data }: { data: PlaylistSongListRes
                     columns={columns}
                     data={localData}
                     enableAlternateRowColors={table.enableAlternateRowColors}
+                    enableHeader={table.enableHeader}
                     enableHorizontalBorders={table.enableHorizontalBorders}
                     enableRowHoverHighlight={table.enableRowHoverHighlight}
                     enableVerticalBorders={table.enableVerticalBorders}
@@ -250,19 +282,31 @@ export const PlaylistDetailSongListEdit = ({ data }: { data: PlaylistSongListRes
     }
 };
 
-const PlaylistDetailSongList = ({ data }: { data: PlaylistSongListResponse }) => {
+const PlaylistDetailTrackView = ({ data }: { data: PlaylistSongListResponse }) => {
     const { isSmartPlaylist, mode } = useListContext();
 
     if (isSmartPlaylist) {
-        return <PlaylistDetailSongListView data={data} />;
+        return <PlaylistDetailTrackViewContent data={data} />;
     }
 
-    switch (mode) {
-        case 'edit':
-            return <PlaylistDetailSongListEdit data={data} />;
-        case 'view':
-            return <PlaylistDetailSongListView data={data} />;
-        default:
-            return null;
+    if (mode === 'edit') {
+        return <PlaylistDetailSongListEdit data={data} />;
     }
+
+    return <PlaylistDetailTrackViewContent data={data} />;
+};
+
+const PlaylistDetailTrackViewContent = ({ data }: { data: PlaylistSongListResponse }) => {
+    const { sortedAndFilteredSongs } = usePlaylistTrackList(data);
+    return <PlaylistDetailSongListView data={data} items={sortedAndFilteredSongs} />;
+};
+
+const PlaylistDetailSongList = ({ data }: { data: PlaylistSongListResponse }) => {
+    const { displayMode } = useListContext();
+
+    if (displayMode === LibraryItem.ALBUM) {
+        return <PlaylistDetailAlbumView data={data} />;
+    }
+
+    return <PlaylistDetailTrackView data={data} />;
 };

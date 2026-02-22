@@ -21,8 +21,14 @@ import { ItemControls } from '/@/renderer/components/item-list/types';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
-import { ListSortByDropdownControlled } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
+import {
+    ListConfigMenu,
+    SONG_DISPLAY_TYPES,
+} from '/@/renderer/features/shared/components/list-config-menu';
+import {
+    CLIENT_SIDE_SONG_FILTERS,
+    ListSortByDropdownControlled,
+} from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButtonControlled } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
 import { FILTER_KEYS, searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -345,7 +351,6 @@ const AlbumMetadataExternalLinks = ({
                         }}
                         radius="md"
                         rel="noopener noreferrer"
-                        size="md"
                         target="_blank"
                         tooltip={{
                             label: t('action.openIn.musicbrainz'),
@@ -639,7 +644,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
 
     const groups = useMemo(() => {
         // Remove groups when filtering
-        if (debouncedSearchTerm.trim()) {
+        if (debouncedSearchTerm?.trim()) {
             return undefined;
         }
 
@@ -743,7 +748,8 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                     value={searchTerm}
                 />
                 <ListSortByDropdownControlled
-                    itemType={LibraryItem.PLAYLIST_SONG}
+                    filters={CLIENT_SIDE_SONG_FILTERS}
+                    itemType={LibraryItem.SONG}
                     setSortBy={(value) => setSortBy(value as SongListSort)}
                     sortBy={sortBy}
                 />
@@ -752,7 +758,10 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                     sortOrder={sortOrder}
                 />
                 <ListConfigMenu
-                    displayTypes={[{ hidden: true, value: ListDisplayType.GRID }]}
+                    displayTypes={[
+                        { hidden: true, value: ListDisplayType.GRID },
+                        ...SONG_DISPLAY_TYPES,
+                    ]}
                     listKey={ItemListKey.ALBUM_DETAIL}
                     optionsConfig={{
                         table: {
@@ -774,7 +783,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                 enableDragScroll={false}
                 enableEntranceAnimation={false}
                 enableExpansion={false}
-                enableHeader
+                enableHeader={tableConfig.enableHeader}
                 enableHorizontalBorders={tableConfig.enableHorizontalBorders}
                 enableRowHoverHighlight={tableConfig.enableRowHoverHighlight}
                 enableSelection

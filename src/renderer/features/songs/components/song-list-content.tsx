@@ -3,6 +3,7 @@ import { lazy, Suspense, useMemo } from 'react';
 import { useListContext } from '/@/renderer/context/list-context';
 import { ListFilters, ListFiltersTitle } from '/@/renderer/features/shared/components/list-filters';
 import { ListWithSidebarContainer } from '/@/renderer/features/shared/components/list-with-sidebar-container';
+import { SaveAsCollectionButton } from '/@/renderer/features/shared/components/save-as-collection-button';
 import { useSongListFilters } from '/@/renderer/features/songs/hooks/use-song-list-filters';
 import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
@@ -44,11 +45,14 @@ export const SongListContent = () => {
 const SongListFilters = () => {
     return (
         <ListWithSidebarContainer.SidebarPortal>
-            <Stack h="100%">
+            <Stack h="100%" style={{ minHeight: 0 }}>
                 <ListFiltersTitle itemType={LibraryItem.SONG} />
-                <ScrollArea>
+                <ScrollArea style={{ flex: 1, minHeight: 0 }}>
                     <ListFilters itemType={LibraryItem.SONG} />
                 </ScrollArea>
+                <Stack p="sm">
+                    <SaveAsCollectionButton fullWidth itemType={LibraryItem.SONG} />
+                </Stack>
             </Stack>
         </ListWithSidebarContainer.SidebarPortal>
     );
@@ -138,6 +142,7 @@ export const SongListView = ({
                             autoFitColumns={table.autoFitColumns}
                             columns={table.columns}
                             enableAlternateRowColors={table.enableAlternateRowColors}
+                            enableHeader={table.enableHeader}
                             enableHorizontalBorders={table.enableHorizontalBorders}
                             enableRowHoverHighlight={table.enableRowHoverHighlight}
                             enableVerticalBorders={table.enableVerticalBorders}
@@ -153,6 +158,7 @@ export const SongListView = ({
                             autoFitColumns={table.autoFitColumns}
                             columns={table.columns}
                             enableAlternateRowColors={table.enableAlternateRowColors}
+                            enableHeader={table.enableHeader}
                             enableHorizontalBorders={table.enableHorizontalBorders}
                             enableRowHoverHighlight={table.enableRowHoverHighlight}
                             enableVerticalBorders={table.enableVerticalBorders}

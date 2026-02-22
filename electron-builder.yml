@@ -1,7 +1,7 @@
 appId: org.jeffvli.feishin
 productName: Feishin
 artifactName: ${productName}-${version}-${os}-${arch}.${ext}
-electronVersion: 39.2.7
+electronVersion: 39.4.0
 directories:
     buildResources: assets
 files:
@@ -13,8 +13,14 @@ asarUnpack:
     - resources/**
 win:
     target:
-        - zip
-        - nsis
+        - target: zip
+          arch:
+              - x64
+              - arm64
+        - target: nsis
+          arch:
+              - x64
+              - arm64
     icon: assets/icons/icon.ico
 
 nsis:
@@ -51,6 +57,7 @@ linux:
     artifactName: ${productName}-${os}-${arch}.${ext}
 
 npmRebuild: false
+afterAllArtifactBuild: scripts/after-all-artifact-build.mjs
 publish:
     provider: github
     owner: jeffvli

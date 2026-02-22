@@ -93,6 +93,7 @@ export const PlaylistDetailSongListHeader = ({
                 </PageHeader>
             ) : (
                 <LibraryHeader
+                    compact
                     imageUrl={imageUrl}
                     item={{
                         imageId: detailQuery?.data?.imageId,
@@ -101,6 +102,7 @@ export const PlaylistDetailSongListHeader = ({
                         type: LibraryItem.PLAYLIST,
                     }}
                     title={detailQuery?.data?.name || ''}
+                    topRight={<ListSearchInput />}
                 >
                     <LibraryHeaderMenu
                         onPlay={(type) => handlePlay(type)}

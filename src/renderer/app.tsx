@@ -10,7 +10,9 @@ import isElectron from 'is-electron';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import i18n from '/@/i18n/i18n';
+import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
 import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-context';
+import { useCheckForUpdates } from '/@/renderer/hooks/use-check-for-updates';
 import { useSyncSettingsToMain } from '/@/renderer/hooks/use-sync-settings-to-main';
 import { AppRouter } from '/@/renderer/router/app-router';
 import { useCssSettings, useHotkeySettings, useLanguage } from '/@/renderer/store';
@@ -38,6 +40,7 @@ export const App = () => {
     const cssRef = useRef<HTMLStyleElement | null>(null);
 
     useSyncSettingsToMain();
+    useCheckForUpdates();
 
     const [webAudio, setWebAudio] = useState<WebAudio>();
 
@@ -76,6 +79,19 @@ export const App = () => {
             i18n.changeLanguage(language);
         }
     }, [language]);
+
+    useEffect(() => {
+        if (isElectron()) {
+            window.api.utils.rendererOpenSettings(() => {
+                openSettingsModal();
+            });
+
+            return () => {
+                ipc?.removeAllListeners('renderer-open-settings');
+            };
+        }
+        return undefined;
+    }, []);
 
     const notificationStyles = useMemo(
         () => ({

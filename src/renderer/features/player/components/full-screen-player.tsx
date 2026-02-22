@@ -17,7 +17,14 @@ import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { FullScreenPlayerImage } from '/@/renderer/features/player/components/full-screen-player-image';
 import { FullScreenPlayerQueue } from '/@/renderer/features/player/components/full-screen-player-queue';
-import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
+import {
+    useIsRadioActive,
+    useRadioPlayer,
+} from '/@/renderer/features/radio/hooks/use-radio-player';
+import {
+    ListConfigMenu,
+    SONG_DISPLAY_TYPES,
+} from '/@/renderer/features/shared/components/list-config-menu';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import {
     useFullScreenPlayerStore,
@@ -555,7 +562,10 @@ const Controls = () => {
                 buttonProps={{
                     variant: 'subtle',
                 }}
-                displayTypes={[{ hidden: true, value: ListDisplayType.GRID }]}
+                displayTypes={[
+                    { hidden: true, value: ListDisplayType.GRID },
+                    ...SONG_DISPLAY_TYPES,
+                ]}
                 listKey={ItemListKey.FULL_SCREEN}
                 optionsConfig={{
                     table: {
@@ -657,6 +667,11 @@ export const FullScreenPlayer = () => {
     const { dynamicBackground, dynamicImageBlur, dynamicIsImage } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { windowBarStyle } = useWindowSettings();
+    const isRadioActive = useIsRadioActive();
+    const { isPlaying: isRadioPlaying } = useRadioPlayer();
+
+    const isPlayingRadio = isRadioActive && isRadioPlaying;
+    const effectiveDynamicBackground = dynamicBackground && !isPlayingRadio;
 
     const location = useLocation();
     const isOpenedRef = useRef<boolean | null>(null);
@@ -671,13 +686,13 @@ export const FullScreenPlayer = () => {
 
     return (
         <PlayerContainer
-            dynamicBackground={dynamicBackground}
+            dynamicBackground={effectiveDynamicBackground}
             dynamicIsImage={dynamicIsImage}
             windowBarStyle={windowBarStyle}
         >
             <Controls />
             <BackgroundImageOverlay
-                dynamicBackground={dynamicBackground}
+                dynamicBackground={effectiveDynamicBackground}
                 dynamicImageBlur={dynamicImageBlur}
             />
             <div className={styles.responsiveContainer}>

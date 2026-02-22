@@ -479,7 +479,8 @@ const VisualizerInner = () => {
 };
 
 const CurrentPresetDisplay = () => {
-    const currentPreset = useSettingsStore.getState().visualizer.butterchurn.currentPreset;
+    const currentPreset = useSettingsStore((store) => store.visualizer.butterchurn.currentPreset);
+
     return (
         <Text className={styles['preset-overlay']} isNoSelect size="sm">
             {currentPreset}

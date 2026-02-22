@@ -36,9 +36,7 @@ export const MpvSettings = memo(() => {
     // const { pause } = usePlayerControls();
     // const { clearQueue } = useQueueControls();
 
-    const [mpvPath, setMpvPath] = useState(
-        (localSettings?.get('mpv_path') as string | undefined) || '',
-    );
+    const [mpvPath, setMpvPath] = useState('');
 
     const handleSetMpvPath = async (clear?: boolean) => {
         if (clear) {
@@ -62,8 +60,8 @@ export const MpvSettings = memo(() => {
     useEffect(() => {
         const getMpvPath = async () => {
             if (!localSettings) return setMpvPath('');
-            const mpvPath = (await localSettings.get('mpv_path')) as string;
-            return setMpvPath(mpvPath);
+            const mpvPath = (await localSettings.get('mpv_path')) as string | undefined;
+            return setMpvPath(mpvPath || '');
         };
 
         getMpvPath();

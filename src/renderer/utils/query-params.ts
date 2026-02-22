@@ -178,3 +178,33 @@ export const parseCustomFiltersParam = (
         return undefined;
     }
 };
+
+const PAGINATION_KEYS = ['currentPage', 'scrollOffset'];
+
+/**
+ * Build filter query string from current search params (minus pagination/scroll).
+ * Optionally merge customFilters (e.g. from ListContext) into the result.
+ */
+export const getFilterQueryStringFromSearchParams = (
+    searchParams: URLSearchParams,
+    customFilters?: Record<string, boolean | number | Record<string, unknown> | string | string[]>,
+): string => {
+    const params = new URLSearchParams(searchParams);
+    for (const key of PAGINATION_KEYS) {
+        params.delete(key);
+    }
+    if (customFilters && Object.keys(customFilters).length > 0) {
+        for (const [key, value] of Object.entries(customFilters)) {
+            if (value === undefined || value === null) continue;
+            if (Array.isArray(value)) {
+                params.delete(key);
+                value.forEach((v) => params.append(key, String(v)));
+            } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                params.set(key, JSON.stringify(value));
+            } else {
+                params.set(key, String(value));
+            }
+        }
+    }
+    return params.toString();
+};

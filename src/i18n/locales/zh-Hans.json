@@ -1,21 +1,21 @@
 {
     "action": {
-        "editPlaylist": "编辑 $t(entity.playlist_one)",
+        "editPlaylist": "编辑 $t(entity.playlist, {\"count\": 1})",
         "moveToTop": "移至顶部",
         "clearQueue": "清空播放队列",
-        "addToFavorites": "添加到 $t(entity.favorite_other)",
-        "addToPlaylist": "添加到 $t(entity.playlist_one)",
-        "createPlaylist": "创建 $t(entity.playlist_one)",
-        "removeFromPlaylist": "从 $t(entity.playlist_one) 移除",
-        "viewPlaylists": "查看 $t(entity.playlist_other)",
+        "addToFavorites": "添加到 $t(entity.favorite, {\"count\": 2})",
+        "addToPlaylist": "添加到 $t(entity.playlist, {\"count\": 1})",
+        "createPlaylist": "创建 $t(entity.playlist, {\"count\": 1})",
+        "removeFromPlaylist": "从 $t(entity.playlist, {\"count\": 1}) 移除",
+        "viewPlaylists": "查看 $t(entity.playlist, {\"count\": 2})",
         "refresh": "$t(common.refresh)",
-        "deletePlaylist": "删除 $t(entity.playlist_one)",
+        "deletePlaylist": "删除 $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "从播放队列中移除",
         "deselectAll": "取消全选",
         "moveToBottom": "移至底部",
         "setRating": "评分",
         "toggleSmartPlaylistEditor": "切换 $t(entity.smartPlaylist) 编辑器",
-        "removeFromFavorites": "从 $t(entity.favorite_other) 移除",
+        "removeFromFavorites": "从 $t(entity.favorite, {\"count\": 2}) 移除",
         "goToPage": "前往页面",
         "openIn": {
             "lastfm": "在 Last.fm 中打开",
@@ -35,8 +35,8 @@
         "addOrRemoveFromSelection": "在所选内容中添加或移除",
         "selectRangeOfItems": "批量选择",
         "selectAll": "全选",
-        "createRadioStation": "创建$t(entity.radioStation_one)",
-        "deleteRadioStation": "删除$t(entity.radioStation_one)",
+        "createRadioStation": "创建$t(entity.radioStation, {\"count\": 1})",
+        "deleteRadioStation": "删除$t(entity.radioStation, {\"count\": 1})",
         "openApplicationDirectory": "打开应用程序目录"
     },
     "common": {
@@ -50,7 +50,7 @@
         "left": "左",
         "save": "保存",
         "right": "右",
-        "currentSong": "当前$t(entity.track_one)",
+        "currentSong": "当前$t(entity.track, {\"count\": 1})",
         "collapse": "折叠",
         "trackNumber": "音轨编号",
         "descending": "降序",
@@ -75,7 +75,7 @@
         "delete": "删除",
         "cancel": "取消",
         "forceRestartRequired": "重启应用使更改生效…关闭通知即可重启",
-        "setting": "设置",
+        "setting_other": "设置",
         "version": "版本",
         "title": "标题",
         "filter_other": "筛选",
@@ -92,7 +92,7 @@
         "disable": "禁用",
         "menu": "菜单",
         "restartRequired": "需要重启应用",
-        "previousSong": "上一首$t(entity.track_one)",
+        "previousSong": "上一首$t(entity.track, {\"count\": 1})",
         "noResultsFromQuery": "未查询到匹配结果",
         "quit": "退出",
         "expand": "展开",
@@ -150,7 +150,12 @@
         "tableColumns": "表格列",
         "itemsMore": "{{count}} 更多",
         "countSelected": "已选择{{count}}项",
-        "retry": "重试"
+        "retry": "重试",
+        "example": "示例",
+        "filter_single": "单项",
+        "mood": "氛围",
+        "rename": "重命名",
+        "filter_multiple": "多项"
     },
     "entity": {
         "albumArtist_other": "专辑艺术家",
@@ -166,11 +171,13 @@
         "favorite_other": "收藏",
         "artistWithCount_other": "{{count}} 位艺术家",
         "folder_other": "文件夹",
-        "smartPlaylist": "智能$t(entity.playlist_one)",
+        "smartPlaylist": "智能$t(entity.playlist, {\"count\": 1})",
         "genreWithCount_other": "{{count}} 种流派",
         "trackWithCount_other": "{{count}} 首曲目",
         "play_other": "{{count}} 次播放",
-        "song_other": "歌曲"
+        "song_other": "歌曲",
+        "radioStation_other": "广播电台",
+        "radioStationWithCount_other": "{{count}} 个广播电台"
     },
     "player": {
         "repeat_all": "循环全部",
@@ -187,7 +194,7 @@
         "shuffle": "播放（随机）",
         "playbackFetchNoResults": "未找到歌曲",
         "playbackFetchInProgress": "正在加载歌曲…",
-        "addNext": "下一首播放",
+        "addNext": "下一个",
         "playbackFetchCancel": "请稍等…关闭通知以取消操作",
         "play": "播放",
         "repeat_off": "循环关闭",
@@ -197,7 +204,7 @@
         "queue_moveToTop": "将所选项移至底部",
         "queue_moveToBottom": "将所选项移至顶部",
         "shuffle_off": "禁用随机播放",
-        "addLast": "上一曲",
+        "addLast": "最后",
         "mute": "静音",
         "skip_forward": "向前跳过",
         "playbackSpeed": "播放速度",
@@ -206,7 +213,21 @@
         "viewQueue": "查看播放队列",
         "saveQueueToServer": "将播放队列保存到服务器",
         "restoreQueueFromServer": "从服务器恢复播放队列",
-        "lyrics": "歌词"
+        "lyrics": "歌词",
+        "addLastShuffled": "最后（随机）",
+        "addNextShuffled": "下一个（随机）",
+        "artistRadio": "艺术家电台",
+        "holdToShuffle": "按住即可随机",
+        "trackRadio": "追踪广播",
+        "sleepTimer": "睡眠定时器",
+        "sleepTimer_endOfSong": "当前歌曲结束时",
+        "sleepTimer_minutes": "{{count}} 分钟",
+        "sleepTimer_hours": "{{count}} 小时",
+        "sleepTimer_custom": "自定义",
+        "sleepTimer_off": "关闭",
+        "sleepTimer_timeRemaining": "剩余时间 {{time}}",
+        "sleepTimer_setCustom": "设置定时器",
+        "sleepTimer_cancel": "取消定时器"
     },
     "setting": {
         "crossfadeStyle_description": "选择用于音频播放器的淡入淡出风格",
@@ -217,7 +238,6 @@
         "audioPlayer_description": "选择用于播放的音频播放器",
         "globalMediaHotkeys": "全局媒体快捷键",
         "gaplessAudio_description": "调整 mpv 无缝音频设置",
-        "disableAutomaticUpdates": "禁用自动更新",
         "followLyric_description": "滚动歌词到当前播放位置",
         "audioExclusiveMode": "音频独占模式",
         "font": "字体",
@@ -238,7 +258,7 @@
         "customFontPath_description": "设置应用使用的自定义字体路径",
         "gaplessAudio_optionWeak": "弱（推荐）",
         "font_description": "设置应用使用的字体",
-        "audioDevice_description": "选择用于播放的音频设备（仅 web 播放器）",
+        "audioDevice_description": "选择用于播放的音频设备",
         "enableRemote_description": "启用远程控制服务器，以允许其他设备控制此应用",
         "remotePort_description": "设置远程服务器端口",
         "hotkey_skipBackward": "向后跳过",
@@ -283,7 +303,7 @@
         "remoteUsername_description": "设置远程控制服务器的用户名。如果用户名和密码都为空，则身份验证将被禁用",
         "exitToTray_description": "退出应用时最小化到系统托盘",
         "hotkey_favoritePreviousSong": "收藏$t(common.previousSong)",
-        "replayGainMode_optionAlbum": "$t(entity.album_one)",
+        "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
         "lyricOffset": "歌词偏移（毫秒）",
         "fontType_optionCustom": "自定义字体",
         "themeDark_description": "应用将使用深色主题",
@@ -292,7 +312,7 @@
         "language_description": "设置应用的语言（$t(common.restartRequired)）",
         "playbackStyle_optionCrossFade": "淡入淡出",
         "hotkey_rate3": "评为 3 星",
-        "replayGainMode_optionTrack": "$t(entity.track_one)",
+        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
         "themeLight_description": "应用将使用浅色主题",
         "hotkey_toggleFullScreenPlayer": "全屏播放",
         "hotkey_localSearch": "页面内搜索",
@@ -333,7 +353,7 @@
         "useSystemTheme_description": "使用系统定义的浅色或深色主题",
         "playButtonBehavior_optionAddNext": "$t(player.addNext)",
         "lyricFetch_description": "从多个互联网源获取歌词",
-        "lyricFetchProvider_description": "选择歌词源。 歌词源顺序与查询顺序一致",
+        "lyricFetchProvider_description": "选择要从中获取歌词的提供商",
         "sidePlayQueueStyle_optionDetached": "不吸附",
         "hotkey_zoomOut": "缩小",
         "hotkey_unfavoriteCurrentSong": "取消收藏$t(common.currentSong)",
@@ -452,9 +472,9 @@
         "releaseChannel_optionLatest": "最新的",
         "releaseChannel_optionBeta": "测试版",
         "releaseChannel": "发布通道",
-        "releaseChannel_description": "选择稳定版本或测试版以进行自动更新",
+        "releaseChannel_description": "选择稳定版、测试版或 Alpha（夜间构建版）以启用自动更新",
         "mediaSession": "启用媒体会话",
-        "mediaSession_description": "启用 Windows 媒体会话集成，在系统音量覆盖和锁定屏幕中显示媒体控件和元数据（仅限 Windows）",
+        "mediaSession_description": "启用媒体会话集成，在系统音量叠加层和锁屏界面显示媒体控件和元数据",
         "exportImportSettings_control_description": "通过 JSON 导出和导入设置",
         "exportImportSettings_control_exportText": "导出设置",
         "exportImportSettings_control_importText": "导入设置",
@@ -515,7 +535,52 @@
         "playerbarWaveformAlign": "波形对齐方式",
         "playerbarWaveformBarWidth": "波形宽度",
         "playerbarWaveformGap": "波形间距",
-        "transcode": "启用转码功能"
+        "transcode": "启用转码功能",
+        "useThemeAccentColor_description": "使用所选主题中定义的主色，而不是自定义强调色",
+        "homeFeatureStyle_optionSingle": "单项",
+        "autoDJ": "自动DJ",
+        "autoDJ_itemCount": "项目数量",
+        "autoDJ_itemCount_description": "启用自动 DJ 功能后，尝试添加到队列中的项目数",
+        "autoDJ_timing": "定时",
+        "autoDJ_timing_description": "自动 DJ 触发前队列中剩余的歌曲数量",
+        "crossfadeStyle": "交叉渐变风格",
+        "discordRichPresence": "{{discord}} rich presence",
+        "homeFeatureStyle_description": "控制首页特色轮播图的样式",
+        "homeFeatureStyle": "首页特色旋转样式",
+        "homeFeatureStyle_optionMultiple": "多样",
+        "hotkey_listNavigateToPage": "列表导航至项目页面",
+        "hotkey_listPlayDefault": "播放列表",
+        "hotkey_listPlayLast": "播放列表最后",
+        "hotkey_listPlayNext": "播放列表下一个",
+        "hotkey_listPlayNow": "播放列表现在",
+        "pathReplace": "文件路径替换",
+        "pathReplace_description": "替换服务器的默认文件路径",
+        "pathReplace_optionRemovePrefix": "移除前缀",
+        "pathReplace_optionAddPrefix": "添加前缀",
+        "playerFilters": "从队列中筛选歌曲",
+        "playerFilters_description": "根据以下条件，忽略添加到队列中的歌曲",
+        "artistRadioCount_description": "设置艺术家电台和曲目电台要获取的歌曲数量",
+        "artistRadioCount": "艺术家/曲目电台数量",
+        "imageResolution_optionItemCard": "项目卡",
+        "playerbarWaveformRadius": "波形半径",
+        "enableGridMultiSelect": "启用网格多选",
+        "enableGridMultiSelect_description": "启用后，允许在网格视图中选择多个项目。禁用后，点击网格项目图像将跳转到项目页面",
+        "sidebarPlaylistSorting_description": "允许在侧边栏中使用拖放操作手动对播放列表进行排序，而不是使用默认的服务器顺序",
+        "sidebarPlaylistSorting": "侧边栏播放列表排序",
+        "sidebarPlaylistListFilterRegex_description": "隐藏侧边栏中与此正则表达式匹配的播放列表",
+        "sidebarPlaylistListFilterRegex_placeholder": "例如：^每日精选*",
+        "sidebarPlaylistListFilterRegex": "播放列表筛选正则表达式",
+        "queryBuilder": "查询构建器",
+        "queryBuilderCustomFields": "自定义字段",
+        "analyticsEnable": "发送基于使用情况的分析",
+        "analyticsEnable_description": "发送匿名使用数据帮助开发者改进应用程序",
+        "automaticUpdates": "自动更新",
+        "automaticUpdates_description": "自动检查并安装更新",
+        "releaseChannel_optionAlpha": "alpha（每日构建版）",
+        "discordStateIcon": "显示播放图标",
+        "discordStateIcon_description": "在 rich presence 状态中显示一个小的播放图标。启用“暂停时显示 rich presence 在线状态”后，暂停图标始终显示",
+        "blurExplicitImages": "模糊显式图片",
+        "blurExplicitImages_description": "专辑和歌曲封面若被标记为不雅内容，将会进行模糊处理"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
@@ -546,7 +611,9 @@
         "noNetwork": "服务器不可用",
         "noNetworkDescription": "无法连接到该服务器",
         "saveQueueFailed": "播放列表保存失败",
-        "settingsSyncError": "渲染器设置与主进程中存在差异，请重启程序以应用更改"
+        "settingsSyncError": "渲染器设置与主进程中存在差异，请重启程序以应用更改",
+        "invalidJson": "无效的 JSON",
+        "serverLockSingleServer": "服务器锁定时，只允许一台服务器运行"
     },
     "filter": {
         "mostPlayed": "最多播放过",
@@ -563,18 +630,18 @@
         "communityRating": "社区评分",
         "path": "路径",
         "favorited": "已收藏",
-        "albumArtist": "$t(entity.albumArtist_one)",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
         "releaseYear": "发布年份",
         "biography": "个人简介",
         "songCount": "歌曲数量",
         "random": "随机",
-        "lastPlayed": "上次播放过",
+        "lastPlayed": "最后播放",
         "toYear": "截止年份",
         "fromYear": "起始年份",
         "criticRating": "评论家评分",
         "trackNumber": "曲目",
         "bpm": "bpm",
-        "artist": "$t(entity.artist_one)",
+        "artist": "$t(entity.artist, {\"count\": 1})",
         "comment": "评论",
         "isCompilation": "为合辑",
         "isFavorited": "已收藏",
@@ -582,34 +649,38 @@
         "recentlyUpdated": "最近更新",
         "isRated": "已评分",
         "isRecentlyPlayed": "最近播放过",
-        "channels": "$t(common.channel_other)",
+        "channels": "$t(common.channel, {\"count\": 2})",
         "owner": "$t(common.owner)",
-        "genre": "$t(entity.genre_one)",
+        "genre": "$t(entity.genre, {\"count\": 1})",
         "note": "注释",
-        "albumCount": "$t(entity.album_other)数",
+        "albumCount": "$t(entity.album, {\"count\": 2})数",
         "id": "id",
         "disc": "碟片",
         "duration": "时长",
-        "album": "$t(entity.album_one)",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "album": "$t(entity.album, {\"count\": 1})",
+        "explicitStatus": "$t(common.explicitStatus)",
+        "sortName": "排序名称",
+        "matchAnd": "和",
+        "matchOr": "或"
     },
     "page": {
         "sidebar": {
             "nowPlaying": "正在播放",
-            "playlists": "$t(entity.playlist_other)",
+            "playlists": "$t(entity.playlist, {\"count\": 2})",
             "search": "$t(common.search)",
-            "tracks": "$t(entity.track_other)",
-            "albums": "$t(entity.album_other)",
-            "genres": "$t(entity.genre_other)",
-            "folders": "$t(entity.folder_other)",
-            "settings": "$t(common.setting_other)",
+            "tracks": "$t(entity.track, {\"count\": 2})",
+            "albums": "$t(entity.album, {\"count\": 2})",
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "folders": "$t(entity.folder, {\"count\": 2})",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "home": "$t(common.home)",
-            "artists": "$t(entity.artist_other)",
-            "albumArtists": "$t(entity.albumArtist_other)",
-            "shared": "共享$t(entity.playlist_other)",
+            "artists": "$t(entity.artist, {\"count\": 2})",
+            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
+            "shared": "共享$t(entity.playlist, {\"count\": 2})",
             "myLibrary": "我的媒体库",
-            "favorites": "$t(entity.favorite_other)",
-            "radio": "$t(entity.radioStation_other)"
+            "favorites": "$t(entity.favorite, {\"count\": 2})",
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "collections": "合集"
         },
         "fullscreenPlayer": {
             "config": {
@@ -643,13 +714,14 @@
             "openBrowserDevtools": "打开浏览器开发者工具",
             "goBack": "返回",
             "goForward": "前进",
-            "settings": "$t(common.setting_other)",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "quit": "$t(common.quit)",
             "privateModeOff": "关闭私人模式",
             "privateModeOn": "开启私人模式",
             "multipleMusicFolders": "已选择{{count}}个媒体库",
             "noMusicFolder": "未选择任何音乐库",
-            "selectMusicFolder": "选择媒体库"
+            "selectMusicFolder": "选择媒体库",
+            "commandPalette": "打开命令面板"
         },
         "home": {
             "mostPlayed": "最多播放",
@@ -658,10 +730,10 @@
             "recentlyPlayed": "最近播放",
             "title": "$t(common.home)",
             "recentlyReleased": "最近发布",
-            "genres": "$t(entity.genre_other)"
+            "genres": "$t(entity.genre, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "更多该$t(entity.artist_one)作品",
+            "moreFromArtist": "更多该$t(entity.artist, {\"count\": 1})作品",
             "moreFromGeneric": "更多{{item}}作品",
             "released": "已发布"
         },
@@ -687,7 +759,8 @@
             "discord": "Discord",
             "logger": "日志记录器",
             "queryBuilder": "查询构建器",
-            "lyricsDisplay": "歌词显示"
+            "lyricsDisplay": "歌词显示",
+            "playerFilters": "播放筛选器"
         },
         "globalSearch": {
             "commands": {
@@ -720,43 +793,48 @@
             "download": "下载",
             "playShuffled": "$t(player.shuffle)",
             "moveToNext": "$t(action.moveToNext)",
-            "goToAlbum": "转到 $t(entity.album_one)",
-            "goToAlbumArtist": "转到 $t(entity.albumArtist_one)",
+            "goToAlbum": "转到 $t(entity.album, {\"count\": 1})",
+            "goToAlbumArtist": "转到 $t(entity.albumArtist, {\"count\": 1})",
             "moveItems": "$t(action.moveItems)",
             "goTo": "前往"
         },
         "trackList": {
-            "title": "$t(entity.track_other)",
-            "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
+            "title": "$t(entity.track, {\"count\": 2})",
+            "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})",
             "artistTracks": "{{artist}} 的曲目"
         },
         "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumList": {
-            "title": "$t(entity.album_other)",
+            "title": "$t(entity.album, {\"count\": 2})",
             "artistAlbums": "{{artist}}的专辑",
-            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)"
+            "genreAlbums": "\"{{genre}}\" $t(entity.album, {\"count\": 2})"
         },
         "genreList": {
-            "title": "$t(entity.genre_other)",
-            "showAlbums": "显示$t(entity.genre_one) $t(entity.album_other)",
-            "showTracks": "显示$t(entity.genre_one) $t(entity.track_other)"
+            "title": "$t(entity.genre, {\"count\": 2})",
+            "showAlbums": "显示$t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
+            "showTracks": "显示$t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2})"
         },
         "playlistList": {
-            "title": "$t(entity.playlist_other)"
+            "title": "$t(entity.playlist, {\"count\": 2})"
         },
         "albumArtistDetail": {
             "recentReleases": "最近发布",
             "viewDiscography": "查看唱片目录",
-            "relatedArtists": "相关$t(entity.artist_other)",
+            "relatedArtists": "相关$t(entity.artist, {\"count\": 2})",
             "topSongs": "热门歌曲",
             "topSongsFrom": "{{title}}的热门歌曲",
-            "viewAllTracks": "查看所有$t(entity.track_other)",
+            "viewAllTracks": "查看所有$t(entity.track, {\"count\": 2})",
             "about": "关于{{artist}}",
             "appearsOn": "出现在",
             "viewAll": "查看全部",
-            "groupingTypeAll": "所有发行类型"
+            "groupingTypeAll": "所有发行类型",
+            "groupingTypePrimary": "首选发布类型",
+            "favoriteSongs": "收藏的歌曲",
+            "favoriteSongsFrom": "来自 {{title}} 收藏的歌曲",
+            "topSongsCommunity": "社区",
+            "topSongsPersonal": "个人"
         },
         "itemDetail": {
             "copyPath": "将路径复制到剪贴板",
@@ -775,17 +853,33 @@
             "removeServer": "移除服务器"
         },
         "favorites": {
-            "title": "$t(entity.favorite_other)"
+            "title": "$t(entity.favorite, {\"count\": 2})"
         },
         "folderList": {
-            "title": "$t(entity.folder_other)"
+            "title": "$t(entity.folder, {\"count\": 2})"
+        },
+        "radioList": {
+            "title": "广播电台"
+        },
+        "windowBar": {
+            "paused": "(暂停) ",
+            "privateMode": "(私人模式)"
+        },
+        "collections": {
+            "overrideExisting": "覆盖现有",
+            "saveAsCollection": "保存为集合"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "自 {{stable}} 以来的提交",
+            "noNewCommits": "此范围内没有新的提交",
+            "noStableReleaseToCompare": "目前没有稳定版本可供比较"
         }
     },
     "form": {
         "deletePlaylist": {
-            "title": "删除$t(entity.playlist_one)",
-            "success": "$t(entity.playlist_one)已成功删除",
-            "input_confirm": "输入$t(entity.playlist_one)的名称进行确认"
+            "title": "删除$t(entity.playlist, {\"count\": 1})",
+            "success": "$t(entity.playlist, {\"count\": 1})已成功删除",
+            "input_confirm": "输入$t(entity.playlist, {\"count\": 1})的名称进行确认"
         },
         "addServer": {
             "title": "添加服务器",
@@ -801,22 +895,22 @@
             "input_url": "url",
             "input_preferInstantMixDescription": "仅使用即时混音来获取类似的歌曲。如果您有修改此行为的插件，则很有用",
             "input_preferInstantMix": "首选即时混音",
-            "input_preferRemoteUrl": "首选公共 URL",
-            "input_remoteUrl": "公共 URL",
-            "input_remoteUrlPlaceholder": "可选：对外功能的公共 URL"
+            "input_preferRemoteUrl": "首选公共 url",
+            "input_remoteUrl": "公共 url",
+            "input_remoteUrlPlaceholder": "可选：对外功能的公共 url"
         },
         "addToPlaylist": {
             "success": "添加$t(entity.trackWithCount, {\"count\": {{message}} })到$t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
-            "title": "添加到$t(entity.playlist_one)",
+            "title": "添加到$t(entity.playlist, {\"count\": 1})",
             "input_skipDuplicates": "跳过重复",
-            "input_playlists": "$t(entity.playlist_other)",
-            "create": "创建 $t(entity.playlist_one) {{playlist}}",
-            "searchOrCreate": "搜索 $t(entity.playlist_other) 或键入以创建一个新的"
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
+            "create": "创建 $t(entity.playlist, {\"count\": 1}) {{playlist}}",
+            "searchOrCreate": "搜索 $t(entity.playlist, {\"count\": 2}) 或键入以创建一个新的"
         },
         "createPlaylist": {
-            "title": "创建$t(entity.playlist_one)",
+            "title": "创建$t(entity.playlist, {\"count\": 1})",
             "input_public": "公开",
-            "success": "已成功创建 $t(entity.playlist_one)",
+            "success": "已成功创建 $t(entity.playlist, {\"count\": 1})",
             "input_description": "$t(common.description)",
             "input_name": "$t(common.name)",
             "input_owner": "$t(common.owner)"
@@ -835,15 +929,15 @@
             "removeRuleGroup": "移除规则组"
         },
         "editPlaylist": {
-            "title": "编辑$t(entity.playlist_one)",
+            "title": "编辑$t(entity.playlist, {\"count\": 1})",
             "publicJellyfinNote": "Jellyfin 出于某种原因不会显示播放列表是否公开。如果您希望保持公开，请选择以下输入",
-            "success": "$t(entity.playlist_one)更新成功",
+            "success": "$t(entity.playlist, {\"count\": 1})更新成功",
             "editNote": "不建议对大型播放列表进行手动编辑，你确定接受新播放列表覆盖已有播放列表可能导致的数据丢失风险吗？"
         },
         "lyricSearch": {
             "title": "搜索歌词",
             "input_name": "$t(common.name)",
-            "input_artist": "$t(entity.artist_one)"
+            "input_artist": "$t(entity.artist, {\"count\": 1})"
         },
         "shareItem": {
             "expireInvalid": "过期时间必须是将来的时间",
@@ -851,7 +945,9 @@
             "allowDownloading": "允许下载",
             "description": "描述",
             "setExpiration": "设置过期时间",
-            "success": "共享链接已复制到剪贴板（或单击此处打开）"
+            "success": "共享链接已复制到剪贴板（或单击此处打开）",
+            "copyToClipboard": "复制到剪贴板：Ctrl+C，Enter",
+            "successMustClick": "分享创建成功。点击此处打开"
         },
         "privateMode": {
             "enabled": "启用私人模式，播放状态现在对外部集成隐藏",
@@ -865,7 +961,9 @@
         "createRadioStation": {
             "input_homepageUrl": "首页地址",
             "input_name": "名称",
-            "input_streamUrl": "串流地址"
+            "input_streamUrl": "串流地址",
+            "success": "电台创建成功",
+            "title": "创建广播电台"
         },
         "lyricsExport": {
             "export": "导出歌词",
@@ -877,12 +975,14 @@
         },
         "shuffleAll": {
             "title": "随机播放",
-            "input_genre": "$t(entity.genre_one)",
+            "input_genre": "$t(entity.genre, {\"count\": 1})",
             "input_played_optionAll": "所有曲目",
             "input_maxYear": "截止年份",
             "input_minYear": "起始年份",
             "input_played_optionUnplayed": "仅未播放的曲目",
-            "input_played_optionPlayed": "仅已播放的曲目"
+            "input_played_optionPlayed": "仅已播放的曲目",
+            "input_limit": "有多少首歌？",
+            "input_played": "播放筛选器"
         }
     },
     "table": {
@@ -916,12 +1016,14 @@
                 "advancedSettings": "高级设置",
                 "autosize": "自动调整大小",
                 "horizontalBorders": "行边框",
-                "verticalBorders": "列边框"
+                "verticalBorders": "列边框",
+                "showHeader": "显示标题"
             },
             "view": {
                 "table": "表格",
                 "grid": "网格",
-                "list": "列表"
+                "list": "列表",
+                "detail": "详情"
             },
             "label": {
                 "releaseDate": "发布日期",
@@ -934,29 +1036,31 @@
                 "trackNumber": "音轨编号",
                 "rowIndex": "行索引",
                 "rating": "$t(common.rating)",
-                "artist": "$t(entity.artist_one)",
-                "album": "$t(entity.album_one)",
+                "artist": "$t(entity.artist, {\"count\": 1})",
+                "album": "$t(entity.album, {\"count\": 1})",
                 "note": "$t(common.note)",
                 "biography": "$t(common.biography)",
                 "owner": "$t(common.owner)",
                 "path": "$t(common.path)",
-                "channels": "$t(common.channel_other)",
+                "channels": "$t(common.channel, {\"count\": 2})",
                 "playCount": "播放次数",
                 "bitrate": "$t(common.bitrate)",
-                "actions": "$t(common.action_other)",
-                "genre": "$t(entity.genre_one)",
+                "actions": "$t(common.action, {\"count\": 2})",
+                "genre": "$t(entity.genre, {\"count\": 1})",
                 "discNumber": "碟片编号",
                 "favorite": "$t(common.favorite)",
                 "year": "$t(common.year)",
-                "albumArtist": "$t(entity.albumArtist_one)",
+                "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
                 "titleCombined": "$t(common.title)（合并）",
                 "codec": "$t(common.codec)",
-                "songCount": "$t(entity.track_other)",
-                "albumCount": "$t(entity.album_other)",
+                "songCount": "$t(entity.track, {\"count\": 2})",
+                "albumCount": "$t(entity.album, {\"count\": 2})",
                 "image": "图片",
                 "bitDepth": "$t(common.bitDepth)",
                 "sampleRate": "$t(common.sampleRate)",
-                "genreBadge": "$t(entity.genre_one)（徽章）"
+                "genreBadge": "$t(entity.genre, {\"count\": 1})（徽章）",
+                "composer": "作曲家",
+                "titleArtist": "$t(common.title) (艺术家)"
             }
         },
         "column": {
@@ -965,7 +1069,7 @@
             "rating": "评分",
             "favorite": "收藏",
             "playCount": "播放次数",
-            "albumCount": "$t(entity.album_other)",
+            "albumCount": "$t(entity.album, {\"count\": 2})",
             "releaseYear": "年份",
             "lastPlayed": "最后播放",
             "biography": "简介",
@@ -974,13 +1078,13 @@
             "title": "标题",
             "bpm": "bpm",
             "dateAdded": "添加日期",
-            "artist": "$t(entity.artist_one)",
-            "songCount": "$t(entity.track_other)",
+            "artist": "$t(entity.artist, {\"count\": 1})",
+            "songCount": "$t(entity.track, {\"count\": 2})",
             "trackNumber": "音轨编号",
-            "genre": "$t(entity.genre_one)",
+            "genre": "$t(entity.genre, {\"count\": 1})",
             "albumArtist": "专辑艺术家",
             "path": "路径",
-            "channels": "$t(common.channel_other)",
+            "channels": "$t(common.channel, {\"count\": 2})",
             "discNumber": "碟片",
             "size": "$t(common.size)",
             "codec": "$t(common.codec)",
@@ -996,7 +1100,7 @@
     },
     "releaseType": {
         "primary": {
-            "album": "$t(entity.album_one)",
+            "album": "$t(entity.album, {\"count\": 1})",
             "broadcast": "播送",
             "ep": "迷你专辑（EP）",
             "single": "单曲",
@@ -1011,7 +1115,10 @@
             "mixtape": "混音专辑",
             "remix": "再混音（Remix）",
             "soundtrack": "原声带",
-            "audioDrama": "广播剧"
+            "audioDrama": "广播剧",
+            "djMix": "DJ混音",
+            "fieldRecording": "现场录制",
+            "spokenWord": "访谈"
         }
     },
     "filterOperator": {
@@ -1032,7 +1139,8 @@
         "notContains": "不包含",
         "startsWith": "以…开头",
         "inTheRangeDate": "在（日期）范围内",
-        "notInPlaylist": "不在…中"
+        "notInPlaylist": "不在…中",
+        "notInTheLast": "不在最后"
     },
     "datetime": {
         "minuteShort": "分",
@@ -1085,6 +1193,87 @@
         "builtIn": "内置",
         "colors": "颜色",
         "gradient": "渐变",
-        "miscellaneousSettings": "杂项设置"
+        "miscellaneousSettings": "杂项设置",
+        "options": {
+            "channelLayout": {
+                "single": "单项"
+            },
+            "mode": {
+                "0": "[0] 离散频率"
+            },
+            "colorMode": {
+                "gradient": "渐变"
+            },
+            "gradient": {
+                "classic": "经典",
+                "prism": "棱镜",
+                "rainbow": "彩虹",
+                "steelblue": "钢蓝色",
+                "orangered": "橙红色"
+            },
+            "frequencyScale": {
+                "none": "无"
+            },
+            "weightingFilter": {
+                "none": "无",
+                "a": "A",
+                "b": "B",
+                "c": "C",
+                "d": "D",
+                "z": "Z"
+            }
+        },
+        "cyclePresets": "循环预设",
+        "includeAllPresets": "包含所有预设",
+        "ignoredPresets": "忽略预设",
+        "selectedPresets": "已选预设",
+        "randomizeNextPreset": "随机化下一个预设",
+        "blendTime": "混合时间",
+        "barSpace": "住间距",
+        "colorStops": "颜色停止",
+        "level": "等级",
+        "colorMode": "颜色模式",
+        "gradientLeft": "左侧渐变",
+        "gradientRight": "右侧渐变",
+        "fft": "FFT",
+        "fftSize": "FFT 大小",
+        "smoothing": "平滑",
+        "frequencyRangeAndScaling": "频率范围和缩放",
+        "minimumFrequency": "最低频率",
+        "maximumFrequency": "最大频率",
+        "frequencyScale": "频率尺度",
+        "sensitivity": "灵敏度",
+        "weightingFilter": "加权滤波器",
+        "minimumDecibels": "最低分贝",
+        "maximumDecibels": "最大分贝",
+        "linearAmplitude": "线性振幅",
+        "linearBoost": "线性增强",
+        "peakBehavior": "峰值行为",
+        "showPeaks": "显示峰值",
+        "fadePeaks": "峰值淡出",
+        "peakLine": "峰值线条",
+        "gravity": "重力",
+        "peakFadeTime": "峰值淡出时间（毫秒）",
+        "peakHoldTime": "峰值保持时间（毫秒）",
+        "radialSpectrum": "圆形频谱",
+        "radial": "径向",
+        "radialInvert": "径向反转",
+        "spinSpeed": "旋转速度",
+        "radius": "半径",
+        "reflexMirror": "反射镜",
+        "reflexFit": "反射贴合",
+        "reflexRatio": "反射比率",
+        "reflexAlpha": "反射Alpha",
+        "reflexBrightness": "反射亮度",
+        "mirror": "镜像",
+        "lowResolution": "低分辨率",
+        "splitGradient": "渐变分割",
+        "showScaleX": "显示比例尺 X",
+        "noteLabels": "笔记标签",
+        "showScaleY": "显示比例尺 Y"
+    },
+    "queryBuilder": {
+        "standardTags": "标准标签",
+        "customTags": "自定义标签"
     }
 }

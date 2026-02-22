@@ -11,6 +11,7 @@ import {
     TableColumnContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { useIsActiveRow } from '/@/renderer/components/item-list/item-table-list/item-table-list-context';
+import { ExplicitIndicator } from '/@/shared/components/explicit-indicator/explicit-indicator';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 
@@ -58,6 +59,7 @@ function DefaultTitleColumn(props: ItemTableListInnerColumn) {
                     isNoSelect
                     {...titleLinkProps}
                 >
+                    <ExplicitIndicator explicitStatus={item?.explicitStatus} />
                     {row}
                 </Text>
             </TableColumnContainer>
@@ -103,6 +105,7 @@ function QueueSongTitleColumn(props: ItemTableListInnerColumn) {
                     isNoSelect
                     {...titleLinkProps}
                 >
+                    <ExplicitIndicator explicitStatus={song?.explicitStatus} />
                     {row}
                     {song?.trackSubtitle && props.itemType !== LibraryItem.QUEUE_SONG && (
                         <Text

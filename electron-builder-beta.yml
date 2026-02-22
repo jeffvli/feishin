@@ -1,7 +1,7 @@
 appId: org.jeffvli.feishin
 productName: Feishin
 artifactName: ${productName}-${version}-${os}-${arch}.${ext}
-electronVersion: 39.2.7
+electronVersion: 39.4.0
 directories:
     buildResources: assets
 files:
@@ -13,9 +13,15 @@ asarUnpack:
     - resources/**
 win:
     target:
-        - zip
-        - nsis
-    icon: assets/icons/icon.png
+        - target: zip
+          arch:
+              - x64
+              - arm64
+        - target: nsis
+          arch:
+              - x64
+              - arm64
+    icon: assets/icons/icon.ico
 
 nsis:
     allowToChangeInstallationDirectory: true

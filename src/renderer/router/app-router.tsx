@@ -8,6 +8,7 @@ import { AppOutlet } from '/@/renderer/router/app-outlet';
 import { AppRoute } from '/@/renderer/router/routes';
 import { TitlebarOutlet } from '/@/renderer/router/titlebar-outlet';
 import { BaseContextModal, ModalsProvider } from '/@/shared/components/modal/modal';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 
 const NowPlayingRoute = lazy(
     () => import('/@/renderer/features/now-playing/routes/now-playing-route'),
@@ -55,6 +56,10 @@ const AlbumArtistDetailTopSongsListRoute = lazy(
     () => import('../features/artists/routes/album-artist-detail-top-songs-list-route'),
 );
 
+const AlbumArtistDetailFavoriteSongsListRoute = lazy(
+    () => import('../features/artists/routes/album-artist-detail-favorite-songs-list-route'),
+);
+
 const AlbumDetailRoute = lazy(
     () => import('/@/renderer/features/albums/routes/album-detail-route'),
 );
@@ -86,7 +91,7 @@ const LazyLyricsSettingsContextModal = lazy(() =>
 );
 
 const LyricsSettingsContextModal = (props: any) => (
-    <Suspense fallback={<></>}>
+    <Suspense fallback={<Spinner container />}>
         <LazyLyricsSettingsContextModal {...props} />
     </Suspense>
 );
@@ -98,7 +103,7 @@ const LazyShuffleAllContextModal = lazy(() =>
 );
 
 const ShuffleAllContextModal = (props: any) => (
-    <Suspense fallback={<></>}>
+    <Suspense fallback={<Spinner container />}>
         <LazyShuffleAllContextModal {...props} />
     </Suspense>
 );
@@ -112,7 +117,7 @@ const LazyAddToPlaylistContextModal = lazy(() =>
 );
 
 const AddToPlaylistContextModal = (props: any) => (
-    <Suspense fallback={<></>}>
+    <Suspense fallback={<Spinner container />}>
         <LazyAddToPlaylistContextModal {...props} />
     </Suspense>
 );
@@ -126,7 +131,7 @@ const LazySaveAndReplaceContextModal = lazy(() =>
 );
 
 const SaveAndReplaceContextModal = (props: any) => (
-    <Suspense fallback={<></>}>
+    <Suspense fallback={<Spinner container />}>
         <LazySaveAndReplaceContextModal {...props} />
     </Suspense>
 );
@@ -138,7 +143,7 @@ const LazyUpdatePlaylistContextModal = lazy(() =>
 );
 
 const UpdatePlaylistContextModal = (props: any) => (
-    <Suspense fallback={<></>}>
+    <Suspense fallback={<Spinner container />}>
         <LazyUpdatePlaylistContextModal {...props} />
     </Suspense>
 );
@@ -150,7 +155,7 @@ const LazySettingsContextModal = lazy(() =>
 );
 
 const SettingsContextModal = (props: any) => (
-    <Suspense fallback={<></>}>
+    <Suspense fallback={<Spinner container />}>
         <LazySettingsContextModal {...props} />
     </Suspense>
 );
@@ -162,7 +167,7 @@ const LazyShareItemContextModal = lazy(() =>
 );
 
 const ShareItemContextModal = (props: any) => (
-    <Suspense fallback={<></>}>
+    <Suspense fallback={<Spinner container />}>
         <LazyShareItemContextModal {...props} />
     </Suspense>
 );
@@ -176,7 +181,7 @@ const LazyVisualizerSettingsContextModal = lazy(() =>
 );
 
 const VisualizerSettingsContextModal = (props: any) => (
-    <Suspense fallback={<></>}>
+    <Suspense fallback={<Spinner container />}>
         <LazyVisualizerSettingsContextModal {...props} />
     </Suspense>
 );
@@ -251,6 +256,14 @@ export const AppRouter = () => {
                                                 element={<AlbumArtistDetailTopSongsListRoute />}
                                                 path={AppRoute.LIBRARY_ARTISTS_DETAIL_TOP_SONGS}
                                             />
+                                            <Route
+                                                element={
+                                                    <AlbumArtistDetailFavoriteSongsListRoute />
+                                                }
+                                                path={
+                                                    AppRoute.LIBRARY_ARTISTS_DETAIL_FAVORITE_SONGS
+                                                }
+                                            />
                                         </Route>
                                         <Route
                                             element={<DummyAlbumDetailRoute />}
@@ -293,6 +306,14 @@ export const AppRouter = () => {
                                                     element={<AlbumArtistDetailTopSongsListRoute />}
                                                     path={
                                                         AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_TOP_SONGS
+                                                    }
+                                                />
+                                                <Route
+                                                    element={
+                                                        <AlbumArtistDetailFavoriteSongsListRoute />
+                                                    }
+                                                    path={
+                                                        AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_FAVORITE_SONGS
                                                     }
                                                 />
                                             </Route>

@@ -87,15 +87,18 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                         </Group>
                                         <Text isMuted size="sm">
                                             {itemType === LibraryItem.ALBUM &&
-                                                t('entity.album_other', {
+                                                t('entity.album', {
+                                                    count: 2,
                                                     postProcess: 'sentenceCase',
                                                 })}
                                             {itemType === LibraryItem.ALBUM_ARTIST &&
-                                                t('entity.artist_other', {
+                                                t('entity.artist', {
+                                                    count: 2,
                                                     postProcess: 'sentenceCase',
                                                 })}
                                             {itemType === LibraryItem.SONG &&
-                                                t('entity.track_other', {
+                                                t('entity.track', {
+                                                    count: 2,
                                                     postProcess: 'sentenceCase',
                                                 })}
                                         </Text>
@@ -107,14 +110,20 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                         leftSection={<Icon icon="track" size="xl" />}
                                         onClick={() => handleItemTypeChange(LibraryItem.SONG)}
                                     >
-                                        {t('entity.track_other', { postProcess: 'sentenceCase' })}
+                                        {t('entity.track', {
+                                            count: 2,
+                                            postProcess: 'sentenceCase',
+                                        })}
                                     </DropdownMenu.Item>
                                     <DropdownMenu.Item
                                         isSelected={itemType === LibraryItem.ALBUM}
                                         leftSection={<Icon icon="album" size="xl" />}
                                         onClick={() => handleItemTypeChange(LibraryItem.ALBUM)}
                                     >
-                                        {t('entity.album_other', { postProcess: 'sentenceCase' })}
+                                        {t('entity.album', {
+                                            count: 2,
+                                            postProcess: 'sentenceCase',
+                                        })}
                                     </DropdownMenu.Item>
                                     <DropdownMenu.Item
                                         isSelected={itemType === LibraryItem.ALBUM_ARTIST}
@@ -123,7 +132,10 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                             handleItemTypeChange(LibraryItem.ALBUM_ARTIST)
                                         }
                                     >
-                                        {t('entity.artist_other', { postProcess: 'sentenceCase' })}
+                                        {t('entity.artist', {
+                                            count: 2,
+                                            postProcess: 'sentenceCase',
+                                        })}
                                     </DropdownMenu.Item>
                                 </DropdownMenu.Dropdown>
                             </DropdownMenu>

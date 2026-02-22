@@ -1,235 +1,71 @@
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useQuery } from '@tanstack/react-query';
-import { Suspense, useCallback, useMemo, useRef, useState } from 'react';
+import { Suspense, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useLocation, useNavigate, useParams } from 'react-router';
 
-import { ListContext } from '/@/renderer/context/list-context';
+import { ListContext, useListContext } from '/@/renderer/context/list-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
+import { ClientSideSongFilters } from '/@/renderer/features/playlists/components/client-side-song-filters';
 import { PlaylistDetailSongListContent } from '/@/renderer/features/playlists/components/playlist-detail-song-list-content';
 import { PlaylistDetailSongListHeader } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header';
-import {
-    PlaylistQueryBuilder,
-    PlaylistQueryBuilderRef,
-} from '/@/renderer/features/playlists/components/playlist-query-builder';
+import { PlaylistQueryBuilderRef } from '/@/renderer/features/playlists/components/playlist-query-builder';
+import { PlaylistQueryEditor } from '/@/renderer/features/playlists/components/playlist-query-editor';
 import { SaveAsPlaylistForm } from '/@/renderer/features/playlists/components/save-as-playlist-form';
+import { usePlaylistSongListFilters } from '/@/renderer/features/playlists/hooks/use-playlist-song-list-filters';
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
-import { convertQueryGroupToNDQuery } from '/@/renderer/features/playlists/utils';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
-import { JsonPreview } from '/@/renderer/features/shared/components/json-preview';
+import { ListWithSidebarContainer } from '/@/renderer/features/shared/components/list-with-sidebar-container';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer } from '/@/renderer/store';
+import {
+    PlaylistTarget,
+    useCurrentServer,
+    usePageSidebar,
+    usePlaylistTarget,
+} from '/@/renderer/store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
-import { Icon } from '/@/shared/components/icon/icon';
 import { ConfirmModal } from '/@/shared/components/modal/modal';
+import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
-import { ServerType, SongListSort } from '/@/shared/types/domain-types';
+import { LibraryItem, ServerType } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
-interface PlaylistQueryEditorProps {
-    createPlaylistMutation: ReturnType<typeof useCreatePlaylist>;
-    detailQuery: ReturnType<typeof useQuery<any>>;
-    handleSave: (
-        filter: Record<string, any>,
-        extraFilters: { limit?: number; sortBy?: string[]; sortOrder?: string },
-    ) => void;
-    handleSaveAs: (
-        filter: Record<string, any>,
-        extraFilters: { limit?: number; sortBy?: string[]; sortOrder?: string },
-    ) => void;
-    isQueryBuilderExpanded: boolean;
-    onToggleExpand: () => void;
-    playlistId: string;
-    queryBuilderRef: React.RefObject<null | PlaylistQueryBuilderRef>;
-}
-
-const PlaylistQueryEditor = ({
-    createPlaylistMutation,
-    detailQuery,
-    handleSave,
-    handleSaveAs,
-    isQueryBuilderExpanded,
-    onToggleExpand,
-    playlistId,
-    queryBuilderRef,
-}: PlaylistQueryEditorProps) => {
+const PlaylistSongListFiltersSidebar = () => {
     const { t } = useTranslation();
-
-    const openPreviewModal = useCallback(() => {
-        const filters = queryBuilderRef.current?.getFilters();
-
-        if (!filters) {
-            return;
-        }
-
-        const queryValue = convertQueryGroupToNDQuery(filters.filters);
-        const sortString = filters.extraFilters.sortBy?.[0];
-
-        const previewValue = {
-            ...queryValue,
-            ...(filters.extraFilters.limit && { limit: filters.extraFilters.limit }),
-            ...(sortString && { sort: sortString }),
-        };
-
-        openModal({
-            children: <JsonPreview value={previewValue} />,
-            size: 'xl',
-            title: t('common.preview', { postProcess: 'titleCase' }),
-        });
-    }, [queryBuilderRef, t]);
-
-    const openSaveAndReplaceModal = useCallback(() => {
-        if (!isQueryBuilderExpanded) {
-            return;
-        }
-
-        const filters = queryBuilderRef.current?.getFilters();
-
-        if (!filters) {
-            return;
-        }
-
-        openModal({
-            children: (
-                <ConfirmModal
-                    onConfirm={() => {
-                        handleSave(
-                            convertQueryGroupToNDQuery(filters.filters),
-                            filters.extraFilters,
-                        );
-                        closeAllModals();
-                    }}
-                >
-                    <Text>{t('common.areYouSure', { postProcess: 'sentenceCase' })}</Text>
-                </ConfirmModal>
-            ),
-            title: t('common.saveAndReplace', { postProcess: 'sentenceCase' }),
-        });
-    }, [isQueryBuilderExpanded, queryBuilderRef, handleSave, t]);
-
-    const parseSortBy = useCallback((): string[] => {
-        const sort = detailQuery?.data?.rules?.sort;
-        // Handle new syntax: comma-separated with +/- prefix
-        // e.g., "+album,-year" -> return as single string in array
-        if (typeof sort === 'string') {
-            // Check if it's new syntax (has +/- prefix or commas)
-            if (sort.includes(',') || sort.startsWith('+') || sort.startsWith('-')) {
-                return [sort];
-            }
-            // Old syntax: single field, convert to new format with default order
-            const order = detailQuery?.data?.rules?.order || 'asc';
-            const prefix = order === 'desc' ? '-' : '+';
-            return [`${prefix}${sort}`];
-        }
-        if (Array.isArray(sort)) {
-            // If array, check if first item has +/- prefix
-            if (
-                sort.length > 0 &&
-                typeof sort[0] === 'string' &&
-                (sort[0].startsWith('+') || sort[0].startsWith('-'))
-            ) {
-                return sort;
-            }
-            // Old array format, convert to new format
-            const order = detailQuery?.data?.rules?.order || 'asc';
-            const prefix = order === 'desc' ? '-' : '+';
-            return sort.map((s) => `${prefix}${s}`);
-        }
-        return ['+dateAdded'];
-    }, [detailQuery?.data?.rules?.order, detailQuery?.data?.rules?.sort]);
-
-    const parseSortOrder = useCallback((): 'asc' | 'desc' => {
-        const sort = detailQuery?.data?.rules?.sort;
-        if (typeof sort === 'string' && sort.startsWith('-')) {
-            return 'desc';
-        }
-        // Fall back to old order field or default
-        return detailQuery?.data?.rules?.order || 'asc';
-    }, [detailQuery?.data?.rules?.order, detailQuery?.data?.rules?.sort]);
+    const { setIsSidebarOpen } = useListContext();
+    const { clear } = usePlaylistSongListFilters();
 
     return (
-        <div className="query-editor-container">
-            <Stack gap={0} h="100%" mah="30dvh" p="md" w="100%">
-                <Group justify="space-between" pb="md" wrap="nowrap">
-                    <Group gap="sm" wrap="nowrap">
-                        <Button
-                            leftSection={
-                                <Icon
-                                    icon={isQueryBuilderExpanded ? 'arrowUpS' : 'arrowDownS'}
-                                    size="lg"
-                                />
-                            }
-                            onClick={onToggleExpand}
-                            size="sm"
+        <Stack h="100%" style={{ minHeight: 0 }}>
+            <Group justify="space-between" pb={0} pl="md" pr="md" pt="md">
+                <Text fw={500} size="xl">
+                    {t('common.filters', { postProcess: 'sentenceCase' })}
+                </Text>
+                <Group gap="xs">
+                    <Button onClick={clear} size="compact-sm" variant="subtle">
+                        {t('common.reset', { postProcess: 'sentenceCase' })}
+                    </Button>
+                    {setIsSidebarOpen && (
+                        <ActionIcon
+                            icon="unpin"
+                            onClick={() => setIsSidebarOpen(false)}
+                            size="compact-sm"
                             variant="subtle"
-                        >
-                            {t('form.queryEditor.title', {
-                                postProcess: 'titleCase',
-                            })}
-                        </Button>
-                    </Group>
-                    <Group gap="xs">
-                        <Button onClick={openPreviewModal} size="sm" variant="subtle">
-                            {t('common.preview', { postProcess: 'titleCase' })}
-                        </Button>
-                        <Button
-                            disabled={!isQueryBuilderExpanded}
-                            leftSection={<Icon icon="save" />}
-                            loading={createPlaylistMutation?.isPending}
-                            onClick={() => {
-                                if (!isQueryBuilderExpanded) return;
-                                const filters = queryBuilderRef.current?.getFilters();
-                                if (filters) {
-                                    handleSaveAs(
-                                        convertQueryGroupToNDQuery(filters.filters),
-                                        filters.extraFilters,
-                                    );
-                                }
-                            }}
-                            size="sm"
-                            variant="subtle"
-                        >
-                            {t('common.saveAs', { postProcess: 'titleCase' })}
-                        </Button>
-                        <Button
-                            disabled={!isQueryBuilderExpanded}
-                            leftSection={<Icon color="error" icon="save" />}
-                            onClick={openSaveAndReplaceModal}
-                            size="sm"
-                            variant="subtle"
-                        >
-                            {t('common.saveAndReplace', {
-                                postProcess: 'titleCase',
-                            })}
-                        </Button>
-                    </Group>
+                        />
+                    )}
                 </Group>
-                <div
-                    style={{
-                        display: isQueryBuilderExpanded ? 'flex' : 'none',
-                        flex: 1,
-                        minHeight: 0,
-                        overflow: 'hidden',
-                    }}
-                >
-                    <PlaylistQueryBuilder
-                        key={JSON.stringify(detailQuery?.data?.rules)}
-                        limit={detailQuery?.data?.rules?.limit}
-                        playlistId={playlistId}
-                        query={detailQuery?.data?.rules}
-                        ref={queryBuilderRef}
-                        sortBy={parseSortBy() as SongListSort | SongListSort[]}
-                        sortOrder={parseSortOrder()}
-                    />
-                </div>
-            </Stack>
-        </div>
+            </Group>
+            <ScrollArea style={{ flex: 1, minHeight: 0 }}>
+                <ClientSideSongFilters />
+            </ScrollArea>
+        </Stack>
     );
 };
 
@@ -396,24 +232,45 @@ const PlaylistDetailSongListRoute = () => {
         setIsQueryBuilderExpanded(true);
     };
 
+    const playlistTarget = usePlaylistTarget();
+    const displayMode: LibraryItem.ALBUM | LibraryItem.SONG =
+        playlistTarget === PlaylistTarget.ALBUM ? LibraryItem.ALBUM : LibraryItem.SONG;
+    const listKey =
+        displayMode === LibraryItem.ALBUM ? ItemListKey.PLAYLIST_ALBUM : ItemListKey.PLAYLIST_SONG;
+
     const [itemCount, setItemCount] = useState<number | undefined>(undefined);
     const [listData, setListData] = useState<unknown[]>([]);
     const [mode, setMode] = useState<'edit' | 'view'>('view');
+    const [isSidebarOpen, setIsSidebarOpen] = usePageSidebar(listKey);
 
     const providerValue = useMemo(() => {
         return {
             customFilters: undefined,
+            displayMode,
             id: playlistId,
+            isSidebarOpen,
             isSmartPlaylist,
             itemCount,
             listData,
+            listKey,
             mode,
-            pageKey: ItemListKey.PLAYLIST_SONG,
+            pageKey: listKey,
+            setIsSidebarOpen,
             setItemCount,
             setListData,
             setMode,
         };
-    }, [playlistId, isSmartPlaylist, itemCount, listData, mode]);
+    }, [
+        playlistId,
+        isSmartPlaylist,
+        displayMode,
+        listKey,
+        isSidebarOpen,
+        itemCount,
+        listData,
+        mode,
+        setIsSidebarOpen,
+    ]);
 
     return (
         <AnimatedPage key={`playlist-detail-songList-${playlistId}`}>
@@ -429,6 +286,15 @@ const PlaylistDetailSongListRoute = () => {
                     onDelete={() => openDeletePlaylistModal()}
                     onToggleQueryBuilder={handleToggleShowQueryBuilder}
                 />
+
+                <ListWithSidebarContainer>
+                    <ListWithSidebarContainer.SidebarPortal>
+                        <PlaylistSongListFiltersSidebar />
+                    </ListWithSidebarContainer.SidebarPortal>
+                    <Suspense fallback={<Spinner container />}>
+                        <PlaylistDetailSongListContent />
+                    </Suspense>
+                </ListWithSidebarContainer>
                 {(isSmartPlaylist || showQueryBuilder) && (
                     <PlaylistQueryEditor
                         createPlaylistMutation={createPlaylistMutation}
@@ -441,9 +307,6 @@ const PlaylistDetailSongListRoute = () => {
                         queryBuilderRef={queryBuilderRef}
                     />
                 )}
-                <Suspense fallback={<Spinner container />}>
-                    <PlaylistDetailSongListContent />
-                </Suspense>
             </ListContext.Provider>
         </AnimatedPage>
     );

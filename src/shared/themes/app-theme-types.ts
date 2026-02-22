@@ -12,6 +12,7 @@ export enum AppTheme {
     DRACULA = 'dracula',
     GITHUB_DARK = 'githubDark',
     GITHUB_LIGHT = 'githubLight',
+    GLASSY_DARK = 'glassyDark',
     GRUVBOX_DARK = 'gruvboxDark',
     GRUVBOX_LIGHT = 'gruvboxLight',
     HIGH_CONTRAST_DARK = 'highContrastDark',

@@ -14,14 +14,16 @@
 }
 
 .content {
-    padding: var(--theme-spacing-md);
+    padding: var(--theme-spacing-sm);
     overflow: hidden;
     background: var(--theme-colors-background);
     border: 2px solid var(--theme-colors-border);
+    border-radius: var(--theme-radius-md);
+    box-shadow: 2px 2px 10px 2px rgb(0 0 0 / 40%);
+    filter: drop-shadow(0 0 5px rgb(0 0 0 / 50%));
 }
 
 .close {
     position: absolute;
-    top: var(--theme-spacing-md);
     right: var(--theme-spacing-md);
 }

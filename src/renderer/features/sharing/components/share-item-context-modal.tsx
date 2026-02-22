@@ -74,13 +74,22 @@ export const ShareItemContextModal = ({
                     if (!serverUrl) throw new Error('Server URL not found');
                     const shareUrl = `${serverUrl}/share/${_data.id}`;
 
-                    navigator.clipboard.writeText(shareUrl);
+                    const canUseClipboard = navigator.clipboard && window.isSecureContext;
+                    if (canUseClipboard) {
+                        navigator.clipboard.writeText(shareUrl);
+                    }
+
                     toast.success({
-                        autoClose: 5000,
+                        autoClose: canUseClipboard ? 5000 : 15000,
                         id: 'share-item-toast',
-                        message: t('form.shareItem.success', {
-                            postProcess: 'sentenceCase',
-                        }),
+                        message: t(
+                            canUseClipboard
+                                ? 'form.shareItem.success'
+                                : 'form.shareItem.successMustClick',
+                            {
+                                postProcess: 'sentenceCase',
+                            },
+                        ),
                         onClick: (a) => {
                             if (!(a.target instanceof HTMLElement)) return;
 

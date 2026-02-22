@@ -81,6 +81,7 @@ export const FullScreenPlayerQueue = () => {
                 gap={0}
                 grow
                 justify="center"
+                pb="md"
             >
                 {headerItems.map((item) => (
                     <div className={styles.headerItemWrapper} key={`tab-${item.label}`}>

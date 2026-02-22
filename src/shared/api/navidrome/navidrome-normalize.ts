@@ -394,6 +394,7 @@ const normalizeAlbum = (
         isCompilation: item.compilation,
         lastPlayedAt: normalizePlayDate(item),
         mbzId: item.mbzAlbumId || null,
+        mbzReleaseGroupId: item.mbzReleaseGroupId || null,
         name: item.name,
         originalDate: originalDate.date,
         originalYear: originalDate.year,

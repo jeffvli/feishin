@@ -8,6 +8,7 @@ import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpe
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemListTableComponentProps } from '/@/renderer/components/item-list/types';
+import { useListContext } from '/@/renderer/context/list-context';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import {
     AlbumListQuery,
@@ -23,6 +24,7 @@ export const AlbumListInfiniteTable = ({
     autoFitColumns = false,
     columns,
     enableAlternateRowColors = false,
+    enableHeader = true,
     enableHorizontalBorders = false,
     enableRowHoverHighlight = true,
     enableSelection = true,
@@ -42,10 +44,11 @@ export const AlbumListInfiniteTable = ({
     }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
 
     const listQueryFn = api.controller.getAlbumList;
+    const { pageKey } = useListContext();
 
     const { getItem, getItemIndex, itemCount, loadedItems, onRangeChanged } =
         useItemListInfiniteLoader({
-            eventKey: ItemListKey.ALBUM,
+            eventKey: pageKey || ItemListKey.ALBUM,
             itemsPerPage,
             itemType: LibraryItem.ALBUM,
             listCountQuery,
@@ -73,6 +76,7 @@ export const AlbumListInfiniteTable = ({
             columns={columns}
             data={loadedItems}
             enableAlternateRowColors={enableAlternateRowColors}
+            enableHeader={enableHeader}
             enableHorizontalBorders={enableHorizontalBorders}
             enableRowHoverHighlight={enableRowHoverHighlight}
             enableSelection={enableSelection}

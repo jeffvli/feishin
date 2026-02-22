@@ -20,7 +20,6 @@ export function AlbumArtistGridCarousel(props: AlbumArtistGridCarouselProps) {
     const controls = useDefaultItemListControls();
 
     const cards = useMemo(() => {
-        // Filter out excluded IDs if provided
         const filteredItems = excludeIds
             ? data.filter((albumArtist) => !excludeIds.includes(albumArtist.id))
             : data;

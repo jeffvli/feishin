@@ -6,6 +6,10 @@
     filter: drop-shadow(0 0 5px rgb(0 0 0 / 40%)) drop-shadow(0 0 5px rgb(0 0 0 / 40%));
 }
 
+.censored.image {
+    filter: blur(30px);
+}
+
 .image-container {
     position: relative;
     display: flex;

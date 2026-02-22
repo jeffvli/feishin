@@ -1,22 +1,22 @@
 {
     "action": {
-        "editPlaylist": "redigera $t(entity.playlist_one)",
+        "editPlaylist": "redigera $t(entity.playlist, {\"count\": 1})",
         "goToPage": "gå till sida",
         "moveToTop": "flytta till toppen",
         "clearQueue": "rensa kö",
-        "addToFavorites": "lägg till $t(entity.favorite_other)",
-        "addToPlaylist": "lägg till $t(entity.playlist_one)",
-        "createPlaylist": "skapa $t(entity.playlist_one)",
-        "removeFromPlaylist": "ta bort från $t(entity.playlist_one)",
-        "viewPlaylists": "visa $t(entity.playlist_other)",
+        "addToFavorites": "lägg till $t(entity.favorite, {\"count\": 2})",
+        "addToPlaylist": "lägg till $t(entity.playlist, {\"count\": 1})",
+        "createPlaylist": "skapa $t(entity.playlist, {\"count\": 1})",
+        "removeFromPlaylist": "ta bort från $t(entity.playlist, {\"count\": 1})",
+        "viewPlaylists": "visa $t(entity.playlist, {\"count\": 2})",
         "refresh": "$t(common.refresh)",
-        "deletePlaylist": "ta bort $t(entity.playlist_one)",
+        "deletePlaylist": "ta bort $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "ta bort från kö",
         "deselectAll": "avmarkera alla",
         "moveToBottom": "flytta till botten",
         "setRating": "sätt betyg",
         "toggleSmartPlaylistEditor": "växla $t(entity.smartPlaylist) redigerare",
-        "removeFromFavorites": "ta bort från $t(entity.favorite_other)",
+        "removeFromFavorites": "ta bort från $t(entity.favorite, {\"count\": 2})",
         "downloadStarted": "startade nedladdning av {{count}} objekt",
         "moveToNext": "flytta till nästa",
         "moveUp": "flytta upp",
@@ -32,8 +32,8 @@
             "lastfm": "Öppna i Last.fm",
             "musicbrainz": "Öppna i MusicBrainz"
         },
-        "createRadioStation": "skapa $t(entity.radioStation_one)",
-        "deleteRadioStation": "ta bort $t(entity.radioStation_one)",
+        "createRadioStation": "skapa $t(entity.radioStation, {\"count\": 1})",
+        "deleteRadioStation": "ta bort $t(entity.radioStation, {\"count\": 1})",
         "addOrRemoveFromSelection": "lägg till eller ta bort från markerade",
         "selectRangeOfItems": "välj en mängd objekt",
         "selectAll": "markera alla",
@@ -52,7 +52,7 @@
         "left": "vänster",
         "save": "spara",
         "right": "höger",
-        "currentSong": "aktuell $t(entity.track_one)",
+        "currentSong": "aktuell $t(entity.track, {\"count\": 1})",
         "collapse": "kollaps",
         "trackNumber": "spår",
         "descending": "fallande",
@@ -81,7 +81,8 @@
         "delete": "ta bort",
         "cancel": "avbryt",
         "forceRestartRequired": "starta om för att tillämpa ändringar... Stäng meddelandet för att starta om",
-        "setting": "inställning",
+        "setting_one": "inställning",
+        "setting_other": "",
         "version": "version",
         "title": "titel",
         "filter_one": "filter",
@@ -105,7 +106,7 @@
         "none": "ingen",
         "menu": "meny",
         "restartRequired": "omstart krävs",
-        "previousSong": "föregående $t(entity.track_one)",
+        "previousSong": "föregående $t(entity.track, {\"count\": 1})",
         "noResultsFromQuery": "frågan returnerade inga resultat",
         "quit": "avsluta",
         "expand": "expandera",
@@ -192,7 +193,7 @@
         "rating": "betyg",
         "search": "sök",
         "bitrate": "bithastighet",
-        "genre": "$t(entity.genre_one)",
+        "genre": "$t(entity.genre, {\"count\": 1})",
         "recentlyAdded": "nyligen tillagda",
         "note": "anteckning",
         "name": "namn",
@@ -201,7 +202,7 @@
         "communityRating": "betyg från communityn",
         "path": "sökväg",
         "favorited": "favoritmärkt",
-        "albumArtist": "$t(entity.albumArtist_one)",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
         "isRecentlyPlayed": "spelas nyligen",
         "isFavorited": "är favoritmärkt",
         "bpm": "bpm",
@@ -209,32 +210,32 @@
         "id": "id",
         "disc": "skiva",
         "biography": "biografi",
-        "artist": "$t(entity.artist_one)",
+        "artist": "$t(entity.artist, {\"count\": 1})",
         "duration": "längd",
         "isPublic": "är offentlig",
         "random": "slumpmässig",
         "lastPlayed": "senast spelad",
         "toYear": "till år",
         "fromYear": "från år",
-        "album": "$t(entity.album_one)",
+        "album": "$t(entity.album, {\"count\": 1})",
         "trackNumber": "spår",
         "songCount": "sångräkning",
         "criticRating": "kritikerbetyg",
-        "albumCount": "$t(entity.album_other) antal",
+        "albumCount": "$t(entity.album, {\"count\": 2}) antal",
         "explicitStatus": "$t(common.explicitStatus)"
     },
     "form": {
         "deletePlaylist": {
-            "title": "ta bort $t(entity.playlist_one)",
-            "success": "$t(entity.playlist_one) har tagits bort",
-            "input_confirm": "Skriv namnet på $t(entity.playlist_one) för att bekräfta"
+            "title": "ta bort $t(entity.playlist, {\"count\": 1})",
+            "success": "$t(entity.playlist, {\"count\": 1}) har tagits bort",
+            "input_confirm": "Skriv namnet på $t(entity.playlist, {\"count\": 1}) för att bekräfta"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
-            "title": "skapa $t(entity.playlist_one)",
+            "title": "skapa $t(entity.playlist, {\"count\": 1})",
             "input_public": "offentlig",
             "input_name": "$t(common.name)",
-            "success": "$t(entity.playlist_one) skapad",
+            "success": "$t(entity.playlist, {\"count\": 1}) skapad",
             "input_owner": "$t(common.owner)"
         },
         "addServer": {
@@ -254,11 +255,11 @@
         },
         "addToPlaylist": {
             "success": "lade till $t(entity.trackWithCount, {\"count\": {{message}} }) till $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
-            "title": "lägg till i $t(entity.playlist_one)",
+            "title": "lägg till i $t(entity.playlist, {\"count\": 1})",
             "input_skipDuplicates": "hoppa över dubbletter",
-            "input_playlists": "$t(entity.playlist_other)",
-            "create": "skapa $t(entity.playlist_one) {{playlist}}",
-            "searchOrCreate": "sök $t(entity.playlist_other) eller skriv för att skapa en ny"
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
+            "create": "skapa $t(entity.playlist, {\"count\": 1}) {{playlist}}",
+            "searchOrCreate": "sök $t(entity.playlist, {\"count\": 2}) eller skriv för att skapa en ny"
         },
         "updateServer": {
             "title": "uppdatera server",
@@ -270,11 +271,11 @@
         },
         "lyricSearch": {
             "input_name": "$t(common.name)",
-            "input_artist": "$t(entity.artist_one)",
+            "input_artist": "$t(entity.artist, {\"count\": 1})",
             "title": "sångtext sök"
         },
         "editPlaylist": {
-            "title": "redigera $t(entity.playlist_one)",
+            "title": "redigera $t(entity.playlist, {\"count\": 1})",
             "publicJellyfinNote": "Jellyfin visar av någon anledning inte om en spellista är publik eller inte. Om du önskar att denna ska förbli publik, så får du ha följande indata markerade"
         },
         "largeFetchConfirmation": {
@@ -309,7 +310,7 @@
         "appMenu": {
             "selectServer": "välj server",
             "version": "version {{version}}",
-            "settings": "$t(common.setting_other)",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "manageServers": "hantera servrar",
             "expandSidebar": "expandera sidofältet",
             "openBrowserDevtools": "öppna webbläsarens utvecklingsverktyg",
@@ -342,19 +343,19 @@
             "playShuffled": "$t(player.shuffle)",
             "shareItem": "dela objekt",
             "goTo": "gå till",
-            "goToAlbum": "gå till $t(entity.album_one)",
-            "goToAlbumArtist": "gå till $t(entity.albumArtist_one)",
+            "goToAlbum": "gå till $t(entity.album, {\"count\": 1})",
+            "goToAlbumArtist": "gå till $t(entity.albumArtist, {\"count\": 1})",
             "showDetails": "hämta information"
         },
         "albumDetail": {
-            "moreFromArtist": "mer från $t(entity.artist_one)",
+            "moreFromArtist": "mer från $t(entity.artist, {\"count\": 1})",
             "moreFromGeneric": "mer från {{item}}"
         },
         "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumList": {
-            "title": "$t(entity.album_other)"
+            "title": "$t(entity.album, {\"count\": 2})"
         },
         "sidebar": {
             "nowPlaying": "nu spelas"
@@ -419,7 +420,7 @@
         "genreWithCount_other": "{{count}} genrer",
         "play_one": "{{count}} spelning",
         "play_other": "{{count}} spelningar",
-        "smartPlaylist": "smart $t(entity.playlist_one)",
+        "smartPlaylist": "smart $t(entity.playlist, {\"count\": 1})",
         "song_one": "låt",
         "song_other": "låtar",
         "radioStation_one": "radiostation",

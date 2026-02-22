@@ -196,7 +196,7 @@ export const QueryBuilder = ({
                             filters={filters}
                             groupIndex={groupIndex || []}
                             level={level}
-                            noRemove={data?.rules?.length === 1}
+                            noRemove={false}
                             onChangeField={onChangeField}
                             onChangeOperator={onChangeOperator}
                             onChangeValue={onChangeValue}

@@ -6,6 +6,7 @@ import { useGridRows } from '/@/renderer/components/item-list/helpers/use-grid-r
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
 import { ItemGridList } from '/@/renderer/components/item-list/item-grid-list/item-grid-list';
 import { ItemListGridComponentProps } from '/@/renderer/components/item-list/types';
+import { useListContext } from '/@/renderer/context/list-context';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { useGeneralSettings } from '/@/renderer/store';
 import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/shared/types/domain-types';
@@ -31,10 +32,11 @@ export const SongListInfiniteGrid = ({
     }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
 
     const listQueryFn = api.controller.getSongList;
+    const { pageKey } = useListContext();
 
     const { dataVersion, getItem, getItemIndex, itemCount, loadedItems, onRangeChanged } =
         useItemListInfiniteLoader({
-            eventKey: ItemListKey.SONG,
+            eventKey: pageKey || ItemListKey.SONG,
             itemsPerPage,
             itemType: LibraryItem.SONG,
             listCountQuery,

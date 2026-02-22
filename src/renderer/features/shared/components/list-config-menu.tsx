@@ -18,6 +18,10 @@ import { Table } from '/@/shared/components/table/table';
 import { useDisclosure } from '/@/shared/hooks/use-disclosure';
 import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 
+export const SONG_DISPLAY_TYPES: ListConfigMenuDisplayTypeConfig[] = [
+    { hidden: true, value: ListDisplayType.DETAIL },
+];
+
 const DISPLAY_TYPES = [
     {
         label: (
@@ -36,6 +40,15 @@ const DISPLAY_TYPES = [
             </Group>
         ),
         value: ListDisplayType.GRID,
+    },
+    {
+        label: (
+            <Group align="center" justify="center" p="sm">
+                <Icon icon="layoutDetail" size="lg" />
+                {i18n.t('table.config.view.detail', { postProcess: 'sentenceCase' }) as string}
+            </Group>
+        ),
+        value: ListDisplayType.DETAIL,
     },
     // {
     //     disabled: true,
@@ -63,6 +76,12 @@ export const ListConfigBooleanControl = ({
     );
 };
 
+export interface ListConfigMenuDetailConfig {
+    optionsConfig?: ListConfigMenuOptionsConfig['detail'];
+    tableColumnsData: { label: string; value: string }[];
+    tableKey: 'detail';
+}
+
 export interface ListConfigMenuDisplayTypeConfig {
     disabled?: boolean;
     hidden?: boolean;
@@ -75,6 +94,9 @@ export interface ListConfigMenuOptionConfig {
 }
 
 export interface ListConfigMenuOptionsConfig {
+    detail?: {
+        [key: string]: ListConfigMenuOptionConfig;
+    };
     grid?: {
         [key: string]: ListConfigMenuOptionConfig;
     };
@@ -85,6 +107,7 @@ export interface ListConfigMenuOptionsConfig {
 
 interface ListConfigMenuProps {
     buttonProps?: ActionIconProps;
+    detailConfig?: ListConfigMenuDetailConfig;
     displayTypes?: ListConfigMenuDisplayTypeConfig[];
     listKey: ItemListKey;
     optionsConfig?: ListConfigMenuOptionsConfig;
@@ -172,6 +195,20 @@ const Config = ({
     ...props
 }: ListConfigMenuProps & { displayType: ListDisplayType }) => {
     switch (displayType) {
+        case ListDisplayType.DETAIL:
+            if (props.detailConfig) {
+                return (
+                    <TableConfig
+                        enablePinColumnButtons={false}
+                        listKey={props.listKey}
+                        optionsConfig={props.detailConfig.optionsConfig}
+                        tableColumnsData={props.detailConfig.tableColumnsData}
+                        tableKey="detail"
+                    />
+                );
+            }
+            return null;
+
         case ListDisplayType.GRID:
             return (
                 <GridConfig

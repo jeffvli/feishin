@@ -27,3 +27,17 @@
 .main-content-container.sidebar-collapsed.right-expanded {
     grid-template-columns: 80px 1fr var(--right-sidebar-width);
 }
+
+.main-content-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.main-content-body-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}

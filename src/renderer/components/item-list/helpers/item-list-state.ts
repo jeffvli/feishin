@@ -109,6 +109,7 @@ export interface ItemListStateItem {
     _itemType: LibraryItem;
     _serverId: string;
     id: string;
+    imageId: null | string;
 }
 
 export type ItemListStateItemWithRequiredProperties = Record<string, unknown> & {

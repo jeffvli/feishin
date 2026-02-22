@@ -12,8 +12,10 @@ import {
 import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
-import { useAuthStoreActions } from '/@/renderer/store';
+import { IgnoreCorsSslSwitches } from '/@/renderer/features/servers/components/ignore-cors-ssl-switches';
+import { useAuthStoreActions, useServerList } from '/@/renderer/store';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
+import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { Paper } from '/@/shared/components/paper/paper';
@@ -96,6 +98,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const focusTrapRef = useFocusTrap(true);
     const [isLoading, setIsLoading] = useState(false);
     const { addServer, setCurrentServer } = useAuthStoreActions();
+    const serverList = useServerList();
     const { servers: discovered } = useAutodiscovery();
 
     const serverLock = isServerLock();
@@ -126,6 +129,13 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     };
 
     const handleSubmit = form.onSubmit(async (values) => {
+        if (serverLock && Object.keys(serverList).length >= 1) {
+            toast.error({
+                message: t('error.serverLockSingleServer', { postProcess: 'sentenceCase' }),
+            });
+            return;
+        }
+
         const authFunction = api.controller.authenticate;
 
         if (!authFunction) {
@@ -333,6 +343,13 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                                 type: 'checkbox',
                             })}
                         />
+                    )}
+                    {isElectron() && (
+                        <>
+                            <Divider />
+                            <IgnoreCorsSslSwitches />
+                            <Divider />
+                        </>
                     )}
                     <Group grow justify="flex-end">
                         {onCancel && (

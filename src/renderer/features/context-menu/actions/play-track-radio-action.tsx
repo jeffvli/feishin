@@ -38,7 +38,7 @@ export const PlayTrackRadioAction = ({ disabled, song }: PlayTrackRadioActionPro
                 });
 
                 if (similarSongs && similarSongs.length > 0) {
-                    player.addToQueueByData(similarSongs, playType);
+                    player.addToQueueByData([song, ...similarSongs], playType);
                 }
             } catch (error) {
                 console.error('Failed to load track radio:', error);

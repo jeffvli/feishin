@@ -24,6 +24,7 @@ export const AlbumArtistListInfiniteTable = ({
     autoFitColumns = false,
     columns,
     enableAlternateRowColors = false,
+    enableHeader = true,
     enableHorizontalBorders = false,
     enableRowHoverHighlight = true,
     enableSelection = true,
@@ -75,6 +76,7 @@ export const AlbumArtistListInfiniteTable = ({
             data={loadedItems}
             enableAlternateRowColors={enableAlternateRowColors}
             enableExpansion={false}
+            enableHeader={enableHeader}
             enableHorizontalBorders={enableHorizontalBorders}
             enableRowHoverHighlight={enableRowHoverHighlight}
             enableSelection={enableSelection}

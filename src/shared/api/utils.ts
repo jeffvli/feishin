@@ -139,7 +139,7 @@ export const getClientType = (): string => {
     }
 };
 
-export const SEPARATOR_STRING = ' · ';
+export const SEPARATOR_STRING = ' • ';
 
 export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: SortOrder) => {
     let results: Song[] = songs;
@@ -151,7 +151,7 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
             results = orderBy(
                 results,
                 [(v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
-                [order, 'asc', 'asc'],
+                [order, order, order],
             );
             break;
 
@@ -159,7 +159,7 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
             results = orderBy(
                 results,
                 [(v) => v.albumArtists[0]?.name.toLowerCase(), 'discNumber', 'trackNumber'],
-                [order, order, 'asc', 'asc'],
+                [order, order, order, order],
             );
             break;
 
@@ -167,32 +167,54 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
             results = orderBy(
                 results,
                 [(v) => v.artistName?.toLowerCase(), 'discNumber', 'trackNumber'],
-                [order, order, 'asc', 'asc'],
+                [order, order, order, order],
             );
             break;
 
         case SongListSort.BPM:
-            results = orderBy(results, ['bpm'], [order]);
+            results = orderBy(
+                results,
+                ['bpm', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [order, order, order, order],
+            );
             break;
 
         case SongListSort.CHANNELS:
-            results = orderBy(results, ['channels'], [order]);
+            results = orderBy(
+                results,
+                ['channels', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [order, order, order, order],
+            );
             break;
 
         case SongListSort.COMMENT:
             results = orderBy(
                 results,
-                ['comment', 'discNumber', 'trackNumber'],
-                [order, order, 'asc', 'asc'],
+                ['comment', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [order, order, order, order],
             );
             break;
 
         case SongListSort.DURATION:
-            results = orderBy(results, ['duration'], [order]);
+            results = orderBy(
+                results,
+                ['duration', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [order, order, order, order],
+            );
             break;
 
         case SongListSort.FAVORITED:
-            results = orderBy(results, ['userFavorite', (v) => v.name.toLowerCase()], [order]);
+            results = orderBy(
+                results,
+                [
+                    'userFavorite',
+                    (v) => v.name.toLowerCase(),
+                    (v) => v.album?.toLowerCase(),
+                    'discNumber',
+                    'trackNumber',
+                ],
+                [order, order, order, order, order],
+            );
             break;
 
         case SongListSort.GENRE:
@@ -204,7 +226,7 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
                     'discNumber',
                     'trackNumber',
                 ],
-                [order, order, 'asc', 'asc'],
+                [order, order, order, order],
             );
             break;
 
@@ -217,11 +239,19 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
             break;
 
         case SongListSort.NAME:
-            results = orderBy(results, [(v) => v.name.toLowerCase()], [order]);
+            results = orderBy(
+                results,
+                [(v) => v.name.toLowerCase(), (v) => v.album?.toLowerCase()],
+                [order, order],
+            );
             break;
 
         case SongListSort.PLAY_COUNT:
-            results = orderBy(results, ['playCount'], [order]);
+            results = orderBy(
+                results,
+                ['playCount', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [order, order, order, order],
+            );
             break;
 
         case SongListSort.RANDOM:
@@ -229,19 +259,51 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
             break;
 
         case SongListSort.RATING:
-            results = orderBy(results, ['userRating', (v) => v.name.toLowerCase()], [order]);
+            results = orderBy(
+                results,
+                [
+                    'userRating',
+                    (v) => v.name.toLowerCase(),
+                    (v) => v.album?.toLowerCase(),
+                    'discNumber',
+                    'trackNumber',
+                ],
+                [order, order, order, order, order],
+            );
             break;
 
         case SongListSort.RECENTLY_ADDED:
-            results = orderBy(results, ['createdAt'], [order]);
+            results = orderBy(
+                results,
+                [
+                    (v) => {
+                        const x = v.createdAt;
+                        if (x == null) return null;
+                        const d = new Date(x);
+                        return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+                    },
+                    (v) => v.album?.toLowerCase(),
+                    'discNumber',
+                    'trackNumber',
+                ],
+                [order, order, order, order],
+            );
             break;
 
         case SongListSort.RECENTLY_PLAYED:
-            results = orderBy(results, ['lastPlayedAt'], [order]);
+            results = orderBy(
+                results,
+                ['lastPlayedAt', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [order, order, order, order],
+            );
             break;
 
         case SongListSort.RELEASE_DATE:
-            results = orderBy(results, ['releaseDate'], [order]);
+            results = orderBy(
+                results,
+                ['releaseDate', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [order, order, order, order],
+            );
             break;
 
         case SongListSort.SORT_NAME:
@@ -252,7 +314,7 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
             results = orderBy(
                 results,
                 ['releaseYear', (v) => v.album?.toLowerCase(), 'discNumber', 'track'],
-                [order, 'asc', 'asc', 'asc'],
+                [order, order, order, order],
             );
             break;
 
@@ -404,6 +466,9 @@ export const sortAlbumList = (albums: Album[], sortBy: AlbumListSort, sortOrder:
         case AlbumListSort.FAVORITED:
             results = orderBy(results, ['starred'], [order]);
             break;
+        case AlbumListSort.ID:
+            results = sortOrder === SortOrder.DESC ? [...results].reverse() : results;
+            break;
         case AlbumListSort.NAME:
             results = orderBy(results, [(v) => v.name.toLowerCase()], [order]);
             break;
@@ -431,14 +496,25 @@ export const sortAlbumList = (albums: Album[], sortBy: AlbumListSort, sortOrder:
                             return new Date(v.originalDate).getTime();
                         }
 
-                        // Fallback to the first day of the release year
+                        // Fallback to the first day of the original year
                         if (v.originalYear) {
                             return new Date(v.originalYear, 0, 1).getTime();
                         }
                         return 0;
                     },
+                    (v) => {
+                        if (v.releaseDate) {
+                            return new Date(v.releaseDate).getTime();
+                        }
+
+                        // Fallback to the first day of the release year
+                        if (v.releaseYear) {
+                            return new Date(v.releaseYear, 0, 1).getTime();
+                        }
+                        return 0;
+                    },
                 ],
-                [order],
+                [order, order],
             );
             break;
         case AlbumListSort.SONG_COUNT:

@@ -1,6 +1,7 @@
 import { useEffect, useImperativeHandle, useMemo } from 'react';
 
-import { ItemListHandle, ItemListStateActions } from '/@/renderer/components/item-list/types';
+import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
+import { ItemListHandle } from '/@/renderer/components/item-list/types';
 
 interface UseTableImperativeHandleProps {
     enableHeader: boolean;

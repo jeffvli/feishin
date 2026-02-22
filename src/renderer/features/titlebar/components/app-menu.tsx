@@ -9,6 +9,7 @@ import packageJson from '../../../../../package.json';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import { ServerList } from '/@/renderer/features/servers/components/server-list';
 import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
+import { openReleaseNotesModal } from '/@/renderer/release-notes-modal';
 import { useAppStore, useAppStoreActions, useCommandPalette } from '/@/renderer/store';
 import { DropdownMenu, MenuItemProps } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -225,16 +226,19 @@ export const AppMenu = () => {
             type: 'divider',
         },
         {
-            component: 'a',
-            href: 'https://github.com/jeffvli/feishin/releases',
             icon: 'brandGitHub',
             id: 'version',
             label: t('page.appMenu.version', {
                 postProcess: 'sentenceCase',
                 version: packageJson.version,
             }),
-            rightSection: <Icon icon="externalLink" />,
-            target: '_blank',
+            onClick: () =>
+                openReleaseNotesModal(
+                    t('common.newVersion', {
+                        postProcess: 'sentenceCase',
+                        version: packageJson.version,
+                    }) as string,
+                ),
             type: 'item',
         },
         {

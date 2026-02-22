@@ -1,0 +1,189 @@
+# Alpha builds published to Cloudflare R2 with date versioning (e.g. 1.0.0-alpha-20260205).
+# Required repo secrets: R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY (from R2 API token in Cloudflare dashboard).
+name: Publish Alpha
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: 'Semantic version number (e.g., 1.0.0) - alpha suffix will be added automatically'
+                required: false
+                type: string
+    schedule:
+        # Run at 3:00 AM PST daily (11:00 UTC; PST = UTC-8)
+        - cron: '0 11 * * *'
+
+jobs:
+    check-new-commits:
+        runs-on: ubuntu-latest
+        outputs:
+            has_new_commits: ${{ steps.manual.outputs.has_new_commits || steps.check.outputs['has-new-commits'] }}
+        steps:
+            - name: Set has new commits (manual trigger)
+              id: manual
+              if: github.event_name == 'workflow_dispatch'
+              run: echo "has_new_commits=true" >> "$GITHUB_OUTPUT"
+
+            - name: Check for new commits (24 hr interval)
+              id: check
+              if: github.event_name != 'workflow_dispatch'
+              uses: adriangl/check-new-commits-action@v1
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  seconds: 86400
+
+    prepare:
+        needs: check-new-commits
+        if: needs.check-new-commits.outputs.has_new_commits == 'true'
+        runs-on: ubuntu-latest
+        outputs:
+            version: ${{ steps.version.outputs.version }}
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v1
+
+            - name: Install Node and PNPM
+              uses: pnpm/action-setup@v4.1.0
+              with:
+                  version: 9
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Set date-based alpha version
+              id: version
+              shell: pwsh
+              run: |
+                  $inputVersion = "${{ github.event.inputs.version }}"
+                  Write-Host "Input version: $inputVersion"
+
+                  if ($inputVersion -eq "" -or $inputVersion -eq "null") {
+                      # No input version provided (scheduled run or manual without input), auto-increment patch version
+                      Write-Host "No version provided, auto-incrementing patch version..."
+
+                      $currentVersion = (Get-Content package.json | ConvertFrom-Json).version
+                      Write-Host "Current version: $currentVersion"
+
+                      $cleanVersion = $currentVersion -replace '-.*$', ''
+                      $versionParts = $cleanVersion.Split('.')
+                      if ($versionParts.Length -ne 3) {
+                          Write-Error "Current version format is invalid: $cleanVersion"
+                          exit 1
+                      }
+
+                      $major = [int]$versionParts[0]
+                      $minor = [int]$versionParts[1]
+                      $patch = [int]$versionParts[2]
+                      $newPatch = $patch + 1
+                      $inputVersion = "$major.$minor.$newPatch"
+                      Write-Host "Auto-generated version: $inputVersion"
+                  } else {
+                      # Validate semantic version format (major.minor.patch)
+                      $versionPattern = '^\d+\.\d+\.\d+$'
+                      if ($inputVersion -notmatch $versionPattern) {
+                          Write-Error "Invalid version format. Expected semantic version (e.g., 1.0.0), got: $inputVersion"
+                          exit 1
+                      }
+                  }
+
+                  # Date in YYYYMMDD (PST / America/Los_Angeles)
+                  $pst = [TimeZoneInfo]::FindSystemTimeZoneById('America/Los_Angeles')
+                  $dateInPst = [TimeZoneInfo]::ConvertTimeFromUtc([DateTime]::UtcNow, $pst)
+                  $dateStr = $dateInPst.ToString("yyyyMMdd")
+                  $alphaVersion = "$inputVersion-alpha-$dateStr"
+                  Write-Host "Alpha version: $alphaVersion"
+
+                  # Update package.json
+                  $packageJson = Get-Content package.json | ConvertFrom-Json
+                  $packageJson.version = $alphaVersion
+                  $packageJson | ConvertTo-Json -Depth 10 | Set-Content package.json
+
+                  echo "version=$alphaVersion" >> $env:GITHUB_OUTPUT
+
+    cleanup:
+        needs: prepare
+        runs-on: ubuntu-latest
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+            R2_ENDPOINT_URL: ${{ secrets.R2_ENDPOINT_URL }}
+        steps:
+            - name: Delete all objects in R2 bucket
+              run: |
+                  aws s3 rm s3://feishin-nightly --recursive --endpoint-url $R2_ENDPOINT_URL
+
+    publish:
+        needs: [prepare, cleanup]
+        runs-on: ${{ matrix.os }}
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+
+        strategy:
+            matrix:
+                os: [windows-latest, macos-latest, ubuntu-latest]
+
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v1
+
+            - name: Install Node and PNPM
+              uses: pnpm/action-setup@v4.1.0
+              with:
+                  version: 9
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Set version from prepare job
+              shell: pwsh
+              run: |
+                  $version = "${{ needs.prepare.outputs.version }}"
+                  Write-Host "Setting version: $version"
+                  $packageJson = Get-Content package.json | ConvertFrom-Json
+                  $packageJson.version = $version
+                  $packageJson | ConvertTo-Json -Depth 10 | Set-Content package.json
+
+            - name: Build and Publish to R2 (Windows)
+              if: matrix.os == 'windows-latest'
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:win:alpha
+                  on_retry_command: pnpm cache delete
+
+            - name: Build and Publish to R2 (macOS)
+              if: matrix.os == 'macos-latest'
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:mac:alpha
+                  on_retry_command: pnpm cache delete
+
+            - name: Build and Publish to R2 (Linux)
+              if: matrix.os == 'ubuntu-latest'
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:linux:alpha
+                  on_retry_command: pnpm cache delete
+
+            - name: Build and Publish to R2 (Linux ARM64)
+              if: matrix.os == 'ubuntu-latest'
+              uses: nick-invision/retry@v2.8.2
+              with:
+                  timeout_minutes: 30
+                  max_attempts: 3
+                  retry_on: error
+                  command: |
+                      pnpm run publish:linux-arm64:alpha
+                  on_retry_command: pnpm cache delete

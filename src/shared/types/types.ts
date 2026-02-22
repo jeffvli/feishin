@@ -26,6 +26,7 @@ export enum ItemListKey {
     GENRE_ALBUM = 'genreAlbum',
     GENRE_SONG = 'genreSong',
     PLAYLIST = LibraryItem.PLAYLIST,
+    PLAYLIST_ALBUM = 'playlistAlbum',
     PLAYLIST_SONG = LibraryItem.PLAYLIST_SONG,
     QUEUE_SONG = LibraryItem.QUEUE_SONG,
     RADIO = 'radio',
@@ -34,6 +35,7 @@ export enum ItemListKey {
 }
 
 export enum ListDisplayType {
+    DETAIL = 'detail',
     GRID = 'poster',
     LIST = 'list',
     TABLE = 'table',
@@ -101,6 +103,10 @@ export enum AuthState {
 }
 
 export enum CrossfadeStyle {
+    CONSTANT_POWER = 'constantPower',
+    CONSTANT_POWER_SLOW_CUT = 'constantPowerSlowCut',
+    CONSTANT_POWER_SLOW_FADE = 'constantPowerSlowFade',
+    DIPPED = 'dipped',
     EQUAL_POWER = 'equalPower',
     EXPONENTIAL = 'exponential',
     LINEAR = 'linear',

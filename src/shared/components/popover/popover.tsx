@@ -36,6 +36,8 @@ export const Popover = ({ children, ...props }: PopoverProps) => {
             classNames={{
                 dropdown: styles.dropdown,
             }}
+            closeOnClickOutside={true}
+            closeOnEscape={true}
             offset={10}
             transitionProps={{ transition: getTransition(props.position) }}
             withArrow={false}

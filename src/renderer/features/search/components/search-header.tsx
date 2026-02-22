@@ -11,7 +11,10 @@ import {
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { FilterBar } from '/@/renderer/features/shared/components/filter-bar';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
-import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
+import {
+    ListConfigMenu,
+    SONG_DISPLAY_TYPES,
+} from '/@/renderer/features/shared/components/list-config-menu';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Button, ButtonGroup } from '/@/shared/components/button/button';
@@ -44,6 +47,7 @@ export const SearchHeader = ({ navigationId }: SearchHeaderProps) => {
             tableColumnsData: ALBUM_ARTIST_TABLE_COLUMNS,
         },
         [LibraryItem.SONG]: {
+            displayTypes: SONG_DISPLAY_TYPES,
             listKey: ItemListKey.SONG,
             tableColumnsData: SONG_TABLE_COLUMNS,
         },
@@ -81,7 +85,7 @@ export const SearchHeader = ({ navigationId }: SearchHeaderProps) => {
                             }}
                             variant={itemType === LibraryItem.SONG ? 'filled' : 'default'}
                         >
-                            {t('entity.track_other', { postProcess: 'sentenceCase' })}
+                            {t('entity.track', { count: 2, postProcess: 'sentenceCase' })}
                         </Button>
                         <Button
                             component={Link}
@@ -97,7 +101,7 @@ export const SearchHeader = ({ navigationId }: SearchHeaderProps) => {
                             }}
                             variant={itemType === LibraryItem.ALBUM ? 'filled' : 'default'}
                         >
-                            {t('entity.album_other', { postProcess: 'sentenceCase' })}
+                            {t('entity.album', { count: 2, postProcess: 'sentenceCase' })}
                         </Button>
                         <Button
                             component={Link}
@@ -113,7 +117,7 @@ export const SearchHeader = ({ navigationId }: SearchHeaderProps) => {
                             }}
                             variant={itemType === LibraryItem.ALBUM_ARTIST ? 'filled' : 'default'}
                         >
-                            {t('entity.artist_other', { postProcess: 'sentenceCase' })}
+                            {t('entity.artist', { count: 2, postProcess: 'sentenceCase' })}
                         </Button>
                     </ButtonGroup>
                     <ListConfigMenu {...listConfigMenuProps[itemType]} />

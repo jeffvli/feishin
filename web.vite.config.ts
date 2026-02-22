@@ -24,7 +24,24 @@ export default defineConfig({
                 ),
             },
             output: {
-                assetFileNames: 'assets/[name].[ext]',
+                assetFileNames: (assetInfo) => {
+                    const stableNames = [
+                        '32x32.png',
+                        '64x64.png',
+                        '128x128.png',
+                        '256x256.png',
+                        '512x512.png',
+                        '1024x1024.png',
+                        'favicon.ico',
+                        'preview_full_screen_player.webp',
+                    ];
+
+                    if (assetInfo.names.length === 1 && stableNames.includes(assetInfo.names[0])) {
+                        return 'assets/[name][extname]';
+                    }
+
+                    return 'assets/[name]-[hash][extname]';
+                },
                 sourcemapExcludeSources: false,
             },
         },
@@ -32,6 +49,7 @@ export default defineConfig({
     },
     css: {
         modules: {
+            generateScopedName: 'fs-[name]-[local]',
             localsConvention: 'camelCase',
         },
     },
@@ -40,7 +58,7 @@ export default defineConfig({
             '@atlaskit/pragmatic-drag-and-drop',
             '@atlaskit/pragmatic-drag-and-drop-auto-scroll',
             '@atlaskit/pragmatic-drag-and-drop-hitbox',
-            '@tanstack_react-query-persist-client',
+            '@tanstack/react-query-persist-client',
             'idb-keyval',
         ],
     },
@@ -113,7 +131,10 @@ export default defineConfig({
             registerType: 'autoUpdate',
             scope: '/assets/',
             workbox: {
+                cleanupOutdatedCaches: true,
+                clientsClaim: true,
                 maximumFileSizeToCacheInBytes: 1000000 * 5, // 5 MB
+                skipWaiting: true,
             },
         }),
     ],

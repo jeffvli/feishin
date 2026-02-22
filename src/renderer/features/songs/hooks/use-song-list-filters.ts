@@ -28,11 +28,6 @@ export const useSongListFilters = (listKey?: ItemListKey) => {
 
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const albumIds = useMemo(
-        () => parseArrayParam(searchParams, FILTER_KEYS.SONG.ALBUM_IDS),
-        [searchParams],
-    );
-
     const genreId = useMemo(
         () => parseArrayParam(searchParams, FILTER_KEYS.SONG.GENRE_ID),
         [searchParams],
@@ -61,15 +56,6 @@ export const useSongListFilters = (listKey?: ItemListKey) => {
     const custom = useMemo(
         () => parseCustomFiltersParam(searchParams, FILTER_KEYS.SONG._CUSTOM),
         [searchParams],
-    );
-
-    const setAlbumIds = useCallback(
-        (value: null | string[]) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.SONG.ALBUM_IDS, value), {
-                replace: true,
-            });
-        },
-        [setSearchParams],
     );
 
     const setGenreId = useCallback(
@@ -153,7 +139,6 @@ export const useSongListFilters = (listKey?: ItemListKey) => {
                     {
                         [FILTER_KEYS.SHARED.SEARCH_TERM]: null,
                         [FILTER_KEYS.SONG._CUSTOM]: null,
-                        [FILTER_KEYS.SONG.ALBUM_IDS]: null,
                         [FILTER_KEYS.SONG.ARTIST_IDS]: null,
                         [FILTER_KEYS.SONG.FAVORITE]: null,
                         [FILTER_KEYS.SONG.GENRE_ID]: null,
@@ -172,31 +157,18 @@ export const useSongListFilters = (listKey?: ItemListKey) => {
             [FILTER_KEYS.SHARED.SORT_BY]: sortBy ?? undefined,
             [FILTER_KEYS.SHARED.SORT_ORDER]: sortOrder ?? undefined,
             [FILTER_KEYS.SONG._CUSTOM]: custom ?? undefined,
-            [FILTER_KEYS.SONG.ALBUM_IDS]: albumIds ?? undefined,
             [FILTER_KEYS.SONG.ARTIST_IDS]: artistIds ?? undefined,
             [FILTER_KEYS.SONG.FAVORITE]: favorite ?? undefined,
             [FILTER_KEYS.SONG.GENRE_ID]: genreId ?? undefined,
             [FILTER_KEYS.SONG.MAX_YEAR]: maxYear ?? undefined,
             [FILTER_KEYS.SONG.MIN_YEAR]: minYear ?? undefined,
         }),
-        [
-            searchTerm,
-            sortBy,
-            sortOrder,
-            custom,
-            albumIds,
-            artistIds,
-            favorite,
-            genreId,
-            maxYear,
-            minYear,
-        ],
+        [searchTerm, sortBy, sortOrder, custom, artistIds, favorite, genreId, maxYear, minYear],
     );
 
     return {
         clear,
         query,
-        setAlbumIds,
         setArtistIds,
         setCustom,
         setFavorite,

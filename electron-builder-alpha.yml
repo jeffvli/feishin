@@ -1,0 +1,65 @@
+appId: org.jeffvli.feishin
+productName: Feishin
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+electronVersion: 39.4.0
+directories:
+    buildResources: assets
+files:
+    - 'out/**/*'
+    - 'package.json'
+extraResources:
+    - assets/**
+asarUnpack:
+    - resources/**
+win:
+    target:
+        - target: zip
+          arch:
+              - x64
+              - arm64
+        - target: nsis
+          arch:
+              - x64
+              - arm64
+    icon: assets/icons/icon.ico
+
+nsis:
+    allowToChangeInstallationDirectory: true
+    oneClick: false
+    shortcutName: ${productName}
+    uninstallDisplayName: ${productName}
+    createDesktopShortcut: always
+
+mac:
+    target:
+        target: default
+        arch:
+            - arm64
+            - x64
+    icon: assets/icons/icon.icns
+    type: distribution
+    hardenedRuntime: true
+    entitlements: assets/entitlements.mac.plist
+    entitlementsInherit: assets/entitlements.mac.plist
+    gatekeeperAssess: false
+    notarize: false
+
+dmg:
+    contents: [{ x: 130, y: 220 }, { x: 410, y: 220, type: link, path: /Applications }]
+
+linux:
+    target:
+        - AppImage
+        - deb
+        - tar.xz
+    category: AudioVideo;Audio;Player
+    icon: assets/icons/icon.png
+    artifactName: ${productName}-${os}-${arch}.${ext}
+
+npmRebuild: false
+
+publish:
+    provider: s3
+    bucket: feishin-nightly
+    channel: alpha
+    endpoint: https://065f090c64de2dc707dd70ac72db9669.r2.cloudflarestorage.com

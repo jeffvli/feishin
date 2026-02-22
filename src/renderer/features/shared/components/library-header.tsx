@@ -27,16 +27,18 @@ import { BaseImage } from '/@/shared/components/image/image';
 import { Rating } from '/@/shared/components/rating/rating';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Text } from '/@/shared/components/text/text';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { ExplicitStatus, LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface LibraryHeaderProps {
     children?: ReactNode;
+    compact?: boolean;
     containerClassName?: string;
     imagePlaceholderUrl?: null | string;
     imageUrl?: null | string;
     item: {
         children?: ReactNode;
+        explicitStatus?: ExplicitStatus | null;
         imageId?: null | string;
         imageUrl?: null | string;
         route: string;
@@ -44,11 +46,20 @@ interface LibraryHeaderProps {
     };
     loading?: boolean;
     title: string;
+    topRight?: ReactNode;
 }
 
 export const LibraryHeader = forwardRef(
     (
-        { children, containerClassName, imageUrl, item, title }: LibraryHeaderProps,
+        {
+            children,
+            compact,
+            containerClassName,
+            imageUrl,
+            item,
+            title,
+            topRight,
+        }: LibraryHeaderProps,
         ref: Ref<HTMLDivElement>,
     ) => {
         const { t } = useTranslation();
@@ -108,6 +119,7 @@ export const LibraryHeader = forwardRef(
                             enableDebounce={false}
                             enableViewport={false}
                             fetchPriority="high"
+                            isExplicit={item.explicitStatus === ExplicitStatus.EXPLICIT}
                             src={imageUrl}
                             style={{
                                 maxHeight: '100%',
@@ -120,10 +132,18 @@ export const LibraryHeader = forwardRef(
                 ),
                 fullScreen: true,
             });
-        }, [item.imageId, item.type]);
+        }, [item.explicitStatus, item.imageId, item.type]);
 
         return (
-            <div className={clsx(styles.libraryHeader, containerClassName)} ref={ref}>
+            <div
+                className={clsx(
+                    styles.libraryHeader,
+                    containerClassName,
+                    compact && styles.compact,
+                )}
+                ref={ref}
+            >
+                {topRight && <div className={styles.topRight}>{topRight}</div>}
                 <div
                     className={styles.imageSection}
                     onClick={() => {
@@ -142,6 +162,7 @@ export const LibraryHeader = forwardRef(
                             containerClassName={styles.image}
                             enableDebounce={false}
                             enableViewport={false}
+                            explicitStatus={item.explicitStatus ?? null}
                             fetchPriority="high"
                             id={item.imageId}
                             itemType={item.type as LibraryItem}

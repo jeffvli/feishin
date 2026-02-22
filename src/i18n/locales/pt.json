@@ -1,23 +1,23 @@
 {
     "action": {
-        "addToFavorites": "adicionar a $t(entity.favorite_other)",
-        "addToPlaylist": "adicionar a $t(entity.playlist_one)",
+        "addToFavorites": "adicionar a $t(entity.favorite, {\"count\": 2})",
+        "addToPlaylist": "adicionar a $t(entity.playlist, {\"count\": 1})",
         "clearQueue": "limpar fila",
-        "createPlaylist": "criar $t(entity.playlist_one)",
-        "deletePlaylist": "apagar $t(entity.playlist_one)",
+        "createPlaylist": "criar $t(entity.playlist, {\"count\": 1})",
+        "deletePlaylist": "apagar $t(entity.playlist, {\"count\": 1})",
         "deselectAll": "desmarcar todos",
-        "editPlaylist": "editar $t(entity.playlist_one)",
+        "editPlaylist": "editar $t(entity.playlist, {\"count\": 1})",
         "goToPage": "vá para página",
         "moveToNext": "mover para o próximo",
         "moveToBottom": "mover para baixo",
         "moveToTop": "mover para o topo",
         "refresh": "$t(common.refresh)",
-        "removeFromFavorites": "remover de $t(entity.favorite_other)",
-        "removeFromPlaylist": "remover da $t(entity.playlist_one)",
+        "removeFromFavorites": "remover de $t(entity.favorite, {\"count\": 2})",
+        "removeFromPlaylist": "remover da $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "remover da fila",
         "setRating": "definir classificação",
         "toggleSmartPlaylistEditor": "alternar editor $t(entity.smartPlaylist)",
-        "viewPlaylists": "ver $t(entity.playlist_other)",
+        "viewPlaylists": "ver $t(entity.playlist, {\"count\": 2})",
         "openIn": {
             "lastfm": "Abrir em Last.fm",
             "musicbrainz": "Abrir em MusicBrainz"
@@ -52,7 +52,7 @@
         "configure": "configurar",
         "confirm": "confirmar",
         "create": "criar",
-        "currentSong": "$t(entity.track_one) atual",
+        "currentSong": "$t(entity.track, {\"count\": 1}) atual",
         "decrease": "diminuir",
         "delete": "apagar",
         "descending": "abaixar",
@@ -92,7 +92,7 @@
         "path": "caminho",
         "playerMustBePaused": "o player deve estar pausado",
         "preview": "pré-visualizar",
-        "previousSong": "anterior $t(entity.track_one)",
+        "previousSong": "anterior $t(entity.track, {\"count\": 1})",
         "quit": "sair",
         "random": "aleatório",
         "rating": "classificação",
@@ -106,7 +106,9 @@
         "saveAndReplace": "gravar e substituir",
         "saveAs": "gravar como",
         "search": "procurar",
-        "setting": "configuração",
+        "setting_one": "configuração",
+        "setting_many": "",
+        "setting_other": "",
         "share": "partilhar",
         "size": "tamanho",
         "sortOrder": "ordem",
@@ -164,7 +166,7 @@
         "playlistWithCount_one": "{{count}} playlist",
         "playlistWithCount_many": "{{count}} playlists",
         "playlistWithCount_other": "{{count}} playlists",
-        "smartPlaylist": "$t(entity.playlist_one) inteligente",
+        "smartPlaylist": "$t(entity.playlist, {\"count\": 1}) inteligente",
         "track_one": "faixa",
         "track_many": "faixas",
         "track_other": "faixas",
@@ -201,10 +203,10 @@
         "systemFontError": "ocorreu um erro ao tentar obter fontes do sistema"
     },
     "filter": {
-        "album": "$t(entity.album_one)",
-        "albumArtist": "$t(entity.albumArtist_one)",
-        "albumCount": "número de $t(entity.album_other)",
-        "artist": "$t(entity.artist_one)",
+        "album": "$t(entity.album, {\"count\": 1})",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+        "albumCount": "número de $t(entity.album, {\"count\": 2})",
+        "artist": "$t(entity.artist, {\"count\": 1})",
         "biography": "bibliografia",
         "bitrate": "bitrate",
         "bpm": "bpm",
@@ -217,7 +219,7 @@
         "duration": "duração",
         "favorited": "favoritado",
         "fromYear": "a partir do ano",
-        "genre": "$t(entity.genre_one)",
+        "genre": "$t(entity.genre, {\"count\": 1})",
         "id": "id",
         "isCompilation": "é compilação",
         "isFavorited": "é favoritado",
@@ -259,31 +261,31 @@
             "title": "adicionar servidor"
         },
         "addToPlaylist": {
-            "input_playlists": "$t(entity.playlist_other)",
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "input_skipDuplicates": "pular duplicadas",
             "success": "adicionado $t(entity.trackWithCount, {\"count\": {{message}} }) para $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
-            "title": "adicionar à $t(entity.playlist_one)"
+            "title": "adicionar à $t(entity.playlist, {\"count\": 1})"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
             "input_name": "$t(common.name)",
             "input_owner": "$t(common.owner)",
             "input_public": "público",
-            "success": "$t(entity.playlist_one) criada com sucesso",
-            "title": "criar $t(entity.playlist_one)"
+            "success": "$t(entity.playlist, {\"count\": 1}) criada com sucesso",
+            "title": "criar $t(entity.playlist, {\"count\": 1})"
         },
         "deletePlaylist": {
-            "input_confirm": "escreva o nome da $t(entity.playlist_one) para confirmar",
-            "success": "$t(entity.playlist_one) apagada com sucesso",
-            "title": "apagar $t(entity.playlist_one)"
+            "input_confirm": "escreva o nome da $t(entity.playlist, {\"count\": 1}) para confirmar",
+            "success": "$t(entity.playlist, {\"count\": 1}) apagada com sucesso",
+            "title": "apagar $t(entity.playlist, {\"count\": 1})"
         },
         "editPlaylist": {
             "publicJellyfinNote": "O Jellyfin por algum motivo não expõe se uma playlist é pública ou não. Se deseja que ela permaneça pública, por favor selecione a seguinte entrada",
-            "success": "$t(entity.playlist_one) atualizada com sucesso",
-            "title": "editar $t(entity.playlist_one)"
+            "success": "$t(entity.playlist, {\"count\": 1}) atualizada com sucesso",
+            "title": "editar $t(entity.playlist, {\"count\": 1})"
         },
         "lyricSearch": {
-            "input_artist": "$t(entity.artist_one)",
+            "input_artist": "$t(entity.artist, {\"count\": 1})",
             "input_name": "$t(common.name)",
             "title": "pesquisa de letras"
         },
@@ -310,24 +312,24 @@
             "appearsOn": "aparece em",
             "recentReleases": "lançamentos recentes",
             "viewDiscography": "ver discografia",
-            "relatedArtists": "$t(entity.artist_other) relacionados",
+            "relatedArtists": "$t(entity.artist, {\"count\": 2}) relacionados",
             "topSongs": "músicas mais tocadas",
             "topSongsFrom": "músicas mais tocadas de {{title}}",
             "viewAll": "ver tudo",
-            "viewAllTracks": "ver todas as $t(entity.track_other)"
+            "viewAllTracks": "ver todas as $t(entity.track, {\"count\": 2})"
         },
         "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "mais deste $t(entity.artist_one)",
+            "moreFromArtist": "mais deste $t(entity.artist, {\"count\": 1})",
             "moreFromGeneric": "mais que {{item}}",
             "released": "lançado"
         },
         "albumList": {
             "artistAlbums": "álbuns de {{artist}}",
-            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
-            "title": "$t(entity.album_other)"
+            "genreAlbums": "\"{{genre}}\" $t(entity.album, {\"count\": 2})",
+            "title": "$t(entity.album, {\"count\": 2})"
         },
         "appMenu": {
             "collapseSidebar": "recolher barra lateral",
@@ -338,7 +340,7 @@
             "openBrowserDevtools": "abrir ferramentas do programador",
             "quit": "$t(common.quit)",
             "selectServer": "selecionar servidor",
-            "settings": "$t(common.setting_other)",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "version": "versão {{version}}"
         },
         "manageServers": {
@@ -397,9 +399,9 @@
             "noLyrics": "nenhuma letra encontrada"
         },
         "genreList": {
-            "showAlbums": "mostrar $t(entity.genre_one) $t(entity.album_other)",
-            "showTracks": "mostrar $t(entity.genre_one) $t(entity.track_other)",
-            "title": "$t(entity.genre_other)"
+            "showAlbums": "mostrar $t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
+            "showTracks": "mostrar $t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.genre, {\"count\": 2})"
         },
         "globalSearch": {
             "commands": {
@@ -425,7 +427,7 @@
             "reorder": "reordenar apenas disponível quando ordenado pelo id"
         },
         "playlistList": {
-            "title": "$t(entity.playlist_other)"
+            "title": "$t(entity.playlist, {\"count\": 2})"
         },
         "setting": {
             "advanced": "avançado",
@@ -435,24 +437,24 @@
             "windowTab": "janela"
         },
         "sidebar": {
-            "albumArtists": "$t(entity.albumArtist_other)",
-            "albums": "$t(entity.album_other)",
-            "artists": "$t(entity.artist_other)",
-            "folders": "$t(entity.folder_other)",
-            "genres": "$t(entity.genre_other)",
+            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
+            "albums": "$t(entity.album, {\"count\": 2})",
+            "artists": "$t(entity.artist, {\"count\": 2})",
+            "folders": "$t(entity.folder, {\"count\": 2})",
+            "genres": "$t(entity.genre, {\"count\": 2})",
             "home": "$t(common.home)",
             "myLibrary": "a minha biblioteca",
             "nowPlaying": "agora a tocar",
-            "playlists": "$t(entity.playlist_other)",
+            "playlists": "$t(entity.playlist, {\"count\": 2})",
             "search": "$t(common.search)",
-            "settings": "$t(common.setting_other)",
-            "shared": "$t(entity.playlist_other) partilhada",
-            "tracks": "$t(entity.track_other)"
+            "settings": "$t(common.setting, {\"count\": 2})",
+            "shared": "$t(entity.playlist, {\"count\": 2}) partilhada",
+            "tracks": "$t(entity.track, {\"count\": 2})"
         },
         "trackList": {
             "artistTracks": "faixas de {{artist}}",
-            "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
-            "title": "$t(entity.track_other)"
+            "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.track, {\"count\": 2})"
         }
     },
     "player": {
@@ -521,7 +523,6 @@
         "customCssEnable_description": "permite escrever css customizado",
         "customCssNotice": "Aviso: apesar de existir alguma higienização (url() e content: não são permitidas), o uso de css personalizado ainda pode representar riscos ao alterar a interface",
         "customCss": "css customizado",
-        "disableAutomaticUpdates": "desativar atualizações automáticas",
         "disableLibraryUpdateOnStartup": "desativar a verificação de novas versões na inicialização",
         "discordApplicationId": "{{discord}} ID da aplicação",
         "discordIdleStatus_description": "quando ativado, atualiza o estado enquanto o player está ocioso",

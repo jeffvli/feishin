@@ -3,7 +3,7 @@ import isElectron from 'is-electron';
 import { useCallback, useEffect } from 'react';
 
 import { useIsRadioActive } from '/@/renderer/features/radio/hooks/use-radio-player';
-import { usePlayerActions } from '/@/renderer/store';
+import { usePlayerActions, useVolumeWheelStep } from '/@/renderer/store';
 import { toast } from '/@/shared/components/toast/toast';
 
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
@@ -12,6 +12,7 @@ const ipc = isElectron() ? window.api.ipc : null;
 
 export const useMainPlayerListener = () => {
     const isRadioActive = useIsRadioActive();
+    const volumeWheelStep = useVolumeWheelStep();
     const {
         decreaseVolume,
         increaseVolume,
@@ -104,11 +105,11 @@ export const useMainPlayerListener = () => {
         });
 
         mpvPlayerListener.rendererVolumeUp(() => {
-            increaseVolume(1);
+            increaseVolume(volumeWheelStep);
         });
 
         mpvPlayerListener.rendererVolumeDown(() => {
-            decreaseVolume(1);
+            decreaseVolume(volumeWheelStep);
         });
 
         mpvPlayerListener.rendererError((_event: any, message: string) => {
@@ -148,6 +149,7 @@ export const useMainPlayerListener = () => {
         mediaTogglePlayPause,
         toggleRepeat,
         toggleShuffle,
+        volumeWheelStep,
     ]);
 };
 

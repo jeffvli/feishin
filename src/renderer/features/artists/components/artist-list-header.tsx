@@ -19,7 +19,7 @@ interface ArtistListHeaderProps {
 export const ArtistListHeader = ({ title }: ArtistListHeaderProps) => {
     const { t } = useTranslation();
 
-    const pageTitle = title || t('entity.artist_other', { postProcess: 'titleCase' });
+    const pageTitle = title || t('entity.artist', { count: 2, postProcess: 'titleCase' });
 
     return (
         <Stack gap={0}>

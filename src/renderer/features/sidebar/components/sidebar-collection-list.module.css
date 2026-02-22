@@ -1,0 +1,74 @@
+.row {
+    position: relative;
+    width: 100%;
+    border-radius: var(--theme-radius-md);
+}
+
+.row:hover .more-button {
+    opacity: 1;
+}
+
+.row-active {
+    background-color: var(--theme-colors-surface);
+}
+
+.row-link {
+    display: flex;
+    gap: var(--theme-spacing-xs);
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    padding: var(--theme-spacing-xs) var(--theme-spacing-md);
+    color: var(--theme-colors-foreground);
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px transparent solid;
+    border-radius: var(--theme-radius-md);
+    transition: color 0.2s ease-in-out;
+
+    &:hover,
+    &:active,
+    &:focus-visible {
+        @mixin dark {
+            background-color: lighten(var(--theme-colors-background), 10%);
+        }
+
+        @mixin light {
+            background-color: darken(var(--theme-colors-background), 5%);
+        }
+    }
+
+    &:focus-visible {
+        border-color: var(--theme-colors-primary-filled);
+    }
+}
+
+.row-active .row-link {
+    color: var(--theme-colors-primary-filled);
+}
+
+.row-active .row-link .name {
+    color: var(--theme-colors-primary-filled);
+}
+
+.row-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.type-icon {
+    flex-shrink: 0;
+}
+
+.name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.more-button {
+    flex-shrink: 0;
+    align-self: center;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}

@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 import styles from './mobile-fullscreen-player.module.css';
 
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
-import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
+import {
+    ListConfigMenu,
+    SONG_DISPLAY_TYPES,
+} from '/@/renderer/features/shared/components/list-config-menu';
 import {
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
@@ -365,7 +368,10 @@ export const MobileFullscreenPlayerHeader = memo(
                     buttonProps={{
                         variant: isPageHovered ? 'default' : 'subtle',
                     }}
-                    displayTypes={[{ hidden: true, value: ListDisplayType.GRID }]}
+                    displayTypes={[
+                        { hidden: true, value: ListDisplayType.GRID },
+                        ...SONG_DISPLAY_TYPES,
+                    ]}
                     listKey={ItemListKey.FULL_SCREEN}
                     optionsConfig={{
                         table: {

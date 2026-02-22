@@ -12,6 +12,7 @@ import { getMpvProperties } from '/@/renderer/features/settings/components/playb
 import {
     usePlaybackSettings,
     usePlayerActions,
+    usePlayerSong,
     usePlayerStore,
     useSettingsStore,
 } from '/@/renderer/store';
@@ -49,14 +50,14 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
     } = props;
 
     const [internalVolume, setInternalVolume] = useState(volume / 100 || 0);
-    const [duration] = useState(0);
+    const currentSong = usePlayerSong();
 
     const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const isInitializedRef = useRef<boolean>(false);
     const hasPopulatedQueueRef = useRef<boolean>(false);
     const isMountedRef = useRef<boolean>(true);
 
-    const { audioDeviceId, transcode } = usePlaybackSettings();
+    const { mpvAudioDeviceId, transcode } = usePlaybackSettings();
     const mpvExtraParameters = useSettingsStore((store) => store.playback.mpvExtraParameters);
     const mpvProperties = useSettingsStore((store) => store.playback.mpvProperties);
     const [reloadTrigger, setReloadTrigger] = useState(0);
@@ -108,8 +109,8 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
 
             const extraParameters: string[] = [...mpvExtraParameters];
 
-            if (audioDeviceId) {
-                extraParameters.push(`--audio-device=${audioDeviceId}`);
+            if (mpvAudioDeviceId) {
+                extraParameters.push(`--audio-device=${mpvAudioDeviceId}`);
             }
 
             await mpvPlayer?.initialize({
@@ -154,7 +155,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
         // update callbacks in usePlayerEvents.
         // reloadTrigger is included to allow manual reload via MPV_RELOAD event.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mpvExtraParameters, mpvProperties, audioDeviceId, reloadTrigger]);
+    }, [mpvExtraParameters, mpvProperties, mpvAudioDeviceId, reloadTrigger]);
 
     // Update volume
     useEffect(() => {
@@ -204,10 +205,16 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
         }
     }, [playerStatus]);
 
+    const hasCurrentSong = !!currentSong?.id;
+
     // Set up progress tracking
     useEffect(() => {
         if (progressIntervalRef.current) {
             clearInterval(progressIntervalRef.current);
+        }
+
+        if (!hasCurrentSong) {
+            return;
         }
 
         const updateProgress = async () => {
@@ -219,7 +226,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
                 const time = await mpvPlayer.getCurrentTime();
                 if (time !== undefined && isMountedRef.current) {
                     onProgress({
-                        played: time / (duration || time + 10),
+                        played: time / (time + 10),
                         playedSeconds: time,
                     });
                 }
@@ -239,7 +246,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
                 progressIntervalRef.current = null;
             }
         };
-    }, [isTransitioning, duration, onProgress]);
+    }, [hasCurrentSong, isTransitioning, onProgress]);
 
     const { mediaAutoNext } = usePlayerActions();
 

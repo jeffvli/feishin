@@ -120,7 +120,7 @@ export const FeaturedGenres = () => {
                 <>
                     <Group align="flex-end" justify="space-between">
                         <TextTitle fw={700} isNoSelect order={3}>
-                            {t('entity.genre_other', { postProcess: 'titleCase' })}
+                            {t('entity.genre', { count: 2, postProcess: 'titleCase' })}
                         </TextTitle>
                         <Button
                             component={Link}

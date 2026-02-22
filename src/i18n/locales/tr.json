@@ -2,30 +2,30 @@
     "action": {
         "moveToBottom": "alttakine geç",
         "moveToTop": "başa dön",
-        "removeFromFavorites": "$t(entity.favorite_other)lerden kaldır",
-        "removeFromPlaylist": "$t(entity.playlist_one) listesinden kaldır",
+        "removeFromFavorites": "$t(entity.favorite, {\"count\": 2})lerden kaldır",
+        "removeFromPlaylist": "$t(entity.playlist, {\"count\": 1}) listesinden kaldır",
         "removeFromQueue": "sıradan kaldır",
         "setRating": "oyla",
-        "viewPlaylists": "$t(entity.playlist_other) listesini görüntüle",
+        "viewPlaylists": "$t(entity.playlist, {\"count\": 2}) listesini görüntüle",
         "openIn": {
             "lastfm": "Last.fm'de aç",
             "musicbrainz": "MusicBrainz'da aç"
         },
-        "addToFavorites": "$t(entity.favorite_other) listesine ekle",
-        "addToPlaylist": "$t(entity.playlist_one) listesine ekle",
+        "addToFavorites": "$t(entity.favorite, {\"count\": 2}) listesine ekle",
+        "addToPlaylist": "$t(entity.playlist, {\"count\": 1}) listesine ekle",
         "clearQueue": "sırayı temizle",
-        "createPlaylist": "$t(entity.playlist_one) listesini oluştur",
-        "deletePlaylist": "$t(entity.playlist_one) listesini sil",
+        "createPlaylist": "$t(entity.playlist, {\"count\": 1}) listesini oluştur",
+        "deletePlaylist": "$t(entity.playlist, {\"count\": 1}) listesini sil",
         "deselectAll": "seçimleri kaldır",
-        "editPlaylist": "$t(entity.playlist_one) listesini düzenle",
+        "editPlaylist": "$t(entity.playlist, {\"count\": 1}) listesini düzenle",
         "goToPage": "sayfaya git",
         "moveToNext": "sonrakine geç",
         "refresh": "$t(common.refresh)",
         "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist) düzenleyiciye geç",
         "addOrRemoveFromSelection": "seçime ekle veya seçimi kaldır",
         "selectRangeOfItems": "bir dizi öğe seçin",
-        "createRadioStation": "$t(entity.radioStation_one) oluştur",
-        "deleteRadioStation": "$t(entity.radioStation_one) istasyonunu sil",
+        "createRadioStation": "$t(entity.radioStation, {\"count\": 1}) oluştur",
+        "deleteRadioStation": "$t(entity.radioStation, {\"count\": 1}) istasyonunu sil",
         "selectAll": "tümünü seç",
         "downloadStarted": "{{count}} öğenin indirilmesine başlandı",
         "moveUp": "yukarı kaydır",
@@ -55,7 +55,7 @@
         "configure": "yapılandır",
         "confirm": "onayla",
         "create": "oluştur",
-        "currentSong": "şu anki parça $t(entity.track_one)",
+        "currentSong": "şu anki parça $t(entity.track, {\"count\": 1})",
         "decrease": "azalt",
         "delete": "sil",
         "descending": "azalan",
@@ -93,7 +93,7 @@
         "path": "yol",
         "playerMustBePaused": "oynatıcı duraklatılmalı",
         "preview": "önizleme",
-        "previousSong": "önceki $t(entity.track_one)",
+        "previousSong": "önceki $t(entity.track, {\"count\": 1})",
         "quit": "çık",
         "random": "rastgele",
         "rating": "oylama",
@@ -108,7 +108,8 @@
         "saveAndReplace": "kaydet ve değiştir",
         "saveAs": "farklı kaydet",
         "search": "arama",
-        "setting": "ayarlar",
+        "setting_one": "ayarlar",
+        "setting_other": "",
         "share": "paylaş",
         "size": "boyut",
         "sortOrder": "sıralama düzeni",
@@ -129,7 +130,8 @@
         "trackPeak": "parça zirvesi",
         "private": "gizli",
         "clean": "temiz",
-        "countSelected": "{{count}} adet seçildi"
+        "countSelected": "{{count}} adet seçildi",
+        "public": "herkese açık"
     },
     "entity": {
         "album_one": "albüm",
@@ -160,13 +162,15 @@
         "play_other": "{{count}} oynatma",
         "playlistWithCount_one": "{{count}} oynatma listesi",
         "playlistWithCount_other": "{{count}} oynatma listesi",
-        "smartPlaylist": "akıllı $t(entity.playlist_one)",
+        "smartPlaylist": "akıllı $t(entity.playlist, {\"count\": 1})",
         "track_one": "parça",
         "track_other": "parçalar",
         "song_one": "şarkı",
         "song_other": "şarkılar",
         "trackWithCount_one": "{{count}} parça",
-        "trackWithCount_other": "{{count}} parça"
+        "trackWithCount_other": "{{count}} parça",
+        "radioStation_one": "radyo istasyonu",
+        "radioStation_other": "radyo istasyonları"
     },
     "error": {
         "apiRouteError": "istek yönlendirilemiyor",
@@ -195,7 +199,7 @@
         "remoteEnableError": "uzak sunucuyu $t(common.enable) yapmaya çalışırken bir hata oluştu"
     },
     "filter": {
-        "albumCount": "$t(entity.album_other) sayısı",
+        "albumCount": "$t(entity.album, {\"count\": 2}) sayısı",
         "biography": "biyografi",
         "bitrate": "bit hızı",
         "bpm": "bpm",
@@ -210,7 +214,7 @@
         "id": "kimlik",
         "isCompilation": "derleme",
         "isFavorited": "favorilendi",
-        "isPublic": "herkese açık",
+        "isPublic": "halka açıktır",
         "isRated": "oylandı",
         "isRecentlyPlayed": "yakın zamanda çalındı",
         "lastPlayed": "son çalınan",
@@ -232,10 +236,10 @@
         "title": "başlık",
         "toYear": "yılına kadar",
         "trackNumber": "parça",
-        "genre": "$t(entity.genre_one)",
-        "album": "$t(entity.album_one)",
-        "albumArtist": "$t(entity.albumArtist_one)",
-        "artist": "$t(entity.artist_one)",
+        "genre": "$t(entity.genre, {\"count\": 1})",
+        "album": "$t(entity.album, {\"count\": 1})",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+        "artist": "$t(entity.artist, {\"count\": 1})",
         "channels": "$t(common.channel_other)"
     },
     "form": {
@@ -255,9 +259,9 @@
             "input_preferInstantMixDescription": "sadece benzer şarkılari bulmak icin anında mix kullan. Bu davranışı değiştiren eklentilere sahipseniz faydalı"
         },
         "addToPlaylist": {
-            "input_playlists": "$t(entity.playlist_other)",
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "input_skipDuplicates": "kopyaları atla",
-            "title": "$t(entity.playlist_one) listesine ekle",
+            "title": "$t(entity.playlist, {\"count\": 1}) listesine ekle",
             "success": "$t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} }) $t(entity.trackWithCount, {\"count\": {{message}} }) eklendi"
         },
         "createPlaylist": {
@@ -265,21 +269,21 @@
             "input_name": "$t(common.name)",
             "input_owner": "$t(common.owner)",
             "input_public": "herkese açık",
-            "success": "$t(entity.playlist_one) listesi başarıyla oluşturuldu",
-            "title": "$t(entity.playlist_one) listesini oluştur"
+            "success": "$t(entity.playlist, {\"count\": 1}) listesi başarıyla oluşturuldu",
+            "title": "$t(entity.playlist, {\"count\": 1}) listesini oluştur"
         },
         "deletePlaylist": {
-            "input_confirm": "onaylamak için $t(entity.playlist_one) listesinin adını yazın",
-            "success": "$t(entity.playlist_one) listesi başarıyla silindi",
-            "title": "$t(entity.playlist_one) listesini sil"
+            "input_confirm": "onaylamak için $t(entity.playlist, {\"count\": 1}) listesinin adını yazın",
+            "success": "$t(entity.playlist, {\"count\": 1}) listesi başarıyla silindi",
+            "title": "$t(entity.playlist, {\"count\": 1}) listesini sil"
         },
         "editPlaylist": {
             "publicJellyfinNote": "Jellyfin bazı nedenlerden dolayı bir çalma listesinin herkese açık olup olmadığını göstermez. Bunun herkese açık kalmasını istiyorsanız, lütfen aşağıdaki girdiyi seçin",
-            "success": "$t(entity.playlist_one) listesi başarıyla güncellendi",
-            "title": "$t(entity.playlist_one) listesini düzenle"
+            "success": "$t(entity.playlist, {\"count\": 1}) listesi başarıyla güncellendi",
+            "title": "$t(entity.playlist, {\"count\": 1}) listesini düzenle"
         },
         "lyricSearch": {
-            "input_artist": "$t(entity.artist_one)",
+            "input_artist": "$t(entity.artist, {\"count\": 1})",
             "input_name": "$t(common.name)",
             "title": "şarkı sözü arama"
         },
@@ -312,10 +316,10 @@
             "appearsOn": "üzerinde görünür",
             "recentReleases": "son sürümler",
             "viewDiscography": "diskografiyi görüntüle",
-            "relatedArtists": "$t(entity.artist_other) ile benzer",
+            "relatedArtists": "$t(entity.artist, {\"count\": 2}) ile benzer",
             "topSongs": "en iyi şarkılar",
             "viewAll": "tümünü görüntüle",
-            "viewAllTracks": "tüm $t(entity.track_other) görüntüle",
+            "viewAllTracks": "tüm $t(entity.track, {\"count\": 2}) görüntüle",
             "topSongsFrom": "{{title}} tarafından en iyi şarkılar"
         },
         "contextMenu": {
@@ -341,8 +345,8 @@
             "playShuffled": "$t(player.shuffle)",
             "shareItem": "öğeyi paylaş",
             "showDetails": "bilgi al",
-            "goToAlbum": "$t(entity.album_one) sayfasına git",
-            "goToAlbumArtist": "$t(entity.albumArtist_one) sayfasına git"
+            "goToAlbum": "$t(entity.album, {\"count\": 1}) sayfasına git",
+            "goToAlbumArtist": "$t(entity.albumArtist, {\"count\": 1}) sayfasına git"
         },
         "manageServers": {
             "url": "URL",
@@ -376,9 +380,9 @@
             "noLyrics": "şarkı sözü bulunamadı"
         },
         "genreList": {
-            "showAlbums": "$t(entity.genre_one) $t(entity.album_other) göster",
-            "showTracks": "$t(entity.genre_one)$t(entity.track_other) göster",
-            "title": "$t(entity.genre_other)"
+            "showAlbums": "$t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2}) göster",
+            "showTracks": "$t(entity.genre, {\"count\": 1})$t(entity.track, {\"count\": 2}) göster",
+            "title": "$t(entity.genre, {\"count\": 2})"
         },
         "globalSearch": {
             "commands": {
@@ -404,7 +408,7 @@
             "reorder": "yeniden sıralama yalnızca kimliğe göre sıralama yapıldığında etkinleştirilir"
         },
         "playlistList": {
-            "title": "$t(entity.playlist_other)"
+            "title": "$t(entity.playlist, {\"count\": 2})"
         },
         "setting": {
             "advanced": "gelişmiş",
@@ -414,36 +418,36 @@
             "windowTab": "pencere"
         },
         "sidebar": {
-            "albumArtists": "$t(entity.albumArtist_other)",
-            "albums": "$t(entity.album_other)",
-            "artists": "$t(entity.artist_other)",
-            "folders": "$t(entity.folder_other)",
-            "genres": "$t(entity.genre_other)",
+            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
+            "albums": "$t(entity.album, {\"count\": 2})",
+            "artists": "$t(entity.artist, {\"count\": 2})",
+            "folders": "$t(entity.folder, {\"count\": 2})",
+            "genres": "$t(entity.genre, {\"count\": 2})",
             "home": "$t(common.home)",
             "myLibrary": "kütüphanem",
             "nowPlaying": "şimdi oynatılıyor",
-            "playlists": "$t(entity.playlist_other)",
+            "playlists": "$t(entity.playlist, {\"count\": 2})",
             "search": "$t(common.search)",
-            "settings": "$t(common.setting_other)",
-            "shared": "paylaşılan $t(entity.playlist_other)",
-            "tracks": "$t(entity.track_other)"
+            "settings": "$t(common.setting, {\"count\": 2})",
+            "shared": "paylaşılan $t(entity.playlist, {\"count\": 2})",
+            "tracks": "$t(entity.track, {\"count\": 2})"
         },
         "trackList": {
             "artistTracks": "{{artist}} parçaları",
-            "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
-            "title": "$t(entity.track_other)"
+            "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.track, {\"count\": 2})"
         },
         "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "$t(entity.artist_one) sanatçısından daha fazla",
+            "moreFromArtist": "$t(entity.artist, {\"count\": 1}) sanatçısından daha fazla",
             "moreFromGeneric": "{{item}} tarafından daha fazla",
             "released": "yayınlandı"
         },
         "albumList": {
-            "title": "$t(entity.album_other)",
-            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
+            "title": "$t(entity.album, {\"count\": 2})",
+            "genreAlbums": "\"{{genre}}\" $t(entity.album, {\"count\": 2})",
             "artistAlbums": "{{artist}} albümleri"
         },
         "appMenu": {
@@ -455,7 +459,7 @@
             "openBrowserDevtools": "tarayıcı geliştirici araçlarını aç",
             "quit": "$t(common.quit)",
             "selectServer": "sunucu seç",
-            "settings": "$t(common.setting_other)",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "version": "{{version}} sürümü",
             "privateModeOff": "gizli modu kapat",
             "privateModeOn": "gizli modu aç"
@@ -530,7 +534,6 @@
         "customCss_description": "özel css içeriği. Not: içerik ve uzaktan URL'ler izin verilmeyen özelliklerdir. İçeriğinizin önizlemesi aşağıda gösterilmektedir. Ayarlamadığınız ek alanlar sterilleme nedeniyle mevcuttur",
         "customFontPath": "özel yazı tipi yolu",
         "customFontPath_description": "uygulama için kullanılacak özel yazı tipinin yolunu ayarlar",
-        "disableAutomaticUpdates": "otomatik güncellemeleri devre dışı bırak",
         "disableLibraryUpdateOnStartup": "başlangıçta yeni sürümler için denetimi devre dışı bırak",
         "discordApplicationId": "{{discord}} uygulama kimliği",
         "discordApplicationId_description": "{{discord}} \"Rich Presence\" için uygulama kimliği (varsayılan olarak {{defaultId}})",
@@ -627,9 +630,9 @@
         "replayGainFallback_description": "dosyada {{ReplayGain}} etiketi yoksa db'e uygulanacak kazanç",
         "replayGainMode": "{{ReplayGain}} modu",
         "replayGainMode_description": "ses seviyesi kazancını dosya meta verilerinde saklanan {{ReplayGain}} değerlerine göre ayarlayın",
-        "replayGainMode_optionAlbum": "$t(entity.album_one)",
+        "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
         "replayGainMode_optionNone": "$t(common.none)",
-        "replayGainMode_optionTrack": "$t(entity.track_one)",
+        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
         "replayGainPreamp": "{{ReplayGain}} preamp (dB)",
         "replayGainPreamp_description": "{{ReplayGain}} değerlerine uygulanan preamp kazancını ayarlar",
         "sampleRate": "örnekleme hızı",
@@ -736,8 +739,8 @@
         "column": {
             "album": "albüm",
             "albumArtist": "albüm sanatçısı",
-            "albumCount": "$t(entity.album_other)",
-            "artist": "$t(entity.artist_one)",
+            "albumCount": "$t(entity.album, {\"count\": 2})",
+            "artist": "$t(entity.artist, {\"count\": 1})",
             "biography": "biyografi",
             "bitrate": "bit hızı",
             "bpm": "bpm (dakika başına vuruş)",
@@ -747,7 +750,7 @@
             "dateAdded": "tarih eklendi",
             "discNumber": "disk",
             "favorite": "favori",
-            "genre": "$t(entity.genre_one)",
+            "genre": "$t(entity.genre, {\"count\": 1})",
             "lastPlayed": "son çalınan",
             "path": "yol",
             "playCount": "oynatılıyor",
@@ -755,7 +758,7 @@
             "releaseDate": "çıkış tarihi",
             "releaseYear": "yıl",
             "size": "$t(common.size)",
-            "songCount": "$t(entity.track_other)",
+            "songCount": "$t(entity.track, {\"count\": 2})",
             "title": "başlık",
             "trackNumber": "parça"
         },
@@ -772,9 +775,9 @@
             },
             "label": {
                 "actions": "$t(common.action_other)",
-                "album": "$t(entity.album_one)",
-                "albumArtist": "$t(entity.albumArtist_one)",
-                "artist": "$t(entity.artist_one)",
+                "album": "$t(entity.album, {\"count\": 1})",
+                "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+                "artist": "$t(entity.artist, {\"count\": 1})",
                 "biography": "$t(common.biography)",
                 "bitrate": "$t(common.bitrate)",
                 "bpm": "$t(common.bpm)",
@@ -784,7 +787,7 @@
                 "discNumber": "disk numarası",
                 "duration": "$t(common.duration)",
                 "favorite": "$t(common.favorite)",
-                "genre": "$t(entity.genre_one)",
+                "genre": "$t(entity.genre, {\"count\": 1})",
                 "lastPlayed": "son çalınan",
                 "note": "$t(common.note)",
                 "owner": "$t(common.owner)",
@@ -794,7 +797,7 @@
                 "releaseDate": "çıkış tarihi",
                 "rowIndex": "satır indeksi",
                 "size": "$t(common.size)",
-                "songCount": "$t(entity.track_other)",
+                "songCount": "$t(entity.track, {\"count\": 2})",
                 "title": "$t(common.title)",
                 "titleCombined": "$t(common.title) (birleşik)",
                 "trackNumber": "parça numarası",

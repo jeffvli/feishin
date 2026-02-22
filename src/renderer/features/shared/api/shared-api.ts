@@ -30,7 +30,7 @@ export const sharedQueries = {
     },
     tagList: (args: QueryHookArgs<TagListQuery>) => {
         return queryOptions({
-            gcTime: 1000 * 60,
+            gcTime: 1000 * 60 * 24,
             queryFn: ({ signal }) => {
                 return api.controller.getTagList({
                     apiClientProps: { serverId: args.serverId, signal },
@@ -38,7 +38,8 @@ export const sharedQueries = {
                 });
             },
             queryKey: queryKeys.tags.list(args.serverId || '', args.query.type),
-            staleTime: 1000 * 60,
+            staleTime: 1000 * 60 * 24,
+            structuralSharing: false,
             ...args.options,
         });
     },

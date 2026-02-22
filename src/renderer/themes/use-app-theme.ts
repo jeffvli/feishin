@@ -22,6 +22,7 @@ export const THEME_DATA = [
     { label: 'Solarized Light', type: 'light', value: AppTheme.SOLARIZED_LIGHT },
     { label: 'GitHub Dark', type: 'dark', value: AppTheme.GITHUB_DARK },
     { label: 'GitHub Light', type: 'light', value: AppTheme.GITHUB_LIGHT },
+    { label: 'Glassy Dark', type: 'dark', value: AppTheme.GLASSY_DARK },
     { label: 'Monokai', type: 'dark', value: AppTheme.MONOKAI },
     { label: 'High Contrast Dark', type: 'dark', value: AppTheme.HIGH_CONTRAST_DARK },
     { label: 'High Contrast Light', type: 'light', value: AppTheme.HIGH_CONTRAST_LIGHT },
@@ -48,7 +49,7 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
     const nativeImageAspect = useNativeAspectRatio();
     const { builtIn, custom, system, type } = useFontSettings();
     const textStyleRef = useRef<HTMLStyleElement | null>(null);
-    const loadedStylesheetsRef = useRef<Set<string>>(new Set());
+    const themeInlineStylesRef = useRef<HTMLStyleElement | null>(null);
     const getCurrentTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
     const [isDarkTheme, setIsDarkTheme] = useState(getCurrentTheme());
     const { followSystemTheme, theme, themeDark, themeLight, useThemeAccentColor } =
@@ -58,54 +59,17 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
         setIsDarkTheme(e.matches);
     };
 
-    const loadStylesheet = (href: string): Promise<void> => {
-        return new Promise((resolve, reject) => {
-            if (loadedStylesheetsRef.current.has(href)) {
-                resolve();
-                return;
-            }
+    const applyInlineStylesheets = useCallback((inlineCssStrings: string[] = []) => {
+        const cssText = inlineCssStrings.filter(Boolean).join('\n');
 
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = href;
-            link.onload = () => {
-                loadedStylesheetsRef.current.add(href);
-                resolve();
-            };
-            link.onerror = () => {
-                console.warn(`Failed to load stylesheet: ${href}`);
-                reject(new Error(`Failed to load stylesheet: ${href}`));
-            };
-
-            document.head.appendChild(link);
-        });
-    };
-
-    const unloadStylesheet = (href: string) => {
-        const existingLink = document.querySelector(`link[href="${href}"]`);
-        if (existingLink) {
-            existingLink.remove();
-            loadedStylesheetsRef.current.delete(href);
-        }
-    };
-
-    const loadThemeStylesheets = useCallback(async (stylesheets: string[] = []) => {
-        if (loadedStylesheetsRef.current.size > 0) {
-            loadedStylesheetsRef.current.forEach((href) => unloadStylesheet(href));
-            loadedStylesheetsRef.current.clear();
+        if (!themeInlineStylesRef.current) {
+            const styleEl = document.createElement('style');
+            styleEl.id = 'theme-inline-styles';
+            document.head.appendChild(styleEl);
+            themeInlineStylesRef.current = styleEl;
         }
 
-        if (stylesheets.length === 0) {
-            return;
-        }
-
-        const loadPromises = stylesheets.map((href) =>
-            loadStylesheet(href).catch((error) => {
-                console.warn(`Error loading stylesheet ${href}:`, error);
-            }),
-        );
-
-        await Promise.all(loadPromises);
+        themeInlineStylesRef.current.textContent = cssText;
     }, []);
 
     const getSelectedTheme = () => {
@@ -133,7 +97,7 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
             const root = document.documentElement;
             root.style.setProperty(
                 '--theme-content-font-family',
-                'dynamic-font, "Noto Sans JP", sans-serif',
+                'dynamic-font, "Noto Sans JP", "Noto Sans Hebrew", sans-serif',
             );
 
             if (!textStyleRef.current) {
@@ -150,7 +114,7 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
             const root = document.documentElement;
             root.style.setProperty(
                 '--theme-content-font-family',
-                'dynamic-font, "Noto Sans JP", sans-serif',
+                'dynamic-font, "Noto Sans JP", "Noto Sans Hebrew", sans-serif',
             );
 
             if (!textStyleRef.current) {
@@ -161,13 +125,13 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
             textStyleRef.current.textContent = `
             @font-face {
                 font-family: "dynamic-font";
-                src: url("feishin://${custom}");
+                src: url("feishin:${custom}");
             }`;
         } else {
             const root = document.documentElement;
             root.style.setProperty(
                 '--theme-content-font-family',
-                `${builtIn}, "Noto Sans JP", sans-serif`,
+                `${builtIn}, "Noto Sans JP", "Noto Sans Hebrew", sans-serif`,
             );
         }
     }, [builtIn, custom, system, type]);
@@ -204,10 +168,8 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
     }, [nativeImageAspect]);
 
     useEffect(() => {
-        if (appTheme?.stylesheets) {
-            loadThemeStylesheets(appTheme.stylesheets);
-        }
-    }, [selectedTheme, appTheme?.stylesheets, loadThemeStylesheets]);
+        applyInlineStylesheets(appTheme?.stylesheets ?? []);
+    }, [selectedTheme, appTheme?.stylesheets, applyInlineStylesheets]);
 
     const themeVars = useMemo(() => {
         return Object.entries(appTheme?.app ?? {})

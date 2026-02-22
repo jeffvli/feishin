@@ -1,10 +1,10 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
-import { useGenreList } from '/@/renderer/features/genres/api/genres-api';
+import { genresQueries } from '/@/renderer/features/genres/api/genres-api';
 import {
     ArtistMultiSelectRow,
     GenreMultiSelectRow,
@@ -22,7 +22,12 @@ import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { YesNoSelect } from '/@/shared/components/yes-no-select/yes-no-select';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
-import { AlbumArtistListSort, LibraryItem, SortOrder } from '/@/shared/types/domain-types';
+import {
+    AlbumArtistListSort,
+    GenreListSort,
+    LibraryItem,
+    SortOrder,
+} from '/@/shared/types/domain-types';
 
 interface JellyfinSongFiltersProps {
     disableArtistFilter?: boolean;
@@ -41,7 +46,20 @@ export const JellyfinSongFilters = ({
 
     // Despite the fact that getTags returns genres, it only returns genre names.
     // We prefer using IDs, hence the double query
-    const genreListQuery = useGenreList();
+    const genreListQuery = useQuery(
+        genresQueries.list({
+            options: {
+                gcTime: 1000 * 60 * 2,
+                staleTime: 1000 * 60 * 1,
+            },
+            query: {
+                sortBy: GenreListSort.NAME,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
 
     const genreList = useMemo(() => {
         if (!genreListQuery.data) return [];

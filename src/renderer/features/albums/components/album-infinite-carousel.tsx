@@ -58,7 +58,6 @@ const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps & { rows: DataRow[]
     const controls = useDefaultItemListControls();
 
     const cards = useMemo(() => {
-        // Flatten all pages and filter excluded IDs
         const allItems = albums?.pages.flatMap((page: AlbumListResponse) => page.items) || [];
         const filteredItems = excludeIds
             ? allItems.filter((album) => !excludeIds.includes(album.id))
@@ -70,6 +69,7 @@ const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps & { rows: DataRow[]
                     controls={controls}
                     data={album}
                     enableDrag
+                    enableExpansion
                     itemType={LibraryItem.ALBUM}
                     rows={rows}
                     type="poster"

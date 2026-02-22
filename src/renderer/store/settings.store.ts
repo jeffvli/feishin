@@ -1,6 +1,7 @@
 import isElectron from 'is-electron';
 import mergeWith from 'lodash/mergeWith';
 import { nanoid } from 'nanoid';
+import { useMemo } from 'react';
 import { generatePath } from 'react-router';
 import { z } from 'zod';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
@@ -26,7 +27,7 @@ import { FontValueSchema } from '/@/renderer/types/fonts';
 import { randomString } from '/@/renderer/utils';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { AppTheme } from '/@/shared/themes/app-theme-types';
-import { LibraryItem, LyricSource } from '/@/shared/types/domain-types';
+import { LibraryItem, LyricSource, SavedCollection } from '/@/shared/types/domain-types';
 import {
     FontType,
     ItemListKey,
@@ -76,6 +77,7 @@ const HomeItemSchema = z.enum([
 const ArtistItemSchema = z.enum([
     'biography',
     'compilations',
+    'favoriteSongs',
     'recentAlbums',
     'similarArtists',
     'topSongs',
@@ -150,9 +152,18 @@ const DiscordLinkTypeSchema = z.enum(['last_fm', 'musicbrainz', 'musicbrainz_las
 
 const GenreTargetSchema = z.enum(['album', 'track']);
 
+const PlaylistTargetSchema = z.enum(['album', 'track']);
+
 const SideQueueTypeSchema = z.enum(['sideDrawerQueue', 'sideQueue']);
 
 const SidebarPanelTypeSchema = z.enum(['queue', 'lyrics', 'visualizer']);
+
+const CollectionSchema = z.object({
+    filterQueryString: z.string(),
+    id: z.string(),
+    name: z.string(),
+    type: z.enum([LibraryItem.ALBUM, LibraryItem.SONG]),
+});
 
 const SidebarItemTypeSchema = z.object({
     disabled: z.boolean(),
@@ -190,13 +201,25 @@ const ItemTableListPropsSchema = z.object({
     autoFitColumns: z.boolean(),
     columns: z.array(ItemTableListColumnConfigSchema),
     enableAlternateRowColors: z.boolean(),
+    enableHeader: z.boolean(),
     enableHorizontalBorders: z.boolean(),
     enableRowHoverHighlight: z.boolean(),
     enableVerticalBorders: z.boolean(),
-    size: z.enum(['compact', 'default']),
+    size: z.enum(['compact', 'default', 'large']),
+});
+
+const ItemDetailListPropsSchema = z.object({
+    columns: z.array(ItemTableListColumnConfigSchema),
+    enableAlternateRowColors: z.boolean(),
+    enableHeader: z.boolean(),
+    enableHorizontalBorders: z.boolean(),
+    enableRowHoverHighlight: z.boolean(),
+    enableVerticalBorders: z.boolean(),
+    size: z.enum(['compact', 'default', 'large']),
 });
 
 const ItemListConfigSchema = z.object({
+    detail: ItemDetailListPropsSchema.optional(),
     display: z.nativeEnum(ListDisplayType),
     grid: z.object({
         itemGap: z.enum(['lg', 'md', 'sm', 'xl', 'xs']),
@@ -240,6 +263,7 @@ const DiscordSettingsSchema = z.object({
     showAsListening: z.boolean(),
     showPaused: z.boolean(),
     showServerImage: z.boolean(),
+    showStateIcon: z.boolean(),
 });
 
 const FontSettingsSchema = z.object({
@@ -406,7 +430,9 @@ export const GeneralSettingsSchema = z.object({
     artistItems: z.array(SortableItemSchema(ArtistItemSchema)),
     artistRadioCount: z.number(),
     artistReleaseTypeItems: z.array(SortableItemSchema(ArtistReleaseTypeItemSchema)),
+    blurExplicitImages: z.boolean(),
     buttonSize: z.number(),
+    collections: z.array(CollectionSchema),
     combinedLyricsAndVisualizer: z.boolean(),
     disabledContextMenu: z.record(z.string(), z.boolean()),
     enableGridMultiSelect: z.boolean(),
@@ -435,6 +461,7 @@ export const GeneralSettingsSchema = z.object({
     playButtonBehavior: z.nativeEnum(Play),
     playerbarOpenDrawer: z.boolean(),
     playerbarSlider: PlayerbarSliderSchema,
+    playlistTarget: PlaylistTargetSchema,
     resume: z.boolean(),
     showLyricsInSidebar: z.boolean(),
     showRatings: z.boolean(),
@@ -444,6 +471,7 @@ export const GeneralSettingsSchema = z.object({
     sidebarItems: z.array(SidebarItemTypeSchema),
     sidebarPanelOrder: z.array(SidebarPanelTypeSchema),
     sidebarPlaylistList: z.boolean(),
+    sidebarPlaylistListFilterRegex: z.string(),
     sidebarPlaylistSorting: z.boolean(),
     sideQueueType: SideQueueTypeSchema,
     skipButtons: SkipButtonsSchema,
@@ -553,6 +581,7 @@ const PlaybackSettingsSchema = z.object({
     audioFadeOnStatusChange: z.boolean(),
     filters: z.array(PlayerFilterSchema),
     mediaSession: z.boolean(),
+    mpvAudioDeviceId: z.string().nullable().optional(),
     mpvExtraParameters: z.array(z.string()),
     mpvProperties: MpvSettingsSchema,
     preservePitch: z.boolean(),
@@ -574,7 +603,7 @@ const WindowSettingsSchema = z.object({
     exitToTray: z.boolean(),
     minimizeToTray: z.boolean(),
     preventSleepOnPlayback: z.boolean(),
-    releaseChannel: z.enum(['beta', 'latest']),
+    releaseChannel: z.enum(['alpha', 'beta', 'latest']),
     startMinimized: z.boolean(),
     tray: z.boolean(),
     windowBarStyle: z.nativeEnum(Platform),
@@ -643,6 +672,7 @@ export const SettingsStateSchema = ValidationSettingsStateSchema.merge(
 
 export enum ArtistItem {
     BIOGRAPHY = 'biography',
+    FAVORITE_SONGS = 'favoriteSongs',
     RECENT_ALBUMS = 'recentAlbums',
     SIMILAR_ARTISTS = 'similarArtists',
     TOP_SONGS = 'topSongs',
@@ -749,10 +779,16 @@ export enum PlayerbarSliderType {
     WAVEFORM = 'waveform',
 }
 
+export enum PlaylistTarget {
+    ALBUM = 'album',
+    TRACK = 'track',
+}
+
 export enum SidebarItem {
     ALBUMS = 'Albums',
     ARTISTS = 'Artists',
     ARTISTS_ALL = 'Artists-all',
+    COLLECTIONS = 'Collections',
     FAVORITES = 'Favorites',
     FOLDERS = 'Folders',
     GENRES = 'Genres',
@@ -774,7 +810,9 @@ export type DataGridProps = {
 };
 
 export type DataTableProps = z.infer<typeof ItemTableListPropsSchema>;
+export type ItemDetailListProps = z.infer<typeof ItemDetailListPropsSchema>;
 export type ItemListSettings = {
+    detail?: ItemDetailListProps;
     display: ListDisplayType;
     grid: DataGridProps;
     itemsPerPage: number;
@@ -790,6 +828,8 @@ export type PlayerFilterOperator = z.infer<typeof PlayerFilterOperatorSchema>;
 
 export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
     actions: {
+        addCollection: (collection: SavedCollection) => void;
+        removeCollection: (id: string) => void;
         reset: () => void;
         resetSampleRate: () => void;
         setArtistItems: (item: SortableItem<ArtistItem>[]) => void;
@@ -798,12 +838,14 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
         setHomeItems: (item: SortableItem<HomeItem>[]) => void;
         setList: (type: ItemListKey, data: DeepPartial<ItemListSettings>) => void;
         setPlaybackFilters: (filters: PlayerFilter[]) => void;
+        setPlaylistBehavior: (target: PlaylistTarget) => void;
         setSettings: (data: DeepPartial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
         setTable: (type: ItemListKey, data: DataTableProps) => void;
         setTranscodingConfig: (config: TranscodingConfig) => void;
         toggleMediaSession: () => void;
         toggleSidebarCollapseShare: () => void;
+        updateCollection: (id: string, updates: Partial<Omit<SavedCollection, 'id'>>) => void;
     };
 }
 export interface SettingsState extends z.infer<typeof SettingsStateSchema> {}
@@ -884,6 +926,12 @@ export const sidebarItems: SidebarItemType[] = [
     },
     {
         disabled: false,
+        id: 'Collections',
+        label: i18n.t('page.sidebar.collections'),
+        route: '',
+    },
+    {
+        disabled: false,
         id: 'Radio',
         label: i18n.t('page.sidebar.radio'),
         route: AppRoute.RADIO,
@@ -948,9 +996,10 @@ const initialState: SettingsState = {
         showAsListening: false,
         showPaused: true,
         showServerImage: false,
+        showStateIcon: true,
     },
     font: {
-        builtIn: 'Poppins',
+        builtIn: 'Inter',
         custom: null,
         system: null,
         type: FontType.BUILT_IN,
@@ -964,7 +1013,9 @@ const initialState: SettingsState = {
         artistItems,
         artistRadioCount: 20,
         artistReleaseTypeItems,
+        blurExplicitImages: false,
         buttonSize: 15,
+        collections: [],
         combinedLyricsAndVisualizer: false,
         disabledContextMenu: {},
         enableGridMultiSelect: false,
@@ -999,6 +1050,7 @@ const initialState: SettingsState = {
             barWidth: 2,
             type: PlayerbarSliderType.SLIDER,
         },
+        playlistTarget: PlaylistTarget.TRACK,
         resume: true,
         showLyricsInSidebar: true,
         showRatings: true,
@@ -1008,6 +1060,7 @@ const initialState: SettingsState = {
         sidebarItems,
         sidebarPanelOrder: ['queue', 'lyrics', 'visualizer'],
         sidebarPlaylistList: true,
+        sidebarPlaylistListFilterRegex: '',
         sidebarPlaylistSorting: false,
         sideQueueType: 'sideQueue',
         skipButtons: {
@@ -1098,6 +1151,7 @@ const initialState: SettingsState = {
                     ],
                 }),
                 enableAlternateRowColors: false,
+                enableHeader: true,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
@@ -1126,13 +1180,40 @@ const initialState: SettingsState = {
                     width: column.width,
                 })),
                 enableAlternateRowColors: false,
+                enableHeader: true,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
                 size: 'default',
             },
         },
-        [LibraryItem.ALBUM]: {
+        [ItemListKey.PLAYLIST_ALBUM]: {
+            detail: {
+                columns: pickTableColumns({
+                    autoSizeColumns: [],
+                    columns: SONG_TABLE_COLUMNS,
+                    columnWidths: {
+                        [TableColumn.ACTIONS]: 60,
+                        [TableColumn.DURATION]: 100,
+                        [TableColumn.TITLE]: 400,
+                        [TableColumn.TRACK_NUMBER]: 50,
+                        [TableColumn.USER_FAVORITE]: 60,
+                    },
+                    enabledColumns: [
+                        TableColumn.TRACK_NUMBER,
+                        TableColumn.TITLE,
+                        TableColumn.DURATION,
+                        TableColumn.USER_FAVORITE,
+                        TableColumn.ACTIONS,
+                    ],
+                }),
+                enableAlternateRowColors: false,
+                enableHeader: true,
+                enableHorizontalBorders: false,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'compact',
+            },
             display: ListDisplayType.GRID,
             grid: {
                 itemGap: 'sm',
@@ -1176,6 +1257,84 @@ const initialState: SettingsState = {
                     width: column.width,
                 })),
                 enableAlternateRowColors: false,
+                enableHeader: true,
+                enableHorizontalBorders: false,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'default',
+            },
+        },
+        [LibraryItem.ALBUM]: {
+            detail: {
+                columns: pickTableColumns({
+                    autoSizeColumns: [],
+                    columns: SONG_TABLE_COLUMNS,
+                    columnWidths: {
+                        [TableColumn.ACTIONS]: 60,
+                        [TableColumn.DURATION]: 100,
+                        [TableColumn.TITLE]: 400,
+                        [TableColumn.TRACK_NUMBER]: 50,
+                        [TableColumn.USER_FAVORITE]: 60,
+                    },
+                    enabledColumns: [
+                        TableColumn.TRACK_NUMBER,
+                        TableColumn.TITLE,
+                        TableColumn.DURATION,
+                        TableColumn.USER_FAVORITE,
+                        TableColumn.ACTIONS,
+                    ],
+                }),
+                enableAlternateRowColors: false,
+                enableHeader: true,
+                enableHorizontalBorders: false,
+                enableRowHoverHighlight: true,
+                enableVerticalBorders: false,
+                size: 'compact',
+            },
+            display: ListDisplayType.GRID,
+            grid: {
+                itemGap: 'sm',
+                itemsPerRow: 6,
+                itemsPerRowEnabled: false,
+                rows: pickGridRows({
+                    alignLeftColumns: [
+                        TableColumn.TITLE,
+                        TableColumn.ALBUM_ARTIST,
+                        TableColumn.YEAR,
+                    ],
+                    columns: ALBUM_TABLE_COLUMNS,
+                    enabledColumns: [TableColumn.TITLE, TableColumn.ALBUM_ARTIST, TableColumn.YEAR],
+                    pickColumns: [
+                        TableColumn.TITLE,
+                        TableColumn.DURATION,
+                        TableColumn.ALBUM_ARTIST,
+                        TableColumn.BIT_RATE,
+                        TableColumn.BPM,
+                        TableColumn.DATE_ADDED,
+                        TableColumn.GENRE,
+                        TableColumn.PLAY_COUNT,
+                        TableColumn.SONG_COUNT,
+                        TableColumn.RELEASE_DATE,
+                        TableColumn.LAST_PLAYED,
+                        TableColumn.YEAR,
+                    ],
+                }),
+                size: 'default',
+            },
+            itemsPerPage: 100,
+            pagination: ListPaginationType.INFINITE,
+            table: {
+                autoFitColumns: true,
+                columns: ALBUM_TABLE_COLUMNS.map((column) => ({
+                    align: column.align,
+                    autoSize: column.autoSize,
+                    id: column.value,
+                    isEnabled: column.isEnabled,
+                    pinned: column.pinned,
+                    width: column.width,
+                })),
+                enableAlternateRowColors: false,
+                enableHeader: true,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
@@ -1216,6 +1375,7 @@ const initialState: SettingsState = {
                     ],
                 }),
                 enableAlternateRowColors: false,
+                enableHeader: true,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
@@ -1261,6 +1421,7 @@ const initialState: SettingsState = {
                     ],
                 }),
                 enableAlternateRowColors: false,
+                enableHeader: true,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
@@ -1306,6 +1467,7 @@ const initialState: SettingsState = {
                     width: column.width,
                 })),
                 enableAlternateRowColors: false,
+                enableHeader: true,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
@@ -1341,6 +1503,7 @@ const initialState: SettingsState = {
                     ],
                 }),
                 enableAlternateRowColors: false,
+                enableHeader: true,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
@@ -1387,6 +1550,7 @@ const initialState: SettingsState = {
                     width: column.width,
                 })),
                 enableAlternateRowColors: false,
+                enableHeader: true,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
@@ -1415,6 +1579,7 @@ const initialState: SettingsState = {
                     width: column.width,
                 })),
                 enableAlternateRowColors: false,
+                enableHeader: true,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
@@ -1461,6 +1626,7 @@ const initialState: SettingsState = {
                     width: column.width,
                 })),
                 enableAlternateRowColors: false,
+                enableHeader: true,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
@@ -1491,6 +1657,7 @@ const initialState: SettingsState = {
                     ],
                 }),
                 enableAlternateRowColors: false,
+                enableHeader: true,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
@@ -1526,6 +1693,7 @@ const initialState: SettingsState = {
         audioFadeOnStatusChange: true,
         filters: [],
         mediaSession: false,
+        mpvAudioDeviceId: undefined,
         mpvExtraParameters: [],
         mpvProperties: {
             audioExclusiveMode: 'no',
@@ -1645,6 +1813,18 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
             subscribeWithSelector(
                 immer((set) => ({
                     actions: {
+                        addCollection: (collection: SavedCollection) => {
+                            set((state) => {
+                                state.general.collections.push(collection);
+                            });
+                        },
+                        removeCollection: (id: string) => {
+                            set((state) => {
+                                state.general.collections = state.general.collections.filter(
+                                    (c) => c.id !== id,
+                                );
+                            });
+                        },
                         reset: () => {
                             localStorage.removeItem('store_settings');
                             window.location.reload();
@@ -1685,6 +1865,23 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                                     delete data.table;
                                 }
 
+                                if (listState && data.detail) {
+                                    if (!listState.detail) {
+                                        const t = listState.table;
+                                        listState.detail = {
+                                            columns: t.columns,
+                                            enableAlternateRowColors: false,
+                                            enableHeader: t.enableHeader,
+                                            enableHorizontalBorders: t.enableHorizontalBorders,
+                                            enableRowHoverHighlight: t.enableRowHoverHighlight,
+                                            enableVerticalBorders: t.enableVerticalBorders,
+                                            size: t.size,
+                                        };
+                                    }
+                                    Object.assign(listState.detail, data.detail);
+                                    delete data.detail;
+                                }
+
                                 if (listState && data.grid) {
                                     Object.assign(listState.grid, data.grid);
                                     delete data.grid;
@@ -1698,6 +1895,11 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                         setPlaybackFilters: (filters: PlayerFilter[]) => {
                             set((state) => {
                                 state.playback.filters = filters;
+                            });
+                        },
+                        setPlaylistBehavior: (target: PlaylistTarget) => {
+                            set((state) => {
+                                state.general.playlistTarget = target;
                             });
                         },
                         setSettings: (data) => {
@@ -1732,6 +1934,17 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                             set((state) => {
                                 state.general.sidebarCollapseShared =
                                     !state.general.sidebarCollapseShared;
+                            });
+                        },
+                        updateCollection: (
+                            id: string,
+                            updates: Partial<Omit<SavedCollection, 'id'>>,
+                        ) => {
+                            set((state) => {
+                                const idx = state.general.collections.findIndex((c) => c.id === id);
+                                if (idx !== -1) {
+                                    Object.assign(state.general.collections[idx], updates);
+                                }
                             });
                         },
                     },
@@ -1998,10 +2211,38 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     });
                 }
 
+                if (version <= 22) {
+                    // Add enableHeader to all list table configs
+                    Object.keys(state.lists).forEach((listKey) => {
+                        const listConfig = state.lists[listKey as keyof typeof state.lists];
+                        if (
+                            listConfig?.table &&
+                            typeof listConfig.table === 'object' &&
+                            !('enableHeader' in listConfig.table)
+                        ) {
+                            (listConfig.table as any).enableHeader = true;
+                        }
+                    });
+                }
+
+                if (version <= 23) {
+                    // Add FAVORITE_SONGS to album artist page configuration
+                    const hasFavoriteSongs = state.general.artistItems?.some(
+                        (item) => item.id === ArtistItem.FAVORITE_SONGS,
+                    );
+
+                    if (!hasFavoriteSongs) {
+                        state.general.artistItems.push({
+                            disabled: false,
+                            id: ArtistItem.FAVORITE_SONGS,
+                        });
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 22,
+            version: 25,
         },
     ),
 );
@@ -2071,6 +2312,9 @@ export const usePlayerbarSlider = () =>
 
 export const useGenreTarget = () => useSettingsStore((store) => store.general.genreTarget, shallow);
 
+export const usePlaylistTarget = () =>
+    useSettingsStore((store) => store.general.playlistTarget, shallow);
+
 export const useLanguage = () => useSettingsStore((state) => state.general.language, shallow);
 
 export const useAccent = () => useSettingsStore((state) => state.general.accent, shallow);
@@ -2107,11 +2351,23 @@ export const useSideQueueType = () =>
 export const useVolumeWheelStep = () =>
     useSettingsStore((state) => state.general.volumeWheelStep, shallow);
 
+export const useCollections = () => {
+    const collections = useSettingsStore((state) => state.general.collections, shallow);
+
+    return useMemo(
+        () => [...(collections ?? [])].sort((a, b) => a.name.localeCompare(b.name)),
+        [collections],
+    );
+};
+
 export const useSidebarPlaylistList = () =>
     useSettingsStore((state) => state.general.sidebarPlaylistList, shallow);
 
 export const useSidebarPlaylistSorting = () =>
     useSettingsStore((state) => state.general.sidebarPlaylistSorting, shallow);
+
+export const useSidebarPlaylistListFilterRegex = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistListFilterRegex, shallow);
 
 export const useSidebarItems = () =>
     useSettingsStore((state) => state.general.sidebarItems, shallow);

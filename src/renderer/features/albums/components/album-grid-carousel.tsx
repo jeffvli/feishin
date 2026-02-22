@@ -20,7 +20,6 @@ export function AlbumGridCarousel(props: AlbumGridCarouselProps) {
     const controls = useDefaultItemListControls();
 
     const cards = useMemo(() => {
-        // Filter out excluded IDs if provided
         const filteredItems = excludeIds
             ? data.filter((album) => !excludeIds.includes(album.id))
             : data;
@@ -31,6 +30,7 @@ export function AlbumGridCarousel(props: AlbumGridCarouselProps) {
                     controls={controls}
                     data={album}
                     enableDrag
+                    enableExpansion
                     itemType={LibraryItem.ALBUM}
                     rows={rows}
                     type="poster"

@@ -1,63 +1,18 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { lazy, Suspense, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { createCallable } from 'react-call';
 import { useParams } from 'react-router';
 
+import { AlbumArtistContextMenu } from '/@/renderer/features/context-menu/menus/album-artist-context-menu';
+import { AlbumContextMenu } from '/@/renderer/features/context-menu/menus/album-context-menu';
+import { ArtistContextMenu } from '/@/renderer/features/context-menu/menus/artist-context-menu';
+import { FolderContextMenu } from '/@/renderer/features/context-menu/menus/folder-context-menu';
+import { GenreContextMenu } from '/@/renderer/features/context-menu/menus/genre-context-menu';
+import { PlaylistContextMenu } from '/@/renderer/features/context-menu/menus/playlist-context-menu';
+import { PlaylistSongContextMenu } from '/@/renderer/features/context-menu/menus/playlist-song-context-menu';
+import { QueueContextMenu } from '/@/renderer/features/context-menu/menus/queue-context-menu';
+import { SongContextMenu } from '/@/renderer/features/context-menu/menus/song-context-menu';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
-
-const AlbumArtistContextMenu = lazy(() =>
-    import('/@/renderer/features/context-menu/menus/album-artist-context-menu').then((module) => ({
-        default: module.AlbumArtistContextMenu,
-    })),
-);
-
-const AlbumContextMenu = lazy(() =>
-    import('/@/renderer/features/context-menu/menus/album-context-menu').then((module) => ({
-        default: module.AlbumContextMenu,
-    })),
-);
-
-const ArtistContextMenu = lazy(() =>
-    import('/@/renderer/features/context-menu/menus/artist-context-menu').then((module) => ({
-        default: module.ArtistContextMenu,
-    })),
-);
-
-const FolderContextMenu = lazy(() =>
-    import('/@/renderer/features/context-menu/menus/folder-context-menu').then((module) => ({
-        default: module.FolderContextMenu,
-    })),
-);
-
-const GenreContextMenu = lazy(() =>
-    import('/@/renderer/features/context-menu/menus/genre-context-menu').then((module) => ({
-        default: module.GenreContextMenu,
-    })),
-);
-
-const PlaylistContextMenu = lazy(() =>
-    import('/@/renderer/features/context-menu/menus/playlist-context-menu').then((module) => ({
-        default: module.PlaylistContextMenu,
-    })),
-);
-
-const PlaylistSongContextMenu = lazy(() =>
-    import('/@/renderer/features/context-menu/menus/playlist-song-context-menu').then((module) => ({
-        default: module.PlaylistSongContextMenu,
-    })),
-);
-
-const QueueContextMenu = lazy(() =>
-    import('/@/renderer/features/context-menu/menus/queue-context-menu').then((module) => ({
-        default: module.QueueContextMenu,
-    })),
-);
-
-const SongContextMenu = lazy(() =>
-    import('/@/renderer/features/context-menu/menus/song-context-menu').then((module) => ({
-        default: module.SongContextMenu,
-    })),
-);
 import {
     Album,
     AlbumArtist,
@@ -125,17 +80,15 @@ export const ContextMenuController = createCallable<ContextMenuControllerProps, 
                         }}
                     />
                 </ContextMenu.Target>
-                <Suspense fallback={null}>
-                    {cmd.type === LibraryItem.QUEUE_SONG && <QueueContextMenu {...cmd} />}
-                    {cmd.type === LibraryItem.ALBUM && <AlbumContextMenu {...cmd} />}
-                    {cmd.type === LibraryItem.ALBUM_ARTIST && <AlbumArtistContextMenu {...cmd} />}
-                    {cmd.type === LibraryItem.ARTIST && <ArtistContextMenu {...cmd} />}
-                    {cmd.type === LibraryItem.FOLDER && <FolderContextMenu {...cmd} />}
-                    {cmd.type === LibraryItem.GENRE && <GenreContextMenu {...cmd} />}
-                    {cmd.type === LibraryItem.PLAYLIST && <PlaylistContextMenu {...cmd} />}
-                    {cmd.type === LibraryItem.PLAYLIST_SONG && <PlaylistSongContextMenu {...cmd} />}
-                    {cmd.type === LibraryItem.SONG && <SongContextMenu {...cmd} />}
-                </Suspense>
+                {cmd.type === LibraryItem.QUEUE_SONG && <QueueContextMenu {...cmd} />}
+                {cmd.type === LibraryItem.ALBUM && <AlbumContextMenu {...cmd} />}
+                {cmd.type === LibraryItem.ALBUM_ARTIST && <AlbumArtistContextMenu {...cmd} />}
+                {cmd.type === LibraryItem.ARTIST && <ArtistContextMenu {...cmd} />}
+                {cmd.type === LibraryItem.FOLDER && <FolderContextMenu {...cmd} />}
+                {cmd.type === LibraryItem.GENRE && <GenreContextMenu {...cmd} />}
+                {cmd.type === LibraryItem.PLAYLIST && <PlaylistContextMenu {...cmd} />}
+                {cmd.type === LibraryItem.PLAYLIST_SONG && <PlaylistSongContextMenu {...cmd} />}
+                {cmd.type === LibraryItem.SONG && <SongContextMenu {...cmd} />}
             </ContextMenu>
         );
     },

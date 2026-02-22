@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiCheckboxBlankLine, RiCloseLine, RiSubtractLine } from 'react-icons/ri';
 
 import appIcon from '../../../assets/icons/32x32.png';
@@ -127,6 +128,7 @@ const MacOsControls = ({ controls, title }: WindowBarControlsProps) => {
 };
 
 export const WindowBar = () => {
+    const { t } = useTranslation();
     const { windowBarStyle } = useWindowSettings();
     const playerStatus = usePlayerStatus();
     const privateMode = useAppStore((state) => state.privateMode);
@@ -149,12 +151,12 @@ export const WindowBar = () => {
     const handleClose = useCallback(() => close(), []);
 
     const title = useMemo(() => {
-        const privateModeString = privateMode ? '(Private mode)' : '';
+        const privateModeString = privateMode ? t('page.windowBar.privateMode') : '';
 
         // Show radio information if radio is active
         if (isRadioActive) {
-            const radioStatusString = !isRadioPlaying ? '(Paused) ' : '';
-            const radioTitle = stationName || 'Radio';
+            const radioStatusString = !isRadioPlaying ? t('page.windowBar.paused') : '';
+            const radioTitle = stationName;
 
             // Format metadata: show title, or combine artist and title if both available
             let radioMetadata = '';
@@ -172,7 +174,7 @@ export const WindowBar = () => {
         }
 
         // Show regular song information
-        const statusString = playerStatus === PlayerStatus.PAUSED ? '(Paused) ' : '';
+        const statusString = playerStatus === PlayerStatus.PAUSED ? t('page.windowBar.paused') : '';
         const queueString = queueLength ? `(${index + 1} / ${queueLength}) ` : '';
         const title = `${
             queueLength
@@ -191,6 +193,7 @@ export const WindowBar = () => {
         privateMode,
         queueLength,
         stationName,
+        t,
     ]);
 
     useEffect(() => {

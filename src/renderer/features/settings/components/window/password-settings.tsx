@@ -53,5 +53,5 @@ export const PasswordSettings = memo(() => {
         },
     ];
 
-    return <SettingsSection divider={false} options={updateOptions} />;
+    return <SettingsSection options={updateOptions} />;
 });

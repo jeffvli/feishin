@@ -28,11 +28,13 @@
     overflow: hidden;
     color: inherit;
     text-decoration: none;
+    border-radius: var(--theme-radius-md);
 
     &::before {
         position: absolute;
         top: 0;
         left: 0;
+        z-index: 5;
         width: 100%;
         height: 100%;
         pointer-events: none;
@@ -111,6 +113,29 @@
 
 .image.is-round {
     border-radius: 50%;
+}
+
+.genre-placeholder {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: var(--theme-spacing-sm);
+    text-align: center;
+}
+
+.genre-placeholder-text {
+    display: -webkit-box;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    font-weight: 600;
+    line-height: 1.2;
+    -webkit-box-orient: vertical;
 }
 
 .detail-container {

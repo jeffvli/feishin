@@ -39,6 +39,10 @@ const download = (url: string) => {
     ipcRenderer.send('download-url', url);
 };
 
+const checkForUpdates = (): Promise<{ updateAvailable: boolean; version?: string }> => {
+    return ipcRenderer.invoke('app-check-for-updates');
+};
+
 const forceGarbageCollection = (): boolean => {
     try {
         if (typeof global.gc === 'function') {
@@ -57,7 +61,12 @@ const forceGarbageCollection = (): boolean => {
     }
 };
 
+const rendererOpenSettings = (cb: (event: IpcRendererEvent) => void) => {
+    ipcRenderer.on('renderer-open-settings', cb);
+};
+
 export const utils = {
+    checkForUpdates,
     disableAutoUpdates,
     download,
     forceGarbageCollection,
@@ -69,6 +78,7 @@ export const utils = {
     openApplicationDirectory,
     openItem,
     playerErrorListener,
+    rendererOpenSettings,
 };
 
 export type Utils = typeof utils;

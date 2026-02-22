@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAudioDevices } from '/@/renderer/features/settings/components/playback/audio-settings';
 import { ListConfigTable } from '/@/renderer/features/shared/components/list-config-menu';
 import {
+    usePlaybackType,
     usePlayerActions,
     usePlayerProperties,
     usePlayerSongProperties,
@@ -186,7 +187,7 @@ export const PlayerConfig = () => {
                     size="sm"
                     stopsPropagation
                     tooltip={{
-                        label: t('common.setting_other', { postProcess: 'titleCase' }),
+                        label: t('common.setting', { count: 2, postProcess: 'titleCase' }),
                         openDelay: 0,
                     }}
                     variant="subtle"
@@ -233,23 +234,30 @@ const AudioPlayerTypeConfig = () => {
 
 const AudioDeviceConfig = () => {
     const status = usePlayerStatus();
+    const playbackType = usePlaybackType();
     const playbackSettings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
 
-    const audioDevices = useAudioDevices();
+    const audioDevices = useAudioDevices(playbackType);
+    const audioDeviceId =
+        playbackType === PlayerType.LOCAL
+            ? playbackSettings.mpvAudioDeviceId
+            : playbackSettings.audioDeviceId;
 
     return (
         <Select
             clearable
             comboboxProps={{ withinPortal: false }}
             data={audioDevices}
-            defaultValue={playbackSettings.audioDeviceId}
+            defaultValue={audioDeviceId}
             disabled={status === PlayerStatus.PLAYING}
             onChange={(e) => {
                 setSettings({
                     playback: {
                         ...playbackSettings,
-                        audioDeviceId: e,
+                        ...(playbackType === PlayerType.LOCAL
+                            ? { mpvAudioDeviceId: e }
+                            : { audioDeviceId: e }),
                     },
                 });
             }}

@@ -118,6 +118,7 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
                             containerClassName={styles.albumImageContainer}
                             enableDebounce={false}
                             enableViewport={false}
+                            explicitStatus={album.explicitStatus}
                             fetchPriority="high"
                             id={album.imageId}
                             itemType={LibraryItem.ALBUM}

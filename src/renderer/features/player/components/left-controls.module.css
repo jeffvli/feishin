@@ -50,6 +50,11 @@
     object-fit: var(--theme-image-fit);
 }
 
+.radio-image {
+    background: var(--theme-colors-surface);
+    border-radius: var(--theme-radius-md);
+}
+
 .line-item {
     display: inline-block;
     width: 100%;

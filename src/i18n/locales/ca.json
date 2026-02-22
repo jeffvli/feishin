@@ -2,24 +2,25 @@
     "page": {
         "sidebar": {
             "myLibrary": "La meva llibreria",
-            "albumArtists": "$t(entity.albumArtist_other)",
-            "albums": "$t(entity.album_other)",
-            "artists": "$t(entity.artist_other)",
-            "folders": "$t(entity.folder_other)",
-            "genres": "$t(entity.genre_other)",
+            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
+            "albums": "$t(entity.album, {\"count\": 2})",
+            "artists": "$t(entity.artist, {\"count\": 2})",
+            "folders": "$t(entity.folder, {\"count\": 2})",
+            "genres": "$t(entity.genre, {\"count\": 2})",
             "home": "$t(common.home)",
-            "playlists": "$t(entity.playlist_other)",
+            "playlists": "$t(entity.playlist, {\"count\": 2})",
             "search": "$t(common.search)",
-            "settings": "$t(common.setting_other)",
-            "tracks": "$t(entity.track_other)",
-            "nowPlaying": "ara sona",
-            "shared": "$t(entity.playlist_other) compartida",
-            "favorites": "$t(entity.favorite_other)",
-            "radio": "$t(entity.radioStation_other)"
+            "settings": "$t(common.setting, {\"count\": 2})",
+            "tracks": "$t(entity.track, {\"count\": 2})",
+            "nowPlaying": "s'està reproduint",
+            "shared": "$t(entity.playlist, {\"count\": 2}) compartides",
+            "favorites": "$t(entity.favorite, {\"count\": 2})",
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "collections": "col·leccions"
         },
         "albumArtistDetail": {
-            "relatedArtists": "$t(entity.artist_other) similars",
-            "viewAllTracks": "veure totes les $t(entity.track_other)",
+            "relatedArtists": "$t(entity.artist, {\"count\": 2}) similars",
+            "viewAllTracks": "mostra totes les $t(entity.track, {\"count\": 2})",
             "about": "Sobre {{artist}}",
             "appearsOn": "apareix a",
             "recentReleases": "Llançaments recents",
@@ -28,24 +29,28 @@
             "topSongsFrom": "les millors cançons de {{title}}",
             "viewAll": "mostra-ho tot",
             "groupingTypeAll": "tots els tipus de llançaments",
-            "groupingTypePrimary": "tipus principals de llançament"
+            "groupingTypePrimary": "tipus principals de llançament",
+            "favoriteSongs": "Cançons preferides",
+            "topSongsCommunity": "comunitat",
+            "topSongsPersonal": "personal",
+            "favoriteSongsFrom": "cançons preferides de {{title}}"
         },
         "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "més d'aquest $t(entity.artist_one)",
+            "moreFromArtist": "més d'aquest $t(entity.artist, {\"count\": 1})",
             "moreFromGeneric": "més de {{item}}",
             "released": "publicat"
         },
         "albumList": {
-            "title": "$t(entity.album_other)",
+            "title": "$t(entity.album, {\"count\": 2})",
             "artistAlbums": "àlbums de {{artist}}",
-            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)"
+            "genreAlbums": "\"{{genre}}\" $t(entity.album, {\"count\": 2})"
         },
         "appMenu": {
             "quit": "$t(common.quit)",
-            "settings": "$t(common.setting_other)",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "goBack": "torna enrere",
             "goForward": "avança",
             "collapseSidebar": "replega la barra lateral",
@@ -84,15 +89,15 @@
             "showDetails": "informació",
             "numberSelected": "{{count}} seleccionat",
             "shareItem": "comparteix l'element",
-            "goToAlbumArtist": "Ves a $t(entity.albumArtist_one)",
-            "goToAlbum": "ves a $t(entity.album_one)",
+            "goToAlbumArtist": "Ves a $t(entity.albumArtist, {\"count\": 1})",
+            "goToAlbum": "ves a $t(entity.album, {\"count\": 1})",
             "moveItems": "$t(action.moveItems)",
             "goTo": "ves a"
         },
         "genreList": {
-            "title": "$t(entity.genre_other)",
-            "showAlbums": "mostra $t(entity.album_other) $t(entity.genre_one)",
-            "showTracks": "mostra $t(entity.track_other) $t(entity.genre_one)"
+            "title": "$t(entity.genre, {\"count\": 2})",
+            "showAlbums": "mostra $t(entity.album, {\"count\": 2}) de $t(entity.genre, {\"count\": 1})",
+            "showTracks": "mostra $t(entity.track, {\"count\": 2}) de $t(entity.genre, {\"count\": 1})"
         },
         "home": {
             "title": "$t(common.home)",
@@ -101,15 +106,15 @@
             "mostPlayed": "els més reproduïts",
             "recentlyPlayed": "reproduït recentment",
             "recentlyReleased": "estrenat fa poc",
-            "genres": "$t(entity.genre_other)"
+            "genres": "$t(entity.genre, {\"count\": 2})"
         },
         "playlistList": {
-            "title": "$t(entity.playlist_other)"
+            "title": "$t(entity.playlist, {\"count\": 2})"
         },
         "trackList": {
-            "title": "$t(entity.track_other)",
+            "title": "$t(entity.track, {\"count\": 2})",
             "artistTracks": "pistes de {{artist}}",
-            "genreTracks": "\"{{genre}}\" $t(entity.track_other)"
+            "genreTracks": "$t(entity.track, {\"count\": 2}) \"{{genre}}\""
         },
         "manageServers": {
             "username": "nom d'usuari",
@@ -184,13 +189,26 @@
             "reorder": "el reordenament només s'activa quan s'ordena per id"
         },
         "favorites": {
-            "title": "$t(entity.favorite_other)"
+            "title": "$t(entity.favorite, {\"count\": 2})"
         },
         "folderList": {
-            "title": "$t(entity.folder_other)"
+            "title": "$t(entity.folder, {\"count\": 2})"
         },
         "radioList": {
             "title": "emissores de ràdio"
+        },
+        "windowBar": {
+            "paused": "(en pausa) ",
+            "privateMode": "(mode privat)"
+        },
+        "collections": {
+            "overrideExisting": "sobreescriu existents",
+            "saveAsCollection": "desa com a col·lecció"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "commits des de {{stable}}",
+            "noNewCommits": "no hi ha hagut commits en aquest període",
+            "noStableReleaseToCompare": "no hi ha actualitzacions disponibles amb les quals comparar"
         }
     },
     "common": {
@@ -262,9 +280,9 @@
         "action_other": "accions",
         "newVersion": "s'ha instal·lat una nova versió ({{version}})",
         "viewReleaseNotes": "veure les notes de la versió",
-        "currentSong": "$t(entity.track_one) actual",
+        "currentSong": "$t(entity.track, {\"count\": 1}) actual",
         "limit": "límit",
-        "previousSong": "$t(entity.track_one) anterior",
+        "previousSong": "$t(entity.track, {\"count\": 1}) anterior",
         "trackNumber": "pista",
         "albumGain": "guany de l'àlbum",
         "albumPeak": "pic de l'àlbum",
@@ -288,7 +306,9 @@
         "playerMustBePaused": "cal pausar el reproductor",
         "restartRequired": "cal reiniciar",
         "sampleRate": "freqüència de mostreig",
-        "setting": "configuració",
+        "setting_one": "configuració",
+        "setting_many": "configuracions",
+        "setting_other": "configuracions",
         "trackGain": "guany de pista",
         "trackPeak": "pic de pista",
         "gap": "espera",
@@ -314,7 +334,8 @@
         "example": "exemple",
         "mood": "estat d'ànim",
         "filter_single": "senzill",
-        "filter_multiple": "multi"
+        "filter_multiple": "multi",
+        "rename": "reanomena"
     },
     "entity": {
         "album_one": "àlbum",
@@ -341,7 +362,7 @@
         "playlistWithCount_one": "{{count}} llista de reproducció",
         "playlistWithCount_many": "{{count}} llistes de reproducció",
         "playlistWithCount_other": "{{count}} llistes de reproducció",
-        "smartPlaylist": "$t(entity.playlist_one) intel·ligent",
+        "smartPlaylist": "$t(entity.playlist, {\"count\": 1}) intel·ligent",
         "play_one": "{{count}} reproducció",
         "play_many": "{{count}} reproduccions",
         "play_other": "{{count}} reproduccions",
@@ -378,34 +399,34 @@
     },
     "form": {
         "addToPlaylist": {
-            "input_playlists": "$t(entity.playlist_other)",
-            "title": "afegir a una $t(entity.playlist_one)",
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
+            "title": "afegir a una $t(entity.playlist, {\"count\": 1})",
             "input_skipDuplicates": "salta't els duplicats",
             "success": "s'ha afegit $t(entity.trackWithCount, {\"count\": {{message}} }) a $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
-            "create": "crea $t(entity.playlist_one) {{playlist}}",
-            "searchOrCreate": "cerca $t(entity.playlist_other) o escriu per crear-ne una de nova"
+            "create": "crea $t(entity.playlist, {\"count\": 1}) {{playlist}}",
+            "searchOrCreate": "cerca $t(entity.playlist, {\"count\": 2}) o escriu per crear-ne una de nova"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
             "input_name": "$t(common.name)",
             "input_owner": "$t(common.owner)",
-            "success": "$t(entity.playlist_one) s'ha creat amb èxit",
-            "title": "crear una $t(entity.playlist_one)",
+            "success": "$t(entity.playlist, {\"count\": 1}) s'ha creat amb èxit",
+            "title": "crea una $t(entity.playlist, {\"count\": 1})",
             "input_public": "públic"
         },
         "deletePlaylist": {
-            "success": "$t(entity.playlist_one) s'ha eliminat amb èxit",
-            "title": "elimina la $t(entity.playlist_one)",
-            "input_confirm": "escriviu el nom de la $t(entity.playlist_one) per confirmar"
+            "success": "$t(entity.playlist, {\"count\": 1}) s'ha eliminat amb èxit",
+            "title": "elimina la $t(entity.playlist, {\"count\": 1})",
+            "input_confirm": "escriviu el nom de la $t(entity.playlist, {\"count\": 1}) per confirmar"
         },
         "editPlaylist": {
-            "success": "$t(entity.playlist_one) s'ha actualitzat amb èxit",
-            "title": "editar la $t(entity.playlist_one)",
+            "success": "$t(entity.playlist, {\"count\": 1}) s'ha actualitzat amb èxit",
+            "title": "editar la $t(entity.playlist, {\"count\": 1})",
             "publicJellyfinNote": "Per algun motiu, Jellyfin no exposa si una llista de reproducció és pública o no. Si voleu que es mantingui pública, seleccioneu la següent entrada",
             "editNote": "es recomana no editar manualment les llistes de reproducció grans. segur que accepteu el risc de perdre dades si sobreescriviu la llista de reproducció existent?"
         },
         "lyricSearch": {
-            "input_artist": "$t(entity.artist_one)",
+            "input_artist": "$t(entity.artist, {\"count\": 1})",
             "input_name": "$t(common.name)",
             "title": "cerca de lletres"
         },
@@ -459,7 +480,7 @@
         },
         "shuffleAll": {
             "title": "reprodueix a l'atzar",
-            "input_genre": "$t(entity.genre_one)",
+            "input_genre": "$t(entity.genre, {\"count\": 1})",
             "input_limit": "quantes cançons?",
             "input_minYear": "de l'any",
             "input_maxYear": "fins a l'any",
@@ -485,14 +506,14 @@
         }
     },
     "action": {
-        "addToFavorites": "afegeix a $t(entity.favorite_other)",
-        "addToPlaylist": "afegeix a $t(entity.playlist_one)",
-        "createPlaylist": "crea $t(entity.playlist_one)",
-        "deletePlaylist": "elimina la $t(entity.playlist_one)",
-        "editPlaylist": "edita la $t(entity.playlist_one)",
+        "addToFavorites": "afegeix a $t(entity.favorite, {\"count\": 2})",
+        "addToPlaylist": "afegeix a $t(entity.playlist, {\"count\": 1})",
+        "createPlaylist": "crea $t(entity.playlist, {\"count\": 1})",
+        "deletePlaylist": "elimina la $t(entity.playlist, {\"count\": 1})",
+        "editPlaylist": "edita $t(entity.playlist, {\"count\": 1})",
         "refresh": "$t(common.refresh)",
-        "removeFromFavorites": "elimina dels $t(entity.favorite_other)",
-        "removeFromPlaylist": "elimina de $t(entity.playlist_one)",
+        "removeFromFavorites": "elimina dels $t(entity.favorite, {\"count\": 2})",
+        "removeFromPlaylist": "elimina de $t(entity.playlist, {\"count\": 1})",
         "clearQueue": "buida la cua",
         "removeFromQueue": "treure de la cua",
         "goToPage": "anar a la pàgina",
@@ -501,7 +522,7 @@
             "musicbrainz": "Obrir a MusicBrainz"
         },
         "deselectAll": "deselecciona-ho tot",
-        "viewPlaylists": "veure$t(entity.playlist_other)",
+        "viewPlaylists": "veure $t(entity.playlist, {\"count\": 2})",
         "moveToNext": "passar al següent",
         "moveToBottom": "anar al final",
         "moveToTop": "anar al principi",
@@ -517,8 +538,8 @@
         "shuffleAll": "mescla-ho tot",
         "shuffleSelected": "mescla els seleccionats",
         "viewMore": "mostra'n més",
-        "createRadioStation": "crea $t(entity.radioStation_one)",
-        "deleteRadioStation": "elimina $t(entity.radioStation_one)",
+        "createRadioStation": "crea $t(entity.radioStation, {\"count\": 1})",
+        "deleteRadioStation": "elimina $t(entity.radioStation, {\"count\": 1})",
         "addOrRemoveFromSelection": "afegeix o elimina de la selecció",
         "selectRangeOfItems": "selecciona un interval d'elements",
         "selectAll": "selecciona-ho tot",
@@ -530,15 +551,14 @@
         "playButtonBehavior_optionAddNext": "$t(player.addNext)",
         "playButtonBehavior_optionPlay": "$t(player.play)",
         "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
-        "replayGainMode_optionAlbum": "$t(entity.album_one)",
+        "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
         "replayGainMode_optionNone": "$t(common.none)",
-        "replayGainMode_optionTrack": "$t(entity.track_one)",
+        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
         "font": "tipus de lletra",
         "fontType": "selecció de tipus de lletra",
         "fontType_optionBuiltIn": "tipus de lletra integrats",
         "fontType_optionCustom": "tipus de lletra personalitzats",
         "fontType_optionSystem": "tipus de lletra del sistema",
-        "disableAutomaticUpdates": "desactivar les actualitzacions automàtiques",
         "disableLibraryUpdateOnStartup": "desactiva la comprovació de noves versions a l'inici",
         "homeConfiguration": "configuració de la pàgina d'inici",
         "sidebarConfiguration": "configuració de la barra lateral",
@@ -548,7 +568,7 @@
         "sidePlayQueueStyle_optionAttached": "unida",
         "sidePlayQueueStyle_optionDetached": "separada",
         "audioDevice": "dispositiu d'àudio",
-        "audioDevice_description": "seleccioneu el dispositiu d'àudio que voleu utilitzar per a la reproducció (només pel reproductor web)",
+        "audioDevice_description": "seleccioneu el dispositiu d'àudio que voleu utilitzar per a la reproducció",
         "audioPlayer": "reproductor d'àudio",
         "audioPlayer_description": "seleccioneu el reproductor d'àudio que voleu utilitzar per a la reproducció",
         "sidebarConfiguration_description": "selecciona els elements i l'ordre en què apareixen a la barra lateral",
@@ -594,9 +614,9 @@
         "customFontPath_description": "estableix la ruta a una font personalitzada per utilitzar-la a l'aplicació",
         "discordApplicationId": "id d'aplicació de {{discord}}",
         "discordApplicationId_description": "l'id d'aplicació per l'estat d'activitat de {{discord}} (per defecte, {{defaultId}})",
-        "discordPausedStatus": "mosta l'estat d'activitat quan està en pausa",
+        "discordPausedStatus": "mostra l'estat d'activitat quan està en pausa",
         "discordPausedStatus_description": "si està activat, l'estat es mostrarà quan el reproductor estigui pausat",
-        "discordIdleStatus": "mosta l'estat d'activitat en inactivitat",
+        "discordIdleStatus": "mosta l'estat d'activitat quan està inactiu",
         "discordIdleStatus_description": "si està activat, s'actualitzarà l'estat mentre el reproductor estigui inactiu",
         "discordListening": "mosta l'estat com escoltant",
         "discordListening_description": "mosta l'estat com escoltant en comptes de jugant",
@@ -662,7 +682,7 @@
         "lyricFetch": "extreu la lletra d'internet",
         "lyricFetch_description": "extreu la lletra de diverses fonts d'internet",
         "lyricFetchProvider": "proveïdors de lletres",
-        "lyricFetchProvider_description": "selecciona els proveïdors de lletres. l'ordre en què apareixen és l'ordre en què es consultaran",
+        "lyricFetchProvider_description": "selecciona els proveïdors de lletres",
         "lyricOffset": "desfasament de la lletra (ms)",
         "lyricOffset_description": "desplaça la lletra els mil·lisegons especificats",
         "minimizeToTray": "minimitza a la safata",
@@ -768,7 +788,7 @@
         "releaseChannel_optionLatest": "última versió",
         "releaseChannel_optionBeta": "beta",
         "releaseChannel": "canal de versions",
-        "releaseChannel_description": "tria entre versions estables i versions beta per les actualitzacions automàtiques",
+        "releaseChannel_description": "trieu entre versions estables i beta o alfa (diàries) per les actualitzacions automàtiques",
         "mediaSession": "activa Media Session",
         "mediaSession_description": "activa la integració amb Media Session per mostrar els controls multimèdia i les metadades a l'indicador de volum del sistema i la pantalla de bloqueig",
         "crossfadeStyle": "estil de fosa encadenada",
@@ -856,17 +876,37 @@
         "pathReplace": "substitució de la ruta de l'arxiu",
         "pathReplace_description": "substitueix la ruta d'arxiu predeterminada del servidor",
         "pathReplace_optionRemovePrefix": "elimina el prefix",
-        "pathReplace_optionAddPrefix": "afegeix prefix"
+        "pathReplace_optionAddPrefix": "afegeix prefix",
+        "homeFeatureStyle_description": "controla l'estil del carrusel de destacats de l'inici",
+        "homeFeatureStyle": "estil del carrusel de destacats de l'inici",
+        "homeFeatureStyle_optionMultiple": "múltiple",
+        "homeFeatureStyle_optionSingle": "simple",
+        "enableGridMultiSelect": "activa la selecció múltiple de quadrícula",
+        "enableGridMultiSelect_description": "quan està activada, podeu seleccionar més d'un element en la vista de quadrícula; si feu clic en la imatge d'un element de la quadrícula, accedireu a la pàgina de l'element",
+        "sidebarPlaylistSorting_description": "permet ordenar manualment les llistes de reproducció a la barra lateral arrossegant amb el ratolí en comptes de seguir l'ordre predeterminat del servidor",
+        "sidebarPlaylistSorting": "ordenació de llistes de reproducció de la barra lateral",
+        "sidebarPlaylistListFilterRegex_description": "amaga les llistes de reproducció de la barra lateral que coincideixin amb aquesta expressió regular",
+        "sidebarPlaylistListFilterRegex_placeholder": "ex. ^Mescla diària.*",
+        "sidebarPlaylistListFilterRegex": "regex pel filtre de llistes",
+        "analyticsEnable": "envia analítiques basades en l'ús",
+        "analyticsEnable_description": "s'envien dades d'ús anonimitzades al desenvolupar per ajudar a millorar l'aplicació",
+        "automaticUpdates": "actualitzacions automàtiques",
+        "automaticUpdates_description": "cerca i instal·la actualitzacions automàticament",
+        "releaseChannel_optionAlpha": "alfa (diària)",
+        "blurExplicitImages": "desenfoca imatges explícites",
+        "blurExplicitImages_description": "les caràtules d'àlbums i cançons marcades com a explícites quedaran desenfocades",
+        "discordStateIcon": "mostra la icona de reproducció",
+        "discordStateIcon_description": "mostra una petita icona de reproducció a l'estat d'activitat. l'icona de pausa es mostra quan \"mostra l'estat d'activitat quan està en pausa\" està activat"
     },
     "table": {
         "column": {
-            "albumCount": "$t(entity.album_other)",
-            "artist": "$t(entity.artist_one)",
-            "channels": "$t(common.channel_other)",
+            "albumCount": "$t(entity.album, {\"count\": 2})",
+            "artist": "$t(entity.artist, {\"count\": 1})",
+            "channels": "$t(common.channel, {\"count\": 2})",
             "codec": "$t(common.codec)",
-            "genre": "$t(entity.genre_one)",
+            "genre": "$t(entity.genre, {\"count\": 1})",
             "size": "$t(common.size)",
-            "songCount": "$t(entity.track_other)",
+            "songCount": "$t(entity.track, {\"count\": 2})",
             "releaseYear": "any",
             "playCount": "reproduccions",
             "releaseDate": "data de llançament",
@@ -918,27 +958,28 @@
                 "alternateRowColors": "colors de fila alternants",
                 "horizontalBorders": "vores de fila",
                 "rowHoverHighlight": "ressalta en passar el cursor per la fila",
-                "verticalBorders": "vores de columna"
+                "verticalBorders": "vores de columna",
+                "showHeader": "mostra l'encapçalament"
             },
             "label": {
-                "actions": "$t(common.action_other)",
-                "album": "$t(entity.album_one)",
-                "albumArtist": "$t(entity.albumArtist_one)",
-                "artist": "$t(entity.artist_one)",
+                "actions": "$t(common.action, {\"count\": 2})",
+                "album": "$t(entity.album, {\"count\": 1})",
+                "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+                "artist": "$t(entity.artist, {\"count\": 1})",
                 "biography": "$t(common.biography)",
                 "bitrate": "$t(common.bitrate)",
                 "bpm": "$t(common.bpm)",
-                "channels": "$t(common.channel_other)",
+                "channels": "$t(common.channel, {\"count\": 2})",
                 "codec": "$t(common.codec)",
                 "duration": "$t(common.duration)",
                 "favorite": "$t(common.favorite)",
-                "genre": "$t(entity.genre_one)",
+                "genre": "$t(entity.genre, {\"count\": 1})",
                 "note": "$t(common.note)",
                 "owner": "$t(common.owner)",
                 "path": "$t(common.path)",
                 "rating": "$t(common.rating)",
                 "size": "$t(common.size)",
-                "songCount": "$t(entity.track_other)",
+                "songCount": "$t(entity.track, {\"count\": 2})",
                 "title": "$t(common.title)",
                 "year": "$t(common.year)",
                 "playCount": "compte de reproduccions",
@@ -949,9 +990,9 @@
                 "lastPlayed": "última reproducció",
                 "rowIndex": "índex de files",
                 "titleCombined": "$t(common.title) (combinat)",
-                "albumCount": "$t(entity.album_other)",
+                "albumCount": "$t(entity.album, {\"count\": 2})",
                 "bitDepth": "$t(common.bitDepth)",
-                "genreBadge": "$t(entity.genre_one) (insígnies)",
+                "genreBadge": "$t(entity.genre, {\"count\": 1}) (insígnies)",
                 "image": "imatge",
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "compositor",
@@ -960,7 +1001,8 @@
             "view": {
                 "table": "taula",
                 "grid": "quadrícula",
-                "list": "llista"
+                "list": "llista",
+                "detail": "detall"
             }
         }
     },
@@ -968,17 +1010,17 @@
         "fromYear": "des de l'any",
         "releaseYear": "any de llançament",
         "toYear": "fins a l'any",
-        "album": "$t(entity.album_one)",
-        "albumArtist": "$t(entity.albumArtist_one)",
-        "artist": "$t(entity.artist_one)",
+        "album": "$t(entity.album, {\"count\": 1})",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+        "artist": "$t(entity.artist, {\"count\": 1})",
         "biography": "biografia",
         "bitrate": "taxa de bits",
         "bpm": "bpm",
-        "channels": "$t(common.channel_other)",
+        "channels": "$t(common.channel, {\"count\": 2})",
         "comment": "comentari",
         "disc": "disc",
         "duration": "durada",
-        "genre": "$t(entity.genre_one)",
+        "genre": "$t(entity.genre, {\"count\": 1})",
         "id": "identificador",
         "name": "nom",
         "note": "nota",
@@ -997,7 +1039,7 @@
         "recentlyAdded": "afegit recentment",
         "recentlyPlayed": "reproduït recentment",
         "recentlyUpdated": "actualitzat recentment",
-        "albumCount": "nombre de $t(entity.album_other)",
+        "albumCount": "nombre de $t(entity.album, {\"count\": 2})",
         "favorited": "preferits",
         "isCompilation": "és una compilació",
         "isFavorited": "és un preferit",
@@ -1007,7 +1049,10 @@
         "lastPlayed": "última reproducció",
         "path": "ruta",
         "songCount": "nombre de cançons",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "explicitStatus": "$t(common.explicitStatus)",
+        "sortName": "ordena per nom",
+        "matchAnd": "i",
+        "matchOr": "o"
     },
     "player": {
         "muted": "silenciat",
@@ -1048,7 +1093,16 @@
         "restoreQueueFromServer": "restaura la cua del servidor",
         "saveQueueToServer": "desa la cua al servidor",
         "artistRadio": "ràdio de l'artista",
-        "trackRadio": "ràdio de la pista"
+        "trackRadio": "ràdio de la pista",
+        "sleepTimer": "temporitzador d'adormir",
+        "sleepTimer_endOfSong": "final de la cançó actual",
+        "sleepTimer_minutes": "{{count}} min",
+        "sleepTimer_hours": "{{count}} h",
+        "sleepTimer_custom": "personalitzat",
+        "sleepTimer_off": "apagat",
+        "sleepTimer_timeRemaining": "queden {{time}}",
+        "sleepTimer_setCustom": "configura el temporitzador",
+        "sleepTimer_cancel": "cancel·la el temporitzador"
     },
     "error": {
         "credentialsRequired": "credencials requerides",
@@ -1083,7 +1137,7 @@
     },
     "releaseType": {
         "primary": {
-            "album": "$t(entity.album_one)",
+            "album": "$t(entity.album, {\"count\": 1})",
             "broadcast": "emissió",
             "ep": "EP",
             "other": "altres",

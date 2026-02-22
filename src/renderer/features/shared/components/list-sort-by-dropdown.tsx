@@ -130,7 +130,7 @@ export const ListSortByDropdownControlled = ({
     );
 };
 
-const CLIENT_SIDE_SONG_FILTERS = [
+export const CLIENT_SIDE_SONG_FILTERS = [
     {
         defaultOrder: SortOrder.ASC,
         name: i18n.t('filter.id', { postProcess: 'titleCase' }),
@@ -225,6 +225,11 @@ export const CLIENT_SIDE_ALBUM_FILTERS = [
         value: AlbumListSort.ALBUM_ARTIST,
     },
     {
+        defaultOrder: SortOrder.ASC,
+        name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+        value: AlbumListSort.ID,
+    },
+    {
         defaultOrder: SortOrder.DESC,
         name: i18n.t('filter.duration', { postProcess: 'titleCase' }),
         value: AlbumListSort.DURATION,
@@ -296,6 +301,11 @@ const ALBUM_LIST_FILTERS: Partial<
             value: AlbumListSort.ALBUM_ARTIST,
         },
         {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+            value: AlbumListSort.ID,
+        },
+        {
             defaultOrder: SortOrder.DESC,
             name: i18n.t('filter.communityRating', { postProcess: 'titleCase' }),
             value: AlbumListSort.COMMUNITY_RATING,
@@ -336,6 +346,11 @@ const ALBUM_LIST_FILTERS: Partial<
             defaultOrder: SortOrder.ASC,
             name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
             value: AlbumListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+            value: AlbumListSort.ID,
         },
         {
             defaultOrder: SortOrder.ASC,
@@ -398,6 +413,11 @@ const ALBUM_LIST_FILTERS: Partial<
             defaultOrder: SortOrder.ASC,
             name: i18n.t('filter.albumArtist', { postProcess: 'titleCase' }),
             value: AlbumListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.id', { postProcess: 'titleCase' }),
+            value: AlbumListSort.ID,
         },
         {
             defaultOrder: SortOrder.DESC,

@@ -181,6 +181,7 @@ export const FolderListView = ({ folderQuery }: FolderListViewProps) => {
                     enableAlternateRowColors={table.enableAlternateRowColors}
                     enableDrag={true}
                     enableExpansion={false}
+                    enableHeader={table.enableHeader}
                     enableHorizontalBorders={table.enableHorizontalBorders}
                     enableRowHoverHighlight={table.enableRowHoverHighlight}
                     enableVerticalBorders={table.enableVerticalBorders}

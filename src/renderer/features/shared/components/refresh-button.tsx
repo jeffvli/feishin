@@ -2,9 +2,11 @@ import { useTranslation } from 'react-i18next';
 
 import { ActionIcon, ActionIconProps } from '/@/shared/components/action-icon/action-icon';
 
-interface RefreshButtonProps extends ActionIconProps {}
+interface RefreshButtonProps extends ActionIconProps {
+    loading?: boolean;
+}
 
-export const RefreshButton = ({ onClick, ...props }: RefreshButtonProps) => {
+export const RefreshButton = ({ loading, onClick, ...props }: RefreshButtonProps) => {
     const { t } = useTranslation();
 
     return (
@@ -14,6 +16,7 @@ export const RefreshButton = ({ onClick, ...props }: RefreshButtonProps) => {
                 size: 'lg',
                 ...props.iconProps,
             }}
+            loading={loading}
             onClick={onClick}
             tooltip={{
                 label: t('common.refresh', { postProcess: 'sentenceCase' }),

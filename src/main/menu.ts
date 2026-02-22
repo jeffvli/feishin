@@ -21,6 +21,14 @@ export default class MenuBuilder {
                     selector: 'orderFrontStandardAboutPanel:',
                 },
                 { type: 'separator' },
+                {
+                    accelerator: 'Command+,',
+                    click: () => {
+                        this.mainWindow.webContents.send('renderer-open-settings');
+                    },
+                    label: 'Settings',
+                },
+                { type: 'separator' },
                 { label: 'Services', submenu: [] },
                 { type: 'separator' },
                 {
@@ -151,8 +159,8 @@ export default class MenuBuilder {
         return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
     }
 
-    buildDefaultTemplate() {
-        const templateDefault = [
+    buildDefaultTemplate(): MenuItemConstructorOptions[] {
+        const templateDefault: MenuItemConstructorOptions[] = [
             {
                 label: '&File',
                 submenu: [
@@ -160,6 +168,14 @@ export default class MenuBuilder {
                         accelerator: 'Ctrl+O',
                         label: '&Open',
                     },
+                    {
+                        accelerator: 'Ctrl+,',
+                        click: () => {
+                            this.mainWindow.webContents.send('renderer-open-settings');
+                        },
+                        label: '&Settings...',
+                    },
+                    { type: 'separator' },
                     {
                         accelerator: 'Ctrl+W',
                         click: () => {

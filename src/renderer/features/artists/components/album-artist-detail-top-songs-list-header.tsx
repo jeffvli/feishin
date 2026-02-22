@@ -20,10 +20,10 @@ export const AlbumArtistDetailTopSongsListHeader = ({
     const { t } = useTranslation();
 
     return (
-        <PageHeader p="1rem">
-            <LibraryHeaderBar>
+        <PageHeader>
+            <LibraryHeaderBar ignoreMaxWidth>
                 <LibraryHeaderBar.PlayButton itemType={LibraryItem.SONG} songs={data} />
-                <LibraryHeaderBar.Title>
+                <LibraryHeaderBar.Title order={2}>
                     {t('page.albumArtistDetail.topSongsFrom', {
                         postProcess: 'titleCase',
                         title,

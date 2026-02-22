@@ -33,7 +33,11 @@
         "viewQueue": "キューを表示する",
         "lyrics": "歌詞",
         "restoreQueueFromServer": "サーバーからキューを復元",
-        "saveQueueToServer": "サーバーにキューを保存"
+        "saveQueueToServer": "サーバーにキューを保存",
+        "addLastShuffled": "最後 (シャッフル)",
+        "addNextShuffled": "次 (シャッフル)",
+        "sleepTimer_minutes": "{{count}} 分",
+        "sleepTimer_hours": "{{count}} 時間"
     },
     "setting": {
         "crossfadeStyle_description": "オーディオプレーヤーが使用するクロスフェードのスタイルを選択します",
@@ -41,7 +45,7 @@
         "hotkey_skipBackward": "前にスキップ",
         "replayGainMode_description": "ファイルのメタデータに保存されている {{ReplayGain}} 値に従って音量ゲインを調整します",
         "volumeWheelStep_description": "音量スライダーでマウスホイールをスクロールしたときに変化する音量を設定します",
-        "audioDevice_description": "再生に使用するオーディオデバイスを選択します (Web プレーヤーのみ)",
+        "audioDevice_description": "再生に使用するオーディオデバイスを選択します",
         "theme_description": "アプリケーションに使用するテーマを設定します",
         "hotkey_playbackPause": "一時停止",
         "replayGainFallback": "{{ReplayGain}} フォールバック",
@@ -93,11 +97,10 @@
         "hotkey_globalSearch": "グローバル検索",
         "gaplessAudio_description": "MPV 向けのギャップレス再生を設定します",
         "remoteUsername_description": "リモートコントロール サーバーのユーザ名を設定します。 ユーザー名とパスワードの両方が空の場合、認証は無効になります",
-        "disableAutomaticUpdates": "自動更新を無効化",
         "exitToTray_description": "アプリケーション終了ボタンが押された際、システムトレイに格納します",
         "followLyric_description": "現在の再生位置に歌詞をスクロールします",
         "hotkey_favoritePreviousSong": "$t(common.previousSong) をお気に入り",
-        "replayGainMode_optionAlbum": "$t(entity.album_one)",
+        "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
         "lyricOffset": "歌詞のオフセット (ミリ秒)",
         "discordUpdateInterval_description": "更新間隔 (秒単位, 最小15秒)",
         "fontType_optionCustom": "カスタムフォント",
@@ -109,7 +112,7 @@
         "playbackStyle_optionCrossFade": "クロスフェード",
         "hotkey_rate3": "3つ星で評価",
         "font": "フォント",
-        "replayGainMode_optionTrack": "$t(entity.track_one)",
+        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
         "themeLight_description": "アプリケーションに使用するライトテーマを設定します",
         "hotkey_toggleFullScreenPlayer": "フルスクリーンプレーヤーの切り替え",
         "hotkey_localSearch": "ページ内検索",
@@ -118,7 +121,7 @@
         "remotePassword_description": "リモートコントロール サーバーのパスワードを設定します。 ログイン情報はデフォルトでセキュアな通信がされないため、個人情報と関係ないランダムなパスワードを利用してください",
         "hotkey_rate5": "5つ星で評価",
         "hotkey_playbackPrevious": "前のトラック",
-        "showSkipButtons_description": "プレーヤーバーのスキップボタンを表示/非表示にします",
+        "showSkipButtons_description": "プレーヤーバーのスキップボタンを表示または非表示にします",
         "crossfadeDuration_description": "クロスフェード効果の時間を設定します",
         "playbackStyle": "再生スタイル",
         "hotkey_toggleShuffle": "シャッフルの切り替え",
@@ -133,7 +136,7 @@
         "exitToTray": "終了時にシステムトレイに格納",
         "hotkey_rate4": "4つ星で評価",
         "enableRemote": "リモートコントロール サーバーを有効化",
-        "showSkipButton_description": "プレーヤーバーのスキップボタンを表示/非表示にします",
+        "showSkipButton_description": "プレーヤーバーのスキップボタンを表示または非表示にします",
         "savePlayQueue": "再生キューを保存",
         "minimumScrobbleSeconds_description": "Scrobble されるために必要な最短の再生時間 (秒)",
         "skipPlaylistPage_description": "プレイリストに移動するときに、デフォルトページではなくプレイリストの曲リストページに移動します",
@@ -159,7 +162,7 @@
         "useSystemTheme_description": "システム設定のライト/ダークテーマに従います",
         "playButtonBehavior_optionAddNext": "$t(player.addNext)",
         "lyricFetch_description": "様々なインターネットソースから歌詞を取得します",
-        "lyricFetchProvider_description": "歌詞を取得するサービスを選択します。サービスの並び順に検索されます",
+        "lyricFetchProvider_description": "歌詞を取得するプロバイダーを選択します",
         "globalMediaHotkeys_description": "システムのメディアホットキーでの再生コントロールを有効/無効化します",
         "customFontPath": "カスタムフォントパス",
         "followLyric": "歌詞を再生位置に追従",
@@ -191,7 +194,7 @@
         "savePlayQueue_description": "アプリケーション終了時に再生キューを保存し、アプリケーション開始時に復元します",
         "useSystemTheme": "システムテーマを使用",
         "webAudio": "Web Audio を使用する",
-        "mediaSession_description": "Windows Media Session の統合を有効にし、システムボリュームオーバーレイとロック画面にメディアコントロールとメタデータを表示します (Windows のみ)",
+        "mediaSession_description": "Media Session の統合を有効にし、システムボリュームオーバーレイとロック画面にメディアコントロールとメタデータを表示します",
         "mediaSession": "Media Session を有効にする",
         "startMinimized_description": "システムトレイでアプリケーションを起動する",
         "startMinimized": "最小化して起動する",
@@ -261,7 +264,7 @@
         "releaseChannel_optionBeta": "ベータ",
         "releaseChannel_optionLatest": "最新",
         "releaseChannel": "リリースチャンネル",
-        "releaseChannel_description": "自動更新のために安定版リリースまたはベータ版リリースを選択してください",
+        "releaseChannel_description": "自動更新のために、安定版、ベータ版、またはアルファ版 (nightly build) リリースから選択してください",
         "discordDisplayType_artistname": "アーティスト名",
         "discordDisplayType_songname": "曲名",
         "discordLinkType_description": "{{discord}} Rich Presence において、曲とアーティストのフィールドに {{lastfm}} または {{musicbrainz}} への外部リンクを追加します。{{musicbrainz}} は最も正確ですが、タグが必要でアーティストリンクを提供しません。一方、{{lastfm}} は常にリンクを提供します。追加のネットワークリクエストは発生しません",
@@ -294,8 +297,8 @@
         "discordDisplayType_description": "ステータスで聴いている内容を変更します",
         "discordLinkType": "{{discord}} Presence リンク",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} と {{lastfm}} のフォールバック",
-        "homeFeature": "ホーム画面の注目カルーセル",
-        "homeFeature_description": "ホーム画面に大きな注目カルーセルを表示するかどうかを制御します",
+        "homeFeature": "ホーム画面のカルーセル",
+        "homeFeature_description": "ホーム画面に大きなカルーセルを表示するかどうかを制御します",
         "exportImportSettings_notValidJSON": "渡されたファイルは有効な JSON ではありません",
         "exportImportSettings_importSuccess": "設定が正常にインポートされました!",
         "exportImportSettings_importModalTitle": "Feishin 設定をインポート",
@@ -339,30 +342,45 @@
         "playerbarWaveformAlign": "波形アライメント",
         "showRatings_description": "インターフェースに星評価機能を表示するかどうかを制御します",
         "showVisualizerInSidebar": "プレーヤーのサイドバーにビジュアライザーを表示する",
-        "combinedLyricsAndVisualizer": "プレイヤーのサイドバーに歌詞とビジュアライザーを統合する",
+        "combinedLyricsAndVisualizer": "プレーヤーのサイドバーに歌詞とビジュアライザーを統合する",
         "audioFadeOnStatusChange_description": "再生 / 一時停止の状態が変わったときにフェードアウトとフェードインを有効にします",
         "audioFadeOnStatusChange": "ステータス変更時の音声フェード",
         "combinedLyricsAndVisualizer_description": "歌詞とビジュアライザーを同じパネルに統合します",
-        "showVisualizerInSidebar_description": "プレーヤーのサイドバーにビジュアライザーを表示するパネルが追加されます"
+        "showVisualizerInSidebar_description": "プレーヤーのサイドバーにビジュアライザーを表示するパネルが追加されます",
+        "queryBuilderCustomFields": "カスタムフィールド",
+        "queryBuilderCustomFields_inputLabel": "ラベル",
+        "queryBuilderCustomFields_inputTag": "タグ",
+        "queryBuilderCustomFields_description": "クエリビルダーで使用するカスタムフィールドを追加します",
+        "queryBuilder": "クエリビルダー",
+        "homeFeatureStyle_description": "ホーム画面のカルーセルのスタイルを制御します",
+        "homeFeatureStyle": "ホーム画面のカルーセルのスタイル",
+        "homeFeatureStyle_optionMultiple": "複数",
+        "homeFeatureStyle_optionSingle": "単数",
+        "mpvExtraParameters": "MPV の追加パラメータ",
+        "mpvExtraParameters_description": "MPV に渡す追加の引数を設定します",
+        "pathReplace": "ファイルパスの置換",
+        "pathReplace_description": "サーバーのデフォルトのファイルパスを置き換えます",
+        "pathReplace_optionRemovePrefix": "接頭辞を削除",
+        "pathReplace_optionAddPrefix": "接頭辞を追加"
     },
     "action": {
-        "editPlaylist": "$t(entity.playlist_one) を編集",
+        "editPlaylist": "$t(entity.playlist, {\"count\": 1}) を編集",
         "goToPage": "ページへ移動",
         "moveToTop": "先頭に移動",
         "clearQueue": "キューをクリア",
-        "addToFavorites": "$t(entity.favorite_other) に追加",
-        "addToPlaylist": "$t(entity.playlist_one) に追加",
-        "createPlaylist": "$t(entity.playlist_one) を作成",
-        "removeFromPlaylist": "$t(entity.playlist_one) から削除",
-        "viewPlaylists": "$t(entity.playlist_other) を表示",
+        "addToFavorites": "$t(entity.favorite, {\"count\": 2}) に追加",
+        "addToPlaylist": "$t(entity.playlist, {\"count\": 1}) に追加",
+        "createPlaylist": "$t(entity.playlist, {\"count\": 1}) を作成",
+        "removeFromPlaylist": "$t(entity.playlist, {\"count\": 1}) から削除",
+        "viewPlaylists": "$t(entity.playlist, {\"count\": 2}) を表示",
         "refresh": "$t(common.refresh)",
-        "deletePlaylist": "$t(entity.playlist_one) を削除",
+        "deletePlaylist": "$t(entity.playlist, {\"count\": 1}) を削除",
         "removeFromQueue": "キューから削除",
         "deselectAll": "すべて選択解除",
         "moveToBottom": "末尾に移動",
         "setRating": "評価を設定する",
         "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist) エディタの切り替え",
-        "removeFromFavorites": "$t(entity.favorite_other) から削除",
+        "removeFromFavorites": "$t(entity.favorite, {\"count\": 2}) から削除",
         "openIn": {
             "lastfm": "Last.fm で開く",
             "musicbrainz": "MusicBrainz で開く"
@@ -374,8 +392,8 @@
         "shuffleAll": "すべてシャッフル",
         "shuffleSelected": "選択した曲をシャッフル",
         "viewMore": "さらに表示",
-        "createRadioStation": "$t(entity.radioStation_one) を作成",
-        "deleteRadioStation": "$t(entity.radioStation_one) を削除",
+        "createRadioStation": "$t(entity.radioStation, {\"count\": 1}) を作成",
+        "deleteRadioStation": "$t(entity.radioStation, {\"count\": 1}) を削除",
         "selectAll": "すべて選択",
         "moveUp": "上に移動",
         "moveDown": "下に移動",
@@ -398,7 +416,7 @@
         "left": "左側",
         "save": "保存",
         "right": "右側",
-        "currentSong": "現在の $t(entity.track_one)",
+        "currentSong": "現在の $t(entity.track, {\"count\": 1})",
         "collapse": "折りたたみ",
         "trackNumber": "トラック",
         "descending": "降順",
@@ -428,7 +446,7 @@
         "delete": "削除",
         "cancel": "キャンセル",
         "forceRestartRequired": "変更を適用するために再起動が必要です… 通知を閉じると再起動します",
-        "setting": "設定",
+        "setting_other": "設定",
         "version": "バージョン",
         "title": "タイトル",
         "filter_other": "フィルタ",
@@ -449,7 +467,7 @@
         "none": "なし",
         "menu": "メニュー",
         "restartRequired": "再起動が必要です",
-        "previousSong": "前の $t(entity.track_one)",
+        "previousSong": "前の $t(entity.track, {\"count\": 1})",
         "noResultsFromQuery": "条件にマッチするものがありません",
         "quit": "終了",
         "expand": "展開",
@@ -498,7 +516,10 @@
         "mood": "気分",
         "recordLabel": "レコードレーベル",
         "tableColumns": "テーブル列",
-        "clean": "クリーン"
+        "clean": "クリーン",
+        "filter_single": "シングル",
+        "filter_multiple": "複数枚組",
+        "rename": "名前を変更"
     },
     "table": {
         "config": {
@@ -515,42 +536,59 @@
                 "size": "$t(common.size)",
                 "itemSize": "項目のサイズ (px)",
                 "itemGap": "項目の間隔 (px)",
-                "followCurrentSong": "現在の曲をフォロー"
+                "followCurrentSong": "現在の曲をフォロー",
+                "advancedSettings": "詳細設定",
+                "autosize": "自動サイズ調整",
+                "moveUp": "上に移動",
+                "moveDown": "下に移動",
+                "alignLeft": "左揃え",
+                "alignCenter": "中央揃え",
+                "alignRight": "右揃え",
+                "itemsPerRow": "行あたりの項目数",
+                "size_default": "デフォルト",
+                "pinToLeft": "左にピン留め",
+                "pinToRight": "右にピン留め",
+                "size_compact": "コンパクト",
+                "size_large": "大きい",
+                "pagination_itemsPerPage": "ページあたりの項目数",
+                "pagination_infinite": "無限"
             },
             "label": {
-                "releaseDate": "リリース日時",
+                "releaseDate": "発売日",
                 "title": "$t(common.title)",
                 "duration": "$t(common.duration)",
                 "titleCombined": "$t(common.title) (結合)",
-                "dateAdded": "追加された日時",
+                "dateAdded": "追加日",
                 "size": "$t(common.size)",
                 "bpm": "$t(common.bpm)",
                 "lastPlayed": "最後に再生",
                 "trackNumber": "トラック番号",
                 "rowIndex": "行インデックス",
                 "rating": "$t(common.rating)",
-                "artist": "$t(entity.artist_one)",
-                "album": "$t(entity.album_one)",
+                "artist": "$t(entity.artist, {\"count\": 1})",
+                "album": "$t(entity.album, {\"count\": 1})",
                 "note": "$t(common.note)",
                 "biography": "$t(common.biography)",
                 "owner": "$t(common.owner)",
                 "path": "$t(common.path)",
-                "channels": "$t(common.channel_other)",
+                "channels": "$t(common.channel, {\"count\": 2})",
                 "playCount": "再生回数",
                 "bitrate": "$t(common.bitrate)",
-                "actions": "$t(common.action_other)",
-                "genre": "$t(entity.genre_one)",
+                "actions": "$t(common.action, {\"count\": 2})",
+                "genre": "$t(entity.genre, {\"count\": 1})",
                 "discNumber": "ディスク番号",
                 "favorite": "$t(common.favorite)",
                 "year": "$t(common.year)",
-                "albumArtist": "$t(entity.albumArtist_one)",
+                "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
                 "codec": "$t(common.codec)",
-                "songCount": "$t(entity.track_other)",
-                "albumCount": "$t(entity.album_other)",
+                "songCount": "$t(entity.track, {\"count\": 2})",
+                "albumCount": "$t(entity.album, {\"count\": 2})",
                 "bitDepth": "$t(common.bitDepth)",
-                "genreBadge": "$t(entity.genre_one) (バッジ)",
+                "genreBadge": "$t(entity.genre, {\"count\": 1}) (バッジ)",
                 "image": "画像",
-                "sampleRate": "$t(common.sampleRate)"
+                "sampleRate": "$t(common.sampleRate)",
+                "composer": "作曲家",
+                "titleArtist": "$t(common.title) (アーティスト)"
             }
         },
         "column": {
@@ -559,7 +597,7 @@
             "rating": "評価",
             "favorite": "お気に入り",
             "playCount": "再生回数",
-            "albumCount": "$t(entity.album_other)",
+            "albumCount": "$t(entity.album, {\"count\": 2})",
             "releaseYear": "年",
             "lastPlayed": "最後に再生",
             "biography": "バイオグラフィー",
@@ -567,19 +605,20 @@
             "bitrate": "ビットレート",
             "title": "タイトル",
             "bpm": "BPM",
-            "dateAdded": "追加された日時",
-            "artist": "$t(entity.artist_one)",
-            "songCount": "$t(entity.track_other)",
+            "dateAdded": "追加日",
+            "artist": "$t(entity.artist, {\"count\": 1})",
+            "songCount": "$t(entity.track, {\"count\": 2})",
             "trackNumber": "トラック",
-            "genre": "$t(entity.genre_one)",
+            "genre": "$t(entity.genre, {\"count\": 1})",
             "albumArtist": "アルバムアーティスト",
             "path": "パス",
             "discNumber": "ディスク",
-            "channels": "$t(common.channel_other)",
+            "channels": "$t(common.channel, {\"count\": 2})",
             "size": "$t(common.size)",
             "codec": "$t(common.codec)",
             "bitDepth": "$t(common.bitDepth)",
-            "sampleRate": "$t(common.sampleRate)"
+            "sampleRate": "$t(common.sampleRate)",
+            "owner": "所有者"
         }
     },
     "error": {
@@ -593,16 +632,16 @@
         "genericError": "エラーが発生しました",
         "credentialsRequired": "ログイン情報が必要です",
         "sessionExpiredError": "セッションの有効期限が切れました",
-        "remoteEnableError": "リモートサーバーを $t(common.enable) にする際にエラーが発生しました",
+        "remoteEnableError": "リモートサーバーを$t(common.enable)にする際にエラーが発生しました",
         "localFontAccessDenied": "ローカルフォントへのアクセスが拒否されました",
         "serverNotSelectedError": "サーバーが選択されていません",
-        "remoteDisableError": "リモートサーバーを $t(common.disable) にする際にエラーが発生しました",
+        "remoteDisableError": "リモートサーバーを$t(common.disable)にする際にエラーが発生しました",
         "mpvRequired": "MPV が必要です",
         "audioDeviceFetchError": "オーディオデバイスの取得時にエラーが発生しました",
         "invalidServer": "無効なサーバー",
         "loginRateError": "ログイン試行回数が多すぎます。数秒後に再試行してください",
         "endpointNotImplementedError": "{{serverType}} にはエンドポイント {{endpoint}} が実装されていません",
-        "badAlbum": "このページが表示されたのは、この曲がアルバムに含まれていないためです。この問題は、音楽フォルダの最上位に曲がある場合に発生する可能性が高くなります。Jellyfin は、トラックがフォルダ内にある場合にのみトラックをグループ化します",
+        "badAlbum": "このページが表示されたのは、この曲がアルバムに含まれていないためです。この問題は、音楽フォルダーの最上位に曲がある場合に発生する可能性が高くなります。Jellyfin は、トラックがフォルダー内にある場合にのみトラックをグループ化します",
         "networkError": "ネットワークエラーが発生しました",
         "notificationDenied": "通知の許可が拒否されました。この設定は効果がありません",
         "openError": "ファイルを開けませんでした",
@@ -611,7 +650,9 @@
         "noNetwork": "サーバーが利用できません",
         "noNetworkDescription": "このサーバーに接続できませんでした",
         "saveQueueFailed": "キューを保存できませんでした",
-        "settingsSyncError": "レンダラーとメインプロセスの設定に矛盾が見つかりました。変更を適用するにはアプリケーションを再起動してください"
+        "settingsSyncError": "レンダラーとメインプロセスの設定に矛盾が見つかりました。変更を適用するにはアプリケーションを再起動してください",
+        "invalidJson": "無効な JSON",
+        "serverLockSingleServer": "サーバーがロックされている場合、1 つのサーバーのみが許可されます"
     },
     "filter": {
         "mostPlayed": "最も多く再生",
@@ -626,12 +667,12 @@
         "recentlyAdded": "最近の追加",
         "note": "ノート",
         "name": "名前",
-        "dateAdded": "追加された日時",
+        "dateAdded": "追加日",
         "releaseDate": "発売日",
         "communityRating": "コミュニティの評価",
         "path": "パス",
         "favorited": "お気に入り",
-        "albumArtist": "$t(entity.albumArtist_one)",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
         "isRecentlyPlayed": "最近再生済み",
         "isFavorited": "お気に入り済み",
         "bpm": "BPM",
@@ -639,7 +680,7 @@
         "disc": "ディスク",
         "biography": "バイオグラフィー",
         "songCount": "曲数",
-        "artist": "$t(entity.artist_one)",
+        "artist": "$t(entity.artist, {\"count\": 1})",
         "duration": "長さ",
         "random": "ランダム",
         "lastPlayed": "最後に再生",
@@ -650,31 +691,33 @@
         "comment": "コメント",
         "recentlyUpdated": "新規更新",
         "isPublic": "共有済み",
-        "channels": "$t(common.channel_other)",
+        "channels": "$t(common.channel, {\"count\": 2})",
         "owner": "$t(common.owner)",
-        "genre": "$t(entity.genre_one)",
-        "albumCount": "$t(entity.album_other) 個",
+        "genre": "$t(entity.genre, {\"count\": 1})",
+        "albumCount": "$t(entity.album, {\"count\": 2}) 枚",
         "id": "ID",
-        "album": "$t(entity.album_one)",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "album": "$t(entity.album, {\"count\": 1})",
+        "explicitStatus": "$t(common.explicitStatus)",
+        "sortName": "ソート名"
     },
     "page": {
         "sidebar": {
             "nowPlaying": "再生中",
-            "playlists": "$t(entity.playlist_other)",
+            "playlists": "$t(entity.playlist, {\"count\": 2})",
             "search": "$t(common.search)",
-            "tracks": "$t(entity.track_other)",
-            "albums": "$t(entity.album_other)",
-            "genres": "$t(entity.genre_other)",
-            "folders": "$t(entity.folder_other)",
-            "settings": "$t(common.setting_other)",
+            "tracks": "$t(entity.track, {\"count\": 2})",
+            "albums": "$t(entity.album, {\"count\": 2})",
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "folders": "$t(entity.folder, {\"count\": 2})",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "home": "$t(common.home)",
-            "artists": "$t(entity.artist_other)",
-            "albumArtists": "$t(entity.albumArtist_other)",
+            "artists": "$t(entity.artist, {\"count\": 2})",
+            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
             "myLibrary": "マイライブラリ",
-            "shared": "$t(entity.playlist_other) を共有",
-            "radio": "$t(entity.radioStation_other)",
-            "favorites": "$t(entity.favorite_other)"
+            "shared": "$t(entity.playlist, {\"count\": 2}) を共有",
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "favorites": "$t(entity.favorite, {\"count\": 2})",
+            "collections": "コレクション"
         },
         "fullscreenPlayer": {
             "config": {
@@ -702,7 +745,7 @@
         "appMenu": {
             "selectServer": "サーバーを選択",
             "version": "バージョン {{version}}",
-            "settings": "$t(common.setting_other)",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "manageServers": "サーバーの管理",
             "expandSidebar": "サイドバーを展開",
             "collapseSidebar": "サイドバーを折りたたむ",
@@ -712,10 +755,10 @@
             "goForward": "進む",
             "privateModeOff": "プライベートモードをオフにする",
             "privateModeOn": "プライベートモードをオンにする",
-            "selectMusicFolder": "音楽フォルダを選択",
-            "noMusicFolder": "音楽フォルダを選択",
+            "selectMusicFolder": "音楽フォルダーを選択",
+            "noMusicFolder": "音楽フォルダーが選択されていません",
             "commandPalette": "コマンドパレットを開く",
-            "multipleMusicFolders": "{{count}} 個の音楽フォルダが選択されました"
+            "multipleMusicFolders": "{{count}} 個の音楽フォルダーが選択されました"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -738,8 +781,8 @@
             "moveToNext": "$t(action.moveToNext)",
             "playSimilarSongs": "$t(player.playSimilarSongs)",
             "shareItem": "アイテムを共有する",
-            "goToAlbum": "$t(entity.album_one) に移動",
-            "goToAlbumArtist": "$t(entity.albumArtist_one) に移動",
+            "goToAlbum": "$t(entity.album, {\"count\": 1}) に移動",
+            "goToAlbumArtist": "$t(entity.albumArtist, {\"count\": 1}) に移動",
             "showDetails": "情報を取得する",
             "playShuffled": "$t(player.shuffle)",
             "moveItems": "$t(action.moveItems)",
@@ -752,10 +795,10 @@
             "explore": "ライブラリから検索",
             "recentlyPlayed": "最近の再生",
             "recentlyReleased": "最近のリリース",
-            "genres": "$t(entity.genre_other)"
+            "genres": "$t(entity.genre, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "$t(entity.artist_one) の他の項目",
+            "moreFromArtist": "$t(entity.artist, {\"count\": 1}) の他の項目",
             "moreFromGeneric": "{{item}} の他の作品",
             "released": "リリース"
         },
@@ -781,20 +824,21 @@
             "lyricsDisplay": "歌詞表示",
             "transcoding": "トランスコーディング",
             "discord": "Discord",
-            "logger": "ロガー"
+            "logger": "ロガー",
+            "playerFilters": "プレーヤーフィルター"
         },
         "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "genreList": {
-            "title": "$t(entity.genre_other)",
-            "showAlbums": "$t(entity.genre_one) $t(entity.album_other) を表示",
-            "showTracks": "$t(entity.genre_one) $t(entity.track_other) を表示"
+            "title": "$t(entity.genre, {\"count\": 2})",
+            "showAlbums": "$t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2}) を表示",
+            "showTracks": "$t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2}) を表示"
         },
         "trackList": {
-            "title": "$t(entity.track_other)",
+            "title": "$t(entity.track, {\"count\": 2})",
             "artistTracks": "{{artist}} のトラック",
-            "genreTracks": "\"{{genre}}\" $t(entity.track_other)"
+            "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})"
         },
         "globalSearch": {
             "commands": {
@@ -805,12 +849,12 @@
             "title": "コマンド"
         },
         "playlistList": {
-            "title": "$t(entity.playlist_other)"
+            "title": "$t(entity.playlist, {\"count\": 2})"
         },
         "albumList": {
-            "title": "$t(entity.album_other)",
+            "title": "$t(entity.album, {\"count\": 2})",
             "artistAlbums": "{{artist}} のアルバム",
-            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)"
+            "genreAlbums": "\"{{genre}}\" $t(entity.album, {\"count\": 2})"
         },
         "albumArtistDetail": {
             "about": "{{artist}} について",
@@ -820,8 +864,8 @@
             "topSongs": "人気曲",
             "topSongsFrom": "{{title}} からの人気曲",
             "viewAll": "すべて表示",
-            "viewAllTracks": "$t(entity.track_other) をすべて表示",
-            "relatedArtists": "関連の $t(entity.artist_other)",
+            "viewAllTracks": "$t(entity.track, {\"count\": 2}) をすべて表示",
+            "relatedArtists": "関連の $t(entity.artist, {\"count\": 2})",
             "groupingTypeAll": "すべてのリリースタイプ",
             "groupingTypePrimary": "主なリリースタイプ"
         },
@@ -845,24 +889,32 @@
             "title": "ラジオ局"
         },
         "favorites": {
-            "title": "$t(entity.favorite_other)"
+            "title": "$t(entity.favorite, {\"count\": 2})"
         },
         "folderList": {
-            "title": "$t(entity.folder_other)"
+            "title": "$t(entity.folder, {\"count\": 2})"
+        },
+        "windowBar": {
+            "paused": "(一時停止) ",
+            "privateMode": "(プライベートモード)"
+        },
+        "collections": {
+            "overrideExisting": "既存のものを上書き",
+            "saveAsCollection": "コレクションとして保存"
         }
     },
     "form": {
         "deletePlaylist": {
-            "title": "$t(entity.playlist_one) を削除",
-            "success": "$t(entity.playlist_one) が削除されました",
-            "input_confirm": "確認のため $t(entity.playlist_one) の名前を入力してください"
+            "title": "$t(entity.playlist, {\"count\": 1}) を削除",
+            "success": "$t(entity.playlist, {\"count\": 1}) が削除されました",
+            "input_confirm": "確認のため $t(entity.playlist, {\"count\": 1}) の名前を入力してください"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
-            "title": "$t(entity.playlist_one) を作成",
+            "title": "$t(entity.playlist, {\"count\": 1}) を作成",
             "input_public": "公開",
             "input_name": "$t(common.name)",
-            "success": "$t(entity.playlist_one) を作成しました",
+            "success": "$t(entity.playlist, {\"count\": 1}) を作成しました",
             "input_owner": "$t(common.owner)"
         },
         "addServer": {
@@ -874,8 +926,8 @@
             "input_name": "サーバー名",
             "success": "サーバーが追加されました",
             "input_savePassword": "パスワードを保存",
-            "ignoreSsl": "SSL を無視 ($t(common.restartRequired))",
-            "ignoreCors": "CORSを無視 ($t(common.restartRequired))",
+            "ignoreSsl": "SSL を無視します ($t(common.restartRequired))",
+            "ignoreCors": "CORS を無視します ($t(common.restartRequired))",
             "error_savePassword": "パスワードを保存する際にエラーが発生しました",
             "input_preferInstantMixDescription": "類似曲を取得するにはインスタントミックスのみを使用してください。この動作を変更するプラグインがある場合に役立ちます",
             "input_preferInstantMix": "インスタントミックスを優先する",
@@ -885,11 +937,11 @@
         },
         "addToPlaylist": {
             "success": "$t(entity.trackWithCount, {\"count\": {{message}} }) を $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} }) に追加しました",
-            "title": "$t(entity.playlist_one) に追加",
+            "title": "$t(entity.playlist, {\"count\": 1}) に追加",
             "input_skipDuplicates": "重複をスキップ",
-            "input_playlists": "$t(entity.playlist_other)",
-            "create": "$t(entity.playlist_one) {{playlist}} を作成する",
-            "searchOrCreate": "$t(entity.playlist_other) を検索するか、入力して新しいものを作成してください"
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
+            "create": "$t(entity.playlist, {\"count\": 1}) {{playlist}} を作成する",
+            "searchOrCreate": "$t(entity.playlist, {\"count\": 2}) を検索するか、入力して新しいプレイリストを作成してください"
         },
         "updateServer": {
             "title": "サーバーをアップデート",
@@ -898,17 +950,21 @@
         "queryEditor": {
             "input_optionMatchAll": "すべて一致",
             "input_optionMatchAny": "一部一致",
-            "title": "クエリエディタ"
+            "title": "クエリエディタ",
+            "addRuleGroup": "ルールグループを追加",
+            "removeRuleGroup": "ルールグループを削除",
+            "resetToDefault": "デフォルトにリセット",
+            "clearFilters": "フィルターを削除"
         },
         "lyricSearch": {
             "input_name": "$t(common.name)",
-            "input_artist": "$t(entity.artist_one)",
+            "input_artist": "$t(entity.artist, {\"count\": 1})",
             "title": "歌詞検索"
         },
         "editPlaylist": {
-            "title": "$t(entity.playlist_one) を編集",
+            "title": "$t(entity.playlist, {\"count\": 1}) を編集",
             "publicJellyfinNote": "Jellyfin では、何らかの理由でプレイリストが公開されているかどうかが表示されません。公開されたままにしたい場合は、以下の項目を選択してください",
-            "success": "$t(entity.playlist_one) が正常に更新されました",
+            "success": "$t(entity.playlist, {\"count\": 1}) が正常に更新されました",
             "editNote": "大規模なプレイリストの場合、手動編集は推奨されません。既存のプレイリストを上書きすることでデータ損失が発生するリスクを許容しますか?"
         },
         "shareItem": {
@@ -942,7 +998,7 @@
         },
         "shuffleAll": {
             "title": "ランダムに再生",
-            "input_genre": "$t(entity.genre_one)",
+            "input_genre": "$t(entity.genre, {\"count\": 1})",
             "input_limit": "曲が多すぎます",
             "input_minYear": "年から",
             "input_maxYear": "年まで",
@@ -950,6 +1006,9 @@
             "input_played_optionUnplayed": "未再生のトラックのみ",
             "input_played_optionPlayed": "再生されたトラックのみ",
             "input_played": "再生フィルター"
+        },
+        "saveQueue": {
+            "success": "プレイキューをサーバーに保存しました"
         }
     },
     "entity": {
@@ -957,15 +1016,15 @@
         "playlistWithCount_other": "{{count}} 個のプレイリスト",
         "playlist_other": "プレイリスト",
         "artist_other": "アーティスト",
-        "folderWithCount_other": "{{count}} 個のフォルダ",
+        "folderWithCount_other": "{{count}} 個のフォルダー",
         "albumArtist_other": "アルバムアーティスト",
         "track_other": "トラック",
         "albumArtistCount_other": "{{count}} アルバムアーティスト",
         "albumWithCount_other": "{{count}} 枚のアルバム",
         "favorite_other": "お気に入り",
         "artistWithCount_other": "{{count}} 人のアーティスト",
-        "folder_other": "フォルダ",
-        "smartPlaylist": "スマート $t(entity.playlist_one)",
+        "folder_other": "フォルダー",
+        "smartPlaylist": "スマート $t(entity.playlist, {\"count\": 1})",
         "album_other": "アルバム",
         "genreWithCount_other": "{{count}} 個のジャンル",
         "trackWithCount_other": "{{count}} 個のトラック",
@@ -985,7 +1044,7 @@
             "ep": "EP",
             "other": "その他",
             "single": "シングル",
-            "album": "$t(entity.album_one)"
+            "album": "$t(entity.album, {\"count\": 1})"
         },
         "secondary": {
             "audiobook": "オーディオブック",
@@ -1008,6 +1067,26 @@
     },
     "filterOperator": {
         "matchesRegex": "正規表現に一致",
-        "notContains": "含まれていない"
+        "notContains": "含まれていない",
+        "after": "以降",
+        "afterDate": "以降 (日付)",
+        "before": "以前",
+        "beforeDate": "以前 (日付)",
+        "contains": "を含む",
+        "endsWith": "で終わる",
+        "inPlaylist": "いずれか",
+        "inTheRange": "範囲内",
+        "inTheRangeDate": "範囲内 (日付)",
+        "is": "完全一致",
+        "isNot": "不一致",
+        "startsWith": "で始まる",
+        "inTheLast": "以内",
+        "isGreaterThan": "より大きい",
+        "isLessThan": "より小さい",
+        "notInPlaylist": "いずれでもない",
+        "notInTheLast": "より前"
+    },
+    "visualizer": {
+        "visualizerType": "ビジュアライザーの種類"
     }
 }

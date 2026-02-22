@@ -391,12 +391,12 @@ export const ApplicationSettings = memo(() => {
                     }
                 />
             ),
-            description: t('setting.homeFeature', {
+            description: t('setting.homeFeatureStyle', {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.homeFeature', { postProcess: 'sentenceCase' }),
+            title: t('setting.homeFeatureStyle', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -620,6 +620,28 @@ export const ApplicationSettings = memo(() => {
             }),
             isHidden: false,
             title: t('setting.showRatings', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.blurExplicitImages', { postProcess: 'sentenceCase' })}
+                    defaultChecked={settings.blurExplicitImages}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                blurExplicitImages: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.blurExplicitImages', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: false,
+            title: t('setting.blurExplicitImages', { postProcess: 'sentenceCase' }),
         },
         {
             control: (

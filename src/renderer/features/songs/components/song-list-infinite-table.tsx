@@ -8,6 +8,7 @@ import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpe
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { ItemListTableComponentProps } from '/@/renderer/components/item-list/types';
+import { useListContext } from '/@/renderer/context/list-context';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { usePlayerSong } from '/@/renderer/store';
 import { LibraryItem, SongListQuery, SongListSort, SortOrder } from '/@/shared/types/domain-types';
@@ -19,6 +20,7 @@ export const SongListInfiniteTable = ({
     autoFitColumns = false,
     columns,
     enableAlternateRowColors = false,
+    enableHeader = true,
     enableHorizontalBorders = false,
     enableRowHoverHighlight = true,
     enableSelection = true,
@@ -38,10 +40,11 @@ export const SongListInfiniteTable = ({
     }) as UseSuspenseQueryOptions<number, Error, number, readonly unknown[]>;
 
     const listQueryFn = api.controller.getSongList;
+    const { pageKey } = useListContext();
 
     const { getItem, getItemIndex, itemCount, loadedItems, onRangeChanged } =
         useItemListInfiniteLoader({
-            eventKey: ItemListKey.SONG,
+            eventKey: pageKey || ItemListKey.SONG,
             itemsPerPage,
             itemType: LibraryItem.SONG,
             listCountQuery,
@@ -73,6 +76,7 @@ export const SongListInfiniteTable = ({
             data={loadedItems}
             enableAlternateRowColors={enableAlternateRowColors}
             enableExpansion={false}
+            enableHeader={enableHeader}
             enableHorizontalBorders={enableHorizontalBorders}
             enableRowHoverHighlight={enableRowHoverHighlight}
             enableSelection={enableSelection}

@@ -8,6 +8,7 @@ import { ItemGridList } from '/@/renderer/components/item-list/item-grid-list/it
 import { ItemListWithPagination } from '/@/renderer/components/item-list/item-list-pagination/item-list-pagination';
 import { useItemListPagination } from '/@/renderer/components/item-list/item-list-pagination/use-item-list-pagination';
 import { ItemListGridComponentProps } from '/@/renderer/components/item-list/types';
+import { useListContext } from '/@/renderer/context/list-context';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { useGeneralSettings } from '/@/renderer/store';
 import {
@@ -32,6 +33,7 @@ export const AlbumListPaginatedGrid = ({
     serverId,
     size,
 }: AlbumListPaginatedGridProps) => {
+    const { pageKey } = useListContext();
     const { currentPage, onChange } = useItemListPagination();
 
     const listCountQuery = albumQueries.listCount({
@@ -43,7 +45,7 @@ export const AlbumListPaginatedGrid = ({
 
     const { data, pageCount, totalItemCount } = useItemListPaginatedLoader({
         currentPage,
-        eventKey: ItemListKey.ALBUM,
+        eventKey: pageKey || ItemListKey.ALBUM,
         itemsPerPage,
         itemType: LibraryItem.ALBUM,
         listCountQuery,

@@ -1,31 +1,31 @@
 {
     "action": {
-        "createPlaylist": "$t(entity.playlist_one) 생성",
-        "addToFavorites": "$t(entity.favorite_other)에 추가",
-        "addToPlaylist": "$t(entity.playlist_one)에 추가",
+        "createPlaylist": "$t(entity.playlist, {\"count\": 1}) 생성",
+        "addToFavorites": "$t(entity.favorite, {\"count\": 2})에 추가",
+        "addToPlaylist": "$t(entity.playlist, {\"count\": 1})에 추가",
         "clearQueue": "대기열 지우기",
-        "deletePlaylist": "$t(entity.playlist_one) 삭제",
+        "deletePlaylist": "$t(entity.playlist, {\"count\": 1}) 삭제",
         "deselectAll": "모두 선택 해제",
-        "editPlaylist": "$t(entity.playlist_one) 편집",
+        "editPlaylist": "$t(entity.playlist, {\"count\": 1}) 편집",
         "goToPage": "페이지 이동",
         "moveToBottom": "맨 아래로 이동",
         "moveToTop": "맨 위로 이동",
         "moveToNext": "다음으로 이동",
         "removeFromQueue": "대기열에서 제거",
         "refresh": "$t(common.refresh)",
-        "removeFromFavorites": "$t(entity.favorite_other)에서 제거",
-        "removeFromPlaylist": "$t(entity.playlist_one)에서 제거",
+        "removeFromFavorites": "$t(entity.favorite, {\"count\": 2})에서 제거",
+        "removeFromPlaylist": "$t(entity.playlist, {\"count\": 1})에서 제거",
         "openIn": {
             "musicbrainz": "MusicBrainz에서 보기",
             "lastfm": "Last.fm에서 보기"
         },
-        "viewPlaylists": "$t(entity.playlist_other) 보기",
+        "viewPlaylists": "$t(entity.playlist, {\"count\": 2}) 보기",
         "setRating": "평점 지정",
         "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist) 편집기 펼치기",
         "addOrRemoveFromSelection": "선택항목에서 추가 또는 제거",
         "selectRangeOfItems": "항목의 범위 선택",
-        "createRadioStation": "$t(entity.radioStation_one) 생성",
-        "deleteRadioStation": "$t(entity.radioStation_one) 삭제",
+        "createRadioStation": "$t(entity.radioStation, {\"count\": 1}) 생성",
+        "deleteRadioStation": "$t(entity.radioStation, {\"count\": 1}) 삭제",
         "selectAll": "전부 선택",
         "downloadStarted": "{{count}}개 항목 다운로드 시작했습니다",
         "moveUp": "위로 옮기기",
@@ -59,7 +59,7 @@
         "backward": "뒤로",
         "saveAs": "(으)로 저장하기",
         "search": "검색",
-        "setting": "설정",
+        "setting_other": "설정",
         "share": "공유",
         "size": "크기",
         "sortOrder": "순서",
@@ -74,7 +74,7 @@
         "comingSoon": "조만간…",
         "configure": "설정",
         "confirm": "확인",
-        "currentSong": "현재 $t(entity.track_one)",
+        "currentSong": "현재 $t(entity.track, {\"count\": 1})",
         "decrease": "감소",
         "delete": "삭제",
         "descending": "내림차순",
@@ -96,7 +96,7 @@
         "path": "경로",
         "playerMustBePaused": "플레이어가 일시정지 되어야 합니다",
         "preview": "미리보기",
-        "previousSong": "이전곡 $t(entity.track_one)",
+        "previousSong": "이전곡 $t(entity.track, {\"count\": 1})",
         "quit": "종료",
         "refresh": "새로고침",
         "reload": "리로드",
@@ -168,7 +168,7 @@
         "song_other": "곡",
         "play_other": "{{count}} 재생",
         "playlistWithCount_other": "{{count}} 재생목록",
-        "smartPlaylist": "스마트 $t(entity.playlist_one)",
+        "smartPlaylist": "스마트 $t(entity.playlist, {\"count\": 1})",
         "track_other": "트랙",
         "radioStation_other": "라디오 방송국",
         "radioStationWithCount_other": "{{count}}개 라디오 방송국"
@@ -214,9 +214,9 @@
         "dateAdded": "추가된 날짜",
         "lastPlayed": "마지막으로 재생한",
         "mostPlayed": "가장 많이 재생한",
-        "album": "$t(entity.album_one)",
-        "albumArtist": "$t(entity.albumArtist_one)",
-        "artist": "$t(entity.artist_one)",
+        "album": "$t(entity.album, {\"count\": 1})",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+        "artist": "$t(entity.artist, {\"count\": 1})",
         "communityRating": "커뮤니티 평점",
         "criticRating": "비평가 평점",
         "disc": "디스크",
@@ -225,11 +225,11 @@
         "channels": "$t(common.channel_other)",
         "duration": "길이",
         "bpm": "bpm",
-        "albumCount": "$t(entity.album_other) 앨범수",
+        "albumCount": "$t(entity.album, {\"count\": 2}) 앨범수",
         "comment": "코멘트",
         "favorited": "즐겨찾기",
         "fromYear": "시작 년도",
-        "genre": "$t(entity.genre_one)",
+        "genre": "$t(entity.genre, {\"count\": 1})",
         "id": "아이디",
         "isCompilation": "편집앨범 여부",
         "isFavorited": "즐겨찾기 여부",
@@ -262,16 +262,16 @@
         },
         "addToPlaylist": {
             "input_skipDuplicates": "중복 건너뛰기",
-            "title": "$t(entity.playlist_one) 에 추가",
-            "input_playlists": "$t(entity.playlist_other)",
+            "title": "$t(entity.playlist, {\"count\": 1}) 에 추가",
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "success": "$t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })에 $t(entity.trackWithCount, {\"count\": {{message}} })가 추가되었습니다",
-            "create": "$t(entity.playlist_one) {{playlist}} 생성",
-            "searchOrCreate": "$t(entity.playlist_other) 검색 또는 입력하여 새로 만들기"
+            "create": "$t(entity.playlist, {\"count\": 1}) {{playlist}} 생성",
+            "searchOrCreate": "$t(entity.playlist, {\"count\": 2}) 검색 또는 입력하여 새로 만들기"
         },
         "lyricSearch": {
             "title": "가사 검색",
             "input_name": "$t(common.name)",
-            "input_artist": "$t(entity.artist_one)"
+            "input_artist": "$t(entity.artist, {\"count\": 1})"
         },
         "queryEditor": {
             "input_optionMatchAll": "모두 일치",
@@ -279,9 +279,9 @@
             "title": "쿼리 편집기"
         },
         "editPlaylist": {
-            "title": "$t(entity.playlist_one) 편집",
+            "title": "$t(entity.playlist, {\"count\": 1}) 편집",
             "publicJellyfinNote": "Jellyfin은 재생목록 공개 여부를 노출하지 않습니다. 만약 공개되길 원한다면 다음을 선택하세요",
-            "success": "$t(entity.playlist_one) 업데이트 되었습니다"
+            "success": "$t(entity.playlist, {\"count\": 1}) 업데이트 되었습니다"
         },
         "shareItem": {
             "allowDownloading": "다운로드 허용",
@@ -298,15 +298,15 @@
         "createPlaylist": {
             "input_description": "$t(common.description)",
             "input_name": "$t(common.name)",
-            "success": "$t(entity.playlist_one)를 생성했습니다",
+            "success": "$t(entity.playlist, {\"count\": 1})를 생성했습니다",
             "input_owner": "$t(common.owner)",
             "input_public": "공개",
-            "title": "$t(entity.playlist_one) 생성"
+            "title": "$t(entity.playlist, {\"count\": 1}) 생성"
         },
         "deletePlaylist": {
-            "input_confirm": "확인을 위해 $t(entity.playlist_one)의 이름을 적어주세요",
-            "success": "$t(entity.playlist_one)가 삭제되었습니다",
-            "title": "$t(entity.playlist_one) 삭제"
+            "input_confirm": "확인을 위해 $t(entity.playlist, {\"count\": 1})의 이름을 적어주세요",
+            "success": "$t(entity.playlist, {\"count\": 1})가 삭제되었습니다",
+            "title": "$t(entity.playlist, {\"count\": 1}) 삭제"
         },
         "privateMode": {
             "enabled": "프라이빗 모드가 활성화되었습니다. 재생상태가 외부 서비스에 지금부터 노출되지 않습니다",
@@ -362,8 +362,8 @@
             "download": "다운로드",
             "numberSelected": "{{count}}개 선택됨",
             "shareItem": "공유",
-            "goToAlbum": "$t(entity.album_one)으로 이동",
-            "goToAlbumArtist": "$t(entity.albumArtist_one)으로 이동",
+            "goToAlbum": "$t(entity.album, {\"count\": 1})으로 이동",
+            "goToAlbumArtist": "$t(entity.albumArtist, {\"count\": 1})으로 이동",
             "showDetails": "추가정보"
         },
         "albumArtistDetail": {
@@ -371,17 +371,17 @@
             "viewDiscography": "디스코그래피 보기",
             "appearsOn": "참여 앨범",
             "recentReleases": "최근 앨범",
-            "relatedArtists": "연관 $t(entity.artist_other)",
+            "relatedArtists": "연관 $t(entity.artist, {\"count\": 2})",
             "topSongs": "최고의 곡들",
             "topSongsFrom": "{{title}}이 포함된 최고의 곡들",
             "viewAll": "전부 보이기",
-            "viewAllTracks": "$t(entity.track_other) 전부 보이기"
+            "viewAllTracks": "$t(entity.track, {\"count\": 2}) 전부 보이기"
         },
         "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "$t(entity.artist_one) 더 보기",
+            "moreFromArtist": "$t(entity.artist, {\"count\": 1}) 더 보기",
             "moreFromGeneric": "{{item}} 더 보기",
             "released": "발매"
         },
@@ -389,8 +389,8 @@
             "artistAlbums": "{{artist}}의 앨범"
         },
         "genreList": {
-            "showAlbums": "$t(entity.genre_one) $t(entity.album_other) 표시",
-            "showTracks": "$t(entity.genre_one) $t(entity.track_other) 표시"
+            "showAlbums": "$t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2}) 표시",
+            "showTracks": "$t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2}) 표시"
         },
         "globalSearch": {
             "commands": {
@@ -425,7 +425,7 @@
         "sidebar": {
             "myLibrary": "내 라이브러리",
             "nowPlaying": "재생중",
-            "shared": "공유 $t(entity.playlist_other)"
+            "shared": "공유 $t(entity.playlist, {\"count\": 2})"
         },
         "trackList": {
             "artistTracks": "{{artist}}의 음악"

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { PopoverPlayQueue } from '/@/renderer/features/now-playing/components/popover-play-queue';
 import { PlayerConfig } from '/@/renderer/features/player/components/player-config';
 import { CustomPlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
+import { SleepTimerButton } from '/@/renderer/features/player/components/sleep-timer-button';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
@@ -16,6 +17,7 @@ import {
     useAutoDJSettings,
     useCurrentServer,
     useFullScreenPlayerStore,
+    useGeneralSettings,
     useHotkeySettings,
     usePlayerData,
     usePlayerMuted,
@@ -69,13 +71,15 @@ const calculateVolumeDown = (volume: number, volumeWheelStep: number) => {
 };
 
 export const RightControls = () => {
+    const { showRatings } = useGeneralSettings();
     return (
         <Flex align="flex-end" direction="column" h="100%" px="1rem" py="0.5rem">
             <Group h="calc(100% / 3)">
-                <RatingButton />
+                {showRatings && <RatingButton />}
                 <AutoDJButton />
             </Group>
             <Group align="center" gap="xs" wrap="nowrap">
+                <SleepTimerButton />
                 <PlayerConfig />
                 <LyricsButton />
                 <FavoriteButton />

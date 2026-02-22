@@ -1,22 +1,22 @@
 {
     "action": {
-        "addToFavorites": "$t(entity.favorite_other) இல் சேர்க்கவும்",
+        "addToFavorites": "$t(entity.favorite, {\"count\": 2}) இல் சேர்க்கவும்",
         "clearQueue": "தெளிவான வரிசை",
         "goToPage": "பக்கத்திற்குச் செல்லுங்கள்",
         "moveToBottom": "கீழே செல்லுங்கள்",
         "moveToTop": "மேலே செல்லுங்கள்",
         "refresh": "$t(common.refresh)",
-        "removeFromFavorites": "$t(entity.favorite_other)இலிருந்து அகற்று",
-        "removeFromPlaylist": "$t(entity.playlist_one) இலிருந்து அகற்று",
+        "removeFromFavorites": "$t(entity.favorite, {\"count\": 2})இலிருந்து அகற்று",
+        "removeFromPlaylist": "$t(entity.playlist, {\"count\": 1}) இலிருந்து அகற்று",
         "removeFromQueue": "வரிசையிலிருந்து அகற்று",
         "setRating": "மதிப்பீட்டை அமைக்கவும்",
         "toggleSmartPlaylistEditor": "மாற்று $t(entity.smartPlaylist) ஆசிரியர்",
-        "viewPlaylists": "$t(entity.playlist_other) காண்க",
-        "addToPlaylist": "$t(entity.playlist_one)இல் சேர்க்கவும்",
-        "createPlaylist": "$t(entity.playlist_one)ஐ உருவாக்கவும்",
-        "deletePlaylist": "$t(entity.playlist_one)ஐ நீக்கு",
+        "viewPlaylists": "$t(entity.playlist, {\"count\": 2}) காண்க",
+        "addToPlaylist": "$t(entity.playlist, {\"count\": 1})இல் சேர்க்கவும்",
+        "createPlaylist": "$t(entity.playlist, {\"count\": 1})ஐ உருவாக்கவும்",
+        "deletePlaylist": "$t(entity.playlist, {\"count\": 1})ஐ நீக்கு",
         "deselectAll": "அனைத்தையும் தேர்வு செய்யுங்கள்",
-        "editPlaylist": "திருத்து $t(entity.playlist_one)",
+        "editPlaylist": "திருத்து $t(entity.playlist, {\"count\": 1})",
         "moveToNext": "அடுத்து செல்லுங்கள்",
         "openIn": {
             "lastfm": "Last.fm இல் திறந்திருக்கும்",
@@ -33,7 +33,7 @@
         "configure": "உள்ளமைக்கவும்",
         "confirm": "உறுதிப்படுத்தவும்",
         "create": "உருவாக்கு",
-        "currentSong": "தற்போதைய $t(entity.track_one)",
+        "currentSong": "தற்போதைய $t(entity.track, {\"count\": 1})",
         "decrease": "குறைவு",
         "action_one": "செயல்",
         "action_other": "செயல்கள்",
@@ -87,7 +87,7 @@
         "path": "பாதை",
         "playerMustBePaused": "வீரர் இடைநிறுத்தப்பட வேண்டும்",
         "preview": "முன்னோட்டம்",
-        "previousSong": "முந்தைய $t(entity.track_one)",
+        "previousSong": "முந்தைய $t(entity.track, {\"count\": 1})",
         "quit": "வெளியேறு",
         "random": "சீரற்ற",
         "rating": "செயல்வரம்பு",
@@ -100,7 +100,8 @@
         "save": "சேமி",
         "saveAndReplace": "சேமித்து மாற்றவும்",
         "search": "தேடல்",
-        "setting": "அமைத்தல்",
+        "setting_one": "அமைத்தல்",
+        "setting_other": "",
         "share": "பங்கு",
         "size": "அளவு",
         "sortOrder": "ஒழுங்கு",
@@ -149,7 +150,7 @@
         "play_other": "{{count}} நாடகங்கள்",
         "playlistWithCount_one": "{{count}} பிளேலிச்ட்",
         "playlistWithCount_other": "{{count}} பிளேலிச்ட்கள்",
-        "smartPlaylist": "அறிவுள்ள $t(entity.playlist_one)",
+        "smartPlaylist": "அறிவுள்ள $t(entity.playlist, {\"count\": 1})",
         "track_one": "மின்தடம்",
         "track_other": "தடங்கள்",
         "song_one": "பாடல்",
@@ -184,9 +185,9 @@
         "notificationDenied": "அறிவிப்புகளுக்கான அனுமதிகள் மறுக்கப்பட்டன. இந்த அமைப்பு எந்த விளைவையும் ஏற்படுத்தாது"
     },
     "filter": {
-        "albumArtist": "$t(entity.albumArtist_one)",
-        "albumCount": "$t(entity.album_other) எண்ணிக்கை",
-        "artist": "$t(entity.artist_one)",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+        "albumCount": "$t(entity.album, {\"count\": 2}) எண்ணிக்கை",
+        "artist": "$t(entity.artist, {\"count\": 1})",
         "biography": "சுயசரிதை",
         "bitrate": "பிட்ரேட்",
         "bpm": "பிபிஎம்",
@@ -197,14 +198,14 @@
         "playCount": "விளையாட்டு எண்ணிக்கை",
         "random": "சீரற்ற",
         "rating": "செயல்வரம்பு",
-        "album": "$t(entity.album_one)",
+        "album": "$t(entity.album, {\"count\": 1})",
         "criticRating": "விமர்சகர் மதிப்பீடு",
         "dateAdded": "தேதி சேர்க்கப்பட்டது",
         "disc": "வட்டு",
         "duration": "காலம்",
         "favorited": "பிடித்தது",
         "fromYear": "ஆண்டு முதல்",
-        "genre": "$t(entity.genre_one)",
+        "genre": "$t(entity.genre, {\"count\": 1})",
         "id": "ஐடி",
         "isCompilation": "தொகுப்பு",
         "isFavorited": "பிடித்தது",
@@ -242,17 +243,17 @@
             "title": "சேவையகத்தைச் சேர்க்கவும்"
         },
         "deletePlaylist": {
-            "input_confirm": "உறுதிப்படுத்த $t(entity.playlist_one) பெயரைத் தட்டச்சு செய்க",
-            "success": "$t(entity.playlist_one) வெற்றிகரமாக நீக்கப்பட்டது",
-            "title": "$t(entity.playlist_one)ஐ நீக்கு"
+            "input_confirm": "உறுதிப்படுத்த $t(entity.playlist, {\"count\": 1}) பெயரைத் தட்டச்சு செய்க",
+            "success": "$t(entity.playlist, {\"count\": 1}) வெற்றிகரமாக நீக்கப்பட்டது",
+            "title": "$t(entity.playlist, {\"count\": 1})ஐ நீக்கு"
         },
         "editPlaylist": {
-            "title": "திருத்து $t(entity.playlist_one)",
+            "title": "திருத்து $t(entity.playlist, {\"count\": 1})",
             "publicJellyfinNote": "சில காரணங்களால் செல்லிஃபின் ஒரு பிளேலிச்ட் பொதுவில் இல்லையா என்பதை அம்பலப்படுத்தவில்லை. இது பொதுவில் இருக்க விரும்பினால், தயவுசெய்து பின்வரும் உள்ளீட்டைத் தேர்ந்தெடுக்கவும்",
-            "success": "$t(entity.playlist_one) வெற்றிகரமாகப் புதுப்பிக்கப்பட்டது"
+            "success": "$t(entity.playlist, {\"count\": 1}) வெற்றிகரமாகப் புதுப்பிக்கப்பட்டது"
         },
         "lyricSearch": {
-            "input_artist": "$t(entity.artist_one)",
+            "input_artist": "$t(entity.artist, {\"count\": 1})",
             "input_name": "$t(common.name)",
             "title": "பாடல் தேடல்"
         },
@@ -270,18 +271,18 @@
             "createFailed": "பங்கை உருவாக்கத் தவறிவிட்டது (பகிர்வு இயக்கப்பட்டதா?)"
         },
         "createPlaylist": {
-            "success": "$t(entity.playlist_one) வெற்றிகரமாக உருவாக்கப்பட்டது",
-            "title": "$t(entity.playlist_one) ஐ உருவாக்கவும்",
+            "success": "$t(entity.playlist, {\"count\": 1}) வெற்றிகரமாக உருவாக்கப்பட்டது",
+            "title": "$t(entity.playlist, {\"count\": 1}) ஐ உருவாக்கவும்",
             "input_description": "$t(common.description)",
             "input_name": "$t(common.name)",
             "input_owner": "$t(common.owner)",
             "input_public": "பொது"
         },
         "addToPlaylist": {
-            "input_playlists": "$t(entity.playlist_other)",
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "input_skipDuplicates": "நகல்களைத் தவிர்க்கவும்",
             "success": "$t(entity.trackWithCount, {\"count\": {{message}} }) இதற்கு $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} }) சேர்க்கப்பட்டது",
-            "title": "$t(entity.playlist_one) இல் சேர்"
+            "title": "$t(entity.playlist, {\"count\": 1}) இல் சேர்"
         },
         "updateServer": {
             "success": "சேவையகம் வெற்றிகரமாக புதுப்பிக்கப்பட்டது",
@@ -295,8 +296,8 @@
             "recentReleases": "அண்மைக் கால வெளியீடுகள்",
             "viewDiscography": "டிச்கோகிராஃபி காண்க",
             "topSongs": "சிறந்த பாடல்கள்",
-            "viewAllTracks": "அனைத்தையும் காண்க $t(entity.track_other)",
-            "relatedArtists": "தொடர்புடைய $t(entity.artist_other)",
+            "viewAllTracks": "அனைத்தையும் காண்க $t(entity.track, {\"count\": 2})",
+            "relatedArtists": "தொடர்புடைய $t(entity.artist, {\"count\": 2})",
             "topSongsFrom": "{{title}} இலிருந்து சிறந்த பாடல்கள்",
             "viewAll": "அனைத்தையும் காண்க"
         },
@@ -309,7 +310,7 @@
             "openBrowserDevtools": "திறந்த உலாவி தேவ்டூல்கள்",
             "quit": "$t(common.quit)",
             "selectServer": "சேவையகத்தைத் தேர்ந்தெடுக்கவும்",
-            "settings": "$t(common.setting_other)",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "version": "பதிப்பு {{version}}"
         },
         "manageServers": {
@@ -368,9 +369,9 @@
             "related": "தொடர்புடைய"
         },
         "genreList": {
-            "showAlbums": "காட்டு $t(entity.genre_one) $t(entity.album_other)",
-            "showTracks": "காட்டு $t(entity.genre_one) $t(entity.track_other)",
-            "title": "$t(entity.genre_other)"
+            "showAlbums": "காட்டு $t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
+            "showTracks": "காட்டு $t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.genre, {\"count\": 2})"
         },
         "globalSearch": {
             "commands": {
@@ -396,7 +397,7 @@
             "reorder": "ஐடியால் வரிசைப்படுத்தும்போது மட்டுமே மறுசீரமைப்பு இயக்கப்பட்டது"
         },
         "playlistList": {
-            "title": "$t(entity.playlist_other)"
+            "title": "$t(entity.playlist, {\"count\": 2})"
         },
         "setting": {
             "advanced": "மேம்பட்ட",
@@ -406,37 +407,37 @@
             "windowTab": "சாளரம்"
         },
         "sidebar": {
-            "folders": "$t(entity.folder_other)",
-            "genres": "$t(entity.genre_other)",
+            "folders": "$t(entity.folder, {\"count\": 2})",
+            "genres": "$t(entity.genre, {\"count\": 2})",
             "home": "$t(common.home)",
             "nowPlaying": "இப்போது விளையாடுகிறது",
-            "playlists": "$t(entity.playlist_other)",
+            "playlists": "$t(entity.playlist, {\"count\": 2})",
             "search": "$t(common.search)",
-            "settings": "$t(common.setting_other)",
-            "albumArtists": "$t(entity.albumArtist_other)",
-            "albums": "$t(entity.album_other)",
-            "artists": "$t(entity.artist_other)",
-            "shared": "$t(entity.playlist_other) பகிரப்பட்டது",
-            "tracks": "$t(entity.track_other)",
+            "settings": "$t(common.setting, {\"count\": 2})",
+            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
+            "albums": "$t(entity.album, {\"count\": 2})",
+            "artists": "$t(entity.artist, {\"count\": 2})",
+            "shared": "$t(entity.playlist, {\"count\": 2}) பகிரப்பட்டது",
+            "tracks": "$t(entity.track, {\"count\": 2})",
             "myLibrary": "எனது நூலகம்"
         },
         "trackList": {
-            "title": "$t(entity.track_other)",
-            "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
+            "title": "$t(entity.track, {\"count\": 2})",
+            "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})",
             "artistTracks": "{{artist}}"
         },
         "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "இந்த $t(entity.artist_one) இலிருந்து மேலும்",
+            "moreFromArtist": "இந்த $t(entity.artist, {\"count\": 1}) இலிருந்து மேலும்",
             "moreFromGeneric": "{{item}} இலிருந்து மேலும்",
             "released": "வெளியிடப்பட்டது"
         },
         "albumList": {
             "artistAlbums": "ஆல்பங்கள் {{artist}}",
-            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
-            "title": "$t(entity.album_other)"
+            "genreAlbums": "\"{{genre}}\" $t(entity.album, {\"count\": 2})",
+            "title": "$t(entity.album, {\"count\": 2})"
         }
     },
     "player": {
@@ -564,9 +565,9 @@
         "replayGainFallback_description": "கோப்பில் {{ReplayGain}} குறிச்சொற்கள் இல்லையென்றால் விண்ணப்பிக்க DB இல் ஆதாயம்",
         "replayGainMode": "{{ReplayGain}} பயன்முறை",
         "replayGainMode_description": "{{ReplayGain}}} மதிப்புகளின் படி தொகுதி ஆதாயத்தை சரிசெய்யவும் மேனிலை தரவு கோப்பு",
-        "replayGainMode_optionAlbum": "$t(entity.album_one)",
+        "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
         "replayGainMode_optionNone": "$t(common.none)",
-        "replayGainMode_optionTrack": "$t(entity.track_one)",
+        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
         "replayGainPreamp": "{{ReplayGain}} preamp (db)",
         "replayGainPreamp_description": "{{ReplayGain}}} மதிப்புகளுக்கு பயன்படுத்தப்படும் Preamp ஆதாயத்தை சரிசெய்யவும்",
         "sampleRate": "மாதிரி வீதம்",
@@ -608,7 +609,6 @@
         "customCssEnable": "தனிப்பயன் சிஎச்எச் ஐ இயக்கவும்",
         "customCssNotice": "எச்சரிக்கை: சில சுத்திகரிப்பு (URL () மற்றும் உள்ளடக்கத்தை அனுமதிக்காதது :) இருக்கும்போது, தனிப்பயன் சிஎச்எச் ஐப் பயன்படுத்துவது இடைமுகத்தை மாற்றுவதன் மூலம் ஆபத்துக்களை ஏற்படுத்தக்கூடும்",
         "contextMenu_description": "நீங்கள் ஒரு உருப்படியை வலது சொடுக்கு செய்யும் போது பட்டியலில் காட்டப்பட்டுள்ள உருப்படிகளை மறைக்க உங்களை அனுமதிக்கிறது. சரிபார்க்கப்படாத உருப்படிகள் மறைக்கப்படும்",
-        "disableAutomaticUpdates": "தானியங்கி புதுப்பிப்புகளை முடக்கு",
         "discordApplicationId_description": "{{discord}} பணக்கார இருப்புக்கான பயன்பாட்டு ஐடி (இயல்புநிலை {{defaultId}})",
         "discordIdleStatus": "பணக்கார இருப்பு செயலற்ற நிலையைக் காட்டுங்கள்",
         "discordIdleStatus_description": "இயக்கப்பட்டால், பிளேயர் சும்மா இருக்கும்போது நிலையைப் புதுப்பிக்கவும்",
@@ -702,8 +702,8 @@
     "table": {
         "config": {
             "label": {
-                "album": "$t(entity.album_one)",
-                "artist": "$t(entity.artist_one)",
+                "album": "$t(entity.album, {\"count\": 1})",
+                "artist": "$t(entity.artist, {\"count\": 1})",
                 "biography": "$t(common.biography)",
                 "bitrate": "$t(common.bitrate)",
                 "bpm": "$t(common.bpm)",
@@ -720,14 +720,14 @@
                 "note": "$t(common.note)",
                 "owner": "$t(common.owner)",
                 "actions": "$t(common.action_other)",
-                "albumArtist": "$t(entity.albumArtist_one)",
+                "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
                 "discNumber": "வட்டு எண்",
                 "duration": "$t(common.duration)",
                 "favorite": "$t(common.favorite)",
-                "genre": "$t(entity.genre_one)",
+                "genre": "$t(entity.genre, {\"count\": 1})",
                 "path": "$t(common.path)",
                 "playCount": "விளையாட்டு எண்ணிக்கை",
-                "songCount": "$t(entity.track_other)",
+                "songCount": "$t(entity.track, {\"count\": 2})",
                 "title": "$t(common.title)",
                 "titleCombined": "$t(common.title) (இணைந்தது)"
             },
@@ -750,8 +750,8 @@
         "column": {
             "album": "ஆல்பம்",
             "albumArtist": "ஆல்பம் கலைஞர்",
-            "albumCount": "$t(entity.album_other)",
-            "artist": "$t(entity.artist_one)",
+            "albumCount": "$t(entity.album, {\"count\": 2})",
+            "artist": "$t(entity.artist, {\"count\": 1})",
             "biography": "சுயசரிதை",
             "bitrate": "பிட்ரேட்",
             "bpm": "பிபிஎம்",
@@ -761,7 +761,7 @@
             "dateAdded": "தேதி சேர்க்கப்பட்டது",
             "discNumber": "வட்டு",
             "favorite": "பிடித்த",
-            "genre": "$t(entity.genre_one)",
+            "genre": "$t(entity.genre, {\"count\": 1})",
             "lastPlayed": "கடைசியாக விளையாடியது",
             "path": "பாதை",
             "playCount": "நாடகங்கள்",
@@ -769,7 +769,7 @@
             "releaseDate": "வெளியீட்டு தேதி",
             "releaseYear": "ஆண்டு",
             "size": "$t(common.size)",
-            "songCount": "$t(entity.track_other)",
+            "songCount": "$t(entity.track, {\"count\": 2})",
             "title": "தலைப்பு",
             "trackNumber": "மின்தடம்"
         }

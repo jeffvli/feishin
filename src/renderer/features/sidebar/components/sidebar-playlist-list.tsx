@@ -23,6 +23,7 @@ import {
     useCurrentServer,
     useCurrentServerId,
     usePermissions,
+    useSidebarPlaylistListFilterRegex,
     useSidebarPlaylistSorting,
 } from '/@/renderer/store';
 import { formatDurationString } from '/@/renderer/utils';
@@ -357,6 +358,7 @@ export const SidebarPlaylistList = () => {
     const { t } = useTranslation();
     const server = useCurrentServer();
     const sidebarPlaylistSorting = useSidebarPlaylistSorting();
+    const filterRegex = useSidebarPlaylistListFilterRegex();
 
     const playlistsQuery = useQuery(
         playlistsQueries.list({
@@ -400,10 +402,23 @@ export const SidebarPlaylistList = () => {
             return { ...base, items: playlistsQuery.data?.items };
         }
 
+        let regex: null | RegExp = null;
+        if (filterRegex) {
+            try {
+                regex = new RegExp(filterRegex, 'i');
+            } catch {
+                // Invalid regex, ignore filtering
+            }
+        }
+
         const ownedPlaylistItems: Array<Playlist> = [];
 
         for (const playlist of playlistsQuery.data?.items ?? []) {
             if (!playlist.owner || playlist.owner === server.username) {
+                // Filter out playlists that match the regex
+                if (regex && regex.test(playlist.name)) {
+                    continue;
+                }
                 ownedPlaylistItems.push(playlist);
             }
         }
@@ -429,6 +444,7 @@ export const SidebarPlaylistList = () => {
         server.username,
         sidebarPlaylistSorting,
         playlistOrder,
+        filterRegex,
     ]);
 
     const handleReorder = (
@@ -533,6 +549,7 @@ export const SidebarSharedPlaylistList = () => {
     const { t } = useTranslation();
     const server = useCurrentServer();
     const sidebarPlaylistSorting = useSidebarPlaylistSorting();
+    const filterRegex = useSidebarPlaylistListFilterRegex();
 
     const playlistsQuery = useQuery(
         playlistsQueries.list({
@@ -580,10 +597,23 @@ export const SidebarSharedPlaylistList = () => {
             return { ...base, items: playlistsQuery.data?.items };
         }
 
+        let regex: null | RegExp = null;
+        if (filterRegex) {
+            try {
+                regex = new RegExp(filterRegex, 'i');
+            } catch {
+                // Invalid regex, ignore filtering
+            }
+        }
+
         const sharedPlaylistItems: Array<Playlist> = [];
 
         for (const playlist of playlistsQuery.data?.items ?? []) {
             if (playlist.owner && playlist.owner !== server.username) {
+                // Filter out playlists that match the regex
+                if (regex && regex.test(playlist.name)) {
+                    continue;
+                }
                 sharedPlaylistItems.push(playlist);
             }
         }
@@ -609,6 +639,7 @@ export const SidebarSharedPlaylistList = () => {
         server.username,
         sidebarPlaylistSorting,
         playlistOrder,
+        filterRegex,
     ]);
 
     const handleReorder = (

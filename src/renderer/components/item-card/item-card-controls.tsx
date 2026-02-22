@@ -19,6 +19,7 @@ import {
     Album,
     AlbumArtist,
     Artist,
+    Genre,
     LibraryItem,
     Playlist,
     ServerType,
@@ -30,7 +31,7 @@ interface ItemCardControlsProps {
     controls?: ItemControls;
     enableExpansion?: boolean;
     internalState?: ItemListStateActions;
-    item: Album | AlbumArtist | Artist | Playlist | Song | undefined;
+    item: Album | AlbumArtist | Artist | Genre | Playlist | Song | undefined;
     itemType: LibraryItem;
     showRating: boolean;
     type?: 'compact' | 'default' | 'poster';
@@ -60,7 +61,7 @@ const containerProps = {
 const createPlayHandler =
     (
         controls: ItemControls | undefined,
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+        item: Album | AlbumArtist | Artist | Genre | Playlist | Song | undefined,
         internalState: ItemListStateActions | undefined,
         itemType: LibraryItem,
         playType: Play,
@@ -108,7 +109,7 @@ const createPlayHandler =
 const createFavoriteHandler =
     (
         controls: ItemControls | undefined,
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+        item: Album | AlbumArtist | Artist | Genre | Playlist | Song | undefined,
         internalState: ItemListStateActions | undefined,
         itemType: LibraryItem,
     ) =>
@@ -133,7 +134,7 @@ const createFavoriteHandler =
 const createRatingChangeHandler =
     (
         controls: ItemControls | undefined,
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+        item: Album | AlbumArtist | Artist | Genre | Playlist | Song | undefined,
         internalState: ItemListStateActions | undefined,
         itemType: LibraryItem,
     ) =>
@@ -165,7 +166,7 @@ const moreDoubleClickHandler = (e: MouseEvent<HTMLButtonElement>) => {
 const createMoreHandler =
     (
         controls: ItemControls | undefined,
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+        item: Album | AlbumArtist | Artist | Genre | Playlist | Song | undefined,
         internalState: ItemListStateActions | undefined,
         itemType: LibraryItem,
     ) =>
@@ -183,7 +184,7 @@ const createMoreHandler =
 const createExpandHandler =
     (
         controls: ItemControls | undefined,
-        item: Album | AlbumArtist | Artist | Playlist | Song | undefined,
+        item: Album | AlbumArtist | Artist | Genre | Playlist | Song | undefined,
         internalState: ItemListStateActions | undefined,
         itemType: LibraryItem,
     ) =>

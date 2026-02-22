@@ -1,4 +1,5 @@
 import {
+    useMutation,
     useQuery,
     useQueryClient,
     useSuspenseQuery,
@@ -10,6 +11,7 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
+import { getListRefreshMutationKey } from '/@/renderer/features/shared/components/list-refresh-button';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const getQueryKeyName = (itemType: LibraryItem): string => {
@@ -83,7 +85,7 @@ export const useItemListPaginatedLoader = ({
         [itemsPerPage, startIndex, query],
     );
 
-    const { data, refetch: queryRefetch } = useQuery({
+    const { data } = useQuery({
         gcTime: 1000 * 15,
         placeholderData: { items: getInitialData(itemsPerPage) },
         queryFn: async ({ signal }) => {
@@ -98,11 +100,9 @@ export const useItemListPaginatedLoader = ({
         staleTime: 1000 * 15,
     });
 
-    const refresh = useCallback(
-        async (force?: boolean) => {
+    const refreshMutation = useMutation({
+        mutationFn: async (force?: boolean) => {
             const queryKey = queryKeys[getQueryKeyName(itemType)].list(serverId, queryParams);
-
-            await queryClient.invalidateQueries();
 
             if (force) {
                 queryClient.setQueryData(queryKey, {
@@ -110,10 +110,10 @@ export const useItemListPaginatedLoader = ({
                 });
             }
 
-            return queryRefetch();
+            await queryClient.invalidateQueries();
         },
-        [queryClient, queryRefetch, queryParams, serverId, itemType, itemsPerPage],
-    );
+        mutationKey: getListRefreshMutationKey(eventKey ?? 'paginated'),
+    });
 
     const updateItems = useCallback(
         (indexes: number[], value: object) => {
@@ -153,7 +153,7 @@ export const useItemListPaginatedLoader = ({
                 return;
             }
 
-            return refresh(true);
+            refreshMutation.mutate(true);
         };
 
         const handleFavorite = (payload: UserFavoriteEventPayload) => {
@@ -220,7 +220,7 @@ export const useItemListPaginatedLoader = ({
             eventEmitter.off('USER_FAVORITE', handleFavorite);
             eventEmitter.off('USER_RATING', handleRating);
         };
-    }, [data, eventKey, itemType, serverId, refresh, updateItems]);
+    }, [data, eventKey, itemType, refreshMutation, serverId, updateItems]);
 
     return { data: data?.items || [], pageCount, totalItemCount };
 };

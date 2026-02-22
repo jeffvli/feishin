@@ -345,8 +345,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
 
         openContextModal({
             innerProps: {
-                itemIds: items,
-                resourceType: itemType,
+                ...modalProps,
             },
             modalKey: 'addToPlaylist',
             size: 'lg',

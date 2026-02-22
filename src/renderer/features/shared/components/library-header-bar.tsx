@@ -41,6 +41,7 @@ interface HeaderPlayButtonProps {
 
 interface TitleProps {
     children: ReactNode;
+    order?: number;
 }
 
 const HeaderPlayButton = ({
@@ -100,9 +101,9 @@ const HeaderPlayButton = ({
     );
 };
 
-const Title = ({ children }: TitleProps) => {
+const Title = ({ children, order = 1 }: TitleProps) => {
     return (
-        <TextTitle fw={700} order={1} overflow="hidden">
+        <TextTitle fw={700} order={order as any} overflow="hidden">
             {children}
         </TextTitle>
     );

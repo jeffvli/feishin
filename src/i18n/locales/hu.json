@@ -1,26 +1,26 @@
 {
     "action": {
         "moveToNext": "ugrás a következőre",
-        "deletePlaylist": "$t(entity.playlist_one) törlése",
-        "removeFromFavorites": "eltávolítás innen $t(entity.favorite_other)",
+        "deletePlaylist": "$t(entity.playlist, {\"count\": 1}) törlése",
+        "removeFromFavorites": "eltávolítás innen $t(entity.favorite, {\"count\": 2})",
         "setRating": "értékelés",
-        "viewPlaylists": "$t(entity.playlist_other) megtekintése",
+        "viewPlaylists": "$t(entity.playlist, {\"count\": 2}) megtekintése",
         "openIn": {
             "lastfm": "Megnyitás Last.fm-ben",
             "musicbrainz": "Megnyitás MusicBrainz-ben"
         },
         "clearQueue": "műsorlista kiürítése",
-        "createPlaylist": "$t(entity.playlist_one) létrehozása",
+        "createPlaylist": "$t(entity.playlist, {\"count\": 1}) létrehozása",
         "deselectAll": "kijelölés törlése",
-        "editPlaylist": "$t(entity.playlist_one) szerkesztése",
+        "editPlaylist": "$t(entity.playlist, {\"count\": 1}) szerkesztése",
         "goToPage": "menj az oldalra",
         "moveToBottom": "ugrás az aljára",
         "moveToTop": "ugrás a tetejére",
-        "removeFromPlaylist": "eltávolítás innen $t(entity.playlist_one)",
+        "removeFromPlaylist": "eltávolítás innen $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "eltávolítás a műsorlistáról",
         "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist) szerkesztője",
-        "addToFavorites": "$t(entity.favorite_other) kedvelése",
-        "addToPlaylist": "hozzáadás lejátszási listához: $t(entity.playlist_one)",
+        "addToFavorites": "$t(entity.favorite, {\"count\": 2}) kedvelése",
+        "addToPlaylist": "hozzáadás lejátszási listához: $t(entity.playlist, {\"count\": 1})",
         "refresh": "$t(common.refresh)",
         "downloadStarted": "megkezdődött {{count}} elem letöltése",
         "moveItems": "elemek mozgatása",
@@ -33,15 +33,15 @@
         "holdToMoveToTop": "hosszan nyomva felülre mozgat",
         "holdToMoveToBottom": "hosszan nyomva lejjebb mozgat",
         "selectAll": "összes kijelölése",
-        "deleteRadioStation": "$t(entity.radioStation_one) törlése",
-        "createRadioStation": "$t(entity.radioStation_one) létrehozása",
+        "deleteRadioStation": "$t(entity.radioStation, {\"count\": 1}) törlése",
+        "createRadioStation": "$t(entity.radioStation, {\"count\": 1}) létrehozása",
         "openApplicationDirectory": "app könyvtár megnyitása",
         "addOrRemoveFromSelection": "hozzáadás vagy eltávolítás a kiválasztásból",
         "selectRangeOfItems": "válaszd ki a tartományt"
     },
     "common": {
         "collapse": "összecsukás",
-        "currentSong": "jelenlegi: $t(entity.track_one)",
+        "currentSong": "jelenlegi: $t(entity.track, {\"count\": 1})",
         "no": "nem",
         "close": "bezárás",
         "confirm": "rendben",
@@ -100,7 +100,7 @@
         "path": "elérési út",
         "playerMustBePaused": "a lejátszónak szüneteltetve kell lennie",
         "preview": "előnézet",
-        "previousSong": "előző $t(entity.track_one)",
+        "previousSong": "előző $t(entity.track, {\"count\": 1})",
         "quit": "kilépés",
         "random": "véletlenszerű",
         "refresh": "frissítés",
@@ -116,7 +116,8 @@
         "yes": "igen",
         "none": "egyik sem",
         "restartRequired": "újraindítás szükséges",
-        "setting": "beállítás",
+        "setting_one": "beállítás",
+        "setting_other": "",
         "translation": "fordítás",
         "rating": "értékelés",
         "reload": "újratöltés",
@@ -176,7 +177,7 @@
         "song_other": "dalok",
         "album_one": "album",
         "album_other": "albumok",
-        "smartPlaylist": "intelligens $t(entity.playlist_one)",
+        "smartPlaylist": "intelligens $t(entity.playlist, {\"count\": 1})",
         "artistWithCount_one": "{{count}} előadó",
         "artistWithCount_other": "{{count}} előadók",
         "playlist_one": "lejátszási lista",
@@ -228,7 +229,7 @@
         "multipleServerSaveQueueError": "a műsorlistában egy vagy több olyan dal található, amely nem az aktuális szerverről származik. Ez nem támogatott"
     },
     "filter": {
-        "albumCount": "$t(entity.album_other) darab",
+        "albumCount": "$t(entity.album, {\"count\": 2}) darab",
         "bitrate": "bitráta",
         "comment": "megjegyzés",
         "dateAdded": "hozzáadás ideje",
@@ -249,9 +250,9 @@
         "disc": "lemez",
         "criticRating": "kritikusok értékelése",
         "communityRating": "közösségi értékelés",
-        "albumArtist": "$t(entity.albumArtist_one)",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
         "biography": "életrajz",
-        "album": "$t(entity.album_one)",
+        "album": "$t(entity.album, {\"count\": 1})",
         "favorited": "kedvelt",
         "isRecentlyPlayed": "mostanában lejátszott",
         "name": "név",
@@ -266,10 +267,10 @@
         "path": "elérési út",
         "toYear": "évhez",
         "trackNumber": "sáv",
-        "artist": "$t(entity.artist_one)",
+        "artist": "$t(entity.artist, {\"count\": 1})",
         "bpm": "bpm",
         "channels": "$t(common.channel_other)",
-        "genre": "$t(entity.genre_one)",
+        "genre": "$t(entity.genre, {\"count\": 1})",
         "explicitStatus": "$t(common.explicitStatus)"
     },
     "form": {
@@ -290,33 +291,33 @@
         },
         "addToPlaylist": {
             "input_skipDuplicates": "duplikátumok átugrása",
-            "input_playlists": "$t(entity.playlist_other)",
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "success": "hozzáadtuk ezt: $t(entity.trackWithCount, {\"count\": {{message}} }) a következőhöz: $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
-            "title": "hozzáadás a következőhöz: $t(entity.playlist_one)",
-            "create": "létrehoz $t(entity.playlist_one) {{playlist}}",
-            "searchOrCreate": "keresés $t(entity.playlist_other) vagy új létrehozása"
+            "title": "hozzáadás a következőhöz: $t(entity.playlist, {\"count\": 1})",
+            "create": "létrehoz $t(entity.playlist, {\"count\": 1}) {{playlist}}",
+            "searchOrCreate": "keresés $t(entity.playlist, {\"count\": 2}) vagy új létrehozása"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
             "input_name": "$t(common.name)",
             "input_owner": "$t(common.owner)",
             "input_public": "publikus",
-            "title": "$t(entity.playlist_one) létrehozása",
-            "success": "$t(entity.playlist_one) sikeresen létrehozva"
+            "title": "$t(entity.playlist, {\"count\": 1}) létrehozása",
+            "success": "$t(entity.playlist, {\"count\": 1}) sikeresen létrehozva"
         },
         "deletePlaylist": {
-            "input_confirm": "a megerősítéshez írd be a(z) $t(entity.playlist_one) nevét",
-            "success": "$t(entity.playlist_one) sikeresen törölve",
-            "title": "$t(entity.playlist_one) törlése"
+            "input_confirm": "a megerősítéshez írd be a(z) $t(entity.playlist, {\"count\": 1}) nevét",
+            "success": "$t(entity.playlist, {\"count\": 1}) sikeresen törölve",
+            "title": "$t(entity.playlist, {\"count\": 1}) törlése"
         },
         "editPlaylist": {
-            "success": "$t(entity.playlist_one) sikeresen módosítva",
+            "success": "$t(entity.playlist, {\"count\": 1}) sikeresen módosítva",
             "publicJellyfinNote": "A Jellyfin valamiért nem teszi közzé, hogy egy lejátszási lista publikus-e vagy sem. Amennyiben azt szeretnéd, hogy publikus maradjon, válaszd ki az alábbi beviteli mezőt",
-            "title": "szerkesztés $t(entity.playlist_one)",
+            "title": "szerkesztés $t(entity.playlist, {\"count\": 1})",
             "editNote": "A kézi szerkesztés nem ajánlott nagy lejátszási listák esetén. Biztosan vállalod a meglévő lejátszási lista felülírásával járó adatvesztés kockázatát?"
         },
         "lyricSearch": {
-            "input_artist": "$t(entity.artist_one)",
+            "input_artist": "$t(entity.artist, {\"count\": 1})",
             "input_name": "$t(common.name)",
             "title": "dalszöveg kereső"
         },
@@ -352,7 +353,7 @@
         },
         "shuffleAll": {
             "title": "véletlenszerű lejátszás",
-            "input_genre": "$t(entity.genre_one)",
+            "input_genre": "$t(entity.genre, {\"count\": 1})",
             "input_limit": "Hány dal?",
             "input_minYear": "ettől az évtől",
             "input_maxYear": "eddig az évig",
@@ -383,24 +384,24 @@
             "appearsOn": "megjelenik",
             "recentReleases": "legújabb kiadványok",
             "viewDiscography": "Diszkográfia megtekintése",
-            "relatedArtists": "kapcsolódik $t(entity.artist_other)",
+            "relatedArtists": "kapcsolódik $t(entity.artist, {\"count\": 2})",
             "topSongs": "sláger dalok",
             "topSongsFrom": "sláger dalok tőle {{title}}",
             "viewAll": "mindet megtekint",
-            "viewAllTracks": "mindet megtekint $t(entity.track_other)"
+            "viewAllTracks": "mindet megtekint $t(entity.track, {\"count\": 2})"
         },
         "albumArtistList": {
-            "title": "$t(entity.albumArtist_other)"
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "még több ettől $t(entity.artist_one)",
+            "moreFromArtist": "még több ettől $t(entity.artist, {\"count\": 1})",
             "moreFromGeneric": "Még több {{item}}",
             "released": "megjelent"
         },
         "albumList": {
             "artistAlbums": "albumok tőle {{artist}}",
-            "genreAlbums": "\"{{genre}}\" $t(entity.album_other)",
-            "title": "$t(entity.album_other)"
+            "genreAlbums": "\"{{genre}}\" $t(entity.album, {\"count\": 2})",
+            "title": "$t(entity.album, {\"count\": 2})"
         },
         "appMenu": {
             "collapseSidebar": "oldalsáv",
@@ -413,7 +414,7 @@
             "openBrowserDevtools": "Fejlesztői eszközök",
             "quit": "$t(common.quit)",
             "selectServer": "Szerver választása",
-            "settings": "$t(common.setting_other)",
+            "settings": "$t(common.setting, {\"count\": 2})",
             "version": "verzió {{version}}",
             "selectMusicFolder": "zene mappa kiválasztása",
             "noMusicFolder": "nincs zene mappa kiválasztva",
@@ -450,8 +451,8 @@
             "setRating": "$t(action.setRating)",
             "playShuffled": "$t(player.shuffle)",
             "shareItem": "Megosztás",
-            "goToAlbum": "menj az $t(entity.album_one)",
-            "goToAlbumArtist": "menj a $t(entity.albumArtist_one)",
+            "goToAlbum": "menj az $t(entity.album, {\"count\": 1})",
+            "goToAlbumArtist": "menj a $t(entity.albumArtist, {\"count\": 1})",
             "showDetails": "info",
             "moveItems": "$t(action.moveItems)",
             "goTo": "menj"
@@ -480,9 +481,9 @@
             "noLyrics": "nem található dalszöveg"
         },
         "genreList": {
-            "showAlbums": "mutasd a $t(entity.genre_one) $t(entity.album_other)",
-            "showTracks": "mutasd a $t(entity.genre_one) $t(entity.track_other)",
-            "title": "$t(entity.genre_other)"
+            "showAlbums": "mutasd a $t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
+            "showTracks": "mutasd a $t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.genre, {\"count\": 2})"
         },
         "globalSearch": {
             "commands": {
@@ -499,7 +500,7 @@
             "recentlyPlayed": "nemrég játszott",
             "recentlyReleased": "nemrég megjelent",
             "title": "$t(common.home)",
-            "genres": "$t(entity.genre_other)"
+            "genres": "$t(entity.genre, {\"count\": 2})"
         },
         "itemDetail": {
             "copyPath": "másolja az útvonalat a vágólapra",
@@ -510,7 +511,7 @@
             "reorder": "átrendezés csak ID szerinti rendezés esetén engedélyezett"
         },
         "playlistList": {
-            "title": "$t(entity.playlist_other)"
+            "title": "$t(entity.playlist, {\"count\": 2})"
         },
         "setting": {
             "advanced": "haladó",
@@ -537,32 +538,32 @@
             "logger": "naplózó"
         },
         "sidebar": {
-            "albumArtists": "$t(entity.albumArtist_other)",
-            "albums": "$t(entity.album_other)",
-            "artists": "$t(entity.artist_other)",
-            "folders": "$t(entity.folder_other)",
-            "genres": "$t(entity.genre_other)",
+            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
+            "albums": "$t(entity.album, {\"count\": 2})",
+            "artists": "$t(entity.artist, {\"count\": 2})",
+            "folders": "$t(entity.folder, {\"count\": 2})",
+            "genres": "$t(entity.genre, {\"count\": 2})",
             "home": "$t(common.home)",
             "myLibrary": "Könyvtáram",
             "nowPlaying": "most játszott",
-            "playlists": "$t(entity.playlist_other)",
+            "playlists": "$t(entity.playlist, {\"count\": 2})",
             "search": "$t(common.search)",
-            "settings": "$t(common.setting_other)",
-            "shared": "megosztott $t(entity.playlist_other)",
-            "tracks": "$t(entity.track_other)",
-            "favorites": "$t(entity.favorite_other)",
-            "radio": "$t(entity.radioStation_other)"
+            "settings": "$t(common.setting, {\"count\": 2})",
+            "shared": "megosztott $t(entity.playlist, {\"count\": 2})",
+            "tracks": "$t(entity.track, {\"count\": 2})",
+            "favorites": "$t(entity.favorite, {\"count\": 2})",
+            "radio": "$t(entity.radioStation, {\"count\": 2})"
         },
         "trackList": {
             "artistTracks": "dalok tőle {{artist}}",
-            "genreTracks": "\"{{genre}}\" $t(entity.track_other)",
-            "title": "$t(entity.track_other)"
+            "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.track, {\"count\": 2})"
         },
         "favorites": {
-            "title": "$t(entity.favorite_other)"
+            "title": "$t(entity.favorite, {\"count\": 2})"
         },
         "folderList": {
-            "title": "$t(entity.folder_other)"
+            "title": "$t(entity.folder, {\"count\": 2})"
         },
         "radioList": {
             "title": "rádió állomások"
@@ -609,7 +610,7 @@
     },
     "releaseType": {
         "primary": {
-            "album": "$t(entity.album_one)",
+            "album": "$t(entity.album, {\"count\": 1})",
             "broadcast": "sugárzás",
             "ep": "ep",
             "other": "más",
@@ -665,7 +666,6 @@
         "customCss": "egyéni css",
         "customCssEnable_description": "lehetővé teszi az egyéni css írását",
         "customCssEnable": "egyéni css engedélyezése",
-        "disableAutomaticUpdates": "automatikus frissítés kikapcsolása",
         "customFontPath": "egyéni betűtípus elérési út",
         "customCss_description": "egyéni css tartalom. Megjegyzés: a tartalom és a távoli URL-ek nem megengedett tulajdonságok. A tartalom előnézete az alábbiakban látható. A tisztítás miatt további mezők is megjelennek, amelyeket te nem állítottál be",
         "customCssNotice": "Figyelem: bár van némi tisztítás (az url() és a content: használata nem engedélyezett), az egyéni css használata továbbra is kockázatot jelenthet, mivel megváltoztatja a felületet",
@@ -824,9 +824,9 @@
         "passwordStore_description": "jelszó/titkos tároló kiválasztása. Módosítsd, ha problémát tapasztalsz a jelszavak tárolásánál",
         "passwordStore": "jelszó/titkos tároló",
         "playbackStyle_optionCrossFade": "áthúzás",
-        "replayGainMode_optionAlbum": "$t(entity.album_one)",
+        "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
         "replayGainMode_optionNone": "$t(common.none)",
-        "replayGainMode_optionTrack": "$t(entity.track_one)",
+        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
         "replayGainMode": "{{ReplayGain}} mód",
         "replayGainClipping_description": "A {{ReplayGain}} által okozott torzítás megelőzése az erősítés automatikus csökkentésével",
         "replayGainClipping": "{{ReplayGain}} torzítás",
@@ -947,17 +947,17 @@
                 "releaseDate": "megjelenés dátuma",
                 "rowIndex": "sor index",
                 "size": "$t(common.size)",
-                "songCount": "$t(entity.track_other)",
+                "songCount": "$t(entity.track, {\"count\": 2})",
                 "title": "$t(common.title)",
                 "titleCombined": "$t(common.title) (kombinált)",
                 "trackNumber": "szám",
                 "year": "$t(common.year)",
-                "genre": "$t(entity.genre_one)",
+                "genre": "$t(entity.genre, {\"count\": 1})",
                 "lastPlayed": "utoljára játszott",
                 "note": "$t(common.note)",
                 "owner": "$t(common.owner)",
-                "albumArtist": "$t(entity.albumArtist_one)",
-                "artist": "$t(entity.artist_one)",
+                "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+                "artist": "$t(entity.artist, {\"count\": 1})",
                 "biography": "$t(common.biography)",
                 "bitrate": "$t(common.bitrate)",
                 "bpm": "$t(common.bpm)",
@@ -968,9 +968,9 @@
                 "duration": "$t(common.duration)",
                 "favorite": "$t(common.favorite)",
                 "actions": "$t(common.action_other)",
-                "album": "$t(entity.album_one)",
-                "albumCount": "$t(entity.album_other)",
-                "genreBadge": "$t(entity.genre_one) (jelvények)",
+                "album": "$t(entity.album, {\"count\": 1})",
+                "albumCount": "$t(entity.album, {\"count\": 2})",
+                "genreBadge": "$t(entity.genre, {\"count\": 1}) (jelvények)",
                 "image": "kép",
                 "bitDepth": "$t(common.bitDepth)",
                 "sampleRate": "$t(common.sampleRate)"
@@ -1013,8 +1013,8 @@
             }
         },
         "column": {
-            "albumCount": "$t(entity.album_other)",
-            "artist": "$t(entity.artist_one)",
+            "albumCount": "$t(entity.album, {\"count\": 2})",
+            "artist": "$t(entity.artist, {\"count\": 1})",
             "biography": "életrajz",
             "bitrate": "bitráta",
             "bpm": "bpm",
@@ -1024,7 +1024,7 @@
             "dateAdded": "hozzáadva",
             "discNumber": "lemez",
             "favorite": "kedvenc",
-            "genre": "$t(entity.genre_one)",
+            "genre": "$t(entity.genre, {\"count\": 1})",
             "lastPlayed": "utoljára játszott",
             "path": "elérési út",
             "playCount": "lejátszások",
@@ -1032,7 +1032,7 @@
             "releaseDate": "megjelenés",
             "releaseYear": "év",
             "size": "$t(common.size)",
-            "songCount": "$t(entity.track_other)",
+            "songCount": "$t(entity.track, {\"count\": 2})",
             "title": "cím",
             "trackNumber": "sáv",
             "album": "album",

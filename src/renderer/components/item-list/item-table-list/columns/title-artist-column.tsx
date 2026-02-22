@@ -13,6 +13,7 @@ import {
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { useIsActiveRow } from '/@/renderer/components/item-list/item-table-list/item-table-list-context';
 import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
+import { ExplicitIndicator } from '/@/shared/components/explicit-indicator/explicit-indicator';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { Folder, LibraryItem, QueueSong } from '/@/shared/types/domain-types';
@@ -52,6 +53,7 @@ export const DefaultTitleArtistColumn = (props: ItemTableListInnerColumn) => {
                     })}
                 >
                     <Text className={styles.title} isNoSelect size="md" {...titleLinkProps}>
+                        <ExplicitIndicator explicitStatus={item?.explicitStatus} />
                         {item.name as string}
                     </Text>
                     <div className={styles.artists}>
@@ -120,6 +122,7 @@ export const QueueSongTitleArtistColumn = (props: ItemTableListInnerColumn) => {
                         size="md"
                         {...titleLinkProps}
                     >
+                        <ExplicitIndicator explicitStatus={song?.explicitStatus} />
                         {row.name as string}
                         {song?.trackSubtitle && props.itemType !== LibraryItem.QUEUE_SONG && (
                             <Text

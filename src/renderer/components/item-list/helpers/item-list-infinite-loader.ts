@@ -1,4 +1,5 @@
 import {
+    useMutation,
     useQuery,
     useQueryClient,
     useSuspenseQuery,
@@ -11,6 +12,7 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
+import { getListRefreshMutationKey } from '/@/renderer/features/shared/components/list-refresh-button';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 export const getListQueryKeyName = (itemType: LibraryItem): string => {
@@ -293,10 +295,10 @@ export const useItemListInfiniteLoader = ({
         [onRangeChangedBase],
     );
 
-    const refresh = useCallback(
-        async (force?: boolean) => {
+    const refreshMutation = useMutation({
+        mutationFn: async (force?: boolean) => {
             // Invalidate all queries to ensure fresh data
-            await queryClient.invalidateQueries();
+            queryClient.invalidateQueries();
 
             // Reset the infinite list data
             const currentData = queryClient.getQueryData<{
@@ -320,7 +322,7 @@ export const useItemListInfiniteLoader = ({
             }
 
             // Add a delay to make the refresh visually clear
-            await new Promise((resolve) => setTimeout(resolve, 150));
+            // await new Promise((resolve) => setTimeout(resolve, 150));
 
             // Determine which page to refetch based on current visible range
             let pageToFetch = 0;
@@ -344,7 +346,12 @@ export const useItemListInfiniteLoader = ({
                 stopIndex,
             });
         },
-        [queryClient, itemsPerPage, onRangeChangedBase, dataQueryKey, totalItemCount, fetchPage],
+        mutationKey: getListRefreshMutationKey(eventKey),
+    });
+
+    const refresh = useCallback(
+        async (force?: boolean) => refreshMutation.mutateAsync(force),
+        [refreshMutation],
     );
 
     const updateItems = useCallback(
@@ -376,7 +383,7 @@ export const useItemListInfiniteLoader = ({
                 return;
             }
 
-            return refresh(true);
+            refreshMutation.mutate(true);
         };
 
         eventEmitter.on('ITEM_LIST_REFRESH', handleRefresh);
@@ -384,7 +391,7 @@ export const useItemListInfiniteLoader = ({
         return () => {
             eventEmitter.off('ITEM_LIST_REFRESH', handleRefresh);
         };
-    }, [eventKey, refresh]);
+    }, [eventKey, refreshMutation]);
 
     useEffect(() => {
         const handleFavorite = (payload: UserFavoriteEventPayload) => {

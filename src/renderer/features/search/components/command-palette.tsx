@@ -166,6 +166,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                                 >
                                     {({ isHighlighted }) => (
                                         <LibraryCommandItem
+                                            explicitStatus={album.explicitStatus}
                                             id={album.id}
                                             imageId={album.imageId}
                                             imageUrl={album.imageUrl}
@@ -238,6 +239,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                                 >
                                     {({ isHighlighted }) => (
                                         <LibraryCommandItem
+                                            explicitStatus={song.explicitStatus}
                                             id={song.id}
                                             imageId={song.imageId}
                                             imageUrl={song.imageUrl}

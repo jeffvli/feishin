@@ -1,0 +1,45 @@
+.root {
+    font-family:
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Segoe UI Symbol', Twemoji,
+        sans-serif;
+}
+
+.size-xs {
+    font-size: var(--theme-font-size-xs);
+}
+
+.size-sm {
+    font-size: var(--theme-font-size-sm);
+}
+
+.size-md {
+    font-size: var(--theme-font-size-md);
+}
+
+.size-lg {
+    font-size: var(--theme-font-size-lg);
+}
+
+.size-xl {
+    font-size: var(--theme-font-size-xl);
+}
+
+.size-2xl {
+    font-size: var(--theme-font-size-2xl);
+}
+
+.size-3xl {
+    font-size: var(--theme-font-size-3xl);
+}
+
+.size-4xl {
+    font-size: var(--theme-font-size-4xl);
+}
+
+.muted {
+    opacity: 0.85;
+}
+
+.with-space {
+    padding-right: var(--theme-spacing-sm);
+}

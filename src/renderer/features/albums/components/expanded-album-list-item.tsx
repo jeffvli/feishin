@@ -22,6 +22,7 @@ import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { PlayButtonGroup } from '/@/renderer/features/shared/components/play-button-group';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
+import { useSetGlobalExpanded } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
@@ -30,9 +31,23 @@ import { Spinner } from '/@/shared/components/spinner/spinner';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { Text } from '/@/shared/components/text/text';
 import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
-import { LibraryItem, Song } from '/@/shared/types/domain-types';
+import { LibraryItem, RelatedArtist, Song } from '/@/shared/types/domain-types';
 import { DragOperation, DragTarget, DragTargetMap } from '/@/shared/types/drag-and-drop';
 import { Play } from '/@/shared/types/types';
+
+export interface ExpandedAlbumData {
+    _serverId: string;
+    albumArtists: RelatedArtist[];
+    id: string;
+    imageId: null | string;
+    name: string;
+    songs?: null | Song[];
+}
+
+export interface ExpandedAlbumListItemProps {
+    album?: ExpandedAlbumData;
+    item?: ItemListStateItem;
+}
 
 interface AlbumTracksTableProps {
     isDark?: boolean;
@@ -46,11 +61,6 @@ interface AlbumTracksTableProps {
     }>;
 }
 
-interface ExpandedAlbumListItemProps {
-    internalState?: ItemListStateActions;
-    item: ItemListStateItem;
-}
-
 interface TrackRowProps {
     controls: ReturnType<typeof useDefaultItemListControls>;
     internalState: ItemListStateActions;
@@ -59,6 +69,23 @@ interface TrackRowProps {
     song: NonNullable<AlbumTracksTableProps['songs']>[0];
     songs: Song[];
 }
+
+const CloseExpandedButton = () => {
+    const setGlobalExpanded = useSetGlobalExpanded();
+    return (
+        <ActionIcon
+            className={clsx(styles.closeButton)}
+            icon="x"
+            iconProps={{
+                size: 'xl',
+            }}
+            onClick={() => setGlobalExpanded(null)}
+            radius="50%"
+            size="sm"
+            variant="default"
+        />
+    );
+};
 
 const TrackRow = ({ controls, internalState, player, serverId, song, songs }: TrackRowProps) => {
     const rowId = internalState.extractRowId(song);
@@ -188,136 +215,165 @@ const AlbumTracksTable = ({ isDark, serverId, songs }: AlbumTracksTableProps) =>
     );
 };
 
-export const ExpandedAlbumListItem = ({ internalState, item }: ExpandedAlbumListItemProps) => {
-    const { data, isLoading } = useSuspenseQuery(
-        albumQueries.detail({
-            query: { id: item.id },
-            serverId: item._serverId,
-        }),
-    );
+interface ExpandedAlbumListItemContentProps {
+    albumData: ExpandedAlbumData;
+}
 
+const ExpandedAlbumListItemContent = ({ albumData }: ExpandedAlbumListItemContentProps) => {
     const player = usePlayer();
 
     const imageUrl = useItemImageUrl({
-        id: item.imageId || undefined,
+        id: albumData.imageId || undefined,
         itemType: LibraryItem.ALBUM,
         type: 'itemCard',
     });
 
     const color = useFastAverageColor({
         algorithm: 'sqrt',
-        id: item.id,
+        id: albumData.id,
         src: imageUrl,
         srcLoaded: true,
     });
 
     const handlePlay = useCallback(
         (playType: Play) => {
-            if (!data) {
-                return;
-            }
-
-            if (data.songs) {
-                player.addToQueueByData(data.songs, playType);
+            if (albumData.songs?.length) {
+                player.addToQueueByData(albumData.songs, playType);
             }
         },
-        [data, player],
+        [albumData.songs, player],
     );
 
     if (color.isLoading) {
-        return null;
+        return <Spinner container />;
     }
+
+    const songs = albumData.songs ?? null;
 
     return (
         <motion.div
-            animate={{
-                opacity: 1,
-            }}
+            animate={{ opacity: 1 }}
             className={styles.container}
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
             style={{ backgroundColor: color.background }}
         >
-            {isLoading && (
-                <div className={styles.loading}>
-                    <Spinner />
-                </div>
-            )}
-            <Suspense>
-                <div className={styles.expanded}>
-                    <div className={styles.content}>
-                        <div className={styles.header}>
-                            <div className={styles.headerTitle}>
-                                <TextTitle
-                                    className={clsx(styles.itemTitle, {
-                                        [styles.dark]: color.isDark,
-                                    })}
-                                    fw={700}
-                                    order={4}
-                                >
-                                    {data?.name}
-                                </TextTitle>
-                                {internalState && (
-                                    <ActionIcon
-                                        className={clsx(styles.closeButton)}
-                                        icon="x"
-                                        iconProps={{
-                                            size: 'xl',
-                                        }}
-                                        onClick={() => {
-                                            const rowId = internalState.extractRowId(item);
-                                            if (rowId) {
-                                                internalState.clearExpanded();
-                                            }
-                                        }}
-                                        radius="50%"
-                                        size="sm"
-                                        variant="default"
-                                    />
-                                )}
-                            </div>
-                            <Group
-                                className={clsx(styles.itemSubtitle, {
-                                    [styles.dark]: color.isDark,
-                                })}
-                                gap="xs"
+            <div className={styles.expanded}>
+                <div className={styles.content}>
+                    <div className={styles.header}>
+                        <div className={styles.headerTitle}>
+                            <TextTitle
+                                className={clsx(styles.itemTitle, { [styles.dark]: color.isDark })}
+                                fw={700}
+                                order={4}
                             >
-                                {data?.albumArtists.map((artist, index) => (
-                                    <Fragment key={artist.id}>
-                                        <Text
-                                            className={clsx(styles.itemSubtitle, {
-                                                [styles.dark]: color.isDark,
-                                            })}
-                                        >
-                                            {artist.name}
-                                        </Text>
-                                        {index < data?.albumArtists.length - 1 && <Separator />}
-                                    </Fragment>
-                                ))}
-                            </Group>
+                                {albumData.name}
+                            </TextTitle>
+                            <CloseExpandedButton />
                         </div>
-                        <AlbumTracksTable
-                            isDark={color.isDark}
-                            serverId={item._serverId}
-                            songs={data?.songs}
-                        />
+                        <Group
+                            className={clsx(styles.itemSubtitle, { [styles.dark]: color.isDark })}
+                            gap="xs"
+                        >
+                            {albumData.albumArtists?.map((artist, index) => (
+                                <Fragment key={artist.id}>
+                                    <Text
+                                        className={clsx(styles.itemSubtitle, {
+                                            [styles.dark]: color.isDark,
+                                        })}
+                                    >
+                                        {artist.name}
+                                    </Text>
+                                    {index < (albumData.albumArtists?.length ?? 0) - 1 && (
+                                        <Separator />
+                                    )}
+                                </Fragment>
+                            ))}
+                        </Group>
                     </div>
-                    <div className={styles.imageContainer}>
-                        <div
-                            className={styles.backgroundImage}
-                            style={{
-                                ['--bg-color' as string]: color?.background,
-                                backgroundImage: `url(${imageUrl})`,
-                            }}
-                        />
-                        {data?.songs && data.songs.length > 0 && (
-                            <div className={styles.playButtonGroup}>
-                                <PlayButtonGroup onPlay={handlePlay} />
-                            </div>
-                        )}
-                    </div>
+                    <AlbumTracksTable
+                        isDark={color.isDark}
+                        serverId={albumData._serverId}
+                        songs={songs ?? undefined}
+                    />
                 </div>
-            </Suspense>
+                <div className={styles.imageContainer}>
+                    <div
+                        className={styles.backgroundImage}
+                        style={{
+                            ['--bg-color' as string]: color?.background,
+                            backgroundImage: `url(${imageUrl})`,
+                        }}
+                    />
+                    {songs && songs.length > 0 && (
+                        <div className={styles.playButtonGroup}>
+                            <PlayButtonGroup onPlay={handlePlay} />
+                        </div>
+                    )}
+                </div>
+            </div>
         </motion.div>
     );
+};
+
+const ExpandedAlbumListItemWithFetch = ({ item }: { item: ItemListStateItem }) => {
+    const { data } = useSuspenseQuery(
+        albumQueries.detail({
+            query: { id: item.id },
+            serverId: item._serverId,
+        }),
+    );
+
+    const albumData: ExpandedAlbumData = {
+        _serverId: item._serverId,
+        albumArtists: data?.albumArtists ?? [],
+        id: item.id,
+        imageId: item.imageId ?? data?.imageId ?? null,
+        name: data?.name ?? '',
+        songs: data?.songs ?? null,
+    };
+
+    return <ExpandedAlbumListItemContent albumData={albumData} />;
+};
+
+function itemToExpandedAlbumData(
+    item: ItemListStateItem & {
+        _playlistSongs?: Song[];
+        albumArtists?: RelatedArtist[];
+        name?: string;
+    },
+): ExpandedAlbumData | null {
+    const songs =
+        (item as { songs?: Song[] }).songs ?? (item as { _playlistSongs?: Song[] })._playlistSongs;
+    if (songs == null) return null;
+    return {
+        _serverId: item._serverId,
+        albumArtists: item.albumArtists ?? [],
+        id: item.id,
+        imageId: (item as { imageId?: null | string }).imageId ?? null,
+        name: (item as { name?: string }).name ?? '',
+        songs,
+    };
+}
+
+export const ExpandedAlbumListItem = (props: ExpandedAlbumListItemProps) => {
+    if (props.album != null) {
+        return <ExpandedAlbumListItemContent albumData={props.album} />;
+    }
+
+    if (props.item != null) {
+        const albumData = itemToExpandedAlbumData(props.item);
+
+        if (albumData != null) {
+            return <ExpandedAlbumListItemContent albumData={albumData} />;
+        }
+
+        return (
+            <Suspense fallback={<Spinner container />}>
+                <ExpandedAlbumListItemWithFetch item={props.item} />
+            </Suspense>
+        );
+    }
+
+    return null;
 };

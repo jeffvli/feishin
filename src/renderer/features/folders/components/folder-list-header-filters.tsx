@@ -3,7 +3,10 @@ import { useTranslation } from 'react-i18next';
 
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
 import { useFolderListFilters } from '/@/renderer/features/folders/hooks/use-folder-list-filters';
-import { ListConfigMenu } from '/@/renderer/features/shared/components/list-config-menu';
+import {
+    ListConfigMenu,
+    SONG_DISPLAY_TYPES,
+} from '/@/renderer/features/shared/components/list-config-menu';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButton } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
@@ -240,7 +243,10 @@ export const FolderListHeaderFilters = () => {
                 </Group>
                 <Group gap="sm" wrap="nowrap">
                     <ListConfigMenu
-                        displayTypes={[{ hidden: true, value: ListDisplayType.GRID }]}
+                        displayTypes={[
+                            { hidden: true, value: ListDisplayType.GRID },
+                            ...SONG_DISPLAY_TYPES,
+                        ]}
                         listKey={ItemListKey.SONG}
                         optionsConfig={{
                             grid: {

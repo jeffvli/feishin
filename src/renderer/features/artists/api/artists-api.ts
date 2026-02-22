@@ -10,6 +10,8 @@ import {
     AlbumArtistListQuery,
     ArtistListQuery,
     ListCountQuery,
+    SongListSort,
+    SortOrder,
     TopSongListQuery,
 } from '/@/shared/types/domain-types';
 
@@ -118,6 +120,24 @@ export const artistsQueries = {
             ),
             staleTime: 1000 * 60 * 60,
             ...args.options,
+        });
+    },
+    favoriteSongs: (args: QueryHookArgs<{ artistId: string }>) => {
+        return queryOptions({
+            queryFn: ({ signal }) => {
+                return api.controller.getSongList({
+                    apiClientProps: { serverId: args.serverId, signal },
+                    query: {
+                        artistIds: [args.query.artistId],
+                        favorite: true,
+                        limit: -1,
+                        sortBy: SongListSort.RELEASE_DATE,
+                        sortOrder: SortOrder.ASC,
+                        startIndex: 0,
+                    },
+                });
+            },
+            queryKey: queryKeys.albumArtists.favoriteSongs(args.serverId, args.query.artistId),
         });
     },
     topSongs: (args: QueryHookArgs<TopSongListQuery>) => {

@@ -61,7 +61,7 @@ export const SimilarSongsList = ({ count, song }: SimilarSongsListProps) => {
                 data={tableData}
                 enableAlternateRowColors={fullScreenTable?.enableAlternateRowColors}
                 enableExpansion={false}
-                enableHeader
+                enableHeader={fullScreenTable?.enableHeader}
                 enableHorizontalBorders={fullScreenTable?.enableHorizontalBorders}
                 enableRowHoverHighlight={fullScreenTable?.enableRowHoverHighlight}
                 enableScrollShadow={false}

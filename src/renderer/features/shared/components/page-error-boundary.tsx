@@ -32,7 +32,7 @@ const PageErrorFallback = ({ error, resetErrorBoundary }: PageErrorFallbackProps
                     position: 'absolute',
                     right: 0,
                     top: 0,
-                    zIndex: 1000,
+                    zIndex: 100,
                 }}
             >
                 <ServerSelector />

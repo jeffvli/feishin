@@ -1,3 +1,6 @@
+import type { ItemListStateItem } from '/@/renderer/components/item-list/helpers/item-list-state';
+import type { LibraryItem } from '/@/shared/types/domain-types';
+
 import merge from 'lodash/merge';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -10,9 +13,14 @@ export interface AppSlice extends AppState {
     actions: {
         setAlbumArtistDetailGroupingType: (groupingType: 'all' | 'primary') => void;
         setAlbumArtistDetailSort: (sortBy: AlbumListSort, sortOrder: SortOrder) => void;
+        setAlbumArtistIdsMode: (mode: 'and' | 'or') => void;
+        setAlbumArtistSelectMode: (mode: 'multi' | 'single') => void;
         setAppStore: (data: Partial<AppSlice>) => void;
+        setArtistIdsMode: (mode: 'and' | 'or') => void;
         setArtistSelectMode: (mode: 'multi' | 'single') => void;
+        setGenreIdsMode: (mode: 'and' | 'or') => void;
         setGenreSelectMode: (mode: 'multi' | 'single') => void;
+        setGlobalExpanded: (value: GlobalExpandedState | null) => void;
         setPageSidebar: (key: string, value: boolean) => void;
         setPrivateMode: (enabled: boolean) => void;
         setShowTimeRemaining: (enabled: boolean) => void;
@@ -27,9 +35,14 @@ export interface AppState {
         sortBy: AlbumListSort;
         sortOrder: SortOrder;
     };
+    albumArtistIdsMode: 'and' | 'or';
+    albumArtistSelectMode: 'multi' | 'single';
+    artistIdsMode: 'and' | 'or';
     artistSelectMode: 'multi' | 'single';
     commandPalette: CommandPaletteProps;
+    genreIdsMode: 'and' | 'or';
     genreSelectMode: 'multi' | 'single';
+    globalExpanded: GlobalExpandedState | null;
     isReorderingQueue: boolean;
     pageSidebar: Record<string, boolean>;
     platform: Platform;
@@ -37,6 +50,11 @@ export interface AppState {
     showTimeRemaining: boolean;
     sidebar: SidebarProps;
     titlebar: TitlebarProps;
+}
+
+export interface GlobalExpandedState {
+    item: ItemListStateItem;
+    itemType: LibraryItem;
 }
 
 type CommandPaletteProps = {
@@ -79,17 +97,42 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                             };
                         });
                     },
+                    setAlbumArtistIdsMode: (mode) => {
+                        set((state) => {
+                            state.albumArtistIdsMode = mode;
+                        });
+                    },
+                    setAlbumArtistSelectMode: (mode) => {
+                        set((state) => {
+                            state.albumArtistSelectMode = mode;
+                        });
+                    },
                     setAppStore: (data) => {
                         set({ ...get(), ...data });
+                    },
+                    setArtistIdsMode: (mode) => {
+                        set((state) => {
+                            state.artistIdsMode = mode;
+                        });
                     },
                     setArtistSelectMode: (mode) => {
                         set((state) => {
                             state.artistSelectMode = mode;
                         });
                     },
+                    setGenreIdsMode: (mode) => {
+                        set((state) => {
+                            state.genreIdsMode = mode;
+                        });
+                    },
                     setGenreSelectMode: (mode) => {
                         set((state) => {
                             state.genreSelectMode = mode;
+                        });
+                    },
+                    setGlobalExpanded: (value) => {
+                        set((state) => {
+                            state.globalExpanded = value;
                         });
                     },
                     setPageSidebar: (key, value) => {
@@ -123,6 +166,9 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                     sortBy: AlbumListSort.RELEASE_DATE,
                     sortOrder: SortOrder.DESC,
                 },
+                albumArtistIdsMode: 'and',
+                albumArtistSelectMode: 'multi',
+                artistIdsMode: 'and',
                 artistSelectMode: 'multi',
                 commandPalette: {
                     close: () => {
@@ -142,7 +188,9 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                         });
                     },
                 },
+                genreIdsMode: 'and',
                 genreSelectMode: 'multi',
+                globalExpanded: null,
                 isReorderingQueue: false,
                 pageSidebar: {
                     album: true,
@@ -178,7 +226,12 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                 return persistedState;
             },
             name: 'store_app',
-            version: 3,
+            partialize: (state) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars -- ignore non-persisted state
+                const { globalExpanded: _, ...rest } = state;
+                return rest;
+            },
+            version: 4,
         },
     ),
 );
@@ -204,4 +257,17 @@ export const usePageSidebar = (key: string): [boolean, (value: boolean) => void]
     };
 
     return [isOpen, setIsOpen];
+};
+
+export const useGlobalExpanded = () => useAppStore((state) => state.globalExpanded);
+
+export const useSetGlobalExpanded = () => useAppStore((state) => state.actions.setGlobalExpanded);
+
+export const useGlobalExpandedState = () => {
+    const globalExpanded = useGlobalExpanded();
+    const setGlobalExpanded = useSetGlobalExpanded();
+
+    const clearGlobalExpanded = () => setGlobalExpanded(null);
+
+    return { clearGlobalExpanded, globalExpanded, setGlobalExpanded };
 };

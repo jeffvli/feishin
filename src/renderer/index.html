@@ -4,14 +4,20 @@
         <meta charset="utf-8" />
         <meta http-equiv="Content-Security-Policy" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script
-            defer
-            src="https://umami.jeffvli.org/script.js"
-            data-website-id="5120fc56-cffa-4d42-8b6c-9afb6f459251"
-            data-exclude-search="true"
-            data-exclude-hash="true"
-            data-auto-track="false"
-        ></script>
+        <script>
+            (function () {
+                if (localStorage.getItem('umami.disabled') !== '1') {
+                    var s = document.createElement('script');
+                    s.defer = true;
+                    s.src = 'https://umami.jeffvli.org/script.js';
+                    s.setAttribute('data-website-id', '5120fc56-cffa-4d42-8b6c-9afb6f459251');
+                    s.setAttribute('data-exclude-search', 'true');
+                    s.setAttribute('data-exclude-hash', 'true');
+                    s.setAttribute('data-auto-track', 'false');
+                    document.head.appendChild(s);
+                }
+            })();
+        </script>
         <title>Feishin</title>
         <% if (web) { %>
         <link rel="icon" href="./assets/favicon.ico" />

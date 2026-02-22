@@ -8,6 +8,7 @@ import { DlnaPlayer } from '/@/renderer/features/player/audio-player/dlna-player
 import { MainPlayerListenerHook } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
+import { SleepTimerHook } from '/@/renderer/features/player/components/sleep-timer-button';
 import { AutoDJHook } from '/@/renderer/features/player/hooks/use-auto-dj';
 import { MediaSessionHook } from '/@/renderer/features/player/hooks/use-media-session';
 import { MPRISHook } from '/@/renderer/features/player/hooks/use-mpris';
@@ -51,6 +52,7 @@ export const AudioPlayers = () => {
 
     return (
         <>
+            <SleepTimerHook />
             <ScrobbleHook />
             <PowerSaveBlockerHook />
             <DiscordRpcHook />

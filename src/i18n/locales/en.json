@@ -129,6 +129,7 @@
         "releaseType": "release type",
         "refresh": "refresh",
         "reload": "reload",
+        "rename": "rename",
         "reset": "reset",
         "resetToDefault": "reset to default",
         "restartRequired": "restart required",
@@ -138,7 +139,6 @@
         "saveAndReplace": "save and replace",
         "saveAs": "save as",
         "search": "search",
-        "setting": "setting",
         "setting_one": "setting",
         "setting_other": "settings",
         "slower": "slower",
@@ -212,6 +212,7 @@
         "credentialsRequired": "credentials required",
         "endpointNotImplementedError": "endpoint {{endpoint}} is not implemented for {{serverType}}",
         "genericError": "an error occurred",
+        "invalidJson": "invalid JSON",
         "invalidServer": "invalid server",
         "localFontAccessDenied": "access denied to local fonts",
         "loginRateError": "too many login attempts, please try again in a few seconds",
@@ -228,6 +229,7 @@
         "remotePortError": "an error occurred when trying to set the remote server port",
         "remotePortWarning": "restart the server to apply the new port",
         "saveQueueFailed": "failed to save queue",
+        "serverLockSingleServer": "only one server is allowed when server is locked",
         "serverNotSelectedError": "no server selected",
         "serverRequired": "server required",
         "sessionExpiredError": "your session has expired",
@@ -237,6 +239,8 @@
     "filter": {
         "album": "$t(entity.album, {\"count\": 1})",
         "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+        "matchAnd": "and",
+        "matchOr": "or",
         "albumCount": "$t(entity.album, {\"count\": 2}) count",
         "artist": "$t(entity.artist, {\"count\": 1})",
         "biography": "biography",
@@ -388,9 +392,11 @@
         },
         "shareItem": {
             "allowDownloading": "allow downloading",
+            "copyToClipboard": "Copy to clipboard: Ctrl+C, Enter",
             "description": "description",
             "setExpiration": "set expiration",
             "success": "share link copied to clipboard (or click here to open)",
+            "successMustClick": "share created successfully. click here to open",
             "expireInvalid": "expiration must be in the future",
             "createFailed": "failed to create share (is sharing enabled?)"
         },
@@ -419,13 +425,17 @@
         "albumArtistDetail": {
             "about": "About {{artist}}",
             "appearsOn": "appears on",
+            "favoriteSongs": "favorite songs",
             "groupingTypeAll": "all release types",
             "groupingTypePrimary": "primary release types",
             "recentReleases": "recent releases",
             "viewDiscography": "view discography",
             "relatedArtists": "related $t(entity.artist, {\"count\": 2})",
             "topSongs": "top songs",
+            "topSongsCommunity": "community",
             "topSongsFrom": "top songs from {{title}}",
+            "topSongsPersonal": "personal",
+            "favoriteSongsFrom": "favorite songs from {{title}}",
             "viewAll": "view all",
             "viewAllTracks": "view all $t(entity.track, {\"count\": 2})"
         },
@@ -445,8 +455,17 @@
         "radioList": {
             "title": "radio stations"
         },
+        "releasenotes": {
+            "commitsSinceStable": "commits since {{stable}}",
+            "noNewCommits": "no new commits in this range",
+            "noStableReleaseToCompare": "no stable release available to compare with"
+        },
         "favorites": {
             "title": "$t(entity.favorite, {\"count\": 2})"
+        },
+        "windowBar": {
+            "paused": "(Paused) ",
+            "privateMode": "(Private mode)"
         },
         "appMenu": {
             "collapseSidebar": "collapse sidebar",
@@ -561,6 +580,10 @@
         "playlistList": {
             "title": "$t(entity.playlist, {\"count\": 2})"
         },
+        "collections": {
+            "overrideExisting": "override existing",
+            "saveAsCollection": "save as collection"
+        },
         "setting": {
             "advanced": "advanced",
             "analytics": "analytics",
@@ -589,6 +612,7 @@
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
             "albums": "$t(entity.album, {\"count\": 2})",
+            "collections": "collections",
             "artists": "$t(entity.artist, {\"count\": 2})",
             "favorites": "$t(entity.favorite, {\"count\": 2})",
             "folders": "$t(entity.folder, {\"count\": 2})",
@@ -655,13 +679,22 @@
         "trackRadio": "track radio",
         "unfavorite": "unfavorite",
         "pause": "pause",
-        "viewQueue": "view queue"
+        "viewQueue": "view queue",
+        "sleepTimer": "sleep timer",
+        "sleepTimer_endOfSong": "end of current song",
+        "sleepTimer_minutes": "{{count}} min",
+        "sleepTimer_hours": "{{count}} hr",
+        "sleepTimer_custom": "custom",
+        "sleepTimer_off": "off",
+        "sleepTimer_timeRemaining": "{{time}} remaining",
+        "sleepTimer_setCustom": "set timer",
+        "sleepTimer_cancel": "cancel timer"
     },
     "queryBuilder": {
         "standardTags": "standard tags",
         "customTags": "custom tags"
     },
-        "releaseType": {
+    "releaseType": {
         "primary": {
             "album": "$t(entity.album, {\"count\": 1})",
             "broadcast": "broadcast",
@@ -701,6 +734,8 @@
         "albumBackgroundBlur": "album background image blur size",
         "analyticsDisable": "Opt-out of usage based analytics",
         "analyticsDisable_description": "Anonymized usage data is sent to the developer to help improve the application",
+        "analyticsEnable": "Send usage-based analytics",
+        "analyticsEnable_description": "Anonymized usage data is sent to the developer to help improve the application",
         "applicationHotkeys_description": "configure application hotkeys. toggle the checkbox to set as a global hotkey (desktop only)",
         "applicationHotkeys": "application hotkeys",
         "artistBackground": "artist background image",
@@ -711,7 +746,7 @@
         "artistConfiguration_description": "configure what items are shown, and in what order, on the album artist page",
         "artistReleaseTypeConfiguration": "artist release type configuration",
         "artistReleaseTypeConfiguration_description": "configure what release types are shown, and in what order, on the album artist page",
-        "audioDevice_description": "select the audio device to use for playback (web player only)",
+        "audioDevice_description": "select the audio device to use for playback",
         "audioDevice": "audio device",
         "audioExclusiveMode_description": "enable exclusive output mode. In this mode, the system is usually locked out, and only mpv will be able to output audio",
         "audioExclusiveMode": "audio exclusive mode",
@@ -737,11 +772,13 @@
         "customCssNotice": "Warning: while there is some sanitization (disallowing url() and content:), using custom css can still pose risks by changing the interface",
         "customFontPath_description": "sets the path to the custom font to use for the application",
         "customFontPath": "custom font path",
-        "disableAutomaticUpdates": "disable automatic updates",
+        "automaticUpdates": "Automatic updates",
+        "automaticUpdates_description": "Check for and install updates automatically",
+        "releaseChannel_optionAlpha": "alpha (nightly)",
         "releaseChannel_optionBeta": "beta",
         "releaseChannel_optionLatest": "latest",
         "releaseChannel": "release channel",
-        "releaseChannel_description": "choose between stable releases or beta releases for automatic updates",
+        "releaseChannel_description": "choose between stable, beta, or alpha (nightly) releases for automatic updates",
         "disableLibraryUpdateOnStartup": "disable checking for new versions on startup",
         "discordApplicationId_description": "the application id for {{discord}} rich presence (defaults to {{defaultId}})",
         "discordApplicationId": "{{discord}} application id",
@@ -763,6 +800,8 @@
         "discordRichPresence_description": "enable playback status in {{discord}} rich presence. Image keys are: {{icon}}, {{playing}}, and {{paused}}",
         "discordServeImage": "serve {{discord}} images from server",
         "discordServeImage_description": "share cover art for {{discord}} rich presence from server itself, only available for Jellyfin and Navidrome. {{discord}} uses a bot to fetch images, so your server must be reachable from the public internet",
+        "discordStateIcon": "show playing icon",
+        "discordStateIcon_description": "show a small playing icon in the rich presence status. the paused icon is always shown when \"Show rich presence when paused\" is enabled",
         "discordUpdateInterval": "{{discord}} rich presence update interval",
         "discordUpdateInterval_description": "the time in seconds between each update (minimum 15 seconds)",
         "enableAutoTranslation_description": "enable translation automatically when lyrics are loaded",
@@ -929,6 +968,8 @@
         "showLyricsInSidebar": "show lyrics in player sidebar",
         "showRatings_description": "controls if the star ratings feature shows up in the interface",
         "showRatings": "show star ratings",
+        "blurExplicitImages": "blur explicit images",
+        "blurExplicitImages_description": "album and song artwork tagged as explicit will be blurred",
         "enableGridMultiSelect": "enable grid multi-select",
         "enableGridMultiSelect_description": "when enabled, allows selecting multiple items in grid views. when disabled, clicking grid item images will navigate to the item page",
         "showVisualizerInSidebar_description": "a panel will be added to the player sidebar that displays the visualizer",
@@ -976,6 +1017,9 @@
         "sidebarPlaylistList": "sidebar playlist list",
         "sidebarPlaylistSorting_description": "allows manual playlist sorting in the sidebar using drag and drop instead of the default server order",
         "sidebarPlaylistSorting": "sidebar playlist sorting",
+        "sidebarPlaylistListFilterRegex_description": "hide playlists in the sidebar that match this regular expression",
+        "sidebarPlaylistListFilterRegex_placeholder": "e.g. ^Daily Mix.*",
+        "sidebarPlaylistListFilterRegex": "playlist filter regex",
         "sidePlayQueueStyle_description": "sets the style of the side play queue",
         "sidePlayQueueStyle_optionAttached": "attached",
         "sidePlayQueueStyle_optionDetached": "detached",
@@ -1086,6 +1130,7 @@
                 "alternateRowColors": "alternate row colors",
                 "horizontalBorders": "row borders",
                 "rowHoverHighlight": "row hover highlight",
+                "showHeader": "show header",
                 "verticalBorders": "column borders"
             },
             "label": {
@@ -1126,6 +1171,7 @@
                 "year": "$t(common.year)"
             },
             "view": {
+                "detail": "detail",
                 "grid": "grid",
                 "list": "list",
                 "table": "table"

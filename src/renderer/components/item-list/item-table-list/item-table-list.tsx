@@ -1,7 +1,7 @@
 // Component adapted from https://github.com/bvaughn/react-window/issues/826
 
 import clsx from 'clsx';
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import React, {
     type JSXElementConstructor,
     memo,
@@ -18,15 +18,12 @@ import { type CellComponentProps, Grid } from 'react-window-v2';
 
 import styles from './item-table-list.module.css';
 
-import { ExpandedListContainer } from '/@/renderer/components/item-list/expanded-list-container';
-import { ExpandedListItem } from '/@/renderer/components/item-list/expanded-list-item';
 import { createExtractRowId } from '/@/renderer/components/item-list/helpers/extract-row-id';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
     ItemListStateActions,
     ItemListStateItemWithRequiredProperties,
     useItemListState,
-    useItemListStateSubscription,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { parseTableColumns } from '/@/renderer/components/item-list/helpers/parse-table-columns';
 import { useListHotkeys } from '/@/renderer/components/item-list/helpers/use-list-hotkeys';
@@ -1651,8 +1648,6 @@ const BaseItemTableList = ({
                         totalColumnCount={totalColumnCount}
                         totalRowCount={totalRowCount}
                     />
-                    <ExpandedContainer internalState={internalState} itemType={itemType} />
-                    {/* {enableSelectionDialog && <SelectionDialog internalState={internalState} />} */}
                 </motion.div>
             </ItemTableListConfigProvider>
         </ItemTableListStoreProvider>
@@ -1660,27 +1655,5 @@ const BaseItemTableList = ({
 };
 
 export const ItemTableList = memo(BaseItemTableList);
-
-const ExpandedContainer = ({
-    internalState,
-    itemType,
-}: {
-    internalState: ItemListStateActions;
-    itemType: LibraryItem;
-}) => {
-    const hasExpanded = useItemListStateSubscription(internalState, (state) =>
-        state ? state.expanded.size > 0 : false,
-    );
-
-    return (
-        <AnimatePresence initial={false}>
-            {hasExpanded && (
-                <ExpandedListContainer>
-                    <ExpandedListItem internalState={internalState} itemType={itemType} />
-                </ExpandedListContainer>
-            )}
-        </AnimatePresence>
-    );
-};
 
 ItemTableList.displayName = 'ItemTableList';

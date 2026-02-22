@@ -41,6 +41,16 @@ export const useSendScrobble = (options?: MutationOptions) => {
                 queryClient.invalidateQueries({
                     queryKey: ['home', 'mostPlayed'],
                 });
+
+                // Invalidate album artist top songs
+                queryClient.invalidateQueries({
+                    queryKey: queryKeys.albumArtists.topSongs(serverId),
+                });
+
+                // Invalidate album artist favorite songs
+                queryClient.invalidateQueries({
+                    queryKey: queryKeys.albumArtists.favoriteSongs(serverId),
+                });
             }
         },
         ...options,

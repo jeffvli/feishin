@@ -1,0 +1,12 @@
+.group {
+    flex-wrap: nowrap;
+    gap: var(--theme-spacing-sm) var(--theme-spacing-xs);
+    min-width: 0;
+    padding: var(--theme-spacing-xs) 0;
+    overflow: hidden;
+}
+
+.group a {
+    cursor: pointer;
+    user-select: none;
+}

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Tabs } from '/@/shared/components/tabs/tabs';
 
 const GeneralTab = lazy(() =>
@@ -71,29 +72,29 @@ export const SettingsContent = () => {
                         </Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel value="general">
-                        <Suspense fallback={null}>
+                        <Suspense fallback={<Spinner container />}>
                             <GeneralTab />
                         </Suspense>
                     </Tabs.Panel>
                     <Tabs.Panel value="playback">
-                        <Suspense fallback={null}>
+                        <Suspense fallback={<Spinner container />}>
                             <PlaybackTab />
                         </Suspense>
                     </Tabs.Panel>
                     <Tabs.Panel value="hotkeys">
-                        <Suspense fallback={null}>
+                        <Suspense fallback={<Spinner container />}>
                             <HotkeysTab />
                         </Suspense>
                     </Tabs.Panel>
                     {isElectron() && (
                         <Tabs.Panel value="window">
-                            <Suspense fallback={null}>
+                            <Suspense fallback={<Spinner container />}>
                                 <WindowTab />
                             </Suspense>
                         </Tabs.Panel>
                     )}
                     <Tabs.Panel value="advanced">
-                        <Suspense fallback={null}>
+                        <Suspense fallback={<Spinner container />}>
                             <AdvancedTab />
                         </Suspense>
                     </Tabs.Panel>

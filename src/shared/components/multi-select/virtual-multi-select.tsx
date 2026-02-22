@@ -94,6 +94,13 @@ export function VirtualMultiSelect<T>({
         const { current: container } = listContainerRef;
         if (!container) return;
 
+        const isListVisible = !isLoading && stableOptions.length > 0;
+
+        if (!isListVisible) {
+            osInstance()?.destroy();
+            return;
+        }
+
         const viewport = container.firstElementChild as HTMLElement;
         if (!viewport) return;
 
@@ -105,7 +112,7 @@ export function VirtualMultiSelect<T>({
         });
 
         return () => osInstance()?.destroy();
-    }, [initialize, osInstance, stableOptions.length]);
+    }, [initialize, osInstance, isLoading, stableOptions.length]);
 
     const handleToggle = useCallback(
         (optionValue: string) => {

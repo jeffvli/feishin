@@ -36,9 +36,10 @@ const getMpvAudioDevices = async () => {
     }
 };
 
-export const useAudioDevices = () => {
-    const playbackType = usePlaybackType();
-    const [audioDevices, setAudioDevices] = useState<{ label: string; value: string }[]>([]);
+export type AudioDeviceOption = { label: string; value: string };
+
+export const useAudioDevices = (playbackType: PlayerType) => {
+    const [audioDevices, setAudioDevices] = useState<AudioDeviceOption[]>([]);
 
     useEffect(() => {
         const fetchAudioDevices = async () => {
@@ -92,8 +93,11 @@ export const AudioSettings = memo(() => {
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
     const status = usePlayerStatus();
+    const playbackType = usePlaybackType();
 
-    const audioDevices = useAudioDevices();
+    const audioDevices = useAudioDevices(playbackType);
+    const audioDeviceId =
+        playbackType === PlayerType.LOCAL ? settings.mpvAudioDeviceId : settings.audioDeviceId;
 
     const audioOptions: SettingOption[] = [
         {
@@ -131,15 +135,23 @@ export const AudioSettings = memo(() => {
                 <Select
                     clearable
                     data={audioDevices}
-                    defaultValue={settings.audioDeviceId}
+                    defaultValue={audioDeviceId}
                     disabled={!isElectron()}
-                    onChange={(e) => setSettings({ playback: { audioDeviceId: e } })}
+                    onChange={(e) =>
+                        setSettings({
+                            playback:
+                                playbackType === PlayerType.LOCAL
+                                    ? { mpvAudioDeviceId: e }
+                                    : { audioDeviceId: e },
+                        })
+                    }
                 />
             ),
             description: t('setting.audioDevice', {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
+            isHidden: !isElectron(),
             title: t('setting.audioDevice', { postProcess: 'sentenceCase' }),
         },
         {

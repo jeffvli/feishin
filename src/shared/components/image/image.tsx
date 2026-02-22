@@ -6,6 +6,7 @@ import {
     type ImgHTMLAttributes,
     memo,
     ReactNode,
+    useRef,
 } from 'react';
 import { Img } from 'react-image';
 
@@ -25,14 +26,15 @@ export interface ImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 's
     imageContainerProps?: Omit<ImageContainerProps, 'children'>;
     includeLoader?: boolean;
     includeUnloader?: boolean;
-    src: string | string[] | undefined;
+    isExplicit?: boolean;
+    src: string | undefined;
     thumbHash?: string;
     unloaderIcon?: keyof typeof AppIcon;
 }
 
 interface ImageContainerProps extends HTMLAttributes<HTMLDivElement> {
     children: ReactNode;
-    enableAnimation?: boolean;
+    isExplicit?: boolean;
 }
 
 interface ImageLoaderProps {
@@ -57,6 +59,7 @@ export function BaseImage({
     imageContainerProps,
     includeLoader = true,
     includeUnloader = true,
+    isExplicit = false,
     src,
     unloaderIcon = 'emptyImage',
     ...props
@@ -71,6 +74,7 @@ export function BaseImage({
                 imageContainerProps={imageContainerProps}
                 includeLoader={includeLoader}
                 includeUnloader={includeUnloader}
+                isExplicit={isExplicit}
                 src={src}
                 unloaderIcon={unloaderIcon}
                 {...props}
@@ -87,6 +91,7 @@ export function BaseImage({
                 imageContainerProps={imageContainerProps}
                 includeLoader={includeLoader}
                 includeUnloader={includeUnloader}
+                isExplicit={isExplicit}
                 src={src}
                 unloaderIcon={unloaderIcon}
                 {...props}
@@ -99,7 +104,7 @@ export function BaseImage({
     return (
         <ImageContainer
             className={clsx(containerClassName, containerPropsClassName)}
-            enableAnimation={enableAnimation}
+            isExplicit={isExplicit}
             {...restContainerProps}
         >
             {src ? (
@@ -110,7 +115,6 @@ export function BaseImage({
                     decoding="async"
                     fetchPriority={fetchPriority}
                     loader={includeLoader ? <ImageLoader className={className} /> : null}
-                    loading="eager"
                     src={src}
                     unloader={
                         includeUnloader ? (
@@ -135,24 +139,52 @@ function ImageWithDebounce({
     imageContainerProps,
     includeLoader,
     includeUnloader,
+    isExplicit = false,
     src,
     unloaderIcon,
     ...props
 }: ImageProps) {
-    const [debouncedSrc] = useDebouncedValue(src, 150, { waitForInitial: true });
+    const [debouncedSrc] = useDebouncedValue(src, 100, { waitForInitial: true });
     const viewport = useInViewport();
     const { inViewport, ref } = enableViewport ? viewport : { inViewport: true, ref: undefined };
     const { className: containerPropsClassName, ...restContainerProps } = imageContainerProps || {};
 
+    const hasBeenInViewportRef = useRef(false);
+    const prevDebouncedSrcRef = useRef(debouncedSrc);
+
+    const srcInDisplayedCache = isInDisplayedCache(src);
+
+    if (srcInDisplayedCache) {
+        hasBeenInViewportRef.current = true;
+    }
+
+    if (prevDebouncedSrcRef.current !== debouncedSrc) {
+        prevDebouncedSrcRef.current = debouncedSrc;
+        if (!srcInDisplayedCache) hasBeenInViewportRef.current = false;
+    }
+
+    if (inViewport && debouncedSrc) {
+        hasBeenInViewportRef.current = true;
+    }
+
+    const effectiveSrc = debouncedSrc ?? (srcInDisplayedCache ? src : undefined);
+    const shouldShowImage = enableViewport
+        ? (inViewport || hasBeenInViewportRef.current) && effectiveSrc
+        : effectiveSrc;
+
     if (enableViewport) {
+        if (shouldShowImage && effectiveSrc) {
+            addToDisplayedCache(effectiveSrc);
+        }
+
         return (
             <ImageContainer
                 className={clsx(containerClassName, containerPropsClassName)}
-                enableAnimation={enableAnimation}
+                isExplicit={isExplicit}
                 ref={ref}
                 {...restContainerProps}
             >
-                {inViewport && debouncedSrc ? (
+                {shouldShowImage && effectiveSrc ? (
                     <Img
                         className={clsx(styles.image, className, {
                             [styles.animated]: enableAnimation,
@@ -160,8 +192,7 @@ function ImageWithDebounce({
                         decoding="async"
                         fetchPriority={fetchPriority}
                         loader={includeLoader ? <ImageLoader className={className} /> : null}
-                        loading="eager"
-                        src={debouncedSrc}
+                        src={effectiveSrc}
                         unloader={
                             includeUnloader ? (
                                 <ImageUnloader className={className} icon={unloaderIcon} />
@@ -178,13 +209,14 @@ function ImageWithDebounce({
         );
     }
 
+    if (effectiveSrc) addToDisplayedCache(effectiveSrc);
     return (
         <ImageContainer
             className={clsx(containerClassName, containerPropsClassName)}
-            enableAnimation={enableAnimation}
+            isExplicit={isExplicit}
             {...restContainerProps}
         >
-            {debouncedSrc ? (
+            {effectiveSrc ? (
                 <Img
                     className={clsx(styles.image, className, {
                         [styles.animated]: enableAnimation,
@@ -192,7 +224,7 @@ function ImageWithDebounce({
                     decoding="async"
                     fetchPriority={fetchPriority}
                     loader={includeLoader ? <ImageLoader className={className} /> : null}
-                    src={debouncedSrc}
+                    src={effectiveSrc}
                     unloader={
                         includeUnloader ? (
                             <ImageUnloader className={className} icon={unloaderIcon} />
@@ -217,6 +249,7 @@ function ImageWithViewport({
     imageContainerProps,
     includeLoader,
     includeUnloader,
+    isExplicit = false,
     src,
     unloaderIcon,
     ...props
@@ -224,14 +257,34 @@ function ImageWithViewport({
     const { inViewport, ref } = useInViewport();
     const { className: containerPropsClassName, ...restContainerProps } = imageContainerProps || {};
 
+    const hasBeenInViewportRef = useRef(false);
+    const prevSrcRef = useRef(src);
+
+    const srcInDisplayedCache = isInDisplayedCache(src);
+    if (srcInDisplayedCache) {
+        hasBeenInViewportRef.current = true;
+    }
+
+    if (prevSrcRef.current !== src) {
+        prevSrcRef.current = src;
+        if (!srcInDisplayedCache) hasBeenInViewportRef.current = false;
+    }
+
+    if (inViewport && src) {
+        hasBeenInViewportRef.current = true;
+    }
+
+    const shouldShowImage = (inViewport || hasBeenInViewportRef.current) && src;
+
+    if (shouldShowImage && src) addToDisplayedCache(src);
     return (
         <ImageContainer
             className={clsx(containerClassName, containerPropsClassName)}
-            enableAnimation={enableAnimation}
+            isExplicit={isExplicit}
             ref={ref}
             {...restContainerProps}
         >
-            {inViewport && src ? (
+            {shouldShowImage ? (
                 <Img
                     className={clsx(styles.image, className, {
                         [styles.animated]: enableAnimation,
@@ -239,7 +292,6 @@ function ImageWithViewport({
                     decoding="async"
                     fetchPriority={fetchPriority}
                     loader={includeLoader ? <ImageLoader className={className} /> : null}
-                    loading="eager"
                     src={src}
                     unloader={
                         includeUnloader ? (
@@ -257,23 +309,61 @@ function ImageWithViewport({
     );
 }
 
+const DISPLAYED_SRC_CACHE_KEY = 'feishin-displayed-src-cache';
+const MAX_DISPLAYED_SRC_CACHE = 500;
+
+function addToDisplayedCache(src: string | undefined) {
+    if (!src) return;
+    try {
+        const cache = getDisplayedSrcCache();
+        if (cache.includes(src)) {
+            return;
+        }
+
+        while (cache.length >= MAX_DISPLAYED_SRC_CACHE) {
+            cache.shift();
+        }
+
+        cache.push(src);
+        sessionStorage.setItem(DISPLAYED_SRC_CACHE_KEY, JSON.stringify(cache));
+    } catch {
+        // ignore error if sessionStorage is unavailable
+    }
+}
+
+function getDisplayedSrcCache(): string[] {
+    try {
+        const raw = sessionStorage.getItem(DISPLAYED_SRC_CACHE_KEY);
+        return raw ? (JSON.parse(raw) as string[]) : [];
+    } catch {
+        return [];
+    }
+}
+
+function isInDisplayedCache(src: string | undefined): boolean {
+    if (!src) return false;
+    try {
+        return getDisplayedSrcCache().includes(src);
+    } catch {
+        return false;
+    }
+}
+
 export const Image = memo(BaseImage);
 
 const ImageContainer = forwardRef(
     (
-        { children, className, enableAnimation, ...props }: ImageContainerProps,
+        { children, className, isExplicit, ...props }: ImageContainerProps,
         ref: ForwardedRef<HTMLDivElement>,
     ) => {
-        if (!enableAnimation) {
-            return (
-                <div className={clsx(styles.imageContainer, className)} ref={ref} {...props}>
-                    {children}
-                </div>
-            );
-        }
-
         return (
-            <div className={clsx(styles.imageContainer, className)} ref={ref} {...props}>
+            <div
+                className={clsx(styles.imageContainer, className, {
+                    [styles.censored]: isExplicit,
+                })}
+                ref={ref}
+                {...props}
+            >
                 {children}
             </div>
         );

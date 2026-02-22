@@ -23,6 +23,7 @@ export const PlaylistListInfiniteTable = ({
     autoFitColumns = false,
     columns,
     enableAlternateRowColors = false,
+    enableHeader = true,
     enableHorizontalBorders = false,
     enableRowHoverHighlight = true,
     enableSelection = true,
@@ -73,6 +74,7 @@ export const PlaylistListInfiniteTable = ({
             columns={columns}
             data={loadedItems}
             enableAlternateRowColors={enableAlternateRowColors}
+            enableHeader={enableHeader}
             enableHorizontalBorders={enableHorizontalBorders}
             enableRowHoverHighlight={enableRowHoverHighlight}
             enableSelection={enableSelection}

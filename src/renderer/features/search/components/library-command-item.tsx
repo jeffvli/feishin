@@ -13,11 +13,12 @@ import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Text } from '/@/shared/components/text/text';
-import { LibraryItem, Song } from '/@/shared/types/domain-types';
+import { ExplicitStatus, LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface LibraryCommandItemProps {
     disabled?: boolean;
+    explicitStatus?: ExplicitStatus | null;
     id: string;
     imageId: null | string;
     imageUrl: null | string;
@@ -30,6 +31,7 @@ interface LibraryCommandItemProps {
 
 export const LibraryCommandItem = ({
     disabled,
+    explicitStatus,
     id,
     imageId,
     imageUrl,
@@ -100,6 +102,7 @@ export const LibraryCommandItem = ({
                     <ItemImage
                         alt="cover"
                         className={styles.image}
+                        explicitStatus={explicitStatus ?? song?.explicitStatus ?? null}
                         height={40}
                         id={imageId}
                         itemType={itemType}

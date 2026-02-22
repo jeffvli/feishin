@@ -16,6 +16,9 @@ interface MobileFullscreenPlayerMetadataProps {
     currentSong?: QueueSong;
     onToggleFavorite: (e: MouseEvent<HTMLButtonElement>) => void;
     onUpdateRating: (rating: number) => void;
+    radioArtist?: string;
+    radioStationName?: string;
+    radioTitle?: string;
     showRating?: boolean;
 }
 
@@ -24,17 +27,24 @@ export const MobileFullscreenPlayerMetadata = memo(
         currentSong,
         onToggleFavorite,
         onUpdateRating,
+        radioArtist,
+        radioStationName,
+        radioTitle,
         showRating,
     }: MobileFullscreenPlayerMetadataProps) => {
-        const title = currentSong?.name;
-        const artists = currentSong?.artists;
-        const album = currentSong?.album;
+        const isRadio = radioTitle !== undefined || radioStationName !== undefined;
+
+        const title = isRadio ? radioTitle || radioStationName || 'Radio' : currentSong?.name;
+        const artistsDisplay = isRadio
+            ? radioArtist || radioStationName || '—'
+            : currentSong?.artists?.map((a) => a.name).join(', ');
+        const album = isRadio ? radioStationName || '—' : currentSong?.album;
         const container = currentSong?.container;
         const year = currentSong?.releaseYear;
         const isFavorite = currentSong?.userFavorite;
         const rating = currentSong?.userRating;
 
-        const hasMetadata = container || year;
+        const hasMetadata = !isRadio && (container || year);
 
         return (
             <div className={styles.metadataContainer}>
@@ -49,7 +59,7 @@ export const MobileFullscreenPlayerMetadata = memo(
                     </TextTitle>
                 </div>
                 <Text className={clsx(PlaybackSelectors.songArtist)} size="md" truncate>
-                    {artists?.map((a) => a.name).join(', ') || '—'}
+                    {artistsDisplay || '—'}
                 </Text>
                 <Text className={clsx(PlaybackSelectors.songAlbum)} size="md" truncate>
                     {album || '—'}
@@ -65,21 +75,23 @@ export const MobileFullscreenPlayerMetadata = memo(
                         )}
                     </Group>
                 )}
-                <Group align="center" className={styles.actionsRow} gap="xs">
-                    <ActionIcon
-                        icon="favorite"
-                        iconProps={{
-                            fill: isFavorite ? 'primary' : undefined,
-                            size: 'md',
-                        }}
-                        onClick={onToggleFavorite}
-                        size="sm"
-                        variant="subtle"
-                    />
-                    {showRating && (
-                        <Rating onChange={onUpdateRating} size="sm" value={rating || 0} />
-                    )}
-                </Group>
+                {!isRadio && (
+                    <Group align="center" className={styles.actionsRow} gap="xs">
+                        <ActionIcon
+                            icon="favorite"
+                            iconProps={{
+                                fill: isFavorite ? 'primary' : undefined,
+                                size: 'md',
+                            }}
+                            onClick={onToggleFavorite}
+                            size="sm"
+                            variant="subtle"
+                        />
+                        {showRating && (
+                            <Rating onChange={onUpdateRating} size="sm" value={rating || 0} />
+                        )}
+                    </Group>
+                )}
             </div>
         );
     },
