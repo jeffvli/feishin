@@ -20,7 +20,6 @@ import {
     PlaylistSongListQuery,
     PlaylistSongListResponse,
     Song,
-
 } from '/@/shared/types/domain-types';
 import { ItemListKey, Play, TableColumn } from '/@/shared/types/types';
 
