@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { ReactElement, useState } from 'react';
 
+import imageColumnStyles from '../item-detail-list/columns/image-column.module.css';
 import styles from './album-group-header.module.css';
 
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
@@ -26,12 +27,12 @@ export const AlbumGroupHeader = ({ onPlay, size, song }: AlbumGroupHeaderProps):
     return (
         <div className={styles.container}>
             <div
-                className={styles.imageWrapper}
+                className={styles.imageContainer}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
                 <ItemImage
-                    containerClassName={styles.image}
+                    className={imageColumnStyles.compactImage}
                     enableDebounce
                     enableViewport={false}
                     id={song?.imageId}
@@ -40,7 +41,7 @@ export const AlbumGroupHeader = ({ onPlay, size, song }: AlbumGroupHeaderProps):
                     type="table"
                 />
                 {isHovered && onPlay && (
-                    <div className={styles.playButtonOverlay}>
+                    <div className={imageColumnStyles.playButtonOverlay}>
                         <PlayTooltip type={playButtonBehavior}>
                             <PlayButton
                                 fill
