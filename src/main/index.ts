@@ -390,8 +390,11 @@ const createTray = () => {
         },
         {
             click: () => {
-                mainWindow?.show();
-                createWinThumbarButtons();
+                if (mainWindow === null) createWindow(false);
+                else {
+                    mainWindow.show();
+                    createWinThumbarButtons();
+                }
             },
             label: 'Open main window',
         },
@@ -618,6 +621,7 @@ async function createWindow(first = true): Promise<void> {
 
     mainWindow.on('closed', () => {
         ipcMain.removeHandler('window-clear-cache');
+        ipcMain.removeHandler('app-check-for-updates');
         mainWindow = null;
     });
 
@@ -866,7 +870,7 @@ if (!singleInstance) {
     app.whenReady()
         .then(() => {
             protocol.handle('feishin', async (request) => {
-                const filePath = `file://${request.url.slice('feishin://'.length)}`;
+                const filePath = `file:${request.url.slice('feishin:'.length)}`;
                 const response = await net.fetch(filePath);
                 const contentType = response.headers.get('content-type');
 

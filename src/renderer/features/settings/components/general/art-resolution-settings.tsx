@@ -78,9 +78,7 @@ export const ImageResolutionSettings = memo(() => {
                                         max={2000}
                                         min={0}
                                         onChange={(e) => {
-                                            if (!e) return;
-
-                                            if (typeof e === 'string') return;
+                                            if (typeof e !== 'number') return;
 
                                             setSettings({
                                                 general: {

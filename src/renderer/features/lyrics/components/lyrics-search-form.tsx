@@ -117,13 +117,13 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
     const [debouncedArtist] = useDebouncedValue(form.values.artist, 500);
     const [debouncedName] = useDebouncedValue(form.values.name, 500);
 
-    const { data, isInitialLoading } = useQuery(
+    const { data, isLoading } = useQuery(
         lyricsQueries.search({
             query: { artist: debouncedArtist, name: debouncedName },
         }),
     );
 
-    const { data: previewData, isInitialLoading: isPreviewLoading } = useQuery(
+    const { data: previewData, isLoading: isPreviewLoading } = useQuery(
         lyricsQueries.songLyricsByRemoteId({
             options: {
                 enabled: !!selectedResult,
@@ -228,7 +228,7 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
                             paddingRight: '1rem',
                         }}
                     >
-                        {isInitialLoading ? (
+                        {isLoading ? (
                             <Spinner container />
                         ) : (
                             <Stack gap="md">

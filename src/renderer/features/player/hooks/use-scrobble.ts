@@ -219,11 +219,20 @@ export const useScrobble = () => {
                                 ? currentSong.artists.map((artist) => artist.name).join(' · ')
                                 : currentSong.artistName;
 
-                        new Notification(`${currentSong.name}`, {
-                            body: `${artists}\n${currentSong.album}`,
-                            icon: imageUrlRef.current || undefined,
-                            silent: true,
-                        });
+                        try {
+                            new Notification(`${currentSong.name}`, {
+                                body: `${artists}\n${currentSong.album}`,
+                                icon: imageUrlRef.current || undefined,
+                                silent: true,
+                            });
+                        } catch (error) {
+                            logFn.error('an error occurred while sending a desktop notification', {
+                                category: LogCategory.SCROBBLE,
+                                meta: {
+                                    error: error as Error,
+                                },
+                            });
+                        }
                     }
                 }, 1000);
             }

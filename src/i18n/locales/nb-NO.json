@@ -21,7 +21,23 @@
         "removeFromQueue": "fjern fra kø",
         "removeFromPlaylist": "fjern fra $t(entity.playlist, {\"count\": 1})",
         "viewPlaylists": "vise $t(entity.playlist, {\"count\": 2})",
-        "toggleSmartPlaylistEditor": "bytt $t(entity.smartPlaylist) editor"
+        "toggleSmartPlaylistEditor": "bytt $t(entity.smartPlaylist) editor",
+        "selectAll": "marker alle",
+        "downloadStarted": "startet nedlasting av {{count}} elementer",
+        "selectRangeOfItems": "velg en rekke elementer",
+        "addOrRemoveFromSelection": "legge til eller fjerne fra utvalg",
+        "moveUp": "flytt opp",
+        "moveDown": "flytt ned",
+        "createRadioStation": "opprett $t(entity.radioStation, {\"count\": 1})",
+        "deleteRadioStation": "slett $t(entity.radioStation, {\"count\": 1})",
+        "holdToMoveToTop": "hold nede for å gå til toppen",
+        "holdToMoveToBottom": "hold nede for å gå til bunnen",
+        "moveItems": "flytt elementer",
+        "shuffle": "tilfeldig avspilling",
+        "shuffleAll": "tilfelding avspilling av alt",
+        "shuffleSelected": "tilfelding avspilling av utvalgte",
+        "viewMore": "se mer",
+        "openApplicationDirectory": "åpne applikasjonskatalogen"
     },
     "common": {
         "bpm": "bpm",
@@ -50,8 +66,8 @@
         "expand": "utvid",
         "favorite": "favoritt",
         "filters": "filter",
-        "forceRestartRequired": "ta omstart for å la endringene trå i kraft... lukk meldingen for å ta omstart",
-        "forward": "fremover",
+        "forceRestartRequired": "ta omstart for å aktivere endringene... lukk meldingen for å ta omstart",
+        "forward": "framover",
         "gap": "avstand",
         "home": "hjem",
         "increase": "øke",
@@ -88,7 +104,7 @@
         "quit": "avslutt",
         "size": "størrelse",
         "setting_one": "innstilling",
-        "setting_other": "",
+        "setting_other": "innstillinger",
         "trackNumber": "spor",
         "title": "tittel",
         "channel_one": "kanal",
@@ -119,7 +135,31 @@
         "albumGain": "gjennomsnittlig lydnivå for album",
         "albumPeak": "høyeste lydnivå for album",
         "bitDepth": "bitdybde",
-        "sampleRate": "samplingsfrekvens"
+        "sampleRate": "samplingsfrekvens",
+        "countSelected": "{{count}} valgt",
+        "doNotShowAgain": "ikke vis dette igjen",
+        "view": "vis",
+        "example": "eksempel",
+        "externalLinks": "eksterne lenker",
+        "faster": "raskere",
+        "filter_single": "enkelt",
+        "filter_multiple": "flerfoldige",
+        "mood": "humør",
+        "noFilters": "ingen filtre konfigurert",
+        "private": "privat",
+        "public": "offentlig",
+        "retry": "prøv igjen",
+        "recordLabel": "plateselskap",
+        "releaseType": "utgivelsestype",
+        "rename": "gi nytt navn",
+        "slower": "saktere",
+        "sort": "sorter",
+        "explicit": "grov",
+        "clean": "ren",
+        "gridRows": "rutenettrader",
+        "tableColumns": "tabellkolonner",
+        "itemsMore": "{{count}} fler",
+        "explicitStatus": "grovhetsstatus"
     },
     "entity": {
         "smartPlaylist": "smart $t(entity.playlist, {\"count\": 1})",
@@ -156,7 +196,11 @@
         "artist_one": "artist",
         "artist_other": "artister",
         "song_one": "sang",
-        "song_other": "sanger"
+        "song_other": "sanger",
+        "radioStation_one": "radiostasjon",
+        "radioStation_other": "radiostasjoner",
+        "radioStationWithCount_one": "{{count}} radiostasjon",
+        "radioStationWithCount_other": "{{count}} radiostasjoner"
     },
     "error": {
         "apiRouteError": "kan ikke behandle forespørselen",
@@ -166,14 +210,14 @@
         "endpointNotImplementedError": "endepunkt {{endpoint}} er ikke implementert for {{serverType}}",
         "credentialsRequired": "innloggingsdetaljer er påkrevd",
         "genericError": "en feil har oppstått",
-        "invalidServer": "ugyldig server",
+        "invalidServer": "ugyldig tjener",
         "playbackError": "et problem oppstod ved avspilling av media",
         "localFontAccessDenied": "ingen tilgang til lokale skrifttyper",
         "loginRateError": "for mange innloggingsforsøk, vennligst prøv igjen om noen få sekunder",
         "audioDeviceFetchError": "en feil oppstod ved innhenting av lydenheter",
-        "networkError": "at nettverksproblem har oppstått",
+        "networkError": "det har oppstått et nettverksproblem",
         "openError": "kunne ikke åpne fil",
-        "serverNotSelectedError": "ingen server er valgt",
+        "serverNotSelectedError": "ingen tjener er valgt",
         "remotePortError": "et problem oppstod med å sette serverport",
         "systemFontError": "et problem oppstod med innlasting av systemskrifttyper",
         "serverRequired": "server er påkrevd",
@@ -182,7 +226,14 @@
         "remoteDisableError": "en problem oppstod ved å $t(common.disable) serveren",
         "remoteEnableError": "et problem oppstod ved å $t(common.enable) serveren",
         "notificationDenied": "tillatelser for varsler ble avvist. Denne innstillingen har ingen effekt",
-        "badValue": "ugyldig alternativ \"{{value}}\". Denne verdien eksisterer ikke lenger"
+        "badValue": "ugyldig alternativ \"{{value}}\". Denne verdien eksisterer ikke lenger",
+        "noNetwork": "tjener utilgjengelig",
+        "noNetworkDescription": "kunne ikke koble til tjeneren",
+        "invalidJson": "ugyldig JSON",
+        "saveQueueFailed": "kunne ikke lagre kø",
+        "multipleServerSaveQueueError": "Spillekøen har en eller flere sanger som ikke finnes på gjeldene tjener. Dette er ikke støttet",
+        "serverLockSingleServer": "kun én tjener er tillatt når tjener er låst",
+        "settingsSyncError": "avvik ble funnet mellom innstillinger i avspilleren og hovedprosessen. ta en omstart av applikasjonen for å aktivere endringene"
     },
     "filter": {
         "bpm": "bpm",
@@ -226,7 +277,11 @@
         "channels": "$t(common.channel_other)",
         "genre": "$t(entity.genre, {\"count\": 1})",
         "trackNumber": "spor",
-        "albumCount": "$t(entity.album, {\"count\": 2}) opptelling"
+        "albumCount": "$t(entity.album, {\"count\": 2}) opptelling",
+        "matchAnd": "og",
+        "matchOr": "eller",
+        "sortName": "sorter navn",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "form": {
         "createPlaylist": {
@@ -253,7 +308,12 @@
             "input_legacyAuthentication": "aktiver tradisjonell autentisering",
             "input_name": "servernavn",
             "title": "legg til server",
-            "input_password": "passord"
+            "input_password": "passord",
+            "input_preferInstantMix": "foretrekk øyeblikkelig miks",
+            "input_preferInstantMixDescription": "bruk bare øyeblikkelig miks for innhenting av lignende sanger. nyttig hvis du har tilleggsmoduler som endrer funksjonaliteten",
+            "input_preferRemoteUrl": "foretrekk offentlig url",
+            "input_remoteUrl": "offentlig url",
+            "input_remoteUrlPlaceholder": "valgfritt: offentlig nettadresse for eksterne funksjoner"
         },
         "addToPlaylist": {
             "success": "la $t(entity.trackWithCount, {\"count\": {{message}} }) til $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -286,6 +346,10 @@
             "input_optionMatchAll": "match alle",
             "input_optionMatchAny": "matche hvilken som helst",
             "title": "redigeringsverktøy for spørringer"
+        },
+        "largeFetchConfirmation": {
+            "title": "legg til elementer i køen",
+            "description": "Denne handlingen vil legge alle elementene til den gjeldende filtervisningen"
         }
     },
     "page": {
@@ -521,5 +585,32 @@
             "title": "tittel",
             "trackNumber": "spor"
         }
+    },
+    "filterOperator": {
+        "after": "er etter",
+        "afterDate": "er etter (date)",
+        "before": "er før",
+        "beforeDate": "er før (date)",
+        "contains": "inneholder",
+        "endsWith": "ender med",
+        "inPlaylist": "er inne i",
+        "inTheLast": "er inne i de siste",
+        "inTheRange": "er innenfor området",
+        "isGreaterThan": "er større enn",
+        "isLessThan": "er mindre enn",
+        "matchesRegex": "samsvarer med regex",
+        "notContains": "inneholder ikke",
+        "notInPlaylist": "er ikke med i",
+        "notInTheLast": "er ikke med i de siste",
+        "startsWith": "starter med",
+        "inTheRangeDate": "er innenfor området (date)",
+        "is": "er",
+        "isNot": "er ikke"
+    },
+    "datetime": {
+        "minuteShort": "m",
+        "secondShort": "s",
+        "hourShort": "h",
+        "dayShort": "d"
     }
 }

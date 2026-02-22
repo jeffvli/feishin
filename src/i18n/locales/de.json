@@ -1168,7 +1168,20 @@
             "frequencyScale": {
                 "linear": "Lineare Skala",
                 "log": "Log Skala",
-                "mel": "Mel Skala"
+                "mel": "Mel Skala",
+                "bark": "Bark-Skala",
+                "none": "Keine"
+            },
+            "gradient": {
+                "classic": "Klassisch",
+                "prism": "Prisma",
+                "rainbow": "Regenbogen",
+                "steelblue": "Stahlblau",
+                "orangered": "Orange-Rot"
+            },
+            "channelLayout": {
+                "dualHorizontal": "Dual-Horizontal",
+                "dualVertical": "Dual-Vertikal"
             }
         },
         "minimumFrequency": "Mindestfrequenz",

@@ -1,12 +1,12 @@
 {
     "player": {
-        "repeat_all": "répète tout",
+        "repeat_all": "répèter tout",
         "stop": "stop",
         "repeat": "répéter",
         "queue_remove": "effacer la sélection",
         "playRandom": "lecture aléatoire",
         "skip": "sauter",
-        "previous": "précédant",
+        "previous": "précédent",
         "toggleFullscreenPlayer": "plein écran",
         "skip_back": "reculer",
         "favorite": "favori",
@@ -23,7 +23,7 @@
         "muted": "en sourdine",
         "queue_moveToTop": "déplacer la sélection vers le bas",
         "queue_moveToBottom": "déplacer la sélection vers le haut",
-        "shuffle_off": "aléatoire désactivée",
+        "shuffle_off": "aléatoire désactivé",
         "addLast": "dernier",
         "mute": "muet",
         "skip_forward": "avancer",
@@ -40,7 +40,7 @@
         "artistRadio": "radio de l'artiste",
         "trackRadio": "radio du titre",
         "sleepTimer": "minuterie de veille",
-        "sleepTimer_endOfSong": "fin de la chanson en cours",
+        "sleepTimer_endOfSong": "fin du titre en cours",
         "sleepTimer_minutes": "{{count}} min",
         "sleepTimer_hours": "{{count}} h",
         "sleepTimer_custom": "personnalisé",
@@ -250,7 +250,7 @@
         "serverLockSingleServer": "un seul serveur est autorisé quand le serveur est verrouillé"
     },
     "filter": {
-        "mostPlayed": "plus joués",
+        "mostPlayed": "les plus joués",
         "playCount": "nombre d'écoutes",
         "isCompilation": "est une compilation",
         "recentlyPlayed": "récemment joué",
@@ -267,13 +267,13 @@
         "communityRating": "note de la communauté",
         "path": "chemin",
         "favorited": "favori",
-        "isRecentlyPlayed": "est récemment joué",
+        "isRecentlyPlayed": "a été joué récemment",
         "isFavorited": "est favori",
         "bpm": "BPM",
         "releaseYear": "année de sortie",
         "disc": "disque",
         "biography": "biographie",
-        "songCount": "nombre de chansons",
+        "songCount": "nombre de titre",
         "duration": "durée",
         "random": "aléatoire",
         "lastPlayed": "écouté récemment",
@@ -310,7 +310,7 @@
             "home": "$t(common.home)",
             "artists": "$t(entity.artist, {\"count\": 2})",
             "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "shared": "partagé $t(entity.playlist, {\"count\": 2})",
+            "shared": "$t(entity.playlist, {\"count\": 2}) partagée",
             "myLibrary": "Bibliothèque",
             "favorites": "$t(entity.favorite, {\"count\": 2})",
             "radio": "$t(entity.radioStation, {\"count\": 2})",
@@ -331,7 +331,7 @@
                 "lyricGap": "espacement des lettres",
                 "dynamicIsImage": "activer l'image d'arrière-plan",
                 "dynamicImageBlur": "intensité du flou sur l'image d'arrière-plan",
-                "lyricOffset": "paroles décalées (ms)"
+                "lyricOffset": "décalage des paroles (ms)"
             },
             "upNext": "à suivre",
             "lyrics": "paroles",
@@ -355,7 +355,7 @@
             "commandPalette": "ouvrir la palette de commandes",
             "selectMusicFolder": "sélectionner le dossier musique",
             "noMusicFolder": "aucun dossier musique de sélectionner",
-            "multipleMusicFolders": "{{count}} dossiers musique sélectionner"
+            "multipleMusicFolders": "{{count}} dossiers musique sélectionnés"
         },
         "home": {
             "mostPlayed": "Les plus joués",
@@ -375,7 +375,7 @@
             "generalTab": "général",
             "hotkeysTab": "raccourcis",
             "windowTab": "fenêtre",
-            "playbackTab": "lecteur",
+            "playbackTab": "lecture",
             "advanced": "avancé",
             "analytics": "analytique",
             "updates": "mise à jour",
@@ -468,7 +468,7 @@
             "groupingTypePrimary": "types de parution principale",
             "topSongsCommunity": "communauté",
             "topSongsPersonal": "personnel",
-            "favoriteSongsFrom": "meilleurs titres de {{title}}"
+            "favoriteSongsFrom": "titres favori de {{title}}"
         },
         "itemDetail": {
             "copyPath": "copier le chemin dans le presse-papiers",
@@ -476,7 +476,7 @@
             "copiedPath": "chemin copié avec succès"
         },
         "playlist": {
-            "reorder": "le tri n'est possible que lors du tri par identifiant"
+            "reorder": "la réorganisation n'est possible que lors du tri par identifiant"
         },
         "manageServers": {
             "serverDetails": "détails du serveur",
@@ -745,8 +745,8 @@
         "discordLinkType_description": "Ajoute des liens externes vers {{lastfm}} ou {{musicbrainz}} aux champs piste et artiste de la Rich Presence de {{discord}}. {{musicbrainz}} est la méthode la plus précise, mais nécessite des balises et ne fournit pas de liens vers les artistes, tandis que {{lastfm}} doit toujours fournir un lien. Aucune requête réseau supplémentaire n'est effectuée",
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} avec {{lastfm}} si le premier n'est pas disponible",
-        "artistBackground": "image d'arrière-plan d'artiste",
-        "artistBackground_description": "ajoute une image d'arrière-plan pour les pages d'artiste contenant l'œuvre de l'artiste",
+        "artistBackground": "image d'arrière-plan de l'artiste",
+        "artistBackground_description": "ajoute une image d'arrière-plan pour les pages d'artiste contenant une image de l'artiste",
         "artistBackgroundBlur": "intensité du flou sur l'image d'arrière-plan d'artiste",
         "artistBackgroundBlur_description": "ajuste la quantité de flou appliquée à l'image d'arrière-plan de l'artiste",
         "releaseChannel_optionLatest": "dernière",
@@ -814,7 +814,7 @@
         "playerFilters_description": "exclure les titres de la file d'attente selon les critères suivants",
         "playerbarSlider_description": "la forme d'onde n'est pas recommandée sur une connexion lente ou limitée",
         "useThemeAccentColor": "utiliser la couleur d'accent du thème",
-        "useThemeAccentColor_description": "utiliser la couleur principale définie dans le thème sélectionné au lieu de la couleur d'accent personnalisée",
+        "useThemeAccentColor_description": "utiliser la couleur principale définie dans le thème sélectionné au lieu de la couleur d'accentuation personnalisée",
         "artistReleaseTypeConfiguration": "configuration du type de sortie de l'artiste",
         "artistReleaseTypeConfiguration_description": "configure quel type de sortie est affiché, et dans quel ordre, sur la page artiste de l'album",
         "mpvExtraParameters": "paramètres supplémentaires de mpv",
@@ -866,17 +866,17 @@
         "addServer": {
             "title": "ajouter un serveur",
             "input_username": "nom d'utilisateur",
-            "input_url": "url",
+            "input_url": "URL",
             "input_password": "mot de passe",
-            "input_legacyAuthentication": "activer l'authtication legacy",
+            "input_legacyAuthentication": "activer l'authentification legacy",
             "input_name": "nom du serveur",
             "success": "serveur ajouté avec succès",
             "input_savePassword": "enregister le mot de passe",
             "ignoreSsl": "ignorer ssl $t(common.restartRequired)",
             "ignoreCors": "ignorer cors $t(common.restartRequired)",
             "error_savePassword": "une erreur s’est produite lors de la tentative de sauvegarde du mot de passe",
-            "input_preferInstantMix": "Préférer le mix instantané",
-            "input_preferInstantMixDescription": "Utiliser uniquement le mix instantané pour jouer des pistes similaires. Activez cette option si vous avez des plugins qui modifient ce comportement",
+            "input_preferInstantMix": "préférer le mix instantané",
+            "input_preferInstantMixDescription": "utiliser uniquement le mix instantané pour jouer des pistes similaires. utile si vous avez des plugins qui modifient ce comportement",
             "input_preferRemoteUrl": "préférer une URL publique",
             "input_remoteUrl": "URL publique",
             "input_remoteUrlPlaceholder": "optionnel : URL publique pour les fonctionnalités externes"
@@ -936,7 +936,7 @@
         },
         "largeFetchConfirmation": {
             "title": "ajouter des entrées à la file d'attente",
-            "description": "Cette action ajoutera tous les éléments dans la vue filtrée actuelle"
+            "description": "Cette action ajoutera toutes les entrées de la vue filtrée actuelle"
         },
         "shuffleAll": {
             "title": "jouer aléatoirement",
@@ -1141,7 +1141,7 @@
     "releaseType": {
         "primary": {
             "album": "$t(entity.album, {\"count\": 1})",
-            "broadcast": "diffuser",
+            "broadcast": "diffusion",
             "ep": "ep",
             "other": "autre",
             "single": "single"

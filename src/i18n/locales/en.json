@@ -391,9 +391,11 @@
         },
         "shareItem": {
             "allowDownloading": "allow downloading",
+            "copyToClipboard": "Copy to clipboard: Ctrl+C, Enter",
             "description": "description",
             "setExpiration": "set expiration",
             "success": "share link copied to clipboard (or click here to open)",
+            "successMustClick": "share created successfully. click here to open",
             "expireInvalid": "expiration must be in the future",
             "createFailed": "failed to create share (is sharing enabled?)"
         },

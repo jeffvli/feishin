@@ -945,7 +945,9 @@
             "allowDownloading": "允许下载",
             "description": "描述",
             "setExpiration": "设置过期时间",
-            "success": "共享链接已复制到剪贴板（或单击此处打开）"
+            "success": "共享链接已复制到剪贴板（或单击此处打开）",
+            "copyToClipboard": "复制到剪贴板：Ctrl+C，Enter",
+            "successMustClick": "分享创建成功。点击此处打开"
         },
         "privateMode": {
             "enabled": "启用私人模式，播放状态现在对外部集成隐藏",

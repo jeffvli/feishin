@@ -1053,7 +1053,9 @@
             "setExpiration": "設定過期時間",
             "success": "分享連結已複製到剪貼簿（或點擊此處開啟）",
             "expireInvalid": "到期日必須是未來",
-            "createFailed": "無法建立分享（分享是否啟用？）"
+            "createFailed": "無法建立分享（分享是否啟用？）",
+            "copyToClipboard": "複製到剪貼簿：Ctrl+C, Enter",
+            "successMustClick": "分享建立成功，點擊此處開啟"
         },
         "privateMode": {
             "enabled": "已啟用私人模式，播放狀態將對外部整合隱藏",

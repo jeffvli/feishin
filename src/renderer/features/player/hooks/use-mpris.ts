@@ -179,13 +179,13 @@ export const useMPRIS = () => {
 
                 mpris?.updateRepeat(properties.repeat);
             },
-            onPlayerSeek: (properties) => {
+            onPlayerSeekToTimestamp: (properties) => {
                 if (!mpris) {
                     return;
                 }
 
-                const seconds = properties.seconds;
-                mpris?.updateSeek(seconds);
+                const timestamp = properties.timestamp;
+                mpris?.updateSeek(timestamp);
             },
             onPlayerShuffle: (properties) => {
                 if (!mpris) {

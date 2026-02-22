@@ -376,7 +376,9 @@
             "setExpiration": "ustaw czas wygaśnięcia",
             "success": "link do udostępniania skopiowany do schowka (lub kliknij tutaj, aby otworzyć)",
             "createFailed": "nie udało się utworzyć linku do udostępniania (czy udostępnianie jest włączone?)",
-            "expireInvalid": "ustawiony czas wygaśnięcia musi być w przyszłości"
+            "expireInvalid": "ustawiony czas wygaśnięcia musi być w przyszłości",
+            "copyToClipboard": "Skopiuj do schowka: Ctrl+C, Enter",
+            "successMustClick": "udostępnianie utworzone pomyślnie, kliknij tutaj żeby otworzyć"
         },
         "privateMode": {
             "enabled": "tryb prywatny włączony, status odtwarzania jest ukryty przed usługami zewnętrznymi",

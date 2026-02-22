@@ -410,15 +410,7 @@ export const queryKeys: Record<
             if (query) return [serverId, 'songs', 'randomSongList', query] as const;
             return [serverId, 'songs', 'randomSongList'] as const;
         },
-        remoteLyrics: (serverId: string, query?: LyricsQuery) => {
-            if (query) return [serverId, 'song', 'lyrics', 'remote', query] as const;
-            return [serverId, 'song', 'lyrics', 'remote'] as const;
-        },
         root: (serverId: string) => [serverId, 'songs'] as const,
-        serverLyrics: (serverId: string, query?: LyricsQuery) => {
-            if (query) return [serverId, 'song', 'lyrics', 'server', query] as const;
-            return [serverId, 'song', 'lyrics', 'server'] as const;
-        },
         similar: (serverId: string, query?: SimilarSongsQuery) => {
             if (query) return [serverId, 'song', 'similar', query] as const;
             return [serverId, 'song', 'similar'] as const;

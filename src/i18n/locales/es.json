@@ -931,7 +931,9 @@
             "description": "Descripción",
             "setExpiration": "Establecer expiración",
             "success": "Enlace de compartición copiado al portapapeles (o pulsa aquí para abrir)",
-            "expireInvalid": "La expiración debe ser en el futuro"
+            "expireInvalid": "La expiración debe ser en el futuro",
+            "copyToClipboard": "Copiar al portapapeles: Ctrl+C, Enter",
+            "successMustClick": "Compartir creado correctamente. Haz clic aquí para abrir"
         },
         "privateMode": {
             "enabled": "Modo privado activado, el estado de reproducción ahora está oculto de integraciones externas",

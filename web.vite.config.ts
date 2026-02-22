@@ -26,17 +26,17 @@ export default defineConfig({
             output: {
                 assetFileNames: (assetInfo) => {
                     const stableNames = [
-                        '32x32',
-                        '64x64',
-                        '128x128',
-                        '256x256',
-                        '512x512',
-                        '1024x1024',
-                        'favicon',
-                        'preview_full_screen_player',
+                        '32x32.png',
+                        '64x64.png',
+                        '128x128.png',
+                        '256x256.png',
+                        '512x512.png',
+                        '1024x1024.png',
+                        'favicon.ico',
+                        'preview_full_screen_player.webp',
                     ];
 
-                    if (assetInfo.name && stableNames.includes(assetInfo.name)) {
+                    if (assetInfo.names.length === 1 && stableNames.includes(assetInfo.names[0])) {
                         return 'assets/[name][extname]';
                     }
 
