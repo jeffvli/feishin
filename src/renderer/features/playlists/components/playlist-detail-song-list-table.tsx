@@ -20,8 +20,7 @@ import {
     PlaylistSongListQuery,
     PlaylistSongListResponse,
     Song,
-    SongListSort,
-    SortOrder,
+
 } from '/@/shared/types/domain-types';
 import { ItemListKey, Play, TableColumn } from '/@/shared/types/types';
 
@@ -74,17 +73,14 @@ export const PlaylistDetailSongListTable = forwardRef<any, PlaylistDetailSongLis
             (col) => col.id === TableColumn.ALBUM_GROUP && col.isEnabled,
         );
 
-        const effectiveSortBy = albumGroupingEnabled ? SongListSort.ALBUM : query.sortBy;
-        const effectiveSortOrder = albumGroupingEnabled ? SortOrder.ASC : query.sortOrder;
-
         const songDataFromData = useMemo(() => {
             let list = data?.items || [];
             if (searchTerm) {
                 list = searchLibraryItems(list, searchTerm, LibraryItem.SONG);
                 return list;
             }
-            return sortSongList(list, effectiveSortBy, effectiveSortOrder);
-        }, [data?.items, searchTerm, effectiveSortBy, effectiveSortOrder]);
+            return sortSongList(list, query.sortBy, query.sortOrder);
+        }, [data?.items, searchTerm, query.sortBy, query.sortOrder]);
 
         const { setListData } = useListContext();
         const songData = itemsProp ?? songDataFromData;
