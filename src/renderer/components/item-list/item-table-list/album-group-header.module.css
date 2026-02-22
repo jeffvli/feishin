@@ -27,8 +27,7 @@
     text-overflow: ellipsis;
     -webkit-line-clamp: 2;
     line-clamp: 2;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--theme-font-size-sm);
     -webkit-box-orient: vertical;
 }
 
@@ -48,7 +47,7 @@
     text-overflow: ellipsis;
     -webkit-line-clamp: 2;
     line-clamp: 2;
-    font-size: 11px;
+    font-size: var(--theme-font-size-xs);
     opacity: 0.7;
     -webkit-box-orient: vertical;
 }
