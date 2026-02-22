@@ -1,4 +1,3 @@
-import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { DlnaPlayerEngine, DlnaPlayerEngineHandle } from './engine/dlna-player-engine';
@@ -19,8 +18,6 @@ import { PlayerStatus } from '/@/shared/types/types';
 
 const PLAY_PAUSE_FADE_DURATION = 300;
 const PLAY_PAUSE_FADE_INTERVAL = 10;
-
-const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 
 export function DlnaPlayer() {
     const playerRef = useRef<DlnaPlayerEngineHandle>(null);

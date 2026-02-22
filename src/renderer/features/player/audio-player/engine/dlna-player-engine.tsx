@@ -290,13 +290,6 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
 
 DlnaPlayerEngine.displayName = 'DlnaPlayerEngine';
 
-function areTrackUrlsEqual(first: string, second: string) {
-    const firstUrl = new URL(first);
-    const secondUrl = new URL(second);
-
-    const a = firstUrl.searchParams.a;
-}
-
 function handleDlnaAutoNext(transcode: {
     bitrate?: number | undefined;
     enabled: boolean;
