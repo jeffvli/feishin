@@ -1,8 +1,8 @@
-import clsx from 'clsx';
 import { ReactElement, useState } from 'react';
 
 import imageColumnStyles from '../item-detail-list/columns/image-column.module.css';
 import styles from './album-group-header.module.css';
+import { TableItemSize } from './item-table-list';
 
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
@@ -15,14 +15,26 @@ import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface AlbumGroupHeaderProps {
+    groupRowCount?: number;
     onPlay?: (playType: Play) => void;
     size?: 'compact' | 'large' | 'normal';
     song: Song | undefined;
 }
 
-export const AlbumGroupHeader = ({ onPlay, size, song }: AlbumGroupHeaderProps): ReactElement => {
+export const AlbumGroupHeader = ({
+    groupRowCount,
+    onPlay,
+    size = 'normal',
+    song,
+}: AlbumGroupHeaderProps): ReactElement => {
     const [isHovered, setIsHovered] = useState(false);
     const playButtonBehavior = usePlayButtonBehavior();
+    const rowHeight = {
+        compact: TableItemSize.COMPACT,
+        large: TableItemSize.LARGE,
+        normal: TableItemSize.DEFAULT,
+    }[size];
+    const infoHeight = groupRowCount !== undefined ? groupRowCount * rowHeight : undefined;
 
     return (
         <div className={styles.container}>
@@ -58,23 +70,9 @@ export const AlbumGroupHeader = ({ onPlay, size, song }: AlbumGroupHeaderProps):
                     </div>
                 )}
             </div>
-            <div className={styles.info}>
-                <div
-                    className={clsx(styles.albumName, {
-                        [styles.compact]: size === 'compact',
-                        [styles.large]: size === 'large',
-                    })}
-                >
-                    {song?.album ?? ''}
-                </div>
-                <div
-                    className={clsx(styles.artistName, {
-                        [styles.compact]: size === 'compact',
-                        [styles.large]: size === 'large',
-                    })}
-                >
-                    {song?.albumArtistName ?? ''}
-                </div>
+            <div className={styles.info} style={{ height: infoHeight }}>
+                <div className={styles.albumName}>{song?.album ?? ''}</div>
+                <div className={styles.artistName}>{song?.albumArtistName ?? ''}</div>
             </div>
         </div>
     );

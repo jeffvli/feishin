@@ -69,9 +69,18 @@ export const AlbumGroupColumn = (props: ItemTableListInnerColumn) => {
         );
     }
 
+    let groupRowCount = 1;
+    const totalDataRows = props.data.length + firstDataRow;
+    for (let idx = props.rowIndex + 1; idx < totalDataRows; idx++) {
+        const nextItem = props.getRowItem?.(idx) as null | Song | undefined;
+        if (!nextItem || nextItem.album !== item.album) break;
+        groupRowCount++;
+    }
+
     return (
         <TableColumnContainer {...props} enableAlternateRowColors={false}>
             <AlbumGroupHeader
+                groupRowCount={groupRowCount}
                 onPlay={handlePlay}
                 size={props.size === 'default' ? 'normal' : props.size}
                 song={item}

@@ -1,7 +1,7 @@
 .container {
     display: flex;
     gap: var(--theme-spacing-sm);
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     height: 100%;
 }
@@ -17,47 +17,17 @@
     display: flex;
     flex-direction: column;
     gap: var(--theme-spacing-xs);
-    justify-content: center;
     min-width: 0;
+    padding-top: var(--theme-spacing-xs);
+    padding-bottom: var(--theme-spacing-xs);
+    overflow: hidden;
 }
 
 .album-name {
-    display: -webkit-box;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
     font-size: var(--theme-font-size-sm);
-    -webkit-box-orient: vertical;
-}
-
-.album-name.compact {
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
-}
-
-.album-name.large {
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
 }
 
 .artist-name {
-    display: -webkit-box;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
     font-size: var(--theme-font-size-xs);
     opacity: 0.7;
-    -webkit-box-orient: vertical;
-}
-
-.artist-name.compact {
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
-}
-
-.artist-name.large {
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
 }

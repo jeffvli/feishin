@@ -94,7 +94,7 @@ const hasRequiredStateItemProperties = (
     );
 };
 
-enum TableItemSize {
+export enum TableItemSize {
     COMPACT = 40,
     DEFAULT = 64,
     LARGE = 88,
