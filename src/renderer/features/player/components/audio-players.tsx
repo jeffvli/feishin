@@ -31,6 +31,7 @@ import {
     usePlaybackType,
     useSettingsStoreActions,
 } from '/@/renderer/store';
+import { useDlnaStore } from '/@/renderer/store/dlna.store';
 import { toast } from '/@/shared/components/toast/toast';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { DlnaDevice, PlayerType } from '/@/shared/types/types';
@@ -40,9 +41,9 @@ export const AudioPlayers = () => {
     const serverId = useCurrentServerId();
     const { resetSampleRate } = useSettingsStoreActions();
 
+    const { dlnaDevice } = useDlnaStore();
     const {
         audioDeviceId,
-        dlnaDevice,
         mpvProperties: { audioSampleRateHz },
         webAudio,
     } = usePlaybackSettings();

@@ -17,7 +17,6 @@ import {
     useCurrentServer,
     useFullScreenPlayerStore,
     useHotkeySettings,
-    usePlaybackSettings,
     usePlayerData,
     usePlayerMuted,
     usePlayerSong,
@@ -29,6 +28,7 @@ import {
     useVolumeWheelStep,
     useVolumeWidth,
 } from '/@/renderer/store';
+import { useDlnaStore } from '/@/renderer/store/dlna.store';
 import { useFullScreenPlayerStoreActions } from '/@/renderer/store/full-screen-player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
@@ -375,12 +375,10 @@ interface DlnaDevice {
 
 const CastButton = () => {
     const { t } = useTranslation();
-    const { dlnaDevice } = usePlaybackSettings();
     const [devices, setDevices] = useState<DlnaDevice[]>([]);
     const [isSearching, setIsSearching] = useState(false);
 
-    const playbackSettings = usePlaybackSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { dlnaDevice, setDlnaDevice } = useDlnaStore();
 
     const pushIfMissing = (devices: DlnaDevice[], toPush: DlnaDevice) => {
         const isMissing = !devices.some((device) => device.url == toPush.url);
@@ -404,11 +402,7 @@ const CastButton = () => {
 
     const handleSelectDevice = async (device: DlnaDevice | null) => {
         console.debug('Selected DLNA device:', JSON.stringify(device));
-
-        // TODO: Make this session-persistent
-        setSettings({
-            playback: { ...playbackSettings, dlnaDevice: device },
-        });
+        setDlnaDevice(device);
     };
     return (
         <Menu position="top-end" shadow="md" width={200} withArrow>

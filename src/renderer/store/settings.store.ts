@@ -548,15 +548,9 @@ const PlayerFilterSchema = z.object({
     ]),
 });
 
-const DlnaDeviceSettingsSchema = z.object({
-    name: z.string(),
-    url: z.string(),
-});
-
 const PlaybackSettingsSchema = z.object({
     audioDeviceId: z.string().nullable().optional(),
     audioFadeOnStatusChange: z.boolean(),
-    dlnaDevice: DlnaDeviceSettingsSchema.nullable().optional(),
     filters: z.array(PlayerFilterSchema),
     mediaSession: z.boolean(),
     mpvExtraParameters: z.array(z.string()),

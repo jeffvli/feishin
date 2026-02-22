@@ -15,6 +15,7 @@ import {
     usePlayerStore,
     useSettingsStore,
 } from '/@/renderer/store';
+import { useDlnaStore } from '/@/renderer/store/dlna.store';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 import { DlnaMetadata, DlnaQueueItem, PlayerStatus } from '/@/shared/types/types';
 
@@ -57,7 +58,8 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     const hasPopulatedQueueRef = useRef<boolean>(false);
     const isMountedRef = useRef<boolean>(true);
 
-    const { dlnaDevice, transcode } = usePlaybackSettings();
+    const { dlnaDevice } = useDlnaStore();
+    const { transcode } = usePlaybackSettings();
 
     // Start the DLNA instance on startup
     useEffect(() => {
