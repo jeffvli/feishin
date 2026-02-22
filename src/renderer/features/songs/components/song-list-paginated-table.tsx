@@ -86,11 +86,6 @@ export const SongListPaginatedTable = ({
 
     const currentSong = usePlayerSong();
 
-    const effectiveColumns = useMemo(() => {
-        if (albumGroupingEnabled) return columns;
-        return columns.filter((col) => col.id !== TableColumn.ALBUM_GROUP);
-    }, [columns, albumGroupingEnabled]);
-
     return (
         <ItemListWithPagination
             currentPage={currentPage}
@@ -103,7 +98,7 @@ export const SongListPaginatedTable = ({
                 activeRowId={currentSong?.id}
                 autoFitColumns={autoFitColumns}
                 CellComponent={ItemTableListColumn}
-                columns={effectiveColumns}
+                columns={columns}
                 data={data || []}
                 enableAlternateRowColors={enableAlternateRowColors}
                 enableExpansion={false}
