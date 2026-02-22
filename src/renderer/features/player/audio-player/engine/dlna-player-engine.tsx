@@ -16,8 +16,9 @@ import {
     useSettingsStore,
 } from '/@/renderer/store';
 import { useDlnaStore } from '/@/renderer/store/dlna.store';
+import { DlnaMetadata, DlnaQueueItem } from '/@/shared/types/dlna';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
-import { DlnaMetadata, DlnaQueueItem, PlayerStatus } from '/@/shared/types/types';
+import { PlayerStatus } from '/@/shared/types/types';
 
 export interface DlnaPlayerEngineHandle extends AudioPlayer {}
 

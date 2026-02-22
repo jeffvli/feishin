@@ -14,7 +14,7 @@ import {
 } from '/@/main/features/core/dlna/controller';
 import { discoverDlnaDevices } from '/@/main/features/core/dlna/discovery';
 import { getMainWindow } from '/@/main/index';
-import { DlnaChangedTrack, DlnaInitialize, DlnaQueue, DlnaQueueItem } from '/@/shared/types/types';
+import { DlnaChangedTrack, DlnaInitialize, DlnaQueue, DlnaQueueItem } from '/@/shared/types/dlna';
 
 ipcMain.handle('dlna-discover', async () => discoverDlnaDevices());
 

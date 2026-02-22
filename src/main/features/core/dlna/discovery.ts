@@ -3,7 +3,7 @@ import * as dgram from 'dgram';
 import { XMLParser } from 'fast-xml-parser';
 import z from 'zod';
 
-import { DlnaDevice } from '/@/shared/types/types';
+import { DlnaDevice } from '/@/shared/types/dlna';
 
 const parser = new XMLParser();
 

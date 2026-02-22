@@ -7,7 +7,7 @@ import {
     DlnaPositionInfo,
     DlnaQueue,
     DlnaQueueItem,
-} from '/@/shared/types/types';
+} from '/@/shared/types/dlna';
 
 const discover = () => {
     return ipcRenderer.invoke('dlna-discover') as Promise<DlnaDevice[]>;

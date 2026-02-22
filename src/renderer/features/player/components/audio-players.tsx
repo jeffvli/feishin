@@ -34,8 +34,9 @@ import {
 } from '/@/renderer/store';
 import { useDlnaStore } from '/@/renderer/store/dlna.store';
 import { toast } from '/@/shared/components/toast/toast';
+import { DlnaDevice } from '/@/shared/types/dlna';
 import { LibraryItem } from '/@/shared/types/domain-types';
-import { DlnaDevice, PlayerType } from '/@/shared/types/types';
+import { PlayerType } from '/@/shared/types/types';
 
 export const AudioPlayers = () => {
     const playbackType = usePlaybackType();

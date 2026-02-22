@@ -1,5 +1,5 @@
 import { MediaRendererClient } from '/@/main/features/core/dlna/renderer';
-import { DlnaPositionInfo, DlnaQueueItem } from '/@/shared/types/types';
+import { DlnaPositionInfo, DlnaQueueItem } from '/@/shared/types/dlna';
 
 const ERR_NOT_INITIALIZED = Error('DLNA client not initialized');
 

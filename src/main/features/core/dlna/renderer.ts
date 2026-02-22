@@ -1,7 +1,7 @@
 import et from 'elementtree';
 import UpnpMediaRendererClient from 'upnp-mediarenderer-client';
 
-import { DlnaMetadata, DlnaPositionInfo } from '/@/shared/types/types';
+import { DlnaMetadata, DlnaPositionInfo } from '/@/shared/types/dlna';
 
 export class MediaRendererClient extends UpnpMediaRendererClient {
     constructor(url: string) {

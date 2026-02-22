@@ -1,7 +1,7 @@
 import { subscribeWithSelector } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
-import { DlnaDevice } from '/@/shared/types/types';
+import { DlnaDevice } from '/@/shared/types/dlna';
 
 interface DlnaState {
     dlnaDevice: DlnaDevice | null;
