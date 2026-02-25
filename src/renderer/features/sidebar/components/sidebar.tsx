@@ -7,7 +7,6 @@ import styles from './sidebar.module.css';
 
 import { AnimatedVideoCover } from '/@/renderer/components/animated-video-cover/animated-video-cover';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
-import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import {
     useIsRadioActive,
@@ -22,6 +21,7 @@ import {
     SidebarPlaylistList,
     SidebarSharedPlaylistList,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
+import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import {
     AnimatedCoverScreen,
     shouldShowAnimatedCover,
@@ -173,7 +173,6 @@ const SidebarImage = () => {
     const isRadioActive = useIsRadioActive();
     const { isPlaying: isRadioPlaying } = useRadioPlayer();
     const { blurExplicitImages } = useGeneralSettings();
-    
     const showAnimatedCover = shouldShowAnimatedCover(AnimatedCoverScreen.SIDEBAR_IMAGE);
 
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -270,8 +269,8 @@ const SidebarImage = () => {
                         />
                         {animatedCoverUrl && (
                             <AnimatedVideoCover
-                                ref={videoRef}
                                 className={styles.sidebarImage}
+                                ref={videoRef}
                                 src={animatedCoverUrl}
                                 style={{
                                     left: 0,

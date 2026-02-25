@@ -2286,13 +2286,12 @@ export const shouldShowAnimatedCover = (
     screen: AnimatedCoverScreen,
     settings?: ReturnType<typeof useAnimatedCoversSettings>,
 ): boolean => {
-    const animatedCoversSettings =
-        settings || useSettingsStore.getState().general.animatedCovers;
+    const animatedCoversSettings = settings || useSettingsStore.getState().general.animatedCovers;
 
     if (!animatedCoversSettings.enabled) {
         return false;
     }
-    
+
     return animatedCoversSettings[screen] ?? false;
 };
 

@@ -1,6 +1,6 @@
 export interface AnimatedCoverResponse {
-    url?: string;
-    artist?: string;
     album?: string;
+    artist?: string;
     isCached?: boolean;
+    url?: string;
 }

@@ -9,11 +9,11 @@ import styles from './left-controls.module.css';
 
 import { AnimatedVideoCover } from '/@/renderer/components/animated-video-cover/animated-video-cover';
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
-import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { RadioMetadataDisplay } from '/@/renderer/features/player/components/radio-metadata-display';
 import { useIsRadioActive } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     AnimatedCoverScreen,
@@ -54,9 +54,9 @@ export const LeftControls = () => {
     const { bindings } = useHotkeySettings();
 
     const isRadioMode = isRadioActive;
-    
+
     const showAnimatedCover = shouldShowAnimatedCover(AnimatedCoverScreen.MINI_PLAYER);
-    
+
     const videoRef = useRef<HTMLVideoElement>(null);
     const { animatedCoverUrl } = useAnimatedCover({
         albumName: currentSong?.album ?? undefined,
@@ -164,11 +164,11 @@ export const LeftControls = () => {
                                             />
                                             {animatedCoverUrl && (
                                                 <AnimatedVideoCover
-                                                    ref={videoRef}
                                                     className={clsx(
                                                         styles.playerbarImage,
                                                         PlaybackSelectors.playerCoverArt,
                                                     )}
+                                                    ref={videoRef}
                                                     src={animatedCoverUrl}
                                                     style={{
                                                         left: 0,

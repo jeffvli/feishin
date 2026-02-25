@@ -1,18 +1,26 @@
 import HLS from 'hls.js';
 import { HTMLMotionProps, motion } from 'motion/react';
-import { forwardRef, useState, useEffect, useRef, SyntheticEvent } from 'react';
+import { forwardRef, SyntheticEvent, useEffect, useRef, useState } from 'react';
 
-interface AnimatedVideoCoverProps extends Omit<HTMLMotionProps<'video'>, 'src' | 'onError'> {
-    src?: string | null;
-    staticImageUrl?: string;
+interface AnimatedVideoCoverProps extends Omit<HTMLMotionProps<'video'>, 'onError' | 'src'> {
     fallbackElement?: React.ReactNode;
     isPlaying?: boolean;
     onLoadError?: (error?: string) => void;
+    src?: null | string;
+    staticImageUrl?: string;
 }
 
 export const AnimatedVideoCover = forwardRef<HTMLVideoElement, AnimatedVideoCoverProps>(
     (
-        { src, staticImageUrl, fallbackElement, isPlaying = true, className, onLoadError, ...props },
+        {
+            className,
+            fallbackElement,
+            isPlaying = true,
+            onLoadError,
+            src,
+            staticImageUrl,
+            ...props
+        },
         ref,
     ) => {
         const [videoFailed, setVideoFailed] = useState(false);
@@ -31,11 +39,9 @@ export const AnimatedVideoCover = forwardRef<HTMLVideoElement, AnimatedVideoCove
             if (!isM3u8 || !HLS.isSupported()) return;
 
             isInitializingRef.current = true;
-            console.debug('AnimatedVideoCover Initializing HLS.js for m3u8 stream');
 
             // Cleanup any existing instance first
             if (hlsRef.current) {
-                console.debug('AnimatedVideoCover Destroying existing HLS instance');
                 hlsRef.current.destroy();
                 hlsRef.current = null;
             }
@@ -49,10 +55,10 @@ export const AnimatedVideoCover = forwardRef<HTMLVideoElement, AnimatedVideoCove
 
                 const hls = new HLS({
                     autoStartLoad: true,
-                    startPosition: -1,
                     debug: false,
                     enableWorker: true,
                     lowLatencyMode: false,
+                    startPosition: -1,
                 });
 
                 hls.loadSource(src);
@@ -114,6 +120,7 @@ export const AnimatedVideoCover = forwardRef<HTMLVideoElement, AnimatedVideoCove
                 }
                 isInitializingRef.current = false;
             };
+            // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [src, videoFailed]);
 
         const handleError = (event: SyntheticEvent<HTMLVideoElement, Event>) => {
@@ -124,9 +131,9 @@ export const AnimatedVideoCover = forwardRef<HTMLVideoElement, AnimatedVideoCove
 
             const errorMsg = event.nativeEvent.type || 'unknown error';
             const details = {
-                src,
                 errorType: errorMsg,
                 message: 'Video failed to load',
+                src,
             };
 
             console.warn('AnimatedVideoCover Video load failed:', details);
@@ -144,7 +151,7 @@ export const AnimatedVideoCover = forwardRef<HTMLVideoElement, AnimatedVideoCove
                         alt="Album cover"
                         className={className}
                         src={staticImageUrl}
-                        style={{ width: '100%', height: '100%' }}
+                        style={{ height: '100%', width: '100%' }}
                     />
                 );
             }
@@ -153,7 +160,6 @@ export const AnimatedVideoCover = forwardRef<HTMLVideoElement, AnimatedVideoCove
 
         return (
             <motion.video
-                ref={ref}
                 autoPlay={isPlaying}
                 className={className}
                 crossOrigin="anonymous"
@@ -161,6 +167,7 @@ export const AnimatedVideoCover = forwardRef<HTMLVideoElement, AnimatedVideoCove
                 muted
                 onError={handleError}
                 playsInline
+                ref={ref}
                 {...props}
             />
         );

@@ -1,9 +1,10 @@
 import isElectron from 'is-electron';
+
 import { logFn } from '/@/renderer/utils/logger';
 
 const animatedCoversIpc = isElectron() ? window.api.animatedCovers : null;
 
-const animatedCoverCache = new Map<string, string | null>();
+const animatedCoverCache = new Map<string, null | string>();
 
 const getCacheKey = (albumName: string, artistName: string): string => {
     return `${albumName}|${artistName}`;
@@ -13,7 +14,7 @@ export const getAnimatedCoverUrl = async (
     albumName: string,
     artistName: string,
     apiBase?: string,
-): Promise<string | null> => {
+): Promise<null | string> => {
     if (!albumName || !artistName) {
         return null;
     }

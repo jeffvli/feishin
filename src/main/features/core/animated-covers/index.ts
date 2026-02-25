@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+
 import {
     ANIMATED_COVERS_API_BASE,
     ANIMATED_COVERS_API_ENDPOINT,
@@ -10,7 +11,7 @@ const getAnimatedCoverUrl = async (
     albumName: string,
     artistName: string,
     apiBase?: string,
-): Promise<string | null> => {
+): Promise<null | string> => {
     const baseUrl = apiBase || ANIMATED_COVERS_API_BASE;
 
     if (!albumName || !artistName) {
@@ -28,8 +29,8 @@ const getAnimatedCoverUrl = async (
         const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
         const response = await fetch(url, {
-            signal: controller.signal,
             method: 'GET',
+            signal: controller.signal,
         });
 
         clearTimeout(timeoutId);

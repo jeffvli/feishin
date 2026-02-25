@@ -4,13 +4,13 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 
 import styles from './mobile-fullscreen-player.module.css';
 
-import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import { AnimatedVideoCover } from '/@/renderer/components/animated-video-cover/animated-video-cover';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import {
     useIsRadioActive,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import {
     AnimatedCoverScreen,
     shouldShowAnimatedCover,
@@ -183,27 +183,30 @@ export const MobileFullscreenPlayerAlbumArt = () => {
             >
                 {animatedCoverUrl && !isPlayingRadio && (
                     <AnimatedVideoCover
-                        ref={videoRef}
                         className={PlaybackSelectors.playerCoverArt}
                         onLoadError={() => {
-                            console.warn('[MobilePlayer] Video playback failed for:', animatedCoverUrl);
+                            console.warn(
+                                '[MobilePlayer] Video playback failed for:',
+                                animatedCoverUrl,
+                            );
                         }}
+                        ref={videoRef}
                         src={animatedCoverUrl}
                         staticImageUrl={
                             imageState.current === 0 ? imageState.topImage : imageState.bottomImage
                         }
                         style={{
+                            height: '100%',
+                            left: 0,
+                            objectFit: useImageAspectRatio ? 'contain' : 'cover',
                             position: 'absolute',
                             top: 0,
-                            left: 0,
                             width: '100%',
-                            height: '100%',
-                            objectFit: useImageAspectRatio ? 'contain' : 'cover',
                             zIndex: 10,
                         }}
                     />
                 )}
-                
+
                 <AnimatePresence initial={false} mode="sync">
                     {isPlayingRadio ? (
                         <ImageWithPlaceholder

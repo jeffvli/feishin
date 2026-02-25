@@ -8,7 +8,6 @@ import styles from './library-header.module.css';
 
 import { AnimatedVideoCover } from '/@/renderer/components/animated-video-cover/animated-video-cover';
 import { getItemImageUrl, ItemImage } from '/@/renderer/components/item-image/item-image';
-import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import { useIsPlayerFetching } from '/@/renderer/features/player/context/player-context';
 import {
     PlayLastTextButton,
@@ -20,6 +19,7 @@ import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-b
 import { useIsMutatingCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useIsMutatingDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useIsMutatingRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
+import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import {
     AnimatedCoverScreen,
     shouldShowAnimatedCover,
@@ -184,20 +184,20 @@ export const LibraryHeader = forwardRef(
                 >
                     {animatedCoverUrl && item.type === LibraryItem.ALBUM && (
                         <AnimatedVideoCover
-                            ref={videoRef}
                             className={styles.image}
                             onLoadError={(error) => {
                                 console.warn('[LibraryHeader] Video playback failed:', error);
                             }}
+                            ref={videoRef}
                             src={animatedCoverUrl}
                             staticImageUrl={imageUrl || undefined}
                             style={{
+                                height: '100%',
+                                left: 0,
+                                objectFit: 'cover',
                                 position: 'absolute',
                                 top: 0,
-                                left: 0,
                                 width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
                                 zIndex: 10,
                             }}
                         />

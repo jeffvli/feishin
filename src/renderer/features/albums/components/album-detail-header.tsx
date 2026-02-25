@@ -220,7 +220,9 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
             <LibraryHeader
                 item={{
                     albumName: detailQuery?.data?.name,
-                    artistName: detailQuery?.data?.albumArtistName || detailQuery?.data?.albumArtists?.[0]?.name,
+                    artistName:
+                        detailQuery?.data?.albumArtistName ||
+                        detailQuery?.data?.albumArtists?.[0]?.name,
                     children: headerItem,
                     explicitStatus: detailQuery?.data?.explicitStatus ?? null,
                     imageId: detailQuery?.data?.imageId,

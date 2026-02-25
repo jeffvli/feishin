@@ -4,11 +4,11 @@ import isElectron from 'is-electron';
 import { memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { clearAnimatedCoverCache } from '/@/renderer/api/animated-covers-api';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { clearAnimatedCoverCache } from '/@/renderer/api/animated-covers-api';
 import { Button } from '/@/shared/components/button/button';
 import { ConfirmModal } from '/@/shared/components/modal/modal';
 import { toast } from '/@/shared/components/toast/toast';
