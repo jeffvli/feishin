@@ -62,8 +62,7 @@ const PillGroup = ({ children, classNames, gap = 'sm', ...props }: PillGroupProp
 Pill.Group = PillGroup;
 
 interface PillLinkProps
-    extends Omit<React.ComponentPropsWithoutRef<typeof Link>, keyof PillProps>,
-        PillProps {}
+    extends Omit<React.ComponentPropsWithoutRef<typeof Link>, keyof PillProps>, PillProps {}
 
 export const PillLink = forwardRef<HTMLDivElement, PillLinkProps>(({ children, ...props }, ref) => {
     const { classNames, radius = 'md', size = 'md', ...rest } = props;

@@ -18,8 +18,7 @@ const isCompactSize = (size: number | string | undefined): boolean => {
 };
 
 export interface ActionIconProps
-    extends ElementProps<'button', keyof MantineActionIconProps>,
-        MantineActionIconProps {
+    extends ElementProps<'button', keyof MantineActionIconProps>, MantineActionIconProps {
     icon?: keyof typeof AppIcon;
     iconProps?: Omit<IconProps, 'icon'>;
     stopsPropagation?: boolean;

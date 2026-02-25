@@ -1337,21 +1337,21 @@ export enum LyricSource {
     NETEASE = 'NetEase',
 }
 
-export type ArtistRadioArgs = BaseEndpointArgs & {
-    query: ArtistRadioQuery;
-};
-
-export type ArtistRadioQuery = {
-    artistId: string;
-    count?: number;
-};
-
 export type AlbumRadioArgs = BaseEndpointArgs & {
     query: AlbumRadioQuery;
 };
 
 export type AlbumRadioQuery = {
     albumId: string;
+    count?: number;
+};
+
+export type ArtistRadioArgs = BaseEndpointArgs & {
+    query: ArtistRadioQuery;
+};
+
+export type ArtistRadioQuery = {
+    artistId: string;
     count?: number;
 };
 

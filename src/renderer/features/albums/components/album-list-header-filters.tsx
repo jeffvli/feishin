@@ -54,15 +54,15 @@ export const AlbumListHeaderFilters = ({ toggleGenreTarget }: { toggleGenreTarge
 
         return Boolean(
             isFilterValueSet(query[FILTER_KEYS.ALBUM._CUSTOM]) ||
-                isFilterValueSet(query[FILTER_KEYS.ALBUM.ARTIST_IDS]) ||
-                query[FILTER_KEYS.ALBUM.COMPILATION] !== undefined ||
-                query[FILTER_KEYS.ALBUM.FAVORITE] !== undefined ||
-                isFilterValueSet(query[FILTER_KEYS.ALBUM.GENRE_ID]) ||
-                query[FILTER_KEYS.ALBUM.HAS_RATING] !== undefined ||
-                isFilterValueSet(query[FILTER_KEYS.ALBUM.MAX_YEAR]) ||
-                isFilterValueSet(query[FILTER_KEYS.ALBUM.MIN_YEAR]) ||
-                query[FILTER_KEYS.ALBUM.RECENTLY_PLAYED] !== undefined ||
-                isFilterValueSet(query[FILTER_KEYS.SHARED.SEARCH_TERM]),
+            isFilterValueSet(query[FILTER_KEYS.ALBUM.ARTIST_IDS]) ||
+            query[FILTER_KEYS.ALBUM.COMPILATION] !== undefined ||
+            query[FILTER_KEYS.ALBUM.FAVORITE] !== undefined ||
+            isFilterValueSet(query[FILTER_KEYS.ALBUM.GENRE_ID]) ||
+            query[FILTER_KEYS.ALBUM.HAS_RATING] !== undefined ||
+            isFilterValueSet(query[FILTER_KEYS.ALBUM.MAX_YEAR]) ||
+            isFilterValueSet(query[FILTER_KEYS.ALBUM.MIN_YEAR]) ||
+            query[FILTER_KEYS.ALBUM.RECENTLY_PLAYED] !== undefined ||
+            isFilterValueSet(query[FILTER_KEYS.SHARED.SEARCH_TERM]),
         );
     }, [albumFilters.query]);
 
