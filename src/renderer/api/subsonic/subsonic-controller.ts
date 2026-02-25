@@ -695,7 +695,12 @@ export const SubsonicController: InternalControllerEndpoint = {
         }
 
         return res.body.similarSongs.song.map((song) =>
-            ssNormalize.song(song, apiClientProps.server, context?.imageSize),
+            ssNormalize.song(
+                song,
+                apiClientProps.server,
+                context?.pathReplace,
+                context?.pathReplaceWith,
+            ),
         );
     },
     getArtistList: async (args) => {
