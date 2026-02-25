@@ -8,6 +8,7 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
+import { clearAnimatedCoverCache } from '/@/renderer/api/animated-covers-api';
 import { Button } from '/@/shared/components/button/button';
 import { ConfirmModal } from '/@/shared/components/modal/modal';
 import { toast } from '/@/shared/components/toast/toast';
@@ -91,6 +92,37 @@ export const CacheSettings = memo(() => {
             }),
             isHidden: !browser,
             title: t('setting.clearCache', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Button
+                    disabled={isClearing}
+                    onClick={() => {
+                        setIsClearing(true);
+                        try {
+                            clearAnimatedCoverCache();
+                            toast.success({
+                                message: t('setting.clearAnimatedCoversCacheSuccess', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                            });
+                        } catch (error) {
+                            console.error(error);
+                            toast.error({ message: (error as Error).message });
+                        }
+                        setIsClearing(false);
+                    }}
+                    size="compact-md"
+                    variant="filled"
+                >
+                    {t('common.clear', { postProcess: 'sentenceCase' })}
+                </Button>
+            ),
+            description: t('setting.clearAnimatedCoversCache', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.clearAnimatedCoversCache', { postProcess: 'sentenceCase' }),
         },
     ];
 

@@ -425,6 +425,14 @@ export const GeneralSettingsSchema = z.object({
         ),
     albumBackground: z.boolean(),
     albumBackgroundBlur: z.number(),
+    animatedCovers: z.object({
+        albumDetail: z.boolean(),
+        apiBase: z.string().optional(),
+        enabled: z.boolean(),
+        fullScreenPlayer: z.boolean(),
+        miniPlayer: z.boolean(),
+        sidebarImage: z.boolean(),
+    }),
     artistBackground: z.boolean(),
     artistBackgroundBlur: z.number(),
     artistItems: z.array(SortableItemSchema(ArtistItemSchema)),
@@ -1008,6 +1016,14 @@ const initialState: SettingsState = {
         accent: 'rgb(53, 116, 252)',
         albumBackground: false,
         albumBackgroundBlur: 3,
+        animatedCovers: {
+            albumDetail: true,
+            apiBase: '',
+            enabled: true,
+            fullScreenPlayer: true,
+            miniPlayer: true,
+            sidebarImage: true,
+        },
         artistBackground: true,
         artistBackgroundBlur: 3,
         artistItems,
@@ -2255,6 +2271,30 @@ export const useTableSettings = (type: ItemListKey) =>
     useSettingsStore((state) => state.lists[type as keyof typeof state.lists]);
 
 export const useGeneralSettings = () => useSettingsStore((state) => state.general, shallow);
+
+export const useAnimatedCoversSettings = () =>
+    useSettingsStore((state) => state.general.animatedCovers, shallow);
+
+export enum AnimatedCoverScreen {
+    ALBUM_DETAIL = 'albumDetail',
+    FULL_SCREEN_PLAYER = 'fullScreenPlayer',
+    MINI_PLAYER = 'miniPlayer',
+    SIDEBAR_IMAGE = 'sidebarImage',
+}
+
+export const shouldShowAnimatedCover = (
+    screen: AnimatedCoverScreen,
+    settings?: ReturnType<typeof useAnimatedCoversSettings>,
+): boolean => {
+    const animatedCoversSettings =
+        settings || useSettingsStore.getState().general.animatedCovers;
+
+    if (!animatedCoversSettings.enabled) {
+        return false;
+    }
+    
+    return animatedCoversSettings[screen] ?? false;
+};
 
 export const usePlaybackType = () => useSettingsStore((state) => state.playback.type, shallow);
 

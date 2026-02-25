@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
+import { AnimatedCoverSettings } from '/@/renderer/features/settings/components/general/animated-cover-settings';
 import { ApplicationSettings } from '/@/renderer/features/settings/components/general/application-settings';
 import { ControlSettings } from '/@/renderer/features/settings/components/general/control-settings';
 import { LyricSettings } from '/@/renderer/features/settings/components/general/lyric-settings';
@@ -26,6 +27,7 @@ export const GeneralTab = memo(() => {
             { component: SidebarSettings, key: 'sidebar' },
             { component: ScrobbleSettings, key: 'scrobble' },
             { component: LyricSettings, key: 'lyrics' },
+            { component: AnimatedCoverSettings, key: 'animatedCovers' },
         ];
 
         if (supportsSmartPlaylists) {

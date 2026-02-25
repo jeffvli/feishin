@@ -5,13 +5,17 @@ import { generatePath, Link } from 'react-router';
 
 import styles from './full-screen-player-image.module.css';
 
+import { AnimatedVideoCover } from '/@/renderer/components/animated-video-cover/animated-video-cover';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import {
     useIsRadioActive,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
+    AnimatedCoverScreen,
+    shouldShowAnimatedCover,
     useGeneralSettings,
     useNativeAspectRatio,
     usePlayerData,
@@ -95,6 +99,7 @@ const ImageWithPlaceholder = ({
 
 export const FullScreenPlayerImage = () => {
     const mainImageRef = useRef<HTMLImageElement | null>(null);
+    const videoRef = useRef<HTMLVideoElement | null>(null);
 
     const isRadioActive = useIsRadioActive();
     const { isPlaying: isRadioPlaying, metadata: radioMetadata, stationName } = useRadioPlayer();
@@ -104,6 +109,14 @@ export const FullScreenPlayerImage = () => {
     const { blurExplicitImages } = useGeneralSettings();
 
     const isPlayingRadio = isRadioActive && isRadioPlaying;
+
+    const showAnimatedCover = shouldShowAnimatedCover(AnimatedCoverScreen.FULL_SCREEN_PLAYER);
+
+    const { animatedCoverUrl } = useAnimatedCover({
+        albumName: currentSong?.album ?? undefined,
+        artistName: currentSong?.albumArtistName,
+        enabled: showAnimatedCover && !isPlayingRadio && !!currentSong,
+    });
 
     const currentImageUrl = useItemImageUrl({
         id: currentSong?.imageId || undefined,
@@ -179,7 +192,30 @@ export const FullScreenPlayerImage = () => {
             justify="flex-start"
             p="1rem"
         >
-            <div className={styles.imageContainer} ref={mainImageRef}>
+            <div className={styles.imageContainer} ref={mainImageRef} style={{ position: 'relative' }}>
+                {animatedCoverUrl && !isPlayingRadio && (
+                    <AnimatedVideoCover
+                        ref={videoRef}
+                        className="full-screen-player-image"
+                        onLoadError={(error) => {
+                            console.warn('[DesktopPlayer] Video playback failed:', error);
+                        }}
+                        src={animatedCoverUrl}
+                        staticImageUrl={
+                            imageState.current === 0 ? imageState.topImage : imageState.bottomImage
+                        }
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'contain',
+                            zIndex: 10,
+                        }}
+                    />
+                )}
+                
                 <AnimatePresence initial={false} mode="sync">
                     {!isPlayingRadio && imageState.current === 0 && (
                         <ImageWithPlaceholder

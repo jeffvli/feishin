@@ -1,3 +1,4 @@
+import './animated-covers';
 import './autodiscover';
 import './lyrics';
 import './player';

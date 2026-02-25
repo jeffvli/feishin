@@ -1,6 +1,7 @@
 import { electronAPI } from '@electron-toolkit/preload';
 import { contextBridge } from 'electron';
 
+import { animatedCovers } from './animated-covers';
 import { autodiscover } from './autodiscover';
 import { browser } from './browser';
 import { discordRpc } from './discord-rpc';
@@ -14,6 +15,7 @@ import { utils } from './utils';
 
 // Custom APIs for renderer
 const api = {
+    animatedCovers,
     autodiscover,
     browser,
     discordRpc,

@@ -1,11 +1,13 @@
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'motion/react';
-import { CSSProperties, MouseEvent, useMemo } from 'react';
+import { CSSProperties, MouseEvent, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './sidebar.module.css';
 
+import { AnimatedVideoCover } from '/@/renderer/components/animated-video-cover/animated-video-cover';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import {
     useIsRadioActive,
@@ -21,6 +23,8 @@ import {
     SidebarSharedPlaylistList,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
 import {
+    AnimatedCoverScreen,
+    shouldShowAnimatedCover,
     useAppStore,
     useAppStoreActions,
     useFullScreenPlayerStore,
@@ -169,6 +173,15 @@ const SidebarImage = () => {
     const isRadioActive = useIsRadioActive();
     const { isPlaying: isRadioPlaying } = useRadioPlayer();
     const { blurExplicitImages } = useGeneralSettings();
+    
+    const showAnimatedCover = shouldShowAnimatedCover(AnimatedCoverScreen.SIDEBAR_IMAGE);
+
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const { animatedCoverUrl } = useAnimatedCover({
+        albumName: currentSong?.album ?? undefined,
+        artistName: currentSong?.albumArtists?.[0]?.name || currentSong?.artists?.[0]?.name,
+        enabled: showAnimatedCover && !isRadioActive && !!currentSong,
+    });
 
     const imageUrl = useItemImageUrl({
         id: currentSong?.imageId || undefined,
@@ -237,15 +250,38 @@ const SidebarImage = () => {
                         <Icon color="muted" icon="radio" size="40%" />
                     </Center>
                 ) : imageUrl ? (
-                    <img
-                        className={clsx(styles.sidebarImage, {
-                            [styles.censored]:
-                                currentSong?.explicitStatus === ExplicitStatus.EXPLICIT &&
-                                blurExplicitImages,
-                        })}
-                        loading="eager"
-                        src={imageUrl}
-                    />
+                    <div
+                        style={{
+                            borderRadius: 'var(--theme-card-default-radius)',
+                            height: '100%',
+                            overflow: 'hidden',
+                            position: 'relative',
+                            width: '100%',
+                        }}
+                    >
+                        <img
+                            className={clsx(styles.sidebarImage, {
+                                [styles.censored]:
+                                    currentSong?.explicitStatus === ExplicitStatus.EXPLICIT &&
+                                    blurExplicitImages,
+                            })}
+                            loading="eager"
+                            src={imageUrl}
+                        />
+                        {animatedCoverUrl && (
+                            <AnimatedVideoCover
+                                ref={videoRef}
+                                className={styles.sidebarImage}
+                                src={animatedCoverUrl}
+                                style={{
+                                    left: 0,
+                                    position: 'absolute',
+                                    top: 0,
+                                    zIndex: 10,
+                                }}
+                            />
+                        )}
+                    </div>
                 ) : (
                     <ImageUnloader icon="emptySongImage" />
                 )}
@@ -266,6 +302,7 @@ const SidebarImage = () => {
                     position: 'absolute',
                     right: '1rem',
                     top: '1rem',
+                    zIndex: 20,
                 }}
                 tooltip={{
                     label: t('common.collapse', {
