@@ -637,6 +637,7 @@
         "addNext": "next",
         "addLastShuffled": "last (shuffled)",
         "addNextShuffled": "next (shuffled)",
+        "albumRadio": "album radio",
         "artistRadio": "artist radio",
         "holdToShuffle": "hold to shuffle",
         "favorite": "favorite",
