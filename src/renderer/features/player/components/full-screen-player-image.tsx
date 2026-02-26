@@ -283,12 +283,10 @@ export const FullScreenPlayerImage = () => {
                 </Text>
                 {!isPlayingRadio && (
                     <Group justify="center" mt="sm">
-                        {currentSong?.container && (
-                            <Badge variant="transparent">{currentSong?.container}</Badge>
+                        {currentSong?.tags.releasetype && (
+                            <Badge>{currentSong?.tags.releasetype[0]}</Badge>
                         )}
-                        {currentSong?.releaseYear && (
-                            <Badge variant="transparent">{currentSong?.releaseYear}</Badge>
-                        )}
+                        {currentSong?.releaseYear && <Badge>{currentSong?.releaseYear}</Badge>}
                     </Group>
                 )}
             </Stack>
