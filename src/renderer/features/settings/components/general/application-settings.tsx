@@ -11,6 +11,7 @@ import {
     ArtistReleaseTypeSettings,
     ArtistSettings,
 } from '/@/renderer/features/settings/components/general/artist-settings';
+import { FullscreenPlayerSettings } from '/@/renderer/features/settings/components/general/fullscreen-player-settings';
 import { HomeSettings } from '/@/renderer/features/settings/components/general/home-settings';
 import { PathSettings } from '/@/renderer/features/settings/components/general/path-settings';
 import {
@@ -697,6 +698,7 @@ export const ApplicationSettings = memo(() => {
                     <HomeSettings />
                     <ArtistSettings />
                     <ArtistReleaseTypeSettings />
+                    <FullscreenPlayerSettings />
                     <PathSettings />
                 </>
             }

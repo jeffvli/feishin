@@ -74,6 +74,8 @@ const HomeItemSchema = z.enum([
     'recentlyReleased',
 ]);
 
+const PlayerItemSchema = z.enum(['codec', 'year', 'release_type']);
+
 const ArtistItemSchema = z.enum([
     'biography',
     'compilations',
@@ -461,6 +463,7 @@ export const GeneralSettingsSchema = z.object({
     playButtonBehavior: z.nativeEnum(Play),
     playerbarOpenDrawer: z.boolean(),
     playerbarSlider: PlayerbarSliderSchema,
+    playerItems: z.array(SortableItemSchema(PlayerItemSchema)),
     playlistTarget: PlaylistTargetSchema,
     resume: z.boolean(),
     showLyricsInSidebar: z.boolean(),
@@ -779,6 +782,12 @@ export enum PlayerbarSliderType {
     WAVEFORM = 'waveform',
 }
 
+export enum PlayerItem {
+    CODEC = 'codec',
+    RELEASE_TYPE = 'release_type',
+    YEAR = 'year',
+}
+
 export enum PlaylistTarget {
     ALBUM = 'album',
     TRACK = 'track',
@@ -838,6 +847,7 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
         setHomeItems: (item: SortableItem<HomeItem>[]) => void;
         setList: (type: ItemListKey, data: DeepPartial<ItemListSettings>) => void;
         setPlaybackFilters: (filters: PlayerFilter[]) => void;
+        setPlayerItems: (items: SortableItem<PlayerItem>[]) => void;
         setPlaylistBehavior: (target: PlaylistTarget) => void;
         setSettings: (data: DeepPartial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
@@ -861,6 +871,21 @@ export type SortableItem<T extends string> = {
 export type TranscodingConfig = z.infer<typeof TranscodingConfigSchema>;
 
 export type VersionedSettings = SettingsState & { version: number };
+
+export const playerItems: SortableItem<PlayerItem>[] = [
+    {
+        disabled: false,
+        id: PlayerItem.RELEASE_TYPE,
+    },
+    {
+        disabled: false,
+        id: PlayerItem.YEAR,
+    },
+    {
+        disabled: true,
+        id: PlayerItem.CODEC,
+    },
+];
 
 export const sidebarItems: SidebarItemType[] = [
     {
@@ -1050,6 +1075,7 @@ const initialState: SettingsState = {
             barWidth: 2,
             type: PlayerbarSliderType.SLIDER,
         },
+        playerItems,
         playlistTarget: PlaylistTarget.TRACK,
         resume: true,
         showLyricsInSidebar: true,
@@ -1897,6 +1923,11 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                                 state.playback.filters = filters;
                             });
                         },
+                        setPlayerItems: (items: SortableItem<PlayerItem>[]) => {
+                            set((state) => {
+                                state.general.playerItems = items;
+                            });
+                        },
                         setPlaylistBehavior: (target: PlaylistTarget) => {
                             set((state) => {
                                 state.general.playlistTarget = target;
@@ -2371,6 +2402,8 @@ export const useSidebarPlaylistListFilterRegex = () =>
 
 export const useSidebarItems = () =>
     useSettingsStore((state) => state.general.sidebarItems, shallow);
+
+export const usePlayerItems = () => useSettingsStore((state) => state.general.playerItems, shallow);
 
 export const useSidebarCollapsedNavigation = () =>
     useSettingsStore((state) => state.general.sidebarCollapsedNavigation, shallow);

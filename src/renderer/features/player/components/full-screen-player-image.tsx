@@ -101,7 +101,7 @@ export const FullScreenPlayerImage = () => {
 
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();
-    const { blurExplicitImages } = useGeneralSettings();
+    const { blurExplicitImages, playerItems } = useGeneralSettings();
 
     const isPlayingRadio = isRadioActive && isRadioPlaying;
 
@@ -170,6 +170,14 @@ export const FullScreenPlayerImage = () => {
         currentSong?.explicitStatus,
         nextSong?.explicitStatus,
     ]);
+
+    const builtDataItems = {
+        codec: currentSong?.container && <Badge>{currentSong?.container}</Badge>,
+        release_type: currentSong?.tags?.releasetype && (
+            <Badge>{currentSong?.tags?.releasetype[0]}</Badge>
+        ),
+        year: currentSong?.releaseYear && <Badge>{currentSong?.releaseYear}</Badge>,
+    };
 
     return (
         <Flex
@@ -283,10 +291,7 @@ export const FullScreenPlayerImage = () => {
                 </Text>
                 {!isPlayingRadio && (
                     <Group justify="center" mt="sm">
-                        {currentSong?.tags.releasetype && (
-                            <Badge>{currentSong?.tags.releasetype[0]}</Badge>
-                        )}
-                        {currentSong?.releaseYear && <Badge>{currentSong?.releaseYear}</Badge>}
+                        {playerItems.map((i) => !i.disabled && builtDataItems[i.id])}
                     </Group>
                 )}
             </Stack>

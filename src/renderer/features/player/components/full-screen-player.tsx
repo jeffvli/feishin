@@ -555,7 +555,6 @@ const Controls = () => {
                             />
                         </Option.Control>
                     </Option>
-                    <Divider my="sm" />
                 </Popover.Dropdown>
             </Popover>
             <ListConfigMenu
