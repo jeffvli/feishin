@@ -1039,7 +1039,9 @@
             "description": "popis",
             "expireInvalid": "čas vypršení musí být v budoucnosti",
             "setExpiration": "nastavit vypršení",
-            "createFailed": "nepodařilo se vytvořit sdílení (je sdílení povoleno?)"
+            "createFailed": "nepodařilo se vytvořit sdílení (je sdílení povoleno?)",
+            "copyToClipboard": "Zkopírovat do schránky: Ctrl+C, Enter",
+            "successMustClick": "sdílení úspěšně vytvořeno. klikněte sem pro otevření"
         },
         "privateMode": {
             "enabled": "soukromý režim povolen, stav přehrávání je nyní skryt před externími integracemi",

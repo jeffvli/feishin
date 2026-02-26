@@ -35,7 +35,9 @@
         "restoreQueueFromServer": "サーバーからキューを復元",
         "saveQueueToServer": "サーバーにキューを保存",
         "addLastShuffled": "最後 (シャッフル)",
-        "addNextShuffled": "次 (シャッフル)"
+        "addNextShuffled": "次 (シャッフル)",
+        "sleepTimer_minutes": "{{count}} 分",
+        "sleepTimer_hours": "{{count}} 時間"
     },
     "setting": {
         "crossfadeStyle_description": "オーディオプレーヤーが使用するクロスフェードのスタイルを選択します",
@@ -43,7 +45,7 @@
         "hotkey_skipBackward": "前にスキップ",
         "replayGainMode_description": "ファイルのメタデータに保存されている {{ReplayGain}} 値に従って音量ゲインを調整します",
         "volumeWheelStep_description": "音量スライダーでマウスホイールをスクロールしたときに変化する音量を設定します",
-        "audioDevice_description": "再生に使用するオーディオデバイスを選択します (Web プレーヤーのみ)",
+        "audioDevice_description": "再生に使用するオーディオデバイスを選択します",
         "theme_description": "アプリケーションに使用するテーマを設定します",
         "hotkey_playbackPause": "一時停止",
         "replayGainFallback": "{{ReplayGain}} フォールバック",
@@ -262,7 +264,7 @@
         "releaseChannel_optionBeta": "ベータ",
         "releaseChannel_optionLatest": "最新",
         "releaseChannel": "リリースチャンネル",
-        "releaseChannel_description": "自動更新のために安定版リリースまたはベータ版リリースを選択してください",
+        "releaseChannel_description": "自動更新のために、安定版、ベータ版、またはアルファ版 (nightly build) リリースから選択してください",
         "discordDisplayType_artistname": "アーティスト名",
         "discordDisplayType_songname": "曲名",
         "discordLinkType_description": "{{discord}} Rich Presence において、曲とアーティストのフィールドに {{lastfm}} または {{musicbrainz}} への外部リンクを追加します。{{musicbrainz}} は最も正確ですが、タグが必要でアーティストリンクを提供しません。一方、{{lastfm}} は常にリンクを提供します。追加のネットワークリクエストは発生しません",
@@ -648,7 +650,9 @@
         "noNetwork": "サーバーが利用できません",
         "noNetworkDescription": "このサーバーに接続できませんでした",
         "saveQueueFailed": "キューを保存できませんでした",
-        "settingsSyncError": "レンダラーとメインプロセスの設定に矛盾が見つかりました。変更を適用するにはアプリケーションを再起動してください"
+        "settingsSyncError": "レンダラーとメインプロセスの設定に矛盾が見つかりました。変更を適用するにはアプリケーションを再起動してください",
+        "invalidJson": "無効な JSON",
+        "serverLockSingleServer": "サーバーがロックされている場合、1 つのサーバーのみが許可されます"
     },
     "filter": {
         "mostPlayed": "最も多く再生",

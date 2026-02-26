@@ -144,6 +144,7 @@ export const NDSongQueryFields = [
     { label: 'MusicBrainz Work Id', type: 'string', value: 'musicbrainz_workid' },
     { label: 'Name', type: 'string', value: 'title' },
     { label: 'Original Date', type: 'date', value: 'originaldate' },
+    { label: 'Original Year', type: 'date', value: 'originalyear' },
     { label: 'Performer', type: 'string', value: 'performer' },
     { label: 'Play Count', type: 'number', value: 'playcount' },
     { label: 'Playlist', type: 'playlist', value: 'id' },

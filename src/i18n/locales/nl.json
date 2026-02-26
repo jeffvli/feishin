@@ -169,7 +169,7 @@
         "comment": "commentaar",
         "playCount": "aantal keer afgespeeld",
         "recentlyUpdated": "recentelijk geüpdate",
-        "channels": "$t(common.channel_other)",
+        "channels": "$t(common.channel, {\"count\": 2})",
         "isCompilation": "is compilatie",
         "recentlyPlayed": "recentelijk afgespeeld",
         "isRated": "is rated",
@@ -205,7 +205,9 @@
         "toYear": "tot jaar",
         "trackNumber": "track",
         "explicitStatus": "$t(common.explicitStatus)",
-        "sortName": "sorteernaam"
+        "sortName": "sorteernaam",
+        "matchAnd": "en",
+        "matchOr": "of"
     },
     "page": {
         "contextMenu": {
@@ -412,6 +414,11 @@
         "collections": {
             "overrideExisting": "bestaande overschrijven",
             "saveAsCollection": "sla op als verzameling"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "commits sinds {{stable}}",
+            "noNewCommits": "geen nieuwe commits in dit bereik",
+            "noStableReleaseToCompare": "geen stabiele uitgave beschikbaar om mee te vergelijken"
         }
     },
     "error": {
@@ -443,7 +450,9 @@
         "noNetwork": "server niet beschikbaar",
         "noNetworkDescription": "kan geen verbinding maken met deze server",
         "saveQueueFailed": "kan wachtrij niet opslaan",
-        "settingsSyncError": "Er zijn verschillen gevonden tussen de instellingen in de renderer en het hoofdproces. Start de applicatie opnieuw op om de wijzigingen toe te passen"
+        "settingsSyncError": "Er zijn verschillen gevonden tussen de instellingen in de renderer en het hoofdproces. Start de applicatie opnieuw op om de wijzigingen toe te passen",
+        "invalidJson": "ongeldige JSON",
+        "serverLockSingleServer": "slechts één server is toegestaan als server op slot is gezet"
     },
     "entity": {
         "genre_one": "genre",
@@ -589,7 +598,8 @@
             "view": {
                 "grid": "grid",
                 "list": "lijst",
-                "table": "tabel"
+                "table": "tabel",
+                "detail": "details"
             }
         }
     },
@@ -603,7 +613,7 @@
         "discordListening_description": "status weergeven als ‘luisterend’ in plaats van ‘afspelend’",
         "discordListening": "status weergeven als 'luisterend'",
         "discordPausedStatus_description": "wanneer ingeschakeld, wordt de status ook weergegeven als de speler gepauzeerd is",
-        "discordPausedStatus": "rich presence tonen wanneer gepauseerd",
+        "discordPausedStatus": "rich presence tonen wanneer gepauzeerd",
         "discordRichPresence": "{{discord}} rich presence",
         "exitToTray_description": "sluit de applicatie naar het systeemvak",
         "exitToTray": "sluit naar systeemvak",
@@ -659,7 +669,7 @@
         "artistConfiguration_description": "configureer welke items worden getoond op de albumartiestpagina en in welke volgorde",
         "artistReleaseTypeConfiguration": "configuratie artiestuitgavesoorten",
         "artistReleaseTypeConfiguration_description": "configureer welke uitgavesoorten worden getoond op de albumartiestpagina en in welke volgorde",
-        "audioDevice_description": "kies het audioapparaat dat wordt gebruikt om af te spelen (enkel voor de webspeler)",
+        "audioDevice_description": "kies het audioapparaat dat wordt gebruikt om af te spelen",
         "audioDevice": "audioapparaat",
         "audioExclusiveMode_description": "schakel exclusieve uitvoermodus in. In deze modus wordt het systeem normaliter uitgesloten en zal enkel mpv audio kunnen uitvoeren",
         "audioExclusiveMode": "audio-exclusieve modus",
@@ -688,7 +698,7 @@
         "releaseChannel_optionBeta": "beta",
         "releaseChannel_optionLatest": "meest recente",
         "releaseChannel": "releasekanaal",
-        "releaseChannel_description": "kies tussen stabiele releases of beta-releases voor automatische updates",
+        "releaseChannel_description": "kies tussen stabiele, of beta- of alpha-releases (nachtelijk) voor automatische updates",
         "disableLibraryUpdateOnStartup": "niet controleren op nieuwe versies bij het opstarten",
         "discordApplicationId_description": "de applicatie-id voor {{discord}} rich presence (standaard is {{defaultId}})",
         "hotkey_listPlayNow": "nu in lijst spelen",
@@ -728,7 +738,7 @@
         "lastfmApiKey": "{{lastfm}}-API-sleutel",
         "lyricFetch_description": "bevraag verschillende bronnen op het internet voor songteksten",
         "lyricFetch": "haal songteksten op van het internet",
-        "lyricFetchProvider_description": "kies de diensten die geraadpleegd worden voor songteksten. de volgorde van de diensten is tevens de volgorde waarop deze worden geraadpleegd",
+        "lyricFetchProvider_description": "kies de diensten die geraadpleegd worden voor songteksten",
         "lyricFetchProvider": "diensten voor songteksten",
         "lyricOffset_description": "compenseer de songtekst met het gegeven aantal milliseconden",
         "lyricOffset": "compensatie songtekst (ms)",
@@ -937,7 +947,14 @@
         "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
         "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
         "replayGainMode_optionNone": "$t(common.none)",
-        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})"
+        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
+        "analyticsEnable": "Verstuur gebruiksstatistieken",
+        "analyticsEnable_description": "Geanonimiseerde gebruiksgegevens worden naar de ontwikkelaar gestuurd om te helpen de applicatie te verbeteren",
+        "automaticUpdates": "Automatisch bijwerken",
+        "automaticUpdates_description": "Zoek en installeer updates automatisch",
+        "releaseChannel_optionAlpha": "alfa (nachtelijk)",
+        "discordStateIcon": "toon afspeelicoon",
+        "discordStateIcon_description": "toon een klein afspeelicoon in de rich-presence-status. het gepauzeerde icoon wordt altijd getoond als \"rich presence tonen wanneer gepauzeerd\" is ingeschakeld"
     },
     "form": {
         "addServer": {
@@ -1009,7 +1026,9 @@
             "setExpiration": "stel vervaldatum in",
             "success": "deel link gekopiëerd naar klembord (of klik hier om te openen)",
             "expireInvalid": "vervaldatum moet in de toekomst zijn",
-            "createFailed": "kon share niet aanmaken (is delen aangezet?)"
+            "createFailed": "kon share niet aanmaken (is delen aangezet?)",
+            "copyToClipboard": "Kopieer naar klembord: Ctrl+C, Enter",
+            "successMustClick": "gedeelde bron succesvol aangemaakt. klik hier om te openen"
         },
         "privateMode": {
             "enabled": "private modus ingeschakeld, afspeelstatus is nu verborgen voor externe integraties",
@@ -1086,7 +1105,16 @@
         "trackRadio": "nummerradio",
         "unfavorite": "verwijder favoriet",
         "pause": "pauzeren",
-        "viewQueue": "toon wachtrij"
+        "viewQueue": "toon wachtrij",
+        "sleepTimer": "slaaptimer",
+        "sleepTimer_endOfSong": "einde van huidige nummer",
+        "sleepTimer_minutes": "{{count}} min",
+        "sleepTimer_hours": "{{count}} uur",
+        "sleepTimer_custom": "afwijkend",
+        "sleepTimer_off": "uit",
+        "sleepTimer_timeRemaining": "{{time}} resterend",
+        "sleepTimer_setCustom": "timer instellen",
+        "sleepTimer_cancel": "timer annuleren"
     },
     "datetime": {
         "minuteShort": "m",
