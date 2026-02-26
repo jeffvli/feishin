@@ -1,8 +1,15 @@
-import isElectron from 'is-electron';
-
 import { logFn } from '/@/renderer/utils/logger';
 
-const animatedCoversIpc = isElectron() ? window.api.animatedCovers : null;
+const ANIMATED_COVERS_API_BASE = 'https://artwork.m8tec.top';
+const ANIMATED_COVERS_API_ENDPOINT = '/api/v1/artwork/search';
+const REQUEST_TIMEOUT = 10000;
+
+interface AnimatedCoverResponse {
+    album?: string;
+    artist?: string;
+    isCached?: boolean;
+    url?: string;
+}
 
 const animatedCoverCache = new Map<string, null | string>();
 
@@ -22,33 +29,55 @@ export const getAnimatedCoverUrl = async (
     const cacheKey = getCacheKey(albumName, artistName);
 
     if (animatedCoverCache.has(cacheKey)) {
-        const cachedUrl = animatedCoverCache.get(cacheKey);
-        return cachedUrl || null;
+        return animatedCoverCache.get(cacheKey) || null;
     }
 
-    if (!animatedCoversIpc) {
-        return null;
-    }
+    const baseUrl = apiBase || ANIMATED_COVERS_API_BASE;
 
     try {
-        const url = await animatedCoversIpc.getAnimatedCoverUrl(albumName, artistName, apiBase);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
-        // Store in cache (even if null to avoid re-fetching failed lookups)
-        animatedCoverCache.set(cacheKey, url);
+        const params = new URLSearchParams({
+            album: albumName,
+            artist: artistName,
+        });
+        const url = `${baseUrl}${ANIMATED_COVERS_API_ENDPOINT}?${params.toString()}`;
 
-        return url;
+        const response = await fetch(url, {
+            method: 'GET',
+            signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            animatedCoverCache.set(cacheKey, null);
+            return null;
+        }
+
+        const data: AnimatedCoverResponse = await response.json();
+        const coverUrl = data.url || null;
+
+        animatedCoverCache.set(cacheKey, coverUrl);
+        return coverUrl;
     } catch (error) {
         if (error instanceof Error) {
-            logFn.error('AnimatedCovers-API IPC error:', {
-                meta: { message: error.message, name: error.name },
-            });
+            if (error.name === 'AbortError') {
+                logFn.warn(`AnimatedCovers-API Request timeout after ${REQUEST_TIMEOUT / 1000}s`, {
+                    meta: { album: albumName, artist: artistName },
+                });
+            } else {
+                logFn.error('AnimatedCovers-API Fetch error:', {
+                    meta: { message: error.message, name: error.name },
+                });
+            }
         } else {
-            logFn.error('AnimatedCovers-API Unknown IPC error:', { meta: { error } });
+            logFn.error('AnimatedCovers-API Unknown fetch error:', { meta: { error } });
         }
 
         // Cache the failure to avoid repeated failed requests
         animatedCoverCache.set(cacheKey, null);
-
         return null;
     }
 };
