@@ -1,8 +1,8 @@
 import HLS from 'hls.js';
-import { HTMLMotionProps, motion } from 'motion/react';
 import { forwardRef, SyntheticEvent, useEffect, useRef, useState } from 'react';
 
-interface AnimatedVideoCoverProps extends Omit<HTMLMotionProps<'video'>, 'onError' | 'src'> {
+interface AnimatedVideoCoverProps
+    extends Omit<React.VideoHTMLAttributes<HTMLVideoElement>, 'onError' | 'src'> {
     fallbackElement?: React.ReactNode;
     isPlaying?: boolean;
     onLoadError?: (error?: string) => void;
@@ -159,7 +159,7 @@ export const AnimatedVideoCover = forwardRef<HTMLVideoElement, AnimatedVideoCove
         }
 
         return (
-            <motion.video
+            <video
                 autoPlay={isPlaying}
                 className={className}
                 crossOrigin="anonymous"
