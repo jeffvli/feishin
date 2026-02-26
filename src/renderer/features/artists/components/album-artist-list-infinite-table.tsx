@@ -17,7 +17,8 @@ import {
 } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
-interface AlbumArtistListInfiniteTableProps extends ItemListTableComponentProps<AlbumArtistListQuery> {}
+interface AlbumArtistListInfiniteTableProps
+    extends ItemListTableComponentProps<AlbumArtistListQuery> {}
 
 export const AlbumArtistListInfiniteTable = ({
     autoFitColumns = false,

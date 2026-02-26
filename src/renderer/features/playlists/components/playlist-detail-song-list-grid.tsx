@@ -20,10 +20,8 @@ import {
 } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
-interface PlaylistDetailSongListGridProps extends Omit<
-    ItemListGridComponentProps<PlaylistSongListQuery>,
-    'query'
-> {
+interface PlaylistDetailSongListGridProps
+    extends Omit<ItemListGridComponentProps<PlaylistSongListQuery>, 'query'> {
     currentPage?: number;
     data: PlaylistSongListResponse;
     items?: Song[];

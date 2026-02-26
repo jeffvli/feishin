@@ -18,7 +18,8 @@ import {
 } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
-interface AlbumArtistListPaginatedGridProps extends ItemListGridComponentProps<AlbumArtistListQuery> {}
+interface AlbumArtistListPaginatedGridProps
+    extends ItemListGridComponentProps<AlbumArtistListQuery> {}
 
 export const AlbumArtistListPaginatedGrid = ({
     gap = 'md',
