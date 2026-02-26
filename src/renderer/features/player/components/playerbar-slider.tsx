@@ -4,7 +4,6 @@ import { lazy, Suspense } from 'react';
 import { PlayerbarSeekSlider } from './playerbar-seek-slider';
 import styles from './playerbar-slider.module.css';
 
-import { useRemote } from '/@/renderer/features/remote/hooks/use-remote';
 import {
     useAppStore,
     useAppStoreActions,
@@ -36,8 +35,6 @@ export const PlayerbarSlider = () => {
 
     const showTimeRemaining = useAppStore((state) => state.showTimeRemaining);
     const { setShowTimeRemaining } = useAppStoreActions();
-
-    useRemote();
 
     const isWaveform = playerbarSlider?.type === PlayerbarSliderType.WAVEFORM;
 

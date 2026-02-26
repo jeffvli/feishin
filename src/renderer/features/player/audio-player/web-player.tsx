@@ -84,6 +84,7 @@ export function WebPlayer() {
             if (status === PlayerStatus.PAUSED) {
                 await promise;
                 setLocalPlayerStatus(status);
+                playerRef.current?.setVolume(startVolume);
             } else if (status === PlayerStatus.PLAYING) {
                 setLocalPlayerStatus(status);
                 await promise;
@@ -257,7 +258,7 @@ export function WebPlayer() {
                     }
                 } else {
                     if (status === PlayerStatus.PAUSED) {
-                        playerRef.current?.setVolume(0);
+                        playerRef.current?.setVolume(volume);
                         setLocalPlayerStatus(PlayerStatus.PAUSED);
                     } else if (status === PlayerStatus.PLAYING) {
                         playerRef.current?.setVolume(volume);

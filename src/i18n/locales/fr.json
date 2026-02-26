@@ -927,7 +927,9 @@
             "setExpiration": "définir une expiration",
             "success": "lien de partage copié dans le presse-papier (ou cliquez ici pour ouvrir)",
             "expireInvalid": "l'expiration doit être définie à une date ultérieure",
-            "createFailed": "échec de la création du lien de partage (le partage est-il activé ?)"
+            "createFailed": "échec de la création du lien de partage (le partage est-il activé ?)",
+            "copyToClipboard": "Copier vers le presse-papiers : Ctrl+C, Entrer",
+            "successMustClick": "partage créé avec succès. cliquez ici pour ouvrir"
         },
         "privateMode": {
             "enabled": "le mode privé est activé, le statut de lecture est maintenant caché des intégrations externes",

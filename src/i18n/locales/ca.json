@@ -454,7 +454,9 @@
             "setExpiration": "estableix expiració",
             "success": "s'ha copiat l'enllaç de compartició al porta-retalls (o feu clic aquí per obrir-lo)",
             "expireInvalid": "la data d'expiració ha de ser al futur",
-            "createFailed": "no s'ha pogut crear el recurs compartit (està habilitat, l'ús compartit?)"
+            "createFailed": "no s'ha pogut crear el recurs compartit (està habilitat, l'ús compartit?)",
+            "copyToClipboard": "Copiar al porta-retalls: Ctrl+C, Enter",
+            "successMustClick": "Compartició creada correctament. Feu clic aquí per obrir-la."
         },
         "updateServer": {
             "success": "s'ha actualitzat el servidor amb èxit",
@@ -1133,7 +1135,9 @@
         "saveQueueFailed": "error en desar la cua",
         "settingsSyncError": "hi ha discrepàncies entre la configuració del renderitzador i el procés principal. reinicieu l'aplicació per aplicar els canvis",
         "noNetwork": "servidor no disponible",
-        "noNetworkDescription": "no s'ha pogut connectar amb el servidor"
+        "noNetworkDescription": "no s'ha pogut connectar amb el servidor",
+        "invalidJson": "JSON invàlid",
+        "serverLockSingleServer": "només es permet un servidor quan el servidor està bloquejat"
     },
     "releaseType": {
         "primary": {

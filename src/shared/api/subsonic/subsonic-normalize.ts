@@ -159,7 +159,7 @@ const normalizeSong = (
         channels: item.channelCount || null,
         comment: null,
         compilation: null,
-        container: item.contentType,
+        container: item.contentType.startsWith('audio/') ? item.contentType.split('/')[1] : null,
         createdAt: item.created,
         discNumber: item.discNumber || 1,
         discSubtitle: discTitleMap?.get(item.discNumber ?? 1) ?? null,

@@ -139,7 +139,7 @@ const QueryValueInput = ({
         case 'dateRange':
             if (operator === 'inTheRangeDate') {
                 return (
-                    <Group gap="sm" wrap="nowrap">
+                    <Group gap="sm" grow wrap="nowrap">
                         <DateInput
                             clearable
                             defaultLevel="year"
