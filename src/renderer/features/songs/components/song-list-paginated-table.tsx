@@ -66,7 +66,7 @@ export const SongListPaginatedTable = ({
         itemType: LibraryItem.SONG,
         listCountQuery,
         listQueryFn,
-        query: effectiveQuery,
+        query,
         serverId,
     });
 
