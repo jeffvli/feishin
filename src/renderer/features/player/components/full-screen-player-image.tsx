@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { t } from 'i18next';
 import { AnimatePresence, HTMLMotionProps, motion, Variants } from 'motion/react';
 import { Fragment, useEffect, useRef } from 'react';
 import { generatePath, Link } from 'react-router';
@@ -174,9 +175,17 @@ export const FullScreenPlayerImage = () => {
     const builtDataItems = {
         bit_depth: currentSong?.bitDepth && <Badge>{currentSong?.bitDepth} bit</Badge>,
         bit_rate: currentSong?.bitRate && <Badge>{currentSong?.bitRate} kbps</Badge>,
-        bpm: currentSong?.bpm && <Badge>{currentSong?.bpm} bpm</Badge>,
+        bpm: currentSong?.bpm && (
+            <Badge>
+                {currentSong?.bpm} {t('common.bpm')}
+            </Badge>
+        ),
         codec: currentSong?.container && <Badge>{currentSong?.container}</Badge>,
-        disc_number: currentSong?.discNumber && <Badge>Disc {currentSong?.discNumber}</Badge>,
+        disc_number: currentSong?.discNumber && (
+            <Badge>
+                {t('common.disc')} {currentSong?.discNumber}
+            </Badge>
+        ),
         genres:
             currentSong?.genres &&
             currentSong?.genres
@@ -188,7 +197,11 @@ export const FullScreenPlayerImage = () => {
         ),
         release_year: currentSong?.releaseYear && <Badge>{currentSong?.releaseYear}</Badge>,
         sample_rate: currentSong?.sampleRate && <Badge>{currentSong?.sampleRate / 1000} kHz</Badge>,
-        track_number: currentSong?.trackNumber && <Badge>Track {currentSong?.trackNumber}</Badge>,
+        track_number: currentSong?.trackNumber && (
+            <Badge>
+                {t('common.trackNumber')} {currentSong?.trackNumber}
+            </Badge>
+        ),
     };
 
     return (
