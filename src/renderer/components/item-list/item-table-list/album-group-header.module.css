@@ -8,8 +8,8 @@
 
 .image-container {
     position: relative;
-    flex-shrink: 0;
     box-sizing: border-box;
+    flex-shrink: 0;
     height: 100%;
     aspect-ratio: 1;
     padding-top: calc(var(--theme-spacing-xs) * 0.5);
