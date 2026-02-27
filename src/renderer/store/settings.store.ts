@@ -74,7 +74,19 @@ const HomeItemSchema = z.enum([
     'recentlyReleased',
 ]);
 
-const PlayerItemSchema = z.enum(['codec', 'year', 'release_type']);
+const PlayerItemSchema = z.enum([
+    'bit_depth',
+    'bit_rate',
+    'bpm',
+    'disc_number',
+    'sample_rate',
+    'track_number',
+    'codec',
+    'release_year',
+    'release_type',
+    'release_date',
+    'genres',
+]);
 
 const ArtistItemSchema = z.enum([
     'biography',
@@ -783,9 +795,17 @@ export enum PlayerbarSliderType {
 }
 
 export enum PlayerItem {
+    BIT_DEPTH = 'bit_depth',
+    BIT_RATE = 'bit_rate',
+    BPM = 'bpm',
     CODEC = 'codec',
+    DISC_NUMBER = 'disc_number',
+    GENRES = 'genres',
+    RELEASE_DATE = 'release_date',
     RELEASE_TYPE = 'release_type',
-    YEAR = 'year',
+    RELEASE_YEAR = 'release_year',
+    SAMPLE_RATE = 'sample_rate',
+    TRACK_NUMBER = 'track_number',
 }
 
 export enum PlaylistTarget {
@@ -874,16 +894,48 @@ export type VersionedSettings = SettingsState & { version: number };
 
 export const playerItems: SortableItem<PlayerItem>[] = [
     {
+        disabled: true,
+        id: PlayerItem.BIT_DEPTH,
+    },
+    {
+        disabled: true,
+        id: PlayerItem.BIT_RATE,
+    },
+    {
+        disabled: true,
+        id: PlayerItem.BPM,
+    },
+    {
+        disabled: true,
+        id: PlayerItem.CODEC,
+    },
+    {
+        disabled: true,
+        id: PlayerItem.DISC_NUMBER,
+    },
+    {
+        disabled: true,
+        id: PlayerItem.GENRES,
+    },
+    {
+        disabled: true,
+        id: PlayerItem.RELEASE_DATE,
+    },
+    {
         disabled: false,
         id: PlayerItem.RELEASE_TYPE,
     },
     {
         disabled: false,
-        id: PlayerItem.YEAR,
+        id: PlayerItem.RELEASE_YEAR,
     },
     {
         disabled: true,
-        id: PlayerItem.CODEC,
+        id: PlayerItem.SAMPLE_RATE,
+    },
+    {
+        disabled: true,
+        id: PlayerItem.TRACK_NUMBER,
     },
 ];
 

@@ -9,9 +9,17 @@ import {
 } from '/@/renderer/store';
 
 const PLAYER_ITEMS: Array<[PlayerItem, string]> = [
+    [PlayerItem.BIT_DEPTH, 'common.bitDepth'],
+    [PlayerItem.BIT_RATE, 'common.bitrate'],
+    [PlayerItem.BPM, 'common.bpm'],
     [PlayerItem.CODEC, 'common.codec'],
+    [PlayerItem.DISC_NUMBER, 'table.config.label.discNumber'],
+    [PlayerItem.GENRES, 'entity.genre_other'],
+    [PlayerItem.RELEASE_DATE, 'filter.releaseDate'],
     [PlayerItem.RELEASE_TYPE, 'common.releaseType'],
-    [PlayerItem.YEAR, 'common.year'],
+    [PlayerItem.RELEASE_YEAR, 'filter.releaseYear'],
+    [PlayerItem.SAMPLE_RATE, 'common.sampleRate'],
+    [PlayerItem.TRACK_NUMBER, 'table.config.label.trackNumber'],
 ];
 
 export const FullscreenPlayerSettings = memo(() => {

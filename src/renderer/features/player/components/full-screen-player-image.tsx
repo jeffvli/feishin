@@ -172,11 +172,23 @@ export const FullScreenPlayerImage = () => {
     ]);
 
     const builtDataItems = {
+        bit_depth: currentSong?.bitDepth && <Badge>{currentSong?.bitDepth} bit</Badge>,
+        bit_rate: currentSong?.bitRate && <Badge>{currentSong?.bitRate} kbps</Badge>,
+        bpm: currentSong?.bpm && <Badge>{currentSong?.bpm} bpm</Badge>,
         codec: currentSong?.container && <Badge>{currentSong?.container}</Badge>,
+        disc_number: currentSong?.discNumber && <Badge>Disc {currentSong?.discNumber}</Badge>,
+        genres:
+            currentSong?.genres &&
+            currentSong?.genres
+                .slice(0, 2)
+                .map((genre) => <Badge key={genre.id}>{genre.name}</Badge>),
+        release_date: currentSong?.releaseDate && <Badge>{currentSong?.releaseDate}</Badge>,
         release_type: currentSong?.tags?.releasetype && (
             <Badge>{currentSong?.tags?.releasetype[0]}</Badge>
         ),
-        year: currentSong?.releaseYear && <Badge>{currentSong?.releaseYear}</Badge>,
+        release_year: currentSong?.releaseYear && <Badge>{currentSong?.releaseYear}</Badge>,
+        sample_rate: currentSong?.sampleRate && <Badge>{currentSong?.sampleRate / 1000} kHz</Badge>,
+        track_number: currentSong?.trackNumber && <Badge>Track {currentSong?.trackNumber}</Badge>,
     };
 
     return (
