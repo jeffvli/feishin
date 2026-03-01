@@ -166,6 +166,7 @@ export enum TableColumn {
     ALBUM = 'album',
     ALBUM_ARTIST = 'albumArtists',
     ALBUM_COUNT = 'albumCount',
+    ALBUM_GROUP = 'albumGroup',
     ARTIST = 'artists',
     BIOGRAPHY = 'biography',
     BIT_DEPTH = 'bitDepth',

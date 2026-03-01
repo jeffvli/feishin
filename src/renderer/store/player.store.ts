@@ -865,42 +865,89 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     return currentIndex === queue.items.length - 1;
                 },
                 mediaAutoNext: () => {
-                    const currentIndex = get().player.index;
-                    const player = get().player;
+                    const stateSnapshot = get();
+                    const currentIndex = stateSnapshot.player.index;
+                    const player = stateSnapshot.player;
                     const repeat = player.repeat;
-                    const queue = get().getQueueOrder();
+                    const queue = stateSnapshot.getQueueOrder();
+                    const isShuffle = isShuffleEnabled(stateSnapshot);
+
+                    const playbackLength = isShuffle
+                        ? stateSnapshot.queue.shuffled.length
+                        : queue.items.length;
 
                     const newPlayerNum = player.playerNum === 1 ? 2 : 1;
-                    const { nextIndex, shouldPause } = calculateNextIndex(
+                    const { nextIndex: nextPlaybackIndex, shouldPause } = calculateNextIndex(
                         currentIndex,
-                        queue.items.length,
+                        playbackLength,
                         repeat,
                     );
                     const newStatus = shouldPause ? PlayerStatus.PAUSED : PlayerStatus.PLAYING;
 
                     set((state) => {
-                        state.player.index = nextIndex;
+                        state.player.index = nextPlaybackIndex;
                         state.player.playerNum = newPlayerNum;
                         setTimestampStore(0);
                         state.player.status = newStatus;
                     });
 
-                    if (repeat === PlayerRepeat.ONE && nextIndex === currentIndex) {
+                    if (repeat === PlayerRepeat.ONE && nextPlaybackIndex === currentIndex) {
                         eventEmitter.emit('PLAYER_REPEATED', {
-                            index: nextIndex,
+                            index: nextPlaybackIndex,
                         });
                     }
 
-                    const nextSong = calculateNextSong(nextIndex, queue.items, repeat);
+                    // Compute current/next/previous using the same shuffle-aware mapping as getPlayerData().
+                    let currentQueueIndex = nextPlaybackIndex;
+                    if (isShuffle) {
+                        currentQueueIndex = mapShuffledToQueueIndex(
+                            nextPlaybackIndex,
+                            stateSnapshot.queue.shuffled,
+                        );
+                    }
+
+                    const currentSong = queue.items[currentQueueIndex];
+
+                    let nextSong: QueueSong | undefined;
+                    if (isShuffle) {
+                        const nextShuffledIndex = nextPlaybackIndex + 1;
+                        if (nextShuffledIndex < stateSnapshot.queue.shuffled.length) {
+                            const nextQueueIndex = stateSnapshot.queue.shuffled[nextShuffledIndex];
+                            nextSong = queue.items[nextQueueIndex];
+                        } else if (repeat === PlayerRepeat.ALL) {
+                            const firstQueueIndex = stateSnapshot.queue.shuffled[0];
+                            nextSong = queue.items[firstQueueIndex];
+                        } else if (repeat === PlayerRepeat.ONE) {
+                            nextSong = currentSong;
+                        }
+                    } else {
+                        nextSong = calculateNextSong(currentQueueIndex, queue.items, repeat);
+                    }
+
+                    let previousSong: QueueSong | undefined;
+                    if (isShuffle) {
+                        const prevShuffledIndex = nextPlaybackIndex - 1;
+                        if (prevShuffledIndex >= 0) {
+                            const prevQueueIndex = stateSnapshot.queue.shuffled[prevShuffledIndex];
+                            previousSong = queue.items[prevQueueIndex];
+                        } else if (repeat === PlayerRepeat.ALL) {
+                            const lastShuffledIndex = stateSnapshot.queue.shuffled.length - 1;
+                            const lastQueueIndex = stateSnapshot.queue.shuffled[lastShuffledIndex];
+                            previousSong = queue.items[lastQueueIndex];
+                        }
+                    } else {
+                        previousSong =
+                            currentQueueIndex > 0 ? queue.items[currentQueueIndex - 1] : undefined;
+                    }
 
                     return {
-                        currentSong: queue.items[nextIndex],
-                        index: nextIndex,
+                        currentSong,
+                        index: currentQueueIndex,
                         nextSong,
                         num: newPlayerNum,
-                        player1: newPlayerNum === 1 ? queue.items[nextIndex] : nextSong,
-                        player2: newPlayerNum === 2 ? queue.items[nextIndex] : nextSong,
-                        previousSong: queue.items[nextIndex - 1],
+                        player1: newPlayerNum === 1 ? currentSong : nextSong,
+                        player2: newPlayerNum === 2 ? currentSong : nextSong,
+                        previousSong,
                         queueLength: queue.items.length,
                         status: newStatus,
                     };

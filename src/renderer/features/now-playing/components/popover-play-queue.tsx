@@ -12,7 +12,7 @@ import { ItemListKey } from '/@/shared/types/types';
 
 interface PopoverPlayQueueProps {
     onClose?: () => void;
-    onToggle?: () => void;
+    onToggle?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     opened?: boolean;
 }
 

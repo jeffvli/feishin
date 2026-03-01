@@ -676,6 +676,33 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return totalRecordCount;
     },
+    getAlbumRadio: async (args) => {
+        const { apiClientProps, context, query } = args;
+
+        const res = await ssApiClient(apiClientProps).getSimilarSongs({
+            query: {
+                count: query.count,
+                id: query.albumId,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get album radio songs');
+        }
+
+        if (!res.body.similarSongs?.song) {
+            return [];
+        }
+
+        return res.body.similarSongs.song.map((song) =>
+            ssNormalize.song(
+                song,
+                apiClientProps.server,
+                context?.pathReplace,
+                context?.pathReplaceWith,
+            ),
+        );
+    },
     getArtistList: async (args) => {
         const { apiClientProps, query } = args;
 

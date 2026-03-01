@@ -410,7 +410,8 @@
         "sleepTimer_off": "關閉",
         "sleepTimer_timeRemaining": "剩餘 {{time}}",
         "sleepTimer_setCustom": "設定定時器",
-        "sleepTimer_cancel": "取消定時器"
+        "sleepTimer_cancel": "取消定時器",
+        "albumRadio": "專輯電台"
     },
     "setting": {
         "audioPlayer_description": "選擇用於播放的音訊播放器",
@@ -834,7 +835,8 @@
                 "bitDepth": "$t(common.bitDepth)",
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "作曲者",
-                "titleArtist": "$t(common.title) (藝人)"
+                "titleArtist": "$t(common.title) (藝人)",
+                "albumGroup": "專輯分組"
             },
             "view": {
                 "table": "表格",

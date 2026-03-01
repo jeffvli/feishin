@@ -637,6 +637,7 @@
         "addNext": "next",
         "addLastShuffled": "last (shuffled)",
         "addNextShuffled": "next (shuffled)",
+        "albumRadio": "album radio",
         "artistRadio": "artist radio",
         "holdToShuffle": "hold to shuffle",
         "favorite": "favorite",
@@ -1130,6 +1131,7 @@
             "label": {
                 "actions": "$t(common.action, {\"count\": 2})",
                 "album": "$t(entity.album, {\"count\": 1})",
+                "albumGroup": "album group",
                 "albumCount": "$t(entity.album, {\"count\": 2})",
                 "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
                 "artist": "$t(entity.artist, {\"count\": 1})",

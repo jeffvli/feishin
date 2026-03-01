@@ -220,7 +220,7 @@
         "serverNotSelectedError": "ingen tjener er valgt",
         "remotePortError": "et problem oppstod med å sette serverport",
         "systemFontError": "et problem oppstod med innlasting av systemskrifttyper",
-        "serverRequired": "server er påkrevd",
+        "serverRequired": "tjener er påkrevd",
         "sessionExpiredError": "sesjonen din har utløpt",
         "remotePortWarning": "ta omstart av serveren for å aktivere ny port",
         "remoteDisableError": "en problem oppstod ved å $t(common.disable) serveren",
@@ -274,7 +274,7 @@
         "isCompilation": "er samling",
         "isFavorited": "er merket som favoritt",
         "recentlyAdded": "nylig lagt til",
-        "channels": "$t(common.channel_other)",
+        "channels": "$t(common.channel, {\"count\": 2})",
         "genre": "$t(entity.genre, {\"count\": 1})",
         "trackNumber": "spor",
         "albumCount": "$t(entity.album, {\"count\": 2}) opptelling",
@@ -345,11 +345,29 @@
         "queryEditor": {
             "input_optionMatchAll": "match alle",
             "input_optionMatchAny": "matche hvilken som helst",
-            "title": "redigeringsverktøy for spørringer"
+            "title": "redigeringsverktøy for spørringer",
+            "addRuleGroup": "legg til regelgruppe",
+            "removeRuleGroup": "fjern regelgruppe",
+            "resetToDefault": "tilbakestill til standard",
+            "clearFilters": "tøm filter"
         },
         "largeFetchConfirmation": {
             "title": "legg til elementer i køen",
             "description": "Denne handlingen vil legge alle elementene til den gjeldende filtervisningen"
+        },
+        "createRadioStation": {
+            "success": "vellykket opprettelse av radiostasjon",
+            "title": "opprett radiostasjon",
+            "input_homepageUrl": "hjemmesidelenke",
+            "input_name": "navn",
+            "input_streamUrl": "strømmelenke"
+        },
+        "saveQueue": {
+            "success": "lagre spillekø på tjener"
+        },
+        "lyricsExport": {
+            "export": "eksporter sangtekster",
+            "input_synced": "eksporter sunkroniserte sangtekster"
         }
     },
     "page": {
@@ -565,7 +583,15 @@
             "general": {
                 "autoFitColumns": "automatisk kolonnetilpasning",
                 "displayType": "visningstype",
-                "followCurrentSong": "følg gjeldende sang"
+                "followCurrentSong": "følg gjeldende sang",
+                "advancedSettings": "avanserte innstillinger",
+                "moveUp": "flytt opp",
+                "moveDown": "flytt ned",
+                "pinToLeft": "fest til venstre",
+                "pinToRight": "fest til høyre",
+                "alignLeft": "venstrejuster",
+                "alignCenter": "midtjuster",
+                "alignRight": "høyrejuster"
             }
         },
         "column": {
@@ -583,7 +609,8 @@
             "rating": "vurdering",
             "releaseDate": "utgivelsesdato",
             "title": "tittel",
-            "trackNumber": "spor"
+            "trackNumber": "spor",
+            "owner": "eier"
         }
     },
     "filterOperator": {
@@ -612,5 +639,16 @@
         "secondShort": "s",
         "hourShort": "h",
         "dayShort": "d"
+    },
+    "visualizer": {
+        "options": {
+            "weightingFilter": {
+                "a": "A",
+                "b": "B",
+                "c": "C",
+                "d": "D",
+                "z": "Z"
+            }
+        }
     }
 }

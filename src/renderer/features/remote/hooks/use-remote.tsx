@@ -294,3 +294,8 @@ export const useRemote = () => {
         [],
     );
 };
+
+export const RemoteHook = () => {
+    useRemote();
+    return null;
+};

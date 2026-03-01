@@ -170,7 +170,10 @@ const QueueButton = () => {
     return (
         <PopoverPlayQueue
             onClose={handlePopoverClose}
-            onToggle={handleToggleQueue}
+            onToggle={(e) => {
+                e.stopPropagation();
+                handleToggleQueue();
+            }}
             opened={popoverOpened}
         />
     );

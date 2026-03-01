@@ -19,24 +19,45 @@ export const useTableColumnModel = ({
     const calculatedColumnWidths = useMemo(() => {
         const baseWidths = parsedColumns.map((c) => c.width);
 
-        // When autoSizeColumns is enabled, treat all widths as proportions and scale to fit container
+        // When autoSizeColumns is enabled, treat unpinned widths as proportions and scale to fit container.
+        // Pinned columns keep their base width so they don't get squeezed.
         if (autoFitColumns) {
-            const totalReferenceWidth = baseWidths.reduce((sum, width) => sum + width, 0);
+            const pinnedWidth = parsedColumns.reduce(
+                (sum, col, idx) => (col.pinned !== null ? sum + baseWidths[idx] : sum),
+                0,
+            );
+            const unpinnedIndices: number[] = [];
+            parsedColumns.forEach((col, idx) => {
+                if (col.pinned === null) {
+                    unpinnedIndices.push(idx);
+                }
+            });
 
-            if (totalReferenceWidth === 0 || totalContainerWidth === 0) {
+            const unpinnedReferenceWidth = unpinnedIndices.reduce(
+                (sum, idx) => sum + baseWidths[idx],
+                0,
+            );
+            const availableForUnpinned = totalContainerWidth - pinnedWidth;
+
+            if (unpinnedReferenceWidth === 0 || availableForUnpinned <= 0) {
                 return baseWidths.map((width) => Math.round(width));
             }
 
-            const scaleFactor = totalContainerWidth / totalReferenceWidth;
-            const scaledWidths = baseWidths.map((width) => Math.round(width * scaleFactor));
+            const scaleFactor = availableForUnpinned / unpinnedReferenceWidth;
+            const scaledWidths = baseWidths.map((width, idx) => {
+                if (parsedColumns[idx].pinned !== null) {
+                    return Math.round(width);
+                }
+                return Math.round(width * scaleFactor);
+            });
 
-            // Adjust for rounding errors: ensure total equals totalContainerWidth
+            // Adjust for rounding errors on unpinned columns only
             const totalScaled = scaledWidths.reduce((sum, width) => sum + width, 0);
             const difference = totalContainerWidth - totalScaled;
 
-            if (difference !== 0 && scaledWidths.length > 0) {
-                const sortedIndices = scaledWidths
-                    .map((width, idx) => ({ idx, width }))
+            if (difference !== 0 && unpinnedIndices.length > 0) {
+                const sortedIndices = unpinnedIndices
+                    .map((idx) => ({ idx, width: scaledWidths[idx] }))
                     .sort((a, b) => b.width - a.width);
 
                 const adjustmentPerColumn = Math.sign(difference);

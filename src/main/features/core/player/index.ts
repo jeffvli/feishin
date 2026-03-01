@@ -116,11 +116,15 @@ const createMpv = async (data: {
 
     mpv.on('status', (status) => {
         if (status.property === 'playlist-pos') {
+            // mpv uses playlist-pos = -1 when nothing is playing (ended, cleared, load failure, etc).
             if (status.value === -1) {
                 mpv?.pause();
+                return;
             }
 
-            if (status.value !== 0) {
+            // In our 2-item queue model, playlist-pos should normally be 0.
+            // When mpv auto-advances to the next track it becomes > 0 (typically 1).
+            if (typeof status.value === 'number' && status.value > 0) {
                 getMainWindow()?.webContents.send('renderer-player-auto-next');
             }
         }

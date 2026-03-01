@@ -21,7 +21,7 @@ import {
     PlaylistSongListResponse,
     Song,
 } from '/@/shared/types/domain-types';
-import { ItemListKey, Play } from '/@/shared/types/types';
+import { ItemListKey, Play, TableColumn } from '/@/shared/types/types';
 
 interface PlaylistDetailSongListTableProps
     extends Omit<ItemListTableComponentProps<PlaylistSongListQuery>, 'query'> {
@@ -67,6 +67,10 @@ export const PlaylistDetailSongListTable = forwardRef<any, PlaylistDetailSongLis
 
         const { searchTerm } = useSearchTermFilter();
         const { query } = usePlaylistSongListFilters();
+
+        const albumGroupingEnabled = columns.some(
+            (col) => col.id === TableColumn.ALBUM_GROUP && col.isEnabled,
+        );
 
         const songDataFromData = useMemo(() => {
             let list = data?.items || [];
@@ -117,6 +121,11 @@ export const PlaylistDetailSongListTable = forwardRef<any, PlaylistDetailSongLis
             };
         }, []);
 
+        const effectiveColumns = useMemo(() => {
+            if (albumGroupingEnabled) return columns;
+            return columns.filter((col) => col.id !== TableColumn.ALBUM_GROUP);
+        }, [columns, albumGroupingEnabled]);
+
         const isPaginated =
             typeof currentPage === 'number' &&
             typeof itemsPerPage === 'number' &&
@@ -135,7 +144,7 @@ export const PlaylistDetailSongListTable = forwardRef<any, PlaylistDetailSongLis
                 activeRowId={currentSong?.id}
                 autoFitColumns={autoFitColumns}
                 CellComponent={ItemTableListColumn}
-                columns={columns}
+                columns={effectiveColumns}
                 data={dataToRender}
                 enableAlternateRowColors={enableAlternateRowColors}
                 enableExpansion={false}

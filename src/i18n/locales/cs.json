@@ -47,7 +47,8 @@
         "sleepTimer_off": "vypnuto",
         "sleepTimer_timeRemaining": "zbývá {{time}}",
         "sleepTimer_setCustom": "nastavit časovač",
-        "sleepTimer_cancel": "zrušit časovač"
+        "sleepTimer_cancel": "zrušit časovač",
+        "albumRadio": "rádio alba"
     },
     "setting": {
         "crossfadeStyle_description": "vyberte způsob prolnutí u přehrávače zvuku",
@@ -643,7 +644,8 @@
                 "bitDepth": "$t(common.bitDepth)",
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "skladatel",
-                "titleArtist": "$t(common.title) (umělec)"
+                "titleArtist": "$t(common.title) (umělec)",
+                "albumGroup": "skupina alb"
             }
         },
         "column": {
@@ -1039,7 +1041,9 @@
             "description": "popis",
             "expireInvalid": "čas vypršení musí být v budoucnosti",
             "setExpiration": "nastavit vypršení",
-            "createFailed": "nepodařilo se vytvořit sdílení (je sdílení povoleno?)"
+            "createFailed": "nepodařilo se vytvořit sdílení (je sdílení povoleno?)",
+            "copyToClipboard": "Zkopírovat do schránky: Ctrl+C, Enter",
+            "successMustClick": "sdílení úspěšně vytvořeno. klikněte sem pro otevření"
         },
         "privateMode": {
             "enabled": "soukromý režim povolen, stav přehrávání je nyní skryt před externími integracemi",

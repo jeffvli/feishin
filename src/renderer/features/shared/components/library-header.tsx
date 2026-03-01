@@ -18,6 +18,7 @@ import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-b
 import { useIsMutatingCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useIsMutatingDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useIsMutatingRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
+import { useGeneralSettings } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Center } from '/@/shared/components/center/center';
@@ -64,6 +65,7 @@ export const LibraryHeader = forwardRef(
     ) => {
         const { t } = useTranslation();
         const [isImageError, setIsImageError] = useState<boolean | null>(false);
+        const { blurExplicitImages } = useGeneralSettings();
 
         const onImageError = () => {
             setIsImageError(true);
@@ -119,7 +121,10 @@ export const LibraryHeader = forwardRef(
                             enableDebounce={false}
                             enableViewport={false}
                             fetchPriority="high"
-                            isExplicit={item.explicitStatus === ExplicitStatus.EXPLICIT}
+                            isExplicit={
+                                blurExplicitImages &&
+                                item.explicitStatus === ExplicitStatus.EXPLICIT
+                            }
                             src={imageUrl}
                             style={{
                                 maxHeight: '100%',
@@ -132,7 +137,7 @@ export const LibraryHeader = forwardRef(
                 ),
                 fullScreen: true,
             });
-        }, [item.explicitStatus, item.imageId, item.type]);
+        }, [blurExplicitImages, item.explicitStatus, item.imageId, item.type]);
 
         return (
             <div
@@ -282,6 +287,7 @@ export const calculateTitleSize = (title: string) => {
 
 interface LibraryHeaderMenuProps {
     favorite?: boolean;
+    onAlbumRadio?: () => void;
     onArtistRadio?: () => void;
     onFavorite?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     onMore?: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -293,6 +299,7 @@ interface LibraryHeaderMenuProps {
 
 export const LibraryHeaderMenu = ({
     favorite,
+    onAlbumRadio,
     onArtistRadio,
     onFavorite,
     onMore,
@@ -344,8 +351,26 @@ export const LibraryHeaderMenu = ({
                 {onPlay && (
                     <PlayLastTextButton {...handlePlayLast.handlers} {...handlePlayLast.props} />
                 )}
+                {onAlbumRadio && (
+                    <Button
+                        disabled={isPlayerFetching}
+                        leftSection={
+                            isPlayerFetching ? (
+                                <Spinner color="white" />
+                            ) : (
+                                <Icon icon="radio" size="lg" />
+                            )
+                        }
+                        onClick={onAlbumRadio}
+                        size="md"
+                        variant="transparent"
+                    >
+                        {t('player.albumRadio', { postProcess: 'sentenceCase' })}
+                    </Button>
+                )}
                 {onArtistRadio && (
                     <Button
+                        disabled={isPlayerFetching}
                         leftSection={
                             isPlayerFetching ? (
                                 <Spinner color="white" />

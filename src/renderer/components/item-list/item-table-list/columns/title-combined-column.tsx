@@ -81,6 +81,7 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
         const rowHeight = props.getRowHeight(props.rowIndex, props);
         const path = getTitlePath(props.itemType, (rowItem as any).id as string);
         const align = props.columns[props.columnIndex]?.align || 'start';
+        const hasAlbumGroupColumn = props.hasAlbumGroupColumn ?? false;
 
         const item = rowItem as any;
         const titleLinkProps = path
@@ -94,46 +95,53 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
 
         return (
             <TableColumnContainer
-                className={styles.titleCombined}
+                className={clsx(styles.titleCombined, {
+                    [styles.noImage]: hasAlbumGroupColumn,
+                })}
                 containerStyle={{ '--row-height': `${rowHeight}px` } as CSSProperties}
                 {...props}
             >
-                <div
-                    className={styles.imageContainer}
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                >
-                    <ItemImage
-                        containerClassName={styles.image}
-                        enableDebounce={true}
-                        enableViewport={false}
-                        explicitStatus={item?.explicitStatus}
-                        id={item?.imageId}
-                        itemType={item?._itemType}
-                        src={item?.imageUrl}
-                        type="table"
-                    />
-                    {isHovered && (
-                        <div
-                            className={clsx(styles.playButtonOverlay, {
-                                [styles.compactPlayButtonOverlay]: props.size === 'compact',
-                            })}
-                        >
-                            <PlayTooltip
-                                disabled={props.itemType === LibraryItem.QUEUE_SONG}
-                                type={playButtonBehavior}
+                {!hasAlbumGroupColumn && (
+                    <div
+                        className={styles.imageContainer}
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => setIsHovered(false)}
+                    >
+                        <ItemImage
+                            containerClassName={styles.image}
+                            enableDebounce={true}
+                            enableViewport={false}
+                            explicitStatus={item?.explicitStatus}
+                            id={item?.imageId}
+                            itemType={item?._itemType}
+                            src={item?.imageUrl}
+                            type="table"
+                        />
+                        {isHovered && (
+                            <div
+                                className={clsx(styles.playButtonOverlay, {
+                                    [styles.compactPlayButtonOverlay]: props.size === 'compact',
+                                })}
                             >
-                                <PlayButton
-                                    fill
-                                    onClick={(e) => handlePlay(playButtonBehavior, e)}
-                                    onLongPress={(e) =>
-                                        handlePlay(LONG_PRESS_PLAY_BEHAVIOR[playButtonBehavior], e)
-                                    }
-                                />
-                            </PlayTooltip>
-                        </div>
-                    )}
-                </div>
+                                <PlayTooltip
+                                    disabled={props.itemType === LibraryItem.QUEUE_SONG}
+                                    type={playButtonBehavior}
+                                >
+                                    <PlayButton
+                                        fill
+                                        onClick={(e) => handlePlay(playButtonBehavior, e)}
+                                        onLongPress={(e) =>
+                                            handlePlay(
+                                                LONG_PRESS_PLAY_BEHAVIOR[playButtonBehavior],
+                                                e,
+                                            )
+                                        }
+                                    />
+                                </PlayTooltip>
+                            </div>
+                        )}
+                    </div>
+                )}
                 <div
                     className={clsx(styles.textContainer, {
                         [styles.alignCenter]: align === 'center',
@@ -224,6 +232,7 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
         const rowHeight = props.getRowHeight(props.rowIndex, props);
         const path = getTitlePath(props.itemType, (rowItem as any).id as string);
         const align = props.columns[props.columnIndex]?.align || 'start';
+        const hasAlbumGroupColumn = props.hasAlbumGroupColumn ?? false;
 
         const item = rowItem as any;
 
@@ -238,45 +247,52 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
 
         return (
             <TableColumnContainer
-                className={styles.titleCombined}
+                className={clsx(styles.titleCombined, {
+                    [styles.noImage]: hasAlbumGroupColumn,
+                })}
                 containerStyle={{ '--row-height': `${rowHeight}px` } as CSSProperties}
                 {...props}
             >
-                <div
-                    className={styles.imageContainer}
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                >
-                    <ItemImage
-                        containerClassName={styles.image}
-                        explicitStatus={item?.explicitStatus}
-                        id={item?.imageId}
-                        itemType={item?._itemType}
-                        serverId={item?._serverId}
-                        src={item?.imageUrl}
-                        type="table"
-                    />
-                    {isHovered && (
-                        <div
-                            className={clsx(styles.playButtonOverlay, {
-                                [styles.compactPlayButtonOverlay]: props.size === 'compact',
-                            })}
-                        >
-                            <PlayTooltip
-                                disabled={props.itemType === LibraryItem.QUEUE_SONG}
-                                type={playButtonBehavior}
+                {!hasAlbumGroupColumn && (
+                    <div
+                        className={styles.imageContainer}
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => setIsHovered(false)}
+                    >
+                        <ItemImage
+                            containerClassName={styles.image}
+                            explicitStatus={item?.explicitStatus}
+                            id={item?.imageId}
+                            itemType={item?._itemType}
+                            serverId={item?._serverId}
+                            src={item?.imageUrl}
+                            type="table"
+                        />
+                        {isHovered && (
+                            <div
+                                className={clsx(styles.playButtonOverlay, {
+                                    [styles.compactPlayButtonOverlay]: props.size === 'compact',
+                                })}
                             >
-                                <PlayButton
-                                    fill
-                                    onClick={(e) => handlePlay(playButtonBehavior, e)}
-                                    onLongPress={(e) =>
-                                        handlePlay(LONG_PRESS_PLAY_BEHAVIOR[playButtonBehavior], e)
-                                    }
-                                />
-                            </PlayTooltip>
-                        </div>
-                    )}
-                </div>
+                                <PlayTooltip
+                                    disabled={props.itemType === LibraryItem.QUEUE_SONG}
+                                    type={playButtonBehavior}
+                                >
+                                    <PlayButton
+                                        fill
+                                        onClick={(e) => handlePlay(playButtonBehavior, e)}
+                                        onLongPress={(e) =>
+                                            handlePlay(
+                                                LONG_PRESS_PLAY_BEHAVIOR[playButtonBehavior],
+                                                e,
+                                            )
+                                        }
+                                    />
+                                </PlayTooltip>
+                            </div>
+                        )}
+                    </div>
+                )}
                 <div
                     className={clsx(styles.textContainer, {
                         [styles.active]: isActive,

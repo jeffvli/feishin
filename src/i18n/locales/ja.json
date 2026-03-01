@@ -30,12 +30,21 @@
         "skip_forward": "次へスキップ",
         "pause": "一時停止",
         "playSimilarSongs": "似たような曲を再生する",
-        "viewQueue": "キューを表示する",
+        "viewQueue": "キューを表示",
         "lyrics": "歌詞",
         "restoreQueueFromServer": "サーバーからキューを復元",
         "saveQueueToServer": "サーバーにキューを保存",
         "addLastShuffled": "最後 (シャッフル)",
-        "addNextShuffled": "次 (シャッフル)"
+        "addNextShuffled": "次 (シャッフル)",
+        "sleepTimer_minutes": "{{count}} 分",
+        "sleepTimer_hours": "{{count}} 時間",
+        "sleepTimer": "スリープタイマー",
+        "sleepTimer_endOfSong": "現在の曲の終わり",
+        "sleepTimer_custom": "カスタム",
+        "sleepTimer_off": "オフ",
+        "sleepTimer_timeRemaining": "残り {{time}}",
+        "sleepTimer_setCustom": "タイマーを設定",
+        "sleepTimer_cancel": "タイマーをキャンセル"
     },
     "setting": {
         "crossfadeStyle_description": "オーディオプレーヤーが使用するクロスフェードのスタイルを選択します",
@@ -43,7 +52,7 @@
         "hotkey_skipBackward": "前にスキップ",
         "replayGainMode_description": "ファイルのメタデータに保存されている {{ReplayGain}} 値に従って音量ゲインを調整します",
         "volumeWheelStep_description": "音量スライダーでマウスホイールをスクロールしたときに変化する音量を設定します",
-        "audioDevice_description": "再生に使用するオーディオデバイスを選択します (Web プレーヤーのみ)",
+        "audioDevice_description": "再生に使用するオーディオデバイスを選択します",
         "theme_description": "アプリケーションに使用するテーマを設定します",
         "hotkey_playbackPause": "一時停止",
         "replayGainFallback": "{{ReplayGain}} フォールバック",
@@ -73,7 +82,7 @@
         "scrobble_description": "再生した音楽をメディアサーバーから Scrobble します",
         "hotkey_browserForward": "ブラウザ 進む",
         "audioExclusiveMode_description": "排他出力モードを有効にします。このモードでは、システムの他の出力がロックされ、MPV のみがオーディオを出力できるようになります",
-        "discordUpdateInterval": "{{discord}} Rich Presenceアップデート間隔",
+        "discordUpdateInterval": "{{discord}} Rich Presence の更新間隔",
         "themeLight": "テーマ (ライト)",
         "fontType_optionBuiltIn": "組み込みフォント",
         "hotkey_playbackPlayPause": "再生 / 一時停止",
@@ -100,7 +109,7 @@
         "hotkey_favoritePreviousSong": "$t(common.previousSong) をお気に入り",
         "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
         "lyricOffset": "歌詞のオフセット (ミリ秒)",
-        "discordUpdateInterval_description": "更新間隔 (秒単位, 最小15秒)",
+        "discordUpdateInterval_description": "更新間隔 (秒単位、最小 15 秒)",
         "fontType_optionCustom": "カスタムフォント",
         "themeDark_description": "アプリケーションに使用するダークテーマを設定します",
         "audioExclusiveMode": "オーディオ排他モード",
@@ -246,8 +255,8 @@
         "artistConfiguration_description": "アルバムアーティストページに表示するアイテムと順序を設定します",
         "buttonSize_description": "プレーヤーバーのボタンのサイズ",
         "buttonSize": "プレーヤーバーのボタンサイズ",
-        "clearCache_description": "Feishin の「ハードクリア」。Feishin のキャッシュをクリアするだけでなく、ブラウザのキャッシュ (保存された画像やその他のアセット) も空にします。サーバーの資格情報や設定は保持されます",
-        "clearCache": "ブラウザのキャッシュをクリアする",
+        "clearCache_description": "Feishin の「ハードクリア」。Feishin のキャッシュをクリアするだけでなく、ブラウザーのキャッシュ (保存された画像やその他のアセット) も空にします。サーバーの資格情報や設定は保持されます",
+        "clearCache": "ブラウザーのキャッシュをクリア",
         "clearCacheSuccess": "キャッシュが正常にクリアされました",
         "clearQueryCache_description": "Feishin の「ソフトクリア」。これにより、プレイリストとトラックのメタデータが更新され、保存された歌詞がリセットされます。設定、サーバーの資格情報、キャッシュされた画像は保持されます",
         "clearQueryCache": "Feishin のキャッシュをクリアする",
@@ -262,11 +271,11 @@
         "releaseChannel_optionBeta": "ベータ",
         "releaseChannel_optionLatest": "最新",
         "releaseChannel": "リリースチャンネル",
-        "releaseChannel_description": "自動更新のために安定版リリースまたはベータ版リリースを選択してください",
+        "releaseChannel_description": "自動更新のために、安定版、ベータ版、またはアルファ版 (nightly build) リリースから選択してください",
         "discordDisplayType_artistname": "アーティスト名",
         "discordDisplayType_songname": "曲名",
         "discordLinkType_description": "{{discord}} Rich Presence において、曲とアーティストのフィールドに {{lastfm}} または {{musicbrainz}} への外部リンクを追加します。{{musicbrainz}} は最も正確ですが、タグが必要でアーティストリンクを提供しません。一方、{{lastfm}} は常にリンクを提供します。追加のネットワークリクエストは発生しません",
-        "discordPausedStatus": "一時停止時に Rich Presence を表示する",
+        "discordPausedStatus": "一時停止時に Rich Presence を表示",
         "discordRichPresence": "{{discord}} Rich Presence",
         "discordServeImage_description": "{{discord}} Rich Presence 用のカバーアートをサーバーから共有します。Jellyfin と Navidrome でのみ利用できます。{{discord}} は bot を使用して画像を取得するため、サーバーはパブリックインターネットからアクセスできる必要があります",
         "exportImportSettings_control_exportText": "設定をエクスポート",
@@ -290,7 +299,7 @@
         "discordDisplayType": "{{discord}} Presence 表示タイプ",
         "discordLinkType_none": "$t(common.none)",
         "discordListening_description": "Playing ではなく Listening としてステータスを表示します",
-        "discordListening": "ステータスを Listening として表示する",
+        "discordListening": "ステータスを Listening として表示",
         "discordPausedStatus_description": "有効にすると、プレーヤーが一時停止されているときにもステータスを表示します",
         "discordDisplayType_description": "ステータスで聴いている内容を変更します",
         "discordLinkType": "{{discord}} Presence リンク",
@@ -359,7 +368,14 @@
         "pathReplace": "ファイルパスの置換",
         "pathReplace_description": "サーバーのデフォルトのファイルパスを置き換えます",
         "pathReplace_optionRemovePrefix": "接頭辞を削除",
-        "pathReplace_optionAddPrefix": "接頭辞を追加"
+        "pathReplace_optionAddPrefix": "接頭辞を追加",
+        "analyticsEnable": "使用状況に基づく分析を送信する",
+        "analyticsEnable_description": "匿名化された利用データは、アプリケーションの改善のために開発者に送信されます",
+        "automaticUpdates": "自動更新",
+        "automaticUpdates_description": "更新を自動的に確認してインストールします",
+        "releaseChannel_optionAlpha": "アルファ (nightly)",
+        "discordStateIcon": "再生中アイコンを表示",
+        "discordStateIcon_description": "Rich Presence ステータスに小さな再生アイコンを表示します。「一時停止時に Rich Presence を表示」が有効になっている場合は、常に一時停止アイコンが表示されます"
     },
     "action": {
         "editPlaylist": "$t(entity.playlist, {\"count\": 1}) を編集",
@@ -648,7 +664,9 @@
         "noNetwork": "サーバーが利用できません",
         "noNetworkDescription": "このサーバーに接続できませんでした",
         "saveQueueFailed": "キューを保存できませんでした",
-        "settingsSyncError": "レンダラーとメインプロセスの設定に矛盾が見つかりました。変更を適用するにはアプリケーションを再起動してください"
+        "settingsSyncError": "レンダラーとメインプロセスの設定に矛盾が見つかりました。変更を適用するにはアプリケーションを再起動してください",
+        "invalidJson": "無効な JSON",
+        "serverLockSingleServer": "サーバーがロックされている場合、1 つのサーバーのみが許可されます"
     },
     "filter": {
         "mostPlayed": "最も多く再生",
@@ -745,7 +763,7 @@
             "manageServers": "サーバーの管理",
             "expandSidebar": "サイドバーを展開",
             "collapseSidebar": "サイドバーを折りたたむ",
-            "openBrowserDevtools": "ブラウザの開発者ツールを開く",
+            "openBrowserDevtools": "ブラウザーの開発者ツールを開く",
             "quit": "$t(common.quit)",
             "goBack": "戻る",
             "goForward": "進む",
@@ -858,12 +876,15 @@
             "recentReleases": "最近のリリース",
             "viewDiscography": "ディスコグラフィーを見る",
             "topSongs": "人気曲",
-            "topSongsFrom": "{{title}} からの人気曲",
+            "topSongsFrom": "{{title}} の人気曲",
             "viewAll": "すべて表示",
             "viewAllTracks": "$t(entity.track, {\"count\": 2}) をすべて表示",
             "relatedArtists": "関連の $t(entity.artist, {\"count\": 2})",
             "groupingTypeAll": "すべてのリリースタイプ",
-            "groupingTypePrimary": "主なリリースタイプ"
+            "groupingTypePrimary": "主なリリースタイプ",
+            "favoriteSongs": "お気に入りの曲",
+            "topSongsCommunity": "コミュニティ",
+            "favoriteSongsFrom": "{{title}} のお気に入りの曲"
         },
         "manageServers": {
             "title": "サーバーの管理",
@@ -897,6 +918,11 @@
         "collections": {
             "overrideExisting": "既存のものを上書き",
             "saveAsCollection": "コレクションとして保存"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "{{stable}} 以降のコミット",
+            "noNewCommits": "この範囲に新しいコミットはありません",
+            "noStableReleaseToCompare": "比較可能な安定版リリースはありません"
         }
     },
     "form": {

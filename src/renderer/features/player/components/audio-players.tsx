@@ -23,6 +23,7 @@ import {
     RadioMetadataHook,
     useIsRadioActive,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { RemoteHook } from '/@/renderer/features/remote/hooks/use-remote';
 import {
     updateQueueFavorites,
     updateQueueRatings,
@@ -57,6 +58,7 @@ export const AudioPlayers = () => {
             <MainPlayerListenerHook />
             <MediaSessionHook />
             <PlaybackHotkeysHook />
+            <RemoteHook />
             <AutoDJHook />
             <QueueRestoreTimestampHook />
             <UpdateCurrentSongHook />

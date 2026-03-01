@@ -119,14 +119,6 @@ export const NavidromeAlbumFilters = ({
     const toggleFilters = useMemo(
         () => [
             {
-                label: t('filter.isRated', { postProcess: 'sentenceCase' }),
-                onChange: (e: ChangeEvent<HTMLInputElement>) => {
-                    const hasRating = e.currentTarget.checked ? true : undefined;
-                    setHasRating(hasRating ?? null);
-                },
-                value: query.hasRating,
-            },
-            {
                 label: t('filter.isRecentlyPlayed', { postProcess: 'sentenceCase' }),
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
                     const recentlyPlayed = e.currentTarget.checked ? true : undefined;
@@ -135,7 +127,7 @@ export const NavidromeAlbumFilters = ({
                 value: query.isRecentlyPlayed,
             },
         ],
-        [t, query.hasRating, query.isRecentlyPlayed, setHasRating, setRecentlyPlayed],
+        [t, query.isRecentlyPlayed, setRecentlyPlayed],
     );
 
     const handleYearFilter = useMemo(
@@ -306,6 +298,20 @@ export const NavidromeAlbumFilters = ({
                     }}
                     size="sm"
                     value={booleanToSegmentValue(query.favorite)}
+                    w="100%"
+                />
+            </Stack>
+            <Stack gap="xs">
+                <Text size="sm" weight={500}>
+                    {t('filter.isRated', { postProcess: 'sentenceCase' })}
+                </Text>
+                <SegmentedControl
+                    data={segmentedControlData}
+                    onChange={(value) => {
+                        setHasRating(segmentValueToBoolean(value));
+                    }}
+                    size="sm"
+                    value={booleanToSegmentValue(query.hasRating)}
                     w="100%"
                 />
             </Stack>

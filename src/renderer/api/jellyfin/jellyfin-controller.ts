@@ -433,6 +433,34 @@ export const JellyfinController: InternalControllerEndpoint = {
             apiClientProps,
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
+    getAlbumRadio: async (args) => {
+        const { apiClientProps, query } = args;
+
+        // For Jellyfin, use instant mix for album radio
+        const res = await jfApiClient(apiClientProps).getInstantMix({
+            params: {
+                itemId: query.albumId,
+            },
+            query: {
+                Fields: JF_FIELDS.SONG,
+                Limit: query.count,
+                UserId: apiClientProps.server?.userId || undefined,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get album radio songs');
+        }
+
+        return res.body.Items.map((song) =>
+            jfNormalize.song(
+                song,
+                apiClientProps.server,
+                args.context?.pathReplace,
+                args.context?.pathReplaceWith,
+            ),
+        );
+    },
     getArtistList: async (args) => {
         const { apiClientProps, query } = args;
 

@@ -2239,10 +2239,44 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
+                if (version <= 26) {
+                    // Add ALBUM_GROUP column to the song table config
+                    const listKeysToUpdate: ItemListKey[] = [
+                        ItemListKey.SONG,
+                        ItemListKey.FOLDER,
+                        ItemListKey.PLAYLIST_SONG,
+                        ItemListKey.ALBUM_ARTIST_SONG,
+                        ItemListKey.GENRE_SONG,
+                        ItemListKey.QUEUE_SONG,
+                        ItemListKey.FULL_SCREEN,
+                        ItemListKey.SIDE_QUEUE,
+                    ];
+
+                    listKeysToUpdate.forEach((listKey) => {
+                        const listConfig = state.lists[listKey as keyof typeof state.lists];
+                        if (listConfig?.table?.columns) {
+                            const columns = listConfig.table.columns;
+                            const hasAlbumGroup = columns.some(
+                                (col) => col.id === TableColumn.ALBUM_GROUP,
+                            );
+                            if (!hasAlbumGroup) {
+                                columns.push({
+                                    align: 'start',
+                                    autoSize: false,
+                                    id: TableColumn.ALBUM_GROUP,
+                                    isEnabled: false,
+                                    pinned: 'left',
+                                    width: 200,
+                                });
+                            }
+                        }
+                    });
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 25,
+            version: 26,
         },
     ),
 );

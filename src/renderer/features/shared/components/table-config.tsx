@@ -262,7 +262,6 @@ export const TableConfig = ({
                 id: 'autoFitColumns',
                 label: t('table.config.general.autoFitColumns', { postProcess: 'sentenceCase' }),
             },
-
             ...(extraOptions || []),
         ];
 
@@ -774,25 +773,18 @@ const TableColumnItem = memo(
                         className={clsx(styles.group, styles.numberInput)}
                         hideControls={false}
                         leftSection={
-                            <>
-                                {item.pinned === null && (
-                                    <Tooltip
-                                        label={t('table.config.general.autosize', {
-                                            postProcess: 'sentenceCase',
-                                        })}
-                                    >
-                                        <Checkbox
-                                            checked={item.autoSize}
-                                            disabled={item.pinned !== null}
-                                            id={item.id}
-                                            onChange={(e) =>
-                                                handleAutoSize(item, e.currentTarget.checked)
-                                            }
-                                            size="xs"
-                                        />
-                                    </Tooltip>
-                                )}
-                            </>
+                            <Tooltip
+                                label={t('table.config.general.autosize', {
+                                    postProcess: 'sentenceCase',
+                                })}
+                            >
+                                <Checkbox
+                                    checked={item.autoSize}
+                                    id={item.id}
+                                    onChange={(e) => handleAutoSize(item, e.currentTarget.checked)}
+                                    size="xs"
+                                />
+                            </Tooltip>
                         }
                         max={2000}
                         min={0}

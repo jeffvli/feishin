@@ -1337,6 +1337,15 @@ export enum LyricSource {
     NETEASE = 'NetEase',
 }
 
+export type AlbumRadioArgs = BaseEndpointArgs & {
+    query: AlbumRadioQuery;
+};
+
+export type AlbumRadioQuery = {
+    albumId: string;
+    count?: number;
+};
+
 export type ArtistRadioArgs = BaseEndpointArgs & {
     query: ArtistRadioQuery;
 };
@@ -1369,6 +1378,7 @@ export type ControllerEndpoint = {
     getAlbumInfo?: (args: AlbumDetailArgs) => Promise<AlbumInfo>;
     getAlbumList: (args: AlbumListArgs) => Promise<AlbumListResponse>;
     getAlbumListCount: (args: AlbumListCountArgs) => Promise<number>;
+    getAlbumRadio: (args: AlbumRadioArgs) => Promise<Song[]>;
     getArtistList: (args: ArtistListArgs) => Promise<ArtistListResponse>;
     getArtistListCount: (args: ArtistListCountArgs) => Promise<number>;
     getArtistRadio: (args: ArtistRadioArgs) => Promise<Song[]>;
@@ -1490,6 +1500,7 @@ export type InternalControllerEndpoint = {
     getAlbumInfo?: (args: ReplaceApiClientProps<AlbumDetailArgs>) => Promise<AlbumInfo>;
     getAlbumList: (args: ReplaceApiClientProps<AlbumListArgs>) => Promise<AlbumListResponse>;
     getAlbumListCount: (args: ReplaceApiClientProps<AlbumListCountArgs>) => Promise<number>;
+    getAlbumRadio: (args: ReplaceApiClientProps<AlbumRadioArgs>) => Promise<Song[]>;
     // getArtistInfo?: (args: any) => void;
     getArtistList: (args: ReplaceApiClientProps<ArtistListArgs>) => Promise<ArtistListResponse>;
     getArtistListCount: (args: ReplaceApiClientProps<ArtistListCountArgs>) => Promise<number>;

@@ -47,7 +47,8 @@
         "sleepTimer_timeRemaining": "{{time}} restante",
         "sleepTimer_off": "Apagado",
         "sleepTimer_endOfSong": "Fin de la canción actual",
-        "sleepTimer": "Temporizador de apagado"
+        "sleepTimer": "Temporizador de apagado",
+        "albumRadio": "Radio del álbum"
     },
     "setting": {
         "crossfadeStyle_description": "selecciona el estilo de crossfade a usar por el reproductor de audio",
@@ -1037,7 +1038,8 @@
                 "bitDepth": "$t(common.bitDepth)",
                 "sampleRate": "$t(common.sampleRate)",
                 "titleArtist": "$t(common.title) (artista)",
-                "composer": "Compositor"
+                "composer": "Compositor",
+                "albumGroup": "Grupo del álbum"
             },
             "general": {
                 "gap": "$t(common.gap)",

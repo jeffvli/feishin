@@ -676,7 +676,8 @@
         "sleepTimer_off": "wyłączony",
         "sleepTimer_timeRemaining": "pozostało {{time}}",
         "sleepTimer_setCustom": "ustaw wyłącznik",
-        "sleepTimer_cancel": "anuluj wyłączanie"
+        "sleepTimer_cancel": "anuluj wyłączanie",
+        "albumRadio": "radio albumu"
     },
     "setting": {
         "crossfadeStyle_description": "wybierz styl przenikania, który ma być używany do odtwarzania dźwięku",
@@ -1106,7 +1107,8 @@
                 "bitDepth": "$t(common.bitDepth)",
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "kompozytor",
-                "titleArtist": "$t(common.title) (wykonawca)"
+                "titleArtist": "$t(common.title) (wykonawca)",
+                "albumGroup": "grupa albumu"
             }
         },
         "column": {
