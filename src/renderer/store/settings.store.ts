@@ -906,7 +906,7 @@ export const playerItems: SortableItem<PlayerItem>[] = [
         id: PlayerItem.BPM,
     },
     {
-        disabled: true,
+        disabled: false,
         id: PlayerItem.CODEC,
     },
     {
@@ -922,7 +922,7 @@ export const playerItems: SortableItem<PlayerItem>[] = [
         id: PlayerItem.RELEASE_DATE,
     },
     {
-        disabled: false,
+        disabled: true,
         id: PlayerItem.RELEASE_TYPE,
     },
     {
