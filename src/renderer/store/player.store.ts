@@ -291,7 +291,7 @@ function regenerateShuffledIndexesIfNeeded(state: {
 
 const initialState: State = {
     player: {
-        crossfadeDuration: 5,
+        crossfadeDuration: 3,
         crossfadeStyle: CrossfadeStyle.EQUAL_POWER,
         index: -1,
         muted: false,
@@ -301,7 +301,7 @@ const initialState: State = {
         shuffle: PlayerShuffle.NONE,
         speed: 1,
         status: PlayerStatus.PAUSED,
-        transitionType: PlayerStyle.GAPLESS,
+        transitionType: PlayerStyle.CROSSFADE,
         volume: 30,
     },
     queue: {

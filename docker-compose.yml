@@ -1,0 +1,13 @@
+services:
+  feishin:
+    build: .
+    container_name: feishin
+    restart: unless-stopped
+    ports:
+      - "9180:9180"
+    environment:
+      # Optional: pre-configure a server so users can't change it
+      # - SERVER_NAME=My Music Server
+      # - SERVER_TYPE=navidrome   # or: jellyfin, subsonic
+      # - SERVER_URL=https://your-server-url.example.com
+      # - SERVER_LOCK=true        # prevent users from changing the server

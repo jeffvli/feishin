@@ -118,7 +118,7 @@ export const Sidebar = () => {
                         item: styles.accordionItem,
                         root: styles.accordionRoot,
                     }}
-                    defaultValue={['library', 'collections', 'playlists']}
+                    defaultValue={['collections', 'playlists']}
                     multiple
                 >
                     <Accordion.Item value="library">
