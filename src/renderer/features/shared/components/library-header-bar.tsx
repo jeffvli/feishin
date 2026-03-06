@@ -114,7 +114,11 @@ interface HeaderBadgeProps extends BadgeProps {
 }
 
 const HeaderBadge = ({ children, isLoading, ...props }: HeaderBadgeProps) => {
-    return <Badge {...props}>{isLoading ? <Spinner /> : children}</Badge>;
+    return (
+        <Badge className={styles.headerBadge} {...props}>
+            {isLoading ? <Spinner /> : children}
+        </Badge>
+    );
 };
 
 export const LibraryHeaderBar = Object.assign(memo(LibraryHeaderBarComponent), {

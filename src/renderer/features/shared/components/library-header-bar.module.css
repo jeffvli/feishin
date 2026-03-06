@@ -9,6 +9,21 @@
     padding: 0 1rem;
 }
 
+@media (max-width: 768px) {
+    .header-badge {
+        display: none;
+    }
+
+    .header-container h1,
+    .header-container h2,
+    .header-container h3 {
+        font-size: clamp(1rem, 5vw, 1.4rem) !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
 .play-button-container {
     position: relative;
     display: flex;

@@ -14,7 +14,7 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    touch-action: pan-x;
+    touch-action: pan-y;
     cursor: grab;
     user-select: none;
 }

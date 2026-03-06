@@ -5,8 +5,8 @@
         'window-bar'
         'main-content'
         'player';
-    grid-template-rows: 0 calc(100vh - 90px) 90px;
-    grid-template-rows: 0 calc(100dvh - 90px) 90px;
+    grid-template-rows: 0 calc(100vh - 130px) 130px;
+    grid-template-rows: 0 calc(100dvh - 130px - env(safe-area-inset-bottom, 0px)) calc(130px + env(safe-area-inset-bottom, 0px));
     grid-template-columns: 1fr;
     gap: 0;
     width: 100vw;
@@ -18,13 +18,13 @@
 
 .windows,
 .macos {
-    grid-template-rows: 30px calc(100vh - 120px) 90px;
-    grid-template-rows: 30px calc(100dvh - 120px) 90px;
+    grid-template-rows: 30px calc(100vh - 160px) 130px;
+    grid-template-rows: 30px calc(100dvh - 160px) 130px;
 }
 
 .drawer-button {
     position: absolute;
-    bottom: calc(90px + 0.75rem);
+    bottom: calc(130px + env(safe-area-inset-bottom, 0px) + 0.75rem);
     left: 0.75rem;
     z-index: 100;
     background: color-mix(in srgb, var(--theme-colors-background) 90%, transparent);

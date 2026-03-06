@@ -76,6 +76,8 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
     const player2Ref = useRef<null | ReactPlayer>(null);
     const networkRetryCount1 = useRef(0);
     const networkRetryCount2 = useRef(0);
+    const isTransitioningRef = useRef(isTransitioning);
+    isTransitioningRef.current = isTransitioning;
     const [ReactPlayerComponent, setReactPlayerComponent] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -180,6 +182,13 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
             const isNetworkError =
                 error?.code === MediaError.MEDIA_ERR_NETWORK ||
                 error?.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED;
+
+            // On mobile, skipping a song causes the interrupted audio request to fire
+            // MEDIA_ERR_NETWORK. Suppress it silently when transitioning between songs.
+            if (isNetworkError && isTransitioningRef.current) {
+                networkRetryCountRef.current = 0;
+                return;
+            }
 
             if (isNetworkError) {
                 if (networkRetryCountRef.current < MAX_NETWORK_RETRIES) {

@@ -2,7 +2,7 @@ import type { Variants } from 'motion/react';
 import type { ReactNode } from 'react';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import styles from './grid-carousel.module.css';
 
@@ -205,70 +205,71 @@ function BaseGridCarousel(props: GridCarouselProps) {
         ],
     );
 
-    const swipeCooldownRef = useRef(0);
-    const dragStartTargetRef = useRef<HTMLElement | null>(null);
-    const swipeCooldownMs = 300;
-    const swipeThreshold = 50;
-    const swipeVelocityThreshold = 500;
+    // Refs for current disabled/handler state — used inside native event listeners
+    const isPrevDisabledRef = useRef(isPrevDisabled);
+    const isNextDisabledRef = useRef(isNextDisabled);
+    const handlePrevPageRef = useRef(handlePrevPage);
+    const handleNextPageRef = useRef(handleNextPage);
+    isPrevDisabledRef.current = isPrevDisabled;
+    isNextDisabledRef.current = isNextDisabled;
+    handlePrevPageRef.current = handlePrevPage;
+    handleNextPageRef.current = handleNextPage;
 
-    const handleDragStart = useCallback((event: MouseEvent | PointerEvent | TouchEvent) => {
-        dragStartTargetRef.current = (event.target as HTMLElement) || null;
-    }, []);
+    const swipeRef = useRef<HTMLDivElement>(null);
 
-    const handleDragEnd = useCallback(
-        (
-            _event: MouseEvent | PointerEvent | TouchEvent,
-            info: { offset: { x: number }; velocity: { x: number } },
-        ) => {
-            const startTarget = dragStartTargetRef.current;
-            if (startTarget) {
-                if (startTarget.closest('button, a, input, select, textarea, [role="button"]')) {
-                    dragStartTargetRef.current = null;
-                    return;
-                }
+    useEffect(() => {
+        const el = swipeRef.current;
+        if (!el) return;
+
+        let startX = 0;
+        let startY = 0;
+        let isHorizontal = false;
+        let lastSwipeTime = 0;
+
+        const onTouchStart = (e: TouchEvent) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isHorizontal = false;
+        };
+
+        const onTouchMove = (e: TouchEvent) => {
+            const dx = Math.abs(e.touches[0].clientX - startX);
+            const dy = Math.abs(e.touches[0].clientY - startY);
+            if (dx > 8 && dx > dy) {
+                isHorizontal = true;
+                e.preventDefault(); // block page scroll during horizontal swipe
             }
+        };
 
+        const onTouchEnd = (e: TouchEvent) => {
+            if (!isHorizontal) return;
+            const deltaX = e.changedTouches[0].clientX - startX;
+            if (Math.abs(deltaX) < 40) return;
             const now = Date.now();
-            const elapsed = now - swipeCooldownRef.current;
+            if (now - lastSwipeTime < 300) return;
+            lastSwipeTime = now;
 
-            if (elapsed < swipeCooldownMs) {
-                dragStartTargetRef.current = null;
-                return;
-            }
+            if (deltaX > 0 && !isPrevDisabledRef.current) handlePrevPageRef.current(0);
+            else if (deltaX < 0 && !isNextDisabledRef.current) handleNextPageRef.current(0);
+        };
 
-            const { offset, velocity } = info;
-            const absOffset = Math.abs(offset.x);
-            const absVelocity = Math.abs(velocity.x);
+        el.addEventListener('touchstart', onTouchStart, { passive: true });
+        el.addEventListener('touchmove', onTouchMove, { passive: false });
+        el.addEventListener('touchend', onTouchEnd, { passive: true });
 
-            if (absOffset > swipeThreshold || absVelocity > swipeVelocityThreshold) {
-                swipeCooldownRef.current = now;
-
-                if (offset.x > 0 && !isPrevDisabled) {
-                    handlePrevPage();
-                } else if (offset.x < 0 && !isNextDisabled) {
-                    handleNextPage();
-                }
-            }
-
-            dragStartTargetRef.current = null;
-        },
-        [handleNextPage, handlePrevPage, isNextDisabled, isPrevDisabled],
-    );
+        return () => {
+            el.removeEventListener('touchstart', onTouchStart);
+            el.removeEventListener('touchmove', onTouchMove);
+            el.removeEventListener('touchend', onTouchEnd);
+        };
+    }, []);
 
     return (
         <div className={styles.gridCarousel} ref={ref}>
+            <div ref={swipeRef} style={{ touchAction: 'pan-y' }}>
             {cq.isCalculated && (
                 <>
-                    <motion.div
-                        className={styles.navigation}
-                        drag="x"
-                        dragConstraints={{ left: 0, right: 0 }}
-                        dragElastic={0}
-                        dragMomentum={false}
-                        dragPropagation={false}
-                        onDragEnd={handleDragEnd}
-                        onDragStart={handleDragStart}
-                    >
+                    <div className={styles.navigation}>
                         {typeof title === 'string' ? (
                             <Group gap="xs" justify="space-between" w="100%">
                                 <Group gap="xs">
@@ -328,7 +329,7 @@ function BaseGridCarousel(props: GridCarouselProps) {
                                 </Group>
                             </div>
                         )}
-                    </motion.div>
+                    </div>
                     <AnimatePresence custom={currentPage} initial={false} mode="wait">
                         <motion.div
                             animate="animate"
@@ -353,6 +354,7 @@ function BaseGridCarousel(props: GridCarouselProps) {
                     </AnimatePresence>
                 </>
             )}
+            </div>
         </div>
     );
 }
