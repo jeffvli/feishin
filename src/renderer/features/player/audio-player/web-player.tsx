@@ -20,6 +20,7 @@ import {
     usePlayerData,
     usePlayerMuted,
     usePlayerProperties,
+    usePlayerStoreBase,
     usePlayerVolume,
 } from '/@/renderer/store';
 import { toast } from '/@/shared/components/toast/toast';
@@ -180,7 +181,15 @@ export function WebPlayer() {
 
         promise.then(() => {
             playerRef.current?.player1()?.ref?.getInternalPlayer().pause();
-            playerRef.current?.setVolume(volume);
+
+            // If mediaAutoNext resulted in a paused state (e.g. end of queue,
+            // or pauseOnNextSongEnd flag), stop all audio instead of restoring volume.
+            const currentStatus = usePlayerStoreBase.getState().player.status;
+            if (currentStatus === PlayerStatus.PAUSED) {
+                playerRef.current?.pause();
+            } else {
+                playerRef.current?.setVolume(volume);
+            }
             setIsTransitioning(false);
         });
     }, [mediaAutoNext, volume]);
@@ -193,7 +202,13 @@ export function WebPlayer() {
 
         promise.then(() => {
             playerRef.current?.player2()?.ref?.getInternalPlayer().pause();
-            playerRef.current?.setVolume(volume);
+
+            const currentStatus = usePlayerStoreBase.getState().player.status;
+            if (currentStatus === PlayerStatus.PAUSED) {
+                playerRef.current?.pause();
+            } else {
+                playerRef.current?.setVolume(volume);
+            }
             setIsTransitioning(false);
         });
     }, [mediaAutoNext, volume]);
@@ -527,6 +542,11 @@ function crossfadeHandler(args: {
 
     if (!isTransitioning) {
         if (duration > 0 && currentTime > duration - crossfadeDuration) {
+            // Skip pre-starting next player if pauseOnNextSongEnd is set
+            if (usePlayerStoreBase.getState().player.pauseOnNextSongEnd) {
+                return;
+            }
+
             nextPlayer.setVolume(0);
             nextPlayer.ref?.getInternalPlayer().play();
             return setIsTransitioning(player);
@@ -616,6 +636,11 @@ function gaplessHandler(args: {
     const durationPadding = getDurationPadding(isFlac);
 
     if (currentTime + durationPadding >= duration) {
+        // Skip pre-starting next player if pauseOnNextSongEnd is set
+        if (usePlayerStoreBase.getState().player.pauseOnNextSongEnd) {
+            return null;
+        }
+
         return nextPlayer.ref
             ?.getInternalPlayer()
             ?.play()

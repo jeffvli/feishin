@@ -67,6 +67,7 @@ interface Actions {
     moveSelectedToTop: (items: QueueSong[]) => void;
     setCrossfadeDuration: (duration: number) => void;
     setCrossfadeStyle: (style: CrossfadeStyle) => void;
+    setPauseOnNextSongEnd: (value: boolean) => void;
     setQueue: (data: Song[], index?: number, position?: number) => void;
     setRepeat: (repeat: PlayerRepeat) => void;
     setShuffle: (shuffle: PlayerShuffle) => void;
@@ -91,6 +92,7 @@ interface State {
         crossfadeStyle: CrossfadeStyle;
         index: number;
         muted: boolean;
+        pauseOnNextSongEnd: boolean;
         playerNum: 1 | 2;
         repeat: PlayerRepeat;
         seekToTimestamp: string;
@@ -295,6 +297,7 @@ const initialState: State = {
         crossfadeStyle: CrossfadeStyle.EQUAL_POWER,
         index: -1,
         muted: false,
+        pauseOnNextSongEnd: false,
         playerNum: 1,
         repeat: PlayerRepeat.NONE,
         seekToTimestamp: uniqueSeekToTimestamp(0),
@@ -882,13 +885,19 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         playbackLength,
                         repeat,
                     );
-                    const newStatus = shouldPause ? PlayerStatus.PAUSED : PlayerStatus.PLAYING;
+                    const pauseOnNext = player.pauseOnNextSongEnd;
+                    const newStatus =
+                        shouldPause || pauseOnNext ? PlayerStatus.PAUSED : PlayerStatus.PLAYING;
 
                     set((state) => {
                         state.player.index = nextPlaybackIndex;
                         state.player.playerNum = newPlayerNum;
                         setTimestampStore(0);
                         state.player.status = newStatus;
+
+                        if (pauseOnNext) {
+                            state.player.pauseOnNextSongEnd = false;
+                        }
                     });
 
                     if (repeat === PlayerRepeat.ONE && nextPlaybackIndex === currentIndex) {
@@ -1315,6 +1324,11 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.crossfadeStyle = style;
                     });
                 },
+                setPauseOnNextSongEnd: (value: boolean) => {
+                    set((state) => {
+                        state.player.pauseOnNextSongEnd = value;
+                    });
+                },
                 setRepeat: (repeat: PlayerRepeat) => {
                     set((state) => {
                         state.player.repeat = repeat;
@@ -1633,6 +1647,7 @@ export const usePlayerActions = () => {
             moveSelectedToTop: state.moveSelectedToTop,
             setCrossfadeDuration: state.setCrossfadeDuration,
             setCrossfadeStyle: state.setCrossfadeStyle,
+            setPauseOnNextSongEnd: state.setPauseOnNextSongEnd,
             setQueue: state.setQueue,
             setRepeat: state.setRepeat,
             setShuffle: state.setShuffle,

@@ -96,24 +96,19 @@ const useSleepTimer = () => {
         [handleOnCurrentSongChange, handleOnPlayerProgress],
     );
 
-    // End-of-song mode: subscribe to player index changes
+    // End-of-song mode: set the pauseOnNextSongEnd flag so that
+    // mediaAutoNext returns PAUSED status when the current song ends.
+    // This is a generic player mechanism — the web player handles it
+    // without needing to know about the sleep timer.
     useEffect(() => {
         if (!active || mode !== 'endOfSong') return;
 
-        const initialIndex = usePlayerStoreBase.getState().player.index;
+        usePlayerStoreBase.getState().setPauseOnNextSongEnd(true);
 
-        const unsub = usePlayerStoreBase.subscribe(
-            (state) => state.player.index,
-            (index) => {
-                if (index !== initialIndex) {
-                    cancelTimer();
-                    mediaPauseRef.current();
-                }
-            },
-        );
-
-        return () => unsub();
-    }, [active, mode, cancelTimer]);
+        return () => {
+            usePlayerStoreBase.getState().setPauseOnNextSongEnd(false);
+        };
+    }, [active, mode]);
 };
 
 export const SleepTimerHookInner = () => {
