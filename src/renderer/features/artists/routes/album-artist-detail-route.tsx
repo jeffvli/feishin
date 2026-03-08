@@ -17,14 +17,13 @@ import { LibraryContainer } from '/@/renderer/features/shared/components/library
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { useFastAverageColor } from '/@/renderer/hooks';
-import { useArtistBackground, useCurrentServer, useCurrentServerId } from '/@/renderer/store';
+import { useArtistBackground, useCurrentServerId } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { AlbumListSort, LibraryItem, SortOrder } from '/@/shared/types/domain-types';
 
 const AlbumArtistDetailRouteContent = () => {
     const scrollAreaRef = useRef<HTMLDivElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
-    const server = useCurrentServer();
     const serverId = useCurrentServerId();
     const { artistBackground, artistBackgroundBlur } = useArtistBackground();
 
@@ -37,7 +36,7 @@ const AlbumArtistDetailRouteContent = () => {
 
     const [detailQuery, albumsQuery] = useSuspenseQueries({
         queries: [
-            artistsQueries.albumArtistDetail({ query: { id: routeId }, serverId: server?.id }),
+            artistsQueries.albumArtistDetail({ query: { id: routeId }, serverId }),
             albumQueries.list({
                 query: {
                     artistIds: [routeId],

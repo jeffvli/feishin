@@ -16,7 +16,7 @@ import {
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { useRecentPlaylists } from '/@/renderer/features/playlists/hooks/use-recent-playlists';
 import { useAddToPlaylist } from '/@/renderer/features/playlists/mutations/add-to-playlist-mutation';
-import { useCurrentServer, useCurrentServerId } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -34,7 +34,6 @@ interface AddToPlaylistActionProps {
 
 export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProps) => {
     const { t } = useTranslation();
-    const server = useCurrentServer();
     const serverId = useCurrentServerId();
     const queryClient = useQueryClient();
     const [searchTerm, setSearchTerm] = useState('');
@@ -52,7 +51,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 sortOrder: SortOrder.ASC,
                 startIndex: 0,
             },
-            serverId: server?.id,
+            serverId,
         }),
     );
 
@@ -147,12 +146,12 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
 
     const getSongsByFolderLocal = useCallback(
         async (folderId: string) => {
-            if (!server) return null;
+            if (!serverId) return null;
 
             const songsResponse = await getSongsByFolder({
                 id: [folderId],
                 queryClient,
-                serverId: server.id,
+                serverId,
             });
 
             return {
@@ -161,7 +160,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 totalRecordCount: songsResponse.items.length,
             };
         },
-        [queryClient, server],
+        [queryClient, serverId],
     );
 
     const handleAddToPlaylist = useCallback(

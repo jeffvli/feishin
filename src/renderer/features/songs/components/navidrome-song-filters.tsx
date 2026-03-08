@@ -41,7 +41,7 @@ export const NavidromeSongFilters = ({
 }: NavidromeSongFiltersProps) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
-    const serverId = server.id;
+    const serverId = server?.id || '';
     const {
         query,
         setArtistIds,

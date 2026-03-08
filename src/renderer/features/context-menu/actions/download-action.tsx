@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '/@/renderer/api';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 
 interface DownloadActionProps {
@@ -14,13 +14,13 @@ const utils = isElectron() ? window.api.utils : null;
 
 export const DownloadAction = ({ ids }: DownloadActionProps) => {
     const { t } = useTranslation();
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
 
     const onSelect = useCallback(async () => {
         try {
             for (const id of ids) {
                 const downloadUrl = api.controller.getDownloadUrl({
-                    apiClientProps: { serverId: server.id },
+                    apiClientProps: { serverId },
                     query: { id },
                 });
 
@@ -33,7 +33,7 @@ export const DownloadAction = ({ ids }: DownloadActionProps) => {
         } catch (error) {
             console.error('Failed to download items:', error);
         }
-    }, [ids, server]);
+    }, [ids, serverId]);
 
     return (
         <ContextMenu.Item disabled={ids.length > 1} leftIcon="download" onSelect={onSelect}>

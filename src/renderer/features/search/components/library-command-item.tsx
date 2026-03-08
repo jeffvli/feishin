@@ -9,7 +9,7 @@ import {
     PlayTooltip,
 } from '/@/renderer/features/shared/components/play-button-group';
 import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-button-click';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Text } from '/@/shared/components/text/text';
@@ -42,20 +42,20 @@ export const LibraryCommandItem = ({
     title,
 }: LibraryCommandItemProps) => {
     const { addToQueueByData, addToQueueByFetch } = usePlayer();
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
 
     const handlePlay = useCallback(
         (playType: Play) => {
-            if (!server.id) return;
+            if (!serverId) return;
 
             // Use addToQueueByData for songs when we have the song data
             if (itemType === LibraryItem.SONG && song) {
                 addToQueueByData([song], playType);
             } else {
-                addToQueueByFetch(server.id, [id], itemType, playType);
+                addToQueueByFetch(serverId, [id], itemType, playType);
             }
         },
-        [addToQueueByData, addToQueueByFetch, id, itemType, server.id, song],
+        [addToQueueByData, addToQueueByFetch, id, itemType, serverId, song],
     );
 
     const handlePlayNext = usePlayButtonClick({

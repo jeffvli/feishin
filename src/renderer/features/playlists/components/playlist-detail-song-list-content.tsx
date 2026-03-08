@@ -9,7 +9,7 @@ import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { PlaylistDetailAlbumView } from '/@/renderer/features/playlists/components/playlist-detail-album-view';
 import { usePlaylistTrackList } from '/@/renderer/features/playlists/hooks/use-playlist-track-list';
-import { useCurrentServer, useListSettings } from '/@/renderer/store';
+import { useCurrentServerId, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import {
     LibraryItem,
@@ -50,7 +50,7 @@ const PlaylistDetailSongListGrid = lazy(() =>
 
 export const PlaylistDetailSongListContent = () => {
     const { playlistId } = useParams() as { playlistId: string };
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const queryClient = useQueryClient();
 
     const playlistSongsQuery = useSuspenseQuery(
@@ -58,7 +58,7 @@ export const PlaylistDetailSongListContent = () => {
             query: {
                 id: playlistId,
             },
-            serverId: server?.id,
+            serverId,
         }),
     );
 
@@ -75,7 +75,7 @@ export const PlaylistDetailSongListContent = () => {
                 query: {
                     id: playlistId,
                 },
-                serverId: server?.id,
+                serverId,
             }).queryKey;
 
             await queryClient.invalidateQueries({ queryKey });
@@ -87,7 +87,7 @@ export const PlaylistDetailSongListContent = () => {
         return () => {
             eventEmitter.off('ITEM_LIST_REFRESH', handleRefresh);
         };
-    }, [playlistId, queryClient, server?.id]);
+    }, [playlistId, queryClient, serverId]);
 
     return (
         <Suspense fallback={<Spinner container />}>
@@ -104,7 +104,7 @@ interface PlaylistDetailSongListViewProps {
 }
 
 export const PlaylistDetailSongListView = ({ data, items }: PlaylistDetailSongListViewProps) => {
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const { display, itemsPerPage, pagination, table } = useListSettings(ItemListKey.PLAYLIST_SONG);
     const { currentPage, onChange: onPageChange } = useItemListPagination();
     const isPaginated = pagination === ListPaginationType.PAGINATED;
@@ -117,13 +117,15 @@ export const PlaylistDetailSongListView = ({ data, items }: PlaylistDetailSongLi
           }
         : undefined;
 
+    if (!serverId) return null;
+
     switch (display) {
         case ListDisplayType.GRID: {
             return (
                 <PlaylistDetailSongListGrid
                     data={data}
                     items={items}
-                    serverId={server.id}
+                    serverId={serverId}
                     {...paginationProps}
                 />
             );
@@ -140,7 +142,7 @@ export const PlaylistDetailSongListView = ({ data, items }: PlaylistDetailSongLi
                     enableRowHoverHighlight={table.enableRowHoverHighlight}
                     enableVerticalBorders={table.enableVerticalBorders}
                     items={items}
-                    serverId={server.id}
+                    serverId={serverId}
                     size={table.size}
                     {...paginationProps}
                 />
@@ -153,7 +155,7 @@ export const PlaylistDetailSongListView = ({ data, items }: PlaylistDetailSongLi
 
 export const PlaylistDetailSongListEdit = ({ data }: { data: PlaylistSongListResponse }) => {
     const { playlistId } = useParams() as { playlistId: string };
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const { display, table } = useListSettings(ItemListKey.PLAYLIST_SONG);
 
     const [localData, setLocalData] = useState<PlaylistSongListResponse>(data);
@@ -272,7 +274,7 @@ export const PlaylistDetailSongListEdit = ({ data }: { data: PlaylistSongListRes
                     enableRowHoverHighlight={table.enableRowHoverHighlight}
                     enableVerticalBorders={table.enableVerticalBorders}
                     ref={tableRef}
-                    serverId={server.id}
+                    serverId={serverId}
                     size={table.size}
                 />
             );

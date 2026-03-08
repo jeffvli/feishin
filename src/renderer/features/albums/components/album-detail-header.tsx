@@ -18,7 +18,7 @@ import { useSetFavorite } from '/@/renderer/features/shared/hooks/use-set-favori
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useShowRatings } from '/@/renderer/store';
+import { useCurrentServerId, useShowRatings } from '/@/renderer/store';
 import { useArtistRadioCount, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDateAbsoluteUTC, formatDurationString } from '/@/renderer/utils';
 import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
@@ -32,12 +32,12 @@ import { Play } from '/@/shared/types/types';
 export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
     const { albumId } = useParams() as { albumId: string };
     const { t } = useTranslation();
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const showRatings = useShowRatings();
     const queryClient = useQueryClient();
     const albumRadioCount = useArtistRadioCount();
     const detailQuery = useQuery(
-        albumQueries.detail({ query: { id: albumId }, serverId: server?.id }),
+        albumQueries.detail({ query: { id: albumId }, serverId: serverId }),
     );
 
     const showRating =
@@ -84,8 +84,8 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
         : undefined;
 
     const handlePlay = (type?: Play) => {
-        if (!server?.id || !albumId) return;
-        addToQueueByFetch(server.id, [albumId], LibraryItem.ALBUM, type || playButtonBehavior);
+        if (!serverId || !albumId) return;
+        addToQueueByFetch(serverId, [albumId], LibraryItem.ALBUM, type || playButtonBehavior);
     };
 
     const handleMoreOptions = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -97,7 +97,7 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
     };
 
     const handleAlbumRadio = async () => {
-        if (!server?.id || !albumId) return;
+        if (!serverId || !albumId) return;
 
         try {
             const albumRadioSongs = await queryClient.fetchQuery({
@@ -106,7 +106,7 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
                         albumId: albumId,
                         count: albumRadioCount,
                     },
-                    serverId: server.id,
+                    serverId: serverId,
                 }),
                 queryKey: queryKeys.player.fetch({ albumId: albumId }),
             });

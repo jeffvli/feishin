@@ -30,7 +30,9 @@ export const HomeCommands = ({
 
     const handleCreatePlaylistModal = useCallback(() => {
         handleClose();
-        openCreatePlaylistModal(server);
+        if (server) {
+            openCreatePlaylistModal(server);
+        }
     }, [handleClose, server]);
 
     const handleSearch = () => {

@@ -16,7 +16,7 @@ import {
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { ListSearchInput } from '/@/renderer/features/shared/components/list-search-input';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { formatDurationString } from '/@/renderer/utils';
 import { Stack } from '/@/shared/components/stack/stack';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
@@ -36,11 +36,11 @@ export const PlaylistDetailSongListHeader = ({
     const { t } = useTranslation();
     const { playlistId } = useParams() as { playlistId: string };
     const { itemCount, listData } = useListContext();
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const location = useLocation();
 
     const detailQuery = useQuery({
-        ...playlistsQueries.detail({ query: { id: playlistId }, serverId: server?.id }),
+        ...playlistsQueries.detail({ query: { id: playlistId }, serverId }),
         placeholderData: location.state?.item,
     });
 

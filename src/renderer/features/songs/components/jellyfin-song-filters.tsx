@@ -11,7 +11,7 @@ import {
 } from '/@/renderer/features/shared/components/multi-select-rows';
 import { TagFilters } from '/@/renderer/features/shared/components/tag-filter';
 import { useSongListFilters } from '/@/renderer/features/songs/hooks/use-song-list-filters';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { useAppStore, useAppStoreActions } from '/@/renderer/store/app.store';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -38,8 +38,7 @@ export const JellyfinSongFilters = ({
     disableArtistFilter,
     disableGenreFilter,
 }: JellyfinSongFiltersProps) => {
-    const server = useCurrentServer();
-    const serverId = server.id;
+    const serverId = useCurrentServerId();
     const { t } = useTranslation();
     const { query, setArtistIds, setCustom, setFavorite, setMaxYear, setMinYear } =
         useSongListFilters();

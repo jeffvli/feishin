@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { FolderButton } from '/@/renderer/features/shared/components/folder-button';
 import { useMusicFolderIdFilter } from '/@/renderer/features/shared/hooks/use-music-folder-id-filter';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -12,10 +12,8 @@ interface ListMusicFolderDropdownProps {
 }
 
 export const ListMusicFolderDropdown = ({ listKey }: ListMusicFolderDropdownProps) => {
-    const server = useCurrentServer();
-    const { data: musicFolders } = useQuery(
-        sharedQueries.musicFolders({ query: null, serverId: server.id }),
-    );
+    const serverId = useCurrentServerId();
+    const { data: musicFolders } = useQuery(sharedQueries.musicFolders({ query: null, serverId }));
 
     const { musicFolderId, setMusicFolderId } = useMusicFolderIdFilter('', listKey);
 

@@ -43,10 +43,6 @@ export const ListFiltersModal = ({ isActive, itemType }: ListFiltersProps) => {
     const server = useCurrentServer();
     const { isSidebarOpen, pageKey, setIsSidebarOpen } = useListContext();
 
-    const serverType = server.type;
-
-    const FilterComponent = FILTERS[serverType][itemType];
-
     const [isOpen, handlers] = useDisclosure(false);
 
     const albumListFilters = useAlbumListFilters(pageKey as ItemListKey);
@@ -66,6 +62,10 @@ export const ListFiltersModal = ({ isActive, itemType }: ListFiltersProps) => {
     const disableArtistFilter = pageKey === ItemListKey.ALBUM_ARTIST_ALBUM;
     const disableGenreFilter =
         pageKey === ItemListKey.GENRE_ALBUM || pageKey === ItemListKey.GENRE_SONG;
+
+    if (!server?.type) return null;
+
+    const FilterComponent = FILTERS[server.type][itemType];
 
     return (
         <>
@@ -118,13 +118,14 @@ export const ListFiltersModal = ({ isActive, itemType }: ListFiltersProps) => {
 
 export const ListFilters = ({ itemType }: ListFiltersProps) => {
     const server = useCurrentServer();
-    const serverType = server.type;
-    const FilterComponent = FILTERS[serverType][itemType];
     const { pageKey } = useListContext();
 
     const disableArtistFilter = pageKey === ItemListKey.ALBUM_ARTIST_ALBUM;
     const disableGenreFilter =
         pageKey === ItemListKey.GENRE_ALBUM || pageKey === ItemListKey.GENRE_SONG;
+
+    if (!server?.type) return null;
+    const FilterComponent = FILTERS[server.type][itemType];
 
     return (
         <ComponentErrorBoundary>

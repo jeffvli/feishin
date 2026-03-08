@@ -41,7 +41,7 @@ export const ServerSelectorItems = () => {
     const queryClient = useQueryClient();
 
     const handleToggleMusicFolder = (musicFolderId: string) => {
-        if (supportsMultiSelect) {
+        if (supportsMultiSelect && currentServer) {
             const currentIds = currentServer.musicFolderId || [];
             const isSelected = currentIds.includes(musicFolderId);
 
@@ -53,7 +53,7 @@ export const ServerSelectorItems = () => {
                 // Add to selection
                 setMusicFolderId([...currentIds, musicFolderId]);
             }
-        } else {
+        } else if (currentServer) {
             const currentId = Array.isArray(currentServer.musicFolderId)
                 ? currentServer.musicFolderId[0]
                 : currentServer.musicFolderId;

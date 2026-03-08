@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo } from 'react';
 
 import { useAlbumArtistListFilters } from '/@/renderer/features/artists/hooks/use-album-artist-list-filters';
-import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
+import { ItemListSettings, useCurrentServerId, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { AlbumArtistListQuery } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, ListPaginationType } from '/@/shared/types/types';
@@ -66,7 +66,7 @@ export const AlbumArtistListView = ({
     pagination,
     table,
 }: ItemListSettings & { overrideQuery?: OverrideAlbumArtistListQuery }) => {
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
 
     const { query } = useAlbumArtistListFilters();
 
@@ -83,6 +83,8 @@ export const AlbumArtistListView = ({
         };
     }, [query, overrideQuery]);
 
+    if (!serverId) return null;
+
     switch (display) {
         case ListDisplayType.GRID: {
             switch (pagination) {
@@ -93,7 +95,7 @@ export const AlbumArtistListView = ({
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={grid.size}
                         />
                     );
@@ -105,7 +107,7 @@ export const AlbumArtistListView = ({
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={grid.size}
                         />
                     );
@@ -128,7 +130,7 @@ export const AlbumArtistListView = ({
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={table.size}
                         />
                     );
@@ -145,7 +147,7 @@ export const AlbumArtistListView = ({
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={table.size}
                         />
                     );

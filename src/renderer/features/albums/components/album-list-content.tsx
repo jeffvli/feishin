@@ -5,7 +5,7 @@ import { useAlbumListFilters } from '/@/renderer/features/albums/hooks/use-album
 import { ListFilters, ListFiltersTitle } from '/@/renderer/features/shared/components/list-filters';
 import { ListWithSidebarContainer } from '/@/renderer/features/shared/components/list-with-sidebar-container';
 import { SaveAsCollectionButton } from '/@/renderer/features/shared/components/save-as-collection-button';
-import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
+import { ItemListSettings, useCurrentServerId, useListSettings } from '/@/renderer/store';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -109,7 +109,7 @@ export const AlbumListView = ({
     detail?: ItemListSettings['detail'];
     overrideQuery?: OverrideAlbumListQuery;
 }) => {
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const { pageKey } = useListContext();
 
     const { query } = useAlbumListFilters(pageKey as ItemListKey);
@@ -127,6 +127,10 @@ export const AlbumListView = ({
         };
     }, [query, overrideQuery]);
 
+    if (!serverId) {
+        return null;
+    }
+
     switch (display) {
         case ListDisplayType.GRID: {
             switch (pagination) {
@@ -137,7 +141,7 @@ export const AlbumListView = ({
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={grid.size}
                         />
                     );
@@ -149,7 +153,7 @@ export const AlbumListView = ({
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={grid.size}
                         />
                     );
@@ -172,7 +176,7 @@ export const AlbumListView = ({
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={table.size}
                         />
                     );
@@ -189,7 +193,7 @@ export const AlbumListView = ({
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={table.size}
                         />
                     );
@@ -206,7 +210,7 @@ export const AlbumListView = ({
                             enableHeader={detail?.enableHeader}
                             itemsPerPage={itemsPerPage}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                         />
                     );
                 }
@@ -216,7 +220,7 @@ export const AlbumListView = ({
                             enableHeader={detail?.enableHeader}
                             itemsPerPage={itemsPerPage}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                         />
                     );
                 }

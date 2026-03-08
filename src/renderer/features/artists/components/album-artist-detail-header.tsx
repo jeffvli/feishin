@@ -16,7 +16,7 @@ import {
 import { useSetFavorite } from '/@/renderer/features/shared/hooks/use-set-favorite';
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useShowRatings } from '/@/renderer/store';
+import { useCurrentServerId, useShowRatings } from '/@/renderer/store';
 import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString } from '/@/renderer/utils';
 import { SEPARATOR_STRING } from '/@/shared/api/utils';
@@ -32,13 +32,13 @@ export const AlbumArtistDetailHeader = forwardRef((_props, ref: Ref<HTMLDivEleme
         artistId?: string;
     };
     const routeId = (artistId || albumArtistId) as string;
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const showRatings = useShowRatings();
     const { t } = useTranslation();
     const detailQuery = useSuspenseQuery(
         artistsQueries.albumArtistDetail({
             query: { id: routeId },
-            serverId: server?.id,
+            serverId: serverId,
         }),
     );
 
@@ -75,15 +75,15 @@ export const AlbumArtistDetailHeader = forwardRef((_props, ref: Ref<HTMLDivEleme
 
     const handlePlay = useCallback(
         (type?: Play) => {
-            if (!server?.id || !routeId) return;
+            if (!serverId || !routeId) return;
             addToQueueByFetch(
-                server.id,
+                serverId,
                 [routeId],
                 LibraryItem.ALBUM_ARTIST,
                 type || playButtonBehavior,
             );
         },
-        [addToQueueByFetch, playButtonBehavior, routeId, server.id],
+        [addToQueueByFetch, playButtonBehavior, routeId, serverId],
     );
 
     const handleFavorite = useCallback(() => {

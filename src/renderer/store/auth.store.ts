@@ -111,7 +111,7 @@ export const useCurrentServerId = (): string =>
         return currentServer.id;
     }, shallow);
 
-export const useCurrentServer = () =>
+export const useCurrentServer = (): null | ServerListItem =>
     useAuthStore((state) => {
         if (!state.currentServer) {
             return null;
@@ -133,7 +133,7 @@ export const useCurrentServer = () =>
             username: state.currentServer?.username,
             version: state.currentServer?.version,
         };
-    }, shallow) as ServerListItem;
+    }, shallow);
 
 export const useIsAdmin = () =>
     useAuthStore((state) => {

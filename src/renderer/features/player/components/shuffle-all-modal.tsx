@@ -71,6 +71,7 @@ export const ShuffleAllContextModal = () => {
     const { enableMaxYear, enableMinYear, genre, limit, maxYear, minYear, musicFolderId, played } =
         useShuffleAllStore();
     const { setStore } = useShuffleAllStoreActions();
+    const serverId = server?.id || '';
 
     const { isFetching, refetch } = useQuery({
         ...randomFetchQuery({
@@ -82,7 +83,7 @@ export const ShuffleAllContextModal = () => {
                 musicFolderId: musicFolderId || undefined,
                 played,
             },
-            serverId: server.id,
+            serverId,
         }),
         enabled: false,
         gcTime: 0,
@@ -215,7 +216,7 @@ const GenreSelect = () => {
                 value,
             };
         });
-    }, [genres, server.type]);
+    }, [genres, server?.type]);
 
     return (
         <Select

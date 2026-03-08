@@ -982,8 +982,10 @@ export const AlbumArtistDetailContent = ({
     const showGenres = detailQuery.data?.genres ? detailQuery.data.genres.length !== 0 : false;
     const mbzId = detailQuery.data?.mbz;
 
+    const serverId = server?.id;
+
     const handleArtistRadio = useCallback(async () => {
-        if (!server?.id || !routeId) return;
+        if (!serverId || !routeId) return;
 
         try {
             const artistRadioSongs = await queryClient.fetchQuery({
@@ -992,7 +994,7 @@ export const AlbumArtistDetailContent = ({
                         artistId: routeId,
                         count: artistRadioCount,
                     },
-                    serverId: server.id,
+                    serverId: serverId,
                 }),
                 queryKey: queryKeys.player.fetch({ artistId: routeId }),
             });
@@ -1002,7 +1004,7 @@ export const AlbumArtistDetailContent = ({
         } catch (error) {
             console.error('Failed to load artist radio:', error);
         }
-    }, [addToQueueByData, artistRadioCount, queryClient, routeId, server.id]);
+    }, [addToQueueByData, artistRadioCount, queryClient, routeId, serverId]);
 
     // Calculate order for genres and external links (show before other sections)
     // Use a very low order number to ensure they appear first

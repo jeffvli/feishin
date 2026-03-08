@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo } from 'react';
 
 import { usePlaylistListFilters } from '/@/renderer/features/playlists/hooks/use-playlist-list-filters';
-import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
+import { ItemListSettings, useCurrentServerId, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { PlaylistListQuery } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, ListPaginationType } from '/@/shared/types/types';
@@ -64,7 +64,7 @@ export const PlaylistListView = ({
     pagination,
     table,
 }: ItemListSettings & { overrideQuery?: Omit<PlaylistListQuery, 'limit' | 'startIndex'> }) => {
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
 
     const { query } = usePlaylistListFilters();
 
@@ -91,7 +91,7 @@ export const PlaylistListView = ({
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={grid.size}
                         />
                     );
@@ -103,7 +103,7 @@ export const PlaylistListView = ({
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={grid.size}
                         />
                     );
@@ -126,7 +126,7 @@ export const PlaylistListView = ({
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={table.size}
                         />
                     );
@@ -143,7 +143,7 @@ export const PlaylistListView = ({
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={table.size}
                         />
                     );

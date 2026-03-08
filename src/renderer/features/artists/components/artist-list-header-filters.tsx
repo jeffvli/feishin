@@ -9,7 +9,7 @@ import { ListSelectFilter } from '/@/renderer/features/shared/components/list-se
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButton } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
@@ -17,9 +17,9 @@ import { ArtistListSort, LibraryItem, SortOrder } from '/@/shared/types/domain-t
 import { ItemListKey } from '/@/shared/types/types';
 
 export const ArtistListHeaderFilters = () => {
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
 
-    const rolesQuery = useQuery(sharedQueries.roles({ query: {}, serverId: server.id }));
+    const rolesQuery = useQuery(sharedQueries.roles({ query: {}, serverId }));
 
     return (
         <Flex justify="space-between">

@@ -14,7 +14,7 @@ import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { usePlayerSong } from '/@/renderer/store';
-import { useCurrentServer } from '/@/renderer/store/auth.store';
+import { useCurrentServerId } from '/@/renderer/store/auth.store';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { ItemListKey, Play } from '/@/shared/types/types';
@@ -25,13 +25,13 @@ const AlbumArtistDetailFavoriteSongsListRoute = () => {
         artistId?: string;
     };
     const routeId = (artistId || albumArtistId) as string;
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const pageKey = LibraryItem.SONG;
 
     const detailQuery = useQuery(
         artistsQueries.albumArtistDetail({
             query: { id: routeId },
-            serverId: server?.id,
+            serverId: serverId,
         }),
     );
 
@@ -39,7 +39,7 @@ const AlbumArtistDetailFavoriteSongsListRoute = () => {
         artistsQueries.favoriteSongs({
             options: { enabled: !!detailQuery?.data?.name },
             query: { artistId: routeId },
-            serverId: server?.id,
+            serverId: serverId,
         }),
     );
 

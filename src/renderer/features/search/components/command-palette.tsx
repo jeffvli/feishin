@@ -11,7 +11,7 @@ import { HomeCommands } from '/@/renderer/features/search/components/home-comman
 import { LibraryCommandItem } from '/@/renderer/features/search/components/library-command-item';
 import { ServerCommands } from '/@/renderer/features/search/components/server-commands';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Box } from '/@/shared/components/box/box';
 import { Button } from '/@/shared/components/button/button';
@@ -31,7 +31,7 @@ interface CommandPaletteProps {
 
 export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
     const navigate = useNavigate();
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const [value, setValue] = useState('');
     const [query, setQuery] = useState('');
     const [debouncedQuery] = useDebouncedValue(query, 400);
@@ -61,7 +61,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                 songLimit: 4,
                 songStartIndex: 0,
             },
-            serverId: server?.id,
+            serverId,
         }),
     );
 

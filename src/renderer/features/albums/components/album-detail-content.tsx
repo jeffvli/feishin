@@ -32,7 +32,7 @@ import {
 import { ListSortOrderToggleButtonControlled } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
 import { FILTER_KEYS, searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, usePlayerSong } from '/@/renderer/store';
+import { useCurrentServerId, usePlayerSong } from '/@/renderer/store';
 import { useExternalLinks, useSettingsStore } from '/@/renderer/store/settings.store';
 import { sentenceCase, titleCase } from '/@/renderer/utils';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
@@ -365,9 +365,9 @@ const AlbumMetadataExternalLinks = ({
 
 export const AlbumDetailContent = () => {
     const { albumId } = useParams() as { albumId: string };
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const detailQuery = useSuspenseQuery(
-        albumQueries.detail({ query: { id: albumId }, serverId: server.id }),
+        albumQueries.detail({ query: { id: albumId }, serverId: serverId }),
     );
 
     const { externalLinks, lastFM, musicBrainz } = useExternalLinks();

@@ -41,6 +41,8 @@ export const ListSortByDropdown = ({
 
     const { setSortBy, sortBy } = useSortByFilter(defaultSortByValue, listKey);
 
+    if (!server?.type) return null;
+
     const sortByLabel =
         (itemType && FILTERS[itemType][server.type].find((f) => f.value === sortBy)?.name) || '—';
 
@@ -94,6 +96,8 @@ export const ListSortByDropdownControlled = ({
     target,
 }: ListSortByDropdownControlledProps) => {
     const server = useCurrentServer();
+
+    if (!server?.type) return null;
 
     const availableFilters = filters || (itemType && FILTERS[itemType]?.[server.type]) || [];
 

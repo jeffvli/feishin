@@ -14,7 +14,7 @@ import {
     GenreMultiSelectRow,
 } from '/@/renderer/features/shared/components/multi-select-rows';
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { useAppStore, useAppStoreActions } from '/@/renderer/store/app.store';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -214,7 +214,7 @@ const MultiSelectFilterLabel = ({
 export const ClientSideSongFilters = () => {
     const { t } = useTranslation();
     const { playlistId } = useParams() as { playlistId: string };
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const {
         query,
         setAlbumArtistIds,
@@ -232,7 +232,7 @@ export const ClientSideSongFilters = () => {
     const playlistSongsQuery = useSuspenseQuery(
         playlistsQueries.songList({
             query: { id: playlistId },
-            serverId: server?.id,
+            serverId,
         }),
     );
 

@@ -13,7 +13,7 @@ import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/cont
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useCurrentServerId } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
@@ -58,7 +58,7 @@ function getGenresToShow(breakpoints: {
 
 export const FeaturedGenres = () => {
     const { t } = useTranslation();
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const { ref, ...cq } = useContainerQuery({
         lg: 900,
         md: 600,
@@ -73,9 +73,9 @@ export const FeaturedGenres = () => {
                 sortOrder: SortOrder.ASC,
                 startIndex: 0,
             },
-            serverId: server?.id,
+            serverId,
         }),
-        queryKey: [server.id, 'home', 'featured-genres'],
+        queryKey: [serverId, 'home', 'featured-genres'],
     });
 
     const randomGenres = useMemo(() => {

@@ -22,7 +22,9 @@ export const PlaylistListHeaderFilters = () => {
     const server = useCurrentServer();
 
     const handleCreatePlaylistModal = (e: MouseEvent<HTMLButtonElement>) => {
-        openCreatePlaylistModal(server, e);
+        if (server) {
+            openCreatePlaylistModal(server, e);
+        }
     };
 
     return (

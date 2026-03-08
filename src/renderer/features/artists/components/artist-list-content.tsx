@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo } from 'react';
 
 import { useArtistListFilters } from '/@/renderer/features/artists/hooks/use-artist-list-filters';
-import { ItemListSettings, useCurrentServer, useListSettings } from '/@/renderer/store';
+import { ItemListSettings, useCurrentServerId, useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { ArtistListQuery } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, ListPaginationType } from '/@/shared/types/types';
@@ -58,7 +58,7 @@ export const ArtistListView = ({
     pagination,
     table,
 }: ItemListSettings & { overrideQuery?: OverrideArtistListQuery }) => {
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
 
     const { query } = useArtistListFilters();
 
@@ -85,7 +85,7 @@ export const ArtistListView = ({
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={grid.size}
                         />
                     );
@@ -97,7 +97,7 @@ export const ArtistListView = ({
                             itemsPerPage={itemsPerPage}
                             itemsPerRow={grid.itemsPerRowEnabled ? grid.itemsPerRow : undefined}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={grid.size}
                         />
                     );
@@ -120,7 +120,7 @@ export const ArtistListView = ({
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={table.size}
                         />
                     );
@@ -137,7 +137,7 @@ export const ArtistListView = ({
                             enableVerticalBorders={table.enableVerticalBorders}
                             itemsPerPage={itemsPerPage}
                             query={mergedQuery}
-                            serverId={server.id}
+                            serverId={serverId}
                             size={table.size}
                         />
                     );

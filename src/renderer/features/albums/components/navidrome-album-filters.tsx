@@ -11,7 +11,7 @@ import {
     GenreMultiSelectRow,
 } from '/@/renderer/features/shared/components/multi-select-rows';
 import { TagFilters } from '/@/renderer/features/shared/components/tag-filter';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { useAppStore, useAppStoreActions } from '/@/renderer/store/app.store';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -39,8 +39,7 @@ export const NavidromeAlbumFilters = ({
     disableGenreFilter,
 }: NavidromeAlbumFiltersProps) => {
     const { t } = useTranslation();
-    const server = useCurrentServer();
-    const serverId = server.id;
+    const serverId = useCurrentServerId();
 
     const artistSelectMode = useAppStore((state) => state.artistSelectMode);
     const genreSelectMode = useAppStore((state) => state.genreSelectMode);

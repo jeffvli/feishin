@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { QueryBuilder } from '/@/renderer/components/query-builder';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { convertNDQueryToQueryGroup } from '/@/renderer/features/playlists/utils';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServerId } from '/@/renderer/store';
 import { useQueryBuilderSettings } from '/@/renderer/store/settings.store';
 import {
     NDSongQueryBooleanOperators,
@@ -168,7 +168,7 @@ export const PlaylistQueryBuilder = forwardRef(
         ref: Ref<PlaylistQueryBuilderRef>,
     ) => {
         const { t } = useTranslation();
-        const server = useCurrentServer();
+        const serverId = useCurrentServerId();
         const queryBuilderSettings = useQueryBuilderSettings();
 
         // Memoize initial filters to avoid recalculation
@@ -189,7 +189,7 @@ export const PlaylistQueryBuilder = forwardRef(
         const { data: playlists } = useQuery(
             playlistsQueries.list({
                 query: { sortBy: PlaylistListSort.NAME, sortOrder: SortOrder.ASC, startIndex: 0 },
-                serverId: server?.id,
+                serverId,
             }),
         );
 
