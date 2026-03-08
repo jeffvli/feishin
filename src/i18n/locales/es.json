@@ -407,7 +407,11 @@
         "primaryShade": "Tono principal",
         "useThemePrimaryShade": "Usar tono principal del tema",
         "useThemePrimaryShade_description": "Usa el tono principal definido en el tema seleccionado para las variantes de color primario",
-        "primaryShade_description": "Sobreescribe el tono principal (0-9) usado para los botones, enlaces, y otros elementos de colores primarios"
+        "primaryShade_description": "Sobreescribe el tono principal (0-9) usado para los botones, enlaces, y otros elementos de colores primarios",
+        "autosave": "Guardar automáticamente la cola de reproducción",
+        "autosaveCount": "Frecuencia de guardado automática de la cola de reproducción",
+        "autosave_description": "Permite guardar automáticamente la cola de reproducción en tu servidor. Esto solo es posible cuando se usa Navidrome/Subsonic, y no puedes tener una cola de reproducción mezclada.",
+        "autosaveCount_description": "Cuántas pistas cambian antes de que la cola sea guardada. 1 (mínimo) quiere decir que todas las canciones cambian"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist, {\"count\": 1})",

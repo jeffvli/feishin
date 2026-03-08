@@ -407,7 +407,11 @@
         "primaryShade": "primární odstín",
         "primaryShade_description": "přepsat primární odstín (0–9) používaný pro tlačítka, odkazy a další prvky obarvené primární barvou",
         "playerItemConfiguration_description": "nastavit, které položky budou zobrazeny a v jakém pořadí, v celoobrazovkovém přehrávači",
-        "playerItemConfiguration": "nastavení položek přehrávače"
+        "playerItemConfiguration": "nastavení položek přehrávače",
+        "autosave": "automaticky ukládat frontu přehrávání",
+        "autosave_description": "zapnout automatické ukládání fronty přehrávání na server. toto je možné pouze při použití Navidrome/Subsonic a není možné mít kombinovanou frontu přehrávání.",
+        "autosaveCount": "četnost automatického ukládání fronty přehrávání",
+        "autosaveCount_description": "kolik změn skladeb se může provést před uložením fronty. 1 (minimum) znamená při každé změně skladby"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist, {\"count\": 1})",
