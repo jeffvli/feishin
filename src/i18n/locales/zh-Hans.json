@@ -74,7 +74,7 @@
         "forward": "前进",
         "delete": "删除",
         "cancel": "取消",
-        "forceRestartRequired": "重启应用使更改生效…关闭通知即可重启",
+        "forceRestartRequired": "重启应用以使更改生效…关闭通知即可重启",
         "setting_other": "设置",
         "version": "版本",
         "title": "标题",
