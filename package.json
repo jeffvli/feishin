@@ -103,7 +103,7 @@
         "electron-store": "^8.2.0",
         "electron-updater": "^6.6.2",
         "fast-average-color": "^9.5.0",
-        "fast-xml-parser": "^5.3.6",
+        "fast-xml-parser": "^5.3.8",
         "format-duration": "^3.0.2",
         "fuse.js": "^7.1.0",
         "i18next": "^25.6.2",
