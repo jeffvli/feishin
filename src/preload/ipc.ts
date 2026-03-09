@@ -12,9 +12,19 @@ const invoke = (channel: string, ...args: any[]) => {
     return ipcRenderer.invoke(channel, ...args);
 };
 
+const on = (channel: string, listener: (event: any, ...args: any[]) => void) => {
+    ipcRenderer.on(channel, listener);
+};
+
+const removeListener = (channel: string, listener: (event: any, ...args: any[]) => void) => {
+    ipcRenderer.removeListener(channel, listener);
+};
+
 export const ipc = {
     invoke,
+    on,
     removeAllListeners,
+    removeListener,
     send,
 };
 

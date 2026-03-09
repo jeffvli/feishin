@@ -160,7 +160,8 @@
         "clean": "clean",
         "gridRows": "grid rows",
         "tableColumns": "table columns",
-        "itemsMore": "{{count}} more"
+        "itemsMore": "{{count}} more",
+        "newVersionAvailable": "a new version is available"
     },
     "entity": {
         "album_one": "album",

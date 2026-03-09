@@ -365,6 +365,7 @@ interface GridCarouselSkeletonProps {
     containerQuery?: ReturnType<typeof useGridCarouselContainerQuery>;
     enableRefresh?: boolean;
     placeholderItemType: LibraryItem;
+    placeholderRound?: boolean;
     placeholderRows: DataRow[];
     rowCount?: number;
     title?: ReactNode | string;
@@ -375,12 +376,15 @@ const GridCarouselSkeleton = (props: GridCarouselSkeletonProps) => {
         containerQuery: providedContainerQuery,
         enableRefresh = false,
         placeholderItemType,
+        placeholderRound = false,
         placeholderRows,
         rowCount = 1,
         title,
     } = props;
 
-    const { ...cq } = providedContainerQuery;
+    const defaultContainerQuery = useGridCarouselContainerQuery();
+    const containerQuery = providedContainerQuery ?? defaultContainerQuery;
+    const { ...cq } = containerQuery;
 
     const cardsToShow = cq.isCalculated
         ? getCardsToShow({
@@ -399,6 +403,7 @@ const GridCarouselSkeleton = (props: GridCarouselSkeletonProps) => {
             content: (
                 <MemoizedItemCard
                     data={undefined}
+                    isRound={placeholderRound}
                     itemType={placeholderItemType}
                     rows={placeholderRows}
                     type="poster"
@@ -406,12 +411,12 @@ const GridCarouselSkeleton = (props: GridCarouselSkeletonProps) => {
             ),
             id: `skeleton-${index}`,
         }));
-    }, [cardsToShow, rowCount, placeholderItemType, placeholderRows]);
+    }, [cardsToShow, placeholderRound, rowCount, placeholderItemType, placeholderRows]);
 
     return (
         <GridCarousel
             cards={placeholderCards}
-            containerQuery={providedContainerQuery}
+            containerQuery={containerQuery}
             enableRefresh={enableRefresh}
             hasNextPage={false}
             isFetchingNextPage={false}

@@ -190,19 +190,11 @@ export const NavidromeController: InternalControllerEndpoint = {
     getAlbumArtistDetail: async (args) => {
         const { apiClientProps, query } = args;
 
-        const [res, artistInfoRes] = await Promise.all([
-            ndApiClient(apiClientProps).getAlbumArtistDetail({
-                params: {
-                    id: query.id,
-                },
-            }),
-            ssApiClient(apiClientProps).getArtistInfo({
-                query: {
-                    count: 10,
-                    id: query.id,
-                },
-            }),
-        ]);
+        const res = await ndApiClient(apiClientProps).getAlbumArtistDetail({
+            params: {
+                id: query.id,
+            },
+        });
 
         if (res.status !== 200) {
             throw new Error('Failed to get album artist detail');
@@ -212,22 +204,42 @@ export const NavidromeController: InternalControllerEndpoint = {
             throw new Error('Server is required');
         }
 
-        // Prefer images from getArtistInfo first (which should be proxied)
-        // Prioritize large > medium > small
-        return ndNormalize.albumArtist(
-            {
-                ...res.body.data,
-                ...(artistInfoRes.status === 200 && {
-                    largeImageUrl:
-                        artistInfoRes.body.artistInfo.largeImageUrl ||
-                        artistInfoRes.body.artistInfo.mediumImageUrl ||
-                        artistInfoRes.body.artistInfo.smallImageUrl ||
-                        res.body.data.largeImageUrl,
-                    similarArtists: artistInfoRes.body.artistInfo.similarArtist,
-                }),
+        return ndNormalize.albumArtist(res.body.data, apiClientProps.server);
+    },
+    getAlbumArtistInfo: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const artistInfoRes = await ssApiClient(apiClientProps).getArtistInfo({
+            query: {
+                id: query.id,
+                ...(query.limit != null && { count: query.limit }),
             },
-            apiClientProps.server,
-        );
+        });
+
+        if (artistInfoRes.status !== 200) {
+            return null;
+        }
+
+        const artistInfo = artistInfoRes.body.artistInfo;
+        const imageUrl =
+            artistInfo?.largeImageUrl ||
+            artistInfo?.mediumImageUrl ||
+            artistInfo?.smallImageUrl ||
+            null;
+
+        return {
+            biography: artistInfo?.biography || null,
+            imageUrl,
+            similarArtists:
+                artistInfo?.similarArtist?.map((artist) => ({
+                    id: artist.id,
+                    imageId: null,
+                    imageUrl: artist?.artistImageUrl?.replace(/\?size=\d+/, '') ?? null,
+                    name: artist.name,
+                    userFavorite: Boolean(artist.starred) || false,
+                    userRating: artist.userRating ?? null,
+                })) ?? null,
+        };
     },
     getAlbumArtistList: async (args) => {
         const { apiClientProps, query } = args;

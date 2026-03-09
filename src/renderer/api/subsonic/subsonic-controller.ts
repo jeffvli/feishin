@@ -258,29 +258,17 @@ export const SubsonicController: InternalControllerEndpoint = {
     getAlbumArtistDetail: async (args) => {
         const { apiClientProps, query } = args;
 
-        const [artistInfoRes, res] = await Promise.all([
-            ssApiClient(apiClientProps).getArtistInfo({
-                query: {
-                    id: query.id,
-                },
-            }),
-            ssApiClient(apiClientProps).getArtist({
-                query: {
-                    id: query.id,
-                },
-            }),
-        ]);
+        const res = await ssApiClient(apiClientProps).getArtist({
+            query: {
+                id: query.id,
+            },
+        });
 
         if (res.status !== 200) {
             throw new Error('Failed to get album artist detail');
         }
 
         const artist = res.body.artist;
-
-        let artistInfo;
-        if (artistInfoRes.status === 200) {
-            artistInfo = artistInfoRes.body.artistInfo;
-        }
 
         return {
             ...ssNormalize.albumArtist(artist, apiClientProps.server),
@@ -292,10 +280,36 @@ export const SubsonicController: InternalControllerEndpoint = {
                     args.context?.pathReplaceWith,
                 ),
             ),
+            similarArtists: null,
+        };
+    },
+    getAlbumArtistInfo: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const artistInfoRes = await ssApiClient(apiClientProps).getArtistInfo({
+            query: {
+                id: query.id,
+                ...(query.limit != null && { count: query.limit }),
+            },
+        });
+
+        if (artistInfoRes.status !== 200) {
+            return null;
+        }
+
+        const artistInfo = artistInfoRes.body.artistInfo;
+
+        return {
+            biography: artistInfo?.biography || null,
             similarArtists:
-                artistInfo?.similarArtist?.map((artist) =>
-                    ssNormalize.albumArtist(artist, apiClientProps.server),
-                ) || null,
+                artistInfo?.similarArtist?.map((artist) => ({
+                    id: artist.id,
+                    imageId: null,
+                    imageUrl: null,
+                    name: artist.name,
+                    userFavorite: Boolean(artist.starred) || false,
+                    userRating: artist.userRating ?? null,
+                })) ?? null,
         };
     },
     getAlbumArtistList: async (args) => {

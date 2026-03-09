@@ -1,5 +1,6 @@
 import type {
     AlbumArtistDetailQuery,
+    AlbumArtistInfoQuery,
     AlbumArtistListQuery,
     AlbumDetailQuery,
     AlbumListQuery,
@@ -92,6 +93,13 @@ export const queryKeys: Record<
             }
 
             return [serverId, 'albumArtists', 'infiniteList'] as const;
+        },
+        info: (serverId: string, query?: AlbumArtistInfoQuery) => {
+            if (query) {
+                return [serverId, 'albumArtists', 'info', query] as const;
+            }
+
+            return [serverId, 'albumArtists', 'info'] as const;
         },
         list: (serverId: string, query?: AlbumArtistListQuery) => {
             const { filter, pagination } = splitPaginatedQuery(query);

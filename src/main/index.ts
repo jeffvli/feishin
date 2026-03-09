@@ -68,16 +68,40 @@ class AppUpdater {
         const effectiveChannel = store.get('release_channel') as string;
         console.log('Effective update channel:', effectiveChannel);
         if (effectiveChannel === 'alpha') {
-            checkAllChannelsAndGetBest().then(({ updater: updaterInstance }) => {
+            checkAllChannelsAndGetBest().then(({ result, updater: updaterInstance }) => {
                 updaterInstance.autoInstallOnAppQuit = true;
                 updaterInstance.autoRunAppAfterInstall = true;
-                updaterInstance.checkForUpdatesAndNotify();
+                if (isMacOS()) {
+                    if (result?.isUpdateAvailable) {
+                        getMainWindow()?.webContents.send(
+                            'update-available',
+                            result.updateInfo.version,
+                        );
+                    }
+                } else {
+                    updaterInstance.checkForUpdatesAndNotify();
+                }
             });
             return;
         }
 
         configureAndGetUpdater();
-        autoUpdater.checkForUpdatesAndNotify();
+        if (isMacOS()) {
+            autoUpdater.autoDownload = false;
+            autoUpdater
+                .checkForUpdates()
+                .then((result) => {
+                    if (result?.isUpdateAvailable) {
+                        getMainWindow()?.webContents.send(
+                            'update-available',
+                            result.updateInfo.version,
+                        );
+                    }
+                })
+                .catch((err) => console.error('Check for updates failed', err));
+        } else {
+            autoUpdater.checkForUpdatesAndNotify();
+        }
     }
 }
 
@@ -555,8 +579,15 @@ async function createWindow(first = true): Promise<void> {
                 const updateAvailable = result?.isUpdateAvailable ?? false;
                 console.log('Update available:', updateAvailable);
                 if (updateAvailable && store.get('disable_auto_updates') !== true) {
-                    console.log('Downloading update');
-                    updater.downloadUpdate();
+                    if (isMacOS()) {
+                        getMainWindow()?.webContents.send(
+                            'update-available',
+                            result?.updateInfo?.version,
+                        );
+                    } else {
+                        console.log('Downloading update');
+                        updater.downloadUpdate();
+                    }
                 }
 
                 return {

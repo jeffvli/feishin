@@ -200,6 +200,18 @@ export const controller: GeneralController = {
             server.type,
         )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
     },
+    getAlbumArtistInfo(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            return Promise.resolve(null);
+        }
+
+        const fn = apiController('getAlbumArtistInfo', server.type);
+        return fn
+            ? fn(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }))
+            : Promise.resolve(null);
+    },
     getAlbumArtistList(args) {
         const server = getServerById(args.apiClientProps.serverId);
 

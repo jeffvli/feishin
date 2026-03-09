@@ -9,7 +9,7 @@ interface DialogProps extends MantineDialogProps {}
 export const Dialog = ({ classNames, style, ...props }: DialogProps) => {
     return (
         <MantineDialog
-            classNames={{ root: styles.root, ...classNames }}
+            classNames={{ closeButton: styles.closeButton, root: styles.root, ...classNames }}
             style={{
                 ...style,
             }}

@@ -7,6 +7,7 @@ import { getOptimizedListCount } from '/@/renderer/api/utils-list-count';
 import { QueryHookArgs } from '/@/renderer/lib/react-query';
 import {
     AlbumArtistDetailQuery,
+    AlbumArtistInfoQuery,
     AlbumArtistListQuery,
     ArtistListQuery,
     ListCountQuery,
@@ -25,6 +26,20 @@ export const artistsQueries = {
                 });
             },
             queryKey: queryKeys.albumArtists.detail(args.serverId, args.query),
+            ...args.options,
+        });
+    },
+    albumArtistInfo: (args: QueryHookArgs<AlbumArtistInfoQuery>) => {
+        return queryOptions({
+            queryFn: ({ signal }) => {
+                return (
+                    api.controller.getAlbumArtistInfo?.({
+                        apiClientProps: { serverId: args.serverId, signal },
+                        query: args.query,
+                    }) ?? Promise.resolve(null)
+                );
+            },
+            queryKey: queryKeys.albumArtists.info(args.serverId, args.query),
             ...args.options,
         });
     },

@@ -565,9 +565,10 @@ export const sortRadioList = (
 };
 
 export const replacePathPrefix = (path: string, replacePrefix?: string, addPrefix?: string) => {
-    if (replacePrefix && path.startsWith(replacePrefix)) {
-        return path.slice(replacePrefix.length);
+    let newPath = path;
+    if (replacePrefix && newPath.startsWith(replacePrefix)) {
+        newPath = newPath.slice(replacePrefix.length);
     }
 
-    return addPrefix ? addPrefix + path : path;
+    return addPrefix ? addPrefix + newPath : newPath;
 };

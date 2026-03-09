@@ -820,6 +820,16 @@ export type AlbumArtistDetailQuery = { id: string };
 
 export type AlbumArtistDetailResponse = AlbumArtist | null;
 
+export type AlbumArtistInfoArgs = BaseEndpointArgs & { query: AlbumArtistInfoQuery };
+
+export type AlbumArtistInfoQuery = { id: string; limit?: number };
+
+export type AlbumArtistInfoResponse = {
+    biography?: null | string;
+    imageUrl?: null | string;
+    similarArtists: null | RelatedArtist[];
+};
+
 export type ArtistListArgs = BaseEndpointArgs & { query: ArtistListQuery };
 
 export type ArtistListCountArgs = BaseEndpointArgs & { query: ListCountQuery<ArtistListQuery> };
@@ -1373,6 +1383,7 @@ export type ControllerEndpoint = {
     ) => Promise<DeleteInternetRadioStationResponse>;
     deletePlaylist: (args: DeletePlaylistArgs) => Promise<DeletePlaylistResponse>;
     getAlbumArtistDetail: (args: AlbumArtistDetailArgs) => Promise<AlbumArtistDetailResponse>;
+    getAlbumArtistInfo?: (args: AlbumArtistInfoArgs) => Promise<AlbumArtistInfoResponse | null>;
     getAlbumArtistList: (args: AlbumArtistListArgs) => Promise<AlbumArtistListResponse>;
     getAlbumArtistListCount: (args: AlbumArtistListCountArgs) => Promise<number>;
     getAlbumDetail: (args: AlbumDetailArgs) => Promise<AlbumDetailResponse>;
@@ -1491,6 +1502,9 @@ export type InternalControllerEndpoint = {
     getAlbumArtistDetail: (
         args: ReplaceApiClientProps<AlbumArtistDetailArgs>,
     ) => Promise<AlbumArtistDetailResponse>;
+    getAlbumArtistInfo?: (
+        args: ReplaceApiClientProps<AlbumArtistInfoArgs>,
+    ) => Promise<AlbumArtistInfoResponse | null>;
     getAlbumArtistList: (
         args: ReplaceApiClientProps<AlbumArtistListArgs>,
     ) => Promise<AlbumArtistListResponse>;

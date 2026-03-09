@@ -60,13 +60,14 @@ const AlbumArtistDetailRouteContent = () => {
 
     const libraryBackgroundImageUrl = useItemImageUrl({
         id: detailQuery.data?.imageId || undefined,
+        imageUrl: detailQuery.data?.imageUrl,
         itemType: LibraryItem.ALBUM_ARTIST,
         type: 'itemCard',
     });
 
     const selectedImageUrl = imageUrl || detailQuery.data?.imageUrl;
 
-    const { background: backgroundColor, isLoading: isColorLoading } = useFastAverageColor({
+    const { background: backgroundColor } = useFastAverageColor({
         id: artistId,
         src: selectedImageUrl,
         srcLoaded: true,
@@ -76,9 +77,9 @@ const AlbumArtistDetailRouteContent = () => {
 
     const showBlurredImage = artistBackground;
 
-    if (isColorLoading) {
-        return <Spinner container />;
-    }
+    // if (isColorLoading) {
+    //     return <Spinner container />;
+    // }
 
     return (
         <AnimatedPage key={`album-artist-detail-${routeId}`}>
@@ -112,7 +113,10 @@ const AlbumArtistDetailRouteContent = () => {
                     <LibraryBackgroundOverlay backgroundColor={background} headerRef={headerRef} />
                 )}
                 <LibraryContainer>
-                    <AlbumArtistDetailHeader ref={headerRef as React.Ref<HTMLDivElement>} />
+                    <AlbumArtistDetailHeader
+                        albumsQuery={albumsQuery}
+                        ref={headerRef as React.Ref<HTMLDivElement>}
+                    />
                     <AlbumArtistDetailContent albumsQuery={albumsQuery} detailQuery={detailQuery} />
                 </LibraryContainer>
             </NativeScrollArea>

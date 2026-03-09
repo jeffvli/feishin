@@ -29,6 +29,12 @@ const ReleaseNotesModal = lazy(() =>
     })),
 );
 
+const UpdateAvailableDialog = lazy(() =>
+    import('./update-available-dialog').then((module) => ({
+        default: module.UpdateAvailableDialog,
+    })),
+);
+
 const ipc = isElectron() ? window.api.ipc : null;
 
 export const App = () => {
@@ -118,6 +124,7 @@ export const App = () => {
             </WebAudioContext.Provider>
             <Suspense fallback={null}>
                 <ReleaseNotesModal />
+                <UpdateAvailableDialog />
             </Suspense>
         </MantineProvider>
     );

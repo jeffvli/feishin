@@ -495,62 +495,72 @@ export const MobileFullscreenPlayer = () => {
                 />
             </motion.div>
 
-            <motion.div
-                animate={{
-                    opacity: isQueueState ? 1 : 0,
-                    zIndex: isQueueState ? 2 : 1,
-                }}
-                className={styles.queueState}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-            >
-                <div className={styles.queueHeader}>
-                    <ActionIcon
-                        icon="arrowDownS"
-                        onClick={handleToggleFullScreenPlayer}
-                        size="sm"
-                        variant={isPageHovered ? 'default' : 'subtle'}
-                    />
-                    <ActionIcon
-                        icon="x"
-                        iconProps={{ size: 'xl' }}
-                        onClick={handleToggleQueue}
-                        size="sm"
-                        variant={isPageHovered ? 'default' : 'subtle'}
-                    />
-                </div>
-                <div className={styles.queueContent}>
-                    <PlayQueue listKey={ItemListKey.FULL_SCREEN} searchTerm={undefined} />
-                </div>
-            </motion.div>
+            <AnimatePresence>
+                {isQueueState && (
+                    <motion.div
+                        animate={{ opacity: 1 }}
+                        className={styles.queueState}
+                        exit={{ opacity: 0 }}
+                        initial={{ opacity: 0 }}
+                        style={{ zIndex: 2 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    >
+                        <div className={styles.queueHeader}>
+                            <ActionIcon
+                                icon="arrowDownS"
+                                onClick={handleToggleFullScreenPlayer}
+                                size="sm"
+                                variant={isPageHovered ? 'default' : 'subtle'}
+                            />
+                            <ActionIcon
+                                icon="x"
+                                iconProps={{ size: 'xl' }}
+                                onClick={handleToggleQueue}
+                                size="sm"
+                                variant={isPageHovered ? 'default' : 'subtle'}
+                            />
+                        </div>
+                        <div className={styles.queueContent}>
+                            <PlayQueue listKey={ItemListKey.FULL_SCREEN} searchTerm={undefined} />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            <motion.div
-                animate={{
-                    opacity: isLyricsState ? 1 : 0,
-                    zIndex: isLyricsState ? 2 : 1,
-                }}
-                className={styles.lyricsState}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-            >
-                <div className={styles.lyricsHeader}>
-                    <ActionIcon
-                        icon="arrowDownS"
-                        onClick={handleToggleFullScreenPlayer}
-                        size="sm"
-                        variant={isPageHovered ? 'default' : 'subtle'}
-                    />
-                    <Text fw={600} size="lg">
-                        {t('page.fullscreenPlayer.lyrics', { postProcess: 'sentenceCase' })}
-                    </Text>
-                    <ActionIcon
-                        icon="x"
-                        iconProps={{ size: 'xl' }}
-                        onClick={handleToggleLyrics}
-                        size="sm"
-                        variant={isPageHovered ? 'default' : 'subtle'}
-                    />
-                </div>
-                <div className={styles.lyricsContent}>{isLyricsState && <Lyrics />}</div>
-            </motion.div>
+            <AnimatePresence>
+                {isLyricsState && (
+                    <motion.div
+                        animate={{ opacity: 1 }}
+                        className={styles.lyricsState}
+                        exit={{ opacity: 0 }}
+                        initial={{ opacity: 0 }}
+                        style={{ zIndex: 2 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    >
+                        <div className={styles.lyricsHeader}>
+                            <ActionIcon
+                                icon="arrowDownS"
+                                onClick={handleToggleFullScreenPlayer}
+                                size="sm"
+                                variant={isPageHovered ? 'default' : 'subtle'}
+                            />
+                            <Text fw={600} size="lg">
+                                {t('page.fullscreenPlayer.lyrics', { postProcess: 'sentenceCase' })}
+                            </Text>
+                            <ActionIcon
+                                icon="x"
+                                iconProps={{ size: 'xl' }}
+                                onClick={handleToggleLyrics}
+                                size="sm"
+                                variant={isPageHovered ? 'default' : 'subtle'}
+                            />
+                        </div>
+                        <div className={styles.lyricsContent}>
+                            <Lyrics />
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </MobilePlayerContainer>
     );
 };

@@ -258,34 +258,54 @@ export const JellyfinController: InternalControllerEndpoint = {
             throw new Error('No userId found');
         }
 
-        const [res, similarArtistsRes] = await Promise.all([
-            jfApiClient(apiClientProps).getAlbumArtistDetail({
-                params: {
-                    id: query.id,
-                    userId: apiClientProps.server?.userId,
-                },
-                query: {
-                    Fields: JF_FIELDS.ALBUM_ARTIST_DETAIL,
-                },
-            }),
-            jfApiClient(apiClientProps).getSimilarArtistList({
-                params: {
-                    id: query.id,
-                },
-                query: {
-                    Limit: 10,
-                },
-            }),
-        ]);
+        const res = await jfApiClient(apiClientProps).getAlbumArtistDetail({
+            params: {
+                id: query.id,
+                userId: apiClientProps.server?.userId,
+            },
+            query: {
+                Fields: ['Genres', 'Overview', 'SortName'],
+            },
+        });
 
-        if (res.status !== 200 || similarArtistsRes.status !== 200) {
+        if (res.status !== 200) {
             throw new Error('Failed to get album artist detail');
         }
 
-        return jfNormalize.albumArtist(
-            { ...res.body, similarArtists: similarArtistsRes.body },
-            apiClientProps.server,
+        return jfNormalize.albumArtist(res.body, apiClientProps.server);
+    },
+    getAlbumArtistInfo: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const similarArtistsRes = await jfApiClient(apiClientProps).getSimilarArtistList({
+            params: {
+                id: query.id,
+            },
+            query: {
+                Limit: query.limit ?? 10,
+            },
+        });
+
+        if (similarArtistsRes.status !== 200) {
+            return null;
+        }
+
+        const items = similarArtistsRes.body?.Items?.filter(
+            (entry) => entry.Name !== 'Various Artists',
         );
+        const similarArtists =
+            items?.map((entry) => ({
+                id: entry.Id,
+                imageId: entry.ImageTags?.Primary ? entry.Id : null,
+                imageUrl: null,
+                name: entry.Name,
+                userFavorite: entry.UserData?.IsFavorite || false,
+                userRating: null,
+            })) ?? null;
+
+        return {
+            similarArtists,
+        };
     },
     getAlbumArtistList: async (args) => {
         const { apiClientProps, query } = args;

@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
 
-import { GridCarousel } from '/@/renderer/components/grid-carousel/grid-carousel-v2';
+import {
+    GridCarousel,
+    GridCarouselSkeletonFallback,
+} from '/@/renderer/components/grid-carousel/grid-carousel-v2';
 import { MemoizedItemCard } from '/@/renderer/components/item-card/item-card';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import { useGridRows } from '/@/renderer/components/item-list/helpers/use-grid-rows';
@@ -10,12 +13,13 @@ import { ItemListKey } from '/@/shared/types/types';
 interface AlbumArtistGridCarouselProps {
     data: AlbumArtist[];
     excludeIds?: string[];
+    isLoading?: boolean;
     rowCount?: number;
     title: React.ReactNode | string;
 }
 
 export function AlbumArtistGridCarousel(props: AlbumArtistGridCarouselProps) {
-    const { data, excludeIds, rowCount = 1, title } = props;
+    const { data, excludeIds, isLoading = false, rowCount = 1, title } = props;
     const rows = useGridRows(LibraryItem.ALBUM_ARTIST, ItemListKey.ALBUM_ARTIST);
     const controls = useDefaultItemListControls();
 
@@ -40,6 +44,18 @@ export function AlbumArtistGridCarousel(props: AlbumArtistGridCarouselProps) {
             id: albumArtist.id,
         }));
     }, [data, excludeIds, controls, rows]);
+
+    if (isLoading) {
+        return (
+            <GridCarouselSkeletonFallback
+                placeholderItemType={LibraryItem.ALBUM_ARTIST}
+                placeholderRound
+                placeholderRows={rows}
+                rowCount={rowCount}
+                title={title}
+            />
+        );
+    }
 
     const handleNextPage = () => {};
     const handlePrevPage = () => {};

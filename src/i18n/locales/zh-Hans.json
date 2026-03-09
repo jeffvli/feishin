@@ -37,7 +37,8 @@
         "selectAll": "全选",
         "createRadioStation": "创建$t(entity.radioStation, {\"count\": 1})",
         "deleteRadioStation": "删除$t(entity.radioStation, {\"count\": 1})",
-        "openApplicationDirectory": "打开应用程序目录"
+        "openApplicationDirectory": "打开应用程序目录",
+        "goToCurrent": "转到当前项目"
     },
     "common": {
         "increase": "增高",
@@ -227,7 +228,8 @@
         "sleepTimer_off": "关闭",
         "sleepTimer_timeRemaining": "剩余时间 {{time}}",
         "sleepTimer_setCustom": "设置定时器",
-        "sleepTimer_cancel": "取消定时器"
+        "sleepTimer_cancel": "取消定时器",
+        "albumRadio": "专辑电台"
     },
     "setting": {
         "crossfadeStyle_description": "选择用于音频播放器的淡入淡出风格",
@@ -580,7 +582,17 @@
         "discordStateIcon": "显示播放图标",
         "discordStateIcon_description": "在 rich presence 状态中显示一个小的播放图标。启用“暂停时显示 rich presence 在线状态”后，暂停图标始终显示",
         "blurExplicitImages": "模糊显式图片",
-        "blurExplicitImages_description": "专辑和歌曲封面若被标记为不雅内容，将会进行模糊处理"
+        "blurExplicitImages_description": "专辑和歌曲封面若被标记为不雅内容，将会进行模糊处理",
+        "autosave": "自动保存播放队列",
+        "autosave_description": "启用自动将播放队列保存到服务器的功能。此功能仅在使用 Navidrome/Subsonic 时可用，且不能使用混合播放队列。",
+        "autosaveCount": "自动播放队列保存频率",
+        "autosaveCount_description": "队列保存前需要更改多少首歌曲？1（最少）表示每次歌曲更改",
+        "useThemePrimaryShade": "使用主题主色调",
+        "useThemePrimaryShade_description": "对于主要颜色变体，请使用所选主题中定义的主色调",
+        "primaryShade": "主色调",
+        "primaryShade_description": "覆盖按钮、链接和其他主色元素使用的主色调（0-9）",
+        "playerItemConfiguration_description": "配置全屏播放器上显示的项目及其显示顺序",
+        "playerItemConfiguration": "播放器项目配置"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
@@ -613,7 +625,8 @@
         "saveQueueFailed": "播放列表保存失败",
         "settingsSyncError": "渲染器设置与主进程中存在差异，请重启程序以应用更改",
         "invalidJson": "无效的 JSON",
-        "serverLockSingleServer": "服务器锁定时，只允许一台服务器运行"
+        "serverLockSingleServer": "服务器锁定时，只允许一台服务器运行",
+        "playbackPausedDueToError": "发生错误，播放已暂停"
     },
     "filter": {
         "mostPlayed": "最多播放过",
@@ -1060,7 +1073,8 @@
                 "sampleRate": "$t(common.sampleRate)",
                 "genreBadge": "$t(entity.genre, {\"count\": 1})（徽章）",
                 "composer": "作曲家",
-                "titleArtist": "$t(common.title) (艺术家)"
+                "titleArtist": "$t(common.title) (艺术家)",
+                "albumGroup": "专辑分组"
             }
         },
         "column": {
