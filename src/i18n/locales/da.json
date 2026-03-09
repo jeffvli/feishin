@@ -37,8 +37,7 @@
         "openIn": {
             "lastfm": "Åbn i Last.fm",
             "musicbrainz": "Åbn i MusicBrainz"
-        },
-        "goToCurrent": "go to current item"
+        }
     },
     "common": {
         "countSelected": "{{count}} markeret",
@@ -160,8 +159,7 @@
         "clean": "ren",
         "gridRows": "gitterrækker",
         "tableColumns": "tabelkolonner",
-        "itemsMore": "{{count}} mere",
-        "newVersionAvailable": "a new version is available"
+        "itemsMore": "{{count}} mere"
     },
     "entity": {
         "album_one": "album",
@@ -233,10 +231,7 @@
         "serverRequired": "server påkrævet",
         "sessionExpiredError": "din session er udløbet",
         "systemFontError": "der opstod en fejl under hentning af systemskrifttyper",
-        "settingsSyncError": "der blev fundet uoverensstemmelser mellem indstillingerne i rendereren og hovedprocessen. genstart programmet for at anvende ændringerne",
-        "invalidJson": "invalid JSON",
-        "playbackPausedDueToError": "playback was paused due to an error",
-        "serverLockSingleServer": "only one server is allowed when server is locked"
+        "settingsSyncError": "der blev fundet uoverensstemmelser mellem indstillingerne i rendereren og hovedprocessen. genstart programmet for at anvende ændringerne"
     },
     "filter": {
         "album": "$t(entity.album, {\"count\": 1})",
@@ -282,9 +277,7 @@
         "title": "titel",
         "toYear": "til år",
         "trackNumber": "spor",
-        "explicitStatus": "$t(common.explicitStatus)",
-        "matchAnd": "and",
-        "matchOr": "or"
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "datetime": {
         "minuteShort": "m",
@@ -398,9 +391,7 @@
             "setExpiration": "sæt udløbsdato",
             "success": "delingslink kopieret til udklipsholder (eller klik her for at åbne)",
             "expireInvalid": "udløbsdatoen skal være i fremtiden",
-            "createFailed": "kunne ikke oprette deling (er deling aktiveret?)",
-            "copyToClipboard": "Copy to clipboard: Ctrl+C, Enter",
-            "successMustClick": "share created successfully. click here to open"
+            "createFailed": "kunne ikke oprette deling (er deling aktiveret?)"
         },
         "shuffleAll": {
             "title": "afspil tilfældigt",
@@ -674,19 +665,7 @@
         "trackRadio": "nummerradio",
         "unfavorite": "fjern fra favoritter",
         "pause": "pause",
-        "viewQueue": "vis kø",
-        "albumRadio": "album radio",
-        "repeat_one": "repeat one",
-        "repeat_other": "",
-        "sleepTimer": "sleep timer",
-        "sleepTimer_endOfSong": "end of current song",
-        "sleepTimer_minutes": "{{count}} min",
-        "sleepTimer_hours": "{{count}} hr",
-        "sleepTimer_custom": "custom",
-        "sleepTimer_off": "off",
-        "sleepTimer_timeRemaining": "{{time}} remaining",
-        "sleepTimer_setCustom": "set timer",
-        "sleepTimer_cancel": "cancel timer"
+        "viewQueue": "vis kø"
     },
     "queryBuilder": {
         "standardTags": "standardtags",
@@ -1060,23 +1039,7 @@
         "queryBuilderCustomFields_inputTag": "tag",
         "queryBuilderCustomFields": "brugerdefinerede felter",
         "queryBuilderCustomFields_description": "tilføj brugerdefinerede felter til brug i forespørgselsbyggere",
-        "customFontPath_description": "angiver stien til den brugerdefinerede skrifttype, der skal bruges i programmet",
-        "autosave": "automatically save play queue",
-        "autosave_description": "enable automatically saving the play queue to your server. this is only possible when using Navidrome/Subsonic, and you cannot have a mixed play queue.",
-        "autosaveCount": "automatic play queue save frequency",
-        "autosaveCount_description": "how many track changes before the queue is saved. 1 (minimum) means every song change",
-        "useThemePrimaryShade": "use theme primary shade",
-        "useThemePrimaryShade_description": "use the primary shade defined in the selected theme for primary color variants",
-        "primaryShade": "primary shade",
-        "primaryShade_description": "override the primary shade (0–9) used for buttons, links, and other primary-colored elements",
-        "analyticsEnable": "Send usage-based analytics",
-        "analyticsEnable_description": "Anonymized usage data is sent to the developer to help improve the application",
-        "automaticUpdates": "Automatic updates",
-        "automaticUpdates_description": "Check for and install updates automatically",
-        "discordStateIcon": "show playing icon",
-        "discordStateIcon_description": "show a small playing icon in the rich presence status. the paused icon is always shown when \"Show rich presence when paused\" is enabled",
-        "playerItemConfiguration_description": "configure what items are shown, and in what order, on the fullscreen player",
-        "playerItemConfiguration": "player item configuration"
+        "customFontPath_description": "angiver stien til den brugerdefinerede skrifttype, der skal bruges i programmet"
     },
     "table": {
         "column": {
@@ -1176,14 +1139,12 @@
                 "titleArtist": "$t(common.title) (kunstner)",
                 "titleCombined": "$t(common.title) (kombineret)",
                 "trackNumber": "spornummer",
-                "year": "$t(common.year)",
-                "albumGroup": "album group"
+                "year": "$t(common.year)"
             },
             "view": {
                 "grid": "gitter",
                 "list": "liste",
-                "table": "tabel",
-                "detail": "detail"
+                "table": "tabel"
             }
         }
     },

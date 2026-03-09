@@ -37,8 +37,7 @@
         "addOrRemoveFromSelection": "Zur Auswahl hinzufügen oder entfernen",
         "selectRangeOfItems": "Wählen sie eine Reihe von Elementen",
         "holdToMoveToTop": "Halten um nach oben zu bewegen",
-        "holdToMoveToBottom": "Halten um nach unten zu bewegen",
-        "goToCurrent": "go to current item"
+        "holdToMoveToBottom": "Halten um nach unten zu bewegen"
     },
     "common": {
         "backward": "zurück",
@@ -83,6 +82,7 @@
         "delete": "Löschen",
         "cancel": "Abbrechen",
         "forceRestartRequired": "Neustarten um die Änderungen zu übernehmen... Schließe die Benachrichtigung zum Neustarten",
+        "setting": "Einstellungen",
         "setting_one": "Einstellung",
         "setting_other": "Einstellungen",
         "version": "Version",
@@ -160,8 +160,7 @@
         "rename": "Umbenennen",
         "filter_single": "einzeln",
         "filter_multiple": "mehrfach",
-        "retry": "Wiederholen",
-        "newVersionAvailable": "a new version is available"
+        "retry": "Wiederholen"
     },
     "error": {
         "remotePortWarning": "Starten Sie den Server neu, um den neuen Port anzuwenden",
@@ -194,8 +193,7 @@
         "noNetworkDescription": "Verbindung zum Server konnte nicht hergestellt werden",
         "invalidJson": "JSON ungültig",
         "serverLockSingleServer": "Nur ein Server ist erlaubt, wenn der Server gesperrt ist",
-        "settingsSyncError": "Es wurden Unstimmigkeiten zwischen den Einstellungen im Renderer und dem Hauptprozess gefunden. Starte die Anwendung neu, um die Änderungen zu übernehmen",
-        "playbackPausedDueToError": "playback was paused due to an error"
+        "settingsSyncError": "Es wurden Unstimmigkeiten zwischen den Einstellungen im Renderer und dem Hauptprozess gefunden. Starte die Anwendung neu, um die Änderungen zu übernehmen"
     },
     "filter": {
         "mostPlayed": "Meistgespielt",
@@ -242,8 +240,7 @@
         "artist": "$t(entity.artist, {\"count\": 1})",
         "explicitStatus": "$t(common.explicitStatus)",
         "matchAnd": "und",
-        "matchOr": "oder",
-        "sortName": "sort name"
+        "matchOr": "oder"
     },
     "form": {
         "deletePlaylist": {
@@ -315,9 +312,7 @@
             "expireInvalid": "Ablaufdatum muss in der Zukunft liegen",
             "allowDownloading": "Herunterladen zulassen",
             "success": "Link in die Zwischenablage kopiert (oder hier klicken, um zu öffnen)",
-            "createFailed": "fehler beim Teilen (Ist Teilen aktiviert?)",
-            "copyToClipboard": "Copy to clipboard: Ctrl+C, Enter",
-            "successMustClick": "share created successfully. click here to open"
+            "createFailed": "fehler beim Teilen (Ist Teilen aktiviert?)"
         },
         "privateMode": {
             "enabled": "Privatmodus aktiviert, Wiedergabe-Status wird externen Quellen nicht preisgegeben",
@@ -471,8 +466,7 @@
                 "songCount": "$t(entity.track, {\"count\": 2})",
                 "genreBadge": "$t(entity.genre, {\"count\": 1}) (Abzeichen)",
                 "composer": "Komponist",
-                "titleArtist": "$t(common.title) (Interpret)",
-                "albumGroup": "album group"
+                "titleArtist": "$t(common.title) (Interpret)"
             }
         },
         "column": {
@@ -713,8 +707,7 @@
         },
         "releasenotes": {
             "commitsSinceStable": "Commits seit {{stable}}",
-            "noStableReleaseToCompare": "Kein stable Relase zum vergleichen verfügbar",
-            "noNewCommits": "no new commits in this range"
+            "noStableReleaseToCompare": "Kein stable Relase zum vergleichen verfügbar"
         }
     },
     "player": {
@@ -765,10 +758,7 @@
         "sleepTimer_custom": "Benutzerdefiniert",
         "sleepTimer_hours": "{{count}} std",
         "sleepTimer_minutes": "{{count}} min",
-        "trackRadio": "Song Radio",
-        "albumRadio": "album radio",
-        "repeat_one": "repeat one",
-        "repeat_other": ""
+        "trackRadio": "Song Radio"
     },
     "setting": {
         "audioDevice_description": "wählen Sie das Audiogerät aus, das für die Wiedergabe verwendet werden soll (nur Webplayer)",
@@ -1104,34 +1094,7 @@
         "trayEnabled_description": "Tray-Symbol anzeigen/verbergen. Bei Deaktivierung werden auch Minimieren/Beenden zum Tray deaktiviert",
         "queryBuilder": "Abfrage-Editor",
         "queryBuilderCustomFields_inputLabel": "Label",
-        "queryBuilderCustomFields_description": "Füge benutzerdefinierte Felder für den Abfrage-Editor hinzu",
-        "autosave": "automatically save play queue",
-        "autosave_description": "enable automatically saving the play queue to your server. this is only possible when using Navidrome/Subsonic, and you cannot have a mixed play queue.",
-        "autosaveCount": "automatic play queue save frequency",
-        "autosaveCount_description": "how many track changes before the queue is saved. 1 (minimum) means every song change",
-        "useThemeAccentColor_description": "use the primary color defined in the selected theme instead of the custom accent color",
-        "useThemePrimaryShade": "use theme primary shade",
-        "useThemePrimaryShade_description": "use the primary shade defined in the selected theme for primary color variants",
-        "primaryShade": "primary shade",
-        "primaryShade_description": "override the primary shade (0–9) used for buttons, links, and other primary-colored elements",
-        "artistReleaseTypeConfiguration": "artist release type configuration",
-        "discordStateIcon": "show playing icon",
-        "discordStateIcon_description": "show a small playing icon in the rich presence status. the paused icon is always shown when \"Show rich presence when paused\" is enabled",
-        "homeFeatureStyle_description": "controls the style of the home featured carousel",
-        "homeFeatureStyle": "home featured carousel style",
-        "homeFeatureStyle_optionSingle": "single",
-        "hotkey_listNavigateToPage": "list navigate to item page",
-        "hotkey_listPlayDefault": "list play",
-        "hotkey_listPlayLast": "list play last",
-        "hotkey_listPlayNext": "list play next",
-        "hotkey_listPlayNow": "list play now",
-        "imageAspectRatio_description": "if enabled, cover art will be shown using their native aspect ratio. for art that is not 1:1, the remaining space will be empty",
-        "mpvExtraParameters": "mpv extra parameters",
-        "imageResolution_optionItemCard": "item card",
-        "imageResolution_optionHeader": "header",
-        "imageResolution_optionFullScreenPlayer": "fullscreen player",
-        "playerItemConfiguration_description": "configure what items are shown, and in what order, on the fullscreen player",
-        "playerItemConfiguration": "player item configuration"
+        "queryBuilderCustomFields_description": "Füge benutzerdefinierte Felder für den Abfrage-Editor hinzu"
     },
     "dragDropZone": {
         "error_oneFileOnly": "Bitte wähle nur 1 Datei",
@@ -1218,26 +1181,7 @@
             },
             "channelLayout": {
                 "dualHorizontal": "Dual-Horizontal",
-                "dualVertical": "Dual-Vertikal",
-                "single": "Single",
-                "dualCombined": "Dual-Combined"
-            },
-            "mode": {
-                "0": "[0] Discrete Frequencies",
-                "1": "[1] 1/24th octave / 240 bands",
-                "2": "[2] 1/12th octave / 120 bands",
-                "3": "[3] 1/8th octave / 80 bands",
-                "4": "[4] 1/6th octave / 60 bands",
-                "5": "[5] 1/4th octave / 40 bands",
-                "6": "[6] 1/3rd octave / 30 bands",
-                "7": "[7] Half octave / 20 bands",
-                "8": "[8] Full octave / 10 bands",
-                "10": "[10] Line / Area graph"
-            },
-            "colorMode": {
-                "gradient": "Gradient",
-                "barIndex": "Bar-Index",
-                "barLevel": "Bar-Level"
+                "dualVertical": "Dual-Vertikal"
             }
         },
         "minimumFrequency": "Mindestfrequenz",
@@ -1311,34 +1255,6 @@
         "miscellaneousSettings": "Verschiedenes Einstellungen",
         "ansiBands": "ANSI Bänder",
         "lowResolution": "Niedrige Auflösung",
-        "showFPS": "FPS anzeigen",
-        "barSpace": "Bar Space",
-        "fillAlpha": "Fill Alpha",
-        "colorStops": "Color Stops",
-        "frequencyScale": "Frequency Scale",
-        "peakBehavior": "Peak Behavior",
-        "showPeaks": "Show Peaks",
-        "fadePeaks": "Fade Peaks",
-        "peakLine": "Peak Line",
-        "gravity": "Gravity",
-        "peakFadeTime": "Peak Fade Time (ms)",
-        "peakHoldTime": "Peak Hold Time (ms)",
-        "spinSpeed": "Spin Speed",
-        "reflexMirror": "Reflex Mirror",
-        "reflexFit": "Reflex Fit",
-        "reflexRatio": "Reflex Ratio",
-        "reflexAlpha": "Reflex Alpha",
-        "reflexBrightness": "Reflex Brightness",
-        "mirror": "Mirror",
-        "alphaBars": "Alpha Bars",
-        "ledBars": "LED Bars",
-        "trueLeds": "True LEDs",
-        "lumiBars": "Lumi Bars",
-        "outlineBars": "Outline Bars",
-        "roundBars": "Round Bars",
-        "splitGradient": "Split Gradient",
-        "showScaleX": "Show Scale X",
-        "noteLabels": "Note Labels",
-        "showScaleY": "Show Scale Y"
+        "showFPS": "FPS anzeigen"
     }
 }

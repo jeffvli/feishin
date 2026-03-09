@@ -37,8 +37,7 @@
         "shuffleAll": "அனைத்தையும் கலக்கவும்",
         "shuffleSelected": "கலக்கு தேர்ந்தெடுக்கப்பட்டது",
         "viewMore": "மேலும் பார்க்க",
-        "openApplicationDirectory": "பயன்பாட்டு கோப்பகத்தைத் திறக்கவும்",
-        "goToCurrent": "go to current item"
+        "openApplicationDirectory": "பயன்பாட்டு கோப்பகத்தைத் திறக்கவும்"
     },
     "common": {
         "description": "விவரம்",
@@ -160,8 +159,7 @@
         "clean": "தூய்மையான",
         "gridRows": "கட்டம் வரிசைகள்",
         "tableColumns": "அட்டவணை நெடுவரிசைகள்",
-        "itemsMore": "மேலும் {{count}}",
-        "newVersionAvailable": "a new version is available"
+        "itemsMore": "மேலும் {{count}}"
     },
     "entity": {
         "folderWithCount_one": "{{count}} கோப்புறை",
@@ -235,8 +233,7 @@
         "noNetworkDescription": "இந்த சேவையகத்துடன் இணைக்க முடியவில்லை",
         "saveQueueFailed": "வரிசையைச் சேமிக்க முடியவில்லை",
         "serverLockSingleServer": "சேவையகம் பூட்டப்பட்டிருக்கும் போது ஒரு சேவையகம் மட்டுமே அனுமதிக்கப்படும்",
-        "settingsSyncError": "ரெண்டரரில் உள்ள அமைப்புகளுக்கும் முக்கிய செயல்முறைக்கும் இடையே முரண்பாடுகள் கண்டறியப்பட்டன. மாற்றங்களைப் பயன்படுத்த பயன்பாட்டை மறுதொடக்கம் செய்யுங்கள்",
-        "playbackPausedDueToError": "playback was paused due to an error"
+        "settingsSyncError": "ரெண்டரரில் உள்ள அமைப்புகளுக்கும் முக்கிய செயல்முறைக்கும் இடையே முரண்பாடுகள் கண்டறியப்பட்டன. மாற்றங்களைப் பயன்படுத்த பயன்பாட்டை மறுதொடக்கம் செய்யுங்கள்"
     },
     "filter": {
         "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
@@ -657,9 +654,7 @@
         "sleepTimer_off": "அணை",
         "sleepTimer_timeRemaining": "{{time}} மீதமுள்ளது",
         "sleepTimer_setCustom": "டைமரை அமைக்கவும்",
-        "sleepTimer_cancel": "நேரங்குறிகருவி ரத்து",
-        "repeat_one": "repeat one",
-        "repeat_other": ""
+        "sleepTimer_cancel": "நேரங்குறிகருவி ரத்து"
     },
     "setting": {
         "accentColor": "உச்சரிப்பு நிறம்",
@@ -1012,17 +1007,7 @@
         "queryBuilderCustomFields_inputLabel": "சிட்டை",
         "queryBuilderCustomFields_inputTag": "குறிச்சொல்",
         "queryBuilderCustomFields": "விருப்ப புலங்கள்",
-        "queryBuilderCustomFields_description": "வினவல் பில்டர்களில் பயன்படுத்த தனிப்பயன் புலங்களைச் சேர்க்கவும்",
-        "autosave": "automatically save play queue",
-        "autosave_description": "enable automatically saving the play queue to your server. this is only possible when using Navidrome/Subsonic, and you cannot have a mixed play queue.",
-        "autosaveCount": "automatic play queue save frequency",
-        "autosaveCount_description": "how many track changes before the queue is saved. 1 (minimum) means every song change",
-        "useThemePrimaryShade": "use theme primary shade",
-        "useThemePrimaryShade_description": "use the primary shade defined in the selected theme for primary color variants",
-        "primaryShade": "primary shade",
-        "primaryShade_description": "override the primary shade (0–9) used for buttons, links, and other primary-colored elements",
-        "playerItemConfiguration_description": "configure what items are shown, and in what order, on the fullscreen player",
-        "playerItemConfiguration": "player item configuration"
+        "queryBuilderCustomFields_description": "வினவல் பில்டர்களில் பயன்படுத்த தனிப்பயன் புலங்களைச் சேர்க்கவும்"
     },
     "table": {
         "config": {

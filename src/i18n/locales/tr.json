@@ -29,16 +29,7 @@
         "selectAll": "tümünü seç",
         "downloadStarted": "{{count}} öğenin indirilmesine başlandı",
         "moveUp": "yukarı kaydır",
-        "moveDown": "aşağı kaydır",
-        "goToCurrent": "go to current item",
-        "holdToMoveToTop": "hold to move to top",
-        "holdToMoveToBottom": "hold to move to bottom",
-        "moveItems": "move items",
-        "shuffle": "shuffle",
-        "shuffleAll": "shuffle all",
-        "shuffleSelected": "shuffle selected",
-        "viewMore": "view more",
-        "openApplicationDirectory": "open application directory"
+        "moveDown": "aşağı kaydır"
     },
     "common": {
         "action_one": "eylem",
@@ -140,28 +131,7 @@
         "private": "gizli",
         "clean": "temiz",
         "countSelected": "{{count}} adet seçildi",
-        "public": "herkese açık",
-        "explicitStatus": "explicit status",
-        "doNotShowAgain": "do not show this again",
-        "view": "view",
-        "example": "example",
-        "externalLinks": "external links",
-        "faster": "faster",
-        "filter_single": "single",
-        "filter_multiple": "multi",
-        "mood": "mood",
-        "noFilters": "no filters configured",
-        "retry": "retry",
-        "recordLabel": "record label",
-        "releaseType": "release type",
-        "rename": "rename",
-        "slower": "slower",
-        "sort": "sort",
-        "explicit": "explicit",
-        "gridRows": "grid rows",
-        "tableColumns": "table columns",
-        "itemsMore": "{{count}} more",
-        "newVersionAvailable": "a new version is available"
+        "public": "herkese açık"
     },
     "entity": {
         "album_one": "albüm",
@@ -200,9 +170,7 @@
         "trackWithCount_one": "{{count}} parça",
         "trackWithCount_other": "{{count}} parça",
         "radioStation_one": "radyo istasyonu",
-        "radioStation_other": "radyo istasyonları",
-        "radioStationWithCount_one": "{{count}} radio station",
-        "radioStationWithCount_other": "{{count}} radio stations"
+        "radioStation_other": "radyo istasyonları"
     },
     "error": {
         "apiRouteError": "istek yönlendirilemiyor",
@@ -228,15 +196,7 @@
         "playbackError": "medya oynatmayı çalışırken bir hata meydana geldi",
         "credentialsRequired": "ki̇mli̇k bi̇lgi̇leri̇ gerekli",
         "remoteDisableError": "uzak sunucuyu $t(common.disable) yapmaya çalışırken bir hata oluştu",
-        "remoteEnableError": "uzak sunucuyu $t(common.enable) yapmaya çalışırken bir hata oluştu",
-        "invalidJson": "invalid JSON",
-        "multipleServerSaveQueueError": "the play queue has one or more songs which are not from the current server. this is not supported",
-        "noNetwork": "server unavailable",
-        "noNetworkDescription": "couldn't connect to this server",
-        "playbackPausedDueToError": "playback was paused due to an error",
-        "saveQueueFailed": "failed to save queue",
-        "serverLockSingleServer": "only one server is allowed when server is locked",
-        "settingsSyncError": "discrepancies were found between the settings in the renderer and the main process. restart the application to apply the changes"
+        "remoteEnableError": "uzak sunucuyu $t(common.enable) yapmaya çalışırken bir hata oluştu"
     },
     "filter": {
         "albumCount": "$t(entity.album, {\"count\": 2}) sayısı",
@@ -280,11 +240,7 @@
         "album": "$t(entity.album, {\"count\": 1})",
         "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
         "artist": "$t(entity.artist, {\"count\": 1})",
-        "channels": "$t(common.channel_other)",
-        "matchAnd": "and",
-        "matchOr": "or",
-        "sortName": "sort name",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "channels": "$t(common.channel_other)"
     },
     "form": {
         "addServer": {
@@ -300,18 +256,13 @@
             "success": "sunucu başarıyla eklendi",
             "title": "sunucu ekle",
             "input_preferInstantMix": "anında mix tercih et",
-            "input_preferInstantMixDescription": "sadece benzer şarkılari bulmak icin anında mix kullan. Bu davranışı değiştiren eklentilere sahipseniz faydalı",
-            "input_preferRemoteUrl": "prefer public url",
-            "input_remoteUrl": "public url",
-            "input_remoteUrlPlaceholder": "optional: public url for external features"
+            "input_preferInstantMixDescription": "sadece benzer şarkılari bulmak icin anında mix kullan. Bu davranışı değiştiren eklentilere sahipseniz faydalı"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "input_skipDuplicates": "kopyaları atla",
             "title": "$t(entity.playlist, {\"count\": 1}) listesine ekle",
-            "success": "$t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} }) $t(entity.trackWithCount, {\"count\": {{message}} }) eklendi",
-            "create": "create $t(entity.playlist, {\"count\": 1}) {{playlist}}",
-            "searchOrCreate": "search $t(entity.playlist, {\"count\": 2}) or type to create a new one"
+            "success": "$t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} }) $t(entity.trackWithCount, {\"count\": {{message}} }) eklendi"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
@@ -329,8 +280,7 @@
         "editPlaylist": {
             "publicJellyfinNote": "Jellyfin bazı nedenlerden dolayı bir çalma listesinin herkese açık olup olmadığını göstermez. Bunun herkese açık kalmasını istiyorsanız, lütfen aşağıdaki girdiyi seçin",
             "success": "$t(entity.playlist, {\"count\": 1}) listesi başarıyla güncellendi",
-            "title": "$t(entity.playlist, {\"count\": 1}) listesini düzenle",
-            "editNote": "manual edits are not recommended for large playlists. are you sure you accept the risk of data loss incurred by overwriting the existing playlist?"
+            "title": "$t(entity.playlist, {\"count\": 1}) listesini düzenle"
         },
         "lyricSearch": {
             "input_artist": "$t(entity.artist, {\"count\": 1})",
@@ -340,11 +290,7 @@
         "queryEditor": {
             "title": "sorgu düzenleyici",
             "input_optionMatchAll": "hepsini eşleştir",
-            "input_optionMatchAny": "herhangi biriyle eşleştir",
-            "addRuleGroup": "add rule group",
-            "removeRuleGroup": "remove rule group",
-            "resetToDefault": "reset to default",
-            "clearFilters": "clear filters"
+            "input_optionMatchAny": "herhangi biriyle eşleştir"
         },
         "shareItem": {
             "allowDownloading": "indirmeye izin ver",
@@ -352,9 +298,7 @@
             "setExpiration": "sona erme tarihi ayarla",
             "success": "paylaşma bağlantısı panoya kopyalandı (veya açmak için buraya tıklayın)",
             "expireInvalid": "son kullanma tarihi gelecekte olmalı",
-            "createFailed": "paylaşım oluşturulamadı (paylaşım etkin mi?)",
-            "copyToClipboard": "Copy to clipboard: Ctrl+C, Enter",
-            "successMustClick": "share created successfully. click here to open"
+            "createFailed": "paylaşım oluşturulamadı (paylaşım etkin mi?)"
         },
         "updateServer": {
             "success": "sunucu başarıyla güncellendi",
@@ -364,36 +308,6 @@
             "enabled": "gizli mod etkinleştirildi, oynatma durumu artık harici eklentilerden gizlendi",
             "disabled": "gizli mod devre dışı bırakıldı, oynatma durumu artık etkinleştirilmiş harici eklentiler tarafından görülebilir",
             "title": "gizli mod"
-        },
-        "largeFetchConfirmation": {
-            "title": "add items to the queue",
-            "description": "This action will add all items in the current filtered view"
-        },
-        "createRadioStation": {
-            "success": "radio station created successfully",
-            "title": "create radio station",
-            "input_homepageUrl": "homepage url",
-            "input_name": "name",
-            "input_streamUrl": "stream url"
-        },
-        "lyricsExport": {
-            "export": "export lyrics",
-            "input_synced": "export synced lyrics",
-            "input_offset": "$t(setting.lyricOffset)"
-        },
-        "saveQueue": {
-            "success": "saved play queue to server"
-        },
-        "shuffleAll": {
-            "title": "play random",
-            "input_genre": "$t(entity.genre, {\"count\": 1})",
-            "input_limit": "how many songs?",
-            "input_minYear": "from year",
-            "input_maxYear": "to year",
-            "input_played": "play filter",
-            "input_played_optionAll": "all tracks",
-            "input_played_optionUnplayed": "only unplayed tracks",
-            "input_played_optionPlayed": "only played tracks"
         }
     },
     "page": {
@@ -406,13 +320,7 @@
             "topSongs": "en iyi şarkılar",
             "viewAll": "tümünü görüntüle",
             "viewAllTracks": "tüm $t(entity.track, {\"count\": 2}) görüntüle",
-            "topSongsFrom": "{{title}} tarafından en iyi şarkılar",
-            "favoriteSongs": "favorite songs",
-            "groupingTypeAll": "all release types",
-            "groupingTypePrimary": "primary release types",
-            "topSongsCommunity": "community",
-            "topSongsPersonal": "personal",
-            "favoriteSongsFrom": "favorite songs from {{title}}"
+            "topSongsFrom": "{{title}} tarafından en iyi şarkılar"
         },
         "contextMenu": {
             "addLast": "$t(player.addLast)",
@@ -438,9 +346,7 @@
             "shareItem": "öğeyi paylaş",
             "showDetails": "bilgi al",
             "goToAlbum": "$t(entity.album, {\"count\": 1}) sayfasına git",
-            "goToAlbumArtist": "$t(entity.albumArtist, {\"count\": 1}) sayfasına git",
-            "moveItems": "$t(action.moveItems)",
-            "goTo": "go to"
+            "goToAlbumArtist": "$t(entity.albumArtist, {\"count\": 1}) sayfasına git"
         },
         "manageServers": {
             "url": "URL",
@@ -491,9 +397,7 @@
             "mostPlayed": "en çok çalınan",
             "newlyAdded": "yeni eklenenler",
             "recentlyPlayed": "yakınlarda çalınanlar",
-            "title": "$t(common.home)",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "recentlyReleased": "recently released"
+            "title": "$t(common.home)"
         },
         "itemDetail": {
             "copyPath": "yolu panoya kopyala",
@@ -511,25 +415,7 @@
             "generalTab": "genel",
             "hotkeysTab": "kısayol tuşları",
             "playbackTab": "oynatma",
-            "windowTab": "pencere",
-            "analytics": "analytics",
-            "updates": "update",
-            "cache": "cache",
-            "application": "application",
-            "queryBuilder": "query builder",
-            "theme": "theme",
-            "controls": "controls",
-            "sidebar": "sidebar",
-            "remote": "remote",
-            "exportImport": "import/export",
-            "scrobble": "scrobble",
-            "audio": "audio",
-            "lyrics": "lyrics",
-            "lyricsDisplay": "lyrics display",
-            "transcoding": "transcoding",
-            "discord": "discord",
-            "logger": "logger",
-            "playerFilters": "player filters"
+            "windowTab": "pencere"
         },
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
@@ -544,10 +430,7 @@
             "search": "$t(common.search)",
             "settings": "$t(common.setting, {\"count\": 2})",
             "shared": "paylaşılan $t(entity.playlist, {\"count\": 2})",
-            "tracks": "$t(entity.track, {\"count\": 2})",
-            "collections": "collections",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})"
+            "tracks": "$t(entity.track, {\"count\": 2})"
         },
         "trackList": {
             "artistTracks": "{{artist}} parçaları",
@@ -579,33 +462,7 @@
             "settings": "$t(common.setting, {\"count\": 2})",
             "version": "{{version}} sürümü",
             "privateModeOff": "gizli modu kapat",
-            "privateModeOn": "gizli modu aç",
-            "commandPalette": "open command palette",
-            "selectMusicFolder": "select music folder",
-            "noMusicFolder": "no music folder selected",
-            "multipleMusicFolders": "{{count}} music folders selected"
-        },
-        "radioList": {
-            "title": "radio stations"
-        },
-        "releasenotes": {
-            "commitsSinceStable": "commits since {{stable}}",
-            "noNewCommits": "no new commits in this range",
-            "noStableReleaseToCompare": "no stable release available to compare with"
-        },
-        "favorites": {
-            "title": "$t(entity.favorite, {\"count\": 2})"
-        },
-        "windowBar": {
-            "paused": "(Paused) ",
-            "privateMode": "(Private mode)"
-        },
-        "folderList": {
-            "title": "$t(entity.folder, {\"count\": 2})"
-        },
-        "collections": {
-            "overrideExisting": "override existing",
-            "saveAsCollection": "save as collection"
+            "privateModeOn": "gizli modu aç"
         }
     },
     "player": {
@@ -639,27 +496,7 @@
         "toggleFullscreenPlayer": "tam ekran oynatıcıya geç",
         "unfavorite": "favoriden kaldır",
         "pause": "durdur",
-        "viewQueue": "kuyruğu görüntüle",
-        "addLastShuffled": "last (shuffled)",
-        "addNextShuffled": "next (shuffled)",
-        "albumRadio": "album radio",
-        "artistRadio": "artist radio",
-        "holdToShuffle": "hold to shuffle",
-        "lyrics": "lyrics",
-        "repeat_one": "repeat one",
-        "repeat_other": "",
-        "restoreQueueFromServer": "restore queue from server",
-        "saveQueueToServer": "save queue to server",
-        "trackRadio": "track radio",
-        "sleepTimer": "sleep timer",
-        "sleepTimer_endOfSong": "end of current song",
-        "sleepTimer_minutes": "{{count}} min",
-        "sleepTimer_hours": "{{count}} hr",
-        "sleepTimer_custom": "custom",
-        "sleepTimer_off": "off",
-        "sleepTimer_timeRemaining": "{{time}} remaining",
-        "sleepTimer_setCustom": "set timer",
-        "sleepTimer_cancel": "cancel timer"
+        "viewQueue": "kuyruğu görüntüle"
     },
     "setting": {
         "accentColor": "vurgu rengi",
@@ -896,133 +733,7 @@
         "releaseChannel_optionBeta": "beta",
         "releaseChannel_optionLatest": "en son",
         "language": "dil",
-        "notify": "müzik bildirimi aktivleştir",
-        "autoDJ": "auto DJ",
-        "autoDJ_description": "automatically add similar songs to the queue",
-        "autoDJ_itemCount": "item count",
-        "autoDJ_itemCount_description": "the number of items attempted to be added to the queue when auto DJ is enabled",
-        "autoDJ_timing": "timing",
-        "autoDJ_timing_description": "the number of songs remaining in the queue before auto DJ is triggered",
-        "autosave": "automatically save play queue",
-        "autosave_description": "enable automatically saving the play queue to your server. this is only possible when using Navidrome/Subsonic, and you cannot have a mixed play queue.",
-        "autosaveCount": "automatic play queue save frequency",
-        "autosaveCount_description": "how many track changes before the queue is saved. 1 (minimum) means every song change",
-        "useThemeAccentColor": "use theme accent color",
-        "useThemeAccentColor_description": "use the primary color defined in the selected theme instead of the custom accent color",
-        "useThemePrimaryShade": "use theme primary shade",
-        "useThemePrimaryShade_description": "use the primary shade defined in the selected theme for primary color variants",
-        "primaryShade": "primary shade",
-        "primaryShade_description": "override the primary shade (0–9) used for buttons, links, and other primary-colored elements",
-        "analyticsDisable": "Opt-out of usage based analytics",
-        "analyticsDisable_description": "Anonymized usage data is sent to the developer to help improve the application",
-        "analyticsEnable": "Send usage-based analytics",
-        "analyticsEnable_description": "Anonymized usage data is sent to the developer to help improve the application",
-        "artistBackground": "artist background image",
-        "artistBackground_description": "adds a background image for artist pages containing the artist art",
-        "artistBackgroundBlur": "artist background image blur size",
-        "artistBackgroundBlur_description": "adjusts the amount of blur applied to the artist background image",
-        "artistReleaseTypeConfiguration": "artist release type configuration",
-        "artistReleaseTypeConfiguration_description": "configure what release types are shown, and in what order, on the album artist page",
-        "crossfadeStyle": "crossfade style",
-        "automaticUpdates": "Automatic updates",
-        "automaticUpdates_description": "Check for and install updates automatically",
-        "releaseChannel_optionAlpha": "alpha (nightly)",
-        "releaseChannel": "release channel",
-        "releaseChannel_description": "choose between stable, beta, or alpha (nightly) releases for automatic updates",
-        "discordLinkType_description": "adds external links to {{lastfm}} or {{musicbrainz}} to the song and artist fields in {{discord}} rich presence. {{musicbrainz}} is the most accurate but requires tags and doesn't provide artist links while {{lastfm}} should always provide a link. makes no extra network requests",
-        "discordLinkType_mbz_lastfm": "{{musicbrainz}} with {{lastfm}} fallback",
-        "discordLinkType_none": "$t(common.none)",
-        "discordLinkType": "{{discord}} presence links",
-        "discordRichPresence": "{{discord}} rich presence",
-        "discordStateIcon": "show playing icon",
-        "discordStateIcon_description": "show a small playing icon in the rich presence status. the paused icon is always shown when \"Show rich presence when paused\" is enabled",
-        "enableAutoTranslation_description": "enable translation automatically when lyrics are loaded",
-        "enableAutoTranslation": "enable auto translation",
-        "exportImportSettings_control_description": "export and import settings via JSON",
-        "exportImportSettings_control_exportText": "export settings",
-        "exportImportSettings_control_importText": "import settings",
-        "exportImportSettings_control_title": "import / export settings",
-        "exportImportSettings_destructiveWarning": "importing settings is destructive, please review the above before clicking \"import\" below!",
-        "exportImportSettings_importBtn": "import settings",
-        "exportImportSettings_importModalTitle": "import feishin settings",
-        "exportImportSettings_importSuccess": "settings have been imported successfully!",
-        "exportImportSettings_notValidJSON": "the file passed is not valid JSON",
-        "exportImportSettings_offendingKeyError": "\"{{offendingKey}}\" is incorrect - {{reason}}",
-        "followCurrentSong_description": "automatically scroll the play queue to the current playing song",
-        "followCurrentSong": "follow current song",
-        "homeFeatureStyle_description": "controls the style of the home featured carousel",
-        "homeFeatureStyle": "home featured carousel style",
-        "homeFeatureStyle_optionMultiple": "multiple",
-        "homeFeatureStyle_optionSingle": "single",
-        "hotkey_listNavigateToPage": "list navigate to item page",
-        "hotkey_listPlayDefault": "list play",
-        "hotkey_listPlayLast": "list play last",
-        "hotkey_listPlayNext": "list play next",
-        "hotkey_listPlayNow": "list play now",
-        "logLevel": "log level",
-        "logLevel_description": "sets the minimum log level to display. debug shows all logs, error only shows errors",
-        "logLevel_optionDebug": "debug",
-        "logLevel_optionError": "error",
-        "logLevel_optionInfo": "info",
-        "logLevel_optionWarn": "warn",
-        "mpvExtraParameters": "mpv extra parameters",
-        "mpvExtraParameters_description": "extra arguments to pass to mpv",
-        "notify_description": "show notifications when changing the current song",
-        "pathReplace": "file path replacement",
-        "pathReplace_description": "replace your server's default filepath",
-        "pathReplace_optionRemovePrefix": "remove prefix",
-        "pathReplace_optionAddPrefix": "add prefix",
-        "playerFilters": "Filter songs from the queue",
-        "playerFilters_description": "omit songs from being added to the queue based on the following criteria",
-        "artistRadioCount_description": "sets the number of songs to fetch for artist radio and track radio",
-        "artistRadioCount": "artist/track radio count",
-        "imageResolution": "image resolution",
-        "imageResolution_description": "the resolution for the images used around the app. using a value of 0 will default to the native image resolution",
-        "imageResolution_optionTable": "table",
-        "imageResolution_optionItemCard": "item card",
-        "imageResolution_optionSidebar": "sidebar",
-        "imageResolution_optionHeader": "header",
-        "imageResolution_optionFullScreenPlayer": "fullscreen player",
-        "playerbarSlider": "playerbar slider",
-        "playerbarSlider_description": "the waveform is not recommended if on a slow or metered internet connection",
-        "playerbarSliderType_optionSlider": "slider",
-        "playerbarSliderType_optionWaveform": "waveform",
-        "playerbarWaveformAlign": "waveform align",
-        "playerbarWaveformAlign_optionTop": "top",
-        "playerbarWaveformAlign_optionCenter": "center",
-        "playerbarWaveformAlign_optionBottom": "bottom",
-        "playerbarWaveformBarWidth": "waveform bar width",
-        "playerbarWaveformGap": "waveform gap",
-        "playerbarWaveformRadius": "waveform radius",
-        "showLyricsInSidebar_description": "a panel will be added to the attached play queue that displays the lyrics",
-        "showLyricsInSidebar": "show lyrics in player sidebar",
-        "showRatings_description": "controls if the star ratings feature shows up in the interface",
-        "showRatings": "show star ratings",
-        "blurExplicitImages": "blur explicit images",
-        "blurExplicitImages_description": "album and song artwork tagged as explicit will be blurred",
-        "enableGridMultiSelect": "enable grid multi-select",
-        "enableGridMultiSelect_description": "when enabled, allows selecting multiple items in grid views. when disabled, clicking grid item images will navigate to the item page",
-        "showVisualizerInSidebar_description": "a panel will be added to the player sidebar that displays the visualizer",
-        "showVisualizerInSidebar": "show visualizer in player sidebar",
-        "combinedLyricsAndVisualizer_description": "combine lyrics and visualizer into the same panel",
-        "combinedLyricsAndVisualizer": "combine lyrics and visualizer in player sidebar",
-        "audioFadeOnStatusChange": "audio fade on status change",
-        "audioFadeOnStatusChange_description": "enables fade out and fade in when play/pause status changes",
-        "playerItemConfiguration_description": "configure what items are shown, and in what order, on the fullscreen player",
-        "playerItemConfiguration": "player item configuration",
-        "sidebarPlaylistSorting_description": "allows manual playlist sorting in the sidebar using drag and drop instead of the default server order",
-        "sidebarPlaylistSorting": "sidebar playlist sorting",
-        "sidebarPlaylistListFilterRegex_description": "hide playlists in the sidebar that match this regular expression",
-        "sidebarPlaylistListFilterRegex_placeholder": "e.g. ^Daily Mix.*",
-        "sidebarPlaylistListFilterRegex": "playlist filter regex",
-        "mediaSession_description": "enables Media Session integration, displaying media controls and metadata in the system volume overlay and lock screen",
-        "mediaSession": "enable media session",
-        "transcode": "enable transcoding",
-        "queryBuilder": "query builder",
-        "queryBuilderCustomFields_inputLabel": "label",
-        "queryBuilderCustomFields_inputTag": "tag",
-        "queryBuilderCustomFields": "custom fields",
-        "queryBuilderCustomFields_description": "add custom fields to use in query builders"
+        "notify": "müzik bildirimi aktivleştir"
     },
     "table": {
         "column": {
@@ -1049,10 +760,7 @@
             "size": "$t(common.size)",
             "songCount": "$t(entity.track, {\"count\": 2})",
             "title": "başlık",
-            "trackNumber": "parça",
-            "bitDepth": "$t(common.bitDepth)",
-            "sampleRate": "$t(common.sampleRate)",
-            "owner": "owner"
+            "trackNumber": "parça"
         },
         "config": {
             "general": {
@@ -1063,29 +771,7 @@
                 "itemGap": "öğe boşluğu (px)",
                 "itemSize": "öğe boyutu (px)",
                 "size": "$t(common.size)",
-                "tableColumns": "tablo sütunları",
-                "advancedSettings": "advanced settings",
-                "autosize": "autosize",
-                "moveUp": "move up",
-                "moveDown": "move down",
-                "pinToLeft": "pin to left",
-                "pinToRight": "pin to right",
-                "alignLeft": "align left",
-                "alignCenter": "align center",
-                "alignRight": "align right",
-                "itemsPerRow": "items per row",
-                "size_default": "default",
-                "size_compact": "compact",
-                "size_large": "large",
-                "pagination": "pagination",
-                "pagination_itemsPerPage": "items per page",
-                "pagination_infinite": "infinite",
-                "pagination_paginate": "paginated",
-                "alternateRowColors": "alternate row colors",
-                "horizontalBorders": "row borders",
-                "rowHoverHighlight": "row hover highlight",
-                "showHeader": "show header",
-                "verticalBorders": "column borders"
+                "tableColumns": "tablo sütunları"
             },
             "label": {
                 "actions": "$t(common.action_other)",
@@ -1115,21 +801,12 @@
                 "title": "$t(common.title)",
                 "titleCombined": "$t(common.title) (birleşik)",
                 "trackNumber": "parça numarası",
-                "year": "$t(common.year)",
-                "albumGroup": "album group",
-                "albumCount": "$t(entity.album, {\"count\": 2})",
-                "bitDepth": "$t(common.bitDepth)",
-                "composer": "composer",
-                "genreBadge": "$t(entity.genre, {\"count\": 1}) (badges)",
-                "image": "image",
-                "sampleRate": "$t(common.sampleRate)",
-                "titleArtist": "$t(common.title) (artist)"
+                "year": "$t(common.year)"
             },
             "view": {
                 "grid": "ızgara",
                 "list": "liste",
-                "table": "tablo",
-                "detail": "detail"
+                "table": "tablo"
             }
         }
     },
@@ -1137,208 +814,11 @@
         "secondary": {
             "demo": "demo",
             "live": "canlı",
-            "remix": "remix",
-            "audiobook": "audiobook",
-            "audioDrama": "audio drama",
-            "compilation": "compilation",
-            "djMix": "dj mix",
-            "fieldRecording": "field recording",
-            "interview": "interview",
-            "mixtape": "mixtape",
-            "soundtrack": "soundtrack",
-            "spokenWord": "spoken word"
-        },
-        "primary": {
-            "album": "$t(entity.album, {\"count\": 1})",
-            "broadcast": "broadcast",
-            "ep": "ep",
-            "other": "other",
-            "single": "single"
+            "remix": "remix"
         }
     },
     "dragDropZone": {
         "error_oneFileOnly": "lütfen sadece 1 dosya seç",
-        "error_readingFile": "bu dosyayi okurken bir sorun oluştu :{{errorMessage}}",
-        "mainText": "drop a file here"
-    },
-    "datetime": {
-        "minuteShort": "m",
-        "secondShort": "s",
-        "hourShort": "h",
-        "dayShort": "d"
-    },
-    "filterOperator": {
-        "after": "is after",
-        "afterDate": "is after (date)",
-        "before": "is before",
-        "beforeDate": "is before (date)",
-        "contains": "contains",
-        "endsWith": "ends with",
-        "inPlaylist": "is in",
-        "inTheLast": "is in the last",
-        "inTheRange": "is in the range",
-        "inTheRangeDate": "is in the range (date)",
-        "is": "is",
-        "isNot": "is not",
-        "isGreaterThan": "is greater than",
-        "isLessThan": "is less than",
-        "matchesRegex": "matches regex",
-        "notContains": "does not contain",
-        "notInPlaylist": "is not in",
-        "notInTheLast": "is not in the last",
-        "startsWith": "starts with"
-    },
-    "queryBuilder": {
-        "standardTags": "standard tags",
-        "customTags": "custom tags"
-    },
-    "visualizer": {
-        "visualizerType": "Visualizer Type",
-        "cyclePresets": "Cycle Presets",
-        "cycleTime": "Cycle Time (seconds)",
-        "includeAllPresets": "Include All Presets",
-        "ignoredPresets": "Ignored Presets",
-        "selectedPresets": "Selected Presets",
-        "randomizeNextPreset": "Randomize Next Preset",
-        "blendTime": "Blend Time",
-        "presets": "Presets",
-        "selectPreset": "Select Preset",
-        "applyPreset": "Apply Preset",
-        "saveAsPreset": "Save as Preset",
-        "updatePreset": "Update Preset",
-        "copyConfiguration": "Copy Configuration",
-        "pasteConfiguration": "Paste Configuration",
-        "pasteConfigurationPlaceholder": "Paste JSON configuration here...",
-        "pasteFromClipboard": "Paste from Clipboard",
-        "applyConfiguration": "Apply Configuration",
-        "configCopied": "Configuration copied to clipboard",
-        "configCopyFailed": "Failed to copy configuration",
-        "configPasted": "Configuration applied successfully",
-        "configPasteFailed": "Failed to apply configuration. Please check the format.",
-        "configPasteReadFailed": "Failed to read from clipboard",
-        "presetName": "Preset Name",
-        "presetNamePlaceholder": "Enter preset name",
-        "general": "General",
-        "mode": "Mode",
-        "mode1To8": "Mode 1 - 8",
-        "mode10": "Mode 10",
-        "barSpace": "Bar Space",
-        "lineWidth": "Line Width",
-        "fillAlpha": "Fill Alpha",
-        "channelLayout": "Channel Layout",
-        "maxFPS": "Max FPS",
-        "opacity": "Opacity",
-        "customGradients": "Custom Gradients",
-        "addCustomGradient": "Add Custom Gradient",
-        "gradientName": "Gradient Name",
-        "gradientNamePlaceholder": "Gradient Name",
-        "vertical": "Vertical",
-        "horizontal": "Horizontal",
-        "colorStops": "Color Stops",
-        "addColor": "Add Color",
-        "position": "Position",
-        "level": "Level",
-        "remove": "Remove",
-        "pasteGradient": "Paste Gradient",
-        "pasteGradientPlaceholder": "Paste gradient JSON here...",
-        "custom": "Custom",
-        "builtIn": "Built-in",
-        "colors": "Colors",
-        "colorMode": "Color Mode",
-        "gradient": "Gradient",
-        "gradientLeft": "Gradient Left",
-        "gradientRight": "Gradient Right",
-        "fft": "FFT",
-        "fftSize": "FFT Size",
-        "smoothing": "Smoothing",
-        "frequencyRangeAndScaling": "Frequency range and scaling",
-        "minimumFrequency": "Minimum Frequency",
-        "maximumFrequency": "Maximum Frequency",
-        "frequencyScale": "Frequency Scale",
-        "sensitivity": "Sensitivity",
-        "weightingFilter": "Weighting Filter",
-        "minimumDecibels": "Minimum Decibels",
-        "maximumDecibels": "Maximum Decibels",
-        "linearAmplitude": "Linear Amplitude",
-        "linearBoost": "Linear Boost",
-        "peakBehavior": "Peak Behavior",
-        "showPeaks": "Show Peaks",
-        "fadePeaks": "Fade Peaks",
-        "peakLine": "Peak Line",
-        "gravity": "Gravity",
-        "peakFadeTime": "Peak Fade Time (ms)",
-        "peakHoldTime": "Peak Hold Time (ms)",
-        "radialSpectrum": "Radial Spectrum",
-        "radial": "Radial",
-        "radialInvert": "Radial Invert",
-        "spinSpeed": "Spin Speed",
-        "radius": "Radius",
-        "reflexMirror": "Reflex Mirror",
-        "reflexFit": "Reflex Fit",
-        "reflexRatio": "Reflex Ratio",
-        "reflexAlpha": "Reflex Alpha",
-        "reflexBrightness": "Reflex Brightness",
-        "mirror": "Mirror",
-        "miscellaneousSettings": "Miscellaneous Settings",
-        "alphaBars": "Alpha Bars",
-        "ansiBands": "ANSI Bands",
-        "ledBars": "LED Bars",
-        "trueLeds": "True LEDs",
-        "lumiBars": "Lumi Bars",
-        "outlineBars": "Outline Bars",
-        "roundBars": "Round Bars",
-        "lowResolution": "Low Resolution",
-        "splitGradient": "Split Gradient",
-        "showFPS": "Show FPS",
-        "showScaleX": "Show Scale X",
-        "noteLabels": "Note Labels",
-        "showScaleY": "Show Scale Y",
-        "options": {
-            "mode": {
-                "0": "[0] Discrete Frequencies",
-                "1": "[1] 1/24th octave / 240 bands",
-                "2": "[2] 1/12th octave / 120 bands",
-                "3": "[3] 1/8th octave / 80 bands",
-                "4": "[4] 1/6th octave / 60 bands",
-                "5": "[5] 1/4th octave / 40 bands",
-                "6": "[6] 1/3rd octave / 30 bands",
-                "7": "[7] Half octave / 20 bands",
-                "8": "[8] Full octave / 10 bands",
-                "10": "[10] Line / Area graph"
-            },
-            "colorMode": {
-                "gradient": "Gradient",
-                "barIndex": "Bar-Index",
-                "barLevel": "Bar-Level"
-            },
-            "gradient": {
-                "classic": "Classic",
-                "prism": "Prism",
-                "rainbow": "Rainbow",
-                "steelblue": "Steelblue",
-                "orangered": "Orangered"
-            },
-            "channelLayout": {
-                "single": "Single",
-                "dualCombined": "Dual-Combined",
-                "dualHorizontal": "Dual-Horizontal",
-                "dualVertical": "Dual-Vertical"
-            },
-            "frequencyScale": {
-                "none": "None",
-                "bark": "Bark Scale",
-                "linear": "Linear Scale",
-                "log": "Log Scale",
-                "mel": "Mel Scale"
-            },
-            "weightingFilter": {
-                "none": "None",
-                "a": "A",
-                "b": "B",
-                "c": "C",
-                "d": "D",
-                "z": "Z"
-            }
-        }
+        "error_readingFile": "bu dosyayi okurken bir sorun oluştu :{{errorMessage}}"
     }
 }

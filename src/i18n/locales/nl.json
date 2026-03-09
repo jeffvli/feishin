@@ -37,8 +37,7 @@
         "moveDown": "verplaats omlaag",
         "holdToMoveToTop": "ingedrukt houden om naar begin te verplaatsen",
         "holdToMoveToBottom": "ingedrukt houden om naar einde te verplaatsen",
-        "openApplicationDirectory": "applicatiemap openen",
-        "goToCurrent": "go to current item"
+        "openApplicationDirectory": "applicatiemap openen"
     },
     "common": {
         "backward": "achteruit",
@@ -160,8 +159,7 @@
         "retry": "opnieuw proberen",
         "filter_single": "single",
         "rename": "hernoemen",
-        "filter_multiple": "meerdere",
-        "newVersionAvailable": "a new version is available"
+        "filter_multiple": "meerdere"
     },
     "filter": {
         "rating": "rating",
@@ -454,8 +452,7 @@
         "saveQueueFailed": "kan wachtrij niet opslaan",
         "settingsSyncError": "Er zijn verschillen gevonden tussen de instellingen in de renderer en het hoofdproces. Start de applicatie opnieuw op om de wijzigingen toe te passen",
         "invalidJson": "ongeldige JSON",
-        "serverLockSingleServer": "slechts één server is toegestaan als server op slot is gezet",
-        "playbackPausedDueToError": "playback was paused due to an error"
+        "serverLockSingleServer": "slechts één server is toegestaan als server op slot is gezet"
     },
     "entity": {
         "genre_one": "genre",
@@ -564,8 +561,7 @@
                 "title": "$t(common.title)",
                 "titleArtist": "$t(common.title) (artiest)",
                 "titleCombined": "$t(common.title) (gecombineerd)",
-                "year": "$t(common.year)",
-                "albumGroup": "album group"
+                "year": "$t(common.year)"
             },
             "general": {
                 "advancedSettings": "geavanceerde instellingen",
@@ -958,17 +954,7 @@
         "automaticUpdates_description": "Zoek en installeer updates automatisch",
         "releaseChannel_optionAlpha": "alfa (nachtelijk)",
         "discordStateIcon": "toon afspeelicoon",
-        "discordStateIcon_description": "toon een klein afspeelicoon in de rich-presence-status. het gepauzeerde icoon wordt altijd getoond als \"rich presence tonen wanneer gepauzeerd\" is ingeschakeld",
-        "autosave": "automatically save play queue",
-        "autosave_description": "enable automatically saving the play queue to your server. this is only possible when using Navidrome/Subsonic, and you cannot have a mixed play queue.",
-        "autosaveCount": "automatic play queue save frequency",
-        "autosaveCount_description": "how many track changes before the queue is saved. 1 (minimum) means every song change",
-        "useThemePrimaryShade": "use theme primary shade",
-        "useThemePrimaryShade_description": "use the primary shade defined in the selected theme for primary color variants",
-        "primaryShade": "primary shade",
-        "primaryShade_description": "override the primary shade (0–9) used for buttons, links, and other primary-colored elements",
-        "playerItemConfiguration_description": "configure what items are shown, and in what order, on the fullscreen player",
-        "playerItemConfiguration": "player item configuration"
+        "discordStateIcon_description": "toon een klein afspeelicoon in de rich-presence-status. het gepauzeerde icoon wordt altijd getoond als \"rich presence tonen wanneer gepauzeerd\" is ingeschakeld"
     },
     "form": {
         "addServer": {
@@ -1128,10 +1114,7 @@
         "sleepTimer_off": "uit",
         "sleepTimer_timeRemaining": "{{time}} resterend",
         "sleepTimer_setCustom": "timer instellen",
-        "sleepTimer_cancel": "timer annuleren",
-        "albumRadio": "album radio",
-        "repeat_one": "repeat one",
-        "repeat_other": ""
+        "sleepTimer_cancel": "timer annuleren"
     },
     "datetime": {
         "minuteShort": "m",

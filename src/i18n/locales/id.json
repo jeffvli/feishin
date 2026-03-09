@@ -156,12 +156,7 @@
         "clean": "bersih",
         "gridRows": "baris kisi",
         "tableColumns": "kolom tabel",
-        "itemsMore": "{{count}} lagi",
-        "action_one": "action",
-        "channel_one": "channel",
-        "filter_one": "filter",
-        "setting_one": "setting",
-        "newVersionAvailable": "a new version is available"
+        "itemsMore": "{{count}} lagi"
     },
     "entity": {
         "album_other": "album",
@@ -183,26 +178,7 @@
         "song_other": "lagu",
         "trackWithCount_other": "{{count}} pista",
         "radioStation_other": "stasiun radio",
-        "radioStationWithCount_other": "{{count}} stasiun radio",
-        "album_one": "album",
-        "albumArtist_one": "album artist",
-        "albumArtistCount_one": "{{count}} album artist",
-        "albumWithCount_one": "{{count}} album",
-        "radioStation_one": "radio station",
-        "radioStationWithCount_one": "{{count}} radio station",
-        "artist_one": "artist",
-        "artistWithCount_one": "{{count}} artist",
-        "favorite_one": "favorite",
-        "folder_one": "folder",
-        "folderWithCount_one": "{{count}} folder",
-        "genre_one": "genre",
-        "genreWithCount_one": "{{count}} genre",
-        "playlist_one": "playlist",
-        "play_one": "{{count}} play",
-        "playlistWithCount_one": "{{count}} playlist",
-        "track_one": "track",
-        "song_one": "song",
-        "trackWithCount_one": "{{count}} track"
+        "radioStationWithCount_other": "{{count}} stasiun radio"
     },
     "error": {
         "apiRouteError": "tidak dapat mengarahkan permintaan",
@@ -235,8 +211,7 @@
         "saveQueueFailed": "gagal menyimpan antrean",
         "settingsSyncError": "ditemukan ketidaksesuaian antara pengaturan di perender dan proses utama. mulai ulang aplikasi untuk menerapkan perubahan",
         "invalidJson": "JSON tidak valid",
-        "serverLockSingleServer": "hanya satu server yang diizinkan ketika server dikunci",
-        "playbackPausedDueToError": "playback was paused due to an error"
+        "serverLockSingleServer": "hanya satu server yang diizinkan ketika server dikunci"
     },
     "filter": {
         "album": "$t(entity.album, {\"count\": 1})",
@@ -657,9 +632,7 @@
         "sleepTimer_off": "mati",
         "sleepTimer_timeRemaining": "{{time}} tersisa",
         "sleepTimer_setCustom": "atur pengatur waktu",
-        "sleepTimer_cancel": "batalkan pengatur waktu",
-        "repeat_one": "repeat one",
-        "repeat_other": ""
+        "sleepTimer_cancel": "batalkan pengatur waktu"
     },
     "setting": {
         "accentColor": "warna sorotan",
@@ -1018,11 +991,7 @@
         "playerItemConfiguration": "konfigurasi item pemutar",
         "sidebarPlaylistListFilterRegex_description": "sembunyikan playlist di bilah sisi yang cocok dengan ekspresi reguler ini",
         "sidebarPlaylistListFilterRegex_placeholder": "mis. ^Daily Mix.*",
-        "sidebarPlaylistListFilterRegex": "regex filter playlist",
-        "autosave": "automatically save play queue",
-        "autosave_description": "enable automatically saving the play queue to your server. this is only possible when using Navidrome/Subsonic, and you cannot have a mixed play queue.",
-        "autosaveCount": "automatic play queue save frequency",
-        "autosaveCount_description": "how many track changes before the queue is saved. 1 (minimum) means every song change"
+        "sidebarPlaylistListFilterRegex": "regex filter playlist"
     },
     "table": {
         "column": {
