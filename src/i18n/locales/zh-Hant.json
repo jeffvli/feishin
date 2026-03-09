@@ -791,7 +791,7 @@
                 "gap": "$t(common.gap)",
                 "size": "$t(common.size)",
                 "tableColumns": "列",
-                "autoFitColumns": "列寬動態",
+                "autoFitColumns": "自動調整列寬",
                 "followCurrentSong": "跟隨目前歌曲",
                 "itemGap": "項目間隔 (px)",
                 "itemSize": "項目大小 (px)",
