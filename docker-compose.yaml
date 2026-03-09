@@ -8,6 +8,7 @@ services:
             - SERVER_LOCK=false # When true AND name/type/url are set, only username/password can be toggled
             - SERVER_TYPE=jellyfin # the allowed types are: jellyfin, navidrome, subsonic. These values are case insensitive
             - SERVER_URL=http://localhost:8096 # http://address:port or https://address:port
+            # - REMOTE_URL=http://share.localhost # Used for compatibility with external functionality, such as custom sharing URLs on Navidrome
             - LEGACY_AUTHENTICATION=false # When SERVER_LOCK is true, sets the legacyauth flag for server authentication (true or false)
             - ANALYTICS_DISABLED=false # Set to true to disable Umami analytics tracking
         ports:

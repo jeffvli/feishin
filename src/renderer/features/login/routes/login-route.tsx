@@ -65,6 +65,7 @@ const LoginRoute = () => {
     const serverType = window.SERVER_TYPE ? toServerType(window.SERVER_TYPE) : null;
     const serverName = window.SERVER_NAME || '';
     const serverUrl = window.SERVER_URL || '';
+    const remoteUrl = window.REMOTE_URL || '';
     const legacyAuth = serverLock && isLegacyAuth();
 
     const config = [
@@ -88,6 +89,11 @@ const LoginRoute = () => {
             key: 'SERVER_URL',
             value: serverUrl,
         },
+        {
+            isvalid: remoteUrl !== '',
+            key: 'REMOTE_URL',
+            value: remoteUrl,
+        }
     ];
 
     const form = useForm({
@@ -150,6 +156,7 @@ const LoginRoute = () => {
             }
 
             const normalizedUrl = normalizeUrl(serverUrl);
+            const normalizedRemoteURL = normalizeUrl(remoteUrl);
             const existingServer =
                 serverLock &&
                 Object.values(serverList).find((s) => normalizeUrl(s.url) === normalizedUrl);
@@ -161,6 +168,7 @@ const LoginRoute = () => {
                 name: serverName,
                 type: serverType as ServerType,
                 url: normalizedUrl,
+                remoteUrl: normalizedRemoteURL,
                 userId: data.userId,
                 username: data.username,
             };

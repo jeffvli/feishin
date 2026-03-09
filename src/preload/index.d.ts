@@ -12,5 +12,6 @@ declare global {
         SERVER_NAME?: string;
         SERVER_TYPE?: ServerType;
         SERVER_URL?: string;
+        REMOTE_URL?: string;
     }
 }
