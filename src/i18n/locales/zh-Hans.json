@@ -75,7 +75,7 @@
         "forward": "前进",
         "delete": "删除",
         "cancel": "取消",
-        "forceRestartRequired": "重启应用使更改生效…关闭通知即可重启",
+        "forceRestartRequired": "重启应用以使更改生效…关闭通知即可重启",
         "setting_other": "设置",
         "version": "版本",
         "title": "标题",
@@ -108,7 +108,7 @@
         "duration": "时长",
         "ok": "好",
         "no": "否",
-        "playerMustBePaused": "播放器必须暂停",
+        "playerMustBePaused": "播放器必须先暂停",
         "channel_other": "频道",
         "none": "无",
         "disc": "碟片",
@@ -156,7 +156,12 @@
         "filter_single": "单项",
         "mood": "氛围",
         "rename": "重命名",
-        "filter_multiple": "多项"
+        "filter_multiple": "多项",
+        "action_one": "action",
+        "channel_one": "channel",
+        "filter_one": "filter",
+        "setting_one": "setting",
+        "newVersionAvailable": "a new version is available"
     },
     "entity": {
         "albumArtist_other": "专辑艺术家",
@@ -178,7 +183,26 @@
         "play_other": "{{count}} 次播放",
         "song_other": "歌曲",
         "radioStation_other": "广播电台",
-        "radioStationWithCount_other": "{{count}} 个广播电台"
+        "radioStationWithCount_other": "{{count}} 个广播电台",
+        "album_one": "album",
+        "albumArtist_one": "album artist",
+        "albumArtistCount_one": "{{count}} album artist",
+        "albumWithCount_one": "{{count}} album",
+        "radioStation_one": "radio station",
+        "radioStationWithCount_one": "{{count}} radio station",
+        "artist_one": "artist",
+        "artistWithCount_one": "{{count}} artist",
+        "favorite_one": "favorite",
+        "folder_one": "folder",
+        "folderWithCount_one": "{{count}} folder",
+        "genre_one": "genre",
+        "genreWithCount_one": "{{count}} genre",
+        "playlist_one": "playlist",
+        "play_one": "{{count}} play",
+        "playlistWithCount_one": "{{count}} playlist",
+        "track_one": "track",
+        "song_one": "song",
+        "trackWithCount_one": "{{count}} track"
     },
     "player": {
         "repeat_all": "循环全部",
@@ -229,7 +253,9 @@
         "sleepTimer_timeRemaining": "剩余时间 {{time}}",
         "sleepTimer_setCustom": "设置定时器",
         "sleepTimer_cancel": "取消定时器",
-        "albumRadio": "专辑电台"
+        "albumRadio": "专辑电台",
+        "repeat_one": "repeat one",
+        "repeat_other": ""
     },
     "setting": {
         "crossfadeStyle_description": "选择用于音频播放器的淡入淡出风格",
@@ -1210,13 +1236,27 @@
         "miscellaneousSettings": "杂项设置",
         "options": {
             "channelLayout": {
-                "single": "单项"
+                "single": "单项",
+                "dualCombined": "Dual-Combined",
+                "dualHorizontal": "Dual-Horizontal",
+                "dualVertical": "Dual-Vertical"
             },
             "mode": {
-                "0": "[0] 离散频率"
+                "0": "[0] 离散频率",
+                "1": "[1] 1/24th octave / 240 bands",
+                "2": "[2] 1/12th octave / 120 bands",
+                "3": "[3] 1/8th octave / 80 bands",
+                "4": "[4] 1/6th octave / 60 bands",
+                "5": "[5] 1/4th octave / 40 bands",
+                "6": "[6] 1/3rd octave / 30 bands",
+                "7": "[7] Half octave / 20 bands",
+                "8": "[8] Full octave / 10 bands",
+                "10": "[10] Line / Area graph"
             },
             "colorMode": {
-                "gradient": "渐变"
+                "gradient": "渐变",
+                "barIndex": "Bar-Index",
+                "barLevel": "Bar-Level"
             },
             "gradient": {
                 "classic": "经典",
@@ -1226,7 +1266,11 @@
                 "orangered": "橙红色"
             },
             "frequencyScale": {
-                "none": "无"
+                "none": "无",
+                "bark": "Bark Scale",
+                "linear": "Linear Scale",
+                "log": "Log Scale",
+                "mel": "Mel Scale"
             },
             "weightingFilter": {
                 "none": "无",
@@ -1284,7 +1328,14 @@
         "splitGradient": "渐变分割",
         "showScaleX": "显示比例尺 X",
         "noteLabels": "笔记标签",
-        "showScaleY": "显示比例尺 Y"
+        "showScaleY": "显示比例尺 Y",
+        "alphaBars": "Alpha Bars",
+        "ansiBands": "ANSI Bands",
+        "ledBars": "LED Bars",
+        "trueLeds": "True LEDs",
+        "lumiBars": "Lumi Bars",
+        "outlineBars": "Outline Bars",
+        "roundBars": "Round Bars"
     },
     "queryBuilder": {
         "standardTags": "标准标签",
