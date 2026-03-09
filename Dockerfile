@@ -20,7 +20,7 @@ COPY --chown=nginx:nginx --from=builder /app/out/web /usr/share/nginx/html
 COPY ./settings.js.template /etc/nginx/templates/settings.js.template
 COPY ng.conf.template /etc/nginx/templates/default.conf.template
 
-ENV SERVER_LOCK=false SERVER_NAME="" SERVER_TYPE="" SERVER_URL=""
+ENV SERVER_LOCK=false SERVER_NAME="" SERVER_TYPE="" SERVER_URL="" REMOTE_URL=""
 ENV LEGACY_AUTHENTICATION="" ANALYTICS_DISABLED="" PUBLIC_PATH="/"
 
 EXPOSE 9180
