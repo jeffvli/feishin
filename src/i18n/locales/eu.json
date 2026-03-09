@@ -33,7 +33,12 @@
         "shuffleAll": "nahastu dena",
         "shuffleSelected": "nahastu aukeratutak",
         "moveItems": "elementuak mugitu",
-        "openApplicationDirectory": "ireki aplikazioaren direktorioa"
+        "openApplicationDirectory": "ireki aplikazioaren direktorioa",
+        "goToCurrent": "go to current item",
+        "moveUp": "move up",
+        "moveDown": "move down",
+        "holdToMoveToTop": "hold to move to top",
+        "holdToMoveToBottom": "hold to move to bottom"
     },
     "common": {
         "add": "gehitu",
@@ -150,7 +155,13 @@
         "recordLabel": "diskoetxea",
         "example": "adibidea",
         "tableColumns": "taulako zutabeak",
-        "doNotShowAgain": "ez erakutsi hau berriro"
+        "doNotShowAgain": "ez erakutsi hau berriro",
+        "filter_single": "single",
+        "filter_multiple": "multi",
+        "mood": "mood",
+        "rename": "rename",
+        "gridRows": "grid rows",
+        "newVersionAvailable": "a new version is available"
     },
     "player": {
         "repeat": "errepikatu",
@@ -190,14 +201,28 @@
         "addLastShuffled": "azkena (ausaz)",
         "addNextShuffled": "hurrengoa (ausaz)",
         "artistRadio": "artista irratia",
-        "trackRadio": "pista irratia"
+        "trackRadio": "pista irratia",
+        "albumRadio": "album radio",
+        "holdToShuffle": "hold to shuffle",
+        "repeat_one": "repeat one",
+        "repeat_other": "",
+        "sleepTimer": "sleep timer",
+        "sleepTimer_endOfSong": "end of current song",
+        "sleepTimer_minutes": "{{count}} min",
+        "sleepTimer_hours": "{{count}} hr",
+        "sleepTimer_custom": "custom",
+        "sleepTimer_off": "off",
+        "sleepTimer_timeRemaining": "{{time}} remaining",
+        "sleepTimer_setCustom": "set timer",
+        "sleepTimer_cancel": "cancel timer"
     },
     "table": {
         "config": {
             "view": {
                 "table": "taula",
                 "list": "zerrenda",
-                "grid": "sareta"
+                "grid": "sareta",
+                "detail": "detail"
             },
             "general": {
                 "gap": "$t(common.gap)",
@@ -217,7 +242,19 @@
                 "itemsPerRow": "elementuak errenkada bakoitzeko",
                 "size_large": "handia",
                 "pagination_itemsPerPage": "elementuak orrialde bakoitzeko",
-                "pagination_infinite": "infinitua"
+                "pagination_infinite": "infinitua",
+                "autosize": "autosize",
+                "moveUp": "move up",
+                "moveDown": "move down",
+                "displayType": "display type",
+                "size_compact": "compact",
+                "pagination": "pagination",
+                "pagination_paginate": "paginated",
+                "alternateRowColors": "alternate row colors",
+                "horizontalBorders": "row borders",
+                "rowHoverHighlight": "row hover highlight",
+                "showHeader": "show header",
+                "verticalBorders": "column borders"
             },
             "label": {
                 "actions": "$t(common.action_other)",
@@ -249,7 +286,13 @@
                 "albumCount": "$t(entity.album, {\"count\": 2})",
                 "image": "irudia",
                 "bitDepth": "$t(common.bitDepth)",
-                "sampleRate": "$t(common.sampleRate)"
+                "sampleRate": "$t(common.sampleRate)",
+                "albumGroup": "album group",
+                "composer": "composer",
+                "genreBadge": "$t(entity.genre, {\"count\": 1}) (badges)",
+                "rowIndex": "row index",
+                "titleArtist": "$t(common.title) (artist)",
+                "trackNumber": "track number"
             }
         },
         "column": {
@@ -351,7 +394,11 @@
         "noNetwork": "zerbitzaria ez dago erabilgarri",
         "noNetworkDescription": "ezin izan da zerbitzari honetara konektatu",
         "saveQueueFailed": "huts egin du ilara gordetzean",
-        "multipleServerSaveQueueError": "erreprodukzio-ilarak zerbitzarikoak ez diren abesti bat edo gehiago ditu. hau ez da onartzen"
+        "multipleServerSaveQueueError": "erreprodukzio-ilarak zerbitzarikoak ez diren abesti bat edo gehiago ditu. hau ez da onartzen",
+        "invalidJson": "invalid JSON",
+        "playbackPausedDueToError": "playback was paused due to an error",
+        "serverLockSingleServer": "only one server is allowed when server is locked",
+        "settingsSyncError": "discrepancies were found between the settings in the renderer and the main process. restart the application to apply the changes"
     },
     "filter": {
         "disc": "diskoa",
@@ -396,7 +443,10 @@
         "releaseYear": "argitalpen urtea",
         "toYear": "urtera arte",
         "fromYear": "urtetik aurrera",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "explicitStatus": "$t(common.explicitStatus)",
+        "matchAnd": "and",
+        "matchOr": "or",
+        "sortName": "sort name"
     },
     "setting": {
         "hotkey_playbackPause": "pausatu",
@@ -675,7 +725,91 @@
         "remotePort_description": "urruneko kontrol zerbitzariaren portua ezartzen du",
         "remotePort": "urruneko kontrol zerbitzariaren ataka",
         "remoteUsername_description": "urruneko kontrol zerbitzariaren erabiltzaile-izena ezartzen du. Erabiltzaile-izena eta pasahitza hutsik badaude, autentifikazioa desgaituta egongo da",
-        "remoteUsername": "urruneko kontrol zerbitzariaren erabiltzaile-izena"
+        "remoteUsername": "urruneko kontrol zerbitzariaren erabiltzaile-izena",
+        "autoDJ_timing": "timing",
+        "autosave": "automatically save play queue",
+        "autosave_description": "enable automatically saving the play queue to your server. this is only possible when using Navidrome/Subsonic, and you cannot have a mixed play queue.",
+        "autosaveCount": "automatic play queue save frequency",
+        "autosaveCount_description": "how many track changes before the queue is saved. 1 (minimum) means every song change",
+        "useThemePrimaryShade": "use theme primary shade",
+        "useThemePrimaryShade_description": "use the primary shade defined in the selected theme for primary color variants",
+        "primaryShade": "primary shade",
+        "primaryShade_description": "override the primary shade (0–9) used for buttons, links, and other primary-colored elements",
+        "analyticsEnable": "Send usage-based analytics",
+        "analyticsEnable_description": "Anonymized usage data is sent to the developer to help improve the application",
+        "automaticUpdates": "Automatic updates",
+        "automaticUpdates_description": "Check for and install updates automatically",
+        "releaseChannel_optionAlpha": "alpha (nightly)",
+        "discordStateIcon": "show playing icon",
+        "discordStateIcon_description": "show a small playing icon in the rich presence status. the paused icon is always shown when \"Show rich presence when paused\" is enabled",
+        "exportImportSettings_notValidJSON": "the file passed is not valid JSON",
+        "homeFeatureStyle_description": "controls the style of the home featured carousel",
+        "homeFeatureStyle": "home featured carousel style",
+        "homeFeatureStyle_optionMultiple": "multiple",
+        "homeFeatureStyle_optionSingle": "single",
+        "hotkey_listNavigateToPage": "list navigate to item page",
+        "hotkey_listPlayNext": "list play next",
+        "logLevel_optionWarn": "warn",
+        "playerbarSlider": "playerbar slider",
+        "playerbarSlider_description": "the waveform is not recommended if on a slow or metered internet connection",
+        "playerbarSliderType_optionSlider": "slider",
+        "playerbarSliderType_optionWaveform": "waveform",
+        "playerbarWaveformAlign": "waveform align",
+        "playerbarWaveformAlign_optionTop": "top",
+        "playerbarWaveformAlign_optionCenter": "center",
+        "playerbarWaveformAlign_optionBottom": "bottom",
+        "playerbarWaveformBarWidth": "waveform bar width",
+        "playerbarWaveformGap": "waveform gap",
+        "playerbarWaveformRadius": "waveform radius",
+        "showLyricsInSidebar_description": "a panel will be added to the attached play queue that displays the lyrics",
+        "showLyricsInSidebar": "show lyrics in player sidebar",
+        "blurExplicitImages": "blur explicit images",
+        "blurExplicitImages_description": "album and song artwork tagged as explicit will be blurred",
+        "enableGridMultiSelect": "enable grid multi-select",
+        "enableGridMultiSelect_description": "when enabled, allows selecting multiple items in grid views. when disabled, clicking grid item images will navigate to the item page",
+        "showVisualizerInSidebar_description": "a panel will be added to the player sidebar that displays the visualizer",
+        "preservePitch_description": "preserves pitch when modifying playback speed",
+        "preservePitch": "preserve pitch",
+        "audioFadeOnStatusChange": "audio fade on status change",
+        "audioFadeOnStatusChange_description": "enables fade out and fade in when play/pause status changes",
+        "preventSleepOnPlayback": "prevent sleep on playback",
+        "replayGainClipping_description": "Prevent clipping caused by {{ReplayGain}} by automatically lowering the gain",
+        "replayGainFallback_description": "gain in db to apply if the file has no {{ReplayGain}} tags",
+        "replayGainMode_description": "adjust volume gain according to {{ReplayGain}} values stored in the file metadata",
+        "replayGainPreamp_description": "adjust the preamp gain applied to the {{ReplayGain}} values",
+        "replayGainPreamp": "{{ReplayGain}} preamp (dB)",
+        "sampleRate_description": "select the output sample rate to be used if the sample frequency selected is different from that of the current media. a value less than 8000 will use the default frequency",
+        "sampleRate": "sample rate",
+        "savePlayQueue_description": "save the play queue when the application is closed and restore it when the application is opened",
+        "scrobble_description": "scrobble plays to your media server",
+        "showSkipButton_description": "show or hide the skip buttons on the player bar",
+        "showSkipButton": "show skip buttons",
+        "showSkipButtons_description": "show or hide the skip buttons on the player bar",
+        "showSkipButtons": "show skip buttons",
+        "sidebarCollapsedNavigation_description": "show or hide the navigation in the collapsed sidebar",
+        "sidebarCollapsedNavigation": "sidebar (collapsed) navigation",
+        "sidebarConfiguration_description": "select the items and order in which they appear in the sidebar",
+        "playerItemConfiguration_description": "configure what items are shown, and in what order, on the fullscreen player",
+        "playerItemConfiguration": "player item configuration",
+        "sidebarPlaylistList_description": "show or hide the playlist list in the sidebar",
+        "sidebarPlaylistList": "sidebar playlist list",
+        "sidebarPlaylistSorting_description": "allows manual playlist sorting in the sidebar using drag and drop instead of the default server order",
+        "sidebarPlaylistSorting": "sidebar playlist sorting",
+        "sidebarPlaylistListFilterRegex_description": "hide playlists in the sidebar that match this regular expression",
+        "sidebarPlaylistListFilterRegex_placeholder": "e.g. ^Daily Mix.*",
+        "sidebarPlaylistListFilterRegex": "playlist filter regex",
+        "skipDuration_description": "sets the duration to skip when using the skip buttons on the player bar",
+        "skipPlaylistPage_description": "when navigating to a playlist, go to the playlist song list page instead of the default page",
+        "translationApiKey_description": "api key for translation (global service endpoint only)",
+        "trayEnabled_description": "show/hide tray icon/menu. if disabled, also disables minimize/exit to tray",
+        "volumeWheelStep_description": "the amount of volume to change when scrolling the mouse wheel on the volume slider",
+        "volumeWheelStep": "volume wheel step",
+        "volumeWidth_description": "the width of the volume slider",
+        "volumeWidth": "volume slider width",
+        "webAudio_description": "use web audio. this enables advanced features like replaygain. disable if you experience otherwise",
+        "queryBuilder": "query builder",
+        "queryBuilderCustomFields": "custom fields",
+        "queryBuilderCustomFields_description": "add custom fields to use in query builders"
     },
     "form": {
         "addServer": {
@@ -692,7 +826,9 @@
             "success": "zerbitzaria behar bezala gehitu da",
             "input_preferInstantMix": "nahiago izan berehalako nahasketa",
             "input_preferInstantMixDescription": "erabili berehalako nahasketa soilik antzeko abestiak lortzeko. erabilgarria portaera hau aldatzen duten pluginak badituzu",
-            "input_remoteUrl": "URL publikoa"
+            "input_remoteUrl": "URL publikoa",
+            "input_preferRemoteUrl": "prefer public url",
+            "input_remoteUrlPlaceholder": "optional: public url for external features"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
@@ -721,7 +857,9 @@
             "success": "partekatzeko esteka arbelera kopiatu da (edo egin klik hemen irekitzeko)",
             "expireInvalid": "iraungitze-data etorkizunean izan behar da",
             "allowDownloading": "baimendu deskargatzea",
-            "createFailed": "partekatzea sortzeak huts egin du (partekatzea gaituta al dago?)"
+            "createFailed": "partekatzea sortzeak huts egin du (partekatzea gaituta al dago?)",
+            "copyToClipboard": "Copy to clipboard: Ctrl+C, Enter",
+            "successMustClick": "share created successfully. click here to open"
         },
         "deletePlaylist": {
             "success": "$t(entity.playlist, {\"count\": 1}) behar bezala ezabatu da",
@@ -739,7 +877,9 @@
             "input_optionMatchAll": "guztiak bat etorri",
             "input_optionMatchAny": "edozeinekin bat etorri",
             "resetToDefault": "lehenetsitako egoerara berrezarri",
-            "clearFilters": "garbitu iragazkiak"
+            "clearFilters": "garbitu iragazkiak",
+            "addRuleGroup": "add rule group",
+            "removeRuleGroup": "remove rule group"
         },
         "updateServer": {
             "success": "zerbitzaria behar bezala eguneratu da",
@@ -751,13 +891,15 @@
             "disabled": "modu pribatua desgaituta, erreprodukzio egoera ikusgai dago orain gaitutako kanpoko integrazioentzat"
         },
         "largeFetchConfirmation": {
-            "title": "gehitu elementuak ilaran"
+            "title": "gehitu elementuak ilaran",
+            "description": "This action will add all items in the current filtered view"
         },
         "createRadioStation": {
             "input_homepageUrl": "hasierako orriaren URLa",
             "input_name": "izena",
             "title": "irrati-katea sortu",
-            "success": "irrati-katea behar bezala sortu da"
+            "success": "irrati-katea behar bezala sortu da",
+            "input_streamUrl": "stream url"
         },
         "lyricsExport": {
             "export": "esportatu letrak",
@@ -770,7 +912,10 @@
             "input_limit": "zenbat abesti?",
             "input_played_optionAll": "pista guztiak",
             "input_played_optionUnplayed": "erreproduzitu gabeko pistak bakarrik",
-            "input_played_optionPlayed": "erreproduzitutako pistak bakarrik"
+            "input_played_optionPlayed": "erreproduzitutako pistak bakarrik",
+            "input_minYear": "from year",
+            "input_maxYear": "to year",
+            "input_played": "play filter"
         },
         "saveQueue": {
             "success": "erreprodukzio-ilara zerbitzarian gordeta"
@@ -841,7 +986,8 @@
             "goToAlbum": "joan $t(entity.album, {\"count\": 1})-(e)ra",
             "goToAlbumArtist": "joan albumera",
             "showDetails": "informazioa lortu",
-            "moveItems": "$t(action.moveItems)"
+            "moveItems": "$t(action.moveItems)",
+            "goTo": "go to"
         },
         "fullscreenPlayer": {
             "config": {
@@ -911,7 +1057,10 @@
             "queryBuilder": "kontsulta-sortzailea",
             "controls": "kontrolak",
             "remote": "urrunekoa",
-            "lyricsDisplay": "erakutsi letrak"
+            "lyricsDisplay": "erakutsi letrak",
+            "analytics": "analytics",
+            "transcoding": "transcoding",
+            "logger": "logger"
         },
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
@@ -928,7 +1077,8 @@
             "nowPlaying": "orain erreproduzitzen",
             "shared": "partekatutako $t(entity.playlist, {\"count\": 2})",
             "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})"
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "collections": "collections"
         },
         "trackList": {
             "title": "$t(entity.track, {\"count\": 2})",
@@ -946,7 +1096,11 @@
             "recentReleases": "azken argitalpenak",
             "viewDiscography": "ikusi diskografia",
             "groupingTypeAll": "argitalpen mota guztiak",
-            "groupingTypePrimary": "argitalpen mota nagusiak"
+            "groupingTypePrimary": "argitalpen mota nagusiak",
+            "favoriteSongs": "favorite songs",
+            "topSongsCommunity": "community",
+            "topSongsPersonal": "personal",
+            "favoriteSongsFrom": "favorite songs from {{title}}"
         },
         "itemDetail": {
             "copyPath": "kopiatu bidea arbelean",
@@ -964,20 +1118,42 @@
         },
         "radioList": {
             "title": "irrati-kateak"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "commits since {{stable}}",
+            "noNewCommits": "no new commits in this range",
+            "noStableReleaseToCompare": "no stable release available to compare with"
+        },
+        "windowBar": {
+            "paused": "(Paused) ",
+            "privateMode": "(Private mode)"
+        },
+        "collections": {
+            "overrideExisting": "override existing",
+            "saveAsCollection": "save as collection"
         }
     },
     "releaseType": {
         "primary": {
             "album": "$t(entity.album, {\"count\": 1})",
             "other": "bestelakoa",
-            "ep": "ep"
+            "ep": "ep",
+            "broadcast": "broadcast",
+            "single": "single"
         },
         "secondary": {
             "compilation": "konpilazioa",
             "audiobook": "audioliburua",
             "interview": "elkarrizketa",
             "remix": "nahasketa",
-            "djMix": "dj nahasketa"
+            "djMix": "dj nahasketa",
+            "audioDrama": "audio drama",
+            "demo": "demo",
+            "fieldRecording": "field recording",
+            "live": "live",
+            "mixtape": "mixtape",
+            "soundtrack": "soundtrack",
+            "spokenWord": "spoken word"
         }
     },
     "datetime": {
@@ -996,7 +1172,20 @@
         "notContains": "ez dauka",
         "startsWith": "honekin hasten da",
         "endsWith": "honekin amaitzen da",
-        "isNot": "ez da"
+        "isNot": "ez da",
+        "after": "is after",
+        "afterDate": "is after (date)",
+        "before": "is before",
+        "beforeDate": "is before (date)",
+        "inPlaylist": "is in",
+        "inTheLast": "is in the last",
+        "inTheRange": "is in the range",
+        "inTheRangeDate": "is in the range (date)",
+        "isGreaterThan": "is greater than",
+        "isLessThan": "is less than",
+        "matchesRegex": "matches regex",
+        "notInPlaylist": "is not in",
+        "notInTheLast": "is not in the last"
     },
     "visualizer": {
         "general": "Orokorra",
@@ -1027,7 +1216,8 @@
                 "classic": "Klasikoa",
                 "prism": "Prisma",
                 "rainbow": "Ostadarra",
-                "orangered": "Laranja-gorria"
+                "orangered": "Laranja-gorria",
+                "steelblue": "Steelblue"
             },
             "weightingFilter": {
                 "none": "Bat ere ez",
@@ -1053,7 +1243,14 @@
                 "none": "Bat ere ez",
                 "linear": "Eskala Lineala",
                 "bark": "Bark Eskala",
-                "mel": "Mel Eskala"
+                "mel": "Mel Eskala",
+                "log": "Log Scale"
+            },
+            "channelLayout": {
+                "single": "Single",
+                "dualCombined": "Dual-Combined",
+                "dualHorizontal": "Dual-Horizontal",
+                "dualVertical": "Dual-Vertical"
             }
         },
         "opacity": "Opakotasuna",
@@ -1097,6 +1294,51 @@
         "saveAsPreset": "Aurrezarpen gisa gorde",
         "applyPreset": "Aurrezarpena Aplikatu",
         "selectPreset": "Aukeratu Aurrezarpena",
-        "presets": "Aurrezarpenak"
+        "presets": "Aurrezarpenak",
+        "visualizerType": "Visualizer Type",
+        "cyclePresets": "Cycle Presets",
+        "cycleTime": "Cycle Time (seconds)",
+        "includeAllPresets": "Include All Presets",
+        "ignoredPresets": "Ignored Presets",
+        "selectedPresets": "Selected Presets",
+        "randomizeNextPreset": "Randomize Next Preset",
+        "blendTime": "Blend Time",
+        "mode1To8": "Mode 1 - 8",
+        "mode10": "Mode 10",
+        "barSpace": "Bar Space",
+        "fillAlpha": "Fill Alpha",
+        "gradientLeft": "Gradient Left",
+        "gradientRight": "Gradient Right",
+        "peakBehavior": "Peak Behavior",
+        "fadePeaks": "Fade Peaks",
+        "peakLine": "Peak Line",
+        "peakFadeTime": "Peak Fade Time (ms)",
+        "peakHoldTime": "Peak Hold Time (ms)",
+        "radialSpectrum": "Radial Spectrum",
+        "radialInvert": "Radial Invert",
+        "spinSpeed": "Spin Speed",
+        "reflexMirror": "Reflex Mirror",
+        "reflexFit": "Reflex Fit",
+        "reflexRatio": "Reflex Ratio",
+        "reflexAlpha": "Reflex Alpha",
+        "reflexBrightness": "Reflex Brightness",
+        "miscellaneousSettings": "Miscellaneous Settings",
+        "alphaBars": "Alpha Bars",
+        "ansiBands": "ANSI Bands",
+        "ledBars": "LED Bars",
+        "trueLeds": "True LEDs",
+        "lumiBars": "Lumi Bars",
+        "outlineBars": "Outline Bars",
+        "roundBars": "Round Bars",
+        "lowResolution": "Low Resolution",
+        "splitGradient": "Split Gradient",
+        "showFPS": "Show FPS",
+        "showScaleX": "Show Scale X",
+        "noteLabels": "Note Labels"
+    },
+    "dragDropZone": {
+        "error_oneFileOnly": "Please only select 1 file",
+        "error_readingFile": "there has been an issue reading the file: {{errorMessage}}",
+        "mainText": "drop a file here"
     }
 }

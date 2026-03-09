@@ -269,14 +269,11 @@
         "yes": "sí",
         "additionalParticipants": "participants addicionals",
         "channel_one": "canal",
-        "channel_many": "canals",
         "channel_other": "canals",
         "filter_one": "filtre",
-        "filter_many": "filtres",
         "filter_other": "filtres",
         "saveAs": "desar com",
         "action_one": "acció",
-        "action_many": "accions",
         "action_other": "accions",
         "newVersion": "s'ha instal·lat una nova versió ({{version}})",
         "viewReleaseNotes": "veure les notes de la versió",
@@ -307,7 +304,6 @@
         "restartRequired": "cal reiniciar",
         "sampleRate": "freqüència de mostreig",
         "setting_one": "configuració",
-        "setting_many": "configuracions",
         "setting_other": "configuracions",
         "trackGain": "guany de pista",
         "trackPeak": "pic de pista",
@@ -335,66 +331,48 @@
         "mood": "estat d'ànim",
         "filter_single": "senzill",
         "filter_multiple": "multi",
-        "rename": "reanomena"
+        "rename": "reanomena",
+        "newVersionAvailable": "a new version is available"
     },
     "entity": {
         "album_one": "àlbum",
-        "album_many": "àlbums",
         "album_other": "àlbums",
         "albumWithCount_one": "{{count}} àlbum",
-        "albumWithCount_many": "{{count}} àlbums",
         "albumWithCount_other": "{{count}} àlbums",
         "albumArtist_one": "artista de l'àlbum",
-        "albumArtist_many": "artistes de l'àlbum",
         "albumArtist_other": "artistes de l'àlbum",
         "albumArtistCount_one": "{{count}} artista de l'àlbum",
-        "albumArtistCount_many": "{{count}} artistes de l'àlbum",
         "albumArtistCount_other": "{{count}} artistes de l'àlbum",
         "artist_one": "artista",
-        "artist_many": "artistes",
         "artist_other": "artistes",
         "artistWithCount_one": "{{count}} artista",
-        "artistWithCount_many": "{{count}} artistes",
         "artistWithCount_other": "{{count}} artistes",
         "playlist_one": "llista de reproducció",
-        "playlist_many": "llistes de reproducció",
         "playlist_other": "llistes de reproducció",
         "playlistWithCount_one": "{{count}} llista de reproducció",
-        "playlistWithCount_many": "{{count}} llistes de reproducció",
         "playlistWithCount_other": "{{count}} llistes de reproducció",
         "smartPlaylist": "$t(entity.playlist, {\"count\": 1}) intel·ligent",
         "play_one": "{{count}} reproducció",
-        "play_many": "{{count}} reproduccions",
         "play_other": "{{count}} reproduccions",
         "folderWithCount_one": "{{count}} carpeta",
-        "folderWithCount_many": "{{count}} carpetes",
         "folderWithCount_other": "{{count}} carpetes",
         "genreWithCount_one": "{{count}} gènere",
-        "genreWithCount_many": "{{count}} gèneres",
         "genreWithCount_other": "{{count}} gèneres",
         "track_one": "pista",
-        "track_many": "pistes",
         "track_other": "pistes",
         "trackWithCount_one": "{{count}} pista",
-        "trackWithCount_many": "{{count}} pistes",
         "trackWithCount_other": "{{count}} pistes",
         "folder_one": "carpeta",
-        "folder_many": "carpetes",
         "folder_other": "carpetes",
         "genre_one": "gènere",
-        "genre_many": "gèneres",
         "genre_other": "gèneres",
         "song_one": "cançó",
-        "song_many": "cançons",
         "song_other": "cançons",
         "favorite_one": "preferit",
-        "favorite_many": "preferits",
         "favorite_other": "preferits",
         "radioStation_one": "emissora de ràdio",
-        "radioStation_many": "emissores de ràdio",
         "radioStation_other": "emissores de ràdio",
         "radioStationWithCount_one": "{{count}} emissora de ràdio",
-        "radioStationWithCount_many": "{{count}} emissores de ràdio",
         "radioStationWithCount_other": "{{count}} emissores de ràdio"
     },
     "form": {
@@ -545,7 +523,8 @@
         "addOrRemoveFromSelection": "afegeix o elimina de la selecció",
         "selectRangeOfItems": "selecciona un interval d'elements",
         "selectAll": "selecciona-ho tot",
-        "openApplicationDirectory": "obre el directori de l'aplicació"
+        "openApplicationDirectory": "obre el directori de l'aplicació",
+        "goToCurrent": "go to current item"
     },
     "setting": {
         "language_description": "estableix l'idioma de l'aplicació ($t(common.restartRequired))",
@@ -898,7 +877,17 @@
         "blurExplicitImages": "desenfoca imatges explícites",
         "blurExplicitImages_description": "les caràtules d'àlbums i cançons marcades com a explícites quedaran desenfocades",
         "discordStateIcon": "mostra la icona de reproducció",
-        "discordStateIcon_description": "mostra una petita icona de reproducció a l'estat d'activitat. l'icona de pausa es mostra quan \"mostra l'estat d'activitat quan està en pausa\" està activat"
+        "discordStateIcon_description": "mostra una petita icona de reproducció a l'estat d'activitat. l'icona de pausa es mostra quan \"mostra l'estat d'activitat quan està en pausa\" està activat",
+        "autosave": "automatically save play queue",
+        "autosave_description": "enable automatically saving the play queue to your server. this is only possible when using Navidrome/Subsonic, and you cannot have a mixed play queue.",
+        "autosaveCount": "automatic play queue save frequency",
+        "autosaveCount_description": "how many track changes before the queue is saved. 1 (minimum) means every song change",
+        "useThemePrimaryShade": "use theme primary shade",
+        "useThemePrimaryShade_description": "use the primary shade defined in the selected theme for primary color variants",
+        "primaryShade": "primary shade",
+        "primaryShade_description": "override the primary shade (0–9) used for buttons, links, and other primary-colored elements",
+        "playerItemConfiguration_description": "configure what items are shown, and in what order, on the fullscreen player",
+        "playerItemConfiguration": "player item configuration"
     },
     "table": {
         "column": {
@@ -998,7 +987,8 @@
                 "image": "imatge",
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "compositor",
-                "titleArtist": "$t(common.title) (artista)"
+                "titleArtist": "$t(common.title) (artista)",
+                "albumGroup": "album group"
             },
             "view": {
                 "table": "taula",
@@ -1104,7 +1094,10 @@
         "sleepTimer_off": "apagat",
         "sleepTimer_timeRemaining": "queden {{time}}",
         "sleepTimer_setCustom": "configura el temporitzador",
-        "sleepTimer_cancel": "cancel·la el temporitzador"
+        "sleepTimer_cancel": "cancel·la el temporitzador",
+        "albumRadio": "album radio",
+        "repeat_one": "repeat one",
+        "repeat_other": ""
     },
     "error": {
         "credentialsRequired": "credencials requerides",
@@ -1137,7 +1130,8 @@
         "noNetwork": "servidor no disponible",
         "noNetworkDescription": "no s'ha pogut connectar amb el servidor",
         "invalidJson": "JSON invàlid",
-        "serverLockSingleServer": "només es permet un servidor quan el servidor està bloquejat"
+        "serverLockSingleServer": "només es permet un servidor quan el servidor està bloquejat",
+        "playbackPausedDueToError": "playback was paused due to an error"
     },
     "releaseType": {
         "primary": {

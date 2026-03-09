@@ -47,7 +47,10 @@
         "sleepTimer_off": "éteint",
         "sleepTimer_timeRemaining": "{{time}} restante(s)",
         "sleepTimer_setCustom": "définir le minuteur",
-        "sleepTimer_cancel": "annuler le minuteur"
+        "sleepTimer_cancel": "annuler le minuteur",
+        "albumRadio": "album radio",
+        "repeat_one": "repeat one",
+        "repeat_other": ""
     },
     "action": {
         "editPlaylist": "éditer $t(entity.playlist, {\"count\": 1})",
@@ -87,7 +90,8 @@
         "addOrRemoveFromSelection": "ajouter ou supprimer de la sélection",
         "selectRangeOfItems": "sélectionner une plage d'entrées",
         "selectAll": "tout sélectionner",
-        "openApplicationDirectory": "ouvrir le répertoire de l'application"
+        "openApplicationDirectory": "ouvrir le répertoire de l'application",
+        "goToCurrent": "go to current item"
     },
     "common": {
         "backward": "en arrière",
@@ -132,21 +136,17 @@
         "delete": "supprimer",
         "cancel": "annuler",
         "forceRestartRequired": "redémarrer pour appliquer les changements… fermer la notification pour redémarrer",
-        "setting": "paramètre",
         "setting_one": "paramètre",
-        "setting_many": "paramètres",
         "setting_other": "paramètres",
         "version": "version",
         "title": "titre",
         "filter_one": "filtre",
-        "filter_many": "filtres",
         "filter_other": "filtres",
         "filters": "filtres",
         "create": "créer",
         "bitrate": "débit binaire",
         "saveAndReplace": "enregistrer et remplacer",
         "action_one": "action",
-        "action_many": "actions",
         "action_other": "actions",
         "playerMustBePaused": "le lecteur doit être en pause",
         "confirm": "confirmer",
@@ -155,7 +155,6 @@
         "comingSoon": "prochainement…",
         "reset": "réinitialiser",
         "channel_one": "canal",
-        "channel_many": "canaux",
         "channel_other": "canaux",
         "disable": "désactiver",
         "sortOrder": "ordre",
@@ -214,7 +213,8 @@
         "retry": "réessayer",
         "filter_single": "unique",
         "filter_multiple": "multiple",
-        "rename": "renommer"
+        "rename": "renommer",
+        "newVersionAvailable": "a new version is available"
     },
     "error": {
         "remotePortWarning": "redémarrer le serveur pour appliquer le nouveau port",
@@ -247,7 +247,8 @@
         "noNetwork": "serveur indisponible",
         "noNetworkDescription": "impossible de se connecter à ce serveur",
         "invalidJson": "JSON invalide",
-        "serverLockSingleServer": "un seul serveur est autorisé quand le serveur est verrouillé"
+        "serverLockSingleServer": "un seul serveur est autorisé quand le serveur est verrouillé",
+        "playbackPausedDueToError": "playback was paused due to an error"
     },
     "filter": {
         "mostPlayed": "les plus joués",
@@ -855,7 +856,22 @@
         "sidebarPlaylistSorting": "tri des listes de lecture dans la barre latérale",
         "sidebarPlaylistListFilterRegex_description": "masquer les listes de lecture dans la barre latérale qui correspondent à cette expression régulière",
         "sidebarPlaylistListFilterRegex_placeholder": "ex. ^Mix Journalier*",
-        "sidebarPlaylistListFilterRegex": "filtre d'expression régulière de liste de lecture"
+        "sidebarPlaylistListFilterRegex": "filtre d'expression régulière de liste de lecture",
+        "autosave": "automatically save play queue",
+        "autosave_description": "enable automatically saving the play queue to your server. this is only possible when using Navidrome/Subsonic, and you cannot have a mixed play queue.",
+        "autosaveCount": "automatic play queue save frequency",
+        "autosaveCount_description": "how many track changes before the queue is saved. 1 (minimum) means every song change",
+        "useThemePrimaryShade": "use theme primary shade",
+        "useThemePrimaryShade_description": "use the primary shade defined in the selected theme for primary color variants",
+        "primaryShade": "primary shade",
+        "primaryShade_description": "override the primary shade (0–9) used for buttons, links, and other primary-colored elements",
+        "hotkey_listNavigateToPage": "list navigate to item page",
+        "hotkey_listPlayDefault": "list play",
+        "hotkey_listPlayLast": "list play last",
+        "hotkey_listPlayNext": "list play next",
+        "hotkey_listPlayNow": "list play now",
+        "playerItemConfiguration_description": "configure what items are shown, and in what order, on the fullscreen player",
+        "playerItemConfiguration": "player item configuration"
     },
     "form": {
         "deletePlaylist": {
@@ -969,62 +985,43 @@
     },
     "entity": {
         "genre_one": "genre",
-        "genre_many": "genres",
         "genre_other": "genres",
         "playlistWithCount_one": "{{count}} liste de lecture",
-        "playlistWithCount_many": "{{count}} listes de lecture",
         "playlistWithCount_other": "{{count}} listes de lecture",
         "playlist_one": "liste de lecture",
-        "playlist_many": "listes de lecture",
         "playlist_other": "listes de lecture",
         "artist_one": "artiste",
-        "artist_many": "artistes",
         "artist_other": "artistes",
         "folderWithCount_one": "{{count}} dossier",
-        "folderWithCount_many": "{{count}} dossiers",
         "folderWithCount_other": "{{count}} dossiers",
         "albumArtist_one": "artiste de l'album",
-        "albumArtist_many": "artistes d'albums",
         "albumArtist_other": "artistes d'albums",
         "track_one": "piste",
-        "track_many": "pistes",
         "track_other": "pistes",
         "albumArtistCount_one": "{{count}} artiste de l'album",
-        "albumArtistCount_many": "{{count}} artistes d'albums",
         "albumArtistCount_other": "{{count}} artistes d'albums",
         "albumWithCount_one": "{{count}} album",
-        "albumWithCount_many": "{{count}} albums",
         "albumWithCount_other": "{{count}} albums",
         "favorite_one": "favori",
-        "favorite_many": "favoris",
         "favorite_other": "favoris",
         "artistWithCount_one": "{{count}} artiste",
-        "artistWithCount_many": "{{count}} artistes",
         "artistWithCount_other": "{{count}} artistes",
         "folder_one": "dossier",
-        "folder_many": "dossiers",
         "folder_other": "dossiers",
         "smartPlaylist": "$t(entity.playlist, {\"count\": 1}) intelligente",
         "album_one": "album",
-        "album_many": "albums",
         "album_other": "albums",
         "genreWithCount_one": "{{count}} genre",
-        "genreWithCount_many": "{{count}} genres",
         "genreWithCount_other": "{{count}} genres",
         "trackWithCount_one": "{{count}} piste",
-        "trackWithCount_many": "{{count}} pistes",
         "trackWithCount_other": "{{count}} pistes",
         "play_one": "{{count}} écoute",
-        "play_many": "{{count}} écoutes",
         "play_other": "{{count}} écoutes",
         "song_one": "titre",
-        "song_many": "titres",
         "song_other": "titres",
         "radioStation_one": "station radio",
-        "radioStation_many": "stations radio",
         "radioStation_other": "stations radio",
         "radioStationWithCount_one": "{{count}} station radio",
-        "radioStationWithCount_many": "{{count}} stations radio",
         "radioStationWithCount_other": "{{count}} stations radio"
     },
     "table": {
@@ -1102,7 +1099,8 @@
                 "bitDepth": "$t(common.bitDepth)",
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "compositeur",
-                "titleArtist": "$t(common.title) (artiste)"
+                "titleArtist": "$t(common.title) (artiste)",
+                "albumGroup": "album group"
             }
         },
         "column": {
@@ -1338,6 +1336,9 @@
                 "d": "D",
                 "z": "Z"
             }
-        }
+        },
+        "lumiBars": "Lumi Bars",
+        "outlineBars": "Outline Bars",
+        "splitGradient": "Split Gradient"
     }
 }

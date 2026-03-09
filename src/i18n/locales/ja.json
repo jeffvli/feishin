@@ -44,7 +44,13 @@
         "sleepTimer_off": "オフ",
         "sleepTimer_timeRemaining": "残り {{time}}",
         "sleepTimer_setCustom": "タイマーを設定",
-        "sleepTimer_cancel": "タイマーをキャンセル"
+        "sleepTimer_cancel": "タイマーをキャンセル",
+        "albumRadio": "album radio",
+        "artistRadio": "artist radio",
+        "holdToShuffle": "hold to shuffle",
+        "repeat_one": "repeat one",
+        "repeat_other": "",
+        "trackRadio": "track radio"
     },
     "setting": {
         "crossfadeStyle_description": "オーディオプレーヤーが使用するクロスフェードのスタイルを選択します",
@@ -375,7 +381,39 @@
         "automaticUpdates_description": "更新を自動的に確認してインストールします",
         "releaseChannel_optionAlpha": "アルファ (nightly)",
         "discordStateIcon": "再生中アイコンを表示",
-        "discordStateIcon_description": "Rich Presence ステータスに小さな再生アイコンを表示します。「一時停止時に Rich Presence を表示」が有効になっている場合は、常に一時停止アイコンが表示されます"
+        "discordStateIcon_description": "Rich Presence ステータスに小さな再生アイコンを表示します。「一時停止時に Rich Presence を表示」が有効になっている場合は、常に一時停止アイコンが表示されます",
+        "autosave": "automatically save play queue",
+        "autosave_description": "enable automatically saving the play queue to your server. this is only possible when using Navidrome/Subsonic, and you cannot have a mixed play queue.",
+        "autosaveCount": "automatic play queue save frequency",
+        "autosaveCount_description": "how many track changes before the queue is saved. 1 (minimum) means every song change",
+        "useThemePrimaryShade": "use theme primary shade",
+        "useThemePrimaryShade_description": "use the primary shade defined in the selected theme for primary color variants",
+        "primaryShade": "primary shade",
+        "primaryShade_description": "override the primary shade (0–9) used for buttons, links, and other primary-colored elements",
+        "hotkey_listNavigateToPage": "list navigate to item page",
+        "hotkey_listPlayDefault": "list play",
+        "hotkey_listPlayLast": "list play last",
+        "hotkey_listPlayNext": "list play next",
+        "hotkey_listPlayNow": "list play now",
+        "imageResolution_optionTable": "table",
+        "imageResolution_optionItemCard": "item card",
+        "playerbarWaveformAlign_optionTop": "top",
+        "playerbarWaveformAlign_optionCenter": "center",
+        "playerbarWaveformAlign_optionBottom": "bottom",
+        "playerbarWaveformBarWidth": "waveform bar width",
+        "playerbarWaveformGap": "waveform gap",
+        "playerbarWaveformRadius": "waveform radius",
+        "blurExplicitImages": "blur explicit images",
+        "blurExplicitImages_description": "album and song artwork tagged as explicit will be blurred",
+        "enableGridMultiSelect": "enable grid multi-select",
+        "enableGridMultiSelect_description": "when enabled, allows selecting multiple items in grid views. when disabled, clicking grid item images will navigate to the item page",
+        "playerItemConfiguration_description": "configure what items are shown, and in what order, on the fullscreen player",
+        "playerItemConfiguration": "player item configuration",
+        "sidebarPlaylistSorting_description": "allows manual playlist sorting in the sidebar using drag and drop instead of the default server order",
+        "sidebarPlaylistSorting": "sidebar playlist sorting",
+        "sidebarPlaylistListFilterRegex_description": "hide playlists in the sidebar that match this regular expression",
+        "sidebarPlaylistListFilterRegex_placeholder": "e.g. ^Daily Mix.*",
+        "sidebarPlaylistListFilterRegex": "playlist filter regex"
     },
     "action": {
         "editPlaylist": "$t(entity.playlist, {\"count\": 1}) を編集",
@@ -415,7 +453,8 @@
         "holdToMoveToBottom": "押し続けると一番下に移動します",
         "openApplicationDirectory": "アプリケーションディレクトリを開く",
         "selectRangeOfItems": "項目の範囲を選択",
-        "addOrRemoveFromSelection": "選択に追加または削除"
+        "addOrRemoveFromSelection": "選択に追加または削除",
+        "goToCurrent": "go to current item"
     },
     "common": {
         "backward": "戻る",
@@ -533,14 +572,20 @@
         "clean": "クリーン",
         "filter_single": "シングル",
         "filter_multiple": "複数枚組",
-        "rename": "名前を変更"
+        "rename": "名前を変更",
+        "action_one": "action",
+        "channel_one": "channel",
+        "filter_one": "filter",
+        "setting_one": "setting",
+        "newVersionAvailable": "a new version is available"
     },
     "table": {
         "config": {
             "view": {
                 "table": "テーブル",
                 "grid": "グリッド",
-                "list": "リスト"
+                "list": "リスト",
+                "detail": "detail"
             },
             "general": {
                 "displayType": "表示タイプ",
@@ -565,7 +610,14 @@
                 "size_compact": "コンパクト",
                 "size_large": "大きい",
                 "pagination_itemsPerPage": "ページあたりの項目数",
-                "pagination_infinite": "無限"
+                "pagination_infinite": "無限",
+                "pagination": "pagination",
+                "pagination_paginate": "paginated",
+                "alternateRowColors": "alternate row colors",
+                "horizontalBorders": "row borders",
+                "rowHoverHighlight": "row hover highlight",
+                "showHeader": "show header",
+                "verticalBorders": "column borders"
             },
             "label": {
                 "releaseDate": "発売日",
@@ -602,7 +654,8 @@
                 "image": "画像",
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "作曲家",
-                "titleArtist": "$t(common.title) (アーティスト)"
+                "titleArtist": "$t(common.title) (アーティスト)",
+                "albumGroup": "album group"
             }
         },
         "column": {
@@ -666,7 +719,8 @@
         "saveQueueFailed": "キューを保存できませんでした",
         "settingsSyncError": "レンダラーとメインプロセスの設定に矛盾が見つかりました。変更を適用するにはアプリケーションを再起動してください",
         "invalidJson": "無効な JSON",
-        "serverLockSingleServer": "サーバーがロックされている場合、1 つのサーバーのみが許可されます"
+        "serverLockSingleServer": "サーバーがロックされている場合、1 つのサーバーのみが許可されます",
+        "playbackPausedDueToError": "playback was paused due to an error"
     },
     "filter": {
         "mostPlayed": "最も多く再生",
@@ -712,7 +766,9 @@
         "id": "ID",
         "album": "$t(entity.album, {\"count\": 1})",
         "explicitStatus": "$t(common.explicitStatus)",
-        "sortName": "ソート名"
+        "sortName": "ソート名",
+        "matchAnd": "and",
+        "matchOr": "or"
     },
     "page": {
         "sidebar": {
@@ -884,7 +940,8 @@
             "groupingTypePrimary": "主なリリースタイプ",
             "favoriteSongs": "お気に入りの曲",
             "topSongsCommunity": "コミュニティ",
-            "favoriteSongsFrom": "{{title}} のお気に入りの曲"
+            "favoriteSongsFrom": "{{title}} のお気に入りの曲",
+            "topSongsPersonal": "personal"
         },
         "manageServers": {
             "title": "サーバーの管理",
@@ -995,7 +1052,9 @@
             "setExpiration": "有効期限を設定",
             "success": "共有リンクがクリップボードにコピーされました (またはここをクリックして開きます)",
             "expireInvalid": "有効期限は将来の日時である必要があります",
-            "createFailed": "共有リンクを作成できませんでした (共有は有効になっていますか?)"
+            "createFailed": "共有リンクを作成できませんでした (共有は有効になっていますか?)",
+            "copyToClipboard": "Copy to clipboard: Ctrl+C, Enter",
+            "successMustClick": "share created successfully. click here to open"
         },
         "privateMode": {
             "enabled": "プライベートモードが有効になりました。再生ステータスは外部連携から非表示になっています",
@@ -1053,7 +1112,26 @@
         "play_other": "{{count}} 回再生",
         "song_other": "曲",
         "radioStation_other": "ラジオ局",
-        "radioStationWithCount_other": "{{count}} 局のラジオ局"
+        "radioStationWithCount_other": "{{count}} 局のラジオ局",
+        "album_one": "album",
+        "albumArtist_one": "album artist",
+        "albumArtistCount_one": "{{count}} album artist",
+        "albumWithCount_one": "{{count}} album",
+        "radioStation_one": "radio station",
+        "radioStationWithCount_one": "{{count}} radio station",
+        "artist_one": "artist",
+        "artistWithCount_one": "{{count}} artist",
+        "favorite_one": "favorite",
+        "folder_one": "folder",
+        "folderWithCount_one": "{{count}} folder",
+        "genre_one": "genre",
+        "genreWithCount_one": "{{count}} genre",
+        "playlist_one": "playlist",
+        "play_one": "{{count}} play",
+        "playlistWithCount_one": "{{count}} playlist",
+        "track_one": "track",
+        "song_one": "song",
+        "trackWithCount_one": "{{count}} track"
     },
     "dragDropZone": {
         "error_oneFileOnly": "1 つのファイルのみ選択してください",
@@ -1074,7 +1152,13 @@
             "compilation": "コンピレーション",
             "djMix": "DJ Mix",
             "demo": "デモ",
-            "soundtrack": "サウンドトラック"
+            "soundtrack": "サウンドトラック",
+            "fieldRecording": "field recording",
+            "interview": "interview",
+            "live": "live",
+            "mixtape": "mixtape",
+            "remix": "remix",
+            "spokenWord": "spoken word"
         }
     },
     "datetime": {
@@ -1110,6 +1194,151 @@
     },
     "visualizer": {
         "visualizerType": "ビジュアライザーの種類",
-        "colors": "色"
+        "colors": "色",
+        "cyclePresets": "Cycle Presets",
+        "cycleTime": "Cycle Time (seconds)",
+        "includeAllPresets": "Include All Presets",
+        "ignoredPresets": "Ignored Presets",
+        "selectedPresets": "Selected Presets",
+        "randomizeNextPreset": "Randomize Next Preset",
+        "blendTime": "Blend Time",
+        "presets": "Presets",
+        "selectPreset": "Select Preset",
+        "applyPreset": "Apply Preset",
+        "saveAsPreset": "Save as Preset",
+        "updatePreset": "Update Preset",
+        "copyConfiguration": "Copy Configuration",
+        "pasteConfiguration": "Paste Configuration",
+        "pasteConfigurationPlaceholder": "Paste JSON configuration here...",
+        "pasteFromClipboard": "Paste from Clipboard",
+        "applyConfiguration": "Apply Configuration",
+        "configCopied": "Configuration copied to clipboard",
+        "configCopyFailed": "Failed to copy configuration",
+        "configPasted": "Configuration applied successfully",
+        "configPasteFailed": "Failed to apply configuration. Please check the format.",
+        "configPasteReadFailed": "Failed to read from clipboard",
+        "presetName": "Preset Name",
+        "presetNamePlaceholder": "Enter preset name",
+        "general": "General",
+        "mode": "Mode",
+        "mode1To8": "Mode 1 - 8",
+        "mode10": "Mode 10",
+        "barSpace": "Bar Space",
+        "lineWidth": "Line Width",
+        "fillAlpha": "Fill Alpha",
+        "channelLayout": "Channel Layout",
+        "maxFPS": "Max FPS",
+        "opacity": "Opacity",
+        "customGradients": "Custom Gradients",
+        "addCustomGradient": "Add Custom Gradient",
+        "gradientName": "Gradient Name",
+        "gradientNamePlaceholder": "Gradient Name",
+        "vertical": "Vertical",
+        "horizontal": "Horizontal",
+        "colorStops": "Color Stops",
+        "addColor": "Add Color",
+        "position": "Position",
+        "level": "Level",
+        "remove": "Remove",
+        "pasteGradient": "Paste Gradient",
+        "pasteGradientPlaceholder": "Paste gradient JSON here...",
+        "custom": "Custom",
+        "builtIn": "Built-in",
+        "colorMode": "Color Mode",
+        "gradient": "Gradient",
+        "gradientLeft": "Gradient Left",
+        "gradientRight": "Gradient Right",
+        "fft": "FFT",
+        "fftSize": "FFT Size",
+        "smoothing": "Smoothing",
+        "frequencyRangeAndScaling": "Frequency range and scaling",
+        "minimumFrequency": "Minimum Frequency",
+        "maximumFrequency": "Maximum Frequency",
+        "frequencyScale": "Frequency Scale",
+        "sensitivity": "Sensitivity",
+        "weightingFilter": "Weighting Filter",
+        "minimumDecibels": "Minimum Decibels",
+        "maximumDecibels": "Maximum Decibels",
+        "linearAmplitude": "Linear Amplitude",
+        "linearBoost": "Linear Boost",
+        "peakBehavior": "Peak Behavior",
+        "showPeaks": "Show Peaks",
+        "fadePeaks": "Fade Peaks",
+        "peakLine": "Peak Line",
+        "gravity": "Gravity",
+        "peakFadeTime": "Peak Fade Time (ms)",
+        "peakHoldTime": "Peak Hold Time (ms)",
+        "radialSpectrum": "Radial Spectrum",
+        "radial": "Radial",
+        "radialInvert": "Radial Invert",
+        "spinSpeed": "Spin Speed",
+        "radius": "Radius",
+        "reflexMirror": "Reflex Mirror",
+        "reflexFit": "Reflex Fit",
+        "reflexRatio": "Reflex Ratio",
+        "reflexAlpha": "Reflex Alpha",
+        "reflexBrightness": "Reflex Brightness",
+        "mirror": "Mirror",
+        "miscellaneousSettings": "Miscellaneous Settings",
+        "alphaBars": "Alpha Bars",
+        "ansiBands": "ANSI Bands",
+        "ledBars": "LED Bars",
+        "trueLeds": "True LEDs",
+        "lumiBars": "Lumi Bars",
+        "outlineBars": "Outline Bars",
+        "roundBars": "Round Bars",
+        "lowResolution": "Low Resolution",
+        "splitGradient": "Split Gradient",
+        "showFPS": "Show FPS",
+        "showScaleX": "Show Scale X",
+        "noteLabels": "Note Labels",
+        "showScaleY": "Show Scale Y",
+        "options": {
+            "mode": {
+                "0": "[0] Discrete Frequencies",
+                "1": "[1] 1/24th octave / 240 bands",
+                "2": "[2] 1/12th octave / 120 bands",
+                "3": "[3] 1/8th octave / 80 bands",
+                "4": "[4] 1/6th octave / 60 bands",
+                "5": "[5] 1/4th octave / 40 bands",
+                "6": "[6] 1/3rd octave / 30 bands",
+                "7": "[7] Half octave / 20 bands",
+                "8": "[8] Full octave / 10 bands",
+                "10": "[10] Line / Area graph"
+            },
+            "colorMode": {
+                "gradient": "Gradient",
+                "barIndex": "Bar-Index",
+                "barLevel": "Bar-Level"
+            },
+            "gradient": {
+                "classic": "Classic",
+                "prism": "Prism",
+                "rainbow": "Rainbow",
+                "steelblue": "Steelblue",
+                "orangered": "Orangered"
+            },
+            "channelLayout": {
+                "single": "Single",
+                "dualCombined": "Dual-Combined",
+                "dualHorizontal": "Dual-Horizontal",
+                "dualVertical": "Dual-Vertical"
+            },
+            "frequencyScale": {
+                "none": "None",
+                "bark": "Bark Scale",
+                "linear": "Linear Scale",
+                "log": "Log Scale",
+                "mel": "Mel Scale"
+            },
+            "weightingFilter": {
+                "none": "None",
+                "a": "A",
+                "b": "B",
+                "c": "C",
+                "d": "D",
+                "z": "Z"
+            }
+        }
     }
 }

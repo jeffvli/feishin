@@ -37,7 +37,8 @@
         "createRadioStation": "$t(entity.radioStation, {\"count\": 1}) létrehozása",
         "openApplicationDirectory": "app könyvtár megnyitása",
         "addOrRemoveFromSelection": "hozzáadás vagy eltávolítás a kiválasztásból",
-        "selectRangeOfItems": "válaszd ki a tartományt"
+        "selectRangeOfItems": "válaszd ki a tartományt",
+        "goToCurrent": "go to current item"
     },
     "common": {
         "collapse": "összecsukás",
@@ -154,7 +155,13 @@
         "view": "nézet",
         "noFilters": "nincs konfigurált szűrő",
         "countSelected": "{{count}} kiválasztott",
-        "retry": "újra"
+        "retry": "újra",
+        "example": "example",
+        "filter_single": "single",
+        "filter_multiple": "multi",
+        "mood": "mood",
+        "rename": "rename",
+        "newVersionAvailable": "a new version is available"
     },
     "entity": {
         "albumArtist_one": "Zenész",
@@ -226,7 +233,10 @@
         "noNetworkDescription": "Nem tudok csatlakozni a szerverhez",
         "saveQueueFailed": "műsorlista mentése sikertelen",
         "settingsSyncError": "Eltéréseket találtam a leképző és a fő folyamat beállításai között. Indítsd újra az alkalmazást",
-        "multipleServerSaveQueueError": "a műsorlistában egy vagy több olyan dal található, amely nem az aktuális szerverről származik. Ez nem támogatott"
+        "multipleServerSaveQueueError": "a műsorlistában egy vagy több olyan dal található, amely nem az aktuális szerverről származik. Ez nem támogatott",
+        "invalidJson": "invalid JSON",
+        "playbackPausedDueToError": "playback was paused due to an error",
+        "serverLockSingleServer": "only one server is allowed when server is locked"
     },
     "filter": {
         "albumCount": "$t(entity.album, {\"count\": 2}) darab",
@@ -271,7 +281,10 @@
         "bpm": "bpm",
         "channels": "$t(common.channel_other)",
         "genre": "$t(entity.genre, {\"count\": 1})",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "explicitStatus": "$t(common.explicitStatus)",
+        "matchAnd": "and",
+        "matchOr": "or",
+        "sortName": "sort name"
     },
     "form": {
         "addServer": {
@@ -287,7 +300,10 @@
             "input_savePassword": "jelszó mentése",
             "input_legacyAuthentication": "klasszikus hitelesítés bekapcsolása",
             "input_preferInstantMix": "az instant mixet részesítem előnyben",
-            "input_preferInstantMixDescription": "Az instant mix használata csak a hasonló dalokhoz javasolt. Hasznos, ha vannak olyan bővítmények, amelyek módosítják ezt a viselkedést"
+            "input_preferInstantMixDescription": "Az instant mix használata csak a hasonló dalokhoz javasolt. Hasznos, ha vannak olyan bővítmények, amelyek módosítják ezt a viselkedést",
+            "input_preferRemoteUrl": "prefer public url",
+            "input_remoteUrl": "public url",
+            "input_remoteUrlPlaceholder": "optional: public url for external features"
         },
         "addToPlaylist": {
             "input_skipDuplicates": "duplikátumok átugrása",
@@ -336,7 +352,9 @@
             "setExpiration": "lejárat beállítása",
             "success": "link másolva a vágólapra (vagy kattintson ide a megnyitáshoz)",
             "expireInvalid": "A lejáratnak a jövőben kell lennie",
-            "createFailed": "a megosztás létrehozása sikertelen (a megosztás engedélyezve van?)"
+            "createFailed": "a megosztás létrehozása sikertelen (a megosztás engedélyezve van?)",
+            "copyToClipboard": "Copy to clipboard: Ctrl+C, Enter",
+            "successMustClick": "share created successfully. click here to open"
         },
         "updateServer": {
             "success": "Szerver sikeresen frissítve",
@@ -371,6 +389,11 @@
         },
         "saveQueue": {
             "success": "mentett lejátszási műsorlista a szerverre"
+        },
+        "lyricsExport": {
+            "export": "export lyrics",
+            "input_synced": "export synced lyrics",
+            "input_offset": "$t(setting.lyricOffset)"
         }
     },
     "dragDropZone": {
@@ -388,7 +411,13 @@
             "topSongs": "sláger dalok",
             "topSongsFrom": "sláger dalok tőle {{title}}",
             "viewAll": "mindet megtekint",
-            "viewAllTracks": "mindet megtekint $t(entity.track, {\"count\": 2})"
+            "viewAllTracks": "mindet megtekint $t(entity.track, {\"count\": 2})",
+            "favoriteSongs": "favorite songs",
+            "groupingTypeAll": "all release types",
+            "groupingTypePrimary": "primary release types",
+            "topSongsCommunity": "community",
+            "topSongsPersonal": "personal",
+            "favoriteSongsFrom": "favorite songs from {{title}}"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -535,7 +564,8 @@
             "discord": "discord",
             "queryBuilder": "lekérdezés-építő",
             "playerFilters": "lejátszó szűrők",
-            "logger": "naplózó"
+            "logger": "naplózó",
+            "lyricsDisplay": "lyrics display"
         },
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
@@ -552,7 +582,8 @@
             "shared": "megosztott $t(entity.playlist, {\"count\": 2})",
             "tracks": "$t(entity.track, {\"count\": 2})",
             "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})"
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "collections": "collections"
         },
         "trackList": {
             "artistTracks": "dalok tőle {{artist}}",
@@ -567,6 +598,19 @@
         },
         "radioList": {
             "title": "rádió állomások"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "commits since {{stable}}",
+            "noNewCommits": "no new commits in this range",
+            "noStableReleaseToCompare": "no stable release available to compare with"
+        },
+        "windowBar": {
+            "paused": "(Paused) ",
+            "privateMode": "(Private mode)"
+        },
+        "collections": {
+            "overrideExisting": "override existing",
+            "saveAsCollection": "save as collection"
         }
     },
     "player": {
@@ -606,7 +650,21 @@
         "holdToShuffle": "tartsd lenyomva a keveréshez",
         "lyrics": "dalszöveg",
         "saveQueueToServer": "műsorlista mentése a szerverre",
-        "restoreQueueFromServer": "műsorlista visszaállítása a szerverről"
+        "restoreQueueFromServer": "műsorlista visszaállítása a szerverről",
+        "albumRadio": "album radio",
+        "artistRadio": "artist radio",
+        "repeat_one": "repeat one",
+        "repeat_other": "",
+        "trackRadio": "track radio",
+        "sleepTimer": "sleep timer",
+        "sleepTimer_endOfSong": "end of current song",
+        "sleepTimer_minutes": "{{count}} min",
+        "sleepTimer_hours": "{{count}} hr",
+        "sleepTimer_custom": "custom",
+        "sleepTimer_off": "off",
+        "sleepTimer_timeRemaining": "{{time}} remaining",
+        "sleepTimer_setCustom": "set timer",
+        "sleepTimer_cancel": "cancel timer"
     },
     "releaseType": {
         "primary": {
@@ -936,7 +994,63 @@
         "audioFadeOnStatusChange": "audio behúzás állapotváltozáskor",
         "audioFadeOnStatusChange_description": "lehetővé teszi a lehúzást és a behúzást, amikor a lejátszás/szünet állapot megváltozik",
         "useThemeAccentColor": "használd a téma kiemelő színét",
-        "useThemeAccentColor_description": "a kiválasztott témában meghatározott alapszínt használja az egyéni kiemelő szín helyett"
+        "useThemeAccentColor_description": "a kiválasztott témában meghatározott alapszínt használja az egyéni kiemelő szín helyett",
+        "autosave": "automatically save play queue",
+        "autosave_description": "enable automatically saving the play queue to your server. this is only possible when using Navidrome/Subsonic, and you cannot have a mixed play queue.",
+        "autosaveCount": "automatic play queue save frequency",
+        "autosaveCount_description": "how many track changes before the queue is saved. 1 (minimum) means every song change",
+        "useThemePrimaryShade": "use theme primary shade",
+        "useThemePrimaryShade_description": "use the primary shade defined in the selected theme for primary color variants",
+        "primaryShade": "primary shade",
+        "primaryShade_description": "override the primary shade (0–9) used for buttons, links, and other primary-colored elements",
+        "analyticsEnable": "Send usage-based analytics",
+        "analyticsEnable_description": "Anonymized usage data is sent to the developer to help improve the application",
+        "artistReleaseTypeConfiguration": "artist release type configuration",
+        "artistReleaseTypeConfiguration_description": "configure what release types are shown, and in what order, on the album artist page",
+        "automaticUpdates": "Automatic updates",
+        "automaticUpdates_description": "Check for and install updates automatically",
+        "releaseChannel_optionAlpha": "alpha (nightly)",
+        "discordStateIcon": "show playing icon",
+        "discordStateIcon_description": "show a small playing icon in the rich presence status. the paused icon is always shown when \"Show rich presence when paused\" is enabled",
+        "homeFeatureStyle_description": "controls the style of the home featured carousel",
+        "homeFeatureStyle": "home featured carousel style",
+        "homeFeatureStyle_optionMultiple": "multiple",
+        "homeFeatureStyle_optionSingle": "single",
+        "hotkey_listNavigateToPage": "list navigate to item page",
+        "hotkey_listPlayDefault": "list play",
+        "hotkey_listPlayLast": "list play last",
+        "hotkey_listPlayNext": "list play next",
+        "hotkey_listPlayNow": "list play now",
+        "mpvExtraParameters": "mpv extra parameters",
+        "mpvExtraParameters_description": "extra arguments to pass to mpv",
+        "pathReplace": "file path replacement",
+        "pathReplace_description": "replace your server's default filepath",
+        "pathReplace_optionRemovePrefix": "remove prefix",
+        "pathReplace_optionAddPrefix": "add prefix",
+        "artistRadioCount_description": "sets the number of songs to fetch for artist radio and track radio",
+        "artistRadioCount": "artist/track radio count",
+        "imageResolution": "image resolution",
+        "imageResolution_description": "the resolution for the images used around the app. using a value of 0 will default to the native image resolution",
+        "imageResolution_optionTable": "table",
+        "imageResolution_optionItemCard": "item card",
+        "imageResolution_optionSidebar": "sidebar",
+        "imageResolution_optionHeader": "header",
+        "imageResolution_optionFullScreenPlayer": "fullscreen player",
+        "showRatings_description": "controls if the star ratings feature shows up in the interface",
+        "showRatings": "show star ratings",
+        "blurExplicitImages": "blur explicit images",
+        "blurExplicitImages_description": "album and song artwork tagged as explicit will be blurred",
+        "enableGridMultiSelect": "enable grid multi-select",
+        "enableGridMultiSelect_description": "when enabled, allows selecting multiple items in grid views. when disabled, clicking grid item images will navigate to the item page",
+        "combinedLyricsAndVisualizer_description": "combine lyrics and visualizer into the same panel",
+        "combinedLyricsAndVisualizer": "combine lyrics and visualizer in player sidebar",
+        "playerItemConfiguration_description": "configure what items are shown, and in what order, on the fullscreen player",
+        "playerItemConfiguration": "player item configuration",
+        "sidebarPlaylistSorting_description": "allows manual playlist sorting in the sidebar using drag and drop instead of the default server order",
+        "sidebarPlaylistSorting": "sidebar playlist sorting",
+        "sidebarPlaylistListFilterRegex_description": "hide playlists in the sidebar that match this regular expression",
+        "sidebarPlaylistListFilterRegex_placeholder": "e.g. ^Daily Mix.*",
+        "sidebarPlaylistListFilterRegex": "playlist filter regex"
     },
     "table": {
         "config": {
@@ -973,12 +1087,16 @@
                 "genreBadge": "$t(entity.genre, {\"count\": 1}) (jelvények)",
                 "image": "kép",
                 "bitDepth": "$t(common.bitDepth)",
-                "sampleRate": "$t(common.sampleRate)"
+                "sampleRate": "$t(common.sampleRate)",
+                "albumGroup": "album group",
+                "composer": "composer",
+                "titleArtist": "$t(common.title) (artist)"
             },
             "view": {
                 "grid": "rács",
                 "list": "lista",
-                "table": "táblázat"
+                "table": "táblázat",
+                "detail": "detail"
             },
             "general": {
                 "autoFitColumns": "oszlopok automatikus igazítása",
@@ -1009,7 +1127,8 @@
                 "alternateRowColors": "alternatív sor színek",
                 "horizontalBorders": "sorhatárok",
                 "rowHoverHighlight": "sor kiemelése egérrel",
-                "verticalBorders": "oszlophatárok"
+                "verticalBorders": "oszlophatárok",
+                "showHeader": "show header"
             }
         },
         "column": {
@@ -1072,5 +1191,154 @@
         "secondShort": "mp",
         "hourShort": "óra",
         "dayShort": "nap"
+    },
+    "visualizer": {
+        "visualizerType": "Visualizer Type",
+        "cyclePresets": "Cycle Presets",
+        "cycleTime": "Cycle Time (seconds)",
+        "includeAllPresets": "Include All Presets",
+        "ignoredPresets": "Ignored Presets",
+        "selectedPresets": "Selected Presets",
+        "randomizeNextPreset": "Randomize Next Preset",
+        "blendTime": "Blend Time",
+        "presets": "Presets",
+        "selectPreset": "Select Preset",
+        "applyPreset": "Apply Preset",
+        "saveAsPreset": "Save as Preset",
+        "updatePreset": "Update Preset",
+        "copyConfiguration": "Copy Configuration",
+        "pasteConfiguration": "Paste Configuration",
+        "pasteConfigurationPlaceholder": "Paste JSON configuration here...",
+        "pasteFromClipboard": "Paste from Clipboard",
+        "applyConfiguration": "Apply Configuration",
+        "configCopied": "Configuration copied to clipboard",
+        "configCopyFailed": "Failed to copy configuration",
+        "configPasted": "Configuration applied successfully",
+        "configPasteFailed": "Failed to apply configuration. Please check the format.",
+        "configPasteReadFailed": "Failed to read from clipboard",
+        "presetName": "Preset Name",
+        "presetNamePlaceholder": "Enter preset name",
+        "general": "General",
+        "mode": "Mode",
+        "mode1To8": "Mode 1 - 8",
+        "mode10": "Mode 10",
+        "barSpace": "Bar Space",
+        "lineWidth": "Line Width",
+        "fillAlpha": "Fill Alpha",
+        "channelLayout": "Channel Layout",
+        "maxFPS": "Max FPS",
+        "opacity": "Opacity",
+        "customGradients": "Custom Gradients",
+        "addCustomGradient": "Add Custom Gradient",
+        "gradientName": "Gradient Name",
+        "gradientNamePlaceholder": "Gradient Name",
+        "vertical": "Vertical",
+        "horizontal": "Horizontal",
+        "colorStops": "Color Stops",
+        "addColor": "Add Color",
+        "position": "Position",
+        "level": "Level",
+        "remove": "Remove",
+        "pasteGradient": "Paste Gradient",
+        "pasteGradientPlaceholder": "Paste gradient JSON here...",
+        "custom": "Custom",
+        "builtIn": "Built-in",
+        "colors": "Colors",
+        "colorMode": "Color Mode",
+        "gradient": "Gradient",
+        "gradientLeft": "Gradient Left",
+        "gradientRight": "Gradient Right",
+        "fft": "FFT",
+        "fftSize": "FFT Size",
+        "smoothing": "Smoothing",
+        "frequencyRangeAndScaling": "Frequency range and scaling",
+        "minimumFrequency": "Minimum Frequency",
+        "maximumFrequency": "Maximum Frequency",
+        "frequencyScale": "Frequency Scale",
+        "sensitivity": "Sensitivity",
+        "weightingFilter": "Weighting Filter",
+        "minimumDecibels": "Minimum Decibels",
+        "maximumDecibels": "Maximum Decibels",
+        "linearAmplitude": "Linear Amplitude",
+        "linearBoost": "Linear Boost",
+        "peakBehavior": "Peak Behavior",
+        "showPeaks": "Show Peaks",
+        "fadePeaks": "Fade Peaks",
+        "peakLine": "Peak Line",
+        "gravity": "Gravity",
+        "peakFadeTime": "Peak Fade Time (ms)",
+        "peakHoldTime": "Peak Hold Time (ms)",
+        "radialSpectrum": "Radial Spectrum",
+        "radial": "Radial",
+        "radialInvert": "Radial Invert",
+        "spinSpeed": "Spin Speed",
+        "radius": "Radius",
+        "reflexMirror": "Reflex Mirror",
+        "reflexFit": "Reflex Fit",
+        "reflexRatio": "Reflex Ratio",
+        "reflexAlpha": "Reflex Alpha",
+        "reflexBrightness": "Reflex Brightness",
+        "mirror": "Mirror",
+        "miscellaneousSettings": "Miscellaneous Settings",
+        "alphaBars": "Alpha Bars",
+        "ansiBands": "ANSI Bands",
+        "ledBars": "LED Bars",
+        "trueLeds": "True LEDs",
+        "lumiBars": "Lumi Bars",
+        "outlineBars": "Outline Bars",
+        "roundBars": "Round Bars",
+        "lowResolution": "Low Resolution",
+        "splitGradient": "Split Gradient",
+        "showFPS": "Show FPS",
+        "showScaleX": "Show Scale X",
+        "noteLabels": "Note Labels",
+        "showScaleY": "Show Scale Y",
+        "options": {
+            "mode": {
+                "0": "[0] Discrete Frequencies",
+                "1": "[1] 1/24th octave / 240 bands",
+                "2": "[2] 1/12th octave / 120 bands",
+                "3": "[3] 1/8th octave / 80 bands",
+                "4": "[4] 1/6th octave / 60 bands",
+                "5": "[5] 1/4th octave / 40 bands",
+                "6": "[6] 1/3rd octave / 30 bands",
+                "7": "[7] Half octave / 20 bands",
+                "8": "[8] Full octave / 10 bands",
+                "10": "[10] Line / Area graph"
+            },
+            "colorMode": {
+                "gradient": "Gradient",
+                "barIndex": "Bar-Index",
+                "barLevel": "Bar-Level"
+            },
+            "gradient": {
+                "classic": "Classic",
+                "prism": "Prism",
+                "rainbow": "Rainbow",
+                "steelblue": "Steelblue",
+                "orangered": "Orangered"
+            },
+            "channelLayout": {
+                "single": "Single",
+                "dualCombined": "Dual-Combined",
+                "dualHorizontal": "Dual-Horizontal",
+                "dualVertical": "Dual-Vertical"
+            },
+            "frequencyScale": {
+                "none": "None",
+                "bark": "Bark Scale",
+                "linear": "Linear Scale",
+                "log": "Log Scale",
+                "mel": "Mel Scale"
+            },
+            "weightingFilter": {
+                "none": "None",
+                "a": "A",
+                "b": "B",
+                "c": "C",
+                "d": "D",
+                "z": "Z"
+            }
+        }
     }
 }
