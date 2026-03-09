@@ -4,6 +4,7 @@ import isElectron from 'is-electron';
 import { memo, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { clearAnimatedCoverCache } from '/@/renderer/api/animated-covers-api';
 import {
     SettingOption,
     SettingsSection,
@@ -91,6 +92,37 @@ export const CacheSettings = memo(() => {
             }),
             isHidden: !browser,
             title: t('setting.clearCache', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Button
+                    disabled={isClearing}
+                    onClick={() => {
+                        setIsClearing(true);
+                        try {
+                            clearAnimatedCoverCache();
+                            toast.success({
+                                message: t('setting.clearAnimatedCoversCacheSuccess', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                            });
+                        } catch (error) {
+                            console.error(error);
+                            toast.error({ message: (error as Error).message });
+                        }
+                        setIsClearing(false);
+                    }}
+                    size="compact-md"
+                    variant="filled"
+                >
+                    {t('common.clear', { postProcess: 'sentenceCase' })}
+                </Button>
+            ),
+            description: t('setting.clearAnimatedCoversCache', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.clearAnimatedCoversCache', { postProcess: 'sentenceCase' }),
         },
     ];
 

@@ -4,12 +4,16 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 
 import styles from './mobile-fullscreen-player.module.css';
 
+import { AnimatedVideoCover } from '/@/renderer/components/animated-video-cover/animated-video-cover';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import {
     useIsRadioActive,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import {
+    AnimatedCoverScreen,
+    shouldShowAnimatedCover,
     useFullScreenPlayerStore,
     useImageRes,
     usePlayerData,
@@ -89,6 +93,7 @@ const ImageWithPlaceholder = ({
 
 export const MobileFullscreenPlayerAlbumArt = () => {
     const mainImageRef = useRef<HTMLImageElement | null>(null);
+    const videoRef = useRef<HTMLVideoElement | null>(null);
     const [mainImageDimensions, setMainImageDimensions] = useState({ idealSize: 1000 });
 
     const { fullScreenPlayer: albumArtRes } = useImageRes();
@@ -99,6 +104,14 @@ export const MobileFullscreenPlayerAlbumArt = () => {
     const { nextSong } = usePlayerData();
 
     const isPlayingRadio = isRadioActive && isRadioPlaying;
+
+    const showAnimatedCover = shouldShowAnimatedCover(AnimatedCoverScreen.FULL_SCREEN_PLAYER);
+
+    const { animatedCoverUrl } = useAnimatedCover({
+        albumName: currentSong?.album ?? undefined,
+        artistName: currentSong?.albumArtistName,
+        enabled: showAnimatedCover && !isPlayingRadio && !!currentSong,
+    });
 
     const currentImageUrl = useItemImageUrl({
         id: currentSong?.imageId || undefined,
@@ -166,7 +179,34 @@ export const MobileFullscreenPlayerAlbumArt = () => {
                 className={clsx(styles.image, {
                     [styles.imageNativeAspectRatio]: useImageAspectRatio,
                 })}
+                style={{ position: 'relative' }}
             >
+                {animatedCoverUrl && !isPlayingRadio && (
+                    <AnimatedVideoCover
+                        className={PlaybackSelectors.playerCoverArt}
+                        onLoadError={() => {
+                            console.warn(
+                                '[MobilePlayer] Video playback failed for:',
+                                animatedCoverUrl,
+                            );
+                        }}
+                        ref={videoRef}
+                        src={animatedCoverUrl}
+                        staticImageUrl={
+                            imageState.current === 0 ? imageState.topImage : imageState.bottomImage
+                        }
+                        style={{
+                            height: '100%',
+                            left: 0,
+                            objectFit: useImageAspectRatio ? 'contain' : 'cover',
+                            position: 'absolute',
+                            top: 0,
+                            width: '100%',
+                            zIndex: 10,
+                        }}
+                    />
+                )}
+
                 <AnimatePresence initial={false} mode="sync">
                     {isPlayingRadio ? (
                         <ImageWithPlaceholder

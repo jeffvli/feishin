@@ -1,11 +1,12 @@
 import { closeAllModals, openModal } from '@mantine/modals';
 import clsx from 'clsx';
-import { forwardRef, ReactNode, Ref, useCallback, useState } from 'react';
+import { forwardRef, ReactNode, Ref, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import styles from './library-header.module.css';
 
+import { AnimatedVideoCover } from '/@/renderer/components/animated-video-cover/animated-video-cover';
 import { getItemImageUrl, ItemImage } from '/@/renderer/components/item-image/item-image';
 import { useIsPlayerFetching } from '/@/renderer/features/player/context/player-context';
 import {
@@ -18,7 +19,12 @@ import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-b
 import { useIsMutatingCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useIsMutatingDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useIsMutatingRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
-import { useGeneralSettings } from '/@/renderer/store';
+import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
+import {
+    AnimatedCoverScreen,
+    shouldShowAnimatedCover,
+    useGeneralSettings,
+} from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Center } from '/@/shared/components/center/center';
@@ -38,6 +44,8 @@ interface LibraryHeaderProps {
     imagePlaceholderUrl?: null | string;
     imageUrl?: null | string;
     item: {
+        albumName?: string;
+        artistName?: string;
         children?: ReactNode;
         explicitStatus?: ExplicitStatus | null;
         imageId?: null | string;
@@ -66,6 +74,19 @@ export const LibraryHeader = forwardRef(
         const { t } = useTranslation();
         const [isImageError, setIsImageError] = useState<boolean | null>(false);
         const { blurExplicitImages } = useGeneralSettings();
+        const videoRef = useRef<HTMLVideoElement | null>(null);
+
+        const showAnimatedCover = shouldShowAnimatedCover(AnimatedCoverScreen.ALBUM_DETAIL);
+
+        const { animatedCoverUrl } = useAnimatedCover({
+            albumName: item.albumName,
+            artistName: item.artistName,
+            enabled:
+                showAnimatedCover &&
+                item.type === LibraryItem.ALBUM &&
+                !!item.albumName &&
+                !!item.artistName,
+        });
 
         const onImageError = () => {
             setIsImageError(true);
@@ -158,9 +179,29 @@ export const LibraryHeader = forwardRef(
                         [' ', 'Enter', 'Spacebar'].includes(event.key) && openImage()
                     }
                     role="button"
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer', position: 'relative' }}
                     tabIndex={0}
                 >
+                    {animatedCoverUrl && item.type === LibraryItem.ALBUM && (
+                        <AnimatedVideoCover
+                            className={styles.image}
+                            onLoadError={(error) => {
+                                console.warn('[LibraryHeader] Video playback failed:', error);
+                            }}
+                            ref={videoRef}
+                            src={animatedCoverUrl}
+                            staticImageUrl={imageUrl || undefined}
+                            style={{
+                                height: '100%',
+                                left: 0,
+                                objectFit: 'cover',
+                                position: 'absolute',
+                                top: 0,
+                                width: '100%',
+                                zIndex: 10,
+                            }}
+                        />
+                    )}
                     {!isImageError && (
                         <ItemImage
                             className={styles.image}

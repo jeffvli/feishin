@@ -1,19 +1,23 @@
 import clsx from 'clsx';
 import { AnimatePresence, LayoutGroup, motion } from 'motion/react';
-import { MouseEvent } from 'react';
+import { MouseEvent, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 import { shallow } from 'zustand/shallow';
 
 import styles from './left-controls.module.css';
 
+import { AnimatedVideoCover } from '/@/renderer/components/animated-video-cover/animated-video-cover';
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { RadioMetadataDisplay } from '/@/renderer/features/player/components/radio-metadata-display';
 import { useIsRadioActive } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { useAnimatedCover } from '/@/renderer/hooks/use-animated-cover';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
+    AnimatedCoverScreen,
+    shouldShowAnimatedCover,
     useAppStore,
     useAppStoreActions,
     useFullScreenPlayerStore,
@@ -50,6 +54,15 @@ export const LeftControls = () => {
     const { bindings } = useHotkeySettings();
 
     const isRadioMode = isRadioActive;
+
+    const showAnimatedCover = shouldShowAnimatedCover(AnimatedCoverScreen.MINI_PLAYER);
+
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const { animatedCoverUrl } = useAnimatedCover({
+        albumName: currentSong?.album ?? undefined,
+        artistName: currentSong?.albumArtists?.[0]?.name || currentSong?.artists?.[0]?.name,
+        enabled: showAnimatedCover && !isRadioMode && !!currentSong,
+    });
     const hideImage = image && !collapsed;
     const isSongDefined = Boolean(currentSong?.id) && !isRadioMode;
     const title = currentSong?.name;
@@ -128,20 +141,44 @@ export const LeftControls = () => {
                                             <Icon color="muted" icon="radio" size="40%" />
                                         </Center>
                                     ) : (
-                                        <ItemImage
-                                            className={clsx(
-                                                styles.playerbarImage,
-                                                PlaybackSelectors.playerCoverArt,
+                                        <div
+                                            style={{
+                                                borderRadius: 'var(--theme-radius-md)',
+                                                overflow: 'hidden',
+                                                position: 'relative',
+                                            }}
+                                        >
+                                            <ItemImage
+                                                className={clsx(
+                                                    styles.playerbarImage,
+                                                    PlaybackSelectors.playerCoverArt,
+                                                )}
+                                                enableDebounce={false}
+                                                enableViewport={false}
+                                                explicitStatus={currentSong?.explicitStatus}
+                                                fetchPriority="high"
+                                                id={currentSong?.imageId}
+                                                itemType={LibraryItem.SONG}
+                                                serverId={currentSong?._serverId}
+                                                type="table"
+                                            />
+                                            {animatedCoverUrl && (
+                                                <AnimatedVideoCover
+                                                    className={clsx(
+                                                        styles.playerbarImage,
+                                                        PlaybackSelectors.playerCoverArt,
+                                                    )}
+                                                    ref={videoRef}
+                                                    src={animatedCoverUrl}
+                                                    style={{
+                                                        left: 0,
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        zIndex: 10,
+                                                    }}
+                                                />
                                             )}
-                                            enableDebounce={false}
-                                            enableViewport={false}
-                                            explicitStatus={currentSong?.explicitStatus}
-                                            fetchPriority="high"
-                                            id={currentSong?.imageId}
-                                            itemType={LibraryItem.SONG}
-                                            serverId={currentSong?._serverId}
-                                            type="table"
-                                        />
+                                        </div>
                                     )}
                                 </Tooltip>
                                 {!collapsed && (
@@ -157,6 +194,7 @@ export const LeftControls = () => {
                                             position: 'absolute',
                                             right: 2,
                                             top: 2,
+                                            zIndex: 20,
                                         }}
                                         tooltip={{
                                             label: t('common.expand', {
