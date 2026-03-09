@@ -93,7 +93,7 @@ const LoginRoute = () => {
             isvalid: remoteUrl !== '',
             key: 'REMOTE_URL',
             value: remoteUrl,
-        }
+        },
     ];
 
     const form = useForm({
@@ -166,9 +166,9 @@ const LoginRoute = () => {
                 id: nanoid(),
                 isAdmin: data.isAdmin,
                 name: serverName,
+                remoteUrl: normalizedRemoteURL,
                 type: serverType as ServerType,
                 url: normalizedUrl,
-                remoteUrl: normalizedRemoteURL,
                 userId: data.userId,
                 username: data.username,
             };

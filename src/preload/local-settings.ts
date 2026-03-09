@@ -74,12 +74,12 @@ const env = {
         SERVER_TYPE !== null
             ? process.env.LEGACY_AUTHENTICATION?.toLocaleLowerCase() === 'true'
             : false,
+    REMOTE_URL: process.env.REMOTE_URL ?? '',
     SERVER_LOCK:
         SERVER_TYPE !== null ? process.env.SERVER_LOCK?.toLocaleLowerCase() === 'true' : false,
     SERVER_NAME: process.env.SERVER_NAME ?? '',
     SERVER_TYPE,
     SERVER_URL: process.env.SERVER_URL ?? 'http://',
-    REMOTE_URL: process.env.REMOTE_URL ?? '',
     START_MAXIMIZED: undefined as boolean | undefined,
 };
 
