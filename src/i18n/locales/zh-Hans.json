@@ -108,7 +108,7 @@
         "duration": "时长",
         "ok": "好",
         "no": "否",
-        "playerMustBePaused": "播放器必须暂停",
+        "playerMustBePaused": "播放器必须先暂停",
         "channel_other": "频道",
         "none": "无",
         "disc": "碟片",
