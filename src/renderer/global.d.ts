@@ -74,6 +74,7 @@ declare global {
         FS_PLAYBACK_TRANSCODE_ENABLED?: string;
         FS_PLAYBACK_WEB_AUDIO?: string;
         LEGACY_AUTHENTICATION?: boolean | string;
+        REMOTE_URL?: string;
         SERVER_LOCK?: boolean | string;
         SERVER_NAME?: string;
         SERVER_TYPE?: string;
