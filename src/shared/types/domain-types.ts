@@ -1346,6 +1346,7 @@ export enum LyricSource {
     GENIUS = 'Genius',
     LRCLIB = 'lrclib.net',
     NETEASE = 'NetEase',
+    SIMPMUSIC = 'SimpMusic',
 }
 
 export type AlbumRadioArgs = BaseEndpointArgs & {

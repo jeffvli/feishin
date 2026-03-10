@@ -5,6 +5,10 @@ import { getLyricsBySongId as getGenius, getSearchResults as searchGenius } from
 import { getLyricsBySongId as getLrcLib, getSearchResults as searchLrcLib } from './lrclib';
 import { getLyricsBySongId as getNetease, getSearchResults as searchNetease } from './netease';
 import { orderSearchResults } from './shared';
+import {
+    getLyricsBySongId as getSimpMusic,
+    getSearchResults as searchSimpMusic,
+} from './simpmusic';
 
 import { Song } from '/@/shared/types/domain-types';
 
@@ -12,6 +16,7 @@ export enum LyricSource {
     GENIUS = 'Genius',
     LRCLIB = 'lrclib.net',
     NETEASE = 'NetEase',
+    SIMPMUSIC = 'SimpMusic',
 }
 
 export type FullLyricsMetadata = Omit<InternetProviderLyricResponse, 'id' | 'lyrics' | 'source'> & {
@@ -66,12 +71,14 @@ const SEARCH_FETCHERS: Record<LyricSource, SearchFetcher> = {
     [LyricSource.GENIUS]: searchGenius,
     [LyricSource.LRCLIB]: searchLrcLib,
     [LyricSource.NETEASE]: searchNetease,
+    [LyricSource.SIMPMUSIC]: searchSimpMusic,
 };
 
 const GET_FETCHERS: Record<LyricSource, GetFetcher> = {
     [LyricSource.GENIUS]: getGenius,
     [LyricSource.LRCLIB]: getLrcLib,
     [LyricSource.NETEASE]: getNetease,
+    [LyricSource.SIMPMUSIC]: getSimpMusic,
 };
 
 const MAX_CACHED_ITEMS = 10;
@@ -191,6 +198,7 @@ const searchRemoteLyrics = async (params: LyricSearchQuery) => {
         [LyricSource.GENIUS]: [],
         [LyricSource.LRCLIB]: [],
         [LyricSource.NETEASE]: [],
+        [LyricSource.SIMPMUSIC]: [],
     };
     for (const item of allSearchResults) {
         results[item.source].push(item);

@@ -167,6 +167,9 @@ const getSettingsProperties = (): SettingsProperties => {
         'settings.lyrics.sources.netease': ignoreWeb(
             settings.lyrics.sources.includes(LyricSource.NETEASE),
         ),
+        'settings.lyrics.sources.simpmusic': ignoreWeb(
+            settings.lyrics.sources.includes(LyricSource.SIMPMUSIC),
+        ),
         'settings.minimizeToTray': ignoreWeb(settings.window.minimizeToTray),
         // 'settings.musicBrainz': settings.general.musicBrainz,
         'settings.nativeAspectRatio': settings.general.nativeAspectRatio,
