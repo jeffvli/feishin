@@ -31,7 +31,6 @@ export interface SimpMusicSearchResponse {
 }
 
 export async function getLyricsBySongId(songId: string): Promise<null | string> {
-    console.log(songId);
     let result: AxiosResponse;
 
     try {
@@ -39,7 +38,6 @@ export async function getLyricsBySongId(songId: string): Promise<null | string> 
             timeout: TIMEOUT_MS,
         });
     } catch (e) {
-        console.log(e);
         console.error('SimpMusic lyrics request errored:', (e as Error)?.message);
         return null;
     }
@@ -53,7 +51,6 @@ export async function getLyricsBySongId(songId: string): Promise<null | string> 
 export async function getSearchResults(
     params: LyricSearchQuery,
 ): Promise<InternetProviderLyricSearchResponse[] | null> {
-    console.log(params);
     let result: AxiosResponse<SimpMusicSearchResponse>;
 
     if (!params.name) return null;
