@@ -46,45 +46,29 @@ export const useSaveQueue = () => {
                 throw new Error(t('error.serverRequired', { postProcess: 'sentenceCase' }));
             }
 
-            const { player, queue } = usePlayerStore.getState();
-            let uniqueIds: string[] = [];
+            const state = usePlayerStore.getState();
+            const queue = state.getQueue();
 
-            if (queue.shuffled.length > 0) {
-                for (const shuffledIndex of queue.shuffled) {
-                    uniqueIds.push(queue.default[shuffledIndex]);
-                }
-            } else {
-                uniqueIds = queue.default;
-            }
+            if (queue.items.some((item) => item._serverId !== serverId)) {
+                toast.error({
+                    message: t('error.multipleServerSaveQueueError', {
+                        postProcess: 'sentenceCase',
+                    }),
+                    title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                });
 
-            const songs: string[] = [];
-
-            if (uniqueIds.length > 0) {
-                for (const song of uniqueIds) {
-                    if (queue.songs[song]._serverId !== serverId) {
-                        toast.error({
-                            message: t('error.multipleServerSaveQueueError', {
-                                postProcess: 'sentenceCase',
-                            }),
-                            title: t('error.genericError', { postProcess: 'sentenceCase' }),
-                        });
-
-                        throw new Error(
-                            `${t('error.multipleServerSaveQueueError', { postProcess: 'sentenceCase' })}`,
-                        );
-                    }
-
-                    songs?.push(queue.songs[song].id);
-                }
+                throw new Error(
+                    `${t('error.multipleServerSaveQueueError', { postProcess: 'sentenceCase' })}`,
+                );
             }
 
             try {
                 await api.controller.savePlayQueue({
                     apiClientProps: { serverId },
                     query: {
-                        currentIndex: queue.default.length > 0 ? player.index : undefined,
+                        currentIndex: queue.items.length > 0 ? state.player.index : undefined,
                         positionMs: useTimestampStoreBase.getState().timestamp * 1000,
-                        songs,
+                        songs: queue.items.map((item) => item.id),
                     },
                 });
 
