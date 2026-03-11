@@ -636,7 +636,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 throw new Error('Failed to get play queue');
             }
 
-            const { changedBy, current, items, position, updatedAt } = res.body.data;
+            const { changedBy, current, items = [], position, updatedAt } = res.body.data; // if there is no queue saved, items is undefined
 
             const entries = items.map((song) =>
                 ndNormalize.song(
