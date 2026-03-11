@@ -114,7 +114,7 @@ services:
             - SERVER_LOCK=true # When true AND name/type/url are set, only username/password can be toggled
             - SERVER_TYPE=jellyfin # the allowed types are: jellyfin, navidrome, subsonic. These values are case insensitive
             - SERVER_URL= # http://address:port or https://address:port
-            = REMOTE_URL= # http://address or https://address
+            - REMOTE_URL= # http://address or https://address
             - LEGACY_AUTHENTICATION=false # When SERVER_LOCK is true, sets the legacy (plaintext) authentication flag for Subsonic/OpenSubsonic servers
             - ANALYTICS_DISABLED=true # Set to true to disable Umami analytics tracking
         ports:
