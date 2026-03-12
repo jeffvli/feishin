@@ -45,7 +45,7 @@ export const handleSsoLogin = async (
 
         // We could also poll or listen to navigation to see if we reached the app
         // but often SSO proxies redirect back to the original URL.
-        ssoWindow.webContents.on('did-navigate', async (event, navigatedUrl) => {
+        ssoWindow.webContents.on('did-navigate', async (_event, navigatedUrl) => {
             if (navigatedUrl.startsWith(url)) {
                 // Potential success, but let the user decide if they are done or wait for a specific cookie
                 const cookies = await checkCookies();

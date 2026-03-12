@@ -71,7 +71,7 @@ export const ensureSsoAuth = async (
                             handleCancel();
                         }
                     } catch (error) {
-                        logFn.error('SSO login error:', error);
+                        logFn.error('SSO login error:', { meta: error });
                         handleCancel();
                     }
                 };
