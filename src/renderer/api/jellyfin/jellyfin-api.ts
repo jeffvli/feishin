@@ -7,6 +7,7 @@ import { z } from 'zod';
 import packageJson from '../../../../package.json';
 
 import i18n from '/@/i18n/i18n';
+import { setupAxiosInterceptors } from '/@/renderer/api/sso-interceptor';
 import { authenticationFailure } from '/@/renderer/api/utils';
 import { useAuthStore } from '/@/renderer/store';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
@@ -358,20 +359,21 @@ export const contract = c.router({
     },
 });
 
-const axiosClient = axios.create({});
+const axiosClient = axios.create({ withCredentials: true });
 
 axiosClient.defaults.paramsSerializer = (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' });
 };
 
+setupAxiosInterceptors(axiosClient);
+
 axiosClient.interceptors.response.use(
-    (response) => {
+    async (response) => {
         return response;
     },
-    (error) => {
+    async (error) => {
         if (error.response && error.response.status === 401) {
             const currentServer = useAuthStore.getState().currentServer;
-
             if (currentServer) {
                 useAuthStore
                     .getState()
@@ -459,7 +461,7 @@ export const jfApiClient = (args: {
                     return {
                         body: response?.data,
                         headers: response?.headers as any,
-                        status: response?.status,
+                        status: response?.status ?? 500,
                     };
                 }
                 throw e;

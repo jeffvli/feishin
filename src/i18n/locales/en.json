@@ -763,6 +763,8 @@
         "clearCache_description": "a 'hard clear' of feishin. in addition to clearing feishin's cache, empty the browser cache (saved images and other assets). server credentials and settings are preserved",
         "clearCache": "clear browser cache",
         "clearCacheSuccess": "cache cleared successfully",
+        "clearCookies_description": "clears all browser cookies. this will force you to re-authenticate with any SSO proxy",
+        "clearCookies": "clear cookies",
         "clearQueryCache_description": "a 'soft clear' of feishin. this will refresh playlists, track metadata, and reset saved lyrics. settings, server credentials and cached images are preserved",
         "clearQueryCache": "clear feishin cache",
         "contextMenu_description": "allows you to hide items that are shown in the menu when you right click on an item. items that are unchecked will be hidden",

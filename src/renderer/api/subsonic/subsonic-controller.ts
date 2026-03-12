@@ -53,6 +53,7 @@ const getSubsonicImageRequest = ({
 
     return {
         cacheKey: ['subsonic', server.id, baseUrl || '', id, imageSize || ''].join(':'),
+        credentials: server.isSsoProxy ? 'include' : undefined,
         url:
             `${url}/rest/getCoverArt.view` +
             `?id=${id}` +
@@ -174,7 +175,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             },
         });
 
-        if (resp.status !== 200) {
+        if (resp.status !== 200 || !resp.body?.user) {
             throw new Error('Failed to log in');
         }
 
@@ -1920,7 +1921,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             },
         });
 
-        if (res.status !== 200) {
+        if (res.status !== 200 || !res.body?.user) {
             throw new Error('Failed to get user info');
         }
 

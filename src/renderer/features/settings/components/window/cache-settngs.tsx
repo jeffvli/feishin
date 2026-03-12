@@ -44,11 +44,41 @@ export const CacheSettings = memo(() => {
         [queryClient, t],
     );
 
-    const openResetConfirmModal = (full: boolean) => {
-        const key = full ? 'clearCache' : 'clearQueryCache';
+    const clearCookies = useCallback(async () => {
+        setIsClearing(true);
+
+        try {
+            if (browser) {
+                await browser.clearCookies();
+            }
+
+            toast.success({
+                message: t('setting.clearCacheSuccess', { postProcess: 'sentenceCase' }),
+            });
+        } catch (error) {
+            console.error(error);
+            toast.error({ message: (error as Error).message });
+        }
+
+        setIsClearing(false);
+        closeAllModals();
+    }, [t]);
+
+    const openResetConfirmModal = (type: 'cookies' | 'full' | 'query') => {
+        let key = 'clearQueryCache';
+        let onConfirm = () => clearCache(false);
+
+        if (type === 'full') {
+            key = 'clearCache';
+            onConfirm = () => clearCache(true);
+        } else if (type === 'cookies') {
+            key = 'clearCookies';
+            onConfirm = clearCookies;
+        }
+
         openModal({
             children: (
-                <ConfirmModal onConfirm={() => clearCache(full)}>
+                <ConfirmModal onConfirm={onConfirm}>
                     {t(`common.areYouSure`, { postProcess: 'sentenceCase' })}
                 </ConfirmModal>
             ),
@@ -61,7 +91,7 @@ export const CacheSettings = memo(() => {
             control: (
                 <Button
                     disabled={isClearing}
-                    onClick={() => openResetConfirmModal(false)}
+                    onClick={() => openResetConfirmModal('query')}
                     size="compact-md"
                     variant="filled"
                 >
@@ -78,7 +108,7 @@ export const CacheSettings = memo(() => {
             control: (
                 <Button
                     disabled={isClearing}
-                    onClick={() => openResetConfirmModal(true)}
+                    onClick={() => openResetConfirmModal('full')}
                     size="compact-md"
                     variant="filled"
                 >
@@ -91,6 +121,24 @@ export const CacheSettings = memo(() => {
             }),
             isHidden: !browser,
             title: t('setting.clearCache', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Button
+                    disabled={isClearing}
+                    onClick={() => openResetConfirmModal('cookies')}
+                    size="compact-md"
+                    variant="filled"
+                >
+                    {t('common.clear', { postProcess: 'sentenceCase' })}
+                </Button>
+            ),
+            description: t('setting.clearCookies', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !browser,
+            title: t('setting.clearCookies', { postProcess: 'sentenceCase' }),
         },
     ];
 

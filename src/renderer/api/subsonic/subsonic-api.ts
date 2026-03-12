@@ -5,6 +5,7 @@ import qs from 'qs';
 import { z } from 'zod';
 
 import i18n from '/@/i18n/i18n';
+import { setupAxiosInterceptors } from '/@/renderer/api/sso-interceptor';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { ssType } from '/@/shared/api/subsonic/subsonic-types';
 import { hasFeature } from '/@/shared/api/utils';
@@ -331,18 +332,22 @@ export const contract = c.router({
     },
 });
 
-const axiosClient = axios.create({});
+const axiosClient = axios.create({ withCredentials: true });
 
 axiosClient.defaults.paramsSerializer = (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' });
 };
 
+setupAxiosInterceptors(axiosClient);
+
 axiosClient.interceptors.response.use(
-    (response) => {
+    async (response) => {
+        if (!response) return response;
+
         const data = response.data;
-        if (data['subsonic-response'].status !== 'ok') {
+        if (data && data['subsonic-response'] && data['subsonic-response'].status !== 'ok') {
             // Suppress code related to non-linked lastfm or spotify from Navidrome
-            if (data['subsonic-response'].error.code !== 0) {
+            if (data['subsonic-response'].error && data['subsonic-response'].error.code !== 0) {
                 toast.error({
                     message: data['subsonic-response'].error.message,
                     title: i18n.t('error.genericError', { postProcess: 'sentenceCase' }) as string,
@@ -355,7 +360,7 @@ axiosClient.interceptors.response.use(
 
         return response;
     },
-    (error) => {
+    async (error) => {
         return Promise.reject(error);
     },
 );
@@ -467,7 +472,7 @@ export const ssApiClient = (args: {
                     return {
                         body: response?.data,
                         headers: response?.headers as any,
-                        status: response?.status,
+                        status: response?.status ?? 500,
                     };
                 }
                 throw e;

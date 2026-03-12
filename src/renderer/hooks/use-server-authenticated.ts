@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 
 import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
+import { SSO_CANCELLED_ERROR } from '/@/renderer/api/sso-interceptor';
 import { AppRoute } from '/@/renderer/router/routes';
 import { getServerById, useAuthStoreActions, useCurrentServer } from '/@/renderer/store';
 import { LogCategory, logFn } from '/@/renderer/utils/logger';
@@ -269,6 +270,12 @@ export const useServerAuthenticated = () => {
                 }
             } catch (error) {
                 const errorMessage = (error as Error).message || 'Authentication failed';
+
+                if (errorMessage === SSO_CANCELLED_ERROR) {
+                    setReady(AuthState.INVALID);
+                    return;
+                }
+
                 const isNetwork = isNetworkError(error);
 
                 // If it's a network error and we haven't exhausted retries, retry

@@ -105,6 +105,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
     const form = useForm({
         initialValues: {
+            isSsoProxy: false,
             legacyAuth: isLegacyAuth(),
             name:
                 (localSettings ? localSettings.env.SERVER_NAME : window.SERVER_NAME) || 'My Server',
@@ -113,6 +114,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             preferRemoteUrl: false,
             remoteUrl: '',
             savePassword: undefined,
+            ssoCookieName: '',
             type:
                 (localSettings
                     ? localSettings.env.SERVER_TYPE
@@ -146,6 +148,22 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
         try {
             setIsLoading(true);
+
+            let ssoCookies: Record<string, string> | undefined;
+            if (isElectron() && values.isSsoProxy) {
+                const loginResult = await window.api.sso.login(
+                    values.url,
+                    values.ssoCookieName || 'CF_Authorization',
+                );
+                if (!loginResult.success) {
+                    setIsLoading(false);
+                    return toast.error({
+                        message: t('error.authenticationFailed', { postProcess: 'sentenceCase' }),
+                    });
+                }
+                ssoCookies = loginResult.cookies;
+            }
+
             const data: AuthenticationResponse | undefined = await authFunction(
                 values.url,
                 {
@@ -166,7 +184,10 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 credential: data.credential,
                 id: nanoid(),
                 isAdmin: data.isAdmin,
+                isSsoProxy: values.isSsoProxy,
                 name: values.name,
+                ssoCookieName: values.ssoCookieName,
+                ssoCookies,
                 type: values.type as ServerType,
                 url: values.url.replace(/\/$/, ''),
                 userId: data.userId,
@@ -270,6 +291,23 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             {...form.getInputProps('url')}
                         />
                     </Group>
+                    {isElectron() && (
+                        <>
+                            <Checkbox
+                                label="Server is behind an SSO Proxy (e.g. Cloudflare Access)"
+                                {...form.getInputProps('isSsoProxy', {
+                                    type: 'checkbox',
+                                })}
+                            />
+                            {form.values.isSsoProxy && (
+                                <TextInput
+                                    label="SSO Cookie Name"
+                                    placeholder="CF_Authorization"
+                                    {...form.getInputProps('ssoCookieName')}
+                                />
+                            )}
+                        </>
+                    )}
                     <TextInput
                         disabled={serverLock}
                         label={t('form.addServer.input', {
