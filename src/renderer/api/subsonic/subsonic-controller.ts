@@ -1137,7 +1137,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             const res = await ssApiClient(apiClientProps).getPlayQueueByIndex();
 
             if (res.status !== 200) {
-                throw new Error('Failed to get random songs');
+                throw new Error('Failed to get play queue');
             }
 
             const { changed, changedBy, currentIndex, entry, position, username } =
@@ -1163,7 +1163,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             const res = await ssApiClient(apiClientProps).getPlayQueue();
 
             if (res.status !== 200) {
-                throw new Error('Failed to get random songs');
+                throw new Error('Failed to get play queue');
             }
 
             const { changed, changedBy, current, entry, position, username } = res.body.playQueue;
