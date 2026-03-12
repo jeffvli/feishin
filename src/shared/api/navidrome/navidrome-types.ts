@@ -709,7 +709,7 @@ const queue = z.object({
     createdAt: z.string(),
     current: z.number(),
     id: z.string(),
-    items: z.array(song),
+    items: z.array(song).optional(),
     position: z.number(),
     updatedAt: z.string(),
     userId: z.string(),

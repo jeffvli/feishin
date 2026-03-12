@@ -1141,7 +1141,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             }
 
             const { changed, changedBy, currentIndex, entry, position, username } =
-                res.body.playQueueByIndex || {}; // if there is no queue saved, playQueueByIndex is undefined
+                res.body.playQueueByIndex || {}; // if there is no queue saved, playQueueByIndex may be undefined from a bug in Navidrome
 
             return {
                 changed,
