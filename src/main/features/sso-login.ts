@@ -1,11 +1,12 @@
 import { BrowserWindow, session } from 'electron';
 
+import { SSO_COOKIE_KEYS } from '/@/shared/constants/sso-cookie-keys';
 import { SsoLoginResponse } from '/@/shared/types/domain-types';
 
 export const handleSsoLogin = async (
     _event: any,
     url: string,
-    ssoCookieName = 'CF_Authorization',
+    ssoCookieName = SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
 ): Promise<SsoLoginResponse> => {
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
         throw new Error('Invalid SSO URL protocol');

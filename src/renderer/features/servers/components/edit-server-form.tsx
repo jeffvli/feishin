@@ -16,6 +16,7 @@ import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { toast } from '/@/shared/components/toast/toast';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
+import { SSO_COOKIE_KEYS } from '/@/shared/constants/sso-cookie-keys';
 import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
 import { useForm } from '/@/shared/hooks/use-form';
 import {
@@ -129,7 +130,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 ) {
                     const loginResult = await window.api.sso.login(
                         values.url,
-                        values.ssoCookieName || 'CF_Authorization',
+                        values.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
                     );
                     if (!loginResult.success) {
                         setIsLoading(false);
@@ -272,7 +273,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                         {form.values.isSsoProxy && (
                             <TextInput
                                 label="SSO Cookie Name"
-                                placeholder="CF_Authorization"
+                                placeholder={SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS}
                                 rightSection={
                                     form.isDirty('ssoCookieName') && <ModifiedFieldIndicator />
                                 }

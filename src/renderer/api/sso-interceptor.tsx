@@ -8,6 +8,7 @@ import { Group } from '/@/shared/components/group/group';
 import { closeAllModals, openModal } from '/@/shared/components/modal/modal';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
+import { SSO_COOKIE_KEYS } from '/@/shared/constants/sso-cookie-keys';
 import { ServerListItemWithCredential } from '/@/shared/types/domain-types';
 
 export const SSO_CANCELLED_ERROR = 'SSO login cancelled';
@@ -31,7 +32,7 @@ export const ensureSsoAuth = async (
             if (isInitialLogin) {
                 const result = await window.api.sso.login(
                     server.url,
-                    server.ssoCookieName || 'CF_Authorization',
+                    server.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
                 );
 
                 if (timedOut) return false;
@@ -52,7 +53,7 @@ export const ensureSsoAuth = async (
                     try {
                         const result = await window.api.sso.login(
                             server.url,
-                            server.ssoCookieName || 'CF_Authorization',
+                            server.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
                         );
 
                         if (timedOut) {
