@@ -1144,8 +1144,8 @@ export const SubsonicController: InternalControllerEndpoint = {
                 res.body.playQueueByIndex || {}; // if there is no queue saved, playQueueByIndex may be undefined from a bug in Navidrome
 
             return {
-                changed,
-                changedBy,
+                changed: changed ?? '',
+                changedBy: changedBy ?? '',
                 currentIndex: currentIndex ?? 0,
                 entry:
                     entry?.map((song) =>
@@ -1157,7 +1157,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                         ),
                     ) || [],
                 positionMs: position ?? 0,
-                username,
+                username: username ?? '',
             };
         } else {
             const res = await ssApiClient(apiClientProps).getPlayQueue();

@@ -667,14 +667,16 @@ const playQueue = z.object({
 });
 
 const playQueueByIndex = z.object({
-    playQueueByIndex: z.object({
-        changed: z.string(),
-        changedBy: z.string(),
-        currentIndex: z.number().optional(),
-        entry: song.array().optional(),
-        position: z.number().optional(),
-        username: z.string(),
-    }),
+    playQueueByIndex: z
+        .object({
+            changed: z.string(),
+            changedBy: z.string(),
+            currentIndex: z.number().optional(),
+            entry: song.array().optional(),
+            position: z.number().optional(),
+            username: z.string(),
+        })
+        .optional(),
 });
 
 const internetRadioStation = z.object({
