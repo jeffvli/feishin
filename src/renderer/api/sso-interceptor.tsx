@@ -103,22 +103,14 @@ export const ensureSsoAuth = async (
                 openModal({
                     children: (
                         <Stack gap="md">
-                            <Text size="sm">
-                                {t('form.addServer.sso_description', {
-                                    postProcess: 'sentenceCase',
-                                })}
-                            </Text>
+                            <Text size="sm">{t('ssoInterceptor.description')}</Text>
                             <Group justify="flex-end">
                                 <Button onClick={handleCancel} variant="default">
-                                    {t('form.addServer.sso_switchServer', {
-                                        postProcess: 'titleCase',
-                                    })}
+                                    {t('ssoInterceptor.switchServer')}
                                 </Button>
                                 {isElectron() ? (
                                     <Button onClick={handleLogin} variant="filled">
-                                        {t('form.addServer.sso_login', {
-                                            postProcess: 'titleCase',
-                                        })}
+                                        {t('ssoInterceptor.login')}
                                     </Button>
                                 ) : (
                                     <>
@@ -128,9 +120,7 @@ export const ensureSsoAuth = async (
                                             }}
                                             variant="outline"
                                         >
-                                            {t('form.addServer.sso_openLoginPage', {
-                                                postProcess: 'titleCase',
-                                            })}
+                                            {t('ssoInterceptor.openLoginPage')}
                                         </Button>
                                         <Button
                                             onClick={() => {
@@ -140,9 +130,7 @@ export const ensureSsoAuth = async (
                                             }}
                                             variant="filled"
                                         >
-                                            {t('form.addServer.sso_confirmLogin', {
-                                                postProcess: 'titleCase',
-                                            })}
+                                            {t('ssoInterceptor.confirmLogin')}
                                         </Button>
                                     </>
                                 )}
@@ -152,7 +140,7 @@ export const ensureSsoAuth = async (
                     closeOnClickOutside: false,
                     closeOnEscape: false,
                     onClose: handleCancel,
-                    title: t('form.addServer.sso_title', { postProcess: 'titleCase' }),
+                    title: t('ssoInterceptor.title'),
                     withCloseButton: false,
                 });
             });

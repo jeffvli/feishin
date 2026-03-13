@@ -316,13 +316,11 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                                 !isElectron()
                                     ? t('form.addServer.input', {
                                           context: 'isSsoProxyDescription',
-                                          postProcess: 'sentenceCase',
                                       })
                                     : undefined
                             }
                             label={t('form.addServer.input', {
                                 context: 'isSsoProxy',
-                                postProcess: 'titleCase',
                             })}
                             {...form.getInputProps('isSsoProxy', {
                                 type: 'checkbox',
@@ -332,7 +330,6 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             <TextInput
                                 label={t('form.addServer.input', {
                                     context: 'ssoCookieName',
-                                    postProcess: 'titleCase',
                                 })}
                                 placeholder={SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS}
                                 {...form.getInputProps('ssoCookieName')}
