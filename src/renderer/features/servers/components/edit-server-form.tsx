@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
+import { ensureSsoAuth } from '/@/renderer/api/sso-interceptor';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { getServerById, useAuthStoreActions } from '/@/renderer/store';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
@@ -124,23 +125,36 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
                 let ssoCookies: Record<string, string> | undefined = server.ssoCookies;
                 if (
-                    isElectron() &&
                     values.isSsoProxy &&
                     (isSsoProxyChanged || urlChanged || ssoCookieNameChanged)
                 ) {
-                    const loginResult = await window.api.sso.login(
-                        values.url,
-                        values.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
-                    );
-                    if (!loginResult.success) {
-                        setIsLoading(false);
-                        return toast.error({
-                            message: t('error.authenticationFailed', {
-                                postProcess: 'sentenceCase',
-                            }),
-                        });
+                    if (isElectron()) {
+                        const loginResult = await window.api.sso.login(
+                            values.url,
+                            values.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
+                        );
+                        if (!loginResult.success) {
+                            setIsLoading(false);
+                            return toast.error({
+                                message: t('error.authenticationFailed', {
+                                    postProcess: 'sentenceCase',
+                                }),
+                            });
+                        }
+                        ssoCookies = loginResult.cookies;
+                    } else {
+                        const dummyServer = {
+                            id: server.id,
+                            isSsoProxy: true,
+                            ssoCookieName: values.ssoCookieName,
+                            url: values.url,
+                        } as any;
+                        const authenticated = await ensureSsoAuth(dummyServer);
+                        if (!authenticated) {
+                            setIsLoading(false);
+                            return;
+                        }
                     }
-                    ssoCookies = loginResult.cookies;
                 }
 
                 data = await authFunction(
@@ -259,29 +273,41 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     rightSection={form.isDirty('url') && <ModifiedFieldIndicator />}
                     {...form.getInputProps('url')}
                 />
-                {isElectron() && (
-                    <Stack gap="xs">
-                        <Group gap="xs">
-                            <Checkbox
-                                label="Server is behind an SSO Proxy (e.g. Cloudflare Access)"
-                                {...form.getInputProps('isSsoProxy', {
-                                    type: 'checkbox',
-                                })}
-                            />
-                            {form.isDirty('isSsoProxy') && <ModifiedFieldIndicator />}
-                        </Group>
-                        {form.values.isSsoProxy && (
-                            <TextInput
-                                label="SSO Cookie Name"
-                                placeholder={SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS}
-                                rightSection={
-                                    form.isDirty('ssoCookieName') && <ModifiedFieldIndicator />
-                                }
-                                {...form.getInputProps('ssoCookieName')}
-                            />
-                        )}
-                    </Stack>
-                )}
+                <Stack gap="xs">
+                    <Group gap="xs">
+                        <Checkbox
+                            description={
+                                !isElectron()
+                                    ? t('form.addServer.input', {
+                                          context: 'isSsoProxyDescription',
+                                          postProcess: 'sentenceCase',
+                                      })
+                                    : undefined
+                            }
+                            label={t('form.addServer.input', {
+                                context: 'isSsoProxy',
+                                postProcess: 'titleCase',
+                            })}
+                            {...form.getInputProps('isSsoProxy', {
+                                type: 'checkbox',
+                            })}
+                        />
+                        {form.isDirty('isSsoProxy') && <ModifiedFieldIndicator />}
+                    </Group>
+                    {form.values.isSsoProxy && (
+                        <TextInput
+                            label={t('form.addServer.input', {
+                                context: 'ssoCookieName',
+                                postProcess: 'titleCase',
+                            })}
+                            placeholder={SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS}
+                            rightSection={
+                                form.isDirty('ssoCookieName') && <ModifiedFieldIndicator />
+                            }
+                            {...form.getInputProps('ssoCookieName')}
+                        />
+                    )}
+                </Stack>
                 <TextInput
                     label={t('form.addServer.input', {
                         context: 'remoteUrl',

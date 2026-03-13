@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '/@/renderer/api';
+import { ensureSsoAuth } from '/@/renderer/api/sso-interceptor';
 import {
     isLegacyAuth,
     isServerLock,
@@ -151,18 +152,35 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             setIsLoading(true);
 
             let ssoCookies: Record<string, string> | undefined;
-            if (isElectron() && values.isSsoProxy) {
-                const loginResult = await window.api.sso.login(
-                    values.url,
-                    values.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
-                );
-                if (!loginResult.success) {
-                    setIsLoading(false);
-                    return toast.error({
-                        message: t('error.authenticationFailed', { postProcess: 'sentenceCase' }),
-                    });
+            if (values.isSsoProxy) {
+                if (isElectron()) {
+                    const loginResult = await window.api.sso.login(
+                        values.url,
+                        values.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
+                    );
+                    if (!loginResult.success) {
+                        setIsLoading(false);
+                        return toast.error({
+                            message: t('error.authenticationFailed', {
+                                postProcess: 'sentenceCase',
+                            }),
+                        });
+                    }
+                    ssoCookies = loginResult.cookies;
+                } else {
+                    // For web, we trigger the ensureSsoAuth modal to make sure the user is logged in
+                    const dummyServer = {
+                        id: 'temp',
+                        isSsoProxy: true,
+                        ssoCookieName: values.ssoCookieName,
+                        url: values.url,
+                    } as any;
+                    const authenticated = await ensureSsoAuth(dummyServer);
+                    if (!authenticated) {
+                        setIsLoading(false);
+                        return;
+                    }
                 }
-                ssoCookies = loginResult.cookies;
             }
 
             const data: AuthenticationResponse | undefined = await authFunction(
@@ -292,23 +310,35 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             {...form.getInputProps('url')}
                         />
                     </Group>
-                    {isElectron() && (
-                        <>
-                            <Checkbox
-                                label="Server is behind an SSO Proxy (e.g. Cloudflare Access)"
-                                {...form.getInputProps('isSsoProxy', {
-                                    type: 'checkbox',
+                    <Stack gap="xs">
+                        <Checkbox
+                            description={
+                                !isElectron()
+                                    ? t('form.addServer.input', {
+                                          context: 'isSsoProxyDescription',
+                                          postProcess: 'sentenceCase',
+                                      })
+                                    : undefined
+                            }
+                            label={t('form.addServer.input', {
+                                context: 'isSsoProxy',
+                                postProcess: 'titleCase',
+                            })}
+                            {...form.getInputProps('isSsoProxy', {
+                                type: 'checkbox',
+                            })}
+                        />
+                        {form.values.isSsoProxy && (
+                            <TextInput
+                                label={t('form.addServer.input', {
+                                    context: 'ssoCookieName',
+                                    postProcess: 'titleCase',
                                 })}
+                                placeholder={SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS}
+                                {...form.getInputProps('ssoCookieName')}
                             />
-                            {form.values.isSsoProxy && (
-                                <TextInput
-                                    label="SSO Cookie Name"
-                                    placeholder={SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS}
-                                    {...form.getInputProps('ssoCookieName')}
-                                />
-                            )}
-                        </>
-                    )}
+                        )}
+                    </Stack>
                     <TextInput
                         disabled={serverLock}
                         label={t('form.addServer.input', {

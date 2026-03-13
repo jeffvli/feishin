@@ -318,6 +318,8 @@
             "error_savePassword": "an error occurred when trying to save the password",
             "ignoreCors": "ignore cors ($t(common.restartRequired))",
             "ignoreSsl": "ignore ssl ($t(common.restartRequired))",
+            "input_isSsoProxy": "server is behind an SSO proxy (e.g. Cloudflare Access, Authelia)",
+            "input_isSsoProxyDescription": "the web version requires Feishin to be hosted on the same domain as your music server, or for your SSO provider to be configured with appropriate CORS headers.",
             "input_legacyAuthentication": "enable legacy authentication",
             "input_name": "server name",
             "input_password": "password",
@@ -327,8 +329,15 @@
             "input_remoteUrl": "public url",
             "input_remoteUrlPlaceholder": "optional: public url for external features",
             "input_savePassword": "save password",
+            "input_ssoCookieName": "SSO cookie name",
             "input_url": "url",
             "input_username": "username",
+            "sso_title": "login required",
+            "sso_description": "your SSO session has expired. please re-authenticate to continue.",
+            "sso_login": "login",
+            "sso_openLoginPage": "open login page",
+            "sso_confirmLogin": "i've logged in",
+            "sso_switchServer": "switch server",
             "success": "server added successfully",
             "title": "add server"
         },
@@ -345,6 +354,7 @@
             "title": "add to $t(entity.playlist, {\"count\": 1})"
         },
         "createPlaylist": {
+
             "input_description": "$t(common.description)",
             "input_name": "$t(common.name)",
             "input_owner": "$t(common.owner)",

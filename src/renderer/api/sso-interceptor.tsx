@@ -1,4 +1,5 @@
 import { AxiosInstance } from 'axios';
+import { t } from 'i18next';
 import isElectron from 'is-electron';
 
 import { useAuthStore } from '/@/renderer/store';
@@ -30,20 +31,26 @@ export const ensureSsoAuth = async (
     const reauthLogic = async (): Promise<boolean> => {
         try {
             if (isInitialLogin) {
-                const result = await window.api.sso.login(
-                    server.url,
-                    server.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
-                );
+                if (isElectron()) {
+                    const result = await window.api.sso.login(
+                        server.url,
+                        server.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
+                    );
 
-                if (timedOut) return false;
+                    if (timedOut) return false;
 
-                if (result && result.success) {
-                    useAuthStore
-                        .getState()
-                        .actions.updateServer(server.id, { ssoCookies: result.cookies });
+                    if (result && result.success) {
+                        useAuthStore
+                            .getState()
+                            .actions.updateServer(server.id, { ssoCookies: result.cookies });
+                        return true;
+                    }
+                    return false;
+                } else {
+                    // Web version: we can't capture cookies, but we can't do much here
+                    // either as this is called during initial login.
                     return true;
                 }
-                return false;
             }
 
             return await new Promise<boolean>((resolve) => {
@@ -51,25 +58,30 @@ export const ensureSsoAuth = async (
 
                 const handleLogin = async () => {
                     try {
-                        const result = await window.api.sso.login(
-                            server.url,
-                            server.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
-                        );
+                        if (isElectron()) {
+                            const result = await window.api.sso.login(
+                                server.url,
+                                server.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
+                            );
 
-                        if (timedOut) {
-                            resolve(false);
-                            return;
-                        }
+                            if (timedOut) {
+                                resolve(false);
+                                return;
+                            }
 
-                        if (result && result.success) {
-                            useAuthStore
-                                .getState()
-                                .actions.updateServer(server.id, { ssoCookies: result.cookies });
-                            isResolved = true;
-                            closeAllModals();
-                            resolve(true);
+                            if (result && result.success) {
+                                useAuthStore.getState().actions.updateServer(server.id, {
+                                    ssoCookies: result.cookies,
+                                });
+                                isResolved = true;
+                                closeAllModals();
+                                resolve(true);
+                            } else {
+                                handleCancel();
+                            }
                         } else {
-                            handleCancel();
+                            window.open(server.url, '_blank', 'noreferrer');
+                            // We don't resolve here, we wait for the user to click "I've logged in"
                         }
                     } catch (error) {
                         logFn.error('SSO login error:', { meta: error });
@@ -92,22 +104,55 @@ export const ensureSsoAuth = async (
                     children: (
                         <Stack gap="md">
                             <Text size="sm">
-                                Your SSO session has expired. Please re-authenticate to continue.
+                                {t('form.addServer.sso_description', {
+                                    postProcess: 'sentenceCase',
+                                })}
                             </Text>
                             <Group justify="flex-end">
                                 <Button onClick={handleCancel} variant="default">
-                                    Switch Server
+                                    {t('form.addServer.sso_switchServer', {
+                                        postProcess: 'titleCase',
+                                    })}
                                 </Button>
-                                <Button onClick={handleLogin} variant="filled">
-                                    Login
-                                </Button>
+                                {isElectron() ? (
+                                    <Button onClick={handleLogin} variant="filled">
+                                        {t('form.addServer.sso_login', {
+                                            postProcess: 'titleCase',
+                                        })}
+                                    </Button>
+                                ) : (
+                                    <>
+                                        <Button
+                                            onClick={() => {
+                                                window.open(server.url, '_blank', 'noreferrer');
+                                            }}
+                                            variant="outline"
+                                        >
+                                            {t('form.addServer.sso_openLoginPage', {
+                                                postProcess: 'titleCase',
+                                            })}
+                                        </Button>
+                                        <Button
+                                            onClick={() => {
+                                                isResolved = true;
+                                                closeAllModals();
+                                                resolve(true);
+                                            }}
+                                            variant="filled"
+                                        >
+                                            {t('form.addServer.sso_confirmLogin', {
+                                                postProcess: 'titleCase',
+                                            })}
+                                        </Button>
+                                    </>
+                                )}
                             </Group>
                         </Stack>
                     ),
                     closeOnClickOutside: false,
                     closeOnEscape: false,
                     onClose: handleCancel,
-                    title: 'Login Required',
+                    title: t('form.addServer.sso_title', { postProcess: 'titleCase' }),
                     withCloseButton: false,
                 });
             });
@@ -146,7 +191,7 @@ const handleSsoResponse = async (
     response: any,
     server: null | ServerListItemWithCredential,
 ) => {
-    if (!isElectron() || !server?.isSsoProxy || !response) {
+    if (!server?.isSsoProxy || !response) {
         return response;
     }
 
@@ -173,7 +218,7 @@ const handleSsoError = async (
     error: any,
     server: null | ServerListItemWithCredential,
 ) => {
-    if (!isElectron() || !server?.isSsoProxy) {
+    if (!server?.isSsoProxy) {
         throw error;
     }
 
