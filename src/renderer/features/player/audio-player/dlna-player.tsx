@@ -10,7 +10,6 @@ import {
     usePlayerMuted,
     usePlayerVolume,
 } from '/@/renderer/store';
-import { PlayerStatus } from '/@/shared/types/types';
 
 export function DlnaPlayer() {
     const playerRef = useRef<DlnaPlayerEngineHandle>(null);

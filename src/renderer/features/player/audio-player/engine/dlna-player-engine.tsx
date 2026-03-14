@@ -10,6 +10,7 @@ import {
     usePlayerActions,
     usePlayerStore,
 } from '/@/renderer/store';
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
 import type { RefObject } from 'react';
@@ -38,7 +39,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
 
     // Define sendCurrentTrackToDlna BEFORE any effects that reference it
     const sendCurrentTrackToDlna = useCallback(
-        (forcePlay = true) => {
+        (_forcePlay = true) => {
             if (!dlnaPlayer) return;
 
             // Skip if the device already auto-transitioned (gapless)
@@ -58,7 +59,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             try {
                 albumArtUrl = api.controller.getImageUrl({
                     apiClientProps: { serverId: song._serverId },
-                    query: { id: song.albumId || song.id, size: 600 },
+                    query: { id: song.albumId || song.id, itemType: LibraryItem.ALBUM, size: 600 },
                 }) || undefined;
             } catch {
                 // Ignore image URL errors
@@ -83,7 +84,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                     try {
                         nextArtUrl = api.controller.getImageUrl({
                             apiClientProps: { serverId: nextSong._serverId },
-                            query: { id: nextSong.albumId || nextSong.id, size: 600 },
+                            query: { id: nextSong.albumId || nextSong.id, itemType: LibraryItem.ALBUM, size: 600 },
                         }) || undefined;
                     } catch {}
 
@@ -139,7 +140,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         try {
             nextArtUrl = api.controller.getImageUrl({
                 apiClientProps: { serverId: nextSong._serverId },
-                query: { id: nextSong.albumId || nextSong.id, size: 600 },
+                query: { id: nextSong.albumId || nextSong.id, itemType: LibraryItem.ALBUM, size: 600 },
             }) || undefined;
         } catch {}
 

@@ -1,13 +1,17 @@
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { usePlayerActions, useSettingsStoreActions } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
-import { Flex } from '/@/shared/components/flex/flex';
 import { PlayerType } from '/@/shared/types/types';
 
-import type { DlnaDevice } from '/@/preload/dlna-player';
+interface DlnaDevice {
+    controlUrl: string;
+    id: string;
+    location: string;
+    name: string;
+    renderingControlUrl: string;
+}
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 
@@ -61,7 +65,6 @@ const DeviceList = ({ devices, isLoading, onSelect }: DeviceListProps) => {
 };
 
 export const DlnaCastButton = () => {
-    const { t } = useTranslation();
     const { setSettings } = useSettingsStoreActions();
     const { setVolume } = usePlayerActions();
     const [isConnected, setIsConnected] = useState(false);
