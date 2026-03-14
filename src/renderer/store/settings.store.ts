@@ -1131,7 +1131,7 @@ const initialState: SettingsState = {
         lastfmApiKey: '',
         musicBrainz: true,
         nativeAspectRatio: false,
-        nativeSpotify: true,
+        nativeSpotify: false,
         passwordStore: undefined,
         pathReplace: '',
         pathReplaceWith: '',
