@@ -1,3 +1,5 @@
+import type { RefObject } from 'react';
+
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 
@@ -5,15 +7,9 @@ import { api } from '/@/renderer/api';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { getSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { AudioPlayer } from '/@/renderer/features/player/audio-player/types';
-import {
-    usePlaybackSettings,
-    usePlayerActions,
-    usePlayerStore,
-} from '/@/renderer/store';
+import { usePlaybackSettings, usePlayerActions, usePlayerStore } from '/@/renderer/store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
-
-import type { RefObject } from 'react';
 
 export interface DlnaPlayerEngineHandle extends AudioPlayer {}
 
@@ -38,68 +34,77 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     const skipNextSendRef = useRef(false);
 
     // Define sendCurrentTrackToDlna BEFORE any effects that reference it
-    const sendCurrentTrackToDlna = useCallback(
-        (_forcePlay = true) => {
-            if (!dlnaPlayer) return;
+    const sendCurrentTrackToDlna = useCallback(() => {
+        if (!dlnaPlayer) return;
 
-            // Skip if the device already auto-transitioned (gapless)
-            if (skipNextSendRef.current) {
-                skipNextSendRef.current = false;
-                return;
-            }
+        // Skip if the device already auto-transitioned (gapless)
+        if (skipNextSendRef.current) {
+            skipNextSendRef.current = false;
+            return;
+        }
 
-            const playerData = usePlayerStore.getState().getPlayerData();
-            const song = playerData.currentSong;
-            if (!song) return;
+        const playerData = usePlayerStore.getState().getPlayerData();
+        const song = playerData.currentSong;
+        if (!song) return;
 
-            const url = getSongUrl(song, transcode);
-            if (!url) return;
+        const url = getSongUrl(song, transcode);
+        if (!url) return;
 
-            let albumArtUrl: string | undefined;
-            try {
-                albumArtUrl = api.controller.getImageUrl({
+        let albumArtUrl: string | undefined;
+        try {
+            albumArtUrl =
+                api.controller.getImageUrl({
                     apiClientProps: { serverId: song._serverId },
-                    query: { id: song.albumId || song.id, itemType: LibraryItem.ALBUM, size: 600 },
+                    query: {
+                        id: song.albumId || song.id,
+                        itemType: LibraryItem.ALBUM,
+                        size: 600,
+                    },
                 }) || undefined;
-            } catch {
-                // Ignore image URL errors
-            }
+        } catch {
+            // Ignore image URL errors
+        }
 
-            dlnaPlayer.playUrl(url, {
-                albumArtUrl,
-                albumName: song.album || undefined,
-                artistName: song.artistName || song.artists?.[0]?.name || undefined,
-                duration: song.duration ? song.duration / 1000 : undefined,
-                title: song.name,
-            });
+        dlnaPlayer.playUrl(url, {
+            albumArtUrl,
+            albumName: song.album || undefined,
+            artistName: song.artistName || song.artists?.[0]?.name || undefined,
+            duration: song.duration ? song.duration / 1000 : undefined,
+            title: song.name,
+        });
 
-            hasPlayedRef.current = true;
+        hasPlayedRef.current = true;
 
-            // Pre-load the next track for gapless playback
-            const nextSong = playerData.nextSong;
-            if (nextSong) {
-                const nextUrl = getSongUrl(nextSong, transcode);
-                if (nextUrl) {
-                    let nextArtUrl: string | undefined;
-                    try {
-                        nextArtUrl = api.controller.getImageUrl({
+        // Pre-load the next track for gapless playback
+        const nextSong = playerData.nextSong;
+        if (nextSong) {
+            const nextUrl = getSongUrl(nextSong, transcode);
+            if (nextUrl) {
+                let nextArtUrl: string | undefined;
+                try {
+                    nextArtUrl =
+                        api.controller.getImageUrl({
                             apiClientProps: { serverId: nextSong._serverId },
-                            query: { id: nextSong.albumId || nextSong.id, itemType: LibraryItem.ALBUM, size: 600 },
+                            query: {
+                                id: nextSong.albumId || nextSong.id,
+                                itemType: LibraryItem.ALBUM,
+                                size: 600,
+                            },
                         }) || undefined;
-                    } catch {}
-
-                    dlnaPlayer.setNextUrl(nextUrl, {
-                        albumArtUrl: nextArtUrl,
-                        albumName: nextSong.album || undefined,
-                        artistName: nextSong.artistName || nextSong.artists?.[0]?.name || undefined,
-                        duration: nextSong.duration ? nextSong.duration / 1000 : undefined,
-                        title: nextSong.name,
-                    });
+                } catch {
+                    // Ignore image URL errors
                 }
+
+                dlnaPlayer.setNextUrl(nextUrl, {
+                    albumArtUrl: nextArtUrl,
+                    albumName: nextSong.album || undefined,
+                    artistName: nextSong.artistName || nextSong.artists?.[0]?.name || undefined,
+                    duration: nextSong.duration ? nextSong.duration / 1000 : undefined,
+                    title: nextSong.name,
+                });
             }
-        },
-        [transcode],
-    );
+        }
+    }, [transcode]);
 
     // On mount, if already playing, send the current track to the DLNA device
     useEffect(() => {
@@ -138,11 +143,18 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
 
         let nextArtUrl: string | undefined;
         try {
-            nextArtUrl = api.controller.getImageUrl({
-                apiClientProps: { serverId: nextSong._serverId },
-                query: { id: nextSong.albumId || nextSong.id, itemType: LibraryItem.ALBUM, size: 600 },
-            }) || undefined;
-        } catch {}
+            nextArtUrl =
+                api.controller.getImageUrl({
+                    apiClientProps: { serverId: nextSong._serverId },
+                    query: {
+                        id: nextSong.albumId || nextSong.id,
+                        itemType: LibraryItem.ALBUM,
+                        size: 600,
+                    },
+                }) || undefined;
+        } catch {
+            // Ignore image URL errors
+        }
 
         dlnaPlayer.setNextUrl(nextUrl, {
             albumArtUrl: nextArtUrl,
@@ -238,7 +250,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 hasPlayedRef.current = false;
             },
             onQueueRestored: () => {
-                sendCurrentTrackToDlna(false);
+                sendCurrentTrackToDlna();
             },
         },
         [transcode, sendCurrentTrackToDlna],

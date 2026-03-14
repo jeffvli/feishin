@@ -44,6 +44,9 @@ const DeviceList = ({ devices, isLoading, onSelect }: DeviceListProps) => {
                 <div
                     key={device.id}
                     onClick={() => onSelect(device)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') onSelect(device);
+                    }}
                     role="button"
                     style={{
                         borderRadius: '4px',
@@ -53,9 +56,6 @@ const DeviceList = ({ devices, isLoading, onSelect }: DeviceListProps) => {
                         padding: '6px 12px',
                     }}
                     tabIndex={0}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') onSelect(device);
-                    }}
                 >
                     {device.name}
                 </div>
@@ -150,7 +150,10 @@ export const DlnaCastButton = () => {
     }, [showPopover]);
 
     const buttonRef = useRef<HTMLDivElement>(null);
-    const [popoverPos, setPopoverPos] = useState<{ left: number; top: number }>({ left: 0, top: 0 });
+    const [popoverPos, setPopoverPos] = useState<{ left: number; top: number }>({
+        left: 0,
+        top: 0,
+    });
 
     useEffect(() => {
         if (showPopover && buttonRef.current) {
@@ -211,16 +214,15 @@ export const DlnaCastButton = () => {
                     >
                         DLNA Devices
                     </div>
-                    <DeviceList
-                        devices={devices}
-                        isLoading={isLoading}
-                        onSelect={handleSelect}
-                    />
+                    <DeviceList devices={devices} isLoading={isLoading} onSelect={handleSelect} />
                     {!isLoading && (
                         <div
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleDiscover();
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleDiscover();
                             }}
                             role="button"
                             style={{
@@ -233,9 +235,6 @@ export const DlnaCastButton = () => {
                                 textAlign: 'center',
                             }}
                             tabIndex={0}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleDiscover();
-                            }}
                         >
                             Refresh
                         </div>

@@ -1,12 +1,13 @@
+import type { ErrorInfo, ReactNode } from 'react';
+
 import isElectron from 'is-electron';
 import { Component, useEffect, useState } from 'react';
-import type { ErrorInfo, ReactNode } from 'react';
 
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { DiscordRpcHook } from '/@/renderer/features/discord-rpc/use-discord-rpc';
-import { MainPlayerListenerHook } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { DlnaPlayer } from '/@/renderer/features/player/audio-player/dlna-player';
+import { MainPlayerListenerHook } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
 import { SleepTimerHook } from '/@/renderer/features/player/components/sleep-timer-button';
