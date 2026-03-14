@@ -13,7 +13,7 @@ jobs:
             - name: Install Node.js and PNPM
               uses: pnpm/action-setup@v4
               with:
-                  version: 9
+                  version: 10
 
             - name: Install dependencies
               run: pnpm install
