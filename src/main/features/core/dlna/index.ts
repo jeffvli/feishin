@@ -3,11 +3,8 @@ import os from 'os';
 
 import { getMainWindow } from '../../../index';
 import { createLog } from '../../../utils';
-
-import { discoverDevices } from './ssdp-discovery';
 import {
     DlnaDevice,
-    TrackMetadata,
     getPositionInfo,
     getTransportInfo,
     getVolume,
@@ -15,11 +12,13 @@ import {
     play,
     seek,
     setAVTransportURI,
-    setNextAVTransportURI,
     setMute,
+    setNextAVTransportURI,
     setVolume,
     stop,
+    TrackMetadata,
 } from './soap-client';
+import { discoverDevices } from './ssdp-discovery';
 
 let connectedDevice: DlnaDevice | null = null;
 let positionPollingInterval: NodeJS.Timeout | null = null;
@@ -27,7 +26,7 @@ let lastKnownPosition = 0;
 let hasStartedPlaying = false;
 let trackLoadedAt = 0;
 
-function getLanIp(): string | null {
+function getLanIp(): null | string {
     const interfaces = os.networkInterfaces();
     for (const name of Object.keys(interfaces)) {
         for (const iface of interfaces[name] || []) {
@@ -83,8 +82,14 @@ function startPositionPolling() {
             }
 
             // Detect gapless transition: position jumped backward significantly
-            if (hasStartedPlaying && lastKnownPosition > 5 && posInfo.position < lastKnownPosition - 3) {
-                dlnaLog(`Gapless transition detected: ${lastKnownPosition}s -> ${posInfo.position}s`);
+            if (
+                hasStartedPlaying &&
+                lastKnownPosition > 5 &&
+                posInfo.position < lastKnownPosition - 3
+            ) {
+                dlnaLog(
+                    `Gapless transition detected: ${lastKnownPosition}s -> ${posInfo.position}s`,
+                );
                 hasStartedPlaying = true; // Already playing the next track
                 trackLoadedAt = Date.now(); // Reset grace period
                 getMainWindow()?.webContents.send('renderer-dlna-track-ended');
@@ -98,7 +103,7 @@ function startPositionPolling() {
                 hasStartedPlaying = false;
                 getMainWindow()?.webContents.send('renderer-dlna-track-ended');
             }
-        } catch (err) {
+        } catch {
             // Polling errors are expected during track transitions
         }
     }, 1000);
@@ -116,7 +121,7 @@ ipcMain.handle('dlna-discover', async () => {
     try {
         dlnaLog('Discovering devices...');
         const devices = await discoverDevices(5000);
-        dlnaLog(`Found ${devices.length} device(s): ${JSON.stringify(devices.map(d => d.name))}`);
+        dlnaLog(`Found ${devices.length} device(s): ${JSON.stringify(devices.map((d) => d.name))}`);
         return devices;
     } catch (err) {
         dlnaLog('Discovery failed', err);
@@ -173,47 +178,41 @@ ipcMain.handle('dlna-disconnect', async () => {
 });
 
 // Play a track on the connected device
-ipcMain.on(
-    'dlna-play-url',
-    async (_event, data: { metadata: TrackMetadata; url: string }) => {
-        if (!connectedDevice) return;
+ipcMain.on('dlna-play-url', async (_event, data: { metadata: TrackMetadata; url: string }) => {
+    if (!connectedDevice) return;
 
-        try {
-            hasStartedPlaying = false;
-            trackLoadedAt = Date.now();
-            const lanUrl = rewriteUrlForLan(data.url);
-            const lanArtUrl = data.metadata.albumArtUrl
-                ? rewriteUrlForLan(data.metadata.albumArtUrl)
-                : undefined;
-            const metadata = { ...data.metadata, albumArtUrl: lanArtUrl };
-            await setAVTransportURI(connectedDevice, lanUrl, metadata);
-            await play(connectedDevice);
-            dlnaLog(`Playing: ${data.metadata.title}`);
-        } catch (err) {
-            dlnaLog(`Failed to play ${data.metadata.title}`, err);
-        }
-    },
-);
+    try {
+        hasStartedPlaying = false;
+        trackLoadedAt = Date.now();
+        const lanUrl = rewriteUrlForLan(data.url);
+        const lanArtUrl = data.metadata.albumArtUrl
+            ? rewriteUrlForLan(data.metadata.albumArtUrl)
+            : undefined;
+        const metadata = { ...data.metadata, albumArtUrl: lanArtUrl };
+        await setAVTransportURI(connectedDevice, lanUrl, metadata);
+        await play(connectedDevice);
+        dlnaLog(`Playing: ${data.metadata.title}`);
+    } catch (err) {
+        dlnaLog(`Failed to play ${data.metadata.title}`, err);
+    }
+});
 
 // Set the next track for gapless playback
-ipcMain.on(
-    'dlna-set-next-url',
-    async (_event, data: { metadata: TrackMetadata; url: string }) => {
-        if (!connectedDevice) return;
+ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; url: string }) => {
+    if (!connectedDevice) return;
 
-        try {
-            const lanUrl = rewriteUrlForLan(data.url);
-            const lanArtUrl = data.metadata.albumArtUrl
-                ? rewriteUrlForLan(data.metadata.albumArtUrl)
-                : undefined;
-            const metadata = { ...data.metadata, albumArtUrl: lanArtUrl };
-            await setNextAVTransportURI(connectedDevice, lanUrl, metadata);
-            dlnaLog(`Set next track: ${data.metadata.title}`);
-        } catch (err) {
-            dlnaLog(`Failed to set next track ${data.metadata.title}`, err);
-        }
-    },
-);
+    try {
+        const lanUrl = rewriteUrlForLan(data.url);
+        const lanArtUrl = data.metadata.albumArtUrl
+            ? rewriteUrlForLan(data.metadata.albumArtUrl)
+            : undefined;
+        const metadata = { ...data.metadata, albumArtUrl: lanArtUrl };
+        await setNextAVTransportURI(connectedDevice, lanUrl, metadata);
+        dlnaLog(`Set next track: ${data.metadata.title}`);
+    } catch (err) {
+        dlnaLog(`Failed to set next track ${data.metadata.title}`, err);
+    }
+});
 
 // Resume playback
 ipcMain.on('dlna-play', async () => {

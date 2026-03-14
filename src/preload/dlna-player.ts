@@ -81,8 +81,8 @@ export const dlnaPlayer = {
     pause,
     play,
     playUrl,
-    setNextUrl,
     seek,
+    setNextUrl,
     stop,
     volume,
 };

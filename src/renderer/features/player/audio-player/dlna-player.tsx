@@ -2,8 +2,8 @@ import { useCallback, useRef } from 'react';
 
 import { DlnaPlayerEngine, DlnaPlayerEngineHandle } from './engine/dlna-player-engine';
 
-import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     usePlayerActions,
     usePlayerData,

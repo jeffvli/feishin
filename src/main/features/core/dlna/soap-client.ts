@@ -16,17 +16,14 @@ export interface TrackMetadata {
     title: string;
 }
 
-function formatDuration(seconds: number): string {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
-    return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
-
 function buildDidlLite(streamUrl: string, metadata: TrackMetadata): string {
     const duration = metadata.duration ? formatDuration(metadata.duration) : '0:00:00';
     const escape = (s: string) =>
-        s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        s
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
 
     const albumArt = metadata.albumArtUrl
         ? `<upnp:albumArtURI>${escape(metadata.albumArtUrl)}</upnp:albumArtURI>`
@@ -45,6 +42,13 @@ function buildDidlLite(streamUrl: string, metadata: TrackMetadata): string {
             <res protocolInfo="http-get:*:audio/mpeg:*" duration="${duration}">${escape(streamUrl)}</res>
         </item>
     </DIDL-Lite>`;
+}
+
+function formatDuration(seconds: number): string {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
 async function soapRequest(
@@ -77,81 +81,10 @@ async function soapRequest(
 const AVT = 'urn:schemas-upnp-org:service:AVTransport:1';
 const RC = 'urn:schemas-upnp-org:service:RenderingControl:1';
 
-export async function setAVTransportURI(
-    device: DlnaDevice,
-    streamUrl: string,
-    metadata: TrackMetadata,
-): Promise<void> {
-    const didl = buildDidlLite(streamUrl, metadata);
-    const escape = (s: string) =>
-        s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-    await soapRequest(
-        device.controlUrl,
-        AVT,
-        'SetAVTransportURI',
-        `<InstanceID>0</InstanceID>
-        <CurrentURI>${escape(streamUrl)}</CurrentURI>
-        <CurrentURIMetaData>${escape(didl)}</CurrentURIMetaData>`,
-    );
-}
-
-export async function setNextAVTransportURI(
-    device: DlnaDevice,
-    streamUrl: string,
-    metadata: TrackMetadata,
-): Promise<void> {
-    const didl = buildDidlLite(streamUrl, metadata);
-    const escape = (s: string) =>
-        s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-    await soapRequest(
-        device.controlUrl,
-        AVT,
-        'SetNextAVTransportURI',
-        `<InstanceID>0</InstanceID>
-        <NextURI>${escape(streamUrl)}</NextURI>
-        <NextURIMetaData>${escape(didl)}</NextURIMetaData>`,
-    );
-}
-
-export async function play(device: DlnaDevice): Promise<void> {
-    await soapRequest(
-        device.controlUrl,
-        AVT,
-        'Play',
-        `<InstanceID>0</InstanceID><Speed>1</Speed>`,
-    );
-}
-
-export async function pause(device: DlnaDevice): Promise<void> {
-    await soapRequest(device.controlUrl, AVT, 'Pause', `<InstanceID>0</InstanceID>`);
-}
-
-export async function stop(device: DlnaDevice): Promise<void> {
-    await soapRequest(device.controlUrl, AVT, 'Stop', `<InstanceID>0</InstanceID>`);
-}
-
-export async function seek(device: DlnaDevice, seconds: number): Promise<void> {
-    const target = formatDuration(seconds);
-    await soapRequest(
-        device.controlUrl,
-        AVT,
-        'Seek',
-        `<InstanceID>0</InstanceID><Unit>REL_TIME</Unit><Target>${target}</Target>`,
-    );
-}
-
 export interface PositionInfo {
     duration: number;
     position: number;
     transportState: string;
-}
-
-function parseTime(timeStr: string): number {
-    const match = timeStr.match(/(\d+):(\d+):(\d+)/);
-    if (!match) return 0;
-    return parseInt(match[1]) * 3600 + parseInt(match[2]) * 60 + parseInt(match[3]);
 }
 
 export async function getPositionInfo(device: DlnaDevice): Promise<PositionInfo> {
@@ -172,9 +105,7 @@ export async function getPositionInfo(device: DlnaDevice): Promise<PositionInfo>
     };
 }
 
-export async function getTransportInfo(
-    device: DlnaDevice,
-): Promise<{ state: string }> {
+export async function getTransportInfo(device: DlnaDevice): Promise<{ state: string }> {
     const response = await soapRequest(
         device.controlUrl,
         AVT,
@@ -182,21 +113,9 @@ export async function getTransportInfo(
         `<InstanceID>0</InstanceID>`,
     );
 
-    const stateMatch = response.match(
-        /<CurrentTransportState>([^<]+)<\/CurrentTransportState>/,
-    );
+    const stateMatch = response.match(/<CurrentTransportState>([^<]+)<\/CurrentTransportState>/);
 
     return { state: stateMatch ? stateMatch[1] : 'UNKNOWN' };
-}
-
-export async function setVolume(device: DlnaDevice, volume: number): Promise<void> {
-    const vol = Math.round(Math.max(0, Math.min(100, volume)));
-    await soapRequest(
-        device.renderingControlUrl,
-        RC,
-        'SetVolume',
-        `<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredVolume>${vol}</DesiredVolume>`,
-    );
 }
 
 export async function getVolume(device: DlnaDevice): Promise<number> {
@@ -210,6 +129,47 @@ export async function getVolume(device: DlnaDevice): Promise<number> {
     return match ? parseInt(match[1]) : 50;
 }
 
+export async function pause(device: DlnaDevice): Promise<void> {
+    await soapRequest(device.controlUrl, AVT, 'Pause', `<InstanceID>0</InstanceID>`);
+}
+
+export async function play(device: DlnaDevice): Promise<void> {
+    await soapRequest(device.controlUrl, AVT, 'Play', `<InstanceID>0</InstanceID><Speed>1</Speed>`);
+}
+
+export async function seek(device: DlnaDevice, seconds: number): Promise<void> {
+    const target = formatDuration(seconds);
+    await soapRequest(
+        device.controlUrl,
+        AVT,
+        'Seek',
+        `<InstanceID>0</InstanceID><Unit>REL_TIME</Unit><Target>${target}</Target>`,
+    );
+}
+
+export async function setAVTransportURI(
+    device: DlnaDevice,
+    streamUrl: string,
+    metadata: TrackMetadata,
+): Promise<void> {
+    const didl = buildDidlLite(streamUrl, metadata);
+    const escape = (s: string) =>
+        s
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+
+    await soapRequest(
+        device.controlUrl,
+        AVT,
+        'SetAVTransportURI',
+        `<InstanceID>0</InstanceID>
+        <CurrentURI>${escape(streamUrl)}</CurrentURI>
+        <CurrentURIMetaData>${escape(didl)}</CurrentURIMetaData>`,
+    );
+}
+
 export async function setMute(device: DlnaDevice, mute: boolean): Promise<void> {
     await soapRequest(
         device.renderingControlUrl,
@@ -217,4 +177,47 @@ export async function setMute(device: DlnaDevice, mute: boolean): Promise<void> 
         'SetMute',
         `<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredMute>${mute ? '1' : '0'}</DesiredMute>`,
     );
+}
+
+export async function setNextAVTransportURI(
+    device: DlnaDevice,
+    streamUrl: string,
+    metadata: TrackMetadata,
+): Promise<void> {
+    const didl = buildDidlLite(streamUrl, metadata);
+    const escape = (s: string) =>
+        s
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+
+    await soapRequest(
+        device.controlUrl,
+        AVT,
+        'SetNextAVTransportURI',
+        `<InstanceID>0</InstanceID>
+        <NextURI>${escape(streamUrl)}</NextURI>
+        <NextURIMetaData>${escape(didl)}</NextURIMetaData>`,
+    );
+}
+
+export async function setVolume(device: DlnaDevice, volume: number): Promise<void> {
+    const vol = Math.round(Math.max(0, Math.min(100, volume)));
+    await soapRequest(
+        device.renderingControlUrl,
+        RC,
+        'SetVolume',
+        `<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredVolume>${vol}</DesiredVolume>`,
+    );
+}
+
+export async function stop(device: DlnaDevice): Promise<void> {
+    await soapRequest(device.controlUrl, AVT, 'Stop', `<InstanceID>0</InstanceID>`);
+}
+
+function parseTime(timeStr: string): number {
+    const match = timeStr.match(/(\d+):(\d+):(\d+)/);
+    if (!match) return 0;
+    return parseInt(match[1]) * 3600 + parseInt(match[2]) * 60 + parseInt(match[3]);
 }
