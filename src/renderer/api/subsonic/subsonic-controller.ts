@@ -1138,15 +1138,15 @@ export const SubsonicController: InternalControllerEndpoint = {
             const res = await ssApiClient(apiClientProps).getPlayQueueByIndex();
 
             if (res.status !== 200) {
-                throw new Error('Failed to get random songs');
+                throw new Error('Failed to get play queue');
             }
 
             const { changed, changedBy, currentIndex, entry, position, username } =
-                res.body.playQueueByIndex;
+                res.body.playQueueByIndex || {}; // if there is no queue saved, playQueueByIndex may be undefined from a bug in Navidrome
 
             return {
-                changed,
-                changedBy,
+                changed: changed ?? '',
+                changedBy: changedBy ?? '',
                 currentIndex: currentIndex ?? 0,
                 entry:
                     entry?.map((song) =>
@@ -1158,13 +1158,13 @@ export const SubsonicController: InternalControllerEndpoint = {
                         ),
                     ) || [],
                 positionMs: position ?? 0,
-                username,
+                username: username ?? '',
             };
         } else {
             const res = await ssApiClient(apiClientProps).getPlayQueue();
 
             if (res.status !== 200) {
-                throw new Error('Failed to get random songs');
+                throw new Error('Failed to get play queue');
             }
 
             const { changed, changedBy, current, entry, position, username } = res.body.playQueue;

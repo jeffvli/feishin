@@ -7,7 +7,7 @@
         "playRandom": "ランダム再生",
         "skip": "スキップ",
         "previous": "前へ",
-        "toggleFullscreenPlayer": "フルスクリーンプレーヤーの切り替え",
+        "toggleFullscreenPlayer": "全画面プレーヤーに切り替える",
         "skip_back": "前へスキップ",
         "favorite": "お気に入り",
         "next": "次へ",
@@ -44,7 +44,8 @@
         "sleepTimer_off": "オフ",
         "sleepTimer_timeRemaining": "残り {{time}}",
         "sleepTimer_setCustom": "タイマーを設定",
-        "sleepTimer_cancel": "タイマーをキャンセル"
+        "sleepTimer_cancel": "タイマーをキャンセル",
+        "holdToShuffle": "長押しでシャッフル"
     },
     "setting": {
         "crossfadeStyle_description": "オーディオプレーヤーが使用するクロスフェードのスタイルを選択します",
@@ -121,7 +122,7 @@
         "font": "フォント",
         "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
         "themeLight_description": "アプリケーションに使用するライトテーマを設定します",
-        "hotkey_toggleFullScreenPlayer": "フルスクリーンプレーヤーの切り替え",
+        "hotkey_toggleFullScreenPlayer": "全画面プレーヤーに切り替え",
         "hotkey_localSearch": "ページ内検索",
         "hotkey_toggleQueue": "キューの切り替え",
         "zoom_description": "アプリケーションのズーム率を設定します",
@@ -215,7 +216,7 @@
         "trayEnabled": "トレイを表示する",
         "volumeWidth_description": "音量スライダーの幅",
         "volumeWidth": "音量スライダーの幅",
-        "webAudio_description": "Web Audio を使用します。これにより、リプレイゲインなどの高度な機能が有効になります。それ以外の場合は無効にしてください",
+        "webAudio_description": "Web Audio を使用します。これにより、リプレイゲインなどの高度な機能が有効になります。問題が発生した場合は無効にしてください",
         "mpvExtraParameters_help": "1 行に 1 つずつ",
         "musicbrainz_description": "MusicBrainz ID が存在するアーティスト/アルバムページに MusicBrainz へのリンクを表示します",
         "musicbrainz": "MusicBrainz リンクを表示する",
@@ -390,7 +391,19 @@
         "useThemePrimaryShade_description": "選択したテーマで定義されたプライマリシェードをプライマリカラーのバリアントに使用します",
         "useThemePrimaryShade": "テーマのプライマリシェードを使用",
         "primaryShade": "プライマリシェード",
-        "primaryShade_description": "ボタン、リンク、およびその他の主要色要素に使用されるプライマリシェード (0–9) を上書きします"
+        "primaryShade_description": "ボタン、リンク、およびその他の主要色要素に使用されるプライマリシェード (0–9) を上書きします",
+        "playerbarWaveformAlign_optionTop": "上部",
+        "playerbarWaveformAlign_optionCenter": "中央",
+        "playerbarWaveformAlign_optionBottom": "下部",
+        "imageResolution_optionTable": "表",
+        "imageResolution_optionItemCard": "アイテムカード",
+        "blurExplicitImages": "露骨な画像をぼかす",
+        "blurExplicitImages_description": "露骨な表現を含むタグが付けられたアルバムおよび楽曲のアートワークをぼかします",
+        "enableGridMultiSelect": "グリッドの複数選択を有効にする",
+        "enableGridMultiSelect_description": "有効にすると、グリッドビューで複数のアイテムを選択できます。無効にすると、グリッドアイテムの画像をクリックするとアイテムページに移動します",
+        "playerbarWaveformBarWidth": "波形バーの幅",
+        "playerbarWaveformGap": "波形ギャップ",
+        "playerbarWaveformRadius": "波形半径"
     },
     "action": {
         "editPlaylist": "$t(entity.playlist, {\"count\": 1}) を編集",
@@ -555,9 +568,10 @@
     "table": {
         "config": {
             "view": {
-                "table": "テーブル",
+                "table": "表",
                 "grid": "グリッド",
-                "list": "リスト"
+                "list": "リスト",
+                "detail": "詳細"
             },
             "general": {
                 "displayType": "表示タイプ",
@@ -582,7 +596,14 @@
                 "size_compact": "コンパクト",
                 "size_large": "大きい",
                 "pagination_itemsPerPage": "ページあたりの項目数",
-                "pagination_infinite": "無限"
+                "pagination_infinite": "無限",
+                "pagination": "ページネーション",
+                "pagination_paginate": "ページ分割",
+                "showHeader": "ヘッダーを表示",
+                "verticalBorders": "列の境界線",
+                "rowHoverHighlight": "行ホバーハイライト",
+                "alternateRowColors": "交互の行の色",
+                "horizontalBorders": "行の境界線"
             },
             "label": {
                 "releaseDate": "発売日",
@@ -619,7 +640,8 @@
                 "image": "画像",
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "作曲家",
-                "titleArtist": "$t(common.title) (アーティスト)"
+                "titleArtist": "$t(common.title) (アーティスト)",
+                "albumGroup": "アルバムグループ"
             }
         },
         "column": {

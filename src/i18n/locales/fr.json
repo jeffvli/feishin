@@ -47,7 +47,8 @@
         "sleepTimer_off": "éteint",
         "sleepTimer_timeRemaining": "{{time}} restante(s)",
         "sleepTimer_setCustom": "définir le minuteur",
-        "sleepTimer_cancel": "annuler le minuteur"
+        "sleepTimer_cancel": "annuler le minuteur",
+        "albumRadio": "radio d'album"
     },
     "action": {
         "editPlaylist": "éditer $t(entity.playlist, {\"count\": 1})",
@@ -87,7 +88,8 @@
         "addOrRemoveFromSelection": "ajouter ou supprimer de la sélection",
         "selectRangeOfItems": "sélectionner une plage d'entrées",
         "selectAll": "tout sélectionner",
-        "openApplicationDirectory": "ouvrir le répertoire de l'application"
+        "openApplicationDirectory": "ouvrir le répertoire de l'application",
+        "goToCurrent": "aller à la piste en cours"
     },
     "common": {
         "backward": "en arrière",
@@ -214,7 +216,8 @@
         "retry": "réessayer",
         "filter_single": "unique",
         "filter_multiple": "multiple",
-        "rename": "renommer"
+        "rename": "renommer",
+        "newVersionAvailable": "une nouvelle version est disponible"
     },
     "error": {
         "remotePortWarning": "redémarrer le serveur pour appliquer le nouveau port",
@@ -247,7 +250,8 @@
         "noNetwork": "serveur indisponible",
         "noNetworkDescription": "impossible de se connecter à ce serveur",
         "invalidJson": "JSON invalide",
-        "serverLockSingleServer": "un seul serveur est autorisé quand le serveur est verrouillé"
+        "serverLockSingleServer": "un seul serveur est autorisé quand le serveur est verrouillé",
+        "playbackPausedDueToError": "la lecture a été suspendue en raison d'une erreur"
     },
     "filter": {
         "mostPlayed": "les plus joués",
@@ -859,7 +863,18 @@
         "autosave": "sauvegarder automatiquement la file d'attente",
         "autosave_description": "activez la sauvegarde automatique de la file d'attente de lecture sur votre serveur. Cette fonction est uniquement disponible avec Navidrome/Subsonic et ne permet pas d'utiliser une file d'attente mixte.",
         "autosaveCount": "fréquence de sauvegarde automatique de la file d'attente",
-        "autosaveCount_description": "nombre de changement de piste avant la sauvegarde de la file d'attente. 1 (minimum) signifie chaque changement de titre"
+        "autosaveCount_description": "nombre de changement de piste avant la sauvegarde de la file d'attente. 1 (minimum) signifie chaque changement de titre",
+        "useThemePrimaryShade": "utiliser la teinte principale du thème",
+        "useThemePrimaryShade_description": "utiliser la teinte principale définie dans le thème sélectionné pour les variantes de couleur primaire",
+        "primaryShade": "teinte principale",
+        "primaryShade_description": "remplacer la teinte principale (0–9) utilisée pour les boutons, les liens et les autres éléments de couleur primaire",
+        "hotkey_listNavigateToPage": "naviguer vers la page de l'élément",
+        "hotkey_listPlayDefault": "lecture",
+        "hotkey_listPlayLast": "lire en dernier",
+        "hotkey_listPlayNext": "lire ensuite",
+        "hotkey_listPlayNow": "lire maintenant",
+        "playerItemConfiguration_description": "configurer les éléments affichés et leur ordre dans le lecteur plein écran",
+        "playerItemConfiguration": "configuration des éléments du lecteur"
     },
     "form": {
         "deletePlaylist": {
@@ -1106,7 +1121,8 @@
                 "bitDepth": "$t(common.bitDepth)",
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "compositeur",
-                "titleArtist": "$t(common.title) (artiste)"
+                "titleArtist": "$t(common.title) (artiste)",
+                "albumGroup": "groupe d'album"
             }
         },
         "column": {
@@ -1342,6 +1358,9 @@
                 "d": "D",
                 "z": "Z"
             }
-        }
+        },
+        "lumiBars": "Lumi Bars",
+        "outlineBars": "Outline Bars",
+        "splitGradient": "Split Gradient"
     }
 }
