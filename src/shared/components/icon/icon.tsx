@@ -125,7 +125,7 @@ import {
 import { MdOutlineVisibility, MdOutlineVisibilityOff } from 'react-icons/md';
 import { PiMouseLeftClickFill, PiMouseRightClickFill } from 'react-icons/pi';
 import { RiPlayListAddLine, RiRepeat2Line, RiRepeatOneLine } from 'react-icons/ri';
-import { SiMusicbrainz } from 'react-icons/si';
+import { SiMusicbrainz, SiSpotify } from 'react-icons/si';
 
 import styles from './icon.module.css';
 
@@ -156,6 +156,7 @@ export const AppIcon = {
     brandGitHub: LuGithub,
     brandLastfm: FaLastfmSquare,
     brandMusicBrainz: SiMusicbrainz,
+    brandSpotify: SiSpotify,
     cache: LuCloudDownload,
     check: LuCheck,
     clipboardCopy: LuClipboardCopy,

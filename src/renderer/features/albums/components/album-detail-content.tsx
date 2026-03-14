@@ -298,6 +298,8 @@ interface AlbumMetadataExternalLinksProps {
     lastFM: boolean;
     mbzId?: null | string;
     musicBrainz: boolean;
+    nativeSpotify: boolean;
+    spotify: boolean;
 }
 
 const AlbumMetadataExternalLinks = ({
@@ -307,10 +309,12 @@ const AlbumMetadataExternalLinks = ({
     lastFM,
     mbzId,
     musicBrainz,
+    nativeSpotify,
+    spotify,
 }: AlbumMetadataExternalLinksProps) => {
     const { t } = useTranslation();
 
-    if (!externalLinks || (!lastFM && !musicBrainz)) return null;
+    if (!externalLinks || (!lastFM && !musicBrainz && !spotify)) return null;
 
     return (
         <Stack gap="xs">
@@ -358,6 +362,28 @@ const AlbumMetadataExternalLinks = ({
                         variant="subtle"
                     />
                 ) : null}
+                {spotify && (
+                    <ActionIcon
+                        component="a"
+                        href={
+                            nativeSpotify
+                                ? `spotify:search:${encodeURIComponent(albumArtist || '')}%20${encodeURIComponent(albumName || '')}`
+                                : `https://open.spotify.com/search/${encodeURIComponent(albumArtist || '')}%20${encodeURIComponent(albumName || '')}`
+                        }
+                        icon="brandSpotify"
+                        iconProps={{
+                            fill: 'default',
+                            size: 'xl',
+                        }}
+                        radius="md"
+                        rel="noopener noreferrer"
+                        target={nativeSpotify ? undefined : '_blank'}
+                        tooltip={{
+                            label: t('action.openIn.spotify'),
+                        }}
+                        variant="subtle"
+                    />
+                )}
             </Group>
         </Stack>
     );
@@ -370,7 +396,7 @@ export const AlbumDetailContent = () => {
         albumQueries.detail({ query: { id: albumId }, serverId: server.id }),
     );
 
-    const { externalLinks, lastFM, musicBrainz } = useExternalLinks();
+    const { externalLinks, lastFM, musicBrainz, nativeSpotify, spotify } = useExternalLinks();
 
     const comment = detailQuery?.data?.comment;
 
@@ -403,6 +429,8 @@ export const AlbumDetailContent = () => {
                             lastFM={lastFM}
                             mbzId={mbzId || undefined}
                             musicBrainz={musicBrainz}
+                            nativeSpotify={nativeSpotify}
+                            spotify={spotify}
                         />
                     </div>
                 </div>

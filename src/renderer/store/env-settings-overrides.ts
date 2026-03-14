@@ -154,6 +154,8 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
     { key: 'FS_GENERAL_LASTFM_API_KEY', path: ['general', 'lastfmApiKey'], type: 'string' },
     { key: 'FS_GENERAL_LAST_FM', path: ['general', 'lastFM'], type: 'bool' },
     { key: 'FS_GENERAL_MUSIC_BRAINZ', path: ['general', 'musicBrainz'], type: 'bool' },
+    { key: 'FS_GENERAL_SPOTIFY', path: ['general', 'spotify'], type: 'bool' },
+    { key: 'FS_GENERAL_SPOTIFY_NATIVE_APP', path: ['general', 'nativeSpotify'], type: 'bool' },
     { key: 'FS_GENERAL_NATIVE_ASPECT_RATIO', path: ['general', 'nativeAspectRatio'], type: 'bool' },
     {
         key: 'FS_GENERAL_PLAYERBAR_OPEN_DRAWER',

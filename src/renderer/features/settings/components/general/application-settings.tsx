@@ -604,6 +604,48 @@ export const ApplicationSettings = memo(() => {
         {
             control: (
                 <Switch
+                    defaultChecked={settings.spotify}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                spotify: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.spotify', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !settings.externalLinks,
+            title: t('setting.spotify', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    defaultChecked={settings.nativeSpotify}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                nativeSpotify: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.nativeSpotify', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !settings.externalLinks || !settings.spotify,
+            title: t('setting.nativeSpotify', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
                     defaultChecked={settings.showRatings}
                     onChange={(e) => {
                         setSettings({

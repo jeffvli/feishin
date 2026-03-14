@@ -890,7 +890,9 @@ interface AlbumArtistMetadataExternalLinksProps {
     lastFM: boolean;
     mbzId?: null | string;
     musicBrainz: boolean;
+    nativeSpotify: boolean;
     order?: number;
+    spotify: boolean;
 }
 
 const AlbumArtistMetadataExternalLinks = ({
@@ -899,11 +901,13 @@ const AlbumArtistMetadataExternalLinks = ({
     lastFM,
     mbzId,
     musicBrainz,
+    nativeSpotify,
     order,
+    spotify,
 }: AlbumArtistMetadataExternalLinksProps) => {
     const { t } = useTranslation();
 
-    if (!externalLinks || (!lastFM && !musicBrainz)) return null;
+    if (!externalLinks || (!lastFM && !musicBrainz && !spotify)) return null;
 
     return (
         <Grid.Col order={order} span={12}>
@@ -948,6 +952,27 @@ const AlbumArtistMetadataExternalLinks = ({
                             variant="subtle"
                         />
                     ) : null}
+                    {spotify && (
+                        <ActionIcon
+                            component="a"
+                            href={
+                                nativeSpotify
+                                    ? `spotify:search:${encodeURIComponent(artistName || '')}`
+                                    : `https://open.spotify.com/search/${encodeURIComponent(artistName || '')}`
+                            }
+                            icon="brandSpotify"
+                            iconProps={{
+                                fill: 'default',
+                                size: 'xl',
+                            }}
+                            rel="noopener noreferrer"
+                            target={nativeSpotify ? undefined : '_blank'}
+                            tooltip={{
+                                label: t('action.openIn.spotify'),
+                            }}
+                            variant="subtle"
+                        />
+                    )}
                 </Group>
             </Stack>
         </Grid.Col>
@@ -1050,7 +1075,7 @@ export const AlbumArtistDetailContent = ({
 }: AlbumArtistDetailContentProps) => {
     const artistItems = useArtistItems();
     const artistRadioCount = useArtistRadioCount();
-    const { externalLinks, lastFM, musicBrainz } = useExternalLinks();
+    const { externalLinks, lastFM, musicBrainz, nativeSpotify, spotify } = useExternalLinks();
     const { albumArtistId, artistId } = useParams() as {
         albumArtistId?: string;
         artistId?: string;
@@ -1136,14 +1161,16 @@ export const AlbumArtistDetailContent = ({
                         genres={detailQuery.data?.genres}
                         order={genresOrder}
                     />
-                    {externalLinks && (lastFM || musicBrainz) && (
+                    {externalLinks && (lastFM || musicBrainz || spotify) && (
                         <AlbumArtistMetadataExternalLinks
                             artistName={detailQuery.data?.name}
                             externalLinks={externalLinks}
                             lastFM={lastFM}
                             mbzId={mbzId}
                             musicBrainz={musicBrainz}
+                            nativeSpotify={nativeSpotify}
                             order={externalLinksOrder}
+                            spotify={spotify}
                         />
                     )}
                     {enabledItem.biography && (

@@ -37,7 +37,8 @@
         "openApplicationDirectory": "open application directory",
         "openIn": {
             "lastfm": "Open in Last.fm",
-            "musicbrainz": "Open in MusicBrainz"
+            "musicbrainz": "Open in MusicBrainz",
+            "spotify": "Open in Spotify"
         }
     },
     "common": {
@@ -924,6 +925,10 @@
         "mpvExtraParameters_help": "one per line",
         "musicbrainz_description": "show links to MusicBrainz on artist/album pages, where MusicBrainz ID exists",
         "musicbrainz": "show MusicBrainz links",
+        "spotify_description": "show links to Spotify on artist/album pages",
+        "spotify": "show Spotify links",
+        "nativeSpotify_description": "open in the Spotify app instead of your browser",
+        "nativeSpotify": "use Spotify app",
         "neteaseTranslation_description": "When enabled, fetches and displays translated lyrics from NetEase if available",
         "neteaseTranslation": "Enable NetEase translations",
         "notify": "enable song notifications",
