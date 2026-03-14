@@ -205,12 +205,15 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     usePlayerEvents(
         {
             onMediaNext: () => {
+                skipNextSendRef.current = false;
                 sendCurrentTrackToDlna();
             },
             onMediaPrev: () => {
+                skipNextSendRef.current = false;
                 sendCurrentTrackToDlna();
             },
             onPlayerPlay: () => {
+                skipNextSendRef.current = false;
                 sendCurrentTrackToDlna();
             },
             onPlayerSeekToTimestamp: (properties) => {
