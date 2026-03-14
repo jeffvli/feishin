@@ -1,4 +1,5 @@
 import './autodiscover';
+import './dlna';
 import './lyrics';
 import './player';
 import './remote';

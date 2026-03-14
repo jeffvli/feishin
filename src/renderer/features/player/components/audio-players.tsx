@@ -1,10 +1,12 @@
 import isElectron from 'is-electron';
-import { useEffect } from 'react';
+import { Component, useEffect, useState } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { DiscordRpcHook } from '/@/renderer/features/discord-rpc/use-discord-rpc';
 import { MainPlayerListenerHook } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
+import { DlnaPlayer } from '/@/renderer/features/player/audio-player/dlna-player';
 import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
 import { SleepTimerHook } from '/@/renderer/features/player/components/sleep-timer-button';
@@ -40,7 +42,18 @@ import { PlayerType } from '/@/shared/types/types';
 export const AudioPlayers = () => {
     const playbackType = usePlaybackType();
     const serverId = useCurrentServerId();
-    const { resetSampleRate } = useSettingsStoreActions();
+    const { resetSampleRate, setSettings } = useSettingsStoreActions();
+
+    // DLNA requires an active connection — fall back to web on startup
+    const [mountChecked, setMountChecked] = useState(false);
+    useEffect(() => {
+        if (playbackType === PlayerType.DLNA) {
+            setSettings({ playback: { type: PlayerType.WEB } });
+        }
+        setMountChecked(true);
+        // Only run on mount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const {
         audioDeviceId,
@@ -48,6 +61,8 @@ export const AudioPlayers = () => {
         webAudio,
     } = usePlaybackSettings();
     const { setWebAudio, webAudio: audioContext } = useWebAudio();
+
+    if (!mountChecked) return null;
 
     return (
         <>
@@ -196,6 +211,33 @@ const AudioPlayersContent = ({
         <>
             {playbackType === PlayerType.WEB && <WebPlayer />}
             {playbackType === PlayerType.LOCAL && <MpvPlayer />}
+            {playbackType === PlayerType.DLNA && (
+                <DlnaErrorBoundary>
+                    <DlnaPlayer />
+                </DlnaErrorBoundary>
+            )}
         </>
     );
 };
+
+class DlnaErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+    constructor(props: { children: ReactNode }) {
+        super(props);
+        this.state = { error: null };
+    }
+
+    static getDerivedStateFromError(error: Error) {
+        return { error };
+    }
+
+    componentDidCatch(error: Error, info: ErrorInfo) {
+        console.error('[DLNA] Player error:', error, info);
+    }
+
+    render() {
+        if (this.state.error) {
+            return <div id="dlna-player-error" style={{ display: 'none' }} />;
+        }
+        return this.props.children;
+    }
+}

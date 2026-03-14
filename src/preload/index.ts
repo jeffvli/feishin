@@ -4,6 +4,7 @@ import { contextBridge } from 'electron';
 import { autodiscover } from './autodiscover';
 import { browser } from './browser';
 import { discordRpc } from './discord-rpc';
+import { dlnaPlayer, dlnaPlayerListener } from './dlna-player';
 import { ipc } from './ipc';
 import { localSettings } from './local-settings';
 import { lyrics } from './lyrics';
@@ -17,6 +18,8 @@ const api = {
     autodiscover,
     browser,
     discordRpc,
+    dlnaPlayer,
+    dlnaPlayerListener,
     ipc,
     localSettings,
     lyrics,

@@ -44,6 +44,8 @@ mac:
     type: distribution
     hardenedRuntime: false
     identity: "-"
+    entitlements: build/entitlements.mac.plist
+    entitlementsInherit: build/entitlements.mac.plist
     gatekeeperAssess: false
     notarize: false
 
