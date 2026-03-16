@@ -26,7 +26,6 @@
     border-radius: 18px !important;
 }
 
-
 .mantine-Modal-overlay {
     backdrop-filter: blur(3px);
 }
@@ -74,11 +73,9 @@
     border-radius: 18px;
 }
 
-
 .mantine-Center-root img {
     border-radius: 18px;
 }
-
 
 .ag-header {
     background-color: transparent !important;
@@ -89,11 +86,9 @@
     border-radius: 8px !important;
 }
 
-
 .favorite_icon .mantine-ActionIcon-icon {
     justify-content: left;
 }
-
 
 .fork-header svg {
     padding-left: 2px;
@@ -108,11 +103,9 @@
     border-radius: 8px !important;
 }
 
-
 .mantine-Table-th {
     background-color: transparent !important;
 }
-
 
 table {
     border: 0 !important;
@@ -132,7 +125,6 @@ table {
     height: 100vh;
 }
 
-
 .mantine-Tabs-root {
     input {
         border-radius: 18px;
@@ -143,15 +135,14 @@ table {
     }
 }
 
-
-
 .mantine-Slider-track::before {
     background-color: var(--theme-colors-surface);
 }
 
-
 /* stylelint-disable selector-not-notation */
-.fs-image-module-image:not(.ag-cell *):not(.fs-left-controls-module-image *):not(.fs-sidebar-playlist-list-module-row-group *) {
+.fs-image-module-image:not(.ag-cell *):not(.fs-left-controls-module-image *):not(
+        .fs-sidebar-playlist-list-module-row-group *
+    ) {
     border-radius: 18px;
 }
 
@@ -162,9 +153,7 @@ table {
 }
 
 .fork-server-selector {
-
     .mantine-SegmentedControl-indicator,
-
     .fs-segmented-control-module-root,
     input,
     button {
@@ -188,21 +177,16 @@ table {
     border-radius: 12px;
 }
 
-
 .mantine-Accordion-label {
-
     button,
     a {
         border-radius: 8px;
     }
 }
 
-
-
 .mantine-Grid-col button {
     border-radius: 8px;
 }
-
 
 /* share dialog */
 .fs-modal-module-body {
@@ -219,11 +203,9 @@ table {
     align-items: normal !important;
 }
 
-
 .mantine-Badge-root {
     background: rgb(1 1 5 / 45%);
 }
-
 
 .fs-sidebar-module-image-container img {
     border-radius: 18px;
@@ -247,11 +229,9 @@ table {
     border-radius: 0 !important;
 }
 
-
 .fs-full-screen-player-module-container .mantine-Group-root button {
     border-radius: 100%;
 }
-
 
 .fs-full-screen-player-image-module-image {
     border-radius: 18px;
@@ -266,7 +246,6 @@ table {
     border-radius: 8px;
 }
 
-
 .fs-table-config-module-group {
     border-radius: 8px;
 }
@@ -279,7 +258,7 @@ table {
     height: 100vh !important;
 
     .fs-full-screen-player-module-responsive-container {
-        height: calc(100% - 250px)
+        height: calc(100% - 250px);
     }
 }
 
@@ -299,13 +278,12 @@ table {
     border-radius: 18px;
     box-shadow: none;
 
-    transition: linear backdrop-filter .25s;
+    transition: linear backdrop-filter 0.25s;
 
     button {
         border-radius: 100% !important;
     }
 }
-
 
 .fs-item-card-module-image-container:before {
     display: none;
