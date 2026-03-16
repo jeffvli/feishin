@@ -38,8 +38,8 @@
 .fs-dropdown-menu-module-menu-dropdown,
 .fs-accordion-module-panel {
     background: rgb(4 4 9 / 50%) !important;
+    border: 0;
     backdrop-filter: blur(2rem);
-    border: 0px;
 
     button,
     input,
@@ -268,16 +268,15 @@ table {
 }
 
 .mantine-Modal-content {
+    border: 0;
     border-radius: 18px;
-    border: 0px;
 }
 
 .fs-item-card-controls-module-container {
-    backdrop-filter: blur(6px);
     background: #03010186;
     border-radius: 18px;
     box-shadow: none;
-
+    backdrop-filter: blur(6px);
     transition: linear backdrop-filter 0.25s;
 
     button {
@@ -285,7 +284,7 @@ table {
     }
 }
 
-.fs-item-card-module-image-container:before {
+.fs-item-card-module-image-container::before {
     display: none;
 }
 
@@ -310,7 +309,7 @@ table {
 
 .mantine-Accordion-root .mantine-Accordion-item {
     background-color: transparent;
-    border: 0px;
+    border: 0;
 }
 
 .fs-item-table-list-module-height-100 {
