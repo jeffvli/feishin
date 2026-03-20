@@ -61,7 +61,7 @@ export const SidebarReorder = () => {
 
     return (
         <DraggableItems
-            description="setting.sidebarCollapsedNavigation"
+            description="setting.sidebarConfiguration"
             itemLabels={SIDEBAR_ITEMS}
             items={mergedSidebarItems as unknown as SidebarItemType[]}
             setItems={setSidebarItems}

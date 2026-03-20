@@ -13,7 +13,9 @@ import {
 } from '/@/renderer/store/sleep-timer.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
+import { Divider } from '/@/shared/components/divider/divider';
 import { Flex } from '/@/shared/components/flex/flex';
+import { Grid } from '/@/shared/components/grid/grid';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Popover } from '/@/shared/components/popover/popover';
@@ -30,6 +32,8 @@ const PRESET_OPTIONS = [
     { minutes: 45, mode: 'timed' as const },
     { minutes: 60, mode: 'timed' as const },
     { minutes: 120, mode: 'timed' as const },
+    { minutes: 180, mode: 'timed' as const },
+    { minutes: 240, mode: 'timed' as const },
 ];
 
 function formatRemaining(totalSeconds: number): string {
@@ -209,7 +213,7 @@ export const SleepTimerButton = () => {
             </Popover.Target>
             <Popover.Dropdown>
                 <Stack gap="xs" p="xs">
-                    <Text fw="600" size="sm" ta="center">
+                    <Text fw="600" pb="md" size="sm" ta="center">
                         {t('player.sleepTimer', { postProcess: 'titleCase' })}
                     </Text>
 
@@ -249,21 +253,49 @@ export const SleepTimerButton = () => {
                         </Flex>
                     )}
 
-                    {PRESET_OPTIONS.map((option, index) => (
-                        <Button
-                            fullWidth
-                            justify="flex-start"
-                            key={index}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handlePreset(option);
-                            }}
-                            size="xs"
-                            variant="subtle"
-                        >
-                            {getPresetLabel(option)}
-                        </Button>
-                    ))}
+                    {PRESET_OPTIONS.filter((option) => option.mode === 'endOfSong').map(
+                        (option, index) => (
+                            <Button
+                                fullWidth
+                                justify="flex-start"
+                                key={index}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handlePreset(option);
+                                }}
+                                size="xs"
+                                variant="outline"
+                            >
+                                {getPresetLabel(option)}
+                            </Button>
+                        ),
+                    )}
+
+                    <Divider my="md" />
+
+                    <Grid gutter="xs">
+                        {PRESET_OPTIONS.filter((option) => option.mode === 'timed').map(
+                            (option, index) => (
+                                <Grid.Col key={index} span={4}>
+                                    <Button
+                                        fullWidth
+                                        justify="flex-start"
+                                        key={index}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handlePreset(option);
+                                        }}
+                                        size="xs"
+                                        variant="outline"
+                                    >
+                                        {getPresetLabel(option)}
+                                    </Button>
+                                </Grid.Col>
+                            ),
+                        )}
+                    </Grid>
+
+                    <Divider my="md" />
 
                     {!showCustom ? (
                         <Button
@@ -274,7 +306,8 @@ export const SleepTimerButton = () => {
                                 setShowCustom(true);
                             }}
                             size="xs"
-                            variant="subtle"
+                            ta="center"
+                            variant="outline"
                         >
                             {t('player.sleepTimer_custom', { postProcess: 'sentenceCase' })}
                         </Button>

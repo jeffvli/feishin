@@ -335,7 +335,8 @@
         "mood": "estat d'ànim",
         "filter_single": "senzill",
         "filter_multiple": "multi",
-        "rename": "reanomena"
+        "rename": "reanomena",
+        "newVersionAvailable": "hi ha una nova versió disponible"
     },
     "entity": {
         "album_one": "àlbum",
@@ -545,7 +546,8 @@
         "addOrRemoveFromSelection": "afegeix o elimina de la selecció",
         "selectRangeOfItems": "selecciona un interval d'elements",
         "selectAll": "selecciona-ho tot",
-        "openApplicationDirectory": "obre el directori de l'aplicació"
+        "openApplicationDirectory": "obre el directori de l'aplicació",
+        "goToCurrent": "anar a l'element actual"
     },
     "setting": {
         "language_description": "estableix l'idioma de l'aplicació ($t(common.restartRequired))",
@@ -898,7 +900,17 @@
         "blurExplicitImages": "desenfoca imatges explícites",
         "blurExplicitImages_description": "les caràtules d'àlbums i cançons marcades com a explícites quedaran desenfocades",
         "discordStateIcon": "mostra la icona de reproducció",
-        "discordStateIcon_description": "mostra una petita icona de reproducció a l'estat d'activitat. l'icona de pausa es mostra quan \"mostra l'estat d'activitat quan està en pausa\" està activat"
+        "discordStateIcon_description": "mostra una petita icona de reproducció a l'estat d'activitat. l'icona de pausa es mostra quan \"mostra l'estat d'activitat quan està en pausa\" està activat",
+        "autosave": "desa automàticament la cua de reproducció",
+        "autosave_description": "activa el desament automàtic de la cua de reproducció al teu servidor. això només és possible quan s'utilitza Navidrome/Subsonic i no es pot tenir una cua de reproducció mixta.",
+        "autosaveCount": "freqüència de desament de cua de reproducció automàtica",
+        "autosaveCount_description": "quants canvis de pista abans que es desi la cua. 1 (mínim) significa cada canvi de cançó",
+        "useThemePrimaryShade": "utilitza l'ombra primària del tema",
+        "useThemePrimaryShade_description": "utilitza el to primari definit al tema seleccionat per a les variants de color primari",
+        "primaryShade": "ombra primària",
+        "primaryShade_description": "substitueix el to primari (0–9) utilitzat per a botons, enllaços i altres elements de color primari",
+        "playerItemConfiguration_description": "configurar quins elements es mostren i en quin ordre al reproductor de pantalla completa",
+        "playerItemConfiguration": "configuració d'elements del jugador"
     },
     "table": {
         "column": {
@@ -998,7 +1010,8 @@
                 "image": "imatge",
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "compositor",
-                "titleArtist": "$t(common.title) (artista)"
+                "titleArtist": "$t(common.title) (artista)",
+                "albumGroup": "grup d'àlbums"
             },
             "view": {
                 "table": "taula",
@@ -1104,7 +1117,8 @@
         "sleepTimer_off": "apagat",
         "sleepTimer_timeRemaining": "queden {{time}}",
         "sleepTimer_setCustom": "configura el temporitzador",
-        "sleepTimer_cancel": "cancel·la el temporitzador"
+        "sleepTimer_cancel": "cancel·la el temporitzador",
+        "albumRadio": "ràdio d'àlbums"
     },
     "error": {
         "credentialsRequired": "credencials requerides",
@@ -1137,7 +1151,8 @@
         "noNetwork": "servidor no disponible",
         "noNetworkDescription": "no s'ha pogut connectar amb el servidor",
         "invalidJson": "JSON invàlid",
-        "serverLockSingleServer": "només es permet un servidor quan el servidor està bloquejat"
+        "serverLockSingleServer": "només es permet un servidor quan el servidor està bloquejat",
+        "playbackPausedDueToError": "la reproducció s'ha pausat a causa d'un error"
     },
     "releaseType": {
         "primary": {

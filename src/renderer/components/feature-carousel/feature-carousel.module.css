@@ -67,10 +67,19 @@
     padding: var(--theme-spacing-md);
 }
 
+.single-carousel-container .carousel {
+    min-height: 240px;
+}
+
+.single-carousel-container .carousel-item {
+    min-height: 240px;
+}
+
 .single-carousel-container .carousel-item .content {
     flex-direction: row;
-    gap: var(--theme-spacing-lg);
+    gap: var(--theme-spacing-md);
     align-items: flex-end;
+    min-height: 240px;
     padding: var(--theme-spacing-xl);
 }
 

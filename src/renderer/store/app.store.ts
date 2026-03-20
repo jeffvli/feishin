@@ -19,6 +19,7 @@ export interface AppSlice extends AppState {
         setAppStore: (data: Partial<AppSlice>) => void;
         setArtistIdsMode: (mode: 'and' | 'or') => void;
         setArtistSelectMode: (mode: 'multi' | 'single') => void;
+        setCommandPaletteSearchSectionExpanded: (sectionId: string, expanded: boolean) => void;
         setGenreIdsMode: (mode: 'and' | 'or') => void;
         setGenreSelectMode: (mode: 'multi' | 'single') => void;
         setGlobalExpanded: (value: GlobalExpandedState | null) => void;
@@ -45,6 +46,7 @@ export interface AppState {
     artistIdsMode: 'and' | 'or';
     artistSelectMode: 'multi' | 'single';
     commandPalette: CommandPaletteProps;
+    commandPaletteSearchSectionsExpanded: Record<string, boolean>;
     genreIdsMode: 'and' | 'or';
     genreSelectMode: 'multi' | 'single';
     globalExpanded: GlobalExpandedState | null;
@@ -75,6 +77,7 @@ type SidebarProps = {
     image: boolean;
     leftWidth: string;
     rightExpanded: boolean;
+    rightHeight: string;
     rightWidth: string;
 };
 
@@ -131,6 +134,11 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                     setArtistSelectMode: (mode) => {
                         set((state) => {
                             state.artistSelectMode = mode;
+                        });
+                    },
+                    setCommandPaletteSearchSectionExpanded: (sectionId, expanded) => {
+                        set((state) => {
+                            state.commandPaletteSearchSectionsExpanded[sectionId] = expanded;
                         });
                     },
                     setGenreIdsMode: (mode) => {
@@ -205,6 +213,7 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                         });
                     },
                 },
+                commandPaletteSearchSectionsExpanded: {},
                 genreIdsMode: 'and',
                 genreSelectMode: 'multi',
                 globalExpanded: null,
@@ -222,6 +231,7 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                     image: false,
                     leftWidth: '400px',
                     rightExpanded: false,
+                    rightHeight: '320px',
                     rightWidth: '600px',
                 },
                 titlebar: {
@@ -237,10 +247,15 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
             },
             migrate: (persistedState, version) => {
                 if (version <= 2) {
-                    return {} as AppState;
+                    return {} as AppSlice;
                 }
 
-                return persistedState;
+                const state = persistedState as AppSlice;
+                if (version <= 4 && !state.sidebar.rightHeight) {
+                    state.sidebar.rightHeight = '320px';
+                }
+
+                return state;
             },
             name: 'store_app',
             partialize: (state) => {
@@ -248,7 +263,7 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                 const { globalExpanded: _, ...rest } = state;
                 return rest;
             },
-            version: 4,
+            version: 5,
         },
     ),
 );

@@ -109,9 +109,8 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
 
             const extraParameters: string[] = [...mpvExtraParameters];
 
-            if (mpvAudioDeviceId) {
-                extraParameters.push(`--audio-device=${mpvAudioDeviceId}`);
-            }
+            const audioDevice = mpvAudioDeviceId?.trim() || 'auto';
+            extraParameters.push(`--audio-device=${audioDevice}`);
 
             await mpvPlayer?.initialize({
                 extraParameters,

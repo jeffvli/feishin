@@ -171,6 +171,7 @@ const GenreTargetSchema = z.enum(['album', 'track']);
 const PlaylistTargetSchema = z.enum(['album', 'track']);
 
 const SideQueueTypeSchema = z.enum(['sideDrawerQueue', 'sideQueue']);
+const SideQueueLayoutSchema = z.enum(['horizontal', 'vertical']);
 
 const SidebarPanelTypeSchema = z.enum(['queue', 'lyrics', 'visualizer']);
 
@@ -475,8 +476,10 @@ export const GeneralSettingsSchema = z.object({
     language: z.string(),
     lastFM: z.boolean(),
     lastfmApiKey: z.string(),
+    listenBrainz: z.boolean(),
     musicBrainz: z.boolean(),
     nativeAspectRatio: z.boolean(),
+    nativeSpotify: z.boolean(),
     passwordStore: z.string().optional(),
     pathReplace: z.string(),
     pathReplaceWith: z.string(),
@@ -486,6 +489,7 @@ export const GeneralSettingsSchema = z.object({
     playerItems: z.array(SortableItemSchema(PlayerItemSchema)),
     playlistTarget: PlaylistTargetSchema,
     primaryShade: z.number().min(0).max(9),
+    qobuz: z.boolean(),
     resume: z.boolean(),
     showLyricsInSidebar: z.boolean(),
     showRatings: z.boolean(),
@@ -497,8 +501,10 @@ export const GeneralSettingsSchema = z.object({
     sidebarPlaylistList: z.boolean(),
     sidebarPlaylistListFilterRegex: z.string(),
     sidebarPlaylistSorting: z.boolean(),
+    sideQueueLayout: SideQueueLayoutSchema,
     sideQueueType: SideQueueTypeSchema,
     skipButtons: SkipButtonsSchema,
+    spotify: z.boolean(),
     theme: z.nativeEnum(AppTheme),
     themeDark: z.nativeEnum(AppTheme),
     themeLight: z.nativeEnum(AppTheme),
@@ -891,6 +897,7 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
 export interface SettingsState extends z.infer<typeof SettingsStateSchema> {}
 export type SidebarItemType = z.infer<typeof SidebarItemTypeSchema>;
 
+export type SideQueueLayout = z.infer<typeof SideQueueLayoutSchema>;
 export type SideQueueType = z.infer<typeof SideQueueTypeSchema>;
 
 export type SortableItem<T extends string> = {
@@ -1127,8 +1134,10 @@ const initialState: SettingsState = {
         language: 'en',
         lastFM: true,
         lastfmApiKey: '',
+        listenBrainz: true,
         musicBrainz: true,
         nativeAspectRatio: false,
+        nativeSpotify: false,
         passwordStore: undefined,
         pathReplace: '',
         pathReplaceWith: '',
@@ -1144,6 +1153,7 @@ const initialState: SettingsState = {
         playerItems,
         playlistTarget: PlaylistTarget.TRACK,
         primaryShade: 6,
+        qobuz: true,
         resume: true,
         showLyricsInSidebar: true,
         showRatings: true,
@@ -1155,12 +1165,14 @@ const initialState: SettingsState = {
         sidebarPlaylistList: true,
         sidebarPlaylistListFilterRegex: '',
         sidebarPlaylistSorting: false,
+        sideQueueLayout: 'horizontal',
         sideQueueType: 'sideQueue',
         skipButtons: {
             enabled: false,
             skipBackwardSeconds: 5,
             skipForwardSeconds: 10,
         },
+        spotify: true,
         theme: AppTheme.DEFAULT_DARK,
         themeDark: AppTheme.DEFAULT_DARK,
         themeLight: AppTheme.DEFAULT_LIGHT,
@@ -2377,10 +2389,16 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     });
                 }
 
+                if (version <= 27) {
+                    if (!state.general.sideQueueLayout) {
+                        state.general.sideQueueLayout = initialState.general.sideQueueLayout;
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 26,
+            version: 27,
         },
     ),
 );
@@ -2488,6 +2506,9 @@ export const useThemeSettings = () =>
 export const useSideQueueType = () =>
     useSettingsStore((state) => state.general.sideQueueType, shallow);
 
+export const useSideQueueLayout = () =>
+    useSettingsStore((state) => state.general.sideQueueLayout, shallow);
+
 export const useVolumeWheelStep = () =>
     useSettingsStore((state) => state.general.volumeWheelStep, shallow);
 
@@ -2548,7 +2569,11 @@ export const useExternalLinks = () =>
         (state) => ({
             externalLinks: state.general.externalLinks,
             lastFM: state.general.lastFM,
+            listenBrainz: state.general.listenBrainz,
             musicBrainz: state.general.musicBrainz,
+            nativeSpotify: state.general.nativeSpotify,
+            qobuz: state.general.qobuz,
+            spotify: state.general.spotify,
         }),
         shallow,
     );

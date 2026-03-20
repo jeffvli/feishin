@@ -157,7 +157,7 @@
         "mood": "氛围",
         "rename": "重命名",
         "filter_multiple": "多项",
-        "newVersionAvailable": "a new version is available"
+        "newVersionAvailable": "新版本现已可用"
     },
     "entity": {
         "albumArtist_other": "专辑艺术家",
@@ -1212,21 +1212,21 @@
         "options": {
             "channelLayout": {
                 "single": "单项",
-                "dualCombined": "Dual-Combined",
-                "dualHorizontal": "Dual-Horizontal",
-                "dualVertical": "Dual-Vertical"
+                "dualCombined": "双重组合",
+                "dualHorizontal": "双水平",
+                "dualVertical": "双垂直"
             },
             "mode": {
                 "0": "[0] 离散频率",
-                "1": "[1] 1/24th octave / 240 bands",
-                "2": "[2] 1/12th octave / 120 bands",
-                "3": "[3] 1/8th octave / 80 bands",
-                "4": "[4] 1/6th octave / 60 bands",
-                "5": "[5] 1/4th octave / 40 bands",
-                "6": "[6] 1/3rd octave / 30 bands",
-                "7": "[7] Half octave / 20 bands",
-                "8": "[8] Full octave / 10 bands",
-                "10": "[10] Line / Area graph"
+                "1": "[1] 1/24倍频程 / 240频段",
+                "2": "[2] 1/12 倍频程 / 120 频段",
+                "3": "[3] 1/8倍频程 / 80频段",
+                "4": "[4] 1/6倍频程 / 60频段",
+                "5": "[5] 1/4倍频程 / 40频段",
+                "6": "[6] 1/3倍频程 / 30频段",
+                "7": "[7] 半倍频程 / 20 频段",
+                "8": "[8] 全倍频程 / 10 频段",
+                "10": "[10] 折线图 / 面积图"
             },
             "colorMode": {
                 "gradient": "渐变",
@@ -1242,10 +1242,10 @@
             },
             "frequencyScale": {
                 "none": "无",
-                "bark": "Bark Scale",
-                "linear": "Linear Scale",
-                "log": "Log Scale",
-                "mel": "Mel Scale"
+                "bark": "树皮鳞片",
+                "linear": "线性刻度",
+                "log": "对数刻度",
+                "mel": "梅尔刻度"
             },
             "weightingFilter": {
                 "none": "无",
@@ -1304,13 +1304,13 @@
         "showScaleX": "显示比例尺 X",
         "noteLabels": "笔记标签",
         "showScaleY": "显示比例尺 Y",
-        "alphaBars": "Alpha Bars",
-        "ansiBands": "ANSI Bands",
-        "ledBars": "LED Bars",
-        "trueLeds": "True LEDs",
-        "lumiBars": "Lumi Bars",
-        "outlineBars": "Outline Bars",
-        "roundBars": "Round Bars"
+        "alphaBars": "Alpha 条",
+        "ansiBands": "ANSI 频段",
+        "ledBars": "LED 灯条",
+        "trueLeds": "真正的LED",
+        "lumiBars": "Lumi 条",
+        "outlineBars": "轮廓栏",
+        "roundBars": "圆条"
     },
     "queryBuilder": {
         "standardTags": "标准标签",

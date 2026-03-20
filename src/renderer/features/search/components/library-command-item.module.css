@@ -32,3 +32,14 @@
     background: alpha(var(--theme-colors-foreground-muted), 0.3);
     border-radius: 4px;
 }
+
+.controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: var(--theme-font-size-sm);
+        height: var(--theme-font-size-sm);
+    }
+}

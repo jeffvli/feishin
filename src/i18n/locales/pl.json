@@ -1041,7 +1041,9 @@
         "playerItemConfiguration_description": "skonfiguruj jakie elementy są pokazywane i w jakiej kolejności, w odtwarzaczu pełnoekranowym",
         "playerItemConfiguration": "konfiguracja elementów odtwarzacza",
         "autosave": "automatycznie zapisuj kolejkę odtwarzania",
-        "autosave_description": "włącz automatyczne zapisywanie kolejki odtwarzania na twój serwer. to jest możliwe tylko gdy używane jest Navidrome/Subsonic, i nie masz zmixowanej kolejki odtwarzania."
+        "autosave_description": "włącz automatyczne zapisywanie kolejki odtwarzania na twój serwer. to jest możliwe tylko gdy używane jest Navidrome/Subsonic, i nie masz zmixowanej kolejki odtwarzania.",
+        "autosaveCount": "częstotliwość automatycznego zapisywania kolejki odtwarzania",
+        "autosaveCount_description": "ile razy piosenka zostanie zmieniona przed zapisaniem kolejki. 1 (najmniejsze) oznacza zapisywanie kolejki po każdej zmianie piosenki"
     },
     "table": {
         "config": {

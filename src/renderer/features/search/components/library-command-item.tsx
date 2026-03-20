@@ -16,6 +16,24 @@ import { Text } from '/@/shared/components/text/text';
 import { ExplicitStatus, LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
+const createPlayKeyDownHandler = (
+    playType: Play,
+    disabled: boolean,
+    onPlay: (type: Play) => void,
+) => {
+    return (e: React.KeyboardEvent) => {
+        if (e.key === ' ' || e.key === 'Enter') {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!disabled) {
+                onPlay(playType);
+            }
+        } else if (e.key === 'Tab') {
+            e.stopPropagation();
+        }
+    };
+};
+
 interface LibraryCommandItemProps {
     disabled?: boolean;
     explicitStatus?: ExplicitStatus | null;
@@ -113,35 +131,53 @@ export const LibraryCommandItem = ({
                 </div>
                 <div className={styles.metadataWrapper}>
                     <Text overflow="hidden">{title}</Text>
-                    <Text isMuted overflow="hidden">
+                    <Text isMuted overflow="hidden" size="sm">
                         {subtitle}
                     </Text>
                 </div>
             </div>
             {showControls && (
-                <ActionIconGroup>
+                <ActionIconGroup className={styles.controls}>
                     <PlayTooltip disabled={disabled} type={Play.NOW}>
                         <ActionIcon
                             icon="mediaPlay"
-                            variant="subtle"
+                            size="xs"
+                            variant="default"
                             {...handlePlayNow.handlers}
                             {...handlePlayNow.props}
+                            onKeyDown={createPlayKeyDownHandler(
+                                Play.NOW,
+                                Boolean(disabled ?? handlePlayNow.props.disabled),
+                                handlePlay,
+                            )}
                         />
                     </PlayTooltip>
                     <PlayTooltip disabled={disabled} type={Play.NEXT}>
                         <ActionIcon
                             icon="mediaPlayNext"
-                            variant="subtle"
+                            size="xs"
+                            variant="default"
                             {...handlePlayNext.handlers}
                             {...handlePlayNext.props}
+                            onKeyDown={createPlayKeyDownHandler(
+                                Play.NEXT,
+                                Boolean(disabled ?? handlePlayNext.props.disabled),
+                                handlePlay,
+                            )}
                         />
                     </PlayTooltip>
                     <PlayTooltip disabled={disabled} type={Play.LAST}>
                         <ActionIcon
                             icon="mediaPlayLast"
-                            variant="subtle"
+                            size="xs"
+                            variant="default"
                             {...handlePlayLast.handlers}
                             {...handlePlayLast.props}
+                            onKeyDown={createPlayKeyDownHandler(
+                                Play.LAST,
+                                Boolean(disabled ?? handlePlayLast.props.disabled),
+                                handlePlay,
+                            )}
                         />
                     </PlayTooltip>
                 </ActionIconGroup>

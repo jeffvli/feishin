@@ -37,7 +37,8 @@
         "addOrRemoveFromSelection": "Zur Auswahl hinzufügen oder entfernen",
         "selectRangeOfItems": "Wählen sie eine Reihe von Elementen",
         "holdToMoveToTop": "Halten um nach oben zu bewegen",
-        "holdToMoveToBottom": "Halten um nach unten zu bewegen"
+        "holdToMoveToBottom": "Halten um nach unten zu bewegen",
+        "goToCurrent": "Zu aktuellem Eintrag wechseln"
     },
     "common": {
         "backward": "zurück",
@@ -160,7 +161,8 @@
         "rename": "Umbenennen",
         "filter_single": "einzeln",
         "filter_multiple": "mehrfach",
-        "retry": "Wiederholen"
+        "retry": "Wiederholen",
+        "newVersionAvailable": "Eine neue Version ist verfügbar"
     },
     "error": {
         "remotePortWarning": "Starten Sie den Server neu, um den neuen Port anzuwenden",
@@ -193,7 +195,8 @@
         "noNetworkDescription": "Verbindung zum Server konnte nicht hergestellt werden",
         "invalidJson": "JSON ungültig",
         "serverLockSingleServer": "Nur ein Server ist erlaubt, wenn der Server gesperrt ist",
-        "settingsSyncError": "Es wurden Unstimmigkeiten zwischen den Einstellungen im Renderer und dem Hauptprozess gefunden. Starte die Anwendung neu, um die Änderungen zu übernehmen"
+        "settingsSyncError": "Es wurden Unstimmigkeiten zwischen den Einstellungen im Renderer und dem Hauptprozess gefunden. Starte die Anwendung neu, um die Änderungen zu übernehmen",
+        "playbackPausedDueToError": "Die Wiedergabe wurde aufgrund eines Fehlers pausiert"
     },
     "filter": {
         "mostPlayed": "Meistgespielt",
@@ -312,7 +315,9 @@
             "expireInvalid": "Ablaufdatum muss in der Zukunft liegen",
             "allowDownloading": "Herunterladen zulassen",
             "success": "Link in die Zwischenablage kopiert (oder hier klicken, um zu öffnen)",
-            "createFailed": "fehler beim Teilen (Ist Teilen aktiviert?)"
+            "createFailed": "fehler beim Teilen (Ist Teilen aktiviert?)",
+            "copyToClipboard": "In Zwischenablage kopieren: Strg+C, Enter",
+            "successMustClick": "Freigabe erfolgreich erstellt. Hier klicken um diese zu öffnen"
         },
         "privateMode": {
             "enabled": "Privatmodus aktiviert, Wiedergabe-Status wird externen Quellen nicht preisgegeben",
@@ -758,7 +763,8 @@
         "sleepTimer_custom": "Benutzerdefiniert",
         "sleepTimer_hours": "{{count}} std",
         "sleepTimer_minutes": "{{count}} min",
-        "trackRadio": "Song Radio"
+        "trackRadio": "Song Radio",
+        "albumRadio": "Album Radio"
     },
     "setting": {
         "audioDevice_description": "wählen Sie das Audiogerät aus, das für die Wiedergabe verwendet werden soll (nur Webplayer)",
@@ -1094,7 +1100,15 @@
         "trayEnabled_description": "Tray-Symbol anzeigen/verbergen. Bei Deaktivierung werden auch Minimieren/Beenden zum Tray deaktiviert",
         "queryBuilder": "Abfrage-Editor",
         "queryBuilderCustomFields_inputLabel": "Label",
-        "queryBuilderCustomFields_description": "Füge benutzerdefinierte Felder für den Abfrage-Editor hinzu"
+        "queryBuilderCustomFields_description": "Füge benutzerdefinierte Felder für den Abfrage-Editor hinzu",
+        "autosave": "Automatisch aktuelle Wiedergabeliste speichern",
+        "autosave_description": "Aktiviere die automatische Speicherung der aktuellen Wiedergabe auf dem Server. Diese Funktion ist nur bei Navidrome/Subsonic Servern verfügbar und es darf sich nicht um eine gemischte Wiedergabeliste handeln.",
+        "autosaveCount": "Häufigkeit der automatischen Speicherung bei Wiedergabelisten",
+        "autosaveCount_description": "Wieviele Lieder gespielt werden, bevor die Wiedergabeliste gespeichert wird. 1 (Minimum) bedeutet die Speicherung nach jedem gespielten Lied",
+        "useThemeAccentColor_description": "Verwendet die Primärfarbe des gewählten Themas anstatt einer ausgewählten Akzentfarbe",
+        "useThemePrimaryShade": "Primärschatten des Themas nutzen",
+        "useThemePrimaryShade_description": "Verwendet den Primärschatten des ausgewählten Themas als primäre Farbvarianten",
+        "primaryShade": "Primärschatten"
     },
     "dragDropZone": {
         "error_oneFileOnly": "Bitte wähle nur 1 Datei",

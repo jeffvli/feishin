@@ -369,7 +369,12 @@
         "trackNumber": "трек",
         "matchAnd": "и",
         "matchOr": "или",
-        "sortName": "сортировка по имени"
+        "sortName": "сортировка по имени",
+        "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+        "artist": "$t(entity.artist, {\"count\": 1})",
+        "channels": "$t(common.channel, {\"count\": 2})",
+        "genre": "$t(entity.genre, {\"count\": 1})",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "player": {
         "repeat_all": "повторять все",
@@ -503,7 +508,8 @@
             "goToAlbumArtist": "Перейти к $t(entity.albumArtist, {\"count\": 1})",
             "goTo": "перейти в",
             "moveToNext": "$t(action.moveToNext)",
-            "playShuffled": "$t(player.shuffle)"
+            "playShuffled": "$t(player.shuffle)",
+            "moveItems": "$t(action.moveItems)"
         },
         "home": {
             "mostPlayed": "слушают чаще всего",
@@ -540,7 +546,8 @@
             "scrobble": "скробблер",
             "logger": "Отладка",
             "playerFilters": "фильтры проигрывателя",
-            "queryBuilder": "конструктор очереди"
+            "queryBuilder": "конструктор очереди",
+            "discord": "дискорд"
         },
         "genreList": {
             "showAlbums": "показать $t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
@@ -561,7 +568,9 @@
             "reorder": "сортировка доступна только по ID"
         },
         "albumList": {
-            "artistAlbums": "альбомы {{artist}}"
+            "artistAlbums": "альбомы {{artist}}",
+            "genreAlbums": "\"{{genre}}\"\n$t(entity.album, {\"count\": 2})",
+            "title": "$t(entity.album, {\"count\": 2})"
         },
         "albumArtistDetail": {
             "topSongs": "популярные треки",
@@ -600,6 +609,12 @@
             "commitsSinceStable": "коммито после {{stable}}",
             "noStableReleaseToCompare": "нет стабильной версии, с которой можно было бы сравнить",
             "noNewCommits": "изменения в этом диапазоне отсутствуют"
+        },
+        "albumArtistList": {
+            "title": "$t(entity.albumArtist, {\"count\": 2})"
+        },
+        "favorites": {
+            "title": "$t(entity.favorite, {\"count\": 2})"
         }
     },
     "form": {
@@ -639,7 +654,8 @@
             "title": "добавить в $t(entity.playlist, {\"count\": 1})",
             "input_skipDuplicates": "не добавлять дубликаты",
             "create": "создать $t(entity.playlist, {\"count\": 1}) {{playlist}}",
-            "searchOrCreate": "для создания нового списка выполните поиск по $t(entity.playlist, {\"count\": 2}) или введите соответствующий текст"
+            "searchOrCreate": "для создания нового списка выполните поиск по $t(entity.playlist, {\"count\": 2}) или введите соответствующий текст",
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})"
         },
         "updateServer": {
             "title": "обновление сервера",
@@ -656,7 +672,8 @@
         },
         "lyricSearch": {
             "input_name": "$t(common.name)",
-            "title": "поиск слов песни"
+            "title": "поиск слов песни",
+            "input_artist": "$t(entity.artist, {\"count\": 1})"
         },
         "editPlaylist": {
             "title": "редактировать $t(entity.playlist, {\"count\": 1})",
@@ -706,7 +723,8 @@
             "input_played": "воспроизвести фильтр",
             "input_played_optionAll": "все треки",
             "input_played_optionUnplayed": "только не игранные треки",
-            "input_played_optionPlayed": "только воспроизведённые треки"
+            "input_played_optionPlayed": "только воспроизведённые треки",
+            "input_genre": "$t(entity.genre, {\"count\": 1})"
         }
     },
     "setting": {
@@ -967,7 +985,75 @@
         "homeFeatureStyle_description": "настройка стиля карусели на главном экране",
         "homeFeatureStyle": "стиль карусели на главной",
         "homeFeatureStyle_optionMultiple": "несколько",
-        "language": "Язык интерфейса"
+        "language": "Язык интерфейса",
+        "autoDJ": "авто DJ",
+        "releaseChannel_optionAlpha": "альфа (ночная версия)",
+        "discordServeImage": "предоставить {{discord}} изображения с сервера",
+        "discordServeImage_description": "получать обложки треков для {{discord}} rich presence непосредственно с сервера, доступно только для Jellyfin и Navidrome. {{discord}} использует бота для получения картинок, поэтому ваш сервер должен быть доступен из общедоступной сети",
+        "discordStateIcon_description": "показывать иконку \"играет\" в статусе. иконка паузы показывается всегда когда опция \"Показывать расширенный статус при паузе\" включена",
+        "homeFeatureStyle_optionSingle": "одиночный",
+        "hotkey_navigateHome": "перейти на главную",
+        "lastfm_description": "показывать ссылки Last.fm на страницах артистов и альбомов",
+        "lastfm": "показывать ссылки last.fm",
+        "lastfmApiKey_description": "API ключ для {{lastfm}}. необходим для обложек",
+        "lastfmApiKey": "API ключ {{lastfm}}",
+        "logLevel": "детализация логов",
+        "logLevel_description": "определяет степень детализации логов. \"отладка\" отображает все логи, \"ошибка\" отображает только ошибки",
+        "logLevel_optionDebug": "отладка",
+        "logLevel_optionError": "ошибка",
+        "logLevel_optionInfo": "инфо",
+        "logLevel_optionWarn": "предупреждение",
+        "mpvExtraParameters": "дополнительные параметры mpv",
+        "mpvExtraParameters_description": "дополнительные аргументы, передаваемые mpv",
+        "musicbrainz_description": "показывать ссылки MusicBrainz на страницах артистов и альбомов, где есть ID MusicBrainz",
+        "musicbrainz": "показывать ссылки MusicBrainz",
+        "neteaseTranslation_description": "Если включено, получает и отображает переведённые текста песен с NetEase по возможности",
+        "neteaseTranslation": "Включить переводы NetEase",
+        "notify": "включить уведомления о песнях",
+        "notify_description": "показывать уведомления при смене песни",
+        "pathReplace": "замена пути к файлу",
+        "pathReplace_description": "заменяет стандартный путь сервера",
+        "pathReplace_optionRemovePrefix": "убрать префикс",
+        "pathReplace_optionAddPrefix": "добавить префикс",
+        "playerFilters": "Фильтр песен в очереди",
+        "playerFilters_description": "пропускает песни при добавлении в очередь, основываясь на заданном критерии",
+        "artistRadioCount_description": "определяет количество песен для добавления в радио по артисту/треку",
+        "artistRadioCount": "кол-во радио по артисту/треку",
+        "imageResolution": "разрешение изображения",
+        "imageResolution_description": "разрешение изображений, используемых в приложении. при значении \"0\" будет использоваться исходное разрешение",
+        "imageResolution_optionItemCard": "карточка элемента",
+        "imageResolution_optionSidebar": "боковая панель",
+        "imageResolution_optionHeader": "заголовок",
+        "imageResolution_optionFullScreenPlayer": "полноэкранный проигрыватель",
+        "playerbarSlider": "ползунок проигрывателя",
+        "playerbarSlider_description": "waveform не рекомендуется при слабом подключении к интернету",
+        "playerbarSliderType_optionSlider": "ползунок",
+        "playerbarSliderType_optionWaveform": "waveform",
+        "playerbarWaveformAlign": "положение waveform",
+        "playerbarWaveformAlign_optionTop": "верх",
+        "playerbarWaveformAlign_optionCenter": "центр",
+        "playerbarWaveformAlign_optionBottom": "низ",
+        "playerbarWaveformBarWidth": "ширина элемента waveform",
+        "playerbarWaveformGap": "промежутки waveform",
+        "playerbarWaveformRadius": "радиус waveform",
+        "preferLocalLyrics_description": "по возможности предпочитать локальные текста песен загружаемым",
+        "preferLocalLyrics": "предпочтитать локальные текста песен",
+        "showLyricsInSidebar_description": "к очереди воспроизведения будет добавлена панель, отображающая текст песни",
+        "showLyricsInSidebar": "показывать текст песни в боковой панели проигрывателя",
+        "showRatings_description": "определяет, отображается ли в интерфейсе функция звёздного рейтинга",
+        "showRatings": "показывать звёздный рейтинг",
+        "enableGridMultiSelect": "включить множественное выделение",
+        "enableGridMultiSelect_description": "если включено, то позволяет выделять несколько элементов в таблицах. если отключено, то нажатие на элемент таблицы откроет страницу элемента",
+        "showVisualizerInSidebar_description": "к боковой части проигрывателя будет добавлена панель, показывающая визуализатор",
+        "showVisualizerInSidebar": "показывать визуализатор в боковой панели",
+        "combinedLyricsAndVisualizer_description": "Объединяет текст песни и визуализатор в одну панель заместо двух",
+        "combinedLyricsAndVisualizer": "объединить текст и визуализатор в одну панель",
+        "preservePitch_description": "сохраняет тональность при изменении скорости воспроизведения",
+        "preservePitch": "сохранять тональность",
+        "audioFadeOnStatusChange": "плавное изменение звука",
+        "audioFadeOnStatusChange_description": "включает эффекты затухания и появления звука при изменении статуса (пауза/проигрывание)",
+        "preventSleepOnPlayback_description": "запрещает спящий режим экрана, пока играет музыка",
+        "preventSleepOnPlayback": "не переходить в спящий режим"
     },
     "releaseType": {
         "secondary": {
@@ -981,7 +1067,8 @@
             "spokenWord": "Художественная декламация",
             "audioDrama": "радиопостановка",
             "fieldRecording": "запись вне студии",
-            "mixtape": "сборник"
+            "mixtape": "сборник",
+            "djMix": "dj микс"
         },
         "primary": {
             "other": "другие",

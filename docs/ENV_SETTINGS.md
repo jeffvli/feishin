@@ -29,12 +29,14 @@ These variables override app settings **on first run** when no persisted setting
 | `general.themeLight` | `defaultLight` | `FS_GENERAL_THEME_LIGHT` | Same as theme (used when system is light). |
 | `general.lastfmApiKey` | *(empty)* | `FS_GENERAL_LASTFM_API_KEY` | Last.fm API key. |
 | `general.lastFM` | `true` | `FS_GENERAL_LAST_FM` | `true` / `false` — Enable Last.fm. |
+| `general.listenBrainz` | `true` | `FS_GENERAL_LISTEN_BRAINZ` | `true` / `false` — ListenBrainz links. |
 | `general.musicBrainz` | `true` | `FS_GENERAL_MUSIC_BRAINZ` | `true` / `false` — MusicBrainz links. |
 | `general.nativeAspectRatio` | `false` | `FS_GENERAL_NATIVE_ASPECT_RATIO` | `true` / `false` — Use native cover art aspect ratio. |
 | `general.pathReplace` | *(empty)* | `FS_GENERAL_PATH_REPLACE` | Path pattern to replace (e.g. server path in Docker). |
 | `general.pathReplaceWith` | *(empty)* | `FS_GENERAL_PATH_REPLACE_WITH` | Replacement path. |
 | `general.playerbarOpenDrawer` | `false` | `FS_GENERAL_PLAYERBAR_OPEN_DRAWER` | `true` / `false` — Open queue/lyrics as drawer from player bar. |
 | `general.primaryShade` | `6` | `FS_GENERAL_PRIMARY_SHADE` | Mantine primary shade 0–9 (number). |
+| `general.qobuz` | `true` | `FS_GENERAL_QOBUZ` | `true` / `false` — Qobuz links. |
 | `general.resume` | `true` | `FS_GENERAL_RESUME` | `true` / `false` — Resume playback on load. |
 | `general.showLyricsInSidebar` | `true` | `FS_GENERAL_SHOW_LYRICS_IN_SIDEBAR` | `true` / `false` — Show lyrics in sidebar. |
 | `general.showRatings` | `true` | `FS_GENERAL_SHOW_RATINGS` | `true` / `false` — Show star ratings. |
@@ -44,6 +46,7 @@ These variables override app settings **on first run** when no persisted setting
 | `general.sidebarPlaylistList` | `true` | `FS_GENERAL_SIDEBAR_PLAYLIST_LIST` | `true` / `false` — Show playlist list in sidebar. |
 | `general.sidebarPlaylistSorting` | `false` | `FS_GENERAL_SIDEBAR_PLAYLIST_SORTING` | `true` / `false` — Enable playlist sorting in sidebar. |
 | `general.sideQueueType` | `sideQueue` | `FS_GENERAL_SIDE_QUEUE_TYPE` | `sideDrawerQueue` / `sideQueue` — Side play queue style. |
+| `general.sideQueueLayout` | `horizontal` | `FS_GENERAL_SIDE_QUEUE_LAYOUT` | `horizontal` / `vertical` — Attached side queue layout orientation. |
 | `general.useThemeAccentColor` | `false` | `FS_GENERAL_USE_THEME_ACCENT_COLOR` | `true` / `false` — Use theme’s accent color instead of custom. |
 | `general.useThemePrimaryShade` | `true` | `FS_GENERAL_USE_THEME_PRIMARY_SHADE` | `true` / `false` — Use theme’s primary shade. |
 | `general.zoomFactor` | `100` | `FS_GENERAL_ZOOM_FACTOR` | UI zoom percentage (number). |
