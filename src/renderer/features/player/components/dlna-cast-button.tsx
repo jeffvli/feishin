@@ -90,7 +90,6 @@ export const DlnaCastButton = () => {
     const handleSelect = useCallback(
         async (device: DlnaDevice) => {
             if (!dlnaPlayer) return;
-
             const result = await dlnaPlayer.connect(device);
             if (result.success) {
                 setIsConnected(true);
@@ -107,42 +106,35 @@ export const DlnaCastButton = () => {
 
     const handleDisconnect = useCallback(async () => {
         if (!dlnaPlayer) return;
-
         await dlnaPlayer.disconnect();
         setIsConnected(false);
         setConnectedDeviceName('');
+        setShowPopover(false);
         setSettings({
             playback: { type: previousPlayerType },
         });
     }, [previousPlayerType, setSettings]);
-
     const handleToggle = useCallback(
         (e: React.MouseEvent) => {
             e.stopPropagation();
-            if (isConnected) {
-                handleDisconnect();
-                return;
-            }
-
             if (showPopover) {
                 setShowPopover(false);
             } else {
                 setShowPopover(true);
-                handleDiscover();
+                if (!isConnected) {
+                    handleDiscover();
+                }
             }
         },
-        [isConnected, showPopover, handleDisconnect, handleDiscover],
+        [isConnected, showPopover, handleDiscover],
     );
-
     // Close popover when clicking outside
     useEffect(() => {
         if (!showPopover) return;
-
         const handleClickOutside = () => setShowPopover(false);
         const timer = setTimeout(() => {
             document.addEventListener('click', handleClickOutside);
         }, 100);
-
         return () => {
             clearTimeout(timer);
             document.removeEventListener('click', handleClickOutside);
@@ -154,7 +146,6 @@ export const DlnaCastButton = () => {
         left: 0,
         top: 0,
     });
-
     useEffect(() => {
         if (showPopover && buttonRef.current) {
             const rect = buttonRef.current.getBoundingClientRect();
@@ -179,7 +170,7 @@ export const DlnaCastButton = () => {
                 size="sm"
                 tooltip={{
                     label: isConnected
-                        ? `Casting to ${connectedDeviceName} (click to disconnect)`
+                        ? `Casting to ${connectedDeviceName}`
                         : 'Cast to DLNA device',
                     openDelay: 0,
                 }}
@@ -202,42 +193,81 @@ export const DlnaCastButton = () => {
                         zIndex: 9999,
                     }}
                 >
-                    <div
-                        style={{
-                            borderBottom: '1px solid #444',
-                            color: '#e0e0e0',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            padding: '4px 12px 8px',
-                            textTransform: 'uppercase',
-                        }}
-                    >
-                        DLNA Devices
-                    </div>
-                    <DeviceList devices={devices} isLoading={isLoading} onSelect={handleSelect} />
-                    {!isLoading && (
-                        <div
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleDiscover();
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleDiscover();
-                            }}
-                            role="button"
-                            style={{
-                                borderTop: '1px solid #444',
-                                color: '#6c9fff',
-                                cursor: 'pointer',
+                    {isConnected ? (
+                        <>
+                            <div style={{
+                                borderBottom: '1px solid #444',
+                                color: '#e0e0e0',
                                 fontSize: '0.75rem',
-                                marginTop: '4px',
-                                padding: '8px 12px 4px',
-                                textAlign: 'center',
-                            }}
-                            tabIndex={0}
-                        >
-                            Refresh
-                        </div>
+                                fontWeight: 600,
+                                padding: '4px 12px 8px',
+                                textTransform: 'uppercase',
+                            }}>
+                                Now Casting
+                            </div>
+                            <div style={{
+                                color: '#aaa',
+                                fontSize: '0.8rem',
+                                padding: '8px 12px',
+                            }}>
+                                {connectedDeviceName}
+                            </div>
+                            <div style={{ borderTop: '1px solid #444', padding: '6px 8px 2px' }}>
+                                <div
+                                    onClick={handleDisconnect}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') handleDisconnect(); }}
+                                    role="button"
+                                    style={{
+                                        borderRadius: '4px',
+                                        color: '#ff6b6b',
+                                        cursor: 'pointer',
+                                        fontSize: '0.8rem',
+                                        padding: '6px 12px',
+                                        textAlign: 'center',
+                                    }}
+                                    tabIndex={0}
+                                >
+                                    Disconnect
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div style={{
+                                borderBottom: '1px solid #444',
+                                color: '#e0e0e0',
+                                fontSize: '0.75rem',
+                                fontWeight: 600,
+                                padding: '4px 12px 8px',
+                                textTransform: 'uppercase',
+                            }}>
+                                DLNA Devices
+                            </div>
+                            <DeviceList
+                                devices={devices}
+                                isLoading={isLoading}
+                                onSelect={handleSelect}
+                            />
+                            {!isLoading && (
+                                <div
+                                    onClick={(e) => { e.stopPropagation(); handleDiscover(); }}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') handleDiscover(); }}
+                                    role="button"
+                                    style={{
+                                        borderTop: '1px solid #444',
+                                        color: '#6c9fff',
+                                        cursor: 'pointer',
+                                        fontSize: '0.75rem',
+                                        marginTop: '4px',
+                                        padding: '8px 12px 4px',
+                                        textAlign: 'center',
+                                    }}
+                                    tabIndex={0}
+                                >
+                                    Refresh
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             )}

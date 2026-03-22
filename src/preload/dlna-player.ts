@@ -13,6 +13,7 @@ export interface TrackMetadata {
     albumName?: string;
     artistName?: string;
     duration?: number;
+    mimeType?: string;
     title: string;
 }
 
