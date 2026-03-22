@@ -288,6 +288,7 @@ const PlayerbarSliderSchema = z.object({
     barGap: z.number(),
     barRadius: z.number(),
     barWidth: z.number(),
+    loadingDelay: z.number(),
     type: PlayerbarSliderTypeSchema,
 });
 

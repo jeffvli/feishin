@@ -1053,6 +1053,8 @@
         "volumeWheelStep": "volume wheel step",
         "volumeWidth_description": "the width of the volume slider",
         "volumeWidth": "volume slider width",
+        "waveformLoadingDelay": "waveform loading delay",
+        "waveformLoadingDelay_description": "delay in seconds before loading waveform. increase this value if you are experiencing stutters when using the web player.",
         "webAudio_description": "use web audio. this enables advanced features like replaygain. disable if you experience otherwise",
         "webAudio": "use web audio",
         "windowBarStyle_description": "select the style of the window bar",
