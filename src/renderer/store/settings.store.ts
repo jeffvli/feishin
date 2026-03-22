@@ -1049,6 +1049,7 @@ const initialState: SettingsState = {
             barGap: 1,
             barRadius: 4,
             barWidth: 2,
+            loadingDelay: 2,
             type: PlayerbarSliderType.SLIDER,
         },
         playlistTarget: PlaylistTarget.TRACK,
