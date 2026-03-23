@@ -602,7 +602,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 id: query.id,
             },
             query: {
-                _sort: 'id',
+                _sort: NDSongListSort.ID,
                 _end: -1,
                 _order: 'ASC',
                 _start: 0,
@@ -1009,6 +1009,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 id: query.id,
             },
             query: {
+                _sort: NDSongListSort.ID,
                 _end: -1,
                 _order: 'ASC',
                 _start: 0,
