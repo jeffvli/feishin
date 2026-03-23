@@ -9,6 +9,7 @@ import process from 'process';
 import { getMainWindow, sendToastToRenderer } from '../../../index';
 import { createLog, isWindows } from '../../../utils';
 import { store } from '../settings';
+import { updateNowPlaying } from './now-playing';
 
 import { PlayerData } from '/@/shared/types/domain-types';
 
@@ -447,6 +448,7 @@ ipcMain.handle('player-get-time', async (): Promise<number | undefined> => {
 // Updates the current player metadata (song data)
 ipcMain.on('player-update-metadata', (_event, data: PlayerData) => {
     currentPlayerData = data;
+    updateNowPlaying(data);
 });
 
 // Returns the current player metadata (song data)

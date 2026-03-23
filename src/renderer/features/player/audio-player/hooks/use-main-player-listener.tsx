@@ -84,6 +84,27 @@ export const useMainPlayerListener = () => {
             }
         });
 
+        // macOS Now Playing / Control Center media key handlers.
+        // These allow the OS-level transport controls (Control Center, headphones,
+        // keyboard media keys when MediaSession is active) to control playback.
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.setActionHandler('play', () => {
+                if (!isRadioActive) mediaPlay();
+            });
+            navigator.mediaSession.setActionHandler('pause', () => {
+                if (!isRadioActive) mediaPause();
+            });
+            navigator.mediaSession.setActionHandler('stop', () => {
+                if (!isRadioActive) mediaStop();
+            });
+            navigator.mediaSession.setActionHandler('nexttrack', () => {
+                if (!isRadioActive) mediaNext();
+            });
+            navigator.mediaSession.setActionHandler('previoustrack', () => {
+                if (!isRadioActive) mediaPrevious();
+            });
+        }
+
         mpvPlayerListener.rendererSkipForward(() => {
             mediaSkipForward();
         });
@@ -131,6 +152,14 @@ export const useMainPlayerListener = () => {
             ipc?.removeAllListeners('renderer-player-volume-up');
             ipc?.removeAllListeners('renderer-player-volume-down');
             ipc?.removeAllListeners('renderer-player-error');
+
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.setActionHandler('play', null);
+                navigator.mediaSession.setActionHandler('pause', null);
+                navigator.mediaSession.setActionHandler('stop', null);
+                navigator.mediaSession.setActionHandler('nexttrack', null);
+                navigator.mediaSession.setActionHandler('previoustrack', null);
+            }
         };
     }, [
         decreaseVolume,

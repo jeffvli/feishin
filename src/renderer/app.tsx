@@ -99,6 +99,51 @@ export const App = () => {
         return undefined;
     }, []);
 
+    // macOS Now Playing / Control Center integration via HTML5 MediaSession API.
+    // The main process fetches artwork and sends metadata here; Electron mirrors
+    // it automatically into the OS-level Now Playing info-center.
+    useEffect(() => {
+        if (!isElectron() || !('mediaSession' in navigator)) return undefined;
+
+        const handler = (
+            _event: unknown,
+            payload: null | {
+                album: string;
+                artist: string;
+                artworkDataUrl: null | string;
+                duration: number;
+                playbackState: string;
+                title: string;
+            },
+        ) => {
+            if (!payload) {
+                navigator.mediaSession.metadata = null;
+                navigator.mediaSession.playbackState = 'none';
+                return;
+            }
+
+            const artwork: MediaImage[] = [];
+            if (payload.artworkDataUrl) {
+                artwork.push({ src: payload.artworkDataUrl });
+            }
+
+            navigator.mediaSession.metadata = new MediaMetadata({
+                album: payload.album,
+                artist: payload.artist,
+                artwork,
+                title: payload.title,
+            });
+
+            navigator.mediaSession.playbackState =
+                payload.playbackState === 'playing' ? 'playing' : 'paused';
+        };
+
+        ipc?.on('update-media-session', handler);
+        return () => {
+            ipc?.removeAllListeners('update-media-session');
+        };
+    }, []);
+
     const notificationStyles = useMemo(
         () => ({
             root: {
