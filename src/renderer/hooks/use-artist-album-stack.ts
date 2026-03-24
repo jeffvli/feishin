@@ -3,7 +3,9 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { api } from '/@/renderer/api';
 import { JellyfinController } from '/@/renderer/api/jellyfin/jellyfin-controller';
 import { NavidromeController } from '/@/renderer/api/navidrome/navidrome-controller';
+import { queryKeys } from '/@/renderer/api/query-keys';
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
+import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServerId, useCurrentServerWithCredential } from '/@/renderer/store';
 import {
     ArtistCoverStackSort,
@@ -36,6 +38,18 @@ interface ArtistAlbumStackResult {
     isLoading: boolean;
 }
 
+// Module-level cache for cover art validation results (hasImage HEAD checks).
+// Mirrors the loadedImageCacheKeys pattern in image.tsx.
+// Key: "serverId:itemId:itemType" → boolean (has real cover art)
+const validationCache = new Map<string, boolean>();
+
+// Module-level cache for computed stack results.
+// Key: "serverId:artistId:sortBy:sortOrder" → resolved stack data
+const stackResultCache = new Map<
+    string,
+    { albumIds: null | string[]; hasRealArtistCover: boolean }
+>();
+
 /**
  * Hook to fetch album stack for an artist, filtering out placeholder covers.
  * Requires CoverArtValidatorContext to be provided by a parent component.
@@ -55,6 +69,22 @@ const mapSortByToAlbumListSort = (sortBy: ArtistCoverStackSortType): AlbumListSo
         default:
             return AlbumListSort.YEAR;
     }
+};
+
+// Wrap a validator function with the module-level validationCache
+const createCachedValidator = (
+    serverId: string,
+    hasImage: CoverArtValidator,
+): CoverArtValidator => {
+    return async (id: string, itemType: LibraryItem): Promise<boolean> => {
+        const cacheKey = `${serverId}:${id}:${itemType}`;
+        const cached = validationCache.get(cacheKey);
+        if (cached !== undefined) return cached;
+
+        const result = await hasImage(id, itemType);
+        validationCache.set(cacheKey, result);
+        return result;
+    };
 };
 
 export function useArtistAlbumStack(
@@ -88,45 +118,67 @@ export function useArtistAlbumStack(
         if (fetchingRef.current === fetchKey) {
             return;
         }
+
+        // Check stack result cache — return immediately if we have a cached result
+        const stackCacheKey = `${serverId}:${artistId}:${options.sortBy}:${options.sortOrder}`;
+        const cachedStack = stackResultCache.get(stackCacheKey);
+        if (cachedStack) {
+            setResult({ ...cachedStack, isLoading: false });
+            return;
+        }
+
         fetchingRef.current = fetchKey;
 
         setResult((prev) => ({ ...prev, isLoading: true }));
 
+        const cachedHasImage = createCachedValidator(serverId, hasImage);
+
         try {
-            // Fetch albums for this artist
-            const albumsRes = await api.controller.getAlbumList({
-                apiClientProps: { serverId },
-                query: {
-                    artistIds: [artistId],
-                    limit: 10, // Fetch a few extra in case some have placeholders
-                    sortBy: mapSortByToAlbumListSort(options.sortBy),
-                    sortOrder: options.sortOrder,
-                    startIndex: 0,
-                },
+            // Fetch albums for this artist via react-query for deduplication and caching
+            const albumQuery = {
+                artistIds: [artistId],
+                limit: 10, // Fetch a few extra in case some have placeholders
+                sortBy: mapSortByToAlbumListSort(options.sortBy),
+                sortOrder: options.sortOrder,
+                startIndex: 0,
+            };
+
+            const albumsRes = await queryClient.fetchQuery({
+                queryFn: () =>
+                    api.controller.getAlbumList({
+                        apiClientProps: { serverId },
+                        query: albumQuery,
+                    }),
+                queryKey: queryKeys.albums.list(serverId, albumQuery, artistId),
+                staleTime: 1000 * 60 * 5, // 5 minutes — album lists rarely change
             });
 
             const albums = albumsRes?.items || [];
             if (albums.length === 0) {
-                setResult({ albumIds: [], hasRealArtistCover: false, isLoading: false });
+                const stackResult = { albumIds: [], hasRealArtistCover: false };
+                stackResultCache.set(stackCacheKey, stackResult);
+                setResult({ ...stackResult, isLoading: false });
                 return;
             }
 
             // Check if artist has a real cover (if preferArtistCover is enabled)
             let hasRealArtistCover = false;
             if (options.preferArtistCover) {
-                hasRealArtistCover = await hasImage(artistId, LibraryItem.ALBUM_ARTIST);
+                hasRealArtistCover = await cachedHasImage(artistId, LibraryItem.ALBUM_ARTIST);
             }
 
             // If artist has real cover, use that instead of album stack
             if (hasRealArtistCover) {
-                setResult({ albumIds: [], hasRealArtistCover: true, isLoading: false });
+                const stackResult = { albumIds: [], hasRealArtistCover: true };
+                stackResultCache.set(stackCacheKey, stackResult);
+                setResult({ ...stackResult, isLoading: false });
                 return;
             }
 
-            // Check album covers in parallel using the validator function
+            // Check album covers in parallel using the cached validator function
             const albumCoverChecks = await Promise.all(
                 albums.map(async (album) => {
-                    const isRealCover = await hasImage(album.id, LibraryItem.ALBUM);
+                    const isRealCover = await cachedHasImage(album.id, LibraryItem.ALBUM);
                     return { albumId: album.id, isRealCover };
                 }),
             );
@@ -140,7 +192,9 @@ export function useArtistAlbumStack(
                 }
             }
 
-            setResult({ albumIds: validAlbumIds, hasRealArtistCover: false, isLoading: false });
+            const stackResult = { albumIds: validAlbumIds, hasRealArtistCover: false };
+            stackResultCache.set(stackCacheKey, stackResult);
+            setResult({ ...stackResult, isLoading: false });
         } catch {
             setResult({ albumIds: null, hasRealArtistCover: false, isLoading: false });
         } finally {
