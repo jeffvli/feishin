@@ -30,7 +30,7 @@ export const PlayerbarWaveform = () => {
 
     const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
 
-    const streamUrl = useSongUrl(currentSong, true, { bitrate: 64, enabled: true, format: 'mp3' });
+    const streamUrl = useSongUrl(currentSong, true, { bitrate: 64, enabled: false, format: 'mp3' });
 
     const { color } = useAppThemeColors();
     const primaryColor = (color['--theme-colors-primary'] as string) || 'rgb(53, 116, 252)';
