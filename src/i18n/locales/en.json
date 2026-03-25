@@ -109,6 +109,7 @@
         "minimize": "minimize",
         "modified": "modified",
         "mbid": "MusicBrainz ID",
+        "grouping": "grouping",
         "mood": "mood",
         "name": "name",
         "no": "no",

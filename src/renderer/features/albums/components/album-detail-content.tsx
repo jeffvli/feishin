@@ -94,6 +94,7 @@ interface AlbumMetadataTagsProps {
 }
 
 const MOOD_TAG = 'mood';
+const GROUPING_TAG = 'grouping';
 const RELEASE_COUNTRY_TAG = 'releasecountry';
 const RELEASE_STATUS_TAG = 'releasestatus';
 
@@ -153,6 +154,30 @@ const AlbumMetadataTags = ({ album }: AlbumMetadataTagsProps) => {
             id: tag,
             value: tag,
         }));
+    }, [album]);
+
+    const groupingItems = useMemo(() => {
+        if (!album) return [];
+
+        return (
+            album.tags?.[GROUPING_TAG]?.map((tag) => {
+                if (album._serverType !== ServerType.NAVIDROME) {
+                    return { id: tag, label: tag, url: null };
+                }
+
+                const searchParams = new URLSearchParams();
+                const paramsWithCustom = setJsonSearchParam(
+                    searchParams,
+                    FILTER_KEYS.ALBUM._CUSTOM,
+                    { grouping: [tag] },
+                );
+                return {
+                    id: tag,
+                    label: tag,
+                    url: `${AppRoute.LIBRARY_ALBUMS}?${paramsWithCustom.toString()}`,
+                };
+            }) ?? []
+        );
     }, [album]);
 
     const recordLabels = useMemo(() => {
@@ -221,6 +246,33 @@ const AlbumMetadataTags = ({ album }: AlbumMetadataTagsProps) => {
                 items={moodTagItems}
                 title={t('common.mood', { postProcess: 'sentenceCase' })}
             />
+
+            {groupingItems.length > 0 && (
+                <Stack align="center" className={styles.metadataPillGroup} gap="xs">
+                    <Text fw={600} isNoSelect size="sm" tt="uppercase">
+                        {t('common.grouping', { postProcess: 'sentenceCase' })}
+                    </Text>
+                    <div className={styles['pill-group-wrapper']}>
+                        <Pill.Group>
+                            {groupingItems.map((item) =>
+                                item.url ? (
+                                    <PillLink
+                                        key={`grouping-${item.id}`}
+                                        size="md"
+                                        to={item.url}
+                                    >
+                                        {item.label}
+                                    </PillLink>
+                                ) : (
+                                    <Pill key={`grouping-${item.id}`} size="md">
+                                        {item.label}
+                                    </Pill>
+                                ),
+                            )}
+                        </Pill.Group>
+                    </div>
+                </Stack>
+            )}
         </>
     );
 };
