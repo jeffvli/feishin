@@ -1551,6 +1551,13 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 return persistedState;
             },
             name: 'player-store',
+            onRehydrateStorage: () => (state) => {
+                if (!state) return;
+                const playback = useSettingsStore.getState().playback;
+                if (playback.previousLocalVolume !== undefined) {
+                    state.player.volume = playback.previousLocalVolume;
+                }
+            },
             partialize: (state) => {
                 const shouldRestorePlayQueue = useSettingsStore.getState().general.resume;
 

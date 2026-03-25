@@ -10,8 +10,6 @@ const playerLog = (action: string, err?: unknown) => {
     }
 };
 
-playerLog('Init Soap Client');
-
 export interface DlnaDevice {
     controlUrl: string;
     id: string;

@@ -435,11 +435,19 @@ ipcMain.on('player-mute', async (_event, mute: boolean) => {
     }
 });
 
-ipcMain.handle('player-get-time', async (): Promise<number | undefined> => {
+ipcMain.handle('player-get-time', async (): Promise<number> => {
     try {
-        return getMpvInstance()?.getTimePosition();
-    } catch (err: any | NodeMpvError) {
-        mpvLog({ action: `Failed to get current time` }, err);
+        const mpv = getMpvInstance();
+        if (!mpv) return 0;
+        const isIdle = await mpv.getProperty('idle-active').catch(() => true);
+        if (isIdle) {
+            return 0;
+        }
+        return await mpv.getTimePosition();
+    } catch (err: any) {
+        if (err?.errcode !== 3) {
+            mpvLog({ action: `Failed to get current time` }, err);
+        }
         return 0;
     }
 });

@@ -1,7 +1,7 @@
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { usePlayerActions, useSettingsStoreActions } from '/@/renderer/store';
+import { usePlayerActions, useSettingsStoreActions, usePlaybackSettings, usePlayerVolume } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { PlayerType } from '/@/shared/types/types';
 
@@ -72,8 +72,9 @@ export const DlnaCastButton = () => {
     const [showPopover, setShowPopover] = useState(false);
     const [devices, setDevices] = useState<DlnaDevice[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [previousPlayerType] = useState<PlayerType>(PlayerType.WEB);
-
+    const volume = usePlayerVolume();
+    const settings = usePlaybackSettings();
+    const previousPlayerTypeRef = useRef<PlayerType>(settings.type);
     const handleDiscover = useCallback(async () => {
         if (!dlnaPlayer) return;
         setIsLoading(true);
@@ -86,10 +87,10 @@ export const DlnaCastButton = () => {
             setIsLoading(false);
         }
     }, []);
-
     const handleSelect = useCallback(
         async (device: DlnaDevice) => {
             if (!dlnaPlayer) return;
+            previousPlayerTypeRef.current = settings.type;
             const result = await dlnaPlayer.connect(device);
             if (result.success) {
                 setIsConnected(true);
@@ -97,13 +98,17 @@ export const DlnaCastButton = () => {
                 setShowPopover(false);
                 setVolume(result.volume);
                 setSettings({
-                    playback: { type: PlayerType.DLNA },
+                    playback: {
+                        ...settings,
+                        previousLocalVolume: volume,
+                        previousPlayerType: settings.type,
+                        type: result.success ? PlayerType.DLNA : settings.type,
+                    },
                 });
             }
         },
-        [setSettings, setVolume],
+        [setSettings, setVolume, settings, settings.type, volume],
     );
-
     const handleDisconnect = useCallback(async () => {
         if (!dlnaPlayer) return;
         await dlnaPlayer.disconnect();
@@ -111,9 +116,12 @@ export const DlnaCastButton = () => {
         setConnectedDeviceName('');
         setShowPopover(false);
         setSettings({
-            playback: { type: previousPlayerType },
+            playback: { ...settings, type: previousPlayerTypeRef.current },
         });
-    }, [previousPlayerType, setSettings]);
+        if (settings.previousLocalVolume !== undefined) {
+            setVolume(settings.previousLocalVolume);
+        }
+    }, [setSettings, setVolume, settings]);
     const handleToggle = useCallback(
         (e: React.MouseEvent) => {
             e.stopPropagation();
@@ -140,7 +148,19 @@ export const DlnaCastButton = () => {
             document.removeEventListener('click', handleClickOutside);
         };
     }, [showPopover]);
-
+    useEffect(() => {
+        if (settings.previousLocalVolume !== undefined) {
+            setSettings({
+                playback: {
+                    ...settings,
+                    type: settings.previousPlayerType ?? previousPlayerTypeRef.current,
+                    previousLocalVolume: undefined,
+                    previousPlayerType: undefined,
+                },
+            });
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     const buttonRef = useRef<HTMLDivElement>(null);
     const [popoverPos, setPopoverPos] = useState<{ left: number; top: number }>({
         left: 0,

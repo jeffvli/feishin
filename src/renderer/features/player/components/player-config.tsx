@@ -205,6 +205,8 @@ const AudioPlayerTypeConfig = () => {
     const playbackSettings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
 
+    const isCasting = playbackSettings.type === PlayerType.DLNA;
+
     return (
         <Select
             comboboxProps={{ withinPortal: false }}
@@ -215,9 +217,10 @@ const AudioPlayerTypeConfig = () => {
                     value: PlayerType.LOCAL,
                 },
                 { label: 'Web', value: PlayerType.WEB },
+                ...(isCasting ? [{ disabled: true, label: 'DLNA', value: PlayerType.DLNA }] : []),
             ]}
             defaultValue={playbackSettings.type}
-            disabled={status === PlayerStatus.PLAYING}
+            disabled={status === PlayerStatus.PLAYING || isCasting}
             onChange={(e) => {
                 setSettings({
                     playback: { ...playbackSettings, type: e as PlayerType },

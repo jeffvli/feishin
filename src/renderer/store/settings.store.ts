@@ -614,6 +614,8 @@ const PlaybackSettingsSchema = z.object({
     transcode: TranscodingConfigSchema,
     type: z.nativeEnum(PlayerType),
     webAudio: z.boolean(),
+    previousLocalVolume: z.number().min(0).max(100).optional(),
+    previousPlayerType: z.nativeEnum(PlayerType).optional(),
 });
 
 const RemoteSettingsSchema = z.object({
@@ -1811,6 +1813,8 @@ const initialState: SettingsState = {
         },
         type: PlayerType.WEB,
         webAudio: true,
+        previousLocalVolume: undefined,
+        previousPlayerType: undefined,
     },
     queryBuilder: {
         tag: [],
