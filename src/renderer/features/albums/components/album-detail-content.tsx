@@ -256,11 +256,7 @@ const AlbumMetadataTags = ({ album }: AlbumMetadataTagsProps) => {
                         <Pill.Group>
                             {groupingItems.map((item) =>
                                 item.url ? (
-                                    <PillLink
-                                        key={`grouping-${item.id}`}
-                                        size="md"
-                                        to={item.url}
-                                    >
+                                    <PillLink key={`grouping-${item.id}`} size="md" to={item.url}>
                                         {item.label}
                                     </PillLink>
                                 ) : (
