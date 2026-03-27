@@ -134,6 +134,7 @@
         "bitDepth": "bitdiepte",
         "codec": "codec",
         "mbid": "MusicBrainz ID",
+        "grouping": "groepering",
         "share": "deel",
         "explicit": "expliciet",
         "sampleRate": "sample rate",

@@ -126,6 +126,7 @@
         "note": "заметка",
         "none": "нет",
         "mbid": "MusicBrainz ID",
+        "grouping": "группировка",
         "reload": "перезагрузить",
         "preview": "просмотр",
         "codec": "кодек",

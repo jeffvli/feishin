@@ -301,6 +301,7 @@
         "forward": "endavant",
         "manage": "gestiona",
         "mbid": "ID de MusicBrainz",
+        "grouping": "agrupament",
         "noResultsFromQuery": "la petició no ha produït resultats",
         "path": "ruta",
         "playerMustBePaused": "cal pausar el reproductor",

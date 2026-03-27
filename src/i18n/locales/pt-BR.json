@@ -84,6 +84,7 @@
         "size": "tamanho",
         "note": "observação",
         "mbid": "ID no MusicBrainz",
+        "grouping": "agrupamento",
         "reload": "recarregar",
         "codec": "codec",
         "preview": "pré-visualizar",
