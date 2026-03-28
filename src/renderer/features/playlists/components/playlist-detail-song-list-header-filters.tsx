@@ -176,6 +176,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
         <Flex justify="space-between" ref={containerRef}>
             <Group gap="sm" w="100%">
                 <Button
+                    disabled={isEditMode}
                     leftSection={<Icon icon="arrowLeftRight" />}
                     onClick={handleToggleDisplayMode}
                     variant="subtle"
