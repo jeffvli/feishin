@@ -745,7 +745,6 @@ export const NavidromeController: InternalControllerEndpoint = {
             args.context?.pathReplaceWith,
         );
     },
-
     getSongList: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -819,6 +818,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             totalRecordCount: albums.totalRecordCount,
         };
     },
+
     getSongListCount: async ({ apiClientProps, query }) =>
         NavidromeController.getSongList({
             apiClientProps,
@@ -1122,6 +1122,7 @@ export const NavidromeController: InternalControllerEndpoint = {
     },
     scrobble: SubsonicController.scrobble,
     search: SubsonicController.search,
+    setPlaylistSongs: SubsonicController.setPlaylistSongs,
     setRating: SubsonicController.setRating,
     shareItem: async (args) => {
         const { apiClientProps, body } = args;

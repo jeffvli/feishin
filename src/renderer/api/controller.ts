@@ -10,6 +10,8 @@ import {
     ControllerEndpoint,
     InternalControllerEndpoint,
     ServerType,
+    SetPlaylistSongsArgs,
+    SetPlaylistSongsResponse,
 } from '/@/shared/types/domain-types';
 
 type ApiController = {
@@ -884,6 +886,20 @@ export const controller: GeneralController = {
                 query: mergeMusicFolderId(args.query, server),
             }),
         );
+    },
+    setPlaylistSongs: function (args: SetPlaylistSongsArgs): Promise<SetPlaylistSongsResponse> {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: setPlaylistSongs`,
+            );
+        }
+
+        return apiController(
+            'setPlaylistSongs',
+            server.type,
+        )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
     },
     setRating(args) {
         const server = getServerById(args.apiClientProps.serverId);

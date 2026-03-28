@@ -1769,6 +1769,24 @@ export const JellyfinController: InternalControllerEndpoint = {
             ),
         };
     },
+    setPlaylistSongs: async (args) => {
+        const { apiClientProps, body } = args;
+
+        const res = await jfApiClient(apiClientProps).updatePlaylist({
+            body: {
+                Ids: body.songIds,
+            },
+            params: {
+                id: body.id,
+            },
+        });
+
+        if (res.status !== 204) {
+            throw new Error('Failed to update playlist songs');
+        }
+
+        return null;
+    },
     updateInternetRadioStation: async (args) => {
         const { apiClientProps, body, query } = args;
 
@@ -1798,14 +1816,8 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         const res = await jfApiClient(apiClientProps).updatePlaylist({
             body: {
-                Genres: body.genres?.map((item) => ({ Id: item.id, Name: item.name })) || [],
                 IsPublic: body.public,
-                MediaType: 'Audio',
                 Name: body.name,
-                PremiereDate: null,
-                ProviderIds: {},
-                Tags: [],
-                UserId: apiClientProps.server?.userId, // Required
             },
             params: {
                 id: query.id,
@@ -1819,31 +1831,6 @@ export const JellyfinController: InternalControllerEndpoint = {
         return null;
     },
 };
-
-// const getArtistList = async (args: ArtistListArgs): Promise<AlbumArtistListResponse> => {
-//     const { query, apiClientProps } = args;
-
-//     const res = await jfApiClient(apiClientProps).getAlbumArtistList({
-//         query: {
-//             Limit: query.limit,
-//             ParentId: query.musicFolderId,
-//             Recursive: true,
-//             SortBy: artistListSortMap.jellyfin[query.sortBy] || 'SortName,Name',
-//             SortOrder: sortOrderMap.jellyfin[query.sortOrder],
-//             StartIndex: query.startIndex,
-//         },
-//     });
-
-//     if (res.status !== 200) {
-//         throw new Error('Failed to get artist list');
-//     }
-
-//     return {
-//         items: res.body.Items.map((item) => jfNormalize.albumArtist(item, apiClientProps.server)),
-//         startIndex: query.startIndex,
-//         totalRecordCount: res.body.TotalRecordCount,
-//     };
-// };
 
 function getLibraryId(musicFolderId?: string | string[]) {
     return Array.isArray(musicFolderId) ? musicFolderId[0] : musicFolderId;

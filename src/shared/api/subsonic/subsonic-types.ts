@@ -467,7 +467,7 @@ const deletePlaylistParameters = z.object({
 });
 
 const createPlaylistParameters = z.object({
-    name: z.string(),
+    name: z.string().optional(),
     playlistId: z.string().optional(),
     songId: z.array(z.string()).optional(),
 });

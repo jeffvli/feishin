@@ -1084,7 +1084,6 @@ export type UpdatePlaylistArgs = BaseEndpointArgs & {
 export type UpdatePlaylistBody = {
     _custom?: Record<string, any>;
     comment?: string;
-    genres?: Genre[];
     name: string;
     ownerId?: string;
     public?: boolean;
@@ -1430,6 +1429,7 @@ export type ControllerEndpoint = {
     savePlayQueue: (args: SaveQueueArgs) => Promise<void>;
     scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
     search: (args: SearchArgs) => Promise<SearchResponse>;
+    setPlaylistSongs: (args: SetPlaylistSongsArgs) => Promise<SetPlaylistSongsResponse>;
     setRating?: (args: SetRatingArgs) => Promise<RatingResponse>;
     shareItem?: (args: ShareItemArgs) => Promise<ShareItemResponse>;
     updateInternetRadioStation: (
@@ -1581,6 +1581,9 @@ export type InternalControllerEndpoint = {
     savePlayQueue: (args: ReplaceApiClientProps<SaveQueueArgs>) => Promise<void>;
     scrobble: (args: ReplaceApiClientProps<ScrobbleArgs>) => Promise<ScrobbleResponse>;
     search: (args: ReplaceApiClientProps<SearchArgs>) => Promise<SearchResponse>;
+    setPlaylistSongs: (
+        args: ReplaceApiClientProps<SetPlaylistSongsArgs>,
+    ) => Promise<SetPlaylistSongsResponse>;
     setRating?: (args: ReplaceApiClientProps<SetRatingArgs>) => Promise<RatingResponse>;
     shareItem?: (args: ReplaceApiClientProps<ShareItemArgs>) => Promise<ShareItemResponse>;
     updateInternetRadioStation: (
@@ -1636,6 +1639,15 @@ export type ServerInfo = {
 };
 
 export type ServerInfoArgs = BaseEndpointArgs;
+
+export type SetPlaylistSongsArgs = BaseEndpointArgs & { body: SetPlaylistSongsQuery };
+
+export type SetPlaylistSongsQuery = {
+    id: string;
+    songIds: string[];
+};
+
+export type SetPlaylistSongsResponse = null;
 
 export type SimilarSongsArgs = BaseEndpointArgs & {
     query: SimilarSongsQuery;
