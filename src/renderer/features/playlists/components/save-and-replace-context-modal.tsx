@@ -56,7 +56,7 @@ export const SaveAndReplaceContextModal = ({
 
     return (
         <ConfirmModal loading={updatePlaylistMutation.isPending} onConfirm={handleConfirm}>
-            <Text>{t('form.editPlaylist.editNote', { postProcess: 'sentenceCase' })}</Text>
+            <Text>{t('common.areYouSure', { postProcess: 'sentenceCase' })}</Text>
         </ConfirmModal>
     );
 };
