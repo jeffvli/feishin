@@ -370,7 +370,6 @@
         },
         "editPlaylist": {
             "publicJellyfinNote": "Jellyfin for some reason does not expose whether a playlist is public or not. If you wish for this to remain public, please have the following input selected",
-            "editNote": "manual edits are not recommended for large playlists. are you sure you accept the risk of data loss incurred by overwriting the existing playlist?",
             "success": "$t(entity.playlist, {\"count\": 1}) updated successfully",
             "title": "edit $t(entity.playlist, {\"count\": 1})"
         },
