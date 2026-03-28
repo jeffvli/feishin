@@ -27,8 +27,6 @@ import {
     PlaylistListSort,
     ReplaceApiClientProps,
     ServerType,
-    SetPlaylistSongsArgs,
-    SetPlaylistSongsResponse,
     Song,
     SongListSort,
     SortOrder,
