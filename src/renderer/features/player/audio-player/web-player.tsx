@@ -174,43 +174,28 @@ export function WebPlayer() {
     );
 
     const handleOnEndedPlayer1 = useCallback(() => {
-        const promise = new Promise((resolve) => {
-            mediaAutoNext();
-            resolve(true);
-        });
-
-        promise.then(() => {
+        mediaAutoNext();
+        const storeStatus = usePlayerStoreBase.getState().player.status;
+        if (storeStatus === PlayerStatus.PAUSED) {
+            setLocalPlayerStatus(PlayerStatus.PAUSED);
+            playerRef.current?.pause();
+        } else {
             playerRef.current?.player1()?.ref?.getInternalPlayer().pause();
-
-            // If mediaAutoNext resulted in a paused state (e.g. end of queue,
-            // or pauseOnNextSongEnd flag), stop all audio instead of restoring volume.
-            const currentStatus = usePlayerStoreBase.getState().player.status;
-            if (currentStatus === PlayerStatus.PAUSED) {
-                playerRef.current?.pause();
-            } else {
-                playerRef.current?.setVolume(volume);
-            }
-            setIsTransitioning(false);
-        });
+            playerRef.current?.setVolume(volume);
+        }
+        setIsTransitioning(false);
     }, [mediaAutoNext, volume]);
-
     const handleOnEndedPlayer2 = useCallback(() => {
-        const promise = new Promise((resolve) => {
-            mediaAutoNext();
-            resolve(true);
-        });
-
-        promise.then(() => {
+        mediaAutoNext();
+        const storeStatus = usePlayerStoreBase.getState().player.status;
+        if (storeStatus === PlayerStatus.PAUSED) {
+            setLocalPlayerStatus(PlayerStatus.PAUSED);
+            playerRef.current?.pause();
+        } else {
             playerRef.current?.player2()?.ref?.getInternalPlayer().pause();
-
-            const currentStatus = usePlayerStoreBase.getState().player.status;
-            if (currentStatus === PlayerStatus.PAUSED) {
-                playerRef.current?.pause();
-            } else {
-                playerRef.current?.setVolume(volume);
-            }
-            setIsTransitioning(false);
-        });
+            playerRef.current?.setVolume(volume);
+        }
+        setIsTransitioning(false);
     }, [mediaAutoNext, volume]);
 
     const player = usePlayer();

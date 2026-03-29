@@ -34,6 +34,7 @@ let eventServer: http.Server | null = null;
 let eventServerPort = 0;
 let subscriptionSid: string | null = null;
 let subscriptionRenewalTimeout: NodeJS.Timeout | null = null;
+let pendingPrevTrack = false;
 
 function getLanIp(): null | string {
     const interfaces = os.networkInterfaces();
@@ -289,8 +290,19 @@ function startPositionPolling() {
                 !!posInfo.trackUri && posInfo.trackUri !== 'NOT_IMPLEMENTED';
             const recentAppSeek = Date.now() - lastAppSeekAt < 3000;
             // Detect gapless transition: position jumped backward significantly
+            if (pendingPrevTrack) {
+                pendingPrevTrack = false;
+                if (transportState !== 'STOPPED') {
+                    dlnaLog(`Position-based prev confirmed`);
+                    trackLoadedAt = Date.now();
+                    lastKnownPosition = 0;
+                    getMainWindow()?.webContents.send('renderer-dlna-prev-track');
+                }
+            }
             if (
+                !pendingPrevTrack &&
                 hasStartedPlaying &&
+                transportState !== 'STOPPED' &&
                 uriReportedByDevice &&
                 posInfo.trackUri === lastCommandedUri &&
                 previousPosition > 2 &&
@@ -298,15 +310,11 @@ function startPositionPolling() {
                 posInfo.position < previousPosition - 2 &&
                 !recentAppSeek
             ) {
-                dlnaLog(
-                    `Position-based prev detected: ${previousPosition}s -> ${posInfo.position}s`,
-                );
-                trackLoadedAt = Date.now();
-                lastKnownPosition = 0;
-                getMainWindow()?.webContents.send('renderer-dlna-prev-track');
+                dlnaLog(`Position-based prev pending: ${previousPosition}s -> ${posInfo.position}s`);
+                pendingPrevTrack = true;
             }
-            // Detect track ended via STOPPED state (non-gapless / end of queue)
             if (hasStartedPlaying && transportState === 'STOPPED') {
+                pendingPrevTrack = false;
                 dlnaLog('Track ended (stopped), advancing queue');
                 hasStartedPlaying = false;
                 getMainWindow()?.webContents.send('renderer-dlna-track-ended');

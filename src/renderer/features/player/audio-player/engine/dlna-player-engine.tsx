@@ -11,6 +11,8 @@ import { PlayerStatus } from '/@/shared/types/types';
 
 export interface DlnaPlayerEngineHandle extends AudioPlayer {}
 
+export const pendingInitialSeek = { value: -1 };
+
 type SongWithAudioMeta = {
     contentType?: string | null;
     suffix?: string | null;
@@ -136,6 +138,11 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             title: song.name,
         });
         hasPlayedRef.current = true;
+        if (pendingInitialSeek.value >= 0) {
+            const seekTo = pendingInitialSeek.value;
+            pendingInitialSeek.value = -1;
+            setTimeout(() => dlnaPlayer?.seek(seekTo), 1500);
+        }
         // Pre-load the next track for gapless playback
         const nextSong = playerData.nextSong;
         if (nextSong) {
@@ -291,12 +298,21 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         if (!dlnaPlayer) return;
         if (playerStatus === PlayerStatus.PLAYING) {
             if (hasPlayedRef.current) {
-                dlnaPlayer.play();
+                const playerData = usePlayerStore.getState().getPlayerData();
+                const currentUrl = playerData.currentSong
+                    ? getSongUrl(playerData.currentSong, transcode)
+                    : undefined;
+                if (currentUrl && currentUrl !== lastSentUrlRef.current) {
+                    skipNextSendRef.current = false;
+                    sendCurrentTrackToDlna();
+                } else {
+                    dlnaPlayer.play();
+                }
             }
         } else if (playerStatus === PlayerStatus.PAUSED) {
             dlnaPlayer.pause();
         }
-    }, [playerStatus]);
+    }, [playerStatus, transcode, sendCurrentTrackToDlna]);
     // Handle volume
     useEffect(() => {
         if (!dlnaPlayer) return;

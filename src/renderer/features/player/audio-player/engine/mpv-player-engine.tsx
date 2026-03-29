@@ -212,35 +212,30 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
         if (progressIntervalRef.current) {
             clearInterval(progressIntervalRef.current);
         }
-
         if (!hasCurrentSong) {
             return;
         }
-
+        let cancelled = false;
         const updateProgress = async () => {
-            if (!mpvPlayer || !isMountedRef.current) {
+            if (!mpvPlayer || cancelled) {
                 return;
             }
 
             try {
                 const time = await mpvPlayer.getCurrentTime();
-                if (time !== undefined && isMountedRef.current) {
+                if (time !== undefined && !cancelled) {
                     onProgress({
                         played: time / (time + 10),
                         playedSeconds: time,
                     });
                 }
             } catch {
-                // Handle error silently
             }
         };
-
-        const interval = PROGRESS_UPDATE_INTERVAL;
-        progressIntervalRef.current = setInterval(updateProgress, interval);
+        progressIntervalRef.current = setInterval(updateProgress, PROGRESS_UPDATE_INTERVAL);
         updateProgress();
-
         return () => {
-            isMountedRef.current = false;
+            cancelled = true;
             if (progressIntervalRef.current) {
                 clearInterval(progressIntervalRef.current);
                 progressIntervalRef.current = null;

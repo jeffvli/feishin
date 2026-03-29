@@ -98,7 +98,7 @@ export const AudioSettings = memo(() => {
     const audioDevices = useAudioDevices(playbackType);
     const audioDeviceId =
         playbackType === PlayerType.LOCAL ? settings.mpvAudioDeviceId : settings.audioDeviceId;
-
+    const isCasting = settings.type === PlayerType.DLNA;
     const audioOptions: SettingOption[] = [
         {
             control: (
@@ -110,9 +110,12 @@ export const AudioSettings = memo(() => {
                             value: PlayerType.LOCAL,
                         },
                         { label: 'Web', value: PlayerType.WEB },
+                        ...(isCasting
+                            ? [{ disabled: true, label: 'DLNA', value: PlayerType.DLNA }]
+                            : []),
                     ]}
                     defaultValue={settings.type}
-                    disabled={status === PlayerStatus.PLAYING}
+                    disabled={status === PlayerStatus.PLAYING || isCasting}
                     onChange={(e) => {
                         setSettings({ playback: { type: e as PlayerType } });
                         ipc?.send('settings-set', { property: 'playbackType', value: e });
