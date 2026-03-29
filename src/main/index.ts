@@ -431,19 +431,21 @@ const createTray = () => {
         },
     ]);
 
-    tray.on('click', () => {
-        if (store.get('window_minimize_to_tray')) {
-            if (mainWindow?.isVisible()) {
-                mainWindow?.hide();
+    if (!isMacOS()) {
+        tray.on('click', () => {
+            if (store.get('window_minimize_to_tray')) {
+                if (mainWindow?.isVisible()) {
+                    mainWindow?.hide();
+                } else {
+                    mainWindow?.show();
+                    createWinThumbarButtons();
+                }
             } else {
                 mainWindow?.show();
                 createWinThumbarButtons();
             }
-        } else {
-            mainWindow?.show();
-            createWinThumbarButtons();
-        }
-    });
+        });
+    }
 
     tray.setToolTip('Feishin');
     tray.setContextMenu(contextMenu);
