@@ -122,6 +122,10 @@ table {
 }
 
 .fs-main-content-module-main-content-container {
+    height: 100vh;
+}
+
+:has(.fs-window-bar-module-window-bar) .fs-main-content-module-main-content-container {
     height: calc(100vh - 30px);
 }
 
