@@ -122,7 +122,7 @@ table {
 }
 
 .fs-main-content-module-main-content-container {
-    height: 100vh;
+    height: calc(100vh - 30px);
 }
 
 /* stylelint-disable selector-class-pattern */
