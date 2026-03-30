@@ -129,7 +129,6 @@ table {
     height: calc(100vh - 30px);
 }
 
-/* stylelint-disable selector-class-pattern */
 .mantine-Tabs-root {
     input {
         border-radius: 18px;
