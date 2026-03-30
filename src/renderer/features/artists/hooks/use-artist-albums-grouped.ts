@@ -13,6 +13,15 @@ export type GroupingType = 'all' | 'primary';
 
 const PRIMARY_RELEASE_TYPES = ['album', 'broadcast', 'ep', 'other', 'single'];
 
+const getNormalizedReleaseTypes = (album: Album): string[] => {
+    const rawReleaseTypes = [...(album.releaseTypes || []), album.releaseType || ''];
+    const normalizedReleaseTypes = rawReleaseTypes
+        .map((type) => type.trim().toLowerCase())
+        .filter(Boolean);
+
+    return [...new Set(normalizedReleaseTypes)];
+};
+
 export const groupAlbumsByReleaseType = (
     albums: Album[],
     routeId: string,
@@ -44,10 +53,9 @@ export const groupAlbumsByReleaseType = (
                 }
 
                 // Group by all release types
-                const releaseTypes = album.releaseTypes || [];
-                if (releaseTypes.length > 0) {
+                const normalizedTypes = getNormalizedReleaseTypes(album);
+                if (normalizedTypes.length > 0) {
                     // Sort release types: primaries first (alphabetically), then secondaries (alphabetically)
-                    const normalizedTypes = releaseTypes.map((type) => type.toLowerCase());
                     const primaryTypes = normalizedTypes
                         .filter((type) => PRIMARY_RELEASE_TYPES.includes(type))
                         .sort();
@@ -92,8 +100,7 @@ export const groupAlbumsByReleaseType = (
                 return acc;
             }
 
-            const releaseTypes = album.releaseTypes || [];
-            const normalizedTypes = releaseTypes.map((type) => type.toLowerCase());
+            const normalizedTypes = getNormalizedReleaseTypes(album);
 
             let matchedType: null | string = null;
 
@@ -107,6 +114,8 @@ export const groupAlbumsByReleaseType = (
                 matchedType = 'broadcast';
             } else if (normalizedTypes.includes('other')) {
                 matchedType = 'other';
+            } else if (normalizedTypes.length > 0) {
+                matchedType = normalizedTypes[0];
             } else {
                 matchedType = 'album';
             }
@@ -292,11 +301,11 @@ export const getArtistAlbumsGrouped = (
             const types = releaseType.split('/');
             return types.some((type) => {
                 const enumValue = releaseTypeToEnumMap[type];
-                return enumValue ? enabledReleaseTypeEnums.has(enumValue) : false;
+                return enumValue ? enabledReleaseTypeEnums.has(enumValue) : true;
             });
         }
         const enumValue = releaseTypeToEnumMap[releaseType];
-        return enumValue ? enabledReleaseTypeEnums.has(enumValue) : false;
+        return enumValue ? enabledReleaseTypeEnums.has(enumValue) : true;
     };
 
     const releaseTypeEntries = Object.entries(albumsByReleaseType)
