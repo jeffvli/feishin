@@ -1,6 +1,7 @@
 import { ipcMain } from 'electron';
 import http from 'http';
 import os from 'os';
+
 import { getMainWindow } from '../../../index';
 import { createLog } from '../../../utils';
 import {
@@ -32,7 +33,7 @@ let lastQueuedNextUri = '';
 let lastAppSeekAt = 0;
 let eventServer: http.Server | null = null;
 let eventServerPort = 0;
-let subscriptionSid: string | null = null;
+let subscriptionSid: null | string = null;
 let subscriptionRenewalTimeout: NodeJS.Timeout | null = null;
 let pendingPrevTrack = false;
 
@@ -67,23 +68,6 @@ const dlnaLog = (action: string, err?: unknown) => {
 };
 function getEventUrl(device: DlnaDevice): string {
     return device.controlUrl.replace(/\/Control$/, '/Event');
-}
-
-async function waitForTransportState(
-    device: DlnaDevice,
-    states: string[],
-    maxWaitMs: number,
-): Promise<void> {
-    const interval = 150;
-    const attempts = Math.ceil(maxWaitMs / interval);
-    for (let i = 0; i < attempts; i++) {
-        await new Promise((r) => setTimeout(r, interval));
-        try {
-            const state = await getTransportInfo(device);
-            if (states.includes(state)) return;
-        } catch {
-        }
-    }
 }
 
 function handleEventNotify(body: string): void {
@@ -124,6 +108,40 @@ function handleEventNotify(body: string): void {
     }
 }
 
+async function renewEventSubscription(device: DlnaDevice): Promise<void> {
+    if (!subscriptionSid) return;
+    const eventUrl = getEventUrl(device);
+    try {
+        const parsedUrl = new URL(eventUrl);
+        await new Promise<void>((resolve, reject) => {
+            const reqOptions: http.RequestOptions = {
+                headers: {
+                    SID: subscriptionSid!,
+                    TIMEOUT: 'Second-1800',
+                },
+                hostname: parsedUrl.hostname,
+                method: 'SUBSCRIBE',
+                path: parsedUrl.pathname,
+                port: parsedUrl.port || '1400',
+            };
+            const req = http.request(reqOptions, (res) => {
+                res.resume();
+                resolve();
+            });
+            req.on('error', reject);
+            req.setTimeout(5000, () => req.destroy(new Error('Renewal timed out')));
+            req.end();
+        });
+        dlnaLog('Renewed AVTransport event subscription');
+        subscriptionRenewalTimeout = setTimeout(
+            () => renewEventSubscription(device),
+            25 * 60 * 1000,
+        );
+    } catch (err) {
+        dlnaLog('Failed to renew event subscription', err);
+    }
+}
+
 async function startEventSubscription(device: DlnaDevice): Promise<void> {
     const lanIp = getLanIp();
     if (!lanIp) {
@@ -160,15 +178,15 @@ async function startEventSubscription(device: DlnaDevice): Promise<void> {
         const parsedUrl = new URL(eventUrl);
         const sid = await new Promise<string>((resolve, reject) => {
             const reqOptions: http.RequestOptions = {
-                hostname: parsedUrl.hostname,
-                method: 'SUBSCRIBE',
-                path: parsedUrl.pathname,
-                port: parsedUrl.port || '1400',
                 headers: {
                     CALLBACK: `<${callbackUrl}>`,
                     NT: 'upnp:event',
                     TIMEOUT: 'Second-1800',
                 },
+                hostname: parsedUrl.hostname,
+                method: 'SUBSCRIBE',
+                path: parsedUrl.pathname,
+                port: parsedUrl.port || '1400',
             };
             const req = http.request(reqOptions, (res) => {
                 const sid = res.headers['sid'] as string | undefined;
@@ -191,79 +209,6 @@ async function startEventSubscription(device: DlnaDevice): Promise<void> {
         );
     } catch (err) {
         dlnaLog('Failed to subscribe to AVTransport events prev/next detection unavailable', err);
-    }
-}
-
-async function renewEventSubscription(device: DlnaDevice): Promise<void> {
-    if (!subscriptionSid) return;
-    const eventUrl = getEventUrl(device);
-    try {
-        const parsedUrl = new URL(eventUrl);
-        await new Promise<void>((resolve, reject) => {
-            const reqOptions: http.RequestOptions = {
-                hostname: parsedUrl.hostname,
-                method: 'SUBSCRIBE',
-                path: parsedUrl.pathname,
-                port: parsedUrl.port || '1400',
-                headers: {
-                    SID: subscriptionSid!,
-                    TIMEOUT: 'Second-1800',
-                },
-            };
-            const req = http.request(reqOptions, (res) => {
-                res.resume();
-                resolve();
-            });
-            req.on('error', reject);
-            req.setTimeout(5000, () => req.destroy(new Error('Renewal timed out')));
-            req.end();
-        });
-        dlnaLog('Renewed AVTransport event subscription');
-        subscriptionRenewalTimeout = setTimeout(
-            () => renewEventSubscription(device),
-            25 * 60 * 1000,
-        );
-    } catch (err) {
-        dlnaLog('Failed to renew event subscription', err);
-    }
-}
-async function stopEventSubscription(device: DlnaDevice): Promise<void> {
-    if (subscriptionRenewalTimeout) {
-        clearTimeout(subscriptionRenewalTimeout);
-        subscriptionRenewalTimeout = null;
-    }
-    if (subscriptionSid) {
-        const eventUrl = getEventUrl(device);
-        try {
-            const parsedUrl = new URL(eventUrl);
-            await new Promise<void>((resolve) => {
-                const reqOptions: http.RequestOptions = {
-                    hostname: parsedUrl.hostname,
-                    method: 'UNSUBSCRIBE',
-                    path: parsedUrl.pathname,
-                    port: parsedUrl.port || '1400',
-                    headers: { SID: subscriptionSid! },
-                };
-                const req = http.request(reqOptions, (res) => {
-                    res.resume();
-                    resolve();
-                });
-                req.on('error', () => resolve()); // best-effort
-                req.setTimeout(3000, () => {
-                    req.destroy();
-                    resolve();
-                });
-                req.end();
-            });
-            dlnaLog('Unsubscribed from AVTransport events');
-        } catch {
-        }
-        subscriptionSid = null;
-    }
-    if (eventServer) {
-        eventServer.close();
-        eventServer = null;
-        eventServerPort = 0;
     }
 }
 
@@ -310,7 +255,9 @@ function startPositionPolling() {
                 posInfo.position < previousPosition - 2 &&
                 !recentAppSeek
             ) {
-                dlnaLog(`Position-based prev pending: ${previousPosition}s -> ${posInfo.position}s`);
+                dlnaLog(
+                    `Position-based prev pending: ${previousPosition}s -> ${posInfo.position}s`,
+                );
                 pendingPrevTrack = true;
             }
             if (hasStartedPlaying && transportState === 'STOPPED') {
@@ -319,15 +266,9 @@ function startPositionPolling() {
                 hasStartedPlaying = false;
                 getMainWindow()?.webContents.send('renderer-dlna-track-ended');
             }
-            if (
-                transportState !== lastKnownTransportState &&
-                transportState !== 'TRANSITIONING'
-            ) {
+            if (transportState !== lastKnownTransportState && transportState !== 'TRANSITIONING') {
                 lastKnownTransportState = transportState;
-                getMainWindow()?.webContents.send(
-                    'renderer-dlna-transport-state',
-                    transportState,
-                );
+                getMainWindow()?.webContents.send('renderer-dlna-transport-state', transportState);
             }
             try {
                 const deviceVolume = await getVolume(connectedDevice);
@@ -336,17 +277,76 @@ function startPositionPolling() {
                     getMainWindow()?.webContents.send('renderer-dlna-volume', deviceVolume);
                 }
             } catch {
+                // Catch
             }
         } catch {
             // Polling errors are expected during track transitions
         }
     }, 1000);
 }
+async function stopEventSubscription(device: DlnaDevice): Promise<void> {
+    if (subscriptionRenewalTimeout) {
+        clearTimeout(subscriptionRenewalTimeout);
+        subscriptionRenewalTimeout = null;
+    }
+    if (subscriptionSid) {
+        const eventUrl = getEventUrl(device);
+        try {
+            const parsedUrl = new URL(eventUrl);
+            await new Promise<void>((resolve) => {
+                const reqOptions: http.RequestOptions = {
+                    headers: { SID: subscriptionSid! },
+                    hostname: parsedUrl.hostname,
+                    method: 'UNSUBSCRIBE',
+                    path: parsedUrl.pathname,
+                    port: parsedUrl.port || '1400',
+                };
+                const req = http.request(reqOptions, (res) => {
+                    res.resume();
+                    resolve();
+                });
+                req.on('error', () => resolve()); // best-effort
+                req.setTimeout(3000, () => {
+                    req.destroy();
+                    resolve();
+                });
+                req.end();
+            });
+            dlnaLog('Unsubscribed from AVTransport events');
+        } catch {
+            // Catch
+        }
+        subscriptionSid = null;
+    }
+    if (eventServer) {
+        eventServer.close();
+        eventServer = null;
+        eventServerPort = 0;
+    }
+}
 
 function stopPositionPolling() {
     if (positionPollingInterval) {
         clearInterval(positionPollingInterval);
         positionPollingInterval = null;
+    }
+}
+
+async function waitForTransportState(
+    device: DlnaDevice,
+    states: string[],
+    maxWaitMs: number,
+): Promise<void> {
+    const interval = 150;
+    const attempts = Math.ceil(maxWaitMs / interval);
+    for (let i = 0; i < attempts; i++) {
+        await new Promise((r) => setTimeout(r, interval));
+        try {
+            const state = await getTransportInfo(device);
+            if (states.includes(state)) return;
+        } catch {
+            // Catch
+        }
     }
 }
 

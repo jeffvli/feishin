@@ -1,7 +1,12 @@
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { usePlayerActions, useSettingsStoreActions, usePlaybackSettings, usePlayerVolume } from '/@/renderer/store';
+import {
+    usePlaybackSettings,
+    usePlayerActions,
+    usePlayerVolume,
+    useSettingsStoreActions,
+} from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { PlayerType } from '/@/shared/types/types';
 
@@ -107,7 +112,7 @@ export const DlnaCastButton = () => {
                 });
             }
         },
-        [setSettings, setVolume, settings, settings.type, volume],
+        [setSettings, setVolume, settings, volume],
     );
     const handleDisconnect = useCallback(async () => {
         if (!dlnaPlayer) return;
@@ -153,13 +158,13 @@ export const DlnaCastButton = () => {
             setSettings({
                 playback: {
                     ...settings,
-                    type: settings.previousPlayerType ?? previousPlayerTypeRef.current,
                     previousLocalVolume: undefined,
                     previousPlayerType: undefined,
+                    type: settings.previousPlayerType ?? previousPlayerTypeRef.current,
                 },
             });
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const buttonRef = useRef<HTMLDivElement>(null);
     const [popoverPos, setPopoverPos] = useState<{ left: number; top: number }>({
@@ -215,27 +220,33 @@ export const DlnaCastButton = () => {
                 >
                     {isConnected ? (
                         <>
-                            <div style={{
-                                borderBottom: '1px solid #444',
-                                color: '#e0e0e0',
-                                fontSize: '0.75rem',
-                                fontWeight: 600,
-                                padding: '4px 12px 8px',
-                                textTransform: 'uppercase',
-                            }}>
+                            <div
+                                style={{
+                                    borderBottom: '1px solid #444',
+                                    color: '#e0e0e0',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 600,
+                                    padding: '4px 12px 8px',
+                                    textTransform: 'uppercase',
+                                }}
+                            >
                                 Now Casting
                             </div>
-                            <div style={{
-                                color: '#aaa',
-                                fontSize: '0.8rem',
-                                padding: '8px 12px',
-                            }}>
+                            <div
+                                style={{
+                                    color: '#aaa',
+                                    fontSize: '0.8rem',
+                                    padding: '8px 12px',
+                                }}
+                            >
                                 {connectedDeviceName}
                             </div>
                             <div style={{ borderTop: '1px solid #444', padding: '6px 8px 2px' }}>
                                 <div
                                     onClick={handleDisconnect}
-                                    onKeyDown={(e) => { if (e.key === 'Enter') handleDisconnect(); }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleDisconnect();
+                                    }}
                                     role="button"
                                     style={{
                                         borderRadius: '4px',
@@ -253,14 +264,16 @@ export const DlnaCastButton = () => {
                         </>
                     ) : (
                         <>
-                            <div style={{
-                                borderBottom: '1px solid #444',
-                                color: '#e0e0e0',
-                                fontSize: '0.75rem',
-                                fontWeight: 600,
-                                padding: '4px 12px 8px',
-                                textTransform: 'uppercase',
-                            }}>
+                            <div
+                                style={{
+                                    borderBottom: '1px solid #444',
+                                    color: '#e0e0e0',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 600,
+                                    padding: '4px 12px 8px',
+                                    textTransform: 'uppercase',
+                                }}
+                            >
                                 DLNA Devices
                             </div>
                             <DeviceList
@@ -270,8 +283,13 @@ export const DlnaCastButton = () => {
                             />
                             {!isLoading && (
                                 <div
-                                    onClick={(e) => { e.stopPropagation(); handleDiscover(); }}
-                                    onKeyDown={(e) => { if (e.key === 'Enter') handleDiscover(); }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDiscover();
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') handleDiscover();
+                                    }}
                                     role="button"
                                     style={{
                                         borderTop: '1px solid #444',

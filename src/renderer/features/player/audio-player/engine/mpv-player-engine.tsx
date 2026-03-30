@@ -230,6 +230,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
                     });
                 }
             } catch {
+                // Catch
             }
         };
         progressIntervalRef.current = setInterval(updateProgress, PROGRESS_UPDATE_INTERVAL);

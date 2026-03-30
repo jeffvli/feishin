@@ -610,12 +610,12 @@ const PlaybackSettingsSchema = z.object({
     mpvExtraParameters: z.array(z.string()),
     mpvProperties: MpvSettingsSchema,
     preservePitch: z.boolean(),
+    previousLocalVolume: z.number().min(0).max(100).optional(),
+    previousPlayerType: z.nativeEnum(PlayerType).optional(),
     scrobble: ScrobbleSettingsSchema,
     transcode: TranscodingConfigSchema,
     type: z.nativeEnum(PlayerType),
     webAudio: z.boolean(),
-    previousLocalVolume: z.number().min(0).max(100).optional(),
-    previousPlayerType: z.nativeEnum(PlayerType).optional(),
 });
 
 const RemoteSettingsSchema = z.object({
@@ -1802,6 +1802,8 @@ const initialState: SettingsState = {
             replayGainPreampDB: 0,
         },
         preservePitch: true,
+        previousLocalVolume: undefined,
+        previousPlayerType: undefined,
         scrobble: {
             enabled: true,
             notify: false,
@@ -1813,8 +1815,6 @@ const initialState: SettingsState = {
         },
         type: PlayerType.WEB,
         webAudio: true,
-        previousLocalVolume: undefined,
-        previousPlayerType: undefined,
     },
     queryBuilder: {
         tag: [],

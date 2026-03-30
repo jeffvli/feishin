@@ -1,6 +1,8 @@
 import type { RefObject } from 'react';
+
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+
 import { api } from '/@/renderer/api';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { getSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
@@ -13,11 +15,6 @@ export interface DlnaPlayerEngineHandle extends AudioPlayer {}
 
 export const pendingInitialSeek = { value: -1 };
 
-type SongWithAudioMeta = {
-    contentType?: string | null;
-    suffix?: string | null;
-};
-
 interface DlnaPlayerEngineProps {
     isMuted: boolean;
     onEnded: () => void;
@@ -25,6 +22,11 @@ interface DlnaPlayerEngineProps {
     playerStatus: PlayerStatus;
     volume: number;
 }
+
+type SongWithAudioMeta = {
+    contentType?: null | string;
+    suffix?: null | string;
+};
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const dlnaPlayerListener = isElectron() ? window.api.dlnaPlayerListener : null;
@@ -50,7 +52,7 @@ const FORMAT_MIME_MAP: Record<string, string> = {
     raw: '',
 };
 
-function getMimeType(url: string, contentType?: string | null, suffix?: string | null): string {
+function getMimeType(url: string, contentType?: null | string, suffix?: null | string): string {
     const formatMatch = url.match(/[?&]format=([^&]+)/i);
     if (formatMatch) {
         const fmt = formatMatch[1].toLowerCase();
@@ -72,8 +74,8 @@ function getMimeType(url: string, contentType?: string | null, suffix?: string |
 
 async function resolveMimeType(
     url: string,
-    contentType?: string | null,
-    suffix?: string | null,
+    contentType?: null | string,
+    suffix?: null | string,
 ): Promise<string> {
     const fromMetadata = getMimeType(url, contentType, suffix);
     if (fromMetadata !== 'audio/mpeg') return fromMetadata;
@@ -82,6 +84,7 @@ async function resolveMimeType(
         const ct = res.headers.get('content-type');
         if (ct?.startsWith('audio/')) return ct.split(';')[0].trim();
     } catch {
+        // Handle
     }
     return 'audio/mpeg';
 }
@@ -89,7 +92,7 @@ async function resolveMimeType(
 export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     const { isMuted, onEnded, playerRef, playerStatus, volume } = props;
     const { transcode } = usePlaybackSettings();
-    const { setTimestamp, mediaPlay, mediaPause, mediaPrevious, setVolume } = usePlayerActions();
+    const { mediaPause, mediaPlay, mediaPrevious, setTimestamp, setVolume } = usePlayerActions();
     const hasPlayedRef = useRef(false);
     const skipNextSendRef = useRef(false);
     const lastSentUrlRef = useRef<string>('');
@@ -164,11 +167,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 }
                 const { contentType: nextContentType, suffix: nextSuffix } =
                     nextSong as unknown as SongWithAudioMeta;
-                const nextMimeType = await resolveMimeType(
-                    nextUrl,
-                    nextContentType,
-                    nextSuffix,
-                );
+                const nextMimeType = await resolveMimeType(nextUrl, nextContentType, nextSuffix);
                 dlnaPlayer.setNextUrl(nextUrl, {
                     albumArtUrl: nextArtUrl,
                     albumName: nextSong.album || undefined,
