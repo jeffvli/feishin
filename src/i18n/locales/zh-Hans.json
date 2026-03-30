@@ -961,8 +961,7 @@
         "editPlaylist": {
             "title": "编辑$t(entity.playlist, {\"count\": 1})",
             "publicJellyfinNote": "Jellyfin 出于某种原因不会显示播放列表是否公开。如果您希望保持公开，请选择以下输入",
-            "success": "$t(entity.playlist, {\"count\": 1})更新成功",
-            "editNote": "不建议对大型播放列表进行手动编辑，你确定接受新播放列表覆盖已有播放列表可能导致的数据丢失风险吗？"
+            "success": "$t(entity.playlist, {\"count\": 1})更新成功"
         },
         "lyricSearch": {
             "title": "搜索歌词",

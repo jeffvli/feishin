@@ -1044,8 +1044,7 @@
         "editPlaylist": {
             "title": "$t(entity.playlist, {\"count\": 1}) aanpassen",
             "publicJellyfinNote": "Jellyfin laat niet weten of een playlist publiek of privaat is. Als u wilt dat dit publiek blijft, selecteer de volgende invoer",
-            "success": "$t(entity.playlist, {\"count\": 1}) succesvol geüpdatet",
-            "editNote": "Handmatige bewerking wordt afgeraden voor grote afspeellijsten. Weet je zeker dat je het risico op dataverlies wilt accepteren door de bestaande afspeellijst te overschrijven?"
+            "success": "$t(entity.playlist, {\"count\": 1}) succesvol geüpdatet"
         },
         "updateServer": {
             "title": "update server",

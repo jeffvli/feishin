@@ -597,7 +597,8 @@
         "filter_multiple": "několik",
         "rename": "přejmenovat",
         "newVersionAvailable": "je dostupná nová verze",
-        "numberOfResults": "{{numberOfResults}} výsledků"
+        "numberOfResults": "{{numberOfResults}} výsledků",
+        "grouping": "seskupování"
     },
     "table": {
         "config": {
@@ -1063,8 +1064,7 @@
         "editPlaylist": {
             "title": "upravit $t(entity.playlist, {\"count\": 1})",
             "success": "$t(entity.playlist, {\"count\": 1}) úspěšně aktualizován",
-            "publicJellyfinNote": "Jellyfin z nějakého důvodu neukazuje, zda je seznam skladeb veřejný, nebo ne. Pokud si přejete, aby zůstal veřejný, zvolte prosím následující vstup",
-            "editNote": "ruční úpravy velkých seznamů skladeb nejsou doporučeny. opravdu přijímáte riziko ztráty dat, které může vzniknout přepsáním existujícího seznamu skladeb?"
+            "publicJellyfinNote": "Jellyfin z nějakého důvodu neukazuje, zda je seznam skladeb veřejný, nebo ne. Pokud si přejete, aby zůstal veřejný, zvolte prosím následující vstup"
         },
         "shareItem": {
             "allowDownloading": "umožnit stahování",

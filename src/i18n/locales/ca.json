@@ -424,8 +424,7 @@
         "editPlaylist": {
             "success": "$t(entity.playlist, {\"count\": 1}) s'ha actualitzat amb èxit",
             "title": "editar la $t(entity.playlist, {\"count\": 1})",
-            "publicJellyfinNote": "Per algun motiu, Jellyfin no exposa si una llista de reproducció és pública o no. Si voleu que es mantingui pública, seleccioneu la següent entrada",
-            "editNote": "es recomana no editar manualment les llistes de reproducció grans. segur que accepteu el risc de perdre dades si sobreescriviu la llista de reproducció existent?"
+            "publicJellyfinNote": "Per algun motiu, Jellyfin no exposa si una llista de reproducció és pública o no. Si voleu que es mantingui pública, seleccioneu la següent entrada"
         },
         "lyricSearch": {
             "input_artist": "$t(entity.artist, {\"count\": 1})",

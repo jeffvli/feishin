@@ -744,8 +744,7 @@
         "editPlaylist": {
             "success": "$t(entity.playlist, {\"count\": 1}) behar bezala eguneratu da",
             "title": "$t(entity.playlist, {\"count\": 1}) editatu",
-            "publicJellyfinNote": "Arrazoiren batengatik, Jellyfin ez du erakusten erreprodukzio-zerrendak publikoak diren edo ez. Hau publiko izaten jarraitzea nahi baduzu, hautatu sarrera hau",
-            "editNote": "ez da gomendatzen eskuzko edizioak egitea erreprodukzio-zerrenda handietarako. ziur zaude onartzen duzula lehendik dagoen erreprodukzio-zerrenda gainidazteagatik datuak galtzeko arriskua?"
+            "publicJellyfinNote": "Arrazoiren batengatik, Jellyfin ez du erakusten erreprodukzio-zerrendak publikoak diren edo ez. Hau publiko izaten jarraitzea nahi baduzu, hautatu sarrera hau"
         },
         "queryEditor": {
             "title": "kontsulta editorea",

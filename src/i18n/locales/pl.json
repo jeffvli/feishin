@@ -374,8 +374,7 @@
         "editPlaylist": {
             "title": "edytuj $t(entity.playlist, {\"count\": 1})",
             "success": "$t(entity.playlist, {\"count\": 1}) zaktualizowana pomyślnie",
-            "publicJellyfinNote": "Z jakiegoś powodu Jellyfin nie udostępnia informacji na temat publiczności playlisty. Jeżeli chcesz, aby ta pozostała publiczna, mniej wybraną poniższą opcję",
-            "editNote": "manualne edytowanie nie jest zalecane dla dużych playlist. czy na pewno zgadzasz się na ryzyko utraty danych wywołane przez nadpisanie istniejącej playlisty?"
+            "publicJellyfinNote": "Z jakiegoś powodu Jellyfin nie udostępnia informacji na temat publiczności playlisty. Jeżeli chcesz, aby ta pozostała publiczna, mniej wybraną poniższą opcję"
         },
         "shareItem": {
             "allowDownloading": "zezwól na pobieranie",

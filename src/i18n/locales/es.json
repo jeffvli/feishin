@@ -597,7 +597,8 @@
         "filter_multiple": "multi",
         "rename": "Renombrar",
         "newVersionAvailable": "Una nueva versión está disponible",
-        "numberOfResults": "{{numberOfResults}} resultados"
+        "numberOfResults": "{{numberOfResults}} resultados",
+        "grouping": "Agrupar"
     },
     "error": {
         "remotePortWarning": "reiniciar el servidor para aplicar el nuevo puerto",
@@ -945,8 +946,7 @@
         "editPlaylist": {
             "title": "editar $t(entity.playlist, {\"count\": 1})",
             "success": "$t(entity.playlist, {\"count\": 1}) actualizada correctamente",
-            "publicJellyfinNote": "Jellyfin por alguna razón no expone si una lista de reproducción es pública o no. Si deseas que ésta siga siendo pública, por favor ten seleccionada la siguiente entrada",
-            "editNote": "No se recomiendan las ediciones manuales para grandes listas de reproducción. ¿Seguro que aceptas el riesgo de pérdida de información incurrido por sobrescribir la lista de reproducción existente?"
+            "publicJellyfinNote": "Jellyfin por alguna razón no expone si una lista de reproducción es pública o no. Si deseas que ésta siga siendo pública, por favor ten seleccionada la siguiente entrada"
         },
         "queryEditor": {
             "input_optionMatchAll": "coincidir todos",

@@ -359,7 +359,6 @@
         },
         "editPlaylist": {
             "publicJellyfinNote": "Jellyfin viser af en eller anden grund ikke, om en playliste er offentlig eller ej. Hvis du ønsker, at den forbliver offentlig, skal du have følgende felt markeret",
-            "editNote": "manuelle ændringer anbefales ikke for store playlister. er du sikker på, at du accepterer risikoen for datatab ved at overskrive den eksisterende playliste?",
             "success": "$t(entity.playlist, {\"count\": 1}) opdateret",
             "title": "rediger $t(entity.playlist, {\"count\": 1})"
         },

@@ -949,8 +949,7 @@
         "editPlaylist": {
             "title": "modifier $t(entity.playlist, {\"count\": 1})",
             "publicJellyfinNote": "Jellyfin n'indique pas si une liste de lecture est publique ou non. Si vous souhaitez que cette liste de lecture reste publique, veuillez sélectionner l'entrée suivante",
-            "success": "$t(entity.playlist, {\"count\": 1}) mis à jour avec succès",
-            "editNote": "les modifications manuelles ne sont pas recommandées pour les listes de lecture volumineuses. êtes-vous sûre d'accepter le risque d'une perte de données en écrasant la liste de lecture existante ?"
+            "success": "$t(entity.playlist, {\"count\": 1}) mis à jour avec succès"
         },
         "lyricSearch": {
             "title": "recherche de paroles",

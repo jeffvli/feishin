@@ -589,7 +589,8 @@
         "filter_multiple": "複数枚組",
         "rename": "名前を変更",
         "newVersionAvailable": "新しいバージョンが利用可能です",
-        "numberOfResults": "{{numberOfResults}} 件の結果"
+        "numberOfResults": "{{numberOfResults}} 件の結果",
+        "grouping": "グループ化"
     },
     "table": {
         "config": {
@@ -1055,8 +1056,7 @@
         "editPlaylist": {
             "title": "$t(entity.playlist, {\"count\": 1}) を編集",
             "publicJellyfinNote": "Jellyfin では、何らかの理由でプレイリストが公開されているかどうかが表示されません。公開されたままにしたい場合は、以下の項目を選択してください",
-            "success": "$t(entity.playlist, {\"count\": 1}) が正常に更新されました",
-            "editNote": "大規模なプレイリストの場合、手動編集は推奨されません。既存のプレイリストを上書きすることでデータ損失が発生するリスクを許容しますか?"
+            "success": "$t(entity.playlist, {\"count\": 1}) が正常に更新されました"
         },
         "shareItem": {
             "allowDownloading": "ダウンロードを許可",

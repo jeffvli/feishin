@@ -19,7 +19,10 @@
         "removeFromFavorites": "Aus $t(entity.favorite, {\"count\": 2}) entfernen",
         "openIn": {
             "lastfm": "Auf Last.fm öffnen",
-            "musicbrainz": "Auf MusicBrainz öffnen"
+            "musicbrainz": "Auf MusicBrainz öffnen",
+            "listenbrainz": "In ListenBrainz öffnen",
+            "qobuz": "In Qobuz öffnen",
+            "spotify": "In Spotify öffnen"
         },
         "moveToNext": "Als nächstes",
         "downloadStarted": "Download von {{count}} Elementen gestartet",
@@ -163,7 +166,8 @@
         "filter_single": "einzeln",
         "filter_multiple": "mehrfach",
         "retry": "Wiederholen",
-        "newVersionAvailable": "Eine neue Version ist verfügbar"
+        "newVersionAvailable": "Eine neue Version ist verfügbar",
+        "numberOfResults": "{{numberOfResults}} Ergebnisse"
     },
     "error": {
         "remotePortWarning": "Starten Sie den Server neu, um den neuen Port anzuwenden",
@@ -302,8 +306,7 @@
         "editPlaylist": {
             "title": "Bearbeite $t(entity.playlist, {\"count\": 1})",
             "success": "$t(entity.playlist, {\"count\": 1}) erfolgreich aktualisiert",
-            "publicJellyfinNote": "Jellyfin legt aus irgendwelchen Gründen nicht offen ob eine Wiedergabeliste öffentlich ist oder nicht. Wenn du möchtest, dass sie öffentlich bleibt, wähle bitte diese Option aus",
-            "editNote": "Manuelles Bearbeiten wird für große Wiedergabelisten nicht empfohlen. Bist Du sicher, dass Du die aktuelle Wiedergabeliste unter dem Risiko von Datenverlust überschrieben möchtest?"
+            "publicJellyfinNote": "Jellyfin legt aus irgendwelchen Gründen nicht offen ob eine Wiedergabeliste öffentlich ist oder nicht. Wenn du möchtest, dass sie öffentlich bleibt, wähle bitte diese Option aus"
         },
         "lyricSearch": {
             "title": "Songtext Suche",
@@ -1109,7 +1112,16 @@
         "useThemeAccentColor_description": "Verwendet die Primärfarbe des gewählten Themas anstatt einer ausgewählten Akzentfarbe",
         "useThemePrimaryShade": "Primärschatten des Themas nutzen",
         "useThemePrimaryShade_description": "Verwendet den Primärschatten des ausgewählten Themas als primäre Farbvarianten",
-        "primaryShade": "Primärschatten"
+        "primaryShade": "Primärschatten",
+        "listenbrainz": "ListenBrainz Links anzeigen",
+        "listenbrainz_description": "Zeige Links zu ListenBrainz auf den Interpreten/Alben Seiten",
+        "mpvExtraParameters": "Zusätzliche mpv Parameter",
+        "qobuz": "Qobuz Links anzeigen",
+        "spotify": "Spotify Links anzeigen",
+        "nativeSpotify": "Spotify App benutzen",
+        "qobuz_description": "Zeige Links zu Qobuz auf den Interpreten/Alben Seiten",
+        "spotify_description": "Zeige Links zu Spotify auf den Interpreten/Alben Seiten",
+        "artistReleaseTypeConfiguration": "Interpreten Release Typ Einstellung"
     },
     "dragDropZone": {
         "error_oneFileOnly": "Bitte wähle nur 1 Datei",
@@ -1270,6 +1282,8 @@
         "miscellaneousSettings": "Verschiedenes Einstellungen",
         "ansiBands": "ANSI Bänder",
         "lowResolution": "Niedrige Auflösung",
-        "showFPS": "FPS anzeigen"
+        "showFPS": "FPS anzeigen",
+        "fadePeaks": "Spitzen abblenden",
+        "showPeaks": "Spitzen anzeigen"
     }
 }
