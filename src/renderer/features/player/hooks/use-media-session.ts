@@ -1,5 +1,6 @@
 import isElectron from 'is-electron';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { debounce } from 'lodash';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
@@ -9,8 +10,9 @@ import {
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
 import {
+    subscribeCurrentTrack,
+    subscribePlayerStatus,
     usePlaybackSettings,
-    usePlaybackType,
     usePlayerStore,
     useSettingsStore,
     useSkipButtons,
@@ -29,6 +31,40 @@ export const useMediaSession = () => {
     const isRadioActive = useIsRadioActive();
     const { isPlaying: isRadioPlaying, metadata: radioMetadata, stationName } = useRadioPlayer();
 
+    // Keep refs to current values to avoid dependency changes triggering handler re-registration
+    const playerRef = useRef(player);
+    const skipRef = useRef(skip);
+    const isRadioActiveRef = useRef(isRadioActive);
+    const isRadioPlayingRef = useRef(isRadioPlaying);
+    const radioMetadataRef = useRef(radioMetadata);
+    const stationNameRef = useRef(stationName);
+    const isMediaSessionEnabledRef = useRef(false);
+
+    // Update refs whenever values change, but don't trigger effects
+    useEffect(() => {
+        playerRef.current = player;
+    }, [player]);
+
+    useEffect(() => {
+        skipRef.current = skip;
+    }, [skip]);
+
+    useEffect(() => {
+        isRadioActiveRef.current = isRadioActive;
+    }, [isRadioActive]);
+
+    useEffect(() => {
+        isRadioPlayingRef.current = isRadioPlaying;
+    }, [isRadioPlaying]);
+
+    useEffect(() => {
+        radioMetadataRef.current = radioMetadata;
+    }, [radioMetadata]);
+
+    useEffect(() => {
+        stationNameRef.current = stationName;
+    }, [stationName]);
+
     const isMediaSessionEnabled = useMemo(() => {
         // Always enable media session on web
         if (!isElectron()) {
@@ -39,70 +75,86 @@ export const useMediaSession = () => {
     }, [mediaSessionEnabled, playbackType]);
 
     useEffect(() => {
+        isMediaSessionEnabledRef.current = isMediaSessionEnabled;
+    }, [isMediaSessionEnabled]);
+
+    // Register/unregister handlers whenever isMediaSessionEnabled changes so that
+    // enabling the setting after mount correctly registers handlers instead of
+    // silently no-oping because the [] effect already ran.
+    useEffect(() => {
         if (!isMediaSessionEnabled) {
+            mediaSession.setActionHandler('nexttrack', null);
+            mediaSession.setActionHandler('pause', null);
+            mediaSession.setActionHandler('play', null);
+            mediaSession.setActionHandler('previoustrack', null);
+            mediaSession.setActionHandler('seekto', null);
+            mediaSession.setActionHandler('stop', null);
+            mediaSession.setActionHandler('seekbackward', null);
+            mediaSession.setActionHandler('seekforward', null);
+
             return;
         }
 
         mediaSession.setActionHandler('nexttrack', () => {
-            if (isRadioActive && isRadioPlaying) {
+            if (isRadioActiveRef.current && isRadioPlayingRef.current) {
                 return;
             }
 
-            player.mediaNext();
+            playerRef.current.mediaNext();
         });
 
         mediaSession.setActionHandler('pause', () => {
-            player.mediaPause();
+            playerRef.current.mediaPause();
         });
 
         mediaSession.setActionHandler('play', () => {
-            player.mediaPlay();
+            playerRef.current.mediaPlay();
         });
 
         mediaSession.setActionHandler('previoustrack', () => {
-            if (isRadioActive && isRadioPlaying) {
+            if (isRadioActiveRef.current && isRadioPlayingRef.current) {
                 return;
             }
 
-            player.mediaPrevious();
+            playerRef.current.mediaPrevious();
         });
 
         mediaSession.setActionHandler('seekto', (e) => {
-            if (isRadioActive && isRadioPlaying) {
+            if (isRadioActiveRef.current && isRadioPlayingRef.current) {
                 return;
             }
 
             if (e.seekTime) {
-                player.mediaSeekToTimestamp(e.seekTime);
+                playerRef.current.mediaSeekToTimestamp(e.seekTime);
             } else if (e.seekOffset) {
                 const currentTimestamp = useTimestampStoreBase.getState().timestamp;
-                player.mediaSeekToTimestamp(currentTimestamp + e.seekOffset);
+                playerRef.current.mediaSeekToTimestamp(currentTimestamp + e.seekOffset);
             }
         });
 
         mediaSession.setActionHandler('stop', () => {
-            player.mediaStop();
+            playerRef.current.mediaStop();
         });
 
         mediaSession.setActionHandler('seekbackward', (e) => {
-            if (isRadioActive && isRadioPlaying) {
+            if (isRadioActiveRef.current && isRadioPlayingRef.current) {
                 return;
             }
 
             const currentTimestamp = useTimestampStoreBase.getState().timestamp;
-            player.mediaSeekToTimestamp(
-                currentTimestamp - (e.seekOffset || skip?.skipBackwardSeconds || 5),
+            playerRef.current.mediaSeekToTimestamp(
+                currentTimestamp - (e.seekOffset || skipRef.current?.skipBackwardSeconds || 5),
             );
         });
 
         mediaSession.setActionHandler('seekforward', (e) => {
-            if (isRadioActive && isRadioPlaying) {
+            if (isRadioActiveRef.current && isRadioPlayingRef.current) {
                 return;
             }
 
             const currentTimestamp = useTimestampStoreBase.getState().timestamp;
-            player.mediaSeekToTimestamp(
-                currentTimestamp + (e.seekOffset || skip?.skipForwardSeconds || 5),
+            playerRef.current.mediaSeekToTimestamp(
+                currentTimestamp + (e.seekOffset || skipRef.current?.skipForwardSeconds || 5),
             );
         });
 
@@ -116,28 +168,22 @@ export const useMediaSession = () => {
             mediaSession.setActionHandler('seekbackward', null);
             mediaSession.setActionHandler('seekforward', null);
         };
-    }, [
-        player,
-        skip?.skipBackwardSeconds,
-        skip?.skipForwardSeconds,
-        isMediaSessionEnabled,
-        isRadioActive,
-        isRadioPlaying,
-    ]);
+    }, [isMediaSessionEnabled]);
 
     const updateMediaSessionMetadata = useCallback(
         (song: QueueSong | undefined) => {
-            if (!isMediaSessionEnabled) {
+            // Read from ref so this callback is never stale regardless of when it was created
+            if (!isMediaSessionEnabledRef.current) {
                 return;
             }
 
             // Handle radio metadata when radio is active and playing
-            if (isRadioActive && isRadioPlaying) {
-                const title = radioMetadata?.title || stationName || 'Radio';
-                const artist = radioMetadata?.artist || stationName || '';
+            if (isRadioActiveRef.current && isRadioPlayingRef.current) {
+                const title = radioMetadataRef.current?.title || stationNameRef.current || 'Radio';
+                const artist = radioMetadataRef.current?.artist || stationNameRef.current || '';
 
                 mediaSession.metadata = new MediaMetadata({
-                    album: stationName || '',
+                    album: stationNameRef.current || '',
                     artist: artist,
                     artwork: [],
                     title: title,
@@ -164,8 +210,25 @@ export const useMediaSession = () => {
                 title: song?.name ?? '',
             });
         },
-        [isMediaSessionEnabled, isRadioActive, isRadioPlaying, radioMetadata, stationName],
+        // All values are read from refs — stable callback, no stale closure risk
+        [],
     );
+
+    // Debounced version to handle rapid skipping — only the last skip in a burst commits
+    // to the media session. Without this, rapid MediaMetadata assignments can tear the
+    // browser's media session state and permanently drop the handlers.
+    const debouncedUpdateMetadata = useRef(
+        debounce((song: QueueSong | undefined) => {
+            updateMediaSessionMetadata(song);
+        }, 100),
+    ).current;
+
+    // Cancel any pending debounced update on unmount
+    useEffect(() => {
+        return () => {
+            debouncedUpdateMetadata.cancel();
+        };
+    }, [debouncedUpdateMetadata]);
 
     // Update metadata when radio metadata changes
     useEffect(() => {
@@ -173,53 +236,62 @@ export const useMediaSession = () => {
             return;
         }
 
-        if (isRadioActive && isRadioPlaying) {
-            updateMediaSessionMetadata(undefined);
+        if (isRadioActiveRef.current && isRadioPlayingRef.current) {
+            debouncedUpdateMetadata(undefined);
         }
-    }, [
-        isMediaSessionEnabled,
-        isRadioActive,
-        isRadioPlaying,
-        radioMetadata,
-        stationName,
-        updateMediaSessionMetadata,
-    ]);
+    }, [radioMetadata, isRadioPlaying, isMediaSessionEnabled, debouncedUpdateMetadata]);
 
+    // Subscribe directly to the player store instead of using usePlayerEvents.
+    // usePlayerEvents receives inline handler objects that cause it to re-subscribe on every
+    // render, which destroys and recreates the media session on play/pause and track changes.
+    // subscribeCurrentTrack and subscribePlayerStatus are stable Zustand subscriptions with
+    // proper equality checks — registered once on mount and never torn down mid-session.
+    useEffect(() => {
+        const unsubscribeCurrentSong = subscribeCurrentTrack(({ song }) => {
+            if (!isMediaSessionEnabledRef.current) {
+                return;
+            }
+
+            if (isRadioActiveRef.current && isRadioPlayingRef.current) {
+                return;
+            }
+
+            debouncedUpdateMetadata(song);
+        });
+
+        const unsubscribeStatus = subscribePlayerStatus(({ status }) => {
+            if (!isMediaSessionEnabledRef.current) {
+                return;
+            }
+
+            mediaSession.playbackState = status === PlayerStatus.PLAYING ? 'playing' : 'paused';
+        });
+
+        return () => {
+            unsubscribeCurrentSong();
+            unsubscribeStatus();
+        };
+    }, [debouncedUpdateMetadata]);
+
+    // onPlayerRepeated fires via eventEmitter (not Zustand), so usePlayerEvents is safe here —
+    // the event emitter uses stable function references for on/off and does not re-subscribe
+    // on render. The inline object is fine because deps is [] and the effect only runs once.
     usePlayerEvents(
         {
-            onCurrentSongChange: (properties) => {
-                if (!isMediaSessionEnabled) {
-                    return;
-                }
-
-                if (isRadioActive && isRadioPlaying) {
-                    return;
-                }
-
-                updateMediaSessionMetadata(properties.song);
-            },
             onPlayerRepeated: () => {
-                if (!isMediaSessionEnabled) {
+                if (!isMediaSessionEnabledRef.current) {
                     return;
                 }
 
-                if (isRadioActive && isRadioPlaying) {
+                if (isRadioActiveRef.current && isRadioPlayingRef.current) {
                     return;
                 }
 
                 const currentSong = usePlayerStore.getState().getCurrentSong();
-                updateMediaSessionMetadata(currentSong);
-            },
-            onPlayerStatus: (properties) => {
-                if (!isMediaSessionEnabled) {
-                    return;
-                }
-
-                const status = properties.status;
-                mediaSession.playbackState = status === PlayerStatus.PLAYING ? 'playing' : 'paused';
+                debouncedUpdateMetadata(currentSong);
             },
         },
-        [isMediaSessionEnabled, isRadioActive, isRadioPlaying, updateMediaSessionMetadata],
+        [],
     );
 };
 
@@ -229,18 +301,7 @@ const MediaSessionHookInner = () => {
 };
 
 export const MediaSessionHook = () => {
-    const isElectronEnv = isElectron();
-    const playbackType = usePlaybackType();
-    const isMediaSessionEnabled = useSettingsStore((state) => state.playback.mediaSession);
-
-    // We always want to enable media session when on web
-    // Otherwise, only enable if it is explicitly enabled in the settings AND using the web player
-    const shouldUseMediaSession =
-        !isElectronEnv || (isMediaSessionEnabled && playbackType === PlayerType.WEB);
-
-    if (!shouldUseMediaSession) {
-        return null;
-    }
-
+    // Always render the hook — let the internal guard logic decide whether to act.
+    // Conditional rendering here causes unmount/remount cycles that destroy handlers mid-session.
     return React.createElement(MediaSessionHookInner);
 };
