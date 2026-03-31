@@ -98,6 +98,11 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     const lastSentUrlRef = useRef<string>('');
     // Define sendCurrentTrackToDlna BEFORE any effects that reference it
     const lastSentAtRef = useRef<number>(0);
+    const recentTrackEndedAtRef = useRef<number>(0);
+    const TRACK_ENDED_PREV_SUPPRESSION_MS = 4000;
+    const sameUriLoopQueuedRef = useRef(false);
+    const wasNearEndRef = useRef(false);
+    const currentSongDurationRef = useRef<number>(0);
     const sendCurrentTrackToDlna = useCallback(async () => {
         if (!dlnaPlayer) return;
         // Skip if the device already auto-transitioned (gapless)
@@ -116,6 +121,8 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         }
         lastSentUrlRef.current = url;
         lastSentAtRef.current = now;
+        wasNearEndRef.current = false;
+        currentSongDurationRef.current = song.duration ? song.duration / 1000 : 0;
         let albumArtUrl: string | undefined;
         try {
             albumArtUrl =
@@ -151,6 +158,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         if (nextSong) {
             const nextUrl = getSongUrl(nextSong, transcode);
             if (nextUrl) {
+                sameUriLoopQueuedRef.current = nextUrl === url;
                 let nextArtUrl: string | undefined;
                 try {
                     nextArtUrl =
@@ -176,64 +184,13 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                     mimeType: nextMimeType,
                     title: nextSong.name,
                 });
+            } else {
+                sameUriLoopQueuedRef.current = false;
             }
+        } else {
+            sameUriLoopQueuedRef.current = false;
         }
     }, [transcode]);
-    // On mount, if already playing, send the current track to the DLNA device
-    useEffect(() => {
-        if (playerStatus === PlayerStatus.PLAYING) {
-            sendCurrentTrackToDlna();
-        }
-        // Only run on mount
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    // Listen for position updates from main process
-    useEffect(() => {
-        if (!dlnaPlayerListener) return;
-        const handleCurrentTime = (_event: any, time: number) => {
-            setTimestamp(Math.floor(time));
-        };
-        dlnaPlayerListener.rendererCurrentTime(handleCurrentTime);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-current-time');
-        };
-    }, [setTimestamp]);
-    // Send just the next track (for after gapless transition)
-    useEffect(() => {
-        if (!ipc) return;
-        const handler = (_event: any, state: string) => {
-            if (state === 'PLAYING') {
-                mediaPlay?.();
-            } else if (state === 'PAUSED_PLAYBACK') {
-                mediaPause?.();
-            }
-        };
-        ipc.on('renderer-dlna-transport-state', handler);
-        return () => {
-            ipc.removeAllListeners('renderer-dlna-transport-state');
-        };
-    }, [mediaPlay, mediaPause]);
-    useEffect(() => {
-        if (!ipc) return;
-        const handler = () => {
-            skipNextSendRef.current = false;
-            mediaPrevious();
-        };
-        ipc.on('renderer-dlna-prev-track', handler);
-        return () => {
-            ipc.removeAllListeners('renderer-dlna-prev-track');
-        };
-    }, [mediaPrevious]);
-    useEffect(() => {
-        if (!ipc) return;
-        const handler = (_event: any, vol: number) => {
-            setVolume?.(vol);
-        };
-        ipc.on('renderer-dlna-volume', handler);
-        return () => {
-            ipc.removeAllListeners('renderer-dlna-volume');
-        };
-    }, [setVolume]);
     const sendNextTrackToDlna = useCallback(async () => {
         if (!dlnaPlayer) return;
         const playerData = usePlayerStore.getState().getPlayerData();
@@ -241,6 +198,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         if (!nextSong) return;
         const nextUrl = getSongUrl(nextSong, transcode);
         if (!nextUrl) return;
+        sameUriLoopQueuedRef.current = nextUrl === lastSentUrlRef.current;
         let nextArtUrl: string | undefined;
         try {
             nextArtUrl =
@@ -267,24 +225,98 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             title: nextSong.name,
         });
     }, [transcode]);
-    // Listen for track ended events
+
+    useEffect(() => {
+        if (playerStatus === PlayerStatus.PLAYING) {
+            sendCurrentTrackToDlna();
+        }
+        // Only run on mount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    // Listen for position updates from main process
     useEffect(() => {
         if (!dlnaPlayerListener) return;
-        const handleTrackEnded = () => {
-            if (hasPlayedRef.current) {
-                // The device already auto-transitioned to the next track (gapless).
-                // Set flag so the onPlayerPlay event doesn't re-send the track.
-                skipNextSendRef.current = true;
-                onEnded();
-                // Queue up the next-next track after the queue advances.
-                setTimeout(() => {
-                    sendNextTrackToDlna();
-                }, 200);
+        const handleCurrentTime = (_event: any, time: number) => {
+            if (
+                !wasNearEndRef.current &&
+                currentSongDurationRef.current > 0 &&
+                time >= currentSongDurationRef.current * 0.9
+            ) {
+                wasNearEndRef.current = true;
+            }
+            setTimestamp(Math.floor(time));
+        };
+        dlnaPlayerListener.rendererCurrentTime(handleCurrentTime);
+        return () => {
+            ipc?.removeAllListeners('renderer-dlna-current-time');
+        };
+    }, [setTimestamp]);
+    // Send just the next track (for after gapless transition)
+    useEffect(() => {
+        if (!ipc) return;
+        const handler = (_event: any, state: string) => {
+            if (state === 'PLAYING') {
+                mediaPlay?.();
+            } else if (state === 'PAUSED_PLAYBACK') {
+                mediaPause?.();
             }
         };
-        dlnaPlayerListener.rendererTrackEnded(handleTrackEnded);
+        ipc.on('renderer-dlna-transport-state', handler);
         return () => {
-            ipc?.removeAllListeners('renderer-dlna-track-ended');
+            ipc.removeAllListeners('renderer-dlna-transport-state');
+        };
+    }, [mediaPlay, mediaPause]);
+    useEffect(() => {
+        if (!ipc) return;
+        const handler = () => {
+            const timeSinceTrackEnded = Date.now() - recentTrackEndedAtRef.current;
+            if (timeSinceTrackEnded < TRACK_ENDED_PREV_SUPPRESSION_MS) {
+                return;
+            }
+            if (sameUriLoopQueuedRef.current && wasNearEndRef.current) {
+                sameUriLoopQueuedRef.current = false;
+                wasNearEndRef.current = false;
+                recentTrackEndedAtRef.current = Date.now();
+                skipNextSendRef.current = true;
+                onEnded();
+                setTimeout(() => sendNextTrackToDlna(), 200);
+                return;
+            }
+            sameUriLoopQueuedRef.current = false;
+            mediaPrevious();
+        };
+        ipc.on('renderer-dlna-prev-track', handler);
+        return () => {
+            ipc.removeAllListeners('renderer-dlna-prev-track');
+        };
+    }, [mediaPrevious, onEnded, sendNextTrackToDlna]);
+    useEffect(() => {
+        if (!ipc) return;
+        const handler = (_event: any, vol: number) => {
+            setVolume?.(vol);
+        };
+        ipc.on('renderer-dlna-volume', handler);
+        return () => {
+            ipc.removeAllListeners('renderer-dlna-volume');
+        };
+    }, [setVolume]);
+    // Listen for track ended events
+    useEffect(() => {
+        if (!ipc) return;
+        const handleTrackEnded = () => {
+            if (!hasPlayedRef.current) return;
+            recentTrackEndedAtRef.current = Date.now();
+            sameUriLoopQueuedRef.current = false;
+            wasNearEndRef.current = false;
+            skipNextSendRef.current = true;
+            onEnded();
+            setTimeout(() => {
+                sendNextTrackToDlna();
+            }, 200);
+        };
+        ipc.on('renderer-dlna-track-ended', handleTrackEnded);
+        return () => {
+            ipc.removeAllListeners('renderer-dlna-track-ended');
         };
     }, [onEnded, sendNextTrackToDlna]);
     // Handle play/pause
@@ -325,10 +357,14 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     usePlayerEvents(
         {
             onMediaNext: () => {
+                sameUriLoopQueuedRef.current = false;
+                wasNearEndRef.current = false;
                 skipNextSendRef.current = false;
                 sendCurrentTrackToDlna();
             },
             onMediaPrev: () => {
+                sameUriLoopQueuedRef.current = false;
+                wasNearEndRef.current = false;
                 skipNextSendRef.current = false;
                 sendCurrentTrackToDlna();
             },
@@ -343,6 +379,8 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 dlnaPlayer?.stop();
                 hasPlayedRef.current = false;
                 lastSentUrlRef.current = '';
+                sameUriLoopQueuedRef.current = false;
+                wasNearEndRef.current = false;
             },
             onQueueRestored: () => {
                 sendCurrentTrackToDlna();
@@ -350,6 +388,24 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         },
         [transcode, sendCurrentTrackToDlna],
     );
+    useEffect(() => {
+        return usePlayerStore.subscribe(
+            (state) => state.player.repeat,
+            () => {
+                if (!hasPlayedRef.current || !dlnaPlayer) return;
+                const playerData = usePlayerStore.getState().getPlayerData();
+                if (playerData.nextSong) {
+                    sendNextTrackToDlna();
+                } else {
+                    if (typeof (dlnaPlayer as any).clearNextUrl === 'function') {
+                        (dlnaPlayer as any).clearNextUrl();
+                    } else {
+                        dlnaPlayer.setNextUrl('', { mimeType: 'audio/mpeg', title: '' });
+                    }
+                }
+            },
+        );
+    }, [sendNextTrackToDlna]);
     useImperativeHandle<DlnaPlayerEngineHandle, DlnaPlayerEngineHandle>(playerRef, () => ({
         decreaseVolume(by: number) {
             const newVol = Math.max(0, volume - by);

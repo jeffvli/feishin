@@ -87,6 +87,18 @@ function handleEventNotify(body: string): void {
         .replace(/&gt;/g, '>')
         .replace(/&apos;/g, "'")
         .replace(/&quot;/g, '"');
+    if (!newUri || newUri === lastCommandedUri) {
+        if (lastQueuedNextUri && newUri === lastQueuedNextUri) {
+            dlnaLog('Gapless same-URI loop detected (event)');
+            lastCommandedUri = newUri;
+            lastQueuedNextUri = '';
+            hasStartedPlaying = true;
+            trackLoadedAt = Date.now();
+            lastKnownPosition = 0;
+            getMainWindow()?.webContents.send('renderer-dlna-track-ended');
+        }
+        return;
+    }
     if (!newUri || newUri === lastCommandedUri) return;
     if (!lastCommandedUri) return;
     if (lastQueuedNextUri && newUri === lastQueuedNextUri) {
@@ -218,7 +230,9 @@ function startPositionPolling() {
         if (!connectedDevice) return;
         // Don't poll during the first few seconds after loading a track
         const timeSinceLoad = Date.now() - trackLoadedAt;
-        if (timeSinceLoad < 2000) return;
+        if (timeSinceLoad < 50) return;
+        // Started polling much sooner, most of the failed DLNA commands I've seen occurred earlier than this, and position info
+        // early in the song is good. I tested with a few configurations, this works well, I believe.
         try {
             const [posInfo, transportState] = await Promise.all([
                 getPositionInfo(connectedDevice),
@@ -250,8 +264,8 @@ function startPositionPolling() {
                 transportState !== 'STOPPED' &&
                 uriReportedByDevice &&
                 posInfo.trackUri === lastCommandedUri &&
-                previousPosition > 2 &&
-                posInfo.position < 3 &&
+                previousPosition > 1 &&
+                posInfo.position < 2 &&
                 posInfo.position < previousPosition - 2 &&
                 !recentAppSeek
             ) {
@@ -282,7 +296,10 @@ function startPositionPolling() {
         } catch {
             // Polling errors are expected during track transitions
         }
-    }, 1000);
+    }, 350);
+    // IMPORTANT: This used to be 1000, but I believe that was not tested explicitly and arbitrary, and we get
+    // benefit from somewhat smaller polling intervals, so I changed it with tests. This might prove too small
+    // for some network configurations, so if need be, I'll make this a setting later.
 }
 async function stopEventSubscription(device: DlnaDevice): Promise<void> {
     if (subscriptionRenewalTimeout) {
@@ -451,16 +468,22 @@ ipcMain.on('dlna-play-url', async (_event, data: { metadata: TrackMetadata; url:
 ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; url: string }) => {
     if (!connectedDevice) return;
     try {
+        if (!data.url) {
+            lastQueuedNextUri = '';
+            await setNextAVTransportURI(connectedDevice, '', {} as TrackMetadata);
+            dlnaLog('Cleared next track');
+            return;
+        }
         const lanUrl = rewriteUrlForLan(data.url);
         lastQueuedNextUri = lanUrl;
-        const lanArtUrl = data.metadata.albumArtUrl
+        const lanArtUrl = data.metadata?.albumArtUrl
             ? rewriteUrlForLan(data.metadata.albumArtUrl)
             : undefined;
         const metadata = { ...data.metadata, albumArtUrl: lanArtUrl };
         await setNextAVTransportURI(connectedDevice, lanUrl, metadata);
         dlnaLog(`Set next track: ${data.metadata.title}`);
     } catch (err) {
-        dlnaLog(`Failed to set next track ${data.metadata.title}`, err);
+        dlnaLog(`Failed to set next track ${data?.metadata?.title || ''}`, err);
     }
 });
 
