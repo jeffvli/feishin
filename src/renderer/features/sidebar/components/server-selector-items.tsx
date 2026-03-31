@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { ensureSsoAuth } from '/@/renderer/api/sso-interceptor';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
@@ -30,7 +31,12 @@ export const ServerSelectorItems = () => {
             : { enabled: false, queryKey: ['disabled'] },
     );
 
-    const handleSetCurrentServer = (server: ServerListItemWithCredential) => {
+    const handleSetCurrentServer = async (server: ServerListItemWithCredential) => {
+        if (server.isSsoProxy) {
+            const success = await ensureSsoAuth(server, true);
+            if (!success) return;
+        }
+
         navigate(AppRoute.HOME);
         setCurrentServer(server);
         setMusicFolderId(undefined);

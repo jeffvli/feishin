@@ -52,6 +52,7 @@ const getJellyfinImageRequest = ({
 
     return {
         cacheKey: ['jellyfin', server.id, baseUrl || '', id, imageSize || ''].join(':'),
+        credentials: server.isSsoProxy ? 'include' : undefined,
         headers: server.credential
             ? { Authorization: createAuthHeader().concat(`, Token="${server.credential}"`) }
             : { Authorization: createAuthHeader() },

@@ -1,4 +1,5 @@
 import merge from 'lodash/merge';
+import omit from 'lodash/omit';
 import { nanoid } from 'nanoid/non-secure';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -95,6 +96,24 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
         {
             merge: (persistedState, currentState) => merge(currentState, persistedState),
             name: 'store_authentication',
+            partialize: (state) => {
+                const sanitizedServerList = Object.fromEntries(
+                    Object.entries(state.serverList).map(([id, server]) => [
+                        id,
+                        omit(server, ['ssoCookies']),
+                    ]),
+                );
+
+                const sanitizedCurrentServer = state.currentServer
+                    ? (omit(state.currentServer, ['ssoCookies']) as ServerListItemWithCredential)
+                    : null;
+
+                return {
+                    ...state,
+                    currentServer: sanitizedCurrentServer,
+                    serverList: sanitizedServerList,
+                };
+            },
             version: 2,
         },
     ),

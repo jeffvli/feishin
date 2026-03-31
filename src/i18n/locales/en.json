@@ -323,6 +323,8 @@
             "error_savePassword": "an error occurred when trying to save the password",
             "ignoreCors": "ignore cors ($t(common.restartRequired))",
             "ignoreSsl": "ignore ssl ($t(common.restartRequired))",
+            "input_isSsoProxy": "Server is behind an SSO proxy (e.g. Cloudflare Access, Authelia)",
+            "input_isSsoProxyDescription": "The web version requires Feishin to be hosted on the same domain as your music server, or for your SSO provider to be configured with appropriate CORS headers.",
             "input_legacyAuthentication": "enable legacy authentication",
             "input_name": "server name",
             "input_password": "password",
@@ -332,6 +334,7 @@
             "input_remoteUrl": "public url",
             "input_remoteUrlPlaceholder": "optional: public url for external features",
             "input_savePassword": "save password",
+            "input_ssoCookieName": "SSO cookie name",
             "input_url": "url",
             "input_username": "username",
             "success": "server added successfully",
@@ -767,6 +770,8 @@
         "clearCache_description": "a 'hard clear' of feishin. in addition to clearing feishin's cache, empty the browser cache (saved images and other assets). server credentials and settings are preserved",
         "clearCache": "clear browser cache",
         "clearCacheSuccess": "cache cleared successfully",
+        "clearCookies_description": "clears all browser cookies. this will force you to re-authenticate with any SSO proxy",
+        "clearCookies": "clear cookies",
         "clearQueryCache_description": "a 'soft clear' of feishin. this will refresh playlists, track metadata, and reset saved lyrics. settings, server credentials and cached images are preserved",
         "clearQueryCache": "clear feishin cache",
         "contextMenu_description": "allows you to hide items that are shown in the menu when you right click on an item. items that are unchecked will be hidden",
@@ -1095,6 +1100,14 @@
         "queryBuilderCustomFields_inputTag": "tag",
         "queryBuilderCustomFields": "custom fields",
         "queryBuilderCustomFields_description": "add custom fields to use in query builders"
+    },
+    "ssoInterceptor": {
+        "title": "Login Required",
+        "description": "Your SSO session has expired. Please re-authenticate to continue.",
+        "login": "Login",
+        "openLoginPage": "Open Login Page",
+        "confirmLogin": "I've Logged In",
+        "switchServer": "Switch Server"
     },
     "table": {
         "column": {

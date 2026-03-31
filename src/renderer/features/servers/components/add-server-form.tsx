@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '/@/renderer/api';
+import { ensureSsoAuth } from '/@/renderer/api/sso-interceptor';
 import {
     isLegacyAuth,
     isServerLock,
@@ -25,6 +26,7 @@ import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
+import { SSO_COOKIE_KEYS } from '/@/shared/constants/sso-cookie-keys';
 import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
 import { useForm } from '/@/shared/hooks/use-form';
 import { AuthenticationResponse, ServerListItemWithCredential } from '/@/shared/types/domain-types';
@@ -105,6 +107,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
     const form = useForm({
         initialValues: {
+            isSsoProxy: false,
             legacyAuth: isLegacyAuth(),
             name:
                 (localSettings ? localSettings.env.SERVER_NAME : window.SERVER_NAME) || 'My Server',
@@ -113,6 +116,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             preferRemoteUrl: false,
             remoteUrl: '',
             savePassword: undefined,
+            ssoCookieName: '',
             type:
                 (localSettings
                     ? localSettings.env.SERVER_TYPE
@@ -146,6 +150,39 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
         try {
             setIsLoading(true);
+
+            let ssoCookies: Record<string, string> | undefined;
+            if (values.isSsoProxy) {
+                if (isElectron()) {
+                    const loginResult = await window.api.sso.login(
+                        values.url,
+                        values.ssoCookieName || SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS,
+                    );
+                    if (!loginResult.success) {
+                        setIsLoading(false);
+                        return toast.error({
+                            message: t('error.authenticationFailed', {
+                                postProcess: 'sentenceCase',
+                            }),
+                        });
+                    }
+                    ssoCookies = loginResult.cookies;
+                } else {
+                    // For web, we trigger the ensureSsoAuth modal to make sure the user is logged in
+                    const dummyServer = {
+                        id: 'temp',
+                        isSsoProxy: true,
+                        ssoCookieName: values.ssoCookieName,
+                        url: values.url,
+                    } as any;
+                    const authenticated = await ensureSsoAuth(dummyServer);
+                    if (!authenticated) {
+                        setIsLoading(false);
+                        return;
+                    }
+                }
+            }
+
             const data: AuthenticationResponse | undefined = await authFunction(
                 values.url,
                 {
@@ -166,7 +203,10 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 credential: data.credential,
                 id: nanoid(),
                 isAdmin: data.isAdmin,
+                isSsoProxy: values.isSsoProxy,
                 name: values.name,
+                ssoCookieName: values.ssoCookieName,
+                ssoCookies,
                 type: values.type as ServerType,
                 url: values.url.replace(/\/$/, ''),
                 userId: data.userId,
@@ -270,6 +310,32 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             {...form.getInputProps('url')}
                         />
                     </Group>
+                    <Stack gap="xs">
+                        <Checkbox
+                            description={
+                                !isElectron()
+                                    ? t('form.addServer.input', {
+                                          context: 'isSsoProxyDescription',
+                                      })
+                                    : undefined
+                            }
+                            label={t('form.addServer.input', {
+                                context: 'isSsoProxy',
+                            })}
+                            {...form.getInputProps('isSsoProxy', {
+                                type: 'checkbox',
+                            })}
+                        />
+                        {form.values.isSsoProxy && (
+                            <TextInput
+                                label={t('form.addServer.input', {
+                                    context: 'ssoCookieName',
+                                })}
+                                placeholder={SSO_COOKIE_KEYS.CLOUDFLARE_ACCESS}
+                                {...form.getInputProps('ssoCookieName')}
+                            />
+                        )}
+                    </Stack>
                     <TextInput
                         disabled={serverLock}
                         label={t('form.addServer.input', {

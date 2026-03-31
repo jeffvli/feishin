@@ -3,6 +3,7 @@ import { Dispatch, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { ensureSsoAuth } from '/@/renderer/api/sso-interceptor';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
 import { ServerList } from '/@/renderer/features/servers/components/server-list';
@@ -33,7 +34,12 @@ export const ServerCommands = ({ handleClose, setPages, setQuery }: ServerComman
     }, [handleClose, setPages, setQuery, t]);
 
     const handleSelectServer = useCallback(
-        (server: ServerListItemWithCredential) => {
+        async (server: ServerListItemWithCredential) => {
+            if (server.isSsoProxy) {
+                const success = await ensureSsoAuth(server, true);
+                if (!success) return;
+            }
+
             navigate(AppRoute.HOME);
             setCurrentServer(server);
             handleClose();
