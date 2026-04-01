@@ -7,6 +7,7 @@ export enum ServerFeature {
     LYRICS_SINGLE_STRUCTURED = 'lyricsSingleStructured',
     MUSIC_FOLDER_MULTISELECT = 'musicFolderMultiselect',
     OS_FORM_POST = 'osFormPost',
+    OS_TRANSCODE_DECISION = 'osTranscodeDecision',
     PLAYLISTS_SMART = 'playlistsSmart',
     PUBLIC_PLAYLIST = 'publicPlaylist',
     SERVER_PLAY_QUEUE = 'serverPlayQueue',

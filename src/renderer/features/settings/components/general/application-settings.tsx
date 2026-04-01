@@ -20,6 +20,7 @@ import {
 } from '/@/renderer/features/settings/components/settings-section';
 import {
     HomeFeatureStyle,
+    SideQueueLayout,
     SideQueueType,
     useFontSettings,
     useGeneralSettings,
@@ -71,6 +72,23 @@ const SIDE_QUEUE_OPTIONS = [
             postProcess: 'sentenceCase',
         }),
         value: 'sideDrawerQueue',
+    },
+];
+
+const SIDE_QUEUE_LAYOUT_OPTIONS = [
+    {
+        label: t('setting.sidePlayQueueLayout', {
+            context: 'optionHorizontal',
+            postProcess: 'sentenceCase',
+        }),
+        value: 'horizontal',
+    },
+    {
+        label: t('setting.sidePlayQueueLayout', {
+            context: 'optionVertical',
+            postProcess: 'sentenceCase',
+        }),
+        value: 'vertical',
     },
 ];
 
@@ -541,65 +559,26 @@ export const ApplicationSettings = memo(() => {
         },
         {
             control: (
-                <Switch
-                    defaultChecked={settings.externalLinks}
-                    onChange={(e) => {
+                <SegmentedControl
+                    aria-label={t('setting.sidePlayQueueLayout', { postProcess: 'sentenceCase' })}
+                    data={SIDE_QUEUE_LAYOUT_OPTIONS}
+                    defaultValue={settings.sideQueueLayout}
+                    onChange={(e) =>
                         setSettings({
                             general: {
                                 ...settings,
-                                externalLinks: e.currentTarget.checked,
+                                sideQueueLayout: e as SideQueueLayout,
                             },
-                        });
-                    }}
+                        })
+                    }
                 />
             ),
-            description: t('setting.externalLinks', {
+            description: t('setting.sidePlayQueueLayout', {
                 context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            title: t('setting.externalLinks', { postProcess: 'sentenceCase' }),
-        },
-        {
-            control: (
-                <Switch
-                    defaultChecked={settings.lastFM}
-                    onChange={(e) => {
-                        setSettings({
-                            general: {
-                                ...settings,
-                                lastFM: e.currentTarget.checked,
-                            },
-                        });
-                    }}
-                />
-            ),
-            description: t('setting.lastfm', {
-                context: 'description',
-                postProcess: 'sentenceCase',
-            }),
-            isHidden: !settings.externalLinks,
-            title: t('setting.lastfm', { postProcess: 'sentenceCase' }),
-        },
-        {
-            control: (
-                <Switch
-                    defaultChecked={settings.musicBrainz}
-                    onChange={(e) => {
-                        setSettings({
-                            general: {
-                                ...settings,
-                                musicBrainz: e.currentTarget.checked,
-                            },
-                        });
-                    }}
-                />
-            ),
-            description: t('setting.musicbrainz', {
-                context: 'description',
-                postProcess: 'sentenceCase',
-            }),
-            isHidden: !settings.externalLinks,
-            title: t('setting.musicbrainz', { postProcess: 'sentenceCase' }),
+            isHidden: settings.sideQueueType !== 'sideQueue',
+            title: t('setting.sidePlayQueueLayout', { postProcess: 'sentenceCase' }),
         },
         {
             control: (

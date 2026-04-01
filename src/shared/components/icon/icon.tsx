@@ -1,8 +1,14 @@
 import clsx from 'clsx';
 import { motion } from 'motion/react';
-import { type ComponentType, forwardRef, memo, useMemo } from 'react';
+import {
+    type ComponentType,
+    type CSSProperties,
+    forwardRef,
+    ImgHTMLAttributes,
+    memo,
+    useMemo,
+} from 'react';
 import { IconBaseProps } from 'react-icons';
-import { FaLastfmSquare } from 'react-icons/fa';
 import {
     LuAlignCenter,
     LuAlignLeft,
@@ -79,6 +85,8 @@ import {
     LuMusic,
     LuMusic2,
     LuPackage2,
+    LuPanelBottom,
+    LuPanelRight,
     LuPanelRightClose,
     LuPanelRightOpen,
     LuPause,
@@ -125,11 +133,88 @@ import {
 import { MdOutlineVisibility, MdOutlineVisibilityOff } from 'react-icons/md';
 import { PiMouseLeftClickFill, PiMouseRightClickFill } from 'react-icons/pi';
 import { RiPlayListAddLine, RiRepeat2Line, RiRepeatOneLine } from 'react-icons/ri';
-import { SiMusicbrainz } from 'react-icons/si';
 
 import styles from './icon.module.css';
+import lastfmLogoIcon from './lastfm_logo_icon.png';
+import listenbrainzLogoIcon from './listenbrainz_logo_icon.svg';
+import musicbrainzLogoIcon from './musicbrainz_logo_icon.svg';
+import qobuzLogoIcon from './qobuz_logo_icon.png';
+import spotifyLogoIcon from './spotify_logo_icon.svg';
 
 export type AppIconSelection = keyof typeof AppIcon;
+
+type LogoImgProps = ImgHTMLAttributes<HTMLImageElement> & { size?: number | string };
+
+function logoImgStyle(size: number | string | undefined): CSSProperties | undefined {
+    if (size === undefined) return undefined;
+    const dim = typeof size === 'number' ? `${size}px` : size;
+    return { height: dim, width: dim };
+}
+
+const ListenBrainzLogoIcon = forwardRef<HTMLImageElement, LogoImgProps>(
+    ({ className, size, style, ...props }, ref) => (
+        <img
+            alt="ListenBrainz"
+            className={className}
+            ref={ref}
+            src={listenbrainzLogoIcon}
+            style={logoImgStyle(size) ?? style}
+            {...props}
+        />
+    ),
+);
+
+const SpotifyLogoIcon = forwardRef<HTMLImageElement, LogoImgProps>(
+    ({ className, size, style, ...props }, ref) => (
+        <img
+            alt="Spotify"
+            className={className}
+            ref={ref}
+            src={spotifyLogoIcon}
+            style={logoImgStyle(size) ?? style}
+            {...props}
+        />
+    ),
+);
+
+const MusicBrainzLogoIcon = forwardRef<HTMLImageElement, LogoImgProps>(
+    ({ className, size, style, ...props }, ref) => (
+        <img
+            alt="MusicBrainz"
+            className={className}
+            ref={ref}
+            src={musicbrainzLogoIcon}
+            style={logoImgStyle(size) ?? style}
+            {...props}
+        />
+    ),
+);
+
+const QobuzLogoIcon = forwardRef<HTMLImageElement, LogoImgProps>(
+    ({ className, size, style, ...props }, ref) => (
+        <img
+            alt="Qobuz"
+            className={className}
+            ref={ref}
+            src={qobuzLogoIcon}
+            style={logoImgStyle(size) ?? style}
+            {...props}
+        />
+    ),
+);
+
+const LastfmLogoIcon = forwardRef<HTMLImageElement, LogoImgProps>(
+    ({ className, size, style, ...props }, ref) => (
+        <img
+            alt="Last.fm"
+            className={className}
+            ref={ref}
+            src={lastfmLogoIcon}
+            style={logoImgStyle(size) ?? style}
+            {...props}
+        />
+    ),
+);
 
 export const AppIcon = {
     add: LuPlus,
@@ -154,8 +239,11 @@ export const AppIcon = {
     arrowUpToLine: LuArrowUpToLine,
     artist: LuUserPen,
     brandGitHub: LuGithub,
-    brandLastfm: FaLastfmSquare,
-    brandMusicBrainz: SiMusicbrainz,
+    brandLastfm: LastfmLogoIcon,
+    brandListenBrainz: ListenBrainzLogoIcon,
+    brandMusicBrainz: MusicBrainzLogoIcon,
+    brandQobuz: QobuzLogoIcon,
+    brandSpotify: SpotifyLogoIcon,
     cache: LuCloudDownload,
     check: LuCheck,
     clipboardCopy: LuClipboardCopy,
@@ -197,6 +285,8 @@ export const AppIcon = {
     layoutDetail: LuLayoutList,
     layoutGrid: LuLayoutGrid,
     layoutList: LuList,
+    layoutPanelBottom: LuPanelBottom,
+    layoutPanelRight: LuPanelRight,
     layoutTable: LuTable,
     library: LuLibrary,
     list: LuList,

@@ -1,5 +1,5 @@
 # --- Builder stage
-FROM node:23-alpine as builder
+FROM node:23-alpine AS builder
 WORKDIR /app
 
 # Copy package.json first to cache node_modules
@@ -14,11 +14,11 @@ COPY . .
 RUN pnpm run build:web
 
 # --- Production stage
-FROM nginx:alpine-slim
+FROM nginxinc/nginx-unprivileged:alpine-slim
 
 COPY --chown=nginx:nginx --from=builder /app/out/web /usr/share/nginx/html
-COPY ./settings.js.template /etc/nginx/templates/settings.js.template
-COPY ng.conf.template /etc/nginx/templates/default.conf.template
+COPY --chown=nginx:nginx ./settings.js.template /etc/nginx/templates/settings.js.template
+COPY --chown=nginx:nginx ng.conf.template /etc/nginx/templates/default.conf.template
 
 ENV SERVER_LOCK=false SERVER_NAME="" SERVER_TYPE="" SERVER_URL="" REMOTE_URL=""
 ENV LEGACY_AUTHENTICATION="" ANALYTICS_DISABLED="" PUBLIC_PATH="/"

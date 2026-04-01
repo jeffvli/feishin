@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { type CSSProperties, memo } from 'react';
+import { type CSSProperties, memo, useEffect, useRef, useState } from 'react';
 
 import styles from './skeleton.module.css';
 
@@ -32,6 +32,64 @@ export function BaseSkeleton({
     style,
     width,
 }: SkeletonProps) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [isInViewport, setIsInViewport] = useState(false);
+    const [isDocumentVisible, setIsDocumentVisible] = useState(
+        typeof document === 'undefined' ? true : document.visibilityState === 'visible',
+    );
+
+    useEffect(() => {
+        if (!enableAnimation || typeof document === 'undefined') {
+            return;
+        }
+
+        const handleVisibilityChange = () => {
+            setIsDocumentVisible(document.visibilityState === 'visible');
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [enableAnimation]);
+
+    useEffect(() => {
+        if (!enableAnimation) {
+            setIsInViewport(false);
+
+            return;
+        }
+
+        const element = containerRef.current;
+
+        if (!element) {
+            return;
+        }
+
+        if (typeof IntersectionObserver === 'undefined') {
+            setIsInViewport(true);
+
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const [entry] = entries;
+                setIsInViewport(Boolean(entry?.isIntersecting));
+            },
+            { threshold: 0.01 },
+        );
+
+        observer.observe(element);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [enableAnimation, count, inline, isCentered, direction]);
+
+    const shouldAnimate = enableAnimation && isDocumentVisible && isInViewport;
+
     const skeletonStyle: CSSProperties = {
         ...style,
         ...(baseColor && { ['--base-color' as string]: baseColor }),
@@ -49,19 +107,23 @@ export function BaseSkeleton({
     });
 
     const skeletonClasses = clsx(styles.skeleton, className, {
-        [styles.animated]: enableAnimation,
+        [styles.animated]: shouldAnimate,
     });
 
     if (count <= 1) {
         return (
-            <div className={containerClasses}>
+            <div className={containerClasses} ref={containerRef}>
                 <div className={skeletonClasses} style={skeletonStyle} />
             </div>
         );
     }
 
     return (
-        <div className={clsx(containerClasses, styles.skeletonWrapper)} dir={direction}>
+        <div
+            className={clsx(containerClasses, styles.skeletonWrapper)}
+            dir={direction}
+            ref={containerRef}
+        >
             {Array.from({ length: count }, (_, i) => (
                 <div className={skeletonClasses} key={i} style={skeletonStyle} />
             ))}

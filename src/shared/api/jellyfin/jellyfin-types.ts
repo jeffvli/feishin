@@ -683,14 +683,9 @@ const createPlaylist = z.object({
 const updatePlaylist = z.null();
 
 const updatePlaylistParameters = z.object({
-    Genres: z.array(genreItem),
+    Ids: z.string().array().optional(),
     IsPublic: z.boolean().optional(),
-    MediaType: z.literal('Audio'),
-    Name: z.string(),
-    PremiereDate: z.null(),
-    ProviderIds: z.object({}),
-    Tags: z.array(genericItem),
-    UserId: z.string(),
+    Name: z.string().optional(),
 });
 
 const addToPlaylist = z.object({

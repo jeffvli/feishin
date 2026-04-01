@@ -15,7 +15,10 @@
         "viewPlaylists": "ikusi $t(entity.playlist, {\"count\": 2})",
         "openIn": {
             "lastfm": "Ireki Last.fm-n",
-            "musicbrainz": "Ireki MusicBrainz-en"
+            "musicbrainz": "Ireki MusicBrainz-en",
+            "listenbrainz": "Ireki ListenBrainz-en",
+            "qobuz": "Ireki Qobuz-en",
+            "spotify": "Ireki Spotify-n"
         },
         "clearQueue": "garbitu ilara",
         "createPlaylist": "sortu $t(entity.playlist, {\"count\": 1})",
@@ -33,7 +36,8 @@
         "shuffleAll": "nahastu dena",
         "shuffleSelected": "nahastu aukeratutak",
         "moveItems": "elementuak mugitu",
-        "openApplicationDirectory": "ireki aplikazioaren direktorioa"
+        "openApplicationDirectory": "ireki aplikazioaren direktorioa",
+        "goToCurrent": "joan uneko elementura"
     },
     "common": {
         "add": "gehitu",
@@ -67,8 +71,8 @@
         "filter_other": "iragazkiak",
         "filters": "iragazkiak",
         "forceRestartRequired": "berreabiarazi aldaketak aplikatzeko... itxi notifikazioa berreabiarazteko",
-        "setting_one": "ezarpenak",
-        "setting_other": "",
+        "setting_one": "ezarpena",
+        "setting_other": "ezarpenak",
         "share": "partekatu",
         "action_one": "ekintza",
         "action_other": "ekintzak",
@@ -150,7 +154,10 @@
         "recordLabel": "diskoetxea",
         "example": "adibidea",
         "tableColumns": "taulako zutabeak",
-        "doNotShowAgain": "ez erakutsi hau berriro"
+        "doNotShowAgain": "ez erakutsi hau berriro",
+        "numberOfResults": "{{numberOfResults}} emaitza",
+        "rename": "berrizendatu",
+        "newVersionAvailable": "bertsio berri bat eskuragarri dago"
     },
     "player": {
         "repeat": "errepikatu",
@@ -351,7 +358,11 @@
         "noNetwork": "zerbitzaria ez dago erabilgarri",
         "noNetworkDescription": "ezin izan da zerbitzari honetara konektatu",
         "saveQueueFailed": "huts egin du ilara gordetzean",
-        "multipleServerSaveQueueError": "erreprodukzio-ilarak zerbitzarikoak ez diren abesti bat edo gehiago ditu. hau ez da onartzen"
+        "multipleServerSaveQueueError": "erreprodukzio-ilarak zerbitzarikoak ez diren abesti bat edo gehiago ditu. hau ez da onartzen",
+        "invalidJson": "JSON baliogabea",
+        "playbackPausedDueToError": "erreprodukzioa eten egin da errore baten ondorioz",
+        "serverLockSingleServer": "zerbitzaria blokeatuta dagoenean, zerbitzari bakarra onartzen da",
+        "settingsSyncError": "desadostasunak aurkitu dira errendatzailearen ezarpenen eta prozesu nagusiaren artean. berrabiarazi aplikazioa aldaketak aplikatzeko"
     },
     "filter": {
         "disc": "diskoa",
@@ -371,7 +382,7 @@
         "biography": "biografia",
         "bitrate": "bit-emaria",
         "bpm": "bpm-ak",
-        "channels": "$t(common.channel_other)",
+        "channels": "$t(common.channel, {\"count\": 2})",
         "comment": "iruzkina",
         "favorited": "gogoko gisa markatua",
         "genre": "$t(entity.genre, {\"count\": 1})",
@@ -396,7 +407,9 @@
         "releaseYear": "argitalpen urtea",
         "toYear": "urtera arte",
         "fromYear": "urtetik aurrera",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "explicitStatus": "$t(common.explicitStatus)",
+        "matchAnd": "eta",
+        "matchOr": "edo"
     },
     "setting": {
         "hotkey_playbackPause": "pausatu",
@@ -561,7 +574,7 @@
         "hotkey_browserForward": "nabigatzailean aurreraka",
         "imageAspectRatio": "erabili jatorrizko azaleko artearen aspektu-erlazioa",
         "lyricFetchProvider": "letrak eskuratzeko hornitzaileak",
-        "lyricFetchProvider_description": "aukeratu letrak eskuratzeko hornitzaileak. hornitzaileen ordena kontsultatuko diren ordena da",
+        "lyricFetchProvider_description": "aukeratu letrak eskuratzeko hornitzaileak",
         "minimizeToTray": "minimizatu erretilura",
         "minimizeToTray_description": "minimizatu aplikazioa sistemaren erretilura",
         "minimumScrobblePercentage": "scrobble iraupen minimoa (ehunekoa)",
@@ -675,7 +688,33 @@
         "remotePort_description": "urruneko kontrol zerbitzariaren portua ezartzen du",
         "remotePort": "urruneko kontrol zerbitzariaren ataka",
         "remoteUsername_description": "urruneko kontrol zerbitzariaren erabiltzaile-izena ezartzen du. Erabiltzaile-izena eta pasahitza hutsik badaude, autentifikazioa desgaituta egongo da",
-        "remoteUsername": "urruneko kontrol zerbitzariaren erabiltzaile-izena"
+        "remoteUsername": "urruneko kontrol zerbitzariaren erabiltzaile-izena",
+        "logLevel_optionWarn": "abisua",
+        "qobuz_description": "erakutsi Qobuz-erako estekak artista/album orrialdeetan",
+        "qobuz": "erakutsi Qobuz-erako estekak",
+        "spotify_description": "erakutsi Spotify-rako estekak artista/album orrialdeetan",
+        "spotify": "erakutsi Spotify-rako estekak",
+        "nativeSpotify_description": "ireki Spotify aplikazioan, arakatzailearen ordez",
+        "nativeSpotify": "erabili Spotify aplikazioa",
+        "playerbarSlider_description": "uhin-forma ez da gomendagarria interneteko konexio motela edo neurtua baduzu",
+        "playerbarSliderType_optionWaveform": "uhin-forma",
+        "playerbarWaveformAlign": "uhin-formaren lerrokatzea",
+        "playerbarWaveformAlign_optionTop": "nagusia",
+        "playerbarWaveformBarWidth": "uhin-formako barraren zabalera",
+        "playerbarWaveformGap": "uhin-formaren tartea",
+        "playerbarWaveformRadius": "uhin-formaren erradioa",
+        "showLyricsInSidebar_description": "letrak erakusten dituen panel bat gehituko da erantsitako erreprodukzio-ilaran",
+        "showLyricsInSidebar": "erakutsi letra erreproduzitzailearen alboko barran",
+        "blurExplicitImages": "irudi esplizituak lausotu",
+        "blurExplicitImages_description": "esplizitu gisa etiketatutako albumaren eta abestiaren azalak lausotuta agertuko dira",
+        "enableGridMultiSelect": "gaitu sareta anitzeko hautaketa",
+        "enableGridMultiSelect_description": "gaituta dagoenean, sareta-ikuspegietan hainbat elementu hautatzea ahalbidetzen du. desgaituta dagoenean, sareta-elementuen irudietan klik egitean elementuaren orrialdera nabigatuko da",
+        "showVisualizerInSidebar_description": "bistaratzailea erakusten duen panel bat gehituko da erreproduzitzailearen alboko barran",
+        "preservePitch_description": "erreprodukzio-abiadura aldatzean tonua mantentzen du",
+        "preservePitch": "mantendu tonua",
+        "preventSleepOnPlayback": "erreprodukzioan loa saihestu",
+        "replayGainClipping_description": "Saihestu {{ReplayGain}}-k eragindako mozketa irabazpena automatikoki jaitsiz",
+        "replayGainMode_description": "doitu bolumenaren irabazia fitxategiaren metadatuetan gordetako {{ReplayGain}} balioen arabera"
     },
     "form": {
         "addServer": {
@@ -731,15 +770,16 @@
         "editPlaylist": {
             "success": "$t(entity.playlist, {\"count\": 1}) behar bezala eguneratu da",
             "title": "$t(entity.playlist, {\"count\": 1}) editatu",
-            "publicJellyfinNote": "Arrazoiren batengatik, Jellyfin ez du erakusten erreprodukzio-zerrendak publikoak diren edo ez. Hau publiko izaten jarraitzea nahi baduzu, hautatu sarrera hau",
-            "editNote": "ez da gomendatzen eskuzko edizioak egitea erreprodukzio-zerrenda handietarako. ziur zaude onartzen duzula lehendik dagoen erreprodukzio-zerrenda gainidazteagatik datuak galtzeko arriskua?"
+            "publicJellyfinNote": "Arrazoiren batengatik, Jellyfin ez du erakusten erreprodukzio-zerrendak publikoak diren edo ez. Hau publiko izaten jarraitzea nahi baduzu, hautatu sarrera hau"
         },
         "queryEditor": {
             "title": "kontsulta editorea",
             "input_optionMatchAll": "guztiak bat etorri",
             "input_optionMatchAny": "edozeinekin bat etorri",
             "resetToDefault": "lehenetsitako egoerara berrezarri",
-            "clearFilters": "garbitu iragazkiak"
+            "clearFilters": "garbitu iragazkiak",
+            "addRuleGroup": "gehitu arau-taldea",
+            "removeRuleGroup": "kendu arau-taldea"
         },
         "updateServer": {
             "success": "zerbitzaria behar bezala eguneratu da",
@@ -751,7 +791,8 @@
             "disabled": "modu pribatua desgaituta, erreprodukzio egoera ikusgai dago orain gaitutako kanpoko integrazioentzat"
         },
         "largeFetchConfirmation": {
-            "title": "gehitu elementuak ilaran"
+            "title": "gehitu elementuak ilaran",
+            "description": "Ekintza honek uneko iragazki-ikuspegian dauden elementu guztiak gehituko ditu"
         },
         "createRadioStation": {
             "input_homepageUrl": "hasierako orriaren URLa",
@@ -928,7 +969,8 @@
             "nowPlaying": "orain erreproduzitzen",
             "shared": "partekatutako $t(entity.playlist, {\"count\": 2})",
             "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})"
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "collections": "bildumak"
         },
         "trackList": {
             "title": "$t(entity.track, {\"count\": 2})",
@@ -1097,6 +1139,26 @@
         "saveAsPreset": "Aurrezarpen gisa gorde",
         "applyPreset": "Aurrezarpena Aplikatu",
         "selectPreset": "Aukeratu Aurrezarpena",
-        "presets": "Aurrezarpenak"
+        "presets": "Aurrezarpenak",
+        "visualizerType": "Bistaratzaile Mota",
+        "cycleTime": "Zikloaren denbora (segundoak)",
+        "includeAllPresets": "Aurrezarpen guztiak sartu",
+        "ignoredPresets": "Aurrezarpen baztertuak",
+        "selectedPresets": "Hautatutako aurrezarpenak",
+        "mode1To8": "1 - 8 modua",
+        "mode10": "10 modua",
+        "gradientLeft": "Gradientearen ezkerra",
+        "gradientRight": "Gradientearen eskuina",
+        "peakBehavior": "Gailurraren Portaera",
+        "peakLine": "Gailurraren lerroa",
+        "miscellaneousSettings": "Hainbat ezarpen",
+        "alphaBars": "Alfa barrak",
+        "ansiBands": "ANSI bandak",
+        "ledBars": "LED barrak",
+        "trueLeds": "True LED-ak",
+        "roundBars": "Barra biribilduak",
+        "lowResolution": "Erresoluzio baxua",
+        "showFPS": "Erakutsi FPS",
+        "showScaleX": "Erakutsi X eskala"
     }
 }

@@ -313,8 +313,7 @@
         "editPlaylist": {
             "success": "$t(entity.playlist, {\"count\": 1}) sikeresen módosítva",
             "publicJellyfinNote": "A Jellyfin valamiért nem teszi közzé, hogy egy lejátszási lista publikus-e vagy sem. Amennyiben azt szeretnéd, hogy publikus maradjon, válaszd ki az alábbi beviteli mezőt",
-            "title": "szerkesztés $t(entity.playlist, {\"count\": 1})",
-            "editNote": "A kézi szerkesztés nem ajánlott nagy lejátszási listák esetén. Biztosan vállalod a meglévő lejátszási lista felülírásával járó adatvesztés kockázatát?"
+            "title": "szerkesztés $t(entity.playlist, {\"count\": 1})"
         },
         "lyricSearch": {
             "input_artist": "$t(entity.artist, {\"count\": 1})",

@@ -119,6 +119,8 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
             player2Ref.current?.getInternalPlayer()?.pause();
         },
         play() {
+            player1Ref.current?.getInternalPlayer()?.pause();
+            player2Ref.current?.getInternalPlayer()?.pause();
             if (playerNum === 1) {
                 player1Ref.current?.getInternalPlayer()?.play();
             } else {
@@ -157,6 +159,11 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
     const volume1 = convertToLogVolume(internalVolume1);
     const volume2 = convertToLogVolume(internalVolume2);
 
+    const pauseBothPlayers = useCallback(() => {
+        player1Ref.current?.getInternalPlayer()?.pause();
+        player2Ref.current?.getInternalPlayer()?.pause();
+    }, []);
+
     const handleOnError = (
         playerRef: React.RefObject<null | ReactPlayer>,
         onEnded: () => void,
@@ -186,6 +193,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                     networkRetryCountRef.current += 1;
                     const audio = target;
                     setTimeout(() => {
+                        pauseBothPlayers();
                         audio.load();
                         audio.play().catch(() => {
                             logFn.error(logMsg[LogCategory.PLAYER].playbackError, {
@@ -202,6 +210,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 return;
             }
 
+            pauseBothPlayers();
             if (error?.code === MediaError.MEDIA_ERR_DECODE) {
                 onEnded();
             } else {
@@ -216,6 +225,20 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
         networkRetryCount1.current = 0;
         networkRetryCount2.current = 0;
     }, [src1, src2]);
+
+    // When not transitioning, ensure only the active player can play (e.g. after seek/prev during transition)
+    useEffect(() => {
+        if (isTransitioning) return;
+        if (playerStatus !== PlayerStatus.PLAYING) {
+            pauseBothPlayers();
+            return;
+        }
+        if (playerNum === 1) {
+            player2Ref.current?.getInternalPlayer()?.pause();
+        } else {
+            player1Ref.current?.getInternalPlayer()?.pause();
+        }
+    }, [isTransitioning, playerNum, playerStatus, pauseBothPlayers]);
 
     useEffect(() => {
         const player1 = player1Ref.current?.getInternalPlayer();

@@ -21,7 +21,13 @@
         "openIn": {
             "lastfm": "فتح في Last.fm",
             "musicbrainz": "فتح في MusicBrainz"
-        }
+        },
+        "addOrRemoveFromSelection": "إضافة أو إزالة من الإختيارات",
+        "selectRangeOfItems": "اختر مجموعة من العناصر",
+        "goToCurrent": "الانتقال إلى العنصر الحالي",
+        "createRadioStation": "يخلق $t(entity.radioStation, {\"count\": 1})",
+        "deleteRadioStation": "يمسح $t(entity.radioStation, {\"count\": 1})",
+        "selectAll": "تحديد الكل"
     },
     "common": {
         "action_zero": "عملية",

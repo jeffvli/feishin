@@ -1,6 +1,6 @@
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid';
-import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
+import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { useShallow } from 'zustand/react/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
@@ -12,7 +12,7 @@ import {
     setTimestamp as setTimestampStore,
     useTimestampStoreBase,
 } from '/@/renderer/store/timestamp.store';
-import { idbStateStorage } from '/@/renderer/store/utils';
+import { migratePlayerStorePersist, playerStoreStorage } from '/@/renderer/store/utils';
 import { shuffleInPlace } from '/@/renderer/utils/shuffle';
 import { PlayerData, QueueData, QueueSong, Song } from '/@/shared/types/domain-types';
 import {
@@ -1543,12 +1543,17 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
             merge: (persistedState: any, currentState: any) => {
                 return merge(currentState, persistedState);
             },
-            migrate: (persistedState, version) => {
-                if (version <= 3) {
+            migrate: async (persistedState, oldVersion) => {
+                if (oldVersion < 3) {
                     return {} as PlayerState;
                 }
 
-                return persistedState;
+                if (oldVersion === 3) {
+                    await migratePlayerStorePersist('player-store');
+                    return persistedState as Partial<PlayerState>;
+                }
+
+                return persistedState as Partial<PlayerState>;
             },
             name: 'player-store',
             onRehydrateStorage: () => (state) => {
@@ -1571,53 +1576,22 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     excludedPlayerKeys.push('index');
                 }
 
-                // Filter top-level state entries
-                const filteredStateEntries = Object.entries(state).filter(([key]) => {
-                    // Exclude queue if shouldRestorePlayQueue is false
-                    if (!shouldRestorePlayQueue && key === 'queue') {
-                        return false;
-                    }
-                    return true;
-                });
+                const player = Object.fromEntries(
+                    Object.entries(state.player).filter(
+                        ([key]) => !excludedPlayerKeys.includes(key),
+                    ),
+                ) as typeof state.player;
 
-                const filteredState = Object.fromEntries(
-                    filteredStateEntries,
-                ) as Partial<PlayerState>;
-
-                // Filter player object
-                if (filteredState.player) {
-                    filteredState.player = Object.fromEntries(
-                        Object.entries(filteredState.player).filter(
-                            ([key]) => !excludedPlayerKeys.includes(key),
-                        ),
-                    ) as typeof filteredState.player;
+                if (!shouldRestorePlayQueue) {
+                    return { player };
                 }
 
-                if (filteredState.queue) {
-                    const allQueueIds = new Set([
-                        ...(filteredState.queue.default || []),
-                        // shuffled now contains indexes, not uniqueIds, so we don't include it here
-                    ]);
-
-                    const songs = filteredState.queue.songs || {};
-                    const cleanedSongs: Record<string, QueueSong> = {};
-
-                    for (const [id, song] of Object.entries(songs)) {
-                        if (allQueueIds.has(id)) {
-                            cleanedSongs[id] = song;
-                        }
-                    }
-
-                    filteredState.queue = {
-                        ...filteredState.queue,
-                        songs: cleanedSongs,
-                    };
-                }
-
-                return filteredState;
+                // Queue pruning and IDB writes are handled in `playerStoreStorage` so we only
+                // serialize the large queue when the queue slice reference actually changes.
+                return { player, queue: state.queue };
             },
-            storage: createJSONStorage(() => idbStateStorage),
-            version: 3,
+            storage: playerStoreStorage,
+            version: 4,
         },
     ),
 );

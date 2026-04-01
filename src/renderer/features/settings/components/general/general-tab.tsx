@@ -3,6 +3,7 @@ import { Fragment } from 'react/jsx-runtime';
 
 import { ApplicationSettings } from '/@/renderer/features/settings/components/general/application-settings';
 import { ControlSettings } from '/@/renderer/features/settings/components/general/control-settings';
+import { ExternalLinksSettings } from '/@/renderer/features/settings/components/general/external-links-settings';
 import { LyricSettings } from '/@/renderer/features/settings/components/general/lyric-settings';
 import { QueryBuilderSettings } from '/@/renderer/features/settings/components/general/query-builder-settings';
 import { ScrobbleSettings } from '/@/renderer/features/settings/components/general/scrobble-settings';
@@ -22,6 +23,7 @@ export const GeneralTab = memo(() => {
         const baseSections = [
             { component: ThemeSettings, key: 'theme' },
             { component: ApplicationSettings, key: 'application' },
+            { component: ExternalLinksSettings, key: 'externalLinks' },
             { component: ControlSettings, key: 'control' },
             { component: SidebarSettings, key: 'sidebar' },
             { component: ScrobbleSettings, key: 'scrobble' },

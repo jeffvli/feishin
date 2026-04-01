@@ -19,7 +19,10 @@
         "goToPage": "前往页面",
         "openIn": {
             "lastfm": "在 Last.fm 中打开",
-            "musicbrainz": "在 MusicBrainz 中打开"
+            "musicbrainz": "在 MusicBrainz 中打开",
+            "listenbrainz": "在 ListenBrainz 中打开",
+            "qobuz": "在 Qobuz 中打开",
+            "spotify": "在 Spotify 中打开"
         },
         "moveToNext": "移至下一首",
         "downloadStarted": "开始下载 {{count}} 个项目",
@@ -157,7 +160,9 @@
         "mood": "氛围",
         "rename": "重命名",
         "filter_multiple": "多项",
-        "newVersionAvailable": "a new version is available"
+        "newVersionAvailable": "新版本现已可用",
+        "numberOfResults": "{{numberOfResults}} 结果",
+        "grouping": "分组"
     },
     "entity": {
         "albumArtist_other": "专辑艺术家",
@@ -448,7 +453,7 @@
         "discordServeImage": "从服务器提供 {{discord}} 图像",
         "discordServeImage_description": "从服务器本身分享 {{discord}} rich presence 的封面艺术，仅适用于 Jellyfin 和 Navidrome。 {{discord}} 使用机器人来获取图像，因此您的服务器必须可通过公共互联网访问",
         "musicbrainz": "显示 MusicBrainz 链接",
-        "musicbrainz_description": "在存在 MusicBrainz ID 的艺术家/专辑页面上显示 MusicBrainz 的链接",
+        "musicbrainz_description": "在艺术家/专辑页面上显示 MusicBrainz 链接（如果存在 MusicBrainz ID）",
         "lastfm": "显示 last.fm 链接",
         "lastfm_description": "在艺术家/专辑页面上显示 Last.fm 的链接",
         "preferLocalLyrics_description": "优先选择本地歌词（如有），而不是远程歌词",
@@ -593,7 +598,21 @@
         "primaryShade": "主色调",
         "primaryShade_description": "覆盖按钮、链接和其他主色元素使用的主色调（0-9）",
         "playerItemConfiguration_description": "配置全屏播放器上显示的项目及其显示顺序",
-        "playerItemConfiguration": "播放器项目配置"
+        "playerItemConfiguration": "播放器项目配置",
+        "listenbrainz_description": "在艺术家/专辑页面上显示 ListenBrainz 链接",
+        "listenbrainz": "显示 ListenBrainz 链接",
+        "qobuz_description": "在艺术家/专辑页面上显示 Qobuz 链接",
+        "qobuz": "显示 Qobuz 链接",
+        "spotify_description": "在艺术家/专辑页面上显示 Spotify 链接",
+        "spotify": "显示 Spotify 链接",
+        "nativeSpotify_description": "在 Spotify 应用中打开，而不是在浏览器中打开",
+        "nativeSpotify": "使用 Spotify 应用",
+        "sidePlayQueueLayout": "侧边播放队列布局",
+        "sidePlayQueueLayout_description": "设置附加侧边播放队列的布局",
+        "sidePlayQueueLayout_optionHorizontal": "水平",
+        "sidePlayQueueLayout_optionVertical": "垂直",
+        "waveformLoadingDelay": "波形加载延迟",
+        "waveformLoadingDelay_description": "加载波形前的延迟时间（秒）。如果在使用网页播放器时遇到卡顿现象，请增加此值。"
     },
     "error": {
         "remotePortWarning": "重启服务器使新端口生效",
@@ -945,8 +964,7 @@
         "editPlaylist": {
             "title": "编辑$t(entity.playlist, {\"count\": 1})",
             "publicJellyfinNote": "Jellyfin 出于某种原因不会显示播放列表是否公开。如果您希望保持公开，请选择以下输入",
-            "success": "$t(entity.playlist, {\"count\": 1})更新成功",
-            "editNote": "不建议对大型播放列表进行手动编辑，你确定接受新播放列表覆盖已有播放列表可能导致的数据丢失风险吗？"
+            "success": "$t(entity.playlist, {\"count\": 1})更新成功"
         },
         "lyricSearch": {
             "title": "搜索歌词",
@@ -1212,21 +1230,21 @@
         "options": {
             "channelLayout": {
                 "single": "单项",
-                "dualCombined": "Dual-Combined",
-                "dualHorizontal": "Dual-Horizontal",
-                "dualVertical": "Dual-Vertical"
+                "dualCombined": "双重组合",
+                "dualHorizontal": "双水平",
+                "dualVertical": "双垂直"
             },
             "mode": {
                 "0": "[0] 离散频率",
-                "1": "[1] 1/24th octave / 240 bands",
-                "2": "[2] 1/12th octave / 120 bands",
-                "3": "[3] 1/8th octave / 80 bands",
-                "4": "[4] 1/6th octave / 60 bands",
-                "5": "[5] 1/4th octave / 40 bands",
-                "6": "[6] 1/3rd octave / 30 bands",
-                "7": "[7] Half octave / 20 bands",
-                "8": "[8] Full octave / 10 bands",
-                "10": "[10] Line / Area graph"
+                "1": "[1] 1/24倍频程 / 240频段",
+                "2": "[2] 1/12 倍频程 / 120 频段",
+                "3": "[3] 1/8倍频程 / 80频段",
+                "4": "[4] 1/6倍频程 / 60频段",
+                "5": "[5] 1/4倍频程 / 40频段",
+                "6": "[6] 1/3倍频程 / 30频段",
+                "7": "[7] 半倍频程 / 20 频段",
+                "8": "[8] 全倍频程 / 10 频段",
+                "10": "[10] 折线图 / 面积图"
             },
             "colorMode": {
                 "gradient": "渐变",
@@ -1242,10 +1260,10 @@
             },
             "frequencyScale": {
                 "none": "无",
-                "bark": "Bark Scale",
-                "linear": "Linear Scale",
-                "log": "Log Scale",
-                "mel": "Mel Scale"
+                "bark": "树皮鳞片",
+                "linear": "线性刻度",
+                "log": "对数刻度",
+                "mel": "梅尔刻度"
             },
             "weightingFilter": {
                 "none": "无",
@@ -1304,13 +1322,13 @@
         "showScaleX": "显示比例尺 X",
         "noteLabels": "笔记标签",
         "showScaleY": "显示比例尺 Y",
-        "alphaBars": "Alpha Bars",
-        "ansiBands": "ANSI Bands",
-        "ledBars": "LED Bars",
-        "trueLeds": "True LEDs",
-        "lumiBars": "Lumi Bars",
-        "outlineBars": "Outline Bars",
-        "roundBars": "Round Bars"
+        "alphaBars": "Alpha 条",
+        "ansiBands": "ANSI 频段",
+        "ledBars": "LED 灯条",
+        "trueLeds": "真正的LED",
+        "lumiBars": "Lumi 条",
+        "outlineBars": "轮廓栏",
+        "roundBars": "圆条"
     },
     "queryBuilder": {
         "standardTags": "标准标签",

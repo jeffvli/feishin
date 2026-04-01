@@ -40,11 +40,56 @@ import { toast } from '/@/shared/components/toast/toast';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerType } from '/@/shared/types/types';
 
+const CODEC_PROBES = [
+    { codec: 'mp3', container: 'mp3', mime: 'audio/mpeg' },
+    { codec: 'aac', container: 'mp4', mime: 'audio/mp4; codecs="mp4a.40.2"' },
+    { codec: 'opus', container: 'ogg', mime: 'audio/ogg; codecs="opus"' },
+    { codec: 'vorbis', container: 'ogg', mime: 'audio/ogg; codecs="vorbis"' },
+    { codec: 'flac', container: 'flac', mime: 'audio/flac' },
+    { codec: 'wav', container: 'wav', mime: 'audio/wav' },
+    { codec: 'alac', container: 'mp4', mime: 'audio/mp4; codecs="alac"' },
+];
+
+const DEFAULT_TRANSCODING_PROFILES = [
+    { audioCodec: 'opus', container: 'ogg', protocol: 'http' },
+    { audioCodec: 'mp3', container: 'mp3', protocol: 'http' },
+];
+
+const DIRECT_PLAY_PROFILES: {
+    audioCodecs: string[];
+    containers: string[];
+    protocols: string[];
+}[] = [];
+
+export function getDefaultTranscodingProfiles() {
+    return DEFAULT_TRANSCODING_PROFILES;
+}
+
+export function getDirectPlayProfiles() {
+    return DIRECT_PLAY_PROFILES;
+}
+
+// Shamelessly taken from NavidromeUI
+function detectBrowserProfile() {
+    const audio = new Audio();
+
+    for (const { codec, container, mime } of CODEC_PROBES) {
+        if (audio.canPlayType(mime) === 'probably') {
+            DIRECT_PLAY_PROFILES.push({
+                audioCodecs: [codec],
+                containers: [container],
+                protocols: ['http'],
+            });
+        }
+    }
+
+    return DIRECT_PLAY_PROFILES;
+}
+
 export const AudioPlayers = () => {
     const playbackType = usePlaybackType();
     const serverId = useCurrentServerId();
     const { resetSampleRate, setSettings } = useSettingsStoreActions();
-
     // DLNA requires an active connection — fall back to web on startup
     const [mountChecked, setMountChecked] = useState(false);
     useEffect(() => {
@@ -55,16 +100,17 @@ export const AudioPlayers = () => {
         // Only run on mount
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
     const {
         audioDeviceId,
         mpvProperties: { audioSampleRateHz },
         webAudio,
     } = usePlaybackSettings();
     const { setWebAudio, webAudio: audioContext } = useWebAudio();
-
+    useEffect(() => {
+        console.log('getDirectPlayProfiles');
+        detectBrowserProfile();
+    }, []);
     if (!mountChecked) return null;
-
     return (
         <>
             <SleepTimerHook />

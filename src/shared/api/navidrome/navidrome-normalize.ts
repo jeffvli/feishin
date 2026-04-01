@@ -153,6 +153,7 @@ const getArtists = (
                     albumArtists = roleList;
                 } else if (role === 'remixer' && includeRemixers) {
                     remixers = roleList;
+                    participants['remixer'] = remixers;
                 } else {
                     artists = roleList;
                 }
@@ -200,7 +201,7 @@ const getArtists = (
         ];
     }
 
-    if (artists === undefined && (includeRemixers ? remixers === undefined : true)) {
+    if (artists === undefined) {
         artists = [
             {
                 id: item.artistId,
@@ -213,11 +214,16 @@ const getArtists = (
         ];
     }
 
-    return {
-        albumArtists,
-        artists: [...(artists || []), ...(includeRemixers ? remixers || [] : [])],
-        participants,
-    };
+    if (remixers?.length && includeRemixers) {
+        const existingIds = new Set(artists.map((artist) => artist.id));
+        for (const remixer of remixers) {
+            if (!existingIds.has(remixer.id)) {
+                artists.push(remixer);
+            }
+        }
+    }
+
+    return { albumArtists, artists, participants };
 };
 
 const normalizeSong = (

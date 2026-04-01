@@ -40,6 +40,7 @@ const LYRICS_ALIGNMENTS = new Set(['center', 'left', 'right']);
 const FONT_TYPES = new Set(['builtIn', 'custom', 'system']);
 const HOME_FEATURE_STYLES = new Set(['multiple', 'single']);
 const SIDE_QUEUE_TYPES = new Set(['sideDrawerQueue', 'sideQueue']);
+const SIDE_QUEUE_LAYOUTS = new Set(['horizontal', 'vertical']);
 
 export type EnvSettingsOverrides = DeepPartial<
     Pick<SettingsState, 'autoDJ' | 'css' | 'discord' | 'font' | 'general' | 'lyrics' | 'playback'>
@@ -153,7 +154,11 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
     { key: 'FS_GENERAL_PATH_REPLACE_WITH', path: ['general', 'pathReplaceWith'], type: 'string' },
     { key: 'FS_GENERAL_LASTFM_API_KEY', path: ['general', 'lastfmApiKey'], type: 'string' },
     { key: 'FS_GENERAL_LAST_FM', path: ['general', 'lastFM'], type: 'bool' },
+    { key: 'FS_GENERAL_LISTEN_BRAINZ', path: ['general', 'listenBrainz'], type: 'bool' },
     { key: 'FS_GENERAL_MUSIC_BRAINZ', path: ['general', 'musicBrainz'], type: 'bool' },
+    { key: 'FS_GENERAL_QOBUZ', path: ['general', 'qobuz'], type: 'bool' },
+    { key: 'FS_GENERAL_SPOTIFY', path: ['general', 'spotify'], type: 'bool' },
+    { key: 'FS_GENERAL_SPOTIFY_NATIVE_APP', path: ['general', 'nativeSpotify'], type: 'bool' },
     { key: 'FS_GENERAL_NATIVE_ASPECT_RATIO', path: ['general', 'nativeAspectRatio'], type: 'bool' },
     {
         key: 'FS_GENERAL_PLAYERBAR_OPEN_DRAWER',
@@ -196,6 +201,12 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
         enumSet: SIDE_QUEUE_TYPES,
         key: 'FS_GENERAL_SIDE_QUEUE_TYPE',
         path: ['general', 'sideQueueType'],
+        type: 'enum',
+    },
+    {
+        enumSet: SIDE_QUEUE_LAYOUTS,
+        key: 'FS_GENERAL_SIDE_QUEUE_LAYOUT',
+        path: ['general', 'sideQueueLayout'],
         type: 'enum',
     },
     { key: 'FS_GENERAL_RESUME', path: ['general', 'resume'], type: 'bool' },

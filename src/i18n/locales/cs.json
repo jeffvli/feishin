@@ -411,7 +411,21 @@
         "autosave": "automaticky ukládat frontu přehrávání",
         "autosave_description": "zapnout automatické ukládání fronty přehrávání na server. toto je možné pouze při použití Navidrome/Subsonic a není možné mít kombinovanou frontu přehrávání.",
         "autosaveCount": "četnost automatického ukládání fronty přehrávání",
-        "autosaveCount_description": "kolik změn skladeb se může provést před uložením fronty. 1 (minimum) znamená při každé změně skladby"
+        "autosaveCount_description": "kolik změn skladeb se může provést před uložením fronty. 1 (minimum) znamená při každé změně skladby",
+        "spotify_description": "na stránkách umělců a alb zobrazit odkazy na Spotify",
+        "spotify": "zobrazit odkazy na Spotify",
+        "nativeSpotify_description": "otevřít v aplikaci Spotify namísto vašeho prohlížeče",
+        "nativeSpotify": "použít aplikaci Spotify",
+        "listenbrainz_description": "na stránkách umělců a alb zobrazit odkazy na ListenBrainz",
+        "listenbrainz": "zobrazit odkazy na ListenBrainz",
+        "qobuz_description": "na stránkách umělců a alb zobrazit odkazy na Qobuz",
+        "qobuz": "zobrazit odkazy na Qobuz",
+        "sidePlayQueueLayout": "rozložení postranní fronty přehrávání",
+        "sidePlayQueueLayout_description": "nastaví rozložení postranní lišty přehrávání",
+        "sidePlayQueueLayout_optionHorizontal": "na šířku",
+        "sidePlayQueueLayout_optionVertical": "na výšku",
+        "waveformLoadingDelay": "zpoždění načítání vlnové křivky",
+        "waveformLoadingDelay_description": "zpoždění v sekundách před načtením vlnové křivky. zvyšte, pokud jste během používání webového přehrávače zaznamenali záseky."
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist, {\"count\": 1})",
@@ -433,7 +447,10 @@
         "removeFromFavorites": "odebrat z $t(entity.favorite, {\"count\": 2})",
         "openIn": {
             "lastfm": "Otevřít v Last.fm",
-            "musicbrainz": "Otevřít v MusicBrainz"
+            "musicbrainz": "Otevřít v MusicBrainz",
+            "spotify": "Otevřít na Spotify",
+            "listenbrainz": "Otevřít ve službě ListenBrainz",
+            "qobuz": "Otevřít ve službě Qobuz"
         },
         "moveToNext": "přesunout na další",
         "downloadStarted": "spuštěno stahování {{count}} položek",
@@ -579,7 +596,9 @@
         "filter_single": "jeden",
         "filter_multiple": "několik",
         "rename": "přejmenovat",
-        "newVersionAvailable": "je dostupná nová verze"
+        "newVersionAvailable": "je dostupná nová verze",
+        "numberOfResults": "{{numberOfResults}} výsledků",
+        "grouping": "seskupování"
     },
     "table": {
         "config": {
@@ -1045,8 +1064,7 @@
         "editPlaylist": {
             "title": "upravit $t(entity.playlist, {\"count\": 1})",
             "success": "$t(entity.playlist, {\"count\": 1}) úspěšně aktualizován",
-            "publicJellyfinNote": "Jellyfin z nějakého důvodu neukazuje, zda je seznam skladeb veřejný, nebo ne. Pokud si přejete, aby zůstal veřejný, zvolte prosím následující vstup",
-            "editNote": "ruční úpravy velkých seznamů skladeb nejsou doporučeny. opravdu přijímáte riziko ztráty dat, které může vzniknout přepsáním existujícího seznamu skladeb?"
+            "publicJellyfinNote": "Jellyfin z nějakého důvodu neukazuje, zda je seznam skladeb veřejný, nebo ne. Pokud si přejete, aby zůstal veřejný, zvolte prosím následující vstup"
         },
         "shareItem": {
             "allowDownloading": "umožnit stahování",

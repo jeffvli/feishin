@@ -85,7 +85,12 @@ const PlaylistDetailSongListRoute = () => {
 
     const handleSave = (
         filter: Record<string, any>,
-        extraFilters: { limit?: number; sortBy?: string[]; sortOrder?: string },
+        extraFilters: {
+            limit?: number;
+            limitPercent?: number;
+            sortBy?: string[];
+            sortOrder?: string;
+        },
     ) => {
         if (!detailQuery?.data) return;
 
@@ -96,7 +101,8 @@ const PlaylistDetailSongListRoute = () => {
 
         const rules = {
             ...filter,
-            limit: extraFilters.limit || undefined,
+            limit: extraFilters.limit ?? undefined,
+            limitPercent: extraFilters.limitPercent ?? undefined,
             sort: sortValue,
         };
 
@@ -123,7 +129,12 @@ const PlaylistDetailSongListRoute = () => {
 
     const handleSaveAs = (
         filter: Record<string, any>,
-        extraFilters: { limit?: number; sortBy?: string[]; sortOrder?: string },
+        extraFilters: {
+            limit?: number;
+            limitPercent?: number;
+            sortBy?: string[];
+            sortOrder?: string;
+        },
     ) => {
         if (!detailQuery?.data) return;
 
@@ -134,7 +145,8 @@ const PlaylistDetailSongListRoute = () => {
 
         const rules = {
             ...filter,
-            limit: extraFilters.limit || undefined,
+            limit: extraFilters.limit ?? undefined,
+            limitPercent: extraFilters.limitPercent ?? undefined,
             sort: sortValue,
         };
 

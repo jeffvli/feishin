@@ -8,7 +8,12 @@ import md5 from 'md5';
 import { z } from 'zod';
 
 import { contract, ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
+import {
+    getDefaultTranscodingProfiles,
+    getDirectPlayProfiles,
+} from '/@/renderer/features/player/components/audio-players';
 import { randomString } from '/@/renderer/utils';
+import { logFn } from '/@/renderer/utils/logger';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { ssNormalize } from '/@/shared/api/subsonic/subsonic-normalize';
 import {
@@ -86,6 +91,151 @@ const ALBUM_LIST_SORT_MAPPING: Record<AlbumListSort, AlbumListSortType | undefin
 
 const MAX_SUBSONIC_ITEMS = 500;
 const SUBSONIC_FAST_BATCH_SIZE = MAX_SUBSONIC_ITEMS * 10;
+
+// const TRANSCODE_DIRECT_PLAY_PROFILES = [
+//     {
+//         audioCodecs: ['mp3'],
+//         containers: ['mp3'],
+//         maxAudioChannels: 2,
+//         protocols: ['http'],
+//     },
+//     {
+//         audioCodecs: ['aac'],
+//         containers: ['m4a', 'mp4'],
+//         maxAudioChannels: 2,
+//         protocols: ['http'],
+//     },
+//     {
+//         audioCodecs: ['vorbis'],
+//         containers: ['ogg'],
+//         maxAudioChannels: 2,
+//         protocols: ['http'],
+//     },
+//     {
+//         audioCodecs: ['opus'],
+//         containers: ['ogg', 'webm'],
+//         maxAudioChannels: 2,
+//         protocols: ['http'],
+//     },
+//     {
+//         audioCodecs: ['pcm'],
+//         containers: ['wav'],
+//         maxAudioChannels: 2,
+//         protocols: ['http'],
+//     },
+//     {
+//         audioCodecs: ['flac'],
+//         containers: ['flac'],
+//         maxAudioChannels: 2,
+//         protocols: ['http'],
+//     },
+// ];
+
+// const TRANSCODE_UNSUPPORTED_DIRECT_PLAY_PROFILES = [
+//     {
+//       containers: ["m4a", "mp4"],
+//       audioCodecs: ["alac"],
+//       protocols: ["http"],
+//       maxAudioChannels: 2
+//     },
+//     {
+//       containers: ["m4a", "mp4"],
+//       audioCodecs: ["ac3", "eac3"],
+//       protocols: ["http"],
+//       maxAudioChannels: 6
+//     },
+//     {
+//       containers: ["ogg"],
+//       audioCodecs: ["flac", "speex"],
+//       protocols: ["http"],
+//       maxAudioChannels: 2
+//     },
+//     {
+//       containers: ["wav"],
+//       audioCodecs: ["adpcm", "gsm", "aac", "mp3"],
+//       protocols: ["http"],
+//       maxAudioChannels: 2
+//     },
+//     {
+//       containers: ["mkv"],
+//       audioCodecs: ["aac", "mp3", "flac", "opus", "vorbis", "ac3", "eac3", "dts"],
+//       protocols: ["http"],
+//       maxAudioChannels: 8
+//     },
+//     {
+//       containers: ["avi"],
+//       audioCodecs: ["mp3", "ac3", "pcm", "aac"],
+//       protocols: ["http"],
+//       maxAudioChannels: 6
+//     },
+//     {
+//       containers: ["asf", "wma"],
+//       audioCodecs: ["wma", "pcm", "mp3"],
+//       protocols: ["http"],
+//       maxAudioChannels: 2
+//     },
+//     {
+//       containers: ["caf"],
+//       audioCodecs: ["pcm", "aac", "alac", "mp3"],
+//       protocols: ["http"],
+//       maxAudioChannels: 8
+//     },
+//     {
+//       containers: ["3gp"],
+//       audioCodecs: ["aac", "amr"],
+//       protocols: ["http"],
+//       maxAudioChannels: 2
+//     },
+//     {
+//       containers: ["amr"],
+//       audioCodecs: ["amr"],
+//       protocols: ["http"],
+//       maxAudioChannels: 1
+//     },
+//     {
+//       containers: ["ape"],
+//       audioCodecs: ["ape"],
+//       protocols: ["http"],
+//       maxAudioChannels: 2
+//     },
+//     {
+//       containers: ["wv"],
+//       audioCodecs: ["wavpack"],
+//       protocols: ["http"],
+//       maxAudioChannels: 2
+//     },
+//     {
+//       containers: ["ac3"],
+//       audioCodecs: ["ac3"],
+//       protocols: ["http"],
+//       maxAudioChannels: 6
+//     },
+//     {
+//       containers: ["eac3"],
+//       audioCodecs: ["eac3"],
+//       protocols: ["http"],
+//       maxAudioChannels: 8
+//     },
+//     {
+//       containers: ["dts"],
+//       audioCodecs: ["dts"],
+//       protocols: ["http"],
+//       maxAudioChannels: 8
+//     }
+//   ];
+
+function appendTranscodeParams(url: string, format?: string, bitrate?: number) {
+    let streamUrl = url;
+
+    if (format) {
+        streamUrl += `&format=${format}`;
+    }
+    if (bitrate !== undefined) {
+        streamUrl += `&maxBitRate=${bitrate}`;
+    }
+
+    return streamUrl;
+}
 
 function sortAndPaginate<T>(
     items: T[],
@@ -1273,6 +1423,10 @@ export const SubsonicController: InternalControllerEndpoint = {
             }
         }
 
+        if (subsonicFeatures[SubsonicExtensions.TRANSCODING]) {
+            features.osTranscodeDecision = [1];
+        }
+
         if (subsonicFeatures[SubsonicExtensions.SONG_LYRICS]) {
             features.lyricsMultipleStructured = [1];
         }
@@ -1801,20 +1955,81 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return totalRecordCount;
     },
-    getStreamUrl: ({ apiClientProps: { server }, query }) => {
-        const { bitrate, format, id, transcode } = query;
-        let url = `${server?.url}/rest/stream.view?id=${id}&v=1.13.0&c=Feishin&${server?.credential}`;
+    getStreamUrl: async ({ apiClientProps, query }) => {
+        const { server } = apiClientProps;
+        const { bitrate, format, id, mediaType = 'song', skipAutoTranscode, transcode } = query;
 
+        const streamUrl = `${server?.url}/rest/stream.view?id=${id}&v=1.13.0&c=Feishin&${server?.credential}`;
+
+        // If transcoding is explicitly enabled, just return the direct transcoded stream URL
         if (transcode) {
-            if (format) {
-                url += `&format=${format}`;
-            }
-            if (bitrate !== undefined) {
-                url += `&maxBitRate=${bitrate}`;
-            }
+            return appendTranscodeParams(streamUrl, format, bitrate);
         }
 
-        return url;
+        // Used in cases where MPV is the default player, since mpv handles basically every audio format
+        if (skipAutoTranscode) {
+            return streamUrl;
+        }
+
+        // If the server supports transcoding decision, always use it to determine if we need to transcode
+        if (hasFeature(server, ServerFeature.OS_TRANSCODE_DECISION)) {
+            const maxTranscodingAudioBitrate = 0;
+
+            const directPlayProfiles = getDirectPlayProfiles();
+            const transcodingProfiles = getDefaultTranscodingProfiles();
+
+            const transcodeDecision = await ssApiClient(apiClientProps).getTranscodeDecision({
+                body: {
+                    codecProfiles: [],
+                    directPlayProfiles,
+                    maxAudioBitrate: 0,
+                    maxTranscodingAudioBitrate,
+                    name: 'Feishin',
+                    platform: navigator.userAgent,
+                    transcodingProfiles,
+                },
+                query: {
+                    mediaId: id,
+                    mediaType,
+                },
+            });
+
+            if (transcodeDecision.status !== 200) {
+                throw new Error('Failed to get transcode decision');
+            }
+
+            const td = transcodeDecision.body.transcodeDecision;
+            const requiresTranscoding = !td?.canDirectPlay;
+
+            // If the server does not require transcoding, just return the direct stream URL
+            if (!requiresTranscoding) {
+                return streamUrl;
+            }
+
+            logFn.info(`Song ${id} requires transcoding: ${[td.transcodeReason].join(', ')}`);
+
+            // If the server does not return transcode params, manually create the transcode params
+            if (!td.transcodeParams) {
+                return appendTranscodeParams(streamUrl, format, bitrate);
+            }
+
+            const transcodeStreamUrl = await ssApiClient(apiClientProps).getTranscodeStream({
+                query: {
+                    mediaId: id,
+                    mediaType,
+                    offset: 0,
+                    transcodeParams: td.transcodeParams,
+                },
+            });
+
+            if (transcodeStreamUrl.status !== 200) {
+                throw new Error('Failed to get transcode stream');
+            }
+
+            return transcodeStreamUrl.body;
+        }
+
+        return streamUrl;
     },
     getStructuredLyrics: async (args) => {
         const { apiClientProps, query } = args;
@@ -2117,6 +2332,22 @@ export const SubsonicController: InternalControllerEndpoint = {
                 ),
             ),
         };
+    },
+    setPlaylistSongs: async (args) => {
+        const { apiClientProps, body } = args;
+
+        const res = await ssApiClient(apiClientProps).createPlaylist({
+            query: {
+                playlistId: body.id,
+                songId: body.songIds,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to update playlist songs');
+        }
+
+        return null;
     },
     setRating: async (args) => {
         const { apiClientProps, query } = args;
