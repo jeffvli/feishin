@@ -90,7 +90,6 @@ export const AudioPlayers = () => {
     const playbackType = usePlaybackType();
     const serverId = useCurrentServerId();
     const { resetSampleRate, setSettings } = useSettingsStoreActions();
-
     // DLNA requires an active connection — fall back to web on startup
     const [mountChecked, setMountChecked] = useState(false);
     useEffect(() => {
@@ -101,21 +100,17 @@ export const AudioPlayers = () => {
         // Only run on mount
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
     const {
         audioDeviceId,
         mpvProperties: { audioSampleRateHz },
         webAudio,
     } = usePlaybackSettings();
     const { setWebAudio, webAudio: audioContext } = useWebAudio();
-
-    if (!mountChecked) return null;
-  
     useEffect(() => {
         console.log('getDirectPlayProfiles');
         detectBrowserProfile();
     }, []);
-
+    if (!mountChecked) return null;
     return (
         <>
             <SleepTimerHook />
