@@ -113,7 +113,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         const playerData = usePlayerStore.getState().getPlayerData();
         const song = playerData.currentSong;
         if (!song) return;
-        const url = getSongUrl(song, transcode);
+        const url = await getSongUrl(song, transcode);
         if (!url) return;
         const now = Date.now();
         if (url === lastSentUrlRef.current && now - lastSentAtRef.current < 500) {
@@ -156,7 +156,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         // Pre-load the next track for gapless playback
         const nextSong = playerData.nextSong;
         if (nextSong) {
-            const nextUrl = getSongUrl(nextSong, transcode);
+            const nextUrl = await getSongUrl(nextSong, transcode);
             if (nextUrl) {
                 sameUriLoopQueuedRef.current = nextUrl === url;
                 let nextArtUrl: string | undefined;
@@ -196,7 +196,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         const playerData = usePlayerStore.getState().getPlayerData();
         const nextSong = playerData.nextSong;
         if (!nextSong) return;
-        const nextUrl = getSongUrl(nextSong, transcode);
+        const nextUrl = await getSongUrl(nextSong, transcode);
         if (!nextUrl) return;
         sameUriLoopQueuedRef.current = nextUrl === lastSentUrlRef.current;
         let nextArtUrl: string | undefined;
@@ -329,16 +329,19 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         if (!dlnaPlayer) return;
         if (playerStatus === PlayerStatus.PLAYING) {
             if (hasPlayedRef.current) {
-                const playerData = usePlayerStore.getState().getPlayerData();
-                const currentUrl = playerData.currentSong
-                    ? getSongUrl(playerData.currentSong, transcode)
-                    : undefined;
-                if (currentUrl && currentUrl !== lastSentUrlRef.current) {
-                    skipNextSendRef.current = false;
-                    sendCurrentTrackToDlna();
-                } else {
-                    dlnaPlayer.play();
-                }
+                const check = async () => {
+                    const playerData = usePlayerStore.getState().getPlayerData();
+                    const currentUrl = playerData.currentSong
+                        ? await getSongUrl(playerData.currentSong, transcode)
+                        : undefined;
+                    if (currentUrl && currentUrl !== lastSentUrlRef.current) {
+                        skipNextSendRef.current = false;
+                        sendCurrentTrackToDlna();
+                    } else {
+                        dlnaPlayer.play();
+                    }
+                };
+                check();
             }
         } else if (playerStatus === PlayerStatus.PAUSED) {
             dlnaPlayer.pause();
