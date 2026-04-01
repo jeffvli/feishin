@@ -14,7 +14,7 @@ input[cmdk-input] {
 [cmdk-group-items] {
     display: flex;
     flex-direction: column;
-    gap: var(--theme-spacing-xs);
+    gap: 0;
 }
 
 [cmdk-item] {

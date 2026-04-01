@@ -28,6 +28,23 @@
     grid-template-columns: 80px 1fr var(--right-sidebar-width);
 }
 
+.main-content-container.vertical-layout {
+    grid-template-areas:
+        'sidebar .'
+        'sidebar right-sidebar';
+    grid-template-rows: minmax(0, 1fr) var(--right-sidebar-height);
+    grid-template-columns: var(--sidebar-width) 1fr;
+}
+
+.main-content-container.sidebar-collapsed.vertical-layout {
+    grid-template-columns: 80px 1fr;
+}
+
+.main-content-container.vertical-layout #sidebar-queue {
+    border-top: 1px solid alpha(var(--theme-colors-border), 0.5);
+    border-left: 0;
+}
+
 .main-content-body {
     display: flex;
     flex: 1;

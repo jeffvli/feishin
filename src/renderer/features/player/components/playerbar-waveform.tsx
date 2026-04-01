@@ -7,10 +7,10 @@ import { CustomPlayerbarSlider } from './playerbar-slider';
 import styles from './playerbar-waveform.module.css';
 
 import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
+import { PlayerbarSeekSlider } from '/@/renderer/features/player/components/playerbar-seek-slider';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { BarAlign, usePlayerbarSlider, usePlayerSong, usePlayerTimestamp } from '/@/renderer/store';
 import { useAppThemeColors, useColorScheme } from '/@/renderer/themes/use-app-theme';
-import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Text } from '/@/shared/components/text/text';
 
 export const PlayerbarWaveform = () => {
@@ -18,6 +18,7 @@ export const PlayerbarWaveform = () => {
     const playerbarSlider = usePlayerbarSlider();
     const currentTime = usePlayerTimestamp();
     const containerRef = useRef<HTMLDivElement>(null);
+    const audioElementRef = useRef<HTMLAudioElement>(document.createElement('audio'));
     const { mediaSeekToTimestamp } = usePlayer();
     const [isLoading, setIsLoading] = useState(true);
     const [isDragging, setIsDragging] = useState(false);
@@ -29,7 +30,7 @@ export const PlayerbarWaveform = () => {
 
     const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
 
-    const streamUrl = useSongUrl(currentSong, true, { bitrate: 64, enabled: true, format: 'mp3' });
+    const streamUrl = useSongUrl(currentSong, true, { bitrate: 64, enabled: false, format: 'mp3' });
 
     const { color } = useAppThemeColors();
     const primaryColor = (color['--theme-colors-primary'] as string) || 'rgb(53, 116, 252)';
@@ -56,28 +57,20 @@ export const PlayerbarWaveform = () => {
         fillParent: true,
         height: 18,
         interact: false,
+        media: audioElementRef.current,
         normalize: false,
         progressColor: primaryColor,
-        url: streamUrl || undefined,
         waveColor,
     });
 
     // Reset loading state when stream URL changes and ensure media is muted
     useEffect(() => {
         setIsLoading(true);
-        if (wavesurfer) {
-            wavesurfer.setVolume(0);
-            const mediaElement = wavesurfer.getMediaElement();
-            if (mediaElement) {
-                mediaElement.muted = true;
-                mediaElement.volume = 0;
-            }
-        }
-    }, [streamUrl, wavesurfer]);
+    }, [streamUrl]);
 
     // Handle waveform ready state
     useEffect(() => {
-        if (!wavesurfer) return;
+        if (!wavesurfer || !streamUrl) return;
 
         const handleReady = () => {
             setIsLoading(false);
@@ -90,20 +83,18 @@ export const PlayerbarWaveform = () => {
 
         wavesurfer.on('ready', handleReady);
 
-        // Check if already loaded
-        if (wavesurfer.getDuration() > 0) {
-            setIsLoading(false);
-            const mediaElement = wavesurfer.getMediaElement();
-            if (mediaElement) {
-                mediaElement.muted = true;
-                mediaElement.volume = 0;
-            }
-        }
+        const waveformTimeout = setTimeout(
+            () => {
+                wavesurfer.load(streamUrl);
+            },
+            playerbarSlider?.loadingDelay ? playerbarSlider.loadingDelay * 1000 : 2000,
+        );
 
         return () => {
             wavesurfer.un('ready', handleReady);
+            clearTimeout(waveformTimeout);
         };
-    }, [wavesurfer]);
+    }, [wavesurfer, streamUrl, playerbarSlider.loadingDelay]);
 
     useEffect(() => {
         if (!wavesurfer) return;
@@ -363,12 +354,12 @@ export const PlayerbarWaveform = () => {
                             height: '100%',
                             left: 0,
                             position: 'absolute',
-                            top: 0,
+                            top: 3,
                             width: '100%',
                         }}
                         transition={{ duration: 0.2 }}
                     >
-                        <Spinner container />
+                        <PlayerbarSeekSlider max={songDuration} min={0} />
                     </motion.div>
                 )}
             </AnimatePresence>

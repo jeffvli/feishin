@@ -340,7 +340,7 @@ export type Playlist = {
     owner: null | string;
     ownerId: null | string;
     public: boolean | null;
-    rules?: null | Record<string, any>;
+    rules?: null | PlaylistRules;
     size: null | number;
     songCount: null | number;
     sync?: boolean | null;
@@ -410,16 +410,18 @@ export type Song = {
     userRating: null | number;
 };
 
+type ApiContext = {
+    pathReplace?: string;
+    pathReplaceWith?: string;
+};
+
 type BaseEndpointArgs = {
     apiClientProps: {
         server?: null | ServerListItemWithCredential;
         serverId: string;
         signal?: AbortSignal;
     };
-    context?: {
-        pathReplace?: string;
-        pathReplaceWith?: string;
-    };
+    context?: ApiContext;
 };
 
 type GenreListSortMap = {
@@ -945,7 +947,7 @@ export type CreatePlaylistBody = {
     name: string;
     ownerId?: string;
     public?: boolean;
-    queryBuilderRules?: Record<string, any>;
+    queryBuilderRules?: PlaylistRules;
     sync?: boolean;
 };
 
@@ -1006,6 +1008,12 @@ export interface PlaylistListQuery extends BaseQuery<PlaylistListSort> {
 
 // Playlist List
 export type PlaylistListResponse = BasePaginatedResponse<Playlist[]>;
+
+export type PlaylistRules = Record<string, any> & {
+    limit?: number;
+    limitPercent?: number;
+    sort?: string;
+};
 
 export type RatingQuery = {
     id: string[];
@@ -1084,11 +1092,10 @@ export type UpdatePlaylistArgs = BaseEndpointArgs & {
 export type UpdatePlaylistBody = {
     _custom?: Record<string, any>;
     comment?: string;
-    genres?: Genre[];
     name: string;
     ownerId?: string;
     public?: boolean;
-    queryBuilderRules?: Record<string, any>;
+    queryBuilderRules?: PlaylistRules;
     sync?: boolean;
 };
 
@@ -1417,11 +1424,10 @@ export type ControllerEndpoint = {
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
     getSongList: (args: SongListArgs) => Promise<SongListResponse>;
     getSongListCount: (args: SongListCountArgs) => Promise<number>;
-    getStreamUrl: (args: StreamArgs) => string;
+    getStreamUrl: (args: StreamArgs) => Promise<string>;
     getStructuredLyrics?: (args: StructuredLyricsArgs) => Promise<StructuredLyric[]>;
     getTagList?: (args: TagListArgs) => Promise<TagListResponse>;
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
-    // getArtistInfo?: (args: any) => void;
     getUserInfo: (args: UserInfoArgs) => Promise<UserInfoResponse>;
     getUserList?: (args: UserListArgs) => Promise<UserListResponse>;
     movePlaylistItem?: (args: MoveItemArgs) => Promise<void>;
@@ -1430,6 +1436,7 @@ export type ControllerEndpoint = {
     savePlayQueue: (args: SaveQueueArgs) => Promise<void>;
     scrobble: (args: ScrobbleArgs) => Promise<ScrobbleResponse>;
     search: (args: SearchArgs) => Promise<SearchResponse>;
+    setPlaylistSongs: (args: SetPlaylistSongsArgs) => Promise<SetPlaylistSongsResponse>;
     setRating?: (args: SetRatingArgs) => Promise<RatingResponse>;
     shareItem?: (args: ShareItemArgs) => Promise<ShareItemResponse>;
     updateInternetRadioStation: (
@@ -1563,7 +1570,7 @@ export type InternalControllerEndpoint = {
     getSongDetail: (args: ReplaceApiClientProps<SongDetailArgs>) => Promise<SongDetailResponse>;
     getSongList: (args: ReplaceApiClientProps<SongListArgs>) => Promise<SongListResponse>;
     getSongListCount: (args: ReplaceApiClientProps<SongListCountArgs>) => Promise<number>;
-    getStreamUrl: (args: ReplaceApiClientProps<StreamArgs>) => string;
+    getStreamUrl: (args: ReplaceApiClientProps<StreamArgs>) => Promise<string>;
     getStructuredLyrics?: (
         args: ReplaceApiClientProps<StructuredLyricsArgs>,
     ) => Promise<StructuredLyric[]>;
@@ -1581,6 +1588,9 @@ export type InternalControllerEndpoint = {
     savePlayQueue: (args: ReplaceApiClientProps<SaveQueueArgs>) => Promise<void>;
     scrobble: (args: ReplaceApiClientProps<ScrobbleArgs>) => Promise<ScrobbleResponse>;
     search: (args: ReplaceApiClientProps<SearchArgs>) => Promise<SearchResponse>;
+    setPlaylistSongs: (
+        args: ReplaceApiClientProps<SetPlaylistSongsArgs>,
+    ) => Promise<SetPlaylistSongsResponse>;
     setRating?: (args: ReplaceApiClientProps<SetRatingArgs>) => Promise<RatingResponse>;
     shareItem?: (args: ReplaceApiClientProps<ShareItemArgs>) => Promise<ShareItemResponse>;
     updateInternetRadioStation: (
@@ -1637,6 +1647,15 @@ export type ServerInfo = {
 
 export type ServerInfoArgs = BaseEndpointArgs;
 
+export type SetPlaylistSongsArgs = BaseEndpointArgs & { body: SetPlaylistSongsQuery };
+
+export type SetPlaylistSongsQuery = {
+    id: string;
+    songIds: string[];
+};
+
+export type SetPlaylistSongsResponse = null;
+
 export type SimilarSongsArgs = BaseEndpointArgs & {
     query: SimilarSongsQuery;
 };
@@ -1655,6 +1674,9 @@ export type StreamQuery = {
     bitrate?: number;
     format?: string;
     id: string;
+    mediaType?: 'podcast' | 'song';
+    offset?: number;
+    skipAutoTranscode?: boolean;
     transcode: boolean;
 };
 
@@ -1699,6 +1721,50 @@ export type TagListResponse = {
     tags?: Tag[];
 };
 
+export type TranscodeDecisionArgs = BaseEndpointArgs & {
+    body?: TranscodeDecisionRequestBody;
+    query: TranscodeDecisionQuery;
+};
+
+export type TranscodeDecisionQuery = {
+    id: string;
+    type: 'song';
+};
+
+export type TranscodeDecisionRequestBody = {
+    codecProfiles?: Array<{
+        limitations?: Array<{
+            comparison: string;
+            name: string;
+            required?: boolean;
+            values: string[];
+        }>;
+        name: string;
+        type: string;
+    }>;
+    directPlayProfiles?: Array<{
+        audioCodecs: string[];
+        containers: string[];
+        maxAudioChannels?: number;
+        protocols: string[];
+    }>;
+    maxAudioBitrate?: number;
+    maxTranscodingAudioBitrate?: number;
+    name: string;
+    platform: string;
+    transcodingProfiles?: Array<{
+        audioCodec: string;
+        container: string;
+        maxAudioChannels?: number;
+        protocol: string;
+    }>;
+};
+
+export type TranscodeDecisionResponse = {
+    decision: 'direct' | 'transcode';
+    transcodeParams?: string;
+};
+
 export type UserInfoArgs = BaseEndpointArgs & { query: UserInfoQuery };
 
 export type UserInfoQuery = {
@@ -1718,8 +1784,5 @@ type BaseEndpointArgsWithServer = {
         serverId: string;
         signal?: AbortSignal;
     };
-    context?: {
-        pathReplace?: string;
-        pathReplaceWith?: string;
-    };
+    context?: ApiContext;
 };

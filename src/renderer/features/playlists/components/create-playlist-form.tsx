@@ -72,6 +72,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                 ? {
                       ...convertQueryGroupToNDQuery(smartPlaylist.filters),
                       limit: smartPlaylist.extraFilters.limit,
+                      limitPercent: smartPlaylist.extraFilters.limitPercent,
                       // order field is now optional - sort direction is embedded in sort field
                       sort: sortValue || '+dateAdded',
                   }

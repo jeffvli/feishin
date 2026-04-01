@@ -304,8 +304,7 @@
         "editPlaylist": {
             "publicJellyfinNote": "Jellyfin entah bagaimana tidak menampilkan apakah playlist ini publik atau tidak. Jika Anda ingin playlist ini tetap publik, harap pilih entri berikut",
             "success": "$t(entity.playlist, {\"count\": 1}) berhasil diperbarui",
-            "title": "ubah $t(entity.playlist, {\"count\": 1})",
-            "editNote": "pengeditan manual tidak disarankan untuk playlist besar. apakah Anda yakin menerima risiko kehilangan data yang timbul akibat menimpa playlist yang ada?"
+            "title": "ubah $t(entity.playlist, {\"count\": 1})"
         },
         "lyricSearch": {
             "input_artist": "$t(entity.artist, {\"count\": 1})",

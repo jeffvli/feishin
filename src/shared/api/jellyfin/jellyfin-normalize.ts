@@ -128,7 +128,12 @@ const getArtists = (
     });
 
     if (participants?.['Remixer']) {
-        result.push(...participants['Remixer']);
+        const existingIds = new Set(result.map((artist) => artist.id));
+        for (const participant of participants['Remixer']) {
+            if (!existingIds.has(participant.id)) {
+                result.push(participant);
+            }
+        }
     }
 
     return result;

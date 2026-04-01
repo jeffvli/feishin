@@ -40,12 +40,12 @@ jobs:
             version: ${{ steps.version.outputs.version }}
         steps:
             - name: Checkout git repo
-              uses: actions/checkout@v1
+              uses: actions/checkout@v6
 
             - name: Install Node and PNPM
-              uses: pnpm/action-setup@v4.1.0
+              uses: pnpm/action-setup@v4
               with:
-                  version: 9
+                  version: 10
 
             - name: Install dependencies
               run: pnpm install
@@ -125,12 +125,12 @@ jobs:
 
         steps:
             - name: Checkout git repo
-              uses: actions/checkout@v1
+              uses: actions/checkout@v6
 
             - name: Install Node and PNPM
-              uses: pnpm/action-setup@v4.1.0
+              uses: pnpm/action-setup@v4
               with:
-                  version: 9
+                  version: 10
 
             - name: Install dependencies
               run: pnpm install
@@ -146,7 +146,7 @@ jobs:
 
             - name: Build and Publish to R2 (Windows)
               if: matrix.os == 'windows-latest'
-              uses: nick-invision/retry@v2.8.2
+              uses: nick-invision/retry@v3.0.2
               with:
                   timeout_minutes: 30
                   max_attempts: 3
@@ -157,7 +157,7 @@ jobs:
 
             - name: Build and Publish to R2 (macOS)
               if: matrix.os == 'macos-latest'
-              uses: nick-invision/retry@v2.8.2
+              uses: nick-invision/retry@v3.0.2
               with:
                   timeout_minutes: 30
                   max_attempts: 3
@@ -168,7 +168,7 @@ jobs:
 
             - name: Build and Publish to R2 (Linux)
               if: matrix.os == 'ubuntu-latest'
-              uses: nick-invision/retry@v2.8.2
+              uses: nick-invision/retry@v3.0.2
               with:
                   timeout_minutes: 30
                   max_attempts: 3
@@ -179,7 +179,7 @@ jobs:
 
             - name: Build and Publish to R2 (Linux ARM64)
               if: matrix.os == 'ubuntu-latest'
-              uses: nick-invision/retry@v2.8.2
+              uses: nick-invision/retry@v3.0.2
               with:
                   timeout_minutes: 30
                   max_attempts: 3

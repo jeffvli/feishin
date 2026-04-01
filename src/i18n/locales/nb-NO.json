@@ -2,7 +2,8 @@
     "action": {
         "openIn": {
             "lastfm": "Åpne i Last.fm",
-            "musicbrainz": "Åpne i MusicBrainz"
+            "musicbrainz": "Åpne i MusicBrainz",
+            "spotify": "Åpne i Spotify"
         },
         "moveToBottom": "flytt til bunnen",
         "deletePlaylist": "slett $t(entity.playlist, {\"count\": 1})",
@@ -159,7 +160,8 @@
         "gridRows": "rutenettrader",
         "tableColumns": "tabellkolonner",
         "itemsMore": "{{count}} fler",
-        "explicitStatus": "grovhetsstatus"
+        "explicitStatus": "grovhetsstatus",
+        "newVersionAvailable": "en ny version er tilgjengelig"
     },
     "entity": {
         "smartPlaylist": "smart $t(entity.playlist, {\"count\": 1})",
@@ -233,7 +235,8 @@
         "saveQueueFailed": "kunne ikke lagre kø",
         "multipleServerSaveQueueError": "Spillekøen har en eller flere sanger som ikke finnes på gjeldene tjener. Dette er ikke støttet",
         "serverLockSingleServer": "kun én tjener er tillatt når tjener er låst",
-        "settingsSyncError": "avvik ble funnet mellom innstillinger i avspilleren og hovedprosessen. ta en omstart av applikasjonen for å aktivere endringene"
+        "settingsSyncError": "avvik ble funnet mellom innstillinger i avspilleren og hovedprosessen. ta en omstart av applikasjonen for å aktivere endringene",
+        "playbackPausedDueToError": "avspilling ble paused på grunn av en feil"
     },
     "filter": {
         "bpm": "bpm",
@@ -319,7 +322,8 @@
             "success": "la $t(entity.trackWithCount, {\"count\": {{message}} }) til $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
             "title": "legg til i $t(entity.playlist, {\"count\": 1})",
             "input_skipDuplicates": "hopp over duplikater",
-            "input_playlists": "$t(entity.playlist, {\"count\": 2})"
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
+            "searchOrCreate": "søk $t(entity.playlist, {\"count\": 2}) eller skriv for å opprette en"
         },
         "deletePlaylist": {
             "title": "slett $t(entity.playlist, {\"count\": 1})",
@@ -328,7 +332,8 @@
         },
         "editPlaylist": {
             "title": "rediger $t(entity.playlist, {\"count\": 1})",
-            "success": "$t(entity.playlist, {\"count\": 1}) er oppdatert"
+            "success": "$t(entity.playlist, {\"count\": 1}) er oppdatert",
+            "publicJellyfinNote": "Jellyfin av en grunn kan ikke oppgi om en spilleliste er offentlig eller ikke. Hvis du ønsker at denne skal beholdes offentlig, vennligst ha følgende inndata valgt"
         },
         "shareItem": {
             "allowDownloading": "tillat nedlasting",
@@ -336,7 +341,9 @@
             "createFailed": "opprettelse av delt ressurs feilet (er deling aktivert?)",
             "setExpiration": "angi utløpstid",
             "success": "del lenke som er kopiert til utklippstavlen (eller klikk her for å åpne)",
-            "expireInvalid": "utløpstid må være et fremtidig tidspunkt"
+            "expireInvalid": "utløpstid må være et fremtidig tidspunkt",
+            "copyToClipboard": "Kopier til kopitavle: Ctrl+C, Enter",
+            "successMustClick": "opprettet deling. trykk her for å åpne"
         },
         "updateServer": {
             "success": "vellykket oppdatering av serveren",
@@ -367,7 +374,19 @@
         },
         "lyricsExport": {
             "export": "eksporter sangtekster",
-            "input_synced": "eksporter sunkroniserte sangtekster"
+            "input_synced": "eksporter sunkroniserte sangtekster",
+            "input_offset": "$t(setting.lyricOffset)"
+        },
+        "shuffleAll": {
+            "title": "spill av tilfeldig",
+            "input_genre": "$t(entity.genre, {\"count\": 1})",
+            "input_limit": "hvor mange sanger?",
+            "input_minYear": "fra år",
+            "input_maxYear": "til år",
+            "input_played": "avspillingsfilter",
+            "input_played_optionAll": "alle sanger",
+            "input_played_optionUnplayed": "bare uavspilte sanger",
+            "input_played_optionPlayed": "bare avspilte sanger"
         }
     },
     "page": {
@@ -503,7 +522,7 @@
             "playlists": "$t(entity.playlist, {\"count\": 2})",
             "search": "$t(common.search)",
             "settings": "$t(common.setting, {\"count\": 2})",
-            "shared": "delt $t(entity.playlist, {\"count\": 2})",
+            "shared": "delte $t(entity.playlist, {\"count\": 2})",
             "artists": "$t(entity.artist, {\"count\": 2})",
             "myLibrary": "mitt bibliotek"
         },
@@ -512,7 +531,8 @@
             "advanced": "avansert",
             "hotkeysTab": "hurtigtaster",
             "playbackTab": "avspilling",
-            "windowTab": "vindu"
+            "windowTab": "vindu",
+            "theme": "tema"
         },
         "playlistList": {
             "title": "$t(entity.playlist, {\"count\": 2})"

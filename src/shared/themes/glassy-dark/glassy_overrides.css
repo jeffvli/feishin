@@ -1,3 +1,4 @@
+/* stylelint-disable selector-class-pattern */
 .fs-player-bar-module-container {
     background: rgb(0 0 0 / 40%) !important;
     backdrop-filter: blur(2rem);
@@ -25,11 +26,9 @@
     border-radius: 18px !important;
 }
 
-/* stylelint-disable selector-class-pattern */
 .mantine-Modal-overlay {
     backdrop-filter: blur(3px);
 }
-/* stylelint-enable selector-class-pattern */
 
 .fs-modal-module-content,
 .fs-select-module-dropdown,
@@ -39,6 +38,7 @@
 .fs-dropdown-menu-module-menu-dropdown,
 .fs-accordion-module-panel {
     background: rgb(4 4 9 / 50%) !important;
+    border: 0;
     backdrop-filter: blur(2rem);
 
     button,
@@ -73,11 +73,9 @@
     border-radius: 18px;
 }
 
-/* stylelint-disable selector-class-pattern */
 .mantine-Center-root img {
     border-radius: 18px;
 }
-/* stylelint-enable selector-class-pattern */
 
 .ag-header {
     background-color: transparent !important;
@@ -88,11 +86,9 @@
     border-radius: 8px !important;
 }
 
-/* stylelint-disable selector-class-pattern */
 .favorite_icon .mantine-ActionIcon-icon {
     justify-content: left;
 }
-/* stylelint-enable selector-class-pattern */
 
 .fork-header svg {
     padding-left: 2px;
@@ -107,11 +103,9 @@
     border-radius: 8px !important;
 }
 
-/* stylelint-disable selector-class-pattern */
 .mantine-Table-th {
     background-color: transparent !important;
 }
-/* stylelint-enable selector-class-pattern */
 
 table {
     border: 0 !important;
@@ -121,11 +115,20 @@ table {
     border-radius: 8px;
 }
 
+/*
 .fs-main-content-module-main-content-container {
     height: 100vh;
 }
+*/
 
-/* stylelint-disable selector-class-pattern */
+.fs-main-content-module-main-content-body {
+    height: 100vh;
+}
+
+:has(.fs-window-bar-module-window-bar) .fs-main-content-module-main-content-container {
+    height: calc(100vh - 30px);
+}
+
 .mantine-Tabs-root {
     input {
         border-radius: 18px;
@@ -135,20 +138,18 @@ table {
         border-radius: 8px;
     }
 }
-/* stylelint-enable selector-class-pattern */
 
-/* stylelint-disable selector-class-pattern */
 .mantine-Slider-track::before {
     background-color: var(--theme-colors-surface);
 }
-/* stylelint-enable selector-class-pattern */
 
 /* stylelint-disable selector-not-notation */
-.fs-image-module-image:not(.ag-cell *)
-:not(.fs-left-controls-module-image *)
-:not(.fs-sidebar-playlist-list-module-row-group *) {
-    border-radius: 18px !important;
+.fs-image-module-image:not(.ag-cell *):not(.fs-left-controls-module-image *):not(
+        .fs-sidebar-playlist-list-module-row-group *
+    ) {
+    border-radius: 18px;
 }
+
 /* stylelint-enable selector-not-notation */
 
 .fs-left-controls-module-image {
@@ -156,9 +157,7 @@ table {
 }
 
 .fork-server-selector {
-    /* stylelint-disable selector-class-pattern */
     .mantine-SegmentedControl-indicator,
-    /* stylelint-enable selector-class-pattern */
     .fs-segmented-control-module-root,
     input,
     button {
@@ -182,20 +181,16 @@ table {
     border-radius: 12px;
 }
 
-/* stylelint-disable selector-class-pattern */
 .mantine-Accordion-label {
     button,
     a {
         border-radius: 8px;
     }
 }
-/* stylelint-enable selector-class-pattern */
 
-/* stylelint-disable selector-class-pattern */
 .mantine-Grid-col button {
     border-radius: 8px;
 }
-/* stylelint-enable selector-class-pattern */
 
 /* share dialog */
 .fs-modal-module-body {
@@ -212,11 +207,9 @@ table {
     align-items: normal !important;
 }
 
-/* stylelint-disable selector-class-pattern */
 .mantine-Badge-root {
     background: rgb(1 1 5 / 45%);
 }
-/* stylelint-enable selector-class-pattern */
 
 .fs-sidebar-module-image-container img {
     border-radius: 18px;
@@ -240,11 +233,9 @@ table {
     border-radius: 0 !important;
 }
 
-/* stylelint-disable selector-class-pattern */
 .fs-full-screen-player-module-container .mantine-Group-root button {
     border-radius: 100%;
 }
-/* stylelint-enable selector-class-pattern */
 
 .fs-full-screen-player-image-module-image {
     border-radius: 18px;
@@ -255,11 +246,9 @@ table {
 }
 
 .fs-segmented-control-module-label[data-active='true'],
-/* stylelint-disable selector-class-pattern */
 .mantine-SegmentedControl-control {
     border-radius: 8px;
 }
-/* stylelint-enable selector-class-pattern */
 
 .fs-table-config-module-group {
     border-radius: 8px;
@@ -267,4 +256,66 @@ table {
 
 .fs-server-selector-module-button-group {
     border-radius: 18px;
+}
+
+.fs-full-screen-player-module-container {
+    height: 100vh !important;
+
+    .fs-full-screen-player-module-responsive-container {
+        height: calc(100% - 250px);
+    }
+}
+
+.fs-skeleton-module-skeleton,
+.fs-select-module-root div input {
+    border-radius: 18px;
+}
+
+.mantine-Modal-content {
+    border: 0;
+    border-radius: 18px;
+}
+
+.fs-item-card-controls-module-container {
+    background: #03010186;
+    border-radius: 18px;
+    box-shadow: none;
+    backdrop-filter: blur(6px);
+    transition: linear backdrop-filter 0.25s;
+
+    button {
+        border-radius: 100% !important;
+    }
+}
+
+.fs-item-card-module-image-container::before {
+    display: none;
+}
+
+.fs-action-bar-module-container .mantine-Input-input {
+    background-color: var(--theme-colors-surface) !important;
+}
+
+.fs-library-background-overlay-module-background-overlay {
+    border-radius: 18px;
+}
+
+/* i really wanted to make this transparent but does not seem to be possible :( */
+.query-editor-container {
+    padding-bottom: 120px;
+}
+
+.fs-full-screen-player-queue-module-queue-container img {
+    border-radius: 8px !important;
+}
+
+/* attempt to patch the server selector, possible unintended consequences */
+
+.mantine-Accordion-root .mantine-Accordion-item {
+    background-color: transparent;
+    border: 0;
+}
+
+.fs-item-table-list-module-height-100 {
+    padding-bottom: 65px !important;
 }

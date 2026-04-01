@@ -58,14 +58,16 @@ export async function getSearchResults(
 ): Promise<InternetProviderLyricSearchResponse[] | null> {
     let result: AxiosResponse<LrcLibSearchResponse[]>;
 
-    if (!params.name) {
+    if (!params.name && !params.artist) {
         return null;
     }
+
+    const searchQuery = [params.name, params.artist].join(' ');
 
     try {
         result = await axios.get<LrcLibSearchResponse[]>(SEEARCH_URL, {
             params: {
-                q: params.name,
+                q: searchQuery,
             },
         });
     } catch (e) {

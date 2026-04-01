@@ -477,6 +477,36 @@ export const ControlSettings = memo(() => {
                           postProcess: 'sentenceCase',
                       }),
                   },
+                  {
+                      control: (
+                          <NumberInput
+                              defaultValue={playerbarSlider?.loadingDelay ?? 2}
+                              max={30}
+                              min={0}
+                              onBlur={(e) => {
+                                  setSettings({
+                                      general: {
+                                          ...settings,
+                                          playerbarSlider: {
+                                              ...playerbarSlider,
+                                              loadingDelay: e.currentTarget.value
+                                                  ? Number(e.currentTarget.value)
+                                                  : 2,
+                                          },
+                                      },
+                                  });
+                              }}
+                              rightSection={<Text size="sm">s</Text>}
+                              width={75}
+                          />
+                      ),
+                      description: t('setting.waveformLoadingDelay', {
+                          context: 'description',
+                          postProcess: 'sentenceCase',
+                      }),
+                      isHidden: false,
+                      title: t('setting.waveformLoadingDelay', { postProcess: 'sentenceCase' }),
+                  },
               ]
             : []),
     ];

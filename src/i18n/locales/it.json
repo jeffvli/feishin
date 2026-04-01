@@ -128,6 +128,7 @@
         "close": "chiudi",
         "codec": "codec",
         "mbid": "MusicBrainz ID",
+        "grouping": "raggruppamento",
         "preview": "anteprima",
         "reload": "aggiorna",
         "share": "condividi",

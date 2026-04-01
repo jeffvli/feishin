@@ -32,6 +32,7 @@ import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
+import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Select } from '/@/shared/components/select/select';
 import { Stack } from '/@/shared/components/stack/stack';
 import { useForm } from '/@/shared/hooks/use-form';
@@ -51,6 +52,7 @@ type DeleteArgs = {
 
 interface PlaylistQueryBuilderProps {
     limit?: number;
+    limitPercent?: number;
     playlistId?: string;
     query: any;
     sortBy: SongListSort | SongListSort[];
@@ -155,6 +157,7 @@ export type PlaylistQueryBuilderRef = {
     getFilters: () => {
         extraFilters: {
             limit?: number;
+            limitPercent?: number;
             sortBy?: string[];
             sortOrder?: string;
         };
@@ -164,7 +167,7 @@ export type PlaylistQueryBuilderRef = {
 
 export const PlaylistQueryBuilder = forwardRef(
     (
-        { limit, playlistId, query, sortBy, sortOrder }: PlaylistQueryBuilderProps,
+        { limit, limitPercent, playlistId, query, sortBy, sortOrder }: PlaylistQueryBuilderProps,
         ref: Ref<PlaylistQueryBuilderRef>,
     ) => {
         const { t } = useTranslation();
@@ -213,6 +216,8 @@ export const PlaylistQueryBuilder = forwardRef(
         const extraFiltersForm = useForm({
             initialValues: {
                 limit,
+                limitMode: limitPercent != null ? 'limitPercent' : 'limit',
+                limitPercent,
                 sortEntries: initialSortEntries,
             },
         });
@@ -224,16 +229,26 @@ export const PlaylistQueryBuilder = forwardRef(
                     const sortString = convertSortEntriesToSortString(
                         extraFiltersForm.values.sortEntries,
                     );
+                    const isLimitPercent = extraFiltersForm.values.limitMode === 'limitPercent';
                     return {
                         extraFilters: {
-                            limit: extraFiltersForm.values.limit,
+                            limit: isLimitPercent ? undefined : extraFiltersForm.values.limit,
+                            limitPercent: isLimitPercent
+                                ? extraFiltersForm.values.limitPercent
+                                : undefined,
                             sortBy: sortString ? [sortString] : undefined,
                         },
                         filters,
                     };
                 },
             }),
-            [extraFiltersForm.values.sortEntries, extraFiltersForm.values.limit, filters],
+            [
+                extraFiltersForm.values.sortEntries,
+                extraFiltersForm.values.limit,
+                extraFiltersForm.values.limitMode,
+                extraFiltersForm.values.limitPercent,
+                filters,
+            ],
         );
 
         const handleResetFilters = useCallback(() => {
@@ -608,10 +623,50 @@ export const PlaylistQueryBuilder = forwardRef(
                                 ))}
                             </Stack>
                             <NumberInput
-                                label={t('common.limit', { postProcess: 'titleCase' })}
-                                maxWidth="20%"
+                                label={
+                                    <Group align="center" gap="xs" wrap="nowrap">
+                                        {t('common.limit', { postProcess: 'titleCase' })}
+                                        <SegmentedControl
+                                            data={[
+                                                { label: '#', value: 'limit' },
+                                                { label: '%', value: 'limitPercent' },
+                                            ]}
+                                            onChange={(value) =>
+                                                extraFiltersForm.setFieldValue(
+                                                    'limitMode',
+                                                    value as 'limit' | 'limitPercent',
+                                                )
+                                            }
+                                            size="xs"
+                                            value={extraFiltersForm.values.limitMode}
+                                        />
+                                    </Group>
+                                }
+                                max={
+                                    extraFiltersForm.values.limitMode === 'limitPercent'
+                                        ? 100
+                                        : undefined
+                                }
+                                min={
+                                    extraFiltersForm.values.limitMode === 'limitPercent'
+                                        ? 0
+                                        : undefined
+                                }
+                                onChange={(value) => {
+                                    const nextValue =
+                                        value === '' || value == null ? undefined : Number(value);
+                                    if (extraFiltersForm.values.limitMode === 'limitPercent') {
+                                        extraFiltersForm.setFieldValue('limitPercent', nextValue);
+                                    } else {
+                                        extraFiltersForm.setFieldValue('limit', nextValue);
+                                    }
+                                }}
+                                value={
+                                    extraFiltersForm.values.limitMode === 'limitPercent'
+                                        ? extraFiltersForm.values.limitPercent
+                                        : extraFiltersForm.values.limit
+                                }
                                 width={75}
-                                {...extraFiltersForm.getInputProps('limit')}
                             />
                         </Group>
                     </Stack>

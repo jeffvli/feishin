@@ -34,7 +34,10 @@ import { LibraryItem } from '/@/shared/types/domain-types';
 export const LeftControls = () => {
     const { t } = useTranslation();
     const { setSideBar } = useAppStoreActions();
-    const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
+    const {
+        expanded: isFullScreenPlayerExpanded,
+        visualizerExpanded: isFullScreenVisualizerExpanded,
+    } = useFullScreenPlayerStore();
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
 
     const { collapsed, image } = useAppStore(
@@ -62,7 +65,14 @@ export const LeftControls = () => {
         }
 
         e?.stopPropagation();
-        setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
+
+        const shouldClose = isFullScreenPlayerExpanded || isFullScreenVisualizerExpanded;
+
+        if (shouldClose) {
+            setFullScreenPlayerStore({ expanded: false, visualizerExpanded: false });
+        } else {
+            setFullScreenPlayerStore({ expanded: true });
+        }
     };
 
     const handleToggleSidebarImage = (e?: MouseEvent<HTMLButtonElement>) => {

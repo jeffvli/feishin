@@ -19,7 +19,10 @@
         "clearQueue": "verwijder lijst",
         "openIn": {
             "lastfm": "Open in Last.fm",
-            "musicbrainz": "Open in MusicBrainz"
+            "musicbrainz": "Open in MusicBrainz",
+            "listenbrainz": "Openen in ListenBrainz",
+            "qobuz": "Openen in Qobuz",
+            "spotify": "Openen in Spotify"
         },
         "moveToNext": "ga naar volgende",
         "downloadStarted": "begonnen met downloaden van {{count}} items",
@@ -37,7 +40,8 @@
         "moveDown": "verplaats omlaag",
         "holdToMoveToTop": "ingedrukt houden om naar begin te verplaatsen",
         "holdToMoveToBottom": "ingedrukt houden om naar einde te verplaatsen",
-        "openApplicationDirectory": "applicatiemap openen"
+        "openApplicationDirectory": "applicatiemap openen",
+        "goToCurrent": "ga naar huidige item"
     },
     "common": {
         "backward": "achteruit",
@@ -130,6 +134,7 @@
         "bitDepth": "bitdiepte",
         "codec": "codec",
         "mbid": "MusicBrainz ID",
+        "grouping": "groepering",
         "share": "deel",
         "explicit": "expliciet",
         "sampleRate": "sample rate",
@@ -159,7 +164,9 @@
         "retry": "opnieuw proberen",
         "filter_single": "single",
         "rename": "hernoemen",
-        "filter_multiple": "meerdere"
+        "filter_multiple": "meerdere",
+        "numberOfResults": "{{numberOfResults}} resultaten",
+        "newVersionAvailable": "een nieuwe versie is beschikbaar"
     },
     "filter": {
         "rating": "rating",
@@ -452,7 +459,8 @@
         "saveQueueFailed": "kan wachtrij niet opslaan",
         "settingsSyncError": "Er zijn verschillen gevonden tussen de instellingen in de renderer en het hoofdproces. Start de applicatie opnieuw op om de wijzigingen toe te passen",
         "invalidJson": "ongeldige JSON",
-        "serverLockSingleServer": "slechts één server is toegestaan als server op slot is gezet"
+        "serverLockSingleServer": "slechts één server is toegestaan als server op slot is gezet",
+        "playbackPausedDueToError": "afspelen gepauzeerd vanwege een fout"
     },
     "entity": {
         "genre_one": "genre",
@@ -561,7 +569,8 @@
                 "title": "$t(common.title)",
                 "titleArtist": "$t(common.title) (artiest)",
                 "titleCombined": "$t(common.title) (gecombineerd)",
-                "year": "$t(common.year)"
+                "year": "$t(common.year)",
+                "albumGroup": "albumgroep"
             },
             "general": {
                 "advancedSettings": "geavanceerde instellingen",
@@ -954,7 +963,29 @@
         "automaticUpdates_description": "Zoek en installeer updates automatisch",
         "releaseChannel_optionAlpha": "alfa (nachtelijk)",
         "discordStateIcon": "toon afspeelicoon",
-        "discordStateIcon_description": "toon een klein afspeelicoon in de rich-presence-status. het gepauzeerde icoon wordt altijd getoond als \"rich presence tonen wanneer gepauzeerd\" is ingeschakeld"
+        "discordStateIcon_description": "toon een klein afspeelicoon in de rich-presence-status. het gepauzeerde icoon wordt altijd getoond als \"rich presence tonen wanneer gepauzeerd\" is ingeschakeld",
+        "autosave": "afspeelwachtrij automatisch opslaan",
+        "autosave_description": "schakel in dat de afspeelwachtrij automatisch wordt opgeslagen op je server. dit is enkel mogelijk bij gebruik van Navidrome/Subsonic met een niet-gemengde afspeelwachtrij.",
+        "autosaveCount": "frequentie automatisch opslaan afspeelwachtrij",
+        "autosaveCount_description": "aantal nummerwisselingen voordat de wachtrij wordt opgeslagen. bij 1 (het minimum) treedt dit bij elke nummerwissel op",
+        "useThemePrimaryShade": "gebruikt primaire tint van thema",
+        "useThemePrimaryShade_description": "gebruik de primaire tint die in het geselecteerde thema is ingesteld voor hoofdkleurvarianten",
+        "primaryShade": "primaire tint",
+        "primaryShade_description": "overschrijf de primaire tint (0-9) die wordt gebruikt voor knoppen, links en andere elementen die de hoofdkleur gebruiken",
+        "listenbrainz_description": "toon links naar ListenBrainz op artiest- en albumpagina's",
+        "listenbrainz": "toon ListenBrainz-links",
+        "qobuz_description": "toon links naar Qobuz op artiest- en albumpagina's",
+        "qobuz": "toon Qobuz-links",
+        "spotify_description": "toon links naar Spotify op artiest- en albumpagina's",
+        "spotify": "toon Spotify-links",
+        "nativeSpotify_description": "open de Spotify app in plaats van de webbrowser",
+        "nativeSpotify": "gebruik Spotify app",
+        "playerItemConfiguration_description": "stel in welke items en in welke volgorde te tonen in de volledigschermspeler",
+        "playerItemConfiguration": "configuratie van afspeel-item",
+        "sidePlayQueueLayout": "uitlijning afspeelwachtrij aan zijkant",
+        "sidePlayQueueLayout_description": "stel de uitlijning in voor de afspeelwachtrij die aan de zijkant is gekoppeld",
+        "sidePlayQueueLayout_optionHorizontal": "horizontaal",
+        "sidePlayQueueLayout_optionVertical": "verticaal"
     },
     "form": {
         "addServer": {
@@ -1013,8 +1044,7 @@
         "editPlaylist": {
             "title": "$t(entity.playlist, {\"count\": 1}) aanpassen",
             "publicJellyfinNote": "Jellyfin laat niet weten of een playlist publiek of privaat is. Als u wilt dat dit publiek blijft, selecteer de volgende invoer",
-            "success": "$t(entity.playlist, {\"count\": 1}) succesvol geüpdatet",
-            "editNote": "Handmatige bewerking wordt afgeraden voor grote afspeellijsten. Weet je zeker dat je het risico op dataverlies wilt accepteren door de bestaande afspeellijst te overschrijven?"
+            "success": "$t(entity.playlist, {\"count\": 1}) succesvol geüpdatet"
         },
         "updateServer": {
             "title": "update server",
@@ -1114,7 +1144,8 @@
         "sleepTimer_off": "uit",
         "sleepTimer_timeRemaining": "{{time}} resterend",
         "sleepTimer_setCustom": "timer instellen",
-        "sleepTimer_cancel": "timer annuleren"
+        "sleepTimer_cancel": "timer annuleren",
+        "albumRadio": "albumradio"
     },
     "datetime": {
         "minuteShort": "m",

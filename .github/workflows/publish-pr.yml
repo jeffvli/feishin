@@ -11,6 +11,7 @@ on:
 
 jobs:
     wait-for-lint:
+        if: github.event_name == 'pull_request'
         runs-on: ubuntu-latest
         steps:
             - name: Wait for Test workflow to complete
@@ -24,6 +25,7 @@ jobs:
 
     publish:
         needs: wait-for-lint
+        if: always() && (needs.wait-for-lint.result == 'success' || needs.wait-for-lint.result == 'skipped')
         runs-on: ${{ matrix.os }}
 
         strategy:
@@ -32,19 +34,19 @@ jobs:
 
         steps:
             - name: Checkout git repo
-              uses: actions/checkout@v3
+              uses: actions/checkout@v6
 
             - name: Install Node and PNPM
-              uses: pnpm/action-setup@v4.1.0
+              uses: pnpm/action-setup@v4
               with:
-                  version: 9
+                  version: 10
 
             - name: Install dependencies
               run: pnpm install
 
             - name: Build for Windows
               if: ${{ matrix.os == 'windows-latest' }}
-              uses: nick-invision/retry@v2.8.2
+              uses: nick-invision/retry@v3.0.2
               with:
                   timeout_minutes: 30
                   max_attempts: 3
@@ -54,7 +56,7 @@ jobs:
 
             - name: Build for Linux
               if: ${{ matrix.os == 'ubuntu-latest' }}
-              uses: nick-invision/retry@v2.8.2
+              uses: nick-invision/retry@v3.0.2
               with:
                   timeout_minutes: 30
                   max_attempts: 3
@@ -64,7 +66,7 @@ jobs:
 
             - name: Build for MacOS
               if: ${{ matrix.os == 'macos-latest' }}
-              uses: nick-invision/retry@v2.8.2
+              uses: nick-invision/retry@v3.0.2
               with:
                   timeout_minutes: 30
                   max_attempts: 3
@@ -90,21 +92,21 @@ jobs:
 
             - name: Upload Windows Binaries
               if: ${{ matrix.os == 'windows-latest' }}
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: windows-binaries
                   path: dist/windows-binaries.zip
 
             - name: Upload Linux Binaries
               if: ${{ matrix.os == 'ubuntu-latest' }}
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: linux-binaries
                   path: dist/linux-binaries.zip
 
             - name: Upload MacOS Binaries
               if: ${{ matrix.os == 'macos-latest' }}
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: macos-binaries
                   path: dist/macos-binaries.zip

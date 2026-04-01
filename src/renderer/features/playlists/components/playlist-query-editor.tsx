@@ -28,11 +28,21 @@ export interface PlaylistQueryEditorProps {
     detailQuery: ReturnType<typeof useQuery<any>>;
     handleSave: (
         filter: Record<string, any>,
-        extraFilters: { limit?: number; sortBy?: string[]; sortOrder?: string },
+        extraFilters: {
+            limit?: number;
+            limitPercent?: number;
+            sortBy?: string[];
+            sortOrder?: string;
+        },
     ) => void;
     handleSaveAs: (
         filter: Record<string, any>,
-        extraFilters: { limit?: number; sortBy?: string[]; sortOrder?: string },
+        extraFilters: {
+            limit?: number;
+            limitPercent?: number;
+            sortBy?: string[];
+            sortOrder?: string;
+        },
     ) => void;
     isQueryBuilderExpanded: boolean;
     onToggleExpand: () => void;
@@ -43,6 +53,7 @@ export interface PlaylistQueryEditorProps {
 
 type AppliedJsonState = {
     limit?: number;
+    limitPercent?: number;
     query: Record<string, any>;
     sort?: string;
 };
@@ -50,7 +61,7 @@ type AppliedJsonState = {
 type EditorMode = 'builder' | 'json';
 
 const serializeFiltersToRulesJson = (filters: {
-    extraFilters: { limit?: number; sortBy?: string[] };
+    extraFilters: { limit?: number; limitPercent?: number; sortBy?: string[] };
     filters: any;
 }): Record<string, any> => {
     const queryValue = convertQueryGroupToNDQuery(filters.filters);
@@ -58,18 +69,25 @@ const serializeFiltersToRulesJson = (filters: {
     return {
         ...queryValue,
         ...(filters.extraFilters.limit != null && { limit: filters.extraFilters.limit }),
+        ...(filters.extraFilters.limitPercent != null && {
+            limitPercent: filters.extraFilters.limitPercent,
+        }),
         ...(sortString && { sort: sortString }),
     };
 };
 
 const parseRulesJsonToSaveArgs = (
     parsed: Record<string, any>,
-): { extraFilters: { limit?: number; sortBy?: string[] }; filter: Record<string, any> } => {
+): {
+    extraFilters: { limit?: number; limitPercent?: number; sortBy?: string[] };
+    filter: Record<string, any>;
+} => {
     const rootKey = parsed.all ? 'all' : 'any';
     const filter = rootKey in parsed ? { [rootKey]: parsed[rootKey] } : { all: [] };
     return {
         extraFilters: {
             ...(parsed.limit != null && { limit: parsed.limit }),
+            ...(parsed.limitPercent != null && { limitPercent: parsed.limitPercent }),
             ...(parsed.sort != null && { sortBy: [parsed.sort] }),
         },
         filter,
@@ -93,7 +111,12 @@ export const PlaylistQueryEditor = ({
     const [appliedJsonState, setAppliedJsonState] = useState<AppliedJsonState | null>(null);
 
     const getFiltersForSave = useCallback((): null | {
-        extraFilters: { limit?: number; sortBy?: string[]; sortOrder?: string };
+        extraFilters: {
+            limit?: number;
+            limitPercent?: number;
+            sortBy?: string[];
+            sortOrder?: string;
+        };
         filter: Record<string, any>;
     } => {
         if (editorMode === 'json') {
@@ -124,6 +147,9 @@ export const PlaylistQueryEditor = ({
         const previewValue = {
             ...payload.filter,
             ...(payload.extraFilters.limit != null && { limit: payload.extraFilters.limit }),
+            ...(payload.extraFilters.limitPercent != null && {
+                limitPercent: payload.extraFilters.limitPercent,
+            }),
             ...(payload.extraFilters.sortBy?.[0] && { sort: payload.extraFilters.sortBy[0] }),
         };
         openModal({
@@ -208,6 +234,8 @@ export const PlaylistQueryEditor = ({
         [appliedJsonState?.query, detailQuery?.data?.rules],
     );
     const effectiveLimit = appliedJsonState?.limit ?? detailQuery?.data?.rules?.limit;
+    const effectiveLimitPercent =
+        appliedJsonState?.limitPercent ?? detailQuery?.data?.rules?.limitPercent;
     const effectiveSortBy = useMemo(
         () =>
             (appliedJsonState?.sort ? [appliedJsonState.sort] : parseSortBy()) as
@@ -233,6 +261,8 @@ export const PlaylistQueryEditor = ({
                         ? { ...effectiveQuery }
                         : { all: [] };
                     if (effectiveLimit != null) fallback.limit = effectiveLimit;
+                    if (effectiveLimitPercent != null)
+                        fallback.limitPercent = effectiveLimitPercent;
                     if (effectiveSortBy?.[0]) fallback.sort = effectiveSortBy[0];
                     if (!fallback.sort) fallback.sort = '+dateAdded';
                     setJsonText(JSON.stringify(fallback, null, 2));
@@ -248,6 +278,7 @@ export const PlaylistQueryEditor = ({
                         }
                         setAppliedJsonState({
                             limit: parsed.limit,
+                            limitPercent: parsed.limitPercent,
                             query: { [rootKey]: parsed[rootKey] },
                             sort: parsed.sort,
                         });
@@ -263,7 +294,16 @@ export const PlaylistQueryEditor = ({
                 setEditorMode('builder');
             }
         },
-        [editorMode, effectiveLimit, effectiveQuery, effectiveSortBy, jsonText, queryBuilderRef, t],
+        [
+            editorMode,
+            effectiveLimit,
+            effectiveLimitPercent,
+            effectiveQuery,
+            effectiveSortBy,
+            jsonText,
+            queryBuilderRef,
+            t,
+        ],
     );
 
     return (
@@ -367,6 +407,7 @@ export const PlaylistQueryEditor = ({
                         <PlaylistQueryBuilder
                             key={JSON.stringify(appliedJsonState ?? detailQuery?.data?.rules)}
                             limit={effectiveLimit}
+                            limitPercent={effectiveLimitPercent}
                             playlistId={playlistId}
                             query={effectiveQuery}
                             ref={queryBuilderRef}

@@ -44,13 +44,7 @@ import { Modal } from '/@/shared/components/modal/modal';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { useDisclosure } from '/@/shared/hooks/use-disclosure';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
-import {
-    LibraryItem,
-    Playlist,
-    SongListSort,
-    SortOrder,
-    UpdatePlaylistBody,
-} from '/@/shared/types/domain-types';
+import { LibraryItem, Song, SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
 interface PlaylistDetailSongListHeaderFiltersProps {
@@ -124,7 +118,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
     isSmartPlaylist,
 }: PlaylistDetailSongListHeaderFiltersProps) => {
     const { t } = useTranslation();
-    const { listKey: listKeyFromContext, mode, setMode } = useListContext();
+    const { listData, listKey: listKeyFromContext, mode, setMode } = useListContext();
     const { playlistId } = useParams() as { playlistId: string };
     const playlistTarget = usePlaylistTarget();
     const { setPlaylistBehavior } = useSettingsStoreActions();
@@ -170,10 +164,19 @@ export const PlaylistDetailSongListHeaderFilters = ({
         key: 'playlist-header-collapsed',
     });
 
+    const tracks = useMemo(() => {
+        if (!listData?.length) {
+            return [];
+        }
+
+        return (listData as Song[]).map((song) => song.id);
+    }, [listData]);
+
     return (
         <Flex justify="space-between" ref={containerRef}>
             <Group gap="sm" w="100%">
                 <Button
+                    disabled={isEditMode}
                     leftSection={<Icon icon="arrowLeftRight" />}
                     onClick={handleToggleDisplayMode}
                     variant="subtle"
@@ -199,15 +202,15 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 <MoreButton onClick={handleMore} />
             </Group>
             <Group gap="sm" wrap="nowrap">
-                {isViewEditMode && <SaveAndReplaceButton mode={mode} playlist={detailQuery.data} />}
+                {isViewEditMode && <SaveAndReplaceButton mode={mode} songIds={tracks} />}
                 {isViewEditMode && (
                     <Button
                         onClick={() => setMode?.(mode === 'edit' ? 'view' : 'edit')}
                         uppercase
-                        variant="subtle"
+                        variant={mode === 'edit' ? 'state-error' : 'subtle'}
                     >
                         {mode === 'edit'
-                            ? t('common.view', { postProcess: 'titleCase' })
+                            ? t('common.cancel', { postProcess: 'titleCase' })
                             : t('common.edit', { postProcess: 'titleCase' })}
                     </Button>
                 )}
@@ -248,39 +251,33 @@ export const PlaylistDetailSongListHeaderFilters = ({
     );
 };
 
-export const openSaveAndReplaceModal = (playlistId: string, updateBody: UpdatePlaylistBody) => {
+export const openSaveAndReplaceModal = (
+    playlistId: string,
+    songIds: string[],
+    onSuccess: () => void,
+) => {
     openContextModal({
-        innerProps: { playlistId, updateBody },
+        innerProps: { onSuccess, playlistId, songIds },
         modalKey: 'saveAndReplace',
         size: 'sm',
         title: i18n.t('common.saveAndReplace', { postProcess: 'titleCase' }) as string,
     });
 };
 
-const SaveAndReplaceButton = ({
-    mode,
-    playlist,
-}: {
-    mode: 'edit' | 'view' | undefined;
-    playlist: Playlist | undefined;
-}) => {
+const SaveAndReplaceButton = ({ mode, songIds }: { mode?: 'edit' | 'view'; songIds: string[] }) => {
     const { t } = useTranslation();
     const { playlistId } = useParams() as { playlistId: string };
+    const { setMode } = useListContext();
+
+    const onSuccess = useCallback(() => {
+        setMode?.('view');
+    }, [setMode]);
 
     const handleOpenModal = useCallback(() => {
-        if (!playlistId || !playlist) return;
+        if (!playlistId) return;
 
-        const updateBody: UpdatePlaylistBody = {
-            comment: playlist.description ?? '',
-            name: playlist.name,
-            ownerId: playlist.ownerId ?? '',
-            public: playlist.public ?? false,
-            queryBuilderRules: playlist.rules ?? undefined,
-            sync: playlist.sync ?? false,
-        };
-
-        openSaveAndReplaceModal(playlistId, updateBody);
-    }, [playlistId, playlist]);
+        openSaveAndReplaceModal(playlistId, songIds, onSuccess);
+    }, [playlistId, songIds, onSuccess]);
 
     if (mode === 'view') {
         return null;
@@ -297,78 +294,3 @@ const SaveAndReplaceButton = ({
         </Button>
     );
 };
-// const GenreFilterSelection = () => {
-//     const { t } = useTranslation();
-//     const { playlistId } = useParams() as { playlistId: string };
-//     const serverId = useCurrentServerId();
-
-//     const { data } = useQuery(playlistsQueries.songList({ query: { id: playlistId }, serverId }));
-
-//     const genres = useMemo(() => {
-//         const uniqueGenres = new Map<string, string>();
-
-//         data?.items.forEach((song) => {
-//             song.genres.forEach((genre) => {
-//                 if (genre.id) {
-//                     uniqueGenres.set(genre.id, genre.name);
-//                 }
-//             });
-//         });
-
-//         return Array.from(uniqueGenres.entries()).map(([id, name]) => ({
-//             label: name,
-//             value: id,
-//         }));
-//     }, [data?.items]);
-
-//     return (
-//         <Stack p="md" style={{ background: 'var(--theme-colors-surface)', height: '12rem' }}>
-//             <Text>{t('filter.genre', { postProcess: 'titleCase' })}</Text>
-//             <ScrollArea>
-//                 <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-//                     {genres.map((genre) => (
-//                         <li key={genre.value}>{genre.label}</li>
-//                     ))}
-//                 </ul>
-//             </ScrollArea>
-//         </Stack>
-//     );
-// };
-
-// const ArtistFilterSelection = () => {
-//     const { t } = useTranslation();
-//     const { playlistId } = useParams() as { playlistId: string };
-//     const serverId = useCurrentServerId();
-
-//     const { data } = useQuery(playlistsQueries.songList({ query: { id: playlistId }, serverId }));
-
-//     const artists = useMemo(() => {
-//         const uniqueArtists = new Map<string, string>();
-
-//         data?.items.forEach((song) => {
-//             song.artists.forEach((artist) => {
-//                 if (artist.id) {
-//                     uniqueArtists.set(artist.id, artist.name);
-//                 }
-//             });
-//         });
-
-//         return Array.from(uniqueArtists.entries()).map(([id, name]) => ({
-//             label: name,
-//             value: id,
-//         }));
-//     }, [data?.items]);
-
-//     return (
-//         <Stack style={{ height: '12rem' }}>
-//             <Text>{t('filter.artist', { postProcess: 'titleCase' })}</Text>
-//             <ScrollArea>
-//                 <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-//                     {artists.map((artist) => (
-//                         <li key={artist.value}>{artist.label}</li>
-//                     ))}
-//                 </ul>
-//             </ScrollArea>
-//         </Stack>
-//     );
-// };

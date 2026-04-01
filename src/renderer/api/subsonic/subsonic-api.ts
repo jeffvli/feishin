@@ -250,6 +250,23 @@ export const contract = c.router({
             200: ssType._response.topSongsList,
         },
     },
+    getTranscodeDecision: {
+        body: ssType._body.getTranscodeDecision,
+        method: 'POST',
+        path: 'getTranscodeDecision.view',
+        query: ssType._parameters.getTranscodeDecision,
+        responses: {
+            200: ssType._response.getTranscodeDecision,
+        },
+    },
+    getTranscodeStream: {
+        method: 'GET',
+        path: 'getTranscodeStream.view',
+        query: ssType._parameters.getTranscodeStream,
+        responses: {
+            200: z.string(),
+        },
+    },
     getUser: {
         method: 'GET',
         path: 'getUser.view',
@@ -392,7 +409,7 @@ export const ssApiClient = (args: {
     const { server, signal, silent, url } = args;
 
     return initClient(contract, {
-        api: async ({ headers, method, path }) => {
+        api: async ({ body, headers, method, path, rawQuery }) => {
             let baseUrl: string | undefined;
             const authParams: Record<string, any> = {};
 
@@ -423,19 +440,44 @@ export const ssApiClient = (args: {
                 url: `${baseUrl}/${api}`,
             };
 
-            const data = {
-                c: 'Feishin',
-                f: 'json',
-                v: '1.13.0',
-                ...authParams,
-                ...params,
-            };
+            const isGetTranscodeDecisionPost =
+                method === 'POST' && api === 'getTranscodeDecision.view';
 
-            if (hasFeature(server, ServerFeature.OS_FORM_POST)) {
+            if (isGetTranscodeDecisionPost && body != null) {
+                request.method = 'POST';
+                request.headers = {
+                    ...headers,
+                    'Content-Type': 'application/json',
+                };
+                request.data = body;
+                request.params = {
+                    c: 'Feishin',
+                    f: 'json',
+                    v: '1.13.0',
+                    ...authParams,
+                    ...(typeof rawQuery === 'object' && rawQuery !== null
+                        ? (rawQuery as Record<string, unknown>)
+                        : {}),
+                };
+            } else if (hasFeature(server, ServerFeature.OS_FORM_POST)) {
                 headers['Content-Type'] = 'application/x-www-form-urlencoded';
                 request.method = 'POST';
+                const data = {
+                    c: 'Feishin',
+                    f: 'json',
+                    v: '1.13.0',
+                    ...authParams,
+                    ...params,
+                };
                 request.data = qs.stringify(data, { arrayFormat: 'repeat' });
             } else {
+                const data = {
+                    c: 'Feishin',
+                    f: 'json',
+                    v: '1.13.0',
+                    ...authParams,
+                    ...params,
+                };
                 request.method = method;
                 request.params = data;
             }

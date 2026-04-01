@@ -2,21 +2,20 @@ import { closeAllModals, ContextModalProps } from '@mantine/modals';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useUpdatePlaylist } from '/@/renderer/features/playlists/mutations/update-playlist-mutation';
+import { useUpdatePlaylistTracks } from '/@/renderer/features/playlists/mutations/update-playlist-tracks-mutation';
 import { useCurrentServerId } from '/@/renderer/store';
 import { ConfirmModal } from '/@/shared/components/modal/modal';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
-import { UpdatePlaylistBody } from '/@/shared/types/domain-types';
 
 export const SaveAndReplaceContextModal = ({
     innerProps,
-}: ContextModalProps<{ playlistId: string; updateBody: UpdatePlaylistBody }>) => {
+}: ContextModalProps<{ onSuccess: () => void; playlistId: string; songIds: string[] }>) => {
     const { t } = useTranslation();
-    const { playlistId, updateBody } = innerProps;
+    const { onSuccess, playlistId, songIds } = innerProps;
     const serverId = useCurrentServerId();
 
-    const updatePlaylistMutation = useUpdatePlaylist({});
+    const updatePlaylistMutation = useUpdatePlaylistTracks({});
 
     const handleConfirm = useCallback(() => {
         if (!serverId || !playlistId) {
@@ -27,8 +26,10 @@ export const SaveAndReplaceContextModal = ({
         updatePlaylistMutation.mutate(
             {
                 apiClientProps: { serverId },
-                body: updateBody,
-                query: { id: playlistId },
+                body: {
+                    id: playlistId,
+                    songIds,
+                },
             },
             {
                 onError: (err) => {
@@ -41,6 +42,7 @@ export const SaveAndReplaceContextModal = ({
                     });
                 },
                 onSuccess: () => {
+                    onSuccess();
                     closeAllModals();
                     toast.success({
                         message: t('form.editPlaylist.success', {
@@ -50,11 +52,11 @@ export const SaveAndReplaceContextModal = ({
                 },
             },
         );
-    }, [t, serverId, playlistId, updateBody, updatePlaylistMutation]);
+    }, [serverId, playlistId, updatePlaylistMutation, songIds, t, onSuccess]);
 
     return (
         <ConfirmModal loading={updatePlaylistMutation.isPending} onConfirm={handleConfirm}>
-            <Text>{t('form.editPlaylist.editNote', { postProcess: 'sentenceCase' })}</Text>
+            <Text>{t('common.areYouSure', { postProcess: 'sentenceCase' })}</Text>
         </ConfirmModal>
     );
 };

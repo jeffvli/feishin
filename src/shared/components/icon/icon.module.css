@@ -34,6 +34,19 @@
     font-size: var(--theme-font-size-5xl);
 }
 
+img.size-xs,
+img.size-sm,
+img.size-md,
+img.size-lg,
+img.size-xl,
+img.size-2xl,
+img.size-3xl,
+img.size-4xl,
+img.size-5xl {
+    width: 1em;
+    height: 1em;
+}
+
 .color-default {
     color: var(--theme-colors-foreground);
 }

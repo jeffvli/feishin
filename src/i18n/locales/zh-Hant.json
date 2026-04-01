@@ -116,7 +116,9 @@
         "itemsMore": "{{count}} 更多",
         "filter_single": "單選",
         "filter_multiple": "複選",
-        "newVersionAvailable": "有新的版本可供使用"
+        "newVersionAvailable": "有新的版本可供使用",
+        "numberOfResults": "{{numberOfResults}} 項結果",
+        "grouping": "分組"
     },
     "error": {
         "endpointNotImplementedError": "{{serverType}} 尚未實現端點 {{endpoint}}",
@@ -776,7 +778,21 @@
         "autosave": "自動儲存播放佇列",
         "autosave_description": "啟用自動將播放佇列儲存到您的伺服器。這只有在使用Navidrome/Subsonic時才可使用，並且您不能有混合播放佇列。",
         "autosaveCount": "自動播放佇列儲存頻率",
-        "autosaveCount_description": "在儲存佇列之前，有多少曲目更改。1（最小）表示每次歌曲更改"
+        "autosaveCount_description": "在儲存佇列之前，有多少曲目更改。1（最小）表示每次歌曲更改",
+        "spotify_description": "在藝人與專輯頁面顯示 Spotify 的連結",
+        "spotify": "顯示 Spotify 的連結",
+        "nativeSpotify_description": "在 Spotify 應用程式中開啟，而非在瀏覽器中開啟",
+        "nativeSpotify": "使用 Spotify 應用程式",
+        "sidePlayQueueLayout": "側邊播放佇列佈局",
+        "sidePlayQueueLayout_description": "設定吸附側邊播放佇列的佈局",
+        "sidePlayQueueLayout_optionHorizontal": "水平",
+        "sidePlayQueueLayout_optionVertical": "垂直",
+        "listenbrainz_description": "在藝術家/專輯頁面上顯示 ListenBrainz 的連結",
+        "listenbrainz": "顯示 ListenBrainz 連結",
+        "qobuz_description": "在藝術家/專輯頁面上顯示 Qobuz 的連結",
+        "qobuz": "顯示 Qobuz 連結",
+        "waveformLoadingDelay": "波形載入延遲",
+        "waveformLoadingDelay_description": "載入波形前的延遲（以秒為單位）。如果您在使用網頁播放器時遇到卡頓，請增加此值。"
     },
     "table": {
         "config": {
@@ -908,7 +924,10 @@
         "moveToNext": "移至下一項",
         "openIn": {
             "lastfm": "在Last.fm開啟",
-            "musicbrainz": "在MusicBrainz開啟"
+            "musicbrainz": "在MusicBrainz開啟",
+            "spotify": "在 Spotify 中開啟",
+            "listenbrainz": "在 ListenBrainz 中開啟",
+            "qobuz": "在 Qobuz 中開啟"
         },
         "downloadStarted": "已開始下載 {{count}} 項內容",
         "moveItems": "移動項目",
@@ -1059,8 +1078,7 @@
         "editPlaylist": {
             "title": "編輯$t(entity.playlist, {\"count\": 1})",
             "publicJellyfinNote": "Jellyfin 出於某種原因，不會顯示播放清單是否公開。如果您希望保持公開狀態，請選擇以下輸入",
-            "success": "$t(entity.playlist, {\"count\": 1}) 更新成功",
-            "editNote": "不建議手動編輯大型播放清單，你確定要承擔覆寫現有播放清單可能造成的資料遺失風險嗎？"
+            "success": "$t(entity.playlist, {\"count\": 1}) 更新成功"
         },
         "shareItem": {
             "allowDownloading": "允許下載",

@@ -332,8 +332,7 @@
         "editPlaylist": {
             "success": "$t(entity.playlist, {\"count\": 1}) päivitetty onnistuneesti",
             "title": "muokkaa $t(entity.playlist, {\"count\": 1})",
-            "publicJellyfinNote": "Jellyfin ei jostain syystä kerro onko soittolista julkinen vai ei. Jos haluat sen pysyvän julkisena, pidä seuraava valinta valittuna",
-            "editNote": "manuaalisia muokkauksia ei suositella suurille soittolistoille. haluatko varmasti hyväksyä riskin, että nykyinen soittolista ylikirjoitetaan ja tietoja voi hävitä?"
+            "publicJellyfinNote": "Jellyfin ei jostain syystä kerro onko soittolista julkinen vai ei. Jos haluat sen pysyvän julkisena, pidä seuraava valinta valittuna"
         },
         "lyricSearch": {
             "input_artist": "$t(entity.artist, {\"count\": 1})",

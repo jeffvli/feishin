@@ -72,12 +72,24 @@ export const NDSongQueryFields = [
     { label: 'Album Artist', type: 'string', value: 'albumartist' },
     { label: 'Album Artists', type: 'string', value: 'albumartists' },
     { label: 'Album Comment', type: 'string', value: 'albumcomment' },
+    { label: 'Album Date Favorited', type: 'date', value: 'albumdateloved' },
+    { label: 'Album Date Last Played', type: 'date', value: 'albumlastplayed' },
+    { label: 'Album Date Rated', type: 'date', value: 'albumdaterated' },
+    { label: 'Album Is Favorite', type: 'boolean', value: 'albumloved' },
+    { label: 'Album Play Count', type: 'number', value: 'albumplaycount' },
+    { label: 'Album Rating', type: 'number', value: 'albumrating' },
     { label: 'Album Type', type: 'string', value: 'albumtype' },
     { label: 'Album Version', type: 'string', value: 'albumversion' },
     { label: 'Arranger', type: 'string', value: 'arranger' },
     { label: 'Artist', type: 'string', value: 'artist' },
+    { label: 'Artist Date Favorited', type: 'date', value: 'artistdateloved' },
+    { label: 'Artist Date Last Played', type: 'date', value: 'artistlastplayed' },
+    { label: 'Artist Date Rated', type: 'date', value: 'artistdaterated' },
+    { label: 'Artist Is Favorite', type: 'boolean', value: 'artistloved' },
+    { label: 'Artist Play Count', type: 'number', value: 'artistplaycount' },
     { label: 'Artists', type: 'string', value: 'artists' },
     { label: 'ASIN', type: 'string', value: 'asin' },
+    { label: 'Average Rating', type: 'number', value: 'averagerating' },
     { label: 'Barcode', type: 'string', value: 'barcode' },
     { label: 'Bit Depth', type: 'number', value: 'bitdepth' },
     { label: 'Bitrate', type: 'number', value: 'bitrate' },
@@ -588,6 +600,14 @@ const songListParameters = paginationParameters.extend({
     year: z.number().optional(),
 });
 
+const playlistRules = z
+    .object({
+        limit: z.number().optional(),
+        limitPercent: z.number().optional(),
+        sort: z.string().optional(),
+    })
+    .catchall(z.any());
+
 const playlist = z.object({
     comment: z.string(),
     createdAt: z.string(),
@@ -599,7 +619,7 @@ const playlist = z.object({
     ownerName: z.string(),
     path: z.string(),
     public: z.boolean(),
-    rules: z.record(z.string(), z.any()),
+    rules: playlistRules,
     size: z.number(),
     songCount: z.number(),
     sync: z.boolean(),
@@ -631,7 +651,7 @@ const createPlaylistParameters = z.object({
     name: z.string(),
     ownerId: z.string().optional(),
     public: z.boolean().optional(),
-    rules: z.record(z.any()).optional(),
+    rules: playlistRules.optional(),
     sync: z.boolean().optional(),
 });
 

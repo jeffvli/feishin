@@ -19,7 +19,10 @@
         "setRating": "oceń",
         "openIn": {
             "lastfm": "Otwórz w Last.fm",
-            "musicbrainz": "Otwórz w MusicBrainz"
+            "musicbrainz": "Otwórz w MusicBrainz",
+            "listenbrainz": "Otwórz w ListenBrainz",
+            "qobuz": "Otwórz w Qobuz",
+            "spotify": "Otwórz w Spotify"
         },
         "moveToNext": "przesuń na następne",
         "downloadStarted": "rozpoczęto pobieranie {{count}} elementów",
@@ -165,7 +168,8 @@
         "filter_multiple": "multi",
         "filter_single": "single",
         "rename": "zmień nazwę",
-        "newVersionAvailable": "nowa wersja jest dostępna"
+        "newVersionAvailable": "nowa wersja jest dostępna",
+        "numberOfResults": "{{numberOfResults}} wyników"
     },
     "entity": {
         "genre_one": "gatunek",
@@ -370,8 +374,7 @@
         "editPlaylist": {
             "title": "edytuj $t(entity.playlist, {\"count\": 1})",
             "success": "$t(entity.playlist, {\"count\": 1}) zaktualizowana pomyślnie",
-            "publicJellyfinNote": "Z jakiegoś powodu Jellyfin nie udostępnia informacji na temat publiczności playlisty. Jeżeli chcesz, aby ta pozostała publiczna, mniej wybraną poniższą opcję",
-            "editNote": "manualne edytowanie nie jest zalecane dla dużych playlist. czy na pewno zgadzasz się na ryzyko utraty danych wywołane przez nadpisanie istniejącej playlisty?"
+            "publicJellyfinNote": "Z jakiegoś powodu Jellyfin nie udostępnia informacji na temat publiczności playlisty. Jeżeli chcesz, aby ta pozostała publiczna, mniej wybraną poniższą opcję"
         },
         "shareItem": {
             "allowDownloading": "zezwól na pobieranie",
@@ -1041,7 +1044,21 @@
         "playerItemConfiguration_description": "skonfiguruj jakie elementy są pokazywane i w jakiej kolejności, w odtwarzaczu pełnoekranowym",
         "playerItemConfiguration": "konfiguracja elementów odtwarzacza",
         "autosave": "automatycznie zapisuj kolejkę odtwarzania",
-        "autosave_description": "włącz automatyczne zapisywanie kolejki odtwarzania na twój serwer. to jest możliwe tylko gdy używane jest Navidrome/Subsonic, i nie masz zmixowanej kolejki odtwarzania."
+        "autosave_description": "włącz automatyczne zapisywanie kolejki odtwarzania na twój serwer. to jest możliwe tylko gdy używane jest Navidrome/Subsonic, i nie masz zmixowanej kolejki odtwarzania.",
+        "autosaveCount": "częstotliwość automatycznego zapisywania kolejki odtwarzania",
+        "autosaveCount_description": "ile razy piosenka zostanie zmieniona przed zapisaniem kolejki. 1 (najmniejsze) oznacza zapisywanie kolejki po każdej zmianie piosenki",
+        "listenbrainz_description": "pokaż linki do ListenBrainz na stronach wykonawców/albumów",
+        "listenbrainz": "pokaż linki ListenBrainz",
+        "qobuz_description": "pokaż linki do Qobuz na stronach wykonawców/albumów",
+        "qobuz": "pokaż linki Qobuz",
+        "spotify_description": "pokaż linki do Spotify na stronach wykonawców/albumów",
+        "spotify": "pokaż linki Spotify",
+        "nativeSpotify_description": "otwieraj w aplikacji Spotify zamiast w twojej przeglądarce",
+        "nativeSpotify": "używaj aplikacji Spotify",
+        "sidePlayQueueLayout": "układ boczny kolejki odtwarzania",
+        "sidePlayQueueLayout_description": "ustawia układ przyczepionej z boku kolejki odtwarzania",
+        "sidePlayQueueLayout_optionHorizontal": "poziomy",
+        "sidePlayQueueLayout_optionVertical": "pionowy"
     },
     "table": {
         "config": {
