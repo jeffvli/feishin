@@ -29,7 +29,7 @@ import packageJson from '../../package.json';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
-import MenuBuilder from './menu';
+import MenuBuilder, { MenuPlaybackState } from './menu';
 import {
     autoUpdaterLogInterface,
     createLog,
@@ -41,7 +41,7 @@ import {
 } from './utils';
 import './features';
 
-import { PlayerType, TitleTheme } from '/@/shared/types/types';
+import { PlayerRepeat, PlayerStatus, PlayerType, TitleTheme } from '/@/shared/types/types';
 
 const ALPHA_UPDATER_CONFIG: {
     bucket: string;
@@ -277,6 +277,13 @@ let tray: null | Tray = null;
 let exitFromTray = false;
 let forceQuit = false;
 let powerSaveBlockerId: null | number = null;
+let menuBuilder: MenuBuilder | null = null;
+let currentPlaybackStatus: PlayerStatus = PlayerStatus.PAUSED;
+let currentPrivateMode = false;
+let currentRepeatMode: PlayerRepeat = PlayerRepeat.NONE;
+let currentSidebarCollapsed = false;
+let currentShuffleEnabled = false;
+let playbackMenuAccelerators: MenuPlaybackState['accelerators'] = {};
 
 if (process.env.NODE_ENV === 'production') {
     import('source-map-support').then((sourceMapSupport) => {
@@ -331,6 +338,23 @@ const getAssetPath = (...paths: string[]): string => {
 
 export const getMainWindow = () => {
     return mainWindow;
+};
+
+const rebuildMainMenu = () => {
+    if (!menuBuilder || !mainWindow) return;
+
+    menuBuilder.buildMenu({
+        accelerators: playbackMenuAccelerators,
+        playbackStatus: currentPlaybackStatus,
+        privateMode: currentPrivateMode,
+        repeatMode: currentRepeatMode,
+        shuffleEnabled: currentShuffleEnabled,
+        sidebarCollapsed: currentSidebarCollapsed,
+    });
+
+    if (process.platform !== 'darwin') {
+        Menu.setApplicationMenu(null);
+    }
 };
 
 export const sendToastToRenderer = ({
@@ -699,12 +723,8 @@ async function createWindow(first = true): Promise<void> {
         });
     }
 
-    const menuBuilder = new MenuBuilder(mainWindow);
-    menuBuilder.buildMenu();
-
-    if (process.platform !== 'darwin') {
-        Menu.setApplicationMenu(null);
-    }
+    menuBuilder = new MenuBuilder(mainWindow);
+    rebuildMainMenu();
 
     // Open URLs in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
@@ -782,6 +802,17 @@ enum BindingActions {
     VOLUME_UP = 'volumeUp',
 }
 
+const getMenuAccelerator = (
+    data: Record<BindingActions, { allowGlobal: boolean; hotkey: string; isGlobal: boolean }>,
+    action: BindingActions,
+) => {
+    const hotkey = data[action]?.hotkey;
+
+    if (!hotkey) return undefined;
+
+    return hotkeyToElectronAccelerator(hotkey);
+};
+
 const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
     [BindingActions.GLOBAL_SEARCH]: () => {},
     [BindingActions.LOCAL_SEARCH]: () => {},
@@ -833,6 +864,26 @@ ipcMain.on(
                     HOTKEY_ACTIONS[shortcut as BindingActions]();
                 });
             }
+        }
+
+        playbackMenuAccelerators = {
+            next: getMenuAccelerator(data, BindingActions.NEXT),
+            playPause:
+                getMenuAccelerator(data, BindingActions.PLAY_PAUSE) ||
+                getMenuAccelerator(data, BindingActions.PLAY) ||
+                getMenuAccelerator(data, BindingActions.PAUSE),
+            previous: getMenuAccelerator(data, BindingActions.PREVIOUS),
+            repeat: getMenuAccelerator(data, BindingActions.TOGGLE_REPEAT),
+            seekBackward: getMenuAccelerator(data, BindingActions.SKIP_BACKWARD),
+            seekForward: getMenuAccelerator(data, BindingActions.SKIP_FORWARD),
+            shuffle: getMenuAccelerator(data, BindingActions.SHUFFLE),
+            stop: getMenuAccelerator(data, BindingActions.STOP),
+            volumeDown: getMenuAccelerator(data, BindingActions.VOLUME_DOWN),
+            volumeUp: getMenuAccelerator(data, BindingActions.VOLUME_UP),
+        };
+
+        if (isMacOS()) {
+            rebuildMainMenu();
         }
 
         const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
@@ -975,3 +1026,43 @@ if (!ipcMain.eventNames().includes('open-application-directory')) {
         shell.openPath(userDataPath);
     });
 }
+
+ipcMain.on('update-playback', (_event, status: PlayerStatus) => {
+    currentPlaybackStatus = status;
+
+    if (!isMacOS()) return;
+
+    rebuildMainMenu();
+});
+
+ipcMain.on('update-repeat', (_event, repeat: PlayerRepeat) => {
+    currentRepeatMode = repeat;
+
+    if (!isMacOS()) return;
+
+    rebuildMainMenu();
+});
+
+ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
+    currentShuffleEnabled = shuffle;
+
+    if (!isMacOS()) return;
+
+    rebuildMainMenu();
+});
+
+ipcMain.on('update-private-mode', (_event, privateMode: boolean) => {
+    currentPrivateMode = privateMode;
+
+    if (!isMacOS()) return;
+
+    rebuildMainMenu();
+});
+
+ipcMain.on('update-sidebar-collapsed', (_event, collapsedSidebar: boolean) => {
+    currentSidebarCollapsed = collapsedSidebar;
+
+    if (!isMacOS()) return;
+
+    rebuildMainMenu();
+});
