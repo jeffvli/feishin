@@ -1,5 +1,5 @@
 /* eslint-disable perfectionist/sort-imports */
-import { MantineProvider } from '@mantine/core';
+import { Box, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import 'overlayscrollbars/overlayscrollbars.css';
 import '/styles/overlayscrollbars.css';
@@ -79,7 +79,9 @@ const AppShell = memo(function AppShell() {
             <WebAudioContext.Provider value={webAudioProvider}>
                 <PlayerProvider>
                     <AudioPlayers />
-                    <AppRouter />
+                    <Box h="100%" pb={90}>
+                        <AppRouter />
+                    </Box>
                 </PlayerProvider>
             </WebAudioContext.Provider>
             <Suspense fallback={null}>
