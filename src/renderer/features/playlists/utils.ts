@@ -36,7 +36,7 @@ export function playlistSongsToAlbums(songs: Song[]): PlaylistAlbumRow[] {
             mbzReleaseGroupId: null,
             name: song.album ?? '',
             originalDate: null,
-            originalYear: null,
+            originalYear: 0,
             participants: song.participants,
             playCount: null,
             recordLabels: [],

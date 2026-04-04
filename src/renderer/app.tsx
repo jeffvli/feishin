@@ -7,7 +7,7 @@ import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
 import isElectron from 'is-electron';
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import i18n from '/@/i18n/i18n';
 import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
@@ -38,66 +38,25 @@ const UpdateAvailableDialog = lazy(() =>
 const ipc = isElectron() ? window.api.ipc : null;
 
 export const App = () => {
+    return <ThemedApp />;
+};
+
+const ThemedApp = () => {
     const { mode, theme } = useAppTheme();
-    const language = useLanguage();
 
-    const { content, enabled } = useCssSettings();
-    const { bindings } = useHotkeySettings();
-    const cssRef = useRef<HTMLStyleElement | null>(null);
+    return (
+        <MantineProvider forceColorScheme={mode} theme={theme}>
+            <AppShell />
+        </MantineProvider>
+    );
+};
 
-    useSyncSettingsToMain();
-    useCheckForUpdates();
-
+const AppShell = memo(function AppShell() {
     const [webAudio, setWebAudio] = useState<WebAudio>();
-
-    useEffect(() => {
-        if (enabled && content) {
-            // Yes, CSS is sanitized here as well. Prevent a suer from changing the
-            // localStorage to bypass sanitizing.
-            const sanitized = sanitizeCss(content);
-            if (!cssRef.current) {
-                cssRef.current = document.createElement('style');
-                document.body.appendChild(cssRef.current);
-            }
-
-            cssRef.current.textContent = sanitized;
-
-            return () => {
-                cssRef.current!.textContent = '';
-            };
-        }
-
-        return () => {};
-    }, [content, enabled]);
 
     const webAudioProvider = useMemo(() => {
         return { setWebAudio, webAudio };
     }, [webAudio]);
-
-    useEffect(() => {
-        if (isElectron()) {
-            ipc?.send('set-global-shortcuts', bindings);
-        }
-    }, [bindings]);
-
-    useEffect(() => {
-        if (language) {
-            i18n.changeLanguage(language);
-        }
-    }, [language]);
-
-    useEffect(() => {
-        if (isElectron()) {
-            window.api.utils.rendererOpenSettings(() => {
-                openSettingsModal();
-            });
-
-            return () => {
-                ipc?.removeAllListeners('renderer-open-settings');
-            };
-        }
-        return undefined;
-    }, []);
 
     const notificationStyles = useMemo(
         () => ({
@@ -109,7 +68,8 @@ export const App = () => {
     );
 
     return (
-        <MantineProvider forceColorScheme={mode} theme={theme}>
+        <>
+            <AppEffects />
             <Notifications
                 containerWidth="300px"
                 position="bottom-center"
@@ -126,6 +86,104 @@ export const App = () => {
                 <ReleaseNotesModal />
                 <UpdateAvailableDialog />
             </Suspense>
-        </MantineProvider>
+        </>
     );
+});
+
+const AppEffects = () => (
+    <>
+        <SyncSettingsEffect />
+        <UpdateCheckEffect />
+        <CssSettingsEffect />
+        <GlobalShortcutsEffect />
+        <LanguageEffect />
+        <OpenSettingsEffect />
+    </>
+);
+
+const SyncSettingsEffect = () => {
+    useSyncSettingsToMain();
+
+    return null;
+};
+
+const UpdateCheckEffect = () => {
+    useCheckForUpdates();
+
+    return null;
+};
+
+const CssSettingsEffect = () => {
+    const { content, enabled } = useCssSettings();
+    const cssRef = useRef<HTMLStyleElement | null>(null);
+
+    useEffect(() => {
+        if (!enabled || !content) {
+            if (cssRef.current) {
+                cssRef.current.textContent = '';
+            }
+
+            return;
+        }
+
+        // Yes, CSS is sanitized here as well. Prevent a user from changing the
+        // localStorage to bypass sanitizing.
+        const sanitized = sanitizeCss(content);
+        if (!cssRef.current) {
+            cssRef.current = document.createElement('style');
+            document.body.appendChild(cssRef.current);
+        }
+
+        cssRef.current.textContent = sanitized;
+
+        return () => {
+            if (cssRef.current) {
+                cssRef.current.textContent = '';
+            }
+        };
+    }, [content, enabled]);
+
+    return null;
+};
+
+const GlobalShortcutsEffect = () => {
+    const { bindings } = useHotkeySettings();
+
+    useEffect(() => {
+        if (isElectron()) {
+            ipc?.send('set-global-shortcuts', bindings);
+        }
+    }, [bindings]);
+
+    return null;
+};
+
+const LanguageEffect = () => {
+    const language = useLanguage();
+
+    useEffect(() => {
+        if (language) {
+            i18n.changeLanguage(language);
+        }
+    }, [language]);
+
+    return null;
+};
+
+const OpenSettingsEffect = () => {
+    useEffect(() => {
+        if (isElectron()) {
+            window.api.utils.rendererOpenSettings(() => {
+                openSettingsModal();
+            });
+
+            return () => {
+                ipc?.removeAllListeners('renderer-open-settings');
+            };
+        }
+
+        return undefined;
+    }, []);
+
+    return null;
 };

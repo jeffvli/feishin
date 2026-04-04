@@ -7,9 +7,17 @@ import { Icon } from '/@/shared/components/icon/icon';
 
 interface SpoilerProps extends Omit<MantineSpoilerProps, 'hideLabel' | 'showLabel'> {
     children?: ReactNode;
+    hideLabel?: ReactNode;
+    showLabel?: ReactNode;
 }
 
-export const Spoiler = ({ children, maxHeight = 56, ...props }: SpoilerProps) => {
+export const Spoiler = ({
+    children,
+    hideLabel,
+    maxHeight = 56,
+    showLabel,
+    ...props
+}: SpoilerProps) => {
     const [expanded, setExpanded] = useState(false);
 
     return (
@@ -18,9 +26,9 @@ export const Spoiler = ({ children, maxHeight = 56, ...props }: SpoilerProps) =>
             expanded={expanded}
             maxHeight={maxHeight}
             {...props}
-            hideLabel={<Icon icon="arrowUpS" size="lg" />}
+            hideLabel={hideLabel ?? <Icon icon="arrowUpS" size="lg" />}
             onClick={() => setExpanded(!expanded)}
-            showLabel={<Icon icon="arrowDownS" size="lg" />}
+            showLabel={showLabel ?? <Icon icon="arrowDownS" size="lg" />}
         >
             {children}
         </MantineSpoiler>

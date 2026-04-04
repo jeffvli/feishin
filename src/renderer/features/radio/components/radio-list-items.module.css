@@ -20,11 +20,55 @@
 
 .radio-item-button {
     all: unset;
+    box-sizing: border-box;
+    display: block;
     flex: 1;
     width: 100%;
+    min-width: 0;
+    text-align: left;
+    cursor: pointer;
+}
+
+.thumbnail {
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    overflow: hidden;
+    border-radius: var(--mantine-radius-md);
+}
+
+.image-container {
+    width: 3rem;
+    height: 3rem;
+}
+
+.meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.meta-line {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .radio-item-link {
     color: inherit;
     text-decoration: underline;
+}
+
+.radio-item-actions {
+    flex-shrink: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.radio-item:hover .radio-item-actions,
+.radio-item:focus-within .radio-item-actions {
+    pointer-events: auto;
+    opacity: 1;
 }

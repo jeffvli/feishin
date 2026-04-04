@@ -175,13 +175,18 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
     );
 
     useEffect(() => {
+        if (!isResizing && !isResizingRight) {
+            return;
+        }
+
         window.addEventListener('mousemove', resize);
         window.addEventListener('mouseup', stopResizing);
+
         return () => {
             window.removeEventListener('mousemove', resize);
             window.removeEventListener('mouseup', stopResizing);
         };
-    }, [resize, stopResizing]);
+    }, [isResizing, isResizingRight, resize, stopResizing]);
 
     return (
         <motion.div

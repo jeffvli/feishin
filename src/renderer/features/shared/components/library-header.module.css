@@ -112,6 +112,7 @@
 }
 
 .image-section {
+    position: relative;
     z-index: 15;
     display: flex;
     grid-area: image;
@@ -122,6 +123,21 @@
     @container (min-width: $mantine-breakpoint-sm) {
         align-items: flex-end;
     }
+}
+
+.image-overlay {
+    position: absolute;
+    right: var(--theme-spacing-xs);
+    bottom: var(--theme-spacing-xs);
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 120ms ease;
+}
+
+.image-section:hover .image-overlay {
+    pointer-events: auto;
+    opacity: 1;
 }
 
 .metadata-section {

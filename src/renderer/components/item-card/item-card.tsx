@@ -22,9 +22,9 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useShowRatings } from '/@/renderer/store';
 import {
     formatDateAbsolute,
-    formatDateAbsoluteUTC,
     formatDateRelative,
     formatDurationString,
+    formatPartialIsoDateUTC,
     formatRating,
 } from '/@/renderer/utils/format';
 import { SEPARATOR_STRING } from '/@/shared/api/utils';
@@ -1161,12 +1161,10 @@ export const getDataRows = (type?: 'compact' | 'default' | 'poster'): DataRow[] 
         },
         {
             format: (data) => {
-                if ('releaseYear' in data && data.releaseYear !== null) {
+                if ('releaseYear' in data && data.releaseYear != null) {
                     const releaseYear = data.releaseYear;
                     const originalYear =
-                        'originalYear' in data && data.originalYear !== null
-                            ? data.originalYear
-                            : null;
+                        'originalYear' in data && data.originalYear > 0 ? data.originalYear : null;
 
                     if (originalYear !== null && originalYear !== releaseYear) {
                         return `${originalYear}${SEPARATOR_STRING}${releaseYear}`;
@@ -1186,10 +1184,10 @@ export const getDataRows = (type?: 'compact' | 'default' | 'poster'): DataRow[] 
                         data.originalDate &&
                         data.originalDate !== data.releaseDate
                     ) {
-                        return `${formatDateAbsoluteUTC(data.originalDate)}${SEPARATOR_STRING}${formatDateAbsoluteUTC(data.releaseDate)}`;
+                        return `${formatPartialIsoDateUTC(data.originalDate)}${SEPARATOR_STRING}${formatPartialIsoDateUTC(data.releaseDate)}`;
                     }
 
-                    return `${formatDateAbsoluteUTC(data.releaseDate)}`;
+                    return `${formatPartialIsoDateUTC(data.releaseDate)}`;
                 }
                 return '';
             },

@@ -3,11 +3,13 @@
 export enum ServerFeature {
     ALBUM_YES_NO_RATING_FILTER = 'albumYesNoRatingFilter',
     BFR = 'bfr',
+    INTERNET_RADIO_IMAGE_UPLOAD = 'internetRadioImageUpload',
     LYRICS_MULTIPLE_STRUCTURED = 'lyricsMultipleStructured',
     LYRICS_SINGLE_STRUCTURED = 'lyricsSingleStructured',
     MUSIC_FOLDER_MULTISELECT = 'musicFolderMultiselect',
     OS_FORM_POST = 'osFormPost',
     OS_TRANSCODE_DECISION = 'osTranscodeDecision',
+    PLAYLIST_IMAGE_UPLOAD = 'playlistImageUpload',
     PLAYLISTS_SMART = 'playlistsSmart',
     PUBLIC_PLAYLIST = 'publicPlaylist',
     SERVER_PLAY_QUEUE = 'serverPlayQueue',

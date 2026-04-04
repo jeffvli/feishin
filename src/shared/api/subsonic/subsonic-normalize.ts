@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { coerceYear, parsePartialIsoDate } from '/@/shared/api/partial-iso-date';
 import { ssType } from '/@/shared/api/subsonic/subsonic-types';
 import { replacePathPrefix } from '/@/shared/api/utils';
 import {
@@ -133,6 +134,32 @@ const getGenres = (
           : [];
 };
 
+const pad2 = (n: number) => String(n).padStart(2, '0');
+
+const subsonicReleaseFields = (item: {
+    releaseDate?: { day?: number; month?: number; year?: number };
+    year?: number;
+}): { releaseDate: null | string; releaseYear: null | number } => {
+    const rd = item.releaseDate;
+    if (
+        rd &&
+        typeof rd.year === 'number' &&
+        typeof rd.month === 'number' &&
+        typeof rd.day === 'number'
+    ) {
+        const iso = `${rd.year}-${pad2(rd.month)}-${pad2(rd.day)}`;
+        const parsed = parsePartialIsoDate(iso);
+        return { releaseDate: parsed.date, releaseYear: parsed.year };
+    }
+
+    const y = coerceYear(item.year);
+    if (y > 0) {
+        return { releaseDate: String(y), releaseYear: y };
+    }
+
+    return { releaseDate: null, releaseYear: null };
+};
+
 const normalizeSong = (
     item: z.infer<typeof ssType._response.song>,
     server?: null | ServerListItemWithCredential,
@@ -147,6 +174,8 @@ const normalizeSong = (
         item.albumArtists?.length > 0
             ? item.albumArtists.map((a) => a.name).join(', ')
             : item.artist || '';
+
+    const { releaseDate, releaseYear } = subsonicReleaseFields(item);
 
     return {
         _itemType: LibraryItem.SONG,
@@ -202,8 +231,8 @@ const normalizeSong = (
                 : null,
         playCount: item?.playCount || 0,
         playlistItemId: playlistIndex !== undefined ? playlistIndex.toString() : undefined,
-        releaseDate: null,
-        releaseYear: item.year || null,
+        releaseDate,
+        releaseYear,
         sampleRate: item.samplingRate || null,
         size: item.size,
         sortName: item.title,
@@ -285,13 +314,7 @@ const normalizeAlbum = (
         discTitleMap.set(discTitle.disc, discTitle.title);
     });
 
-    const releaseDate =
-        item.releaseDate &&
-        typeof item.releaseDate.year === 'number' &&
-        typeof item.releaseDate.month === 'number' &&
-        typeof item.releaseDate.day === 'number'
-            ? `${item.releaseDate.year}-${item.releaseDate.month}-${item.releaseDate.day}`
-            : null;
+    const { releaseDate, releaseYear } = subsonicReleaseFields(item);
 
     return {
         _itemType: LibraryItem.ALBUM,
@@ -319,14 +342,14 @@ const normalizeAlbum = (
         mbzReleaseGroupId: null,
         name: item.name,
         originalDate: releaseDate,
-        originalYear: item.year || null,
+        originalYear: releaseYear ?? 0,
         participants: getParticipants(item),
         playCount: null,
         recordLabels: item.recordLabels?.map((item) => item.name) || [],
         releaseDate,
         releaseType: getReleaseType(item),
         releaseTypes: item.releaseTypes || [],
-        releaseYear: item.year || null,
+        releaseYear,
         size: null,
         songCount: item.songCount,
         songs:
@@ -432,6 +455,8 @@ const normalizeInternetRadioStation = (
     return {
         homepageUrl: item.homepageUrl || null,
         id: item.id,
+        imageId: item.coverArt?.toString() || null,
+        imageUrl: null,
         name: item.name,
         streamUrl: item.streamUrl,
     };

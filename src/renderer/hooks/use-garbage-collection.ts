@@ -7,15 +7,23 @@ const GARBAGE_COLLECTION_INTERVAL = 1000 * 60 * 5;
 export const useGarbageCollection = () => {
     const intervalIdRef = useRef<NodeJS.Timeout | null>(null);
 
+    const startInterval = () => {
+        if (intervalIdRef.current) {
+            clearInterval(intervalIdRef.current);
+        }
+
+        intervalIdRef.current = setInterval(() => {
+            window.api?.utils?.forceGarbageCollection?.();
+        }, GARBAGE_COLLECTION_INTERVAL);
+    };
+
     // Clear the cache on an interval
     useEffect(() => {
         if (!isElectron()) {
             return;
         }
 
-        intervalIdRef.current = setInterval(() => {
-            window.api?.utils?.forceGarbageCollection?.();
-        }, GARBAGE_COLLECTION_INTERVAL);
+        startInterval();
 
         return () => {
             if (intervalIdRef.current) {
@@ -38,5 +46,6 @@ export const useGarbageCollection = () => {
         }
 
         window.api?.utils?.forceGarbageCollection?.();
+        startInterval();
     }, [location]);
 };

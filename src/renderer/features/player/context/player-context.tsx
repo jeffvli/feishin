@@ -64,7 +64,7 @@ export interface PlayerContext {
     mediaSeekToTimestamp: (timestamp: number) => void;
     mediaSkipBackward: () => void;
     mediaSkipForward: () => void;
-    mediaStop: () => void;
+    mediaStop: (options?: { reset?: boolean }) => void;
     mediaToggleMute: () => void;
     mediaTogglePlayPause: () => void;
     moveSelectedTo: (items: QueueSong[], edge: 'bottom' | 'top', uniqueId: string) => void;
@@ -596,13 +596,17 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         storeActions.mediaPrevious();
     }, [storeActions]);
 
-    const mediaStop = useCallback(() => {
-        logFn.debug(logMsg[LogCategory.PLAYER].mediaStop, {
-            category: LogCategory.PLAYER,
-        });
+    const mediaStop = useCallback(
+        (options?: { reset?: boolean }) => {
+            logFn.debug(logMsg[LogCategory.PLAYER].mediaStop, {
+                category: LogCategory.PLAYER,
+                meta: { reset: options?.reset },
+            });
 
-        storeActions.mediaStop();
-    }, [storeActions]);
+            storeActions.mediaStop(options);
+        },
+        [storeActions],
+    );
 
     const mediaSeekToTimestamp = useCallback(
         (timestamp: number) => {

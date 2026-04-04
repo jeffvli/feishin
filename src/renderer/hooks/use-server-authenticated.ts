@@ -2,13 +2,13 @@ import { isAxiosError } from 'axios';
 import isElectron from 'is-electron';
 import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
 import { AppRoute } from '/@/renderer/router/routes';
-import { getServerById, useAuthStoreActions, useCurrentServer } from '/@/renderer/store';
+import { getServerById, useAuthStoreActions, useCurrentServerId } from '/@/renderer/store';
 import { LogCategory, logFn } from '/@/renderer/utils/logger';
 import { logMsg } from '/@/renderer/utils/logger-message';
 import { toast } from '/@/shared/components/toast/toast';
@@ -40,12 +40,17 @@ const isNetworkError = (error: any): boolean => {
 
 export const useServerAuthenticated = () => {
     const priorServerId = useRef<string | undefined>(undefined);
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
     const [ready, setReady] = useState(AuthState.LOADING);
     const navigate = useNavigate();
+    const navigateRef = useRef(navigate);
     const retryCountRef = useRef<number>(0);
 
     const { setCurrentServer, updateServer } = useAuthStoreActions();
+
+    useEffect(() => {
+        navigateRef.current = navigate;
+    }, [navigate]);
 
     const authenticateServer = useCallback(
         async (serverWithAuth: NonNullable<ReturnType<typeof getServerById>>, retryAttempt = 0) => {
@@ -312,7 +317,7 @@ export const useServerAuthenticated = () => {
 
                     // Don't clear credentials on network failure - preserve them for when network returns
                     setReady(AuthState.INVALID);
-                    navigate(AppRoute.NO_NETWORK, { replace: true });
+                    navigateRef.current(AppRoute.NO_NETWORK, { replace: true });
                     return;
                 }
 
@@ -341,18 +346,19 @@ export const useServerAuthenticated = () => {
                 setReady(AuthState.INVALID);
             }
         },
-        [updateServer, setCurrentServer, navigate],
+        [updateServer, setCurrentServer],
     );
 
-    const debouncedAuth = debounce(
-        (serverWithAuth: NonNullable<ReturnType<typeof getServerById>>) => {
-            authenticateServer(serverWithAuth).catch(console.error);
-        },
-        300,
+    const debouncedAuth = useMemo(
+        () =>
+            debounce((serverWithAuth: NonNullable<ReturnType<typeof getServerById>>) => {
+                authenticateServer(serverWithAuth).catch(console.error);
+            }, 300),
+        [authenticateServer],
     );
 
     useEffect(() => {
-        if (!server) {
+        if (!serverId) {
             logFn.debug(logMsg[LogCategory.SYSTEM].serverAuthenticationInvalid, {
                 category: LogCategory.SYSTEM,
                 meta: {
@@ -363,9 +369,9 @@ export const useServerAuthenticated = () => {
             return;
         }
 
-        if (priorServerId.current !== server.id) {
-            const serverWithAuth = getServerById(server.id);
-            priorServerId.current = server.id;
+        if (priorServerId.current !== serverId) {
+            const serverWithAuth = getServerById(serverId);
+            priorServerId.current = serverId;
             retryCountRef.current = 0; // Reset retry count when server changes
 
             if (!serverWithAuth) {
@@ -373,7 +379,7 @@ export const useServerAuthenticated = () => {
                     category: LogCategory.SYSTEM,
                     meta: {
                         reason: 'Server not found in store',
-                        serverId: server.id,
+                        serverId,
                     },
                 });
                 setReady(AuthState.INVALID);
@@ -383,7 +389,10 @@ export const useServerAuthenticated = () => {
             setReady(AuthState.LOADING);
             debouncedAuth(serverWithAuth);
         }
-    }, [debouncedAuth, server]);
+        return () => {
+            debouncedAuth.cancel();
+        };
+    }, [debouncedAuth, serverId]);
 
     return ready;
 };

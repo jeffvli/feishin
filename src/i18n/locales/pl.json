@@ -169,7 +169,8 @@
         "filter_single": "single",
         "rename": "zmień nazwę",
         "newVersionAvailable": "nowa wersja jest dostępna",
-        "numberOfResults": "{{numberOfResults}} wyników"
+        "numberOfResults": "{{numberOfResults}} wyników",
+        "grouping": "grupowanie"
     },
     "entity": {
         "genre_one": "gatunek",
@@ -420,6 +421,9 @@
             "export": "eksportuj tekst",
             "input_synced": "eksportuj zsynchronizowany tekst",
             "input_offset": "$t(setting.lyricOffset)"
+        },
+        "editRadioStation": {
+            "success": "stacja radiowa zaktualizowana pomyślnie"
         }
     },
     "page": {
@@ -1058,7 +1062,9 @@
         "sidePlayQueueLayout": "układ boczny kolejki odtwarzania",
         "sidePlayQueueLayout_description": "ustawia układ przyczepionej z boku kolejki odtwarzania",
         "sidePlayQueueLayout_optionHorizontal": "poziomy",
-        "sidePlayQueueLayout_optionVertical": "pionowy"
+        "sidePlayQueueLayout_optionVertical": "pionowy",
+        "waveformLoadingDelay": "opóźnienie załadowania fali",
+        "waveformLoadingDelay_description": "opóźnienie w sekundach przed załadowaniem fali. zwiększ tą wartość jeżeli doświadczasz zawieszania się odtwarzacza przeglądarkowego."
     },
     "table": {
         "config": {

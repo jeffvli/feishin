@@ -36,12 +36,16 @@
     min-width: 0;
 }
 
+.grid-carousel-viewport {
+    width: 100%;
+    min-height: 0;
+}
+
 .grid {
     display: grid;
     grid-template-columns: repeat(var(--cards-to-show, 2), minmax(0, 1fr));
     gap: var(--theme-spacing-md);
     contain: layout paint;
-    content-visibility: auto;
     overflow: hidden;
     will-change: transform;
 }

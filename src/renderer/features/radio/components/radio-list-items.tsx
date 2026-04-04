@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './radio-list-items.module.css';
 
+import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { openEditRadioStationModal } from '/@/renderer/features/radio/components/edit-radio-station-form';
 import {
     useRadioControls,
@@ -12,15 +13,15 @@ import {
 import { useDeleteRadioStation } from '/@/renderer/features/radio/mutations/delete-radio-station-mutation';
 import { useCurrentServer, usePermissions } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Box } from '/@/shared/components/box/box';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
-import { Icon } from '/@/shared/components/icon/icon';
 import { closeAllModals, ConfirmModal, openModal } from '/@/shared/components/modal/modal';
 import { Paper } from '/@/shared/components/paper/paper';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
-import { InternetRadioStation } from '/@/shared/types/domain-types';
+import { InternetRadioStation, LibraryItem } from '/@/shared/types/domain-types';
 
 interface RadioListItemProps {
     station: InternetRadioStation;
@@ -44,8 +45,13 @@ const RadioListItem = ({ station }: RadioListItemProps) => {
     const handleClick = () => {
         if (stationIsPlaying) {
             stop();
-        } else {
-            play(station.streamUrl, station.name);
+        } else if (server?.id) {
+            play(station.streamUrl, station.name, {
+                id: station.id,
+                imageId: station.imageId,
+                imageUrl: station.imageUrl,
+                serverId: server.id,
+            });
         }
     };
 
@@ -107,27 +113,39 @@ const RadioListItem = ({ station }: RadioListItemProps) => {
             })}
             p="md"
         >
-            <Flex align="flex-start" gap="md" justify="space-between">
-                <button className={styles['radio-item-button']} onClick={handleClick} role="button">
-                    <Stack gap="xs">
-                        <Group gap="xs">
-                            <Icon color="muted" icon="radio" size="md" />
+            <Flex align="center" gap="md" justify="space-between" wrap="nowrap">
+                <button className={styles['radio-item-button']} onClick={handleClick} type="button">
+                    <Group align="center" gap="md" wrap="nowrap">
+                        <Box className={styles.thumbnail}>
+                            <ItemImage
+                                enableViewport={false}
+                                id={station.imageId ?? undefined}
+                                imageContainerProps={{
+                                    className: styles['image-container'],
+                                }}
+                                itemType={LibraryItem.RADIO_STATION}
+                                serverId={server?.id}
+                                src={station.imageUrl ?? ''}
+                                type="table"
+                            />
+                        </Box>
+                        <Stack className={styles.meta} gap={4}>
                             <Text fw={500} size="md">
                                 {station.name}
                             </Text>
-                        </Group>
-                        <Text isMuted size="sm">
-                            {station.streamUrl}
-                        </Text>
-                        {station.homepageUrl && (
-                            <Text isMuted size="sm">
-                                {station.homepageUrl}
+                            <Text className={styles['meta-line']} isMuted size="sm">
+                                {station.streamUrl}
                             </Text>
-                        )}
-                    </Stack>
+                            {station.homepageUrl ? (
+                                <Text className={styles['meta-line']} isMuted size="sm">
+                                    {station.homepageUrl}
+                                </Text>
+                            ) : null}
+                        </Stack>
+                    </Group>
                 </button>
                 {(permissions.radio.edit || permissions.radio.delete) && (
-                    <Group gap="xs">
+                    <Group className={styles['radio-item-actions']} gap="xs">
                         {permissions.radio.edit && (
                             <ActionIcon
                                 icon="edit"

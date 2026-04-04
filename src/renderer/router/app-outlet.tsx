@@ -1,37 +1,45 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Navigate, Outlet } from 'react-router';
+import { shallow } from 'zustand/shallow';
 
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useAuthStoreActions, useCurrentServer } from '/@/renderer/store';
+import { useAuthStore, useAuthStoreActions } from '/@/renderer/store';
 
 const normalizeUrl = (url: string) => url.replace(/\/$/, '');
 
 export const AppOutlet = () => {
-    const currentServer = useCurrentServer();
+    const currentServer = useAuthStore(
+        (state) =>
+            state.currentServer
+                ? {
+                      id: state.currentServer.id,
+                      url: state.currentServer.url,
+                  }
+                : null,
+        shallow,
+    );
     const { deleteServer, setCurrentServer } = useAuthStoreActions();
 
-    const isActionsRequired = useMemo(() => {
-        // When SERVER_LOCK is enabled and the configured URL has changed,
-        // clear the stale session so the user re-authenticates against the new server.
-        if (isServerLock() && currentServer && window.SERVER_URL) {
-            const configuredUrl = normalizeUrl(window.SERVER_URL);
-            const persistedUrl = normalizeUrl(currentServer.url);
-
-            if (configuredUrl !== persistedUrl) {
-                deleteServer(currentServer.id);
-                setCurrentServer(null);
-                return true;
-            }
+    const hasServerLockMismatch = useMemo(() => {
+        if (!isServerLock() || !currentServer || !window.SERVER_URL) {
+            return false;
         }
 
-        const isServerRequired = !currentServer;
+        const configuredUrl = normalizeUrl(window.SERVER_URL);
+        const persistedUrl = normalizeUrl(currentServer.url);
 
-        const actions = [isServerRequired];
-        const isActionRequired = actions.some((c) => c);
+        return configuredUrl !== persistedUrl;
+    }, [currentServer]);
 
-        return isActionRequired;
-    }, [currentServer, deleteServer, setCurrentServer]);
+    useEffect(() => {
+        if (hasServerLockMismatch && currentServer) {
+            deleteServer(currentServer.id);
+            setCurrentServer(null);
+        }
+    }, [currentServer, deleteServer, hasServerLockMismatch, setCurrentServer]);
+
+    const isActionsRequired = !currentServer || hasServerLockMismatch;
 
     if (isActionsRequired) {
         return <Navigate replace to={AppRoute.ACTION_REQUIRED} />;

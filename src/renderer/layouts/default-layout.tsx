@@ -7,7 +7,7 @@ import styles from './default-layout.module.css';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { MainContent } from '/@/renderer/layouts/default-layout/main-content';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
-import { useSettingsStore, useWindowSettings } from '/@/renderer/store/settings.store';
+import { useSettingsStore, useWindowBarStyle } from '/@/renderer/store/settings.store';
 import { Platform, PlayerType } from '/@/shared/types/types';
 
 if (!isElectron()) {
@@ -29,7 +29,7 @@ interface DefaultLayoutProps {
 }
 
 export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
-    const { windowBarStyle } = useWindowSettings();
+    const windowBarStyle = useWindowBarStyle();
 
     return (
         <>

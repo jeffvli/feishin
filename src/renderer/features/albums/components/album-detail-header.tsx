@@ -20,7 +20,7 @@ import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useShowRatings } from '/@/renderer/store';
 import { useArtistRadioCount, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
-import { formatDateAbsoluteUTC, formatDurationString, formatSizeString } from '/@/renderer/utils';
+import { formatDurationString, formatPartialIsoDateUTC, formatSizeString } from '/@/renderer/utils';
 import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
 import { Group } from '/@/shared/components/group/group';
 import { Separator } from '/@/shared/components/separator/separator';
@@ -131,7 +131,10 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
         const originalDifferentFromRelease =
             album?.originalDate && album?.originalDate !== album?.releaseDate;
 
-        const originalYearDifferentFromRelease = album?.originalYear !== album?.releaseYear;
+        const originalYearDifferentFromRelease =
+            album.originalYear > 0 &&
+            album.releaseYear != null &&
+            album.originalYear !== album.releaseYear;
 
         const playCount = album?.playCount;
 
@@ -147,17 +150,17 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
             if (originalDifferentFromRelease) {
                 items.push({
                     id: 'originalDate',
-                    value: `♫ ${formatDateAbsoluteUTC(album.originalDate)}`,
+                    value: `♫ ${formatPartialIsoDateUTC(album.originalDate)}`,
                 });
             }
 
             if (releaseDate) {
                 items.push({
                     id: 'releaseDate',
-                    value: `${releasePrefix} ${formatDateAbsoluteUTC(releaseDate)}`,
+                    value: `${releasePrefix} ${formatPartialIsoDateUTC(releaseDate)}`,
                 });
             }
-        } else if (album.originalYear) {
+        } else if (album.originalYear > 0) {
             if (originalYearDifferentFromRelease) {
                 items.push({
                     id: 'originalYear',
@@ -168,14 +171,24 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
             if (releaseDate) {
                 items.push({
                     id: 'releaseDate',
-                    value: `${releaseYearPrefix} ${formatDateAbsoluteUTC(releaseDate)}`,
+                    value: `${releaseYearPrefix} ${formatPartialIsoDateUTC(releaseDate)}`,
                 });
-            } else if (releaseYear) {
+            } else if (releaseYear != null && releaseYear > 0) {
                 items.push({
                     id: 'releaseYear',
                     value: `${releaseYearPrefix} ${releaseYear}`,
                 });
             }
+        } else if (releaseDate) {
+            items.push({
+                id: 'releaseDate',
+                value: `♫ ${formatPartialIsoDateUTC(releaseDate)}`,
+            });
+        } else if (releaseYear != null && releaseYear > 0) {
+            items.push({
+                id: 'releaseYear',
+                value: `♫ ${releaseYear}`,
+            });
         }
 
         items.push(

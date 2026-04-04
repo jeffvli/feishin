@@ -755,6 +755,7 @@ const playQueueByIndex = z.object({
 });
 
 const internetRadioStation = z.object({
+    coverArt: z.string().optional(),
     homepageUrl: z.string().optional(),
     id: z.string(),
     name: z.string(),

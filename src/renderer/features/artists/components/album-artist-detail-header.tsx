@@ -189,13 +189,15 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
         }, [detailQuery.data?.imageUrl, imageUrl]);
 
         const alternateImageUrl = artistInfoQuery.data?.imageUrl;
+        const hasImageId = Boolean(detailQuery.data?.imageId);
+        const fallbackHeaderImageUrl = alternateImageUrl || selectedImageUrl;
 
         return (
             <LibraryHeader
-                imageUrl={alternateImageUrl || selectedImageUrl}
+                imageUrl={hasImageId ? undefined : fallbackHeaderImageUrl}
                 item={{
                     imageId: detailQuery.data?.imageId,
-                    imageUrl: alternateImageUrl || detailQuery.data?.imageUrl,
+                    imageUrl: hasImageId ? undefined : fallbackHeaderImageUrl,
                     route: AppRoute.LIBRARY_ALBUM_ARTISTS,
                     type: LibraryItem.ALBUM_ARTIST,
                 }}

@@ -364,6 +364,9 @@
             "input_name": "name",
             "input_streamUrl": "stream url"
         },
+        "editRadioStation": {
+            "success": "radio station updated successfully"
+        },
         "deletePlaylist": {
             "input_confirm": "type the name of the $t(entity.playlist, {\"count\": 1}) to confirm",
             "success": "$t(entity.playlist, {\"count\": 1}) deleted successfully",

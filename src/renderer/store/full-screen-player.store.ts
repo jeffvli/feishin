@@ -1,6 +1,7 @@
 import merge from 'lodash/merge';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 export interface FullScreenPlayerSlice extends FullScreenPlayerState {
@@ -62,3 +63,12 @@ export const useFullScreenPlayerStoreActions = () =>
 
 export const useSetFullScreenPlayerStore = () =>
     useFullScreenPlayerStore((state) => state.actions.setStore);
+
+export const useFullScreenPlayerOverlayState = () =>
+    useFullScreenPlayerStore(
+        (state) => ({
+            expanded: state.expanded,
+            visualizerExpanded: state.visualizerExpanded,
+        }),
+        shallow,
+    );

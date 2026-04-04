@@ -13,10 +13,10 @@ const YearColumnBase = (props: ItemTableListInnerColumn) => {
     const item = rowItem as any;
 
     const yearDisplay = useMemo(() => {
-        if (item && 'releaseYear' in item && item.releaseYear !== null) {
+        if (item && 'releaseYear' in item && item.releaseYear != null) {
             const releaseYear = item.releaseYear;
             const originalYear =
-                'originalYear' in item && item.originalYear !== null ? item.originalYear : null;
+                'originalYear' in item && item.originalYear > 0 ? item.originalYear : null;
 
             if (originalYear !== null && originalYear !== releaseYear) {
                 return `${originalYear}${SEPARATOR_STRING}${releaseYear}`;

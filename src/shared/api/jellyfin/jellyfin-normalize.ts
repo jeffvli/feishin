@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { jfType } from '/@/shared/api/jellyfin/jellyfin-types';
+import { coerceYear, parsePartialIsoDateFromApi } from '/@/shared/api/partial-iso-date';
 import { replacePathPrefix } from '/@/shared/api/utils';
 import {
     Album,
@@ -138,6 +139,20 @@ const getArtists = (
 
     return result;
 };
+
+const jellyfinPremiereFields = (item: {
+    PremiereDate?: string;
+    ProductionYear?: number;
+}): { originalYear: number; releaseDate: null | string; releaseYear: null | number } => {
+    const premiere = parsePartialIsoDateFromApi(item.PremiereDate ?? null);
+    const prodYear = coerceYear(item.ProductionYear);
+    const releaseYear: null | number =
+        premiere.year > 0 ? premiere.year : prodYear > 0 ? prodYear : null;
+    const releaseDate = premiere.date ?? (prodYear > 0 ? String(prodYear) : null);
+    const originalYear = premiere.year > 0 ? premiere.year : prodYear;
+    return { originalYear, releaseDate, releaseYear };
+};
+
 const normalizeSong = (
     item: z.infer<typeof jfType._response.song>,
     server: null | ServerListItem,
@@ -180,6 +195,8 @@ const normalizeSong = (
     const participants = getPeople(item);
 
     const artists = getArtists(item, participants);
+
+    const { releaseDate, releaseYear } = jellyfinPremiereFields(item);
 
     return {
         _itemType: LibraryItem.SONG,
@@ -244,8 +261,8 @@ const normalizeSong = (
         peak: null,
         playCount: (item.UserData && item.UserData.PlayCount) || 0,
         playlistItemId: item.PlaylistItemId,
-        releaseDate: item.PremiereDate || null,
-        releaseYear: item.ProductionYear || null,
+        releaseDate,
+        releaseYear,
         sampleRate,
         size,
         sortName: item.SortName || item.Name,
@@ -262,6 +279,8 @@ const normalizeAlbum = (
     item: z.infer<typeof jfType._response.album>,
     server: null | ServerListItem,
 ): Album => {
+    const { originalYear, releaseDate, releaseYear } = jellyfinPremiereFields(item);
+
     return {
         _itemType: LibraryItem.ALBUM,
         _serverId: server?.id || '',
@@ -310,15 +329,15 @@ const normalizeAlbum = (
         mbzId: item.ProviderIds?.MusicBrainzAlbum || null,
         mbzReleaseGroupId: item.ProviderIds?.MusicBrainzReleaseGroup || null,
         name: item.Name,
-        originalDate: item.PremiereDate || null,
-        originalYear: item.ProductionYear || null,
+        originalDate: releaseDate,
+        originalYear,
         participants: getPeople(item),
         playCount: item.UserData?.PlayCount || 0,
         recordLabels: item.Studios?.map((entry) => entry.Name) || [],
-        releaseDate: item.PremiereDate || null,
+        releaseDate,
         releaseType: null,
         releaseTypes: [],
-        releaseYear: item.ProductionYear || null,
+        releaseYear,
         size: null,
         songCount: item?.ChildCount || null,
         songs: item.Songs?.map((song) => normalizeSong(song, server)),

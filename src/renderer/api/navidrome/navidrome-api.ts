@@ -46,12 +46,39 @@ export const contract = c.router({
             500: resultWithHeaders(ndType._response.error),
         },
     },
+    deleteInternetRadioStation: {
+        body: null,
+        method: 'DELETE',
+        path: 'radio/:id',
+        responses: {
+            200: resultWithHeaders(ndType._response.deleteInternetRadioStation),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
+    deleteInternetRadioStationImage: {
+        body: null,
+        method: 'DELETE',
+        path: 'radio/:id/image',
+        responses: {
+            200: resultWithHeaders(ndType._response.deleteInternetRadioStationImage),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
     deletePlaylist: {
         body: null,
         method: 'DELETE',
         path: 'playlist/:id',
         responses: {
             200: resultWithHeaders(ndType._response.deletePlaylist),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
+    deletePlaylistImage: {
+        body: null,
+        method: 'DELETE',
+        path: 'playlist/:id/image',
+        responses: {
+            200: resultWithHeaders(ndType._response.deletePlaylistImage),
             500: resultWithHeaders(ndType._response.error),
         },
     },
@@ -132,6 +159,15 @@ export const contract = c.router({
             500: resultWithHeaders(ndType._response.error),
         },
     },
+    getRadioList: {
+        method: 'GET',
+        path: 'radio',
+        query: ndType._parameters.radioList,
+        responses: {
+            200: resultWithHeaders(ndType._response.radioList),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
     getSongDetail: {
         method: 'GET',
         path: 'song/:id',
@@ -205,12 +241,39 @@ export const contract = c.router({
             500: resultWithHeaders(ndType._response.error),
         },
     },
+    updateInternetRadioStation: {
+        body: ndType._parameters.updateInternetRadioStation,
+        method: 'PUT',
+        path: 'radio/:id',
+        responses: {
+            200: resultWithHeaders(ndType._response.updateInternetRadioStation),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
     updatePlaylist: {
         body: ndType._parameters.updatePlaylist,
         method: 'PUT',
         path: 'playlist/:id',
         responses: {
             200: resultWithHeaders(ndType._response.updatePlaylist),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
+    uploadInternetRadioStationImage: {
+        body: ndType._parameters.uploadInternetRadioStationImage,
+        method: 'POST',
+        path: 'radio/:id/image',
+        responses: {
+            200: resultWithHeaders(ndType._response.uploadInternetRadioStationImage),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
+    uploadPlaylistImage: {
+        body: ndType._parameters.uploadPlaylistImage,
+        method: 'POST',
+        path: 'playlist/:id/image',
+        responses: {
+            200: resultWithHeaders(ndType._response.uploadPlaylistImage),
             500: resultWithHeaders(ndType._response.error),
         },
     },

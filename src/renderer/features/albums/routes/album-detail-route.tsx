@@ -17,8 +17,9 @@ import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { useAlbumBackground, useCurrentServer } from '/@/renderer/store';
-import { Spinner } from '/@/shared/components/spinner/spinner';
 import { LibraryItem } from '/@/shared/types/domain-types';
+
+const ALBUM_DETAIL_BG_FALLBACK = 'var(--theme-colors-foreground-muted)';
 
 const AlbumDetailRoute = () => {
     const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -42,25 +43,21 @@ const AlbumDetailRoute = () => {
             type: 'itemCard',
         }) || '';
 
-    const { background: backgroundColor, isLoading: isColorLoading } = useFastAverageColor({
+    const { background: backgroundColor } = useFastAverageColor({
         id: albumId,
         src: imageUrl,
         srcLoaded: true,
     });
 
-    const background = backgroundColor;
+    const background = backgroundColor ?? ALBUM_DETAIL_BG_FALLBACK;
 
     const showBlurredImage = albumBackground;
-
-    if (isColorLoading) {
-        return <Spinner container />;
-    }
 
     return (
         <AnimatedPage key={`album-detail-${albumId}`}>
             <NativeScrollArea
                 pageHeaderProps={{
-                    backgroundColor: backgroundColor || undefined,
+                    backgroundColor: backgroundColor ?? ALBUM_DETAIL_BG_FALLBACK,
                     children: (
                         <LibraryHeaderBar>
                             <LibraryHeaderBar.PlayButton

@@ -35,6 +35,7 @@ interface LibraryHeaderProps {
     children?: ReactNode;
     compact?: boolean;
     containerClassName?: string;
+    imageOverlay?: ReactNode;
     imagePlaceholderUrl?: null | string;
     imageUrl?: null | string;
     item: {
@@ -56,6 +57,7 @@ export const LibraryHeader = forwardRef(
             children,
             compact,
             containerClassName,
+            imageOverlay,
             imageUrl,
             item,
             title,
@@ -168,6 +170,16 @@ export const LibraryHeader = forwardRef(
                         src={imageUrl || ''}
                         type="header"
                     />
+                    {imageOverlay && (
+                        <div
+                            className={styles.imageOverlay}
+                            onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            role="presentation"
+                        >
+                            {imageOverlay}
+                        </div>
+                    )}
                 </div>
                 {title && (
                     <div className={styles.metadataSection}>

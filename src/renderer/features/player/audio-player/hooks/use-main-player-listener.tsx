@@ -80,7 +80,7 @@ export const useMainPlayerListener = () => {
 
         mpvPlayerListener.rendererStop(() => {
             if (!isRadioActive) {
-                mediaStop();
+                mediaStop({ reset: false });
             }
         });
 

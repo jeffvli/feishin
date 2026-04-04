@@ -11,7 +11,10 @@ import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { RadioMetadataDisplay } from '/@/renderer/features/player/components/radio-metadata-display';
-import { useIsRadioActive } from '/@/renderer/features/radio/hooks/use-radio-player';
+import {
+    useIsRadioActive,
+    useRadioPlayer,
+} from '/@/renderer/features/radio/hooks/use-radio-player';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useAppStore,
@@ -50,9 +53,11 @@ export const LeftControls = () => {
 
     const currentSong = usePlayerSong();
     const isRadioActive = useIsRadioActive();
+    const { currentStationArt } = useRadioPlayer();
     const { bindings } = useHotkeySettings();
 
     const isRadioMode = isRadioActive;
+    const hasRadioStationImage = Boolean(currentStationArt?.imageId || currentStationArt?.imageUrl);
     const hideImage = image && !collapsed;
     const isSongDefined = Boolean(currentSong?.id) && !isRadioMode;
     const title = currentSong?.name;
@@ -128,7 +133,22 @@ export const LeftControls = () => {
                                     })}
                                     openDelay={0}
                                 >
-                                    {isRadioMode ? (
+                                    {isRadioMode && hasRadioStationImage ? (
+                                        <ItemImage
+                                            className={clsx(
+                                                styles.playerbarImage,
+                                                PlaybackSelectors.playerCoverArt,
+                                            )}
+                                            enableDebounce={false}
+                                            enableViewport={false}
+                                            fetchPriority="high"
+                                            id={currentStationArt?.imageId ?? undefined}
+                                            itemType={LibraryItem.RADIO_STATION}
+                                            serverId={currentStationArt?.serverId}
+                                            src={currentStationArt?.imageUrl ?? ''}
+                                            type="table"
+                                        />
+                                    ) : isRadioMode ? (
                                         <Center
                                             className={clsx(
                                                 styles.playerbarImage,

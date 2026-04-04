@@ -186,22 +186,22 @@ const VisualizerSettingsContextModal = (props: any) => (
     </Suspense>
 );
 
+const appRouterModals = {
+    addToPlaylist: AddToPlaylistContextModal,
+    base: BaseContextModal,
+    lyricsSettings: LyricsSettingsContextModal,
+    saveAndReplace: SaveAndReplaceContextModal,
+    settings: SettingsContextModal,
+    shareItem: ShareItemContextModal,
+    shuffleAll: ShuffleAllContextModal,
+    updatePlaylist: UpdatePlaylistContextModal,
+    visualizerSettings: VisualizerSettingsContextModal,
+};
+
 export const AppRouter = () => {
     const router = (
         <HashRouter>
-            <ModalsProvider
-                modals={{
-                    addToPlaylist: AddToPlaylistContextModal,
-                    base: BaseContextModal,
-                    lyricsSettings: LyricsSettingsContextModal,
-                    saveAndReplace: SaveAndReplaceContextModal,
-                    settings: SettingsContextModal,
-                    shareItem: ShareItemContextModal,
-                    shuffleAll: ShuffleAllContextModal,
-                    updatePlaylist: UpdatePlaylistContextModal,
-                    visualizerSettings: VisualizerSettingsContextModal,
-                }}
-            >
+            <ModalsProvider modals={appRouterModals}>
                 <RouterErrorBoundary>
                     <Routes>
                         <Route element={<AuthenticationOutlet />}>
@@ -341,5 +341,5 @@ export const AppRouter = () => {
         </HashRouter>
     );
 
-    return <Suspense fallback={<></>}>{router}</Suspense>;
+    return <Suspense fallback={<Spinner container />}>{router}</Suspense>;
 };

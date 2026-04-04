@@ -1,5 +1,6 @@
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid';
+import { useMemo } from 'react';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { useShallow } from 'zustand/react/shallow';
@@ -58,7 +59,11 @@ interface Actions {
     mediaSeekToTimestamp: (timestamp: number) => void;
     mediaSkipBackward: (offset?: number) => void;
     mediaSkipForward: (offset?: number) => void;
-    mediaStop: () => void;
+    /**
+     * @param options.reset - When true (default), sets seekToTimestamp(0) so the engine seeks to start.
+     * Timestamp display is always cleared to 0. Use false when the engine is already idle (e.g. mpv `stopped`) to skip that seek.
+     */
+    mediaStop: (options?: { reset?: boolean }) => void;
     mediaToggleMute: () => void;
     mediaTogglePlayPause: () => void;
     moveSelectedTo: (items: QueueSong[], uniqueId: string, edge: 'bottom' | 'top') => void;
@@ -1163,11 +1168,14 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(newTimestamp);
                     });
                 },
-                mediaStop: () => {
+                mediaStop: (options?: { reset?: boolean }) => {
+                    const reset = options?.reset !== false;
                     set((state) => {
                         state.player.status = PlayerStatus.PAUSED;
-                        state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
                         setTimestampStore(0);
+                        if (reset) {
+                            state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
+                        }
                     });
                 },
                 mediaToggleMute: () => {
@@ -1643,10 +1651,13 @@ export const usePlayerActions = () => {
         })),
     );
 
-    return {
-        ...actions,
-        setTimestamp: setTimestampStore,
-    };
+    return useMemo(
+        () => ({
+            ...actions,
+            setTimestamp: setTimestampStore,
+        }),
+        [actions],
+    );
 };
 
 export type AddToQueueByPlayType = Play;
@@ -1720,6 +1731,8 @@ export const subscribeNextSongInsertion = (onChange: (song: QueueSong | undefine
                 queueIndex = mapShuffledToQueueIndex(queueIndex, state.queue.shuffled);
             }
 
+            const currentSong = queue.items[queueIndex];
+
             // Calculate next song based on shuffle and repeat settings
             let nextSong: QueueSong | undefined;
             if (isShuffleEnabled(state)) {
@@ -1737,20 +1750,25 @@ export const subscribeNextSongInsertion = (onChange: (song: QueueSong | undefine
                 nextSong = calculateNextSong(queueIndex, queue.items, repeat);
             }
 
-            return { index: queueIndex, song: nextSong };
+            return {
+                currentUniqueId: currentSong?._uniqueId,
+                nextSong,
+            };
         },
         (current, prev) => {
-            // Only trigger if:
-            // 1. We have a previous value (not the first call)
-            // 2. Index hasn't changed (not a natural advance)
-            // 3. Next song has changed (song was inserted)
-            if (
-                prev &&
-                current.index === prev.index &&
-                current.song?._uniqueId !== prev.song?._uniqueId
-            ) {
-                // Index stayed the same but next song changed = insertion at next position
-                onChange(current.song);
+            if (!prev) {
+                return;
+            }
+
+            // Still on the same track, but the upcoming song changed (queue edit: insert, reorder, etc.).
+            // Do not require the current track's queue index to stay fixed — e.g. inserting *before* the
+            // current item shifts its index in `queue.default`, and the old check missed that case.
+            const sameTrackStillPlaying =
+                current.currentUniqueId !== undefined &&
+                current.currentUniqueId === prev.currentUniqueId;
+
+            if (sameTrackStillPlaying && current.nextSong?._uniqueId !== prev.nextSong?._uniqueId) {
+                onChange(current.nextSong);
             }
         },
         {

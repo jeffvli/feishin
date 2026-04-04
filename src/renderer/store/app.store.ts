@@ -4,6 +4,7 @@ import type { LibraryItem } from '/@/shared/types/domain-types';
 import merge from 'lodash/merge';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { AlbumListSort, SongListSort, SortOrder } from '/@/shared/types/domain-types';
@@ -279,6 +280,17 @@ export const useSetTitlebar = () => useAppStore((state) => state.actions.setTitl
 export const useTitlebarStore = () => useAppStore((state) => state.titlebar);
 
 export const useCommandPalette = () => useAppStore((state) => state.commandPalette);
+
+export const useCommandPaletteState = () =>
+    useAppStore(
+        (state) => ({
+            close: state.commandPalette.close,
+            open: state.commandPalette.open,
+            opened: state.commandPalette.opened,
+            toggle: state.commandPalette.toggle,
+        }),
+        shallow,
+    );
 
 export const usePageSidebar = (key: string): [boolean, (value: boolean) => void] => {
     const isOpen = useAppStore((state) => state.pageSidebar[key] ?? false);

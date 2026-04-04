@@ -167,13 +167,21 @@ const SidebarImage = () => {
     const { setSideBar } = useAppStoreActions();
     const currentSong = usePlayerSong();
     const isRadioActive = useIsRadioActive();
-    const { isPlaying: isRadioPlaying } = useRadioPlayer();
+    const { currentStationArt, isPlaying: isRadioPlaying } = useRadioPlayer();
     const { blurExplicitImages } = useGeneralSettings();
 
     const imageUrl = useItemImageUrl({
         id: currentSong?.imageId || undefined,
         itemType: LibraryItem.SONG,
         serverId: currentSong?._serverId,
+        type: 'sidebar',
+    });
+
+    const radioImageUrl = useItemImageUrl({
+        id: isRadioActive ? currentStationArt?.imageId || undefined : undefined,
+        imageUrl: isRadioActive ? currentStationArt?.imageUrl || undefined : undefined,
+        itemType: LibraryItem.RADIO_STATION,
+        serverId: isRadioActive ? currentStationArt?.serverId : undefined,
         type: 'sidebar',
     });
 
@@ -224,7 +232,9 @@ const SidebarImage = () => {
                     postProcess: 'sentenceCase',
                 })}
             >
-                {isPlayingRadio ? (
+                {isRadioActive && radioImageUrl ? (
+                    <img className={styles.sidebarImage} loading="eager" src={radioImageUrl} />
+                ) : isRadioActive ? (
                     <Center
                         className={styles.sidebarImage}
                         style={{

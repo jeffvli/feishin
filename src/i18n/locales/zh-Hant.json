@@ -1124,6 +1124,9 @@
             "export": "匯出歌詞",
             "input_synced": "匯出同步歌詞",
             "input_offset": "$t(setting.lyricOffset)"
+        },
+        "editRadioStation": {
+            "success": "電臺更新成功"
         }
     },
     "releaseType": {

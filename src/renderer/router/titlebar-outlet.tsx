@@ -3,11 +3,11 @@ import { Outlet } from 'react-router';
 import styles from './titlebar-outlet.module.css';
 
 import { Titlebar } from '/@/renderer/features/titlebar/components/titlebar';
-import { useWindowSettings } from '/@/renderer/store/settings.store';
+import { useWindowBarStyle } from '/@/renderer/store/settings.store';
 import { Platform } from '/@/shared/types/types';
 
 export const TitlebarOutlet = () => {
-    const { windowBarStyle } = useWindowSettings();
+    const windowBarStyle = useWindowBarStyle();
 
     return (
         <>

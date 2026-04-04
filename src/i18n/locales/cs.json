@@ -1110,6 +1110,9 @@
             "export": "exportovat texty",
             "input_synced": "exportovat synchronizované texty",
             "input_offset": "$t(setting.lyricOffset)"
+        },
+        "editRadioStation": {
+            "success": "stanice rádia úspěšně upravena"
         }
     },
     "entity": {

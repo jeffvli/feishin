@@ -76,6 +76,16 @@ const getDayjsLocale = (i18nLang: string): string => {
     return localeMap[i18nLang] || 'en';
 };
 
+// BCP 47 tags for Intl (differs from dayjs locale ids for some languages).
+const getIntlLocale = (i18nLang: string): string => {
+    const localeMap: Record<string, string> = {
+        'zh-Hans': 'zh-CN',
+        'zh-Hant': 'zh-TW',
+    };
+
+    return localeMap[i18nLang] ?? i18nLang;
+};
+
 const updateDayjsLocale = () => {
     const dayjsLocale = getDayjsLocale(i18n.language);
     dayjs.locale(dayjsLocale);
@@ -91,6 +101,44 @@ export const formatDateAbsolute = (key: null | string) => (key ? dayjs(key).form
 
 export const formatDateAbsoluteUTC = (key: null | string) =>
     key ? dayjs.utc(key).format('ll') : '';
+
+const PARTIAL_ISO_YEAR = /^\d{4}$/;
+const PARTIAL_ISO_YEAR_MONTH = /^\d{4}-\d{2}$/;
+
+export const formatPartialIsoDateUTC = (key: null | string): string => {
+    if (!key) {
+        return '';
+    }
+
+    const trimmedKey = key.trim();
+    const intlLocale = getIntlLocale(i18n.language);
+
+    if (PARTIAL_ISO_YEAR.test(trimmedKey)) {
+        const year = Number.parseInt(trimmedKey, 10);
+        if (!Number.isFinite(year)) {
+            return trimmedKey;
+        }
+
+        return new Intl.DateTimeFormat(intlLocale, { timeZone: 'UTC', year: 'numeric' }).format(
+            new Date(Date.UTC(year, 0, 1)),
+        );
+    }
+
+    if (PARTIAL_ISO_YEAR_MONTH.test(trimmedKey)) {
+        const d = dayjs.utc(`${trimmedKey}-01`);
+        if (!d.isValid()) {
+            return trimmedKey;
+        }
+
+        return new Intl.DateTimeFormat(intlLocale, {
+            month: 'long',
+            timeZone: 'UTC',
+            year: 'numeric',
+        }).format(d.toDate());
+    }
+
+    return dayjs.utc(trimmedKey).format('ll');
+};
 
 export const formatHrDateTime = (key: null | string) => (key ? dayjs(key).format('lll') : '');
 

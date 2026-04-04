@@ -67,7 +67,7 @@ import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useSettingsStore, useShowRatings } from '/@/renderer/store';
-import { formatDateAbsoluteUTC, formatDurationString } from '/@/renderer/utils';
+import { formatDurationString, formatPartialIsoDateUTC } from '/@/renderer/utils';
 import { SEPARATOR_STRING } from '/@/shared/api/utils';
 import { ExplicitIndicator } from '/@/shared/components/explicit-indicator/explicit-indicator';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
@@ -489,9 +489,9 @@ const MetadataSection = memo(
             let releaseStr = '';
             if (item.releaseDate) {
                 if (item.originalDate && item.originalDate !== item.releaseDate) {
-                    releaseStr = `${formatDateAbsoluteUTC(item.originalDate)}${SEPARATOR_STRING}${formatDateAbsoluteUTC(item.releaseDate)}`;
+                    releaseStr = `${formatPartialIsoDateUTC(item.originalDate)}${SEPARATOR_STRING}${formatPartialIsoDateUTC(item.releaseDate)}`;
                 } else {
-                    releaseStr = formatDateAbsoluteUTC(item.releaseDate);
+                    releaseStr = formatPartialIsoDateUTC(item.releaseDate);
                 }
             } else if (item.releaseYear != null) {
                 releaseStr = String(item.releaseYear);

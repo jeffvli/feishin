@@ -7,6 +7,13 @@ import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/
 import { usePlaybackType, usePlayerStoreBase, useSettingsStore } from '/@/renderer/store';
 import { PlayerStatus, PlayerType } from '/@/shared/types/types';
 
+export type RadioCurrentStationArt = {
+    id: string;
+    imageId?: null | string;
+    imageUrl?: null | string;
+    serverId: string;
+};
+
 export interface RadioMetadata {
     artist: null | string;
     title: null | string;
@@ -15,13 +22,18 @@ export interface RadioMetadata {
 interface RadioStore {
     actions: {
         pause: () => void;
-        play: (streamUrl?: string, stationName?: string) => void;
+        play: (
+            streamUrl?: string,
+            stationName?: string,
+            stationArt?: null | RadioCurrentStationArt,
+        ) => void;
         setCurrentStreamUrl: (currentStreamUrl: null | string) => void;
         setIsPlaying: (isPlaying: boolean) => void;
         setMetadata: (metadata: null | RadioMetadata) => void;
         setStationName: (stationName: null | string) => void;
         stop: () => void;
     };
+    currentStationArt: null | RadioCurrentStationArt;
     currentStreamUrl: null | string;
     isPlaying: boolean;
     metadata: null | RadioMetadata;
@@ -34,7 +46,11 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
             set({ isPlaying: false });
             usePlayerStoreBase.getState().mediaPause();
         },
-        play: (streamUrl?: string, stationName?: string) => {
+        play: (
+            streamUrl?: string,
+            stationName?: string,
+            stationArt?: null | RadioCurrentStationArt,
+        ) => {
             set((state) => {
                 const newStreamUrl = streamUrl ?? state.currentStreamUrl;
                 const newStationName = stationName ?? state.stationName;
@@ -43,12 +59,19 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
                     return state;
                 }
 
-                // Reset metadata when switching stations (streamUrl changes)
-                const isSwitchingStation = newStreamUrl !== state.currentStreamUrl;
+                const streamUrlExplicit = streamUrl !== undefined;
+                const isSwitchingStation =
+                    streamUrlExplicit && streamUrl !== state.currentStreamUrl;
+
+                let nextStationArt = state.currentStationArt;
+                if (isSwitchingStation) {
+                    nextStationArt = stationArt ?? null;
+                }
 
                 usePlayerStoreBase.getState().mediaPlay();
 
                 return {
+                    currentStationArt: nextStationArt,
                     currentStreamUrl: newStreamUrl,
                     isPlaying: true,
                     metadata: isSwitchingStation ? null : state.metadata,
@@ -64,6 +87,7 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
             const playbackType = useSettingsStore.getState().playback.type;
 
             set({
+                currentStationArt: null,
                 currentStreamUrl: null,
                 isPlaying: false,
                 metadata: null,
@@ -79,6 +103,7 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
             }
         },
     },
+    currentStationArt: null,
     currentStreamUrl: null,
     isPlaying: false,
     metadata: null,
@@ -90,12 +115,14 @@ export const useIsPlayingRadio = () => useRadioStore((state) => state.isPlaying)
 export const useIsRadioActive = () => useRadioStore((state) => Boolean(state.currentStreamUrl));
 
 export const useRadioPlayer = () => {
+    const currentStationArt = useRadioStore((state) => state.currentStationArt);
     const currentStreamUrl = useRadioStore((state) => state.currentStreamUrl);
     const isPlaying = useRadioStore((state) => state.isPlaying);
     const metadata = useRadioStore((state) => state.metadata);
     const stationName = useRadioStore((state) => state.stationName);
 
     return {
+        currentStationArt,
         currentStreamUrl,
         isPlaying,
         metadata,
@@ -163,6 +190,7 @@ export const useRadioAudioInstance = () => {
             setIsPlaying(false);
             setCurrentStreamUrl(null);
             setStationName(null);
+            useRadioStore.setState({ currentStationArt: null, metadata: null });
         };
 
         mpvPlayerListener.rendererPlay(handleMpvPlay);

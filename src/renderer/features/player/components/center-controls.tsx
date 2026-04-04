@@ -112,7 +112,7 @@ const StopButton = ({ disabled }: { disabled?: boolean }) => {
         <PlayerButton
             disabled={disabled}
             icon={<Icon fill="default" icon="mediaStop" size={buttonSize - 2} />}
-            onClick={mediaStop}
+            onClick={() => mediaStop()}
             tooltip={{
                 label: t('player.stop', { postProcess: 'sentenceCase' }),
                 openDelay: 0,

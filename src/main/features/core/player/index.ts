@@ -435,20 +435,24 @@ ipcMain.on('player-mute', async (_event, mute: boolean) => {
     }
 });
 
-ipcMain.handle('player-get-time', async (): Promise<number> => {
+ipcMain.handle('player-get-time', async (): Promise<number | undefined> => {
     try {
         const mpv = getMpvInstance();
-        if (!mpv) return 0;
+        if (!mpv) {
+            return undefined;
+        }
         const isIdle = await mpv.getProperty('idle-active').catch(() => true);
         if (isIdle) {
-            return 0;
+            return undefined;
         }
         return await mpv.getTimePosition();
-    } catch (err: any) {
-        if (err?.errcode !== 3) {
-            mpvLog({ action: `Failed to get current time` }, err);
+    } catch (err: any | NodeMpvError) {
+        // Err 3: IPC command invalid — e.g. time-pos unavailable when idle / between tracks
+        if (err?.errcode === 3) {
+            return undefined;
         }
-        return 0;
+        mpvLog({ action: `Failed to get current time` }, err);
+        return undefined;
     }
 });
 
