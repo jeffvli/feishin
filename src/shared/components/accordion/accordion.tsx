@@ -7,8 +7,10 @@ import styles from './accordion.module.css';
 
 import { Icon } from '/@/shared/components/icon/icon';
 
-export interface AccordionProps
-    extends Omit<MantineAccordionProps, 'defaultValue' | 'multiple' | 'onChange'> {
+export interface AccordionProps extends Omit<
+    MantineAccordionProps,
+    'defaultValue' | 'multiple' | 'onChange'
+> {
     defaultValue?: string | string[];
     multiple?: boolean;
     onChange?: (value: null | string | string[]) => void;

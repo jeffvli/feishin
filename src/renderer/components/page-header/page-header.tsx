@@ -11,8 +11,10 @@ import { useWindowSettings } from '/@/renderer/store/settings.store';
 import { Flex, FlexProps } from '/@/shared/components/flex/flex';
 import { Platform } from '/@/shared/types/types';
 
-export interface PageHeaderProps
-    extends Omit<FlexProps, 'onAnimationStart' | 'onDrag' | 'onDragEnd' | 'onDragStart'> {
+export interface PageHeaderProps extends Omit<
+    FlexProps,
+    'onAnimationStart' | 'onDrag' | 'onDragEnd' | 'onDragStart'
+> {
     animated?: boolean;
     backgroundColor?: string;
     children?: ReactNode;

@@ -23,8 +23,10 @@ import {
 } from '/@/shared/types/domain-types';
 import { ItemListKey, Play, TableColumn } from '/@/shared/types/types';
 
-interface PlaylistDetailSongListTableProps
-    extends Omit<ItemListTableComponentProps<PlaylistSongListQuery>, 'query'> {
+interface PlaylistDetailSongListTableProps extends Omit<
+    ItemListTableComponentProps<PlaylistSongListQuery>,
+    'query'
+> {
     currentPage?: number;
     data: PlaylistSongListResponse;
     items?: Song[];

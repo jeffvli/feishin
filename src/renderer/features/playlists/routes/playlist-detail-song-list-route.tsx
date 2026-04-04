@@ -213,8 +213,8 @@ const PlaylistDetailSongListRoute = () => {
 
     const isSmartPlaylist = Boolean(
         !detailQuery?.isLoading &&
-            detailQuery?.data?.rules &&
-            server?.type === ServerType.NAVIDROME,
+        detailQuery?.data?.rules &&
+        server?.type === ServerType.NAVIDROME,
     );
 
     const [showQueryBuilder, setShowQueryBuilder] = useState(false);

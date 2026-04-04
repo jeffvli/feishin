@@ -19,8 +19,7 @@ import {
 } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
-interface AlbumArtistListPaginatedTableProps
-    extends ItemListTableComponentProps<AlbumArtistListQuery> {}
+interface AlbumArtistListPaginatedTableProps extends ItemListTableComponentProps<AlbumArtistListQuery> {}
 
 export const AlbumArtistListPaginatedTable = ({
     autoFitColumns = false,
