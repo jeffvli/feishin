@@ -1,0 +1,17 @@
+.toolbar {
+    width: 100%;
+    min-width: 0;
+    container-type: inline-size;
+}
+
+.restore-section {
+    display: contents;
+}
+
+@container (max-width: 296px) {
+    .restore-section {
+        display: none;
+    }
+}
+
+

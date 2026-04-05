@@ -15,6 +15,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
+import { useParams } from 'react-router';
 import { type CellComponentProps, Grid } from 'react-window-v2';
 
 import styles from './item-table-list.module.css';
@@ -43,6 +44,7 @@ import { useTableRowModel } from '/@/renderer/components/item-list/item-table-li
 import { useTableScrollToIndex } from '/@/renderer/components/item-list/item-table-list/hooks/use-table-scroll-to-index';
 import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import {
+    type ItemTableListConfig,
     ItemTableListConfigProvider,
     ItemTableListStoreProvider,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-context';
@@ -104,27 +106,11 @@ export enum TableItemSize {
 interface VirtualizedTableGridProps {
     calculatedColumnWidths: number[];
     CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
-    cellPadding: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
-    controls: ItemControls;
     data: unknown[];
     dataWithGroups: (null | unknown)[];
-    enableAlternateRowColors: boolean;
-    enableColumnReorder: boolean;
-    enableColumnResize: boolean;
-    enableDrag?: boolean;
-    enableExpansion: boolean;
-    enableHeader: boolean;
-    enableHorizontalBorders: boolean;
-    enableRowHoverHighlight: boolean;
     enableScrollShadow: boolean;
-    enableSelection: boolean;
-    enableVerticalBorders: boolean;
     getItem?: (index: number) => undefined | unknown;
-    getRowHeight: (index: number, cellProps: TableItemProps) => number;
-    groups?: TableGroupHeader[];
     headerHeight: number;
-    internalState: ItemListStateActions;
-    itemType: LibraryItem;
     mergedRowRef: React.Ref<HTMLDivElement>;
     onRangeChanged?: ItemTableListProps['onRangeChanged'];
     parsedColumns: ReturnType<typeof parseTableColumns>;
@@ -134,13 +120,10 @@ interface VirtualizedTableGridProps {
     pinnedRightColumnRef: React.RefObject<HTMLDivElement | null>;
     pinnedRowCount: number;
     pinnedRowRef: React.RefObject<HTMLDivElement | null>;
-    playerContext: PlayerContext;
     showLeftShadow: boolean;
     showRightShadow: boolean;
     showTopShadow: boolean;
-    size: 'compact' | 'default' | 'large';
-    startRowIndex?: number;
-    tableId: string;
+    tableConfig: ItemTableListConfig;
     totalColumnCount: number;
     totalRowCount: number;
 }
@@ -148,27 +131,11 @@ interface VirtualizedTableGridProps {
 const VirtualizedTableGrid = ({
     calculatedColumnWidths,
     CellComponent,
-    cellPadding,
-    controls,
     data,
     dataWithGroups,
-    enableAlternateRowColors,
-    enableColumnReorder,
-    enableColumnResize,
-    enableDrag,
-    enableExpansion,
-    enableHeader,
-    enableHorizontalBorders,
-    enableRowHoverHighlight,
     enableScrollShadow,
-    enableSelection,
-    enableVerticalBorders,
     getItem,
-    getRowHeight,
-    groups,
     headerHeight,
-    internalState,
-    itemType,
     mergedRowRef,
     onRangeChanged,
     parsedColumns,
@@ -178,16 +145,14 @@ const VirtualizedTableGrid = ({
     pinnedRightColumnRef,
     pinnedRowCount,
     pinnedRowRef,
-    playerContext,
     showLeftShadow,
     showRightShadow,
     showTopShadow,
-    size,
-    startRowIndex,
-    tableId,
+    tableConfig,
     totalColumnCount,
     totalRowCount,
 }: VirtualizedTableGridProps) => {
+    const { enableHeader, enableRowHoverHighlight, getRowHeight, groups } = tableConfig;
     const hoverDelegateRef = useRef<HTMLDivElement | null>(null);
 
     useRowInteractionDelegate({
@@ -345,35 +310,7 @@ const VirtualizedTableGrid = ({
         ],
     );
 
-    const stableConfigProps = useMemo(
-        () => ({
-            cellPadding,
-            columns: parsedColumns,
-            controls,
-            enableHeader,
-            getRowHeight,
-            hasAlbumGroupColumn: parsedColumns.some((col) => col.id === TableColumn.ALBUM_GROUP),
-            internalState,
-            itemType,
-            playerContext,
-            size,
-            tableId,
-        }),
-        [
-            cellPadding,
-            parsedColumns,
-            controls,
-            enableHeader,
-            getRowHeight,
-            internalState,
-            itemType,
-            playerContext,
-            size,
-            tableId,
-        ],
-    );
-
-    const dynamicDataProps = useMemo(
+    const gridOnlyProps = useMemo(
         () => ({
             calculatedColumnWidths,
             data: dataWithGroups,
@@ -381,11 +318,11 @@ const VirtualizedTableGrid = ({
             getGroupRenderData,
             getRowItem,
             groupHeaderInfoByRowIndex,
+            hasAlbumGroupColumn: parsedColumns.some((col) => col.id === TableColumn.ALBUM_GROUP),
             pinnedLeftColumnCount,
             pinnedLeftColumnWidths,
             pinnedRightColumnCount,
             pinnedRightColumnWidths,
-            startRowIndex,
         }),
         [
             calculatedColumnWidths,
@@ -394,49 +331,67 @@ const VirtualizedTableGrid = ({
             getAdjustedRowIndex,
             getGroupRenderData,
             groupHeaderInfoByRowIndex,
+            parsedColumns,
             pinnedLeftColumnCount,
             pinnedLeftColumnWidths,
             pinnedRightColumnCount,
             pinnedRightColumnWidths,
-            startRowIndex,
-        ],
-    );
-
-    const featureFlags = useMemo(
-        () => ({
-            enableAlternateRowColors,
-            enableColumnReorder,
-            enableColumnResize,
-            enableDrag,
-            enableExpansion,
-            enableHorizontalBorders,
-            enableRowHoverHighlight,
-            enableSelection,
-            enableVerticalBorders,
-            groups,
-        }),
-        [
-            enableAlternateRowColors,
-            enableColumnReorder,
-            enableColumnResize,
-            enableDrag,
-            enableExpansion,
-            enableHorizontalBorders,
-            enableRowHoverHighlight,
-            enableSelection,
-            enableVerticalBorders,
-            groups,
         ],
     );
 
     const itemProps: TableItemProps = useMemo(
         () => ({
-            ...stableConfigProps,
-            ...dynamicDataProps,
-            ...featureFlags,
+            cellPadding: tableConfig.cellPadding,
+            columns: tableConfig.columns,
+            controls: tableConfig.controls,
+            enableAlternateRowColors: tableConfig.enableAlternateRowColors,
+            enableColumnReorder: tableConfig.enableColumnReorder,
+            enableColumnResize: tableConfig.enableColumnResize,
+            enableDrag: tableConfig.enableDrag,
+            enableExpansion: tableConfig.enableExpansion,
+            enableHeader: tableConfig.enableHeader,
+            enableHorizontalBorders: tableConfig.enableHorizontalBorders,
+            enableRowHoverHighlight: tableConfig.enableRowHoverHighlight,
+            enableSelection: tableConfig.enableSelection,
+            enableVerticalBorders: tableConfig.enableVerticalBorders,
+            getRowHeight: tableConfig.getRowHeight,
+            groups: tableConfig.groups,
+            internalState: tableConfig.internalState,
+            itemType: tableConfig.itemType,
+            playerContext: tableConfig.playerContext,
+            playlistId: tableConfig.playlistId,
+            size: tableConfig.size,
+            startRowIndex: tableConfig.startRowIndex,
+            tableId: tableConfig.tableId,
+            ...gridOnlyProps,
         }),
-        [stableConfigProps, dynamicDataProps, featureFlags],
+        [gridOnlyProps, tableConfig],
     );
+
+    const pinnedLeftGridMinWidthPx = useMemo(() => {
+        let sum = 0;
+        for (let i = 0; i < pinnedLeftColumnCount; i++) {
+            sum += calculatedColumnWidths[i] ?? 0;
+        }
+        return sum;
+    }, [calculatedColumnWidths, pinnedLeftColumnCount]);
+
+    const pinnedRightGridMinWidthPx = useMemo(() => {
+        let sum = 0;
+        const start = pinnedLeftColumnCount + totalColumnCount;
+        for (let i = 0; i < pinnedRightColumnCount; i++) {
+            sum += calculatedColumnWidths[start + i] ?? 0;
+        }
+        return sum;
+    }, [calculatedColumnWidths, pinnedLeftColumnCount, pinnedRightColumnCount, totalColumnCount]);
+
+    const pinnedRowsMinHeightPx = useMemo(() => {
+        let sum = 0;
+        for (let i = 0; i < pinnedRowCount; i++) {
+            sum += getRowHeight(i, itemProps);
+        }
+        return sum;
+    }, [getRowHeight, itemProps, pinnedRowCount]);
 
     const PinnedRowCell = useCallback(
         (cellProps: CellComponentProps & TableItemProps) => {
@@ -447,16 +402,14 @@ const VirtualizedTableGrid = ({
                 />
             );
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [pinnedLeftColumnCount, CellComponent, featureFlags, calculatedColumnWidths],
+        [pinnedLeftColumnCount, CellComponent],
     );
 
     const PinnedColumnCell = useCallback(
         (cellProps: CellComponentProps & TableItemProps) => {
             return <CellComponent {...cellProps} rowIndex={cellProps.rowIndex + pinnedRowCount} />;
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [pinnedRowCount, CellComponent, featureFlags, calculatedColumnWidths],
+        [pinnedRowCount, CellComponent],
     );
 
     const PinnedRightColumnCell = useCallback(
@@ -469,15 +422,7 @@ const VirtualizedTableGrid = ({
                 />
             );
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [
-            pinnedLeftColumnCount,
-            pinnedRowCount,
-            totalColumnCount,
-            CellComponent,
-            featureFlags,
-            calculatedColumnWidths,
-        ],
+        [pinnedLeftColumnCount, pinnedRowCount, totalColumnCount, CellComponent],
     );
 
     const PinnedRightIntersectionCell = useCallback(
@@ -489,14 +434,7 @@ const VirtualizedTableGrid = ({
                 />
             );
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [
-            pinnedLeftColumnCount,
-            totalColumnCount,
-            CellComponent,
-            featureFlags,
-            calculatedColumnWidths,
-        ],
+        [pinnedLeftColumnCount, totalColumnCount, CellComponent],
     );
 
     const RowCell = useCallback(
@@ -509,14 +447,7 @@ const VirtualizedTableGrid = ({
                 />
             );
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [
-            pinnedLeftColumnCount,
-            pinnedRowCount,
-            CellComponent,
-            featureFlags,
-            calculatedColumnWidths,
-        ],
+        [pinnedLeftColumnCount, pinnedRowCount, CellComponent],
     );
 
     const handleOnCellsRendered = useCallback(
@@ -541,10 +472,7 @@ const VirtualizedTableGrid = ({
                 style={
                     {
                         '--header-height': `${headerHeight}px`,
-                        minWidth: `${Array.from({ length: pinnedLeftColumnCount }, () => 0).reduce(
-                            (a, _, i) => a + columnWidth(i),
-                            0,
-                        )}px`,
+                        minWidth: `${pinnedLeftGridMinWidthPx}px`,
                     } as React.CSSProperties
                 }
             >
@@ -554,10 +482,7 @@ const VirtualizedTableGrid = ({
                             [styles.withHeader]: enableHeader,
                         })}
                         style={{
-                            minHeight: `${Array.from({ length: pinnedRowCount }, () => 0).reduce(
-                                (a, _, i) => a + getRowHeight(i, itemProps),
-                                0,
-                            )}px`,
+                            minHeight: `${pinnedRowsMinHeightPx}px`,
                             overflow: 'hidden',
                         }}
                     >
@@ -611,10 +536,7 @@ const VirtualizedTableGrid = ({
                         style={
                             {
                                 '--header-height': `${headerHeight}px`,
-                                minHeight: `${Array.from(
-                                    { length: pinnedRowCount },
-                                    () => 0,
-                                ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
+                                minHeight: `${pinnedRowsMinHeightPx}px`,
                                 overflow: 'hidden',
                             } as React.CSSProperties
                         }
@@ -627,7 +549,7 @@ const VirtualizedTableGrid = ({
                             columnWidth={(index) => {
                                 return columnWidth(index + pinnedLeftColumnCount);
                             }}
-                            rowCount={Array.from({ length: pinnedRowCount }, () => 0).length}
+                            rowCount={pinnedRowCount}
                             rowHeight={getRowHeight}
                         />
                     </div>
@@ -660,14 +582,7 @@ const VirtualizedTableGrid = ({
                     style={
                         {
                             '--header-height': `${headerHeight}px`,
-                            minWidth: `${Array.from(
-                                { length: pinnedRightColumnCount },
-                                () => 0,
-                            ).reduce(
-                                (a, _, i) =>
-                                    a + columnWidth(i + pinnedLeftColumnCount + totalColumnCount),
-                                0,
-                            )}px`,
+                            minWidth: `${pinnedRightGridMinWidthPx}px`,
                         } as React.CSSProperties
                     }
                 >
@@ -677,10 +592,7 @@ const VirtualizedTableGrid = ({
                                 [styles.withHeader]: enableHeader,
                             })}
                             style={{
-                                minHeight: `${Array.from(
-                                    { length: pinnedRowCount },
-                                    () => 0,
-                                ).reduce((a, _, i) => a + getRowHeight(i, itemProps), 0)}px`,
+                                minHeight: `${pinnedRowsMinHeightPx}px`,
                                 overflow: 'hidden',
                             }}
                         >
@@ -739,27 +651,12 @@ const MemoizedVirtualizedTableGrid = memo(VirtualizedTableGrid, (prevProps, next
             prevProps.calculatedColumnWidths,
             nextProps.calculatedColumnWidths,
         ) &&
-        prevProps.cellPadding === nextProps.cellPadding &&
-        prevProps.controls === nextProps.controls &&
+        prevProps.tableConfig === nextProps.tableConfig &&
         prevProps.data === nextProps.data &&
         prevProps.dataWithGroups === nextProps.dataWithGroups &&
-        prevProps.enableAlternateRowColors === nextProps.enableAlternateRowColors &&
-        prevProps.enableColumnReorder === nextProps.enableColumnReorder &&
-        prevProps.enableColumnResize === nextProps.enableColumnResize &&
-        prevProps.enableDrag === nextProps.enableDrag &&
-        prevProps.enableExpansion === nextProps.enableExpansion &&
-        prevProps.enableHeader === nextProps.enableHeader &&
-        prevProps.enableHorizontalBorders === nextProps.enableHorizontalBorders &&
-        prevProps.enableRowHoverHighlight === nextProps.enableRowHoverHighlight &&
         prevProps.enableScrollShadow === nextProps.enableScrollShadow &&
-        prevProps.enableSelection === nextProps.enableSelection &&
-        prevProps.enableVerticalBorders === nextProps.enableVerticalBorders &&
         prevProps.getItem === nextProps.getItem &&
-        prevProps.getRowHeight === nextProps.getRowHeight &&
-        prevProps.groups === nextProps.groups &&
         prevProps.headerHeight === nextProps.headerHeight &&
-        prevProps.internalState === nextProps.internalState &&
-        prevProps.itemType === nextProps.itemType &&
         prevProps.mergedRowRef === nextProps.mergedRowRef &&
         prevProps.onRangeChanged === nextProps.onRangeChanged &&
         prevProps.parsedColumns === nextProps.parsedColumns &&
@@ -769,13 +666,9 @@ const MemoizedVirtualizedTableGrid = memo(VirtualizedTableGrid, (prevProps, next
         prevProps.pinnedRightColumnRef === nextProps.pinnedRightColumnRef &&
         prevProps.pinnedRowCount === nextProps.pinnedRowCount &&
         prevProps.pinnedRowRef === nextProps.pinnedRowRef &&
-        prevProps.playerContext === nextProps.playerContext &&
         prevProps.showLeftShadow === nextProps.showLeftShadow &&
         prevProps.showRightShadow === nextProps.showRightShadow &&
         prevProps.showTopShadow === nextProps.showTopShadow &&
-        prevProps.size === nextProps.size &&
-        prevProps.startRowIndex === nextProps.startRowIndex &&
-        prevProps.tableId === nextProps.tableId &&
         prevProps.totalColumnCount === nextProps.totalColumnCount &&
         prevProps.totalRowCount === nextProps.totalRowCount &&
         prevProps.CellComponent === nextProps.CellComponent
@@ -828,6 +721,7 @@ export interface TableItemProps {
     pinnedRightColumnCount?: number;
     pinnedRightColumnWidths?: number[];
     playerContext: PlayerContext;
+    playlistId?: string;
     size?: ItemTableListProps['size'];
     startRowIndex?: number;
     tableId: string;
@@ -1309,6 +1203,7 @@ const BaseItemTableList = ({
     size = 'default',
     startRowIndex,
 }: ItemTableListProps) => {
+    const { playlistId: routePlaylistId } = useParams() as { playlistId?: string };
     const tableId = useId();
     const baseItemCount = itemCount ?? data.length;
     const totalItemCount = enableHeader ? baseItemCount + 1 : baseItemCount;
@@ -1574,6 +1469,7 @@ const BaseItemTableList = ({
                 pinnedLeftColumnCount + totalColumnCount,
             ),
             playerContext,
+            playlistId: routePlaylistId,
             size,
             tableId,
         }),
@@ -1599,6 +1495,7 @@ const BaseItemTableList = ({
             pinnedLeftColumnCount,
             pinnedRightColumnCount,
             playerContext,
+            routePlaylistId,
             size,
             tableId,
             totalColumnCount,
@@ -1612,17 +1509,27 @@ const BaseItemTableList = ({
         itemType,
     });
 
-    const tableConfigValue = useMemo(
+    const tableConfigValue = useMemo<ItemTableListConfig>(
         () => ({
             cellPadding,
             columns: parsedColumns,
             controls,
+            enableAlternateRowColors,
+            enableColumnReorder: !!onColumnReordered,
+            enableColumnResize: !!onColumnResized,
+            enableDrag,
+            enableExpansion,
             enableHeader,
+            enableHorizontalBorders,
             enableRowHoverHighlight,
             enableSelection,
+            enableVerticalBorders,
+            getRowHeight,
+            groups,
             internalState,
             itemType,
             playerContext,
+            playlistId: routePlaylistId,
             size,
             startRowIndex,
             tableId,
@@ -1631,12 +1538,22 @@ const BaseItemTableList = ({
             cellPadding,
             parsedColumns,
             controls,
+            enableAlternateRowColors,
+            onColumnReordered,
+            onColumnResized,
+            enableDrag,
+            enableExpansion,
             enableHeader,
+            enableHorizontalBorders,
             enableRowHoverHighlight,
             enableSelection,
+            enableVerticalBorders,
+            getRowHeight,
+            groups,
             internalState,
             itemType,
             playerContext,
+            routePlaylistId,
             size,
             startRowIndex,
             tableId,
@@ -1707,27 +1624,11 @@ const BaseItemTableList = ({
                     <MemoizedVirtualizedTableGrid
                         calculatedColumnWidths={calculatedColumnWidths}
                         CellComponent={optimizedCellComponent}
-                        cellPadding={cellPadding}
-                        controls={controls}
                         data={data}
                         dataWithGroups={dataWithGroups}
-                        enableAlternateRowColors={enableAlternateRowColors}
-                        enableColumnReorder={!!onColumnReordered}
-                        enableColumnResize={!!onColumnResized}
-                        enableDrag={enableDrag}
-                        enableExpansion={enableExpansion}
-                        enableHeader={enableHeader}
-                        enableHorizontalBorders={enableHorizontalBorders}
-                        enableRowHoverHighlight={enableRowHoverHighlight}
                         enableScrollShadow={enableScrollShadow}
-                        enableSelection={enableSelection}
-                        enableVerticalBorders={enableVerticalBorders}
                         getItem={getItem}
-                        getRowHeight={getRowHeight}
-                        groups={groups}
                         headerHeight={headerHeight}
-                        internalState={internalState}
-                        itemType={itemType}
                         mergedRowRef={mergedRowRef}
                         onRangeChanged={onRangeChanged}
                         parsedColumns={parsedColumns}
@@ -1737,13 +1638,10 @@ const BaseItemTableList = ({
                         pinnedRightColumnRef={pinnedRightColumnRef}
                         pinnedRowCount={pinnedRowCount}
                         pinnedRowRef={pinnedRowRef}
-                        playerContext={playerContext}
                         showLeftShadow={showLeftShadow}
                         showRightShadow={showRightShadow}
                         showTopShadow={showTopShadow}
-                        size={size}
-                        startRowIndex={startRowIndex}
-                        tableId={tableId}
+                        tableConfig={tableConfigValue}
                         totalColumnCount={totalColumnCount}
                         totalRowCount={totalRowCount}
                     />

@@ -60,12 +60,12 @@ const PlaylistSongListFiltersModal = () => {
     const hasActiveFilters = useMemo(() => {
         return Boolean(
             isFilterValueSet(query[FILTER_KEYS.SONG.ALBUM_ARTIST_IDS]) ||
-                isFilterValueSet(query[FILTER_KEYS.SONG.ARTIST_IDS]) ||
-                query[FILTER_KEYS.SONG.FAVORITE] !== undefined ||
-                isFilterValueSet(query[FILTER_KEYS.SONG.GENRE_ID]) ||
-                query[FILTER_KEYS.SONG.HAS_RATING] !== undefined ||
-                query[FILTER_KEYS.SONG.MAX_YEAR] !== undefined ||
-                query[FILTER_KEYS.SONG.MIN_YEAR] !== undefined,
+            isFilterValueSet(query[FILTER_KEYS.SONG.ARTIST_IDS]) ||
+            query[FILTER_KEYS.SONG.FAVORITE] !== undefined ||
+            isFilterValueSet(query[FILTER_KEYS.SONG.GENRE_ID]) ||
+            query[FILTER_KEYS.SONG.HAS_RATING] !== undefined ||
+            query[FILTER_KEYS.SONG.MAX_YEAR] !== undefined ||
+            query[FILTER_KEYS.SONG.MIN_YEAR] !== undefined,
         );
     }, [query]);
 
@@ -258,7 +258,7 @@ export const openSaveAndReplaceModal = (
 ) => {
     openContextModal({
         innerProps: { onSuccess, playlistId, songIds },
-        modalKey: 'saveAndReplace',
+        modal: 'saveAndReplace',
         size: 'sm',
         title: i18n.t('common.saveAndReplace', { postProcess: 'titleCase' }) as string,
     });

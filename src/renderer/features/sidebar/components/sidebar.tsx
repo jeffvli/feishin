@@ -12,7 +12,6 @@ import {
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
-import { ServerSelector } from '/@/renderer/features/sidebar/components/server-selector';
 import { SidebarCollectionList } from '/@/renderer/features/sidebar/components/sidebar-collection-list';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
@@ -152,9 +151,6 @@ export const Sidebar = () => {
                 </Accordion>
             </ScrollArea>
             <AnimatePresence initial={false} mode="popLayout">
-                <motion.div className={styles.serverSelectorWrapper} key="server-selector" layout>
-                    <ServerSelector />
-                </motion.div>
                 {showImage && <SidebarImage />}
             </AnimatePresence>
         </div>

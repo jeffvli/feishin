@@ -55,12 +55,12 @@ export const SongListHeaderFilters = ({ toggleGenreTarget }: { toggleGenreTarget
         const query = songFilters.query;
         return Boolean(
             isFilterValueSet(query[FILTER_KEYS.SONG._CUSTOM]) ||
-                isFilterValueSet(query[FILTER_KEYS.SONG.ARTIST_IDS]) ||
-                query[FILTER_KEYS.SONG.FAVORITE] !== undefined ||
-                isFilterValueSet(query[FILTER_KEYS.SONG.GENRE_ID]) ||
-                isFilterValueSet(query[FILTER_KEYS.SONG.MAX_YEAR]) ||
-                isFilterValueSet(query[FILTER_KEYS.SONG.MIN_YEAR]) ||
-                isFilterValueSet(query[FILTER_KEYS.SHARED.SEARCH_TERM]),
+            isFilterValueSet(query[FILTER_KEYS.SONG.ARTIST_IDS]) ||
+            query[FILTER_KEYS.SONG.FAVORITE] !== undefined ||
+            isFilterValueSet(query[FILTER_KEYS.SONG.GENRE_ID]) ||
+            isFilterValueSet(query[FILTER_KEYS.SONG.MAX_YEAR]) ||
+            isFilterValueSet(query[FILTER_KEYS.SONG.MIN_YEAR]) ||
+            isFilterValueSet(query[FILTER_KEYS.SHARED.SEARCH_TERM]),
         );
     }, [songFilters.query]);
 

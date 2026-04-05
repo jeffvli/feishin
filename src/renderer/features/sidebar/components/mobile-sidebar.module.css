@@ -22,7 +22,8 @@
 }
 
 .accordion-control {
-    height: 2.5rem;
+    height: auto;
+    min-height: 2.5rem;
     border-radius: var(--theme-radius-md);
 
     &:hover {
@@ -37,10 +38,4 @@
 
 .accordion-content:last-child {
     padding-bottom: var(--theme-spacing-md);
-}
-
-.server-selector-wrapper {
-    position: relative;
-    z-index: 1;
-    flex-shrink: 0;
 }

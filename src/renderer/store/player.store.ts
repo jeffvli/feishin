@@ -92,6 +92,7 @@ interface GroupedQueue {
 }
 
 interface State {
+    hydrated: boolean;
     player: {
         crossfadeDuration: number;
         crossfadeStyle: CrossfadeStyle;
@@ -297,6 +298,7 @@ function regenerateShuffledIndexesIfNeeded(state: {
 }
 
 const initialState: State = {
+    hydrated: false,
     player: {
         crossfadeDuration: 5,
         crossfadeStyle: CrossfadeStyle.EQUAL_POWER,
@@ -1570,6 +1572,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 if (playback.previousLocalVolume !== undefined) {
                     state.player.volume = playback.previousLocalVolume;
                 }
+                usePlayerStoreBase.setState({ hydrated: true });
             },
             partialize: (state) => {
                 const shouldRestorePlayQueue = useSettingsStore.getState().general.resume;
@@ -2030,6 +2033,10 @@ export const usePlayerShuffle = () => {
 
 export const usePlayerStatus = () => {
     return usePlayerStoreBase((state) => state.player.status);
+};
+
+export const usePlayerHydrated = () => {
+    return usePlayerStoreBase((state) => state.hydrated);
 };
 
 export const usePlayerVolume = () => {

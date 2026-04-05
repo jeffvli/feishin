@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { CellComponentProps } from 'react-window-v2';
 
 import { createColumnCellComponents } from './cell-component-factory';
@@ -24,24 +24,7 @@ const MemoizedCellRouterBase = (props: MemoizedCellRouterProps) => {
     return <ItemTableListColumn {...props} />;
 };
 
-export const MemoizedCellRouter = memo(MemoizedCellRouterBase, (prevProps, nextProps) => {
-    return (
-        prevProps.rowIndex === nextProps.rowIndex &&
-        prevProps.columnIndex === nextProps.columnIndex &&
-        prevProps.data === nextProps.data &&
-        prevProps.columns === nextProps.columns &&
-        prevProps.columnCellComponents === nextProps.columnCellComponents &&
-        prevProps.size === nextProps.size &&
-        prevProps.enableAlternateRowColors === nextProps.enableAlternateRowColors &&
-        prevProps.enableHorizontalBorders === nextProps.enableHorizontalBorders &&
-        prevProps.enableVerticalBorders === nextProps.enableVerticalBorders &&
-        prevProps.enableRowHoverHighlight === nextProps.enableRowHoverHighlight &&
-        prevProps.enableSelection === nextProps.enableSelection &&
-        prevProps.enableColumnResize === nextProps.enableColumnResize &&
-        prevProps.enableColumnReorder === nextProps.enableColumnReorder &&
-        prevProps.cellPadding === nextProps.cellPadding
-    );
-});
+export const MemoizedCellRouter = MemoizedCellRouterBase;
 
 export const useColumnCellComponents = (
     columns: TableColumn[],

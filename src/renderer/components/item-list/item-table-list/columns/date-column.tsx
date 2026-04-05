@@ -18,10 +18,15 @@ const DateColumnBase = (props: ItemTableListInnerColumn) => {
     const rowItem = props.getRowItem?.(props.rowIndex) ?? (props.data as any[])[props.rowIndex];
     const row: string | undefined = (rowItem as any)?.[props.columns[props.columnIndex].id];
 
-    if (typeof row === 'string' && row) {
+    const formattedAbsolute = useMemo(
+        () => (typeof row === 'string' && row ? formatDateAbsolute(row) : null),
+        [row],
+    );
+
+    if (formattedAbsolute) {
         return (
             <TableColumnTextContainer {...props}>
-                <span>{formatDateAbsolute(row)}</span>
+                <span>{formattedAbsolute}</span>
             </TableColumnTextContainer>
         );
     }
@@ -63,6 +68,11 @@ const AbsoluteDateColumnBase = (props: ItemTableListInnerColumn) => {
         return null;
     }, [props.type, rowItem]);
 
+    const formattedIsoFallback = useMemo(
+        () => (typeof row === 'string' && row ? formatPartialIsoDateUTC(row) : null),
+        [row],
+    );
+
     if (props.type === TableColumn.RELEASE_DATE) {
         if (releaseDateContent) {
             return (
@@ -72,10 +82,10 @@ const AbsoluteDateColumnBase = (props: ItemTableListInnerColumn) => {
             );
         }
 
-        if (typeof row === 'string' && row) {
+        if (formattedIsoFallback) {
             return (
                 <TableColumnTextContainer {...props}>
-                    <span>{formatPartialIsoDateUTC(row)}</span>
+                    <span>{formattedIsoFallback}</span>
                 </TableColumnTextContainer>
             );
         }
@@ -96,10 +106,15 @@ const RelativeDateColumnBase = (props: ItemTableListInnerColumn) => {
     const rowItem = props.getRowItem?.(props.rowIndex) ?? (props.data as any[])[props.rowIndex];
     const row: string | undefined = (rowItem as any)?.[props.columns[props.columnIndex].id];
 
-    if (typeof row === 'string') {
+    const formattedRelative = useMemo(() => {
+        if (typeof row !== 'string') return null;
+        return formatDateRelative(row);
+    }, [row]);
+
+    if (formattedRelative !== null) {
         return (
             <TableColumnTextContainer {...props}>
-                <span>{formatDateRelative(row)}</span>
+                <span>{formattedRelative}</span>
             </TableColumnTextContainer>
         );
     }

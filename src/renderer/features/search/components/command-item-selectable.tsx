@@ -1,8 +1,10 @@
 import { Command } from 'cmdk';
 import { ComponentPropsWithoutRef, ReactNode, useEffect, useRef, useState } from 'react';
 
-interface CommandItemSelectableProps
-    extends Omit<ComponentPropsWithoutRef<typeof Command.Item>, 'children'> {
+interface CommandItemSelectableProps extends Omit<
+    ComponentPropsWithoutRef<typeof Command.Item>,
+    'children'
+> {
     children: (args: { isHighlighted: boolean }) => ReactNode;
 }
 

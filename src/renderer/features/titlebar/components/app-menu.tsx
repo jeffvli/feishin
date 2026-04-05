@@ -5,15 +5,18 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 
 import packageJson from '../../../../../package.json';
+import styles from './app-menu.module.css';
 
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import { ServerList } from '/@/renderer/features/servers/components/server-list';
 import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
+import { ServerSelector } from '/@/renderer/features/sidebar/components/server-selector';
 import { openReleaseNotesModal } from '/@/renderer/release-notes-modal';
 import {
     useAppStore,
     useAppStoreActions,
     useCommandPalette,
+    useCurrentServer,
     useGeneralSettings,
     useSettingsStoreActions,
 } from '/@/renderer/store';
@@ -84,6 +87,7 @@ export const AppMenu = () => {
     const { setPrivateMode, setSideBar } = useAppStoreActions();
     const { setSettings } = useSettingsStoreActions();
     const settings = useGeneralSettings();
+    const currentServer = useCurrentServer();
     const { open: openCommandPalette } = useCommandPalette();
 
     const handleBrowserDevTools = () => {
@@ -134,7 +138,26 @@ export const AppMenu = () => {
         });
     };
 
+    const serverHeaderMenuItems: MenuItem[] = currentServer
+        ? [
+              {
+                  component: (
+                      <div className={styles.serverSelector}>
+                          <ServerSelector />
+                      </div>
+                  ),
+                  id: 'server-selector',
+                  type: 'custom',
+              },
+              {
+                  id: 'divider-server',
+                  type: 'divider',
+              },
+          ]
+        : [];
+
     const menuConfig: MenuItem[] = [
+        ...serverHeaderMenuItems,
         {
             icon: 'search',
             id: 'command-palette',

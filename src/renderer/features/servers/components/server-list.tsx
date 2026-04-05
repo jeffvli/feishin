@@ -33,7 +33,7 @@ export const ServerList = () => {
                     <AddServerForm onCancel={() => vars.context.closeModal(vars.id)} />
                 ),
             },
-            modalKey: 'base',
+            modal: 'base',
             title: t('form.addServer.title', { postProcess: 'titleCase' }),
         });
     };

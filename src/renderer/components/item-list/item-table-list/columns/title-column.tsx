@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { useMemo } from 'react';
 import { Link } from 'react-router';
 
 import styles from './title-column.module.css';
@@ -35,8 +36,12 @@ function DefaultTitleColumn(props: ItemTableListInnerColumn) {
     const rowItem = props.getRowItem?.(props.rowIndex) ?? (props.data as any[])[props.rowIndex];
     const row: string | undefined = rowItem?.[props.columns[props.columnIndex].id];
 
+    const path = useMemo(() => {
+        if (typeof row !== 'string' || !rowItem || !(rowItem as any).id) return undefined;
+        return getTitlePath(props.itemType, (rowItem as any).id as string);
+    }, [props.itemType, row, rowItem]);
+
     if (typeof row === 'string') {
-        const path = getTitlePath(props.itemType, (rowItem as any).id as string);
         const item = rowItem as any;
 
         const titleLinkProps = path
@@ -80,8 +85,12 @@ function QueueSongTitleColumn(props: ItemTableListInnerColumn) {
     const song = rowItem as QueueSong;
     const isActive = useIsActiveRow(song?.id, song?._uniqueId);
 
+    const path = useMemo(() => {
+        if (typeof row !== 'string' || !rowItem || !(rowItem as any).id) return undefined;
+        return getTitlePath(props.itemType, (rowItem as any).id as string);
+    }, [props.itemType, row, rowItem]);
+
     if (typeof row === 'string') {
-        const path = getTitlePath(props.itemType, (rowItem as any).id as string);
         const item = rowItem as any;
 
         const titleLinkProps = path

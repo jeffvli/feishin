@@ -20,7 +20,8 @@ export const createColumnCellComponent = (
                 prevProps.columnIndex === nextProps.columnIndex &&
                 prevProps.data === nextProps.data &&
                 prevProps.style === nextProps.style &&
-                prevProps.columns === nextProps.columns
+                prevProps.columns === nextProps.columns &&
+                prevProps.playlistId === nextProps.playlistId
             );
         },
     );

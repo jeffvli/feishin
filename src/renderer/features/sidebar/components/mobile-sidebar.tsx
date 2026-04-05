@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import styles from './mobile-sidebar.module.css';
 
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
-import { ServerSelector } from '/@/renderer/features/sidebar/components/server-selector';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import {
@@ -104,9 +103,6 @@ export const MobileSidebar = () => {
                     )}
                 </Accordion>
             </ScrollArea>
-            <div className={styles.serverSelectorWrapper}>
-                <ServerSelector />
-            </div>
         </div>
     );
 };

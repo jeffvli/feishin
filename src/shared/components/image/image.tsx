@@ -97,7 +97,7 @@ export function BaseImage({
 
     const shouldLoadImage = Boolean(
         effectiveImageRequest &&
-            (!enableViewport || isInSessionCache || inViewport || hasLoadedInInstance),
+        (!enableViewport || isInSessionCache || inViewport || hasLoadedInInstance),
     );
 
     const nativeImage = useNativeImage({

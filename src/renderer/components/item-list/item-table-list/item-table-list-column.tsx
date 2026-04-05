@@ -19,7 +19,6 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { useParams } from 'react-router';
 import { CellComponentProps } from 'react-window-v2';
 
 import styles from './item-table-list-column.module.css';
@@ -82,7 +81,6 @@ export interface ItemTableListInnerColumn extends ItemTableListColumn {
 }
 
 const ItemTableListColumnBase = (props: ItemTableListColumn) => {
-    const { playlistId } = useParams() as { playlistId?: string };
     const type = props.columnType ?? (props.columns[props.columnIndex].id as TableColumn);
 
     const isHeaderEnabled = !!props.enableHeader;
@@ -135,7 +133,7 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
         item,
         itemType: props.itemType,
         playerContext: props.playerContext,
-        playlistId,
+        playlistId: props.playlistId,
     });
 
     const controls = props.controls;
@@ -362,6 +360,7 @@ export const ItemTableListColumn = memo(ItemTableListColumnBase, (prevProps, nex
         prevProps.enableColumnResize === nextProps.enableColumnResize &&
         prevProps.enableColumnReorder === nextProps.enableColumnReorder &&
         prevProps.cellPadding === nextProps.cellPadding &&
+        prevProps.playlistId === nextProps.playlistId &&
         prevItem === nextItem
     );
 });

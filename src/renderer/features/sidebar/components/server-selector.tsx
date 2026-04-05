@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './server-selector.module.css';
@@ -9,7 +8,7 @@ import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { ServerSelectorItems } from '/@/renderer/features/sidebar/components/server-selector-items';
-import { useAppStore, useCurrentServer } from '/@/renderer/store';
+import { useCurrentServer } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
 import { Box } from '/@/shared/components/box/box';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
@@ -24,17 +23,12 @@ import { ServerFeature } from '/@/shared/types/features-types';
 export const ServerSelector = () => {
     const { t } = useTranslation();
     const currentServer = useCurrentServer();
-    const sidebarImageEnabled = useAppStore((state) => state.sidebar.image);
-    const showImage = sidebarImageEnabled;
 
     const { data: musicFolders } = useQuery(
         currentServer
             ? sharedQueries.musicFolders({ query: null, serverId: currentServer.id })
             : { enabled: false, queryKey: ['disabled'] },
     );
-
-    const targetRef = useRef<HTMLDivElement | null>(null);
-    const widthOfTarget = targetRef.current?.getBoundingClientRect().width;
 
     if (!currentServer) {
         return null;
@@ -69,15 +63,11 @@ export const ServerSelector = () => {
               : OpenSubsonicLogo;
 
     return (
-        <DropdownMenu offset={0} position="right">
+        <DropdownMenu offset={0} position="right-start" withinPortal={false}>
             <DropdownMenu.Target>
                 <div className={styles.popoverTarget}>
-                    <Box
-                        className={`${styles.buttonContainer} ${
-                            showImage ? styles.buttonContainerNoBottomPadding : ''
-                        }`}
-                    >
-                        <Group className={styles.buttonGroup} gap="sm" ref={targetRef}>
+                    <Box className={styles.buttonContainer}>
+                        <Group className={styles.buttonGroup} gap="sm">
                             <img className={styles.logo} src={logo} />
                             <Stack className={styles.buttonStack} gap={2}>
                                 <Text fw={600} size="sm" truncate>
@@ -92,7 +82,7 @@ export const ServerSelector = () => {
                     </Box>
                 </div>
             </DropdownMenu.Target>
-            <DropdownMenu.Dropdown style={{ width: `${widthOfTarget}px` }}>
+            <DropdownMenu.Dropdown miw="16rem">
                 <ScrollArea className={styles.scrollArea}>
                     <ServerSelectorItems />
                 </ScrollArea>

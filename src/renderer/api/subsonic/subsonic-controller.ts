@@ -1185,7 +1185,7 @@ export const SubsonicController: InternalControllerEndpoint = {
         return ssNormalize.playlist(res.body.playlist, apiClientProps.server);
     },
     getPlaylistList: async ({ apiClientProps, query }) => {
-        const sortOrder = query.sortOrder.toLowerCase() as 'asc' | 'desc';
+        const sortOrder = (query.sortOrder || SortOrder.ASC).toLowerCase() as 'asc' | 'desc';
 
         const res = await ssApiClient(apiClientProps).getPlaylists({});
 

@@ -1,29 +1,49 @@
+import type { ReactElement } from 'react';
+
 import React, { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import { useSyncExternalStore } from 'react';
+
+import type { TableItemProps } from './item-table-list';
 
 import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls, ItemTableListColumnConfig } from '/@/renderer/components/item-list/types';
 import { PlayerContext } from '/@/renderer/features/player/context/player-context';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
-/**
- * Stage A/B: Provide table-scoped config + external stores so churny values can update
- * without forcing `cellProps` identity changes (and therefore without rerendering every visible cell).
- */
-
 export type ItemTableListConfig = {
     cellPadding: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     columns: ItemTableListColumnConfig[];
     controls: ItemControls;
+    enableAlternateRowColors: boolean;
+    enableColumnReorder: boolean;
+    enableColumnResize: boolean;
+    enableDrag: boolean;
+    enableExpansion: boolean;
     enableHeader: boolean;
+    enableHorizontalBorders: boolean;
     enableRowHoverHighlight: boolean;
     enableSelection: boolean;
+    enableVerticalBorders: boolean;
+    getRowHeight: (index: number, cellProps: TableItemProps) => number;
+    groups?: ItemTableListGroupHeader[];
     internalState: ItemListStateActions;
     itemType: LibraryItem;
     playerContext: PlayerContext;
+    playlistId?: string;
     size: 'compact' | 'default' | 'large';
     startRowIndex?: number;
     tableId: string;
+};
+
+export type ItemTableListGroupHeader = {
+    itemCount: number;
+    render: (props: {
+        data: unknown[];
+        groupIndex: number;
+        index: number;
+        internalState: ItemListStateActions;
+        startDataIndex: number;
+    }) => ReactElement;
 };
 
 const ItemTableListConfigContext = createContext<ItemTableListConfig | null>(null);

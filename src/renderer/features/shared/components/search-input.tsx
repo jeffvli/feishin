@@ -19,6 +19,7 @@ import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 interface SearchInputProps extends TextInputProps {
     buttonProps?: Partial<ActionIconProps>;
     enableHotkey?: boolean;
+    fillContainer?: boolean;
     inputProps?: Partial<TextInputProps>;
     value?: string;
 }
@@ -26,6 +27,7 @@ interface SearchInputProps extends TextInputProps {
 export const SearchInput = ({
     buttonProps,
     enableHotkey = true,
+    fillContainer = false,
     inputProps,
     onChange,
     ...props
@@ -104,9 +106,17 @@ export const SearchInput = ({
             overflow: 'hidden',
             position: 'relative',
             transition: 'width 0.3s ease-in-out',
-            width: shouldExpand ? '200px' : '36px',
+            ...(fillContainer
+                ? {
+                      flex: '1 1 0',
+                      minWidth: 0,
+                      width: shouldExpand ? '100%' : '36px',
+                  }
+                : {
+                      width: shouldExpand ? '200px' : '36px',
+                  }),
         }),
-        [shouldExpand],
+        [fillContainer, shouldExpand],
     );
 
     const buttonStyle: CSSProperties = useMemo(
@@ -135,7 +145,7 @@ export const SearchInput = ({
         <Box style={containerStyle}>
             <TextInput
                 leftSection={<Icon icon="search" />}
-                maw="20dvw"
+                maw={fillContainer ? '100%' : '20dvw'}
                 {...inputProps}
                 onBlur={handleBlur}
                 onChange={onChange}

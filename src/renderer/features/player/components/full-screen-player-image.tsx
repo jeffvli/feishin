@@ -269,25 +269,7 @@ export const FullScreenPlayerImage = () => {
                         ? radioMetadata?.title || stationName || 'Radio'
                         : currentSong?.name}
                 </Text>
-                {isPlayingRadio ? (
-                    <Text overflow="hidden" size="xl" w="100%">
-                        {stationName || 'Radio'}
-                    </Text>
-                ) : (
-                    <Text
-                        component={Link}
-                        isLink
-                        overflow="hidden"
-                        size="xl"
-                        to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
-                            albumId: currentSong?.albumId || '',
-                        })}
-                        w="100%"
-                    >
-                        {currentSong?.album}
-                    </Text>
-                )}
-                <Text key="fs-artists">
+                <Text key="fs-artists" size="xl">
                     {isPlayingRadio
                         ? radioMetadata?.artist || stationName || 'Radio'
                         : currentSong?.artists?.map((artist, index) => (
@@ -314,6 +296,24 @@ export const FullScreenPlayerImage = () => {
                               </Fragment>
                           ))}
                 </Text>
+                {isPlayingRadio ? (
+                    <Text overflow="hidden" size="xl" w="100%">
+                        {stationName || 'Radio'}
+                    </Text>
+                ) : (
+                    <Text
+                        component={Link}
+                        isLink
+                        overflow="hidden"
+                        size="xl"
+                        to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+                            albumId: currentSong?.albumId || '',
+                        })}
+                        w="100%"
+                    >
+                        {currentSong?.album}
+                    </Text>
+                )}
                 {!isPlayingRadio && (
                     <Group justify="center" mt="sm">
                         {playerItems.map((i) => !i.disabled && builtDataItems[i.id])}

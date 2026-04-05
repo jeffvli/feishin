@@ -11,7 +11,6 @@
     font-size: var(--theme-font-size-sm);
     cursor: pointer;
     user-select: none;
-    opacity: 0.8;
 }
 
 .heading:hover {
@@ -38,4 +37,8 @@
 .items {
     display: flex;
     flex-direction: column;
+}
+
+.items button:focus-visible {
+    outline: 2px solid var(--theme-colors-primary);
 }
