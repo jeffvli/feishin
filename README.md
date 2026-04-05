@@ -55,8 +55,6 @@ Download the [latest desktop client](https://github.com/jeffvli/feishin/releases
 
 If you're using a device running macOS 12 (Monterey) or higher, [check here](https://github.com/jeffvli/feishin/issues/104#issuecomment-1553914730) for instructions on how to remove the app from quarantine.
 
-For media keys to work, you will be prompted to allow Feishin to be a Trusted Accessibility Client. After allowing, you will need to restart Feishin for the privacy settings to take effect.
-
 #### Linux Notes
 
 Feishin is available in [Flathub](https://flathub.org/en/apps/org.jeffvli.feishin).

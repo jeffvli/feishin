@@ -1800,7 +1800,7 @@ const initialState: SettingsState = {
         audioDeviceId: undefined,
         audioFadeOnStatusChange: true,
         filters: [],
-        mediaSession: false,
+        mediaSession: utils?.isMacOS() ?? false,
         mpvAudioDeviceId: undefined,
         mpvExtraParameters: [],
         mpvProperties: {
