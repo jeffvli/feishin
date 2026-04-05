@@ -1,3 +1,4 @@
+import { Loader } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -8,6 +9,12 @@ import {
     useSettingsStoreActions,
 } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Button } from '/@/shared/components/button/button';
+import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
+import { AppIcon } from '/@/shared/components/icon/icon';
+import { Popover } from '/@/shared/components/popover/popover';
+import { Text } from '/@/shared/components/text/text';
 import { PlayerType } from '/@/shared/types/types';
 
 interface DlnaDevice {
@@ -29,17 +36,19 @@ interface DeviceListProps {
 const DeviceList = ({ devices, isLoading, onSelect }: DeviceListProps) => {
     if (isLoading) {
         return (
-            <div style={{ color: '#e0e0e0', fontSize: '0.8rem', padding: '8px 12px' }}>
-                Searching for devices...
-            </div>
+            <Group p={'sm'}>
+                <Loader color="gray" size={12} type="bars" />
+                <Text c={'dimmed'}>Searching for devices..</Text>
+            </Group>
         );
     }
 
     if (devices.length === 0) {
         return (
-            <div style={{ color: '#888', fontSize: '0.8rem', padding: '8px 12px' }}>
-                No DLNA devices found
-            </div>
+            <Group p={'sm'}>
+                <AppIcon.circleSlash size={12} />
+                <Text c={'dimmed'}>No DLNA devices found</Text>
+            </Group>
         );
     }
 
@@ -80,6 +89,7 @@ export const DlnaCastButton = () => {
     const volume = usePlayerVolume();
     const settings = usePlaybackSettings();
     const previousPlayerTypeRef = useRef<PlayerType>(settings.type);
+
     const handleDiscover = useCallback(async () => {
         if (!dlnaPlayer) return;
         setIsLoading(true);
@@ -92,6 +102,7 @@ export const DlnaCastButton = () => {
             setIsLoading(false);
         }
     }, []);
+
     const handleSelect = useCallback(
         async (device: DlnaDevice) => {
             if (!dlnaPlayer) return;
@@ -114,6 +125,7 @@ export const DlnaCastButton = () => {
         },
         [setSettings, setVolume, settings, volume],
     );
+
     const handleDisconnect = useCallback(async () => {
         if (!dlnaPlayer) return;
         await dlnaPlayer.disconnect();
@@ -127,6 +139,7 @@ export const DlnaCastButton = () => {
             setVolume(settings.previousLocalVolume);
         }
     }, [setSettings, setVolume, settings]);
+
     const handleToggle = useCallback(
         (e: React.MouseEvent) => {
             e.stopPropagation();
@@ -141,18 +154,7 @@ export const DlnaCastButton = () => {
         },
         [isConnected, showPopover, handleDiscover],
     );
-    // Close popover when clicking outside
-    useEffect(() => {
-        if (!showPopover) return;
-        const handleClickOutside = () => setShowPopover(false);
-        const timer = setTimeout(() => {
-            document.addEventListener('click', handleClickOutside);
-        }, 100);
-        return () => {
-            clearTimeout(timer);
-            document.removeEventListener('click', handleClickOutside);
-        };
-    }, [showPopover]);
+
     useEffect(() => {
         if (settings.previousLocalVolume !== undefined) {
             setSettings({
@@ -166,88 +168,63 @@ export const DlnaCastButton = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const buttonRef = useRef<HTMLDivElement>(null);
-    const [popoverPos, setPopoverPos] = useState<{ left: number; top: number }>({
-        left: 0,
-        top: 0,
-    });
-    useEffect(() => {
-        if (showPopover && buttonRef.current) {
-            const rect = buttonRef.current.getBoundingClientRect();
-            setPopoverPos({
-                left: rect.left + rect.width / 2,
-                top: rect.top - 8,
-            });
-        }
-    }, [showPopover]);
 
     if (!isElectron()) return null;
 
     return (
-        <div ref={buttonRef} style={{ position: 'relative' }}>
-            <ActionIcon
-                icon={'cast'}
-                iconProps={{
-                    color: isConnected ? 'primary' : undefined,
-                    size: 'lg',
-                }}
-                onClick={handleToggle}
-                size="sm"
-                tooltip={{
-                    label: isConnected
-                        ? `Casting to ${connectedDeviceName}`
-                        : 'Cast to DLNA device',
-                    openDelay: 0,
-                }}
-                variant="subtle"
-            />
-            {showPopover && (
-                <div
-                    onClick={(e) => e.stopPropagation()}
-                    style={{
-                        backgroundColor: '#1a1a2e',
-                        border: '1px solid #333',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-                        left: `${popoverPos.left}px`,
-                        minWidth: '220px',
-                        padding: '8px 0',
-                        position: 'fixed',
-                        top: `${popoverPos.top}px`,
-                        transform: 'translateX(-50%) translateY(-100%)',
-                        zIndex: 9999,
+        <Popover
+            onChange={(val) => {
+                setShowPopover(val);
+                if (val) handleDiscover();
+            }}
+            opened={showPopover}
+            position={'top'}
+        >
+            <Popover.Target>
+                <ActionIcon
+                    icon={'cast'}
+                    iconProps={{
+                        color: isConnected ? 'primary' : undefined,
+                        size: 'lg',
                     }}
-                >
+                    onClick={handleToggle}
+                    size="sm"
+                    tooltip={{
+                        label: isConnected
+                            ? `Casting to ${connectedDeviceName}`
+                            : 'Cast to DLNA device',
+                        openDelay: 0,
+                    }}
+                    variant="subtle"
+                />
+            </Popover.Target>
+            <Popover.Dropdown>
+                <div onClick={(e) => e.stopPropagation()}>
                     {isConnected ? (
                         <>
-                            <div
+                            <Text
+                                pb={'sm'}
                                 style={{
-                                    borderBottom: '1px solid #444',
                                     color: '#e0e0e0',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 600,
-                                    padding: '4px 12px 8px',
-                                    textTransform: 'uppercase',
                                 }}
                             >
-                                Now Casting
-                            </div>
-                            <div
-                                style={{
-                                    color: '#aaa',
-                                    fontSize: '0.8rem',
-                                    padding: '8px 12px',
-                                }}
-                            >
+                                Now casting
+                            </Text>
+                            <Divider mb={'sm'} />
+
+                            <Text c={'dimmed'} size={'sm'}>
                                 {connectedDeviceName}
-                            </div>
-                            <div style={{ borderTop: '1px solid #444', padding: '6px 8px 2px' }}>
-                                <div
+                            </Text>
+
+                            <div>
+                                <Button
+                                    color={'red'}
+                                    fullWidth
+                                    mt={'sm'}
                                     onClick={handleDisconnect}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') handleDisconnect();
                                     }}
-                                    role="button"
                                     style={{
                                         borderRadius: '4px',
                                         color: '#ff6b6b',
@@ -259,30 +236,31 @@ export const DlnaCastButton = () => {
                                     tabIndex={0}
                                 >
                                     Disconnect
-                                </div>
+                                </Button>
                             </div>
                         </>
                     ) : (
                         <>
-                            <div
+                            <Text
+                                pb={'sm'}
                                 style={{
-                                    borderBottom: '1px solid #444',
                                     color: '#e0e0e0',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 600,
-                                    padding: '4px 12px 8px',
-                                    textTransform: 'uppercase',
                                 }}
                             >
                                 DLNA Devices
-                            </div>
+                            </Text>
+                            <Divider mb={'sm'} />
+
                             <DeviceList
                                 devices={devices}
                                 isLoading={isLoading}
                                 onSelect={handleSelect}
                             />
                             {!isLoading && (
-                                <div
+                                <Button
+                                    fullWidth
+                                    leftSection={<AppIcon.refresh size={12}></AppIcon.refresh>}
+                                    mt={'sm'}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleDiscover();
@@ -290,25 +268,18 @@ export const DlnaCastButton = () => {
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') handleDiscover();
                                     }}
-                                    role="button"
-                                    style={{
-                                        borderTop: '1px solid #444',
-                                        color: '#6c9fff',
-                                        cursor: 'pointer',
-                                        fontSize: '0.75rem',
-                                        marginTop: '4px',
-                                        padding: '8px 12px 4px',
-                                        textAlign: 'center',
-                                    }}
+                                    size={'xs'}
+                                    ta={'center'}
                                     tabIndex={0}
+                                    variant={'outline'}
                                 >
                                     Refresh
-                                </div>
+                                </Button>
                             )}
                         </>
                     )}
                 </div>
-            )}
-        </div>
+            </Popover.Dropdown>
+        </Popover>
     );
 };
