@@ -186,7 +186,7 @@ export const DlnaCastButton = () => {
     return (
         <div ref={buttonRef} style={{ position: 'relative' }}>
             <ActionIcon
-                icon={isConnected ? 'wifiOn' : 'wifiOff'}
+                icon={'cast'}
                 iconProps={{
                     color: isConnected ? 'primary' : undefined,
                     size: 'lg',
