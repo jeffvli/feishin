@@ -121,14 +121,6 @@ table {
 }
 */
 
-.fs-main-content-module-main-content-body {
-    height: 100vh;
-}
-
-:has(.fs-window-bar-module-window-bar) .fs-main-content-module-main-content-container {
-    height: calc(100vh - 30px);
-}
-
 .mantine-Tabs-root {
     input {
         border-radius: 18px;
@@ -217,12 +209,7 @@ table {
 
 .fs-expanded-list-item-module-container {
     position: relative;
-    bottom: 90px;
     border-radius: 18px;
-}
-
-.fs-sidebar-play-queue-module-lyrics-section {
-    bottom: 90px;
 }
 
 .fs-page-header-module-container {
