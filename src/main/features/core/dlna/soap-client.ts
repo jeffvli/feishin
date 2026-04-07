@@ -34,8 +34,75 @@ function formatDuration(seconds: number): string {
     return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
-const AVT = 'urn:schemas-upnp-org:service:AVTransport:1';
 const RC = 'urn:schemas-upnp-org:service:RenderingControl:1';
+const AVT = 'urn:schemas-upnp-org:service:AVTransport:1';
+const DP = 'urn:schemas-upnp-org:service:DeviceProperties:1';
+
+export async function becomeCoordinatorOfStandaloneGroup(device: DlnaDevice): Promise<void> {
+    playerLog(`BecomeCoordinatorOfStandaloneGroup: ${device.name}`);
+    await soapRequest(
+        device.controlUrl,
+        AVT,
+        'BecomeCoordinatorOfStandaloneGroup',
+        `<InstanceID>0</InstanceID>`,
+    );
+}
+
+export async function getBass(device: DlnaDevice): Promise<number> {
+    const xml = await soapRequest(
+        device.renderingControlUrl,
+        RC,
+        'GetBass',
+        '<InstanceID>0</InstanceID>',
+    );
+    return parseInt2(xml, 'CurrentBass');
+}
+
+export async function getButtonLockState(device: DlnaDevice): Promise<boolean> {
+    const dpUrl = getDevicePropertiesUrl(device);
+    const xml = await soapRequest(dpUrl, DP, 'GetButtonLockState', '');
+    const m = xml.match(/<CurrentButtonLockState>(.*?)<\/CurrentButtonLockState>/);
+    return m ? m[1].trim().toLowerCase() === 'off' : true;
+}
+
+export async function getCrossfadeMode(device: DlnaDevice): Promise<boolean> {
+    const xml = await soapRequest(
+        device.controlUrl,
+        AVT,
+        'GetCrossfadeMode',
+        '<InstanceID>0</InstanceID>',
+    );
+    return parseBool(xml, 'CrossfadeMode');
+}
+
+export function getDevicePropertiesUrl(device: DlnaDevice): string {
+    try {
+        const base = new URL(device.location);
+        return `${base.protocol}//${base.hostname}:1400/DeviceProperties/Control`;
+    } catch {
+        return device.controlUrl.replace(
+            '/MediaRenderer/AVTransport/Control',
+            '/DeviceProperties/Control',
+        );
+    }
+}
+
+export async function getLEDState(device: DlnaDevice): Promise<boolean> {
+    const dpUrl = getDevicePropertiesUrl(device);
+    const xml = await soapRequest(dpUrl, DP, 'GetLEDState', '');
+    const m = xml.match(/<CurrentLEDState>(.*?)<\/CurrentLEDState>/);
+    return m ? m[1].trim().toLowerCase() === 'on' : false;
+}
+
+export async function getLoudness(device: DlnaDevice): Promise<boolean> {
+    const xml = await soapRequest(
+        device.renderingControlUrl,
+        RC,
+        'GetLoudness',
+        '<InstanceID>0</InstanceID><Channel>Master</Channel>',
+    );
+    return parseBool(xml, 'CurrentLoudness');
+}
 
 export async function getPositionInfo(
     device: DlnaDevice,
@@ -69,6 +136,20 @@ export async function getPositionInfo(
     };
 }
 
+export function getRinconId(device: DlnaDevice): string {
+    return device.id.replace(/^uuid:/i, '');
+}
+
+export function getTopologyControlUrl(device: DlnaDevice): string {
+    const base = new URL(device.location);
+    return `${base.protocol}//${base.hostname}:1400/ZoneGroupTopology/Control`;
+}
+
+export function getTopologyEventUrl(device: DlnaDevice): string {
+    const base = new URL(device.location);
+    return `${base.protocol}//${base.hostname}:1400/ZoneGroupTopology/Event`;
+}
+
 export async function getTransportInfo(device: DlnaDevice): Promise<string> {
     const xml = await soapRequest(
         device.controlUrl,
@@ -80,6 +161,16 @@ export async function getTransportInfo(device: DlnaDevice): Promise<string> {
     return match ? match[1] : 'STOPPED';
 }
 
+export async function getTreble(device: DlnaDevice): Promise<number> {
+    const xml = await soapRequest(
+        device.renderingControlUrl,
+        RC,
+        'GetTreble',
+        '<InstanceID>0</InstanceID>',
+    );
+    return parseInt2(xml, 'CurrentTreble');
+}
+
 export async function getVolume(device: DlnaDevice): Promise<number> {
     const xml = await soapRequest(
         device.renderingControlUrl,
@@ -89,6 +180,36 @@ export async function getVolume(device: DlnaDevice): Promise<number> {
     );
     const match = xml.match(/<CurrentVolume>(.*?)<\/CurrentVolume>/);
     return match ? parseInt(match[1], 10) : 0;
+}
+
+export async function getZoneGroupState(device: DlnaDevice): Promise<string> {
+    const xml = await soapRequest(
+        getTopologyControlUrl(device),
+        'urn:schemas-upnp-org:service:ZoneGroupTopology:1',
+        'GetZoneGroupState',
+        '',
+    );
+    const match = xml.match(/<ZoneGroupState>([\s\S]*?)<\/ZoneGroupState>/);
+    if (!match) return '';
+    return match[1]
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&apos;/g, "'")
+        .replace(/&quot;/g, '"');
+}
+
+export async function joinGroup(member: DlnaDevice, coordinator: DlnaDevice): Promise<void> {
+    const rinconId = getRinconId(coordinator);
+    playerLog(`Join group: ${member.name} -> ${coordinator.name} (${rinconId})`);
+    await soapRequest(
+        member.controlUrl,
+        AVT,
+        'SetAVTransportURI',
+        `<InstanceID>0</InstanceID>
+         <CurrentURI>x-rincon:${rinconId}</CurrentURI>
+         <CurrentURIMetaData></CurrentURIMetaData>`,
+    );
 }
 
 export async function pause(device: DlnaDevice): Promise<void> {
@@ -130,6 +251,53 @@ export async function setAVTransportURI(
     );
 }
 
+export async function setBass(device: DlnaDevice, value: number): Promise<void> {
+    await soapRequest(
+        device.renderingControlUrl,
+        RC,
+        'SetBass',
+        `<InstanceID>0</InstanceID><DesiredBass>${value}</DesiredBass>`,
+    );
+}
+
+export async function setButtonLockState(device: DlnaDevice, touchEnabled: boolean): Promise<void> {
+    const dpUrl = getDevicePropertiesUrl(device);
+    await soapRequest(
+        dpUrl,
+        DP,
+        'SetButtonLockState',
+        `<DesiredButtonLockState>${touchEnabled ? 'Off' : 'On'}</DesiredButtonLockState>`,
+    );
+}
+
+export async function setCrossfadeMode(device: DlnaDevice, value: boolean): Promise<void> {
+    await soapRequest(
+        device.controlUrl,
+        AVT,
+        'SetCrossfadeMode',
+        `<InstanceID>0</InstanceID><CrossfadeMode>${value ? '1' : '0'}</CrossfadeMode>`,
+    );
+}
+
+export async function setLEDState(device: DlnaDevice, on: boolean): Promise<void> {
+    const dpUrl = getDevicePropertiesUrl(device);
+    await soapRequest(
+        dpUrl,
+        DP,
+        'SetLEDState',
+        `<DesiredLEDState>${on ? 'On' : 'Off'}</DesiredLEDState>`,
+    );
+}
+
+export async function setLoudness(device: DlnaDevice, value: boolean): Promise<void> {
+    await soapRequest(
+        device.renderingControlUrl,
+        RC,
+        'SetLoudness',
+        `<InstanceID>0</InstanceID><Channel>Master</Channel><DesiredLoudness>${value ? '1' : '0'}</DesiredLoudness>`,
+    );
+}
+
 export async function setMute(device: DlnaDevice, mute: boolean): Promise<void> {
     playerLog(`Set Mute to ${mute}`);
     await soapRequest(
@@ -154,6 +322,15 @@ export async function setNextAVTransportURI(
         `<InstanceID>0</InstanceID>
          <NextURI>${escapeXml(url)}</NextURI>
          <NextURIMetaData>${escapeXml(didl)}</NextURIMetaData>`,
+    );
+}
+
+export async function setTreble(device: DlnaDevice, value: number): Promise<void> {
+    await soapRequest(
+        device.renderingControlUrl,
+        RC,
+        'SetTreble',
+        `<InstanceID>0</InstanceID><DesiredTreble>${value}</DesiredTreble>`,
     );
 }
 
@@ -196,7 +373,6 @@ function buildDIDL(metadata: TrackMetadata, url: string, mimeType: string): stri
         .replace(/\s+/g, ' ')
         .trim();
 }
-
 function escapeXml(unsafe: string): string {
     if (!unsafe) return '';
     return unsafe.replace(/[<>&'"]/g, (c) => {
@@ -215,6 +391,18 @@ function escapeXml(unsafe: string): string {
                 return c;
         }
     });
+}
+
+function parseBool(xml: string, tag: string): boolean {
+    const m = xml.match(new RegExp(`<${tag}>(.*?)</${tag}>`));
+    if (!m) return false;
+    const v = m[1].trim().toLowerCase();
+    return v === '1' || v === 'true';
+}
+
+function parseInt2(xml: string, tag: string): number {
+    const m = xml.match(new RegExp(`<${tag}>(.*?)</${tag}>`));
+    return m ? parseInt(m[1], 10) : 0;
 }
 
 async function soapRequest(

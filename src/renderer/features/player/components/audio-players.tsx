@@ -21,6 +21,7 @@ import { QueueRestoreTimestampHook } from '/@/renderer/features/player/hooks/use
 import { ScrobbleHook } from '/@/renderer/features/player/hooks/use-scrobble';
 import { UpdateCurrentSongHook } from '/@/renderer/features/player/hooks/use-update-current-song';
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
+import { RadioDlnaPlayer } from '/@/renderer/features/radio/components/radio-dlna-player';
 import { RadioWebPlayer } from '/@/renderer/features/radio/components/radio-web-player';
 import {
     RadioAudioInstanceHook,
@@ -255,7 +256,13 @@ const AudioPlayersContent = ({
     if (isRadioActive && playbackType === PlayerType.WEB) {
         return <RadioWebPlayer />;
     }
-
+    if (isRadioActive && playbackType === PlayerType.DLNA) {
+        return (
+            <DlnaErrorBoundary>
+                <RadioDlnaPlayer />
+            </DlnaErrorBoundary>
+        );
+    }
     return (
         <>
             {playbackType === PlayerType.WEB && <WebPlayer />}
