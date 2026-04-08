@@ -11,6 +11,8 @@ import { defaultTheme } from '/@/shared/themes/default';
 import { defaultDark } from '/@/shared/themes/default-dark/default-dark';
 import { defaultLight } from '/@/shared/themes/default-light/default-light';
 import { dracula } from '/@/shared/themes/dracula/dracula';
+import { everforestDark } from '/@/shared/themes/everforest-dark/everforest-dark';
+import { everforestLight } from '/@/shared/themes/everforest-light/everforest-light';
 import { githubDark } from '/@/shared/themes/github-dark/github-dark';
 import { githubLight } from '/@/shared/themes/github-light/github-light';
 import { glassyDark } from '/@/shared/themes/glassy-dark/glassy-dark';
@@ -42,6 +44,8 @@ export const appTheme: Record<AppTheme, AppThemeConfiguration> = {
     [AppTheme.DEFAULT_DARK]: defaultDark,
     [AppTheme.DEFAULT_LIGHT]: defaultLight,
     [AppTheme.DRACULA]: dracula,
+    [AppTheme.EVERFOREST_DARK]: everforestDark,
+    [AppTheme.EVERFOREST_LIGHT]: everforestLight,
     [AppTheme.GITHUB_DARK]: githubDark,
     [AppTheme.GITHUB_LIGHT]: githubLight,
     [AppTheme.GLASSY_DARK]: glassyDark,
