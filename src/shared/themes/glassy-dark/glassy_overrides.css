@@ -238,11 +238,11 @@ table {
 }
 
 /* i didn't find a better way to make this work */
-#main-content .fs-native-scroll-area-module-scroll-area > :first-child > div > div {
+.fs-main-content-module-main-content-body .fs-native-scroll-area-module-scroll-area > :first-child > div > div {
     padding-bottom: 90px;
 }
  
-:has(.fs-window-bar-module-window-bar) #main-content .fs-native-scroll-area-module-scroll-area > :first-child > div > div {
+:has(.fs-window-bar-module-window-bar) .fs-main-content-module-main-content-body .fs-native-scroll-area-module-scroll-area > :first-child > div > div {
     padding-bottom: 120px;
 }
 
