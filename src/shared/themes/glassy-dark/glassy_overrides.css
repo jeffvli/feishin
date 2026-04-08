@@ -343,9 +343,9 @@ table {
 }
 
 :has(.fs-right-sidebar-module-vertical-layout) .fs-right-sidebar-module-right-sidebar-container {
+    z-index: 10;
     position: relative;
     transform: translateY(-90px);
-    z-index: 10;
     height: 100%;
 }
 
