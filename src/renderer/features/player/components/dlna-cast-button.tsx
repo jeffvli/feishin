@@ -4,12 +4,8 @@ import { Loader } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import {
-    usePlaybackSettings,
-    usePlayerActions,
-    usePlayerVolume,
-    useSettingsStoreActions,
-} from '/@/renderer/store';
+import { usePlayerActions, usePlayerVolume } from '/@/renderer/store/player.store';
+import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';

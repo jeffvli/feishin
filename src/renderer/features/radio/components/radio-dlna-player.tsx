@@ -2,7 +2,7 @@ import isElectron from 'is-electron';
 import { useEffect, useRef } from 'react';
 
 import { useRadioPlayer, useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
-import { usePlayerActions, usePlayerMuted, usePlayerVolume } from '/@/renderer/store';
+import { usePlayerActions, usePlayerMuted, usePlayerVolume } from '/@/renderer/store/player.store';
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const ipc = isElectron() ? window.api.ipc : null;

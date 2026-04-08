@@ -12,25 +12,28 @@ import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
+import { useAppStoreActions, useSidebarRightExpanded } from '/@/renderer/store/app.store';
+import { useCurrentServer } from '/@/renderer/store/auth.store';
+import { useFullScreenPlayerStoreActions } from '/@/renderer/store/full-screen-player.store';
 import {
-    useAppStoreActions,
-    useAutoDJSettings,
-    useCurrentServer,
     useFullScreenPlayerStore,
-    useGeneralSettings,
-    useHotkeySettings,
+    useSetFullScreenPlayerStore,
+} from '/@/renderer/store/full-screen-player.store';
+import {
     usePlayerData,
     usePlayerMuted,
     usePlayerSong,
     usePlayerVolume,
-    useSetFullScreenPlayerStore,
+} from '/@/renderer/store/player.store';
+import {
+    useAutoDJSettings,
+    useGeneralSettings,
+    useHotkeySettings,
     useSettingsStoreActions,
-    useSidebarRightExpanded,
     useSideQueueType,
     useVolumeWheelStep,
     useVolumeWidth,
-} from '/@/renderer/store';
-import { useFullScreenPlayerStoreActions } from '/@/renderer/store/full-screen-player.store';
+} from '/@/renderer/store/settings.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
