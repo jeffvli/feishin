@@ -1,3 +1,4 @@
+import { Loader } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -8,6 +9,12 @@ import {
     useSettingsStoreActions,
 } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Button } from '/@/shared/components/button/button';
+import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
+import { AppIcon } from '/@/shared/components/icon/icon';
+import { Popover } from '/@/shared/components/popover/popover';
+import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { PlayerType } from '/@/shared/types/types';
 
@@ -45,31 +52,52 @@ const DeviceList = ({
     isLoading: boolean;
     onSelect: (device: DlnaDevice) => void;
 }) => {
-    if (isLoading) return <div style={s.hint}>Searching for devices…</div>;
-    if (devices.length === 0) return <div style={s.hint}>No DLNA devices found</div>;
+    if (isLoading) {
+        return (
+            <Group p="sm">
+                <Loader color="gray" size={12} type="bars" />
+                <Text c="dimmed">Searching for devices…</Text>
+            </Group>
+        );
+    }
+
+    if (devices.length === 0) {
+        return (
+            <Group p="sm">
+                <AppIcon.circleSlash size={12} />
+                <Text c="dimmed">No DLNA devices found</Text>
+            </Group>
+        );
+    }
+
     return (
         <>
             {devices.map((device) => {
                 const disabled = disabledIds.includes(device.id);
                 return (
-                    <button
-                        disabled={disabled}
+                    <div
                         key={device.id}
                         onClick={() => !disabled && onSelect(device)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !disabled) onSelect(device);
+                        }}
+                        role="button"
                         style={{
-                            ...s.deviceBtn,
+                            borderRadius: '4px',
                             color: disabled ? '#555' : '#e0e0e0',
                             cursor: disabled ? 'default' : 'pointer',
+                            fontSize: '0.8rem',
+                            padding: '6px 12px',
                         }}
-                        type="button"
+                        tabIndex={disabled ? -1 : 0}
                     >
                         {device.name}
                         {disabled && (
-                            <span style={{ color: '#6c9fff', fontSize: '0.7rem', marginLeft: 6 }}>
+                            <Text c="primary" display="inline" ml={6} size="xs">
                                 connected
-                            </span>
+                            </Text>
                         )}
-                    </button>
+                    </div>
                 );
             })}
         </>
@@ -109,25 +137,47 @@ const GroupBuilder = ({
 
     return (
         <>
-            <div style={s.sectionHeader}>
+            <Text pb="xs" style={{ color: '#e0e0e0' }}>
                 {lockedCoordinator ? 'Add Speakers' : 'Select Group Speakers'}
-            </div>
-            {isLoading && <div style={s.hint}>Searching…</div>}
-            {!isLoading && devices.length === 0 && <div style={s.hint}>No Sonos devices found</div>}
+            </Text>
+            <Divider mb="xs" />
+
+            {isLoading && (
+                <Group p="sm">
+                    <Loader color="gray" size={12} type="bars" />
+                    <Text c="dimmed">Searching…</Text>
+                </Group>
+            )}
+            {!isLoading && devices.length === 0 && (
+                <Group p="sm">
+                    <AppIcon.circleSlash size={12} />
+                    <Text c="dimmed">No Sonos devices found</Text>
+                </Group>
+            )}
+
             {devices.map((device) => {
                 const isLocked = lockedCoordinator?.id === device.id;
                 const isChecked = checked.some((d) => d.id === device.id);
                 const isCoord = device.id === coordinator?.id;
                 return (
-                    <button
+                    <div
                         key={device.id}
                         onClick={() => toggle(device)}
-                        style={{
-                            ...s.deviceBtn,
-                            background: isChecked ? 'rgba(108,159,255,0.15)' : 'transparent',
-                            cursor: isLocked ? 'default' : 'pointer',
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') toggle(device);
                         }}
-                        type="button"
+                        role="button"
+                        style={{
+                            alignItems: 'center',
+                            background: isChecked ? 'rgba(108,159,255,0.15)' : 'transparent',
+                            borderRadius: '4px',
+                            cursor: isLocked ? 'default' : 'pointer',
+                            display: 'flex',
+                            fontSize: '0.8rem',
+                            gap: 8,
+                            padding: '6px 12px',
+                        }}
+                        tabIndex={isLocked ? -1 : 0}
                     >
                         <span
                             style={{
@@ -137,58 +187,51 @@ const GroupBuilder = ({
                                 display: 'inline-block',
                                 flexShrink: 0,
                                 height: 12,
-                                marginRight: 8,
                                 width: 12,
                             }}
                         />
-                        {device.name}
+                        <Text c={isLocked ? 'dimmed' : undefined} size="sm">
+                            {device.name}
+                        </Text>
                         {isCoord && (
-                            <span style={{ color: '#6c9fff', fontSize: '0.7rem', marginLeft: 6 }}>
+                            <Text c="primary" size="xs">
                                 coordinator
-                            </span>
+                            </Text>
                         )}
-                    </button>
+                    </div>
                 );
             })}
-            {!lockedCoordinator && <div style={s.hint}>First selected = coordinator</div>}
-            <div
-                style={{
-                    borderTop: '1px solid #444',
-                    display: 'flex',
-                    gap: 6,
-                    marginTop: 6,
-                    padding: '6px 8px 2px',
-                }}
-            >
-                <button
+
+            {!lockedCoordinator && (
+                <Text c="dimmed" px="sm" size="xs">
+                    First selected = coordinator
+                </Text>
+            )}
+
+            <Group gap="xs" mt="sm">
+                <Button
                     disabled={isLoading}
+                    flex={1}
+                    leftSection={<AppIcon.refresh size={12} />}
                     onClick={onRefresh}
-                    style={{ ...s.actionBtn, color: '#6c9fff', flex: 1 }}
-                    type="button"
+                    size="xs"
+                    variant="outline"
                 >
                     Refresh
-                </button>
-                <button
-                    onClick={onCancel}
-                    style={{ ...s.actionBtn, color: '#aaa', flex: 1 }}
-                    type="button"
-                >
+                </Button>
+                <Button color="gray" flex={1} onClick={onCancel} size="xs" variant="outline">
                     Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                     disabled={!canConfirm}
+                    flex={1}
                     onClick={() => coordinator && onConfirm(checked, coordinator)}
-                    style={{
-                        ...s.actionBtn,
-                        color: canConfirm ? '#6c9fff' : '#555',
-                        flex: 1,
-                        fontWeight: 600,
-                    }}
-                    type="button"
+                    size="xs"
+                    variant="filled"
                 >
                     {lockedCoordinator ? 'Add' : 'Connect'}
-                </button>
-            </div>
+                </Button>
+            </Group>
         </>
     );
 };
@@ -208,8 +251,6 @@ export const DlnaCastButton = () => {
     const coordinatorRef = useRef<DlnaDevice | null>(null);
 
     const previousPlayerTypeRef = useRef<PlayerType>(settings.type);
-    const buttonRef = useRef<HTMLDivElement>(null);
-    const [popoverPos, setPopoverPos] = useState({ left: 0, top: 0 });
 
     const isConnected = screen === 'connected' || screen === 'group';
     const hasSonosDevices = devices.some(isSonosDevice);
@@ -274,7 +315,6 @@ export const DlnaCastButton = () => {
                     },
                 });
                 setScreen('connected');
-                setShowPopover(true);
             } else {
                 setScreen('idle');
             }
@@ -319,7 +359,6 @@ export const DlnaCastButton = () => {
             setGroupMemberList(initialMembers);
             setConnectedDeviceName(`Group (${initialMembers.length})`);
             setScreen('group');
-            setShowPopover(true);
         },
         [setSettings, setVolume, settings, volume],
     );
@@ -374,39 +413,6 @@ export const DlnaCastButton = () => {
         if (settings.previousLocalVolume !== undefined) setVolume(settings.previousLocalVolume);
     }, [setSettings, setVolume, settings]);
 
-    const handleToggle = useCallback(
-        (e: React.MouseEvent) => {
-            e.stopPropagation();
-            if (showPopover) {
-                setShowPopover(false);
-                return;
-            }
-            setShowPopover(true);
-            if (!isConnected) {
-                handleDiscover();
-                setScreen('idle');
-            } else refreshGroupState();
-        },
-        [isConnected, showPopover, handleDiscover, refreshGroupState],
-    );
-
-    useEffect(() => {
-        if (!showPopover) return;
-        const close = () => setShowPopover(false);
-        const timer = setTimeout(() => document.addEventListener('click', close), 100);
-        return () => {
-            clearTimeout(timer);
-            document.removeEventListener('click', close);
-        };
-    }, [showPopover]);
-
-    useEffect(() => {
-        if (showPopover && buttonRef.current) {
-            const rect = buttonRef.current.getBoundingClientRect();
-            setPopoverPos({ left: rect.left + rect.width / 2, top: rect.top - 8 });
-        }
-    }, [showPopover]);
-
     useEffect(() => {
         if (settings.previousLocalVolume !== undefined) {
             setSettings({
@@ -422,6 +428,7 @@ export const DlnaCastButton = () => {
     }, []);
 
     if (!isElectron()) return null;
+
     const expandGroupDevices = devices.filter(
         (d) =>
             d.id === coordinatorRef.current?.id ||
@@ -429,34 +436,45 @@ export const DlnaCastButton = () => {
     );
 
     return (
-        <div ref={buttonRef} style={{ position: 'relative' }}>
-            <ActionIcon
-                icon={isConnected ? 'wifiOn' : 'wifiOff'}
-                iconProps={{ color: isConnected ? 'primary' : undefined, size: 'lg' }}
-                onClick={handleToggle}
-                size="sm"
-                tooltip={{
-                    label: isConnected
-                        ? screen === 'group'
-                            ? `Casting to group (${groupMemberList.length})`
-                            : `Casting to ${connectedDeviceName}`
-                        : 'Cast to DLNA device',
-                    openDelay: 0,
-                }}
-                variant="subtle"
-            />
-
-            {showPopover && (
-                <div
-                    onClick={(e) => e.stopPropagation()}
-                    style={{
-                        ...s.popover,
-                        left: `${popoverPos.left}px`,
-                        top: `${popoverPos.top}px`,
+        <Popover onChange={setShowPopover} opened={showPopover} position="top">
+            <Popover.Target>
+                <ActionIcon
+                    icon="cast"
+                    iconProps={{ color: isConnected ? 'primary' : undefined, size: 'lg' }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        const opening = !showPopover;
+                        setShowPopover(opening);
+                        if (opening) {
+                            if (!isConnected) {
+                                setScreen('idle');
+                                handleDiscover();
+                            } else {
+                                refreshGroupState();
+                            }
+                        }
                     }}
-                >
-                    {screen === 'connecting' && <div style={s.hint}>Connecting…</div>}
+                    size="sm"
+                    tooltip={{
+                        label: isConnected
+                            ? screen === 'group'
+                                ? `Casting to group (${groupMemberList.length})`
+                                : `Casting to ${connectedDeviceName}`
+                            : 'Cast to DLNA device',
+                        openDelay: 0,
+                    }}
+                    variant="subtle"
+                />
+            </Popover.Target>
 
+            <Popover.Dropdown style={{ minWidth: 340 }}>
+                <div onClick={(e) => e.stopPropagation()}>
+                    {screen === 'connecting' && (
+                        <Group p="sm">
+                            <Loader color="gray" size={12} type="bars" />
+                            <Text c="dimmed">Connecting…</Text>
+                        </Group>
+                    )}
                     {screen === 'group-build' && (
                         <GroupBuilder
                             devices={devices}
@@ -466,7 +484,6 @@ export const DlnaCastButton = () => {
                             onRefresh={handleDiscover}
                         />
                     )}
-
                     {screen === 'expand-group' && coordinatorRef.current && (
                         <GroupBuilder
                             devices={expandGroupDevices}
@@ -479,227 +496,157 @@ export const DlnaCastButton = () => {
                             onRefresh={handleDiscover}
                         />
                     )}
-
                     {screen === 'idle' && (
                         <>
-                            <div style={s.sectionHeader}>DLNA Devices</div>
+                            <Text pb="sm" style={{ color: '#e0e0e0' }}>
+                                DLNA Devices
+                            </Text>
+                            <Divider mb="sm" />
+
                             <DeviceList
                                 devices={devices}
                                 isLoading={isLoading}
                                 onSelect={handleSelect}
                             />
                             {!isLoading && (
-                                <div
-                                    style={{
-                                        borderTop: '1px solid #444',
-                                        display: 'flex',
-                                        gap: 6,
-                                        marginTop: 4,
-                                        padding: '6px 8px 2px',
-                                    }}
-                                >
-                                    <button
+                                <Group gap="xs" mt="sm">
+                                    <Button
+                                        flex={
+                                            hasSonosDevices && devices.length >= 2 ? 1 : undefined
+                                        }
+                                        fullWidth={!hasSonosDevices || devices.length < 2}
+                                        leftSection={<AppIcon.refresh size={12} />}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleDiscover();
                                         }}
-                                        style={{
-                                            ...s.actionBtn,
-                                            color: '#6c9fff',
-                                            flex:
-                                                hasSonosDevices && devices.length >= 2
-                                                    ? 1
-                                                    : undefined,
-                                            width:
-                                                hasSonosDevices && devices.length >= 2
-                                                    ? undefined
-                                                    : '100%',
-                                        }}
-                                        type="button"
+                                        size="xs"
+                                        variant="outline"
                                     >
                                         Refresh
-                                    </button>
+                                    </Button>
                                     {hasSonosDevices && devices.length >= 2 && (
-                                        <button
+                                        <Button
+                                            flex={1}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setScreen('group-build');
                                             }}
-                                            style={{ ...s.actionBtn, color: '#a78bfa', flex: 1 }}
-                                            type="button"
+                                            size="xs"
+                                            variant="outline"
                                         >
                                             Create Group
-                                        </button>
+                                        </Button>
                                     )}
-                                </div>
+                                </Group>
                             )}
                         </>
                     )}
-
                     {screen === 'connected' && (
                         <>
-                            <div style={s.sectionHeader}>Now Casting</div>
-                            <div style={s.hint}>{connectedDeviceName}</div>
-                            <div
-                                style={{
-                                    borderTop: '1px solid #444',
-                                    display: 'flex',
-                                    gap: 6,
-                                    padding: '6px 8px 2px',
-                                }}
-                            >
+                            <Text pb="sm" style={{ color: '#e0e0e0' }}>
+                                Now casting
+                            </Text>
+                            <Divider mb="sm" />
+                            <Text c="dimmed" size="sm">
+                                {connectedDeviceName}
+                            </Text>
+                            <Group gap="xs" mt="sm">
                                 {coordinatorRef.current &&
                                     isSonosDevice(coordinatorRef.current) && (
-                                        <button
+                                        <Button
+                                            flex={1}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setScreen('expand-group');
                                                 handleDiscover();
                                             }}
-                                            style={{ ...s.actionBtn, color: '#a78bfa', flex: 1 }}
-                                            type="button"
+                                            size="xs"
+                                            variant="outline"
                                         >
                                             Add to Group
-                                        </button>
+                                        </Button>
                                     )}
-                                <button
+                                <Button
+                                    color="red"
+                                    flex={1}
+                                    fullWidth={
+                                        !(
+                                            coordinatorRef.current &&
+                                            isSonosDevice(coordinatorRef.current)
+                                        )
+                                    }
                                     onClick={handleDisconnect}
-                                    style={{ ...s.actionBtn, color: '#ff6b6b', flex: 1 }}
-                                    type="button"
+                                    size="xs"
+                                    style={{ color: 'var(--mantine-color-red-4, #ff6b6b)' }}
+                                    variant="outline"
                                 >
                                     Disconnect
-                                </button>
-                            </div>
+                                </Button>
+                            </Group>
                         </>
                     )}
-
                     {screen === 'group' && (
                         <>
-                            <div style={s.sectionHeader}>
+                            <Text pb="sm" style={{ color: '#e0e0e0' }}>
                                 Group ({groupMemberList.length} speakers)
-                            </div>
+                            </Text>
+                            <Divider mb="sm" />
+
                             {groupMemberList.map((m) => (
-                                <div
-                                    key={m.device.id}
-                                    style={{
-                                        alignItems: 'center',
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        padding: '4px 12px',
-                                    }}
-                                >
-                                    <span
-                                        style={{
-                                            color: m.isCoordinator ? '#6c9fff' : '#e0e0e0',
-                                            fontSize: '0.8rem',
-                                        }}
-                                    >
+                                <Group justify="space-between" key={m.device.id} px="sm" py={4}>
+                                    <Text c={m.isCoordinator ? 'primary' : undefined} size="sm">
                                         {m.device.name}
                                         {m.isCoordinator && (
-                                            <span
-                                                style={{
-                                                    color: '#6c9fff',
-                                                    fontSize: '0.7rem',
-                                                    marginLeft: 4,
-                                                }}
-                                            >
+                                            <Text c="primary" display="inline" ml={4} size="xs">
                                                 ★
-                                            </span>
+                                            </Text>
                                         )}
-                                    </span>
+                                    </Text>
                                     {!m.isCoordinator && (
-                                        <button
+                                        <Button
+                                            color="red"
                                             onClick={() => handleRemoveMember(m.device.id)}
+                                            size="compact-xs"
                                             style={{
-                                                ...s.actionBtn,
-                                                color: '#ff6b6b',
-                                                fontSize: '0.7rem',
-                                                padding: '2px 6px',
+                                                color: 'var(--mantine-color-red-4, #ff6b6b)',
                                             }}
-                                            type="button"
+                                            variant="subtle"
                                         >
                                             Remove
-                                        </button>
+                                        </Button>
                                     )}
-                                </div>
+                                </Group>
                             ))}
-                            <div
-                                style={{
-                                    borderTop: '1px solid #444',
-                                    display: 'flex',
-                                    gap: 6,
-                                    marginTop: 4,
-                                    padding: '6px 8px 2px',
-                                }}
-                            >
-                                <button
+
+                            <Group gap="xs" mt="sm">
+                                <Button
+                                    flex={1}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setScreen('expand-group');
                                         handleDiscover();
                                     }}
-                                    style={{ ...s.actionBtn, color: '#a78bfa', flex: 1 }}
-                                    type="button"
+                                    size="xs"
+                                    variant="outline"
                                 >
                                     Add Speaker
-                                </button>
-                                <button
+                                </Button>
+                                <Button
+                                    color="red"
+                                    flex={1}
                                     onClick={handleDisconnect}
-                                    style={{ ...s.actionBtn, color: '#ff6b6b', flex: 1 }}
-                                    type="button"
+                                    size="xs"
+                                    style={{ color: 'var(--mantine-color-red-4, #ff6b6b)' }}
+                                    variant="outline"
                                 >
                                     Disconnect All
-                                </button>
-                            </div>
+                                </Button>
+                            </Group>
                         </>
                     )}
                 </div>
-            )}
-        </div>
+            </Popover.Dropdown>
+        </Popover>
     );
 };
-
-const s = {
-    actionBtn: {
-        background: 'transparent',
-        border: 'none',
-        borderRadius: 4,
-        cursor: 'pointer',
-        fontSize: '0.75rem',
-        padding: '6px 8px',
-        textAlign: 'center' as const,
-    },
-    deviceBtn: {
-        alignItems: 'center',
-        background: 'transparent',
-        border: 'none',
-        borderRadius: 4,
-        color: '#e0e0e0',
-        cursor: 'pointer',
-        display: 'flex',
-        fontSize: '0.8rem',
-        padding: '6px 12px',
-        textAlign: 'left' as const,
-        width: '100%',
-    },
-    hint: { color: '#888', fontSize: '0.8rem', padding: '8px 12px' },
-    popover: {
-        backgroundColor: '#1a1a2e',
-        border: '1px solid #333',
-        borderRadius: 8,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-        minWidth: 240,
-        padding: '8px 0',
-        position: 'fixed' as const,
-        transform: 'translateX(-50%) translateY(-100%)',
-        zIndex: 9999,
-    },
-    sectionHeader: {
-        borderBottom: '1px solid #444',
-        color: '#e0e0e0',
-        fontSize: '0.75rem',
-        fontWeight: 600,
-        padding: '4px 12px 8px',
-        textTransform: 'uppercase' as const,
-    },
-} as const;

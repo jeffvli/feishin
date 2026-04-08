@@ -326,6 +326,46 @@ function handleTopologyNotify(xml: string): void {
     }
 }
 
+function refreshTopology() {
+    if (!connectedDevice) return;
+    try {
+        const parsedUrl = new URL(connectedDevice.controlUrl);
+        const controlUrl = `http://${parsedUrl.hostname}:1400/ZoneGroupTopology/Control`;
+        const body = `<?xml version="1.0" encoding="utf-8"?>
+            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                <s:Body>
+                    <u:GetZoneGroupState xmlns:u="urn:schemas-upnp-org:service:ZoneGroupTopology:1"></u:GetZoneGroupState>
+                </s:Body>
+            </s:Envelope>`;
+        const req = http.request(
+            controlUrl,
+            {
+                headers: {
+                    Connection: 'close',
+                    'Content-Type': 'text/xml; charset="utf-8"',
+                    SOAPAction:
+                        '"urn:schemas-upnp-org:service:ZoneGroupTopology:1#GetZoneGroupState"',
+                },
+                method: 'POST',
+            },
+            (res) => {
+                let data = '';
+                res.on('data', (chunk) => (data += chunk));
+                res.on('end', () => {
+                    if (data.includes('GetZoneGroupStateResponse')) {
+                        handleTopologyNotify(data);
+                    }
+                });
+            },
+        );
+        req.on('error', () => {});
+        req.write(body);
+        req.end();
+    } catch {
+        // Catch
+    }
+}
+
 async function renewEventSubscription(device: DlnaDevice): Promise<void> {
     if (!subscriptionSid) return;
     try {
@@ -574,45 +614,7 @@ function startPositionPolling() {
 
 function startTopologyPolling() {
     if (topologyPollingInterval) clearInterval(topologyPollingInterval);
-    topologyPollingInterval = setInterval(async () => {
-        if (!connectedDevice) return;
-        try {
-            const parsedUrl = new URL(connectedDevice.controlUrl);
-            const controlUrl = `http://${parsedUrl.hostname}:1400/ZoneGroupTopology/Control`;
-            const body = `<?xml version="1.0" encoding="utf-8"?>
-                <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-                    <s:Body>
-                        <u:GetZoneGroupState xmlns:u="urn:schemas-upnp-org:service:ZoneGroupTopology:1"></u:GetZoneGroupState>
-                    </s:Body>
-                </s:Envelope>`;
-            const req = http.request(
-                controlUrl,
-                {
-                    headers: {
-                        Connection: 'close',
-                        'Content-Type': 'text/xml; charset="utf-8"',
-                        SOAPAction:
-                            '"urn:schemas-upnp-org:service:ZoneGroupTopology:1#GetZoneGroupState"',
-                    },
-                    method: 'POST',
-                },
-                (res) => {
-                    let data = '';
-                    res.on('data', (chunk) => (data += chunk));
-                    res.on('end', () => {
-                        if (data.includes('GetZoneGroupStateResponse')) {
-                            handleTopologyNotify(data);
-                        }
-                    });
-                },
-            );
-            req.on('error', () => {});
-            req.write(body);
-            req.end();
-        } catch {
-            // Catch
-        }
-    }, 4000);
+    topologyPollingInterval = setInterval(refreshTopology, 4000);
 }
 
 async function startTopologySubscription(device: DlnaDevice): Promise<void> {
@@ -784,6 +786,7 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
         lastQueuedNextUri = '';
         startPositionPolling();
         startTopologyPolling();
+        refreshTopology();
         await startEventSubscription(device);
         await startTopologySubscription(device);
         dlnaLog(`Connected to ${device.name}`);

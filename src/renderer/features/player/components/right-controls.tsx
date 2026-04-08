@@ -65,6 +65,13 @@ const isSonosMember = (device: { id: string }) => device.id.toUpperCase().includ
 const calculateVolumeUp = (volume: number, step: number) => Math.min(100, volume + step);
 const calculateVolumeDown = (volume: number, step: number) => Math.max(0, volume - step);
 
+const POPOVER_BG = 'var(--mantine-color-dark-7, var(--theme-colors-surface, #1a1b1e))';
+const POPOVER_BORDER = '1px solid var(--mantine-color-dark-4, rgba(255,255,255,0.15))';
+const POPOVER_SHADOW = '0 4px 20px rgba(0,0,0,0.55)';
+const POPOVER_RADIUS = '8px';
+const POPOVER_TEXT = '#e0e0e0';
+const POPOVER_SUBTEXT = 'var(--theme-colors-subtext, #c1c2c5)';
+
 const SpeakerPropertiesPopover = ({
     deviceId,
     deviceName,
@@ -81,6 +88,7 @@ const SpeakerPropertiesPopover = ({
     const leftCenter = triggerRect.left + triggerRect.width / 2;
     const left = Math.min(window.innerWidth - 150, leftCenter);
     const bottom = window.innerHeight - triggerRect.top + 6;
+
     useEffect(() => {
         if (!dlnaPlayer) {
             setLoading(false);
@@ -94,6 +102,7 @@ const SpeakerPropertiesPopover = ({
             })
             .catch(() => setLoading(false));
     }, [deviceId]);
+
     useEffect(() => {
         const close = (e: MouseEvent) => {
             const target = e.target as Element;
@@ -105,25 +114,26 @@ const SpeakerPropertiesPopover = ({
             document.removeEventListener('mousedown', close);
         };
     }, [onClose]);
+
     const set = <K extends keyof SpeakerProperties>(key: K, value: SpeakerProperties[K]) => {
         if (!speakerProps) return;
-        const next = { ...speakerProps, [key]: value };
-        setSpeakerProps(next);
+        setSpeakerProps({ ...speakerProps, [key]: value });
         ipc?.send('dlna-set-speaker-property', { deviceId, property: key, value });
     };
+
     return (
         <div
             data-speaker-props-popover
             onClick={(e) => e.stopPropagation()}
             style={{
-                background: 'var(--theme-colors-surface, #1a1a2e)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: 10,
+                background: POPOVER_BG,
+                border: POPOVER_BORDER,
+                borderRadius: POPOVER_RADIUS,
                 bottom: `${bottom}px`,
-                boxShadow: '0 -4px 20px rgba(0,0,0,0.55)',
+                boxShadow: POPOVER_SHADOW,
                 left: `${left}px`,
                 minWidth: 280,
-                padding: '10px 14px 12px',
+                padding: '12px 16px 14px',
                 position: 'fixed',
                 transform: 'translateX(-50%)',
                 zIndex: 9999,
@@ -150,29 +160,21 @@ const SpeakerPropertiesPopover = ({
                 >
                     {deviceName}
                 </span>
-                <button
-                    onClick={onClose}
-                    style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: '#888',
-                        cursor: 'pointer',
-                        fontSize: '0.8rem',
-                        lineHeight: 1,
-                        padding: '0 0 0 8px',
-                    }}
-                    type="button"
-                >
-                    ✕
-                </button>
             </div>
+
             {loading && (
-                <div style={{ color: '#888', fontSize: '0.75rem', textAlign: 'center' }}>
+                <div style={{ color: POPOVER_SUBTEXT, fontSize: '0.75rem', textAlign: 'center' }}>
                     Loading…
                 </div>
             )}
             {!loading && !speakerProps && (
-                <div style={{ color: '#ff6b6b', fontSize: '0.75rem', textAlign: 'center' }}>
+                <div
+                    style={{
+                        color: 'var(--mantine-color-red-4, #ff6b6b)',
+                        fontSize: '0.75rem',
+                        textAlign: 'center',
+                    }}
+                >
                     Could not load properties
                 </div>
             )}
@@ -219,7 +221,7 @@ const SpeakerPropertiesPopover = ({
 };
 
 const labelStyle: React.CSSProperties = {
-    color: 'var(--theme-colors-subtext, #aaa)',
+    color: POPOVER_TEXT,
     flex: '0 0 auto',
     fontSize: '0.68rem',
     width: 80,
@@ -241,11 +243,8 @@ const PropSlider = ({
     const handleWheel = (e: WheelEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        const step = 1;
         const next =
-            e.deltaY > 0 || e.deltaX > 0
-                ? Math.max(min, value - step)
-                : Math.min(max, value + step);
+            e.deltaY > 0 || e.deltaX > 0 ? Math.max(min, value - 1) : Math.min(max, value + 1);
         onChange(next);
     };
     return (
@@ -265,6 +264,16 @@ const PropSlider = ({
                     w="100%"
                 />
             </div>
+            <span
+                style={{
+                    color: POPOVER_SUBTEXT,
+                    fontSize: '0.68rem',
+                    minWidth: 20,
+                    textAlign: 'right',
+                }}
+            >
+                {value > 0 ? `+${value}` : value}
+            </span>
         </div>
     );
 };
@@ -290,7 +299,9 @@ const PropToggle = ({
         <span style={labelStyle}>{label}</span>
         <span
             style={{
-                background: value ? 'var(--theme-colors-primary, #6c9fff)' : '#444',
+                background: value
+                    ? 'var(--theme-colors-primary, #6c9fff)'
+                    : 'var(--mantine-color-dark-4, #444)',
                 borderRadius: 10,
                 display: 'inline-block',
                 height: 16,
@@ -387,7 +398,7 @@ const GroupMemberVolumeRow = ({
         >
             <div
                 style={{
-                    color: 'var(--theme-colors-subtext, #aaa)',
+                    color: POPOVER_TEXT,
                     fontSize: '0.68rem',
                     marginBottom: '4px',
                     overflow: 'hidden',
@@ -480,6 +491,7 @@ const VolumeButton = () => {
     const coordinator = groupMembers.find((m) => m.isCoordinator) ?? groupMembers[0];
     const nonCoordinators = groupMembers.filter((m) => !m.isCoordinator);
     const coordinatorIsSonos = coordinator ? isSonosMember(coordinator.device) : false;
+
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (e.key === 'Shift') setIsShiftDown(true);
@@ -661,11 +673,11 @@ const VolumeButton = () => {
             {isGroupMode && (
                 <div
                     style={{
-                        background: 'var(--theme-colors-surface, rgba(20, 20, 35, 0.97))',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '10px',
+                        background: POPOVER_BG,
+                        border: POPOVER_BORDER,
+                        borderRadius: POPOVER_RADIUS,
                         bottom: '-12px',
-                        boxShadow: '0 -6px 20px rgba(0, 0, 0, 0.45)',
+                        boxShadow: POPOVER_SHADOW,
                         left: '-10px',
                         opacity: isHovered ? 1 : 0,
                         padding: '0 10px 45px 10px',
@@ -679,7 +691,7 @@ const VolumeButton = () => {
                 >
                     <div
                         style={{
-                            color: 'var(--theme-colors-subtext, #888)',
+                            color: POPOVER_SUBTEXT,
                             fontSize: '0.62rem',
                             padding: '8px 0',
                             textAlign: 'center',
@@ -689,12 +701,8 @@ const VolumeButton = () => {
                             ? "Modifying all speakers' volumes"
                             : "Hold Shift to modify all speakers' volumes"}
                     </div>
-                    <div
-                        style={{
-                            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                            margin: '0 -10px 10px -10px',
-                        }}
-                    />
+                    <div style={{ borderBottom: POPOVER_BORDER, margin: '0 -10px 10px -10px' }} />
+
                     {nonCoordinators.map((m) => (
                         <GroupMemberVolumeRow
                             disabled={isShiftDown}
