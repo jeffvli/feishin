@@ -343,8 +343,8 @@ table {
 }
 
 :has(.fs-right-sidebar-module-vertical-layout) .fs-right-sidebar-module-right-sidebar-container {
-    transform: translateY(-90px);
     position: relative;
+    transform: translateY(-90px);
     z-index: 10;
     height: 100%;
 }
