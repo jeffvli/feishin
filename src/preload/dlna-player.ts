@@ -1,4 +1,9 @@
-import type { DlnaDevice, GroupMember, TrackMetadata } from '/@/shared/types/dlna';
+import type {
+    DlnaDevice,
+    GroupMember,
+    SpeakerProperties,
+    TrackMetadata,
+} from '/@/shared/types/dlna';
 
 import { ipcRenderer, IpcRendererEvent } from 'electron';
 
@@ -72,12 +77,3 @@ export const dlnaPlayerListener = {
 export type DlnaPlayer = typeof dlnaPlayer;
 
 export type DlnaPlayerListener = typeof dlnaPlayerListener;
-
-export interface SpeakerProperties {
-    bass: number;
-    crossfade: boolean;
-    ledState: boolean;
-    loudness: boolean;
-    touchControls: boolean;
-    treble: number;
-}
