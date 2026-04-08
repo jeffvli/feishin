@@ -46,6 +46,8 @@ mac:
     identity: "-"
     gatekeeperAssess: false
     notarize: false
+    extendInfo:
+        NSAudioCaptureUsageDescription: "System audio access is required for mpv visualizer capture in Feishin"
 
 dmg:
     contents: [{ x: 130, y: 220 }, { x: 410, y: 220, type: link, path: /Applications }]

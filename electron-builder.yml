@@ -47,6 +47,7 @@ mac:
     gatekeeperAssess: false
     notarize: false
     extendInfo:
+        NSAudioCaptureUsageDescription: 'System audio access is required for mpv visualizer capture in Feishin'
         NSLocalNetworkUsageDescription: 'Local network is necessary for accessing servers hosted on the same system as Feishin'
 
 dmg:
