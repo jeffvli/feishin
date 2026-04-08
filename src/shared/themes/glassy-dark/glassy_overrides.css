@@ -233,6 +233,16 @@ table {
     margin-bottom: 90px;
 }
 
+/* settings */
+.fs-library-container-module-container > .m_8bffd616 > .fs-library-container-module-container {
+    margin-bottom: 90px;
+}
+
+/* settings window */
+.m_60c222c7.m_1f958f16.mantine-Modal-inner > .m_fd1ab0aa > .fs-scroll-area-module-scroll-area > .os-scrollbar {
+    margin-bottom: 0;
+}
+
 .mantine-Tabs-root {
     input {
         border-radius: 18px;
@@ -330,6 +340,13 @@ table {
 
 .fs-main-content-module-main-content-body .fs-list-with-sidebar-container-module-sidebar-container {
     height: calc(100% - 90px);
+}
+
+:has(.fs-right-sidebar-module-vertical-layout) .fs-right-sidebar-module-right-sidebar-container {
+    transform: translateY(-90px);
+    position: relative;
+    z-index: 10;
+    height: 100%;
 }
 
 .fs-page-header-module-container {
