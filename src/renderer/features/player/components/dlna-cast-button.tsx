@@ -1,3 +1,5 @@
+import type { DlnaDevice, GroupMember } from '/@/shared/types/dlna';
+
 import { Loader } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -17,20 +19,6 @@ import { Popover } from '/@/shared/components/popover/popover';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { PlayerType } from '/@/shared/types/types';
-
-interface DlnaDevice {
-    controlUrl: string;
-    id: string;
-    location: string;
-    name: string;
-    renderingControlUrl: string;
-}
-
-interface GroupMember {
-    device: DlnaDevice;
-    isCoordinator: boolean;
-    volume: number;
-}
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const ipc = isElectron() ? window.api.ipc : null;

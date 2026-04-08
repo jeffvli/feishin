@@ -1,3 +1,5 @@
+import type { DlnaDevice, SpeakerProperties, TrackMetadata } from '/@/shared/types/dlna';
+
 import { ipcMain } from 'electron';
 import http from 'http';
 import os from 'os';
@@ -6,7 +8,6 @@ import { getMainWindow } from '../../../index';
 import { createLog } from '../../../utils';
 import {
     becomeCoordinatorOfStandaloneGroup,
-    DlnaDevice,
     getBass,
     getButtonLockState,
     getCrossfadeMode,
@@ -33,7 +34,6 @@ import {
     setTreble,
     setVolume,
     stop,
-    TrackMetadata,
 } from './soap-client';
 import { discoverDevices } from './ssdp-discovery';
 
@@ -85,15 +85,6 @@ const dlnaLog = (action: string, err?: unknown) => {
     createLog({ message, type: err ? 'error' : 'info' });
     if (err) console.error(message, err);
 };
-
-export interface SpeakerProperties {
-    bass: number;
-    crossfade: boolean;
-    ledState: boolean;
-    loudness: boolean;
-    touchControls: boolean;
-    treble: number;
-}
 
 async function ensureEventServer(): Promise<void> {
     if (eventServer) return;

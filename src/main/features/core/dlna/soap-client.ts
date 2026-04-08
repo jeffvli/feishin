@@ -1,3 +1,5 @@
+import type { DlnaDevice, TrackMetadata } from '/@/shared/types/dlna';
+
 import { net } from 'electron';
 
 import { createLog } from '../../../utils';
@@ -9,23 +11,6 @@ const playerLog = (action: string, err?: unknown) => {
         console.error(message, err);
     }
 };
-
-export interface DlnaDevice {
-    controlUrl: string;
-    id: string;
-    location: string;
-    name: string;
-    renderingControlUrl: string;
-}
-
-export interface TrackMetadata {
-    albumArtUrl?: string;
-    albumName?: string;
-    artistName?: string;
-    duration?: number;
-    mimeType?: string;
-    title: string;
-}
 
 function formatDuration(seconds: number): string {
     const h = Math.floor(seconds / 3600);

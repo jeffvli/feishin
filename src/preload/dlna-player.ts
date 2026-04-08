@@ -1,27 +1,6 @@
+import type { DlnaDevice, GroupMember, TrackMetadata } from '/@/shared/types/dlna';
+
 import { ipcRenderer, IpcRendererEvent } from 'electron';
-
-export interface DlnaDevice {
-    controlUrl: string;
-    id: string;
-    location: string;
-    name: string;
-    renderingControlUrl: string;
-}
-
-export interface GroupMember {
-    device: DlnaDevice;
-    isCoordinator: boolean;
-    volume: number;
-}
-
-export interface TrackMetadata {
-    albumArtUrl?: string;
-    albumName?: string;
-    artistName?: string;
-    duration?: number;
-    mimeType?: string;
-    title: string;
-}
 
 const discover = (): Promise<DlnaDevice[]> => ipcRenderer.invoke('dlna-discover');
 const connect = (device: DlnaDevice): Promise<{ success: boolean; volume: number }> =>
