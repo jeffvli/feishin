@@ -250,7 +250,9 @@ export const DlnaCastButton = () => {
     const [groupMemberList, setGroupMemberList] = useState<GroupMember[]>([]);
     const coordinatorRef = useRef<DlnaDevice | null>(null);
 
-    const previousPlayerTypeRef = useRef<PlayerType>(settings.type);
+    const previousPlayerTypeRef = useRef<PlayerType>(
+        settings.type === PlayerType.DLNA ? PlayerType.WEB : settings.type,
+    );
 
     const isConnected = screen === 'connected' || screen === 'group';
     const hasSonosDevices = devices.some(isSonosDevice);
@@ -298,7 +300,9 @@ export const DlnaCastButton = () => {
     const handleSelect = useCallback(
         async (device: DlnaDevice) => {
             if (!dlnaPlayer) return;
-            previousPlayerTypeRef.current = settings.type;
+            if (settings.type !== PlayerType.DLNA) {
+                previousPlayerTypeRef.current = settings.type;
+            }
             setScreen('connecting');
             const result = await dlnaPlayer.connect(device);
             if (result.success) {
@@ -310,7 +314,8 @@ export const DlnaCastButton = () => {
                     playback: {
                         ...settings,
                         previousLocalVolume: volume,
-                        previousPlayerType: settings.type,
+                        previousPlayerType:
+                            settings.type !== PlayerType.DLNA ? settings.type : PlayerType.WEB,
                         type: PlayerType.DLNA,
                     },
                 });
@@ -325,7 +330,9 @@ export const DlnaCastButton = () => {
     const handleGroupConfirm = useCallback(
         async (selected: DlnaDevice[], coordinator: DlnaDevice) => {
             if (!dlnaPlayer || selected.length < 2) return;
-            previousPlayerTypeRef.current = settings.type;
+            if (settings.type !== PlayerType.DLNA) {
+                previousPlayerTypeRef.current = settings.type;
+            }
             setScreen('connecting');
             const result = await dlnaPlayer.connect(coordinator);
             if (!result.success) {
@@ -338,7 +345,8 @@ export const DlnaCastButton = () => {
                 playback: {
                     ...settings,
                     previousLocalVolume: volume,
-                    previousPlayerType: settings.type,
+                    previousPlayerType:
+                        settings.type !== PlayerType.DLNA ? settings.type : PlayerType.WEB,
                     type: PlayerType.DLNA,
                 },
             });
@@ -409,18 +417,26 @@ export const DlnaCastButton = () => {
         setGroupMemberList([]);
         coordinatorRef.current = null;
         setShowPopover(false);
-        setSettings({ playback: { ...settings, type: previousPlayerTypeRef.current } });
+        const nextType =
+            previousPlayerTypeRef.current === PlayerType.DLNA
+                ? PlayerType.WEB
+                : previousPlayerTypeRef.current;
+        setSettings({ playback: { ...settings, type: nextType } });
         if (settings.previousLocalVolume !== undefined) setVolume(settings.previousLocalVolume);
     }, [setSettings, setVolume, settings]);
 
     useEffect(() => {
         if (settings.previousLocalVolume !== undefined) {
+            const typeToRestore =
+                settings.previousPlayerType === PlayerType.DLNA
+                    ? PlayerType.WEB
+                    : (settings.previousPlayerType ?? previousPlayerTypeRef.current);
             setSettings({
                 playback: {
                     ...settings,
                     previousLocalVolume: undefined,
                     previousPlayerType: undefined,
-                    type: settings.previousPlayerType ?? previousPlayerTypeRef.current,
+                    type: typeToRestore,
                 },
             });
         }
