@@ -1,9 +1,8 @@
+import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig, normalizePath } from 'vite';
 import { ViteEjsPlugin } from 'vite-plugin-ejs';
 import { VitePWA } from 'vite-plugin-pwa';
-
-import { createReactPlugin } from './vite.react-plugin';
 
 export default defineConfig({
     base: './',
@@ -64,7 +63,7 @@ export default defineConfig({
         ],
     },
     plugins: [
-        createReactPlugin(),
+        react(),
         ViteEjsPlugin({
             root: normalizePath(path.resolve(__dirname, './src/renderer')),
             web: true,
