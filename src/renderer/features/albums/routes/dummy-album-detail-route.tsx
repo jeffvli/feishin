@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link, useParams } from 'react-router';
@@ -39,7 +39,7 @@ const DummyAlbumDetailRoute = () => {
     const { albumId } = useParams() as { albumId: string };
     const server = useCurrentServer();
     const queryKey = queryKeys.songs.detail(server?.id || '', albumId);
-    const detailQuery = useQuery({
+    const detailQuery = useSuspenseQuery({
         queryFn: ({ signal }) => {
             return api.controller.getSongDetail({
                 apiClientProps: { serverId: server?.id || '', signal },
@@ -52,7 +52,7 @@ const DummyAlbumDetailRoute = () => {
     const { background, colorId } = useFastAverageColor({
         id: albumId,
         src: detailQuery.data?.imageUrl,
-        srcLoaded: !detailQuery.isLoading,
+        srcLoaded: Boolean(detailQuery.data?.imageUrl),
     });
     const { addToQueueByFetch } = usePlayer();
     const playButtonBehavior = usePlayButtonBehavior();

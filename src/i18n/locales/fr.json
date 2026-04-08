@@ -1002,6 +1002,9 @@
             "export": "exporter les paroles",
             "input_synced": "exporter les paroles synchronisées",
             "input_offset": "$t(setting.lyricOffset)"
+        },
+        "editRadioStation": {
+            "success": "station de radio a été mise à jour avec succès"
         }
     },
     "entity": {
@@ -1379,6 +1382,12 @@
         },
         "lumiBars": "Lumi Bars",
         "outlineBars": "Outline Bars",
-        "splitGradient": "Split Gradient"
+        "splitGradient": "Split Gradient",
+        "systemAudioNoAudioTrack": "Aucune piste audio n'a été renvoyée. Assurez-vous que la capture audio est activée lorsque vous y êtes invité.",
+        "systemAudioConsentAllow": "Permettre",
+        "systemAudioConsentBody": "Le visualiseur nécessite un accès au système audio pour fonctionner",
+        "systemAudioConsentDecline": "Refuser",
+        "systemAudioConsentTitle": "Permettre l'accès au système audio ?",
+        "systemAudioCaptureFailed": "Impossible de démarrer la capture : {{message}}"
     }
 }

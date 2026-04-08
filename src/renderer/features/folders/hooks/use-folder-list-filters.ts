@@ -6,6 +6,7 @@ import { useSortByFilter } from '/@/renderer/features/shared/hooks/use-sort-by-f
 import { useSortOrderFilter } from '/@/renderer/features/shared/hooks/use-sort-order-filter';
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
 import { parseJsonParam, setJsonSearchParam } from '/@/renderer/utils/query-params';
+import { runInUrlTransition } from '/@/renderer/utils/url-transition';
 import { SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -29,13 +30,19 @@ export const useFolderListFilters = () => {
     }, [searchParams]);
 
     const setFolderPath = (path: FolderPathItem[]) => {
-        setSearchParams(
-            (prev) => {
-                const newParams = setJsonSearchParam(prev, FILTER_KEYS.FOLDER.FOLDER_PATH, path);
-                return newParams;
-            },
-            { replace: false },
-        );
+        runInUrlTransition(() => {
+            setSearchParams(
+                (prev) => {
+                    const newParams = setJsonSearchParam(
+                        prev,
+                        FILTER_KEYS.FOLDER.FOLDER_PATH,
+                        path,
+                    );
+                    return newParams;
+                },
+                { replace: false },
+            );
+        });
     };
 
     // Navigate to a folder (adds to path)

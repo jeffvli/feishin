@@ -169,6 +169,10 @@ Feishin supports any music server that implements a [Navidrome](https://www.navi
     - [Qm-Music](https://github.com/chenqimiao/qm-music)
     - More (?)
 
+- [Plex](https://www.plex.tv/media-server-downloads)
+    - [Feishin fork by lux032](https://github.com/lux032/feishin) - Plex is not natively supported. Use the fork by lux032 to use Plex with Feishin.
+
+
 ### I have the issue "The SUID sandbox helper binary was found, but is not configured correctly" on Linux
 
 This happens when you have user (unprivileged) namespaces disabled (`sysctl kernel.unprivileged_userns_clone` returns 0). You can fix this by either enabling unprivileged namespaces, or by making the `chrome-sandbox` Setuid.

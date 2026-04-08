@@ -1,17 +1,38 @@
+import type { ChangeEvent, DragEvent, HTMLAttributes, ReactNode } from 'react';
+
+import clsx from 'clsx';
 import { t } from 'i18next';
 import { useCallback, useRef, useState } from 'react';
+
+import styles from './drag-drop-zone.module.css';
 
 import { Flex } from '/@/shared/components/flex/flex';
 import { AppIcon, Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
+import { isNativeFileDrag, pickFirstImageFile } from '/@/shared/utils/image-drop';
 
-interface DragDropZoneProps {
+export interface DragDropZoneFileProps extends DivProps {
+    accept?: string;
+    children: ReactNode;
+    mode: 'file';
+    onFileSelected: (file: File) => Promise<void> | void;
+}
+
+export type DragDropZoneProps = DragDropZoneFileProps | DragDropZoneTextProps;
+
+type DivProps = Omit<
+    HTMLAttributes<HTMLDivElement>,
+    'children' | 'onDragEnter' | 'onDragLeave' | 'onDragOver' | 'onDrop'
+>;
+
+interface DragDropZoneTextProps {
     icon: keyof typeof AppIcon;
+    mode?: 'text';
     onItemSelected: (contents: string) => void;
     validateItem?: (contents: string) => { error?: string; isValid: boolean };
 }
 
-export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZoneProps) => {
+const DragDropZoneText = ({ icon, onItemSelected, validateItem }: DragDropZoneTextProps) => {
     const zoneFileInput = useRef<HTMLInputElement | null>(null);
     const [error, setError] = useState<string>('');
 
@@ -32,7 +53,7 @@ export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZon
     );
 
     const onItemDropped = useCallback(
-        (event: React.DragEvent<HTMLDivElement>) => {
+        (event: DragEvent<HTMLDivElement>) => {
             event.preventDefault();
 
             const items = event.dataTransfer.items;
@@ -62,7 +83,7 @@ export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZon
         [processItem],
     );
 
-    const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    const onDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
         event.stopPropagation();
         event.preventDefault();
     }, []);
@@ -72,7 +93,7 @@ export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZon
     }, []);
 
     const onZoneInputChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
+        (event: ChangeEvent<HTMLInputElement>) => {
             const { files } = event.target;
 
             if (!files || files.length > 1) {
@@ -130,4 +151,84 @@ export const DragDropZone = ({ icon, onItemSelected, validateItem }: DragDropZon
             />
         </Flex>
     );
+};
+
+const DragDropZoneFile = (props: DragDropZoneFileProps) => {
+    const { accept = 'image/*', children, className, mode, onFileSelected, ...divProps } = props;
+    void mode;
+    const fileDragDepth = useRef(0);
+    const [fileDragOver, setFileDragOver] = useState(false);
+
+    const resolveFile = useCallback(
+        (dataTransfer: DataTransfer): File | null => {
+            if (accept === 'image/*') {
+                return pickFirstImageFile(dataTransfer.files);
+            }
+            const first = dataTransfer.files?.item(0);
+            return first ?? null;
+        },
+        [accept],
+    );
+
+    const handleDragEnter = useCallback((e: DragEvent<HTMLDivElement>) => {
+        if (!isNativeFileDrag(e)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        fileDragDepth.current += 1;
+        setFileDragOver(true);
+    }, []);
+
+    const handleDragLeave = useCallback((e: DragEvent<HTMLDivElement>) => {
+        if (!isNativeFileDrag(e)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        fileDragDepth.current -= 1;
+        if (fileDragDepth.current <= 0) {
+            fileDragDepth.current = 0;
+            setFileDragOver(false);
+        }
+    }, []);
+
+    const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
+        if (!isNativeFileDrag(e)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = 'copy';
+    }, []);
+
+    const handleDrop = useCallback(
+        (e: DragEvent<HTMLDivElement>) => {
+            if (!isNativeFileDrag(e)) return;
+            e.preventDefault();
+            e.stopPropagation();
+            fileDragDepth.current = 0;
+            setFileDragOver(false);
+            const file = resolveFile(e.dataTransfer);
+            if (file) void onFileSelected(file);
+        },
+        [onFileSelected, resolveFile],
+    );
+
+    return (
+        <div
+            {...divProps}
+            className={clsx(className, {
+                [styles.fileTargetDragOver]: fileDragOver,
+            })}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+        >
+            {children}
+        </div>
+    );
+};
+
+export const DragDropZone = (props: DragDropZoneProps) => {
+    if (props.mode === 'file') {
+        return <DragDropZoneFile {...props} />;
+    }
+
+    return <DragDropZoneText {...props} />;
 };

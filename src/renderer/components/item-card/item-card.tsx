@@ -169,6 +169,292 @@ export interface ItemCardDerivativeProps extends Omit<ItemCardProps, 'type'> {
     showRating: boolean;
 }
 
+type ItemCardData = NonNullable<ItemCardProps['data']>;
+
+const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
+    controls,
+    data,
+    enableExpansion,
+    enableImageViewport = true,
+    enableNavigation,
+    handleContextMenu,
+    handleImageClick,
+    handleLinkDragStart,
+    imageAsLink,
+    imageFetchPriority,
+    internalState,
+    isRound,
+    itemType,
+    navigationPath,
+    showRating,
+    variant,
+    withControls,
+}: {
+    controls?: ItemControls;
+    data: ItemCardData;
+    enableExpansion?: boolean;
+    enableImageViewport?: boolean;
+    enableNavigation?: boolean;
+    handleContextMenu: (e: React.MouseEvent<HTMLElement>) => void;
+    handleImageClick: (e: React.MouseEvent<HTMLElement>) => void;
+    handleLinkDragStart: (e: React.DragEvent<HTMLAnchorElement>) => void;
+    imageAsLink?: boolean;
+    imageFetchPriority?: 'auto' | 'high' | 'low';
+    internalState?: ItemListStateActions;
+    isRound?: boolean;
+    itemType: LibraryItem;
+    navigationPath: null | string;
+    showRating: boolean;
+    variant: 'default' | 'poster';
+    withControls?: boolean;
+}) {
+    const [showControls, setShowControls] = useState(false);
+
+    const handleMouseEnter = () => {
+        if (withControls) {
+            setShowControls(true);
+        }
+    };
+
+    const handleMouseLeave = () => {
+        if (withControls) {
+            setShowControls(false);
+        }
+    };
+
+    const imageContainerClassName = clsx(styles.imageContainer, {
+        [styles.isRound]: isRound,
+    });
+
+    const isFavorite = 'userFavorite' in data && (data as { userFavorite: boolean }).userFavorite;
+    const userRating =
+        'userRating' in data &&
+        typeof (data as { userRating: null | number }).userRating === 'number'
+            ? (data as { userRating: null | number }).userRating
+            : null;
+    const hasRating = showRating && userRating !== null && userRating > 0;
+
+    const imageContainerContent = (
+        <>
+            {itemType === LibraryItem.GENRE &&
+            data &&
+            'name' in data &&
+            typeof (data as Genre).name === 'string' ? (
+                <GenreImagePlaceholder
+                    className={clsx(styles.image, styles.genrePlaceholder, {
+                        [styles.isRound]: isRound,
+                    })}
+                    name={(data as Genre).name}
+                />
+            ) : (
+                <ItemImage
+                    className={clsx(styles.image, { [styles.isRound]: isRound })}
+                    enableDebounce={false}
+                    {...(variant === 'poster' ? { enableViewport: enableImageViewport } : {})}
+                    explicitStatus={'explicitStatus' in data && data ? data.explicitStatus : null}
+                    fetchPriority={imageFetchPriority}
+                    id={(data as { imageId?: string })?.imageId}
+                    itemType={itemType}
+                    src={(data as { imageUrl?: string })?.imageUrl}
+                    type="itemCard"
+                />
+            )}
+            {isFavorite && <div className={styles.favoriteBadge} />}
+            {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
+            <AnimatePresence>
+                {withControls && showControls && (
+                    <ItemCardControls
+                        controls={controls}
+                        enableExpansion={enableExpansion}
+                        {...(variant === 'poster' ? { internalState } : {})}
+                        item={data}
+                        itemType={itemType}
+                        showRating={showRating}
+                        type={variant}
+                    />
+                )}
+            </AnimatePresence>
+        </>
+    );
+
+    return enableNavigation && navigationPath && (imageAsLink ?? !internalState) ? (
+        <Link
+            className={imageContainerClassName}
+            draggable={false}
+            onClick={handleImageClick}
+            onContextMenu={handleContextMenu}
+            onDragStart={handleLinkDragStart}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            state={{ item: data }}
+            to={navigationPath}
+        >
+            {imageContainerContent}
+        </Link>
+    ) : (
+        <div
+            className={imageContainerClassName}
+            onClick={handleImageClick}
+            onContextMenu={handleContextMenu}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+        >
+            {imageContainerContent}
+        </div>
+    );
+});
+
+ItemCardStandardImageArea.displayName = 'ItemCardStandardImageArea';
+
+const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
+    controls,
+    data,
+    enableExpansion,
+    enableNavigation,
+    handleContextMenu,
+    handleImageClick,
+    handleLinkDragStart,
+    imageAsLink,
+    imageFetchPriority,
+    internalState,
+    isRound,
+    itemType,
+    navigationPath,
+    rows,
+    showRating,
+    withControls,
+}: {
+    controls?: ItemControls;
+    data: ItemCardData;
+    enableExpansion?: boolean;
+    enableNavigation?: boolean;
+    handleContextMenu: (e: React.MouseEvent<HTMLElement>) => void;
+    handleImageClick: (e: React.MouseEvent<HTMLElement>) => void;
+    handleLinkDragStart: (e: React.DragEvent<HTMLAnchorElement>) => void;
+    imageAsLink?: boolean;
+    imageFetchPriority?: 'auto' | 'high' | 'low';
+    internalState?: ItemListStateActions;
+    isRound?: boolean;
+    itemType: LibraryItem;
+    navigationPath: null | string;
+    rows: DataRow[];
+    showRating: boolean;
+    withControls?: boolean;
+}) {
+    const [showControls, setShowControls] = useState(false);
+
+    const handleMouseEnter = () => {
+        if (withControls) {
+            setShowControls(true);
+        }
+    };
+
+    const handleMouseLeave = () => {
+        if (withControls) {
+            setShowControls(false);
+        }
+    };
+
+    const imageContainerClassName = clsx(styles.imageContainer, {
+        [styles.isRound]: isRound,
+    });
+
+    const isFavorite = 'userFavorite' in data && (data as { userFavorite: boolean }).userFavorite;
+    const userRating =
+        'userRating' in data &&
+        typeof (data as { userRating: null | number }).userRating === 'number'
+            ? (data as { userRating: null | number }).userRating
+            : null;
+    const hasRating = showRating && userRating !== null && userRating > 0;
+
+    const imageContainerContent = (
+        <>
+            {itemType === LibraryItem.GENRE &&
+            data &&
+            'name' in data &&
+            typeof (data as Genre).name === 'string' ? (
+                <GenreImagePlaceholder
+                    className={clsx(styles.image, styles.genrePlaceholder, {
+                        [styles.isRound]: isRound,
+                    })}
+                    name={(data as Genre).name}
+                />
+            ) : (
+                <ItemImage
+                    className={clsx(styles.image, {
+                        [styles.isRound]: isRound,
+                    })}
+                    enableDebounce={false}
+                    explicitStatus={'explicitStatus' in data && data ? data.explicitStatus : null}
+                    fetchPriority={imageFetchPriority}
+                    id={data?.imageId}
+                    itemType={itemType}
+                    src={(data as Album | AlbumArtist | Playlist | Song)?.imageUrl}
+                    type="itemCard"
+                />
+            )}
+            {isFavorite && <div className={styles.favoriteBadge} />}
+            {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
+            <AnimatePresence>
+                {withControls && showControls && data && (
+                    <ItemCardControls
+                        controls={controls}
+                        enableExpansion={enableExpansion}
+                        internalState={internalState}
+                        item={data}
+                        itemType={itemType}
+                        showRating={showRating}
+                        type="compact"
+                    />
+                )}
+            </AnimatePresence>
+            <div className={clsx(styles.detailContainer, styles.compact)}>
+                {rows
+                    .filter(
+                        (row): row is NonNullable<typeof row> => row !== null && row !== undefined,
+                    )
+                    .map((row, index) => (
+                        <ItemCardRow
+                            data={data!}
+                            index={index}
+                            key={row.id}
+                            row={row}
+                            type="compact"
+                        />
+                    ))}
+            </div>
+        </>
+    );
+
+    return enableNavigation && navigationPath && (imageAsLink ?? !internalState) ? (
+        <Link
+            className={imageContainerClassName}
+            draggable={false}
+            onClick={handleImageClick}
+            onContextMenu={handleContextMenu}
+            onDragStart={handleLinkDragStart}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            state={{ item: data }}
+            to={navigationPath}
+        >
+            {imageContainerContent}
+        </Link>
+    ) : (
+        <div
+            className={imageContainerClassName}
+            onClick={handleImageClick}
+            onContextMenu={handleContextMenu}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+        >
+            {imageContainerContent}
+        </div>
+    );
+});
+
+CompactItemCardImageArea.displayName = 'CompactItemCardImageArea';
+
 const CompactItemCard = ({
     controls,
     data,
@@ -185,7 +471,6 @@ const CompactItemCard = ({
     showRating,
     withControls,
 }: ItemCardDerivativeProps) => {
-    const [showControls, setShowControls] = useState(false);
     const itemRowId =
         data && internalState && typeof data === 'object' && 'id' in data
             ? internalState.extractRowId(data)
@@ -297,18 +582,6 @@ const CompactItemCard = ({
     if (data) {
         const navigationPath = getItemNavigationPath(data, itemType);
 
-        const handleMouseEnter = () => {
-            if (withControls) {
-                setShowControls(true);
-            }
-        };
-
-        const handleMouseLeave = () => {
-            if (withControls) {
-                setShowControls(false);
-            }
-        };
-
         const handleContextMenu = (e: React.MouseEvent<HTMLElement>) => {
             if (!data || !controls) {
                 return;
@@ -338,81 +611,6 @@ const CompactItemCard = ({
             e.stopPropagation();
         };
 
-        const isFavorite =
-            'userFavorite' in data && (data as { userFavorite: boolean }).userFavorite;
-        const userRating =
-            'userRating' in data &&
-            typeof (data as { userRating: null | number }).userRating === 'number'
-                ? (data as { userRating: null | number }).userRating
-                : null;
-        const hasRating = showRating && userRating !== null && userRating > 0;
-
-        const imageContainerClassName = clsx(styles.imageContainer, {
-            [styles.isRound]: isRound,
-        });
-
-        const imageContainerContent = (
-            <>
-                {itemType === LibraryItem.GENRE &&
-                data &&
-                'name' in data &&
-                typeof (data as Genre).name === 'string' ? (
-                    <GenreImagePlaceholder
-                        className={clsx(styles.image, styles.genrePlaceholder, {
-                            [styles.isRound]: isRound,
-                        })}
-                        name={(data as Genre).name}
-                    />
-                ) : (
-                    <ItemImage
-                        className={clsx(styles.image, {
-                            [styles.isRound]: isRound,
-                        })}
-                        enableDebounce={false}
-                        explicitStatus={
-                            'explicitStatus' in data && data ? data.explicitStatus : null
-                        }
-                        fetchPriority={imageFetchPriority}
-                        id={data?.imageId}
-                        itemType={itemType}
-                        src={(data as Album | AlbumArtist | Playlist | Song)?.imageUrl}
-                        type="itemCard"
-                    />
-                )}
-                {isFavorite && <div className={styles.favoriteBadge} />}
-                {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
-                <AnimatePresence>
-                    {withControls && showControls && data && (
-                        <ItemCardControls
-                            controls={controls}
-                            enableExpansion={enableExpansion}
-                            internalState={internalState}
-                            item={data}
-                            itemType={itemType}
-                            showRating={showRating}
-                            type="compact"
-                        />
-                    )}
-                </AnimatePresence>
-                <div className={clsx(styles.detailContainer, styles.compact)}>
-                    {rows
-                        .filter(
-                            (row): row is NonNullable<typeof row> =>
-                                row !== null && row !== undefined,
-                        )
-                        .map((row, index) => (
-                            <ItemCardRow
-                                data={data!}
-                                index={index}
-                                key={row.id}
-                                row={row}
-                                type="compact"
-                            />
-                        ))}
-                </div>
-            </>
-        );
-
         return (
             <div
                 className={clsx(styles.container, styles.compact, {
@@ -421,31 +619,24 @@ const CompactItemCard = ({
                 })}
                 ref={ref}
             >
-                {enableNavigation && navigationPath && (imageAsLink ?? !internalState) ? (
-                    <Link
-                        className={imageContainerClassName}
-                        draggable={false}
-                        onClick={handleImageClick}
-                        onContextMenu={handleContextMenu}
-                        onDragStart={handleLinkDragStart}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                        state={{ item: data }}
-                        to={navigationPath}
-                    >
-                        {imageContainerContent}
-                    </Link>
-                ) : (
-                    <div
-                        className={imageContainerClassName}
-                        onClick={handleImageClick}
-                        onContextMenu={handleContextMenu}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                    >
-                        {imageContainerContent}
-                    </div>
-                )}
+                <CompactItemCardImageArea
+                    controls={controls}
+                    data={data}
+                    enableExpansion={enableExpansion}
+                    enableNavigation={enableNavigation}
+                    handleContextMenu={handleContextMenu}
+                    handleImageClick={handleImageClick}
+                    handleLinkDragStart={handleLinkDragStart}
+                    imageAsLink={imageAsLink}
+                    imageFetchPriority={imageFetchPriority}
+                    internalState={internalState}
+                    isRound={isRound}
+                    itemType={itemType}
+                    navigationPath={navigationPath}
+                    rows={rows}
+                    showRating={showRating}
+                    withControls={withControls}
+                />
             </div>
         );
     }
@@ -491,7 +682,6 @@ const DefaultItemCard = ({
     showRating,
     withControls,
 }: ItemCardDerivativeProps) => {
-    const [showControls, setShowControls] = useState(false);
     const itemRowId =
         data && internalState && typeof data === 'object' && 'id' in data
             ? internalState.extractRowId(data)
@@ -538,18 +728,6 @@ const DefaultItemCard = ({
     if (data) {
         const navigationPath = getItemNavigationPath(data, itemType);
 
-        const handleMouseEnter = () => {
-            if (withControls) {
-                setShowControls(true);
-            }
-        };
-
-        const handleMouseLeave = () => {
-            if (withControls) {
-                setShowControls(false);
-            }
-        };
-
         const handleContextMenu = (e: React.MouseEvent<HTMLElement>) => {
             if (!data || !controls) {
                 return;
@@ -579,93 +757,30 @@ const DefaultItemCard = ({
             e.stopPropagation();
         };
 
-        const imageContainerClassName = clsx(styles.imageContainer, {
-            [styles.isRound]: isRound,
-        });
-
-        const isFavorite =
-            'userFavorite' in data && (data as { userFavorite: boolean }).userFavorite;
-        const userRating =
-            'userRating' in data &&
-            typeof (data as { userRating: null | number }).userRating === 'number'
-                ? (data as { userRating: null | number }).userRating
-                : null;
-        const hasRating = showRating && userRating !== null && userRating > 0;
-
-        const imageContainerContent = (
-            <>
-                {itemType === LibraryItem.GENRE &&
-                data &&
-                'name' in data &&
-                typeof (data as Genre).name === 'string' ? (
-                    <GenreImagePlaceholder
-                        className={clsx(styles.image, styles.genrePlaceholder, {
-                            [styles.isRound]: isRound,
-                        })}
-                        name={(data as Genre).name}
-                    />
-                ) : (
-                    <ItemImage
-                        className={clsx(styles.image, { [styles.isRound]: isRound })}
-                        enableDebounce={false}
-                        explicitStatus={
-                            'explicitStatus' in data && data ? data.explicitStatus : null
-                        }
-                        fetchPriority={imageFetchPriority}
-                        id={data?.imageId}
-                        itemType={itemType}
-                        src={(data as Album | AlbumArtist | Playlist | Song)?.imageUrl}
-                        type="itemCard"
-                    />
-                )}
-                {isFavorite && <div className={styles.favoriteBadge} />}
-                {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
-                <AnimatePresence>
-                    {withControls && showControls && (
-                        <ItemCardControls
-                            controls={controls}
-                            enableExpansion={enableExpansion}
-                            item={data}
-                            itemType={itemType}
-                            showRating={showRating}
-                            type="default"
-                        />
-                    )}
-                </AnimatePresence>
-            </>
-        );
-
         return (
             <div
                 className={clsx(styles.container, {
                     [styles.selected]: isSelected,
                 })}
             >
-                {enableNavigation && navigationPath && (imageAsLink ?? !internalState) ? (
-                    <Link
-                        className={imageContainerClassName}
-                        draggable={false}
-                        onClick={handleImageClick}
-                        onContextMenu={handleContextMenu}
-                        onDragStart={handleLinkDragStart}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                        state={{ item: data }}
-                        to={navigationPath}
-                    >
-                        {imageContainerContent}
-                    </Link>
-                ) : (
-                    <div
-                        className={imageContainerClassName}
-                        onClick={handleImageClick}
-                        onContextMenu={handleContextMenu}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                    >
-                        {imageContainerContent}
-                    </div>
-                )}
+                <ItemCardStandardImageArea
+                    controls={controls}
+                    data={data}
+                    enableExpansion={enableExpansion}
+                    enableNavigation={enableNavigation}
+                    handleContextMenu={handleContextMenu}
+                    handleImageClick={handleImageClick}
+                    handleLinkDragStart={handleLinkDragStart}
+                    imageAsLink={imageAsLink}
+                    imageFetchPriority={imageFetchPriority}
+                    internalState={internalState}
+                    isRound={isRound}
+                    itemType={itemType}
+                    navigationPath={navigationPath}
+                    showRating={showRating}
+                    variant="default"
+                    withControls={withControls}
+                />
                 <div className={styles.detailContainer}>
                     {rows
                         .filter(
@@ -728,7 +843,6 @@ const PosterItemCard = ({
     showRating,
     withControls,
 }: ItemCardDerivativeProps) => {
-    const [showControls, setShowControls] = useState(false);
     const itemRowId =
         data && internalState && typeof data === 'object' && 'id' in data
             ? internalState.extractRowId(data)
@@ -840,18 +954,6 @@ const PosterItemCard = ({
     if (data) {
         const navigationPath = getItemNavigationPath(data, itemType);
 
-        const handleMouseEnter = () => {
-            if (withControls) {
-                setShowControls(true);
-            }
-        };
-
-        const handleMouseLeave = () => {
-            if (withControls) {
-                setShowControls(false);
-            }
-        };
-
         const handleContextMenu = (e: React.MouseEvent<HTMLElement>) => {
             if (!data || !controls) {
                 return;
@@ -881,63 +983,6 @@ const PosterItemCard = ({
             e.stopPropagation();
         };
 
-        const imageContainerClassName = clsx(styles.imageContainer, {
-            [styles.isRound]: isRound,
-        });
-
-        const isFavorite =
-            'userFavorite' in data && (data as { userFavorite: boolean }).userFavorite;
-        const userRating =
-            'userRating' in data &&
-            typeof (data as { userRating: null | number }).userRating === 'number'
-                ? (data as { userRating: null | number }).userRating
-                : null;
-        const hasRating = showRating && userRating !== null && userRating > 0;
-
-        const imageContainerContent = (
-            <>
-                {itemType === LibraryItem.GENRE &&
-                data &&
-                'name' in data &&
-                typeof (data as Genre).name === 'string' ? (
-                    <GenreImagePlaceholder
-                        className={clsx(styles.image, styles.genrePlaceholder, {
-                            [styles.isRound]: isRound,
-                        })}
-                        name={(data as Genre).name}
-                    />
-                ) : (
-                    <ItemImage
-                        className={clsx(styles.image, { [styles.isRound]: isRound })}
-                        enableDebounce={false}
-                        explicitStatus={
-                            'explicitStatus' in data && data ? data.explicitStatus : null
-                        }
-                        fetchPriority={imageFetchPriority}
-                        id={(data as { imageId: string })?.imageId}
-                        itemType={itemType}
-                        src={(data as { imageUrl: string })?.imageUrl}
-                        type="itemCard"
-                    />
-                )}
-                {isFavorite && <div className={styles.favoriteBadge} />}
-                {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
-                <AnimatePresence>
-                    {withControls && showControls && data && (
-                        <ItemCardControls
-                            controls={controls}
-                            enableExpansion={enableExpansion}
-                            internalState={internalState}
-                            item={data}
-                            itemType={itemType}
-                            showRating={showRating}
-                            type="poster"
-                        />
-                    )}
-                </AnimatePresence>
-            </>
-        );
-
         return (
             <div
                 className={clsx(styles.container, styles.poster, {
@@ -946,31 +991,24 @@ const PosterItemCard = ({
                 })}
                 ref={ref}
             >
-                {enableNavigation && navigationPath && (imageAsLink ?? !internalState) ? (
-                    <Link
-                        className={imageContainerClassName}
-                        draggable={false}
-                        onClick={handleImageClick}
-                        onContextMenu={handleContextMenu}
-                        onDragStart={handleLinkDragStart}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                        state={{ item: data }}
-                        to={navigationPath}
-                    >
-                        {imageContainerContent}
-                    </Link>
-                ) : (
-                    <div
-                        className={imageContainerClassName}
-                        onClick={handleImageClick}
-                        onContextMenu={handleContextMenu}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                    >
-                        {imageContainerContent}
-                    </div>
-                )}
+                <ItemCardStandardImageArea
+                    controls={controls}
+                    data={data}
+                    enableExpansion={enableExpansion}
+                    enableNavigation={enableNavigation}
+                    handleContextMenu={handleContextMenu}
+                    handleImageClick={handleImageClick}
+                    handleLinkDragStart={handleLinkDragStart}
+                    imageAsLink={imageAsLink}
+                    imageFetchPriority={imageFetchPriority}
+                    internalState={internalState}
+                    isRound={isRound}
+                    itemType={itemType}
+                    navigationPath={navigationPath}
+                    showRating={showRating}
+                    variant="poster"
+                    withControls={withControls}
+                />
                 {data && (
                     <div className={styles.detailContainer}>
                         {rows

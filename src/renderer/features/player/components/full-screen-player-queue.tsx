@@ -15,7 +15,7 @@ import {
 } from '/@/renderer/store/full-screen-player.store';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
-import { ItemListKey, PlayerType } from '/@/shared/types/types';
+import { ItemListKey } from '/@/shared/types/types';
 
 const AudioMotionAnalyzerVisualizer = lazy(() =>
     import('../../visualizer/components/audiomotionanalyzer/visualizer').then((module) => ({
@@ -33,7 +33,7 @@ export const FullScreenPlayerQueue = () => {
     const { t } = useTranslation();
     const { activeTab, opacity } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
-    const { type, webAudio } = usePlaybackSettings();
+    const { webAudio } = usePlaybackSettings();
     const visualizerType = useSettingsStore((store) => store.visualizer.type);
 
     const headerItems = useMemo(() => {
@@ -55,7 +55,7 @@ export const FullScreenPlayerQueue = () => {
             },
         ];
 
-        if (type === PlayerType.WEB && webAudio) {
+        if (webAudio) {
             items.push({
                 active: activeTab === 'visualizer',
                 label: t('page.fullscreenPlayer.visualizer', { postProcess: 'titleCase' }),
@@ -64,7 +64,7 @@ export const FullScreenPlayerQueue = () => {
         }
 
         return items;
-    }, [activeTab, setStore, t, type, webAudio]);
+    }, [activeTab, setStore, t, webAudio]);
 
     return (
         <div
@@ -119,7 +119,7 @@ export const FullScreenPlayerQueue = () => {
                 </div>
             ) : activeTab === 'lyrics' ? (
                 <Lyrics fadeOutNoLyricsMessage={false} />
-            ) : activeTab === 'visualizer' && type === PlayerType.WEB && webAudio ? (
+            ) : activeTab === 'visualizer' && webAudio ? (
                 <Suspense fallback={<></>}>
                     {visualizerType === 'butterchurn' ? (
                         <ButterchurnVisualizer />

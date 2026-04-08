@@ -349,9 +349,12 @@ export const useItemListInfiniteLoader = ({
         mutationKey: getListRefreshMutationKey(eventKey),
     });
 
+    const refreshMutationRef = useRef(refreshMutation);
+    refreshMutationRef.current = refreshMutation;
+
     const refresh = useCallback(
-        async (force?: boolean) => refreshMutation.mutateAsync(force),
-        [refreshMutation],
+        async (force?: boolean) => refreshMutationRef.current.mutateAsync(force),
+        [],
     );
 
     const updateItems = useCallback(
@@ -383,7 +386,7 @@ export const useItemListInfiniteLoader = ({
                 return;
             }
 
-            refreshMutation.mutate(true);
+            refreshMutationRef.current.mutate(true);
         };
 
         eventEmitter.on('ITEM_LIST_REFRESH', handleRefresh);
@@ -391,7 +394,7 @@ export const useItemListInfiniteLoader = ({
         return () => {
             eventEmitter.off('ITEM_LIST_REFRESH', handleRefresh);
         };
-    }, [eventKey, refreshMutation]);
+    }, [eventKey]);
 
     useEffect(() => {
         const handleFavorite = (payload: UserFavoriteEventPayload) => {

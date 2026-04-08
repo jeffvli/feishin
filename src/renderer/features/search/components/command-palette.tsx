@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useDeferredValue, useRef, useState } from 'react';
 
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
 import { GoToCommands } from '/@/renderer/features/search/components/go-to-commands';
@@ -49,6 +49,7 @@ function CommandPaletteSearch({
     setQuery,
 }: CommandPaletteSearchProps) {
     const [debouncedQuery] = useDebouncedValue(query, 400);
+    const deferredSearchQuery = useDeferredValue(debouncedQuery ?? '');
     const searchSectionsExpanded = useAppStore(
         (state) => state.commandPaletteSearchSectionsExpanded,
     );
@@ -83,7 +84,7 @@ function CommandPaletteSearch({
             <Command.List>
                 <Stack gap="xs">
                     <SearchAlbumsSection
-                        debouncedQuery={debouncedQuery ?? ''}
+                        debouncedQuery={deferredSearchQuery}
                         expanded={searchSectionsExpanded[SEARCH_SECTION_IDS.albums] ?? true}
                         isHome={isHome}
                         onSelectResult={onSelectResult}
@@ -96,7 +97,7 @@ function CommandPaletteSearch({
                         query={query}
                     />
                     <SearchAlbumArtistsSection
-                        debouncedQuery={debouncedQuery ?? ''}
+                        debouncedQuery={deferredSearchQuery}
                         expanded={searchSectionsExpanded[SEARCH_SECTION_IDS.artists] ?? true}
                         isHome={isHome}
                         onSelectResult={onSelectResult}
@@ -109,7 +110,7 @@ function CommandPaletteSearch({
                         query={query}
                     />
                     <SearchSongsSection
-                        debouncedQuery={debouncedQuery ?? ''}
+                        debouncedQuery={deferredSearchQuery}
                         expanded={searchSectionsExpanded[SEARCH_SECTION_IDS.tracks] ?? true}
                         isHome={isHome}
                         onSelectResult={onSelectResult}

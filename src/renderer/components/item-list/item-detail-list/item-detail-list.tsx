@@ -911,8 +911,7 @@ const DetailListHeaderCell = memo(
         const percent = col ? (columnWidthPercents[colIndex] ?? 0) : 0;
         const { fixedWidth, isFixedColumn } = getTrackColumnFixed(columnId);
         const currentWidth = col?.width ?? (fixedWidth || 100);
-        const showResizeHandle =
-            enableColumnResize && !isFixedColumn && !col?.autoSize && onColumnResized;
+        const showResizeHandle = enableColumnResize && !isFixedColumn;
 
         useEffect(() => {
             if (!containerRef.current || !onColumnReordered) {
@@ -1026,6 +1025,7 @@ const DetailListHeaderCell = memo(
                 {showResizeHandle && (
                     <DetailListColumnResizeHandle
                         columnId={columnId}
+                        disabled={!!col?.autoSize}
                         initialWidth={currentWidth}
                         onResize={handleResize}
                         side="right"
@@ -1040,6 +1040,7 @@ DetailListHeaderCell.displayName = 'DetailListHeaderCell';
 
 interface DetailListColumnResizeHandleProps {
     columnId: TableColumn;
+    disabled?: boolean;
     initialWidth: number;
     onResize: (columnId: TableColumn, width: number) => void;
     side: 'left' | 'right';
@@ -1047,6 +1048,7 @@ interface DetailListColumnResizeHandleProps {
 
 const DetailListColumnResizeHandle = ({
     columnId,
+    disabled = false,
     initialWidth,
     onResize,
     side,
@@ -1091,6 +1093,11 @@ const DetailListColumnResizeHandle = ({
     }, [isDragging, columnId, onResize]);
 
     const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (disabled) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
         event.preventDefault();
         event.stopPropagation();
         setIsDragging(true);
@@ -1103,6 +1110,7 @@ const DetailListColumnResizeHandle = ({
     return (
         <div
             className={clsx(styles.resizeHandle, {
+                [styles.resizeHandleDisabled]: disabled,
                 [styles.resizeHandleDragging]: isDragging,
                 [styles.resizeHandleLeft]: side === 'left',
                 [styles.resizeHandleRight]: side === 'right',

@@ -12,6 +12,7 @@ import { logMsg } from '/@/renderer/utils/logger-message';
 import { hasFeature } from '/@/shared/api/utils';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Box } from '/@/shared/components/box/box';
+import { DragDropZone } from '/@/shared/components/drag-drop-zone/drag-drop-zone';
 import { FileButton } from '/@/shared/components/file-button/file-button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
@@ -241,16 +242,20 @@ function RadioStationCoverField({
     const iconControls = (
         <>
             <FileButton accept="image/*" onChange={onFileSelect}>
-                {(props) => (
-                    <ActionIcon
-                        icon="uploadImage"
-                        iconProps={{ size: 'lg' }}
-                        radius="xl"
-                        size="sm"
-                        variant="default"
-                        {...props}
-                    />
-                )}
+                {(props) => {
+                    const { ...triggerRest } = props;
+                    return (
+                        <ActionIcon
+                            icon="uploadImage"
+                            iconProps={{ size: 'lg' }}
+                            radius="xl"
+                            size="sm"
+                            variant="default"
+                            {...triggerRest}
+                            style={{ pointerEvents: 'auto' }}
+                        />
+                    );
+                }}
             </FileButton>
             <ActionIcon
                 disabled={secondaryDisabled}
@@ -259,20 +264,10 @@ function RadioStationCoverField({
                 onClick={secondaryAction}
                 radius="xl"
                 size="sm"
+                style={{ pointerEvents: 'auto' }}
                 variant="default"
             />
         </>
-    );
-
-    const coverArt = (
-        <ItemImage
-            enableViewport={false}
-            id={previewId}
-            itemType={LibraryItem.RADIO_STATION}
-            serverId={server?.id}
-            src={previewSrc}
-            type="header"
-        />
     );
 
     return (
@@ -286,21 +281,41 @@ function RadioStationCoverField({
                 width: COVER_SIZE,
             }}
         >
-            {coverArt}
-            <Group
-                gap={4}
+            <DragDropZone
+                accept="image/*"
+                mode="file"
+                onFileSelected={(file) => onFileSelect(file)}
                 style={{
-                    background: 'rgba(0, 0, 0, 0.55)',
-                    borderRadius: 'var(--mantine-radius-md)',
-                    bottom: 6,
-                    padding: 4,
-                    position: 'absolute',
-                    right: 6,
+                    height: '100%',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    width: '100%',
                 }}
-                wrap="nowrap"
             >
-                {iconControls}
-            </Group>
+                <ItemImage
+                    enableViewport={false}
+                    id={previewId}
+                    itemType={LibraryItem.RADIO_STATION}
+                    serverId={server?.id}
+                    src={previewSrc}
+                    type="header"
+                />
+                <Group
+                    gap={4}
+                    style={{
+                        background: 'rgba(0, 0, 0, 0.55)',
+                        bottom: 6,
+                        padding: 4,
+                        pointerEvents: 'none',
+                        position: 'absolute',
+                        right: 6,
+                        zIndex: 2,
+                    }}
+                    wrap="nowrap"
+                >
+                    {iconControls}
+                </Group>
+            </DragDropZone>
         </Box>
     );
 }

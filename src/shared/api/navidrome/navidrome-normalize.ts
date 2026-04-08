@@ -18,14 +18,20 @@ import {
 } from '/@/shared/types/domain-types';
 import { ServerListItem, ServerType } from '/@/shared/types/types';
 
-const getImageUrl = (args: { url: null | string }) => {
-    const { url } = args;
-    if (url === '/app/artist-placeholder.webp') {
-        return null;
-    }
+// const getImageUrl = (args: { url: null | string }) => {
+//     const { url } = args;
+//     if (url === '/app/artist-placeholder.webp') {
+//         return null;
+//     }
 
-    return url;
-};
+//     return url;
+// };
+
+const navidromeImageIdWithCacheBust = (
+    id: string,
+    uploadedImage: string | undefined,
+    updatedAt: string | undefined,
+): string => (!uploadedImage ? id : `${id}&_=${updatedAt ?? ''}`);
 
 interface WithDate {
     playDate?: string;
@@ -397,7 +403,7 @@ const normalizeAlbumArtist = (
     },
     server?: null | ServerListItem,
 ): AlbumArtist => {
-    const imageUrl = getImageUrl({ url: item?.largeImageUrl?.replace(/\?size=\d+/, '') || null });
+    // const imageUrl = getImageUrl({ url: item?.largeImageUrl?.replace(/\?size=\d+/, '') || null });
 
     let albumCount: number;
     let songCount: number;
@@ -415,6 +421,12 @@ const normalizeAlbumArtist = (
         albumCount = item.albumCount;
         songCount = item.songCount;
     }
+
+    const imageId = navidromeImageIdWithCacheBust(
+        item.id,
+        item.uploadedImage,
+        item.updatedAt ?? item.externalInfoUpdatedAt,
+    );
 
     return {
         _itemType: LibraryItem.ALBUM_ARTIST,
@@ -435,8 +447,8 @@ const normalizeAlbumArtist = (
             songCount: null,
         })),
         id: item.id,
-        imageId: item.id,
-        imageUrl: imageUrl || null,
+        imageId,
+        imageUrl: null,
         lastPlayedAt: normalizePlayDate(item),
         mbz: item.mbzArtistId || null,
         name: item.name,
@@ -444,13 +456,14 @@ const normalizeAlbumArtist = (
         similarArtists:
             item.similarArtists?.map((artist) => ({
                 id: artist.id,
-                imageId: null,
-                imageUrl: artist?.artistImageUrl?.replace(/\?size=\d+/, '') || null,
+                imageId: artist.id,
+                imageUrl: null,
                 name: artist.name,
                 userFavorite: Boolean(artist.starred) || false,
                 userRating: artist.userRating || null,
             })) || [],
         songCount,
+        uploadedImage: item.uploadedImage,
         userFavorite: item.starred || false,
         userRating: item.rating || null,
     };
@@ -460,7 +473,7 @@ const normalizePlaylist = (
     item: z.infer<typeof ndType._response.playlist>,
     server?: null | ServerListItem,
 ): Playlist => {
-    const imageId = !item.uploadedImage ? item.id : `${item.id}&_=${item.updatedAt}`;
+    const imageId = navidromeImageIdWithCacheBust(item.id, item.uploadedImage, item.updatedAt);
 
     return {
         _itemType: LibraryItem.PLAYLIST,
@@ -517,7 +530,7 @@ const normalizeInternetRadioStation = (
     item: z.infer<typeof ndType._response.radioStation>,
 ): InternetRadioStation => {
     const homepageUrl = item.homePageUrl?.trim() ? item.homePageUrl : null;
-    const imageId = item.uploadedImage ? `${item.id}&_=${item.updatedAt}` : item.id;
+    const imageId = navidromeImageIdWithCacheBust(item.id, item.uploadedImage, item.updatedAt);
 
     return {
         homepageUrl,

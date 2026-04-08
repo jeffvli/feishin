@@ -1001,6 +1001,9 @@
             "export": "Exportar letras",
             "input_synced": "Exportar letras sincronizadas",
             "input_offset": "$t(setting.lyricOffset)"
+        },
+        "editRadioStation": {
+            "success": "Estación de radio actualizada con éxito"
         }
     },
     "table": {
@@ -1378,6 +1381,12 @@
         "lowResolution": "Baja resolución",
         "splitGradient": "Dividir degradado",
         "noteLabels": "Etiquetas de notas",
-        "lumiBars": "Barras luminiscentes"
+        "lumiBars": "Barras luminiscentes",
+        "systemAudioConsentAllow": "Permitir",
+        "systemAudioConsentDecline": "Denegar",
+        "systemAudioConsentTitle": "¿Permitir acceso al sistema de audio?",
+        "systemAudioConsentBody": "El visualizador requiere acceso al sistema de audio para funcionar",
+        "systemAudioCaptureFailed": "No se pudo iniciar la captura: {{message}}",
+        "systemAudioNoAudioTrack": "Ninguna pista de audio devuelta. Asegúrate de que la captura de audio está activada cuando se solicite."
     }
 }

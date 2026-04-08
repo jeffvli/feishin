@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQueries } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useParams } from 'react-router';
 
@@ -35,20 +35,18 @@ const AlbumArtistDetailFavoriteSongsListRoute = () => {
     const server = useCurrentServer();
     const pageKey = LibraryItem.SONG;
 
-    const detailQuery = useQuery(
-        artistsQueries.albumArtistDetail({
-            query: { id: routeId },
-            serverId: server?.id,
-        }),
-    );
-
-    const favoriteSongsQuery = useQuery(
-        artistsQueries.favoriteSongs({
-            options: { enabled: !!detailQuery?.data?.name },
-            query: { artistId: routeId },
-            serverId: server?.id,
-        }),
-    );
+    const [detailQuery, favoriteSongsQuery] = useSuspenseQueries({
+        queries: [
+            artistsQueries.albumArtistDetail({
+                query: { id: routeId },
+                serverId: server?.id,
+            }),
+            artistsQueries.favoriteSongs({
+                query: { artistId: routeId },
+                serverId: server?.id,
+            }),
+        ],
+    });
 
     const songs = useMemo(
         () => favoriteSongsQuery?.data?.items || [],
@@ -168,7 +166,7 @@ const AlbumArtistDetailFavoriteSongsListRoute = () => {
     );
 };
 
-const AlbumArtistDetailTopSongsListRouteWithBoundary = () => {
+const AlbumArtistDetailFavoriteSongsListRouteWithBoundary = () => {
     return (
         <PageErrorBoundary>
             <AlbumArtistDetailFavoriteSongsListRoute />
@@ -176,4 +174,4 @@ const AlbumArtistDetailTopSongsListRouteWithBoundary = () => {
     );
 };
 
-export default AlbumArtistDetailTopSongsListRouteWithBoundary;
+export default AlbumArtistDetailFavoriteSongsListRouteWithBoundary;

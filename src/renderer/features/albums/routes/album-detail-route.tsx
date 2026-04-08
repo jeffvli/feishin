@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRef } from 'react';
-import { useLocation, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
@@ -16,7 +16,7 @@ import { LibraryContainer } from '/@/renderer/features/shared/components/library
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { useFastAverageColor } from '/@/renderer/hooks';
-import { useAlbumBackground, useCurrentServer } from '/@/renderer/store';
+import { useAlbumBackground, useCurrentServerId } from '/@/renderer/store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const ALBUM_DETAIL_BG_FALLBACK = 'var(--theme-colors-foreground-muted)';
@@ -27,13 +27,10 @@ const AlbumDetailRoute = () => {
     const { albumBackground, albumBackgroundBlur } = useAlbumBackground();
 
     const { albumId } = useParams() as { albumId: string };
-    const server = useCurrentServer();
+    const serverId = useCurrentServerId();
 
-    const location = useLocation();
-
-    const detailQuery = useQuery({
-        ...albumQueries.detail({ query: { id: albumId }, serverId: server?.id }),
-        placeholderData: location.state?.item,
+    const detailQuery = useSuspenseQuery({
+        ...albumQueries.detail({ query: { id: albumId }, serverId }),
     });
 
     const imageUrl =
@@ -65,9 +62,7 @@ const AlbumDetailRoute = () => {
                                 itemType={LibraryItem.ALBUM}
                                 variant="default"
                             />
-                            <LibraryHeaderBar.Title>
-                                {detailQuery?.data?.name}
-                            </LibraryHeaderBar.Title>
+                            <LibraryHeaderBar.Title>{detailQuery.data.name}</LibraryHeaderBar.Title>
                         </LibraryHeaderBar>
                     ),
                     offset: 200,

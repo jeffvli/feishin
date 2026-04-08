@@ -3,11 +3,13 @@ import { createRef, useCallback, useEffect, useRef, useState } from 'react';
 import styles from './visualizer.module.css';
 
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
+import { getVisualizerAudioNodes } from '/@/renderer/features/player/utils/get-visualizer-audio-nodes';
 import { openVisualizerSettingsModal } from '/@/renderer/features/player/utils/open-visualizer-settings-modal';
 import { ComponentErrorBoundary } from '/@/renderer/features/shared/components/component-error-boundary';
 import {
     subscribeButterchurnPreset,
     useButterchurnSettings,
+    usePlaybackType,
     useSettingsStore,
     useSettingsStoreActions,
 } from '/@/renderer/store';
@@ -19,7 +21,7 @@ import { usePlayerStatus } from '/@/renderer/store/player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
 import { Text } from '/@/shared/components/text/text';
-import { PlayerStatus } from '/@/shared/types/types';
+import { PlayerStatus, PlayerType } from '/@/shared/types/types';
 
 // Ignore presets that are erroring out
 const IGNORED_PRESETS = ['Flexi + Martin - astral projection'];
@@ -56,9 +58,14 @@ const VisualizerInner = () => {
     const initialPresetLoadedRef = useRef(false);
     const butterchurnSettings = useButterchurnSettings();
     const opacity = useSettingsStore((store) => store.visualizer.butterchurn.opacity);
+    const playbackType = usePlaybackType();
     const { setSettings } = useSettingsStoreActions();
     const playerStatus = usePlayerStatus();
     const isPlaying = playerStatus === PlayerStatus.PLAYING;
+    const [resumeInitGeneration, setResumeInitGeneration] = useState(0);
+    const wasPlayingRef = useRef(false);
+    const isFirstMountRef = useRef(true);
+    const prevPlaybackTypeRef = useRef(playbackType);
 
     useEffect(() => {
         let isMounted = true;
@@ -89,6 +96,26 @@ const VisualizerInner = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const prevType = prevPlaybackTypeRef.current;
+
+        if (isFirstMountRef.current) {
+            isFirstMountRef.current = false;
+            wasPlayingRef.current = isPlaying;
+            prevPlaybackTypeRef.current = playbackType;
+            return;
+        }
+
+        const wasPlaying = wasPlayingRef.current;
+        wasPlayingRef.current = isPlaying;
+
+        if (isPlaying && (!wasPlaying || prevType !== playbackType)) {
+            setResumeInitGeneration((g) => g + 1);
+        }
+
+        prevPlaybackTypeRef.current = playbackType;
+    }, [playbackType, isPlaying]);
+
     const cleanupVisualizer = () => {
         if (animationFrameRef.current) {
             cancelAnimationFrame(animationFrameRef.current);
@@ -118,17 +145,21 @@ const VisualizerInner = () => {
 
     // Initialize butterchurn instance
     useEffect(() => {
-        const { context, gains } = webAudio || {};
+        const { context } = webAudio || {};
+        const inputNodes = getVisualizerAudioNodes(webAudio, playbackType);
         const canvas = canvasRef.current;
         const container = containerRef.current;
 
+        const shouldRunForWebPlayback = playbackType === PlayerType.WEB && isPlaying;
+        const shouldRunForMpvLoopback =
+            playbackType === PlayerType.LOCAL && isPlaying && inputNodes.length > 0;
+
         const needsInitialization =
             context &&
-            gains &&
-            gains.length > 0 &&
+            inputNodes.length > 0 &&
             canvas &&
             container &&
-            isPlaying &&
+            (shouldRunForWebPlayback || shouldRunForMpvLoopback) &&
             librariesLoaded &&
             (!isInitializedRef.current || !visualizerRef.current);
 
@@ -159,7 +190,8 @@ const VisualizerInner = () => {
         }
 
         async function initializeVisualizer(width: number, height: number) {
-            if (!gains || gains.length === 0 || !canvas || !context || !librariesLoaded) return;
+            const nodes = getVisualizerAudioNodes(webAudio, playbackType);
+            if (!nodes.length || !canvas || !context || !librariesLoaded) return;
 
             canvas.width = width;
             canvas.height = height;
@@ -173,8 +205,8 @@ const VisualizerInner = () => {
                     width,
                 }) as ButterchurnVisualizer;
 
-                for (const gain of gains) {
-                    butterchurnInstance.connectAudio(gain);
+                for (const node of nodes) {
+                    butterchurnInstance.connectAudio(node);
                 }
 
                 visualizerRef.current = butterchurnInstance;
@@ -192,7 +224,7 @@ const VisualizerInner = () => {
             cleanupVisualizer();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [webAudio, isPlaying, librariesLoaded]);
+    }, [webAudio, playbackType, librariesLoaded, resumeInitGeneration]);
 
     // Kill visualizer after 5 seconds of pause
     useEffect(() => {
@@ -220,7 +252,7 @@ const VisualizerInner = () => {
                 pauseTimerRef.current = undefined;
             }
         };
-    }, [isPlaying]);
+    }, [isPlaying, playbackType]);
 
     // Handle resize
     useEffect(() => {
@@ -460,7 +492,7 @@ const VisualizerInner = () => {
         };
     }, [isVisualizerReady, librariesLoaded, butterchurnSettings.blendTime]);
 
-    const shouldRenderContainer = isPlaying || isVisualizerReady;
+    const shouldRenderContainer = isPlaying || isVisualizerReady || !!webAudio;
 
     if (!shouldRenderContainer) {
         return null;

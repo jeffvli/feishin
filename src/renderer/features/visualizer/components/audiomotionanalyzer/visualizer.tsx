@@ -3,25 +3,32 @@ import { createRef, useCallback, useEffect, useMemo, useRef, useState } from 're
 import styles from './visualizer.module.css';
 
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
+import { getVisualizerAudioNodes } from '/@/renderer/features/player/utils/get-visualizer-audio-nodes';
 import { openVisualizerSettingsModal } from '/@/renderer/features/player/utils/open-visualizer-settings-modal';
 import { ComponentErrorBoundary } from '/@/renderer/features/shared/components/component-error-boundary';
-import { useAccent, useSettingsStore } from '/@/renderer/store';
+import { useAccent, usePlaybackType, useSettingsStore } from '/@/renderer/store';
 import {
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
 } from '/@/renderer/store/full-screen-player.store';
+import { usePlayerStatus } from '/@/renderer/store/player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
+import { PlayerStatus, PlayerType } from '/@/shared/types/types';
 
 const VisualizerInner = () => {
     const { webAudio } = useWebAudio();
     const canvasRef = createRef<HTMLDivElement>();
     const accent = useAccent();
     const visualizer = useSettingsStore((store) => store.visualizer);
+    const playbackType = usePlaybackType();
     const opacity = useSettingsStore((store) => store.visualizer.audiomotionanalyzer.opacity);
     const [motion, setMotion] = useState<any>();
     const [libraryLoaded, setLibraryLoaded] = useState(false);
     const AudioMotionAnalyzerRef = useRef<any>(null);
+    const pauseTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
+    const playerStatus = usePlayerStatus();
+    const isPlaying = playerStatus === PlayerStatus.PLAYING;
 
     useEffect(() => {
         let isMounted = true;
@@ -214,9 +221,21 @@ const VisualizerInner = () => {
     );
 
     useEffect(() => {
-        const { context, gains } = webAudio || {};
+        const { context } = webAudio || {};
+        const inputNodes = getVisualizerAudioNodes(webAudio, playbackType);
+        const shouldRunForWebPlayback = playbackType === PlayerType.WEB && isPlaying;
+        const shouldRunForMpvLoopback =
+            playbackType === PlayerType.LOCAL && isPlaying && inputNodes.length > 0;
+
         let audioMotion: any | undefined;
-        if (gains && context && canvasRef.current && !motion && libraryLoaded) {
+        if (
+            inputNodes.length > 0 &&
+            context &&
+            canvasRef.current &&
+            !motion &&
+            libraryLoaded &&
+            (shouldRunForWebPlayback || shouldRunForMpvLoopback)
+        ) {
             const AudioMotionAnalyzer = AudioMotionAnalyzerRef.current;
             if (!AudioMotionAnalyzer) return;
 
@@ -249,12 +268,16 @@ const VisualizerInner = () => {
             registerCustomGradients(audioMotion);
 
             setMotion(audioMotion);
-            for (const gain of gains) audioMotion.connectInput(gain);
+            for (const node of inputNodes) audioMotion.connectInput(node);
         }
 
         return () => {
             if (motion) {
-                motion.destroy();
+                try {
+                    motion.destroy();
+                } catch {
+                    // ignore (e.g. already destroyed by idle timer)
+                }
                 setMotion(undefined);
             }
         };
@@ -262,13 +285,49 @@ const VisualizerInner = () => {
         accent,
         canvasRef,
         registerCustomGradients,
+        playbackType,
         webAudio,
         visualizer,
         options,
         isCustomGradient,
         motion,
         libraryLoaded,
+        isPlaying,
     ]);
+
+    // Kill visualizer after 5 seconds of pause
+    useEffect(() => {
+        if (isPlaying) {
+            if (pauseTimerRef.current) {
+                clearTimeout(pauseTimerRef.current);
+                pauseTimerRef.current = undefined;
+            }
+            return;
+        }
+
+        if (!motion) return;
+
+        pauseTimerRef.current = setTimeout(() => {
+            setMotion((current) => {
+                if (current) {
+                    try {
+                        current.destroy();
+                    } catch {
+                        // ignore
+                    }
+                }
+                return undefined;
+            });
+            pauseTimerRef.current = undefined;
+        }, 5000);
+
+        return () => {
+            if (pauseTimerRef.current) {
+                clearTimeout(pauseTimerRef.current);
+                pauseTimerRef.current = undefined;
+            }
+        };
+    }, [isPlaying, motion]);
 
     // Re-register custom gradients when they change
     useEffect(() => {

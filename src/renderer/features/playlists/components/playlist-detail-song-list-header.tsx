@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router';
 
@@ -40,8 +41,13 @@ interface PlaylistDetailSongListHeaderProps {
     onToggleQueryBuilder?: () => void;
 }
 
-function ImageUploadOverlay({ data }: { data?: Playlist }) {
-    const uploadPlaylistImageMutation = useUploadPlaylistImage({});
+function ImageUploadOverlay({
+    data,
+    onUploadFile,
+}: {
+    data?: Playlist;
+    onUploadFile: (file: File) => Promise<void>;
+}) {
     const deletePlaylistImageMutation = useDeletePlaylistImage({});
     const server = useCurrentServer();
 
@@ -53,16 +59,8 @@ function ImageUploadOverlay({ data }: { data?: Playlist }) {
             <FileButton
                 accept="image/*"
                 onChange={async (file) => {
-                    if (!file || !data?._serverId) return;
-
-                    const buffer = await file.arrayBuffer();
-                    uploadPlaylistImageMutation.mutate({
-                        apiClientProps: {
-                            serverId: data._serverId,
-                        },
-                        body: { image: new Uint8Array(buffer) },
-                        query: { id: data.id },
-                    });
+                    if (!file) return;
+                    await onUploadFile(file);
                 }}
             >
                 {(props) => (
@@ -121,10 +119,32 @@ export const PlaylistDetailSongListHeader = ({
     });
 
     const player = usePlayer();
+    const uploadPlaylistImageMutation = useUploadPlaylistImage({});
 
     const handlePlay = (type?: Play) => {
         player.addToQueueByData(listData as Song[], type || Play.NOW);
     };
+
+    const canUploadPlaylistImage =
+        hasFeature(server, ServerFeature.PLAYLIST_IMAGE_UPLOAD) &&
+        Boolean(detailQuery?.data?._serverId);
+
+    const handlePlaylistImageUpload = useCallback(
+        async (file: File) => {
+            const playlist = detailQuery?.data;
+            if (!playlist?._serverId) return;
+
+            const buffer = await file.arrayBuffer();
+            uploadPlaylistImageMutation.mutate({
+                apiClientProps: {
+                    serverId: playlist._serverId,
+                },
+                body: { image: new Uint8Array(buffer) },
+                query: { id: playlist.id },
+            });
+        },
+        [detailQuery?.data, uploadPlaylistImageMutation],
+    );
 
     const imageUrl = useItemImageUrl({
         id: detailQuery?.data?.imageId || undefined,
@@ -163,7 +183,12 @@ export const PlaylistDetailSongListHeader = ({
             ) : (
                 <LibraryHeader
                     compact
-                    imageOverlay={<ImageUploadOverlay data={detailQuery?.data} />}
+                    imageOverlay={
+                        <ImageUploadOverlay
+                            data={detailQuery?.data}
+                            onUploadFile={handlePlaylistImageUpload}
+                        />
+                    }
                     imageUrl={imageUrl}
                     item={{
                         imageId: detailQuery?.data?.imageId,
@@ -171,6 +196,7 @@ export const PlaylistDetailSongListHeader = ({
                         route: AppRoute.PLAYLISTS,
                         type: LibraryItem.PLAYLIST,
                     }}
+                    onImageFileDrop={canUploadPlaylistImage ? handlePlaylistImageUpload : undefined}
                     title={detailQuery?.data?.name || ''}
                     topRight={<ListSearchInput />}
                 >

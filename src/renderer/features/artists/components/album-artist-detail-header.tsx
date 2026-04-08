@@ -1,5 +1,5 @@
-import { useQuery, useSuspenseQuery, UseSuspenseQueryResult } from '@tanstack/react-query';
-import { forwardRef, Fragment, useCallback, useMemo } from 'react';
+import { useSuspenseQuery, UseSuspenseQueryResult } from '@tanstack/react-query';
+import { forwardRef, Fragment, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
@@ -8,6 +8,8 @@ import styles from './album-artist-detail-header.module.css';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { getArtistAlbumsGrouped } from '/@/renderer/features/artists/hooks/use-artist-albums-grouped';
+import { useDeleteArtistImage } from '/@/renderer/features/artists/mutations/delete-artist-image-mutation';
+import { useUploadArtistImage } from '/@/renderer/features/artists/mutations/upload-artist-image-mutation';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
@@ -20,15 +22,78 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useAppStore, useCurrentServer, useShowRatings } from '/@/renderer/store';
 import { useArtistReleaseTypeItems, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString } from '/@/renderer/utils';
-import { SEPARATOR_STRING, sortAlbumList } from '/@/shared/api/utils';
+import { hasFeature, SEPARATOR_STRING, sortAlbumList } from '/@/shared/api/utils';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { FileButton } from '/@/shared/components/file-button/file-button';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
-import { AlbumListResponse, LibraryItem, ServerType } from '/@/shared/types/domain-types';
+import {
+    AlbumArtistDetailResponse,
+    AlbumListResponse,
+    LibraryItem,
+    ServerType,
+} from '/@/shared/types/domain-types';
+import { ServerFeature } from '/@/shared/types/features-types';
 import { Play } from '/@/shared/types/types';
 
 interface AlbumArtistDetailHeaderProps {
     albumsQuery: UseSuspenseQueryResult<AlbumListResponse, Error>;
+}
+
+function ArtistImageUploadOverlay({
+    data,
+    onUploadFile,
+}: {
+    data?: AlbumArtistDetailResponse;
+    onUploadFile: (file: File) => Promise<void>;
+}) {
+    const deleteArtistImageMutation = useDeleteArtistImage({});
+    const server = useCurrentServer();
+
+    if (!data) return null;
+    if (!hasFeature(server, ServerFeature.ARTIST_IMAGE_UPLOAD)) return null;
+
+    return (
+        <Group gap="xs">
+            <FileButton
+                accept="image/*"
+                onChange={async (file) => {
+                    if (!file) return;
+                    await onUploadFile(file);
+                }}
+            >
+                {(props) => (
+                    <ActionIcon
+                        icon="uploadImage"
+                        iconProps={{ size: 'lg' }}
+                        radius="xl"
+                        size="xs"
+                        variant="default"
+                        {...props}
+                    />
+                )}
+            </FileButton>
+            <ActionIcon
+                disabled={!data?.uploadedImage}
+                icon="delete"
+                iconProps={{ size: 'lg' }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    if (!data?._serverId) return;
+                    deleteArtistImageMutation.mutate({
+                        apiClientProps: {
+                            serverId: data._serverId,
+                        },
+                        query: { id: data.id },
+                    });
+                }}
+                radius="xl"
+                size="xs"
+                variant="default"
+            />
+        </Group>
+    );
 }
 
 export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDetailHeaderProps>(
@@ -78,6 +143,7 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
         const playButtonBehavior = usePlayButtonBehavior();
         const setFavorite = useSetFavorite();
         const setRating = useSetRating();
+        const uploadArtistImageMutation = useUploadArtistImage({});
 
         const albumArtistDetailSort = useAppStore((state) => state.albumArtistDetailSort);
         const sortBy = albumArtistDetailSort.sortBy;
@@ -167,40 +233,52 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
             [detailQuery.data],
         );
 
-        const imageUrl = useItemImageUrl({
+        const headerImageUrl = useItemImageUrl({
             id: detailQuery.data?.imageId || undefined,
             imageUrl: detailQuery.data?.imageUrl,
             itemType: LibraryItem.ALBUM_ARTIST,
-            type: 'itemCard',
-        });
-
-        const artistInfoQuery = useQuery({
-            ...artistsQueries.albumArtistInfo({
-                query: { id: routeId, limit: 10 },
-                serverId: server?.id,
-            }),
-            enabled: Boolean(server?.id && routeId),
+            type: 'header',
         });
 
         const showRating = showRatings && detailQuery?.data?._serverType === ServerType.NAVIDROME;
 
-        const selectedImageUrl = useMemo(() => {
-            return detailQuery.data?.imageUrl || imageUrl;
-        }, [detailQuery.data?.imageUrl, imageUrl]);
+        const canUploadArtistImage =
+            hasFeature(server, ServerFeature.ARTIST_IMAGE_UPLOAD) &&
+            Boolean(detailQuery.data?._serverId);
 
-        const alternateImageUrl = artistInfoQuery.data?.imageUrl;
-        const hasImageId = Boolean(detailQuery.data?.imageId);
-        const fallbackHeaderImageUrl = alternateImageUrl || selectedImageUrl;
+        const handleArtistImageUpload = useCallback(
+            async (file: File) => {
+                const artist = detailQuery.data;
+                if (!artist?._serverId) return;
+
+                const buffer = await file.arrayBuffer();
+                uploadArtistImageMutation.mutate({
+                    apiClientProps: {
+                        serverId: artist._serverId,
+                    },
+                    body: { image: new Uint8Array(buffer) },
+                    query: { id: artist.id },
+                });
+            },
+            [detailQuery.data, uploadArtistImageMutation],
+        );
 
         return (
             <LibraryHeader
-                imageUrl={hasImageId ? undefined : fallbackHeaderImageUrl}
+                imageOverlay={
+                    <ArtistImageUploadOverlay
+                        data={detailQuery.data}
+                        onUploadFile={handleArtistImageUpload}
+                    />
+                }
+                imageUrl={headerImageUrl}
                 item={{
                     imageId: detailQuery.data?.imageId,
-                    imageUrl: hasImageId ? undefined : fallbackHeaderImageUrl,
+                    imageUrl: detailQuery.data?.imageUrl,
                     route: AppRoute.LIBRARY_ALBUM_ARTISTS,
                     type: LibraryItem.ALBUM_ARTIST,
                 }}
+                onImageFileDrop={canUploadArtistImage ? handleArtistImageUpload : undefined}
                 ref={ref}
                 title={detailQuery.data?.name || ''}
             >

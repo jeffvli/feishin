@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { createContext, ReactNode, useContext, useMemo, useRef } from 'react';
+import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
 
 import styles from './list-with-sidebar-container.module.css';
 
@@ -8,7 +8,7 @@ import { animationProps } from '/@/shared/components/animations/animation-props'
 import { Portal } from '/@/shared/components/portal/portal';
 
 interface ListWithSidebarContainerContextValue {
-    sidebarRef: React.RefObject<HTMLDivElement | null>;
+    sidebarElement: HTMLDivElement | null;
 }
 
 const ListWithSidebarContainerContext = createContext<ListWithSidebarContainerContextValue | null>(
@@ -36,12 +36,12 @@ function Sidebar({ children }: SidebarProps) {
         throw new Error('Sidebar must be used within ListWithSidebarContainer');
     }
 
-    if (!context.sidebarRef?.current) {
+    if (!context.sidebarElement) {
         return null;
     }
 
     return (
-        <Portal target={context.sidebarRef.current}>
+        <Portal target={context.sidebarElement}>
             <motion.div {...animationProps.slideInLeft} style={{ height: '100%', width: '100%' }}>
                 {children}
             </motion.div>
@@ -56,25 +56,25 @@ function SidebarPortal({ children }: SidebarPortalProps) {
         throw new Error('SidebarPortal must be used within ListWithSidebarContainer');
     }
 
-    if (!context.sidebarRef?.current) {
+    if (!context.sidebarElement) {
         return null;
     }
 
-    return <Portal target={context.sidebarRef.current}>{children}</Portal>;
+    return <Portal target={context.sidebarElement}>{children}</Portal>;
 }
 
 export const ListWithSidebarContainer = ({
     children,
     useBreakpoint = false,
 }: ListWithSidebarContainerProps) => {
-    const sidebarRef = useRef<HTMLDivElement>(null);
+    const [sidebarElement, setSidebarElement] = useState<HTMLDivElement | null>(null);
     const { isSidebarOpen = false } = useListContext();
 
     const contextValue = useMemo(
         () => ({
-            sidebarRef,
+            sidebarElement,
         }),
-        [],
+        [sidebarElement],
     );
 
     return (
@@ -84,7 +84,7 @@ export const ListWithSidebarContainer = ({
                 data-sidebar-open={useBreakpoint ? undefined : isSidebarOpen}
                 data-use-breakpoint={useBreakpoint}
             >
-                <div className={styles.sidebarContainer} ref={sidebarRef} />
+                <div className={styles.sidebarContainer} ref={setSidebarElement} />
                 <div className={styles.contentContainer}>{children}</div>
             </div>
         </ListWithSidebarContainerContext.Provider>

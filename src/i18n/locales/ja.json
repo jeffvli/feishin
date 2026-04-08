@@ -1037,7 +1037,7 @@
         },
         "updateServer": {
             "title": "サーバーをアップデート",
-            "success": "サーバーがアップデートされました"
+            "success": "サーバーの更新に成功しました"
         },
         "queryEditor": {
             "input_optionMatchAll": "すべて一致",
@@ -1102,6 +1102,9 @@
         },
         "saveQueue": {
             "success": "プレイキューをサーバーに保存しました"
+        },
+        "editRadioStation": {
+            "success": "ラジオ局の更新に成功しました"
         }
     },
     "entity": {
@@ -1332,6 +1335,12 @@
                 "d": "D",
                 "z": "Z"
             }
-        }
+        },
+        "systemAudioConsentAllow": "許可",
+        "systemAudioConsentBody": "ビジュアライザーを機能させるためには、システムオーディオへのアクセスが必要です",
+        "systemAudioConsentDecline": "拒否",
+        "systemAudioConsentTitle": "システムオーディオへのアクセスを許可しますか？",
+        "systemAudioCaptureFailed": "キャプチャを開始できませんでした: {{message}}",
+        "systemAudioNoAudioTrack": "音声トラックが返されませんでした。プロンプトが表示されたら、音声キャプチャが有効になっていることを確認してください。"
     }
 }

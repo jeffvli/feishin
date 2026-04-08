@@ -40,6 +40,13 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
     const setFavorite = useSetFavorite();
     const setRating = useSetRating();
 
+    const playerRef = useRef(player);
+    const setFavoriteRef = useRef(setFavorite);
+    const setRatingRef = useRef(setRating);
+    playerRef.current = player;
+    setFavoriteRef.current = setFavorite;
+    setRatingRef.current = setRating;
+
     useEffect(() => {
         navigateRef.current = navigate;
     }, [navigate]);
@@ -266,14 +273,14 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                         return;
                     }
 
-                    player.addToQueueByData(songsToAdd, playType, item.id);
+                    playerRef.current.addToQueueByData(songsToAdd, playType, item.id);
                     return;
                 }
 
                 if (itemType === LibraryItem.QUEUE_SONG) {
                     const queueSong = item as QueueSong;
                     if (queueSong._uniqueId) {
-                        player.mediaPlay(queueSong._uniqueId);
+                        playerRef.current.mediaPlay(queueSong._uniqueId);
                     }
                 }
             },
@@ -316,7 +323,7 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                     return;
                 }
 
-                setFavorite(item._serverId, [item.id], apiItemType, favorite);
+                setFavoriteRef.current(item._serverId, [item.id], apiItemType, favorite);
             },
 
             onMore: ({ event, internalState, item, itemType }: DefaultItemControlProps) => {
@@ -394,7 +401,7 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                     return;
                 }
 
-                player.addToQueueByFetch(item._serverId, [item.id], itemType, playType);
+                playerRef.current.addToQueueByFetch(item._serverId, [item.id], itemType, playType);
             },
 
             onRating: ({
@@ -420,20 +427,12 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                     newRating = 0;
                 }
 
-                setRating(item._serverId, [item.id], apiItemType, newRating);
+                setRatingRef.current(item._serverId, [item.id], apiItemType, newRating);
             },
 
             ...overrides,
         };
-    }, [
-        enableMultiSelect,
-        overrides,
-        onColumnReordered,
-        onColumnResized,
-        player,
-        setFavorite,
-        setRating,
-    ]);
+    }, [enableMultiSelect, overrides, onColumnReordered, onColumnResized]);
 
     return controls;
 };

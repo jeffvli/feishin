@@ -13,6 +13,7 @@ import {
     setMultipleSearchParams,
     setSearchParam,
 } from '/@/renderer/utils/query-params';
+import { runInUrlTransition } from '/@/renderer/utils/url-transition';
 import { AlbumListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -74,8 +75,10 @@ export const useAlbumListFilters = (listKey?: ItemListKey) => {
 
     const setGenreId = useCallback(
         (value: null | string[]) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.GENRE_ID, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.GENRE_ID, value), {
+                    replace: true,
+                });
             });
         },
         [setSearchParams],
@@ -83,8 +86,13 @@ export const useAlbumListFilters = (listKey?: ItemListKey) => {
 
     const setAlbumArtist = useCallback(
         (value: null | string[]) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.ARTIST_IDS, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams(
+                    (prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.ARTIST_IDS, value),
+                    {
+                        replace: true,
+                    },
+                );
             });
         },
         [setSearchParams],
@@ -92,8 +100,10 @@ export const useAlbumListFilters = (listKey?: ItemListKey) => {
 
     const setMinYear = useCallback(
         (value: null | number) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.MIN_YEAR, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.MIN_YEAR, value), {
+                    replace: true,
+                });
             });
         },
         [setSearchParams],
@@ -101,8 +111,10 @@ export const useAlbumListFilters = (listKey?: ItemListKey) => {
 
     const setMaxYear = useCallback(
         (value: null | number) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.MAX_YEAR, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.MAX_YEAR, value), {
+                    replace: true,
+                });
             });
         },
         [setSearchParams],
@@ -110,8 +122,10 @@ export const useAlbumListFilters = (listKey?: ItemListKey) => {
 
     const setFavorite = useCallback(
         (value: boolean | null) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.FAVORITE, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.FAVORITE, value), {
+                    replace: true,
+                });
             });
         },
         [setSearchParams],
@@ -119,8 +133,13 @@ export const useAlbumListFilters = (listKey?: ItemListKey) => {
 
     const setCompilation = useCallback(
         (value: boolean | null) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.COMPILATION, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams(
+                    (prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.COMPILATION, value),
+                    {
+                        replace: true,
+                    },
+                );
             });
         },
         [setSearchParams],
@@ -128,8 +147,13 @@ export const useAlbumListFilters = (listKey?: ItemListKey) => {
 
     const setHasRating = useCallback(
         (value: boolean | null) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.HAS_RATING, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams(
+                    (prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.HAS_RATING, value),
+                    {
+                        replace: true,
+                    },
+                );
             });
         },
         [setSearchParams],
@@ -137,65 +161,71 @@ export const useAlbumListFilters = (listKey?: ItemListKey) => {
 
     const setRecentlyPlayed = useCallback(
         (value: boolean | null) => {
-            setSearchParams(
-                (prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.RECENTLY_PLAYED, value),
-                {
-                    replace: true,
-                },
-            );
+            runInUrlTransition(() => {
+                setSearchParams(
+                    (prev) => setSearchParam(prev, FILTER_KEYS.ALBUM.RECENTLY_PLAYED, value),
+                    {
+                        replace: true,
+                    },
+                );
+            });
         },
         [setSearchParams],
     );
 
     const setCustom = useCallback(
         (value: null | Record<string, any>) => {
-            setSearchParams(
-                (prev) => {
-                    const previousValue = prev.get(FILTER_KEYS.ALBUM._CUSTOM);
+            runInUrlTransition(() => {
+                setSearchParams(
+                    (prev) => {
+                        const previousValue = prev.get(FILTER_KEYS.ALBUM._CUSTOM);
 
-                    const newCustom = {
-                        ...(previousValue ? JSON.parse(previousValue) : {}),
-                        ...value,
-                    };
+                        const newCustom = {
+                            ...(previousValue ? JSON.parse(previousValue) : {}),
+                            ...value,
+                        };
 
-                    const filteredNewCustom = Object.fromEntries(
-                        Object.entries(newCustom).filter(
-                            ([, value]) => value !== null && value !== undefined,
-                        ),
-                    );
+                        const filteredNewCustom = Object.fromEntries(
+                            Object.entries(newCustom).filter(
+                                ([, value]) => value !== null && value !== undefined,
+                            ),
+                        );
 
-                    prev.set(FILTER_KEYS.ALBUM._CUSTOM, JSON.stringify(filteredNewCustom));
-                    return prev;
-                },
-                {
-                    replace: true,
-                },
-            );
+                        prev.set(FILTER_KEYS.ALBUM._CUSTOM, JSON.stringify(filteredNewCustom));
+                        return prev;
+                    },
+                    {
+                        replace: true,
+                    },
+                );
+            });
         },
         [setSearchParams],
     );
 
     const clear = useCallback(() => {
-        setSearchParams(
-            (prev) =>
-                setMultipleSearchParams(
-                    prev,
-                    {
-                        [FILTER_KEYS.ALBUM._CUSTOM]: null,
-                        [FILTER_KEYS.ALBUM.ARTIST_IDS]: null,
-                        [FILTER_KEYS.ALBUM.COMPILATION]: null,
-                        [FILTER_KEYS.ALBUM.FAVORITE]: null,
-                        [FILTER_KEYS.ALBUM.GENRE_ID]: null,
-                        [FILTER_KEYS.ALBUM.HAS_RATING]: null,
-                        [FILTER_KEYS.ALBUM.MAX_YEAR]: null,
-                        [FILTER_KEYS.ALBUM.MIN_YEAR]: null,
-                        [FILTER_KEYS.ALBUM.RECENTLY_PLAYED]: null,
-                        [FILTER_KEYS.SHARED.SEARCH_TERM]: null,
-                    },
-                    new Set([FILTER_KEYS.ALBUM._CUSTOM]),
-                ),
-            { replace: true },
-        );
+        runInUrlTransition(() => {
+            setSearchParams(
+                (prev) =>
+                    setMultipleSearchParams(
+                        prev,
+                        {
+                            [FILTER_KEYS.ALBUM._CUSTOM]: null,
+                            [FILTER_KEYS.ALBUM.ARTIST_IDS]: null,
+                            [FILTER_KEYS.ALBUM.COMPILATION]: null,
+                            [FILTER_KEYS.ALBUM.FAVORITE]: null,
+                            [FILTER_KEYS.ALBUM.GENRE_ID]: null,
+                            [FILTER_KEYS.ALBUM.HAS_RATING]: null,
+                            [FILTER_KEYS.ALBUM.MAX_YEAR]: null,
+                            [FILTER_KEYS.ALBUM.MIN_YEAR]: null,
+                            [FILTER_KEYS.ALBUM.RECENTLY_PLAYED]: null,
+                            [FILTER_KEYS.SHARED.SEARCH_TERM]: null,
+                        },
+                        new Set([FILTER_KEYS.ALBUM._CUSTOM]),
+                    ),
+                { replace: true },
+            );
+        });
     }, [setSearchParams]);
 
     const query = useMemo(

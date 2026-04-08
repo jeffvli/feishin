@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
@@ -8,21 +8,26 @@ export const useSetFavorite = () => {
     const createFavoriteMutation = useCreateFavorite({});
     const deleteFavoriteMutation = useDeleteFavorite({});
 
+    const createFavoriteMutationRef = useRef(createFavoriteMutation);
+    const deleteFavoriteMutationRef = useRef(deleteFavoriteMutation);
+    createFavoriteMutationRef.current = createFavoriteMutation;
+    deleteFavoriteMutationRef.current = deleteFavoriteMutation;
+
     const setFavorite = useCallback(
         (serverId: string, id: string[], itemType: LibraryItem, isFavorite: boolean) => {
             if (isFavorite) {
-                createFavoriteMutation.mutate({
+                createFavoriteMutationRef.current.mutate({
                     apiClientProps: { serverId },
                     query: { id, type: itemType },
                 });
             } else {
-                deleteFavoriteMutation.mutate({
+                deleteFavoriteMutationRef.current.mutate({
                     apiClientProps: { serverId },
                     query: { id, type: itemType },
                 });
             }
         },
-        [createFavoriteMutation, deleteFavoriteMutation],
+        [],
     );
 
     return setFavorite;

@@ -13,7 +13,7 @@ import {
     useWindowSettings,
 } from '/@/renderer/store/settings.store';
 import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
-import { Platform, PlayerType } from '/@/shared/types/types';
+import { Platform } from '/@/shared/types/types';
 
 const AudioMotionAnalyzerVisualizer = lazy(() =>
     import('../../visualizer/components/audiomotionanalyzer/visualizer').then((module) => ({
@@ -131,7 +131,7 @@ VisualizerContainer.displayName = 'VisualizerContainer';
 export const FullScreenVisualizer = () => {
     const { setStore } = useFullScreenPlayerStoreActions();
     const { windowBarStyle } = useWindowSettings();
-    const { type, webAudio } = usePlaybackSettings();
+    const { webAudio } = usePlaybackSettings();
     const visualizerType = useSettingsStore((store) => store.visualizer.type);
     const isMobile = useIsMobile();
 
@@ -155,7 +155,7 @@ export const FullScreenVisualizer = () => {
     return (
         <VisualizerContainer isMobile={isMobile} windowBarStyle={windowBarStyle}>
             <div className={styles.visualizerContainer}>
-                {type === PlayerType.WEB && webAudio ? (
+                {webAudio ? (
                     <Suspense fallback={<></>}>
                         {visualizerType === 'butterchurn' ? (
                             <ButterchurnVisualizer />

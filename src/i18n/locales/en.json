@@ -1214,6 +1214,12 @@
         "mainText": "drop a file here"
     },
     "visualizer": {
+        "systemAudioConsentAllow": "Allow",
+        "systemAudioConsentBody": "The visualizer requires access to the system audio to work",
+        "systemAudioConsentDecline": "Deny",
+        "systemAudioConsentTitle": "Allow access to system audio?",
+        "systemAudioCaptureFailed": "Could not start capture: {{message}}",
+        "systemAudioNoAudioTrack": "No audio track was returned. Ensure audio capture is enabled when prompted.",
         "visualizerType": "Visualizer Type",
         "cyclePresets": "Cycle Presets",
         "cycleTime": "Cycle Time (seconds)",

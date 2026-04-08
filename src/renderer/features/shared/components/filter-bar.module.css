@@ -1,5 +1,5 @@
 .filter-bar {
     z-index: 1;
-    padding: var(--theme-spacing-sm);
+    padding: var(--theme-spacing-xs);
     border-bottom: 1px solid var(--theme-colors-border);
 }

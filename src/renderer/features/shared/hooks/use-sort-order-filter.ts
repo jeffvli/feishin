@@ -5,6 +5,7 @@ import { useListFilterPersistence } from '/@/renderer/features/shared/hooks/use-
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
 import { useCurrentServer } from '/@/renderer/store';
 import { parseStringParam, setSearchParam } from '/@/renderer/utils/query-params';
+import { runInUrlTransition } from '/@/renderer/utils/url-transition';
 import { SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -21,14 +22,20 @@ export const useSortOrderFilter = (defaultValue: null | string, listKey: ItemLis
     }, [searchParams, persisted, defaultValue]);
 
     const handleSetSortOrder = (sortOrder: SortOrder) => {
-        setSearchParams(
-            (prev) => {
-                const newParams = setSearchParam(prev, FILTER_KEYS.SHARED.SORT_ORDER, sortOrder);
-                return newParams;
-            },
-            { replace: true },
-        );
-        setFilter(FILTER_KEYS.SHARED.SORT_ORDER, sortOrder);
+        runInUrlTransition(() => {
+            setSearchParams(
+                (prev) => {
+                    const newParams = setSearchParam(
+                        prev,
+                        FILTER_KEYS.SHARED.SORT_ORDER,
+                        sortOrder,
+                    );
+                    return newParams;
+                },
+                { replace: true },
+            );
+            setFilter(FILTER_KEYS.SHARED.SORT_ORDER, sortOrder);
+        });
     };
 
     return {

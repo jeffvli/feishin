@@ -1,3 +1,5 @@
+import type { KeyboardEvent } from 'react';
+
 import { closeAllModals, openModal } from '@mantine/modals';
 import clsx from 'clsx';
 import { forwardRef, ReactNode, Ref, useCallback } from 'react';
@@ -22,6 +24,7 @@ import { useGeneralSettings } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Center } from '/@/shared/components/center/center';
+import { DragDropZone } from '/@/shared/components/drag-drop-zone/drag-drop-zone';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { BaseImage } from '/@/shared/components/image/image';
@@ -47,6 +50,7 @@ interface LibraryHeaderProps {
         type?: LibraryItem;
     };
     loading?: boolean;
+    onImageFileDrop?: (file: File) => Promise<void> | void;
     title: string;
     topRight?: ReactNode;
 }
@@ -60,6 +64,7 @@ export const LibraryHeader = forwardRef(
             imageOverlay,
             imageUrl,
             item,
+            onImageFileDrop,
             title,
             topRight,
         }: LibraryHeaderProps,
@@ -136,6 +141,17 @@ export const LibraryHeader = forwardRef(
             });
         }, [blurExplicitImages, item.explicitStatus, item.imageId, item.type]);
 
+        const imageSectionSharedProps = {
+            onClick: () => {
+                openImage();
+            },
+            onKeyDown: (event: KeyboardEvent) =>
+                [' ', 'Enter', 'Spacebar'].includes(event.key) && openImage(),
+            role: 'button' as const,
+            style: { cursor: 'pointer' as const },
+            tabIndex: 0,
+        };
+
         return (
             <div
                 className={clsx(
@@ -146,41 +162,63 @@ export const LibraryHeader = forwardRef(
                 ref={ref}
             >
                 {topRight && <div className={styles.topRight}>{topRight}</div>}
-                <div
-                    className={styles.imageSection}
-                    onClick={() => {
-                        openImage();
-                    }}
-                    onKeyDown={(event) =>
-                        [' ', 'Enter', 'Spacebar'].includes(event.key) && openImage()
-                    }
-                    role="button"
-                    style={{ cursor: 'pointer' }}
-                    tabIndex={0}
-                >
-                    <ItemImage
-                        className={styles.image}
-                        containerClassName={styles.image}
-                        enableDebounce={false}
-                        enableViewport={false}
-                        explicitStatus={item.explicitStatus ?? null}
-                        fetchPriority="high"
-                        id={item.imageId}
-                        itemType={item.type as LibraryItem}
-                        src={imageUrl || ''}
-                        type="header"
-                    />
-                    {imageOverlay && (
-                        <div
-                            className={styles.imageOverlay}
-                            onClick={(e) => e.stopPropagation()}
-                            onKeyDown={(e) => e.stopPropagation()}
-                            role="presentation"
-                        >
-                            {imageOverlay}
-                        </div>
-                    )}
-                </div>
+                {onImageFileDrop ? (
+                    <DragDropZone
+                        accept="image/*"
+                        className={styles.imageSection}
+                        mode="file"
+                        onFileSelected={(file) => void onImageFileDrop(file)}
+                        {...imageSectionSharedProps}
+                    >
+                        <ItemImage
+                            className={styles.image}
+                            containerClassName={styles.image}
+                            enableDebounce={false}
+                            enableViewport={false}
+                            explicitStatus={item.explicitStatus ?? null}
+                            fetchPriority="high"
+                            id={item.imageId}
+                            itemType={item.type as LibraryItem}
+                            src={imageUrl || ''}
+                            type="header"
+                        />
+                        {imageOverlay && (
+                            <div
+                                className={styles.imageOverlay}
+                                onClick={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => e.stopPropagation()}
+                                role="presentation"
+                            >
+                                {imageOverlay}
+                            </div>
+                        )}
+                    </DragDropZone>
+                ) : (
+                    <div className={styles.imageSection} {...imageSectionSharedProps}>
+                        <ItemImage
+                            className={styles.image}
+                            containerClassName={styles.image}
+                            enableDebounce={false}
+                            enableViewport={false}
+                            explicitStatus={item.explicitStatus ?? null}
+                            fetchPriority="high"
+                            id={item.imageId}
+                            itemType={item.type as LibraryItem}
+                            src={imageUrl || ''}
+                            type="header"
+                        />
+                        {imageOverlay && (
+                            <div
+                                className={styles.imageOverlay}
+                                onClick={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => e.stopPropagation()}
+                                role="presentation"
+                            >
+                                {imageOverlay}
+                            </div>
+                        )}
+                    </div>
+                )}
                 {title && (
                     <div className={styles.metadataSection}>
                         {item.children ? (

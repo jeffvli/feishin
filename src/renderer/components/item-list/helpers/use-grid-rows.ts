@@ -67,6 +67,7 @@ const getRowIdFromTableColumn = (tableColumn: TableColumn): null | string => {
         [TableColumn.ID]: null,
         [TableColumn.IMAGE]: null,
         [TableColumn.LAST_PLAYED]: 'lastPlayedAt',
+        [TableColumn.LAYOUT_FILL]: null,
         [TableColumn.OWNER]: null,
         [TableColumn.PATH]: null,
         [TableColumn.PLAY_COUNT]: 'playCount',

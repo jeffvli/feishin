@@ -25,7 +25,7 @@ export default tseslint.config(
             'react-refresh': eslintPluginReactRefresh,
         },
         rules: {
-            ...eslintPluginReactHooks.configs.recommended.rules,
+            ...eslintPluginReactHooks.configs['recommended-latest'].rules,
             ...eslintPluginReactRefresh.configs.vite.rules,
             '@typescript-eslint/explicit-function-return-type': 'off',
             '@typescript-eslint/no-duplicate-enum-values': 'off',

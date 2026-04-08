@@ -1381,6 +1381,12 @@
             }
         },
         "pasteGradient": "Vložit přechod",
-        "pasteGradientPlaceholder": "Sem vložte JSON přechodu…"
+        "pasteGradientPlaceholder": "Sem vložte JSON přechodu…",
+        "systemAudioConsentAllow": "Povolit",
+        "systemAudioConsentBody": "Vizualizér potřebuje pro svou činnost přístup k systémovému zvuku",
+        "systemAudioConsentTitle": "Povolit přístup k systémovému zvuku?",
+        "systemAudioCaptureFailed": "Nepodařilo se spustit zachytávání: {{message}}",
+        "systemAudioNoAudioTrack": "Nebyla zachycena žádná zvuková stopa. Ujistěte se, že jste při výzvě povolili zachytávání zvuku.",
+        "systemAudioConsentDecline": "Zamítnout"
     }
 }
