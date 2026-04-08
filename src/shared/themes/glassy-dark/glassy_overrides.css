@@ -128,6 +128,7 @@ table {
 }
 
 /* i didn't find a better way to make this work */
+
 /* home */
 .fs-main-content-module-main-content-body .fs-library-container-module-container > .m_6d731127 {
     padding-bottom: 90px;
@@ -153,7 +154,7 @@ table {
 
 /* artist page */
 .fs-main-content-module-main-content-body .fs-native-scroll-area-module-scroll-area .fs-album-artist-detail-content-module-content-container  .os-scrollbar {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .fs-album-artist-detail-content-module-content-container {
@@ -252,8 +253,7 @@ table {
 }
 
 .fs-expanded-list-item-module-container {
-    position: relative;
-    bottom: 90px;
+    padding-bottom: 90px;
     border-radius: 18px;
 }
 
