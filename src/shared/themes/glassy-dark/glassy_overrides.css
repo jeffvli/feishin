@@ -127,7 +127,7 @@ table {
     height: 100%;
 }
 
-/* i didn't find a better way to make this work */
+/* could be reorganized better */
 
 /* home */
 .fs-main-content-module-main-content-body .fs-library-container-module-container > .m_6d731127 {
@@ -138,22 +138,67 @@ table {
     margin-bottom: 90px;
 }
 
-/* albums, artists, album artists */
-.fs-main-content-module-main-content-body .fs-item-grid-list-module-item-grid-container > div:nth-child(2) {
+/* infinite grid */
+.fs-main-content-module-main-content-body-scroll .fs-item-grid-list-module-item-grid-container > div:nth-child(2) {
     padding-bottom: 90px !important;
 }
 
-.fs-main-content-module-main-content-body .fs-item-grid-list-module-item-grid-container > .os-scrollbar {
+.fs-main-content-module-main-content-body-scroll .fs-item-grid-list-module-item-grid-container > .os-scrollbar {
     margin-bottom: 90px;
 }
 
-/* tracks, favourites */
-.fs-main-content-module-main-content-body .fs-item-list-pagination-module-pagination-container {
+/* infinite table */
+.fs-main-content-module-main-content-body-scroll .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100 {
+    padding-bottom: 90px !important;
+}
+
+.fs-main-content-module-main-content-body-scroll .fs-item-table-list-module-item-table-grid-container > .os-scrollbar {
+    margin-bottom: 90px;
+}
+
+/* infinite detail */
+.fs-main-content-module-main-content-body-scroll .fs-item-detail-list-module-container > div:nth-child(1) {
+    padding-bottom: 90px !important;
+}
+
+.fs-main-content-module-main-content-body-scroll .fs-item-detail-list-module-container > .os-scrollbar {
+    margin-bottom: 90px;
+}
+
+/* paginated */
+.fs-item-list-pagination-module-container .fs-item-list-pagination-module-pagination-container {
     padding-bottom: calc(90px + var(--theme-spacing-md)) !important;
 }
 
+/* paginated table */
+.fs-item-list-pagination-module-container .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100 {
+    padding-bottom: 0 !important;
+}
+
+.fs-item-list-pagination-module-container .fs-item-table-list-module-item-table-grid-container > .os-scrollbar {
+    margin-bottom: 0
+}
+
+/* paginated grid */
+.fs-item-list-pagination-module-container .fs-item-grid-list-module-item-grid-container > div:nth-child(2) {
+    padding-bottom: 0 !important;
+}
+
+.fs-item-list-pagination-module-container .fs-item-grid-list-module-item-grid-container > .os-scrollbar {
+    margin-bottom: 0;
+}
+
+/* paginated detail */
+.fs-item-list-pagination-module-container .fs-item-detail-list-module-container > div:nth-child(1) {
+    padding-bottom: 0 !important;
+}
+
+.fs-item-list-pagination-module-container .fs-item-detail-list-module-container > .os-scrollbar {
+    margin-bottom: 0;
+}
+
 /* artist page */
-.fs-main-content-module-main-content-body .fs-native-scroll-area-module-scroll-area .fs-album-artist-detail-content-module-content-container  .os-scrollbar {
+.fs-album-artist-detail-content-module-content-container  .os-scrollbar {
     margin-bottom: 0;
 }
 
@@ -162,8 +207,30 @@ table {
 }
 
 /* album page */
-.fs-library-container-module-container .fs-album-detail-content-module-content-container > .fs-album-detail-content-module-detail-container > div:nth-child(3) {
+.fs-album-detail-content-module-content-container > .fs-album-detail-content-module-detail-container > div:nth-child(3) {
     padding-bottom: 90px;
+}
+
+.fs-album-detail-content-module-content-container .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100 {
+    padding-bottom: 0 !important;
+}
+
+:has(.fs-album-detail-content-module-content-container) .fs-library-container-module-container > .m_6d731127 {
+    padding-bottom: 0;
+} /* this fixes the above issue with the home padding */
+
+/*folders (i cannot test as i only have navidrome)*/
+.fs-main-content-module-main-content-body-scroll .m_4451eb3a {
+    padding-bottom: calc(90px + var(--mantine-spacing-md)) !important;
+}
+
+/* radio */
+.fs-scroll-area-module-scroll-area > .m_6d731127 > .m_6d731127 {
+    padding-bottom: 90px;
+}
+
+.fs-scroll-area-module-scroll-area > .os-scrollbar {
+    margin-bottom: 90px;
 }
 
 .mantine-Tabs-root {
@@ -334,6 +401,10 @@ table {
 
 .fs-action-bar-module-container .mantine-Input-input {
     background-color: var(--theme-colors-surface) !important;
+}
+
+.fs-feature-carousel-module-carousel-item {
+    border-radius: 18px !important;
 }
 
 .fs-library-background-overlay-module-background-overlay {
