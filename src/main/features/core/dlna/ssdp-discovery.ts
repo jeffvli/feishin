@@ -1,9 +1,9 @@
+import type { DlnaDevice } from '/@/shared/types/dlna';
+
 // ssdp-discovery.ts
 import dgram from 'dgram';
 import http from 'http';
 import os from 'os';
-
-import { DlnaDevice } from './soap-client';
 
 const MEDIA_RENDERER_URN = 'urn:schemas-upnp-org:device:MediaRenderer:1';
 const AV_TRANSPORT_URN = 'urn:schemas-upnp-org:service:AVTransport:1';
