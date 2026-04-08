@@ -6,7 +6,7 @@
     width: 100%;
     max-width: var(--theme-content-max-width);
     height: 100%;
-    padding: 0 1rem;
+    padding: 0 var(--theme-spacing-sm);
 }
 
 .play-button-container {

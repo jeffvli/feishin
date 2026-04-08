@@ -732,6 +732,10 @@ async function createWindow(first = true): Promise<void> {
         return { action: 'deny' };
     });
 
+    mainWindow.webContents.session.setDisplayMediaRequestHandler((_request, callback) => {
+        callback({ audio: 'loopback' });
+    });
+
     if (!disableAutoUpdates() && store.get('disable_auto_updates') !== true) {
         new AppUpdater();
     }

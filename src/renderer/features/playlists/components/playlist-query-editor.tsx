@@ -1,5 +1,6 @@
+import type { UseSuspenseQueryResult } from '@tanstack/react-query';
+
 import { closeAllModals, openModal } from '@mantine/modals';
-import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -25,7 +26,7 @@ import { toast } from '/@/shared/components/toast/toast';
 import { SongListSort } from '/@/shared/types/domain-types';
 
 export interface PlaylistQueryEditorProps {
-    detailQuery: ReturnType<typeof useQuery<any>>;
+    detailQuery: UseSuspenseQueryResult<any, Error>;
     handleSave: (
         filter: Record<string, any>,
         extraFilters: {
@@ -421,8 +422,12 @@ export const PlaylistQueryEditor = ({
                                 minRows={8}
                                 onChange={(value) => setJsonText(value)}
                                 placeholder='{ "all": [], "limit": 100, "sort": "+dateAdded" }'
+                                size="lg"
                                 spellCheck={false}
-                                style={{ flex: 1, minHeight: 0 }}
+                                style={{
+                                    flex: 1,
+                                    minHeight: 0,
+                                }}
                                 value={jsonText}
                             />
                         </ScrollArea>

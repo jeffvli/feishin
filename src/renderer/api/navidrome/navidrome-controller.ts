@@ -13,6 +13,8 @@ import {
     albumArtistListSortMap,
     albumListSortMap,
     AuthenticationResponse,
+    DeleteArtistImageArgs,
+    DeleteArtistImageResponse,
     DeleteInternetRadioStationImageArgs,
     DeleteInternetRadioStationImageResponse,
     DeletePlaylistImageArgs,
@@ -28,6 +30,8 @@ import {
     SortOrder,
     sortOrderMap,
     tagListSortMap,
+    UploadArtistImageArgs,
+    UploadArtistImageResponse,
     UploadInternetRadioStationImageArgs,
     UploadInternetRadioStationImageResponse,
     UploadPlaylistImageArgs,
@@ -42,6 +46,7 @@ const VERSION_INFO: VersionInfo = [
     [
         '0.61.0',
         {
+            [ServerFeature.ARTIST_IMAGE_UPLOAD]: [1],
             [ServerFeature.INTERNET_RADIO_IMAGE_UPLOAD]: [1],
             [ServerFeature.PLAYLIST_IMAGE_UPLOAD]: [1],
         },
@@ -186,6 +191,21 @@ export const NavidromeController: InternalControllerEndpoint = {
             id: res.body.data.id,
         };
     },
+    deleteArtistImage: async (args: DeleteArtistImageArgs): Promise<DeleteArtistImageResponse> => {
+        const { apiClientProps, query } = args;
+
+        const res = await ndApiClient(apiClientProps as any).deleteArtistImage({
+            params: {
+                id: query.id,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to delete artist image');
+        }
+
+        return res.body.data.status === 'ok';
+    },
     deleteFavorite: SubsonicController.deleteFavorite,
     deleteInternetRadioStation: async (args) => {
         const { apiClientProps, query } = args;
@@ -297,8 +317,8 @@ export const NavidromeController: InternalControllerEndpoint = {
             similarArtists:
                 artistInfo?.similarArtist?.map((artist) => ({
                     id: artist.id,
-                    imageId: null,
-                    imageUrl: artist?.artistImageUrl?.replace(/\?size=\d+/, '') ?? null,
+                    imageId: artist.id,
+                    imageUrl: null,
                     name: artist.name,
                     userFavorite: Boolean(artist.starred) || false,
                     userRating: artist.userRating ?? null,
@@ -1269,6 +1289,40 @@ export const NavidromeController: InternalControllerEndpoint = {
         }
 
         return null;
+    },
+    uploadArtistImage: async (args: UploadArtistImageArgs): Promise<UploadArtistImageResponse> => {
+        const { apiClientProps, body, query } = args;
+
+        const server = apiClientProps.server;
+        const serverUrl = server?.url?.replace(/\/$/, '');
+
+        if (!serverUrl) {
+            throw new Error('Server is required');
+        }
+
+        const form = new FormData();
+        const bytes = body.image as Uint8Array<ArrayBuffer>;
+        const fileLike =
+            typeof File !== 'undefined'
+                ? new File([bytes], 'image', { type: 'application/octet-stream' })
+                : new Blob([bytes], { type: 'application/octet-stream' });
+        form.append('image', fileLike as any);
+
+        const res = await axios.post(`${serverUrl}/api/artist/${query.id}/image`, form, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                ...(server?.ndCredential && {
+                    'x-nd-authorization': `Bearer ${server.ndCredential}`,
+                }),
+            },
+            signal: apiClientProps.signal,
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to upload artist image');
+        }
+
+        return res.data?.status === 'ok';
     },
     uploadInternetRadioStationImage: async (
         args: UploadInternetRadioStationImageArgs,

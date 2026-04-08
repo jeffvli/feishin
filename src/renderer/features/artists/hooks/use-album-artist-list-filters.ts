@@ -6,6 +6,7 @@ import { useSortByFilter } from '/@/renderer/features/shared/hooks/use-sort-by-f
 import { useSortOrderFilter } from '/@/renderer/features/shared/hooks/use-sort-order-filter';
 import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
 import { setMultipleSearchParams } from '/@/renderer/utils/query-params';
+import { runInUrlTransition } from '/@/renderer/utils/url-transition';
 import { AlbumArtistListSort } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -19,13 +20,15 @@ export const useAlbumArtistListFilters = () => {
     const [, setSearchParams] = useSearchParams();
 
     const clear = useCallback(() => {
-        setSearchParams(
-            (prev) =>
-                setMultipleSearchParams(prev, {
-                    [FILTER_KEYS.SHARED.SEARCH_TERM]: null,
-                }),
-            { replace: true },
-        );
+        runInUrlTransition(() => {
+            setSearchParams(
+                (prev) =>
+                    setMultipleSearchParams(prev, {
+                        [FILTER_KEYS.SHARED.SEARCH_TERM]: null,
+                    }),
+                { replace: true },
+            );
+        });
     }, [setSearchParams]);
 
     const query = {

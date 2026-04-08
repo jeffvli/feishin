@@ -1,3 +1,5 @@
+import type { TableScrollShadowStore } from '/@/renderer/components/item-list/item-table-list/table-scroll-shadow-store';
+
 import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
 import throttle from 'lodash/throttle';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
@@ -18,9 +20,7 @@ export const useTablePaneSync = ({
     pinnedRowRef,
     rowRef,
     scrollContainerRef,
-    setShowLeftShadow,
-    setShowRightShadow,
-    setShowTopShadow,
+    scrollShadowStore,
 }: {
     enableDrag: boolean | undefined;
     enableDragScroll: boolean | undefined;
@@ -36,9 +36,7 @@ export const useTablePaneSync = ({
     pinnedRowRef: React.RefObject<HTMLDivElement | null>;
     rowRef: React.RefObject<HTMLDivElement | null>;
     scrollContainerRef: React.RefObject<HTMLDivElement | null>;
-    setShowLeftShadow: (v: boolean) => void;
-    setShowRightShadow: (v: boolean) => void;
-    setShowTopShadow: (v: boolean) => void;
+    scrollShadowStore: TableScrollShadowStore;
 }) => {
     // Main grid overlayscrollbars - only handle X-axis if right-pinned columns exist
     const [initialize, osInstance] = useOverlayScrollbars({
@@ -471,8 +469,10 @@ export const useTablePaneSync = ({
 
         if (!row) {
             const timeout = setTimeout(() => {
-                setShowLeftShadow(false);
-                setShowRightShadow(false);
+                scrollShadowStore.setSnapshot({
+                    showLeftShadow: false,
+                    showRightShadow: false,
+                });
             }, 0);
 
             return () => clearTimeout(timeout);
@@ -482,8 +482,10 @@ export const useTablePaneSync = ({
             const scrollLeft = row.scrollLeft;
             const maxScrollLeft = row.scrollWidth - row.clientWidth;
 
-            setShowLeftShadow(pinnedLeftColumnCount > 0 && scrollLeft > 0);
-            setShowRightShadow(pinnedRightColumnCount > 0 && scrollLeft < maxScrollLeft);
+            scrollShadowStore.setSnapshot({
+                showLeftShadow: pinnedLeftColumnCount > 0 && scrollLeft > 0,
+                showRightShadow: pinnedRightColumnCount > 0 && scrollLeft < maxScrollLeft,
+            });
         }, 50);
 
         checkScrollPosition();
@@ -494,13 +496,7 @@ export const useTablePaneSync = ({
             checkScrollPosition.cancel();
             row.removeEventListener('scroll', checkScrollPosition);
         };
-    }, [
-        pinnedLeftColumnCount,
-        pinnedRightColumnCount,
-        rowRef,
-        setShowLeftShadow,
-        setShowRightShadow,
-    ]);
+    }, [pinnedLeftColumnCount, pinnedRightColumnCount, rowRef, scrollShadowStore]);
 
     // Handle top shadow visibility based on vertical scroll
     useEffect(() => {
@@ -509,7 +505,7 @@ export const useTablePaneSync = ({
 
         if (!row || !enableHeader) {
             const timeout = setTimeout(() => {
-                setShowTopShadow(false);
+                scrollShadowStore.setSnapshot({ showTopShadow: false });
             }, 0);
 
             return () => clearTimeout(timeout);
@@ -519,7 +515,7 @@ export const useTablePaneSync = ({
 
         const checkScrollPosition = throttle(() => {
             const currentScrollTop = scrollElement.scrollTop;
-            setShowTopShadow(currentScrollTop > 0);
+            scrollShadowStore.setSnapshot({ showTopShadow: currentScrollTop > 0 });
         }, 50);
 
         checkScrollPosition();
@@ -530,5 +526,5 @@ export const useTablePaneSync = ({
             checkScrollPosition.cancel();
             scrollElement.removeEventListener('scroll', checkScrollPosition);
         };
-    }, [enableHeader, pinnedRightColumnCount, pinnedRightColumnRef, rowRef, setShowTopShadow]);
+    }, [enableHeader, pinnedRightColumnCount, pinnedRightColumnRef, rowRef, scrollShadowStore]);
 };

@@ -5,7 +5,7 @@ import {
     useSuspenseQuery,
     UseSuspenseQueryOptions,
 } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { useListContext } from '/@/renderer/context/list-context';
@@ -115,6 +115,9 @@ export const useItemListPaginatedLoader = ({
         mutationKey: getListRefreshMutationKey(eventKey ?? 'paginated'),
     });
 
+    const refreshMutationRef = useRef(refreshMutation);
+    refreshMutationRef.current = refreshMutation;
+
     const updateItems = useCallback(
         (indexes: number[], value: object) => {
             return queryClient.setQueryData(
@@ -153,7 +156,7 @@ export const useItemListPaginatedLoader = ({
                 return;
             }
 
-            refreshMutation.mutate(true);
+            refreshMutationRef.current.mutate(true);
         };
 
         const handleFavorite = (payload: UserFavoriteEventPayload) => {
@@ -220,7 +223,7 @@ export const useItemListPaginatedLoader = ({
             eventEmitter.off('USER_FAVORITE', handleFavorite);
             eventEmitter.off('USER_RATING', handleRating);
         };
-    }, [data, eventKey, itemType, refreshMutation, serverId, updateItems]);
+    }, [data, eventKey, itemType, serverId, updateItems]);
 
     return { data: data?.items || [], pageCount, totalItemCount };
 };

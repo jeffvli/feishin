@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 import { Outlet } from 'react-router';
 
 import styles from './mobile-layout.module.css';
@@ -13,6 +13,7 @@ import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
 import { useFullScreenPlayerOverlayState, useWindowBarStyle } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Drawer } from '/@/shared/components/drawer/drawer';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { useDisclosure } from '/@/shared/hooks/use-disclosure';
 import { Platform } from '/@/shared/types/types';
 
@@ -53,7 +54,9 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
                     variant="subtle"
                 />
                 <main className={styles.mainContent}>
-                    <Outlet />
+                    <Suspense fallback={<Spinner container />}>
+                        <Outlet />
+                    </Suspense>
                 </main>
                 <PlayerBar />
             </div>

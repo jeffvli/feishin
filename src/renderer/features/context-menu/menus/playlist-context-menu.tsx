@@ -38,10 +38,10 @@ export const PlaylistContextMenu = ({ items, type }: PlaylistContextMenuProps) =
             <ContextMenu.Divider />
             <AddToPlaylistAction items={ids} itemType={LibraryItem.PLAYLIST} />
             <ContextMenu.Divider />
-            <GetInfoAction disabled={items.length === 0} items={items} />
-            <ContextMenu.Divider />
             <EditPlaylistAction disabled={!canEditPlaylist} items={items} />
             <DeletePlaylistAction disabled={!canDeletePlaylist} items={items} />
+            <ContextMenu.Divider />
+            <GetInfoAction disabled={items.length === 0} items={items} />
         </ContextMenu.Content>
     );
 };

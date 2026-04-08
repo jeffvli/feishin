@@ -225,6 +225,7 @@ export type AlbumArtist = {
     playCount: null | number;
     similarArtists: null | RelatedArtist[];
     songCount: null | number;
+    uploadedImage?: string;
     userFavorite: boolean;
     userRating: null | number;
 };
@@ -957,6 +958,16 @@ export type CreatePlaylistBody = {
 // Create Playlist
 export type CreatePlaylistResponse = undefined | { id: string };
 
+export type DeleteArtistImageArgs = BaseEndpointArgs & {
+    query: DeleteArtistImageQuery;
+};
+
+export type DeleteArtistImageQuery = {
+    id: string;
+};
+
+export type DeleteArtistImageResponse = boolean;
+
 export type DeleteInternetRadioStationArgs = BaseEndpointArgs & {
     query: DeleteInternetRadioStationQuery;
 };
@@ -1131,6 +1142,21 @@ export type UpdatePlaylistQuery = {
 
 // Update Playlist
 export type UpdatePlaylistResponse = null | undefined;
+
+export type UploadArtistImageArgs = BaseEndpointArgs & {
+    body: UploadArtistImageBody;
+    query: UploadArtistImageQuery;
+};
+
+export type UploadArtistImageBody = {
+    image: Uint8Array;
+};
+
+export type UploadArtistImageQuery = {
+    id: string;
+};
+
+export type UploadArtistImageResponse = boolean;
 
 export type UploadInternetRadioStationImageArgs = BaseEndpointArgs & {
     body: UploadInternetRadioStationImageBody;
@@ -1441,6 +1467,7 @@ export type ControllerEndpoint = {
         args: CreateInternetRadioStationArgs,
     ) => Promise<CreateInternetRadioStationResponse>;
     createPlaylist: (args: CreatePlaylistArgs) => Promise<CreatePlaylistResponse>;
+    deleteArtistImage?: (args: DeleteArtistImageArgs) => Promise<DeleteArtistImageResponse>;
     deleteFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
     deleteInternetRadioStation: (
         args: DeleteInternetRadioStationArgs,
@@ -1503,6 +1530,7 @@ export type ControllerEndpoint = {
         args: UpdateInternetRadioStationArgs,
     ) => Promise<UpdateInternetRadioStationResponse>;
     updatePlaylist: (args: UpdatePlaylistArgs) => Promise<UpdatePlaylistResponse>;
+    uploadArtistImage?: (args: UploadArtistImageArgs) => Promise<UploadArtistImageResponse>;
     uploadInternetRadioStationImage?: (
         args: UploadInternetRadioStationImageArgs,
     ) => Promise<UploadInternetRadioStationImageResponse>;
@@ -1572,6 +1600,9 @@ export type InternalControllerEndpoint = {
     createPlaylist: (
         args: ReplaceApiClientProps<CreatePlaylistArgs>,
     ) => Promise<CreatePlaylistResponse>;
+    deleteArtistImage?: (
+        args: ReplaceApiClientProps<DeleteArtistImageArgs>,
+    ) => Promise<DeleteArtistImageResponse>;
     deleteFavorite: (args: ReplaceApiClientProps<FavoriteArgs>) => Promise<FavoriteResponse>;
     deleteInternetRadioStation: (
         args: ReplaceApiClientProps<DeleteInternetRadioStationArgs>,
@@ -1669,6 +1700,9 @@ export type InternalControllerEndpoint = {
     updatePlaylist: (
         args: ReplaceApiClientProps<UpdatePlaylistArgs>,
     ) => Promise<UpdatePlaylistResponse>;
+    uploadArtistImage?: (
+        args: ReplaceApiClientProps<UploadArtistImageArgs>,
+    ) => Promise<UploadArtistImageResponse>;
     uploadInternetRadioStationImage?: (
         args: ReplaceApiClientProps<UploadInternetRadioStationImageArgs>,
     ) => Promise<UploadInternetRadioStationImageResponse>;

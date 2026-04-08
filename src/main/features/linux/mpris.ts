@@ -150,6 +150,23 @@ ipcMain.on(
                 return;
             }
 
+            // If the served id is an empty string, this is a radio
+            // Use a limited subset of the fields
+            if (song._serverId === '') {
+                // The id as passed in from use-mpris is radio- plus the radio ID
+                // If there are spaces or some other characters, this causes MPRIS to error and
+                // disconnect the bus. To prevent this, just use a fake track/radio
+                mprisPlayer.metadata = {
+                    'mpris:trackid': mprisPlayer.objectPath(`track/radio`),
+                    'xesam:album': song.album || null,
+                    'xesam:artist': song.artists?.length
+                        ? song.artists.map((artist) => artist.name)
+                        : null,
+                    'xesam:title': song.name || null,
+                };
+                return;
+            }
+
             mprisPlayer.metadata = {
                 'mpris:artUrl': imageUrl || null,
                 'mpris:length': song.duration ? Math.round((song.duration || 0) * 1e3) : null,

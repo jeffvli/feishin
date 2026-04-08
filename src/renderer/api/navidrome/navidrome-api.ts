@@ -46,6 +46,15 @@ export const contract = c.router({
             500: resultWithHeaders(ndType._response.error),
         },
     },
+    deleteArtistImage: {
+        body: null,
+        method: 'DELETE',
+        path: 'artist/:id/image',
+        responses: {
+            200: resultWithHeaders(ndType._response.deleteArtistImage),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
     deleteInternetRadioStation: {
         body: null,
         method: 'DELETE',
@@ -256,6 +265,15 @@ export const contract = c.router({
         path: 'playlist/:id',
         responses: {
             200: resultWithHeaders(ndType._response.updatePlaylist),
+            500: resultWithHeaders(ndType._response.error),
+        },
+    },
+    uploadArtistImage: {
+        body: ndType._parameters.uploadArtistImage,
+        method: 'POST',
+        path: 'artist/:id/image',
+        responses: {
+            200: resultWithHeaders(ndType._response.uploadArtistImage),
             500: resultWithHeaders(ndType._response.error),
         },
     },

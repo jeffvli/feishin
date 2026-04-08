@@ -8,7 +8,10 @@ import { shallow } from 'zustand/shallow';
 import styles from './left-controls.module.css';
 
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
-import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
+import {
+    JOINED_ARTISTS_MUTED_PROPS,
+    JoinedArtists,
+} from '/@/renderer/features/albums/components/joined-artists';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { RadioMetadataDisplay } from '/@/renderer/features/player/components/radio-metadata-display';
 import {
@@ -266,6 +269,14 @@ export const LeftControls = () => {
                                 <JoinedArtists
                                     artistName={currentSong?.artistName || ''}
                                     artists={artists || []}
+                                    linkProps={{
+                                        ...JOINED_ARTISTS_MUTED_PROPS.linkProps,
+                                        size: 'md',
+                                    }}
+                                    rootTextProps={{
+                                        ...JOINED_ARTISTS_MUTED_PROPS.rootTextProps,
+                                        size: 'md',
+                                    }}
                                 />
                             </div>
                             <div

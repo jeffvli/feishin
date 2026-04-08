@@ -1381,6 +1381,12 @@
         },
         "pasteGradient": "Wklej Gradient",
         "pasteGradientPlaceholder": "Wklej tutaj JSON gradientu...",
-        "ansiBands": "Paski ANSI"
+        "ansiBands": "Paski ANSI",
+        "systemAudioConsentAllow": "Zezwól",
+        "systemAudioConsentBody": "Wizualizer wymaga dostępu do audio systemu do działania",
+        "systemAudioConsentDecline": "Odmów",
+        "systemAudioConsentTitle": "Przyznać dostęp do audio systemu?",
+        "systemAudioCaptureFailed": "Nie udało się rozpocząć przechwytywania: {{message}}",
+        "systemAudioNoAudioTrack": "Nie została zwrócona żadna ścieżka audio. Sprawdź czy przechwytywanie audio będzie włączone, gdy będzie o to prośba."
     }
 }

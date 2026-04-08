@@ -98,6 +98,7 @@ export const NDSongQueryFields = [
     { label: 'Channels', type: 'number', value: 'channels' },
     { label: 'Comment', type: 'string', value: 'comment' },
     { label: 'Composer', type: 'string', value: 'composer' },
+    { label: 'Codec', type: 'string', value: 'codec' },
     { label: 'Conductor', type: 'string', value: 'conductor' },
     { label: 'Copyright', type: 'string', value: 'copyright' },
     { label: 'Date Added', type: 'date', value: 'dateadded' },
@@ -129,6 +130,7 @@ export const NDSongQueryFields = [
     { label: 'Lyricist', type: 'string', value: 'lyricist' },
     { label: 'Lyrics', type: 'string', value: 'lyrics' },
     { label: 'Media', type: 'string', value: 'media' },
+    { label: 'Missing', type: 'boolean', value: 'missing' },
     { label: 'Mixer', type: 'string', value: 'mixer' },
     { label: 'Mood', type: 'string', value: 'mood' },
     { label: 'Movement', type: 'string', value: 'movement' },
@@ -176,6 +178,7 @@ export const NDSongQueryFields = [
     { label: 'ReplayGain Track Peak', type: 'number', value: 'replaygain_track_peak' },
     { label: 'Remixer', type: 'string', value: 'remixer' },
     { label: 'Script', type: 'string', value: 'script' },
+    { label: 'Sample Rate', type: 'number', value: 'sampleRate' },
     { label: 'Size', type: 'number', value: 'size' },
     { label: 'Sort Album', type: 'string', value: 'albumsort' },
     { label: 'Sort Album Artist', type: 'string', value: 'albumartistsort' },
@@ -425,6 +428,7 @@ const albumArtist = z.object({
     starredAt: z.string(),
     stats: z.record(z.string(), stats).optional(),
     updatedAt: z.string().optional(),
+    uploadedImage: z.string().optional(),
 });
 
 const albumArtistList = z.array(albumArtist);
@@ -680,6 +684,9 @@ const deletePlaylistImage = z.object({
 
 const uploadInternetRadioStationImage = uploadPlaylistImage;
 const uploadInternetRadioStationImageParameters = uploadPlaylistImageParameters;
+const uploadArtistImage = uploadPlaylistImage;
+const uploadArtistImageParameters = uploadPlaylistImageParameters;
+const deleteArtistImage = deletePlaylistImage;
 const deleteInternetRadioStationImage = deletePlaylistImage;
 
 const deletePlaylist = z.null();
@@ -810,6 +817,7 @@ export const ndType = {
         tagList: tagListParameters,
         updateInternetRadioStation: updateInternetRadioStationParameters,
         updatePlaylist: updatePlaylistParameters,
+        uploadArtistImage: uploadArtistImageParameters,
         uploadInternetRadioStationImage: uploadInternetRadioStationImageParameters,
         uploadPlaylistImage: uploadPlaylistImageParameters,
         userList: userListParameters,
@@ -822,6 +830,7 @@ export const ndType = {
         albumList,
         authenticate,
         createPlaylist,
+        deleteArtistImage,
         deleteInternetRadioStation,
         deleteInternetRadioStationImage,
         deletePlaylist,
@@ -845,6 +854,7 @@ export const ndType = {
         tagList,
         updateInternetRadioStation,
         updatePlaylist,
+        uploadArtistImage,
         uploadInternetRadioStationImage,
         uploadPlaylistImage,
         user,

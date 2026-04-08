@@ -57,6 +57,7 @@ import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table
 import { YearColumn } from '/@/renderer/components/item-list/item-table-list/columns/year-column';
 import { useItemDragDropState } from '/@/renderer/components/item-list/item-table-list/hooks/use-item-drag-drop-state';
 import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
+import { useItemTableListColumnResizeLive } from '/@/renderer/components/item-list/item-table-list/item-table-list-context';
 import { ItemControls, ItemListItem } from '/@/renderer/components/item-list/types';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -190,6 +191,14 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
             >
                 {groupHeader}
             </div>
+        );
+    }
+
+    if (type === TableColumn.LAYOUT_FILL) {
+        return (
+            <TableColumnContainer {...props} {...dragProps} controls={controls} type={type}>
+                {null}
+            </TableColumnContainer>
         );
     }
 
@@ -707,6 +716,8 @@ export const TableColumnContainer = (
 
 interface ColumnResizeHandleProps {
     columnId: TableColumn;
+    columnIndex: number;
+    disabled?: boolean;
     initialWidth: number;
     onResize: (columnId: TableColumn, width: number) => void;
     side: 'left' | 'right';
@@ -714,6 +725,8 @@ interface ColumnResizeHandleProps {
 
 const ColumnResizeHandle = ({
     columnId,
+    columnIndex,
+    disabled = false,
     initialWidth,
     onResize,
     side,
@@ -723,6 +736,17 @@ const ColumnResizeHandle = ({
     const startWidthRef = useRef<number>(initialWidth);
     const startXRef = useRef<number>(0);
     const finalWidthRef = useRef<number>(initialWidth);
+    const columnResizeLive = useItemTableListColumnResizeLive();
+    const onResizeRef = useRef(onResize);
+    const columnResizeLiveRef = useRef(columnResizeLive);
+
+    useEffect(() => {
+        onResizeRef.current = onResize;
+    }, [onResize]);
+
+    useEffect(() => {
+        columnResizeLiveRef.current = columnResizeLive;
+    }, [columnResizeLive]);
 
     // Update the ref when initialWidth changes (but not during drag)
     useEffect(() => {
@@ -738,6 +762,7 @@ const ColumnResizeHandle = ({
             const deltaX = event.clientX - startXRef.current;
             const newWidth = Math.min(Math.max(10, startWidthRef.current + deltaX), 1000);
             finalWidthRef.current = newWidth;
+            columnResizeLiveRef.current?.scheduleColumnResizePreview(columnIndex, newWidth);
         };
 
         const handleMouseUp = () => {
@@ -746,7 +771,8 @@ const ColumnResizeHandle = ({
             document.body.style.userSelect = '';
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
-            onResize(columnId, finalWidthRef.current);
+            onResizeRef.current(columnId, finalWidthRef.current);
+            columnResizeLiveRef.current?.clearColumnResizePreview();
         };
 
         document.addEventListener('mousemove', handleMouseMove);
@@ -755,10 +781,18 @@ const ColumnResizeHandle = ({
         return () => {
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+            columnResizeLiveRef.current?.clearColumnResizePreview();
         };
-    }, [isDragging, columnId, onResize]);
+    }, [isDragging, columnId, columnIndex]);
 
     const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (disabled) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
         event.preventDefault();
         event.stopPropagation();
         setIsDragging(true);
@@ -771,6 +805,7 @@ const ColumnResizeHandle = ({
     return (
         <div
             className={clsx(styles.resizeHandle, {
+                [styles.resizeHandleDisabled]: disabled,
                 [styles.resizeHandleDragging]: isDragging,
                 [styles.resizeHandleLeft]: side === 'left',
                 [styles.resizeHandleRight]: side === 'right',
@@ -802,7 +837,11 @@ export const TableColumnHeaderContainer = (
     const [isDraggedOver, setIsDraggedOver] = useState<Edge | null>(null);
 
     useEffect(() => {
-        if (!containerRef.current || !props.enableColumnReorder) {
+        if (
+            !containerRef.current ||
+            !props.enableColumnReorder ||
+            props.type === TableColumn.LAYOUT_FILL
+        ) {
             return;
         }
 
@@ -917,9 +956,11 @@ export const TableColumnHeaderContainer = (
             >
                 {columnLabelMap[props.type]}
             </Text>
-            {!columnConfig.autoSize && props.enableColumnResize && (
+            {props.enableColumnResize && (
                 <ColumnResizeHandle
                     columnId={props.type}
+                    columnIndex={props.columnIndex}
+                    disabled={!!columnConfig.autoSize}
                     initialWidth={currentWidth}
                     onResize={handleResize}
                     side="right"
@@ -982,6 +1023,7 @@ export const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.LAST_PLAYED]: i18n.t('table.column.lastPlayed', {
         postProcess: 'upperCase',
     }) as string,
+    [TableColumn.LAYOUT_FILL]: '',
     [TableColumn.OWNER]: i18n.t('table.column.owner', { postProcess: 'upperCase' }) as string,
     [TableColumn.PATH]: i18n.t('table.column.path', { postProcess: 'upperCase' }) as string,
     [TableColumn.PLAY_COUNT]: i18n.t('table.column.playCount', {

@@ -237,6 +237,27 @@ function appendTranscodeParams(url: string, format?: string, bitrate?: number) {
     return streamUrl;
 }
 
+function buildGetTranscodeStreamUrl(
+    server: null | undefined | { credential?: string; url?: string },
+    args: {
+        mediaId: string;
+        mediaType: 'podcast' | 'song';
+        offset: number;
+        transcodeParams: string;
+    },
+): string {
+    const params = new URLSearchParams({
+        c: 'Feishin',
+        mediaId: args.mediaId,
+        mediaType: args.mediaType,
+        offset: String(args.offset),
+        transcodeParams: args.transcodeParams,
+        v: '1.13.0',
+    });
+
+    return `${server?.url}/rest/getTranscodeStream.view?${params.toString()}&${server?.credential}`;
+}
+
 function sortAndPaginate<T>(
     items: T[],
     options: {
@@ -487,7 +508,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             similarArtists:
                 artistInfo?.similarArtist?.map((artist) => ({
                     id: artist.id,
-                    imageId: null,
+                    imageId: artist.coverArt ?? artist.id,
                     imageUrl: null,
                     name: artist.name,
                     userFavorite: Boolean(artist.starred) || false,
@@ -1994,8 +2015,12 @@ export const SubsonicController: InternalControllerEndpoint = {
                 },
             });
 
+            // If the server returns an error for transcodeDecision, fall back to direct stream so that we don't break the player
             if (transcodeDecision.status !== 200) {
-                throw new Error('Failed to get transcode decision');
+                logFn.error(
+                    `Failed to get transcode decision for song ${id}, falling back to direct stream`,
+                );
+                return streamUrl;
             }
 
             const td = transcodeDecision.body.transcodeDecision;
@@ -2013,20 +2038,14 @@ export const SubsonicController: InternalControllerEndpoint = {
                 return appendTranscodeParams(streamUrl, format, bitrate);
             }
 
-            const transcodeStreamUrl = await ssApiClient(apiClientProps).getTranscodeStream({
-                query: {
-                    mediaId: id,
-                    mediaType,
-                    offset: 0,
-                    transcodeParams: td.transcodeParams,
-                },
+            const transcodeStreamUrl = buildGetTranscodeStreamUrl(server, {
+                mediaId: String(id),
+                mediaType: (mediaType ?? 'song') as 'podcast' | 'song',
+                offset: 0,
+                transcodeParams: td.transcodeParams,
             });
 
-            if (transcodeStreamUrl.status !== 200) {
-                throw new Error('Failed to get transcode stream');
-            }
-
-            return transcodeStreamUrl.body;
+            return transcodeStreamUrl;
         }
 
         return streamUrl;

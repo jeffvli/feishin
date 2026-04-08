@@ -14,6 +14,7 @@ import {
     setMultipleSearchParams,
     setSearchParam,
 } from '/@/renderer/utils/query-params';
+import { runInUrlTransition } from '/@/renderer/utils/url-transition';
 import { SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -65,8 +66,10 @@ export const useSongListFilters = (listKey?: ItemListKey) => {
 
     const setGenreId = useCallback(
         (value: null | string[]) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.SONG.GENRE_ID, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.SONG.GENRE_ID, value), {
+                    replace: true,
+                });
             });
         },
         [setSearchParams],
@@ -74,8 +77,13 @@ export const useSongListFilters = (listKey?: ItemListKey) => {
 
     const setArtistIds = useCallback(
         (value: null | string[]) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.SONG.ARTIST_IDS, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams(
+                    (prev) => setSearchParam(prev, FILTER_KEYS.SONG.ARTIST_IDS, value),
+                    {
+                        replace: true,
+                    },
+                );
             });
         },
         [setSearchParams],
@@ -83,8 +91,10 @@ export const useSongListFilters = (listKey?: ItemListKey) => {
 
     const setMinYear = useCallback(
         (value: null | number) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.SONG.MIN_YEAR, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.SONG.MIN_YEAR, value), {
+                    replace: true,
+                });
             });
         },
         [setSearchParams],
@@ -92,8 +102,10 @@ export const useSongListFilters = (listKey?: ItemListKey) => {
 
     const setMaxYear = useCallback(
         (value: null | number) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.SONG.MAX_YEAR, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.SONG.MAX_YEAR, value), {
+                    replace: true,
+                });
             });
         },
         [setSearchParams],
@@ -101,8 +113,10 @@ export const useSongListFilters = (listKey?: ItemListKey) => {
 
     const setFavorite = useCallback(
         (value: boolean | null) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.SONG.FAVORITE, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.SONG.FAVORITE, value), {
+                    replace: true,
+                });
             });
         },
         [setSearchParams],
@@ -110,8 +124,13 @@ export const useSongListFilters = (listKey?: ItemListKey) => {
 
     const setHasRating = useCallback(
         (value: boolean | null) => {
-            setSearchParams((prev) => setSearchParam(prev, FILTER_KEYS.SONG.HAS_RATING, value), {
-                replace: true,
+            runInUrlTransition(() => {
+                setSearchParams(
+                    (prev) => setSearchParam(prev, FILTER_KEYS.SONG.HAS_RATING, value),
+                    {
+                        replace: true,
+                    },
+                );
             });
         },
         [setSearchParams],
@@ -124,46 +143,53 @@ export const useSongListFilters = (listKey?: ItemListKey) => {
                 | null
                 | Record<string, any>,
         ) => {
-            setSearchParams(
-                (prev) => {
-                    const currentCustom = parseCustomFiltersParam(prev, FILTER_KEYS.SONG._CUSTOM);
-                    let newValue =
-                        typeof value === 'function' ? value(currentCustom ?? null) : value;
-                    // Convert empty objects to null to clear them from URL
-                    if (
-                        newValue &&
-                        typeof newValue === 'object' &&
-                        Object.keys(newValue).length === 0
-                    ) {
-                        newValue = null;
-                    }
-                    return setJsonSearchParam(prev, FILTER_KEYS.SONG._CUSTOM, newValue);
-                },
-                { replace: true },
-            );
+            runInUrlTransition(() => {
+                setSearchParams(
+                    (prev) => {
+                        const currentCustom = parseCustomFiltersParam(
+                            prev,
+                            FILTER_KEYS.SONG._CUSTOM,
+                        );
+                        let newValue =
+                            typeof value === 'function' ? value(currentCustom ?? null) : value;
+                        // Convert empty objects to null to clear them from URL
+                        if (
+                            newValue &&
+                            typeof newValue === 'object' &&
+                            Object.keys(newValue).length === 0
+                        ) {
+                            newValue = null;
+                        }
+                        return setJsonSearchParam(prev, FILTER_KEYS.SONG._CUSTOM, newValue);
+                    },
+                    { replace: true },
+                );
+            });
         },
         [setSearchParams],
     );
 
     const clear = useCallback(() => {
-        setSearchParams(
-            (prev) =>
-                setMultipleSearchParams(
-                    prev,
-                    {
-                        [FILTER_KEYS.SHARED.SEARCH_TERM]: null,
-                        [FILTER_KEYS.SONG._CUSTOM]: null,
-                        [FILTER_KEYS.SONG.ARTIST_IDS]: null,
-                        [FILTER_KEYS.SONG.FAVORITE]: null,
-                        [FILTER_KEYS.SONG.GENRE_ID]: null,
-                        [FILTER_KEYS.SONG.HAS_RATING]: null,
-                        [FILTER_KEYS.SONG.MAX_YEAR]: null,
-                        [FILTER_KEYS.SONG.MIN_YEAR]: null,
-                    },
-                    new Set([FILTER_KEYS.SONG._CUSTOM]),
-                ),
-            { replace: true },
-        );
+        runInUrlTransition(() => {
+            setSearchParams(
+                (prev) =>
+                    setMultipleSearchParams(
+                        prev,
+                        {
+                            [FILTER_KEYS.SHARED.SEARCH_TERM]: null,
+                            [FILTER_KEYS.SONG._CUSTOM]: null,
+                            [FILTER_KEYS.SONG.ARTIST_IDS]: null,
+                            [FILTER_KEYS.SONG.FAVORITE]: null,
+                            [FILTER_KEYS.SONG.GENRE_ID]: null,
+                            [FILTER_KEYS.SONG.HAS_RATING]: null,
+                            [FILTER_KEYS.SONG.MAX_YEAR]: null,
+                            [FILTER_KEYS.SONG.MIN_YEAR]: null,
+                        },
+                        new Set([FILTER_KEYS.SONG._CUSTOM]),
+                    ),
+                { replace: true },
+            );
+        });
     }, [setSearchParams]);
 
     const query = useMemo(

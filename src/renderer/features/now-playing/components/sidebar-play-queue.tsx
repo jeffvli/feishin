@@ -27,7 +27,7 @@ import {
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Stack } from '/@/shared/components/stack/stack';
-import { ItemListKey, Platform, PlayerType } from '/@/shared/types/types';
+import { ItemListKey, Platform } from '/@/shared/types/types';
 
 type SidebarPanelType = 'lyrics' | 'queue' | 'visualizer';
 
@@ -55,9 +55,9 @@ export const SidebarPlayQueue = () => {
     const showLyricsInSidebar = useShowLyricsInSidebar();
     const showVisualizerInSidebar = useShowVisualizerInSidebar();
     const sidebarPanelOrder = useSidebarPanelOrder();
-    const { type, webAudio } = usePlaybackSettings();
+    const { webAudio } = usePlaybackSettings();
     const { windowBarStyle } = useWindowSettings();
-    const showVisualizer = showVisualizerInSidebar && type === PlayerType.WEB && webAudio;
+    const showVisualizer = showVisualizerInSidebar && webAudio;
     const showPanel = showLyricsInSidebar || showVisualizer;
 
     const shouldAddTopMargin = isElectron() && windowBarStyle === Platform.WEB;
@@ -374,8 +374,8 @@ const CombinedLyricsAndVisualizerPanel = () => {
     const visualizerType = useSettingsStore((store) => store.visualizer.type);
     const showLyricsInSidebar = useShowLyricsInSidebar();
     const showVisualizerInSidebar = useShowVisualizerInSidebar();
-    const { type, webAudio } = usePlaybackSettings();
-    const showVisualizer = showVisualizerInSidebar && type === PlayerType.WEB && webAudio;
+    const { webAudio } = usePlaybackSettings();
+    const showVisualizer = showVisualizerInSidebar && webAudio;
 
     const { data: lyricsData } = useQuery(
         lyricsQueries.songLyrics(

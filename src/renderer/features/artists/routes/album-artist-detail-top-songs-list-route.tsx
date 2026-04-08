@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useParams } from 'react-router';
 
@@ -34,16 +34,15 @@ const AlbumArtistDetailTopSongsListRoute = () => {
         key: 'album-artist-top-songs-query-type',
     });
 
-    const detailQuery = useQuery(
+    const detailQuery = useSuspenseQuery(
         artistsQueries.albumArtistDetail({
             query: { id: routeId },
             serverId: server?.id,
         }),
     );
 
-    const topSongsQuery = useQuery(
+    const topSongsQuery = useSuspenseQuery(
         artistsQueries.topSongs({
-            options: { enabled: !!detailQuery?.data?.name },
             query: {
                 artist: detailQuery?.data?.name || '',
                 artistId: routeId,

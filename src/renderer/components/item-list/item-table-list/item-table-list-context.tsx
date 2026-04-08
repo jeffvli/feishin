@@ -1,6 +1,14 @@
 import type { ReactElement } from 'react';
 
-import React, { createContext, useContext, useEffect, useMemo, useRef } from 'react';
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useSyncExternalStore } from 'react';
 
 import type { TableItemProps } from './item-table-list';
@@ -66,6 +74,69 @@ export const ItemTableListConfigProvider = ({
 
 export const useItemTableListConfig = (): ItemTableListConfig | null => {
     return useContext(ItemTableListConfigContext);
+};
+
+export type ItemTableListColumnResizeLiveContextValue = {
+    clearColumnResizePreview: () => void;
+    scheduleColumnResizePreview: (columnIndex: number, width: number) => void;
+};
+
+const ItemTableListColumnResizeLiveContext =
+    createContext<ItemTableListColumnResizeLiveContextValue | null>(null);
+
+export const ItemTableListColumnResizeLiveProvider = ({
+    children,
+    value,
+}: {
+    children: React.ReactNode;
+    value: ItemTableListColumnResizeLiveContextValue;
+}) => {
+    return (
+        <ItemTableListColumnResizeLiveContext.Provider value={value}>
+            {children}
+        </ItemTableListColumnResizeLiveContext.Provider>
+    );
+};
+
+export const useItemTableListColumnResizeLive =
+    (): ItemTableListColumnResizeLiveContextValue | null => {
+        return useContext(ItemTableListColumnResizeLiveContext);
+    };
+
+export const useItemTableListColumnResizeLiveState = () => {
+    const [columnResizePreview, setColumnResizePreview] = useState<null | {
+        columnIndex: number;
+        width: number;
+    }>(null);
+    const previewRafRef = useRef<null | number>(null);
+    const pendingPreviewRef = useRef<null | { columnIndex: number; width: number }>(null);
+
+    const scheduleColumnResizePreview = useCallback((columnIndex: number, width: number) => {
+        pendingPreviewRef.current = { columnIndex, width };
+        if (previewRafRef.current !== null) return;
+        previewRafRef.current = requestAnimationFrame(() => {
+            previewRafRef.current = null;
+            const pending = pendingPreviewRef.current;
+            if (pending) {
+                setColumnResizePreview(pending);
+            }
+        });
+    }, []);
+
+    const clearColumnResizePreview = useCallback(() => {
+        if (previewRafRef.current !== null) {
+            cancelAnimationFrame(previewRafRef.current);
+            previewRafRef.current = null;
+        }
+        pendingPreviewRef.current = null;
+        setColumnResizePreview(null);
+    }, []);
+
+    return {
+        clearColumnResizePreview,
+        columnResizePreview,
+        scheduleColumnResizePreview,
+    };
 };
 
 type ItemTableListStoreContextValue = {

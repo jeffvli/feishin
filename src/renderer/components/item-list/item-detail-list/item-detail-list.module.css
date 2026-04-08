@@ -179,6 +179,14 @@
     opacity: 1;
 }
 
+.resize-handle.resize-handle-disabled {
+    cursor: not-allowed;
+}
+
+.track-header-cell:hover .resize-handle.resize-handle-disabled {
+    cursor: not-allowed;
+}
+
 .resize-handle:hover {
     opacity: 1;
 }

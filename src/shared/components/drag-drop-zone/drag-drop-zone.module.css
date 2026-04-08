@@ -1,0 +1,18 @@
+/*
+ * Inset outline on the root is hidden behind a full-bleed ItemImage; a ::after layer paints
+ * above the image. Keep z-index below overlay controls (e.g. z-index: 2).
+ * Avoid positive outline-offset so ancestors with overflow:hidden do not clip the indicator.
+ */
+.file-target-drag-over {
+    position: relative;
+}
+
+.file-target-drag-over::after {
+    position: absolute;
+    inset: calc(var(--theme-spacing-sm) * -1);
+    z-index: 1;
+    pointer-events: none;
+    content: '';
+    border-radius: var(--theme-radius-md);
+    box-shadow: inset 0 0 0 3px var(--theme-colors-primary);
+}

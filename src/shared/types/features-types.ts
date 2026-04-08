@@ -2,6 +2,7 @@
 // For example: <FEATURE GROUP>: "Playlists", <FEATURE NAME>: "Smart" = "PLAYLISTS_SMART"
 export enum ServerFeature {
     ALBUM_YES_NO_RATING_FILTER = 'albumYesNoRatingFilter',
+    ARTIST_IMAGE_UPLOAD = 'artistImageUpload',
     BFR = 'bfr',
     INTERNET_RADIO_IMAGE_UPLOAD = 'internetRadioImageUpload',
     LYRICS_MULTIPLE_STRUCTURED = 'lyricsMultipleStructured',

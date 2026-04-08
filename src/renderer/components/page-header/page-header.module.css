@@ -97,7 +97,7 @@
     justify-content: center;
     width: 100%;
     height: 100%;
-    padding: var(--theme-spacing-sm);
+    padding: 0 var(--theme-spacing-xs);
 }
 
 .title-wrapper.hidden {
