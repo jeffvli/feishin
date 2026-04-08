@@ -219,7 +219,7 @@ table {
     padding-bottom: 0;
 } /* this fixes the above issue with the home padding */
 
-/*folders (i cannot test as i only have navidrome)*/
+/* folders (i cannot test as i only have navidrome) */
 .fs-main-content-module-main-content-body-scroll .m_4451eb3a {
     padding-bottom: calc(90px + var(--mantine-spacing-md)) !important;
 }
