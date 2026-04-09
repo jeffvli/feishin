@@ -157,6 +157,14 @@ table {
     padding-bottom: 0;
 }
 
+/* Fixes favourite scroll in artist pages */
+.fs-album-artist-detail-content-module-content-container .fs-item-table-list-module-item-table-pinned-rows-container > .fs-item-table-list-module-item-table-grid-container > .os-scrollbar {
+    margin-bottom: 0 !important;
+}
+.fs-album-artist-detail-content-module-content-container .fs-item-table-list-module-item-table-pinned-rows-container > .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100 {
+    padding-bottom: 0 !important;
+}
+
 /* Paginated (Table, Grid, Detail), Album page */
 .fs-item-list-pagination-module-container .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100,
 .fs-item-list-pagination-module-container .fs-item-grid-list-module-item-grid-container > div:nth-child(2),
