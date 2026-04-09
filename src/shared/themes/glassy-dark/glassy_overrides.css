@@ -282,14 +282,12 @@ table {
     height: calc(100% - 90px);
 }
 
-
 :has(.fs-right-sidebar-module-vertical-layout) .fs-right-sidebar-module-right-sidebar-container {
     position: relative;
     z-index: 10;
     height: 100%;
     transform: translateY(-90px);
 }
-
 
 .fs-page-header-module-container {
     background-color: transparent;
