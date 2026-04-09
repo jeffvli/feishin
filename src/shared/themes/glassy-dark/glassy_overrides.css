@@ -127,120 +127,60 @@ table {
     height: 100%;
 }
 
-/* could be reorganized better */
-
-/* home */
-.fs-main-content-module-main-content-body .fs-library-container-module-container > .m_6d731127 {
-    padding-bottom: 90px;
-} /* the same element appears in the album dedicated pages and creates a gap with the album-detail-content */
-
-.fs-main-content-module-main-content-body .fs-native-scroll-area-module-scroll-area .os-scrollbar {
-    margin-bottom: 90px;
-}
-
-/* infinite grid */
-.fs-main-content-module-main-content-body-scroll .fs-item-grid-list-module-item-grid-container > div:nth-child(2) {
-    padding-bottom: 90px !important;
-}
-
-.fs-main-content-module-main-content-body-scroll .fs-item-grid-list-module-item-grid-container > .os-scrollbar {
-    margin-bottom: 90px;
-}
-
-/* infinite table */
-.fs-main-content-module-main-content-body-scroll .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100 {
-    padding-bottom: 90px !important;
-}
-
-.fs-main-content-module-main-content-body-scroll .fs-item-table-list-module-item-table-grid-container > .os-scrollbar {
-    margin-bottom: 90px;
-}
-
-/* infinite detail */
-.fs-main-content-module-main-content-body-scroll .fs-item-detail-list-module-container > div:nth-child(1) {
-    padding-bottom: 90px !important;
-}
-
-.fs-main-content-module-main-content-body-scroll .fs-item-detail-list-module-container > .os-scrollbar {
-    margin-bottom: 90px;
-}
-
-/* paginated */
-.fs-item-list-pagination-module-container .fs-item-list-pagination-module-pagination-container {
-    padding-bottom: calc(90px + var(--theme-spacing-md)) !important;
-}
-
-/* paginated table */
-.fs-item-list-pagination-module-container .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100 {
-    padding-bottom: 0 !important;
-}
-
-.fs-item-list-pagination-module-container .fs-item-table-list-module-item-table-grid-container > .os-scrollbar {
-    margin-bottom: 0
-}
-
-/* paginated grid */
-.fs-item-list-pagination-module-container .fs-item-grid-list-module-item-grid-container > div:nth-child(2) {
-    padding-bottom: 0 !important;
-}
-
-.fs-item-list-pagination-module-container .fs-item-grid-list-module-item-grid-container > .os-scrollbar {
-    margin-bottom: 0;
-}
-
-/* paginated detail */
-.fs-item-list-pagination-module-container .fs-item-detail-list-module-container > div:nth-child(1) {
-    padding-bottom: 0 !important;
-}
-
-.fs-item-list-pagination-module-container .fs-item-detail-list-module-container > .os-scrollbar {
-    margin-bottom: 0;
-}
-
-/* artist page */
-.fs-album-artist-detail-content-module-content-container  .os-scrollbar {
-    margin-bottom: 0;
-}
-
-.fs-album-artist-detail-content-module-content-container {
-    padding-bottom: 90px;
-}
-
-/* album page */
-.fs-album-detail-content-module-content-container > .fs-album-detail-content-module-detail-container > div:nth-child(3) {
-    padding-bottom: 90px;
-}
-
-.fs-album-detail-content-module-content-container .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100 {
-    padding-bottom: 0 !important;
-}
-
-:has(.fs-album-detail-content-module-content-container) .fs-library-container-module-container > .m_6d731127 {
-    padding-bottom: 0;
-} /* this fixes the above issue with the home padding */
-
-/* folders (i cannot test as i only have navidrome) */
-.fs-main-content-module-main-content-body-scroll .m_4451eb3a {
-    padding-bottom: calc(90px + var(--mantine-spacing-md)) !important;
-}
-
-/* radio */
+/* Home, Artist, Album, Radio */
+.fs-main-content-module-main-content-body .fs-library-container-module-container > .m_6d731127,
+.fs-album-artist-detail-content-module-content-container,
+.fs-album-detail-content-module-content-container > .fs-album-detail-content-module-detail-container > div:nth-child(3),
 .fs-animated-page-module-animated-page > .fs-scroll-area-module-scroll-area > .m_6d731127 > .m_6d731127 {
     padding-bottom: 90px;
 }
 
-.fs-animated-page-module-animated-page > .fs-scroll-area-module-scroll-area > .os-scrollbar {
-    margin-bottom: 90px;
+/* Infinite  (Grid, Table, Detail) */
+.fs-main-content-module-main-content-body-scroll .fs-item-grid-list-module-item-grid-container > div:nth-child(2),
+.fs-main-content-module-main-content-body-scroll .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100,
+.fs-main-content-module-main-content-body-scroll .fs-item-detail-list-module-container > div:nth-child(1) {
+    padding-bottom: 90px !important;
 }
 
-/* settings */
+/* Scrollbars in infinite views and settings */
+.fs-main-content-module-main-content-body .fs-native-scroll-area-module-scroll-area .os-scrollbar,
+.fs-main-content-module-main-content-body-scroll .fs-item-grid-list-module-item-grid-container > .os-scrollbar,
+.fs-main-content-module-main-content-body-scroll .fs-item-table-list-module-item-table-grid-container > .os-scrollbar,
+.fs-main-content-module-main-content-body-scroll .fs-item-detail-list-module-container > .os-scrollbar,
+.fs-animated-page-module-animated-page > .fs-scroll-area-module-scroll-area > .os-scrollbar,
 .fs-library-container-module-container > .m_8bffd616 > .fs-library-container-module-container {
     margin-bottom: 90px;
 }
 
-/* settings window */
+/* Fixes the home padding issue in album dedicated pages */
+:has(.fs-album-detail-content-module-content-container) .fs-library-container-module-container > .m_6d731127 {
+    padding-bottom: 0;
+}
+
+/* Paginated (Table, Grid, Detail), Album page */
+.fs-item-list-pagination-module-container .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100,
+.fs-item-list-pagination-module-container .fs-item-grid-list-module-item-grid-container > div:nth-child(2),
+.fs-item-list-pagination-module-container .fs-item-detail-list-module-container > div:nth-child(1),
+.fs-album-detail-content-module-content-container .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100 {
+    padding-bottom: 0 !important;
+}
+
+/* Scrollbars in paginated lists, artist pages, and settings windows */
+.fs-item-list-pagination-module-container .fs-item-table-list-module-item-table-grid-container > .os-scrollbar,
+.fs-item-list-pagination-module-container .fs-item-grid-list-module-item-grid-container > .os-scrollbar,
+.fs-item-list-pagination-module-container .fs-item-detail-list-module-container > .os-scrollbar,
+.fs-album-artist-detail-content-module-content-container .os-scrollbar,
 .m_60c222c7.m_1f958f16.mantine-Modal-inner > .m_fd1ab0aa > .fs-scroll-area-module-scroll-area > .os-scrollbar {
     margin-bottom: 0;
+}
+
+/* Paginated container and folders */
+.fs-item-list-pagination-module-container .fs-item-list-pagination-module-pagination-container {
+    padding-bottom: calc(90px + var(--theme-spacing-md)) !important;
+}
+
+.fs-main-content-module-main-content-body-scroll .m_4451eb3a {
+    padding-bottom: calc(90px + var(--mantine-spacing-md)) !important;
 }
 
 .mantine-Tabs-root {
