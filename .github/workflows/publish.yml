@@ -8,7 +8,7 @@ jobs:
 
         strategy:
             matrix:
-                os: [windows-latest, macos-latest, ubuntu-latest]
+                os: [windows-latest, macos-26, ubuntu-latest]
 
         steps:
             - name: Checkout git repo
@@ -36,7 +36,7 @@ jobs:
                   on_retry_command: pnpm cache delete
 
             - name: Build and Publish releases (macOS)
-              if: matrix.os == 'macos-latest'
+              if: matrix.os == 'macos-26'
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               uses: nick-invision/retry@v3.0.2
