@@ -2,6 +2,10 @@ import { Loader } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import type { DlnaDevice, GroupMember } from './dlna/types';
+
+import { DeviceList } from '/@/renderer/features/player/components/dlna/device-list';
+import { GroupBuilder } from '/@/renderer/features/player/components/dlna/group-builder';
 import { playerHandoff } from '../audio-player/engine/player-handoff';
 
 import {
@@ -13,27 +17,12 @@ import {
 import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
-import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { AppIcon } from '/@/shared/components/icon/icon';
 import { Popover } from '/@/shared/components/popover/popover';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { PlayerType } from '/@/shared/types/types';
-
-interface DlnaDevice {
-    controlUrl: string;
-    id: string;
-    location: string;
-    name: string;
-    renderingControlUrl: string;
-}
-
-interface GroupMember {
-    device: DlnaDevice;
-    isCoordinator: boolean;
-    volume: number;
-}
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const ipc = isElectron() ? window.api.ipc : null;
@@ -43,201 +32,6 @@ type Screen = 'connected' | 'connecting' | 'expand-group' | 'group' | 'group-bui
 function isSonosDevice(device: DlnaDevice): boolean {
     return device.id.toUpperCase().includes('RINCON');
 }
-
-const DeviceList = ({
-    devices,
-    disabledIds = [],
-    isLoading,
-    onSelect,
-}: {
-    devices: DlnaDevice[];
-    disabledIds?: string[];
-    isLoading: boolean;
-    onSelect: (device: DlnaDevice) => void;
-}) => {
-    if (isLoading) {
-        return (
-            <Group p="sm">
-                <Loader color="gray" size={12} type="bars" />
-                <Text c="dimmed">Searching for devices…</Text>
-            </Group>
-        );
-    }
-
-    if (devices.length === 0) {
-        return (
-            <Group p="sm">
-                <AppIcon.circleSlash size={12} />
-                <Text c="dimmed">No DLNA devices found</Text>
-            </Group>
-        );
-    }
-
-    return (
-        <>
-            {devices.map((device) => {
-                const disabled = disabledIds.includes(device.id);
-                return (
-                    <div
-                        key={device.id}
-                        onClick={() => !disabled && onSelect(device)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !disabled) onSelect(device);
-                        }}
-                        role="button"
-                        style={{
-                            borderRadius: '4px',
-                            color: disabled ? '#555' : '#e0e0e0',
-                            cursor: disabled ? 'default' : 'pointer',
-                            fontSize: '0.8rem',
-                            padding: '6px 12px',
-                        }}
-                        tabIndex={disabled ? -1 : 0}
-                    >
-                        {device.name}
-                        {disabled && (
-                            <Text c="primary" display="inline" ml={6} size="xs">
-                                connected
-                            </Text>
-                        )}
-                    </div>
-                );
-            })}
-        </>
-    );
-};
-
-const GroupBuilder = ({
-    devices,
-    isLoading,
-    lockedCoordinator,
-    onCancel,
-    onConfirm,
-    onRefresh,
-}: {
-    devices: DlnaDevice[];
-    isLoading: boolean;
-    lockedCoordinator?: DlnaDevice;
-    onCancel: () => void;
-    onConfirm: (selected: DlnaDevice[], coordinator: DlnaDevice) => void;
-    onRefresh: () => void;
-}) => {
-    const [checked, setChecked] = useState<DlnaDevice[]>(
-        lockedCoordinator ? [lockedCoordinator] : [],
-    );
-
-    const toggle = (device: DlnaDevice) => {
-        if (lockedCoordinator && device.id === lockedCoordinator.id) return;
-        setChecked((prev) =>
-            prev.some((d) => d.id === device.id)
-                ? prev.filter((d) => d.id !== device.id)
-                : [...prev, device],
-        );
-    };
-
-    const coordinator = lockedCoordinator ?? checked[0];
-    const canConfirm = checked.length >= 2;
-
-    return (
-        <>
-            <Text pb="xs" style={{ color: '#e0e0e0' }}>
-                {lockedCoordinator ? 'Add Speakers' : 'Select Group Speakers'}
-            </Text>
-            <Divider mb="xs" />
-
-            {isLoading && (
-                <Group p="sm">
-                    <Loader color="gray" size={12} type="bars" />
-                    <Text c="dimmed">Searching…</Text>
-                </Group>
-            )}
-            {!isLoading && devices.length === 0 && (
-                <Group p="sm">
-                    <AppIcon.circleSlash size={12} />
-                    <Text c="dimmed">No Sonos devices found</Text>
-                </Group>
-            )}
-
-            {devices.map((device) => {
-                const isLocked = lockedCoordinator?.id === device.id;
-                const isChecked = checked.some((d) => d.id === device.id);
-                const isCoord = device.id === coordinator?.id;
-                return (
-                    <div
-                        key={device.id}
-                        onClick={() => toggle(device)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') toggle(device);
-                        }}
-                        role="button"
-                        style={{
-                            alignItems: 'center',
-                            background: isChecked ? 'rgba(108,159,255,0.15)' : 'transparent',
-                            borderRadius: '4px',
-                            cursor: isLocked ? 'default' : 'pointer',
-                            display: 'flex',
-                            fontSize: '0.8rem',
-                            gap: 8,
-                            padding: '6px 12px',
-                        }}
-                        tabIndex={isLocked ? -1 : 0}
-                    >
-                        <span
-                            style={{
-                                background: isChecked ? '#6c9fff' : 'transparent',
-                                border: `2px solid ${isChecked ? '#6c9fff' : '#555'}`,
-                                borderRadius: 3,
-                                display: 'inline-block',
-                                flexShrink: 0,
-                                height: 12,
-                                width: 12,
-                            }}
-                        />
-                        <Text c={isLocked ? 'dimmed' : undefined} size="sm">
-                            {device.name}
-                        </Text>
-                        {isCoord && (
-                            <Text c="primary" size="xs">
-                                coordinator
-                            </Text>
-                        )}
-                    </div>
-                );
-            })}
-
-            {!lockedCoordinator && (
-                <Text c="dimmed" px="sm" size="xs">
-                    First selected = coordinator
-                </Text>
-            )}
-
-            <Group gap="xs" mt="sm">
-                <Button
-                    disabled={isLoading}
-                    flex={1}
-                    leftSection={<AppIcon.refresh size={12} />}
-                    onClick={onRefresh}
-                    size="xs"
-                    variant="outline"
-                >
-                    Refresh
-                </Button>
-                <Button color="gray" flex={1} onClick={onCancel} size="xs" variant="outline">
-                    Cancel
-                </Button>
-                <Button
-                    disabled={!canConfirm}
-                    flex={1}
-                    onClick={() => coordinator && onConfirm(checked, coordinator)}
-                    size="xs"
-                    variant="filled"
-                >
-                    {lockedCoordinator ? 'Add' : 'Connect'}
-                </Button>
-            </Group>
-        </>
-    );
-};
 
 export const DlnaCastButton = () => {
     const { setSettings } = useSettingsStoreActions();
@@ -474,9 +268,9 @@ export const DlnaCastButton = () => {
                         if (opening) {
                             if (!isConnected) {
                                 setScreen('idle');
-                                handleDiscover();
+                                void handleDiscover();
                             } else {
-                                refreshGroupState();
+                                void refreshGroupState();
                             }
                         }
                     }}
@@ -524,10 +318,9 @@ export const DlnaCastButton = () => {
                     )}
                     {screen === 'idle' && (
                         <>
-                            <Text pb="sm" style={{ color: '#e0e0e0' }}>
+                            <Text fw="600" pb="md" size="sm" ta="center">
                                 DLNA Devices
                             </Text>
-                            <Divider mb="sm" />
 
                             <DeviceList
                                 devices={devices}
@@ -542,9 +335,9 @@ export const DlnaCastButton = () => {
                                         }
                                         fullWidth={!hasSonosDevices || devices.length < 2}
                                         leftSection={<AppIcon.refresh size={12} />}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDiscover();
+                                        onClick={(event) => {
+                                            event.stopPropagation();
+                                            void handleDiscover();
                                         }}
                                         size="xs"
                                         variant="outline"
@@ -554,6 +347,7 @@ export const DlnaCastButton = () => {
                                     {hasSonosDevices && devices.length >= 2 && (
                                         <Button
                                             flex={1}
+                                            leftSection={<AppIcon.group size={12} />}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setScreen('group-build');
@@ -570,10 +364,10 @@ export const DlnaCastButton = () => {
                     )}
                     {screen === 'connected' && (
                         <>
-                            <Text pb="sm" style={{ color: '#e0e0e0' }}>
+                            <Text fw="600" pb="md" size="sm" ta="center">
                                 Now casting
                             </Text>
-                            <Divider mb="sm" />
+
                             <Text c="dimmed" size="sm">
                                 {connectedDeviceName}
                             </Text>
@@ -582,10 +376,11 @@ export const DlnaCastButton = () => {
                                     isSonosDevice(coordinatorRef.current) && (
                                         <Button
                                             flex={1}
+                                            leftSection={<AppIcon.group size={12} />}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setScreen('expand-group');
-                                                handleDiscover();
+                                                void handleDiscover();
                                             }}
                                             size="xs"
                                             variant="outline"
@@ -614,25 +409,31 @@ export const DlnaCastButton = () => {
                     )}
                     {screen === 'group' && (
                         <>
-                            <Text pb="sm" style={{ color: '#e0e0e0' }}>
+                            <Text fw="600" pb="md" size="sm" ta="center">
                                 Group ({groupMemberList.length} speakers)
                             </Text>
-                            <Divider mb="sm" />
 
-                            {groupMemberList.map((m) => (
-                                <Group justify="space-between" key={m.device.id} px="sm" py={4}>
-                                    <Text c={m.isCoordinator ? 'primary' : undefined} size="sm">
-                                        {m.device.name}
-                                        {m.isCoordinator && (
-                                            <Text c="primary" display="inline" ml={4} size="xs">
-                                                ★
-                                            </Text>
-                                        )}
-                                    </Text>
-                                    {!m.isCoordinator && (
+                            {groupMemberList.map((member) => (
+                                <Group
+                                    justify="space-between"
+                                    key={member.device.id}
+                                    px="sm"
+                                    py={4}
+                                >
+                                    <Group>
+                                        <Text
+                                            c={member.isCoordinator ? 'primary' : undefined}
+                                            size="sm"
+                                        >
+                                            {member.device.name}
+                                        </Text>
+                                        {member.isCoordinator && <AppIcon.star size={12} />}
+                                    </Group>
+
+                                    {!member.isCoordinator && (
                                         <Button
                                             color="red"
-                                            onClick={() => handleRemoveMember(m.device.id)}
+                                            onClick={() => handleRemoveMember(member.device.id)}
                                             size="compact-xs"
                                             style={{
                                                 color: 'var(--mantine-color-red-4, #ff6b6b)',
@@ -651,7 +452,7 @@ export const DlnaCastButton = () => {
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setScreen('expand-group');
-                                        handleDiscover();
+                                        void handleDiscover();
                                     }}
                                     size="xs"
                                     variant="outline"
