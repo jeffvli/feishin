@@ -4,10 +4,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { DlnaDevice, GroupMember } from './dlna/types';
 
-import { DeviceList } from '/@/renderer/features/player/components/dlna/device-list';
-import { GroupBuilder } from '/@/renderer/features/player/components/dlna/group-builder';
 import { playerHandoff } from '../audio-player/engine/player-handoff';
 
+import { DeviceList } from '/@/renderer/features/player/components/dlna/device-list';
+import { GroupBuilder } from '/@/renderer/features/player/components/dlna/group-builder';
 import {
     usePlaybackSettings,
     usePlayerActions,
