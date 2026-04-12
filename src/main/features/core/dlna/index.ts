@@ -1,6 +1,17 @@
+import { ChildProcess, spawn } from 'child_process';
+import { createHash } from 'crypto';
 import { ipcMain } from 'electron';
+import {
+    createReadStream,
+    existsSync,
+    promises as fsPromises,
+    readdirSync,
+    statSync,
+    unlinkSync,
+} from 'fs';
 import http from 'http';
 import os from 'os';
+import path from 'path';
 
 import { getMainWindow } from '../../../index';
 import { createLog } from '../../../utils';
@@ -47,6 +58,7 @@ let lastKnownTransportState = '';
 let lastKnownDeviceVolume = -1;
 let lastCommandedUri = '';
 let lastQueuedNextUri = '';
+let lastFinishedUri = '';
 let lastAppSeekAt = 0;
 let pendingPrevTrack = false;
 let isRadioMode = false;
@@ -59,6 +71,26 @@ let eventServerPort = 0;
 let subscriptionSid: null | string = null;
 let subscriptionRenewalTimeout: NodeJS.Timeout | null = null;
 let topologyPollingInterval: NodeJS.Timeout | null = null;
+let speedProxyProcess: ChildProcess | null = null;
+let isPausedIntentionally = false;
+let currentFfmpegProcess: ChildProcess | null = null;
+let currentTranscodeFile = '';
+
+cleanupTempFiles();
+
+function cleanupTempFiles() {
+    try {
+        const tmpDir = os.tmpdir();
+        const files = readdirSync(tmpDir);
+        for (const file of files) {
+            if (file.startsWith('dlna-speed-') && file.endsWith('.mp3')) {
+                unlinkSync(path.join(tmpDir, file));
+            }
+        }
+    } catch (err) {
+        dlnaLog('Failed to cleanup temp files', err);
+    }
+}
 
 function getLanIp(): null | string {
     const interfaces = os.networkInterfaces();
@@ -70,6 +102,29 @@ function getLanIp(): null | string {
     return null;
 }
 
+function getLanIpForDevice(deviceIp: string): null | string {
+    try {
+        const devOctets = deviceIp.split('.');
+        const interfaces = os.networkInterfaces();
+        for (const name of Object.keys(interfaces)) {
+            for (const iface of interfaces[name] || []) {
+                if (iface.family !== 'IPv4' || iface.internal) continue;
+                const ifOctets = iface.address.split('.');
+                if (
+                    ifOctets[0] === devOctets[0] &&
+                    ifOctets[1] === devOctets[1] &&
+                    ifOctets[2] === devOctets[2]
+                ) {
+                    return iface.address;
+                }
+            }
+        }
+    } catch {
+        // LAN IP may be malformed, etc
+    }
+    return getLanIp();
+}
+
 function rewriteUrlForLan(url: string): string {
     const lanIp = getLanIp();
     if (!lanIp) return url;
@@ -78,6 +133,29 @@ function rewriteUrlForLan(url: string): string {
         .replace(/http:\/\/127\.0\.0\.1(:\d+)/, `http://${lanIp}$1`)
         .replace(/http:\/\/\[::1\](:\d+)/, `http://${lanIp}$1`)
         .replace(/http:\/\/\[::\](:\d+)/, `http://${lanIp}$1`);
+}
+
+function stopCurrentTranscode() {
+    if (currentFfmpegProcess) {
+        dlnaLog('Stopping active transcode process');
+        try {
+            currentFfmpegProcess.kill('SIGKILL');
+        } catch (err) {
+            dlnaLog('Failed to kill ffmpeg', err);
+        }
+        currentFfmpegProcess = null;
+    }
+    if (currentTranscodeFile) {
+        try {
+            if (existsSync(currentTranscodeFile)) {
+                unlinkSync(currentTranscodeFile);
+                dlnaLog('Deleted transcode temp file');
+            }
+        } catch {
+            // File errors
+        }
+        currentTranscodeFile = '';
+    }
 }
 
 const dlnaLog = (action: string, err?: unknown) => {
@@ -98,6 +176,60 @@ export interface SpeakerProperties {
 async function ensureEventServer(): Promise<void> {
     if (eventServer) return;
     eventServer = http.createServer((req, res) => {
+        const isFileServe = req.url?.startsWith('/serve-temp');
+        if (
+            isFileServe &&
+            (req.method === 'GET' || req.method === 'HEAD') &&
+            req.url != undefined
+        ) {
+            try {
+                const qs = new URLSearchParams(req.url.split('?')[1] ?? '');
+                const filePath = qs.get('path');
+                if (!filePath || !filePath.startsWith(os.tmpdir())) {
+                    res.writeHead(403);
+                    return res.end();
+                }
+                const stat = statSync(filePath);
+                const fileSize = stat.size;
+                const range = req.headers.range;
+                if (req.method === 'HEAD') {
+                    res.writeHead(200, {
+                        'Accept-Ranges': 'bytes',
+                        'Content-Length': fileSize,
+                        'Content-Type': 'audio/mpeg',
+                    });
+                    return res.end();
+                }
+                if (range) {
+                    const parts = range.replace(/bytes=/, '').split('-');
+                    const start = parseInt(parts[0], 10);
+                    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+                    const chunksize = end - start + 1;
+                    const file = createReadStream(filePath, { end, start });
+                    res.writeHead(206, {
+                        'Accept-Ranges': 'bytes',
+                        'Content-Length': chunksize,
+                        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+                        'Content-Type': 'audio/mpeg',
+                    });
+                    file.pipe(res);
+                } else {
+                    res.writeHead(200, {
+                        'Accept-Ranges': 'bytes',
+                        'Content-Length': fileSize,
+                        'Content-Type': 'audio/mpeg',
+                    });
+                    createReadStream(filePath).pipe(res);
+                }
+            } catch (err) {
+                dlnaLog('Static file serve error', err);
+                if (!res.writableEnded) {
+                    res.writeHead(404);
+                    res.end();
+                }
+            }
+            return;
+        }
         if (req.method !== 'NOTIFY') {
             res.writeHead(405);
             res.end();
@@ -111,6 +243,7 @@ async function ensureEventServer(): Promise<void> {
             if (req.url === '/topology') handleTopologyNotify(body);
             else handleEventNotify(body);
         });
+        return;
     });
     await new Promise<void>((resolve) => {
         eventServer!.listen(0, '0.0.0.0', () => {
@@ -138,6 +271,11 @@ function fetchXml(url: string): Promise<string> {
 }
 
 async function fullDisconnect(): Promise<void> {
+    stopPositionPolling();
+    hasStartedPlaying = false;
+    lastCommandedUri = '';
+    lastQueuedNextUri = '';
+    isRadioMode = false;
     if (groupMembers.length > 1 && connectedDevice) {
         const members = groupMembers.filter((m) => m.id !== connectedDevice!.id);
         await Promise.allSettled(
@@ -169,8 +307,6 @@ async function fullDisconnect(): Promise<void> {
     currentCoordinatorId = '';
     groupMembers = [];
     groupMemberVolumes = {};
-    isRadioMode = false;
-    stopPositionPolling();
     if (topologyPollingInterval) {
         clearInterval(topologyPollingInterval);
         topologyPollingInterval = null;
@@ -181,6 +317,27 @@ async function fullDisconnect(): Promise<void> {
         eventServer = null;
         eventServerPort = 0;
     }
+    cleanupTempFiles();
+}
+
+function getActiveProxyState(uri: string) {
+    if (!uri) return null;
+    if (uri.includes('/audio-proxy')) {
+        try {
+            const urlObj = new URL(uri);
+            return {
+                offset: parseFloat(urlObj.searchParams.get('offset') || '0'),
+                speed: parseFloat(urlObj.searchParams.get('speed') || '1'),
+            };
+        } catch {
+            return null;
+        }
+    }
+    const match = uri.match(/dlna-speed-[^-]+-s([0-9.]+)-p[01]\.mp3/);
+    if (match) {
+        return { offset: 0, speed: parseFloat(match[1]) };
+    }
+    return null;
 }
 
 function getAttr(attrString: string, name: string): string {
@@ -211,14 +368,18 @@ function handleEventNotify(body: string): void {
         .replace(/&apos;/g, "'")
         .replace(/&quot;/g, '"');
     if (!newUri || newUri === lastCommandedUri) {
-        if (lastQueuedNextUri && newUri === lastQueuedNextUri) {
-            dlnaLog('Gapless same-URI loop detected (event)');
+        if (
+            lastQueuedNextUri &&
+            newUri === lastQueuedNextUri &&
+            lastQueuedNextUri !== lastCommandedUri
+        ) {
+            dlnaLog('Gapless transition detected (event)');
             lastCommandedUri = newUri;
             lastQueuedNextUri = '';
             hasStartedPlaying = true;
             trackLoadedAt = Date.now();
             lastKnownPosition = 0;
-            getMainWindow()?.webContents.send('renderer-dlna-track-ended');
+            getMainWindow()?.webContents.send('renderer-dlna-track-ended', { gapless: true });
         }
         return;
     }
@@ -230,7 +391,7 @@ function handleEventNotify(body: string): void {
         hasStartedPlaying = true;
         trackLoadedAt = Date.now();
         lastKnownPosition = 0;
-        getMainWindow()?.webContents.send('renderer-dlna-track-ended');
+        getMainWindow()?.webContents.send('renderer-dlna-track-ended', { gapless: true });
     } else {
         dlnaLog('Event: device went to previous track');
         lastCommandedUri = newUri;
@@ -499,7 +660,12 @@ function startPositionPolling() {
                 getPositionInfo(connectedDevice),
                 getTransportInfo(connectedDevice),
             ]);
-            getMainWindow()?.webContents.send('renderer-dlna-current-time', posInfo.position);
+            let realPosition = posInfo.position;
+            const proxyState = getActiveProxyState(lastCommandedUri);
+            if (proxyState) {
+                realPosition = posInfo.position * proxyState.speed;
+            }
+            getMainWindow()?.webContents.send('renderer-dlna-current-time', realPosition);
             // Track that playback has started
             if (transportState === 'PLAYING' || transportState === 'TRANSITIONING')
                 hasStartedPlaying = true;
@@ -511,6 +677,9 @@ function startPositionPolling() {
             const recentAppSeek = Date.now() - lastAppSeekAt < 3000;
             // Detect gapless transition: position jumped backward significantly
             if (!isRadioMode) {
+                const isSameUriLoop =
+                    lastQueuedNextUri === lastCommandedUri && lastQueuedNextUri !== '';
+
                 if (
                     hasStartedPlaying &&
                     uriReportedByDevice &&
@@ -518,14 +687,31 @@ function startPositionPolling() {
                     lastQueuedNextUri &&
                     posInfo.trackUri === lastQueuedNextUri
                 ) {
-                    dlnaLog(
-                        `Polling: advanced to next track (${lastCommandedUri} → ${posInfo.trackUri})`,
-                    );
+                    dlnaLog(`Polling: advanced to next track`);
                     lastCommandedUri = posInfo.trackUri;
                     lastQueuedNextUri = '';
                     trackLoadedAt = Date.now();
                     lastKnownPosition = 0;
-                    getMainWindow()?.webContents.send('renderer-dlna-track-ended');
+                    getMainWindow()?.webContents.send('renderer-dlna-track-ended', {
+                        gapless: true,
+                    });
+                } else if (
+                    hasStartedPlaying &&
+                    isSameUriLoop &&
+                    uriReportedByDevice &&
+                    posInfo.trackUri === lastCommandedUri &&
+                    previousPosition > 1 &&
+                    posInfo.position < 2 &&
+                    posInfo.position < previousPosition - 2 &&
+                    !recentAppSeek
+                ) {
+                    dlnaLog(`Polling: looped same track (gapless 1-loop)`);
+                    trackLoadedAt = Date.now();
+                    lastKnownPosition = 0;
+                    pendingPrevTrack = false;
+                    getMainWindow()?.webContents.send('renderer-dlna-track-ended', {
+                        gapless: true,
+                    });
                 }
 
                 if (pendingPrevTrack) {
@@ -553,11 +739,55 @@ function startPositionPolling() {
                     );
                     pendingPrevTrack = true;
                 }
-                if (hasStartedPlaying && transportState === 'STOPPED') {
-                    pendingPrevTrack = false;
-                    dlnaLog('Track ended (stopped), advancing queue');
-                    hasStartedPlaying = false;
-                    getMainWindow()?.webContents.send('renderer-dlna-track-ended');
+                const isGracePeriod = Date.now() - trackLoadedAt < 4000;
+                let justFiredTrackEnded = false;
+                if (
+                    hasStartedPlaying &&
+                    transportState === 'STOPPED' &&
+                    !isPausedIntentionally &&
+                    !isGracePeriod
+                ) {
+                    const isResumeFailure =
+                        previousPosition < 15 ||
+                        (Date.now() - trackLoadedAt < 12000 && previousPosition < 30);
+
+                    if (isResumeFailure) {
+                        dlnaLog('Stream dropped unexpectedly (resume failure). Kicking device...');
+                        trackLoadedAt = Date.now();
+                        play(connectedDevice).catch(() => {});
+                    } else {
+                        pendingPrevTrack = false;
+                        dlnaLog('Track ended (stopped), advancing queue');
+                        hasStartedPlaying = false;
+                        lastKnownPosition = 0;
+                        justFiredTrackEnded = true;
+                        lastFinishedUri = lastCommandedUri;
+                        lastCommandedUri = '';
+                        getMainWindow()?.webContents.send('renderer-dlna-track-ended', {
+                            gapless: false,
+                        });
+                    }
+                }
+                if (
+                    !hasStartedPlaying &&
+                    !justFiredTrackEnded &&
+                    transportState === 'STOPPED' &&
+                    !isPausedIntentionally &&
+                    !isGracePeriod &&
+                    lastCommandedUri
+                ) {
+                    const isStuck =
+                        !hasStartedPlaying &&
+                        trackLoadedAt > 0 &&
+                        Date.now() - trackLoadedAt > 5000;
+
+                    if (isStuck && lastCommandedUri && lastCommandedUri !== lastFinishedUri) {
+                        if (lastKnownTransportState !== 'TRANSITIONING') {
+                            dlnaLog('Stream startup slow/stuck in STOPPED. Kicking device...');
+                            play(connectedDevice).catch(() => {});
+                            trackLoadedAt = Date.now();
+                        }
+                    }
                 }
             } else if (hasStartedPlaying && transportState === 'STOPPED') {
                 hasStartedPlaying = false;
@@ -606,7 +836,7 @@ function startPositionPolling() {
         } catch {
             // Polling errors are expected during track transitions
         }
-    }, 350);
+    }, 500);
     // IMPORTANT: This used to be 1000, but I believe that was not tested explicitly and arbitrary, and we get
     // benefit from somewhat smaller polling intervals, so I changed it with tests. This might prove too small
     // for some network configurations, so if need be, I'll make this a setting later.
@@ -699,6 +929,17 @@ function stopPositionPolling() {
     if (positionPollingInterval) {
         clearInterval(positionPollingInterval);
         positionPollingInterval = null;
+    }
+}
+
+function stopSpeedProxy(): void {
+    if (speedProxyProcess) {
+        try {
+            speedProxyProcess.kill('SIGKILL');
+        } catch {
+            // Catch
+        }
+        speedProxyProcess = null;
     }
 }
 
@@ -923,29 +1164,95 @@ ipcMain.on('dlna-set-radio-mode', (_event, enabled: boolean) => {
 });
 
 // Play a track on the connected device
-ipcMain.on('dlna-play-url', async (_event, data: { metadata: TrackMetadata; url: string }) => {
-    if (!connectedDevice) return;
-    const device = connectedDevice;
-    try {
-        hasStartedPlaying = false;
-        lastKnownPosition = 0;
-        lastAppSeekAt = 0;
-        trackLoadedAt = Date.now();
-        const lanUrl = rewriteUrlForLan(data.url);
-        lastCommandedUri = lanUrl;
-        lastQueuedNextUri = '';
-        const lanArtUrl = data.metadata.albumArtUrl
-            ? rewriteUrlForLan(data.metadata.albumArtUrl)
-            : undefined;
-        const metadata = { ...data.metadata, albumArtUrl: lanArtUrl };
-        await setAVTransportURI(device, lanUrl, metadata);
-        await waitForTransportState(device, ['STOPPED', 'PAUSED_PLAYBACK'], 1500);
-        await play(device);
-        dlnaLog(`Playing: ${data.metadata.title}`);
-    } catch (err) {
-        dlnaLog(`Failed to play ${data.metadata.title}`, err);
-    }
-});
+ipcMain.on(
+    'dlna-play-url',
+    async (
+        _event,
+        data: { isMuted?: boolean; metadata: TrackMetadata; seekTo?: number; url: string },
+    ) => {
+        if (!connectedDevice) return;
+        const device = connectedDevice;
+        try {
+            hasStartedPlaying = false;
+            lastKnownPosition = 0;
+            isPausedIntentionally = data.metadata.autoPlay === false;
+            lastAppSeekAt = Date.now();
+            trackLoadedAt = Date.now();
+            const lanUrl = rewriteUrlForLan(data.url);
+            lastCommandedUri = lanUrl;
+            lastQueuedNextUri = '';
+            const lanArtUrl = data.metadata.albumArtUrl
+                ? rewriteUrlForLan(data.metadata.albumArtUrl)
+                : undefined;
+            const metadata = { ...data.metadata, albumArtUrl: lanArtUrl };
+            const shouldMuteTrick = data.seekTo !== undefined && data.seekTo > 0;
+            if (shouldMuteTrick) {
+                try {
+                    await setMute(device, true);
+                } catch {
+                    // Pass
+                }
+            }
+            await setAVTransportURI(device, lanUrl, metadata);
+            await new Promise((r) => setTimeout(r, 1000));
+            if (data.metadata.autoPlay !== false) {
+                await play(device).catch((err) => dlnaLog('Initial play failed', err));
+                dlnaLog(`Playing: ${data.metadata.title}`);
+                if (shouldMuteTrick) {
+                    await waitForTransportState(device, ['PLAYING'], 4000);
+                    await new Promise((r) => setTimeout(r, 1200));
+                    let targetSeek = data.seekTo!;
+                    const proxyState = getActiveProxyState(lanUrl);
+                    if (proxyState) {
+                        targetSeek = targetSeek / proxyState.speed;
+                    }
+                    for (let i = 0; i < 3; i++) {
+                        try {
+                            await seek(device, targetSeek);
+                            break;
+                        } catch (err: any) {
+                            if (err?.message?.includes('701') || err?.message?.includes('500')) {
+                                dlnaLog(`Seek failed (701), retrying... (${i + 1}/3)`);
+                                await new Promise((r) => setTimeout(r, 1000));
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                    await setMute(device, !!data.isMuted).catch(() => {});
+                }
+            } else {
+                dlnaLog(`Queued (Paused): ${data.metadata.title}`);
+                if (shouldMuteTrick) {
+                    await play(device).catch(() => {});
+                    await waitForTransportState(device, ['PLAYING'], 4000);
+                    await new Promise((r) => setTimeout(r, 1200));
+                    let targetSeek = data.seekTo!;
+                    const proxyState = getActiveProxyState(lanUrl);
+                    if (proxyState) targetSeek = targetSeek / proxyState.speed;
+                    for (let i = 0; i < 3; i++) {
+                        try {
+                            await seek(device, targetSeek);
+                            break;
+                        } catch (err: any) {
+                            if (err?.message?.includes('701') || err?.message?.includes('500')) {
+                                dlnaLog(`Seek failed (701), retrying... (${i + 1}/3)`);
+                                await new Promise((r) => setTimeout(r, 1000));
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                    await pause(device).catch(() => {});
+                    await setMute(device, !!data.isMuted).catch(() => {});
+                }
+            }
+        } catch (err) {
+            dlnaLog(`Failed to play ${data.metadata.title}`, err);
+            if (data.seekTo !== undefined) await setMute(device, !!data.isMuted).catch(() => {});
+        }
+    },
+);
 
 // Set the next track for gapless playback
 ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; url: string }) => {
@@ -953,7 +1260,11 @@ ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; 
     try {
         if (!data.url) {
             lastQueuedNextUri = '';
-            await setNextAVTransportURI(connectedDevice, '', {} as TrackMetadata);
+            try {
+                await setNextAVTransportURI(connectedDevice, '', {} as TrackMetadata);
+            } catch {
+                // Pass
+            }
             dlnaLog('Cleared next track');
             return;
         }
@@ -976,6 +1287,8 @@ ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; 
 ipcMain.on('dlna-play', async () => {
     if (!connectedDevice) return;
     try {
+        isPausedIntentionally = false;
+        trackLoadedAt = Date.now();
         await play(connectedDevice);
     } catch (err) {
         dlnaLog('Failed to resume playback', err);
@@ -986,9 +1299,15 @@ ipcMain.on('dlna-play', async () => {
 ipcMain.on('dlna-pause', async () => {
     if (!connectedDevice) return;
     try {
+        isPausedIntentionally = true;
         await pause(connectedDevice);
-    } catch (err) {
+    } catch (err: any) {
         dlnaLog('Failed to pause', err);
+        if (err?.message?.includes('701') || err?.message?.includes('500')) {
+            setTimeout(() => {
+                if (isPausedIntentionally) pause(connectedDevice!).catch(() => {});
+            }, 1500);
+        }
     }
 });
 
@@ -996,6 +1315,9 @@ ipcMain.on('dlna-pause', async () => {
 ipcMain.on('dlna-stop', async () => {
     if (!connectedDevice) return;
     try {
+        isPausedIntentionally = true;
+        lastCommandedUri = '';
+        lastQueuedNextUri = '';
         await stop(connectedDevice);
     } catch (err) {
         dlnaLog('Failed to stop', err);
@@ -1007,7 +1329,12 @@ ipcMain.on('dlna-seek', async (_event, seconds: number) => {
     if (!connectedDevice) return;
     try {
         lastAppSeekAt = Date.now();
-        await seek(connectedDevice, seconds);
+        let targetSeconds = seconds;
+        const proxyState = getActiveProxyState(lastCommandedUri);
+        if (proxyState) {
+            targetSeconds = seconds / proxyState.speed;
+        }
+        await seek(connectedDevice, targetSeconds);
     } catch (err) {
         dlnaLog(`Failed to seek to ${seconds}`, err);
     }
@@ -1040,7 +1367,8 @@ ipcMain.handle('dlna-get-position', async () => {
     if (!connectedDevice) return 0;
     try {
         const info = await getPositionInfo(connectedDevice);
-        return info.position;
+        const proxyState = getActiveProxyState(lastCommandedUri);
+        return proxyState ? info.position * proxyState.speed : info.position;
     } catch {
         return lastKnownPosition;
     }
@@ -1101,3 +1429,121 @@ ipcMain.on(
         }
     },
 );
+
+ipcMain.handle(
+    'dlna-prepare-speed-file',
+    async (
+        _event,
+        data: { offset: number; preservePitch: boolean; speed: number; url: string },
+    ) => {
+        stopCurrentTranscode();
+        let lanIp: null | string = null;
+        if (connectedDevice) {
+            try {
+                const deviceIp = new URL(connectedDevice.controlUrl).hostname;
+                lanIp = getLanIpForDevice(deviceIp);
+            } catch {
+                // Catch
+            }
+        }
+        if (!lanIp) lanIp = getLanIp();
+        if (!lanIp) return null;
+        await ensureEventServer();
+        const safeUrlId = createHash('md5').update(data.url).digest('hex').substring(0, 16);
+        const pp = data.preservePitch ? '1' : '0';
+        const fileName = `dlna-speed-${safeUrlId}-s${data.speed}-p${pp}.mp3`;
+        const filePath = path.join(os.tmpdir(), fileName);
+        currentTranscodeFile = filePath;
+        return new Promise<null | string>((resolve) => {
+            try {
+                let audioFilter = '';
+                if (data.speed !== 1) {
+                    if (!data.preservePitch) {
+                        const targetRate = Math.round(44100 * data.speed);
+                        audioFilter = `aresample=44100,asetrate=${targetRate},aresample=44100`;
+                    } else {
+                        const parts: string[] = [];
+                        let remaining = data.speed;
+                        while (remaining > 2) {
+                            parts.push('atempo=2.0');
+                            remaining /= 2;
+                        }
+                        while (remaining < 0.5) {
+                            parts.push('atempo=0.5');
+                            remaining /= 0.5;
+                        }
+                        parts.push(`atempo=${remaining.toFixed(6)}`);
+                        audioFilter = parts.join(',');
+                    }
+                }
+                dlnaLog(`Transcode started for speed: ${data.speed}`);
+                const ffmpeg = spawn('ffmpeg', [
+                    '-loglevel',
+                    'error',
+                    '-i',
+                    data.url,
+                    '-vn',
+                    '-af',
+                    audioFilter || 'anull',
+                    '-f',
+                    'mp3',
+                    currentTranscodeFile,
+                ]);
+                currentFfmpegProcess = ffmpeg;
+                ffmpeg.on('error', (err) => {
+                    dlnaLog('FFmpeg spawn error', err);
+                    currentFfmpegProcess = null;
+                    resolve(null);
+                });
+                ffmpeg.on('close', (code) => {
+                    currentFfmpegProcess = null;
+                    if (code === 0) {
+                        dlnaLog('Transcode finished successfully');
+                        resolve(
+                            `http://${lanIp}:${eventServerPort}/serve-temp?path=${encodeURIComponent(currentTranscodeFile)}`,
+                        );
+                    } else {
+                        dlnaLog(`FFmpeg exited with code ${code}`);
+                        resolve(null);
+                    }
+                });
+            } catch (err) {
+                dlnaLog('Transcode setup failed', err);
+                resolve(null);
+            }
+        });
+    },
+);
+
+ipcMain.handle(
+    'dlna-check-speed-file',
+    async (_event, data: { preservePitch: boolean; speed: number; url: string }) => {
+        let lanIp = getLanIp();
+        if (connectedDevice) {
+            try {
+                lanIp = getLanIpForDevice(new URL(connectedDevice.controlUrl).hostname) || lanIp;
+            } catch {
+                // Catch
+            }
+        }
+        const safeUrlId = createHash('md5').update(data.url).digest('hex').substring(0, 16);
+        const pp = data.preservePitch ? '1' : '0';
+        const fileName = `dlna-speed-${safeUrlId}-s${data.speed}-p${pp}.mp3`;
+        const filePath = path.join(os.tmpdir(), fileName);
+        try {
+            await fsPromises.access(filePath);
+            return `http://${lanIp}:${eventServerPort}/serve-temp?path=${encodeURIComponent(filePath)}`;
+        } catch {
+            return null;
+        }
+    },
+);
+
+ipcMain.on('dlna-cancel-speed-file', () => {
+    stopCurrentTranscode();
+});
+
+ipcMain.on('dlna-destroy-speed-proxy', () => {
+    stopSpeedProxy();
+    stopCurrentTranscode();
+});

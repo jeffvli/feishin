@@ -3,11 +3,18 @@ import type { RefObject } from 'react';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 
+import { playerHandoff } from './player-handoff';
+
 import { api } from '/@/renderer/api';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { getSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { AudioPlayer } from '/@/renderer/features/player/audio-player/types';
-import { usePlaybackSettings, usePlayerActions, usePlayerStore } from '/@/renderer/store';
+import {
+    usePlaybackSettings,
+    usePlayerActions,
+    usePlayerStore,
+    useSettingsStore,
+} from '/@/renderer/store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
@@ -58,7 +65,7 @@ function getMimeType(url: string, contentType?: null | string, suffix?: null | s
         const fmt = formatMatch[1].toLowerCase();
         const mime = FORMAT_MIME_MAP[fmt];
         if (mime) return mime;
-        if (mime !== '') return 'audio/mpeg';
+        if (mime === '') return 'audio/mpeg';
     }
     if (contentType?.startsWith('audio/')) return contentType;
     if (suffix) {
@@ -80,7 +87,10 @@ async function resolveMimeType(
     const fromMetadata = getMimeType(url, contentType, suffix);
     if (fromMetadata !== 'audio/mpeg') return fromMetadata;
     try {
-        const res = await fetch(url, { method: 'HEAD' });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1000);
+        const res = await fetch(url, { method: 'HEAD', signal: controller.signal });
+        clearTimeout(timeoutId);
         const ct = res.headers.get('content-type');
         if (ct?.startsWith('audio/')) return ct.split(';')[0].trim();
     } catch {
@@ -97,12 +107,24 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     const skipNextSendRef = useRef(false);
     const lastSentUrlRef = useRef<string>('');
     // Define sendCurrentTrackToDlna BEFORE any effects that reference it
+    const lastSentRawUrlRef = useRef<string>('');
     const lastSentAtRef = useRef<number>(0);
     const recentTrackEndedAtRef = useRef<number>(0);
     const TRACK_ENDED_PREV_SUPPRESSION_MS = 4000;
     const sameUriLoopQueuedRef = useRef(false);
     const wasNearEndRef = useRef(false);
     const currentSongDurationRef = useRef<number>(0);
+    const preservePitchRef = useRef(useSettingsStore.getState().playback?.preservePitch ?? true);
+    const isAutoAdvancingRef = useRef(false);
+    useEffect(() => {
+        const unsubscribe = useSettingsStore.subscribe(
+            (state) => state.playback.preservePitch,
+            (newPreservePitch) => {
+                preservePitchRef.current = newPreservePitch;
+            },
+        );
+        return () => unsubscribe();
+    }, []);
     const sendCurrentTrackToDlna = useCallback(async () => {
         if (!dlnaPlayer) return;
         // Skip if the device already auto-transitioned (gapless)
@@ -110,19 +132,40 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             skipNextSendRef.current = false;
             return;
         }
+        const wasPlayingAtStart = usePlayerStore.getState().player.status === PlayerStatus.PLAYING;
+        const wasAutoAdvancingAtStart = isAutoAdvancingRef.current;
         const playerData = usePlayerStore.getState().getPlayerData();
         const song = playerData.currentSong;
         if (!song) return;
-        const url = await getSongUrl(song, transcode);
-        if (!url) return;
+        const currentSpeed = usePlayerStore.getState().player.speed || 1;
+        const rawUrl = await getSongUrl(song, transcode);
+        if (!rawUrl) return;
+        let urlToPlay = rawUrl;
+        let isProxy = false;
+        if (currentSpeed !== 1) {
+            const proxyUrl = await dlnaPlayer.prepareSpeedFile({
+                offset: 0,
+                preservePitch: preservePitchRef.current,
+                speed: currentSpeed,
+                url: rawUrl,
+            });
+            if (proxyUrl) {
+                urlToPlay = proxyUrl;
+                isProxy = true;
+            }
+        } else {
+            dlnaPlayer.destroySpeedProxy?.();
+        }
         const now = Date.now();
-        if (url === lastSentUrlRef.current && now - lastSentAtRef.current < 500) {
+        if (urlToPlay === lastSentUrlRef.current && now - lastSentAtRef.current < 500) {
             return;
         }
-        lastSentUrlRef.current = url;
+        lastSentUrlRef.current = urlToPlay;
+        lastSentRawUrlRef.current = rawUrl;
         lastSentAtRef.current = now;
         wasNearEndRef.current = false;
-        currentSongDurationRef.current = song.duration ? song.duration / 1000 : 0;
+        const durationSeconds = song.duration ? song.duration / 1000 : 0;
+        currentSongDurationRef.current = isProxy ? durationSeconds / currentSpeed : durationSeconds;
         let albumArtUrl: string | undefined;
         try {
             albumArtUrl =
@@ -138,61 +181,97 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             // Ignore image URL errors
         }
         const { contentType, suffix } = song as unknown as SongWithAudioMeta;
-        const mimeType = await resolveMimeType(url, contentType, suffix);
-        dlnaPlayer.playUrl(url, {
-            albumArtUrl,
-            albumName: song.album || undefined,
-            artistName: song.artistName || song.artists?.[0]?.name || undefined,
-            duration: song.duration ? song.duration / 1000 : undefined,
-            mimeType,
-            title: song.name,
-        });
-        hasPlayedRef.current = true;
-        if (pendingInitialSeek.value >= 0) {
-            const seekTo = pendingInitialSeek.value;
-            pendingInitialSeek.value = -1;
-            setTimeout(() => dlnaPlayer?.seek(seekTo), 1500);
+        const mimeType = isProxy
+            ? 'audio/mpeg'
+            : await resolveMimeType(rawUrl, contentType, suffix);
+        const isCurrentlyPlaying = usePlayerStore.getState().player.status === PlayerStatus.PLAYING;
+        const shouldAutoPlay =
+            isAutoAdvancingRef.current ||
+            wasAutoAdvancingAtStart ||
+            isCurrentlyPlaying ||
+            wasPlayingAtStart;
+        if (!shouldAutoPlay && !hasPlayedRef.current) {
+            return;
         }
-        // Pre-load the next track for gapless playback
-        const nextSong = playerData.nextSong;
-        if (nextSong) {
-            const nextUrl = await getSongUrl(nextSong, transcode);
-            if (nextUrl) {
-                sameUriLoopQueuedRef.current = nextUrl === url;
-                let nextArtUrl: string | undefined;
-                try {
-                    nextArtUrl =
-                        api.controller.getImageUrl({
-                            apiClientProps: { serverId: nextSong._serverId },
-                            query: {
-                                id: nextSong.albumId || nextSong.id,
-                                itemType: LibraryItem.ALBUM,
-                                size: 600,
-                            },
-                        }) || undefined;
-                } catch {
-                    // Ignore image URL errors
+        let targetSeek = 0;
+        if (playerHandoff.pendingDlnaSeek >= 0) {
+            targetSeek = playerHandoff.pendingDlnaSeek;
+            playerHandoff.pendingDlnaSeek = -1;
+        } else if (pendingInitialSeek.value >= 0) {
+            targetSeek = pendingInitialSeek.value;
+            pendingInitialSeek.value = -1;
+        }
+        dlnaPlayer.playUrl(
+            urlToPlay,
+            {
+                albumArtUrl,
+                albumName: song.album || undefined,
+                artistName: song.artistName || song.artists?.[0]?.name || undefined,
+                autoPlay: shouldAutoPlay,
+                duration: currentSongDurationRef.current,
+                mimeType,
+                title: song.name,
+            },
+            { isMuted: props.isMuted, seekTo: targetSeek },
+        );
+        hasPlayedRef.current = true;
+        isAutoAdvancingRef.current = false;
+        setTimeout(async () => {
+            const freshState = usePlayerStore.getState().getPlayerData();
+            // Pre-load the next track for gapless playback
+            const nextSong = freshState.nextSong;
+            if (nextSong && currentSpeed === 1) {
+                const nextUrl = await getSongUrl(nextSong, transcode);
+                if (nextUrl) {
+                    sameUriLoopQueuedRef.current = nextUrl === rawUrl;
+                    let nextArtUrl: string | undefined;
+                    try {
+                        nextArtUrl =
+                            api.controller.getImageUrl({
+                                apiClientProps: { serverId: nextSong._serverId },
+                                query: {
+                                    id: nextSong.albumId || nextSong.id,
+                                    itemType: LibraryItem.ALBUM,
+                                    size: 600,
+                                },
+                            }) || undefined;
+                    } catch {
+                        // Ignore image URL errors
+                    }
+                    const { contentType: nextContentType, suffix: nextSuffix } =
+                        nextSong as unknown as SongWithAudioMeta;
+                    const nextMimeType = await resolveMimeType(
+                        nextUrl,
+                        nextContentType,
+                        nextSuffix,
+                    );
+                    dlnaPlayer.setNextUrl(nextUrl, {
+                        albumArtUrl: nextArtUrl,
+                        albumName: nextSong.album || undefined,
+                        artistName: nextSong.artistName || nextSong.artists?.[0]?.name || undefined,
+                        duration: nextSong.duration ? nextSong.duration / 1000 : undefined,
+                        mimeType: nextMimeType,
+                        title: nextSong.name,
+                    });
+                } else {
+                    sameUriLoopQueuedRef.current = false;
                 }
-                const { contentType: nextContentType, suffix: nextSuffix } =
-                    nextSong as unknown as SongWithAudioMeta;
-                const nextMimeType = await resolveMimeType(nextUrl, nextContentType, nextSuffix);
-                dlnaPlayer.setNextUrl(nextUrl, {
-                    albumArtUrl: nextArtUrl,
-                    albumName: nextSong.album || undefined,
-                    artistName: nextSong.artistName || nextSong.artists?.[0]?.name || undefined,
-                    duration: nextSong.duration ? nextSong.duration / 1000 : undefined,
-                    mimeType: nextMimeType,
-                    title: nextSong.name,
-                });
             } else {
                 sameUriLoopQueuedRef.current = false;
+                setTimeout(() => {
+                    if (typeof (dlnaPlayer as any).clearNextUrl === 'function') {
+                        (dlnaPlayer as any).clearNextUrl();
+                    } else {
+                        dlnaPlayer?.setNextUrl('', { mimeType: 'audio/mpeg', title: '' });
+                    }
+                }, 2000);
             }
-        } else {
-            sameUriLoopQueuedRef.current = false;
-        }
-    }, [transcode]);
+        }, 1000);
+    }, [transcode, props.isMuted]);
     const sendNextTrackToDlna = useCallback(async () => {
         if (!dlnaPlayer) return;
+        const currentSpeed = usePlayerStore.getState().player.speed || 1;
+        if (currentSpeed !== 1) return;
         const playerData = usePlayerStore.getState().getPlayerData();
         const nextSong = playerData.nextSong;
         if (!nextSong) return;
@@ -277,7 +356,10 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 sameUriLoopQueuedRef.current = false;
                 wasNearEndRef.current = false;
                 recentTrackEndedAtRef.current = Date.now();
-                skipNextSendRef.current = true;
+
+                const currentSpeed = usePlayerStore.getState().player.speed || 1;
+                skipNextSendRef.current = currentSpeed === 1;
+
                 onEnded();
                 setTimeout(() => sendNextTrackToDlna(), 200);
                 return;
@@ -305,20 +387,37 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         if (!ipc) return;
         const handleTrackEnded = () => {
             if (!hasPlayedRef.current) return;
+            const state = usePlayerStore.getState();
+            const playerData = state.getPlayerData();
+            const isAtEnd = !playerData.nextSong;
+            const isRepeating = state.player.repeat !== 'none';
+            if (isAtEnd && !isRepeating) {
+                isAutoAdvancingRef.current = false;
+                hasPlayedRef.current = false;
+                dlnaPlayer?.stop();
+                onEnded();
+                return;
+            }
             recentTrackEndedAtRef.current = Date.now();
             sameUriLoopQueuedRef.current = false;
             wasNearEndRef.current = false;
-            skipNextSendRef.current = true;
+            const currentSpeed = usePlayerStore.getState().player.speed || 1;
+            isAutoAdvancingRef.current = true;
+            skipNextSendRef.current = currentSpeed === 1;
             onEnded();
-            setTimeout(() => {
-                sendNextTrackToDlna();
-            }, 200);
+            if (currentSpeed !== 1) {
+                setTimeout(() => {
+                    sendCurrentTrackToDlna();
+                }, 200);
+            } else {
+                setTimeout(() => sendNextTrackToDlna(), 500);
+            }
         };
         ipc.on('renderer-dlna-track-ended', handleTrackEnded);
         return () => {
             ipc.removeAllListeners('renderer-dlna-track-ended');
         };
-    }, [onEnded, sendNextTrackToDlna]);
+    }, [onEnded, sendCurrentTrackToDlna, sendNextTrackToDlna]);
     // Handle play/pause
     const isInitialMount = useRef(true);
     useEffect(() => {
@@ -334,14 +433,18 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                     const currentUrl = playerData.currentSong
                         ? await getSongUrl(playerData.currentSong, transcode)
                         : undefined;
-                    if (currentUrl && currentUrl !== lastSentUrlRef.current) {
+                    if (currentUrl && currentUrl !== lastSentRawUrlRef.current) {
                         skipNextSendRef.current = false;
                         sendCurrentTrackToDlna();
                     } else {
-                        dlnaPlayer.play();
+                        if (Date.now() - lastSentAtRef.current > 2000) {
+                            dlnaPlayer.play();
+                        }
                     }
                 };
                 check();
+            } else {
+                sendCurrentTrackToDlna();
             }
         } else if (playerStatus === PlayerStatus.PAUSED) {
             dlnaPlayer.pause();
@@ -372,7 +475,6 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 sendCurrentTrackToDlna();
             },
             onPlayerPlay: () => {
-                skipNextSendRef.current = false;
                 sendCurrentTrackToDlna();
             },
             onPlayerSeekToTimestamp: (properties) => {
@@ -382,6 +484,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 dlnaPlayer?.stop();
                 hasPlayedRef.current = false;
                 lastSentUrlRef.current = '';
+                lastSentRawUrlRef.current = '';
                 sameUriLoopQueuedRef.current = false;
                 wasNearEndRef.current = false;
             },
@@ -409,6 +512,44 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             },
         );
     }, [sendNextTrackToDlna]);
+    // Handle manual change in playback speed
+    useEffect(() => {
+        return usePlayerStore.subscribe(
+            (state) => state.player.speed,
+            async (newSpeed, oldSpeed) => {
+                if (newSpeed === oldSpeed) return;
+                if (!hasPlayedRef.current || !dlnaPlayer) return;
+
+                try {
+                    pendingInitialSeek.value = await dlnaPlayer.getPosition();
+                } catch {
+                    pendingInitialSeek.value = 0;
+                }
+                skipNextSendRef.current = false;
+                sendCurrentTrackToDlna();
+            },
+        );
+    }, [sendCurrentTrackToDlna]);
+    // Handle pitch preservation change
+    useEffect(() => {
+        return useSettingsStore.subscribe(
+            (state) => state.playback.preservePitch,
+            async (newPitch, oldPitch) => {
+                if (newPitch === oldPitch) return;
+                const currentSpeed = usePlayerStore.getState().player.speed || 1;
+                if (currentSpeed === 1) return;
+                if (!hasPlayedRef.current || !dlnaPlayer) return;
+
+                try {
+                    pendingInitialSeek.value = await dlnaPlayer.getPosition();
+                } catch {
+                    pendingInitialSeek.value = 0;
+                }
+                skipNextSendRef.current = false;
+                sendCurrentTrackToDlna();
+            },
+        );
+    }, [sendCurrentTrackToDlna]);
     useImperativeHandle<DlnaPlayerEngineHandle, DlnaPlayerEngineHandle>(playerRef, () => ({
         decreaseVolume(by: number) {
             const newVol = Math.max(0, volume - by);

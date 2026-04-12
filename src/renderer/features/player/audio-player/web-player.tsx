@@ -4,6 +4,8 @@ import type ReactPlayer from 'react-player';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { playerHandoff } from './engine/player-handoff';
+
 import {
     WebPlayerEngine,
     WebPlayerEngineHandle,
@@ -43,7 +45,16 @@ export function WebPlayer() {
     const volume = usePlayerVolume();
     const { audioFadeOnStatusChange, preservePitch, transcode } = usePlaybackSettings();
 
-    const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(status);
+    const pendingLocalSeekRef = useRef(-1);
+
+    const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(() => {
+        if (playerHandoff.pendingLocalSeek > 0) {
+            pendingLocalSeekRef.current = playerHandoff.pendingLocalSeek;
+            playerHandoff.pendingLocalSeek = -1;
+            return PlayerStatus.PAUSED;
+        }
+        return status;
+    });
     const [isTransitioning, setIsTransitioning] = useState<boolean | string>(false);
     const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -404,8 +415,24 @@ export function WebPlayer() {
     const player1Url = useSongUrl(player1, num === 1, transcode);
     const player2Url = useSongUrl(player2, num === 2, transcode);
 
+    const applyPendingSeekIfNeeded = useCallback(
+        (reactPlayer: ReactPlayer, activeSlot: 1 | 2) => {
+            if (pendingLocalSeekRef.current <= 0) return;
+            if (activeSlot !== num) return;
+            const seekTo = pendingLocalSeekRef.current;
+            pendingLocalSeekRef.current = -1;
+            reactPlayer.seekTo(seekTo, 'seconds');
+            if (status === PlayerStatus.PLAYING) {
+                playerRef.current?.setVolume(volume);
+                setLocalPlayerStatus(PlayerStatus.PLAYING);
+            }
+        },
+        [num, status, volume],
+    );
+
     const handlePlayer1Start = useCallback(
-        async (player: ReactPlayer) => {
+        async (reactPlayer: ReactPlayer) => {
+            applyPendingSeekIfNeeded(reactPlayer, 1);
             if (!webAudio || player1Source) return;
             if (player1Url) {
                 // This should fire once, only if the source is real (meaning we
@@ -415,7 +442,7 @@ export function WebPlayer() {
                 }
             }
 
-            const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
+            const internal = reactPlayer.getInternalPlayer() as HTMLMediaElement | undefined;
             if (internal) {
                 const { context, gains } = webAudio;
                 const source = context.createMediaElementSource(internal);
@@ -423,11 +450,12 @@ export function WebPlayer() {
                 setPlayer1Source(source);
             }
         },
-        [player1Source, player1Url, webAudio],
+        [applyPendingSeekIfNeeded, player1Source, player1Url, webAudio],
     );
 
     const handlePlayer2Start = useCallback(
-        async (player: ReactPlayer) => {
+        async (reactPlayer: ReactPlayer) => {
+            applyPendingSeekIfNeeded(reactPlayer, 2);
             if (!webAudio || player2Source) return;
             if (player2Url) {
                 if (webAudio.context.state !== 'running') {
@@ -435,7 +463,7 @@ export function WebPlayer() {
                 }
             }
 
-            const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
+            const internal = reactPlayer.getInternalPlayer() as HTMLMediaElement | undefined;
             if (internal) {
                 const { context, gains } = webAudio;
                 const source = context.createMediaElementSource(internal);
@@ -443,7 +471,7 @@ export function WebPlayer() {
                 setPlayer2Source(source);
             }
         },
-        [player2Source, player2Url, webAudio],
+        [applyPendingSeekIfNeeded, player2Source, player2Url, webAudio],
     );
 
     const handleOnErrorPause = useCallback(() => {

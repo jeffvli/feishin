@@ -3,6 +3,8 @@ import type { RefObject } from 'react';
 import isElectron from 'is-electron';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
+import { playerHandoff } from './player-handoff';
+
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { getSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
@@ -56,6 +58,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
     const isInitializedRef = useRef<boolean>(false);
     const hasPopulatedQueueRef = useRef<boolean>(false);
     const isMountedRef = useRef<boolean>(true);
+    const [initializationTick, setInitializationTick] = useState(0);
 
     const { mpvAudioDeviceId, transcode } = usePlaybackSettings();
     const mpvExtraParameters = useSettingsStore((store) => store.playback.mpvExtraParameters);
@@ -130,9 +133,24 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
                     ? await getSongUrl(playerData.nextSong, transcode, true)
                     : undefined;
 
-                if (currentSongUrl && nextSongUrl && !hasPopulatedQueueRef.current && mpvPlayer) {
+                if (currentSongUrl && !hasPopulatedQueueRef.current && mpvPlayer) {
                     mpvPlayer.setQueue(currentSongUrl, nextSongUrl, true);
                     hasPopulatedQueueRef.current = true;
+                    isInitializedRef.current = true;
+                    let seekToAfterInit = -1;
+                    if (playerHandoff.pendingLocalSeek > 0 && isMountedRef.current) {
+                        seekToAfterInit = playerHandoff.pendingLocalSeek;
+                        playerHandoff.pendingLocalSeek = -1;
+                    }
+                    await new Promise((r) => setTimeout(r, 400));
+                    if (isMountedRef.current) {
+                        setInitializationTick((t) => t + 1);
+                        if (seekToAfterInit > 0) {
+                            setTimeout(() => {
+                                if (isMountedRef.current) mpvPlayer?.seekTo(seekToAfterInit);
+                            }, 800);
+                        }
+                    }
                 }
             }
 
@@ -193,16 +211,13 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
 
     // Handle play/pause status
     useEffect(() => {
-        if (!mpvPlayer) {
-            return;
-        }
-
+        if (!mpvPlayer || !isInitializedRef.current) return;
         if (playerStatus === PlayerStatus.PLAYING) {
             mpvPlayer.play();
         } else if (playerStatus === PlayerStatus.PAUSED) {
             mpvPlayer.pause();
         }
-    }, [playerStatus]);
+    }, [playerStatus, initializationTick]);
 
     const hasCurrentSong = !!currentSong?.id;
 
