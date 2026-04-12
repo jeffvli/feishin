@@ -43,10 +43,11 @@ mac:
     icon: assets/icons/icon.icns
     type: distribution
     hardenedRuntime: false
-    identity: "-"
+    identity: '-'
     gatekeeperAssess: false
     notarize: false
-
+    extendInfo:
+        NSLocalNetworkUsageDescription: 'Local network is necessary for accessing servers hosted on the same system as Feishin'
 
 dmg:
     contents: [{ x: 130, y: 220 }, { x: 410, y: 220, type: link, path: /Applications }]
@@ -61,7 +62,7 @@ linux:
     artifactName: ${productName}-${os}-${arch}.${ext}
 
 toolsets:
-    appimage: "1.0.2"
+    appimage: '1.0.2'
 
 npmRebuild: false
 

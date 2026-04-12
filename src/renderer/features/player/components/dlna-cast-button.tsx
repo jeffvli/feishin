@@ -6,12 +6,15 @@ import type { DlnaDevice, GroupMember } from './dlna/types';
 
 import { DeviceList } from '/@/renderer/features/player/components/dlna/device-list';
 import { GroupBuilder } from '/@/renderer/features/player/components/dlna/group-builder';
+import { playerHandoff } from '../audio-player/engine/player-handoff';
+
 import {
     usePlaybackSettings,
     usePlayerActions,
     usePlayerVolume,
     useSettingsStoreActions,
 } from '/@/renderer/store';
+import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
@@ -94,6 +97,10 @@ export const DlnaCastButton = () => {
     const handleSelect = useCallback(
         async (device: DlnaDevice) => {
             if (!dlnaPlayer) return;
+            const currentTimestamp = useTimestampStoreBase.getState().timestamp;
+            if (currentTimestamp > 0) {
+                playerHandoff.pendingDlnaSeek = currentTimestamp;
+            }
             if (settings.type !== PlayerType.DLNA) {
                 previousPlayerTypeRef.current = settings.type;
             }
@@ -115,6 +122,7 @@ export const DlnaCastButton = () => {
                 });
                 setScreen('connected');
             } else {
+                playerHandoff.pendingDlnaSeek = -1;
                 setScreen('idle');
             }
         },
@@ -205,6 +213,8 @@ export const DlnaCastButton = () => {
 
     const handleDisconnect = useCallback(async () => {
         if (!dlnaPlayer) return;
+        const position = await dlnaPlayer.getPosition();
+        if (position > 0) playerHandoff.pendingLocalSeek = position;
         await dlnaPlayer.disconnect();
         setScreen('idle');
         setConnectedDeviceName('');

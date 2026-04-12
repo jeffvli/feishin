@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
-import { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
 import { Outlet } from 'react-router';
 
 import styles from './mobile-layout.module.css';
@@ -10,18 +10,13 @@ import { FullScreenVisualizer } from '/@/renderer/features/player/components/ful
 import { MobileFullscreenPlayer } from '/@/renderer/features/player/components/mobile-fullscreen-player';
 import { MobileSidebar } from '/@/renderer/features/sidebar/components/mobile-sidebar';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
+import { WindowBar } from '/@/renderer/layouts/window-bar';
 import { useFullScreenPlayerOverlayState, useWindowBarStyle } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Drawer } from '/@/shared/components/drawer/drawer';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { useDisclosure } from '/@/shared/hooks/use-disclosure';
 import { Platform } from '/@/shared/types/types';
-
-const WindowBar = lazy(() =>
-    import('/@/renderer/layouts/window-bar').then((module) => ({
-        default: module.WindowBar,
-    })),
-);
 
 interface MobileLayoutProps {
     shell?: boolean;

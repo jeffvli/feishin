@@ -24,6 +24,7 @@ jobs:
 
             - name: Build and Publish releases
               env:
+                  NODE_OPTIONS: --max-old-space-size=4096
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               uses: nick-invision/retry@v3.0.2
               with:

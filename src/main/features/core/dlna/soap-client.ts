@@ -22,6 +22,7 @@ export interface TrackMetadata {
     albumArtUrl?: string;
     albumName?: string;
     artistName?: string;
+    autoPlay?: boolean;
     duration?: number;
     mimeType?: string;
     title: string;

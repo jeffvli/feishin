@@ -18,6 +18,7 @@ export interface TrackMetadata {
     albumArtUrl?: string;
     albumName?: string;
     artistName?: string;
+    autoPlay?: boolean;
     duration?: number;
     mimeType?: string;
     title: string;
@@ -27,8 +28,11 @@ const discover = (): Promise<DlnaDevice[]> => ipcRenderer.invoke('dlna-discover'
 const connect = (device: DlnaDevice): Promise<{ success: boolean; volume: number }> =>
     ipcRenderer.invoke('dlna-connect', device);
 const disconnect = (): Promise<boolean> => ipcRenderer.invoke('dlna-disconnect');
-const playUrl = (url: string, metadata: TrackMetadata) =>
-    ipcRenderer.send('dlna-play-url', { metadata, url });
+const playUrl = (
+    url: string,
+    metadata: TrackMetadata,
+    options?: { isMuted?: boolean; seekTo?: number },
+) => ipcRenderer.send('dlna-play-url', { metadata, url, ...options });
 const setNextUrl = (url: string, metadata: TrackMetadata) =>
     ipcRenderer.send('dlna-set-next-url', { metadata, url });
 const play = () => ipcRenderer.send('dlna-play');
@@ -52,9 +56,29 @@ const rendererCurrentTime = (cb: (event: IpcRendererEvent, time: number) => void
     ipcRenderer.on('renderer-dlna-current-time', cb);
 const rendererTrackEnded = (cb: (event: IpcRendererEvent) => void) =>
     ipcRenderer.on('renderer-dlna-track-ended', cb);
+const prepareSpeedFile = (data: {
+    offset: number;
+    preservePitch: boolean;
+    speed: number;
+    url: string;
+}) => ipcRenderer.invoke('dlna-prepare-speed-file', data);
+const checkSpeedFile = (data: {
+    preservePitch: boolean;
+    speed: number;
+    url: string;
+}): Promise<null | string> => ipcRenderer.invoke('dlna-check-speed-file', data);
+const cancelSpeedFile = (data: { preservePitch: boolean; speed: number; url: string }) =>
+    ipcRenderer.send('dlna-cancel-speed-file', data);
 
 const getSpeakerProperties = (deviceId: string): Promise<null | SpeakerProperties> =>
     ipcRenderer.invoke('dlna-get-speaker-properties', deviceId);
+const createSpeedProxy = (data: {
+    offset: number;
+    preservePitch: boolean;
+    speed: number;
+    url: string;
+}): Promise<null | string> => ipcRenderer.invoke('dlna-create-speed-proxy', data);
+const destroySpeedProxy = () => ipcRenderer.send('dlna-destroy-speed-proxy');
 
 const setSpeakerProperty = (
     deviceId: string,
@@ -64,7 +88,11 @@ const setSpeakerProperty = (
 
 export const dlnaPlayer = {
     addGroupMember,
+    cancelSpeedFile,
+    checkSpeedFile,
     connect,
+    createSpeedProxy,
+    destroySpeedProxy,
     disconnect,
     discover,
     getGroupState,
@@ -74,6 +102,7 @@ export const dlnaPlayer = {
     pause,
     play,
     playUrl,
+    prepareSpeedFile,
     removeGroupMember,
     seek,
     setGroupMemberMute,

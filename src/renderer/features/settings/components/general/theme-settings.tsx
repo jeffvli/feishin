@@ -146,6 +146,7 @@ export const ThemeSettings = memo(() => {
                         }
                     }}
                     renderOption={renderThemeOption}
+                    searchable
                     width={240}
                 />
             ),

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { HashRouter, Route, Routes } from 'react-router';
 
+import { ShuffleAllContextModal } from '/@/renderer/features/player/components/shuffle-all-modal';
 import { RouterErrorBoundary } from '/@/renderer/features/shared/components/router-error-boundary';
 import { AuthenticationOutlet } from '/@/renderer/layouts/authentication-outlet';
 import { ResponsiveLayout } from '/@/renderer/layouts/responsive-layout';
@@ -93,18 +94,6 @@ const LazyLyricsSettingsContextModal = lazy(() =>
 const LyricsSettingsContextModal = (props: any) => (
     <Suspense fallback={<Spinner container />}>
         <LazyLyricsSettingsContextModal {...props} />
-    </Suspense>
-);
-
-const LazyShuffleAllContextModal = lazy(() =>
-    import('/@/renderer/features/player/components/shuffle-all-modal').then((module) => ({
-        default: module.ShuffleAllContextModal,
-    })),
-);
-
-const ShuffleAllContextModal = (props: any) => (
-    <Suspense fallback={<Spinner container />}>
-        <LazyShuffleAllContextModal {...props} />
     </Suspense>
 );
 
