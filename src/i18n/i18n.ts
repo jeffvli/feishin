@@ -193,9 +193,24 @@ const upperCasePostProcessor: PostProcessorModule = {
     type: 'postProcessor',
 };
 
+// Languages that follow sentence-style capitalization in titles
+// Only the first word (and proper nouns) are capitalized, unlike English-style title case
+const sentenceCaseLanguages = ['es', 'ca', 'pt', 'pt-BR', 'fr', 'it', 'ro'];
+
 const titleCasePostProcessor: PostProcessorModule = {
     name: 'titleCase',
-    process: (value: string) => {
+    process: (
+        value: string,
+        _key: string,
+        _options: TOptions<Record<string, string>>,
+        translator: any,
+    ) => {
+        // For romance languages: only capitalize the first letter
+        if (sentenceCaseLanguages.includes(translator.language)) {
+            return value.charAt(0).toLocaleUpperCase() + value.slice(1);
+        }
+
+        // For English and other languages: capitalize the first letter of each word
         return value.replace(/\S\S*/g, (txt) => {
             return txt.charAt(0).toLocaleUpperCase() + txt.slice(1).toLowerCase();
         });
