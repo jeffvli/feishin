@@ -1,4 +1,5 @@
-import { SetActivity, StatusDisplayType } from '@xhayper/discord-rpc';
+import type { SetActivity } from '@xhayper/discord-rpc';
+
 import isElectron from 'is-electron';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -27,6 +28,13 @@ import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types
 import { PlayerStatus } from '/@/shared/types/types';
 
 const discordRpc = isElectron() ? window.api.discordRpc : null;
+
+const DiscordStatusDisplayType = {
+    DETAILS: 2,
+    NAME: 0,
+    STATE: 1,
+} as const;
+
 type ActivityState = [QueueSong | undefined, number, PlayerStatus];
 
 const MAX_FIELD_LENGTH = 127;
@@ -122,7 +130,7 @@ export const useDiscordRpc = () => {
                                 : undefined
                             : sentenceCase(current[2]),
                     state: truncate(artist),
-                    statusDisplayType: StatusDisplayType.STATE,
+                    statusDisplayType: DiscordStatusDisplayType.STATE,
                     type: discordSettings.showAsListening ? 2 : 0,
                 };
 
@@ -196,9 +204,9 @@ export const useDiscordRpc = () => {
                 const artists = song?.artists.map((artist) => artist.name).join(', ');
 
                 const statusDisplayMap = {
-                    [DiscordDisplayType.ARTIST_NAME]: StatusDisplayType.STATE,
-                    [DiscordDisplayType.FEISHIN]: StatusDisplayType.NAME,
-                    [DiscordDisplayType.SONG_NAME]: StatusDisplayType.DETAILS,
+                    [DiscordDisplayType.ARTIST_NAME]: DiscordStatusDisplayType.STATE,
+                    [DiscordDisplayType.FEISHIN]: DiscordStatusDisplayType.NAME,
+                    [DiscordDisplayType.SONG_NAME]: DiscordStatusDisplayType.DETAILS,
                 };
 
                 const activity: SetActivity = {

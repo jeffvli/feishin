@@ -1,4 +1,5 @@
-import { SetActivity } from '@xhayper/discord-rpc';
+import type { SetActivity } from '@xhayper/discord-rpc';
+
 import { ipcRenderer } from 'electron';
 
 const initialize = (clientId: string) => {
