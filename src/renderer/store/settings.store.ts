@@ -2202,7 +2202,10 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
 
                         // Extract display settings
                         const displaySettings = {
-                            ...defaultSettings,
+                            fontSize: defaultSettings.fontSize || 24,
+                            fontSizeUnsync: defaultSettings.fontSizeUnsync || 24,
+                            gap: defaultSettings.gap || 24,
+                            gapUnsync: defaultSettings.gapUnsync || 24,
                         };
 
                         // Remove display properties from main settings
@@ -2212,7 +2215,10 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
 
                         state.lyrics = mainSettings;
                         state.lyricsDisplay = {
-                            default: displaySettings,
+                            default: {
+                                ...state.lyricsDisplay.default,
+                                ...displaySettings,
+                            },
                         };
                     }
                 }
