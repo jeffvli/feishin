@@ -1796,7 +1796,7 @@ const initialState: SettingsState = {
             fontSizeUnsync: 24,
             gap: 24,
             gapUnsync: 24,
-            opacityNonActive: 0.8,
+            opacityNonActive: 0.2,
             scaleNonActive: 0.95,
         },
     },
