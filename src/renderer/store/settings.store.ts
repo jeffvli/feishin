@@ -536,6 +536,8 @@ const LyricsDisplaySettingsSchema = z.object({
     fontSizeUnsync: z.number(),
     gap: z.number(),
     gapUnsync: z.number(),
+    opacityNonActive: z.number(),
+    scaleNonActive: z.number(),
 });
 
 const LyricsSettingsSchema = z.object({
@@ -1794,6 +1796,8 @@ const initialState: SettingsState = {
             fontSizeUnsync: 24,
             gap: 24,
             gapUnsync: 24,
+            opacityNonActive: 0.8,
+            scaleNonActive: 0.95,
         },
     },
     playback: {
@@ -2198,10 +2202,7 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
 
                         // Extract display settings
                         const displaySettings = {
-                            fontSize: defaultSettings.fontSize || 24,
-                            fontSizeUnsync: defaultSettings.fontSizeUnsync || 24,
-                            gap: defaultSettings.gap || 24,
-                            gapUnsync: defaultSettings.gapUnsync || 24,
+                            ...defaultSettings,
                         };
 
                         // Remove display properties from main settings

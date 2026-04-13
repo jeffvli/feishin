@@ -540,6 +540,8 @@
                 "lyricOffset": "lyrics offset (ms)",
                 "lyricGap": "lyric gap",
                 "lyricSize": "lyric size",
+                "lyricOpacityNonActive": "non-active lyric opacity",
+                "lyricScaleNonActive": "non-active lyric scale",
                 "opacity": "opacity",
                 "showLyricMatch": "show lyric match",
                 "showLyricProvider": "show lyric provider",
