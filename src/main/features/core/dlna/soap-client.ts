@@ -12,6 +12,8 @@ const playerLog = (action: string, err?: unknown) => {
 
 export interface DlnaDevice {
     controlUrl: string;
+    groupCoordinatorId?: string;
+    groupMembers?: DlnaDevice[];
     id: string;
     location: string;
     name: string;
@@ -46,6 +48,16 @@ export async function becomeCoordinatorOfStandaloneGroup(device: DlnaDevice): Pr
         AVT,
         'BecomeCoordinatorOfStandaloneGroup',
         `<InstanceID>0</InstanceID>`,
+    );
+}
+
+export async function clearNextAVTransportURI(device: DlnaDevice): Promise<void> {
+    playerLog(`ClearNextAVTransportURI: ${device.name}`);
+    await soapRequest(
+        device.controlUrl,
+        AVT,
+        'SetNextAVTransportURI',
+        `<InstanceID>0</InstanceID><NextURI></NextURI><NextURIMetaData></NextURIMetaData>`,
     );
 }
 

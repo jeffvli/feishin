@@ -107,7 +107,7 @@ export const GroupBuilder = ({
 
             {!lockedCoordinator && (
                 <Text c="dimmed" px="sm" size="xs">
-                    First selected = coordinator
+                    Select Coordinator first
                 </Text>
             )}
 

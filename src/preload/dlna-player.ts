@@ -2,6 +2,8 @@ import { ipcRenderer, IpcRendererEvent } from 'electron';
 
 export interface DlnaDevice {
     controlUrl: string;
+    groupCoordinatorId?: string;
+    groupMembers?: DlnaDevice[];
     id: string;
     location: string;
     name: string;
@@ -35,6 +37,7 @@ const playUrl = (
 ) => ipcRenderer.send('dlna-play-url', { metadata, url, ...options });
 const setNextUrl = (url: string, metadata: TrackMetadata) =>
     ipcRenderer.send('dlna-set-next-url', { metadata, url });
+const clearNextUrl = () => ipcRenderer.send('dlna-clear-next');
 const play = () => ipcRenderer.send('dlna-play');
 const pause = () => ipcRenderer.send('dlna-pause');
 const stop = () => ipcRenderer.send('dlna-stop');
@@ -90,6 +93,7 @@ export const dlnaPlayer = {
     addGroupMember,
     cancelSpeedFile,
     checkSpeedFile,
+    clearNextUrl,
     connect,
     createSpeedProxy,
     destroySpeedProxy,

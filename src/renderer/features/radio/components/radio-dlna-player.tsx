@@ -49,6 +49,7 @@ export function RadioDlnaPlayer() {
             return;
         }
         if (!isPlaying) {
+            dlnaPlayer?.stop();
             useRadioStore.getState().actions.stop();
         }
     }, [isPlaying]);

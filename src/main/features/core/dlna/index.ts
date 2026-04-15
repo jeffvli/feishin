@@ -17,6 +17,7 @@ import { getMainWindow } from '../../../index';
 import { createLog } from '../../../utils';
 import {
     becomeCoordinatorOfStandaloneGroup,
+    clearNextAVTransportURI,
     DlnaDevice,
     getBass,
     getButtonLockState,
@@ -173,6 +174,155 @@ export interface SpeakerProperties {
     treble: number;
 }
 
+function consolidateDiscoveredDevices(
+    devices: DlnaDevice[],
+    decodedTopology: string,
+): DlnaDevice[] {
+    const zoneGroupRegex = /<ZoneGroup\b[^>]*>[\s\S]*?<\/ZoneGroup>/g;
+    const zoneGroups = decodedTopology.match(zoneGroupRegex);
+    dlnaLog(`[Consolidate] Total ZoneGroup blocks matched: ${zoneGroups?.length ?? 0}`);
+    if (!zoneGroups) return devices;
+
+    const deviceById = new Map<string, DlnaDevice>(devices.map((d) => [d.id, d]));
+    const groupedIds = new Set<string>();
+    const groupEntries: DlnaDevice[] = [];
+
+    for (let gi = 0; gi < zoneGroups.length; gi++) {
+        const group = zoneGroups[gi];
+        const groupTagMatch = group.match(/^<ZoneGroup\b([^>]*)>/);
+        if (!groupTagMatch) {
+            dlnaLog(`[Consolidate] Group[${gi}]: no opening tag match, skipping`);
+            continue;
+        }
+        const coordinatorUuid = getAttr(groupTagMatch[1], 'Coordinator');
+        dlnaLog(`[Consolidate] Group[${gi}]: Coordinator UUID="${coordinatorUuid}"`);
+        if (!coordinatorUuid) continue;
+        const coordinatorId = `uuid:${coordinatorUuid}`;
+
+        const memberDevices: DlnaDevice[] = [];
+        const memberTagRegex = /<ZoneGroupMember\b([^>]*)\/?>/g;
+        let tagMatch: null | RegExpExecArray;
+
+        while ((tagMatch = memberTagRegex.exec(group)) !== null) {
+            const attrs = tagMatch[1];
+            const uuid = getAttr(attrs, 'UUID');
+            const location = getAttr(attrs, 'Location');
+            const zoneName = getAttr(attrs, 'ZoneName');
+            dlnaLog(
+                `[Consolidate] Group[${gi}] member: UUID="${uuid}" ZoneName="${zoneName}" Location="${location}"`,
+            );
+            if (!uuid || !location) {
+                dlnaLog(`[Consolidate] Group[${gi}] member skipped: missing UUID or Location`);
+                continue;
+            }
+
+            const fullId = `uuid:${uuid}`;
+            const existing = deviceById.get(fullId);
+            if (existing) {
+                dlnaLog(
+                    `[Consolidate] Group[${gi}] member "${zoneName}": matched discovered device "${existing.name}"`,
+                );
+                memberDevices.push(existing);
+            } else {
+                dlnaLog(
+                    `[Consolidate] Group[${gi}] member "${zoneName}" (${fullId}): NOT in discovered list, building from topology`,
+                );
+                try {
+                    const base = new URL(location);
+                    const baseUrl = `${base.protocol}//${base.hostname}:1400`;
+                    memberDevices.push({
+                        controlUrl: `${baseUrl}/MediaRenderer/AVTransport/Control`,
+                        id: fullId,
+                        location,
+                        name: zoneName || uuid,
+                        renderingControlUrl: `${baseUrl}/MediaRenderer/RenderingControl/Control`,
+                    });
+                } catch (e: any) {
+                    dlnaLog(`[Consolidate] Group[${gi}] member URL parse failed: ${e?.message}`);
+                    continue;
+                }
+            }
+            groupedIds.add(fullId);
+        }
+
+        dlnaLog(`[Consolidate] Group[${gi}]: ${memberDevices.length} members total`);
+        if (memberDevices.length < 2) {
+            dlnaLog(`[Consolidate] Group[${gi}]: fewer than 2 members, skipping`);
+            continue;
+        }
+
+        const coordinator =
+            deviceById.get(coordinatorId) ?? memberDevices.find((m) => m.id === coordinatorId);
+        if (!coordinator) {
+            dlnaLog(
+                `[Consolidate] Group[${gi}]: coordinator ${coordinatorId} not resolvable, skipping`,
+            );
+            continue;
+        }
+
+        const sortedMembers = [coordinator, ...memberDevices.filter((m) => m.id !== coordinatorId)];
+
+        dlnaLog(
+            `[Consolidate] Group[${gi}]: creating group entry "${coordinator.name}" with ${sortedMembers.length} members`,
+        );
+        groupEntries.push({
+            ...coordinator,
+            groupCoordinatorId: coordinatorId,
+            groupMembers: sortedMembers,
+            name: `Group (${sortedMembers.length})`,
+        });
+    }
+
+    dlnaLog(`[Consolidate] groupedIds: ${JSON.stringify([...groupedIds])}`);
+    dlnaLog(`[Consolidate] groupEntries count: ${groupEntries.length}`);
+    const remaining = devices.filter((d) => !groupedIds.has(d.id));
+    dlnaLog(`[Consolidate] remaining solo devices: ${remaining.map((d) => d.name).join(', ')}`);
+    return [...remaining, ...groupEntries];
+}
+
+async function enrichDevicesWithTopology(devices: DlnaDevice[]): Promise<DlnaDevice[]> {
+    const sonosDevices = devices.filter((d) => d.id.toUpperCase().includes('RINCON'));
+    if (sonosDevices.length === 0) return devices;
+
+    dlnaLog(
+        `[Discovery/Topology] Starting topology scan for ${sonosDevices.length} Sonos device(s)`,
+    );
+    const attemptDelays = [1000, 2000, 4000, 6000];
+
+    for (let attempt = 0; attempt < attemptDelays.length; attempt++) {
+        await new Promise((r) => setTimeout(r, attemptDelays[attempt]));
+        dlnaLog(`[Discovery/Topology] Attempt ${attempt + 1}/${attemptDelays.length}`);
+
+        for (const sonosDevice of sonosDevices) {
+            const rawSoap = await fetchTopologyForDevice(sonosDevice);
+            if (!rawSoap) continue;
+
+            const stateMatch = rawSoap.match(/<ZoneGroupState>([\s\S]*?)<\/ZoneGroupState>/);
+            if (!stateMatch) {
+                continue;
+            }
+
+            const decodedTopology = stateMatch[1]
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&quot;/g, '"')
+                .replace(/&amp;/g, '&');
+
+            const consolidated = consolidateDiscoveredDevices(devices, decodedTopology);
+            const groupEntries = consolidated.filter((d) => d.groupMembers);
+            if (groupEntries.length > 0) {
+                dlnaLog(
+                    `[Discovery/Topology] Result: ${consolidated.length} entries, ${groupEntries.length} group(s)`,
+                );
+                return consolidated;
+            }
+        }
+    }
+
+    dlnaLog('[Discovery/Topology] All attempts exhausted, returning flat device list');
+    return devices;
+}
+
 async function ensureEventServer(): Promise<void> {
     if (eventServer) return;
     eventServer = http.createServer((req, res) => {
@@ -255,6 +405,67 @@ async function ensureEventServer(): Promise<void> {
     });
 }
 
+function fetchTopologyForDevice(device: DlnaDevice): Promise<string> {
+    return new Promise((resolve) => {
+        try {
+            const parsedUrl = new URL(device.controlUrl);
+            const controlUrl = `http://${parsedUrl.hostname}:1400/ZoneGroupTopology/Control`;
+            dlnaLog(`[Discovery/Topology] Requesting from ${device.name} at ${controlUrl}`);
+            const body = `<?xml version="1.0" encoding="utf-8"?>
+            <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                <s:Body>
+                    <u:GetZoneGroupState xmlns:u="urn:schemas-upnp-org:service:ZoneGroupTopology:1"></u:GetZoneGroupState>
+                </s:Body>
+            </s:Envelope>`;
+            const req = http.request(
+                controlUrl,
+                {
+                    headers: {
+                        Connection: 'close',
+                        'Content-Length': Buffer.byteLength(body, 'utf8'),
+                        'Content-Type': 'text/xml; charset="utf-8"',
+                        SOAPAction:
+                            '"urn:schemas-upnp-org:service:ZoneGroupTopology:1#GetZoneGroupState"',
+                    },
+                    method: 'POST',
+                },
+                (res) => {
+                    dlnaLog(`[Discovery/Topology] HTTP ${res.statusCode} from ${device.name}`);
+                    let data = '';
+                    res.on('data', (chunk) => (data += chunk));
+                    res.on('end', () => {
+                        dlnaLog(
+                            `[Discovery/Topology] Response ${data.length} bytes from ${device.name}`,
+                        );
+                        if (data.includes('GetZoneGroupStateResponse')) {
+                            resolve(data);
+                        } else {
+                            dlnaLog(
+                                `[Discovery/Topology] Guard failed for ${device.name}: ${data.substring(0, 200).replace(/\s+/g, ' ')}`,
+                            );
+                            resolve('');
+                        }
+                    });
+                },
+            );
+            req.on('error', (err) => {
+                dlnaLog(`[Discovery/Topology] Error from ${device.name}: ${err.message}`);
+                resolve('');
+            });
+            req.setTimeout(5000, () => {
+                dlnaLog(`[Discovery/Topology] Timeout for ${device.name}`);
+                req.destroy();
+                resolve('');
+            });
+            req.write(body);
+            req.end();
+        } catch (err: any) {
+            dlnaLog(`[Discovery/Topology] Exception for ${device.name}: ${err?.message}`);
+            resolve('');
+        }
+    });
+}
+
 function fetchXml(url: string): Promise<string> {
     return new Promise((resolve) => {
         const req = http.get(url, (res) => {
@@ -276,23 +487,6 @@ async function fullDisconnect(): Promise<void> {
     lastCommandedUri = '';
     lastQueuedNextUri = '';
     isRadioMode = false;
-    if (groupMembers.length > 1 && connectedDevice) {
-        const members = groupMembers.filter((m) => m.id !== connectedDevice!.id);
-        await Promise.allSettled(
-            members.map(async (m) => {
-                try {
-                    await stop(m);
-                } catch {
-                    // Catch
-                }
-                try {
-                    await becomeCoordinatorOfStandaloneGroup(m);
-                } catch {
-                    // Catch
-                }
-            }),
-        );
-    }
     if (connectedDevice) {
         try {
             await stop(connectedDevice);
@@ -341,7 +535,7 @@ function getActiveProxyState(uri: string) {
 }
 
 function getAttr(attrString: string, name: string): string {
-    const m = attrString.match(new RegExp(`\\b${name}="([^"]*)"`));
+    const m = attrString.match(new RegExp(`\\b${name}=["']([^"']*)["']`, 'i'));
     return m ? m[1] : '';
 }
 
@@ -414,18 +608,18 @@ function handleTopologyNotify(xml: string): void {
             .replace(/&amp;/g, '&');
         if (!connectedDevice) return;
         const myRinconId = getRinconId(connectedDevice);
-        const zoneGroupRegex = /<ZoneGroup[^>]*>[\s\S]*?<\/ZoneGroup>/g;
+        const zoneGroupRegex = /<ZoneGroup\b[^>]*>[\s\S]*?<\/ZoneGroup>/g;
         const zoneGroups = decodedXml.match(zoneGroupRegex);
         if (!zoneGroups) return;
         const newMembers: DlnaDevice[] = [];
         let newCoordinatorRincon = '';
         for (const group of zoneGroups) {
             if (!group.includes(myRinconId)) continue;
-            const groupTagMatch = group.match(/^<ZoneGroup([^>]*)>/);
+            const groupTagMatch = group.match(/^<ZoneGroup\b([^>]*)>/);
             if (groupTagMatch) {
                 newCoordinatorRincon = getAttr(groupTagMatch[1], 'Coordinator');
             }
-            const memberTagRegex = /<ZoneGroupMember([^>]*)\/?>/g;
+            const memberTagRegex = /<ZoneGroupMember\b([^>]*)\/?>/g;
             let tagMatch: null | RegExpExecArray;
             while ((tagMatch = memberTagRegex.exec(group)) !== null) {
                 const attrs = tagMatch[1];
@@ -503,6 +697,7 @@ function refreshTopology() {
             {
                 headers: {
                     Connection: 'close',
+                    'Content-Length': Buffer.byteLength(body, 'utf8'),
                     'Content-Type': 'text/xml; charset="utf-8"',
                     SOAPAction:
                         '"urn:schemas-upnp-org:service:ZoneGroupTopology:1#GetZoneGroupState"',
@@ -1002,8 +1197,9 @@ ipcMain.handle('dlna-discover', async () => {
     try {
         dlnaLog('Discovering devices...');
         const devices = await discoverDevices(5000);
-        dlnaLog(`Found ${devices.length} device(s): ${JSON.stringify(devices.map((d) => d.name))}`);
-        return devices;
+        dlnaLog(`Found ${devices.length} device(s)`);
+        const finalDevices = await enrichDevicesWithTopology(devices);
+        return finalDevices;
     } catch (err) {
         dlnaLog('Discovery failed', err);
         return [];
@@ -1261,7 +1457,7 @@ ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; 
         if (!data.url) {
             lastQueuedNextUri = '';
             try {
-                await setNextAVTransportURI(connectedDevice, '', {} as TrackMetadata);
+                await clearNextAVTransportURI(connectedDevice);
             } catch {
                 // Pass
             }
@@ -1300,6 +1496,12 @@ ipcMain.on('dlna-pause', async () => {
     if (!connectedDevice) return;
     try {
         isPausedIntentionally = true;
+        if (isRadioMode) {
+            lastCommandedUri = '';
+            lastQueuedNextUri = '';
+            await stop(connectedDevice);
+            return;
+        }
         await pause(connectedDevice);
     } catch (err: any) {
         dlnaLog('Failed to pause', err);
@@ -1308,6 +1510,17 @@ ipcMain.on('dlna-pause', async () => {
                 if (isPausedIntentionally) pause(connectedDevice!).catch(() => {});
             }, 1500);
         }
+    }
+});
+
+ipcMain.on('dlna-clear-next', async () => {
+    if (!connectedDevice) return;
+    lastQueuedNextUri = '';
+    try {
+        await clearNextAVTransportURI(connectedDevice);
+        dlnaLog('Cleared next track');
+    } catch (err) {
+        dlnaLog('Failed to clear next track', err);
     }
 });
 

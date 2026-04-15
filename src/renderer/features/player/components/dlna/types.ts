@@ -1,5 +1,7 @@
 export interface DlnaDevice {
     controlUrl: string;
+    groupCoordinatorId?: string;
+    groupMembers?: DlnaDevice[];
     id: string;
     location: string;
     name: string;

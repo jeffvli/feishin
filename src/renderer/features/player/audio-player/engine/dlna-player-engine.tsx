@@ -259,11 +259,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             } else {
                 sameUriLoopQueuedRef.current = false;
                 setTimeout(() => {
-                    if (typeof (dlnaPlayer as any).clearNextUrl === 'function') {
-                        (dlnaPlayer as any).clearNextUrl();
-                    } else {
-                        dlnaPlayer?.setNextUrl('', { mimeType: 'audio/mpeg', title: '' });
-                    }
+                    dlnaPlayer?.clearNextUrl();
                 }, 2000);
             }
         }, 1000);
@@ -503,11 +499,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 if (playerData.nextSong) {
                     sendNextTrackToDlna();
                 } else {
-                    if (typeof (dlnaPlayer as any).clearNextUrl === 'function') {
-                        (dlnaPlayer as any).clearNextUrl();
-                    } else {
-                        dlnaPlayer.setNextUrl('', { mimeType: 'audio/mpeg', title: '' });
-                    }
+                    dlnaPlayer.clearNextUrl();
                 }
             },
         );

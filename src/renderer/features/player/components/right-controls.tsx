@@ -1,3 +1,4 @@
+import { Paper } from '@mantine/core';
 import { t } from 'i18next';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState, WheelEvent } from 'react';
@@ -65,13 +66,6 @@ const isSonosMember = (device: { id: string }) => device.id.toUpperCase().includ
 const calculateVolumeUp = (volume: number, step: number) => Math.min(100, volume + step);
 const calculateVolumeDown = (volume: number, step: number) => Math.max(0, volume - step);
 
-const POPOVER_BG = 'var(--mantine-color-dark-7, var(--theme-colors-surface, #1a1b1e))';
-const POPOVER_BORDER = '1px solid var(--mantine-color-dark-4, rgba(255,255,255,0.15))';
-const POPOVER_SHADOW = '0 4px 20px rgba(0,0,0,0.55)';
-const POPOVER_RADIUS = '8px';
-const POPOVER_TEXT = '#e0e0e0';
-const POPOVER_SUBTEXT = 'var(--theme-colors-subtext, #c1c2c5)';
-
 const SpeakerPropertiesPopover = ({
     deviceId,
     deviceName,
@@ -120,17 +114,20 @@ const SpeakerPropertiesPopover = ({
         setSpeakerProps({ ...speakerProps, [key]: value });
         ipc?.send('dlna-set-speaker-property', { deviceId, property: key, value });
     };
-
     return (
-        <div
+        <Paper
             data-speaker-props-popover
             onClick={(e) => e.stopPropagation()}
+            radius="md"
+            shadow="xl"
             style={{
-                background: POPOVER_BG,
-                border: POPOVER_BORDER,
-                borderRadius: POPOVER_RADIUS,
+                background: 'var(--theme-colors-background)',
+                border: '2px solid var(--theme-colors-border)',
+                borderRadius: 'var(--theme-radius-md)',
                 bottom: `${bottom}px`,
-                boxShadow: POPOVER_SHADOW,
+                boxShadow: '2px 2px 10px 2px rgb(0 0 0 / 40%)',
+                color: 'var(--theme-colors-foreground)',
+                filter: 'drop-shadow(0 0 5px rgb(0 0 0 / 50%))',
                 left: `${left}px`,
                 minWidth: 280,
                 padding: '12px 16px 14px',
@@ -163,7 +160,13 @@ const SpeakerPropertiesPopover = ({
             </div>
 
             {loading && (
-                <div style={{ color: POPOVER_SUBTEXT, fontSize: '0.75rem', textAlign: 'center' }}>
+                <div
+                    style={{
+                        color: 'var(--mantine-color-dimmed)',
+                        fontSize: '0.75rem',
+                        textAlign: 'center',
+                    }}
+                >
                     Loading…
                 </div>
             )}
@@ -216,12 +219,12 @@ const SpeakerPropertiesPopover = ({
                     />
                 </div>
             )}
-        </div>
+        </Paper>
     );
 };
 
 const labelStyle: React.CSSProperties = {
-    color: POPOVER_TEXT,
+    color: 'var(--mantine-color-text)',
     flex: '0 0 auto',
     fontSize: '0.68rem',
     width: 80,
@@ -266,7 +269,7 @@ const PropSlider = ({
             </div>
             <span
                 style={{
-                    color: POPOVER_SUBTEXT,
+                    color: 'var(--mantine-color-dimmed)',
                     fontSize: '0.68rem',
                     minWidth: 20,
                     textAlign: 'right',
@@ -301,7 +304,7 @@ const PropToggle = ({
             style={{
                 background: value
                     ? 'var(--theme-colors-primary, #6c9fff)'
-                    : 'var(--mantine-color-dark-4, #444)',
+                    : 'var(--mantine-color-default-border)',
                 borderRadius: 10,
                 display: 'inline-block',
                 height: 16,
@@ -398,7 +401,7 @@ const GroupMemberVolumeRow = ({
         >
             <div
                 style={{
-                    color: POPOVER_TEXT,
+                    color: 'var(--mantine-color-text)',
                     fontSize: '0.68rem',
                     marginBottom: '4px',
                     overflow: 'hidden',
@@ -598,7 +601,7 @@ const VolumeButton = () => {
 
     const handleVolumeSlider = useCallback(
         (e: number) => {
-            if (isGroupMode && isShiftDown) applyDeltaToGroup(e);
+            if (isGroupMode && !isShiftDown) applyDeltaToGroup(e);
             setSliderValue(e);
         },
         [isGroupMode, isShiftDown, applyDeltaToGroup],
@@ -612,7 +615,7 @@ const VolumeButton = () => {
                 e.deltaY > 0 || e.deltaX > 0
                     ? calculateVolumeDown(sliderValue, volumeWheelStep)
                     : calculateVolumeUp(sliderValue, volumeWheelStep);
-            if (isGroupMode && isShiftDown) applyDeltaToGroup(v);
+            if (isGroupMode && !isShiftDown) applyDeltaToGroup(v);
             setSliderValue(v);
         },
         [sliderValue, volumeWheelStep, isGroupMode, isShiftDown, applyDeltaToGroup],
@@ -670,14 +673,18 @@ const VolumeButton = () => {
                     triggerRect={propsTarget.rect}
                 />
             )}
-            {isGroupMode && (
-                <div
+            {isGroupMode && isHovered && (
+                <Paper
+                    radius="md"
+                    shadow="xl"
                     style={{
-                        background: POPOVER_BG,
-                        border: POPOVER_BORDER,
-                        borderRadius: POPOVER_RADIUS,
+                        background: 'var(--theme-colors-background)',
+                        border: '2px solid var(--theme-colors-border)',
+                        borderRadius: 'var(--theme-radius-md)',
                         bottom: '-12px',
-                        boxShadow: POPOVER_SHADOW,
+                        boxShadow: '2px 2px 10px 2px rgb(0 0 0 / 40%)',
+                        color: 'var(--theme-colors-foreground)',
+                        filter: 'drop-shadow(0 0 5px rgb(0 0 0 / 50%))',
                         left: '-10px',
                         opacity: isHovered ? 1 : 0,
                         padding: '0 10px 45px 10px',
@@ -691,21 +698,26 @@ const VolumeButton = () => {
                 >
                     <div
                         style={{
-                            color: POPOVER_SUBTEXT,
+                            color: 'var(--mantine-color-dimmed)',
                             fontSize: '0.62rem',
                             padding: '8px 0',
                             textAlign: 'center',
                         }}
                     >
                         {isShiftDown
-                            ? "Modifying all speakers' volumes"
-                            : "Hold Shift to modify all speakers' volumes"}
+                            ? 'Individual control · release Shift for grouped'
+                            : 'All speakers · Hold Shift for individual control'}
                     </div>
-                    <div style={{ borderBottom: POPOVER_BORDER, margin: '0 -10px 10px -10px' }} />
+                    <div
+                        style={{
+                            borderBottom: '1px solid var(--mantine-color-default-border)',
+                            margin: '0 -10px 10px -10px',
+                        }}
+                    />
 
                     {nonCoordinators.map((m) => (
                         <GroupMemberVolumeRow
-                            disabled={isShiftDown}
+                            disabled={!isShiftDown}
                             handleMemberVolume={handleMemberVolume}
                             isMinWidth={isMinWidth}
                             key={m.device.id}
@@ -729,7 +741,7 @@ const VolumeButton = () => {
                     >
                         {coordinator?.device.name}
                     </div>
-                </div>
+                </Paper>
             )}
             <div
                 style={{
@@ -754,7 +766,7 @@ const VolumeButton = () => {
                             e.stopPropagation();
                             if (wasCoordLongPress.current) return;
                             const newMuteState = !muted;
-                            if (isGroupMode && isShiftDown) {
+                            if (isGroupMode && !isShiftDown) {
                                 const newMutes: Record<string, boolean> = {};
                                 groupMembersRef.current.forEach((m) => {
                                     if (!m.isCoordinator) {

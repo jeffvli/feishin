@@ -72,6 +72,20 @@ export const DlnaCastButton = () => {
             ipc.removeAllListeners('renderer-dlna-group-state');
         };
     }, []);
+    useEffect(() => {
+        if (!ipc) return;
+        const handleDiscoveryUpdate = (_: unknown, updated: DlnaDevice[]) => {
+            setDevices((current) => {
+                const hasNewGroups = updated.some((d) => d.groupMembers);
+                if (!hasNewGroups) return current;
+                return updated;
+            });
+        };
+        ipc.on('renderer-dlna-discovery-update', handleDiscoveryUpdate);
+        return () => {
+            ipc.removeAllListeners('renderer-dlna-discovery-update');
+        };
+    }, []);
 
     const handleDiscover = useCallback(async () => {
         if (!dlnaPlayer) return;
@@ -108,8 +122,6 @@ export const DlnaCastButton = () => {
             const result = await dlnaPlayer.connect(device);
             if (result.success) {
                 coordinatorRef.current = device;
-                setConnectedDeviceName(device.name);
-                setGroupMemberList([{ device, isCoordinator: true, volume: result.volume }]);
                 setVolume(result.volume);
                 setSettings({
                     playback: {
@@ -120,7 +132,20 @@ export const DlnaCastButton = () => {
                         type: PlayerType.DLNA,
                     },
                 });
-                setScreen('connected');
+                if (device.groupMembers && device.groupMembers.length > 1) {
+                    const initialMembers: GroupMember[] = device.groupMembers.map((m) => ({
+                        device: m as DlnaDevice,
+                        isCoordinator: m.id === device.id,
+                        volume: m.id === device.id ? result.volume : 50,
+                    }));
+                    setGroupMemberList(initialMembers);
+                    setConnectedDeviceName(`Group (${initialMembers.length})`);
+                    setScreen('group');
+                } else {
+                    setConnectedDeviceName(device.name);
+                    setGroupMemberList([{ device, isCoordinator: true, volume: result.volume }]);
+                    setScreen('connected');
+                }
             } else {
                 playerHandoff.pendingDlnaSeek = -1;
                 setScreen('idle');
@@ -252,7 +277,9 @@ export const DlnaCastButton = () => {
     const expandGroupDevices = devices.filter(
         (d) =>
             d.id === coordinatorRef.current?.id ||
-            (isSonosDevice(d) && !groupMemberList.some((m) => m.device.id === d.id)),
+            (isSonosDevice(d) &&
+                !d.groupMembers &&
+                !groupMemberList.some((m) => m.device.id === d.id)),
     );
 
     return (
@@ -321,9 +348,44 @@ export const DlnaCastButton = () => {
                             <Text fw="600" pb="md" size="sm" ta="center">
                                 DLNA Devices
                             </Text>
-
+                            {devices
+                                .filter((d) => d.groupMembers && d.groupMembers.length > 1)
+                                .map((groupDevice) => (
+                                    <div
+                                        key={groupDevice.id}
+                                        onClick={() => void handleSelect(groupDevice)}
+                                        style={{
+                                            borderRadius: 6,
+                                            cursor: 'pointer',
+                                            marginBottom: 4,
+                                            padding: '8px 10px',
+                                        }}
+                                    >
+                                        <Text fw={600} size="sm">
+                                            {groupDevice.name}
+                                        </Text>
+                                        {groupDevice.groupMembers!.map((m) => (
+                                            <Text
+                                                c="dimmed"
+                                                fw={m.id === groupDevice.id ? 700 : 400}
+                                                key={m.id}
+                                                size="xs"
+                                                style={{
+                                                    fontWeight:
+                                                        m.id === groupDevice.id ? 700 : undefined,
+                                                    paddingLeft: 8,
+                                                }}
+                                            >
+                                                {m.id === groupDevice.id ? '★ ' : ''}
+                                                {m.name}
+                                            </Text>
+                                        ))}
+                                    </div>
+                                ))}
                             <DeviceList
-                                devices={devices}
+                                devices={devices.filter(
+                                    (d) => !d.groupMembers || d.groupMembers.length <= 1,
+                                )}
                                 isLoading={isLoading}
                                 onSelect={handleSelect}
                             />
