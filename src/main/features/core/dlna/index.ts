@@ -182,11 +182,9 @@ function consolidateDiscoveredDevices(
     const zoneGroups = decodedTopology.match(zoneGroupRegex);
     dlnaLog(`[Consolidate] Total ZoneGroup blocks matched: ${zoneGroups?.length ?? 0}`);
     if (!zoneGroups) return devices;
-
     const deviceById = new Map<string, DlnaDevice>(devices.map((d) => [d.id, d]));
     const groupedIds = new Set<string>();
     const groupEntries: DlnaDevice[] = [];
-
     for (let gi = 0; gi < zoneGroups.length; gi++) {
         const group = zoneGroups[gi];
         const groupTagMatch = group.match(/^<ZoneGroup\b([^>]*)>/);
@@ -198,11 +196,9 @@ function consolidateDiscoveredDevices(
         dlnaLog(`[Consolidate] Group[${gi}]: Coordinator UUID="${coordinatorUuid}"`);
         if (!coordinatorUuid) continue;
         const coordinatorId = `uuid:${coordinatorUuid}`;
-
         const memberDevices: DlnaDevice[] = [];
         const memberTagRegex = /<ZoneGroupMember\b([^>]*)\/?>/g;
         let tagMatch: null | RegExpExecArray;
-
         while ((tagMatch = memberTagRegex.exec(group)) !== null) {
             const attrs = tagMatch[1];
             const uuid = getAttr(attrs, 'UUID');
@@ -215,7 +211,6 @@ function consolidateDiscoveredDevices(
                 dlnaLog(`[Consolidate] Group[${gi}] member skipped: missing UUID or Location`);
                 continue;
             }
-
             const fullId = `uuid:${uuid}`;
             const existing = deviceById.get(fullId);
             if (existing) {
@@ -244,13 +239,11 @@ function consolidateDiscoveredDevices(
             }
             groupedIds.add(fullId);
         }
-
         dlnaLog(`[Consolidate] Group[${gi}]: ${memberDevices.length} members total`);
         if (memberDevices.length < 2) {
             dlnaLog(`[Consolidate] Group[${gi}]: fewer than 2 members, skipping`);
             continue;
         }
-
         const coordinator =
             deviceById.get(coordinatorId) ?? memberDevices.find((m) => m.id === coordinatorId);
         if (!coordinator) {
@@ -259,9 +252,7 @@ function consolidateDiscoveredDevices(
             );
             continue;
         }
-
         const sortedMembers = [coordinator, ...memberDevices.filter((m) => m.id !== coordinatorId)];
-
         dlnaLog(
             `[Consolidate] Group[${gi}]: creating group entry "${coordinator.name}" with ${sortedMembers.length} members`,
         );
@@ -272,7 +263,6 @@ function consolidateDiscoveredDevices(
             name: `Group (${sortedMembers.length})`,
         });
     }
-
     dlnaLog(`[Consolidate] groupedIds: ${JSON.stringify([...groupedIds])}`);
     dlnaLog(`[Consolidate] groupEntries count: ${groupEntries.length}`);
     const remaining = devices.filter((d) => !groupedIds.has(d.id));
@@ -283,25 +273,20 @@ function consolidateDiscoveredDevices(
 async function enrichDevicesWithTopology(devices: DlnaDevice[]): Promise<DlnaDevice[]> {
     const sonosDevices = devices.filter((d) => d.id.toUpperCase().includes('RINCON'));
     if (sonosDevices.length === 0) return devices;
-
     dlnaLog(
         `[Discovery/Topology] Starting topology scan for ${sonosDevices.length} Sonos device(s)`,
     );
     const attemptDelays = [1000, 2000, 4000, 6000];
-
     for (let attempt = 0; attempt < attemptDelays.length; attempt++) {
         await new Promise((r) => setTimeout(r, attemptDelays[attempt]));
         dlnaLog(`[Discovery/Topology] Attempt ${attempt + 1}/${attemptDelays.length}`);
-
         for (const sonosDevice of sonosDevices) {
             const rawSoap = await fetchTopologyForDevice(sonosDevice);
             if (!rawSoap) continue;
-
             const stateMatch = rawSoap.match(/<ZoneGroupState>([\s\S]*?)<\/ZoneGroupState>/);
             if (!stateMatch) {
                 continue;
             }
-
             const decodedTopology = stateMatch[1]
                 .replace(/&lt;/g, '<')
                 .replace(/&gt;/g, '>')
@@ -318,7 +303,6 @@ async function enrichDevicesWithTopology(devices: DlnaDevice[]): Promise<DlnaDev
             }
         }
     }
-
     dlnaLog('[Discovery/Topology] All attempts exhausted, returning flat device list');
     return devices;
 }
