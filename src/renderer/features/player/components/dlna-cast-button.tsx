@@ -73,7 +73,7 @@ export const DlnaCastButton = () => {
         return () => {
             ipc.removeAllListeners('renderer-dlna-group-state');
         };
-    }, []);
+    }, [t]);
     useEffect(() => {
         if (!ipc) return;
         const handleDiscoveryUpdate = (_: unknown, updated: DlnaDevice[]) => {
@@ -155,7 +155,7 @@ export const DlnaCastButton = () => {
                 setScreen('idle');
             }
         },
-        [setSettings, setVolume, settings, volume],
+        [setSettings, setVolume, settings, volume, t],
     );
 
     const handleGroupConfirm = useCallback(
@@ -199,7 +199,7 @@ export const DlnaCastButton = () => {
             setConnectedDeviceName(t('dlna.castingToGroup', { count: initialMembers.length }));
             setScreen('group');
         },
-        [setSettings, setVolume, settings, volume],
+        [setSettings, setVolume, settings, volume, t],
     );
 
     const handleExpandGroupConfirm = useCallback(
@@ -222,23 +222,26 @@ export const DlnaCastButton = () => {
             setConnectedDeviceName(t('dlna.castingToGroup', { count: newMembers.length }));
             setScreen('group');
         },
-        [groupMemberList],
+        [groupMemberList, t],
     );
 
-    const handleRemoveMember = useCallback(async (deviceId: string) => {
-        if (!dlnaPlayer) return;
-        await dlnaPlayer.removeGroupMember(deviceId);
-        setGroupMemberList((prev) => {
-            const next = prev.filter((m) => m.device.id !== deviceId);
-            if (next.length === 1) {
-                setConnectedDeviceName(next[0].device.name);
-                setScreen('connected');
-            } else {
-                setConnectedDeviceName(t('dlna.castingToGroup', { count: next.length }));
-            }
-            return next;
-        });
-    }, []);
+    const handleRemoveMember = useCallback(
+        async (deviceId: string) => {
+            if (!dlnaPlayer) return;
+            await dlnaPlayer.removeGroupMember(deviceId);
+            setGroupMemberList((prev) => {
+                const next = prev.filter((m) => m.device.id !== deviceId);
+                if (next.length === 1) {
+                    setConnectedDeviceName(next[0].device.name);
+                    setScreen('connected');
+                } else {
+                    setConnectedDeviceName(t('dlna.castingToGroup', { count: next.length }));
+                }
+                return next;
+            });
+        },
+        [t],
+    );
 
     const handleDisconnect = useCallback(async () => {
         if (!dlnaPlayer) return;

@@ -1252,7 +1252,7 @@
         },
         "volume": {
             "groupControl": "Hold Shift to modify individual speaker volumes",
-            "individualControl": "Release Shift to affect all speaker volumes"
+            "individualControl": "Release Shift to modify all speaker volumes"
         }
     },
     "dragDropZone": {
