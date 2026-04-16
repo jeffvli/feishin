@@ -77,6 +77,7 @@ const SpeakerPropertiesPopover = ({
     onClose: () => void;
     triggerRect: DOMRect;
 }) => {
+    const { t } = useTranslation();
     const [speakerProps, setSpeakerProps] = useState<null | SpeakerProperties>(null);
     const [loading, setLoading] = useState(true);
     const leftCenter = triggerRect.left + triggerRect.width / 2;
@@ -167,7 +168,7 @@ const SpeakerPropertiesPopover = ({
                         textAlign: 'center',
                     }}
                 >
-                    Loading…
+                    {t('dlna.speakerProperties.loading')}
                 </div>
             )}
             {!loading && !speakerProps && (
@@ -178,42 +179,42 @@ const SpeakerPropertiesPopover = ({
                         textAlign: 'center',
                     }}
                 >
-                    Could not load properties
+                    {t('dlna.speakerProperties.loadFailed')}
                 </div>
             )}
             {!loading && speakerProps && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     <PropSlider
-                        label="Bass"
+                        label={t('dlna.speakerProperties.bass')}
                         max={10}
                         min={-10}
                         onChange={(v) => set('bass', v)}
                         value={speakerProps.bass}
                     />
                     <PropSlider
-                        label="Treble"
+                        label={t('dlna.speakerProperties.treble')}
                         max={10}
                         min={-10}
                         onChange={(v) => set('treble', v)}
                         value={speakerProps.treble}
                     />
                     <PropToggle
-                        label="Loudness"
+                        label={t('dlna.speakerProperties.loudness')}
                         onChange={(v) => set('loudness', v)}
                         value={speakerProps.loudness}
                     />
                     <PropToggle
-                        label="Crossfade"
+                        label={t('dlna.speakerProperties.crossfade')}
                         onChange={(v) => set('crossfade', v)}
                         value={speakerProps.crossfade}
                     />
                     <PropToggle
-                        label="Status Light"
+                        label={t('dlna.speakerProperties.ledState')}
                         onChange={(v) => set('ledState', v)}
                         value={speakerProps.ledState}
                     />
                     <PropToggle
-                        label="Touch Controls"
+                        label={t('dlna.speakerProperties.touchControls')}
                         onChange={(v) => set('touchControls', v)}
                         value={speakerProps.touchControls}
                     />
@@ -432,7 +433,7 @@ const GroupMemberVolumeRow = ({
                         size="sm"
                         tooltip={{
                             label: isSonos
-                                ? 'Long press for speaker properties'
+                                ? t('dlna.speakerProperties.longPressHint')
                                 : muted
                                   ? t('player.muted', { postProcess: 'titleCase' })
                                   : member.volume,
@@ -705,8 +706,8 @@ const VolumeButton = () => {
                         }}
                     >
                         {isShiftDown
-                            ? 'Individual control · release Shift for grouped'
-                            : 'All speakers · Hold Shift for individual control'}
+                            ? t('dlna.volume.individualControl')
+                            : t('dlna.volume.groupControl')}
                     </div>
                     <div
                         style={{
@@ -785,7 +786,7 @@ const VolumeButton = () => {
                         size="sm"
                         tooltip={{
                             label: coordinatorIsSonos
-                                ? 'Long press for speaker properties'
+                                ? t('dlna.speakerProperties.longPressHint')
                                 : muted
                                   ? t('player.muted', { postProcess: 'titleCase' })
                                   : volume,

@@ -1208,6 +1208,53 @@
             }
         }
     },
+    "dlna": {
+        "castToDevice": "Cast to DLNA device",
+        "castingToDevice": "Casting to {{name}}",
+        "castingToGroup": "Casting to group ({{count}})",
+        "connected": "connected",
+        "connecting": "Connecting…",
+        "createGroup": "Create Group",
+        "devices": "DLNA Devices",
+        "disconnect": "Disconnect",
+        "disconnectAll": "Disconnect All",
+        "noDevicesFound": "No DLNA devices found",
+        "nowCasting": "Now casting",
+        "searching": "Searching for devices…",
+        "group": {
+            "add": "$t(common.add)",
+            "addSpeaker": "Add Speaker",
+            "addSpeakers": "Add Speakers",
+            "addToGroup": "Add to Group",
+            "cancel": "$t(common.cancel)",
+            "connect": "Connect",
+            "coordinator": "coordinator",
+            "failedToAddMessage": "Cannot add {{name}}. It might not be in the same Sonos system.",
+            "failedToAddTitle": "Failed to Add Speaker",
+            "firstSelectedIsCoordinator": "First selected = coordinator",
+            "noSonosFound": "No Sonos devices found",
+            "refresh": "$t(common.refresh)",
+            "remove": "Remove",
+            "searching": "Searching…",
+            "selectSpeakers": "Select Group Speakers",
+            "title": "Group ({{count}} speakers)"
+        },
+        "speakerProperties": {
+            "bass": "Bass",
+            "crossfade": "Crossfade",
+            "ledState": "Status Light",
+            "loadFailed": "Could not load properties",
+            "loading": "Loading…",
+            "longPressHint": "Long press for speaker properties",
+            "loudness": "Loudness",
+            "touchControls": "Touch Controls",
+            "treble": "Treble"
+        },
+        "volume": {
+            "groupControl": "Hold Shift to modify individual speaker volumes",
+            "individualControl": "Release Shift to affect all speaker volumes"
+        }
+    },
     "dragDropZone": {
         "error_oneFileOnly": "Please only select 1 file",
         "error_readingFile": "there has been an issue reading the file: {{errorMessage}}",
@@ -1220,6 +1267,7 @@
         "systemAudioConsentTitle": "Allow access to system audio?",
         "systemAudioCaptureFailed": "Could not start capture: {{message}}",
         "systemAudioNoAudioTrack": "No audio track was returned. Ensure audio capture is enabled when prompted.",
+        "systemAudioExclusiveModeNotSupported": "Visualizer is unavailable while audio exclusive mode is enabled. Disable Audio Exclusive Mode in MPV settings and try again.",
         "visualizerType": "Visualizer Type",
         "cyclePresets": "Cycle Presets",
         "cycleTime": "Cycle Time (seconds)",

@@ -367,7 +367,6 @@ function buildDIDL(metadata: TrackMetadata, url: string, mimeType: string): stri
     const artist = escapeXml(metadata.artistName || 'Unknown Artist');
     const album = escapeXml(metadata.albumName || 'Unknown Album');
     const art = escapeXml(metadata.albumArtUrl || '');
-    const duration = formatDuration(metadata.duration || 0);
     const protocolInfo = `http-get:*:${mimeType}:*`;
     return `
         <DIDL-Lite xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/"
@@ -379,7 +378,7 @@ function buildDIDL(metadata: TrackMetadata, url: string, mimeType: string): stri
                 <upnp:album>${album}</upnp:album>
                 <upnp:class>object.item.audioItem.musicTrack</upnp:class>
                 <upnp:albumArtURI>${art}</upnp:albumArtURI>
-                <res protocolInfo="${protocolInfo}" duration="${duration}">${escapeXml(url)}</res>
+                <res protocolInfo="${protocolInfo}">${escapeXml(url)}</res>
             </item>
         </DIDL-Lite>
     `

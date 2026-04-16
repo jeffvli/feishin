@@ -61,6 +61,7 @@ let lastCommandedUri = '';
 let lastQueuedNextUri = '';
 let lastFinishedUri = '';
 let lastAppSeekAt = 0;
+let lastPlayCommandAt = 0;
 let pendingPrevTrack = false;
 let isRadioMode = false;
 let groupMembers: DlnaDevice[] = [];
@@ -76,6 +77,8 @@ let speedProxyProcess: ChildProcess | null = null;
 let isPausedIntentionally = false;
 let currentFfmpegProcess: ChildProcess | null = null;
 let currentTranscodeFile = '';
+let lastKnownDuration = 0;
+let nearEndStallCount = 0;
 
 cleanupTempFiles();
 
@@ -470,7 +473,26 @@ async function fullDisconnect(): Promise<void> {
     hasStartedPlaying = false;
     lastCommandedUri = '';
     lastQueuedNextUri = '';
+    lastKnownDuration = 0;
+    nearEndStallCount = 0;
     isRadioMode = false;
+    if (groupMembers.length > 1 && connectedDevice) {
+        const members = groupMembers.filter((m) => m.id !== connectedDevice!.id);
+        await Promise.allSettled(
+            members.map(async (m) => {
+                try {
+                    await stop(m);
+                } catch {
+                    // Catch
+                }
+                try {
+                    await becomeCoordinatorOfStandaloneGroup(m);
+                } catch {
+                    // Catch
+                }
+            }),
+        );
+    }
     if (connectedDevice) {
         try {
             await stop(connectedDevice);
@@ -845,6 +867,9 @@ function startPositionPolling() {
                 realPosition = posInfo.position * proxyState.speed;
             }
             getMainWindow()?.webContents.send('renderer-dlna-current-time', realPosition);
+            if (posInfo.duration > 0) {
+                getMainWindow()?.webContents.send('renderer-dlna-duration', posInfo.duration);
+            }
             // Track that playback has started
             if (transportState === 'PLAYING' || transportState === 'TRANSITIONING')
                 hasStartedPlaying = true;
@@ -920,11 +945,38 @@ function startPositionPolling() {
                 }
                 const isGracePeriod = Date.now() - trackLoadedAt < 4000;
                 let justFiredTrackEnded = false;
+                if (posInfo.duration > 0) lastKnownDuration = posInfo.duration;
+                if (
+                    hasStartedPlaying &&
+                    lastKnownDuration > 0 &&
+                    posInfo.position > 0 &&
+                    posInfo.position >= lastKnownDuration - 2 &&
+                    Math.abs(posInfo.position - previousPosition) < 0.5 &&
+                    !recentAppSeek
+                ) {
+                    nearEndStallCount += 1;
+                    if (nearEndStallCount >= 3) {
+                        dlnaLog(
+                            `Stuck-at-end detected (${posInfo.position}/${lastKnownDuration}s), advancing`,
+                        );
+                        nearEndStallCount = 0;
+                        hasStartedPlaying = false;
+                        lastKnownDuration = 0;
+                        trackLoadedAt = Date.now();
+                        getMainWindow()?.webContents.send('renderer-dlna-track-ended', {
+                            gapless: false,
+                        });
+                    }
+                } else {
+                    nearEndStallCount = 0;
+                }
+                const recentPlayCommand = Date.now() - lastPlayCommandAt < 4000;
                 if (
                     hasStartedPlaying &&
                     transportState === 'STOPPED' &&
+                    !isGracePeriod &&
                     !isPausedIntentionally &&
-                    !isGracePeriod
+                    !recentPlayCommand
                 ) {
                     const isResumeFailure =
                         previousPosition < 15 ||
@@ -1208,8 +1260,10 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
         startPositionPolling();
         startTopologyPolling();
         refreshTopology();
-        await startEventSubscription(device);
-        await startTopologySubscription(device);
+        if (process.platform !== 'darwin') {
+            await startEventSubscription(device);
+            await startTopologySubscription(device);
+        }
         dlnaLog(`Connected to ${device.name}`);
         // Get current volume from device to sync UI
         let deviceVolume = 50;
@@ -1358,9 +1412,12 @@ ipcMain.on(
             isPausedIntentionally = data.metadata.autoPlay === false;
             lastAppSeekAt = Date.now();
             trackLoadedAt = Date.now();
+            lastKnownDuration = 0;
+            nearEndStallCount = 0;
             const lanUrl = rewriteUrlForLan(data.url);
             lastCommandedUri = lanUrl;
             lastQueuedNextUri = '';
+            lastPlayCommandAt = Date.now();
             const lanArtUrl = data.metadata.albumArtUrl
                 ? rewriteUrlForLan(data.metadata.albumArtUrl)
                 : undefined;
@@ -1469,6 +1526,7 @@ ipcMain.on('dlna-play', async () => {
     try {
         isPausedIntentionally = false;
         trackLoadedAt = Date.now();
+        lastPlayCommandAt = Date.now();
         await play(connectedDevice);
     } catch (err) {
         dlnaLog('Failed to resume playback', err);

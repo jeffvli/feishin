@@ -433,7 +433,7 @@
         "audioDevice": "音訊設備",
         "audioDevice_description": "選擇用於播放的音訊設備",
         "audioExclusiveMode": "音訊獨佔模式",
-        "audioExclusiveMode_description": "啟用獨佔輸出模式。在此模式下，系統通常被鎖定，只有 mpv 能夠輸出音訊",
+        "audioExclusiveMode_description": "啟用獨佔輸出模式。在此模式下，系統通常被鎖定，只有 mpv 能夠輸出音訊。視覺化音訊截取在此選項啟用時不會作用",
         "audioPlayer": "音訊播放器",
         "crossfadeDuration": "淡入淡出持續時間",
         "crossfadeDuration_description": "設定淡入淡出持續時間",
@@ -1341,6 +1341,7 @@
         "systemAudioConsentAllow": "允許",
         "systemAudioConsentBody": "此視覺化器需要存取系統音訊才能運作",
         "systemAudioConsentDecline": "拒絕",
-        "systemAudioConsentTitle": "允許存取系統音訊？"
+        "systemAudioConsentTitle": "允許存取系統音訊？",
+        "systemAudioExclusiveModeNotSupported": "啟用音訊獨佔模式時，視覺化不可用。 在MPV設定中停用音訊獨佔模式，然後再試一次。"
     }
 }

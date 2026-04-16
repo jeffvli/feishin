@@ -85,7 +85,7 @@
         "hotkey_zoomIn": "přiblížení",
         "scrobble_description": "scrobblovat přehrání na váš multimediální server",
         "hotkey_browserForward": "vpřed v prohlížeči",
-        "audioExclusiveMode_description": "zapnout režim výhradního výstupu. V tomto režimu bude obvykle v systému schopný přehrávat zvuk pouze přehrávač mpv",
+        "audioExclusiveMode_description": "zapnout režim výhradního výstupu. v tomto režimu bude obvykle v systému schopný přehrávat zvuk pouze přehrávač mpv. záznam systémového zvuku ve vizualizéru nebude fungovat",
         "discordUpdateInterval": "interval aktualizací {{discord}} rich presence",
         "themeLight": "motiv (světlý)",
         "fontType_optionBuiltIn": "vestavěné písmo",
@@ -1387,6 +1387,7 @@
         "systemAudioConsentTitle": "Povolit přístup k systémovému zvuku?",
         "systemAudioCaptureFailed": "Nepodařilo se spustit zachytávání: {{message}}",
         "systemAudioNoAudioTrack": "Nebyla zachycena žádná zvuková stopa. Ujistěte se, že jste při výzvě povolili zachytávání zvuku.",
-        "systemAudioConsentDecline": "Zamítnout"
+        "systemAudioConsentDecline": "Zamítnout",
+        "systemAudioExclusiveModeNotSupported": "Vizualizér není dostupný při zapnutém režimu výhradního výstupu zvuku. Zakažte Režim výhradního výstupu zvuku v nastavení MPV a zkuste to znovu."
     }
 }

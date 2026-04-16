@@ -1,5 +1,6 @@
 import { Loader } from '@mantine/core';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { DlnaDevice } from './types';
 
@@ -38,23 +39,24 @@ export const GroupBuilder = ({
 
     const coordinator = lockedCoordinator ?? checked[0];
     const canConfirm = checked.length >= 2;
+    const { t } = useTranslation();
 
     return (
         <>
             <Text fw="600" pb="md" size="sm" ta="center">
-                {lockedCoordinator ? 'Add Speakers' : 'Select Group Speakers'}
+                {lockedCoordinator ? t('dlna.group.addSpeakers') : t('dlna.group.selectSpeakers')}
             </Text>
 
             {isLoading && (
                 <Group p="sm">
                     <Loader color="gray" size={12} type="bars" />
-                    <Text c="dimmed">Searching…</Text>
+                    <Text c="dimmed">{t('dlna.group.searching')}</Text>
                 </Group>
             )}
             {!isLoading && devices.length === 0 && (
                 <Group p="sm">
                     <AppIcon.circleSlash size={12} />
-                    <Text c="dimmed">No Sonos devices found</Text>
+                    <Text c="dimmed">{t('dlna.group.noSonosFound')}</Text>
                 </Group>
             )}
 
@@ -98,7 +100,7 @@ export const GroupBuilder = ({
                         </Text>
                         {isCoord && (
                             <Text c="primary" size="xs">
-                                coordinator
+                                {t('dlna.group.coordinator')}
                             </Text>
                         )}
                     </div>
@@ -107,7 +109,7 @@ export const GroupBuilder = ({
 
             {!lockedCoordinator && (
                 <Text c="dimmed" px="sm" size="xs">
-                    Select Coordinator first
+                    {t('dlna.group.firstSelectedIsCoordinator')}
                 </Text>
             )}
 
@@ -120,10 +122,10 @@ export const GroupBuilder = ({
                     size="xs"
                     variant="outline"
                 >
-                    Refresh
+                    {t('dlna.group.refresh')}
                 </Button>
                 <Button color="gray" flex={1} onClick={onCancel} size="xs" variant="outline">
-                    Cancel
+                    {t('dlna.group.cancel')}
                 </Button>
                 <Button
                     disabled={!canConfirm}
@@ -132,7 +134,7 @@ export const GroupBuilder = ({
                     size="xs"
                     variant="filled"
                 >
-                    {lockedCoordinator ? 'Add' : 'Connect'}
+                    {lockedCoordinator ? t('dlna.group.add') : t('dlna.group.connect')}
                 </Button>
             </Group>
         </>

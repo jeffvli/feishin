@@ -246,10 +246,10 @@
         "loginRateError": "trop de tentatives de connexion, merci de réessayer dans quelques secondes",
         "openError": "impossible d'ouvrir le fichier",
         "networkError": "une erreur de réseau est survenue",
-        "badAlbum": "vous voyez cette page parce que ce titre ne fait pas parti d'un album. vous rencontrez probablement cette erreur si vous avez un titre à la racine de votre dossier musique. Jellyfin gère les chansons uniquement si elles sont dans un sous-dossier, qui est lui-même dans un dossier \"Musique(s)\"",
+        "badAlbum": "vous voyez cette page parce que ce titre ne fait pas parti d'un album. vous rencontrez probablement cette erreur si vous avez un titre à la racine de votre dossier musique. Jellyfin gère les pistes uniquement si elles sont dans un sous-dossier, qui est lui-même dans un dossier \"Musique(s)\"",
         "badValue": "option {{value}} invalide. cette valeur n'existe plus",
         "notificationDenied": "les autorisations pour les notifications ont été refusées. ce paramètre n'a aucun effet",
-        "multipleServerSaveQueueError": "la file d'attente contient un ou plusieurs morceaux qui ne proviennent pas du serveur actuel. Ceci n'est pas prise en charge",
+        "multipleServerSaveQueueError": "la file d'attente contient un ou plusieurs titres qui ne proviennent pas du serveur actuel. Ceci n'est pas prise en charge",
         "saveQueueFailed": "échec de l'enregistrement de la file d'attente",
         "settingsSyncError": "des incohérences ont été détectées entre les paramètres du moteur de rendu et ceux du processus principal. redémarrez l'application pour appliquer les modifications",
         "noNetwork": "serveur indisponible",
@@ -477,7 +477,7 @@
             "groupingTypePrimary": "types de parution principale",
             "topSongsCommunity": "communauté",
             "topSongsPersonal": "personnel",
-            "favoriteSongsFrom": "titres favori de {{title}}"
+            "favoriteSongsFrom": "titres favoris de {{title}}"
         },
         "itemDetail": {
             "copyPath": "copier le chemin dans le presse-papiers",
@@ -520,7 +520,7 @@
     },
     "setting": {
         "audioDevice_description": "sélectionnez le périphérique audio à utiliser pour la lecture",
-        "audioExclusiveMode_description": "activer le mode de sortie exclusif. Dans ce mode, le système est généralement verrouillé et seul mpv pourra émettre de l'audio",
+        "audioExclusiveMode_description": "activer le mode de sortie exclusif. Dans ce mode, le système est généralement verrouillé et seul mpv pourra émettre de l'audio. La capture audio du système de visualisation ne fonctionnera pas lorsque cette option est activée",
         "audioPlayer_description": "sélectionnez le lecteur audio à utiliser pour la lecture",
         "crossfadeDuration_description": "définit la durée du fondu enchaîné",
         "audioDevice": "périphérique audio",
@@ -914,7 +914,7 @@
             "ignoreCors": "ignorer cors $t(common.restartRequired)",
             "error_savePassword": "une erreur s’est produite lors de la tentative de sauvegarde du mot de passe",
             "input_preferInstantMix": "préférer le mix instantané",
-            "input_preferInstantMixDescription": "utiliser uniquement le mix instantané pour jouer des pistes similaires. utile si vous avez des plugins qui modifient ce comportement",
+            "input_preferInstantMixDescription": "utiliser uniquement le mix instantané pour jouer des titres similaires. utile si vous avez des plugins qui modifient ce comportement",
             "input_preferRemoteUrl": "préférer une URL publique",
             "input_remoteUrl": "URL publique",
             "input_remoteUrlPlaceholder": "optionnel : URL publique pour les fonctionnalités externes"
@@ -1388,6 +1388,7 @@
         "systemAudioConsentBody": "Le visualiseur nécessite un accès au système audio pour fonctionner",
         "systemAudioConsentDecline": "Refuser",
         "systemAudioConsentTitle": "Permettre l'accès au système audio ?",
-        "systemAudioCaptureFailed": "Impossible de démarrer la capture : {{message}}"
+        "systemAudioCaptureFailed": "Impossible de démarrer la capture : {{message}}",
+        "systemAudioExclusiveModeNotSupported": "Le visualiseur est indisponible lorsque le mode audio exclusif est activé. Désactivez ce mode dans les paramètres MPV et réessayez."
     }
 }

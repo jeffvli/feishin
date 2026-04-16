@@ -10,6 +10,8 @@ export enum AppTheme {
     DEFAULT_DARK = 'defaultDark',
     DEFAULT_LIGHT = 'defaultLight',
     DRACULA = 'dracula',
+    EVERFOREST_DARK = 'everforestDark',
+    EVERFOREST_LIGHT = 'everforestLight',
     GITHUB_DARK = 'githubDark',
     GITHUB_LIGHT = 'githubLight',
     GLASSY_DARK = 'glassyDark',

@@ -18,8 +18,11 @@
         "toggleSmartPlaylistEditor": "вкл./откл. редактор $t(entity.smartPlaylist)",
         "removeFromFavorites": "удалить из $t(entity.favorite, {\"count\": 2})",
         "openIn": {
-            "lastfm": "открыть на Last.fm",
-            "musicbrainz": "открыть на MusicBrainz"
+            "lastfm": "Открыть на Last.fm",
+            "musicbrainz": "открыть на MusicBrainz",
+            "listenbrainz": "Открыть на ListenBrainz",
+            "qobuz": "Открыть в Qobuz",
+            "spotify": "Открыть в Spotify"
         },
         "moveToNext": "следующий",
         "addOrRemoveFromSelection": "добавить или удалить из выделения",
@@ -510,7 +513,8 @@
             "goTo": "перейти в",
             "moveToNext": "$t(action.moveToNext)",
             "playShuffled": "$t(player.shuffle)",
-            "moveItems": "$t(action.moveItems)"
+            "moveItems": "$t(action.moveItems)",
+            "playSimilarSongs": "$t(player.playSimilarSongs)"
         },
         "home": {
             "mostPlayed": "слушают чаще всего",
@@ -725,6 +729,9 @@
             "input_played_optionUnplayed": "только не игранные треки",
             "input_played_optionPlayed": "только воспроизведённые треки",
             "input_genre": "$t(entity.genre, {\"count\": 1})"
+        },
+        "editRadioStation": {
+            "success": "радиостанция успешно обновлена"
         }
     },
     "setting": {

@@ -1,4 +1,5 @@
 import { Loader } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 import type { DlnaDevice } from './types';
 
@@ -17,11 +18,12 @@ export const DeviceList = ({
     isLoading: boolean;
     onSelect: (device: DlnaDevice) => void;
 }) => {
+    const { t } = useTranslation();
     if (isLoading) {
         return (
             <Group justify={'center'} p="sm">
                 <Loader color="gray" size={12} type="bars" />
-                <Text c="dimmed">Searching for devices…</Text>
+                <Text c="dimmed">{t('dlna.searching')}</Text>
             </Group>
         );
     }
@@ -30,7 +32,7 @@ export const DeviceList = ({
         return (
             <Group p="sm">
                 <AppIcon.circleSlash size={12} />
-                <Text c="dimmed">No DLNA devices found</Text>
+                <Text c="dimmed">{t('dlna.noDevicesFound')}</Text>
             </Group>
         );
     }
@@ -59,7 +61,7 @@ export const DeviceList = ({
                         {device.name}
                         {disabled && (
                             <Text c="primary" display="inline" ml={6} size="xs">
-                                connected
+                                {t('dlna.connected')}
                             </Text>
                         )}
                     </div>

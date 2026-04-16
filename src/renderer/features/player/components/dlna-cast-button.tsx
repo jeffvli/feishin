@@ -1,6 +1,7 @@
 import { Loader } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { DlnaDevice, GroupMember } from './dlna/types';
 
@@ -35,6 +36,7 @@ function isSonosDevice(device: DlnaDevice): boolean {
 
 export const DlnaCastButton = () => {
     const { setSettings } = useSettingsStoreActions();
+    const { t } = useTranslation();
     const { setVolume } = usePlayerActions();
     const volume = usePlayerVolume();
     const settings = usePlaybackSettings();
@@ -60,7 +62,7 @@ export const DlnaCastButton = () => {
             setGroupMemberList(state);
             if (state.length > 1) {
                 setScreen('group');
-                setConnectedDeviceName(`Group (${state.length})`);
+                setConnectedDeviceName(t('dlna.castingToGroup', { count: state.length }));
             } else if (state.length === 1) {
                 setScreen('connected');
                 setConnectedDeviceName(state[0].device.name);
@@ -139,7 +141,9 @@ export const DlnaCastButton = () => {
                         volume: m.id === device.id ? result.volume : 50,
                     }));
                     setGroupMemberList(initialMembers);
-                    setConnectedDeviceName(`Group (${initialMembers.length})`);
+                    setConnectedDeviceName(
+                        t('dlna.castingToGroup', { count: initialMembers.length }),
+                    );
                     setScreen('group');
                 } else {
                     setConnectedDeviceName(device.name);
@@ -186,13 +190,13 @@ export const DlnaCastButton = () => {
                     initialMembers.push({ device: member, isCoordinator: false, volume: 50 });
                 } else {
                     toast.error({
-                        message: `Cannot add ${member.name}. It might not be in the same Sonos system.`,
-                        title: 'Failed to Add Speaker',
+                        message: t('dlna.group.failedToAddMessage', { name: member.name }),
+                        title: t('dlna.group.failedToAddTitle'),
                     });
                 }
             }
             setGroupMemberList(initialMembers);
-            setConnectedDeviceName(`Group (${initialMembers.length})`);
+            setConnectedDeviceName(t('dlna.castingToGroup', { count: initialMembers.length }));
             setScreen('group');
         },
         [setSettings, setVolume, settings, volume],
@@ -209,13 +213,13 @@ export const DlnaCastButton = () => {
                     newMembers.push({ device: member, isCoordinator: false, volume: 50 });
                 } else {
                     toast.error({
-                        message: `Cannot add ${member.name}. It might not be in the same Sonos system.`,
-                        title: 'Failed to Add Speaker',
+                        message: t('dlna.group.failedToAddMessage', { name: member.name }),
+                        title: t('dlna.group.failedToAddTitle'),
                     });
                 }
             }
             setGroupMemberList(newMembers);
-            setConnectedDeviceName(`Group (${newMembers.length})`);
+            setConnectedDeviceName(t('dlna.castingToGroup', { count: newMembers.length }));
             setScreen('group');
         },
         [groupMemberList],
@@ -230,7 +234,7 @@ export const DlnaCastButton = () => {
                 setConnectedDeviceName(next[0].device.name);
                 setScreen('connected');
             } else {
-                setConnectedDeviceName(`Group (${next.length})`);
+                setConnectedDeviceName(t('dlna.castingToGroup', { count: next.length }));
             }
             return next;
         });
@@ -305,9 +309,9 @@ export const DlnaCastButton = () => {
                     tooltip={{
                         label: isConnected
                             ? screen === 'group'
-                                ? `Casting to group (${groupMemberList.length})`
-                                : `Casting to ${connectedDeviceName}`
-                            : 'Cast to DLNA device',
+                                ? t('dlna.castingToGroup', { count: groupMemberList.length })
+                                : t('dlna.castingToDevice', { name: connectedDeviceName })
+                            : t('dlna.castToDevice'),
                         openDelay: 0,
                     }}
                     variant="subtle"
@@ -319,7 +323,7 @@ export const DlnaCastButton = () => {
                     {screen === 'connecting' && (
                         <Group p="sm">
                             <Loader color="gray" size={12} type="bars" />
-                            <Text c="dimmed">Connecting…</Text>
+                            <Text c="dimmed">{t('dlna.connecting')}</Text>
                         </Group>
                     )}
                     {screen === 'group-build' && (
@@ -346,7 +350,7 @@ export const DlnaCastButton = () => {
                     {screen === 'idle' && (
                         <>
                             <Text fw="600" pb="md" size="sm" ta="center">
-                                DLNA Devices
+                                {t('dlna.devices')}
                             </Text>
                             {devices
                                 .filter((d) => d.groupMembers && d.groupMembers.length > 1)
@@ -404,7 +408,7 @@ export const DlnaCastButton = () => {
                                         size="xs"
                                         variant="outline"
                                     >
-                                        Refresh
+                                        {t('common.refresh')}
                                     </Button>
                                     {hasSonosDevices && devices.length >= 2 && (
                                         <Button
@@ -417,7 +421,7 @@ export const DlnaCastButton = () => {
                                             size="xs"
                                             variant="outline"
                                         >
-                                            Create Group
+                                            {t('dlna.createGroup')}
                                         </Button>
                                     )}
                                 </Group>
@@ -427,7 +431,7 @@ export const DlnaCastButton = () => {
                     {screen === 'connected' && (
                         <>
                             <Text fw="600" pb="md" size="sm" ta="center">
-                                Now casting
+                                {t('dlna.nowCasting')}
                             </Text>
 
                             <Text c="dimmed" size="sm">
@@ -447,7 +451,7 @@ export const DlnaCastButton = () => {
                                             size="xs"
                                             variant="outline"
                                         >
-                                            Add to Group
+                                            {t('dlna.group.addToGroup')}
                                         </Button>
                                     )}
                                 <Button
@@ -464,7 +468,7 @@ export const DlnaCastButton = () => {
                                     style={{ color: 'var(--mantine-color-red-4, #ff6b6b)' }}
                                     variant="outline"
                                 >
-                                    Disconnect
+                                    {t('dlna.disconnect')}
                                 </Button>
                             </Group>
                         </>
@@ -472,7 +476,7 @@ export const DlnaCastButton = () => {
                     {screen === 'group' && (
                         <>
                             <Text fw="600" pb="md" size="sm" ta="center">
-                                Group ({groupMemberList.length} speakers)
+                                {t('dlna.group.title', { count: groupMemberList.length })}
                             </Text>
 
                             {groupMemberList.map((member) => (
@@ -502,7 +506,7 @@ export const DlnaCastButton = () => {
                                             }}
                                             variant="subtle"
                                         >
-                                            Remove
+                                            {t('dlna.group.remove')}
                                         </Button>
                                     )}
                                 </Group>
@@ -519,7 +523,7 @@ export const DlnaCastButton = () => {
                                     size="xs"
                                     variant="outline"
                                 >
-                                    Add Speaker
+                                    {t('dlna.group.addSpeaker')}
                                 </Button>
                                 <Button
                                     color="red"
@@ -529,7 +533,7 @@ export const DlnaCastButton = () => {
                                     style={{ color: 'var(--mantine-color-red-4, #ff6b6b)' }}
                                     variant="outline"
                                 >
-                                    Disconnect All
+                                    {t('dlna.disconnectAll')}
                                 </Button>
                             </Group>
                         </>

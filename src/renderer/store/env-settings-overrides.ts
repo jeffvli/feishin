@@ -10,6 +10,8 @@ const APP_THEMES = new Set([
     'defaultDark',
     'defaultLight',
     'dracula',
+    'everforestDark',
+    'everforestLight',
     'githubDark',
     'githubLight',
     'glassyDark',

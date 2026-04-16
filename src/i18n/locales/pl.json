@@ -702,7 +702,7 @@
         "hotkey_favoriteCurrentSong": "ulubiona $t(common.currentSong)",
         "hotkey_zoomIn": "przybliż",
         "hotkey_browserForward": "przeglądarka w przód",
-        "audioExclusiveMode_description": "włącz wyłączny tryb wyjścia. W tym trybie, system zwykle jest zablokowany i może odtwarzać tylko poprzez mpv",
+        "audioExclusiveMode_description": "włącz wyłączny tryb wyjścia. W tym trybie, system zwykle jest zablokowany i może odtwarzać tylko poprzez mpv. wizualizer i przechwytywanie audio przez sysytem nie będzie działać gdy jest to włączone",
         "discordUpdateInterval": "{{discord}} interwał aktualizacji rich presence",
         "fontType_optionBuiltIn": "wbudowana czcionka",
         "hotkey_playbackPlayPause": "odtwarzaj / wstrzymaj",
@@ -1387,6 +1387,7 @@
         "systemAudioConsentDecline": "Odmów",
         "systemAudioConsentTitle": "Przyznać dostęp do audio systemu?",
         "systemAudioCaptureFailed": "Nie udało się rozpocząć przechwytywania: {{message}}",
-        "systemAudioNoAudioTrack": "Nie została zwrócona żadna ścieżka audio. Sprawdź czy przechwytywanie audio będzie włączone, gdy będzie o to prośba."
+        "systemAudioNoAudioTrack": "Nie została zwrócona żadna ścieżka audio. Sprawdź czy przechwytywanie audio będzie włączone, gdy będzie o to prośba.",
+        "systemAudioExclusiveModeNotSupported": "Wizualizer jest niedostępny w gdy tryb wyłącznie z dźwiękiek jest włączony. Wyłącz tryb wyłącznie audio w ustawieniach MPV i spróbuj ponownie."
     }
 }
