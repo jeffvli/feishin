@@ -409,6 +409,8 @@ export const JellyfinController: InternalControllerEndpoint = {
         return jfNormalize.album(
             { ...res.body, Songs: songsRes.body.Items },
             apiClientProps.server,
+            args.context?.pathReplace,
+            args.context?.pathReplaceWith,
         );
     },
     getAlbumList: async (args) => {
@@ -580,7 +582,8 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         return `${apiClientProps.server?.url}/items/${query.id}/download?apiKey=${apiClientProps.server?.credential}`;
     },
-    getFolder: async ({ apiClientProps, query }) => {
+    getFolder: async (args) => {
+        const { apiClientProps, query } = args;
         const userId = apiClientProps.server?.userId;
 
         if (!userId) throw new Error('No userId found');
@@ -742,6 +745,8 @@ export const JellyfinController: InternalControllerEndpoint = {
                 jfNormalize.song(
                     item as unknown as z.infer<typeof jfType._response.song>,
                     apiClientProps.server,
+                    args.context?.pathReplace,
+                    args.context?.pathReplaceWith,
                 ),
             );
 

@@ -2125,6 +2125,7 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         const res = await SubsonicController.getSongList({
             apiClientProps,
+            context,
             query: {
                 artistIds: [query.artistId],
                 sortBy: SongListSort.PLAY_COUNT,

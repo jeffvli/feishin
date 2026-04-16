@@ -496,7 +496,12 @@ export const NavidromeController: InternalControllerEndpoint = {
         }
 
         return res.body.similarSongs.song.map((song) =>
-            ssNormalize.song(song, apiClientProps.server),
+            ssNormalize.song(
+                song,
+                apiClientProps.server,
+                args.context?.pathReplace,
+                args.context?.pathReplaceWith,
+            ),
         );
     },
     getArtistList: async (args) => {
@@ -566,7 +571,12 @@ export const NavidromeController: InternalControllerEndpoint = {
         }
 
         return res.body.similarSongs2.song.map((song) =>
-            ssNormalize.song(song, apiClientProps.server),
+            ssNormalize.song(
+                song,
+                apiClientProps.server,
+                args.context?.pathReplace,
+                args.context?.pathReplaceWith,
+            ),
         );
     },
     getDownloadUrl: SubsonicController.getDownloadUrl,
@@ -823,7 +833,14 @@ export const NavidromeController: InternalControllerEndpoint = {
         return (
             (res.body.similarSongs?.song || [])
                 .filter((song) => song.id !== query.songId)
-                .map((song) => ssNormalize.song(song, apiClientProps.server)) || []
+                .map((song) =>
+                    ssNormalize.song(
+                        song,
+                        apiClientProps.server,
+                        args.context?.pathReplace,
+                        args.context?.pathReplaceWith,
+                    ),
+                ) || []
         );
     },
     getSongDetail: async (args) => {
@@ -1022,6 +1039,7 @@ export const NavidromeController: InternalControllerEndpoint = {
 
         const res = await NavidromeController.getSongList({
             apiClientProps,
+            context: args.context,
             query: {
                 artistIds: [query.artistId],
                 sortBy: SongListSort.PLAY_COUNT,

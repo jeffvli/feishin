@@ -278,6 +278,8 @@ const normalizeSong = (
 const normalizeAlbum = (
     item: z.infer<typeof jfType._response.album>,
     server: null | ServerListItem,
+    pathReplace?: string,
+    pathReplaceWith?: string,
 ): Album => {
     const { originalYear, releaseDate, releaseYear } = jellyfinPremiereFields(item);
 
@@ -340,7 +342,7 @@ const normalizeAlbum = (
         releaseYear,
         size: null,
         songCount: item?.ChildCount || null,
-        songs: item.Songs?.map((song) => normalizeSong(song, server)),
+        songs: item.Songs?.map((song) => normalizeSong(song, server, pathReplace, pathReplaceWith)),
         sortName: item.SortName || item.Name,
         tags: getTags(item),
         updatedAt: item?.DateLastMediaAdded || item.DateCreated,
