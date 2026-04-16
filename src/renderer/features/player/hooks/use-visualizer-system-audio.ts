@@ -19,6 +19,7 @@ export function useVisualizerSystemAudio(options: {
     onDeniedRef.current = onSystemAudioCaptureDenied;
     onSuccessRef.current = onSystemAudioCaptureSuccess;
     const playbackType = usePlaybackType();
+    const isMacOS = Boolean(window.api?.utils?.isMacOS?.());
     const { setWebAudio, webAudio } = useWebAudio();
     const webAudioRef = useRef(webAudio);
     const streamRef = useRef<MediaStream | null>(null);
@@ -80,7 +81,7 @@ export function useVisualizerSystemAudio(options: {
         try {
             const stream = await navigator.mediaDevices.getDisplayMedia({
                 audio: true,
-                video: false,
+                video: isMacOS, // On macOS, getDisplayMedia requires video to be requested in order to capture system audio
             });
 
             const audioTracks = stream.getAudioTracks();
@@ -124,7 +125,7 @@ export function useVisualizerSystemAudio(options: {
         } finally {
             connectInFlightRef.current = false;
         }
-    }, [disconnect, setWebAudio]);
+    }, [disconnect, isMacOS, setWebAudio]);
 
     const connectRef = useRef(connect);
     connectRef.current = connect;

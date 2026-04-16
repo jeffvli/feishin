@@ -5,6 +5,7 @@ import {
     app,
     BrowserWindow,
     BrowserWindowConstructorOptions,
+    desktopCapturer,
     globalShortcut,
     ipcMain,
     Menu,
@@ -733,7 +734,26 @@ async function createWindow(first = true): Promise<void> {
     });
 
     mainWindow.webContents.session.setDisplayMediaRequestHandler((_request, callback) => {
-        callback({ audio: 'loopback' });
+        if (!isMacOS()) {
+            callback({ audio: 'loopback' });
+            return;
+        }
+
+        desktopCapturer
+            .getSources({ thumbnailSize: { height: 0, width: 0 }, types: ['screen'] })
+            .then((sources) => {
+                const source = sources[0];
+                if (!source) {
+                    callback({});
+                    return;
+                }
+
+                callback({ audio: 'loopback', video: source });
+            })
+            .catch((err) => {
+                log.warn('desktopCapturer.getSources failed', err);
+                callback({});
+            });
     });
 
     if (!disableAutoUpdates() && store.get('disable_auto_updates') !== true) {

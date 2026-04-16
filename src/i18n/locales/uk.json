@@ -36,7 +36,10 @@
         "openApplicationDirectory": "відкрити каталог додатків",
         "openIn": {
             "lastfm": "Відкрити в Last.fm",
-            "musicbrainz": "Відкрити в MusicBrainz"
+            "musicbrainz": "Відкрити в MusicBrainz",
+            "listenbrainz": "Відкрити у ListenBrainz",
+            "qobuz": "Відкрити у Qobuz",
+            "spotify": "Відкрити у Spotify"
         }
     },
     "common": {
@@ -164,7 +167,9 @@
         "explicit": "Експліцитний зміст",
         "gridRows": "рядки сітки",
         "tableColumns": "стовпці таблиці",
-        "itemsMore": "{{count}} більше"
+        "itemsMore": "{{count}} більше",
+        "numberOfResults": "{{numberOfResults}} результатів",
+        "newVersionAvailable": "доступна нова версія"
     },
     "entity": {
         "album_one": "альбом",
@@ -255,7 +260,9 @@
         "serverRequired": "потрібен сервер",
         "sessionExpiredError": "ваша сесія закінчилася",
         "systemFontError": "сталася помилка під час спроби отримати системні шрифти",
-        "settingsSyncError": "виявлено розбіжності між налаштуваннями в рендерері та основним процесом. перезапустіть програму, щоб застосувати зміни"
+        "settingsSyncError": "виявлено розбіжності між налаштуваннями в рендерері та основним процесом. перезапустіть програму, щоб застосувати зміни",
+        "invalidJson": "недійсний JSON",
+        "playbackPausedDueToError": "відтворення було призупинено через помилку"
     },
     "filter": {
         "album": "$t(entity.album, {\"count\": 1})",
@@ -281,7 +288,7 @@
         "isPublic": "є публічним",
         "isRated": "є оціненим",
         "isRecentlyPlayed": "нещодавно відтворено",
-        "lastPlayed": "нещодавно відтворені",
+        "lastPlayed": "останнє відтворене",
         "mostPlayed": "найбільш відтворювані",
         "name": "назва",
         "note": "примітка",
@@ -301,7 +308,9 @@
         "title": "назва",
         "toYear": "до року",
         "trackNumber": "трек",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "explicitStatus": "$t(common.explicitStatus)",
+        "matchAnd": "і",
+        "matchOr": "або"
     },
     "datetime": {
         "minuteShort": "хв.",
@@ -414,7 +423,9 @@
             "setExpiration": "встановити термін дії",
             "success": "посилання для спільного використання скопійовано в буфер обміну (натисніть тут, щоб відкрити)",
             "expireInvalid": "термін дії повинен бути в майбутньому",
-            "createFailed": "не вдалося створити спільний доступ (чи ввімкнено спільний доступ?)"
+            "createFailed": "не вдалося створити спільний доступ (чи ввімкнено спільний доступ?)",
+            "copyToClipboard": "Скопіювати до буфера обміну: Ctrl+C, Enter",
+            "successMustClick": "посилання успішно створено, натисніть сюди, щоб відкрити"
         },
         "shuffleAll": {
             "title": "відтворити випадково",
@@ -435,6 +446,9 @@
             "enabled": "приватний режим увімкнено, стан відтворення тепер приховано від зовнішніх інтеграцій",
             "disabled": "приватний режим вимкнено, стан відтворення тепер видно для увімкнених зовнішніх інтеграцій",
             "title": "приватний режим"
+        },
+        "editRadioStation": {
+            "success": "радіо станція успішно оновлена"
         }
     },
     "player": {
@@ -539,6 +553,52 @@
             "goToAlbum": "перейти до $t(entity.album, {\"count\": 1})",
             "goToAlbumArtist": "перейти до $t(entity.albumArtist, {\"count\": 1})",
             "showDetails": "отримати інформацію"
+        },
+        "fullscreenPlayer": {
+            "config": {
+                "dynamicBackground": "динамічний фон",
+                "dynamicImageBlur": "розмір розмиття зображення",
+                "dynamicIsImage": "включити фонове зображення",
+                "followCurrentLyric": "слідкувати за поточним рядком",
+                "lyricAlignment": "вирівнювання тексту",
+                "lyricOffset": "затримка тексту (мс)",
+                "lyricGap": "розмір між рядками",
+                "lyricSize": "розмір тексту",
+                "opacity": "непрозорість",
+                "showLyricMatch": "показувати збіг тексту пісень",
+                "showLyricProvider": "показувати джерело тексту пісень",
+                "synchronized": "синхронізовано",
+                "unsynchronized": "несинхронізовано",
+                "useImageAspectRatio": "використовувати співвідношення сторін зображення"
+            },
+            "lyrics": "текст пісні",
+            "related": "пов'язані",
+            "upNext": "далі",
+            "visualizer": "візуалізатор",
+            "noLyrics": "текст пісні не знайдено"
+        },
+        "genreList": {
+            "showAlbums": "показати $t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
+            "showTracks": "показати $t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.genre, {\"count\": 2})"
+        },
+        "folderList": {
+            "title": "$t(entity.folder, {\"count\": 2})"
+        },
+        "globalSearch": {
+            "commands": {
+                "goToPage": "перейти до сторінки",
+                "searchFor": "шукати на {{query}}",
+                "serverCommands": "команди сервера"
+            },
+            "title": "команди"
+        },
+        "home": {
+            "explore": "дослідити з вашої бібліотеки",
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "mostPlayed": "найбільш відтворені",
+            "newlyAdded": "нещодавно додані релізи",
+            "recentlyPlayed": "нещодавно відтворені"
         }
     }
 }

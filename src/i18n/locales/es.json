@@ -83,7 +83,7 @@
         "replayGainClipping": "recortar {{ReplayGain}}",
         "hotkey_zoomIn": "ampliar",
         "scrobble_description": "hace scrobble de las reproducciones en tu servidor de medios",
-        "audioExclusiveMode_description": "activa el modo de audio exclusivo. En este modo, el sistema es normalmente bloqueado, y solo se permitirá mpv en la salida de audio",
+        "audioExclusiveMode_description": "activa el modo de audio exclusivo. En este modo, el sistema es normalmente bloqueado, y solo se permitirá mpv en la salida de audio. El sistema visualizador de captura de audio no funcionará mientras esto esté activado",
         "discordUpdateInterval": "intervalo de actualización del estado de actividad de {{discord}}",
         "themeLight": "tema (claro)",
         "fontType_optionBuiltIn": "fuente incorporada",
@@ -1387,6 +1387,7 @@
         "systemAudioConsentTitle": "¿Permitir acceso al sistema de audio?",
         "systemAudioConsentBody": "El visualizador requiere acceso al sistema de audio para funcionar",
         "systemAudioCaptureFailed": "No se pudo iniciar la captura: {{message}}",
-        "systemAudioNoAudioTrack": "Ninguna pista de audio devuelta. Asegúrate de que la captura de audio está activada cuando se solicite."
+        "systemAudioNoAudioTrack": "Ninguna pista de audio devuelta. Asegúrate de que la captura de audio está activada cuando se solicite.",
+        "systemAudioExclusiveModeNotSupported": "El visualizador no está disponible mientras el modo de audio exclusivo esté activado. Desactiva el modo de audio exclusivo en la configuración de MPV e inténtalo de nuevo."
     }
 }

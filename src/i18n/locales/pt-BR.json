@@ -91,7 +91,7 @@
         "share": "compartilhar",
         "close": "fechar",
         "translation": "tradução",
-        "albumGain": "ganho do album",
+        "albumGain": "ganho do álbum",
         "trackPeak": "peak da faixa",
         "albumPeak": "pico do álbum",
         "trackGain": "ganho da faixa",
@@ -121,10 +121,21 @@
         "removeFromFavorites": "remover de $t(entity.favorite, {\"count\": 2})",
         "openIn": {
             "lastfm": "Abrir em Last.fm",
-            "musicbrainz": "Abrir em MusicBrainz"
+            "musicbrainz": "Abrir em MusicBrainz",
+            "listenbrainz": "Abrir no ListenBrainz",
+            "qobuz": "Abrir no Qobuz"
         },
         "toggleSmartPlaylistEditor": "alternar editor $t(entity.smartPlaylist)",
-        "moveToNext": "mover para o próximo"
+        "moveToNext": "mover para o próximo",
+        "addOrRemoveFromSelection": "adicionar ou remover da seleção",
+        "goToCurrent": "ir para o item atual",
+        "createRadioStation": "criar $t(entity.radioStation, {\"count\": 1})",
+        "deleteRadioStation": "deletar $t(entity.radioStation, {\"count\": 1})",
+        "selectAll": "selecionar tudo",
+        "holdToMoveToTop": "segure para ir ao topo",
+        "moveItems": "mover itens",
+        "viewMore": "ver mais",
+        "openApplicationDirectory": "abrir a pasta do aplicativo"
     },
     "form": {
         "deletePlaylist": {

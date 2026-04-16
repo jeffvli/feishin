@@ -30,7 +30,7 @@ jobs:
 
         strategy:
             matrix:
-                os: [macos-latest, ubuntu-latest, windows-latest]
+                os: [macos-26, ubuntu-latest, windows-latest]
 
         steps:
             - name: Checkout git repo
@@ -65,7 +65,7 @@ jobs:
                       pnpm run package:linux:pr
 
             - name: Build for MacOS
-              if: ${{ matrix.os == 'macos-latest' }}
+              if: ${{ matrix.os == 'macos-26' }}
               uses: nick-invision/retry@v3.0.2
               with:
                   timeout_minutes: 30
@@ -86,7 +86,7 @@ jobs:
                   zip -r dist/linux-binaries.zip dist/*.{AppImage,deb,rpm}
 
             - name: Zip MacOS Binaries
-              if: ${{ matrix.os == 'macos-latest' }}
+              if: ${{ matrix.os == 'macos-26' }}
               run: |
                   zip -r dist/macos-binaries.zip dist/*.dmg
 
@@ -105,7 +105,7 @@ jobs:
                   path: dist/linux-binaries.zip
 
             - name: Upload MacOS Binaries
-              if: ${{ matrix.os == 'macos-latest' }}
+              if: ${{ matrix.os == 'macos-26' }}
               uses: actions/upload-artifact@v7
               with:
                   name: macos-binaries
