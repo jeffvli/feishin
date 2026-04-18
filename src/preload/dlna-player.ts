@@ -27,8 +27,16 @@ export interface TrackMetadata {
 }
 
 const discover = (): Promise<DlnaDevice[]> => ipcRenderer.invoke('dlna-discover');
-const connect = (device: DlnaDevice): Promise<{ success: boolean; volume: number }> =>
-    ipcRenderer.invoke('dlna-connect', device);
+const connect = (
+    device: DlnaDevice,
+): Promise<{
+    currentDuration: number;
+    currentPosition: number;
+    currentTransportState: string;
+    currentUri: string;
+    success: boolean;
+    volume: number;
+}> => ipcRenderer.invoke('dlna-connect', device);
 const disconnect = (): Promise<boolean> => ipcRenderer.invoke('dlna-disconnect');
 const playUrl = (
     url: string,

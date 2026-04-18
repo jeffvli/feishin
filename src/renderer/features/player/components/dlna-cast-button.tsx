@@ -67,6 +67,14 @@ export const DlnaCastButton = () => {
                 setScreen('connected');
                 setConnectedDeviceName(state[0].device.name);
                 coordinatorRef.current = state[0].device as DlnaDevice;
+            } else {
+                if (coordinatorRef.current) {
+                    setScreen('connected');
+                    setConnectedDeviceName(coordinatorRef.current.name);
+                    setGroupMemberList([
+                        { device: coordinatorRef.current, isCoordinator: true, volume: 50 },
+                    ]);
+                }
             }
         };
         ipc.on('renderer-dlna-group-state', handleGroupState);
@@ -78,6 +86,7 @@ export const DlnaCastButton = () => {
         if (!ipc) return;
         const handleDiscoveryUpdate = (_: unknown, updated: DlnaDevice[]) => {
             setDevices((current) => {
+                if (screen !== 'idle') return current;
                 const hasNewGroups = updated.some((d) => d.groupMembers);
                 if (!hasNewGroups) return current;
                 return updated;
@@ -87,10 +96,11 @@ export const DlnaCastButton = () => {
         return () => {
             ipc.removeAllListeners('renderer-dlna-discovery-update');
         };
-    }, []);
+    }, [screen]);
 
     const handleDiscover = useCallback(async () => {
         if (!dlnaPlayer) return;
+        setDevices([]);
         setIsLoading(true);
         try {
             setDevices(await dlnaPlayer.discover());
@@ -125,6 +135,16 @@ export const DlnaCastButton = () => {
             if (result.success) {
                 coordinatorRef.current = device;
                 setVolume(result.volume);
+                if (result.currentUri && result.currentTransportState !== 'STOPPED') {
+                    playerHandoff.pendingDlnaSeek = -1;
+                    playerHandoff.deviceAlreadyPlaying = true;
+                    ipc?.send('renderer-dlna-connect-playback', {
+                        duration: result.currentDuration,
+                        position: result.currentPosition,
+                        transportState: result.currentTransportState,
+                        uri: result.currentUri,
+                    });
+                }
                 setSettings({
                     playback: {
                         ...settings,
@@ -259,7 +279,9 @@ export const DlnaCastButton = () => {
                 : previousPlayerTypeRef.current;
         setSettings({ playback: { ...settings, type: nextType } });
         if (settings.previousLocalVolume !== undefined) setVolume(settings.previousLocalVolume);
-    }, [setSettings, setVolume, settings]);
+        setDevices([]);
+        void handleDiscover();
+    }, [setSettings, setVolume, settings, handleDiscover]);
 
     useEffect(() => {
         if (settings.previousLocalVolume !== undefined) {
@@ -411,7 +433,7 @@ export const DlnaCastButton = () => {
                                         size="xs"
                                         variant="outline"
                                     >
-                                        {t('common.refresh')}
+                                        {t('dlna.group.refresh')}
                                     </Button>
                                     {hasSonosDevices && devices.length >= 2 && (
                                         <Button

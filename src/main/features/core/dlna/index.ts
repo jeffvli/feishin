@@ -282,29 +282,35 @@ async function enrichDevicesWithTopology(devices: DlnaDevice[]): Promise<DlnaDev
     const attemptDelays = [1000, 2000, 4000, 6000];
     for (let attempt = 0; attempt < attemptDelays.length; attempt++) {
         await new Promise((r) => setTimeout(r, attemptDelays[attempt]));
-        dlnaLog(`[Discovery/Topology] Attempt ${attempt + 1}/${attemptDelays.length}`);
-        for (const sonosDevice of sonosDevices) {
-            const rawSoap = await fetchTopologyForDevice(sonosDevice);
-            if (!rawSoap) continue;
-            const stateMatch = rawSoap.match(/<ZoneGroupState>([\s\S]*?)<\/ZoneGroupState>/);
-            if (!stateMatch) {
-                continue;
-            }
-            const decodedTopology = stateMatch[1]
-                .replace(/&lt;/g, '<')
-                .replace(/&gt;/g, '>')
-                .replace(/&quot;/g, '"')
-                .replace(/&amp;/g, '&');
-
-            const consolidated = consolidateDiscoveredDevices(devices, decodedTopology);
-            const groupEntries = consolidated.filter((d) => d.groupMembers);
-            if (groupEntries.length > 0) {
-                dlnaLog(
-                    `[Discovery/Topology] Result: ${consolidated.length} entries, ${groupEntries.length} group(s)`,
-                );
-                return consolidated;
-            }
+        dlnaLog(`[Discovery/Topology] Attempt ${attempt + 1}/${attemptDelays.length} (parallel)`);
+        const rawSoap = await Promise.race(
+            sonosDevices.map((sonosDevice) =>
+                fetchTopologyForDevice(sonosDevice).then((raw) => {
+                    if (!raw) return null;
+                    const stateMatch = raw.match(/<ZoneGroupState>([\s\S]*?)<\/ZoneGroupState>/);
+                    if (!stateMatch) return null;
+                    return stateMatch[1]
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>')
+                        .replace(/&quot;/g, '"')
+                        .replace(/&amp;/g, '&');
+                }),
+            ),
+        );
+        if (!rawSoap) {
+            dlnaLog(`[Discovery/Topology] Attempt ${attempt + 1}: no topology from any device`);
+            continue;
         }
+        const consolidated = consolidateDiscoveredDevices(devices, rawSoap);
+        const groupEntries = consolidated.filter((d) => d.groupMembers);
+        if (groupEntries.length > 0) {
+            dlnaLog(
+                `[Discovery/Topology] Result: ${consolidated.length} entries, ${groupEntries.length} group(s)`,
+            );
+            return consolidated;
+        }
+        dlnaLog('[Discovery/Topology] Topology received but no groups found, returning flat list');
+        return devices;
     }
     dlnaLog('[Discovery/Topology] All attempts exhausted, returning flat device list');
     return devices;
@@ -476,23 +482,6 @@ async function fullDisconnect(): Promise<void> {
     lastKnownDuration = 0;
     nearEndStallCount = 0;
     isRadioMode = false;
-    if (groupMembers.length > 1 && connectedDevice) {
-        const members = groupMembers.filter((m) => m.id !== connectedDevice!.id);
-        await Promise.allSettled(
-            members.map(async (m) => {
-                try {
-                    await stop(m);
-                } catch {
-                    // Catch
-                }
-                try {
-                    await becomeCoordinatorOfStandaloneGroup(m);
-                } catch {
-                    // Catch
-                }
-            }),
-        );
-    }
     if (connectedDevice) {
         try {
             await stop(connectedDevice);
@@ -669,8 +658,20 @@ function handleTopologyNotify(xml: string): void {
             break;
         }
         let newCoordinatorId = newCoordinatorRincon ? `uuid:${newCoordinatorRincon}` : '';
-        if (newMembers.length === 1 && connectedDevice) {
+        if (newMembers.length <= 1 && connectedDevice) {
+            const solo = newMembers.length === 1 ? newMembers[0] : connectedDevice;
             newCoordinatorId = connectedDevice.id;
+            const hasTopologyChanged =
+                groupMembers.length !== 1 ||
+                groupMembers[0]?.id !== solo.id ||
+                currentCoordinatorId !== newCoordinatorId;
+            if (hasTopologyChanged) {
+                groupMembers = [solo];
+                currentCoordinatorId = newCoordinatorId;
+                dlnaLog(`Topology Change Detected: Group size is now 1 (solo)`);
+                sendGroupStateToRenderer();
+            }
+            return;
         }
         const hasTopologyChanged =
             newMembers.length !== groupMembers.length ||
@@ -1246,9 +1247,10 @@ ipcMain.handle('dlna-discover', async () => {
 ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
     try {
         if (connectedDevice) await fullDisconnect();
-        connectedDevice = device;
-        currentCoordinatorId = device.id;
-        groupMembers = [device];
+        const actualDevice = device.groupMembers?.find((m) => m.id === device.id) || device;
+        connectedDevice = actualDevice;
+        currentCoordinatorId = actualDevice.id;
+        groupMembers = device.groupMembers ? [...device.groupMembers] : [actualDevice];
         groupMemberVolumes = {};
         lastKnownPosition = 0;
         hasStartedPlaying = false;
@@ -1275,8 +1277,38 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
         } catch {
             // Use default
         }
+        let currentUri = '';
+        let currentPosition = 0;
+        let currentDuration = 0;
+        let currentTransportState = 'STOPPED';
+        try {
+            const [posInfo, tState] = await Promise.all([
+                getPositionInfo(device),
+                getTransportInfo(device),
+            ]);
+            currentTransportState = tState;
+            const isActive =
+                tState === 'PLAYING' || tState === 'PAUSED_PLAYBACK' || tState === 'TRANSITIONING';
+            if (isActive && posInfo.trackUri && posInfo.trackUri !== 'NOT_IMPLEMENTED') {
+                currentUri = posInfo.trackUri;
+                currentPosition = posInfo.position;
+                currentDuration = posInfo.duration;
+                lastCommandedUri = currentUri;
+                dlnaLog(`Device already playing: ${currentUri} at ${currentPosition}s (${tState})`);
+            }
+        } catch {
+            // Catch
+        }
+
         sendGroupStateToRenderer();
-        return { success: true, volume: deviceVolume };
+        return {
+            currentDuration,
+            currentPosition,
+            currentTransportState,
+            currentUri,
+            success: true,
+            volume: deviceVolume,
+        };
     } catch (err) {
         dlnaLog(`Failed to connect to ${device.name}`, err);
         return { success: false, volume: 50 };
@@ -1415,9 +1447,19 @@ ipcMain.on(
             lastKnownDuration = 0;
             nearEndStallCount = 0;
             const lanUrl = rewriteUrlForLan(data.url);
+            lastPlayCommandAt = Date.now();
+            if (lanUrl === lastCommandedUri && !data.seekTo) {
+                dlnaLog(
+                    `dlna-play-url: URI already loaded (${data.metadata.title}), skipping SetAVTransportURI`,
+                );
+                lastQueuedNextUri = '';
+                if (data.metadata.autoPlay !== false) {
+                    await play(device).catch((err) => dlnaLog('Play (skip-reload) failed', err));
+                }
+                return;
+            }
             lastCommandedUri = lanUrl;
             lastQueuedNextUri = '';
-            lastPlayCommandAt = Date.now();
             const lanArtUrl = data.metadata.albumArtUrl
                 ? rewriteUrlForLan(data.metadata.albumArtUrl)
                 : undefined;
