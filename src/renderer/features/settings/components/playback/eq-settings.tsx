@@ -7,7 +7,7 @@ import {
 import {
     buildMpvAudioFilters,
     type CompressorSettings,
-    type EqSettings,
+    type EqSettings as EqSettingsType,
 } from './mpv-audio-filters';
 import { Divider } from '/@/shared/components/divider/divider';
 import { PlayerType } from '/@/shared/types/types';
