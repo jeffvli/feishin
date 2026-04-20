@@ -1,6 +1,6 @@
 import isElectron from 'is-electron';
 import { memo, useCallback, useState } from 'react';
-
+import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import {
     buildMpvAudioFilters,
     type CompressorSettings,
@@ -263,42 +263,46 @@ function Toggle({
 }) {
     return (
         <label
-            style={{
-                alignItems: 'center',
-                cursor: 'pointer',
-                display: 'flex',
-                gap: 10,
-                userSelect: 'none',
-            }}
+        style={{
+            alignItems: 'center',
+            cursor: 'pointer',
+            display: 'flex',
+            gap: 10,
+            userSelect: 'none',
+        }}
         >
-            <div
-                onClick={() => onChange(!checked)}
-                style={{
-                    background: checked
-                        ? 'var(--primary-color, #3574fc)'
-                        : 'rgba(255,255,255,0.15)',
-                    borderRadius: 12,
-                    flexShrink: 0,
-                    height: 22,
-                    position: 'relative',
-                    transition: 'background 0.2s',
-                    width: 40,
-                }}
-            >
-                <div
-                    style={{
-                        background: '#fff',
-                        borderRadius: '50%',
-                        height: 16,
-                        left: checked ? 20 : 3,
-                        position: 'absolute',
-                        top: 3,
-                        transition: 'left 0.2s',
-                        width: 16,
-                    }}
-                />
-            </div>
-            <span style={{ fontSize: 14, fontWeight: 500 }}>{label}</span>
+        <button
+        onClick={() => onChange(!checked)}
+        style={{
+            background: checked
+            ? 'var(--primary-color, #3574fc)'
+            : 'rgba(255,255,255,0.15)',
+            border: 'none',
+            borderRadius: 12,
+            cursor: 'pointer',
+            flexShrink: 0,
+            height: 22,
+            padding: 0,
+            position: 'relative',
+            transition: 'background 0.2s',
+            width: 40,
+        }}
+        type="button"
+        >
+        <div
+        style={{
+            background: '#fff',
+            borderRadius: '50%',
+            height: 16,
+            left: checked ? 20 : 3,
+            position: 'absolute',
+            top: 3,
+            transition: 'left 0.2s',
+            width: 16,
+        }}
+        />
+        </button>
+        <span style={{ fontSize: 14, fontWeight: 500 }}>{label}</span>
         </label>
     );
 }
@@ -350,7 +354,7 @@ function VerticalSlider({
 export const EqSettings = memo(() => {
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
-
+    const { webAudio } = useWebAudio();
     // Custom preset state (stored in localStorage, not Zustand)
     const [customEqPresets, setCustomEqPresets] = useState<Record<string, number[]>>(() =>
         loadCustomPresets<number[]>(LS_EQ_PRESETS),
@@ -359,10 +363,46 @@ export const EqSettings = memo(() => {
         () => loadCustomPresets<CompressorPreset>(LS_COMP_PRESETS),
     );
 
-    const applyFilters = useCallback((eq: EqSettingsType, compressor: CompressorSettings) => {
-        const filterStr = buildMpvAudioFilters(eq, compressor);
-        mpvPlayer?.setProperties({ af: filterStr });
-    }, []);
+    const applyFilters = useCallback(
+        (eq: EqSettingsType, compressor: CompressorSettings) => {
+            // ── MPV player ────────────────────────────────────────────────
+            if (settings.type === PlayerType.LOCAL) {
+                const filterStr = buildMpvAudioFilters(eq, compressor);
+                mpvPlayer?.setProperties({ af: filterStr });
+                return;
+            }
+
+            // ── Web Audio player ──────────────────────────────────────────
+            const dsp = webAudio?.dsp;
+            if (!dsp) return;
+
+            dsp.preampGain.gain.value = eq.enabled
+            ? Math.pow(10, eq.preamp / 20)
+            : 1;
+
+            dsp.eqFilters.forEach((filter, i) => {
+                const band = eq.bands[i];
+                if (band) {
+                    filter.gain.value = eq.enabled ? band.gain : 0;
+                }
+            });
+
+            if (compressor.enabled) {
+                dsp.compressor.threshold.value = compressor.threshold;
+                dsp.compressor.ratio.value = compressor.ratio;
+                dsp.compressor.attack.value = compressor.attack / 1000;
+                dsp.compressor.release.value = compressor.release / 1000;
+                dsp.compressor.knee.value = compressor.knee;
+            } else {
+                dsp.compressor.threshold.value = 0;
+                dsp.compressor.ratio.value = 1;
+                dsp.compressor.attack.value = 0;
+                dsp.compressor.release.value = 0.25;
+                dsp.compressor.knee.value = 0;
+            }
+        },
+        [settings.type, webAudio],
+    );
 
     // ── EQ handlers ────────────────────────────────────────────────────────────
     const handleEqToggle = (enabled: boolean) => {
@@ -474,8 +514,7 @@ export const EqSettings = memo(() => {
         applyFilters(settings.equalizer, newComp);
     };
 
-    const isLocal = settings.type === PlayerType.LOCAL;
-    if (!isLocal) return null;
+// EQ and compressor work on both MPV (lavfi) and Web Audio (BiquadFilter/DynamicsCompressor)
 
     const compParams: {
         key: keyof CompressorSettings;
@@ -515,7 +554,9 @@ export const EqSettings = memo(() => {
                             onChange={handleEqToggle}
                         />
                         <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>
-                            Graphical EQ · FFmpeg lavfi · MPV only
+                            {settings.type === PlayerType.LOCAL
+                                ? 'Graphical EQ · FFmpeg lavfi · MPV'
+                                : 'Graphical EQ · Web Audio API'}
                         </span>
                     </div>
 
@@ -655,7 +696,9 @@ export const EqSettings = memo(() => {
                             onChange={handleCompToggle}
                         />
                         <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>
-                            Dynamic range · FFmpeg acompressor · MPV only
+                            {settings.type === PlayerType.LOCAL
+                                ? 'Dynamic range · FFmpeg acompressor · MPV'
+                                : 'Dynamic range · Web Audio API'}
                         </span>
                     </div>
 

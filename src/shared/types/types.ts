@@ -288,6 +288,11 @@ export interface UniqueId {
 
 export type WebAudio = {
     context: AudioContext;
+    dsp: {
+        compressor: DynamicsCompressorNode;
+        eqFilters: BiquadFilterNode[];
+        preampGain: GainNode;
+    } | null;
     gains: GainNode[];
     visualizerInputs?: AudioNode[];
 };
