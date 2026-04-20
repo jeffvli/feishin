@@ -1,9 +1,9 @@
 import isElectron from 'is-electron';
 import { lazy, memo, Suspense, useMemo } from 'react';
 import { shallow } from 'zustand/shallow';
-
 import { AudioSettings } from '/@/renderer/features/settings/components/playback/audio-settings';
 import { AutoDJSettings } from '/@/renderer/features/settings/components/playback/auto-dj-settings';
+import { EqSettings } from '/@/renderer/features/settings/components/playback/eq-settings';
 import { PlayerFilterSettings } from '/@/renderer/features/settings/components/playback/player-filter-settings';
 import { TranscodeSettings } from '/@/renderer/features/settings/components/playback/transcode-settings';
 import { useSettingsStore } from '/@/renderer/store';
@@ -12,9 +12,9 @@ import { Stack } from '/@/shared/components/stack/stack';
 import { PlayerType } from '/@/shared/types/types';
 
 const MpvSettings = lazy(() =>
-    import('/@/renderer/features/settings/components/playback/mpv-settings').then((module) => {
-        return { default: module.MpvSettings };
-    }),
+import('/@/renderer/features/settings/components/playback/mpv-settings').then((module) => {
+    return { default: module.MpvSettings };
+}),
 );
 
 export const PlaybackTab = memo(() => {
@@ -35,14 +35,15 @@ export const PlaybackTab = memo(() => {
 
     return (
         <Stack gap="md">
-            <AudioSettings />
-            <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
-            <Divider />
-            <TranscodeSettings />
-            <Divider />
-            <PlayerFilterSettings />
-            <Divider />
-            <AutoDJSettings />
+        <AudioSettings />
+        <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
+        <EqSettings />
+        <Divider />
+        <TranscodeSettings />
+        <Divider />
+        <PlayerFilterSettings />
+        <Divider />
+        <AutoDJSettings />
         </Stack>
     );
 });
