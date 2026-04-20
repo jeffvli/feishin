@@ -1862,9 +1862,6 @@ const initialState: SettingsState = {
             replayGainMode: 'no',
             replayGainPreampDB: 0,
         },
-            enabled: false,
-            preamp: 0,
-        },
         preservePitch: true,
         scrobble: {
             enabled: true,
