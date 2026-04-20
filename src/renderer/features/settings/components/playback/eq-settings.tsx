@@ -309,7 +309,7 @@ export const EqSettings = memo(() => {
     );
 
     const applyFilters = useCallback(
-        (eq: EqSettings, compressor: CompressorSettings) => {
+        (eq: EqSettingsType, compressor: CompressorSettings) => {
             const filterStr = buildMpvAudioFilters(eq, compressor);
             mpvPlayer?.setProperties({ af: filterStr });
         },
