@@ -1,6 +1,6 @@
 import isElectron from 'is-electron';
 import { useEffect } from 'react';
-import { useSettingsStore } from '/@/renderer/store';
+
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { DiscordRpcHook } from '/@/renderer/features/discord-rpc/use-discord-rpc';
@@ -26,6 +26,7 @@ import {
 } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { RemoteHook } from '/@/renderer/features/remote/hooks/use-remote';
 import { VisualizerSystemAudioBridgeHook } from '/@/renderer/features/visualizer/components/visualizer-system-audio-bridge';
+import { useSettingsStore } from '/@/renderer/store';
 import {
     updateQueueFavorites,
     updateQueueRatings,
@@ -196,13 +197,11 @@ const AudioPlayersContent = ({
             // Build DSP chain from persisted settings so EQ/compressor
             // are active immediately on first playback, not just after
             // the user opens the settings panel.
-            const { equalizer, compressor } = useSettingsStore.getState().playback;
+            const { compressor, equalizer } = useSettingsStore.getState().playback;
 
             // Preamp gain — converts dB to linear
             const preampGain = context.createGain();
-            preampGain.gain.value = equalizer.enabled
-            ? Math.pow(10, equalizer.preamp / 20)
-            : 1;
+            preampGain.gain.value = equalizer.enabled ? Math.pow(10, equalizer.preamp / 20) : 1;
 
             // One peaking BiquadFilterNode per EQ band
             const eqFilters: BiquadFilterNode[] = equalizer.bands.map((band) => {

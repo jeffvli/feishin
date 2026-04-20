@@ -1,14 +1,16 @@
 import isElectron from 'is-electron';
-import { memo, useCallback, useState } from 'react';
-import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
+import { memo, useCallback, useContext, useState } from 'react';
+
 import {
     buildMpvAudioFilters,
     type CompressorSettings,
     type EqSettings as EqSettingsType,
 } from './mpv-audio-filters';
 
+import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-context';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { Divider } from '/@/shared/components/divider/divider';
+import { Select } from '/@/shared/components/select/select';
 import { PlayerType } from '/@/shared/types/types';
 
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
@@ -140,6 +142,7 @@ function HSlider({
     );
 }
 
+// ─── Preset selector + save/delete ───────────────────────────────────────────
 function PresetBar<T>({
     builtins,
     customs,
@@ -205,6 +208,7 @@ function PresetBar<T>({
                         }}
                         style={{ ...BTN_DANGER, fontSize: 12, padding: '6px 10px' }}
                         title={`Delete "${selectedPreset}"`}
+                        type="button"
                     >
                         Delete
                     </button>
@@ -243,6 +247,7 @@ function PresetBar<T>({
                         }
                     }}
                     style={BTN}
+                    type="button"
                 >
                     Save
                 </button>
@@ -251,7 +256,7 @@ function PresetBar<T>({
     );
 }
 
-// ─── Toggle switch (inline, no Mantine dependency) ───────────────────────────
+// ─── Toggle switch ────────────────────────────────────────────────────────────
 function Toggle({
     checked,
     label,
@@ -263,52 +268,49 @@ function Toggle({
 }) {
     return (
         <label
-        style={{
-            alignItems: 'center',
-            cursor: 'pointer',
-            display: 'flex',
-            gap: 10,
-            userSelect: 'none',
-        }}
+            style={{
+                alignItems: 'center',
+                cursor: 'pointer',
+                display: 'flex',
+                gap: 10,
+                userSelect: 'none',
+            }}
         >
-        <button
-        onClick={() => onChange(!checked)}
-        style={{
-            background: checked
-            ? 'var(--primary-color, #3574fc)'
-            : 'rgba(255,255,255,0.15)',
-            border: 'none',
-            borderRadius: 12,
-            cursor: 'pointer',
-            flexShrink: 0,
-            height: 22,
-            padding: 0,
-            position: 'relative',
-            transition: 'background 0.2s',
-            width: 40,
-        }}
-        type="button"
-        >
-        <div
-        style={{
-            background: '#fff',
-            borderRadius: '50%',
-            height: 16,
-            left: checked ? 20 : 3,
-            position: 'absolute',
-            top: 3,
-            transition: 'left 0.2s',
-            width: 16,
-        }}
-        />
-        </button>
-        <span style={{ fontSize: 14, fontWeight: 500 }}>{label}</span>
+            <button
+                onClick={() => onChange(!checked)}
+                style={{
+                    background: checked
+                        ? 'var(--primary-color, #3574fc)'
+                        : 'rgba(255,255,255,0.15)',
+                    border: 'none',
+                    borderRadius: 12,
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    height: 22,
+                    padding: 0,
+                    position: 'relative',
+                    transition: 'background 0.2s',
+                    width: 40,
+                }}
+                type="button"
+            >
+                <div
+                    style={{
+                        background: '#fff',
+                        borderRadius: '50%',
+                        height: 16,
+                        left: checked ? 20 : 3,
+                        position: 'absolute',
+                        top: 3,
+                        transition: 'left 0.2s',
+                        width: 16,
+                    }}
+                />
+            </button>
+            <span style={{ fontSize: 14, fontWeight: 500 }}>{label}</span>
         </label>
     );
 }
-
-// ─── Preset selector dropdown + save/delete ──────────────────────────────────
-import { Select } from '/@/shared/components/select/select';
 
 // ─── Vertical slider ──────────────────────────────────────────────────────────
 function VerticalSlider({
@@ -354,7 +356,8 @@ function VerticalSlider({
 export const EqSettings = memo(() => {
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
-    const { webAudio } = useWebAudio();
+    const webAudioContext = useContext(WebAudioContext);
+
     // Custom preset state (stored in localStorage, not Zustand)
     const [customEqPresets, setCustomEqPresets] = useState<Record<string, number[]>>(() =>
         loadCustomPresets<number[]>(LS_EQ_PRESETS),
@@ -373,12 +376,12 @@ export const EqSettings = memo(() => {
             }
 
             // ── Web Audio player ──────────────────────────────────────────
-            const dsp = webAudio?.dsp;
+            // Mutations to Web Audio API nodes are intentional side effects, not React state mutations
+            const dsp = webAudioContext.webAudio?.dsp;
             if (!dsp) return;
 
-            dsp.preampGain.gain.value = eq.enabled
-            ? Math.pow(10, eq.preamp / 20)
-            : 1;
+            // eslint-disable-next-line react-hooks/immutability
+            dsp.preampGain.gain.value = eq.enabled ? Math.pow(10, eq.preamp / 20) : 1;
 
             dsp.eqFilters.forEach((filter, i) => {
                 const band = eq.bands[i];
@@ -401,7 +404,7 @@ export const EqSettings = memo(() => {
                 dsp.compressor.knee.value = 0;
             }
         },
-        [settings.type, webAudio],
+        [settings.type, webAudioContext],
     );
 
     // ── EQ handlers ────────────────────────────────────────────────────────────
@@ -414,6 +417,7 @@ export const EqSettings = memo(() => {
     const handlePreampChange = (preamp: number) => {
         setSettings({ playback: { equalizer: { ...settings.equalizer, preamp } } });
     };
+
     const handlePreampRelease = (preamp: number) => {
         const newEq = { ...settings.equalizer, preamp };
         setSettings({ playback: { equalizer: newEq } });
@@ -424,6 +428,7 @@ export const EqSettings = memo(() => {
         const newBands = settings.equalizer.bands.map((b, i) => (i === index ? { ...b, gain } : b));
         setSettings({ playback: { equalizer: { ...settings.equalizer, bands: newBands } } });
     };
+
     const handleBandRelease = (index: number, gain: number) => {
         const newBands = settings.equalizer.bands.map((b, i) => (i === index ? { ...b, gain } : b));
         const newEq = { ...settings.equalizer, bands: newBands };
@@ -472,6 +477,7 @@ export const EqSettings = memo(() => {
     const handleCompChange = (key: keyof CompressorSettings, value: number) => {
         setSettings({ playback: { compressor: { ...settings.compressor, [key]: value } } });
     };
+
     const handleCompRelease = (key: keyof CompressorSettings, value: number) => {
         const newComp = { ...settings.compressor, [key]: value };
         setSettings({ playback: { compressor: newComp } });
@@ -514,7 +520,7 @@ export const EqSettings = memo(() => {
         applyFilters(settings.equalizer, newComp);
     };
 
-// EQ and compressor work on both MPV (lavfi) and Web Audio (BiquadFilter/DynamicsCompressor)
+    // EQ and compressor work on both MPV (lavfi) and Web Audio (BiquadFilter/DynamicsCompressor)
 
     const compParams: {
         key: keyof CompressorSettings;
@@ -609,7 +615,7 @@ export const EqSettings = memo(() => {
                                         : settings.equalizer.preamp}{' '}
                                     dB
                                 </span>
-                                <button onClick={resetEq} style={BTN}>
+                                <button onClick={resetEq} style={BTN} type="button">
                                     Reset all
                                 </button>
                             </div>
@@ -767,7 +773,7 @@ export const EqSettings = memo(() => {
                             </div>
 
                             <div style={{ marginTop: 12 }}>
-                                <button onClick={resetComp} style={BTN}>
+                                <button onClick={resetComp} style={BTN} type="button">
                                     Reset to defaults
                                 </button>
                             </div>
