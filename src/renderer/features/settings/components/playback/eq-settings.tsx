@@ -447,7 +447,7 @@ export const EqSettings = memo(() => {
     const saveCompPreset = (name: string) => {
         const rest = Object.fromEntries(
             Object.entries(settings.compressor).filter(([key]) => key !== 'enabled'),
-        );
+        ) as CompressorPreset;
         const updated = { ...customCompPresets, [name]: rest };
         setCustomCompPresets(updated);
         saveCustomPresets(LS_COMP_PRESETS, updated);
