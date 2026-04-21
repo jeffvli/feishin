@@ -240,12 +240,17 @@ function consolidateDiscoveredDevices(
                     continue;
                 }
             }
-            groupedIds.add(fullId);
         }
         dlnaLog(`[Consolidate] Group[${gi}]: ${memberDevices.length} members total`);
+        if (memberDevices.length === 1) {
+            continue;
+        }
         if (memberDevices.length < 2) {
             dlnaLog(`[Consolidate] Group[${gi}]: fewer than 2 members, skipping`);
             continue;
+        }
+        for (const m of memberDevices) {
+            groupedIds.add(m.id);
         }
         const coordinator =
             deviceById.get(coordinatorId) ?? memberDevices.find((m) => m.id === coordinatorId);
