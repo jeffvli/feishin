@@ -3,6 +3,7 @@ export interface DlnaDevice {
     groupCoordinatorId?: string;
     groupMembers?: DlnaDevice[];
     id: string;
+    isPair?: boolean;
     location: string;
     name: string;
     renderingControlUrl: string;

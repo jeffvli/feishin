@@ -5,6 +5,7 @@ export interface DlnaDevice {
     groupCoordinatorId?: string;
     groupMembers?: DlnaDevice[];
     id: string;
+    isPair?: boolean;
     location: string;
     name: string;
     renderingControlUrl: string;
@@ -38,6 +39,7 @@ const connect = (
     volume: number;
 }> => ipcRenderer.invoke('dlna-connect', device);
 const disconnect = (): Promise<boolean> => ipcRenderer.invoke('dlna-disconnect');
+const disconnectPassive = (): Promise<boolean> => ipcRenderer.invoke('dlna-disconnect-passive');
 const playUrl = (
     url: string,
     metadata: TrackMetadata,
@@ -106,6 +108,7 @@ export const dlnaPlayer = {
     createSpeedProxy,
     destroySpeedProxy,
     disconnect,
+    disconnectPassive,
     discover,
     getGroupState,
     getPosition,

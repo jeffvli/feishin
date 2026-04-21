@@ -30,6 +30,7 @@ export const GroupBuilder = ({
 
     const toggle = (device: DlnaDevice) => {
         if (lockedCoordinator && device.id === lockedCoordinator.id) return;
+        if (device.isPair) return;
         setChecked((prev) =>
             prev.some((d) => d.id === device.id)
                 ? prev.filter((d) => d.id !== device.id)
@@ -64,6 +65,7 @@ export const GroupBuilder = ({
                 const isLocked = lockedCoordinator?.id === device.id;
                 const isChecked = checked.some((d) => d.id === device.id);
                 const isCoord = device.id === coordinator?.id;
+                const isPair = device.isPair ?? false;
                 return (
                     <div
                         key={device.id}
@@ -76,13 +78,14 @@ export const GroupBuilder = ({
                             alignItems: 'center',
                             background: isChecked ? 'rgba(108,159,255,0.15)' : 'transparent',
                             borderRadius: '4px',
-                            cursor: isLocked ? 'default' : 'pointer',
+                            cursor: isLocked || isPair ? 'default' : 'pointer',
                             display: 'flex',
                             fontSize: '0.8rem',
                             gap: 8,
+                            opacity: isPair ? 0.45 : 1,
                             padding: '6px 12px',
                         }}
-                        tabIndex={isLocked ? -1 : 0}
+                        tabIndex={isLocked || isPair ? -1 : 0}
                     >
                         <span
                             style={{
@@ -95,7 +98,7 @@ export const GroupBuilder = ({
                                 width: 12,
                             }}
                         />
-                        <Text c={isLocked ? 'dimmed' : undefined} size="sm">
+                        <Text c={isLocked || isPair ? 'dimmed' : undefined} size="sm">
                             {device.name}
                         </Text>
                         {isCoord && (

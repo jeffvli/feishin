@@ -37,7 +37,7 @@ function isSonosDevice(device: DlnaDevice): boolean {
 export const DlnaCastButton = () => {
     const { setSettings } = useSettingsStoreActions();
     const { t } = useTranslation();
-    const { setVolume } = usePlayerActions();
+    const { mediaPause, setVolume } = usePlayerActions();
     const volume = usePlayerVolume();
     const settings = usePlaybackSettings();
 
@@ -267,7 +267,8 @@ export const DlnaCastButton = () => {
         if (!dlnaPlayer) return;
         const position = await dlnaPlayer.getPosition();
         if (position > 0) playerHandoff.pendingLocalSeek = position;
-        await dlnaPlayer.disconnect();
+        await dlnaPlayer.disconnectPassive();
+        mediaPause?.();
         setScreen('idle');
         setConnectedDeviceName('');
         setGroupMemberList([]);
@@ -281,7 +282,7 @@ export const DlnaCastButton = () => {
         if (settings.previousLocalVolume !== undefined) setVolume(settings.previousLocalVolume);
         setDevices([]);
         void handleDiscover();
-    }, [setSettings, setVolume, settings, handleDiscover]);
+    }, [setSettings, setVolume, settings, handleDiscover, mediaPause]);
 
     useEffect(() => {
         if (settings.previousLocalVolume !== undefined) {
@@ -399,13 +400,8 @@ export const DlnaCastButton = () => {
                                                 fw={m.id === groupDevice.id ? 700 : 400}
                                                 key={m.id}
                                                 size="xs"
-                                                style={{
-                                                    fontWeight:
-                                                        m.id === groupDevice.id ? 700 : undefined,
-                                                    paddingLeft: 8,
-                                                }}
+                                                style={{ paddingLeft: 8 }}
                                             >
-                                                {m.id === groupDevice.id ? '★ ' : ''}
                                                 {m.name}
                                             </Text>
                                         ))}
@@ -417,6 +413,7 @@ export const DlnaCastButton = () => {
                                 )}
                                 isLoading={isLoading}
                                 onSelect={handleSelect}
+                                showEmptyState={devices.length === 0}
                             />
                             {!isLoading && (
                                 <Group gap="xs" mt="sm">
@@ -482,12 +479,6 @@ export const DlnaCastButton = () => {
                                 <Button
                                     color="red"
                                     flex={1}
-                                    fullWidth={
-                                        !(
-                                            coordinatorRef.current &&
-                                            isSonosDevice(coordinatorRef.current)
-                                        )
-                                    }
                                     onClick={handleDisconnect}
                                     size="xs"
                                     style={{ color: 'var(--mantine-color-red-4, #ff6b6b)' }}
@@ -521,7 +512,7 @@ export const DlnaCastButton = () => {
                                         {member.isCoordinator && <AppIcon.star size={12} />}
                                     </Group>
 
-                                    {!member.isCoordinator && (
+                                    {!member.isCoordinator && !member.device.isPair && (
                                         <Button
                                             color="red"
                                             onClick={() => handleRemoveMember(member.device.id)}
@@ -558,7 +549,7 @@ export const DlnaCastButton = () => {
                                     style={{ color: 'var(--mantine-color-red-4, #ff6b6b)' }}
                                     variant="outline"
                                 >
-                                    {t('dlna.disconnectAll')}
+                                    {t('dlna.disconnect')}
                                 </Button>
                             </Group>
                         </>

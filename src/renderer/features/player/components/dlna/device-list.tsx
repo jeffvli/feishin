@@ -12,11 +12,13 @@ export const DeviceList = ({
     disabledIds = [],
     isLoading,
     onSelect,
+    showEmptyState = true,
 }: {
     devices: DlnaDevice[];
     disabledIds?: string[];
     isLoading: boolean;
     onSelect: (device: DlnaDevice) => void;
+    showEmptyState?: boolean;
 }) => {
     const { t } = useTranslation();
     if (isLoading) {
@@ -29,6 +31,7 @@ export const DeviceList = ({
     }
 
     if (devices.length === 0) {
+        if (!showEmptyState) return null;
         return (
             <Group p="sm">
                 <AppIcon.circleSlash size={12} />

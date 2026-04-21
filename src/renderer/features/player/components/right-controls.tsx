@@ -47,7 +47,7 @@ const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const ipc = isElectron() ? window.api.ipc : null;
 
 interface DlnaGroupMember {
-    device: { id: string; name: string };
+    device: { id: string; isPair?: boolean; name: string };
     isCoordinator: boolean;
     volume: number;
 }
@@ -492,6 +492,7 @@ const VolumeButton = () => {
     const coordButtonRef = useRef<HTMLSpanElement>(null);
 
     const isGroupMode = groupMembers.length > 1;
+    const showGroupVolumePanel = isGroupMode && !groupMembers.some((m) => m.device.isPair);
     const coordinator = groupMembers.find((m) => m.isCoordinator) ?? groupMembers[0];
     const nonCoordinators = groupMembers.filter((m) => !m.isCoordinator);
     const coordinatorIsSonos = coordinator ? isSonosMember(coordinator.device) : false;
@@ -602,10 +603,10 @@ const VolumeButton = () => {
 
     const handleVolumeSlider = useCallback(
         (e: number) => {
-            if (isGroupMode && !isShiftDown) applyDeltaToGroup(e);
+            if (showGroupVolumePanel && !isShiftDown) applyDeltaToGroup(e);
             setSliderValue(e);
         },
-        [isGroupMode, isShiftDown, applyDeltaToGroup],
+        [showGroupVolumePanel, isShiftDown, applyDeltaToGroup],
     );
 
     const handleVolumeWheel = useCallback(
@@ -616,10 +617,10 @@ const VolumeButton = () => {
                 e.deltaY > 0 || e.deltaX > 0
                     ? calculateVolumeDown(sliderValue, volumeWheelStep)
                     : calculateVolumeUp(sliderValue, volumeWheelStep);
-            if (isGroupMode && !isShiftDown) applyDeltaToGroup(v);
+            if (showGroupVolumePanel && !isShiftDown) applyDeltaToGroup(v);
             setSliderValue(v);
         },
-        [sliderValue, volumeWheelStep, isGroupMode, isShiftDown, applyDeltaToGroup],
+        [sliderValue, volumeWheelStep, showGroupVolumePanel, isShiftDown, applyDeltaToGroup],
     );
 
     const handleVolumeDownThrottled = useThrottledCallback(handleVolumeDown, 100);
@@ -674,7 +675,7 @@ const VolumeButton = () => {
                     triggerRect={propsTarget.rect}
                 />
             )}
-            {isGroupMode && isHovered && (
+            {showGroupVolumePanel && isHovered && (
                 <Paper
                     radius="md"
                     shadow="xl"
@@ -768,17 +769,19 @@ const VolumeButton = () => {
                             if (wasCoordLongPress.current) return;
                             const newMuteState = !muted;
                             if (isGroupMode && !isShiftDown) {
-                                const newMutes: Record<string, boolean> = {};
-                                groupMembersRef.current.forEach((m) => {
-                                    if (!m.isCoordinator) {
-                                        newMutes[m.device.id] = newMuteState;
-                                        ipc?.send('dlna-group-member-mute', {
-                                            deviceId: m.device.id,
-                                            muted: newMuteState,
-                                        });
-                                    }
-                                });
-                                setMemberMutes((prev) => ({ ...prev, ...newMutes }));
+                                if (showGroupVolumePanel) {
+                                    const newMutes: Record<string, boolean> = {};
+                                    groupMembersRef.current.forEach((m) => {
+                                        if (!m.isCoordinator) {
+                                            newMutes[m.device.id] = newMuteState;
+                                            ipc?.send('dlna-group-member-mute', {
+                                                deviceId: m.device.id,
+                                                muted: newMuteState,
+                                            });
+                                        }
+                                    });
+                                    setMemberMutes((prev) => ({ ...prev, ...newMutes }));
+                                }
                             }
                             handleMute();
                         }}

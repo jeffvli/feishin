@@ -1217,7 +1217,7 @@
         "createGroup": "Create Group",
         "devices": "DLNA Devices",
         "disconnect": "Disconnect",
-        "disconnectAll": "Disconnect All",
+        "disconnectAndContinue": "Disconnect and Continue",
         "noDevicesFound": "No DLNA devices found",
         "nowCasting": "Now casting",
         "searching": "Searching for devices…",

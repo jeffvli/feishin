@@ -255,6 +255,22 @@ function consolidateDiscoveredDevices(
             );
             continue;
         }
+        const isStereoGroup =
+            group.includes('ChannelMapSet=') && !group.includes('HTSatChanMapSet=');
+        if (isStereoGroup) {
+            const firstMemberMatch = group.match(/<ZoneGroupMember\b([^>]*)\/?>/);
+            const pairName = firstMemberMatch
+                ? getAttr(firstMemberMatch[1], 'ZoneName') || coordinator.name
+                : coordinator.name;
+            dlnaLog(`[Consolidate] Group[${gi}]: stereo pair detected, name="${pairName}"`);
+            for (const m of memberDevices) groupedIds.add(m.id);
+            groupEntries.push({
+                ...coordinator,
+                isPair: true,
+                name: `${pairName} (Stereo Pair)`,
+            });
+            continue;
+        }
         const sortedMembers = [coordinator, ...memberDevices.filter((m) => m.id !== coordinatorId)];
         dlnaLog(
             `[Consolidate] Group[${gi}]: creating group entry "${coordinator.name}" with ${sortedMembers.length} members`,
@@ -277,40 +293,56 @@ async function enrichDevicesWithTopology(devices: DlnaDevice[]): Promise<DlnaDev
     const sonosDevices = devices.filter((d) => d.id.toUpperCase().includes('RINCON'));
     if (sonosDevices.length === 0) return devices;
     dlnaLog(
-        `[Discovery/Topology] Starting topology scan for ${sonosDevices.length} Sonos device(s)`,
+        `[Discovery/Topology] Starting parallel topology scan for ${sonosDevices.length} Sonos device(s)`,
     );
     const attemptDelays = [1000, 2000, 4000, 6000];
     for (let attempt = 0; attempt < attemptDelays.length; attempt++) {
         await new Promise((r) => setTimeout(r, attemptDelays[attempt]));
         dlnaLog(`[Discovery/Topology] Attempt ${attempt + 1}/${attemptDelays.length} (parallel)`);
-        const rawSoap = await Promise.race(
+        const allResults = await Promise.all(
             sonosDevices.map((sonosDevice) =>
-                fetchTopologyForDevice(sonosDevice).then((raw) => {
-                    if (!raw) return null;
-                    const stateMatch = raw.match(/<ZoneGroupState>([\s\S]*?)<\/ZoneGroupState>/);
-                    if (!stateMatch) return null;
-                    return stateMatch[1]
-                        .replace(/&lt;/g, '<')
-                        .replace(/&gt;/g, '>')
-                        .replace(/&quot;/g, '"')
-                        .replace(/&amp;/g, '&');
-                }),
+                fetchTopologyForDevice(sonosDevice)
+                    .then((raw) => {
+                        if (!raw) return null;
+                        const stateMatch = raw.match(
+                            /<ZoneGroupState>([\s\S]*?)<\/ZoneGroupState>/,
+                        );
+                        if (!stateMatch) return null;
+                        return stateMatch[1]
+                            .replace(/&lt;/g, '<')
+                            .replace(/&gt;/g, '>')
+                            .replace(/&quot;/g, '"')
+                            .replace(/&amp;/g, '&');
+                    })
+                    .catch(() => null),
             ),
         );
-        if (!rawSoap) {
-            dlnaLog(`[Discovery/Topology] Attempt ${attempt + 1}: no topology from any device`);
-            continue;
+        let bestResult: DlnaDevice[] | null = null;
+        let bestScore = 0;
+        let anyResponded = false;
+        for (const rawSoap of allResults) {
+            if (!rawSoap) continue;
+            anyResponded = true;
+            const consolidated = consolidateDiscoveredDevices(devices, rawSoap);
+            const score = consolidated.filter((d) => d.groupMembers || d.isPair).length;
+            if (score > bestScore) {
+                bestScore = score;
+                bestResult = consolidated;
+            }
         }
-        const consolidated = consolidateDiscoveredDevices(devices, rawSoap);
-        const groupEntries = consolidated.filter((d) => d.groupMembers);
-        if (groupEntries.length > 0) {
+        if (bestResult && bestScore > 0) {
             dlnaLog(
-                `[Discovery/Topology] Result: ${consolidated.length} entries, ${groupEntries.length} group(s)`,
+                `[Discovery/Topology] Result: ${bestResult.length} entries (groups/pairs found)`,
             );
-            return consolidated;
+            return bestResult;
         }
-        dlnaLog('[Discovery/Topology] Topology received but no groups found, returning flat list');
-        return devices;
+        if (anyResponded) {
+            dlnaLog(
+                '[Discovery/Topology] Topology received but no groups/pairs found, returning flat list',
+            );
+            return devices;
+        }
+        dlnaLog(`[Discovery/Topology] Attempt ${attempt + 1}: no topology from any device`);
     }
     dlnaLog('[Discovery/Topology] All attempts exhausted, returning flat device list');
     return devices;
@@ -602,6 +634,7 @@ function handleTopologyNotify(xml: string): void {
             .replace(/&quot;/g, '"')
             .replace(/&amp;/g, '&');
         if (!connectedDevice) return;
+        if (connectedDevice.isPair) return;
         const myRinconId = getRinconId(connectedDevice);
         const zoneGroupRegex = /<ZoneGroup\b[^>]*>[\s\S]*?<\/ZoneGroup>/g;
         const zoneGroups = decodedXml.match(zoneGroupRegex);
@@ -686,6 +719,36 @@ function handleTopologyNotify(xml: string): void {
     } catch (error) {
         dlnaLog('Topology parse error', error);
     }
+}
+
+async function passiveDisconnect(): Promise<void> {
+    stopPositionPolling();
+    hasStartedPlaying = false;
+    lastCommandedUri = '';
+    lastQueuedNextUri = '';
+    lastKnownDuration = 0;
+    nearEndStallCount = 0;
+    isRadioMode = false;
+    if (connectedDevice) {
+        await stopEventSubscription(connectedDevice);
+        await stopTopologySubscription(connectedDevice);
+        dlnaLog(`Passive disconnect from ${connectedDevice.name} (speaker keeps playing)`);
+    }
+    connectedDevice = null;
+    currentCoordinatorId = '';
+    groupMembers = [];
+    groupMemberVolumes = {};
+    if (topologyPollingInterval) {
+        clearInterval(topologyPollingInterval);
+        topologyPollingInterval = null;
+    }
+    sendGroupStateToRenderer();
+    if (eventServer) {
+        eventServer.close();
+        eventServer = null;
+        eventServerPort = 0;
+    }
+    cleanupTempFiles();
 }
 
 function refreshTopology() {
@@ -1331,6 +1394,21 @@ ipcMain.handle('dlna-disconnect', async () => {
     }
 });
 
+ipcMain.handle('dlna-disconnect-passive', async () => {
+    try {
+        await passiveDisconnect();
+        return true;
+    } catch (err) {
+        dlnaLog('Failed to passive-disconnect', err);
+        connectedDevice = null;
+        groupMembers = [];
+        groupMemberVolumes = {};
+        isRadioMode = false;
+        stopPositionPolling();
+        return false;
+    }
+});
+
 ipcMain.handle('dlna-group-add-member', async (_event, device: DlnaDevice) => {
     if (!connectedDevice) return { success: false };
     if (groupMembers.some((m) => m.id === device.id)) {
@@ -1450,10 +1528,15 @@ ipcMain.on(
             lastPlayCommandAt = Date.now();
             if (lanUrl === lastCommandedUri && !data.seekTo) {
                 dlnaLog(
-                    `dlna-play-url: URI already loaded (${data.metadata.title}), skipping SetAVTransportURI`,
+                    `dlna-play-url: URI already loaded (${data.metadata.title}), seeking to 0 and playing`,
                 );
                 lastQueuedNextUri = '';
                 if (data.metadata.autoPlay !== false) {
+                    try {
+                        await seek(device, 0);
+                    } catch {
+                        // seek may fail on some devices; proceed to play anyway
+                    }
                     await play(device).catch((err) => dlnaLog('Play (skip-reload) failed', err));
                 }
                 return;

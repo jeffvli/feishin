@@ -479,6 +479,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         if (!dlnaPlayer) return;
         if (devicePassiveModeRef.current) {
             if (playerStatus === PlayerStatus.PAUSED) {
+                devicePassiveModeRef.current = false;
                 dlnaPlayer.pause();
             }
             return;
@@ -563,6 +564,20 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 if (!hasPlayedRef.current || !dlnaPlayer) return;
                 const playerData = usePlayerStore.getState().getPlayerData();
                 if (playerData.nextSong) {
+                    sendNextTrackToDlna();
+                } else {
+                    dlnaPlayer.clearNextUrl();
+                }
+            },
+        );
+    }, [sendNextTrackToDlna]);
+    useEffect(() => {
+        return usePlayerStore.subscribe(
+            (state) => state.getPlayerData().nextSong?.id ?? null,
+            (nextId, prevId) => {
+                if (!hasPlayedRef.current || !dlnaPlayer) return;
+                if (nextId === prevId) return;
+                if (nextId) {
                     sendNextTrackToDlna();
                 } else {
                     dlnaPlayer.clearNextUrl();
