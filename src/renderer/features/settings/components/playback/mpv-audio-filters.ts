@@ -43,10 +43,7 @@ const BAND_WIDTHS: Record<number, number> = {
  * Returns the MPV `af` property value for the given EQ + compressor settings.
  * An empty string clears all filters (pass-through).
  */
-export function buildMpvAudioFilters(
-    eq: EqSettings,
-    compressor: CompressorSettings,
-): string {
+export function buildMpvAudioFilters(eq: EqSettings, compressor: CompressorSettings): string {
     const parts: string[] = [];
 
     if (eq.enabled) {
@@ -64,9 +61,7 @@ export function buildMpvAudioFilters(
         for (const band of eq.bands) {
             if (band.gain === 0) continue;
             const w = BAND_WIDTHS[band.freq] ?? 1.0;
-            parts.push(
-                `lavfi=[equalizer=f=${band.freq}:width_type=o:w=${w}:g=${band.gain}]`,
-            );
+            parts.push(`lavfi=[equalizer=f=${band.freq}:width_type=o:w=${w}:g=${band.gain}]`);
         }
     }
 
@@ -75,13 +70,13 @@ export function buildMpvAudioFilters(
         const makeupLinear = Math.pow(10, compressor.makeup / 20);
         parts.push(
             `lavfi=[acompressor=` +
-            `threshold=${threshLinear.toFixed(6)}:` +
-            `ratio=${compressor.ratio}:` +
-            `attack=${compressor.attack}:` +
-            `release=${compressor.release}:` +
-            `makeup=${makeupLinear.toFixed(6)}:` +
-            `knee=${compressor.knee}` +
-            `]`,
+                `threshold=${threshLinear.toFixed(6)}:` +
+                `ratio=${compressor.ratio}:` +
+                `attack=${compressor.attack}:` +
+                `release=${compressor.release}:` +
+                `makeup=${makeupLinear.toFixed(6)}:` +
+                `knee=${compressor.knee}` +
+                `]`,
         );
     }
 
