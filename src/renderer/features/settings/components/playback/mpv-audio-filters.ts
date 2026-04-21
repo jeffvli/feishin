@@ -43,37 +43,45 @@ const BAND_WIDTHS: Record<number, number> = {
  * Returns the MPV `af` property value for the given EQ + compressor settings.
  * An empty string clears all filters (pass-through).
  */
-export function buildMpvAudioFilters(eq: EqSettings, compressor: CompressorSettings): string {
+export function buildMpvAudioFilters(
+    eq: EqSettings,
+    compressor: CompressorSettings,
+): string {
     const parts: string[] = [];
 
     if (eq.enabled) {
-        // Preamp: insert a volume filter first so EQ boosts don't clip
-        if (eq.preamp !== 0) {
-            parts.push(`volume=${eq.preamp}dB`);
+        // Compensated gain = preamp - maxBandBoost
+        // This ensures the input signal has enough headroom for band boosts
+        // while still allowing the preamp to act as a pre-EQ level control.
+        // Negative preamp values add additional headroom on top of the auto-protection.
+        const maxBandBoost = Math.max(0, ...eq.bands.map((b) => b.gain));
+        const compensatedGain = eq.preamp - maxBandBoost;
+        if (compensatedGain !== 0) {
+            parts.push(`volume=${compensatedGain}dB`);
         }
 
         // One parametric EQ filter per non-zero band
         for (const band of eq.bands) {
             if (band.gain === 0) continue;
             const w = BAND_WIDTHS[band.freq] ?? 1.0;
-            // MPV lavfi equalizer: f=<Hz>:width_type=o:w=<octaves>:g=<dB>
-            parts.push(`lavfi=[equalizer=f=${band.freq}:width_type=o:w=${w}:g=${band.gain}]`);
+            parts.push(
+                `lavfi=[equalizer=f=${band.freq}:width_type=o:w=${w}:g=${band.gain}]`,
+            );
         }
     }
 
     if (compressor.enabled) {
-        // FFmpeg acompressor expects threshold and makeup in linear amplitude
         const threshLinear = Math.pow(10, compressor.threshold / 20);
         const makeupLinear = Math.pow(10, compressor.makeup / 20);
         parts.push(
             `lavfi=[acompressor=` +
-                `threshold=${threshLinear.toFixed(6)}:` +
-                `ratio=${compressor.ratio}:` +
-                `attack=${compressor.attack}:` +
-                `release=${compressor.release}:` +
-                `makeup=${makeupLinear.toFixed(6)}:` +
-                `knee=${compressor.knee}` +
-                `]`,
+            `threshold=${threshLinear.toFixed(6)}:` +
+            `ratio=${compressor.ratio}:` +
+            `attack=${compressor.attack}:` +
+            `release=${compressor.release}:` +
+            `makeup=${makeupLinear.toFixed(6)}:` +
+            `knee=${compressor.knee}` +
+            `]`,
         );
     }
 
