@@ -1,8 +1,9 @@
 // ssdp-discovery.ts
-import { execFile } from 'child_process';
+import { execFile, execSync } from 'child_process';
 import dgram from 'dgram';
 import http from 'http';
 import os from 'os';
+import path from 'path';
 
 import { DlnaDevice } from './soap-client';
 
@@ -108,19 +109,35 @@ function fetchXml(url) {
     });
 }
 
+function decodeXml(str) {
+    if (!str) return str;
+    return str
+        .replace(/&apos;/g, "'")
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>');
+}
+
 function parseDevice(xml, location) {
     const udn = xml.match(/<UDN>([^<]+)<\\/UDN>/);
     const baseUrl = new URL(location);
     const base = baseUrl.protocol + '//' + baseUrl.host;
-    const roomName = (xml.match(/<roomName>([^<]+)<\\/roomName>/) || [])[1];
-    const modelName = (xml.match(/<modelName>([^<]+)<\\/modelName>/) || [])[1];
-    const friendlyName = (xml.match(/<friendlyName>([^<]+)<\\/friendlyName>/) || [])[1];
+    const roomName = decodeXml((xml.match(/<roomName>([^<]+)<\\/roomName>/) || [])[1]?.trim());
+    const modelName = decodeXml((xml.match(/<modelName>([^<]+)<\\/modelName>/) || [])[1]?.trim());
+    const friendlyName = decodeXml((xml.match(/<friendlyName>([^<]+)<\\/friendlyName>/) || [])[1]?.trim());
     let name;
-    if (roomName && modelName) name = roomName.trim() + ' (' + modelName.trim() + ')';
-    else if (roomName) name = roomName.trim();
-    else if (friendlyName && !friendlyName.trim().startsWith('RINCON_')) name = friendlyName.trim();
-    else if (modelName) name = modelName.trim();
-    else name = 'Unknown DLNA Device';
+    if (roomName && modelName) {
+        name = roomName + ' (' + modelName + ')';
+    } else if (roomName) {
+        name = roomName;
+    } else if (friendlyName && !friendlyName.startsWith('RINCON_')) {
+        name = friendlyName;
+    } else if (modelName) {
+        name = modelName;
+    } else {
+        name = 'Unknown DLNA Device';
+    }
     let controlUrl = '';
     let renderingControlUrl = '';
     const serviceRegex = /<service>(.*?)<\\/service>/gs;
@@ -132,7 +149,9 @@ function parseDevice(xml, location) {
         if (typeMatch && urlMatch) {
             const svcType = typeMatch[1].trim();
             const svcUrl = urlMatch[1].trim();
-            const fullUrl = svcUrl.startsWith('http') ? svcUrl : base + (svcUrl.startsWith('/') ? '' : '/') + svcUrl;
+            const fullUrl = svcUrl.startsWith('http')
+                ? svcUrl
+                : base + (svcUrl.startsWith('/') ? '' : '/') + svcUrl;
             if (svcType === AV_TRANSPORT_URN) controlUrl = fullUrl;
             if (svcType === RENDERING_CONTROL_URN) renderingControlUrl = fullUrl;
         }
@@ -208,11 +227,19 @@ function createSocketForInterface(
     });
 }
 
+function decodeXml(str: string | undefined): string | undefined {
+    if (!str) return str;
+    return str
+        .replace(/&apos;/g, "'")
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>');
+}
+
 async function discoverMacOS(timeout: number): Promise<DlnaDevice[]> {
     return new Promise((resolve) => {
-        const nodePath = process.execPath.includes('node')
-            ? process.execPath
-            : '/usr/local/bin/node';
+        const nodePath = resolveNodePath();
         const child = execFile(nodePath, ['-e', DISCOVERY_SCRIPT], { timeout }, (err, stdout) => {
             if (err) {
                 resolve([]);
@@ -260,9 +287,9 @@ function parseDevice(xml: string, location: string): DlnaDevice | null {
     const base = `${baseUrl.protocol}//${baseUrl.host}`;
 
     // For Sonos speakers only. I haven't been able to test with other devices, which might need similar name sanitisation.
-    const roomName = xml.match(/<roomName>([^<]+)<\/roomName>/)?.[1]?.trim();
-    const modelName = xml.match(/<modelName>([^<]+)<\/modelName>/)?.[1]?.trim();
-    const friendlyName = xml.match(/<friendlyName>([^<]+)<\/friendlyName>/)?.[1]?.trim();
+    const roomName = decodeXml(xml.match(/<roomName>([^<]+)<\/roomName>/)?.[1]?.trim());
+    const modelName = decodeXml(xml.match(/<modelName>([^<]+)<\/modelName>/)?.[1]?.trim());
+    const friendlyName = decodeXml(xml.match(/<friendlyName>([^<]+)<\/friendlyName>/)?.[1]?.trim());
     let name: string;
     if (roomName && modelName) {
         name = `${roomName} (${modelName})`;
@@ -302,4 +329,18 @@ function parseDevice(xml: string, location: string): DlnaDevice | null {
         name,
         renderingControlUrl: renderingControlUrl || controlUrl,
     };
+}
+
+function resolveNodePath(): string {
+    const execName = path.basename(process.execPath).toLowerCase();
+    if (execName === 'node') {
+        return process.execPath;
+    }
+    try {
+        const nodePath = execSync('which node').toString().trim();
+        if (nodePath) return nodePath;
+    } catch {
+        // Catch
+    }
+    return '/usr/local/bin/node';
 }
