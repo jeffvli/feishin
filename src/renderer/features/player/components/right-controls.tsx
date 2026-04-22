@@ -572,23 +572,15 @@ const VolumeButton = () => {
         });
     }, []);
 
-    const applyDeltaToGroup = useCallback(
+    const applyVolumeToGroup = useCallback(
         (newVol: number) => {
-            const delta = newVol - sliderValue;
-            if (delta === 0) return;
             groupMembersRef.current.forEach((m) => {
                 if (!m.isCoordinator) {
-                    const vol =
-                        newVol === 0
-                            ? 0
-                            : newVol === 100
-                              ? 100
-                              : Math.min(100, Math.max(0, m.volume + delta));
-                    handleMemberVolume(m.device.id, vol);
+                    handleMemberVolume(m.device.id, newVol);
                 }
             });
         },
-        [sliderValue, handleMemberVolume],
+        [handleMemberVolume],
     );
 
     const handleVolumeDown = useCallback(
@@ -603,10 +595,10 @@ const VolumeButton = () => {
 
     const handleVolumeSlider = useCallback(
         (e: number) => {
-            if (showGroupVolumePanel && !isShiftDown) applyDeltaToGroup(e);
+            if (showGroupVolumePanel && !isShiftDown) applyVolumeToGroup(e);
             setSliderValue(e);
         },
-        [showGroupVolumePanel, isShiftDown, applyDeltaToGroup],
+        [showGroupVolumePanel, isShiftDown, applyVolumeToGroup],
     );
 
     const handleVolumeWheel = useCallback(
@@ -617,10 +609,10 @@ const VolumeButton = () => {
                 e.deltaY > 0 || e.deltaX > 0
                     ? calculateVolumeDown(sliderValue, volumeWheelStep)
                     : calculateVolumeUp(sliderValue, volumeWheelStep);
-            if (showGroupVolumePanel && !isShiftDown) applyDeltaToGroup(v);
+            if (showGroupVolumePanel && !isShiftDown) applyVolumeToGroup(v);
             setSliderValue(v);
         },
-        [sliderValue, volumeWheelStep, showGroupVolumePanel, isShiftDown, applyDeltaToGroup],
+        [sliderValue, volumeWheelStep, showGroupVolumePanel, isShiftDown, applyVolumeToGroup],
     );
 
     const handleVolumeDownThrottled = useThrottledCallback(handleVolumeDown, 100);

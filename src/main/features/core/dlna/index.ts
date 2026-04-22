@@ -1,4 +1,4 @@
-import { ChildProcess, spawn } from 'child_process';
+import { ChildProcess, execSync, spawn } from 'child_process';
 import { createHash } from 'crypto';
 import { ipcMain } from 'electron';
 import {
@@ -1301,9 +1301,17 @@ async function waitForTransportState(
 ipcMain.handle('dlna-discover', async () => {
     try {
         dlnaLog('Discovering devices...');
-        const devices = await discoverDevices(5000);
-        dlnaLog(`Found ${devices.length} device(s)`);
-        const finalDevices = await enrichDevicesWithTopology(devices);
+        const result = await discoverDevices(5000);
+        if (result === null) {
+            dlnaLog('Discovery aborted, Node not found');
+            getMainWindow()?.webContents.send('renderer-dlna-toast', {
+                message: 'DLNA discovery on macOS requires Node to be installed and added to PATH.',
+                type: 'error',
+            });
+            return [];
+        }
+        dlnaLog(`Found ${result.length} device(s)`);
+        const finalDevices = await enrichDevicesWithTopology(result);
         return finalDevices;
     } catch (err) {
         dlnaLog('Discovery failed', err);
@@ -1822,6 +1830,17 @@ ipcMain.handle(
         data: { offset: number; preservePitch: boolean; speed: number; url: string },
     ) => {
         stopCurrentTranscode();
+        try {
+            execSync('ffmpeg -version', { stdio: 'ignore' });
+        } catch {
+            dlnaLog('FFmpeg not found on PATH');
+            getMainWindow()?.webContents.send('renderer-dlna-toast', {
+                message:
+                    'DLNA playback speed changes require FFMpeg to be installed and added to PATH.',
+                type: 'error',
+            });
+            return null;
+        }
         let lanIp: null | string = null;
         if (connectedDevice) {
             try {

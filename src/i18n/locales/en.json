@@ -1221,6 +1221,7 @@
         "noDevicesFound": "No DLNA devices found",
         "nowCasting": "Now casting",
         "searching": "Searching for devices…",
+        "shiftDisconnectHint": "Hold Shift and press Disconnect to keep playing on the speaker",
         "group": {
             "add": "Add",
             "addSpeaker": "Add Speaker",

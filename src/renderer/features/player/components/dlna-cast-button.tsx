@@ -47,6 +47,7 @@ export const DlnaCastButton = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [connectedDeviceName, setConnectedDeviceName] = useState('');
     const [groupMemberList, setGroupMemberList] = useState<GroupMember[]>([]);
+    const [isShiftDown, setIsShiftDown] = useState(false);
     const coordinatorRef = useRef<DlnaDevice | null>(null);
 
     const previousPlayerTypeRef = useRef<PlayerType>(
@@ -55,6 +56,36 @@ export const DlnaCastButton = () => {
 
     const isConnected = screen === 'connected' || screen === 'group';
     const hasSonosDevices = devices.some(isSonosDevice);
+    useEffect(() => {
+        if (!showPopover) return;
+        const onKey = (e: KeyboardEvent) => setIsShiftDown(e.shiftKey);
+        window.addEventListener('keydown', onKey);
+        window.addEventListener('keyup', onKey);
+        return () => {
+            window.removeEventListener('keydown', onKey);
+            window.removeEventListener('keyup', onKey);
+            setIsShiftDown(false);
+        };
+    }, [showPopover]);
+    useEffect(() => {
+        if (!ipc) return;
+        const handler = (
+            _: unknown,
+            payload: { message: string; type: 'error' | 'info' | 'warning' },
+        ) => {
+            if (payload.type === 'error') {
+                toast.error({ message: payload.message });
+            } else if (payload.type === 'warning') {
+                toast.warn?.({ message: payload.message });
+            } else {
+                toast.info?.({ message: payload.message });
+            }
+        };
+        ipc.on('renderer-dlna-toast', handler);
+        return () => {
+            ipc.removeAllListeners('renderer-dlna-toast');
+        };
+    }, []);
 
     useEffect(() => {
         if (!ipc) return;
@@ -267,8 +298,14 @@ export const DlnaCastButton = () => {
         if (!dlnaPlayer) return;
         const position = await dlnaPlayer.getPosition();
         if (position > 0) playerHandoff.pendingLocalSeek = position;
-        await dlnaPlayer.disconnectPassive();
-        mediaPause?.();
+
+        if (isShiftDown) {
+            await dlnaPlayer.disconnectPassive();
+            mediaPause?.();
+        } else {
+            await dlnaPlayer.disconnect();
+        }
+
         setScreen('idle');
         setConnectedDeviceName('');
         setGroupMemberList([]);
@@ -282,7 +319,7 @@ export const DlnaCastButton = () => {
         if (settings.previousLocalVolume !== undefined) setVolume(settings.previousLocalVolume);
         setDevices([]);
         void handleDiscover();
-    }, [setSettings, setVolume, settings, handleDiscover, mediaPause]);
+    }, [setSettings, setVolume, settings, handleDiscover, mediaPause, isShiftDown]);
 
     useEffect(() => {
         if (settings.previousLocalVolume !== undefined) {
@@ -477,16 +514,32 @@ export const DlnaCastButton = () => {
                                         </Button>
                                     )}
                                 <Button
-                                    color="red"
+                                    color={isShiftDown ? 'orange' : 'red'}
                                     flex={1}
                                     onClick={handleDisconnect}
                                     size="xs"
-                                    style={{ color: 'var(--mantine-color-red-4, #ff6b6b)' }}
+                                    style={{
+                                        color: isShiftDown
+                                            ? 'var(--mantine-color-orange-4, #ffa94d)'
+                                            : 'var(--mantine-color-red-4, #ff6b6b)',
+                                    }}
                                     variant="outline"
                                 >
                                     {t('dlna.disconnect')}
                                 </Button>
                             </Group>
+                            <Text
+                                c="dimmed"
+                                mt={6}
+                                size="xs"
+                                style={{
+                                    opacity: isShiftDown ? 0 : 1,
+                                    textAlign: 'center',
+                                    transition: 'opacity 150ms',
+                                }}
+                            >
+                                {t('dlna.shiftDisconnectHint')}
+                            </Text>
                         </>
                     )}
                     {screen === 'group' && (
@@ -542,16 +595,32 @@ export const DlnaCastButton = () => {
                                     {t('dlna.group.addSpeaker')}
                                 </Button>
                                 <Button
-                                    color="red"
+                                    color={isShiftDown ? 'orange' : 'red'}
                                     flex={1}
                                     onClick={handleDisconnect}
                                     size="xs"
-                                    style={{ color: 'var(--mantine-color-red-4, #ff6b6b)' }}
+                                    style={{
+                                        color: isShiftDown
+                                            ? 'var(--mantine-color-orange-4, #ffa94d)'
+                                            : 'var(--mantine-color-red-4, #ff6b6b)',
+                                    }}
                                     variant="outline"
                                 >
                                     {t('dlna.disconnect')}
                                 </Button>
                             </Group>
+                            <Text
+                                c="dimmed"
+                                mt={6}
+                                size="xs"
+                                style={{
+                                    opacity: isShiftDown ? 0 : 1,
+                                    textAlign: 'center',
+                                    transition: 'opacity 150ms',
+                                }}
+                            >
+                                {t('dlna.shiftDisconnectHint')}
+                            </Text>
                         </>
                     )}
                 </div>
