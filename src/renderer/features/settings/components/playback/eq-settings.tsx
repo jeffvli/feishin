@@ -379,17 +379,18 @@ export const EqSettings = memo(() => {
             // Mutations to Web Audio API nodes are intentional side effects, not React state mutations
             const dsp = webAudioContext.webAudio?.dsp;
             if (!dsp) return;
-
             // eslint-disable-next-line react-hooks/immutability
             dsp.preampGain.gain.value = eq.enabled ? Math.pow(10, eq.preamp / 20) : 1;
 
             dsp.eqFilters.forEach((filter, i) => {
+                // Re-apply filters when switching to the Web Audio player so the DSP
+                // nodes reflect the persisted settings immediately without requiring
+                // the user to move a slider first.
                 const band = eq.bands[i];
                 if (band) {
                     filter.gain.value = eq.enabled ? band.gain : 0;
                 }
             });
-
             if (compressor.enabled) {
                 dsp.compressor.threshold.value = compressor.threshold;
                 dsp.compressor.ratio.value = compressor.ratio;
@@ -599,7 +600,12 @@ export const EqSettings = memo(() => {
 
                             {/* Preamp row */}
                             <div style={{ ...ROW, marginBottom: 16 }}>
-                                <span style={{ fontSize: 13, minWidth: 64 }}>Preamp</span>
+                                <span
+                                    style={{ fontSize: 13, minWidth: 64 }}
+                                    title="Set negative when boosting bands to prevent clipping"
+                                >
+                                    Preamp
+                                </span>
                                 <HSlider
                                     max={12}
                                     min={-12}

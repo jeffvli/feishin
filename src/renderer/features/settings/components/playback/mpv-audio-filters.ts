@@ -47,14 +47,12 @@ export function buildMpvAudioFilters(eq: EqSettings, compressor: CompressorSetti
     const parts: string[] = [];
 
     if (eq.enabled) {
-        // Compensated gain = preamp - maxBandBoost
-        // This ensures the input signal has enough headroom for band boosts
-        // while still allowing the preamp to act as a pre-EQ level control.
-        // Negative preamp values add additional headroom on top of the auto-protection.
-        const maxBandBoost = Math.max(0, ...eq.bands.map((b) => b.gain));
-        const compensatedGain = eq.preamp - maxBandBoost;
-        if (compensatedGain !== 0) {
-            parts.push(`volume=${compensatedGain}dB`);
+        // Apply preamp as a straight input gain before the band filters.
+        // The user is responsible for setting a negative preamp value when
+        // boosting bands to avoid clipping — matching the behaviour of VLC,
+        // foobar2000, and hardware EQs. The UI preamp slider exists for this purpose.
+        if (eq.preamp !== 0) {
+            parts.push(`volume=${eq.preamp}dB`);
         }
 
         // One parametric EQ filter per non-zero band
