@@ -383,14 +383,12 @@ export const EqSettings = memo(() => {
             dsp.preampGain.gain.value = eq.enabled ? Math.pow(10, eq.preamp / 20) : 1;
 
             dsp.eqFilters.forEach((filter, i) => {
-                // Re-apply filters when switching to the Web Audio player so the DSP
-                // nodes reflect the persisted settings immediately without requiring
-                // the user to move a slider first.
                 const band = eq.bands[i];
                 if (band) {
                     filter.gain.value = eq.enabled ? band.gain : 0;
                 }
             });
+
             if (compressor.enabled) {
                 dsp.compressor.threshold.value = compressor.threshold;
                 dsp.compressor.ratio.value = compressor.ratio;
