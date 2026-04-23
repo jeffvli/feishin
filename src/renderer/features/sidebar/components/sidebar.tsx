@@ -215,6 +215,9 @@ const SidebarImage = () => {
             onClick={expandFullScreenPlayer}
             onContextMenu={handleToggleContextMenu}
             role="button"
+            style={{
+                aspectRatio: (isRadioActive && radioImageUrl) || imageUrl ? 'auto' : 1,
+            }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
         >
             <Tooltip
