@@ -442,7 +442,9 @@
                 "lyricGap": "odstępy tekstu",
                 "dynamicImageBlur": "rozmiar rozmycia obrazu",
                 "dynamicIsImage": "włącz obraz w tle",
-                "lyricOffset": "opóźnienie tekstów (ms)"
+                "lyricOffset": "opóźnienie tekstów (ms)",
+                "lyricOpacityNonActive": "przezroczystość nieaktywnego tekstu",
+                "lyricScaleNonActive": "skala nieaktywnego tekstu"
             },
             "upNext": "następne",
             "lyrics": "tekst",

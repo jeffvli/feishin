@@ -4,14 +4,18 @@
     line-height: 1.2;
     color: var(--theme-colors-foreground);
     word-break: normal;
-    opacity: 0.35;
+    opacity: var(--lyric-opacity);
+    transform: scale(var(--lyric-scale));
+    transform-origin: var(--lyric-scale-origin) center;
     transition:
-        opacity 0.3s ease-in-out,
-        transform 0.3s ease-in-out;
+        opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
 }
 
 .lyric-line:global(.active) {
     opacity: 1 !important;
+    transform: scale(1);
 }
 
 .lyric-line:global(.unsynchronized) {

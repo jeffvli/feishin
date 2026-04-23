@@ -1,6 +1,5 @@
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, isAxiosError } from 'axios';
-import omitBy from 'lodash/omitBy';
 import qs from 'qs';
 import { z } from 'zod';
 
@@ -380,8 +379,26 @@ axiosClient.interceptors.response.use(
 const parsePath = (fullPath: string) => {
     const [path, params] = fullPath.split('?');
 
-    const parsedParams = qs.parse(params, { arrayLimit: 99999, parameterLimit: 99999 });
-    const notNilParams = omitBy(parsedParams, (value) => value === 'undefined' || value === 'null');
+    const url = new URLSearchParams(params);
+    const notNilParams: Record<string, string[]> = {};
+
+    for (const [key, value] of url) {
+        if (value === 'undefined' || value === 'null') {
+            continue;
+        }
+
+        let realKey = key;
+
+        if (key.includes('[') && key.includes(']')) {
+            realKey = key.split('[')[0];
+        }
+
+        if (realKey in notNilParams) {
+            notNilParams[realKey].push(value);
+        } else {
+            notNilParams[realKey] = [value];
+        }
+    }
 
     return {
         params: notNilParams,

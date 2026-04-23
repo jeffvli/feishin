@@ -772,7 +772,9 @@
                 "lyricGap": "desfase de letra",
                 "dynamicImageBlur": "tamaño de desenfoque de imagen",
                 "dynamicIsImage": "habilitar imagen de fondo",
-                "lyricOffset": "desplazamiento de letras (ms)"
+                "lyricOffset": "desplazamiento de letras (ms)",
+                "lyricScaleNonActive": "Escala de letra no activa",
+                "lyricOpacityNonActive": "Opacidad de letra no activa"
             },
             "lyrics": "letras",
             "related": "relacionado",

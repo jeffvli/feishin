@@ -49,6 +49,11 @@ export const SynchronizedLyrics = ({
                 ? displaySettings.fontSize
                 : 24,
         gap: displaySettings.gap && displaySettings.gap !== 0 ? displaySettings.gap : 24,
+        opacityNonActive: displaySettings.opacityNonActive,
+        scaleNonActive:
+            displaySettings.scaleNonActive && displaySettings.scaleNonActive !== 0
+                ? displaySettings.scaleNonActive
+                : 0.95,
     };
     const { mediaSeekToTimestamp } = usePlayerActions();
     const status = usePlayerStatus();
@@ -308,7 +313,18 @@ export const SynchronizedLyrics = ({
             onMouseEnter={showScrollbar}
             onMouseLeave={hideScrollbar}
             ref={containerRef}
-            style={{ gap: `${settings.gap}px`, ...style }}
+            style={
+                {
+                    // opacity/scale is set here for every lyric,
+                    // and then overwritten by CSS for active lyrics
+                    // to prevent expensive rerenders each lyric
+                    '--lyric-opacity': settings.opacityNonActive,
+                    '--lyric-scale': settings.scaleNonActive,
+                    '--lyric-scale-origin': settings.alignment,
+                    gap: `${settings.gap}px`,
+                    ...style,
+                } as React.CSSProperties
+            }
         >
             {settings.showProvider && source && (
                 <LyricLine

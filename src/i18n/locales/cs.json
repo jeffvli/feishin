@@ -825,7 +825,9 @@
                 "lyricGap": "mezera textů",
                 "dynamicImageBlur": "velikost rozostření obrázku",
                 "dynamicIsImage": "povolit obrázek na pozadí",
-                "lyricOffset": "posunutí textů (ms)"
+                "lyricOffset": "posunutí textů (ms)",
+                "lyricOpacityNonActive": "neprůhlednost neaktivních textů",
+                "lyricScaleNonActive": "velikost neaktivních textů"
             },
             "upNext": "další",
             "lyrics": "texty",

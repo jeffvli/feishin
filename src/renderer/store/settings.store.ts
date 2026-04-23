@@ -536,6 +536,8 @@ const LyricsDisplaySettingsSchema = z.object({
     fontSizeUnsync: z.number(),
     gap: z.number(),
     gapUnsync: z.number(),
+    opacityNonActive: z.number(),
+    scaleNonActive: z.number(),
 });
 
 const LyricsSettingsSchema = z.object({
@@ -1794,6 +1796,8 @@ const initialState: SettingsState = {
             fontSizeUnsync: 24,
             gap: 24,
             gapUnsync: 24,
+            opacityNonActive: 0.2,
+            scaleNonActive: 0.95,
         },
     },
     playback: {
@@ -2211,7 +2215,10 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
 
                         state.lyrics = mainSettings;
                         state.lyricsDisplay = {
-                            default: displaySettings,
+                            default: {
+                                ...state.lyricsDisplay.default,
+                                ...displaySettings,
+                            },
                         };
                     }
                 }

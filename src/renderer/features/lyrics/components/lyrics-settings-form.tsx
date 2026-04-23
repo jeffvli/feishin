@@ -17,6 +17,7 @@ import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Select } from '/@/shared/components/select/select';
+import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
 import { TextInput } from '/@/shared/components/text-input/text-input';
@@ -182,6 +183,48 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             ),
             description: '',
             title: t('page.fullscreenPlayer.config.followCurrentLyric', {
+                postProcess: 'sentenceCase',
+            }),
+        },
+        {
+            control: (
+                <Slider
+                    defaultValue={displaySettings.opacityNonActive}
+                    label={(e) => (e * 100).toFixed(0) + '%'}
+                    max={1.0}
+                    min={0.0}
+                    onChangeEnd={(e) => {
+                        updateDisplaySetting({
+                            opacityNonActive: e,
+                        });
+                    }}
+                    step={0.01}
+                    w={100}
+                />
+            ),
+            description: '',
+            title: t(`${t('page.fullscreenPlayer.config.lyricOpacityNonActive')}`, {
+                postProcess: 'sentenceCase',
+            }),
+        },
+        {
+            control: (
+                <Slider
+                    defaultValue={displaySettings.scaleNonActive}
+                    label={(e) => (e * 100).toFixed(0) + '%'}
+                    max={1.0}
+                    min={0.5}
+                    onChangeEnd={(e) => {
+                        updateDisplaySetting({
+                            scaleNonActive: e,
+                        });
+                    }}
+                    step={0.01}
+                    w={100}
+                />
+            ),
+            description: '',
+            title: t(`${t('page.fullscreenPlayer.config.lyricScaleNonActive')}`, {
                 postProcess: 'sentenceCase',
             }),
         },

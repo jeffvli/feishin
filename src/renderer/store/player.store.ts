@@ -776,7 +776,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                     // For nextSong calculation, we need to consider the shuffled order
                     let nextSong: QueueSong | undefined;
-                    if (isShuffleEnabled(state)) {
+                    if (isShuffleEnabled(state) && repeat !== PlayerRepeat.ONE) {
                         // Calculate next in shuffled order
                         const nextShuffledIndex = index + 1;
                         if (nextShuffledIndex < state.queue.shuffled.length) {
@@ -925,7 +925,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const currentSong = queue.items[currentQueueIndex];
 
                     let nextSong: QueueSong | undefined;
-                    if (isShuffle) {
+                    if (isShuffle && repeat !== PlayerRepeat.ONE) {
                         const nextShuffledIndex = nextPlaybackIndex + 1;
                         if (nextShuffledIndex < stateSnapshot.queue.shuffled.length) {
                             const nextQueueIndex = stateSnapshot.queue.shuffled[nextShuffledIndex];
@@ -933,8 +933,6 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         } else if (repeat === PlayerRepeat.ALL) {
                             const firstQueueIndex = stateSnapshot.queue.shuffled[0];
                             nextSong = queue.items[firstQueueIndex];
-                        } else if (repeat === PlayerRepeat.ONE) {
-                            nextSong = currentSong;
                         }
                     } else {
                         nextSong = calculateNextSong(currentQueueIndex, queue.items, repeat);
@@ -1733,7 +1731,7 @@ export const subscribeNextSongInsertion = (onChange: (song: QueueSong | undefine
 
             // Calculate next song based on shuffle and repeat settings
             let nextSong: QueueSong | undefined;
-            if (isShuffleEnabled(state)) {
+            if (isShuffleEnabled(state) && repeat !== PlayerRepeat.ONE) {
                 // Calculate next in shuffled order
                 const nextShuffledIndex = state.player.index + 1;
                 if (nextShuffledIndex < state.queue.shuffled.length) {
@@ -1940,7 +1938,7 @@ export const usePlayerData = (): PlayerData => {
 
             // For nextSong calculation, we need to consider the shuffled order
             let nextSong: QueueSong | undefined;
-            if (isShuffleEnabled(state)) {
+            if (isShuffleEnabled(state) && repeat !== PlayerRepeat.ONE) {
                 // Calculate next in shuffled order
                 const nextShuffledIndex = index + 1;
                 if (nextShuffledIndex < state.queue.shuffled.length) {

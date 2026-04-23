@@ -233,7 +233,9 @@
                 "showLyricMatch": "顯示匹配的歌詞",
                 "dynamicImageBlur": "圖片模糊大小",
                 "dynamicIsImage": "啟用背景圖片",
-                "lyricOffset": "歌詞偏移時間 (ms)"
+                "lyricOffset": "歌詞偏移時間 (ms)",
+                "lyricOpacityNonActive": "非活躍歌詞的不透明度",
+                "lyricScaleNonActive": "非活躍歌詞的比例"
             },
             "lyrics": "歌詞",
             "related": "相關",
