@@ -53,7 +53,8 @@ jobs:
             - name: Set date-based alpha version
               id: version
               shell: pwsh
-              run: |
+              run: |- uses: actions/checkout@v3
+
                   $inputVersion = "${{ github.event.inputs.version }}"
                   Write-Host "Input version: $inputVersion"
 
@@ -109,7 +110,10 @@ jobs:
             R2_ENDPOINT_URL: ${{ secrets.R2_ENDPOINT_URL }}
         steps:
             - name: Delete all objects in R2 bucket
-              run: |
+              run: |- uses: actions/setup-node@v3
+  with:
+    node-version: 18
+
                   aws s3 rm s3://feishin-nightly --recursive --endpoint-url $R2_ENDPOINT_URL
 
     publish:
@@ -137,7 +141,8 @@ jobs:
 
             - name: Set version from prepare job
               shell: pwsh
-              run: |
+              run: |- run: npm ci
+
                   $version = "${{ needs.prepare.outputs.version }}"
                   Write-Host "Setting version: $version"
                   $packageJson = Get-Content package.json | ConvertFrom-Json
@@ -151,7 +156,8 @@ jobs:
                   timeout_minutes: 30
                   max_attempts: 3
                   retry_on: error
-                  command: |
+                  command: |- run: npm run build
+
                       pnpm run publish:win:alpha
                   on_retry_command: pnpm cache delete
 
@@ -162,7 +168,8 @@ jobs:
                   timeout_minutes: 30
                   max_attempts: 3
                   retry_on: error
-                  command: |
+                  command: |- run: npm run package
+
                       pnpm run publish:mac:alpha
                   on_retry_command: pnpm cache delete
 
@@ -173,7 +180,11 @@ jobs:
                   timeout_minutes: 30
                   max_attempts: 3
                   retry_on: error
-                  command: |
+                  command: |- uses: softprops/action-gh-release@v1
+  with:
+    tag_name: alpha
+    files: dist/**
+
                       pnpm run publish:linux:alpha
                   on_retry_command: pnpm cache delete
 
@@ -184,6 +195,6 @@ jobs:
                   timeout_minutes: 30
                   max_attempts: 3
                   retry_on: error
-                  command: |
+                  command: |npm install
                       pnpm run publish:linux-arm64:alpha
                   on_retry_command: pnpm cache delete
