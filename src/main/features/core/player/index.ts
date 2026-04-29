@@ -1,13 +1,13 @@
 import console from 'console';
 import { app, ipcMain } from 'electron';
-import { rm } from 'fs/promises';
+import { access, rm } from 'fs/promises';
 import uniq from 'lodash/uniq';
 import MpvAPI from 'node-mpv';
 import { pid } from 'node:process';
 import process from 'process';
 
 import { getMainWindow, sendToastToRenderer } from '../../../index';
-import { createLog, isWindows } from '../../../utils';
+import { createLog, isMacOS, isWindows } from '../../../utils';
 import { store } from '../settings';
 
 import { PlayerData } from '/@/shared/types/domain-types';
@@ -69,6 +69,7 @@ const mpvLog = (
 };
 
 const MPV_BINARY_PATH = store.get('mpv_path') as string | undefined;
+const MACOS_MPV_BINARY_PATHS = ['/opt/homebrew/bin/mpv', '/usr/local/bin/mpv'];
 
 const prefetchPlaylistParams = [
     '--prefetch-playlist=no',
@@ -86,12 +87,38 @@ const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
     return parameters;
 };
 
+const resolveMpvBinaryPath = async (binaryPath?: string) => {
+    if (binaryPath) {
+        return binaryPath;
+    }
+
+    if (MPV_BINARY_PATH) {
+        return MPV_BINARY_PATH;
+    }
+
+    if (!isMacOS()) {
+        return undefined;
+    }
+
+    for (const candidate of MACOS_MPV_BINARY_PATHS) {
+        try {
+            await access(candidate);
+            return candidate;
+        } catch {
+            // Try the next common Homebrew location.
+        }
+    }
+
+    return undefined;
+};
+
 const createMpv = async (data: {
     binaryPath?: string;
     extraParameters?: string[];
     properties?: Record<string, any>;
 }): Promise<MpvAPI> => {
     const { binaryPath, extraParameters, properties } = data;
+    const resolvedBinaryPath = await resolveMpvBinaryPath(binaryPath);
 
     const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
 
@@ -99,7 +126,7 @@ const createMpv = async (data: {
         {
             audio_only: true,
             auto_restart: false,
-            binary: binaryPath || MPV_BINARY_PATH || undefined,
+            binary: resolvedBinaryPath,
             socket: socketPath,
             time_update: 1,
         },
