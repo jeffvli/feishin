@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 import { useAppTracker } from '/@/renderer/features/analytics/hooks/use-app-tracker';
 import { CommandPalette } from '/@/renderer/features/search/components/command-palette';
 import { useGarbageCollection } from '/@/renderer/hooks/use-garbage-collection';
+import { HotkeyItem, useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { useIsMobile } from '/@/renderer/hooks/use-is-mobile';
 import { DefaultLayout } from '/@/renderer/layouts/default-layout';
 import { MobileLayout } from '/@/renderer/layouts/mobile-layout/mobile-layout';
@@ -15,7 +16,6 @@ import {
     useSettingsStoreActions,
     useZoomFactor,
 } from '/@/renderer/store';
-import { HotkeyItem, useHotkeys } from '/@/shared/hooks/use-hotkeys';
 
 interface ResponsiveLayoutProps {
     shell?: boolean;

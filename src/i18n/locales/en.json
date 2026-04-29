@@ -985,6 +985,8 @@
         "playerbarWaveformBarWidth": "waveform bar width",
         "playerbarWaveformGap": "waveform gap",
         "playerbarWaveformRadius": "waveform radius",
+        "playerbarWaveformStretch": "waveform stretch",
+        "playerbarWaveformStretch_description": "stretches the waveform to fill the available space",
         "preferLocalLyrics_description": "prefer local lyrics over remote lyrics when available",
         "preferLocalLyrics": "prefer local lyrics",
         "showLyricsInSidebar_description": "a panel will be added to the attached play queue that displays the lyrics",

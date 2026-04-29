@@ -794,7 +794,9 @@
         "qobuz_description": "在藝術家/專輯頁面上顯示 Qobuz 的連結",
         "qobuz": "顯示 Qobuz 連結",
         "waveformLoadingDelay": "波形載入延遲",
-        "waveformLoadingDelay_description": "載入波形前的延遲（以秒為單位）。如果您在使用網頁播放器時遇到卡頓，請增加此值。"
+        "waveformLoadingDelay_description": "載入波形前的延遲（以秒為單位）。如果您在使用網頁播放器時遇到卡頓，請增加此值。",
+        "playerbarWaveformStretch": "波形拉伸",
+        "playerbarWaveformStretch_description": "拉伸波形來填補可用空間"
     },
     "table": {
         "config": {

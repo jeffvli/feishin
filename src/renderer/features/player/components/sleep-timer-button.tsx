@@ -273,7 +273,7 @@ export const SleepTimerButton = () => {
 
                     <Divider my="md" />
 
-                    <Grid gutter="xs">
+                    <Grid gap="xs">
                         {PRESET_OPTIONS.filter((option) => option.mode === 'timed').map(
                             (option, index) => (
                                 <Grid.Col key={index} span={4}>

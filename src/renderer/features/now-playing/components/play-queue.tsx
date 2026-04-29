@@ -15,6 +15,7 @@ import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/context/player-context';
 import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
+import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import {
     isShuffleEnabled,
     mapShuffledToQueueIndex,
@@ -30,7 +31,6 @@ import { Flex } from '/@/shared/components/flex/flex';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
 import { useDebouncedValue } from '/@/shared/hooks/use-debounced-value';
 import { useFocusWithin } from '/@/shared/hooks/use-focus-within';
-import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
 import { Folder, LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 import { DragTarget } from '/@/shared/types/drag-and-drop';

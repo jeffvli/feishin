@@ -425,7 +425,9 @@
         "sidePlayQueueLayout": "Diseño de la cola de reproducción lateral",
         "sidePlayQueueLayout_description": "Establece el diseño de la cola de reproducción lateral adjunta",
         "waveformLoadingDelay": "Retraso de carga de la forma de onda",
-        "waveformLoadingDelay_description": "Retraso en segundos antes de cargar la forma de onda. Incrementa este valor si estás experimentando tartamudeos al usar el reproductor web."
+        "waveformLoadingDelay_description": "Retraso en segundos antes de cargar la forma de onda. Incrementa este valor si estás experimentando tartamudeos al usar el reproductor web.",
+        "playerbarWaveformStretch": "Estiramiento de la forma de onda",
+        "playerbarWaveformStretch_description": "Estira la forma de onda para rellenar el espacio disponible"
     },
     "action": {
         "editPlaylist": "editar $t(entity.playlist, {\"count\": 1})",

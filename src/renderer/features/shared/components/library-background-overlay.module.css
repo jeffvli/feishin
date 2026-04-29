@@ -6,6 +6,8 @@
     pointer-events: none;
     user-select: none;
     background-image: var(--theme-overlay-subheader);
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
 }
 
 .background-overlay {
@@ -30,6 +32,18 @@
         var(--dither);
 }
 
+.background-image-stack {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    pointer-events: none;
+    isolation: isolate;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+}
+
 .background-image {
     position: absolute;
     top: 0;
@@ -37,6 +51,7 @@
     width: 100%;
     background-position: center !important;
     background-size: cover !important;
+    isolation: isolate;
     opacity: 0.7;
 }
 

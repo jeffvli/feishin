@@ -9,12 +9,12 @@ import {
 } from 'react';
 import { shallow } from 'zustand/shallow';
 
+import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { useSettingsStore } from '/@/renderer/store';
 import { ActionIcon, ActionIconProps } from '/@/shared/components/action-icon/action-icon';
 import { Box } from '/@/shared/components/box/box';
 import { Icon } from '/@/shared/components/icon/icon';
 import { TextInput, TextInputProps } from '/@/shared/components/text-input/text-input';
-import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 
 interface SearchInputProps extends TextInputProps {
     buttonProps?: Partial<ActionIconProps>;

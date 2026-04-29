@@ -43,6 +43,7 @@ import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { useContainerQuery } from '/@/renderer/hooks';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
+import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     ArtistItem,
@@ -75,7 +76,6 @@ import { TextInput } from '/@/shared/components/text-input/text-input';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { Text } from '/@/shared/components/text/text';
 import { useDebouncedValue } from '/@/shared/hooks/use-debounced-value';
-import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import {
     Album,
@@ -1214,7 +1214,7 @@ export const AlbumArtistDetailContent = ({
                     artistSongsLink={artistSongsLink}
                     onArtistRadio={handleArtistRadio}
                 />
-                <Grid gutter="2xl">
+                <Grid gap="2xl">
                     <AlbumArtistMetadataGenres
                         genres={detailQuery.data?.genres}
                         order={genresOrder}

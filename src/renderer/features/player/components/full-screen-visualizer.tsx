@@ -5,6 +5,7 @@ import { useLocation } from 'react-router';
 import styles from './full-screen-visualizer.module.css';
 
 import { FullScreenVisualizerSongInfo } from '/@/renderer/features/player/components/full-screen-visualizer-song-info';
+import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { useIsMobile } from '/@/renderer/hooks/use-is-mobile';
 import { useFullScreenPlayerStoreActions } from '/@/renderer/store/full-screen-player.store';
 import {
@@ -12,7 +13,6 @@ import {
     useSettingsStore,
     useWindowSettings,
 } from '/@/renderer/store/settings.store';
-import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { Platform } from '/@/shared/types/types';
 
 const AudioMotionAnalyzerVisualizer = lazy(() =>

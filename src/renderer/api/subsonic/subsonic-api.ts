@@ -376,6 +376,16 @@ axiosClient.interceptors.response.use(
     },
 );
 
+const keysToSkipEmptyCheck = new Set([
+    'artist',
+    'comment',
+    'genre',
+    'name',
+    'query',
+    'u',
+    'username',
+]);
+
 const parsePath = (fullPath: string) => {
     const [path, params] = fullPath.split('?');
 
@@ -383,7 +393,7 @@ const parsePath = (fullPath: string) => {
     const notNilParams: Record<string, string[]> = {};
 
     for (const [key, value] of url) {
-        if (value === 'undefined' || value === 'null') {
+        if (!keysToSkipEmptyCheck.has(key) && (value === 'undefined' || value === 'null')) {
             continue;
         }
 

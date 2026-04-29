@@ -425,7 +425,9 @@
         "sidePlayQueueLayout_optionHorizontal": "na šířku",
         "sidePlayQueueLayout_optionVertical": "na výšku",
         "waveformLoadingDelay": "zpoždění načítání vlnové křivky",
-        "waveformLoadingDelay_description": "zpoždění v sekundách před načtením vlnové křivky. zvyšte, pokud jste během používání webového přehrávače zaznamenali záseky."
+        "waveformLoadingDelay_description": "zpoždění v sekundách před načtením vlnové křivky. zvyšte, pokud jste během používání webového přehrávače zaznamenali záseky.",
+        "playerbarWaveformStretch": "natáhnutí vlnové křivky",
+        "playerbarWaveformStretch_description": "natáhně vlnovou křivku tak, aby vyplnila dostupný prostor"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist, {\"count\": 1})",

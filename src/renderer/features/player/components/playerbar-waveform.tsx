@@ -58,7 +58,7 @@ export const PlayerbarWaveform = () => {
         height: 18,
         interact: false,
         media: audioElementRef.current,
-        normalize: false,
+        normalize: playerbarSlider?.stretched ?? false,
         progressColor: primaryColor,
         waveColor,
     });

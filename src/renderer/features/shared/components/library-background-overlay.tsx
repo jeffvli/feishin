@@ -76,7 +76,7 @@ export const LibraryBackgroundImage = ({ blur, headerRef, imageUrl }: LibraryBac
     const url = imageUrl ? `url(${imageUrl})` : undefined;
     const height = useHeaderHeight(headerRef);
     return (
-        <>
+        <div className={styles.backgroundImageStack}>
             <div
                 className={styles.backgroundImage}
                 style={{
@@ -91,7 +91,7 @@ export const LibraryBackgroundImage = ({ blur, headerRef, imageUrl }: LibraryBac
                     height: height ? `${height + 64}px` : undefined,
                 }}
             />
-        </>
+        </div>
     );
 };
 
