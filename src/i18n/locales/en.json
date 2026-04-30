@@ -347,6 +347,7 @@
             "input_skipDuplicates": "skip duplicates",
             "searchOrCreate": "search $t(entity.playlist, {\"count\": 2}) or type to create a new one",
             "success": "added $t(entity.trackWithCount, {\"count\": {{message}} }) to $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
+            "noneAdded": "no tracks were added to $t(entity.playlist, {\"count\": 1}) '{{playlist}}'",
             "title": "add to $t(entity.playlist, {\"count\": 1})"
         },
         "createPlaylist": {
