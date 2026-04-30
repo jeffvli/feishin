@@ -204,7 +204,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 if (allSongIds.length === 0) {
                     toast.info({
                         message: t("form.addToPlaylist.noneAdded", {
-                            playlist: playlistName
+                            playlist: playlistName,
                             postProcess: "sentenceCase",
                         }),
                     });
@@ -246,7 +246,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 if (songsToAdd.length === 0) {
                     toast.info({
                         message: t("form.addToPlaylist.noneAdded", {
-                            playlist: playlistName
+                            playlist: playlistName,
                             postProcess: "sentenceCase",
                         }),
                     });
