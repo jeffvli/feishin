@@ -203,9 +203,9 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
 
                 if (allSongIds.length === 0) {
                     toast.info({
-                        message: t("form.addToPlaylist.noneAdded", {
+                        message: t('form.addToPlaylist.noneAdded', {
                             playlist: playlistName,
-                            postProcess: "sentenceCase",
+                            postProcess: 'sentenceCase',
                         }),
                     });
                     return;
@@ -245,9 +245,9 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
 
                 if (songsToAdd.length === 0) {
                     toast.info({
-                        message: t("form.addToPlaylist.noneAdded", {
+                        message: t('form.addToPlaylist.noneAdded', {
                             playlist: playlistName,
-                            postProcess: "sentenceCase",
+                            postProcess: 'sentenceCase',
                         }),
                     });
                     return;
@@ -411,7 +411,12 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                     <>
                         <ContextMenu.Item
                             key={recentPlaylist.id}
-                            onSelect={() => handleAddToPlaylist(recentPlaylist.id, recentPlaylist.name)}
+                            onSelect={() => 
+                                handleAddToPlaylist(
+                                    recentPlaylist.id,
+                                    recentPlaylist.name
+                                )
+                            }
                         >
                             {recentPlaylist.name}
                         </ContextMenu.Item>
@@ -426,7 +431,12 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 {filteredPlaylists.map((playlist) => (
                     <ContextMenu.Item
                         key={playlist.id}
-                        onSelect={() => handleAddToPlaylist(playlist.id, playlist.name)}
+                        onSelect={() => 
+                            handleAddToPlaylist(
+                                playlist.id,
+                                playlist.name
+                            )
+                        }
                     >
                         {playlist.name}
                     </ContextMenu.Item>
