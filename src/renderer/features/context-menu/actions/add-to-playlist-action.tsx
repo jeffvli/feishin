@@ -412,10 +412,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                         <ContextMenu.Item
                             key={recentPlaylist.id}
                             onSelect={() => 
-                                handleAddToPlaylist(
-                                    recentPlaylist.id,
-                                    recentPlaylist.name
-                                )
+                                handleAddToPlaylist(recentPlaylist.id, recentPlaylist.name)
                             }
                         >
                             {recentPlaylist.name}
@@ -432,10 +429,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                     <ContextMenu.Item
                         key={playlist.id}
                         onSelect={() => 
-                            handleAddToPlaylist(
-                                playlist.id,
-                                playlist.name
-                            )
+                            handleAddToPlaylist(playlist.id, playlist.name)
                         }
                     >
                         {playlist.name}
