@@ -1,9 +1,7 @@
 // ssdp-discovery.ts
-import { execFile, execSync } from 'child_process';
 import dgram from 'dgram';
 import http from 'http';
 import os from 'os';
-import path from 'path';
 
 import { DlnaDevice } from './soap-client';
 
@@ -13,7 +11,7 @@ const RENDERING_CONTROL_URN = 'urn:schemas-upnp-org:service:RenderingControl:1';
 const SSDP_ADDRESS = '239.255.255.250';
 const SSDP_PORT = 1900;
 
-async function discoverDirect(timeout: number): Promise<DlnaDevice[]> {
+export async function discoverDevices(timeout: number = 5000): Promise<DlnaDevice[]> {
     const locations = new Set<string>();
     const localAddresses = getLocalIpv4Addresses();
     const sockets = await Promise.all(
@@ -39,155 +37,6 @@ async function discoverDirect(timeout: number): Promise<DlnaDevice[]> {
         }
     }
     return devices;
-}
-
-const DISCOVERY_SCRIPT = `
-const dgram = require('dgram');
-const http = require('http');
-const os = require('os');
-
-const MEDIA_RENDERER_URN = 'urn:schemas-upnp-org:device:MediaRenderer:1';
-const AV_TRANSPORT_URN = 'urn:schemas-upnp-org:service:AVTransport:1';
-const RENDERING_CONTROL_URN = 'urn:schemas-upnp-org:service:RenderingControl:1';
-
-const locations = new Set();
-
-const message = Buffer.from(
-    'M-SEARCH * HTTP/1.1\\r\\n' +
-    'HOST: 239.255.255.250:1900\\r\\n' +
-    'MAN: "ssdp:discover"\\r\\n' +
-    'MX: 3\\r\\n' +
-    'ST: ' + MEDIA_RENDERER_URN + '\\r\\n' +
-    '\\r\\n'
-);
-
-function getLocalAddresses() {
-    const addresses = [];
-    const interfaces = os.networkInterfaces();
-    for (const name of Object.keys(interfaces)) {
-        for (const iface of interfaces[name] || []) {
-            if (iface.family === 'IPv4' && !iface.internal) {
-                addresses.push(iface.address);
-            }
-        }
-    }
-    return addresses.length > 0 ? addresses : ['0.0.0.0'];
-}
-
-const localAddresses = getLocalAddresses();
-const sockets = [];
-
-for (const addr of localAddresses) {
-    const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
-    sockets.push(socket);
-    socket.on('message', (msg) => {
-        const text = msg.toString();
-        const loc = text.match(/LOCATION:\\s*(.+)\\r?\\n/i);
-        if (loc) locations.add(loc[1].trim());
-    });
-    socket.on('error', () => {});
-    socket.bind(0, addr, () => {
-        try {
-            socket.setMulticastInterface(addr);
-            socket.setMulticastTTL(4);
-        } catch {}
-        socket.send(message, 0, message.length, 1900, '239.255.255.250');
-        setTimeout(() => socket.send(message, 0, message.length, 1900, '239.255.255.250'), 500);
-        setTimeout(() => socket.send(message, 0, message.length, 1900, '239.255.255.250'), 1500);
-    });
-}
-
-function fetchXml(url) {
-    return new Promise((resolve, reject) => {
-        const req = http.get(url, (res) => {
-            let data = '';
-            res.on('data', (chunk) => data += chunk);
-            res.on('end', () => resolve(data));
-        });
-        req.on('error', reject);
-        req.setTimeout(3000, () => req.destroy(new Error('timeout')));
-    });
-}
-
-function decodeXml(str) {
-    if (!str) return str;
-    return str
-        .replace(/&apos;/g, "'")
-        .replace(/&quot;/g, '"')
-        .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>');
-}
-
-function parseDevice(xml, location) {
-    const udn = xml.match(/<UDN>([^<]+)<\\/UDN>/);
-    const baseUrl = new URL(location);
-    const base = baseUrl.protocol + '//' + baseUrl.host;
-    const roomName = decodeXml((xml.match(/<roomName>([^<]+)<\\/roomName>/) || [])[1]?.trim());
-    const modelName = decodeXml((xml.match(/<modelName>([^<]+)<\\/modelName>/) || [])[1]?.trim());
-    const friendlyName = decodeXml((xml.match(/<friendlyName>([^<]+)<\\/friendlyName>/) || [])[1]?.trim());
-    let name;
-    if (roomName && modelName) {
-        name = roomName + ' (' + modelName + ')';
-    } else if (roomName) {
-        name = roomName;
-    } else if (friendlyName && !friendlyName.startsWith('RINCON_')) {
-        name = friendlyName;
-    } else if (modelName) {
-        name = modelName;
-    } else {
-        name = 'Unknown DLNA Device';
-    }
-    let controlUrl = '';
-    let renderingControlUrl = '';
-    const serviceRegex = /<service>(.*?)<\\/service>/gs;
-    let match;
-    while ((match = serviceRegex.exec(xml)) !== null) {
-        const block = match[1];
-        const typeMatch = block.match(/<serviceType>([^<]+)<\\/serviceType>/);
-        const urlMatch = block.match(/<controlURL>([^<]+)<\\/controlURL>/);
-        if (typeMatch && urlMatch) {
-            const svcType = typeMatch[1].trim();
-            const svcUrl = urlMatch[1].trim();
-            const fullUrl = svcUrl.startsWith('http')
-                ? svcUrl
-                : base + (svcUrl.startsWith('/') ? '' : '/') + svcUrl;
-            if (svcType === AV_TRANSPORT_URN) controlUrl = fullUrl;
-            if (svcType === RENDERING_CONTROL_URN) renderingControlUrl = fullUrl;
-        }
-    }
-    if (!controlUrl) return null;
-    return {
-        id: udn ? udn[1] : location,
-        name: name,
-        location: location,
-        controlUrl: controlUrl,
-        renderingControlUrl: renderingControlUrl || controlUrl,
-    };
-}
-
-setTimeout(async () => {
-    for (const s of sockets) {
-        try { s.close(); } catch {}
-    }
-    const devices = [];
-    for (const loc of locations) {
-        try {
-            const xml = await fetchXml(loc);
-            const device = parseDevice(xml, loc);
-            if (device) devices.push(device);
-        } catch {}
-    }
-    process.stdout.write(JSON.stringify(devices));
-    process.exit(0);
-}, 4000);
-`;
-
-export async function discoverDevices(timeout: number = 5000): Promise<DlnaDevice[]> {
-    if (process.platform === 'darwin') {
-        return discoverMacOS(timeout);
-    }
-    return discoverDirect(timeout);
 }
 
 function createSocketForInterface(
@@ -235,25 +84,6 @@ function decodeXml(str: string | undefined): string | undefined {
         .replace(/&amp;/g, '&')
         .replace(/&lt;/g, '<')
         .replace(/&gt;/g, '>');
-}
-
-async function discoverMacOS(timeout: number): Promise<DlnaDevice[]> {
-    return new Promise((resolve) => {
-        const nodePath = resolveNodePath();
-        const child = execFile(nodePath, ['-e', DISCOVERY_SCRIPT], { timeout }, (err, stdout) => {
-            if (err) {
-                resolve([]);
-                return;
-            }
-            try {
-                const devices: DlnaDevice[] = JSON.parse(stdout);
-                resolve(devices);
-            } catch {
-                resolve([]);
-            }
-        });
-        child.on('error', () => resolve([]));
-    });
 }
 
 function fetchXml(url: string): Promise<string> {
@@ -329,18 +159,4 @@ function parseDevice(xml: string, location: string): DlnaDevice | null {
         name,
         renderingControlUrl: renderingControlUrl || controlUrl,
     };
-}
-
-function resolveNodePath(): string {
-    const execName = path.basename(process.execPath).toLowerCase();
-    if (execName === 'node') {
-        return process.execPath;
-    }
-    try {
-        const nodePath = execSync('which node').toString().trim();
-        if (nodePath) return nodePath;
-    } catch {
-        // Catch
-    }
-    return '/usr/local/bin/node';
 }
