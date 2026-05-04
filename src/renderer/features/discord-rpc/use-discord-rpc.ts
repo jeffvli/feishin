@@ -276,12 +276,12 @@ export const useDiscordRpc = () => {
 
                 if (discordSettings.showServerImage && song) {
                     if (song._uniqueId === currentSong?._uniqueId && imageUrlRef.current) {
-                        if (song._serverType === ServerType.JELLYFIN) {
-                            activity.largeImageKey = imageUrlRef.current;
-                        } else if (
-                            song._serverType === ServerType.NAVIDROME ||
-                            song._serverType === ServerType.SUBSONIC
+                        if (
+                            song._serverType === ServerType.JELLYFIN ||
+                            song._serverType === ServerType.NAVIDROME
                         ) {
+                            activity.largeImageKey = imageUrlRef.current;
+                        } else if (song._serverType === ServerType.SUBSONIC) {
                             try {
                                 const info = await api.controller.getAlbumInfo({
                                     apiClientProps: { serverId: song._serverId },
