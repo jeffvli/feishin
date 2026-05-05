@@ -428,12 +428,13 @@ const silentlyTransformResponse = (data: any) => {
 };
 
 export const ssApiClient = (args: {
+    forceRemoteUrl?: boolean;
     server: null | ServerListItemWithCredential;
     signal?: AbortSignal;
     silent?: boolean;
     url?: string;
 }) => {
-    const { server, signal, silent, url } = args;
+    const { forceRemoteUrl, server, signal, silent, url } = args;
 
     return initClient(contract, {
         api: async ({ body, headers, method, path, rawQuery }) => {
@@ -443,7 +444,7 @@ export const ssApiClient = (args: {
             const { params, path: api } = parsePath(path);
 
             if (server) {
-                const serverUrl = getServerUrl(server);
+                const serverUrl = getServerUrl(server, forceRemoteUrl);
                 baseUrl = serverUrl ? `${serverUrl}/rest` : undefined;
                 const token = server.credential;
                 const params = token.split(/&?\w=/gm);
