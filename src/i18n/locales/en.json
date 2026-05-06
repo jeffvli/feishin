@@ -785,7 +785,7 @@
         "crossfadeDuration": "Crossfade duration",
         "crossfadeStyle": "Crossfade style",
         "crossfadeStyle_description": "Select the crossfade style to use for the audio player",
-        "customCss_description": "Custom CSS content. Note: content and remote urls are disallowed properties. A preview of your content is shown below. Additional fields you didn't set are present due to sanitization",
+        "customCss_description": "Custom CSS content. Note: content and remote urls are disallowed properties. A preview of your content is shown below. Additional fields you didn't set are present due to sanitization. Desktop: feishin reads and writes custom.css in the app config directory and reloads it when the file changes",
         "customCss": "Custom CSS",
         "customCssEnable_description": "Allow for writing custom CSS",
         "customCssEnable": "Enable custom CSS",

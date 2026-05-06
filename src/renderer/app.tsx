@@ -15,7 +15,12 @@ import { useCheckForUpdates } from '/@/renderer/hooks/use-check-for-updates';
 import { useNativeMenuSync } from '/@/renderer/hooks/use-native-menu-sync';
 import { useSyncSettingsToMain } from '/@/renderer/hooks/use-sync-settings-to-main';
 import { AppRouter } from '/@/renderer/router/app-router';
-import { useCssSettings, useHotkeySettings, useLanguage } from '/@/renderer/store';
+import {
+    useCssSettings,
+    useHotkeySettings,
+    useLanguage,
+    useSettingsStoreActions,
+} from '/@/renderer/store';
 import { useAppTheme } from '/@/renderer/themes/use-app-theme';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { WebAudio } from '/@/shared/types/types';
@@ -89,6 +94,7 @@ const AppEffects = () => (
     <>
         <SyncSettingsEffect />
         <UpdateCheckEffect />
+        <CustomCssFileEffect />
         <CssSettingsEffect />
         <GlobalShortcutsEffect />
         <LanguageEffect />
@@ -138,6 +144,77 @@ const CssSettingsEffect = () => {
             }
         };
     }, [content, enabled]);
+
+    return null;
+};
+
+const CustomCssFileEffect = () => {
+    const { setSettings } = useSettingsStoreActions();
+    const { content } = useCssSettings();
+    const latestContentRef = useRef(content);
+
+    useEffect(() => {
+        latestContentRef.current = content;
+    }, [content]);
+
+    useEffect(() => {
+        if (!isElectron() || !ipc) return;
+
+        let disposed = false;
+
+        const applyContent = (rawContent: string | undefined) => {
+            const sanitized = sanitizeCss(`<style>${rawContent ?? ''}`);
+            if (sanitized !== latestContentRef.current) {
+                setSettings({
+                    css: {
+                        content: sanitized,
+                    },
+                });
+            }
+        };
+
+        const loadCustomCss = async () => {
+            try {
+                const result = (await ipc.invoke('custom-css-get')) as
+                    | undefined
+                    | { content: string; exists: boolean };
+
+                if (disposed || !result) return;
+
+                if (!result.exists && latestContentRef.current) {
+                    await ipc.invoke('custom-css-save', {
+                        content: latestContentRef.current,
+                    });
+                    return;
+                }
+
+                applyContent(result.content);
+            } catch (error) {
+                console.error('Failed to load custom css', error);
+            }
+        };
+
+        const handleCustomCssUpdated = (
+            _event: unknown,
+            data: { content?: string; exists?: boolean },
+        ) => {
+            if (disposed) return;
+            if (data?.exists === false) {
+                applyContent('');
+                return;
+            }
+
+            applyContent(data?.content);
+        };
+
+        ipc.on('custom-css-updated', handleCustomCssUpdated);
+        loadCustomCss();
+
+        return () => {
+            disposed = true;
+            ipc.removeListener('custom-css-updated', handleCustomCssUpdated);
+        };
+    }, [setSettings]);
 
     return null;
 };

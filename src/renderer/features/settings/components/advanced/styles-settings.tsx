@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,18 +15,28 @@ export const StylesSettings = memo(() => {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation();
 
+    const ipc = isElectron() ? window.api.ipc : null;
+
     const { content, enabled } = useCssSettings();
     const [css, setCss] = useState(content);
 
     const { setSettings } = useSettingsStoreActions();
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setSettings({
             css: {
                 content: css,
                 enabled,
             },
         });
+
+        if (ipc) {
+            try {
+                await ipc.invoke('custom-css-save', { content: css });
+            } catch (error) {
+                console.error('Failed to save custom css file', error);
+            }
+        }
     };
 
     useEffect(() => {
