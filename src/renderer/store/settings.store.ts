@@ -175,6 +175,8 @@ const SideQueueLayoutSchema = z.enum(['horizontal', 'vertical']);
 
 const SidebarPanelTypeSchema = z.enum(['queue', 'lyrics', 'visualizer']);
 
+const SidebarPlaylistFolderViewSchema = z.enum(['single', 'tree', 'navigation']);
+
 const CollectionSchema = z.object({
     filterQueryString: z.string(),
     id: z.string(),
@@ -500,6 +502,11 @@ export const GeneralSettingsSchema = z.object({
     sidebarCollapseShared: z.boolean(),
     sidebarItems: z.array(SidebarItemTypeSchema),
     sidebarPanelOrder: z.array(SidebarPanelTypeSchema),
+    sidebarPlaylistFolders: z.boolean(),
+    sidebarPlaylistFolderSeparator: z.string().min(1),
+    sidebarPlaylistFolderTreeIndent: z.number().int().min(0).max(64),
+    sidebarPlaylistFolderTreeLineColor: z.string(),
+    sidebarPlaylistFolderView: SidebarPlaylistFolderViewSchema,
     sidebarPlaylistList: z.boolean(),
     sidebarPlaylistListFilterRegex: z.string(),
     sidebarPlaylistSorting: z.boolean(),
@@ -1169,6 +1176,11 @@ const initialState: SettingsState = {
         sidebarCollapseShared: false,
         sidebarItems,
         sidebarPanelOrder: ['queue', 'lyrics', 'visualizer'],
+        sidebarPlaylistFolders: true,
+        sidebarPlaylistFolderSeparator: '/',
+        sidebarPlaylistFolderTreeIndent: 16,
+        sidebarPlaylistFolderTreeLineColor: '',
+        sidebarPlaylistFolderView: 'single',
         sidebarPlaylistList: true,
         sidebarPlaylistListFilterRegex: '',
         sidebarPlaylistSorting: false,
@@ -2551,6 +2563,21 @@ export const useCollections = () => {
         [collections],
     );
 };
+
+export const useSidebarPlaylistFolders = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistFolders, shallow);
+
+export const useSidebarPlaylistFolderSeparator = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistFolderSeparator, shallow);
+
+export const useSidebarPlaylistFolderView = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistFolderView, shallow);
+
+export const useSidebarPlaylistFolderTreeIndent = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistFolderTreeIndent, shallow);
+
+export const useSidebarPlaylistFolderTreeLineColor = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistFolderTreeLineColor, shallow);
 
 export const useSidebarPlaylistList = () =>
     useSettingsStore((state) => state.general.sidebarPlaylistList, shallow);

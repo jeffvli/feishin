@@ -5,6 +5,13 @@ import { memo, MouseEvent, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 
+import {
+    collectFolderPaths,
+    PlaylistFolderViews,
+    usePlaylistFolderState,
+    usePlaylistFolderViewState,
+    usePlaylistNavigationState,
+} from './playlist-folder-tree';
 import styles from './sidebar-playlist-list.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
@@ -50,7 +57,7 @@ const getPlaylistOrderKey = (serverId: string | undefined, scope: 'owned' | 'sha
     return `playlist_order:${sid}:${scope}`;
 };
 
-interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'onPlay'> {
+export interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'onPlay'> {
     item: Playlist;
     name: string;
     onContextMenu: (e: MouseEvent<HTMLAnchorElement>, item: Playlist) => void;
@@ -58,7 +65,7 @@ interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'on
     to: string;
 }
 
-const PlaylistRowButton = memo(
+export const PlaylistRowButton = memo(
     ({ item, name, onContextMenu, onReorder, to }: PlaylistRowButtonProps) => {
         const url = {
             pathname: generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: to }),
@@ -485,11 +492,62 @@ export const SidebarPlaylistList = () => {
         openCreatePlaylistModal(server, e);
     };
 
+    const folderViewState = usePlaylistFolderViewState(playlistItems?.items ?? []);
+    const { folderView, groups, tree } = folderViewState;
+    const navigation = usePlaylistNavigationState();
+    const inNavigation = folderView === 'navigation' && navigation.pathStack.length > 0;
+
+    const folderPaths = useMemo(() => {
+        if (folderView === 'single') {
+            return groups.reduce<string[]>((acc, g) => {
+                if (g.type === 'folder') acc.push(g.name);
+                return acc;
+            }, []);
+        }
+        return collectFolderPaths(tree);
+    }, [folderView, groups, tree]);
+
+    const { expandedSet, setMany, toggle } = usePlaylistFolderState('owned');
+    const allExpanded =
+        folderPaths.length > 0 && folderPaths.every((path) => expandedSet.has(path));
+
+    const handleToggleAllFolders = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            setMany(folderPaths, !allExpanded);
+        },
+        [setMany, folderPaths, allExpanded],
+    );
+
+    const handleNavigateUp = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            navigation.goUp();
+        },
+        [navigation],
+    );
+
+    const showExpandAll = folderView !== 'navigation' && folderPaths.length > 0;
+
     return (
         <Accordion.Item value="playlists">
             <Accordion.Control component="div" role="button" style={{ userSelect: 'none' }}>
                 <Group justify="space-between" pr="var(--theme-spacing-md)">
-                    <Text fw={500}>{t('page.sidebar.playlists')}</Text>
+                    <Group gap="xs" style={{ minWidth: 0 }} wrap="nowrap">
+                        {inNavigation && (
+                            <ActionIcon
+                                icon="arrowLeftS"
+                                iconProps={{ size: 'lg' }}
+                                onClick={handleNavigateUp}
+                                size="xs"
+                                tooltip={{ label: t('common.back') }}
+                                variant="subtle"
+                            />
+                        )}
+                        <Text className={styles.name} fw={500}>
+                            {inNavigation ? navigation.currentName : t('page.sidebar.playlists')}
+                        </Text>
+                    </Group>
                     <Group gap="xs">
                         <ActionIcon
                             icon="add"
@@ -503,6 +561,27 @@ export const SidebarPlaylistList = () => {
                             }}
                             variant="subtle"
                         />
+                        {showExpandAll && (
+                            <ActionIcon
+                                icon={allExpanded ? 'collapseAll' : 'expandAll'}
+                                iconProps={{
+                                    size: 'lg',
+                                }}
+                                onClick={handleToggleAllFolders}
+                                size="xs"
+                                tooltip={{
+                                    label: t(
+                                        allExpanded
+                                            ? 'action.collapseAllFolders'
+                                            : 'action.expandAllFolders',
+                                        {
+                                            postProcess: 'sentenceCase',
+                                        },
+                                    ),
+                                }}
+                                variant="subtle"
+                            />
+                        )}
                         <ActionIcon
                             component={Link}
                             icon="list"
@@ -521,16 +600,14 @@ export const SidebarPlaylistList = () => {
                 </Group>
             </Accordion.Control>
             <Accordion.Panel>
-                {playlistItems?.items?.map((item, index) => (
-                    <PlaylistRowButton
-                        item={item}
-                        key={index}
-                        name={item.name}
-                        onContextMenu={handleContextMenu}
-                        onReorder={handleReorder}
-                        to={item.id}
-                    />
-                ))}
+                <PlaylistFolderViews
+                    {...folderViewState}
+                    expandedSet={expandedSet}
+                    navigation={navigation}
+                    onContextMenu={handleContextMenu}
+                    onReorder={handleReorder}
+                    onToggleFolder={toggle}
+                />
             </Accordion.Panel>
         </Accordion.Item>
     );
@@ -668,28 +745,52 @@ export const SidebarSharedPlaylistList = () => {
         setPlaylistOrder(reorderedIds);
     };
 
+    const folderViewState = usePlaylistFolderViewState(playlistItems?.items ?? []);
+    const navigation = usePlaylistNavigationState();
+    const { expandedSet, toggle } = usePlaylistFolderState('shared');
+    const inNavigation =
+        folderViewState.folderView === 'navigation' && navigation.pathStack.length > 0;
+
+    const handleNavigateUp = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            navigation.goUp();
+        },
+        [navigation],
+    );
+
     if (playlistItems?.items?.length === 0) {
         return null;
     }
 
     return (
         <Accordion.Item value="shared-playlists">
-            <Accordion.Control>
-                <Text fw={500} variant="secondary">
-                    {t('page.sidebar.shared')}
-                </Text>
+            <Accordion.Control component="div" role="button" style={{ userSelect: 'none' }}>
+                <Group gap="xs" style={{ minWidth: 0 }} wrap="nowrap">
+                    {inNavigation && (
+                        <ActionIcon
+                            icon="arrowLeftS"
+                            iconProps={{ size: 'lg' }}
+                            onClick={handleNavigateUp}
+                            size="xs"
+                            tooltip={{ label: t('common.back') }}
+                            variant="subtle"
+                        />
+                    )}
+                    <Text className={styles.name} fw={500} variant="secondary">
+                        {inNavigation ? navigation.currentName : t('page.sidebar.shared')}
+                    </Text>
+                </Group>
             </Accordion.Control>
             <Accordion.Panel>
-                {playlistItems?.items?.map((item, index) => (
-                    <PlaylistRowButton
-                        item={item}
-                        key={index}
-                        name={item.name}
-                        onContextMenu={handleContextMenu}
-                        onReorder={handleReorder}
-                        to={item.id}
-                    />
-                ))}
+                <PlaylistFolderViews
+                    {...folderViewState}
+                    expandedSet={expandedSet}
+                    navigation={navigation}
+                    onContextMenu={handleContextMenu}
+                    onReorder={handleReorder}
+                    onToggleFolder={toggle}
+                />
             </Accordion.Panel>
         </Accordion.Item>
     );
