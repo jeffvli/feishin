@@ -360,6 +360,10 @@ async function handleMpvAutoNext(transcode: {
     enabled: boolean;
     format?: string | undefined;
 }) {
+    const storeStatus = usePlayerStore.getState().player?.status;
+    if (storeStatus !== PlayerStatus.PLAYING) {
+        return;
+    }
     const playerData = usePlayerStore.getState().getPlayerData();
     const nextSongUrl = playerData.nextSong
         ? await getSongUrl(playerData.nextSong, transcode, true)

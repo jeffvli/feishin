@@ -302,7 +302,7 @@ export function WebPlayer() {
     }, []);
 
     useEffect(() => {
-        if (localPlayerStatus !== PlayerStatus.PLAYING) {
+        if (status !== PlayerStatus.PLAYING) {
             return;
         }
 
@@ -327,7 +327,19 @@ export function WebPlayer() {
         }, 500);
 
         return () => clearInterval(interval);
-    }, [localPlayerStatus, num, setTimestamp, transitionType]);
+    }, [status, num, setTimestamp, transitionType]);
+
+    useEffect(() => {
+        if (status !== PlayerStatus.PLAYING || localPlayerStatus === PlayerStatus.PLAYING) {
+            return;
+        }
+        if (fadeIntervalRef.current) {
+            clearInterval(fadeIntervalRef.current);
+            fadeIntervalRef.current = null;
+        }
+        playerRef.current?.setVolume(volume);
+        setLocalPlayerStatus(PlayerStatus.PLAYING);
+    }, [status, localPlayerStatus, volume]);
 
     const calculateReplayGain = useCallback(
         (song: QueueSong): number => {

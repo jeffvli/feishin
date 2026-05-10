@@ -129,10 +129,6 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     const sendCurrentTrackToDlna = useCallback(async () => {
         if (!dlnaPlayer) return;
         // Skip if the device already auto-transitioned (gapless)
-        if (skipNextSendRef.current) {
-            skipNextSendRef.current = false;
-            return;
-        }
         const wasPlayingAtStart = usePlayerStore.getState().player.status === PlayerStatus.PLAYING;
         const wasAutoAdvancingAtStart = isAutoAdvancingRef.current;
         const playerData = usePlayerStore.getState().getPlayerData();
@@ -156,6 +152,13 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             }
         } else {
             dlnaPlayer.destroySpeedProxy?.();
+        }
+        if (skipNextSendRef.current) {
+            skipNextSendRef.current = false;
+            lastSentUrlRef.current = urlToPlay;
+            lastSentRawUrlRef.current = rawUrl;
+            lastSentAtRef.current = Date.now();
+            return;
         }
         const now = Date.now();
         if (urlToPlay === lastSentUrlRef.current && now - lastSentAtRef.current < 500) {
@@ -536,6 +539,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             },
             onPlayerPlay: () => {
                 devicePassiveModeRef.current = false;
+                skipNextSendRef.current = false;
                 sendCurrentTrackToDlna();
             },
             onPlayerSeekToTimestamp: (properties) => {
@@ -585,6 +589,16 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             },
         );
     }, [sendNextTrackToDlna]);
+    useEffect(() => {
+        return usePlayerStore.subscribe(
+            (state) => state.getPlayerData().currentSong?.id ?? null,
+            (nextId, prevId) => {
+                if (!hasPlayedRef.current || !dlnaPlayer) return;
+                if (nextId === prevId) return;
+                sendCurrentTrackToDlna();
+            },
+        );
+    }, [sendCurrentTrackToDlna]);
     // Handle manual change in playback speed
     useEffect(() => {
         return usePlayerStore.subscribe(

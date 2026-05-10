@@ -514,13 +514,13 @@ export const DlnaCastButton = () => {
                                         </Button>
                                     )}
                                 <Button
-                                    color={isShiftDown ? 'orange' : 'red'}
+                                    color={isShiftDown ? 'white' : 'red'}
                                     flex={1}
                                     onClick={handleDisconnect}
                                     size="xs"
                                     style={{
                                         color: isShiftDown
-                                            ? 'var(--mantine-color-orange-4, #ffa94d)'
+                                            ? 'var(--mantine-color-white, #ffffff)'
                                             : 'var(--mantine-color-red-4, #ff6b6b)',
                                     }}
                                     variant="outline"
@@ -595,13 +595,13 @@ export const DlnaCastButton = () => {
                                     {t('dlna.group.addSpeaker')}
                                 </Button>
                                 <Button
-                                    color={isShiftDown ? 'orange' : 'red'}
+                                    color={isShiftDown ? 'white' : 'red'}
                                     flex={1}
                                     onClick={handleDisconnect}
                                     size="xs"
                                     style={{
                                         color: isShiftDown
-                                            ? 'var(--mantine-color-orange-4, #ffa94d)'
+                                            ? 'var(--mantine-color-white, #ffffff)'
                                             : 'var(--mantine-color-red-4, #ff6b6b)',
                                     }}
                                     variant="outline"

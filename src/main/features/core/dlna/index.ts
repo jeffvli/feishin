@@ -79,6 +79,7 @@ let currentFfmpegProcess: ChildProcess | null = null;
 let currentTranscodeFile = '';
 let lastKnownDuration = 0;
 let nearEndStallCount = 0;
+let resumeKickCount = 0;
 
 cleanupTempFiles();
 
@@ -1050,11 +1051,24 @@ function startPositionPolling() {
                     const isResumeFailure =
                         previousPosition < 15 ||
                         (Date.now() - trackLoadedAt < 12000 && previousPosition < 30);
-
                     if (isResumeFailure) {
-                        dlnaLog('Stream dropped unexpectedly (resume failure). Kicking device...');
-                        trackLoadedAt = Date.now();
-                        play(connectedDevice).catch(() => {});
+                        resumeKickCount++;
+                        if (resumeKickCount <= 4) {
+                            dlnaLog(
+                                `Stream dropped unexpectedly (resume failure). Kicking device... (${resumeKickCount}/4)`,
+                            );
+                            trackLoadedAt = Date.now();
+                            lastPlayCommandAt = Date.now();
+                            play(connectedDevice).catch(() => {});
+                        } else {
+                            dlnaLog('Stream failed to resume after 4 attempts, giving up');
+                            hasStartedPlaying = false;
+                            isPausedIntentionally = true;
+                            getMainWindow()?.webContents.send('renderer-dlna-toast', {
+                                message: 'DLNA stream failed to resume. Please try playing again.',
+                                type: 'error',
+                            });
+                        }
                     } else {
                         pendingPrevTrack = false;
                         dlnaLog('Track ended (stopped), advancing queue');
