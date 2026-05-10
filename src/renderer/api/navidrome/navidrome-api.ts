@@ -479,11 +479,12 @@ axiosClient.interceptors.response.use(
 );
 
 export const ndApiClient = (args: {
+    forceRemoteUrl?: boolean;
     server: null | ServerListItemWithCredential;
     signal?: AbortSignal;
     url?: string;
 }) => {
-    const { server, signal, url } = args;
+    const { forceRemoteUrl, server, signal, url } = args;
 
     return initClient(contract, {
         api: async ({ body, headers, method, path }) => {
@@ -493,7 +494,7 @@ export const ndApiClient = (args: {
             const { params, path: api } = parsePath(path);
 
             if (server) {
-                const serverUrl = getServerUrl(server);
+                const serverUrl = getServerUrl(server, forceRemoteUrl);
                 baseUrl = serverUrl ? `${serverUrl}/api` : undefined;
                 token = server?.ndCredential;
             } else {

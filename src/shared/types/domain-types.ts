@@ -421,6 +421,7 @@ type ApiContext = {
 
 type BaseEndpointArgs = {
     apiClientProps: {
+        forceRemoteUrl?: boolean;
         server?: null | ServerListItemWithCredential;
         serverId: string;
         signal?: AbortSignal;

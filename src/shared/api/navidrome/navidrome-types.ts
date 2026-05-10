@@ -87,6 +87,7 @@ export const NDSongQueryFields = [
     { label: 'Artist Date Rated', type: 'date', value: 'artistdaterated' },
     { label: 'Artist Is Favorite', type: 'boolean', value: 'artistloved' },
     { label: 'Artist Play Count', type: 'number', value: 'artistplaycount' },
+    { label: 'Artist Rating', type: 'number', value: 'artistrating' },
     { label: 'Artists', type: 'string', value: 'artists' },
     { label: 'ASIN', type: 'string', value: 'asin' },
     { label: 'Average Rating', type: 'number', value: 'averagerating' },
