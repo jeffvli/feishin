@@ -236,10 +236,16 @@ export function WebPlayer() {
                     }
                 }
 
+                let type: 'fraction' | 'seconds' | undefined = undefined;
+
+                if (timestamp < 1) {
+                    type = 'seconds';
+                }
+
                 if (num === 1) {
-                    playerRef.current?.player1()?.ref?.seekTo(timestamp);
+                    playerRef.current?.player1()?.ref?.seekTo(timestamp, type);
                 } else {
-                    playerRef.current?.player2()?.ref?.seekTo(timestamp);
+                    playerRef.current?.player2()?.ref?.seekTo(timestamp, type);
                 }
             },
             onPlayerStatus: async (properties) => {

@@ -385,8 +385,8 @@ const BaseItemGridList = ({
     rows,
     size = 'default',
 }: ItemGridListProps) => {
-    const rootRef = useRef(null);
-    const outerRef = useRef(null);
+    const rootRef = useRef<HTMLDivElement | null>(null);
+    const outerRef = useRef<HTMLDivElement | null>(null);
     const listRef = useRef<FixedSizeList<GridItemProps>>(null);
     const { ref: containerRef, width: containerWidth } = useElementSize();
     const { focused, ref: containerFocusRef } = useFocusWithin();
@@ -486,7 +486,7 @@ const BaseItemGridList = ({
     }, [itemsPerRow, rows?.length, size]);
 
     useLayoutEffect(() => {
-        const { current: container } = containerRef;
+        const container = rootRef.current;
         if (!container) return;
 
         throttledSetTableMeta(containerWidth, resolvedItemCount, (meta) => {
@@ -500,13 +500,15 @@ const BaseItemGridList = ({
                 current.rowCount !== meta.rowCount
             ) {
                 tableMetaRef.current = meta;
-                container.style.setProperty('--grid-column-count', String(meta.columnCount));
-                container.style.setProperty('--grid-item-height', `${meta.itemHeight}px`);
-                container.style.setProperty('--grid-row-count', String(meta.rowCount));
+                const el = rootRef.current;
+                if (!el) return;
+                el.style.setProperty('--grid-column-count', String(meta.columnCount));
+                el.style.setProperty('--grid-item-height', `${meta.itemHeight}px`);
+                el.style.setProperty('--grid-row-count', String(meta.rowCount));
                 setTableMetaVersion((v) => v + 1);
             }
         });
-    }, [containerWidth, resolvedItemCount, throttledSetTableMeta, containerRef]);
+    }, [containerWidth, resolvedItemCount, throttledSetTableMeta]);
 
     const controls = useDefaultItemListControls({
         enableMultiSelect,

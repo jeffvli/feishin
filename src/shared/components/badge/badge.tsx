@@ -28,4 +28,4 @@ const BaseBadge = ({ children, classNames, variant = 'default', ...props }: Badg
     );
 };
 
-export const Badge = createPolymorphicComponent<'button', BadgeProps>(BaseBadge);
+export const Badge = createPolymorphicComponent<'div', BadgeProps>(BaseBadge);

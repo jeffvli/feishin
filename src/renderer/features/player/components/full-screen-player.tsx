@@ -26,6 +26,7 @@ import {
     SONG_DISPLAY_TYPES,
 } from '/@/renderer/features/shared/components/list-config-menu';
 import { useFastAverageColor } from '/@/renderer/hooks';
+import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import {
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
@@ -46,7 +47,6 @@ import { Popover } from '/@/shared/components/popover/popover';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Switch } from '/@/shared/components/switch/switch';
-import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { ItemListKey, ListDisplayType, Platform } from '/@/shared/types/types';
 

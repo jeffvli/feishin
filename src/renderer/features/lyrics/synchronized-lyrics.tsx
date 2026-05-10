@@ -49,6 +49,11 @@ export const SynchronizedLyrics = ({
                 ? displaySettings.fontSize
                 : 24,
         gap: displaySettings.gap && displaySettings.gap !== 0 ? displaySettings.gap : 24,
+        opacityNonActive: displaySettings.opacityNonActive,
+        scaleNonActive:
+            displaySettings.scaleNonActive && displaySettings.scaleNonActive !== 0
+                ? displaySettings.scaleNonActive
+                : 0.95,
     };
     const { mediaSeekToTimestamp } = usePlayerActions();
     const status = usePlayerStatus();
@@ -90,18 +95,20 @@ export const SynchronizedLyrics = ({
     const programmaticScrollRef = useRef(false);
 
     const getCurrentLyric = (timeInMs: number) => {
-        if (lyricRef.current) {
-            const activeLyrics = lyricRef.current;
-            for (let idx = 0; idx < activeLyrics.length; idx += 1) {
-                if (timeInMs <= activeLyrics[idx][0]) {
-                    return idx === 0 ? idx : idx - 1;
-                }
-            }
-
-            return activeLyrics.length - 1;
+        const activeLyrics = lyricRef.current;
+        if (!activeLyrics?.length) {
+            return -1;
         }
 
-        return -1;
+        let index = -1;
+        for (let idx = 0; idx < activeLyrics.length; idx += 1) {
+            if (timeInMs < activeLyrics[idx][0]) {
+                break;
+            }
+            index = idx;
+        }
+
+        return index;
     };
 
     const setCurrentLyricRef = useRef<
@@ -136,7 +143,20 @@ export const SynchronizedLyrics = ({
                 .forEach((node) => node.classList.remove('active'));
 
             if (index === -1) {
-                lyricRef.current = null;
+                const activeLyrics = lyricRef.current;
+                if (!activeLyrics?.length) {
+                    return;
+                }
+
+                const firstTime = activeLyrics[0][0];
+                if (timeInMs < firstTime) {
+                    const elapsed = performance.now() - start;
+                    const delay = Math.max(0, firstTime - timeInMs - elapsed);
+                    lyricTimer.current = setTimeout(() => {
+                        setCurrentLyricRef.current(firstTime, nextEpoch, 0);
+                    }, delay);
+                }
+
                 return;
             }
 
@@ -148,7 +168,6 @@ export const SynchronizedLyrics = ({
             const offsetTop = currentLyric?.offsetTop - doc?.clientHeight / 2 || 0;
 
             if (currentLyric === null) {
-                lyricRef.current = null;
                 return;
             }
 
@@ -308,7 +327,18 @@ export const SynchronizedLyrics = ({
             onMouseEnter={showScrollbar}
             onMouseLeave={hideScrollbar}
             ref={containerRef}
-            style={{ gap: `${settings.gap}px`, ...style }}
+            style={
+                {
+                    // opacity/scale is set here for every lyric,
+                    // and then overwritten by CSS for active lyrics
+                    // to prevent expensive rerenders each lyric
+                    '--lyric-opacity': settings.opacityNonActive,
+                    '--lyric-scale': settings.scaleNonActive,
+                    '--lyric-scale-origin': settings.alignment,
+                    gap: `${settings.gap}px`,
+                    ...style,
+                } as React.CSSProperties
+            }
         >
             {settings.showProvider && source && (
                 <LyricLine

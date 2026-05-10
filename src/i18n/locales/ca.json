@@ -139,7 +139,9 @@
                 "lyricOffset": "demora de la lletra (ms)",
                 "showLyricMatch": "mosta coincidències de lletres",
                 "showLyricProvider": "mostra el proveïdor de la lletra",
-                "lyricGap": "espera entre lletres"
+                "lyricGap": "espera entre lletres",
+                "lyricOpacityNonActive": "Opacitat de la lletra inactiva",
+                "lyricScaleNonActive": "Escala de la lletra inactiva"
             },
             "lyrics": "lletres",
             "visualizer": "visualitzador",
@@ -337,7 +339,8 @@
         "filter_single": "senzill",
         "filter_multiple": "multi",
         "rename": "reanomena",
-        "newVersionAvailable": "hi ha una nova versió disponible"
+        "newVersionAvailable": "hi ha una nova versió disponible",
+        "numberOfResults": "{{numberOfResults}} resultats"
     },
     "entity": {
         "album_one": "àlbum",
@@ -406,7 +409,8 @@
             "input_skipDuplicates": "salta't els duplicats",
             "success": "s'ha afegit $t(entity.trackWithCount, {\"count\": {{message}} }) a $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
             "create": "crea $t(entity.playlist, {\"count\": 1}) {{playlist}}",
-            "searchOrCreate": "cerca $t(entity.playlist, {\"count\": 2}) o escriu per crear-ne una de nova"
+            "searchOrCreate": "cerca $t(entity.playlist, {\"count\": 2}) o escriu per crear-ne una de nova",
+            "noneAdded": "no s'han afegit pistes a la $t(entity.playlist, {\"count\": 1}) '{{playlist}}'"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
@@ -506,6 +510,9 @@
             "export": "exporta la lletra",
             "input_synced": "exporta la lletra sincronitzada",
             "input_offset": "$t(setting.lyricOffset)"
+        },
+        "editRadioStation": {
+            "success": "Emissora de ràdio actualitzada amb èxit"
         }
     },
     "action": {
@@ -522,7 +529,10 @@
         "goToPage": "anar a la pàgina",
         "openIn": {
             "lastfm": "Obrir a Last.fm",
-            "musicbrainz": "Obrir a MusicBrainz"
+            "musicbrainz": "Obrir a MusicBrainz",
+            "listenbrainz": "Obre a ListenBrainz",
+            "qobuz": "Obre a Qobuz",
+            "spotify": "Obre a Spotify"
         },
         "deselectAll": "deselecciona-ho tot",
         "viewPlaylists": "veure $t(entity.playlist, {\"count\": 2})",
@@ -597,7 +607,7 @@
         "artistConfiguration": "configuració de la pàgina de l'artista de l'àlbum",
         "artistConfiguration_description": "configura quins elements es mostren i el seu ordre de la pàgina de l'artista de l'àlbum",
         "audioExclusiveMode": "mode d'àudio exclusiu",
-        "audioExclusiveMode_description": "activa el mode d'àudio exclusiu. En aquest mode, el sistema normalment estarà bloquejat i només mpv podrà emetre àudio",
+        "audioExclusiveMode_description": "activa el mode d'àudio exclusiu. En aquest mode, el sistema normalment estarà bloquejat i només mpv podrà emetre àudio. El sistema visualitzador de captura d'àudio no funcionarà mentre això estigui activat",
         "buttonSize": "mida dels botons de la barra de reproducció",
         "buttonSize_description": "la mida dels botons de la barra de reproducció",
         "clearCache": "neteja la memòria del navegador",
@@ -910,7 +920,25 @@
         "primaryShade": "ombra primària",
         "primaryShade_description": "substitueix el to primari (0–9) utilitzat per a botons, enllaços i altres elements de color primari",
         "playerItemConfiguration_description": "configurar quins elements es mostren i en quin ordre al reproductor de pantalla completa",
-        "playerItemConfiguration": "configuració d'elements del jugador"
+        "playerItemConfiguration": "configuració d'elements del jugador",
+        "listenbrainz_description": "mostra enllaços a ListenBrainz a les pàgines d'artista/àlbum",
+        "listenbrainz": "mostra enllaços a ListenBrainz",
+        "qobuz_description": "mostra enllaços a Qobuz a les pàgines d'artista/àlbum",
+        "qobuz": "mostra enllaços a Qobuz",
+        "spotify_description": "mostra enllaços a Spotify a les pàgines d'artista/àlbum",
+        "spotify": "mostra enllaços a Spotify",
+        "nativeSpotify_description": "obre amb Spotify en lloc del vostre navegador",
+        "nativeSpotify": "fes servir Spotify",
+        "playerbarWaveformStretch": "extensió de la forma d'ona",
+        "playerbarWaveformStretch_description": "estén la forma d'ona per omplir l'espai disponible",
+        "sidePlayQueueLayout": "disposició de la cua de reproducció lateral",
+        "sidePlayQueueLayout_description": "estableix la disposició de la cua de reproducció lateral adjunta",
+        "sidePlayQueueLayout_optionHorizontal": "horitzontal",
+        "sidePlayQueueLayout_optionVertical": "vertical",
+        "waveformLoadingDelay": "demora de càrrega de la forma d'ona",
+        "waveformLoadingDelay_description": "demora en segons abans de carregar la forma d'ona. incrementeu aquest valor si patiu interrupcions en fer servir el reproductor web.",
+        "preventSuspendOnPlayback_description": "evita que l'aplicació quedi suspesa mentre es reprodueix música",
+        "preventSuspendOnPlayback": "evita la suspensió durant la reproducció"
     },
     "table": {
         "column": {
@@ -1360,6 +1388,13 @@
             }
         },
         "pasteGradient": "enganxa degradat",
-        "pasteGradientPlaceholder": "enganxa el degradat JSON aquí..."
+        "pasteGradientPlaceholder": "enganxa el degradat JSON aquí...",
+        "systemAudioConsentAllow": "permetre",
+        "systemAudioConsentBody": "el visualitzador necessita accés a l'àudio del sistema per funcionar",
+        "systemAudioConsentDecline": "denega",
+        "systemAudioConsentTitle": "Voleu permetre accés al sistema d'àudio?",
+        "systemAudioCaptureFailed": "No s'ha pogut iniciar la captura: {{message}}",
+        "systemAudioNoAudioTrack": "No s'ha tornat cap pista d'àudio. Comproveu que la captura d'àudio estigui activada quan se sol·liciti.",
+        "systemAudioExclusiveModeNotSupported": "El visualitzador no està disponible amb el mode d'àudio exclusiu activat. Desactiveu-lo a la configuració d'MPV i torneu-ho a intentar."
     }
 }

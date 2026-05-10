@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'motion/react';
-import { CSSProperties, MouseEvent, useMemo } from 'react';
+import { MouseEvent, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './sidebar.module.css';
@@ -159,7 +159,6 @@ export const Sidebar = () => {
 
 const SidebarImage = () => {
     const { t } = useTranslation();
-    const leftWidth = useAppStore((state) => state.sidebar.leftWidth);
     const { setSideBar } = useAppStoreActions();
     const currentSong = usePlayerSong();
     const isRadioActive = useIsRadioActive();
@@ -216,11 +215,7 @@ const SidebarImage = () => {
             onClick={expandFullScreenPlayer}
             onContextMenu={handleToggleContextMenu}
             role="button"
-            style={
-                {
-                    '--sidebar-image-height': leftWidth,
-                } as CSSProperties
-            }
+            style={{ aspectRatio: 1 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
         >
             <Tooltip

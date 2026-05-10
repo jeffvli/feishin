@@ -233,7 +233,9 @@
                 "showLyricMatch": "顯示匹配的歌詞",
                 "dynamicImageBlur": "圖片模糊大小",
                 "dynamicIsImage": "啟用背景圖片",
-                "lyricOffset": "歌詞偏移時間 (ms)"
+                "lyricOffset": "歌詞偏移時間 (ms)",
+                "lyricOpacityNonActive": "非活躍歌詞的不透明度",
+                "lyricScaleNonActive": "非活躍歌詞的比例"
             },
             "lyrics": "歌詞",
             "related": "相關",
@@ -792,7 +794,11 @@
         "qobuz_description": "在藝術家/專輯頁面上顯示 Qobuz 的連結",
         "qobuz": "顯示 Qobuz 連結",
         "waveformLoadingDelay": "波形載入延遲",
-        "waveformLoadingDelay_description": "載入波形前的延遲（以秒為單位）。如果您在使用網頁播放器時遇到卡頓，請增加此值。"
+        "waveformLoadingDelay_description": "載入波形前的延遲（以秒為單位）。如果您在使用網頁播放器時遇到卡頓，請增加此值。",
+        "playerbarWaveformStretch": "波形拉伸",
+        "playerbarWaveformStretch_description": "拉伸波形來填補可用空間",
+        "preventSuspendOnPlayback_description": "音樂播放時防止應用程式進入休眠",
+        "preventSuspendOnPlayback": "在播放時防止應用程式暫停"
     },
     "table": {
         "config": {
@@ -1042,7 +1048,8 @@
             "success": "新增 $t(entity.trackWithCount, {\"count\": {{message}} }) 到 $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
             "title": "新增到$t(entity.playlist, {\"count\": 1})",
             "create": "建立 $t(entity.playlist, {\"count\": 1}) {{playlist}}",
-            "searchOrCreate": "搜尋$t(entity.playlist, {\"count\": 2}) 或輸入內容以建立新項目"
+            "searchOrCreate": "搜尋$t(entity.playlist, {\"count\": 2}) 或輸入內容以建立新項目",
+            "noneAdded": "沒有曲目新增到 $t(entity.playlist, {\"count\": 1}) '{{playlist}}'"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",

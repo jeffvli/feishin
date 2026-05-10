@@ -170,7 +170,8 @@
         "explicit": "нецензурная лексика",
         "externalLinks": "внешние ссылки",
         "explicitStatus": "признак нецензурного контента",
-        "newVersionAvailable": "доступна новая версия"
+        "newVersionAvailable": "доступна новая версия",
+        "numberOfResults": "{{numberOfResults}} результатов"
     },
     "entity": {
         "album_one": "альбом",
@@ -438,7 +439,17 @@
             "home": "$t(common.home)",
             "myLibrary": "Моя библиотека",
             "shared": "Публичные плейлисты $t(entity.playlist, {\"count\": 2})",
-            "collections": "коллекции"
+            "collections": "коллекции",
+            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
+            "albums": "$t(entity.album, {\"count\": 2})",
+            "artists": "$t(entity.artist, {\"count\": 2})",
+            "favorites": "$t(entity.favorite, {\"count\": 2})",
+            "folders": "$t(entity.folder, {\"count\": 2})",
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "playlists": "$t(entity.playlist, {\"count\": 2})",
+            "settings": "$t(common.setting, {\"count\": 2})",
+            "tracks": "$t(entity.track, {\"count\": 2})"
         },
         "fullscreenPlayer": {
             "config": {
@@ -455,7 +466,9 @@
                 "useImageAspectRatio": "использовать соотношение сторон изображения",
                 "lyricGap": "пробел между словами",
                 "dynamicIsImage": "включить фоновое изображение",
-                "dynamicImageBlur": "сила размытия изображения"
+                "dynamicImageBlur": "сила размытия изображения",
+                "lyricOpacityNonActive": "непрозрачность неактивных слов",
+                "lyricScaleNonActive": "размер неактивных слов"
             },
             "upNext": "играет",
             "lyrics": "слова",
@@ -478,7 +491,8 @@
             "selectMusicFolder": "выбрать папку с музыкой",
             "noMusicFolder": "папка с музыкой не выбрана",
             "multipleMusicFolders": "{{count}} выбрано музыкальных папок",
-            "commandPalette": "открыть командную строку"
+            "commandPalette": "открыть командную строку",
+            "settings": "$t(common.setting, {\"count\": 2})"
         },
         "manageServers": {
             "title": "сервера",
@@ -522,7 +536,8 @@
             "title": "$t(common.home)",
             "explore": "откройте новое",
             "recentlyPlayed": "игралось недавно",
-            "recentlyReleased": "Новинки"
+            "recentlyReleased": "Новинки",
+            "genres": "$t(entity.genre, {\"count\": 2})"
         },
         "albumDetail": {
             "moreFromArtist": "больше от $t(entity.artist, {\"count\": 1})",
@@ -556,10 +571,13 @@
         },
         "genreList": {
             "showAlbums": "показать $t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
-            "showTracks": "показать $t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2})"
+            "showTracks": "показать $t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.genre, {\"count\": 2})"
         },
         "trackList": {
-            "artistTracks": "Треки {{artist}}"
+            "artistTracks": "Треки {{artist}}",
+            "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.track, {\"count\": 2})"
         },
         "globalSearch": {
             "commands": {
@@ -620,6 +638,12 @@
         },
         "favorites": {
             "title": "$t(entity.favorite, {\"count\": 2})"
+        },
+        "folderList": {
+            "title": "$t(entity.folder, {\"count\": 2})"
+        },
+        "playlistList": {
+            "title": "$t(entity.playlist, {\"count\": 2})"
         }
     },
     "form": {
@@ -660,7 +684,8 @@
             "input_skipDuplicates": "не добавлять дубликаты",
             "create": "создать $t(entity.playlist, {\"count\": 1}) {{playlist}}",
             "searchOrCreate": "для создания нового списка выполните поиск по $t(entity.playlist, {\"count\": 2}) или введите соответствующий текст",
-            "input_playlists": "$t(entity.playlist, {\"count\": 2})"
+            "input_playlists": "$t(entity.playlist, {\"count\": 2})",
+            "noneAdded": "в плейлист $t(entity.playlist, {\"count\": 1}) '{{playlist}}' не было добавлено ни одного трека"
         },
         "updateServer": {
             "title": "обновление сервера",
@@ -1060,7 +1085,8 @@
         "audioFadeOnStatusChange": "плавное изменение звука",
         "audioFadeOnStatusChange_description": "включает эффекты затухания и появления звука при изменении статуса (пауза/проигрывание)",
         "preventSleepOnPlayback_description": "запрещает спящий режим экрана, пока играет музыка",
-        "preventSleepOnPlayback": "не переходить в спящий режим"
+        "preventSleepOnPlayback": "не переходить в спящий режим",
+        "discordLinkType_none": "$t(common.none)"
     },
     "releaseType": {
         "secondary": {
@@ -1081,7 +1107,8 @@
             "other": "другие",
             "broadcast": "транслировать",
             "ep": "эп",
-            "single": "сингл"
+            "single": "сингл",
+            "album": "$t(entity.album, {\"count\": 1})"
         }
     },
     "datetime": {

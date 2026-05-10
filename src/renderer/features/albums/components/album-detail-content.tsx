@@ -31,6 +31,7 @@ import {
 } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButtonControlled } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
 import { FILTER_KEYS, searchLibraryItems } from '/@/renderer/features/shared/utils';
+import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, usePlayerSong } from '/@/renderer/store';
 import { useExternalLinks, useSettingsStore } from '/@/renderer/store/settings.store';
@@ -49,7 +50,6 @@ import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { useDebouncedValue } from '/@/shared/hooks/use-debounced-value';
-import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import {
     Album,
     AlbumListSort,

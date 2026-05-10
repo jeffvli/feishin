@@ -425,7 +425,11 @@
         "sidePlayQueueLayout_optionHorizontal": "na šířku",
         "sidePlayQueueLayout_optionVertical": "na výšku",
         "waveformLoadingDelay": "zpoždění načítání vlnové křivky",
-        "waveformLoadingDelay_description": "zpoždění v sekundách před načtením vlnové křivky. zvyšte, pokud jste během používání webového přehrávače zaznamenali záseky."
+        "waveformLoadingDelay_description": "zpoždění v sekundách před načtením vlnové křivky. zvyšte, pokud jste během používání webového přehrávače zaznamenali záseky.",
+        "playerbarWaveformStretch": "natáhnutí vlnové křivky",
+        "playerbarWaveformStretch_description": "natáhně vlnovou křivku tak, aby vyplnila dostupný prostor",
+        "preventSuspendOnPlayback_description": "zabránit aplikaci v uspání během přehrávání hudby",
+        "preventSuspendOnPlayback": "zabránit uspání při přehrávání"
     },
     "action": {
         "editPlaylist": "upravit $t(entity.playlist, {\"count\": 1})",
@@ -825,7 +829,9 @@
                 "lyricGap": "mezera textů",
                 "dynamicImageBlur": "velikost rozostření obrázku",
                 "dynamicIsImage": "povolit obrázek na pozadí",
-                "lyricOffset": "posunutí textů (ms)"
+                "lyricOffset": "posunutí textů (ms)",
+                "lyricOpacityNonActive": "neprůhlednost neaktivních textů",
+                "lyricScaleNonActive": "velikost neaktivních textů"
             },
             "upNext": "další",
             "lyrics": "texty",
@@ -1041,7 +1047,8 @@
             "input_skipDuplicates": "přeskočit duplicity",
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "create": "vytvořit $t(entity.playlist, {\"count\": 1}) {{playlist}}",
-            "searchOrCreate": "vyhledejte $t(entity.playlist, {\"count\": 2}) nebo pište pro vytvoření nového"
+            "searchOrCreate": "vyhledejte $t(entity.playlist, {\"count\": 2}) nebo pište pro vytvoření nového",
+            "noneAdded": "do $t(entity.playlist, {\"count\": 1}) '{{playlist}}' nebyly přidány žádné skladby"
         },
         "updateServer": {
             "title": "upravit server",

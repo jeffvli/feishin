@@ -306,6 +306,7 @@ const PlayerbarSliderSchema = z.object({
     barRadius: z.number(),
     barWidth: z.number(),
     loadingDelay: z.number(),
+    stretched: z.boolean(),
     type: PlayerbarSliderTypeSchema,
 });
 
@@ -536,6 +537,8 @@ const LyricsDisplaySettingsSchema = z.object({
     fontSizeUnsync: z.number(),
     gap: z.number(),
     gapUnsync: z.number(),
+    opacityNonActive: z.number(),
+    scaleNonActive: z.number(),
 });
 
 const LyricsSettingsSchema = z.object({
@@ -637,6 +640,7 @@ const WindowSettingsSchema = z.object({
     exitToTray: z.boolean(),
     minimizeToTray: z.boolean(),
     preventSleepOnPlayback: z.boolean(),
+    preventSuspendOnPlayback: z.boolean(),
     releaseChannel: z.enum(['alpha', 'beta', 'latest']),
     startMinimized: z.boolean(),
     tray: z.boolean(),
@@ -1152,6 +1156,7 @@ const initialState: SettingsState = {
             barRadius: 4,
             barWidth: 2,
             loadingDelay: 2,
+            stretched: false,
             type: PlayerbarSliderType.SLIDER,
         },
         playerItems,
@@ -1796,6 +1801,8 @@ const initialState: SettingsState = {
             fontSizeUnsync: 24,
             gap: 24,
             gapUnsync: 24,
+            opacityNonActive: 0.2,
+            scaleNonActive: 0.95,
         },
     },
     playback: {
@@ -1912,6 +1919,7 @@ const initialState: SettingsState = {
         exitToTray: false,
         minimizeToTray: false,
         preventSleepOnPlayback: false,
+        preventSuspendOnPlayback: false,
         releaseChannel: 'latest',
         startMinimized: false,
         tray: true,
@@ -2215,7 +2223,10 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
 
                         state.lyrics = mainSettings;
                         state.lyricsDisplay = {
-                            default: displaySettings,
+                            default: {
+                                ...state.lyricsDisplay.default,
+                                ...displaySettings,
+                            },
                         };
                     }
                 }

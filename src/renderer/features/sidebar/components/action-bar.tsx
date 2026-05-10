@@ -18,12 +18,7 @@ export const ActionBar = () => {
 
     return (
         <div className={styles.container}>
-            <Grid
-                display="flex"
-                gutter="sm"
-                style={{ padding: '0 var(--theme-spacing-md)' }}
-                w="100%"
-            >
+            <Grid display="flex" gap="sm" style={{ padding: '0 var(--theme-spacing-md)' }} w="100%">
                 <Grid.Col span={7}>
                     <TextInput
                         leftSection={<Icon icon="search" />}

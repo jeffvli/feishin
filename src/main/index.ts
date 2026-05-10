@@ -931,12 +931,14 @@ ipcMain.on(
     },
 );
 
-ipcMain.handle('power-save-blocker-start', () => {
+ipcMain.handle('power-save-blocker-start', (_event, { full }: { full: boolean }) => {
     if (powerSaveBlockerId !== null) {
         return powerSaveBlockerId;
     }
 
-    powerSaveBlockerId = powerSaveBlocker.start('prevent-display-sleep');
+    powerSaveBlockerId = powerSaveBlocker.start(
+        full ? 'prevent-display-sleep' : 'prevent-app-suspension',
+    );
     return powerSaveBlockerId;
 });
 

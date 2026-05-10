@@ -340,7 +340,9 @@
                 "lyricGap": "espacement des lettres",
                 "dynamicIsImage": "activer l'image d'arrière-plan",
                 "dynamicImageBlur": "intensité du flou sur l'image d'arrière-plan",
-                "lyricOffset": "décalage des paroles (ms)"
+                "lyricOffset": "décalage des paroles (ms)",
+                "lyricScaleNonActive": "mise à l'échelle des paroles inactives",
+                "lyricOpacityNonActive": "opacité des paroles inactive"
             },
             "upNext": "à suivre",
             "lyrics": "paroles",

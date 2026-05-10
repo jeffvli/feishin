@@ -157,7 +157,8 @@
         "doNotShowAgain": "ez erakutsi hau berriro",
         "numberOfResults": "{{numberOfResults}} emaitza",
         "rename": "berrizendatu",
-        "newVersionAvailable": "bertsio berri bat eskuragarri dago"
+        "newVersionAvailable": "bertsio berri bat eskuragarri dago",
+        "gridRows": "sareta-errenkadak"
     },
     "player": {
         "repeat": "errepikatu",
@@ -409,7 +410,8 @@
         "fromYear": "urtetik aurrera",
         "explicitStatus": "$t(common.explicitStatus)",
         "matchAnd": "eta",
-        "matchOr": "edo"
+        "matchOr": "edo",
+        "sortName": "izenaren arabera ordenatu"
     },
     "setting": {
         "hotkey_playbackPause": "pausatu",
@@ -643,7 +645,7 @@
         "passwordStore_description": "zein pasahitz/sekretu biltegi erabili. aldatu hau pasahitzak gordetzeko arazoak badituzu",
         "playerFilters": "Iragazi ilarako abestiak",
         "sidePlayQueueStyle_description": "alboko erreprodukzio-ilararen estiloa ezartzen du",
-        "mediaSession_description": "Windows Media Session integrazioa gaitzen du, multimedia kontrolak eta metadatuak sistemaren bolumenaren gainjartzean eta blokeo pantailan bistaratuz (Windows bakarrik)",
+        "mediaSession_description": "Media Session integrazioa gaitzen du, multimedia kontrolak eta metadatuak sistemaren bolumenaren gainjartzean eta blokeo pantailan bistaratuz",
         "sidePlayQueueStyle": "alboko erreprodukzio-ilarako estiloa",
         "skipPlaylistPage": "saltatu erreprodukzio-zerrenda orria",
         "startMinimized_description": "abiarazi aplikazioa sistemaren erretiluan",
@@ -714,7 +716,19 @@
         "preservePitch": "mantendu tonua",
         "preventSleepOnPlayback": "erreprodukzioan loa saihestu",
         "replayGainClipping_description": "Saihestu {{ReplayGain}}-k eragindako mozketa irabazpena automatikoki jaitsiz",
-        "replayGainMode_description": "doitu bolumenaren irabazia fitxategiaren metadatuetan gordetako {{ReplayGain}} balioen arabera"
+        "replayGainMode_description": "doitu bolumenaren irabazia fitxategiaren metadatuetan gordetako {{ReplayGain}} balioen arabera",
+        "listenbrainz": "erakutsi ListenBrainz estekak",
+        "sidebarPlaylistSorting": "alboko barrako erreprodukzio-zerrenda ordenatzea",
+        "sidebarPlaylistListFilterRegex_description": "ezkutatu alboko barran adierazpen erregular honekin bat datozen erreprodukzio-zerrendak",
+        "sidebarPlaylistListFilterRegex_placeholder": "adib. ^Eguneroko Nahasketa.*",
+        "sidebarPlaylistListFilterRegex": "erreprodukzio-zerrenda iragazteko adierazpen erregularra",
+        "sidePlayQueueLayout": "alboko erreprodukzio-ilararen diseinua",
+        "sidePlayQueueLayout_description": "erantsitako alboko erreprodukzio-ilararen diseinua ezartzen du",
+        "sidePlayQueueLayout_optionHorizontal": "horizontala",
+        "sidePlayQueueLayout_optionVertical": "bertikala",
+        "skipDuration_description": "erreproduzitzailearen barran saltatzeko botoiak erabiltzean saltatzeko iraupena ezartzen du",
+        "skipPlaylistPage_description": "erreprodukzio-zerrenda batera nabigatzean, joan erreprodukzio-zerrendako abestien zerrendara lehenetsitako orrialdera joan beharrean",
+        "translationApiKey_description": "itzulpenerako api gakoa (zerbitzu globalaren amaiera-puntua soilik)"
     },
     "form": {
         "addServer": {
@@ -731,7 +745,9 @@
             "success": "zerbitzaria behar bezala gehitu da",
             "input_preferInstantMix": "nahiago izan berehalako nahasketa",
             "input_preferInstantMixDescription": "erabili berehalako nahasketa soilik antzeko abestiak lortzeko. erabilgarria portaera hau aldatzen duten pluginak badituzu",
-            "input_remoteUrl": "URL publikoa"
+            "input_remoteUrl": "URL publikoa",
+            "input_preferRemoteUrl": "url publikoa nahiago izan",
+            "input_remoteUrlPlaceholder": "aukerakoa: kanpoko funtzioetarako url publikoa"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
@@ -739,7 +755,8 @@
             "input_skipDuplicates": "saltatu bikoiztuak",
             "title": "gehitu $t(entity.playlist, {\"count\": 1})-(a)ri",
             "create": "sortu $t(entity.playlist, {\"count\": 1}) {{playlist}}",
-            "searchOrCreate": "bilatu $t(entity.playlist, {\"count\": 2}) edo idatzi berri bat sortzeko"
+            "searchOrCreate": "bilatu $t(entity.playlist, {\"count\": 2}) edo idatzi berri bat sortzeko",
+            "noneAdded": "ez da pistarik gehitu honi $t(entity.playlist, {\"count\": 1}) '{{playlist}}'"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
@@ -760,7 +777,9 @@
             "success": "partekatzeko esteka arbelera kopiatu da (edo egin klik hemen irekitzeko)",
             "expireInvalid": "iraungitze-data etorkizunean izan behar da",
             "allowDownloading": "baimendu deskargatzea",
-            "createFailed": "partekatzea sortzeak huts egin du (partekatzea gaituta al dago?)"
+            "createFailed": "partekatzea sortzeak huts egin du (partekatzea gaituta al dago?)",
+            "copyToClipboard": "Kopiatu arbelean: Ctrl+C, Enter",
+            "successMustClick": "partekatzea behar bezala sortu da. egin klik hemen irekitzeko"
         },
         "deletePlaylist": {
             "success": "$t(entity.playlist, {\"count\": 1}) behar bezala ezabatu da",
@@ -988,7 +1007,10 @@
             "recentReleases": "azken argitalpenak",
             "viewDiscography": "ikusi diskografia",
             "groupingTypeAll": "argitalpen mota guztiak",
-            "groupingTypePrimary": "argitalpen mota nagusiak"
+            "groupingTypePrimary": "argitalpen mota nagusiak",
+            "favoriteSongs": "abesti gogokoenak",
+            "topSongsCommunity": "komunitatea",
+            "topSongsPersonal": "pertsonala"
         },
         "itemDetail": {
             "copyPath": "kopiatu bidea arbelean",
@@ -1006,6 +1028,13 @@
         },
         "radioList": {
             "title": "irrati-kateak"
+        },
+        "releasenotes": {
+            "noStableReleaseToCompare": "ez dago bertsio egonkorrik alderatzeko"
+        },
+        "windowBar": {
+            "paused": "(Pausatuta) ",
+            "privateMode": "(Modu pribatua)"
         }
     },
     "releaseType": {
@@ -1038,7 +1067,19 @@
         "notContains": "ez dauka",
         "startsWith": "honekin hasten da",
         "endsWith": "honekin amaitzen da",
-        "isNot": "ez da"
+        "isNot": "ez da",
+        "afterDate": "(data) ondoren da",
+        "after": "ondoren da",
+        "before": "lehenago da",
+        "beforeDate": "(data) baino lehenagokoa da",
+        "inTheLast": "azkenengoan dago",
+        "inPlaylist": "bertan dago",
+        "inTheRange": "tartean dago",
+        "inTheRangeDate": "(data) tartean dago",
+        "isGreaterThan": "hau baino handiagoa da",
+        "isLessThan": "hau baino gutxiago da",
+        "notInPlaylist": "ez dago barruan",
+        "notInTheLast": "ez dago azkenengoan"
     },
     "visualizer": {
         "general": "Orokorra",

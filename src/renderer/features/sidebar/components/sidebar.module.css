@@ -31,8 +31,7 @@
 .image-container {
     position: relative;
     flex-shrink: 0;
-    width: var(--sidebar-image-height);
-    height: var(--sidebar-image-height);
+    min-height: 0;
     padding: var(--theme-spacing-md);
     cursor: pointer;
     animation: fade-in 0.2s ease-in-out;

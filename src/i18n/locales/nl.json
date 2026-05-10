@@ -143,7 +143,7 @@
         "doNotShowAgain": "niet opnieuw tonen",
         "externalLinks": "externe links",
         "faster": "sneller",
-        "preview": "voorvertoning",
+        "preview": "voorbeeld",
         "private": "privé",
         "public": "publiekelijk",
         "recordLabel": "platenlabel",
@@ -152,7 +152,7 @@
         "sort": "sorteer",
         "trackGain": "trackvolume",
         "trackPeak": "piekniveau",
-        "clean": "schoon",
+        "clean": "opschonen",
         "gridRows": "rasterrijen",
         "tableColumns": "tabelkolommen",
         "itemsMore": "{{count}} meer",
@@ -283,7 +283,9 @@
                 "unsynchronized": "niet gesynchronizeerd",
                 "useImageAspectRatio": "gebruik aspect ratio van de afbeelding",
                 "lyricOffset": "songtekst-vertraging (ms)",
-                "showLyricProvider": "toon songtekstaanbieder"
+                "showLyricProvider": "toon songtekstaanbieder",
+                "lyricOpacityNonActive": "opaciteit van niet-actieve songtekst",
+                "lyricScaleNonActive": "schaal niet-actieve songtekst"
             },
             "lyrics": "liedtekst",
             "related": "gerelateerd",
@@ -680,7 +682,7 @@
         "artistReleaseTypeConfiguration_description": "configureer welke uitgavesoorten worden getoond op de albumartiestpagina en in welke volgorde",
         "audioDevice_description": "kies het audioapparaat dat wordt gebruikt om af te spelen",
         "audioDevice": "audioapparaat",
-        "audioExclusiveMode_description": "schakel exclusieve uitvoermodus in. In deze modus wordt het systeem normaliter uitgesloten en zal enkel mpv audio kunnen uitvoeren",
+        "audioExclusiveMode_description": "schakel exclusieve uitvoermodus in. in deze modus wordt het systeem normaliter uitgesloten en zal enkel mpv audio kunnen uitvoeren. geluidsopname in de visualiseerder zal niet werken als dit is ingeschakeld",
         "audioExclusiveMode": "audio-exclusieve modus",
         "audioPlayer_description": "kies de audiospeler om te gebruiken bij het afspelen",
         "audioPlayer": "audiospeler",
@@ -985,7 +987,11 @@
         "sidePlayQueueLayout": "uitlijning afspeelwachtrij aan zijkant",
         "sidePlayQueueLayout_description": "stel de uitlijning in voor de afspeelwachtrij die aan de zijkant is gekoppeld",
         "sidePlayQueueLayout_optionHorizontal": "horizontaal",
-        "sidePlayQueueLayout_optionVertical": "verticaal"
+        "sidePlayQueueLayout_optionVertical": "verticaal",
+        "playerbarWaveformStretch": "rekking van golfvorm",
+        "playerbarWaveformStretch_description": "rekt de golfvorm om de beschikbare ruimte op te vullen",
+        "waveformLoadingDelay": "laadvertraging van golfvorm",
+        "waveformLoadingDelay_description": "vertraging in seconden voordat de golfvorm wordt geladen. vergroot deze waarde als je stotteringen ervaart bij gebruik van de webspeler."
     },
     "form": {
         "addServer": {
@@ -1094,6 +1100,9 @@
         },
         "saveQueue": {
             "success": "wachtrij opgeslagen op server"
+        },
+        "editRadioStation": {
+            "success": "radiozender succesvol bijgewerkt"
         }
     },
     "player": {
@@ -1353,6 +1362,13 @@
                 "d": "D",
                 "z": "Z"
             }
-        }
+        },
+        "systemAudioConsentAllow": "Toestaan",
+        "systemAudioConsentBody": "De visualiseerder heeft toegang tot het audiosysteem nodig om te werken",
+        "systemAudioConsentDecline": "Weigeren",
+        "systemAudioConsentTitle": "Toegang tot audiosysteem toestaan?",
+        "systemAudioCaptureFailed": "Kon opname niet starten: {{message}}",
+        "systemAudioNoAudioTrack": "Geen geluidsspoor ontvangen. Verifieer dat audio-opname is ingeschakeld als daar om wordt gevraagd.",
+        "systemAudioExclusiveModeNotSupported": "De visualiseerder is niet beschikbaar als audio-exclusieve modus is ingeschakeld. Schakel audio-exclusieve modus in de MPV-instellingen uit en probeer het opnieuw."
     }
 }

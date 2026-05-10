@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
+import { HotkeyItem, useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { useHotkeySettings, usePlayerStore } from '/@/renderer/store';
-import { HotkeyItem, useHotkeys } from '/@/shared/hooks/use-hotkeys';
 
 export const usePlaybackHotkeys = () => {
     const { bindings } = useHotkeySettings();

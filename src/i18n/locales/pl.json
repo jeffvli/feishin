@@ -352,7 +352,8 @@
             "input_skipDuplicates": "pomiń duplikaty",
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "create": "utwórz $t(entity.playlist, {\"count\": 1}) {{playlist}}",
-            "searchOrCreate": "wyszukaj $t(entity.playlist, {\"count\": 2}) lub wpisz, aby utworzyć nową"
+            "searchOrCreate": "wyszukaj $t(entity.playlist, {\"count\": 2}) lub wpisz, aby utworzyć nową",
+            "noneAdded": "nie dodano utworów do $t(entity.playlist, {\"count\": 1}) '{{playlist}}'"
         },
         "updateServer": {
             "title": "uaktualnij serwer",
@@ -442,7 +443,9 @@
                 "lyricGap": "odstępy tekstu",
                 "dynamicImageBlur": "rozmiar rozmycia obrazu",
                 "dynamicIsImage": "włącz obraz w tle",
-                "lyricOffset": "opóźnienie tekstów (ms)"
+                "lyricOffset": "opóźnienie tekstów (ms)",
+                "lyricOpacityNonActive": "przezroczystość nieaktywnego tekstu",
+                "lyricScaleNonActive": "skala nieaktywnego tekstu"
             },
             "upNext": "następne",
             "lyrics": "tekst",
@@ -1064,7 +1067,11 @@
         "sidePlayQueueLayout_optionHorizontal": "poziomy",
         "sidePlayQueueLayout_optionVertical": "pionowy",
         "waveformLoadingDelay": "opóźnienie załadowania fali",
-        "waveformLoadingDelay_description": "opóźnienie w sekundach przed załadowaniem fali. zwiększ tą wartość jeżeli doświadczasz zawieszania się odtwarzacza przeglądarkowego."
+        "waveformLoadingDelay_description": "opóźnienie w sekundach przed załadowaniem fali. zwiększ tą wartość jeżeli doświadczasz zawieszania się odtwarzacza przeglądarkowego.",
+        "playerbarWaveformStretch": "rozciąganie przebiegu",
+        "playerbarWaveformStretch_description": "rozciąga przebieg aby wypełnić dostępną przestrzeń",
+        "preventSuspendOnPlayback_description": "powstrzymuj wstrzymanie podczas odtwarzania muzyki",
+        "preventSuspendOnPlayback": "powstrzymuje wstrzymanie przy odtwarzaniu"
     },
     "table": {
         "config": {

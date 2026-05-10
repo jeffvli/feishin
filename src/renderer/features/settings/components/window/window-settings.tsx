@@ -184,7 +184,7 @@ export const WindowSettings = memo(() => {
                 <Switch
                     aria-label="Toggle prevent sleep on playback"
                     defaultChecked={settings.preventSleepOnPlayback}
-                    disabled={!isElectron()}
+                    disabled={!isElectron() || settings.preventSuspendOnPlayback}
                     onChange={(e) => {
                         if (!e) return;
                         localSettings?.set(
@@ -205,6 +205,33 @@ export const WindowSettings = memo(() => {
             }),
             isHidden: !isElectron(),
             title: t('setting.preventSleepOnPlayback', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label="Toggle prevent suspend on playback"
+                    defaultChecked={settings.preventSuspendOnPlayback}
+                    disabled={!isElectron() || settings.preventSleepOnPlayback}
+                    onChange={(e) => {
+                        if (!e) return;
+                        localSettings?.set(
+                            'window_prevent_suspend_on_playback',
+                            e.currentTarget.checked,
+                        );
+                        setSettings({
+                            window: {
+                                preventSuspendOnPlayback: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.preventSuspendOnPlayback', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.preventSuspendOnPlayback', { postProcess: 'sentenceCase' }),
         },
     ];
 

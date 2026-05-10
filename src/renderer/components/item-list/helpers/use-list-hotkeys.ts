@@ -6,8 +6,8 @@ import {
     ItemListStateItemWithRequiredProperties,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls } from '/@/renderer/components/item-list/types';
+import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { useHotkeySettings, usePlayButtonBehavior } from '/@/renderer/store';
-import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 

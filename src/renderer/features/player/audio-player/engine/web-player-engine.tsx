@@ -140,9 +140,15 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
             };
         },
         seekTo(seekTo: number) {
+            let type: 'fraction' | 'seconds' | undefined = undefined;
+
+            if (seekTo < 1) {
+                type = 'seconds';
+            }
+
             playerNum === 1
-                ? player1Ref.current?.seekTo(seekTo)
-                : player2Ref.current?.seekTo(seekTo);
+                ? player1Ref.current?.seekTo(seekTo, type)
+                : player2Ref.current?.seekTo(seekTo, type);
         },
         setVolume(volume: number) {
             setInternalVolume1(volume / 100 || 0);

@@ -479,6 +479,32 @@ export const ControlSettings = memo(() => {
                   },
                   {
                       control: (
+                          <Switch
+                              defaultChecked={playerbarSlider?.stretched ?? false}
+                              onChange={(e) =>
+                                  setSettings({
+                                      general: {
+                                          ...settings,
+                                          playerbarSlider: {
+                                              ...playerbarSlider,
+                                              stretched: e.currentTarget.checked,
+                                          },
+                                      },
+                                  })
+                              }
+                          />
+                      ),
+                      description: t('setting.playerbarWaveformStretch', {
+                          context: 'description',
+                          postProcess: 'sentenceCase',
+                      }),
+                      isHidden: false,
+                      title: t('setting.playerbarWaveformStretch', {
+                          postProcess: 'sentenceCase',
+                      }),
+                  },
+                  {
+                      control: (
                           <NumberInput
                               defaultValue={playerbarSlider?.loadingDelay ?? 2}
                               max={30}

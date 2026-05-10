@@ -85,7 +85,7 @@
         "hotkey_zoomIn": "拡大",
         "scrobble_description": "再生した音楽をメディアサーバーから Scrobble します",
         "hotkey_browserForward": "ブラウザ 進む",
-        "audioExclusiveMode_description": "排他出力モードを有効にします。このモードでは、システムの他の出力がロックされ、MPV のみがオーディオを出力できるようになります",
+        "audioExclusiveMode_description": "排他出力モードを有効にします。このモードでは、システムの他の出力がロックされ、MPV のみがオーディオを出力できるようになります。このモードが有効になっている間は、ビジュアライザーやシステムオーディオのキャプチャ機能は動作しません",
         "discordUpdateInterval": "{{discord}} Rich Presence の更新間隔",
         "themeLight": "テーマ (ライト)",
         "fontType_optionBuiltIn": "組み込みフォント",
@@ -425,7 +425,11 @@
         "sidePlayQueueLayout_optionHorizontal": "水平",
         "sidePlayQueueLayout_optionVertical": "垂直",
         "waveformLoadingDelay": "波形読み込みの遅延",
-        "waveformLoadingDelay_description": "波形を読み込むまでの遅延時間（秒単位）を設定します。Web プレーヤー使用時にカクつきが発生する場合は、この値を増やしてください。"
+        "waveformLoadingDelay_description": "波形を読み込むまでの遅延時間（秒単位）を設定します。Web プレーヤー使用時にカクつきが発生する場合は、この値を増やしてください。",
+        "playerbarWaveformStretch": "波形伸縮",
+        "playerbarWaveformStretch_description": "波形を伸縮させて、利用可能なスペースを埋めます",
+        "preventSuspendOnPlayback_description": "音楽再生中にアプリケーションが停止しないようにします",
+        "preventSuspendOnPlayback": "再生の中断を防止する"
     },
     "action": {
         "editPlaylist": "$t(entity.playlist, {\"count\": 1}) を編集",
@@ -808,7 +812,7 @@
                 "dynamicBackground": "ダイナミック背景",
                 "synchronized": "同期",
                 "followCurrentLyric": "歌詞を再生位置に追従",
-                "opacity": "非透過率",
+                "opacity": "不透明度",
                 "lyricSize": "歌詞のサイズ",
                 "showLyricProvider": "歌詞の提供元を表示",
                 "unsynchronized": "非同期",
@@ -817,7 +821,9 @@
                 "lyricGap": "歌詞の間隔",
                 "dynamicImageBlur": "画像のぼかしサイズ",
                 "dynamicIsImage": "背景画像を有効にする",
-                "lyricOffset": "歌詞のオフセット (ms)"
+                "lyricOffset": "歌詞のオフセット (ms)",
+                "lyricOpacityNonActive": "非アクティブな歌詞の不透明度",
+                "lyricScaleNonActive": "非アクティブな歌詞のスケール"
             },
             "upNext": "次へ",
             "lyrics": "歌詞",
@@ -1033,7 +1039,8 @@
             "input_skipDuplicates": "重複をスキップ",
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "create": "$t(entity.playlist, {\"count\": 1}) {{playlist}} を作成する",
-            "searchOrCreate": "$t(entity.playlist, {\"count\": 2}) を検索するか、入力して新しいプレイリストを作成してください"
+            "searchOrCreate": "$t(entity.playlist, {\"count\": 2}) を検索するか、入力して新しいプレイリストを作成してください",
+            "noneAdded": "$t(entity.playlist, {\"count\": 1}) {{playlist}} にトラックが追加されませんでした"
         },
         "updateServer": {
             "title": "サーバーをアップデート",
@@ -1341,6 +1348,7 @@
         "systemAudioConsentDecline": "拒否",
         "systemAudioConsentTitle": "システムオーディオへのアクセスを許可しますか？",
         "systemAudioCaptureFailed": "キャプチャを開始できませんでした: {{message}}",
-        "systemAudioNoAudioTrack": "音声トラックが返されませんでした。プロンプトが表示されたら、音声キャプチャが有効になっていることを確認してください。"
+        "systemAudioNoAudioTrack": "音声トラックが返されませんでした。プロンプトが表示されたら、音声キャプチャが有効になっていることを確認してください。",
+        "systemAudioExclusiveModeNotSupported": "オーディオ排他モードが有効になっている間は、ビジュアライザーは利用できません。MPV の設定でオーディオ排他モードを無効にしてから、もう一度お試しください。"
     }
 }

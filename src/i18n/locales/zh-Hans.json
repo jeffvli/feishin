@@ -1015,6 +1015,9 @@
             "input_played_optionPlayed": "仅已播放的曲目",
             "input_limit": "有多少首歌？",
             "input_played": "播放筛选器"
+        },
+        "editRadioStation": {
+            "success": "电台更新成功"
         }
     },
     "table": {
