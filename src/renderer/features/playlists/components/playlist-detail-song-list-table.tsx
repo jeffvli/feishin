@@ -83,7 +83,7 @@ export const PlaylistDetailSongListTable = forwardRef<any, PlaylistDetailSongLis
             return sortSongList(list, query.sortBy, query.sortOrder);
         }, [data?.items, searchTerm, query.sortBy, query.sortOrder]);
 
-        const { id: playlistId, setListData } = useListContext();
+        const { setListData } = useListContext();
         const songData = itemsProp ?? songDataFromData;
 
         useEffect(() => {
@@ -107,11 +107,11 @@ export const PlaylistDetailSongListTable = forwardRef<any, PlaylistDetailSongLis
                     const items = internalState?.getData() as Song[];
 
                     if (index !== undefined) {
-                        player.addToQueueByData(items, playType, item.id, playlistId);
+                        player.addToQueueByData(items, playType, item.id);
                     }
                 },
             };
-        }, [player, playlistId]);
+        }, [player]);
 
         const getRowId = useMemo(() => {
             return (item: unknown) => {
@@ -221,8 +221,6 @@ export const PlaylistDetailSongListEditTable = forwardRef<any, PlaylistDetailSon
 
         const currentSong = usePlayerSong();
 
-        const { id: playlistId } = useListContext();
-
         const overrideControls: Partial<ItemControls> = useMemo(() => {
             return {
                 onDoubleClick: ({ index, internalState, item, meta }) => {
@@ -234,11 +232,11 @@ export const PlaylistDetailSongListEditTable = forwardRef<any, PlaylistDetailSon
                     const items = internalState?.getData() as Song[];
 
                     if (index !== undefined) {
-                        player.addToQueueByData(items, playType, item.id, playlistId);
+                        player.addToQueueByData(items, playType, item.id);
                     }
                 },
             };
-        }, [player, playlistId]);
+        }, [player]);
 
         const getRowId = useMemo(() => {
             return (item: unknown) => {

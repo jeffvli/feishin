@@ -38,7 +38,7 @@ import {
 
 export const PlaylistDetailAlbumView = ({ data }: { data: PlaylistSongListResponse }) => {
     const player = usePlayer();
-    const { id: playlistId, setItemCount, setListData } = useListContext();
+    const { setItemCount, setListData } = useListContext();
     const { detail, display, grid, itemsPerPage, pagination, table } = useListSettings(
         ItemListKey.PLAYLIST_ALBUM,
     );
@@ -121,14 +121,14 @@ export const PlaylistDetailAlbumView = ({ data }: { data: PlaylistSongListRespon
 
                 const rowSongs = (item as PlaylistAlbumRow)._playlistSongs;
                 if (itemType === LibraryItem.ALBUM && rowSongs?.length) {
-                    player.addToQueueByData(rowSongs, playType, undefined, playlistId);
+                    player.addToQueueByData(rowSongs, playType);
                     return;
                 }
                 player.addToQueueByFetch(item._serverId, [item.id], itemType, playType);
             },
             onRating: undefined,
         };
-    }, [player, playlistId]);
+    }, [player]);
 
     useEffect(() => {
         setItemCount?.(totalAlbumCount);
@@ -176,7 +176,7 @@ export const PlaylistDetailAlbumView = ({ data }: { data: PlaylistSongListRespon
                         onSongRowDoubleClick={({ internalState, item }) => {
                             if (playlistSongs.length === 0) return;
                             internalState?.setSelected([item]);
-                            player.addToQueueByData(playlistSongs, Play.NOW, item.id, playlistId);
+                            player.addToQueueByData(playlistSongs, Play.NOW, item.id);
                         }}
                         overrideControls={albumControlOverrides}
                         scrollOffset={scrollOffset ?? 0}

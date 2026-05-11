@@ -39,12 +39,7 @@ import {
 import { Play, PlayerRepeat, PlayerShuffle } from '/@/shared/types/types';
 
 export interface PlayerContext {
-    addToQueueByData: (
-        data: Song[],
-        type: AddToQueueType,
-        playSongId?: string,
-        playlistContextId?: string,
-    ) => void;
+    addToQueueByData: (data: Song[], type: AddToQueueType, playSongId?: string) => void;
     addToQueueByFetch: (
         serverId: string,
         id: string[],
@@ -147,6 +142,13 @@ const isReplaceQueueType = (type: AddToQueueType): boolean => {
     return type === Play.NOW || type === Play.SHUFFLE;
 };
 
+// HashRouter puts the route in location.hash, not pathname.
+const inferPlaylistContextFromUrl = (): null | string => {
+    const route = window.location.hash.replace(/^#/, '');
+    const match = route.match(/^\/playlists\/([^/]+)/);
+    return match ? match[1] : null;
+};
+
 export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
@@ -205,12 +207,12 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     }, [doNotShowAgain, setDoNotShowAgain, t]);
 
     const addToQueueByData = useCallback(
-        (data: Song[], type: AddToQueueType, playSongId?: string, playlistContextId?: string) => {
+        (data: Song[], type: AddToQueueType, playSongId?: string) => {
             const filters = useSettingsStore.getState().playback.filters;
             const filteredData = filterSongsByPlayerFilters(data, filters);
 
             if (isReplaceQueueType(type)) {
-                storeActions.setCurrentPlaylistContextId(playlistContextId ?? null);
+                storeActions.setCurrentPlaylistContextId(inferPlaylistContextFromUrl());
             }
 
             if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
@@ -308,9 +310,11 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 const filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
 
                 if (isReplaceQueueType(type)) {
-                    const nextContextId =
+                    const explicitId =
                         itemType === LibraryItem.PLAYLIST && id.length === 1 ? id[0] : null;
-                    storeActions.setCurrentPlaylistContextId(nextContextId);
+                    storeActions.setCurrentPlaylistContextId(
+                        explicitId ?? inferPlaylistContextFromUrl(),
+                    );
                 }
 
                 if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
@@ -530,7 +534,6 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
         storeActions.clearQueue();
-        storeActions.setCurrentPlaylistContextId(null);
     }, [storeActions]);
 
     const clearSelected = useCallback(

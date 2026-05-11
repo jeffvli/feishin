@@ -683,6 +683,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 clearQueue: () => {
                     set((state) => {
                         state.player.index = -1;
+                        state.player.currentPlaylistContextId = null;
                         state.queue.default = [];
                         state.queue.shuffled = [];
                         state.queue.songs = {};
