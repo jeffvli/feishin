@@ -39,7 +39,12 @@ import {
 import { Play, PlayerRepeat, PlayerShuffle } from '/@/shared/types/types';
 
 export interface PlayerContext {
-    addToQueueByData: (data: Song[], type: AddToQueueType, playSongId?: string) => void;
+    addToQueueByData: (
+        data: Song[],
+        type: AddToQueueType,
+        playSongId?: string,
+        playlistContextId?: string,
+    ) => void;
     addToQueueByFetch: (
         serverId: string,
         id: string[],
@@ -137,6 +142,11 @@ const getRootQueryKey = (itemType: LibraryItem, serverId: string) => {
     }
 };
 
+const isReplaceQueueType = (type: AddToQueueType): boolean => {
+    if (typeof type === 'object') return false;
+    return type === Play.NOW || type === Play.SHUFFLE;
+};
+
 export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
@@ -195,9 +205,13 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     }, [doNotShowAgain, setDoNotShowAgain, t]);
 
     const addToQueueByData = useCallback(
-        (data: Song[], type: AddToQueueType, playSongId?: string) => {
+        (data: Song[], type: AddToQueueType, playSongId?: string, playlistContextId?: string) => {
             const filters = useSettingsStore.getState().playback.filters;
             const filteredData = filterSongsByPlayerFilters(data, filters);
+
+            if (isReplaceQueueType(type)) {
+                storeActions.setCurrentPlaylistContextId(playlistContextId ?? null);
+            }
 
             if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
                 const edge = type.edge === 'top' ? 'top' : 'bottom';
@@ -292,6 +306,14 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
                 const filters = useSettingsStore.getState().playback.filters;
                 const filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
+
+                if (isReplaceQueueType(type)) {
+                    if (itemType === LibraryItem.PLAYLIST && id.length === 1) {
+                        storeActions.setCurrentPlaylistContextId(id[0]);
+                    } else {
+                        storeActions.setCurrentPlaylistContextId(null);
+                    }
+                }
 
                 if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
                     const edge = type.edge === 'top' ? 'top' : 'bottom';
@@ -510,6 +532,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
         storeActions.clearQueue();
+        storeActions.setCurrentPlaylistContextId(null);
     }, [storeActions]);
 
     const clearSelected = useCallback(

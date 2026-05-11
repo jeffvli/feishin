@@ -20,9 +20,11 @@ import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-b
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
+    useCurrentPlaylistContextId,
     useCurrentServer,
     useCurrentServerId,
     usePermissions,
+    usePlayerSong,
     useSidebarPlaylistListFilterRegex,
     useSidebarPlaylistSorting,
 } from '/@/renderer/store';
@@ -51,6 +53,7 @@ const getPlaylistOrderKey = (serverId: string | undefined, scope: 'owned' | 'sha
 };
 
 interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'onPlay'> {
+    isActive?: boolean;
     item: Playlist;
     name: string;
     onContextMenu: (e: MouseEvent<HTMLAnchorElement>, item: Playlist) => void;
@@ -59,7 +62,7 @@ interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'on
 }
 
 const PlaylistRowButton = memo(
-    ({ item, name, onContextMenu, onReorder, to }: PlaylistRowButtonProps) => {
+    ({ isActive, item, name, onContextMenu, onReorder, to }: PlaylistRowButtonProps) => {
         const url = {
             pathname: generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: to }),
             state: { item },
@@ -231,7 +234,11 @@ const PlaylistRowButton = memo(
                 <div className={styles.rowGroup}>
                     <Image containerClassName={styles.imageContainer} src={imageUrl} />
                     <div className={styles.metadata}>
-                        <Text className={styles.name} fw={500} size="md">
+                        <Text
+                            className={clsx(styles.name, { [styles.nameActive]: isActive })}
+                            fw={500}
+                            size="md"
+                        >
                             {name}
                         </Text>
                         <div className={styles.metadataGroup}>
@@ -359,6 +366,9 @@ export const SidebarPlaylistList = () => {
     const server = useCurrentServer();
     const sidebarPlaylistSorting = useSidebarPlaylistSorting();
     const filterRegex = useSidebarPlaylistListFilterRegex();
+    const currentPlaylistContextId = useCurrentPlaylistContextId();
+    const currentSong = usePlayerSong();
+    const activePlaylistId = currentSong ? currentPlaylistContextId : null;
 
     const playlistsQuery = useQuery(
         playlistsQueries.list({
@@ -531,6 +541,7 @@ export const SidebarPlaylistList = () => {
             <Accordion.Panel>
                 {playlistItems?.items?.map((item, index) => (
                     <PlaylistRowButton
+                        isActive={activePlaylistId === item.id}
                         item={item}
                         key={index}
                         name={item.name}
@@ -550,6 +561,9 @@ export const SidebarSharedPlaylistList = () => {
     const server = useCurrentServer();
     const sidebarPlaylistSorting = useSidebarPlaylistSorting();
     const filterRegex = useSidebarPlaylistListFilterRegex();
+    const currentPlaylistContextId = useCurrentPlaylistContextId();
+    const currentSong = usePlayerSong();
+    const activePlaylistId = currentSong ? currentPlaylistContextId : null;
 
     const playlistsQuery = useQuery(
         playlistsQueries.list({
@@ -692,6 +706,7 @@ export const SidebarSharedPlaylistList = () => {
             <Accordion.Panel>
                 {playlistItems?.items?.map((item, index) => (
                     <PlaylistRowButton
+                        isActive={activePlaylistId === item.id}
                         item={item}
                         key={index}
                         name={item.name}

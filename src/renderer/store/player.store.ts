@@ -72,6 +72,7 @@ interface Actions {
     moveSelectedToTop: (items: QueueSong[]) => void;
     setCrossfadeDuration: (duration: number) => void;
     setCrossfadeStyle: (style: CrossfadeStyle) => void;
+    setCurrentPlaylistContextId: (id: null | string) => void;
     setPauseOnNextSongEnd: (value: boolean) => void;
     setQueue: (data: Song[], index?: number, position?: number) => void;
     setRepeat: (repeat: PlayerRepeat) => void;
@@ -96,6 +97,7 @@ interface State {
     player: {
         crossfadeDuration: number;
         crossfadeStyle: CrossfadeStyle;
+        currentPlaylistContextId: null | string;
         index: number;
         muted: boolean;
         pauseOnNextSongEnd: boolean;
@@ -302,6 +304,7 @@ const initialState: State = {
     player: {
         crossfadeDuration: 5,
         crossfadeStyle: CrossfadeStyle.EQUAL_POWER,
+        currentPlaylistContextId: null,
         index: -1,
         muted: false,
         pauseOnNextSongEnd: false,
@@ -1332,6 +1335,11 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.crossfadeStyle = style;
                     });
                 },
+                setCurrentPlaylistContextId: (id: null | string) => {
+                    set((state) => {
+                        state.player.currentPlaylistContextId = id;
+                    });
+                },
                 setPauseOnNextSongEnd: (value: boolean) => {
                     set((state) => {
                         state.player.pauseOnNextSongEnd = value;
@@ -1576,8 +1584,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 const excludedPlayerKeys = ['playerNum', 'seekToTimestamp', 'status'];
 
                 // If we're not restoring the play queue, we don't need the index property
+                // or the playlist context (both are meaningless without the queue)
                 if (!shouldRestorePlayQueue) {
                     excludedPlayerKeys.push('index');
+                    excludedPlayerKeys.push('currentPlaylistContextId');
                 }
 
                 const player = Object.fromEntries(
@@ -1632,6 +1642,7 @@ export const usePlayerActions = () => {
             moveSelectedToTop: state.moveSelectedToTop,
             setCrossfadeDuration: state.setCrossfadeDuration,
             setCrossfadeStyle: state.setCrossfadeStyle,
+            setCurrentPlaylistContextId: state.setCurrentPlaylistContextId,
             setPauseOnNextSongEnd: state.setPauseOnNextSongEnd,
             setQueue: state.setQueue,
             setRepeat: state.setRepeat,
@@ -2010,6 +2021,10 @@ export const updateQueueSong = (songId: string, updatedSong: Song) => {
             }
         });
     });
+};
+
+export const useCurrentPlaylistContextId = () => {
+    return usePlayerStoreBase((state) => state.player.currentPlaylistContextId);
 };
 
 export const usePlayerMuted = () => {
