@@ -308,11 +308,9 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 const filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
 
                 if (isReplaceQueueType(type)) {
-                    if (itemType === LibraryItem.PLAYLIST && id.length === 1) {
-                        storeActions.setCurrentPlaylistContextId(id[0]);
-                    } else {
-                        storeActions.setCurrentPlaylistContextId(null);
-                    }
+                    const nextContextId =
+                        itemType === LibraryItem.PLAYLIST && id.length === 1 ? id[0] : null;
+                    storeActions.setCurrentPlaylistContextId(nextContextId);
                 }
 
                 if (typeof type === 'object' && 'edge' in type && type.edge !== null) {

@@ -1586,8 +1586,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 // If we're not restoring the play queue, we don't need the index property
                 // or the playlist context (both are meaningless without the queue)
                 if (!shouldRestorePlayQueue) {
-                    excludedPlayerKeys.push('index');
-                    excludedPlayerKeys.push('currentPlaylistContextId');
+                    excludedPlayerKeys.push('index', 'currentPlaylistContextId');
                 }
 
                 const player = Object.fromEntries(

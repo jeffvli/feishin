@@ -24,7 +24,6 @@ import {
     useCurrentServer,
     useCurrentServerId,
     usePermissions,
-    usePlayerSong,
     useSidebarPlaylistListFilterRegex,
     useSidebarPlaylistSorting,
 } from '/@/renderer/store';
@@ -366,9 +365,7 @@ export const SidebarPlaylistList = () => {
     const server = useCurrentServer();
     const sidebarPlaylistSorting = useSidebarPlaylistSorting();
     const filterRegex = useSidebarPlaylistListFilterRegex();
-    const currentPlaylistContextId = useCurrentPlaylistContextId();
-    const currentSong = usePlayerSong();
-    const activePlaylistId = currentSong ? currentPlaylistContextId : null;
+    const activePlaylistId = useCurrentPlaylistContextId();
 
     const playlistsQuery = useQuery(
         playlistsQueries.list({
@@ -561,9 +558,7 @@ export const SidebarSharedPlaylistList = () => {
     const server = useCurrentServer();
     const sidebarPlaylistSorting = useSidebarPlaylistSorting();
     const filterRegex = useSidebarPlaylistListFilterRegex();
-    const currentPlaylistContextId = useCurrentPlaylistContextId();
-    const currentSong = usePlayerSong();
-    const activePlaylistId = currentSong ? currentPlaylistContextId : null;
+    const activePlaylistId = useCurrentPlaylistContextId();
 
     const playlistsQuery = useQuery(
         playlistsQueries.list({
