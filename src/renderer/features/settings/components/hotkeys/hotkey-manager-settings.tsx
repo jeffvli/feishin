@@ -60,6 +60,7 @@ const BINDINGS_MAP: Record<BindingActions, string> = {
         context: 'listPlayNext',
     }),
     listPlayNow: i18n.t('setting.hotkey', { context: 'listPlayNow' }),
+    listShowPlayingSong: i18n.t('setting.hotkey', { context: 'listShowPlayingSong' }),
     localSearch: i18n.t('setting.hotkey', { context: 'localSearch' }),
     navigateHome: i18n.t('setting.hotkey', {
         context: 'navigateHome',

@@ -160,6 +160,7 @@ const BindingActionsSchema = z.enum([
     'listPlayNext',
     'listPlayLast',
     'listNavigateToPage',
+    'listShowPlayingSong',
 ]);
 
 const DiscordDisplayTypeSchema = z.enum(['artist', 'feishin', 'song']);
@@ -756,6 +757,7 @@ export enum BindingActions {
     LIST_PLAY_LAST = 'listPlayLast',
     LIST_PLAY_NEXT = 'listPlayNext',
     LIST_PLAY_NOW = 'listPlayNow',
+    LIST_SHOW_PLAYING_SONG = 'listShowPlayingSong',
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
     NAVIGATE_HOME = 'navigateHome',
@@ -1205,6 +1207,7 @@ const initialState: SettingsState = {
             listPlayLast: { allowGlobal: false, hotkey: '', isGlobal: false },
             listPlayNext: { allowGlobal: false, hotkey: '', isGlobal: false },
             listPlayNow: { allowGlobal: false, hotkey: '', isGlobal: false },
+            listShowPlayingSong: { allowGlobal: false, hotkey: 'mod+l', isGlobal: false },
             localSearch: { allowGlobal: false, hotkey: 'mod+f', isGlobal: false },
             navigateHome: { allowGlobal: false, hotkey: '', isGlobal: false },
             next: { allowGlobal: true, hotkey: '', isGlobal: false },

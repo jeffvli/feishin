@@ -873,6 +873,7 @@
         "hotkey_listPlayLast": "List play last",
         "hotkey_listPlayNext": "List play next",
         "hotkey_listPlayNow": "List play now",
+        "hotkey_listShowPlayingSong": "Show playing song in list",
         "hotkey_navigateHome": "Navigate to home",
         "hotkey_playbackNext": "Next track",
         "hotkey_playbackPause": "Pause",
