@@ -293,11 +293,16 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 const filters = useSettingsStore.getState().playback.filters;
                 const filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
 
+                const taggedSongs =
+                    itemType === LibraryItem.PLAYLIST && id.length === 1
+                        ? filteredSongs.map((s) => ({ ...s, _playlistId: id[0] }))
+                        : filteredSongs;
+
                 if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
                     const edge = type.edge === 'top' ? 'top' : 'bottom';
-                    storeActions.addToQueueByUniqueId(filteredSongs, type.uniqueId, edge);
+                    storeActions.addToQueueByUniqueId(taggedSongs, type.uniqueId, edge);
                 } else {
-                    storeActions.addToQueueByType(filteredSongs, type as Play);
+                    storeActions.addToQueueByType(taggedSongs, type as Play);
                 }
             } catch (err: any) {
                 if (instanceOfCancellationError(err)) {

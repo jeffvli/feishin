@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { motion } from 'motion/react';
-import { memo, MouseEvent, useMemo } from 'react';
+import { memo, MouseEvent, useCallback, useMemo } from 'react';
 
 import styles from './item-card-controls.module.css';
 
@@ -11,6 +11,7 @@ import { PlayTooltip } from '/@/renderer/features/shared/components/play-button-
 import { useIsMutatingCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useIsMutatingDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useIsMutatingRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
+import { usePlayerActions, usePlayerSong, usePlayerStatus } from '/@/renderer/store';
 import { animationVariants } from '/@/shared/components/animations/animation-variants';
 import { AppIcon, Icon, IconProps } from '/@/shared/components/icon/icon';
 import { Rating } from '/@/shared/components/rating/rating';
@@ -25,7 +26,7 @@ import {
     ServerType,
     Song,
 } from '/@/shared/types/domain-types';
-import { Play } from '/@/shared/types/types';
+import { Play, PlayerStatus } from '/@/shared/types/types';
 
 interface ItemCardControlsProps {
     controls?: ItemControls;
@@ -258,16 +259,54 @@ export const ItemCardControls = ({
         [controls, item, internalState, itemType],
     );
 
+    const currentSong = usePlayerSong();
+    const playerStatus = usePlayerStatus();
+    const { mediaTogglePlayPause } = usePlayerActions();
+
+    const isActiveItem = useMemo(() => {
+        if (!item || !currentSong) return false;
+
+        switch ((item._itemType ?? itemType) as LibraryItem) {
+            case LibraryItem.ALBUM:
+                return currentSong.albumId === item.id;
+            case LibraryItem.ALBUM_ARTIST:
+            case LibraryItem.ARTIST:
+                return (
+                    (currentSong.albumArtists?.some((a) => a.id === item.id) ?? false) ||
+                    (currentSong.artists?.some((a) => a.id === item.id) ?? false)
+                );
+            case LibraryItem.PLAYLIST:
+                return currentSong._playlistId === item.id;
+            case LibraryItem.PLAYLIST_SONG:
+            case LibraryItem.SONG:
+                return currentSong.id === item.id;
+            default:
+                return false;
+        }
+    }, [currentSong, item, itemType]);
+
+    const isActiveAndPlaying = isActiveItem && playerStatus === PlayerStatus.PLAYING;
+
+    const togglePlayPauseHandler = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            e.preventDefault();
+            mediaTogglePlayPause();
+        },
+        [mediaTogglePlayPause],
+    );
+
     const isFavorite = (item as { userFavorite?: boolean })?.userFavorite ?? false;
 
     return (
         <motion.div className={clsx(styles.container)} {...containerProps[type]}>
             {controls?.onPlay && (
                 <Tooltip.Group>
-                    <PlayTooltip type={Play.NOW}>
+                    <PlayTooltip disabled={isActiveItem} type={Play.NOW}>
                         <PlayButton
                             classNames={clsx(styles.playButton, styles.primary)}
-                            onClick={playNowHandler}
+                            icon={isActiveAndPlaying ? 'mediaPause' : 'mediaPlay'}
+                            onClick={isActiveItem ? togglePlayPauseHandler : playNowHandler}
                             onLongPress={playShuffleHandler}
                         />
                     </PlayTooltip>
