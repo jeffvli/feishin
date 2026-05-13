@@ -2,6 +2,7 @@ import isElectron from 'is-electron';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { EqualizerEntry } from '/@/renderer/features/player/equalizer';
 import { useAudioDevices } from '/@/renderer/features/settings/components/playback/audio-settings';
 import { ListConfigTable } from '/@/renderer/features/shared/components/list-config-menu';
 import {
@@ -81,6 +82,11 @@ export const PlayerConfig = () => {
                 component: <CrossfadeDurationConfig />,
                 id: 'crossfadeDuration',
                 label: t('setting.crossfadeDuration'),
+            },
+            {
+                component: <EqualizerEntry />,
+                id: 'equalizer',
+                label: t('equalizer.menuLabel'),
             },
             {
                 component: null,

@@ -7,8 +7,7 @@ export function getVisualizerAudioNodes(
     playbackType: PlayerType,
 ): AudioNode[] {
     if (!webAudio) return [];
-    if (playbackType === PlayerType.LOCAL) {
-        return webAudio.visualizerInputs ?? [];
-    }
+    if (webAudio.visualizerInputs?.length) return webAudio.visualizerInputs;
+    if (playbackType === PlayerType.LOCAL) return [];
     return webAudio.gains;
 }

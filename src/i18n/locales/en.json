@@ -209,6 +209,31 @@
         "trackWithCount_one": "{{count}} track",
         "trackWithCount_other": "{{count}} tracks"
     },
+    "equalizer": {
+        "bandLabelHz": "{{frequency}} Hz",
+        "bandLabelKHz": "{{frequency}} kHz",
+        "custom": "Custom",
+        "deletePresetLabel": "Delete preset",
+        "enabled": "Enabled",
+        "menuLabel": "Equalizer",
+        "openLabel": "Open…",
+        "preamp": "Pre-amp",
+        "preset": {
+            "bassBoost": "Bass Boost",
+            "classical": "Classical",
+            "flat": "Flat",
+            "jazz": "Jazz",
+            "pop": "Pop",
+            "rock": "Rock",
+            "vocal": "Vocal"
+        },
+        "presetLabel": "Preset",
+        "reset": "Reset",
+        "saveAs": "Save as preset…",
+        "saveDialogName": "Name",
+        "saveDialogTitle": "Save preset",
+        "title": "Equalizer"
+    },
     "error": {
         "apiRouteError": "Unable to route request",
         "audioDeviceFetchError": "An error occurred when trying to get audio devices",

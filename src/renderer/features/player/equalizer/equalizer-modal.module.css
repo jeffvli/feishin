@@ -1,0 +1,81 @@
+.bands {
+    display: grid;
+    grid-template-columns: 0.9fr 12px repeat(10, 1fr);
+    gap: 8px;
+    align-items: stretch;
+    padding: 16px 0 4px;
+}
+.band {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+.bandLabel {
+    font-size: 11px;
+    line-height: 1.2;
+    text-align: center;
+    opacity: 0.8;
+    white-space: nowrap;
+}
+.bandReadout {
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    min-width: 32px;
+    text-align: center;
+    opacity: 0.85;
+}
+.verticalSlider {
+    height: 220px;
+}
+.verticalTrack {
+    width: 4px;
+    height: 100%;
+}
+.divider {
+    width: 1px;
+    background: rgba(255, 255, 255, 0.12);
+    align-self: stretch;
+    margin: 8px 4px;
+}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+.footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    padding-top: 8px;
+}
+.customPresetList {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+.customPresetRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.customPresetRow:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+.customPresetName {
+    flex: 1;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
