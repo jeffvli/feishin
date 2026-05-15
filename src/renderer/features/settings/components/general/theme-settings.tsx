@@ -44,11 +44,11 @@ const getGroupedThemeData = () => {
 
     return [
         {
-            group: i18n.t('setting.themeDark', { postProcess: 'sentenceCase' }),
+            group: i18n.t('setting.themeDark'),
             items: darkThemes,
         },
         {
-            group: i18n.t('setting.themeLight', { postProcess: 'sentenceCase' }),
+            group: i18n.t('setting.themeLight'),
             items: lightThemes,
         },
     ];
@@ -118,10 +118,9 @@ export const ThemeSettings = memo(() => {
             ),
             description: t('setting.useSystemTheme', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.useSystemTheme', { postProcess: 'sentenceCase' }),
+            title: t('setting.useSystemTheme'),
         },
         {
             control: (
@@ -152,10 +151,9 @@ export const ThemeSettings = memo(() => {
             ),
             description: t('setting.theme', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: settings.followSystemTheme,
-            title: t('setting.theme', { postProcess: 'sentenceCase' }),
+            title: t('setting.theme'),
         },
         {
             control: (
@@ -175,10 +173,9 @@ export const ThemeSettings = memo(() => {
             ),
             description: t('setting.themeDark', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !settings.followSystemTheme,
-            title: t('setting.themeDark', { postProcess: 'sentenceCase' }),
+            title: t('setting.themeDark'),
         },
         {
             control: (
@@ -198,10 +195,9 @@ export const ThemeSettings = memo(() => {
             ),
             description: t('setting.themeLight', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !settings.followSystemTheme,
-            title: t('setting.themeLight', { postProcess: 'sentenceCase' }),
+            title: t('setting.themeLight'),
         },
         {
             control: (
@@ -218,10 +214,9 @@ export const ThemeSettings = memo(() => {
             ),
             description: t('setting.useThemeAccentColor', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.useThemeAccentColor', { postProcess: 'sentenceCase' }),
+            title: t('setting.useThemeAccentColor'),
         },
         {
             control: (
@@ -251,9 +246,8 @@ export const ThemeSettings = memo(() => {
             ),
             description: t('setting.accentColor', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.accentColor', { postProcess: 'sentenceCase' }),
+            title: t('setting.accentColor'),
         },
         {
             control: (
@@ -270,10 +264,9 @@ export const ThemeSettings = memo(() => {
             ),
             description: t('setting.useThemePrimaryShade', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.useThemePrimaryShade', { postProcess: 'sentenceCase' }),
+            title: t('setting.useThemePrimaryShade'),
         },
         {
             control: (
@@ -295,10 +288,9 @@ export const ThemeSettings = memo(() => {
             ),
             description: t('setting.primaryShade', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: settings.useThemePrimaryShade,
-            title: t('setting.primaryShade', { postProcess: 'sentenceCase' }),
+            title: t('setting.primaryShade'),
         },
     ];
 
@@ -306,7 +298,7 @@ export const ThemeSettings = memo(() => {
         <SettingsSection
             extra={<StylesSettings />}
             options={themeOptions}
-            title={t('page.setting.theme', { postProcess: 'sentenceCase' })}
+            title={t('page.setting.theme')}
         />
     );
 });

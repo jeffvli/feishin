@@ -50,12 +50,12 @@ export const SaveAsPlaylistForm = ({
                 onError: (err) => {
                     toast.error({
                         message: err.message,
-                        title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                        title: t('error.genericError'),
                     });
                 },
                 onSuccess: (data) => {
                     toast.success({
-                        message: t('form.createPlaylist.success', { postProcess: 'sentenceCase' }),
+                        message: t('form.createPlaylist.success'),
                     });
                     onSuccess(data);
                     onCancel();
@@ -74,7 +74,6 @@ export const SaveAsPlaylistForm = ({
                     data-autofocus
                     label={t('form.createPlaylist.input', {
                         context: 'name',
-                        postProcess: 'titleCase',
                     })}
                     required
                     {...form.getInputProps('name')}
@@ -83,7 +82,6 @@ export const SaveAsPlaylistForm = ({
                     <TextInput
                         label={t('form.createPlaylist.input', {
                             context: 'description',
-                            postProcess: 'titleCase',
                         })}
                         {...form.getInputProps('comment')}
                     />
@@ -92,7 +90,6 @@ export const SaveAsPlaylistForm = ({
                     <Switch
                         label={t('form.createPlaylist.input', {
                             context: 'public',
-                            postProcess: 'titleCase',
                         })}
                         {...form.getInputProps('public', { type: 'checkbox' })}
                     />

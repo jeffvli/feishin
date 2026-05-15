@@ -70,8 +70,8 @@ const RadioListItem = ({ station }: RadioListItemProps) => {
                 children: (
                     <ConfirmModal
                         labels={{
-                            cancel: t('common.cancel', { postProcess: 'sentenceCase' }),
-                            confirm: t('common.delete', { postProcess: 'sentenceCase' }),
+                            cancel: t('common.cancel'),
+                            confirm: t('common.delete'),
                         }}
                         loading={deleteRadioStationMutation.isPending}
                         onConfirm={async () => {
@@ -88,19 +88,17 @@ const RadioListItem = ({ station }: RadioListItemProps) => {
                             } catch (err: any) {
                                 toast.error({
                                     message: err.message,
-                                    title: t('error.genericError', {
-                                        postProcess: 'sentenceCase',
-                                    }),
+                                    title: t('error.genericError'),
                                 });
                             }
 
                             closeAllModals();
                         }}
                     >
-                        <Text>{t('common.areYouSure', { postProcess: 'sentenceCase' })}</Text>
+                        <Text>{t('common.areYouSure')}</Text>
                     </ConfirmModal>
                 ),
-                title: t('common.delete', { postProcess: 'titleCase' }),
+                title: t('common.delete'),
             });
         },
         [deleteRadioStationMutation, isCurrentStation, server, station.id, stop, t],
@@ -152,7 +150,7 @@ const RadioListItem = ({ station }: RadioListItemProps) => {
                                 onClick={handleEditClick}
                                 size="sm"
                                 tooltip={{
-                                    label: t('common.edit', { postProcess: 'sentenceCase' }),
+                                    label: t('common.edit'),
                                 }}
                                 variant="subtle"
                             />
@@ -164,7 +162,7 @@ const RadioListItem = ({ station }: RadioListItemProps) => {
                                 onClick={handleDeleteClick}
                                 size="sm"
                                 tooltip={{
-                                    label: t('common.delete', { postProcess: 'sentenceCase' }),
+                                    label: t('common.delete'),
                                 }}
                                 variant="subtle"
                             />

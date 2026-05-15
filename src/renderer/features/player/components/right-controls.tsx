@@ -159,7 +159,7 @@ const QueueButton = () => {
                 onClick={handleClick}
                 size="sm"
                 tooltip={{
-                    label: t('player.viewQueue', { postProcess: 'titleCase' }),
+                    label: t('player.viewQueue'),
                     openDelay: 0,
                 }}
                 variant="subtle"
@@ -205,7 +205,7 @@ const LyricsButton = () => {
             role="button"
             size="sm"
             tooltip={{
-                label: t('player.lyrics', { postProcess: 'titleCase' }),
+                label: t('player.lyrics'),
                 openDelay: 0,
             }}
             variant="subtle"
@@ -288,9 +288,7 @@ const FavoriteButton = () => {
             }}
             size="sm"
             tooltip={{
-                label: currentSong?.userFavorite
-                    ? t('player.unfavorite', { postProcess: 'titleCase' })
-                    : t('player.favorite', { postProcess: 'titleCase' }),
+                label: currentSong?.userFavorite ? t('player.unfavorite') : t('player.favorite'),
                 openDelay: 0,
             }}
             variant="subtle"
@@ -445,7 +443,7 @@ const VolumeButton = () => {
                 onWheel={handleVolumeWheel}
                 size="sm"
                 tooltip={{
-                    label: muted ? t('player.muted', { postProcess: 'titleCase' }) : volume,
+                    label: muted ? t('player.muted') : volume,
                     openDelay: 0,
                 }}
                 variant="subtle"

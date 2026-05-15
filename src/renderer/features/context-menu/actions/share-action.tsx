@@ -37,13 +37,13 @@ export const ShareAction = ({ ids, itemType }: ShareActionProps) => {
                 resourceType,
             },
             modal: 'shareItem',
-            title: t('page.contextMenu.shareItem', { postProcess: 'titleCase' }),
+            title: t('page.contextMenu.shareItem'),
         });
     }, [ids, resourceType, t]);
 
     return (
         <ContextMenu.Item leftIcon="share" onSelect={onSelect}>
-            {t('page.contextMenu.shareItem', { postProcess: 'sentenceCase' })}
+            {t('page.contextMenu.shareItem')}
         </ContextMenu.Item>
     );
 };

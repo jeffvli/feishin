@@ -94,9 +94,7 @@ function VisualizerSystemAudioBridge() {
     useEffect(() => {
         if (isVisualizerBlockedByExclusiveMode && !wasBlockedByExclusiveModeRef.current) {
             toast.error({
-                message: t('visualizer.systemAudioExclusiveModeNotSupported', {
-                    postProcess: 'sentenceCase',
-                }),
+                message: t('visualizer.systemAudioExclusiveModeNotSupported'),
             });
             setSessionAllowCapture(false);
             closePrompt();
@@ -156,19 +154,17 @@ function VisualizerSystemAudioBridge() {
             handlers={{ close: closePrompt, open: openPrompt, toggle: togglePrompt }}
             opened={isPromptOpen}
             size="md"
-            title={t('visualizer.systemAudioConsentTitle', { postProcess: 'sentenceCase' })}
+            title={t('visualizer.systemAudioConsentTitle')}
             withCloseButton={false}
         >
             <Stack gap="lg">
-                <Text size="sm">
-                    {t('visualizer.systemAudioConsentBody', { postProcess: 'sentenceCase' })}
-                </Text>
+                <Text size="sm">{t('visualizer.systemAudioConsentBody')}</Text>
                 <Group justify="flex-end">
                     <Button onClick={handleDecline} variant="default">
-                        {t('visualizer.systemAudioConsentDecline', { postProcess: 'titleCase' })}
+                        {t('visualizer.systemAudioConsentDecline')}
                     </Button>
                     <Button onClick={handleAllow} variant="filled">
-                        {t('visualizer.systemAudioConsentAllow', { postProcess: 'titleCase' })}
+                        {t('visualizer.systemAudioConsentAllow')}
                     </Button>
                 </Group>
             </Stack>

@@ -30,21 +30,18 @@ export const UpdateSettings = memo(() => {
                         {
                             label: t('setting.releaseChannel', {
                                 context: 'optionLatest',
-                                postProcess: 'titleCase',
                             }),
                             value: 'latest',
                         },
                         {
                             label: t('setting.releaseChannel', {
                                 context: 'optionBeta',
-                                postProcess: 'titleCase',
                             }),
                             value: 'beta',
                         },
                         {
                             label: t('setting.releaseChannel', {
                                 context: 'optionAlpha',
-                                postProcess: 'titleCase',
                             }),
                             value: 'alpha',
                         },
@@ -63,15 +60,14 @@ export const UpdateSettings = memo(() => {
             ),
             description: t('setting.releaseChannel', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: disableAutoUpdates(),
-            title: t('setting.releaseChannel', { postProcess: 'sentenceCase' }),
+            title: t('setting.releaseChannel'),
         },
         {
             control: (
                 <Switch
-                    aria-label={t('setting.automaticUpdates', { postProcess: 'sentenceCase' })}
+                    aria-label={t('setting.automaticUpdates')}
                     defaultChecked={!settings.disableAutoUpdate}
                     disabled={disableAutoUpdates()}
                     onChange={(e) => {
@@ -88,17 +84,11 @@ export const UpdateSettings = memo(() => {
             ),
             description: t('setting.automaticUpdates', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: disableAutoUpdates(),
-            title: t('setting.automaticUpdates', { postProcess: 'sentenceCase' }),
+            title: t('setting.automaticUpdates'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={updateOptions}
-            title={t('page.setting.updates', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={updateOptions} title={t('page.setting.updates')} />;
 });

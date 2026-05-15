@@ -30,9 +30,7 @@ export const ShowInFileExplorerAction = ({ items }: ShowInFileExplorerActionProp
         } catch (error) {
             toast.error({
                 message: (error as Error).message,
-                title: t('error.openError', {
-                    postProcess: 'sentenceCase',
-                }),
+                title: t('error.openError'),
             });
         }
     }, [items, t]);
@@ -47,7 +45,7 @@ export const ShowInFileExplorerAction = ({ items }: ShowInFileExplorerActionProp
 
     return (
         <ContextMenu.Item disabled={isDisabled} leftIcon="folder" onSelect={onSelect}>
-            {t('page.itemDetail.openFile', { postProcess: 'sentenceCase' })}
+            {t('page.itemDetail.openFile')}
         </ContextMenu.Item>
     );
 };

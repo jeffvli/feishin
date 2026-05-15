@@ -104,7 +104,7 @@ export const ShuffleAllContextModal = () => {
     return (
         <Stack gap="md">
             <NumberInput
-                label={t('form.shuffleAll.input_limit', { postProcess: 'sentenceCase' })}
+                label={t('form.shuffleAll.input_limit')}
                 max={500}
                 min={1}
                 onChange={(e) => setStore({ limit: e ? Number(e) : 500 })}
@@ -113,7 +113,7 @@ export const ShuffleAllContextModal = () => {
             />
             <Group grow>
                 <NumberInput
-                    label={t('form.shuffleAll.input_minYear', { postProcess: 'sentenceCase' })}
+                    label={t('form.shuffleAll.input_minYear')}
                     max={2050}
                     min={1850}
                     onChange={(e) => setStore({ minYear: e ? Number(e) : 0 })}
@@ -127,7 +127,7 @@ export const ShuffleAllContextModal = () => {
                     value={minYear}
                 />
                 <NumberInput
-                    label={t('form.shuffleAll.input_maxYear', { postProcess: 'sentenceCase' })}
+                    label={t('form.shuffleAll.input_maxYear')}
                     max={2050}
                     min={1850}
                     onChange={(e) => setStore({ maxYear: e ? Number(e) : 0 })}
@@ -148,7 +148,7 @@ export const ShuffleAllContextModal = () => {
                 <Select
                     clearable
                     data={PLAYED_DATA}
-                    label={t('form.shuffleAll.input_played', { postProcess: 'sentenceCase' })}
+                    label={t('form.shuffleAll.input_played')}
                     onChange={(e) => {
                         setStore({ played: e as Played });
                     }}
@@ -191,7 +191,7 @@ export const openShuffleAllModal = async () => {
         innerProps: {},
         modal: 'shuffleAll',
         size: 'sm',
-        title: i18n.t('player.playRandom', { postProcess: 'sentenceCase' }) as string,
+        title: i18n.t('player.playRandom') as string,
     });
 };
 
@@ -221,7 +221,7 @@ const GenreSelect = () => {
         <Select
             clearable
             data={genreData}
-            label={t('form.shuffleAll.input_genre', { postProcess: 'sentenceCase' })}
+            label={t('form.shuffleAll.input_genre')}
             onChange={(e) => setStore({ genre: e || '' })}
             searchable
             value={genre}

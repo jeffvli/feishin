@@ -37,7 +37,7 @@ export const DownloadAction = ({ ids }: DownloadActionProps) => {
 
     return (
         <ContextMenu.Item disabled={ids.length > 1} leftIcon="download" onSelect={onSelect}>
-            {t('page.contextMenu.download', { postProcess: 'sentenceCase' })}
+            {t('page.contextMenu.download')}
         </ContextMenu.Item>
     );
 };

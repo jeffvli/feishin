@@ -38,12 +38,12 @@ export const DeletePlaylistAction = ({ disabled, items }: DeletePlaylistActionPr
 
             navigate(AppRoute.PLAYLISTS, { replace: true });
             toast.success({
-                message: t('action.deletePlaylist', { postProcess: 'sentenceCase' }),
+                message: t('action.deletePlaylist'),
             });
         } catch (err: any) {
             toast.error({
                 message: err.message,
-                title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                title: t('error.genericError'),
             });
         }
 
@@ -56,10 +56,10 @@ export const DeletePlaylistAction = ({ disabled, items }: DeletePlaylistActionPr
         openModal({
             children: (
                 <ConfirmModal onConfirm={handleDeletePlaylist}>
-                    <Text>{t('common.areYouSure', { postProcess: 'sentenceCase' })}</Text>
+                    <Text>{t('common.areYouSure')}</Text>
                 </ConfirmModal>
             ),
-            title: t('form.deletePlaylist.title', { postProcess: 'sentenceCase' }),
+            title: t('form.deletePlaylist.title'),
         });
     }, [handleDeletePlaylist, items.length, t]);
 
@@ -67,7 +67,7 @@ export const DeletePlaylistAction = ({ disabled, items }: DeletePlaylistActionPr
 
     return (
         <ContextMenu.Item disabled={disabled} leftIcon="remove" onSelect={openDeletePlaylistModal}>
-            {t('action.deletePlaylist', { postProcess: 'sentenceCase' })}
+            {t('action.deletePlaylist')}
         </ContextMenu.Item>
     );
 };

@@ -55,11 +55,11 @@ export const UpdateAvailableDialog = () => {
         >
             <Stack gap="md">
                 <Text fw={700} size="md">
-                    {t('common.newVersionAvailable', { postProcess: 'sentenceCase' })} - {version}
+                    {t('common.newVersionAvailable')} - {version}
                 </Text>
                 <Group justify="flex-end">
                     <Button onClick={handleDismiss} size="xs" variant="default">
-                        {t('common.dismiss', { postProcess: 'titleCase' })}
+                        {t('common.dismiss')}
                     </Button>
                     <Button
                         component="a"
@@ -70,7 +70,7 @@ export const UpdateAvailableDialog = () => {
                         target="_blank"
                         variant="filled"
                     >
-                        {t('action.viewMore', { postProcess: 'titleCase' })}
+                        {t('action.viewMore')}
                     </Button>
                 </Group>
             </Stack>

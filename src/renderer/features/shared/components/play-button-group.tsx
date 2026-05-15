@@ -24,10 +24,10 @@ const playButtons: {
         label: (
             <Stack gap="xs" justify="center">
                 <Text fw={500} ta="center">
-                    {i18n.t('player.addNext', { postProcess: 'sentenceCase' })}
+                    {i18n.t('player.addNext')}
                 </Text>
                 <Text fw={500} isMuted size="xs" ta="center">
-                    {i18n.t('player.holdToShuffle', { postProcess: 'sentenceCase' })}
+                    {i18n.t('player.holdToShuffle')}
                 </Text>
             </Stack>
         ),
@@ -40,10 +40,10 @@ const playButtons: {
         label: (
             <Stack gap="xs" justify="center">
                 <Text fw={500} ta="center">
-                    {i18n.t('player.play', { postProcess: 'sentenceCase' })}
+                    {i18n.t('player.play')}
                 </Text>
                 <Text fw={500} isMuted size="xs" ta="center">
-                    {i18n.t('player.holdToShuffle', { postProcess: 'sentenceCase' })}
+                    {i18n.t('player.holdToShuffle')}
                 </Text>
             </Stack>
         ),
@@ -55,10 +55,10 @@ const playButtons: {
         label: (
             <Stack gap="xs" justify="center">
                 <Text fw={500} ta="center">
-                    {i18n.t('player.addLast', { postProcess: 'sentenceCase' })}
+                    {i18n.t('player.addLast')}
                 </Text>
                 <Text fw={500} isMuted size="xs" ta="center">
-                    {i18n.t('player.holdToShuffle', { postProcess: 'sentenceCase' })}
+                    {i18n.t('player.holdToShuffle')}
                 </Text>
             </Stack>
         ),
@@ -74,9 +74,9 @@ export const LONG_PRESS_PLAY_BEHAVIOR = {
 };
 
 const PLAY_BEHAVIOR_TO_LABEL = {
-    [Play.LAST]: i18n.t('player.addLast', { postProcess: 'sentenceCase' }),
-    [Play.NEXT]: i18n.t('player.addNext', { postProcess: 'sentenceCase' }),
-    [Play.NOW]: i18n.t('player.play', { postProcess: 'sentenceCase' }),
+    [Play.LAST]: i18n.t('player.addLast'),
+    [Play.NEXT]: i18n.t('player.addNext'),
+    [Play.NOW]: i18n.t('player.play'),
 };
 
 const TooltipLabel = ({ label }: { label: React.ReactNode | string; type: Play }) => {
@@ -86,7 +86,7 @@ const TooltipLabel = ({ label }: { label: React.ReactNode | string; type: Play }
                 {label}
             </Text>
             <Text fw={500} isMuted size="xs" ta="center">
-                {i18n.t('player.holdToShuffle', { postProcess: 'sentenceCase' })}
+                {i18n.t('player.holdToShuffle')}
             </Text>
         </Stack>
     );

@@ -361,7 +361,7 @@ axiosClient.interceptors.response.use(
             if (data['subsonic-response'].error.code !== 0) {
                 toast.error({
                     message: data['subsonic-response'].error.message,
-                    title: i18n.t('error.genericError', { postProcess: 'sentenceCase' }) as string,
+                    title: i18n.t('error.genericError') as string,
                 });
 
                 // Since we do status === 200, override this value with the error code
@@ -524,11 +524,7 @@ export const ssApiClient = (args: {
             } catch (e: any | AxiosError | Error) {
                 if (isAxiosError(e)) {
                     if (e.code === 'ERR_NETWORK') {
-                        throw new Error(
-                            i18n.t('error.networkError', {
-                                postProcess: 'sentenceCase',
-                            }) as string,
-                        );
+                        throw new Error(i18n.t('error.networkError') as string);
                     }
 
                     const error = e as AxiosError;

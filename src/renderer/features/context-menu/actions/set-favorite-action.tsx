@@ -51,15 +51,15 @@ export const SetFavoriteAction = ({ ids, itemType }: SetFavoriteActionProps) => 
                     onSelect={(e) => e.preventDefault()}
                     rightIcon="arrowRightS"
                 >
-                    {t('common.favorite', { postProcess: 'sentenceCase' })}
+                    {t('common.favorite')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuTarget>
             <ContextMenu.SubmenuContent>
                 <ContextMenu.Item leftIcon="favorite" onSelect={handleAddToFavorites}>
-                    {t('action.addToFavorites', { postProcess: 'sentenceCase' })}
+                    {t('action.addToFavorites')}
                 </ContextMenu.Item>
                 <ContextMenu.Item leftIcon="unfavorite" onSelect={handleRemoveFromFavorites}>
-                    {t('action.removeFromFavorites', { postProcess: 'sentenceCase' })}
+                    {t('action.removeFromFavorites')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuContent>
         </ContextMenu.Submenu>

@@ -9,16 +9,10 @@ export const openRestartRequiredToast = (message?: string) => {
     return toast.warn({
         autoClose: false,
         id: 'restart-toast',
-        message:
-            message ||
-            t('common.forceRestartRequired', {
-                postProcess: 'sentenceCase',
-            }),
+        message: message || t('common.forceRestartRequired'),
         onClose: () => {
             ipc?.send('app-restart');
         },
-        title: t('common.restartRequired', {
-            postProcess: 'sentenceCase',
-        }),
+        title: t('common.restartRequired'),
     });
 };

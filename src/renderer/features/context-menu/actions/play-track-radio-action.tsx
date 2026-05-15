@@ -72,18 +72,18 @@ export const PlayTrackRadioAction = ({ disabled, song }: PlayTrackRadioActionPro
                     onSelect={defaultPlayTrackRadioAction}
                     rightIcon="arrowRightS"
                 >
-                    {t('player.trackRadio', { postProcess: 'sentenceCase' })}
+                    {t('player.trackRadio')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuTarget>
             <ContextMenu.SubmenuContent>
                 <ContextMenu.Item leftIcon="mediaPlay" onSelect={handlePlayTrackRadioNow}>
-                    {t('player.play', { postProcess: 'sentenceCase' })}
+                    {t('player.play')}
                 </ContextMenu.Item>
                 <ContextMenu.Item leftIcon="mediaPlayNext" onSelect={handlePlayTrackRadioNext}>
-                    {t('player.addNext', { postProcess: 'sentenceCase' })}
+                    {t('player.addNext')}
                 </ContextMenu.Item>
                 <ContextMenu.Item leftIcon="mediaPlayLast" onSelect={handlePlayTrackRadioLast}>
-                    {t('player.addLast', { postProcess: 'sentenceCase' })}
+                    {t('player.addLast')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuContent>
         </ContextMenu.Submenu>

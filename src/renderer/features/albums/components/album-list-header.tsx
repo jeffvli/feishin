@@ -55,7 +55,7 @@ const AlbumListHeaderBadge = () => {
 const PageTitle = ({ title }: { title?: string }) => {
     const { t } = useTranslation();
     const { pageKey } = useListContext();
-    const pageTitle = title || t('page.albumList.title', { postProcess: 'titleCase' });
+    const pageTitle = title || t('page.albumList.title');
 
     switch (pageKey) {
         case ItemListKey.ALBUM_ARTIST_ALBUM:

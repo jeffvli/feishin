@@ -22,20 +22,15 @@ export const AnalyticsSettings = memo(() => {
         {
             control: (
                 <Switch
-                    aria-label={t('setting.analyticsEnable', { postProcess: 'sentenceCase' })}
+                    aria-label={t('setting.analyticsEnable')}
                     defaultChecked={localStorage.getItem('umami.disabled') !== '1'}
                     onChange={(e) => handleSetSendAnalytics(e.currentTarget.checked)}
                 />
             ),
-            description: t('setting.analyticsEnable_description', { postProcess: 'sentenceCase' }),
-            title: t('setting.analyticsEnable', { postProcess: 'sentenceCase' }),
+            description: t('setting.analyticsEnable_description'),
+            title: t('setting.analyticsEnable'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={analyticsOptions}
-            title={t('page.setting.analytics', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={analyticsOptions} title={t('page.setting.analytics')} />;
 });

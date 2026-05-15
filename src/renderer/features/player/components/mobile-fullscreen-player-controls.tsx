@@ -33,7 +33,7 @@ export const MobileFullscreenPlayerControls = memo(
                     icon={<Icon fill="default" icon="mediaPrevious" size="xl" />}
                     onClick={mediaPrevious}
                     tooltip={{
-                        label: t('player.previous', { postProcess: 'sentenceCase' }),
+                        label: t('player.previous'),
                         openDelay: 0,
                     }}
                     variant="secondary"
@@ -44,7 +44,6 @@ export const MobileFullscreenPlayerControls = memo(
                     tooltip={{
                         label: t('player.skip', {
                             context: 'back',
-                            postProcess: 'sentenceCase',
                         }),
                         openDelay: 0,
                     }}
@@ -65,7 +64,6 @@ export const MobileFullscreenPlayerControls = memo(
                     tooltip={{
                         label: t('player.skip', {
                             context: 'forward',
-                            postProcess: 'sentenceCase',
                         }),
                         openDelay: 0,
                     }}
@@ -75,7 +73,7 @@ export const MobileFullscreenPlayerControls = memo(
                     icon={<Icon fill="default" icon="mediaNext" size="xl" />}
                     onClick={mediaNext}
                     tooltip={{
-                        label: t('player.next', { postProcess: 'sentenceCase' }),
+                        label: t('player.next'),
                         openDelay: 0,
                     }}
                     variant="secondary"

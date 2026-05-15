@@ -142,11 +142,7 @@ const AlbumArtistActionButtons = ({
                         size="compact-md"
                         variant="transparent"
                     >
-                        {String(
-                            t('player.artistRadio', {
-                                postProcess: 'sentenceCase',
-                            }),
-                        ).toUpperCase()}
+                        {String(t('player.artistRadio')).toUpperCase()}
                     </Button>
                 )}
             </Group>
@@ -414,9 +410,7 @@ const AlbumArtistMetadataTopSongsContent = ({
                     <div className={styles.albumSectionTitle}>
                         <Group>
                             <TextTitle fw={700} order={3}>
-                                {t('page.albumArtistDetail.topSongs', {
-                                    postProcess: 'sentenceCase',
-                                })}
+                                {t('page.albumArtistDetail.topSongs')}
                             </TextTitle>
                             {!isLoading && <Badge>{songs.length}</Badge>}
                         </Group>
@@ -431,9 +425,7 @@ const AlbumArtistMetadataTopSongsContent = ({
                                 uppercase
                                 variant="subtle"
                             >
-                                {t('page.albumArtistDetail.viewAll', {
-                                    postProcess: 'sentenceCase',
-                                })}
+                                {t('page.albumArtistDetail.viewAll')}
                             </Button>
                             {songs.length > 0 && (
                                 <ActionIconGroup>
@@ -485,9 +477,7 @@ const AlbumArtistMetadataTopSongsContent = ({
                                     flex={1}
                                     leftSection={<Icon icon="search" />}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder={t('common.search', {
-                                        postProcess: 'sentenceCase',
-                                    })}
+                                    placeholder={t('common.search')}
                                     radius="xl"
                                     rightSection={
                                         searchTerm ? (
@@ -510,15 +500,11 @@ const AlbumArtistMetadataTopSongsContent = ({
                                 <SegmentedControl
                                     data={[
                                         {
-                                            label: t('page.albumArtistDetail.topSongsCommunity', {
-                                                postProcess: 'sentenceCase',
-                                            }),
+                                            label: t('page.albumArtistDetail.topSongsCommunity'),
                                             value: 'community',
                                         },
                                         {
-                                            label: t('page.albumArtistDetail.topSongsPersonal', {
-                                                postProcess: 'sentenceCase',
-                                            }),
+                                            label: t('page.albumArtistDetail.topSongsPersonal'),
                                             value: 'personal',
                                         },
                                     ]}
@@ -716,9 +702,7 @@ const AlbumArtistMetadataFavoriteSongs = ({
                     <div className={styles.albumSectionTitle}>
                         <Group>
                             <TextTitle fw={700} order={3}>
-                                {t('page.albumArtistDetail.favoriteSongs', {
-                                    postProcess: 'sentenceCase',
-                                })}
+                                {t('page.albumArtistDetail.favoriteSongs')}
                             </TextTitle>
                             {!isLoading && <Badge>{songs.length}</Badge>}
                         </Group>
@@ -736,9 +720,7 @@ const AlbumArtistMetadataFavoriteSongs = ({
                                 uppercase
                                 variant="subtle"
                             >
-                                {t('page.albumArtistDetail.viewAll', {
-                                    postProcess: 'sentenceCase',
-                                })}
+                                {t('page.albumArtistDetail.viewAll')}
                             </Button>
                             {songs.length > 0 && (
                                 <ActionIconGroup>
@@ -790,9 +772,7 @@ const AlbumArtistMetadataFavoriteSongs = ({
                                     flex={1}
                                     leftSection={<Icon icon="search" />}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder={t('common.search', {
-                                        postProcess: 'sentenceCase',
-                                    })}
+                                    placeholder={t('common.search')}
                                     radius="xl"
                                     rightSection={
                                         searchTerm ? (
@@ -941,9 +921,7 @@ const AlbumArtistMetadataExternalLinks = ({
         <Grid.Col order={order} span={12}>
             <Stack gap="xs">
                 <Text fw={600} isNoSelect size="sm" tt="uppercase">
-                    {t('common.externalLinks', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    {t('common.externalLinks')}
                 </Text>
                 <Group gap="xs">
                     {lastFM && (
@@ -1092,9 +1070,7 @@ const AlbumArtistMetadataSimilarArtists = ({
         () => (
             <div className={styles.similarArtistsTitle}>
                 <TextTitle fw={700} order={3}>
-                    {t('page.albumArtistDetail.relatedArtists', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    {t('page.albumArtistDetail.relatedArtists')}
                 </TextTitle>
                 <div className={styles.albumSectionDividerContainer}>
                     <div className={styles.albumSectionDivider} />
@@ -1432,7 +1408,7 @@ const AlbumSection = memo(function AlbumSection({
             {hasMoreAlbums && !showAll && (
                 <Group justify="center" w="100%">
                     <Button onClick={() => setShowAll(true)} variant="subtle">
-                        {t('action.viewMore', { postProcess: 'sentenceCase' })}
+                        {t('action.viewMore')}
                     </Button>
                 </Group>
             )}
@@ -1521,7 +1497,7 @@ const ArtistAlbums = ({ albumsQuery, order }: ArtistAlbumsProps) => {
                         flex={1}
                         leftSection={<Icon icon="search" />}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder={t('common.search', { postProcess: 'sentenceCase' })}
+                        placeholder={t('common.search')}
                         radius="xl"
                         ref={searchInputRef}
                         rightSection={
@@ -1585,17 +1561,13 @@ function GroupingTypeSelector() {
                     isSelected={groupingType === 'all'}
                     onClick={() => setAlbumArtistDetailGroupingType('all')}
                 >
-                    {t('page.albumArtistDetail.groupingTypeAll', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    {t('page.albumArtistDetail.groupingTypeAll')}
                 </DropdownMenu.Item>
                 <DropdownMenu.Item
                     isSelected={groupingType === 'primary'}
                     onClick={() => setAlbumArtistDetailGroupingType('primary')}
                 >
-                    {t('page.albumArtistDetail.groupingTypePrimary', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    {t('page.albumArtistDetail.groupingTypePrimary')}
                 </DropdownMenu.Item>
             </DropdownMenu.Dropdown>
         </DropdownMenu>

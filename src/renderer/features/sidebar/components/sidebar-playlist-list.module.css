@@ -13,12 +13,28 @@
 }
 
 .row-hover {
-    .metadata {
+    .metadata,
+    .compact-name {
         margin-right: 100px;
     }
 
     background-color: var(--theme-colors-surface);
 }
+
+.row-compact {
+    align-items: center;
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+}
+
+.compact-name {
+    flex: 1;
+    min-width: 0;
+    padding:  0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 
 .controls {
     position: absolute;
@@ -28,6 +44,18 @@
     background: var(--theme-colors-surface);
     transform: translateY(-50%);
 }
+
+
+.controls-compact {
+    position: absolute;
+    top: 50%;
+    right: var(--theme-spacing-xs);
+    flex-shrink: 0;
+    padding: 0 var(--theme-spacing-sm);
+    background: none;
+    transform: translateY(-50%);
+}
+
 
 .row-dragged-over {
     border-radius: var(--mantine-radius-sm);

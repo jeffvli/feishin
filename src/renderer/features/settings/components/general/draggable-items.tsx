@@ -55,9 +55,10 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
 
     const translatedItemMap = useMemo(
         () =>
-            Object.fromEntries(
-                itemLabels.map(([key, value]) => [key, t(value, { postProcess: 'sentenceCase' })]),
-            ) as Record<K, string>,
+            Object.fromEntries(itemLabels.map(([key, value]) => [key, t(value)])) as Record<
+                K,
+                string
+            >,
         [itemLabels, t],
     );
 
@@ -78,10 +79,9 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
         );
     }, []);
 
-    const titleText = t(title, { postProcess: 'sentenceCase' });
+    const titleText = t(title);
     const descriptionText = t(description, {
         context: 'description',
-        postProcess: 'sentenceCase',
     });
 
     const shouldShow = useMemo(() => {
@@ -114,7 +114,7 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
                                 size="compact-md"
                                 variant="filled"
                             >
-                                {t('common.save', { postProcess: 'titleCase' })}
+                                {t('common.save')}
                             </Button>
                         )}
                         <Button
@@ -122,7 +122,7 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
                             size="compact-md"
                             variant={open ? 'subtle' : 'filled'}
                         >
-                            {t(open ? 'common.close' : 'common.edit', { postProcess: 'titleCase' })}
+                            {t(open ? 'common.close' : 'common.edit')}
                         </Button>
                     </>
                 }

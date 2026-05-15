@@ -43,7 +43,7 @@ export const useSaveQueue = () => {
     const mutation = useMutation({
         mutationFn: async () => {
             if (!serverId) {
-                throw new Error(t('error.serverRequired', { postProcess: 'sentenceCase' }));
+                throw new Error(t('error.serverRequired'));
             }
 
             const state = usePlayerStore.getState();
@@ -51,15 +51,11 @@ export const useSaveQueue = () => {
 
             if (queue.items.some((item) => item._serverId !== serverId)) {
                 toast.error({
-                    message: t('error.multipleServerSaveQueueError', {
-                        postProcess: 'sentenceCase',
-                    }),
-                    title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                    message: t('error.multipleServerSaveQueueError'),
+                    title: t('error.genericError'),
                 });
 
-                throw new Error(
-                    `${t('error.multipleServerSaveQueueError', { postProcess: 'sentenceCase' })}`,
-                );
+                throw new Error(`${t('error.multipleServerSaveQueueError')}`);
             }
 
             try {
@@ -73,12 +69,12 @@ export const useSaveQueue = () => {
                 });
 
                 toast.success({
-                    message: t('form.saveQueue.success', { postProcess: 'sentenceCase' }),
+                    message: t('form.saveQueue.success'),
                 });
             } catch (error) {
                 toast.error({
                     message: (error as Error).message,
-                    title: t('error.saveQueueFailed', { postProcess: 'sentenceCase' }),
+                    title: t('error.saveQueueFailed'),
                 });
                 throw error;
             }
@@ -111,7 +107,7 @@ export const useRestoreQueue = () => {
         } catch (error) {
             toast.error({
                 message: (error as Error).message,
-                title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                title: t('error.genericError'),
             });
         }
     }, [player, queryClient, serverId]);

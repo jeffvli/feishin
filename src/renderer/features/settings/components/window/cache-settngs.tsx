@@ -31,7 +31,7 @@ export const CacheSettings = memo(() => {
                 }
 
                 toast.success({
-                    message: t('setting.clearCacheSuccess', { postProcess: 'sentenceCase' }),
+                    message: t('setting.clearCacheSuccess'),
                 });
             } catch (error) {
                 console.error(error);
@@ -49,10 +49,10 @@ export const CacheSettings = memo(() => {
         openModal({
             children: (
                 <ConfirmModal onConfirm={() => clearCache(full)}>
-                    {t(`common.areYouSure`, { postProcess: 'sentenceCase' })}
+                    {t(`common.areYouSure`)}
                 </ConfirmModal>
             ),
-            title: t(`setting.${key}`, { postProcess: 'sentenceCase' }),
+            title: t(`setting.${key}`),
         });
     };
 
@@ -65,14 +65,13 @@ export const CacheSettings = memo(() => {
                     size="compact-md"
                     variant="filled"
                 >
-                    {t('common.clear', { postProcess: 'sentenceCase' })}
+                    {t('common.clear')}
                 </Button>
             ),
             description: t('setting.clearQueryCache', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.clearQueryCache', { postProcess: 'sentenceCase' }),
+            title: t('setting.clearQueryCache'),
         },
         {
             control: (
@@ -82,15 +81,14 @@ export const CacheSettings = memo(() => {
                     size="compact-md"
                     variant="filled"
                 >
-                    {t('common.clear', { postProcess: 'sentenceCase' })}
+                    {t('common.clear')}
                 </Button>
             ),
             description: t('setting.clearCache', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !browser,
-            title: t('setting.clearCache', { postProcess: 'sentenceCase' }),
+            title: t('setting.clearCache'),
         },
     ];
 
@@ -102,15 +100,10 @@ export const CacheSettings = memo(() => {
 
     return (
         <>
-            <SettingsSection
-                options={options}
-                title={t('page.setting.cache', { postProcess: 'sentenceCase' })}
-            />
+            <SettingsSection options={options} title={t('page.setting.cache')} />
             {isElectron() && (
                 <Button onClick={handleOpenApplicationDirectory} variant="default">
-                    {t('action.openApplicationDirectory', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    {t('action.openApplicationDirectory')}
                 </Button>
             )}
         </>

@@ -19,7 +19,7 @@ interface GenreListHeaderProps {
 export const GenreListHeader = ({ title }: GenreListHeaderProps) => {
     const { t } = useTranslation();
 
-    const pageTitle = title || t('page.genreList.title', { postProcess: 'titleCase' });
+    const pageTitle = title || t('page.genreList.title');
 
     return (
         <Stack gap={0}>

@@ -105,23 +105,23 @@ export const AppMenu = () => {
     const handlePrivateModeOff = () => {
         setPrivateMode(false);
         toast.info({
-            message: t('form.privateMode.disabled', { postProcess: 'sentenceCase' }),
-            title: t('form.privateMode.title', { postProcess: 'sentenceCase' }),
+            message: t('form.privateMode.disabled'),
+            title: t('form.privateMode.title'),
         });
     };
 
     const handlePrivateModeOn = () => {
         setPrivateMode(true);
         toast.info({
-            message: t('form.privateMode.enabled', { postProcess: 'sentenceCase' }),
-            title: t('form.privateMode.title', { postProcess: 'sentenceCase' }),
+            message: t('form.privateMode.enabled'),
+            title: t('form.privateMode.title'),
         });
     };
 
     const handleManageServersModal = () => {
         openModal({
             children: <ServerList />,
-            title: t('page.manageServers.title', { postProcess: 'titleCase' }),
+            title: t('page.manageServers.title'),
         });
     };
 
@@ -161,7 +161,7 @@ export const AppMenu = () => {
         {
             icon: 'search',
             id: 'command-palette',
-            label: t('page.appMenu.commandPalette', { postProcess: 'sentenceCase' }),
+            label: t('page.appMenu.commandPalette'),
             onClick: openCommandPalette,
             type: 'item',
         },
@@ -176,14 +176,14 @@ export const AppMenu = () => {
                 {
                     icon: 'arrowLeftS',
                     id: 'go-back',
-                    label: t('page.appMenu.goBack', { postProcess: 'sentenceCase' }),
+                    label: t('page.appMenu.goBack'),
                     onClick: () => navigate(-1),
                     type: 'item',
                 },
                 {
                     icon: 'arrowRightS',
                     id: 'go-forward',
-                    label: t('page.appMenu.goForward', { postProcess: 'sentenceCase' }),
+                    label: t('page.appMenu.goForward'),
                     onClick: () => navigate(1),
                     type: 'item',
                 },
@@ -196,7 +196,7 @@ export const AppMenu = () => {
             item: {
                 icon: 'panelRightOpen',
                 id: 'expand-sidebar',
-                label: t('page.appMenu.expandSidebar', { postProcess: 'sentenceCase' }),
+                label: t('page.appMenu.expandSidebar'),
                 onClick: handleExpandSidebar,
                 type: 'item',
             },
@@ -208,7 +208,7 @@ export const AppMenu = () => {
             item: {
                 icon: 'panelRightClose',
                 id: 'collapse-sidebar',
-                label: t('page.appMenu.collapseSidebar', { postProcess: 'sentenceCase' }),
+                label: t('page.appMenu.collapseSidebar'),
                 onClick: handleCollapseSidebar,
                 type: 'item',
             },
@@ -222,7 +222,7 @@ export const AppMenu = () => {
             condition: !isServerLock(),
             id: 'manage-servers',
             item: {
-                label: t('page.appMenu.manageServers', { postProcess: 'sentenceCase' }),
+                label: t('page.appMenu.manageServers'),
                 leftSection: <Icon icon="edit" />,
                 onClick: handleManageServersModal,
                 type: 'item',
@@ -236,7 +236,7 @@ export const AppMenu = () => {
         {
             icon: 'settings',
             id: 'settings',
-            label: t('page.appMenu.settings', { postProcess: 'sentenceCase' }),
+            label: t('page.appMenu.settings'),
             onClick: () => openSettingsModal(),
             type: 'item',
         },
@@ -246,7 +246,7 @@ export const AppMenu = () => {
             item: {
                 icon: 'lock',
                 iconColor: 'error',
-                label: t('page.appMenu.privateModeOff', { postProcess: 'sentenceCase' }),
+                label: t('page.appMenu.privateModeOff'),
                 onClick: handlePrivateModeOff,
                 type: 'item',
             },
@@ -257,7 +257,7 @@ export const AppMenu = () => {
             id: 'private-mode-on',
             item: {
                 icon: 'lockOpen',
-                label: t('page.appMenu.privateModeOn', { postProcess: 'sentenceCase' }),
+                label: t('page.appMenu.privateModeOn'),
                 onClick: handlePrivateModeOn,
                 type: 'item',
             },
@@ -270,16 +270,10 @@ export const AppMenu = () => {
         {
             icon: 'brandGitHub',
             id: 'version',
-            label: t('page.appMenu.version', {
-                postProcess: 'sentenceCase',
-                version: packageJson.version,
-            }),
+            label: t('page.appMenu.version', { version: packageJson.version }),
             onClick: () =>
                 openReleaseNotesModal(
-                    t('common.newVersion', {
-                        postProcess: 'sentenceCase',
-                        version: packageJson.version,
-                    }) as string,
+                    t('common.newVersion', { version: packageJson.version }) as string,
                 ),
             type: 'item',
         },
@@ -289,7 +283,7 @@ export const AppMenu = () => {
             item: {
                 icon: 'appWindow',
                 id: 'open-devtools',
-                label: t('page.appMenu.openBrowserDevtools', { postProcess: 'sentenceCase' }),
+                label: t('page.appMenu.openBrowserDevtools'),
                 onClick: handleBrowserDevTools,
                 type: 'item',
             },
@@ -301,7 +295,7 @@ export const AppMenu = () => {
             item: {
                 icon: 'x',
                 id: 'quit-app',
-                label: t('page.appMenu.quit', { postProcess: 'sentenceCase' }),
+                label: t('page.appMenu.quit'),
                 onClick: handleQuit,
                 type: 'item',
             },
@@ -327,7 +321,6 @@ export const AppMenu = () => {
                                 tooltip={{
                                     label: t('setting.sidePlayQueueLayout', {
                                         context: 'optionHorizontal',
-                                        postProcess: 'sentenceCase',
                                     }),
                                     openDelay: 0,
                                     position: 'bottom',
@@ -347,7 +340,6 @@ export const AppMenu = () => {
                                 tooltip={{
                                     label: t('setting.sidePlayQueueLayout', {
                                         context: 'optionVertical',
-                                        postProcess: 'sentenceCase',
                                     }),
                                     openDelay: 0,
                                     position: 'bottom',

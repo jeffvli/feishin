@@ -452,9 +452,7 @@ export const PlaylistQueryBuilder = forwardRef(
             // Custom Fields group
             if (customFields.length > 0) {
                 groups.push({
-                    group: t('queryBuilder.customTags', {
-                        postProcess: 'titleCase',
-                    }),
+                    group: t('queryBuilder.customTags'),
                     items: customFields,
                 });
             }
@@ -462,9 +460,7 @@ export const PlaylistQueryBuilder = forwardRef(
             // Standard Fields group
             if (NDSongQueryFields.length > 0) {
                 groups.push({
-                    group: t('queryBuilder.standardTags', {
-                        postProcess: 'titleCase',
-                    }),
+                    group: t('queryBuilder.standardTags'),
                     items: NDSongQueryFields,
                 });
             }
@@ -484,7 +480,7 @@ export const PlaylistQueryBuilder = forwardRef(
         const sortOptions = useMemo(
             () => [
                 {
-                    label: t('filter.random', { postProcess: 'titleCase' }),
+                    label: t('filter.random'),
                     type: 'string',
                     value: 'random',
                 },
@@ -497,11 +493,11 @@ export const PlaylistQueryBuilder = forwardRef(
         const orderSelectData = useMemo(
             () => [
                 {
-                    label: t('common.ascending', { postProcess: 'sentenceCase' }),
+                    label: t('common.ascending'),
                     value: 'asc',
                 },
                 {
-                    label: t('common.descending', { postProcess: 'sentenceCase' }),
+                    label: t('common.descending'),
                     value: 'desc',
                 },
             ],
@@ -574,11 +570,7 @@ export const PlaylistQueryBuilder = forwardRef(
                                     <Group align="flex-end" gap="sm" key={index} wrap="nowrap">
                                         <Select
                                             data={sortOptions}
-                                            label={
-                                                index === 0
-                                                    ? t('common.sort', { postProcess: 'titleCase' })
-                                                    : ''
-                                            }
+                                            label={index === 0 ? t('common.sort') : ''}
                                             onChange={(value) =>
                                                 handleSortFieldChange(index, value || '')
                                             }
@@ -588,13 +580,7 @@ export const PlaylistQueryBuilder = forwardRef(
                                         />
                                         <Select
                                             data={orderSelectData}
-                                            label={
-                                                index === 0
-                                                    ? t('common.sortOrder', {
-                                                          postProcess: 'titleCase',
-                                                      })
-                                                    : ''
-                                            }
+                                            label={index === 0 ? t('common.sortOrder') : ''}
                                             onChange={(value) =>
                                                 handleSortOrderChange(
                                                     index,
@@ -625,7 +611,7 @@ export const PlaylistQueryBuilder = forwardRef(
                             <NumberInput
                                 label={
                                     <Group align="center" gap="xs" wrap="nowrap">
-                                        {t('common.limit', { postProcess: 'titleCase' })}
+                                        {t('common.limit')}
                                         <SegmentedControl
                                             data={[
                                                 { label: '#', value: 'limit' },

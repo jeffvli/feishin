@@ -17,7 +17,7 @@ export const RadioListHeader = ({ title }: RadioListHeaderProps) => {
     const { t } = useTranslation();
 
     const { itemCount } = useListContext();
-    const pageTitle = title || t('page.radioList.title', { postProcess: 'titleCase' });
+    const pageTitle = title || t('page.radioList.title');
 
     return (
         <Stack gap={0}>

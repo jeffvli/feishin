@@ -11,25 +11,23 @@ import { Text } from '/@/shared/components/text/text';
 
 const options = [
     {
-        label: i18n.t('setting.imageResolution_optionTable', { postProcess: 'sentenceCase' }),
+        label: i18n.t('setting.imageResolution_optionTable'),
         value: 'table',
     },
     {
-        label: i18n.t('setting.imageResolution_optionItemCard', { postProcess: 'sentenceCase' }),
+        label: i18n.t('setting.imageResolution_optionItemCard'),
         value: 'itemCard',
     },
     {
-        label: i18n.t('setting.imageResolution_optionSidebar', { postProcess: 'sentenceCase' }),
+        label: i18n.t('setting.imageResolution_optionSidebar'),
         value: 'sidebar',
     },
     {
-        label: i18n.t('setting.imageResolution_optionHeader', { postProcess: 'sentenceCase' }),
+        label: i18n.t('setting.imageResolution_optionHeader'),
         value: 'header',
     },
     {
-        label: i18n.t('setting.imageResolution_optionFullScreenPlayer', {
-            postProcess: 'sentenceCase',
-        }),
+        label: i18n.t('setting.imageResolution_optionFullScreenPlayer'),
         value: 'fullScreenPlayer',
     },
 ];
@@ -43,10 +41,9 @@ export const ImageResolutionSettings = memo(() => {
 
     const descriptionText = t('setting.imageResolution', {
         context: 'description',
-        postProcess: 'sentenceCase',
     });
 
-    const titleText = t('setting.imageResolution', { postProcess: 'sentenceCase' });
+    const titleText = t('setting.imageResolution');
 
     return (
         <>
@@ -58,7 +55,7 @@ export const ImageResolutionSettings = memo(() => {
                             size="compact-md"
                             variant={open ? 'subtle' : 'filled'}
                         >
-                            {t(open ? 'common.close' : 'common.edit', { postProcess: 'titleCase' })}
+                            {t(open ? 'common.close' : 'common.edit')}
                         </Button>
                     </>
                 }

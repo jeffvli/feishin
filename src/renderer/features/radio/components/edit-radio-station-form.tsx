@@ -104,9 +104,7 @@ export const EditRadioStationForm = ({ onCancel, station }: EditRadioStationForm
             }
 
             toast.success({
-                message: t('form.editRadioStation.success', {
-                    postProcess: 'sentenceCase',
-                }) as string,
+                message: t('form.editRadioStation.success') as string,
             });
             closeAllModals();
         } catch (err: unknown) {
@@ -116,7 +114,7 @@ export const EditRadioStationForm = ({ onCancel, station }: EditRadioStationForm
 
             toast.error({
                 message: (err as Error)?.message,
-                title: t('error.genericError', { postProcess: 'sentenceCase' }) as string,
+                title: t('error.genericError') as string,
             });
         } finally {
             setIsSaving(false);
@@ -132,7 +130,6 @@ export const EditRadioStationForm = ({ onCancel, station }: EditRadioStationForm
             key="name"
             label={t('form.createRadioStation.input', {
                 context: 'name',
-                postProcess: 'titleCase',
             })}
             required
             {...form.getInputProps('name')}
@@ -141,7 +138,6 @@ export const EditRadioStationForm = ({ onCancel, station }: EditRadioStationForm
             key="streamUrl"
             label={t('form.createRadioStation.input', {
                 context: 'streamUrl',
-                postProcess: 'titleCase',
             })}
             required
             {...form.getInputProps('streamUrl')}
@@ -150,7 +146,6 @@ export const EditRadioStationForm = ({ onCancel, station }: EditRadioStationForm
             key="homepageUrl"
             label={t('form.createRadioStation.input', {
                 context: 'homepageUrl',
-                postProcess: 'titleCase',
             })}
             {...form.getInputProps('homepageUrl')}
         />,
@@ -329,7 +324,7 @@ export const openEditRadioStationModal = (
 
     if (!server) {
         toast.error({
-            message: t('common.error.noServer', { postProcess: 'sentenceCase' }) as string,
+            message: t('common.error.noServer') as string,
         });
         return;
     }
@@ -339,6 +334,6 @@ export const openEditRadioStationModal = (
     openModal({
         children: <EditRadioStationForm onCancel={closeAllModals} station={station} />,
         size: hasImageUpload ? 'lg' : 'md',
-        title: t('common.edit', { postProcess: 'titleCase' }) as string,
+        title: t('common.edit') as string,
     });
 };

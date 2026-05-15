@@ -18,7 +18,7 @@ interface FolderListHeaderProps {
 export const FolderListHeader = ({ title }: FolderListHeaderProps) => {
     const { t } = useTranslation();
 
-    const pageTitle = title || t('page.folderList.title', { postProcess: 'titleCase' });
+    const pageTitle = title || t('page.folderList.title');
 
     return (
         <Stack gap={0}>

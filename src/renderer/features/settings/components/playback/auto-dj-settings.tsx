@@ -33,9 +33,8 @@ export const AutoDJSettings = memo(() => {
             ),
             description: t('setting.autoDJ_itemCount', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.autoDJ_itemCount', { postProcess: 'sentenceCase' }),
+            title: t('setting.autoDJ_itemCount'),
         },
         {
             control: (
@@ -56,16 +55,10 @@ export const AutoDJSettings = memo(() => {
             ),
             description: t('setting.autoDJ_timing', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.autoDJ_timing', { postProcess: 'sentenceCase' }),
+            title: t('setting.autoDJ_timing'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={autoDJOptions}
-            title={t('setting.autoDJ', { postProcess: 'titleCase' })}
-        />
-    );
+    return <SettingsSection options={autoDJOptions} title={t('setting.autoDJ')} />;
 });

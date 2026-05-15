@@ -34,7 +34,7 @@ export const ServerList = () => {
                 ),
             },
             modal: 'base',
-            title: t('form.addServer.title', { postProcess: 'titleCase' }),
+            title: t('form.addServer.title'),
         });
     };
 
@@ -79,7 +79,7 @@ export const ServerList = () => {
                                 leftSection={<Icon icon="add" />}
                                 onClick={handleAddServerModal}
                             >
-                                {t('form.addServer.title', { postProcess: 'titleCase' })}
+                                {t('form.addServer.title')}
                             </Button>
                         </Group>
                     )}

@@ -405,12 +405,8 @@ axiosClient.interceptors.response.use(
 
                         if (res.status === 429) {
                             toast.error({
-                                message: i18n.t('error.loginRateError', {
-                                    postProcess: 'sentenceCase',
-                                }) as string,
-                                title: i18n.t('error.sessionExpiredError', {
-                                    postProcess: 'sentenceCase',
-                                }) as string,
+                                message: i18n.t('error.loginRateError') as string,
+                                title: i18n.t('error.sessionExpiredError') as string,
                             });
 
                             const serverId = currentServer.id;
@@ -425,11 +421,7 @@ axiosClient.interceptors.response.use(
                             throw TIMEOUT_ERROR;
                         }
                         if (res.status !== 200) {
-                            throw new Error(
-                                i18n.t('error.authenticatedFailed', {
-                                    postProcess: 'sentenceCase',
-                                }) as string,
-                            );
+                            throw new Error(i18n.t('error.authenticatedFailed') as string);
                         }
 
                         const newCredential = res.data.token;
@@ -523,11 +515,7 @@ export const ndApiClient = (args: {
             } catch (e: any | AxiosError | Error) {
                 if (isAxiosError(e)) {
                     if (e.code === 'ERR_NETWORK') {
-                        throw new Error(
-                            i18n.t('error.networkError', {
-                                postProcess: 'sentenceCase',
-                            }) as string,
-                        );
+                        throw new Error(i18n.t('error.networkError') as string);
                     }
 
                     const error = e as AxiosError;

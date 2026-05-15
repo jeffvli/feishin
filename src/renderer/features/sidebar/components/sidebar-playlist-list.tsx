@@ -17,6 +17,14 @@ import {
     PlayTooltip,
 } from '/@/renderer/features/shared/components/play-button-group';
 import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-button-click';
+import {
+    collectFolderPaths,
+    PlaylistFolderViews,
+    PlaylistRootAccordionControl,
+    usePlaylistFolderState,
+    usePlaylistFolderViewState,
+    usePlaylistNavigationState,
+} from '/@/renderer/features/sidebar/components/playlist-folder-tree';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
@@ -25,6 +33,7 @@ import {
     useCurrentServerId,
     usePermissions,
     useSidebarPlaylistListFilterRegex,
+    useSidebarPlaylistMode,
     useSidebarPlaylistSorting,
 } from '/@/renderer/store';
 import { formatDurationString } from '/@/renderer/utils';
@@ -51,8 +60,7 @@ const getPlaylistOrderKey = (serverId: string | undefined, scope: 'owned' | 'sha
     return `playlist_order:${sid}:${scope}`;
 };
 
-interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'onPlay'> {
-    isActive?: boolean;
+export interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'onPlay'> {
     item: Playlist;
     name: string;
     onContextMenu: (e: MouseEvent<HTMLAnchorElement>, item: Playlist) => void;
@@ -60,14 +68,18 @@ interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'on
     to: string;
 }
 
-const PlaylistRowButton = memo(
-    ({ isActive, item, name, onContextMenu, onReorder, to }: PlaylistRowButtonProps) => {
+export const PlaylistRowButton = memo(
+    ({ item, name, onContextMenu, onReorder, to }: PlaylistRowButtonProps) => {
         const url = {
             pathname: generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: to }),
             state: { item },
         };
         const { t } = useTranslation();
         const sidebarPlaylistSorting = useSidebarPlaylistSorting();
+        const sidebarPlaylistMode = useSidebarPlaylistMode();
+        const isCompact = sidebarPlaylistMode === 'compact';
+        const activePlaylistId = useCurrentPlaylistContextId();
+        const isActive = activePlaylistId === item.id;
 
         const [isHovered, setIsHovered] = useState(false);
 
@@ -187,7 +199,7 @@ const PlaylistRowButton = memo(
                         innerProps: modalProps,
                         modal: 'addToPlaylist',
                         size: 'lg',
-                        title: t('form.addToPlaylist.title', { postProcess: 'titleCase' }),
+                        title: t('form.addToPlaylist.title'),
                     });
                 },
             },
@@ -215,6 +227,7 @@ const PlaylistRowButton = memo(
         return (
             <Link
                 className={clsx(styles.row, {
+                    [styles.rowCompact]: isCompact,
                     [styles.rowDraggedOver]: isDraggedOver,
                     [styles.rowHover]: isHovered,
                 })}
@@ -230,54 +243,74 @@ const PlaylistRowButton = memo(
                 }}
                 to={url}
             >
-                <div className={styles.rowGroup}>
-                    <Image containerClassName={styles.imageContainer} src={imageUrl} />
-                    <div className={styles.metadata}>
+                {isCompact ? (
+                    <>
                         <Text
-                            className={clsx(styles.name, { [styles.nameActive]: isActive })}
+                            className={clsx(styles.compactName, {
+                                [styles.nameActive]: isActive,
+                            })}
                             fw={500}
                             size="md"
                         >
                             {name}
                         </Text>
-                        <div className={styles.metadataGroup}>
-                            <div
-                                className={clsx(
-                                    styles.metadataGroupItem,
-                                    styles.metadataGroupItemNoShrink,
-                                )}
-                            >
-                                <Icon color="muted" icon="itemSong" size="sm" />
-                                <Text isMuted size="sm">
-                                    {item.songCount || 0}
+                        {isHovered && <RowControls id={to} onPlay={handlePlay} variant="compact" />}
+                    </>
+                ) : (
+                    <>
+                        <div className={styles.rowGroup}>
+                            <Image containerClassName={styles.imageContainer} src={imageUrl} />
+                            <div className={styles.metadata}>
+                                <Text
+                                    className={clsx(styles.name, {
+                                        [styles.nameActive]: isActive,
+                                    })}
+                                    fw={500}
+                                    size="md"
+                                >
+                                    {name}
                                 </Text>
-                            </div>
-                            <div className={styles.metadataGroupItem}>
-                                <Icon color="muted" icon="duration" size="sm" />
-                                <Text isMuted size="sm">
-                                    {formatDurationString(item.duration ?? 0)}
-                                </Text>
-                            </div>
-                            {item.ownerId === permissions.userId && Boolean(item.public) && (
-                                <div className={styles.metadataGroupItem}>
-                                    <Text isMuted size="sm">
-                                        {t('common.public', { postProcess: 'titleCase' })}
-                                    </Text>
+                                <div className={styles.metadataGroup}>
+                                    <div
+                                        className={clsx(
+                                            styles.metadataGroupItem,
+                                            styles.metadataGroupItemNoShrink,
+                                        )}
+                                    >
+                                        <Icon color="muted" icon="itemSong" size="sm" />
+                                        <Text isMuted size="sm">
+                                            {item.songCount || 0}
+                                        </Text>
+                                    </div>
+                                    <div className={styles.metadataGroupItem}>
+                                        <Icon color="muted" icon="duration" size="sm" />
+                                        <Text isMuted size="sm">
+                                            {formatDurationString(item.duration ?? 0)}
+                                        </Text>
+                                    </div>
+                                    {item.ownerId === permissions.userId &&
+                                        Boolean(item.public) && (
+                                            <div className={styles.metadataGroupItem}>
+                                                <Text isMuted size="sm">
+                                                    {t('common.public')}
+                                                </Text>
+                                            </div>
+                                        )}
+                                    {item.ownerId !== permissions.userId && (
+                                        <div className={styles.metadataGroupItem}>
+                                            <Icon color="muted" icon="user" size="sm" />
+                                            <Text isMuted size="sm">
+                                                {item.owner}
+                                            </Text>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                            {item.ownerId !== permissions.userId && (
-                                <div className={styles.metadataGroupItem}>
-                                    <Icon color="muted" icon="user" size="sm" />
-                                    <Text isMuted size="sm">
-                                        {item.owner}
-                                    </Text>
-                                </div>
-                            )}
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                {isHovered && <RowControls id={to} onPlay={handlePlay} />}
+                        {isHovered && <RowControls id={to} onPlay={handlePlay} />}
+                    </>
+                )}
             </Link>
         );
     },
@@ -286,9 +319,11 @@ const PlaylistRowButton = memo(
 const RowControls = ({
     id,
     onPlay,
+    variant = 'expanded',
 }: {
     id: string;
     onPlay: (id: string, playType: Play) => void;
+    variant?: 'compact' | 'expanded';
 }) => {
     const handlePlayNext = usePlayButtonClick({
         onClick: () => {
@@ -318,7 +353,11 @@ const RowControls = ({
     });
 
     return (
-        <ActionIconGroup className={styles.controls}>
+        <ActionIconGroup
+            className={clsx(styles.controls, {
+                [styles.controlsCompact]: variant === 'compact',
+            })}
+        >
             <PlayTooltip type={Play.NOW}>
                 <ActionIcon
                     icon="mediaPlay"
@@ -365,7 +404,6 @@ export const SidebarPlaylistList = () => {
     const server = useCurrentServer();
     const sidebarPlaylistSorting = useSidebarPlaylistSorting();
     const filterRegex = useSidebarPlaylistListFilterRegex();
-    const activePlaylistId = useCurrentPlaylistContextId();
 
     const playlistsQuery = useQuery(
         playlistsQueries.list({
@@ -492,15 +530,62 @@ export const SidebarPlaylistList = () => {
         openCreatePlaylistModal(server, e);
     };
 
+    const folderViewState = usePlaylistFolderViewState(playlistItems?.items ?? []);
+    const { folderView, groups, tree } = folderViewState;
+    const navigation = usePlaylistNavigationState();
+    const inNavigation = folderView === 'navigation' && navigation.pathStack.length > 0;
+
+    const folderPaths = useMemo(() => {
+        if (folderView === 'single') {
+            return groups.reduce<string[]>((acc, g) => {
+                if (g.type === 'folder') acc.push(g.name);
+                return acc;
+            }, []);
+        }
+        return collectFolderPaths(tree);
+    }, [folderView, groups, tree]);
+
+    const { expandedSet, setMany, toggle } = usePlaylistFolderState('owned');
+    const allExpanded =
+        folderPaths.length > 0 && folderPaths.every((path) => expandedSet.has(path));
+
+    const handleToggleAllFolders = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            setMany(folderPaths, !allExpanded);
+        },
+        [setMany, folderPaths, allExpanded],
+    );
+
+    const handleNavigateUp = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            navigation.goUp();
+        },
+        [navigation],
+    );
+
+    const showExpandAll = folderView !== 'navigation' && folderPaths.length > 0;
+
     return (
         <Accordion.Item value="playlists">
-            <Accordion.Control component="div" role="button" style={{ userSelect: 'none' }}>
-                <Group justify="space-between" pr="var(--theme-spacing-md)">
-                    <Text fw={500}>
-                        {t('page.sidebar.playlists', {
-                            postProcess: 'titleCase',
-                        })}
-                    </Text>
+            <PlaylistRootAccordionControl allPlaylists={playlistItems?.items ?? []}>
+                <Group gap="xs" justify="space-between" pr="var(--theme-spacing-md)" wrap="nowrap">
+                    <Group gap="xs" style={{ minWidth: 0 }} wrap="nowrap">
+                        {inNavigation && (
+                            <ActionIcon
+                                icon="arrowLeftS"
+                                iconProps={{ size: 'lg' }}
+                                onClick={handleNavigateUp}
+                                size="xs"
+                                tooltip={{ label: t('common.back') }}
+                                variant="subtle"
+                            />
+                        )}
+                        <Text className={styles.name} fw={500}>
+                            {inNavigation ? navigation.currentName : t('page.sidebar.playlists')}
+                        </Text>
+                    </Group>
                     <Group gap="xs">
                         <ActionIcon
                             icon="add"
@@ -510,12 +595,31 @@ export const SidebarPlaylistList = () => {
                             onClick={handleCreatePlaylistModal}
                             size="xs"
                             tooltip={{
-                                label: t('action.createPlaylist', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('action.createPlaylist'),
                             }}
                             variant="subtle"
                         />
+                        {showExpandAll && (
+                            <ActionIcon
+                                icon={allExpanded ? 'collapseAll' : 'expandAll'}
+                                iconProps={{
+                                    size: 'lg',
+                                }}
+                                onClick={handleToggleAllFolders}
+                                size="xs"
+                                tooltip={{
+                                    label: t(
+                                        allExpanded
+                                            ? 'action.collapseAllFolders'
+                                            : 'action.expandAllFolders',
+                                        {
+                                            postProcess: 'sentenceCase',
+                                        },
+                                    ),
+                                }}
+                                variant="subtle"
+                            />
+                        )}
                         <ActionIcon
                             component={Link}
                             icon="list"
@@ -526,27 +630,23 @@ export const SidebarPlaylistList = () => {
                             size="xs"
                             to={AppRoute.PLAYLISTS}
                             tooltip={{
-                                label: t('action.viewPlaylists', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('action.viewPlaylists'),
                             }}
                             variant="subtle"
                         />
                     </Group>
                 </Group>
-            </Accordion.Control>
+            </PlaylistRootAccordionControl>
             <Accordion.Panel>
-                {playlistItems?.items?.map((item, index) => (
-                    <PlaylistRowButton
-                        isActive={activePlaylistId === item.id}
-                        item={item}
-                        key={index}
-                        name={item.name}
-                        onContextMenu={handleContextMenu}
-                        onReorder={handleReorder}
-                        to={item.id}
-                    />
-                ))}
+                <PlaylistFolderViews
+                    {...folderViewState}
+                    allPlaylists={playlistItems?.items ?? []}
+                    expandedSet={expandedSet}
+                    navigation={navigation}
+                    onContextMenu={handleContextMenu}
+                    onReorder={handleReorder}
+                    onToggleFolder={toggle}
+                />
             </Accordion.Panel>
         </Accordion.Item>
     );
@@ -558,7 +658,6 @@ export const SidebarSharedPlaylistList = () => {
     const server = useCurrentServer();
     const sidebarPlaylistSorting = useSidebarPlaylistSorting();
     const filterRegex = useSidebarPlaylistListFilterRegex();
-    const activePlaylistId = useCurrentPlaylistContextId();
 
     const playlistsQuery = useQuery(
         playlistsQueries.list({
@@ -685,31 +784,53 @@ export const SidebarSharedPlaylistList = () => {
         setPlaylistOrder(reorderedIds);
     };
 
+    const folderViewState = usePlaylistFolderViewState(playlistItems?.items ?? []);
+    const navigation = usePlaylistNavigationState();
+    const { expandedSet, toggle } = usePlaylistFolderState('shared');
+    const inNavigation =
+        folderViewState.folderView === 'navigation' && navigation.pathStack.length > 0;
+
+    const handleNavigateUp = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            navigation.goUp();
+        },
+        [navigation],
+    );
+
     if (playlistItems?.items?.length === 0) {
         return null;
     }
 
     return (
         <Accordion.Item value="shared-playlists">
-            <Accordion.Control>
-                <Text fw={500} variant="secondary">
-                    {t('page.sidebar.shared', {
-                        postProcess: 'titleCase',
-                    })}
-                </Text>
+            <Accordion.Control component="motion.div" role="button" style={{ userSelect: 'none' }}>
+                <Group gap="xs" style={{ minWidth: 0 }} wrap="nowrap">
+                    {inNavigation && (
+                        <ActionIcon
+                            icon="arrowLeftS"
+                            iconProps={{ size: 'lg' }}
+                            onClick={handleNavigateUp}
+                            size="xs"
+                            tooltip={{ label: t('common.back') }}
+                            variant="subtle"
+                        />
+                    )}
+                    <Text className={styles.name} fw={500} variant="secondary">
+                        {inNavigation ? navigation.currentName : t('page.sidebar.shared')}
+                    </Text>
+                </Group>
             </Accordion.Control>
             <Accordion.Panel>
-                {playlistItems?.items?.map((item, index) => (
-                    <PlaylistRowButton
-                        isActive={activePlaylistId === item.id}
-                        item={item}
-                        key={index}
-                        name={item.name}
-                        onContextMenu={handleContextMenu}
-                        onReorder={handleReorder}
-                        to={item.id}
-                    />
-                ))}
+                <PlaylistFolderViews
+                    {...folderViewState}
+                    allPlaylists={playlistItems?.items ?? []}
+                    expandedSet={expandedSet}
+                    navigation={navigation}
+                    onContextMenu={handleContextMenu}
+                    onReorder={handleReorder}
+                    onToggleFolder={toggle}
+                />
             </Accordion.Panel>
         </Accordion.Item>
     );

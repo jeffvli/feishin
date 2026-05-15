@@ -80,7 +80,7 @@ function ServerSelector() {
                 />
             ),
             size: 'sm',
-            title: t('form.updateServer.title', { postProcess: 'titleCase' }),
+            title: t('form.updateServer.title'),
         });
     };
 

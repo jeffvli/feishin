@@ -18,7 +18,19 @@ export const ActionBar = () => {
 
     return (
         <div className={styles.container}>
-            <Grid display="flex" gap="sm" style={{ padding: '0 var(--theme-spacing-md)' }} w="100%">
+            <Grid
+                display="flex"
+                gap="sm"
+                styles={{
+                    inner: {
+                        width: '100%',
+                    },
+                    root: {
+                        padding: '0 var(--theme-spacing-md',
+                        width: '100%',
+                    },
+                }}
+            >
                 <Grid.Col span={7}>
                     <TextInput
                         leftSection={<Icon icon="search" />}
@@ -28,7 +40,7 @@ export const ActionBar = () => {
                                 open();
                             }
                         }}
-                        placeholder={t('common.search', { postProcess: 'titleCase' })}
+                        placeholder={t('common.search')}
                         readOnly
                     />
                 </Grid.Col>

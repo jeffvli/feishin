@@ -19,7 +19,7 @@ interface PlaylistListHeaderProps {
 export const PlaylistListHeader = ({ title }: PlaylistListHeaderProps) => {
     const { t } = useTranslation();
 
-    const pageTitle = title || t('page.playlistList.title', { postProcess: 'titleCase' });
+    const pageTitle = title || t('page.playlistList.title');
 
     return (
         <Stack gap={0}>

@@ -22,17 +22,17 @@ const controls = [
     {
         control1: <Kbd>CTRL</Kbd>,
         control2: <Kbd>A</Kbd>,
-        label: i18n.t('action.selectAll', { postProcess: 'sentenceCase' }),
+        label: i18n.t('action.selectAll'),
     },
     {
         control1: <Kbd>CTRL</Kbd>,
         control2: <Icon fill="default" icon="mouseLeftClick" />,
-        label: i18n.t('action.addOrRemoveFromSelection', { postProcess: 'sentenceCase' }),
+        label: i18n.t('action.addOrRemoveFromSelection'),
     },
     {
         control1: <Kbd>SHIFT</Kbd>,
         control2: <Icon fill="default" icon="mouseLeftClick" />,
-        label: i18n.t('action.selectRangeOfItems', { postProcess: 'sentenceCase' }),
+        label: i18n.t('action.selectRangeOfItems'),
     },
 ];
 

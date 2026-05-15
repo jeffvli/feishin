@@ -19,7 +19,7 @@ interface AlbumArtistListHeaderProps {
 export const AlbumArtistListHeader = ({ title }: AlbumArtistListHeaderProps) => {
     const { t } = useTranslation();
 
-    const pageTitle = title || t('page.albumArtistList.title', { postProcess: 'titleCase' });
+    const pageTitle = title || t('page.albumArtistList.title');
 
     return (
         <Stack gap={0}>

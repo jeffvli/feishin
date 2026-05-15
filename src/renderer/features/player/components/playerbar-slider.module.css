@@ -59,9 +59,24 @@
 .slider-value-wrapper {
     display: flex;
     flex: 1;
-    align-self: center;
+    align-items: center;
     justify-content: center;
     max-width: 50px;
+    min-height: 0;
+
+    @media (width < 768px) {
+        display: none;
+    }
+}
+
+.slider-value-wrapper-elapsed {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    max-width: 4.75rem;
+    min-height: 0;
 
     @media (width < 768px) {
         display: none;

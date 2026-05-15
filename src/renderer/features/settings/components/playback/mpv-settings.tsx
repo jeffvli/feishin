@@ -107,7 +107,7 @@ export const MpvSettings = memo(() => {
                         icon="refresh"
                         onClick={handleReloadMpv}
                         tooltip={{
-                            label: t('common.reload', { postProcess: 'titleCase' }),
+                            label: t('common.reload'),
                             openDelay: 0,
                         }}
                         variant="subtle"
@@ -137,11 +137,10 @@ export const MpvSettings = memo(() => {
             ),
             description: t('setting.mpvExecutablePath', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: settings.type !== PlayerType.LOCAL,
             note: 'Restart required',
-            title: t('setting.mpvExecutablePath', { postProcess: 'sentenceCase' }),
+            title: t('setting.mpvExecutablePath'),
         },
         {
             control: (
@@ -155,7 +154,6 @@ export const MpvSettings = memo(() => {
                         }}
                         placeholder={`(${t('setting.mpvExtraParameters', {
                             context: 'help',
-                            postProcess: 'sentenceCase',
                         })}):\n--gapless-audio=weak\n--prefetch-playlist=yes`}
                         width={225}
                     />
@@ -166,7 +164,6 @@ export const MpvSettings = memo(() => {
                     <Text isMuted isNoSelect size="sm">
                         {t('setting.mpvExtraParameters', {
                             context: 'description',
-                            postProcess: 'sentenceCase',
                         })}
                     </Text>
                     <Text size="sm">
@@ -181,12 +178,8 @@ export const MpvSettings = memo(() => {
                 </Stack>
             ),
             isHidden: settings.type !== PlayerType.LOCAL,
-            note: t('common.restartRequired', {
-                postProcess: 'sentenceCase',
-            }),
-            title: t('setting.mpvExtraParameters', {
-                postProcess: 'sentenceCase',
-            }),
+            note: t('common.restartRequired'),
+            title: t('setting.mpvExtraParameters'),
         },
     ];
 
@@ -195,12 +188,11 @@ export const MpvSettings = memo(() => {
             control: (
                 <Select
                     data={[
-                        { label: t('common.no', { postProcess: 'titleCase' }), value: 'no' },
-                        { label: t('common.yes', { postProcess: 'titleCase' }), value: 'yes' },
+                        { label: t('common.no'), value: 'no' },
+                        { label: t('common.yes'), value: 'yes' },
                         {
                             label: t('setting.gaplessAudio', {
                                 context: 'optionWeak',
-                                postProcess: 'sentenceCase',
                             }),
                             value: 'weak',
                         },
@@ -211,10 +203,9 @@ export const MpvSettings = memo(() => {
             ),
             description: t('setting.gaplessAudio', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: settings.type !== PlayerType.LOCAL,
-            title: t('setting.gaplessAudio', { postProcess: 'sentenceCase' }),
+            title: t('setting.gaplessAudio'),
         },
         {
             control: (
@@ -234,10 +225,9 @@ export const MpvSettings = memo(() => {
             ),
             description: t('setting.sampleRate', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             note: 'Page refresh required for web player',
-            title: t('setting.sampleRate', { postProcess: 'sentenceCase' }),
+            title: t('setting.sampleRate'),
         },
         {
             control: (
@@ -254,10 +244,9 @@ export const MpvSettings = memo(() => {
 
             description: t('setting.audioExclusiveMode', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: settings.type !== PlayerType.LOCAL,
-            title: t('setting.audioExclusiveMode', { postProcess: 'sentenceCase' }),
+            title: t('setting.audioExclusiveMode'),
         },
     ];
 
@@ -269,21 +258,18 @@ export const MpvSettings = memo(() => {
                         {
                             label: t('setting.replayGainMode', {
                                 context: 'optionNone',
-                                postProcess: 'titleCase',
                             }),
                             value: 'no',
                         },
                         {
                             label: t('setting.replayGainMode', {
                                 context: 'optionTrack',
-                                postProcess: 'titleCase',
                             }),
                             value: 'track',
                         },
                         {
                             label: t('setting.replayGainMode', {
                                 context: 'optionAlbum',
-                                postProcess: 'titleCase',
                             }),
                             value: 'album',
                         },
@@ -294,14 +280,11 @@ export const MpvSettings = memo(() => {
             ),
             description: t('setting.replayGainMode', {
                 context: 'description',
-                postProcess: 'sentenceCase',
+
                 ReplayGain: 'ReplayGain',
             }),
-            note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
-            title: t('setting.replayGainMode', {
-                postProcess: 'sentenceCase',
-                ReplayGain: 'ReplayGain',
-            }),
+            note: t('common.restartRequired'),
+            title: t('setting.replayGainMode', { ReplayGain: 'ReplayGain' }),
         },
         {
             control: (
@@ -313,13 +296,10 @@ export const MpvSettings = memo(() => {
             ),
             description: t('setting.replayGainMode', {
                 context: 'description',
-                postProcess: 'sentenceCase',
+
                 ReplayGain: 'ReplayGain',
             }),
-            title: t('setting.replayGainPreamp', {
-                postProcess: 'sentenceCase',
-                ReplayGain: 'ReplayGain',
-            }),
+            title: t('setting.replayGainPreamp', { ReplayGain: 'ReplayGain' }),
         },
         {
             control: (
@@ -332,13 +312,10 @@ export const MpvSettings = memo(() => {
             ),
             description: t('setting.replayGainClipping', {
                 context: 'description',
-                postProcess: 'sentenceCase',
+
                 ReplayGain: 'ReplayGain',
             }),
-            title: t('setting.replayGainClipping', {
-                postProcess: 'sentenceCase',
-                ReplayGain: 'ReplayGain',
-            }),
+            title: t('setting.replayGainClipping', { ReplayGain: 'ReplayGain' }),
         },
         {
             control: (
@@ -350,14 +327,8 @@ export const MpvSettings = memo(() => {
                     width={75}
                 />
             ),
-            description: t('setting.replayGainFallback', {
-                postProcess: 'sentenceCase',
-                ReplayGain: 'ReplayGain',
-            }),
-            title: t('setting.replayGainFallback', {
-                postProcess: 'sentenceCase',
-                ReplayGain: 'ReplayGain',
-            }),
+            description: t('setting.replayGainFallback', { ReplayGain: 'ReplayGain' }),
+            title: t('setting.replayGainFallback', { ReplayGain: 'ReplayGain' }),
         },
     ];
 

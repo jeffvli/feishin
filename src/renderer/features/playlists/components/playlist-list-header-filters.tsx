@@ -42,7 +42,7 @@ export const PlaylistListHeaderFilters = () => {
             </Group>
             <Group gap="sm" wrap="nowrap">
                 <Button onClick={handleCreatePlaylistModal} variant="subtle">
-                    {t('action.createPlaylist', { postProcess: 'sentenceCase' })}
+                    {t('action.createPlaylist')}
                 </Button>
                 <ListDisplayTypeToggleButton listKey={ItemListKey.PLAYLIST} />
                 <ListConfigMenu

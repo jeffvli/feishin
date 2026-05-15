@@ -53,10 +53,9 @@ export const StylesSettings = memo(() => {
                 }
                 description={t('setting.customCssEnable', {
                     context: 'description',
-                    postProcess: 'sentenceCase',
                 })}
-                note={t('setting.customCssNotice', { postProcess: 'sentenceCase' })}
-                title={t('setting.customCssEnable', { postProcess: 'sentenceCase' })}
+                note={t('setting.customCssNotice')}
+                title={t('setting.customCssEnable')}
             />
             {enabled && (
                 <>
@@ -70,7 +69,7 @@ export const StylesSettings = memo(() => {
                                         // disabled={isSaveButtonDisabled}
                                         variant="filled"
                                     >
-                                        {t('common.save', { postProcess: 'titleCase' })}
+                                        {t('common.save')}
                                     </Button>
                                 )}
                                 <Button
@@ -78,17 +77,14 @@ export const StylesSettings = memo(() => {
                                     size="compact-md"
                                     variant="filled"
                                 >
-                                    {t(open ? 'common.close' : 'common.edit', {
-                                        postProcess: 'titleCase',
-                                    })}
+                                    {t(open ? 'common.close' : 'common.edit', {})}
                                 </Button>
                             </>
                         }
                         description={t('setting.customCss', {
                             context: 'description',
-                            postProcess: 'sentenceCase',
                         })}
-                        title={t('setting.customCss', { postProcess: 'sentenceCase' })}
+                        title={t('setting.customCss')}
                     />
                     {open && (
                         <>
@@ -100,7 +96,7 @@ export const StylesSettings = memo(() => {
                                     setCss(sanitizeCss(`<style>${e.currentTarget.value}`))
                                 }
                             />
-                            <Text>{t('common.preview', { postProcess: 'sentenceCase' })}: </Text>
+                            <Text>{t('common.preview')}: </Text>
                             <Code block>{css}</Code>
                         </>
                     )}

@@ -221,7 +221,7 @@ export const AddToPlaylistContextModal = ({
                     } catch (error: any) {
                         toast.error({
                             message: `[${playlist}] ${error?.message}`,
-                            title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                            title: t('error.genericError'),
                         });
                     }
                 }
@@ -273,7 +273,7 @@ export const AddToPlaylistContextModal = ({
                                             (playlist) => playlist.value === playlistId,
                                         )?.label
                                     }] ${err.message}`,
-                                    title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                                    title: t('error.genericError'),
                                 });
                             },
                         },
@@ -292,15 +292,14 @@ export const AddToPlaylistContextModal = ({
                 message: t('form.addToPlaylist.success', {
                     message: addMessage,
                     numOfPlaylists: playlistIds.length,
-                    postProcess: 'sentenceCase',
                 }),
             });
             closeModal(id);
         } catch (error: any) {
             setIsLoading(false);
             toast.error({
-                message: error?.message || t('error.genericError', { postProcess: 'sentenceCase' }),
-                title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                message: error?.message || t('error.genericError'),
+                title: t('error.genericError'),
             });
         }
     });
@@ -422,9 +421,7 @@ export const AddToPlaylistContextModal = ({
                     <TextInput
                         data-autofocus
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder={t('form.addToPlaylist.searchOrCreate', {
-                            postProcess: 'sentenceCase',
-                        })}
+                        placeholder={t('form.addToPlaylist.searchOrCreate')}
                         value={search}
                     />
                     <ScrollArea style={{ maxHeight: '18rem' }}>
@@ -482,7 +479,6 @@ export const AddToPlaylistContextModal = ({
                         >
                             {t('form.addToPlaylist.create', {
                                 playlist: search,
-                                postProcess: 'sentenceCase',
                             })}
                         </Button>
                     )}
@@ -512,7 +508,6 @@ export const AddToPlaylistContextModal = ({
                     <Switch
                         label={t('form.addToPlaylist.input', {
                             context: 'skipDuplicates',
-                            postProcess: 'titleCase',
                         })}
                         {...form.getInputProps('skipDuplicates', { type: 'checkbox' })}
                     />
@@ -523,7 +518,7 @@ export const AddToPlaylistContextModal = ({
                             uppercase
                             variant="subtle"
                         >
-                            {t('common.cancel', { postProcess: 'titleCase' })}
+                            {t('common.cancel')}
                         </ModalButton>
                         <ModalButton
                             disabled={
@@ -537,7 +532,7 @@ export const AddToPlaylistContextModal = ({
                             uppercase
                             variant="filled"
                         >
-                            {t('common.add', { postProcess: 'titleCase' })}
+                            {t('common.add')}
                         </ModalButton>
                     </Group>
                 </Stack>
@@ -587,13 +582,7 @@ const PlaylistTableItem = memo(
                                 </Group>
 
                                 <Text className={styles.statusText} isMuted size="sm">
-                                    {item.public
-                                        ? t('common.public', {
-                                              postProcess: 'titleCase',
-                                          })
-                                        : t('common.private', {
-                                              postProcess: 'titleCase',
-                                          })}
+                                    {item.public ? t('common.public') : t('common.private')}
                                 </Text>
                             </Group>
                         </Stack>

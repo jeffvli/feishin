@@ -448,11 +448,7 @@ export const jfApiClient = (args: {
             } catch (e: any | AxiosError | Error) {
                 if (isAxiosError(e)) {
                     if (e.code === 'ERR_NETWORK') {
-                        throw new Error(
-                            i18n.t('error.networkError', {
-                                postProcess: 'sentenceCase',
-                            }) as string,
-                        );
+                        throw new Error(i18n.t('error.networkError') as string);
                     }
 
                     const error = e as AxiosError;

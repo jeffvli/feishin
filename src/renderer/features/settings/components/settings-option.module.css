@@ -1,0 +1,9 @@
+.row {
+    align-items: center;
+}
+
+.row-indented {
+    padding-left: var(--theme-spacing-lg);
+    margin-left: var(--theme-spacing-md);
+    border-left: 2px solid var(--theme-colors-surface);
+}

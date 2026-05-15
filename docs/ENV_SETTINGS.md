@@ -43,7 +43,13 @@ These variables override app settings **on first run** when no persisted setting
 | `general.showVisualizerInSidebar` | `true` | `FS_GENERAL_SHOW_VISUALIZER_IN_SIDEBAR` | `true` / `false` — Show visualizer in sidebar. |
 | `general.sidebarCollapsedNavigation` | `true` | `FS_GENERAL_SIDEBAR_COLLAPSED_NAVIGATION` | `true` / `false` — Start with collapsed sidebar nav. |
 | `general.sidebarCollapseShared` | `false` | `FS_GENERAL_SIDEBAR_COLLAPSE_SHARED` | `true` / `false` — Share sidebar collapse state. |
+| `general.sidebarPlaylistFolders` | `true` | `FS_GENERAL_SIDEBAR_PLAYLIST_FOLDERS` | `true` / `false` — Group playlists into folders by name separator. |
+| `general.sidebarPlaylistFolderSeparator` | `/` | `FS_GENERAL_SIDEBAR_PLAYLIST_FOLDER_SEPARATOR` | Character or string that separates folder levels in a playlist name. Empty = use default. |
+| `general.sidebarPlaylistFolderTreeIndent` | `16` | `FS_GENERAL_SIDEBAR_PLAYLIST_FOLDER_TREE_INDENT` | Pixels each tree level is indented (0–64). |
+| `general.sidebarPlaylistFolderTreeLineColor` | *(empty)* | `FS_GENERAL_SIDEBAR_PLAYLIST_FOLDER_TREE_LINE_COLOR` | CSS color for tree connecting lines. Empty = theme default. |
+| `general.sidebarPlaylistFolderView` | `tree` | `FS_GENERAL_SIDEBAR_PLAYLIST_FOLDER_VIEW` | `single` / `tree` / `navigation` — How folders are displayed in the sidebar. |
 | `general.sidebarPlaylistList` | `true` | `FS_GENERAL_SIDEBAR_PLAYLIST_LIST` | `true` / `false` — Show playlist list in sidebar. |
+| `general.sidebarPlaylistMode` | `expanded` | `FS_GENERAL_SIDEBAR_PLAYLIST_MODE` | `compact` / `expanded` — Sidebar playlist row layout. |
 | `general.sidebarPlaylistSorting` | `false` | `FS_GENERAL_SIDEBAR_PLAYLIST_SORTING` | `true` / `false` — Enable playlist sorting in sidebar. |
 | `general.sideQueueType` | `sideQueue` | `FS_GENERAL_SIDE_QUEUE_TYPE` | `sideDrawerQueue` / `sideQueue` — Side play queue style. |
 | `general.sideQueueLayout` | `horizontal` | `FS_GENERAL_SIDE_QUEUE_LAYOUT` | `horizontal` / `vertical` — Attached side queue layout orientation. |
@@ -66,6 +72,9 @@ These variables override app settings **on first run** when no persisted setting
 | `playback.scrobble.scrobbleAtDuration` | `240` | `FS_PLAYBACK_SCROBBLE_AT_DURATION` | Seconds of playback before scrobble. |
 | `playback.scrobble.scrobbleAtPercentage` | `75` | `FS_PLAYBACK_SCROBBLE_AT_PERCENTAGE` | Percentage of track before scrobble. |
 | `playback.transcode.enabled` | `false` | `FS_PLAYBACK_TRANSCODE_ENABLED` | `true` / `false` — Enable transcoding. |
+| `playback.transcode.format` | *(unset)* | `FS_PLAYBACK_TRANSCODE_FORMAT` | Transcode format string (codec/container), e.g. server-specific value. Empty = use default. |
+| `playback.transcode.bitrate` | *(unset)* | `FS_PLAYBACK_TRANSCODE_BITRATE` | Transcode bitrate (number, kbps or as defined by server). |
+| `playback.filters` | `[]` | `FS_PLAYBACK_FILTERS` | JSON array of player filters: each object needs `id`, `field`, `operator`, `value`; optional `isEnabled`. Invalid JSON or shape is ignored. |
 
 ---
 

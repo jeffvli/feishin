@@ -73,7 +73,7 @@ const PlayButton = () => {
 const PageTitle = ({ title }: { title?: string }) => {
     const { t } = useTranslation();
     const { pageKey } = useListContext();
-    const pageTitle = title || t('page.trackList.title', { postProcess: 'titleCase' });
+    const pageTitle = title || t('page.trackList.title');
 
     switch (pageKey) {
         case ItemListKey.ALBUM_ARTIST_SONG:

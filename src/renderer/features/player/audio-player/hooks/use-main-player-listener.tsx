@@ -35,7 +35,7 @@ export const useMainPlayerListener = () => {
             toast.error({
                 id: 'mpv-error',
                 message,
-                title: t('error.playbackError', { postProcess: 'sentenceCase' }) as string,
+                title: t('error.playbackError') as string,
             });
             mediaPause();
             mpvPlayer!.pause();

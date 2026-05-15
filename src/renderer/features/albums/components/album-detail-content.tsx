@@ -127,9 +127,7 @@ const AlbumMetadataTags = ({ album }: AlbumMetadataTagsProps) => {
             ...releaseTypes,
             {
                 id: 'isCompilation',
-                value: album?.isCompilation
-                    ? t('filter.isCompilation', { postProcess: 'sentenceCase' })
-                    : undefined,
+                value: album?.isCompilation ? t('filter.isCompilation') : undefined,
             },
             ...releaseCountries,
             ...releaseStatuses,
@@ -137,9 +135,9 @@ const AlbumMetadataTags = ({ album }: AlbumMetadataTagsProps) => {
                 id: 'explicitStatus',
                 value:
                     album.explicitStatus === ExplicitStatus.EXPLICIT
-                        ? t('common.explicit', { postProcess: 'sentenceCase' })
+                        ? t('common.explicit')
                         : album.explicitStatus === ExplicitStatus.CLEAN
-                          ? t('common.clean', { postProcess: 'sentenceCase' })
+                          ? t('common.clean')
                           : undefined,
             },
         );
@@ -210,15 +208,12 @@ const AlbumMetadataTags = ({ album }: AlbumMetadataTagsProps) => {
 
     return (
         <>
-            <MetadataPillGroup
-                items={defaultTagItems}
-                title={t('common.tags', { postProcess: 'sentenceCase' })}
-            />
+            <MetadataPillGroup items={defaultTagItems} title={t('common.tags')} />
 
             {recordLabels.length > 0 && (
                 <Stack align="center" className={styles.metadataPillGroup} gap="xs">
                     <Text fw={600} isNoSelect size="sm" tt="uppercase">
-                        {t('common.recordLabel', { postProcess: 'sentenceCase' })}
+                        {t('common.recordLabel')}
                     </Text>
                     <div className={styles['pill-group-wrapper']}>
                         <Pill.Group>
@@ -242,15 +237,12 @@ const AlbumMetadataTags = ({ album }: AlbumMetadataTagsProps) => {
                 </Stack>
             )}
 
-            <MetadataPillGroup
-                items={moodTagItems}
-                title={t('common.mood', { postProcess: 'sentenceCase' })}
-            />
+            <MetadataPillGroup items={moodTagItems} title={t('common.mood')} />
 
             {groupingItems.length > 0 && (
                 <Stack align="center" className={styles.metadataPillGroup} gap="xs">
                     <Text fw={600} isNoSelect size="sm" tt="uppercase">
-                        {t('common.grouping', { postProcess: 'sentenceCase' })}
+                        {t('common.grouping')}
                     </Text>
                     <div className={styles['pill-group-wrapper']}>
                         <Pill.Group>
@@ -402,9 +394,7 @@ const AlbumMetadataExternalLinks = ({
     return (
         <Stack gap="xs">
             <Text fw={600} isNoSelect size="sm" tt="uppercase">
-                {t('common.externalLinks', {
-                    postProcess: 'sentenceCase',
-                })}
+                {t('common.externalLinks')}
             </Text>
             <Group className={styles.externalLinksGroup} gap="xs">
                 {lastFM && (
@@ -634,7 +624,7 @@ const DiscGroupRow = ({ discGroup, groupItems, internalState, t }: DiscGroupRowP
                 id={`disc-${discGroup.discNumber}`}
                 label={
                     <Text component="label" size="sm" truncate>
-                        {t('common.disc', { postProcess: 'sentenceCase' })} {discGroup.discNumber}
+                        {t('common.disc')} {discGroup.discNumber}
                         {discGroup.discSubtitle && ` - ${discGroup.discSubtitle}`}
                     </Text>
                 }
@@ -691,7 +681,7 @@ function AlbumDetailCarousels({ data }: { data: Album }) {
                 rowCount: 1,
                 sortBy: AlbumListSort.YEAR,
                 sortOrder: SortOrder.DESC,
-                title: t('page.albumDetail.moreFromArtist', { postProcess: 'sentenceCase' }),
+                title: t('page.albumDetail.moreFromArtist'),
                 uniqueId: moreFromArtistUniqueId,
             },
             ...genreCarousels,
@@ -878,7 +868,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                     flex={1}
                     leftSection={<Icon icon="search" />}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder={t('common.search', { postProcess: 'sentenceCase' })}
+                    placeholder={t('common.search')}
                     radius="xl"
                     ref={searchInputRef}
                     rightSection={

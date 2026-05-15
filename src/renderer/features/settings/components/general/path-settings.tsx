@@ -62,7 +62,7 @@ export const PathSettings = memo(() => {
     return (
         <Stack>
             <Group>
-                <Text>{t('setting.pathReplace', { postProcess: 'sentenceCase' })}</Text>
+                <Text>{t('setting.pathReplace')}</Text>
                 <ActionIcon
                     icon="refresh"
                     loading={randomSong.isFetching}
@@ -83,9 +83,7 @@ export const PathSettings = memo(() => {
                         setLocalPathReplace(value);
                         debouncedSetPathReplace(value);
                     }}
-                    placeholder={t('setting.pathReplace_optionRemovePrefix', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    placeholder={t('setting.pathReplace_optionRemovePrefix')}
                     value={localPathReplace}
                 />
                 <TextInput
@@ -94,9 +92,7 @@ export const PathSettings = memo(() => {
                         setLocalPathReplaceWith(value);
                         debouncedSetPathReplaceWith(value);
                     }}
-                    placeholder={t('setting.pathReplace_optionAddPrefix', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    placeholder={t('setting.pathReplace_optionAddPrefix')}
                     value={localPathReplaceWith}
                 />
             </Group>

@@ -72,13 +72,13 @@ export const GoToAction = ({ items }: GoToActionProps) => {
                     onSelect={(e) => e.preventDefault()}
                     rightIcon="arrowRightS"
                 >
-                    {t('page.contextMenu.goTo', { postProcess: 'sentenceCase' })}
+                    {t('page.contextMenu.goTo')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuTarget>
             <ContextMenu.SubmenuContent>
                 {hasAlbum && (
                     <ContextMenu.Item leftIcon="album" onSelect={handleGoToAlbum}>
-                        {t('page.contextMenu.goToAlbum', { postProcess: 'sentenceCase' })}
+                        {t('page.contextMenu.goToAlbum')}
                     </ContextMenu.Item>
                 )}
                 {albumArtists.map((albumArtist) => (
@@ -87,7 +87,7 @@ export const GoToAction = ({ items }: GoToActionProps) => {
                         leftIcon="artist"
                         onSelect={() => handleGoToAlbumArtist(albumArtist.id)}
                     >
-                        {`${t('page.contextMenu.goTo', { postProcess: 'sentenceCase' })} ${albumArtist.name}`}
+                        {`${t('page.contextMenu.goTo')} ${albumArtist.name}`}
                     </ContextMenu.Item>
                 ))}
             </ContextMenu.SubmenuContent>
