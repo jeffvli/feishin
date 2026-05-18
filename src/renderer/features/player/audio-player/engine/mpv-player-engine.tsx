@@ -134,7 +134,11 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
                     : undefined;
 
                 if (currentSongUrl && !hasPopulatedQueueRef.current && mpvPlayer) {
-                    mpvPlayer.setQueue(currentSongUrl, nextSongUrl, true);
+                    const isDifferentNextSong =
+                        playerData.nextSong &&
+                        playerData.nextSong.id !== playerData.currentSong?.id;
+                    const safeNextSongUrl = isDifferentNextSong ? nextSongUrl : undefined;
+                    mpvPlayer.setQueue(currentSongUrl, safeNextSongUrl, true);
                     hasPopulatedQueueRef.current = true;
                     isInitializedRef.current = true;
                     let seekToAfterInit = -1;
@@ -387,8 +391,10 @@ async function replaceMpvQueue(transcode: {
     const currentSongUrl = playerData.currentSong
         ? await getSongUrl(playerData.currentSong, transcode, true)
         : undefined;
-    const nextSongUrl = playerData.nextSong
-        ? await getSongUrl(playerData.nextSong, transcode, true)
+    const isDifferentNextSong =
+        playerData.nextSong && playerData.nextSong.id !== playerData.currentSong?.id;
+    const nextSongUrl = isDifferentNextSong
+        ? await getSongUrl(playerData.nextSong!, transcode, true)
         : undefined;
     mpvPlayer?.setQueue(currentSongUrl, nextSongUrl, false);
 }
