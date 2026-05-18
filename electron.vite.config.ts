@@ -1,9 +1,10 @@
-import react from '@vitejs/plugin-react';
 import { externalizeDepsPlugin, UserConfig } from 'electron-vite';
 import { resolve } from 'path';
 import conditionalImportPlugin from 'vite-plugin-conditional-import';
 import dynamicImportPlugin from 'vite-plugin-dynamic-import';
 import { ViteEjsPlugin } from 'vite-plugin-ejs';
+
+import { createReactPlugin } from './vite.react-plugin';
 
 const currentOSEnv = process.platform;
 const electronRendererTarget = 'chrome87';
@@ -64,7 +65,7 @@ const config: UserConfig = {
                 localsConvention: 'camelCase',
             },
         },
-        plugins: [react(), ViteEjsPlugin({ web: false })],
+        plugins: [createReactPlugin(), ViteEjsPlugin({ web: false })],
         resolve: {
             alias: {
                 '/@/i18n': resolve('src/i18n'),

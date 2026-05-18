@@ -1,9 +1,9 @@
-import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig, normalizePath } from 'vite';
 import { ViteEjsPlugin } from 'vite-plugin-ejs';
 
 import { version } from './package.json';
+import { createReactPlugin } from './vite.react-plugin';
 
 export default defineConfig({
     build: {
@@ -35,7 +35,7 @@ export default defineConfig({
         },
     },
     plugins: [
-        react(),
+        createReactPlugin(),
         ViteEjsPlugin({
             prod: process.env.NODE_ENV === 'production',
             root: normalizePath(path.resolve(__dirname, './src/remote')),
