@@ -7,6 +7,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { eventEmitter } from '/@/renderer/events/event-emitter';
+import { useRadioStore as useRadioPlayerStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { createSelectors } from '/@/renderer/lib/zustand';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import {
@@ -480,6 +481,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             break;
                         }
                         case Play.NOW: {
+                            if (useRadioPlayerStore.getState().currentStreamUrl) {
+                                useRadioPlayerStore.getState().actions.stop();
+                            }
+
                             set((state) => {
                                 newItems.forEach((item) => {
                                     state.queue.songs[item._uniqueId] = item;
@@ -534,6 +539,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             break;
                         }
                         case Play.SHUFFLE: {
+                            if (useRadioPlayerStore.getState().currentStreamUrl) {
+                                useRadioPlayerStore.getState().actions.stop();
+                            }
+
                             set((state) => {
                                 newItems.forEach((item) => {
                                     state.queue.songs[item._uniqueId] = item;

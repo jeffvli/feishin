@@ -100,9 +100,6 @@ const EXCLUDED_SONG_TAGS = new Set<string>(['disctotal', 'tracktotal']);
 const numericSortCollator = new Intl.Collator(undefined, { numeric: true });
 const collator = new Intl.Collator();
 
-// Tags that use IDs as values as opposed to the tag value
-const ID_TAGS = new Set<string>(['albumversion', 'mood']);
-
 const excludeMissing = (server?: null | ServerListItemWithCredential) => {
     if (!server) {
         return undefined;
@@ -965,13 +962,13 @@ export const NavidromeController: InternalControllerEndpoint = {
             if (!EXCLUDED_TAGS.has(tag.tagName)) {
                 if (tagsToValues.has(tag.tagName)) {
                     tagsToValues.get(tag.tagName)!.push({
-                        id: ID_TAGS.has(tag.tagName) ? tag.id : tag.tagValue,
+                        id: tag.id,
                         name: tag.tagValue,
                     });
                 } else {
                     tagsToValues.set(tag.tagName, [
                         {
-                            id: ID_TAGS.has(tag.tagName) ? tag.id : tag.tagValue,
+                            id: tag.id,
                             name: tag.tagValue,
                         },
                     ]);

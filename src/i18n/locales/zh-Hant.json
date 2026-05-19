@@ -118,7 +118,8 @@
         "filter_multiple": "複選",
         "newVersionAvailable": "有新的版本可供使用",
         "numberOfResults": "{{numberOfResults}} 項結果",
-        "grouping": "分組"
+        "grouping": "分組",
+        "back": "返回"
     },
     "error": {
         "endpointNotImplementedError": "{{serverType}} 尚未實現端點 {{endpoint}}",
@@ -800,7 +801,24 @@
         "playerbarWaveformStretch_description": "拉伸波形來填補可用空間",
         "preventSuspendOnPlayback_description": "音樂播放時防止應用程式進入休眠",
         "preventSuspendOnPlayback": "在播放時防止應用程式暫停",
-        "hotkey_listShowPlayingSong": "在清單中顯示正在播放的歌曲"
+        "hotkey_listShowPlayingSong": "在清單中顯示正在播放的歌曲",
+        "sidebarPlaylistFolders_description": "為名稱中包含配置分隔符的播放清單建立資料夾檢視",
+        "sidebarPlaylistFolders": "啟用資料夾",
+        "sidebarPlaylistFolderSeparator_description": "在播放清單名稱中分隔資料夾級別的字元（或字串）",
+        "sidebarPlaylistFolderSeparator": "資料夾分隔符",
+        "sidebarPlaylistFolderView_description": "資料夾在側邊欄中顯示的方式",
+        "sidebarPlaylistFolderView": "資料夾檢視",
+        "sidebarPlaylistFolderView_optionSingle": "單一資料夾",
+        "sidebarPlaylistFolderView_optionTree": "樹狀顯示",
+        "sidebarPlaylistFolderView_optionNavigation": "導覽視圖",
+        "sidebarPlaylistFolderTreeIndent_description": "每個樹狀層級縮排的像素",
+        "sidebarPlaylistFolderTreeIndent": "樹狀縮排",
+        "sidebarPlaylistFolderTreeLineColor_description": "樹狀連接線的顏色（留空則使用佈景主題預設值）",
+        "sidebarPlaylistFolderTreeLineColor": "樹狀線條顏色",
+        "sidebarPlaylistMode_description": "各播放清單在側邊欄列表中的顯示方式",
+        "sidebarPlaylistMode": "側邊欄播放清單模式",
+        "sidebarPlaylistMode_optionCompact": "緊湊",
+        "sidebarPlaylistMode_optionExpanded": "展開"
     },
     "table": {
         "config": {

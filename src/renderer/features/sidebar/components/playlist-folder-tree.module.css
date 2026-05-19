@@ -22,7 +22,7 @@
     gap: var(--theme-spacing-md);
     align-items: center;
     width: 100%;
-    padding: var(--theme-spacing-xs) var(--theme-spacing-md);
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
     font: inherit;
     color: inherit;
     text-align: left;
@@ -32,12 +32,18 @@
     border-radius: var(--theme-radius-md);
 
     &:hover {
-        background-color: var(--theme-colors-surface);
+        background-color: var(--theme-colors-background);
     }
 }
 
 .chevron {
+    display: flex;
     flex-shrink: 0;
+    align-items: center;
+}
+
+.collapse {
+    overflow: hidden;
 }
 
 .name {

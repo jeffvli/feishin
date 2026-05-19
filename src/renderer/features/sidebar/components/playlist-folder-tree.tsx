@@ -1,11 +1,16 @@
 import clsx from 'clsx';
+import { motion } from 'motion/react';
 import {
     ComponentPropsWithoutRef,
+    createContext,
     CSSProperties,
     MouseEvent,
     ReactElement,
+    ReactNode,
     useCallback,
+    useContext,
     useMemo,
+    useRef,
     useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +37,25 @@ import { LibraryItem, Playlist } from '/@/shared/types/domain-types';
 import { DragData, DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
 
 const STORAGE_KEY_PREFIX = 'feishin:playlist-folder-state';
+
+const FOLDER_COLLAPSE_TRANSITION = { duration: 0.2, ease: 'easeInOut' } as const;
+
+interface PlaylistFolderCollapseProps {
+    children: ReactNode;
+    className?: string;
+    open: boolean;
+}
+
+const PlaylistFolderCollapse = ({ children, className, open }: PlaylistFolderCollapseProps) => (
+    <motion.div
+        animate={{ height: open ? 'auto' : 0, opacity: open ? 1 : 0 }}
+        className={clsx(styles.collapse, className)}
+        initial={false}
+        transition={FOLDER_COLLAPSE_TRANSITION}
+    >
+        {children}
+    </motion.div>
+);
 
 export const getPlaylistLeafName = (name: string, separator: string): string => {
     if (!separator) return name;
@@ -67,6 +91,42 @@ export const isDirectChildFolder = (
 
     const relativePath = childFolderPath.slice(prefix.length);
     return relativePath.length > 0 && !relativePath.includes(separator);
+};
+
+export const canDropOnPlaylistFolder = (
+    source: DragData,
+    folderPath: string,
+    separator: string,
+): boolean => {
+    if (source.type === DragTarget.SIDEBAR_PLAYLIST_FOLDER) {
+        const sourceFolderPath =
+            source.id[0] ?? (source.metadata as undefined | { folderName?: string })?.folderName;
+        if (!sourceFolderPath) return false;
+        return isValidFolderNest(sourceFolderPath, folderPath, separator);
+    }
+
+    if (source.itemType === LibraryItem.PLAYLIST) {
+        const items = source.item as Playlist[] | undefined;
+        return Array.isArray(items) && items.length > 0;
+    }
+
+    return false;
+};
+
+export const canDragOverPlaylistFolder = (
+    source: DragData,
+    folderPath: string,
+    separator: string,
+): boolean => {
+    if (canDropOnPlaylistFolder(source, folderPath, separator)) {
+        return true;
+    }
+
+    return (
+        source.itemType !== undefined &&
+        source.type !== DragTarget.PLAYLIST &&
+        (source.operation?.includes(DragOperation.ADD) ?? false)
+    );
 };
 
 export const isValidFolderNest = (
@@ -123,6 +183,32 @@ export const remapPlaylistToRoot = (playlistName: string, separator: string): st
     return getPlaylistLeafName(playlistName, separator).trim();
 };
 
+export const isRootLevelFolder = (folderPath: string, separator: string): boolean => {
+    const segments = folderPath.split(separator).filter((segment) => segment.length > 0);
+    return segments.length === 1;
+};
+
+export const remapPlaylistFolderToRoot = (
+    playlistName: string,
+    sourceFolderPath: string,
+    separator: string,
+): null | string => {
+    const sourcePrefix = `${sourceFolderPath}${separator}`;
+    if (!playlistName.startsWith(sourcePrefix)) return null;
+
+    const remainder = playlistName.slice(sourcePrefix.length);
+    if (!remainder) return null;
+
+    // Root-level folder on root: flatten playlists to root (Rock/x -> x).
+    if (isRootLevelFolder(sourceFolderPath, separator)) {
+        return remapPlaylistToRoot(playlistName, separator);
+    }
+
+    // Nested folder on root: promote one level (Auto/Test/x -> Test/x).
+    const folderName = getFolderName(sourceFolderPath, separator);
+    return `${folderName}${separator}${remainder}`;
+};
+
 const updatePlaylistName = async (
     updateMutation: ReturnType<typeof useUpdatePlaylist>,
     serverId: string,
@@ -169,12 +255,14 @@ export const usePlaylistRootDrop = (allPlaylists: Playlist[]) => {
                     );
 
                     for (const playlist of affected) {
-                        await updatePlaylistName(
-                            updateMutation,
-                            serverId,
-                            playlist,
-                            remapPlaylistToRoot(playlist.name, separator),
+                        const newName = remapPlaylistFolderToRoot(
+                            playlist.name,
+                            sourceFolderPath,
+                            separator,
                         );
+                        if (!newName) continue;
+
+                        await updatePlaylistName(updateMutation, serverId, playlist, newName);
                     }
 
                     return;
@@ -263,12 +351,134 @@ export const PlaylistRootAccordionControl = ({
     );
 };
 
+interface PlaylistFolderDragExpandContextValue {
+    onFolderDragHover: (folderPath: string) => void;
+    onFolderDragLeave: (folderPath: string) => void;
+    onFolderDrop: (folderPath: string) => void;
+}
+
+const PlaylistFolderDragExpandContext = createContext<null | PlaylistFolderDragExpandContextValue>(
+    null,
+);
+
+interface PlaylistFolderDragExpandProviderProps {
+    children: ReactNode;
+    expandedSet: Set<string>;
+    setMany: (paths: string[], shouldExpand: boolean) => void;
+}
+
+export const PlaylistFolderDragExpandProvider = ({
+    children,
+    expandedSet,
+    setMany,
+}: PlaylistFolderDragExpandProviderProps) => {
+    const autoExpandedRef = useRef<Set<string>>(new Set());
+    const activeHoveredRef = useRef<null | string>(null);
+
+    const collapseAutoExpanded = useCallback(
+        (paths: string[]) => {
+            const toCollapse = paths.filter((path) => autoExpandedRef.current.has(path));
+            if (toCollapse.length === 0) return;
+
+            for (const path of toCollapse) autoExpandedRef.current.delete(path);
+            setMany(toCollapse, false);
+        },
+        [setMany],
+    );
+
+    const onFolderDragHover = useCallback(
+        (folderPath: string) => {
+            const previous = activeHoveredRef.current;
+            if (previous && previous !== folderPath) {
+                collapseAutoExpanded([previous]);
+            }
+            activeHoveredRef.current = folderPath;
+
+            if (expandedSet.has(folderPath) || autoExpandedRef.current.has(folderPath)) return;
+            autoExpandedRef.current.add(folderPath);
+            setMany([folderPath], true);
+        },
+        [collapseAutoExpanded, expandedSet, setMany],
+    );
+
+    const onFolderDragLeave = useCallback(
+        (folderPath: string) => {
+            if (activeHoveredRef.current === folderPath) {
+                activeHoveredRef.current = null;
+            }
+            collapseAutoExpanded([folderPath]);
+        },
+        [collapseAutoExpanded],
+    );
+
+    const onFolderDrop = useCallback((folderPath: string) => {
+        autoExpandedRef.current.delete(folderPath);
+        if (activeHoveredRef.current === folderPath) {
+            activeHoveredRef.current = null;
+        }
+    }, []);
+
+    const value = useMemo(
+        () => ({ onFolderDragHover, onFolderDragLeave, onFolderDrop }),
+        [onFolderDragHover, onFolderDragLeave, onFolderDrop],
+    );
+
+    return (
+        <PlaylistFolderDragExpandContext.Provider value={value}>
+            {children}
+        </PlaylistFolderDragExpandContext.Provider>
+    );
+};
+
+const usePlaylistFolderExpandDrop = (folderPath: string) => {
+    const separator = useSidebarPlaylistFolderSeparator();
+    const dragExpand = useContext(PlaylistFolderDragExpandContext);
+
+    return useDragDrop<HTMLDivElement>({
+        drop: {
+            canDrop: (args) => canDragOverPlaylistFolder(args.source, folderPath, separator),
+            getData: () => ({
+                id: [folderPath],
+                type: DragTarget.SIDEBAR_PLAYLIST_FOLDER,
+            }),
+            onDrag: ({ source }) => {
+                if (!dragExpand) return;
+                if (!canDragOverPlaylistFolder(source, folderPath, separator)) return;
+                dragExpand.onFolderDragHover(folderPath);
+            },
+            onDragLeave: () => {
+                dragExpand?.onFolderDragLeave(folderPath);
+            },
+            onDrop: () => {
+                dragExpand?.onFolderDrop(folderPath);
+            },
+        },
+        isEnabled: Boolean(dragExpand),
+    });
+};
+
+interface PlaylistFolderProps {
+    children: ReactNode;
+    folderPath: string;
+}
+
+const PlaylistFolder = ({ children, folderPath }: PlaylistFolderProps) => {
+    const { ref } = usePlaylistFolderExpandDrop(folderPath);
+
+    return (
+        <div className={styles.folder} ref={ref}>
+            {children}
+        </div>
+    );
+};
+
 // Drag-and-drop on folder headers: folders can be dragged, and accept folder or playlist drops.
 const usePlaylistFolderDrop = (folderPath: string, allPlaylists: Playlist[]) => {
     const { t } = useTranslation();
     const serverId = useCurrentServerId();
     const separator = useSidebarPlaylistFolderSeparator();
     const updateMutation = useUpdatePlaylist({});
+    const dragExpand = useContext(PlaylistFolderDragExpandContext);
 
     const handleDrop = useCallback(
         async (source: DragData) => {
@@ -353,7 +563,6 @@ const usePlaylistFolderDrop = (folderPath: string, allPlaylists: Playlist[]) => 
 
     const { isDraggedOver, isDragging, ref } = useDragDrop<HTMLButtonElement>({
         drag: {
-            // Folders are virtual; drag data carries the folder path, not playlist items.
             getId: () => [folderPath],
             getItem: () => [],
             metadata: { folderName: folderPath },
@@ -361,20 +570,7 @@ const usePlaylistFolderDrop = (folderPath: string, allPlaylists: Playlist[]) => 
             target: DragTarget.SIDEBAR_PLAYLIST_FOLDER,
         },
         drop: {
-            canDrop: (args) => {
-                if (args.source.type === DragTarget.SIDEBAR_PLAYLIST_FOLDER) {
-                    const sourceFolderPath =
-                        args.source.id[0] ??
-                        (args.source.metadata as undefined | { folderName?: string })?.folderName;
-                    if (!sourceFolderPath) return false;
-                    return isValidFolderNest(sourceFolderPath, folderPath, separator);
-                }
-
-                // Single playlist rows can also be dropped onto a folder header.
-                if (args.source.itemType !== LibraryItem.PLAYLIST) return false;
-                const items = args.source.item as Playlist[] | undefined;
-                return Array.isArray(items) && items.length > 0;
-            },
+            canDrop: (args) => canDropOnPlaylistFolder(args.source, folderPath, separator),
             getData: () => ({
                 id: [folderPath],
                 type: DragTarget.SIDEBAR_PLAYLIST_FOLDER,
@@ -386,6 +582,7 @@ const usePlaylistFolderDrop = (folderPath: string, allPlaylists: Playlist[]) => 
                 return;
             },
             onDrop: ({ source }) => {
+                dragExpand?.onFolderDrop(folderPath);
                 void handleDrop(source);
             },
         },
@@ -429,7 +626,7 @@ const PlaylistFolderHeader = ({
                 type="button"
             >
                 <div className={styles.navFolderIcon}>
-                    <Icon color="muted" icon="folder" size="xl" />
+                    <Icon color="muted" icon={isOpen ? 'folder' : 'folderClosed'} size="md" />
                 </div>
                 <Text className={styles.name} fw={500} size="md">
                     {name}
@@ -454,18 +651,21 @@ const PlaylistFolderHeader = ({
             style={{ opacity: isDragging ? 0.5 : 1 }}
             type="button"
         >
-            <Icon
-                className={styles.chevron}
-                icon={isOpen ? 'arrowDownS' : 'arrowRightS'}
-                size="sm"
-            />
-            <Icon color="muted" icon="folder" size="sm" />
+            <Icon color="muted" icon={isOpen ? 'folder' : 'folderClosed'} size="md" />
             <Text className={styles.name} fw={500} size="md">
                 {name}
             </Text>
             <Text className={styles.count} isMuted size="sm">
                 {leafCount}
             </Text>
+            <motion.span
+                animate={{ rotate: isOpen ? 180 : 0 }}
+                className={styles.chevron}
+                initial={false}
+                transition={FOLDER_COLLAPSE_TRANSITION}
+            >
+                <Icon icon="arrowUpS" size="md" />
+            </motion.span>
         </button>
     );
 };
@@ -686,7 +886,7 @@ export const PlaylistFolderTree = ({
 
                 const isOpen = expandedSet.has(group.name);
                 return (
-                    <div className={styles.folder} key={`folder:${group.name}`}>
+                    <PlaylistFolder folderPath={group.name} key={`folder:${group.name}`}>
                         <PlaylistFolderHeader
                             allPlaylists={allPlaylists}
                             folderPath={group.name}
@@ -696,21 +896,19 @@ export const PlaylistFolderTree = ({
                             onClick={() => onToggleFolder(group.name)}
                             variant="header"
                         />
-                        {isOpen && (
-                            <div className={styles.children}>
-                                {group.items.map((item) => (
-                                    <PlaylistRowButton
-                                        item={item}
-                                        key={item.id}
-                                        name={item.name.slice(group.name.length + 1)}
-                                        onContextMenu={onContextMenu}
-                                        onReorder={onReorder}
-                                        to={item.id}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </div>
+                        <PlaylistFolderCollapse className={styles.children} open={isOpen}>
+                            {group.items.map((item) => (
+                                <PlaylistRowButton
+                                    item={item}
+                                    key={item.id}
+                                    name={item.name.slice(group.name.length + 1)}
+                                    onContextMenu={onContextMenu}
+                                    onReorder={onReorder}
+                                    to={item.id}
+                                />
+                            ))}
+                        </PlaylistFolderCollapse>
+                    </PlaylistFolder>
                 );
             })}
         </>
@@ -750,7 +948,7 @@ export const PlaylistFolderTreeView = ({
 
         const isOpen = expandedSet.has(node.path);
         return (
-            <div className={styles.folder} key={`folder:${node.path}`}>
+            <PlaylistFolder folderPath={node.path} key={`folder:${node.path}`}>
                 <PlaylistFolderHeader
                     allPlaylists={allPlaylists}
                     folderPath={node.path}
@@ -760,16 +958,14 @@ export const PlaylistFolderTreeView = ({
                     onClick={() => onToggleFolder(node.path)}
                     variant="header"
                 />
-                {isOpen && (
-                    <div className={styles.treeChildren}>
-                        {node.children.map((child) => (
-                            <div className={styles.treeBranch} key={getNodeKey(child)}>
-                                {renderNode(child)}
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+                <PlaylistFolderCollapse className={styles.treeChildren} open={isOpen}>
+                    {node.children.map((child) => (
+                        <div className={styles.treeBranch} key={getNodeKey(child)}>
+                            {renderNode(child)}
+                        </div>
+                    ))}
+                </PlaylistFolderCollapse>
+            </PlaylistFolder>
         );
     };
 

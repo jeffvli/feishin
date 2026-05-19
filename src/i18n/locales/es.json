@@ -430,7 +430,25 @@
         "playerbarWaveformStretch": "Estiramiento de la forma de onda",
         "playerbarWaveformStretch_description": "Estira la forma de onda para rellenar el espacio disponible",
         "preventSuspendOnPlayback": "Evitar la suspensión durante la reproducción",
-        "preventSuspendOnPlayback_description": "Evita que la aplicación se suspenda mientras se reproduce música"
+        "preventSuspendOnPlayback_description": "Evita que la aplicación se suspenda mientras se reproduce música",
+        "hotkey_listShowPlayingSong": "Mostrar canción en reproducción en la lista",
+        "sidebarPlaylistFolders": "Habilitar carpetas",
+        "sidebarPlaylistFolders_description": "Crea una vista de carpeta para las listas de reproducción que incluye el separador configurado en el nombre",
+        "sidebarPlaylistFolderSeparator_description": "Carácter (o cadena) que separa los niveles de la carpeta en un nombre de lista de reproducción",
+        "sidebarPlaylistFolderSeparator": "Separador de carpeta",
+        "sidebarPlaylistFolderView": "Vista de carpeta",
+        "sidebarPlaylistFolderView_description": "Cómo se muestran las carpetas en la barra lateral",
+        "sidebarPlaylistFolderView_optionSingle": "Carpeta simple",
+        "sidebarPlaylistFolderView_optionTree": "Vista en árbol",
+        "sidebarPlaylistFolderView_optionNavigation": "Vista de navegación",
+        "sidebarPlaylistFolderTreeIndent": "Sangría del árbol",
+        "sidebarPlaylistFolderTreeLineColor": "Color de línea del árbol",
+        "sidebarPlaylistFolderTreeLineColor_description": "Color de las líneas interconectadas del árbol (dejar en blanco para usar el tema predeterminado)",
+        "sidebarPlaylistMode": "Modo de lista de reproducción de la barra lateral",
+        "sidebarPlaylistMode_optionCompact": "Compacto",
+        "sidebarPlaylistMode_optionExpanded": "Expandido",
+        "sidebarPlaylistMode_description": "Cómo se muestra cada lista de reproducción en la lista de la barra lateral",
+        "sidebarPlaylistFolderTreeIndent_description": "Píxeles que está sangrado cada nivel del árbol"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",
@@ -474,7 +492,9 @@
         "addOrRemoveFromSelection": "Añadir o quitar de la selección",
         "selectRangeOfItems": "Seleccionar un intervalo de elementos",
         "selectAll": "Seleccionar todo",
-        "goToCurrent": "Ir al elemento actual"
+        "goToCurrent": "Ir al elemento actual",
+        "collapseAllFolders": "Contraer todas las carpetas",
+        "expandAllFolders": "Expandir todas las carpetas"
     },
     "common": {
         "backward": "Hacia atrás",
@@ -603,7 +623,8 @@
         "rename": "Renombrar",
         "newVersionAvailable": "Una nueva versión está disponible",
         "numberOfResults": "{{numberOfResults}} resultados",
-        "grouping": "Agrupar"
+        "grouping": "Agrupar",
+        "back": "Atrás"
     },
     "error": {
         "remotePortWarning": "Reiniciar el servidor para aplicar el nuevo puerto",

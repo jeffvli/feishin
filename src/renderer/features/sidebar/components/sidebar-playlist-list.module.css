@@ -57,9 +57,14 @@
 }
 
 
-.row-dragged-over {
-    border-radius: var(--mantine-radius-sm);
-    box-shadow: 0 0 0 2px var(--theme-colors-primary);
+.row-dragged-over::after {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    content: "";
+    border: 2px solid var(--theme-colors-primary);
+    border-radius: var(--theme-radius-md);
     opacity: 0.8;
 }
 

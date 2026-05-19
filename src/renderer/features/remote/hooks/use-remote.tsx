@@ -29,9 +29,8 @@ export const useRemote = () => {
 
     // Initialize the remote
     useEffect(() => {
-        if (!isRemoteEnabled) {
-            return;
-        }
+        // we must send this EVEN IF the remote is disabled, as this is what
+        // makes sure that the main process gets the port/username/password on startup
 
         logFn.debug(logMsg[LogCategory.REMOTE].initializingRemoteSettings, {
             category: LogCategory.REMOTE,
