@@ -515,7 +515,7 @@ async function createWindow(first = true): Promise<void> {
             backgroundThrottling: false,
             contextIsolation: true,
             devTools: true,
-            nodeIntegration: true,
+            nodeIntegration: false,
             preload: join(__dirname, '../preload/index.js'),
             sandbox: false,
             webSecurity: !store.get('ignore_cors'),

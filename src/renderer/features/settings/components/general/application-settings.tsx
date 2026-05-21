@@ -39,7 +39,7 @@ import { FontType } from '/@/shared/types/types';
 const localSettings = isElectron() ? window.api.localSettings : null;
 const ipc = isElectron() ? window.api.ipc : null;
 // Electron 32+ removed file.path, use this which is exposed in preload to get real path
-const webUtils = isElectron() ? window.electron.webUtils : null;
+const getPathForFile = isElectron() ? window.api.getPathForFile : null;
 
 const HOME_FEATURE_STYLE_OPTIONS = [
     {
@@ -295,7 +295,7 @@ export const ApplicationSettings = memo(() => {
                         setSettings({
                             font: {
                                 ...fontSettings,
-                                custom: e ? webUtils?.getPathForFile(e) || null : null,
+                                custom: e ? getPathForFile?.(e) || null : null,
                             },
                         })
                     }
