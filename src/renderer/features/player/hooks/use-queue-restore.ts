@@ -9,6 +9,7 @@ import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import {
     setTimestamp,
     useCurrentServerId,
+    usePlayerActions,
     usePlayerHydrated,
     usePlayerSong,
     usePlayerStatus,
@@ -42,7 +43,7 @@ export const QueueRestoreTimestampHook = () => {
 };
 
 export const useInitialTimestampRestore = () => {
-    const player = usePlayerStore();
+    const { mediaSeekToTimestamp } = usePlayerActions();
     const playerHydrated = usePlayerHydrated();
     const currentSong = usePlayerSong();
     const playerStatus = usePlayerStatus();
@@ -66,9 +67,9 @@ export const useInitialTimestampRestore = () => {
         startupSeekArmedRef.current = null;
 
         setTimeout(() => {
-            player.mediaSeekToTimestamp(seekTimestamp);
+            mediaSeekToTimestamp(seekTimestamp);
         }, 100);
-    }, [player]);
+    }, [mediaSeekToTimestamp]);
 
     useEffect(() => {
         if (startupRestoreInitializedRef.current) {
