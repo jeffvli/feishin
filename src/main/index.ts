@@ -33,16 +33,9 @@ import { store } from './features/core/settings';
 import { canHandleVisualizerDisplayMedia } from './features/core/visualizer';
 import MenuBuilder, { MenuPlaybackState } from './menu';
 import './features';
-import {
-    autoUpdaterLogInterface,
-    createLog,
-    disableAutoUpdates,
-    hotkeyToElectronAccelerator,
-    isLinux,
-    isMacOS,
-    isWindows,
-} from './utils';
+import { autoUpdaterLogInterface, createLog, hotkeyToElectronAccelerator } from './utils';
 
+import { disableAutoUpdates, isLinux, isMacOS, isWindows } from '/@/main/env';
 import { PlayerRepeat, PlayerStatus, PlayerType, TitleTheme } from '/@/shared/types/types';
 
 const ALPHA_UPDATER_CONFIG: {
@@ -518,7 +511,7 @@ async function createWindow(first = true): Promise<void> {
             devTools: true,
             nodeIntegration: false,
             preload: join(__dirname, '../preload/index.js'),
-            sandbox: false,
+            sandbox: true,
             webSecurity: !store.get('ignore_cors'),
         },
         width: 1440,

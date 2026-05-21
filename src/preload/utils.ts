@@ -1,6 +1,6 @@
 import { ipcRenderer, IpcRendererEvent, webFrame } from 'electron';
 
-import { disableAutoUpdates, isLinux, isMacOS, isWindows } from '../main/utils';
+import { disableAutoUpdates, isLinux, isMacOS, isWindows } from '../main/env';
 
 const openItem = async (path: string) => {
     return ipcRenderer.invoke('open-item', path);
