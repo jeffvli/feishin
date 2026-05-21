@@ -20,7 +20,7 @@ import { toast } from '/@/shared/components/toast/toast';
 import { PlayerStatus } from '/@/shared/types/types';
 
 export const useQueueRestoreTimestamp = () => {
-    const player = usePlayerStore();
+    const { mediaSeekToTimestamp } = usePlayerActions();
 
     usePlayerEvents(
         {
@@ -29,7 +29,7 @@ export const useQueueRestoreTimestamp = () => {
 
                 setTimeout(() => {
                     setTimestamp(position);
-                    player.mediaSeekToTimestamp(position);
+                    mediaSeekToTimestamp(position);
                 }, 100);
             },
         },
