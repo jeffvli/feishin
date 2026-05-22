@@ -14,7 +14,10 @@ import { MediaSessionHook } from '/@/renderer/features/player/hooks/use-media-se
 import { MPRISHook } from '/@/renderer/features/player/hooks/use-mpris';
 import { PlaybackHotkeysHook } from '/@/renderer/features/player/hooks/use-playback-hotkeys';
 import { PowerSaveBlockerHook } from '/@/renderer/features/player/hooks/use-power-save-blocker';
-import { QueueRestoreTimestampHook } from '/@/renderer/features/player/hooks/use-queue-restore';
+import {
+    InitialTimestampRestoreHook,
+    QueueRestoreTimestampHook,
+} from '/@/renderer/features/player/hooks/use-queue-restore';
 import { ScrobbleHook } from '/@/renderer/features/player/hooks/use-scrobble';
 import { UpdateCurrentSongHook } from '/@/renderer/features/player/hooks/use-update-current-song';
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
@@ -134,6 +137,7 @@ export const AudioPlayers = () => {
             <RemoteHook />
             <AutoDJHook />
             <QueueRestoreTimestampHook />
+            <InitialTimestampRestoreHook />
             <UpdateCurrentSongHook />
             <RadioAudioInstanceHook />
             <RadioMetadataHook />

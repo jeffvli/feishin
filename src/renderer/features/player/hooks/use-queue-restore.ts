@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { t } from 'i18next';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { api } from '/@/renderer/api';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
@@ -9,13 +9,18 @@ import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import {
     setTimestamp,
     useCurrentServerId,
+    usePlayerActions,
+    usePlayerHydrated,
+    usePlayerSong,
+    usePlayerStatus,
     usePlayerStore,
     useTimestampStoreBase,
 } from '/@/renderer/store';
 import { toast } from '/@/shared/components/toast/toast';
+import { PlayerStatus } from '/@/shared/types/types';
 
 export const useQueueRestoreTimestamp = () => {
-    const player = usePlayerStore();
+    const { mediaSeekToTimestamp } = usePlayerActions();
 
     usePlayerEvents(
         {
@@ -24,7 +29,7 @@ export const useQueueRestoreTimestamp = () => {
 
                 setTimeout(() => {
                     setTimestamp(position);
-                    player.mediaSeekToTimestamp(position);
+                    mediaSeekToTimestamp(position);
                 }, 100);
             },
         },
@@ -34,6 +39,72 @@ export const useQueueRestoreTimestamp = () => {
 
 export const QueueRestoreTimestampHook = () => {
     useQueueRestoreTimestamp();
+    return null;
+};
+
+export const useInitialTimestampRestore = () => {
+    const { mediaSeekToTimestamp } = usePlayerActions();
+    const playerHydrated = usePlayerHydrated();
+    const currentSong = usePlayerSong();
+    const playerStatus = usePlayerStatus();
+    const timestamp = useTimestampStoreBase((state) => state.timestamp);
+
+    const startupRestoreInitializedRef = useRef(false);
+    const startupSeekArmedRef = useRef<null | number>(null);
+    const startupSeekAppliedRef = useRef(false);
+
+    const applyStartupSeek = useCallback(() => {
+        if (startupSeekAppliedRef.current) {
+            return;
+        }
+
+        const seekTimestamp = startupSeekArmedRef.current;
+        if (!seekTimestamp || seekTimestamp <= 0) {
+            return;
+        }
+
+        startupSeekAppliedRef.current = true;
+        startupSeekArmedRef.current = null;
+
+        setTimeout(() => {
+            mediaSeekToTimestamp(seekTimestamp);
+        }, 100);
+    }, [mediaSeekToTimestamp]);
+
+    useEffect(() => {
+        if (startupRestoreInitializedRef.current) {
+            return;
+        }
+
+        if (!playerHydrated || !currentSong) {
+            return;
+        }
+
+        startupRestoreInitializedRef.current = true;
+
+        if (timestamp > 0) {
+            startupSeekArmedRef.current = timestamp;
+        }
+
+        if (playerStatus === PlayerStatus.PLAYING) {
+            applyStartupSeek();
+        }
+    }, [applyStartupSeek, currentSong, playerHydrated, playerStatus, timestamp]);
+
+    usePlayerEvents(
+        {
+            onPlayerStatus: (properties) => {
+                if (properties.status === PlayerStatus.PLAYING) {
+                    applyStartupSeek();
+                }
+            },
+        },
+        [applyStartupSeek],
+    );
+};
+
+export const InitialTimestampRestoreHook = () => {
+    useInitialTimestampRestore();
     return null;
 };
 

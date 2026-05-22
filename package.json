@@ -160,7 +160,7 @@
         "babel-plugin-react-compiler": "^1.0.0",
         "concurrently": "^9.2.1",
         "cross-env": "^10.1.0",
-        "electron": "^39.8.6",
+        "electron": "^41.7.0",
         "electron-builder": "^26.8.2",
         "electron-devtools-installer": "^4.0.0",
         "electron-vite": "^4.0.1",
