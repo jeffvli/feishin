@@ -7,9 +7,10 @@ import { pid } from 'node:process';
 import process from 'process';
 
 import { getMainWindow, sendToastToRenderer } from '../../../index';
-import { createLog, isMacOS, isWindows } from '../../../utils';
+import { createLog } from '../../../utils';
 import { store } from '../settings';
 
+import { isMacOS, isWindows } from '/@/main/env';
 import { PlayerData } from '/@/shared/types/domain-types';
 
 declare module 'node-mpv';

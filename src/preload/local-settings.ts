@@ -1,4 +1,4 @@
-import { ipcRenderer, IpcRendererEvent, OpenDialogOptions, webFrame } from 'electron';
+import { ipcRenderer, OpenDialogOptions, webFrame } from 'electron';
 
 import { TitleTheme } from '/@/shared/types/types';
 
@@ -41,8 +41,8 @@ const setZoomFactor = (zoomFactor: number) => {
     webFrame.setZoomFactor(zoomFactor / 100);
 };
 
-const fontError = (cb: (event: IpcRendererEvent, file: string) => void) => {
-    ipcRenderer.on('custom-font-error', cb);
+const fontError = (cb: (file: string) => void) => {
+    ipcRenderer.on('custom-font-error', (_, file) => cb(file));
 };
 
 const themeSet = (theme: TitleTheme): void => {

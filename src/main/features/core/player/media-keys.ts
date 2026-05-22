@@ -1,8 +1,8 @@
 import { BrowserWindow, globalShortcut, systemPreferences } from 'electron';
 
-import { isLinux, isMacOS } from '../../../utils';
 import { store } from '../settings';
 
+import { isLinux, isMacOS } from '/@/main/env';
 import { PlayerType } from '/@/shared/types/types';
 
 export const enableMediaKeys = (window: BrowserWindow | null) => {

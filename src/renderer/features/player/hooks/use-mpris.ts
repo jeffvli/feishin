@@ -117,11 +117,11 @@ export const useMPRIS = () => {
             return;
         }
 
-        mpris?.requestPosition((_e: unknown, data: { position: number }) => {
+        mpris?.requestPosition((data: { position: number }) => {
             player.mediaSeekToTimestamp(data.position);
         });
 
-        mpris?.requestSeek((_e: unknown, data: { offset: number }) => {
+        mpris?.requestSeek((data: { offset: number }) => {
             player.mediaSkipForward(data.offset);
         });
 
@@ -133,7 +133,7 @@ export const useMPRIS = () => {
             player.toggleShuffle();
         });
 
-        mpris?.requestVolume((_e: unknown, data: { volume: number }) => {
+        mpris?.requestVolume((data: { volume: number }) => {
             player.setVolume(data.volume);
         });
 

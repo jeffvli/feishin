@@ -1,4 +1,4 @@
-import { ipcRenderer, IpcRendererEvent } from 'electron';
+import { ipcRenderer } from 'electron';
 
 import { QueueSong } from '/@/shared/types/domain-types';
 import { PlayerRepeat, PlayerStatus } from '/@/shared/types/types';
@@ -31,28 +31,24 @@ const updateSong = (song: QueueSong | undefined, imageUrl?: null | string) => {
     ipcRenderer.send('update-song', song, imageUrl);
 };
 
-const requestSeek = (cb: (event: IpcRendererEvent, data: { offset: number }) => void) => {
-    ipcRenderer.on('request-seek', cb);
+const requestSeek = (cb: (data: { offset: number }) => void) => {
+    ipcRenderer.on('request-seek', (_, data) => cb(data));
 };
 
-const requestPosition = (cb: (event: IpcRendererEvent, data: { position: number }) => void) => {
-    ipcRenderer.on('request-position', cb);
+const requestPosition = (cb: (data: { position: number }) => void) => {
+    ipcRenderer.on('request-position', (_, data) => cb(data));
 };
 
-const requestToggleRepeat = (
-    cb: (event: IpcRendererEvent, data: { repeat: PlayerRepeat }) => void,
-) => {
-    ipcRenderer.on('mpris-request-toggle-repeat', cb);
+const requestToggleRepeat = (cb: (data: { repeat: PlayerRepeat }) => void) => {
+    ipcRenderer.on('mpris-request-toggle-repeat', (_, data) => cb(data));
 };
 
-const requestToggleShuffle = (
-    cb: (event: IpcRendererEvent, data: { shuffle: boolean }) => void,
-) => {
-    ipcRenderer.on('mpris-request-toggle-shuffle', cb);
+const requestToggleShuffle = (cb: (data: { shuffle: boolean }) => void) => {
+    ipcRenderer.on('mpris-request-toggle-shuffle', (_, data) => cb(data));
 };
 
-const requestVolume = (cb: (event: IpcRendererEvent, data: { volume: number }) => void) => {
-    ipcRenderer.on('request-volume', cb);
+const requestVolume = (cb: (data: { volume: number }) => void) => {
+    ipcRenderer.on('request-volume', (_, data) => cb(data));
 };
 
 export const mpris = {

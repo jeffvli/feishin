@@ -16,6 +16,7 @@ import {
     protocol,
     Rectangle,
     screen,
+    session,
     shell,
     Tray,
 } from 'electron';
@@ -470,6 +471,15 @@ const createTray = () => {
     tray.setContextMenu(contextMenu);
 };
 
+const validateUrl = (url: string): boolean => {
+    // Minor security, really. Enforce only loading websites (http/https). file://
+    // URLs and the like should've already been blocked, but this is another check.
+    // Note that arbitrary web URLs are still allowed under this scheme, although
+    // that should really only be hit by Subsonic share url (or if artist homepage
+    // is allowed for ND extensions)
+    return url.startsWith('http://') || url.startsWith('https://');
+};
+
 async function createWindow(first = true): Promise<void> {
     if (isDevelopment) {
         await installExtensions().catch(console.log);
@@ -723,7 +733,9 @@ async function createWindow(first = true): Promise<void> {
 
     // Open URLs in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
-        shell.openExternal(edata.url);
+        if (validateUrl(edata.url)) {
+            shell.openExternal(edata.url);
+        }
         return { action: 'deny' };
     });
 
@@ -763,7 +775,9 @@ async function createWindow(first = true): Promise<void> {
     nativeTheme.themeSource = theme || 'dark';
 
     mainWindow.webContents.setWindowOpenHandler((details) => {
-        shell.openExternal(details.url);
+        if (validateUrl(details.url)) {
+            shell.openExternal(details.url);
+        }
         return { action: 'deny' };
     });
 
@@ -1008,6 +1022,17 @@ if (!singleInstance) {
                 }
 
                 return response;
+            });
+
+            session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+                callback({
+                    responseHeaders: {
+                        ...details.responseHeaders,
+                        'Content-Security-Policy': [
+                            "script-src 'self' 'unsafe-inline' https://umami.jeffvli.org; style-src 'self' 'unsafe-inline'; media-src 'self' http: https: data: blob:; img-src 'self' http: https: data: blob:; connect-src 'self' http: https: ws: wss:; default-src 'self';",
+                        ],
+                    },
+                });
             });
 
             createWindow();

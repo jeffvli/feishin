@@ -1,5 +1,3 @@
-import type { IpcRendererEvent } from 'electron';
-
 import { t } from 'i18next';
 import isElectron from 'is-electron';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -124,7 +122,7 @@ export const ApplicationSettings = memo(() => {
     // }, [fontSettings.custom]);
 
     const onFontError = useCallback(
-        (_: IpcRendererEvent, file: string) => {
+        (file: string) => {
             toast.error({
                 message: `${file} is not a valid font file`,
             });

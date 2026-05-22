@@ -21,14 +21,14 @@ export const UpdateAvailableDialog = () => {
     useEffect(() => {
         if (!isElectron()) return;
 
-        const handleUpdateAvailable = (_event: any, newVersion: string) => {
+        const handleUpdateAvailable = (newVersion: string) => {
             if (versionDismissed !== newVersion) {
                 setVersion(newVersion);
                 setOpened(true);
             }
         };
 
-        window.api.ipc.on('update-available', handleUpdateAvailable);
+        window.api.utils.rendererUpdateAvailable(handleUpdateAvailable);
 
         return () => {
             window.api.ipc.removeListener?.('update-available', handleUpdateAvailable);

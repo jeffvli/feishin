@@ -1,4 +1,4 @@
-import { ipcRenderer, IpcRendererEvent, webFrame } from 'electron';
+import { ipcRenderer, webFrame } from 'electron';
 
 import { disableAutoUpdates, isLinux, isMacOS, isWindows } from '../main/env';
 
@@ -10,29 +10,14 @@ const openApplicationDirectory = async () => {
     return ipcRenderer.invoke('open-application-directory');
 };
 
-const playerErrorListener = (cb: (event: IpcRendererEvent, data: { code: number }) => void) => {
-    ipcRenderer.on('player-error-listener', cb);
+const playerErrorListener = (cb: (data: { code: number }) => void) => {
+    ipcRenderer.on('player-error-listener', (_, data) => cb(data));
 };
 
 const mainMessageListener = (
-    cb: (
-        event: IpcRendererEvent,
-        data: { message: string; type: 'error' | 'info' | 'success' | 'warning' },
-    ) => void,
+    cb: (data: { message: string; type: 'error' | 'info' | 'success' | 'warning' }) => void,
 ) => {
-    ipcRenderer.on('toast-from-main', cb);
-};
-
-const logger = (
-    cb: (
-        event: IpcRendererEvent,
-        data: {
-            message: string;
-            type: 'debug' | 'error' | 'info' | 'verbose' | 'warning';
-        },
-    ) => void,
-) => {
-    ipcRenderer.send('logger', cb);
+    ipcRenderer.on('toast-from-main', (_, data) => cb(data));
 };
 
 const download = (url: string) => {
@@ -41,6 +26,14 @@ const download = (url: string) => {
 
 const checkForUpdates = (): Promise<{ updateAvailable: boolean; version?: string }> => {
     return ipcRenderer.invoke('app-check-for-updates');
+};
+
+const startPowerSaveBlocker = (full: boolean) => {
+    return ipcRenderer.invoke('power-save-blocker-start', { full });
+};
+
+const stopPowerSaveBlocker = () => {
+    return ipcRenderer.invoke('power-save-blocker-stop');
 };
 
 const forceGarbageCollection = (): boolean => {
@@ -61,28 +54,32 @@ const forceGarbageCollection = (): boolean => {
     }
 };
 
-const rendererOpenSettings = (cb: (event: IpcRendererEvent) => void) => {
-    ipcRenderer.on('renderer-open-settings', cb);
+const rendererOpenSettings = (cb: () => void) => {
+    ipcRenderer.on('renderer-open-settings', () => cb());
 };
 
-const rendererOpenCommandPalette = (cb: (event: IpcRendererEvent) => void) => {
-    ipcRenderer.on('renderer-open-command-palette', cb);
+const rendererOpenCommandPalette = (cb: () => void) => {
+    ipcRenderer.on('renderer-open-command-palette', () => cb());
 };
 
-const rendererOpenManageServers = (cb: (event: IpcRendererEvent) => void) => {
-    ipcRenderer.on('renderer-open-manage-servers', cb);
+const rendererOpenManageServers = (cb: () => void) => {
+    ipcRenderer.on('renderer-open-manage-servers', () => cb());
 };
 
-const rendererTogglePrivateMode = (cb: (event: IpcRendererEvent) => void) => {
+const rendererTogglePrivateMode = (cb: () => void) => {
     ipcRenderer.on('renderer-toggle-private-mode', cb);
 };
 
-const rendererToggleSidebar = (cb: (event: IpcRendererEvent) => void) => {
-    ipcRenderer.on('renderer-toggle-sidebar', cb);
+const rendererToggleSidebar = (cb: () => void) => {
+    ipcRenderer.on('renderer-toggle-sidebar', () => cb());
 };
 
-const rendererOpenReleaseNotes = (cb: (event: IpcRendererEvent) => void) => {
-    ipcRenderer.on('renderer-open-release-notes', cb);
+const rendererOpenReleaseNotes = (cb: () => void) => {
+    ipcRenderer.on('renderer-open-release-notes', () => cb());
+};
+
+const rendererUpdateAvailable = (cb: (version: string) => void) => {
+    ipcRenderer.on('update-available', (_, version) => cb(version));
 };
 
 export const utils = {
@@ -93,7 +90,6 @@ export const utils = {
     isLinux,
     isMacOS,
     isWindows,
-    logger,
     mainMessageListener,
     openApplicationDirectory,
     openItem,
@@ -104,6 +100,9 @@ export const utils = {
     rendererOpenSettings,
     rendererTogglePrivateMode,
     rendererToggleSidebar,
+    rendererUpdateAvailable,
+    startPowerSaveBlocker,
+    stopPowerSaveBlocker,
 };
 
 export type Utils = typeof utils;
