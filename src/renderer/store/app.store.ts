@@ -201,17 +201,22 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                         set((state) => {
                             state.commandPalette.opened = false;
                         });
+                        window.api?.utils?.setCommandPaletteOpen?.(false);
                     },
                     open: () => {
                         set((state) => {
                             state.commandPalette.opened = true;
                         });
+                        window.api?.utils?.setCommandPaletteOpen?.(true);
                     },
                     opened: false,
                     toggle: () => {
+                        let nextOpened = false;
                         set((state) => {
                             state.commandPalette.opened = !state.commandPalette.opened;
+                            nextOpened = state.commandPalette.opened;
                         });
+                        window.api?.utils?.setCommandPaletteOpen?.(nextOpened);
                     },
                 },
                 commandPaletteSearchSectionsExpanded: {},

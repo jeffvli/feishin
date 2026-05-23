@@ -54,6 +54,10 @@ const forceGarbageCollection = (): boolean => {
     }
 };
 
+const setCommandPaletteOpen = (opened: boolean) => {
+    ipcRenderer.send('command-palette-state', opened);
+};
+
 const rendererOpenSettings = (cb: () => void) => {
     ipcRenderer.on('renderer-open-settings', () => cb());
 };
@@ -101,6 +105,7 @@ export const utils = {
     rendererTogglePrivateMode,
     rendererToggleSidebar,
     rendererUpdateAvailable,
+    setCommandPaletteOpen,
     startPowerSaveBlocker,
     stopPowerSaveBlocker,
 };

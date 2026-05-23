@@ -280,6 +280,16 @@ let currentRepeatMode: PlayerRepeat = PlayerRepeat.NONE;
 let currentSidebarCollapsed = false;
 let currentShuffleEnabled = false;
 let playbackMenuAccelerators: MenuPlaybackState['accelerators'] = {};
+let commandPaletteOpen = false;
+
+ipcMain.on('command-palette-state', (_event, opened: boolean) => {
+    const next = !!opened;
+    if (commandPaletteOpen === next) return;
+    commandPaletteOpen = next;
+    if (isMacOS()) {
+        rebuildMainMenu();
+    }
+});
 
 if (process.env.NODE_ENV === 'production') {
     import('source-map-support').then((sourceMapSupport) => {
@@ -340,7 +350,7 @@ const rebuildMainMenu = () => {
     if (!menuBuilder || !mainWindow) return;
 
     menuBuilder.buildMenu({
-        accelerators: playbackMenuAccelerators,
+        accelerators: commandPaletteOpen ? {} : playbackMenuAccelerators,
         playbackStatus: currentPlaybackStatus,
         privateMode: currentPrivateMode,
         repeatMode: currentRepeatMode,
