@@ -1,0 +1,5 @@
+allowBuilds:
+  abstract-socket: true
+  electron: true
+  electron-winstaller: true
+  esbuild: true
