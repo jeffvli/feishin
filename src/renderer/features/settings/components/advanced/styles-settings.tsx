@@ -16,6 +16,7 @@ export const StylesSettings = memo(() => {
     const { t } = useTranslation();
 
     const ipc = isElectron() ? window.api.ipc : null;
+    const isDesktop = isElectron();
 
     const { content, enabled } = useCssSettings();
     const [css, setCss] = useState(content);
@@ -36,6 +37,16 @@ export const StylesSettings = memo(() => {
             } catch (error) {
                 console.error('Failed to save custom css file', error);
             }
+        }
+    };
+
+    const handleOpenFolder = async () => {
+        if (!ipc) return;
+
+        try {
+            await ipc.invoke('custom-css-open-folder');
+        } catch (error) {
+            console.error('Failed to open custom css folder', error);
         }
     };
 
@@ -73,6 +84,15 @@ export const StylesSettings = memo(() => {
                     <SettingsOptions
                         control={
                             <>
+                                {isDesktop && (
+                                    <Button
+                                        onClick={handleOpenFolder}
+                                        size="compact-md"
+                                        variant="subtle"
+                                    >
+                                        {t('common.openFolder', { postProcess: 'titleCase' })}
+                                    </Button>
+                                )}
                                 {open && (
                                     <Button
                                         onClick={handleSave}

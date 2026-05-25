@@ -9,6 +9,7 @@ import {
     nativeTheme,
     OpenDialogOptions,
     safeStorage,
+    shell,
 } from 'electron';
 import Store from 'electron-store';
 import { promises as fs, watch as fsWatch } from 'fs';
@@ -206,6 +207,12 @@ ipcMain.handle('custom-css-save', async (_event, data: { content: string }) => {
     await fs.mkdir(storePath, { recursive: true });
     await fs.writeFile(customCssPath, content, 'utf8');
     await notifyCustomCssUpdate();
+    return true;
+});
+
+ipcMain.handle('custom-css-open-folder', async () => {
+    await fs.mkdir(storePath, { recursive: true });
+    await shell.openPath(storePath);
     return true;
 });
 
