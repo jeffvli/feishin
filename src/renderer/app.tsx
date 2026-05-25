@@ -36,6 +36,7 @@ const UpdateAvailableDialog = lazy(() =>
 );
 
 const ipc = isElectron() ? window.api.ipc : null;
+const utils = isElectron() ? window.api.utils : null;
 
 export const App = () => {
     return <ThemedApp />;
@@ -158,7 +159,7 @@ const CustomCssFileEffect = () => {
     }, [content]);
 
     useEffect(() => {
-        if (!isElectron() || !ipc) return;
+        if (!isElectron() || !utils) return;
 
         let disposed = false;
 
@@ -175,16 +176,12 @@ const CustomCssFileEffect = () => {
 
         const loadCustomCss = async () => {
             try {
-                const result = (await ipc.invoke('custom-css-get')) as
-                    | undefined
-                    | { content: string; exists: boolean };
+                const result = await utils.getCustomCss();
 
                 if (disposed || !result) return;
 
                 if (!result.exists && latestContentRef.current) {
-                    await ipc.invoke('custom-css-save', {
-                        content: latestContentRef.current,
-                    });
+                    await utils.saveCustomCss(latestContentRef.current);
                     return;
                 }
 
@@ -207,12 +204,13 @@ const CustomCssFileEffect = () => {
             applyContent(data?.content);
         };
 
-        ipc.on('custom-css-updated', handleCustomCssUpdated);
+        const removeCustomCssUpdatedListener =
+            utils.customCssUpdatedListener(handleCustomCssUpdated);
         loadCustomCss();
 
         return () => {
             disposed = true;
-            ipc.removeListener('custom-css-updated', handleCustomCssUpdated);
+            removeCustomCssUpdatedListener();
         };
     }, [setSettings]);
 

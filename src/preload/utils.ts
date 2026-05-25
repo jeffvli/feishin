@@ -10,6 +10,36 @@ const openApplicationDirectory = async () => {
     return ipcRenderer.invoke('open-application-directory');
 };
 
+const getCustomCss = async (): Promise<
+    | undefined
+    | {
+          content: string;
+          exists: boolean;
+          path?: string;
+      }
+> => {
+    return ipcRenderer.invoke('custom-css-get');
+};
+
+const saveCustomCss = async (content: string) => {
+    return ipcRenderer.invoke('custom-css-save', { content });
+};
+
+const openCustomCssFolder = async () => {
+    return ipcRenderer.invoke('custom-css-open-folder');
+};
+
+const customCssUpdatedListener = (
+    cb: (data: { content?: string; exists?: boolean; path?: string }) => void,
+) => {
+    const listener = (_event: unknown, data: { content?: string; exists?: boolean }) => cb(data);
+    ipcRenderer.on('custom-css-updated', listener);
+
+    return () => {
+        ipcRenderer.removeListener('custom-css-updated', listener);
+    };
+};
+
 const playerErrorListener = (cb: (data: { code: number }) => void) => {
     ipcRenderer.on('player-error-listener', (_, data) => cb(data));
 };
@@ -88,14 +118,17 @@ const rendererUpdateAvailable = (cb: (version: string) => void) => {
 
 export const utils = {
     checkForUpdates,
+    customCssUpdatedListener,
     disableAutoUpdates,
     download,
     forceGarbageCollection,
+    getCustomCss,
     isLinux,
     isMacOS,
     isWindows,
     mainMessageListener,
     openApplicationDirectory,
+    openCustomCssFolder,
     openItem,
     playerErrorListener,
     rendererOpenCommandPalette,
@@ -105,6 +138,7 @@ export const utils = {
     rendererTogglePrivateMode,
     rendererToggleSidebar,
     rendererUpdateAvailable,
+    saveCustomCss,
     setInputFocused,
     startPowerSaveBlocker,
     stopPowerSaveBlocker,

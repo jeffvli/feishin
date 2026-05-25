@@ -15,7 +15,7 @@ export const StylesSettings = memo(() => {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation();
 
-    const ipc = isElectron() ? window.api.ipc : null;
+    const utils = isElectron() ? window.api.utils : null;
     const isDesktop = isElectron();
 
     const { content, enabled } = useCssSettings();
@@ -31,9 +31,9 @@ export const StylesSettings = memo(() => {
             },
         });
 
-        if (ipc) {
+        if (utils) {
             try {
-                await ipc.invoke('custom-css-save', { content: css });
+                await utils.saveCustomCss(css);
             } catch (error) {
                 console.error('Failed to save custom css file', error);
             }
@@ -41,10 +41,10 @@ export const StylesSettings = memo(() => {
     };
 
     const handleOpenFolder = async () => {
-        if (!ipc) return;
+        if (!utils) return;
 
         try {
-            await ipc.invoke('custom-css-open-folder');
+            await utils.openCustomCssFolder();
         } catch (error) {
             console.error('Failed to open custom css folder', error);
         }
