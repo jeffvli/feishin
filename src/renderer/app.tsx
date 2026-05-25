@@ -93,6 +93,7 @@ const AppEffects = () => (
         <GlobalShortcutsEffect />
         <LanguageEffect />
         <NativeMenuSyncEffect />
+        <InputFocusEffect />
     </>
 );
 
@@ -167,6 +168,45 @@ const LanguageEffect = () => {
 
 const NativeMenuSyncEffect = () => {
     useNativeMenuSync();
+
+    return null;
+};
+
+const InputFocusEffect = () => {
+    useEffect(() => {
+        if (!isElectron()) return;
+
+        const handleFocusIn = (e: FocusEvent) => {
+            const target = e.target as Element | null;
+            if (
+                target instanceof HTMLInputElement ||
+                target instanceof HTMLTextAreaElement ||
+                (target instanceof HTMLElement && target.isContentEditable)
+            ) {
+                window.api?.utils?.setInputFocused?.(true);
+            }
+        };
+
+        const handleFocusOut = (e: FocusEvent) => {
+            const related = e.relatedTarget as Element | null;
+            if (
+                related instanceof HTMLInputElement ||
+                related instanceof HTMLTextAreaElement ||
+                (related instanceof HTMLElement && related.isContentEditable)
+            ) {
+                return;
+            }
+            window.api?.utils?.setInputFocused?.(false);
+        };
+
+        document.addEventListener('focusin', handleFocusIn);
+        document.addEventListener('focusout', handleFocusOut);
+
+        return () => {
+            document.removeEventListener('focusin', handleFocusIn);
+            document.removeEventListener('focusout', handleFocusOut);
+        };
+    }, []);
 
     return null;
 };

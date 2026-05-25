@@ -54,8 +54,8 @@ const forceGarbageCollection = (): boolean => {
     }
 };
 
-const setCommandPaletteOpen = (opened: boolean) => {
-    ipcRenderer.send('command-palette-state', opened);
+const setInputFocused = (focused: boolean) => {
+    ipcRenderer.send('input-focus-state', focused);
 };
 
 const rendererOpenSettings = (cb: () => void) => {
@@ -105,7 +105,7 @@ export const utils = {
     rendererTogglePrivateMode,
     rendererToggleSidebar,
     rendererUpdateAvailable,
-    setCommandPaletteOpen,
+    setInputFocused,
     startPowerSaveBlocker,
     stopPowerSaveBlocker,
 };

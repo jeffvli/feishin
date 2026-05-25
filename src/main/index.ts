@@ -280,12 +280,12 @@ let currentRepeatMode: PlayerRepeat = PlayerRepeat.NONE;
 let currentSidebarCollapsed = false;
 let currentShuffleEnabled = false;
 let playbackMenuAccelerators: MenuPlaybackState['accelerators'] = {};
-let commandPaletteOpen = false;
+let inputFocused = false;
 
-ipcMain.on('command-palette-state', (_event, opened: boolean) => {
-    const next = !!opened;
-    if (commandPaletteOpen === next) return;
-    commandPaletteOpen = next;
+ipcMain.on('input-focus-state', (_event, focused: boolean) => {
+    const next = !!focused;
+    if (inputFocused === next) return;
+    inputFocused = next;
     if (isMacOS()) {
         rebuildMainMenu();
     }
@@ -350,7 +350,7 @@ const rebuildMainMenu = () => {
     if (!menuBuilder || !mainWindow) return;
 
     menuBuilder.buildMenu({
-        accelerators: commandPaletteOpen ? {} : playbackMenuAccelerators,
+        accelerators: inputFocused ? {} : playbackMenuAccelerators,
         playbackStatus: currentPlaybackStatus,
         privateMode: currentPrivateMode,
         repeatMode: currentRepeatMode,
