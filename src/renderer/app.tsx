@@ -191,10 +191,7 @@ const CustomCssFileEffect = () => {
             }
         };
 
-        const handleCustomCssUpdated = (
-            _event: unknown,
-            data: { content?: string; exists?: boolean },
-        ) => {
+        const handleCustomCssUpdated = (data: { content?: string; exists?: boolean }) => {
             if (disposed) return;
             if (data?.exists === false) {
                 applyContent('');
