@@ -93,6 +93,7 @@ export const SynchronizedLyrics = ({
     const scrollTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const programmaticScrollRef = useRef(false);
+    const programmaticScrollTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null);
 
     const getCurrentLyric = (timeInMs: number) => {
         const activeLyrics = lyricRef.current;
@@ -176,9 +177,6 @@ export const SynchronizedLyrics = ({
             if (followRef.current && !userScrollingRef.current) {
                 programmaticScrollRef.current = true;
                 doc?.scroll({ behavior: 'smooth', top: offsetTop });
-                setTimeout(() => {
-                    programmaticScrollRef.current = false;
-                }, 600);
             }
 
             if (index !== lyricRef.current!.length - 1) {
@@ -285,6 +283,14 @@ export const SynchronizedLyrics = ({
         const handleScroll = () => {
             // Ignore programmatic scrolls (auto-scroll)
             if (programmaticScrollRef.current) {
+                if (programmaticScrollTimeoutRef.current) {
+                    clearTimeout(programmaticScrollTimeoutRef.current);
+                }
+
+                programmaticScrollTimeoutRef.current = setTimeout(() => {
+                    programmaticScrollRef.current = false;
+                }, 150);
+
                 return;
             }
 
@@ -306,6 +312,10 @@ export const SynchronizedLyrics = ({
             container.removeEventListener('scroll', handleScroll);
             if (scrollTimeoutRef.current) {
                 clearTimeout(scrollTimeoutRef.current);
+            }
+
+            if (programmaticScrollTimeoutRef.current) {
+                clearTimeout(programmaticScrollTimeoutRef.current);
             }
         };
     }, []);
