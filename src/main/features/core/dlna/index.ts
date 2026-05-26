@@ -951,10 +951,12 @@ function startPositionPolling() {
             const recentAppSeek = Date.now() - lastAppSeekAt < 3000;
             // Detect gapless transition: position jumped backward significantly
             if (!isRadioMode) {
+                const isGracePeriod = Date.now() - trackLoadedAt < 4000;
                 const isSameUriLoop =
                     lastQueuedNextUri === lastCommandedUri && lastQueuedNextUri !== '';
 
                 if (
+                    !isGracePeriod &&
                     hasStartedPlaying &&
                     uriReportedByDevice &&
                     posInfo.trackUri !== lastCommandedUri &&
@@ -970,6 +972,7 @@ function startPositionPolling() {
                         gapless: true,
                     });
                 } else if (
+                    !isGracePeriod &&
                     hasStartedPlaying &&
                     isSameUriLoop &&
                     uriReportedByDevice &&
@@ -1013,7 +1016,7 @@ function startPositionPolling() {
                     );
                     pendingPrevTrack = true;
                 }
-                const isGracePeriod = Date.now() - trackLoadedAt < 4000;
+                const recentPlayCommand = Date.now() - lastPlayCommandAt < 4000;
                 let justFiredTrackEnded = false;
                 if (posInfo.duration > 0) lastKnownDuration = posInfo.duration;
                 if (
@@ -1040,7 +1043,6 @@ function startPositionPolling() {
                 } else {
                     nearEndStallCount = 0;
                 }
-                const recentPlayCommand = Date.now() - lastPlayCommandAt < 4000;
                 if (
                     hasStartedPlaying &&
                     transportState === 'STOPPED' &&
