@@ -53,23 +53,13 @@ export const SettingsContent = () => {
                     variant="default"
                 >
                     <Tabs.List>
-                        <Tabs.Tab value="general">
-                            {t('page.setting.generalTab', { postProcess: 'sentenceCase' })}
-                        </Tabs.Tab>
-                        <Tabs.Tab value="playback">
-                            {t('page.setting.playbackTab', { postProcess: 'sentenceCase' })}
-                        </Tabs.Tab>
-                        <Tabs.Tab value="hotkeys">
-                            {t('page.setting.hotkeysTab', { postProcess: 'sentenceCase' })}
-                        </Tabs.Tab>
+                        <Tabs.Tab value="general">{t('page.setting.generalTab')}</Tabs.Tab>
+                        <Tabs.Tab value="playback">{t('page.setting.playbackTab')}</Tabs.Tab>
+                        <Tabs.Tab value="hotkeys">{t('page.setting.hotkeysTab')}</Tabs.Tab>
                         {isElectron() && (
-                            <Tabs.Tab value="window">
-                                {t('page.setting.windowTab', { postProcess: 'sentenceCase' })}
-                            </Tabs.Tab>
+                            <Tabs.Tab value="window">{t('page.setting.windowTab')}</Tabs.Tab>
                         )}
-                        <Tabs.Tab value="advanced">
-                            {t('page.setting.advanced', { postProcess: 'sentenceCase' })}
-                        </Tabs.Tab>
+                        <Tabs.Tab value="advanced">{t('page.setting.advanced')}</Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel value="general">
                         <Suspense fallback={<Spinner container />}>

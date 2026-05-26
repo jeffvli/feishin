@@ -133,9 +133,7 @@ export const useSyncSettingsToMain = () => {
 
                 // Show restart toast if there were differences
                 if (hasDifferences) {
-                    openRestartRequiredToast(
-                        i18n.t('error.settingsSyncError', { postProcess: 'sentenceCase' }),
-                    );
+                    openRestartRequiredToast(i18n.t('error.settingsSyncError'));
                 }
             })();
         }, 5000);

@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,18 +15,39 @@ export const StylesSettings = memo(() => {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation();
 
+    const utils = isElectron() ? window.api.utils : null;
+    const isDesktop = isElectron();
+
     const { content, enabled } = useCssSettings();
     const [css, setCss] = useState(content);
 
     const { setSettings } = useSettingsStoreActions();
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setSettings({
             css: {
                 content: css,
                 enabled,
             },
         });
+
+        if (utils) {
+            try {
+                await utils.saveCustomCss(css);
+            } catch (error) {
+                console.error('Failed to save custom css file', error);
+            }
+        }
+    };
+
+    const handleOpenFolder = async () => {
+        if (!utils) return;
+
+        try {
+            await utils.openCustomCssFolder();
+        } catch (error) {
+            console.error('Failed to open custom css folder', error);
+        }
     };
 
     useEffect(() => {
@@ -53,16 +75,24 @@ export const StylesSettings = memo(() => {
                 }
                 description={t('setting.customCssEnable', {
                     context: 'description',
-                    postProcess: 'sentenceCase',
                 })}
-                note={t('setting.customCssNotice', { postProcess: 'sentenceCase' })}
-                title={t('setting.customCssEnable', { postProcess: 'sentenceCase' })}
+                note={t('setting.customCssNotice')}
+                title={t('setting.customCssEnable')}
             />
             {enabled && (
                 <>
                     <SettingsOptions
                         control={
                             <>
+                                {isDesktop && (
+                                    <Button
+                                        onClick={handleOpenFolder}
+                                        size="compact-md"
+                                        variant="subtle"
+                                    >
+                                        {t('common.openFolder', { postProcess: 'titleCase' })}
+                                    </Button>
+                                )}
                                 {open && (
                                     <Button
                                         onClick={handleSave}
@@ -70,7 +100,7 @@ export const StylesSettings = memo(() => {
                                         // disabled={isSaveButtonDisabled}
                                         variant="filled"
                                     >
-                                        {t('common.save', { postProcess: 'titleCase' })}
+                                        {t('common.save')}
                                     </Button>
                                 )}
                                 <Button
@@ -78,17 +108,14 @@ export const StylesSettings = memo(() => {
                                     size="compact-md"
                                     variant="filled"
                                 >
-                                    {t(open ? 'common.close' : 'common.edit', {
-                                        postProcess: 'titleCase',
-                                    })}
+                                    {t(open ? 'common.close' : 'common.edit', {})}
                                 </Button>
                             </>
                         }
                         description={t('setting.customCss', {
                             context: 'description',
-                            postProcess: 'sentenceCase',
                         })}
-                        title={t('setting.customCss', { postProcess: 'sentenceCase' })}
+                        title={t('setting.customCss')}
                     />
                     {open && (
                         <>
@@ -100,7 +127,7 @@ export const StylesSettings = memo(() => {
                                     setCss(sanitizeCss(`<style>${e.currentTarget.value}`))
                                 }
                             />
-                            <Text>{t('common.preview', { postProcess: 'sentenceCase' })}: </Text>
+                            <Text>{t('common.preview')}: </Text>
                             <Code block>{css}</Code>
                         </>
                     )}

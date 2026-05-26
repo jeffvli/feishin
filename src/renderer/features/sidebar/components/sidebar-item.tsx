@@ -6,7 +6,7 @@ import styles from './sidebar-item.module.css';
 
 import { Button, ButtonProps } from '/@/shared/components/button/button';
 
-interface SidebarItemProps extends ButtonProps {
+interface SidebarItemProps extends Omit<ButtonProps, 'component' | 'ref'> {
     to: LinkProps['to'];
 }
 

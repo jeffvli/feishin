@@ -284,7 +284,10 @@ export const useDiscordRpc = () => {
                         ) {
                             try {
                                 const info = await api.controller.getAlbumInfo({
-                                    apiClientProps: { serverId: song._serverId },
+                                    apiClientProps: {
+                                        forceRemoteUrl: true,
+                                        serverId: song._serverId,
+                                    },
                                     query: { id: song.albumId },
                                 });
 

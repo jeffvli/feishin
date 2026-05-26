@@ -44,7 +44,6 @@ import { FavoriteColumn } from '/@/renderer/components/item-list/item-table-list
 import { GenreBadgeColumn } from '/@/renderer/components/item-list/item-table-list/columns/genre-badge-column';
 import { GenreColumn } from '/@/renderer/components/item-list/item-table-list/columns/genre-column';
 import { ImageColumn } from '/@/renderer/components/item-list/item-table-list/columns/image-column';
-import { NumericColumn } from '/@/renderer/components/item-list/item-table-list/columns/numeric-column';
 import { PathColumn } from '/@/renderer/components/item-list/item-table-list/columns/path-column';
 import { PlaylistReorderColumn } from '/@/renderer/components/item-list/item-table-list/columns/playlist-reorder-column';
 import { RatingColumn } from '/@/renderer/components/item-list/item-table-list/columns/rating-column';
@@ -54,6 +53,7 @@ import { TextColumn } from '/@/renderer/components/item-list/item-table-list/col
 import { TitleArtistColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-artist-column';
 import { TitleColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-column';
 import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-combined-column';
+import { TrackNumberColumn } from '/@/renderer/components/item-list/item-table-list/columns/track-number-column';
 import { YearColumn } from '/@/renderer/components/item-list/item-table-list/columns/year-column';
 import { useItemDragDropState } from '/@/renderer/components/item-list/item-table-list/hooks/use-item-drag-drop-state';
 import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
@@ -240,7 +240,9 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
             case TableColumn.DISC_NUMBER:
             case TableColumn.SAMPLE_RATE:
             case TableColumn.TRACK_NUMBER:
-                return <NumericColumn {...props} {...dragProps} controls={controls} type={type} />;
+                return (
+                    <TrackNumberColumn {...props} {...dragProps} controls={controls} type={type} />
+                );
 
             case TableColumn.COMPOSER:
                 return <ComposerColumn {...props} {...dragProps} controls={controls} type={type} />;

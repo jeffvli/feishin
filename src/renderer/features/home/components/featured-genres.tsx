@@ -120,7 +120,7 @@ export const FeaturedGenres = () => {
                 <>
                     <Group align="flex-end" justify="space-between">
                         <TextTitle fw={700} isNoSelect order={3}>
-                            {t('entity.genre', { count: 2, postProcess: 'titleCase' })}
+                            {t('entity.genre', { count: 2 })}
                         </TextTitle>
                         <Button
                             component={Link}
@@ -128,7 +128,7 @@ export const FeaturedGenres = () => {
                             to={AppRoute.LIBRARY_GENRES}
                             variant="subtle"
                         >
-                            {t('action.viewMore', { postProcess: 'sentenceCase' })}
+                            {t('action.viewMore')}
                         </Button>
                     </Group>
                     <div className={styles.grid}>

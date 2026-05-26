@@ -19,7 +19,7 @@ export const FilterButton = ({ isActive, onClick, ...props }: FilterButtonProps)
             }}
             onClick={onClick}
             tooltip={{
-                label: t('common.filters', { count: 2, postProcess: 'sentenceCase' }),
+                label: t('common.filters', { count: 2 }),
                 ...props.tooltip,
             }}
             variant="subtle"

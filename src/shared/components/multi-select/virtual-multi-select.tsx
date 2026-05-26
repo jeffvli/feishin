@@ -275,7 +275,7 @@ export function VirtualMultiSelect<T>({
                 ) : stableOptions.length === 0 ? (
                     <Center h="100%" w="100%">
                         <Text isMuted isNoSelect size="sm">
-                            {t('common.noResultsFromQuery', { postProcess: 'sentenceCase' })}
+                            {t('common.noResultsFromQuery')}
                         </Text>
                     </Center>
                 ) : (

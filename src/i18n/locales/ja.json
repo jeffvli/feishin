@@ -22,8 +22,8 @@
         "queue_clear": "キューをクリア",
         "muted": "ミュート中",
         "unfavorite": "お気に入り解除",
-        "queue_moveToTop": "選択項目を一番下に移動",
-        "queue_moveToBottom": "選択項目を先頭に移動",
+        "queue_moveToTop": "選択項目を先頭に移動",
+        "queue_moveToBottom": "選択項目を一番下に移動",
         "shuffle_off": "シャッフル無効",
         "addLast": "最後",
         "mute": "ミュート",
@@ -48,7 +48,8 @@
         "holdToShuffle": "長押しでシャッフル",
         "albumRadio": "アルバム・ラジオ",
         "artistRadio": "アーティストラジオ",
-        "trackRadio": "ラジオを追跡する"
+        "trackRadio": "ラジオを追跡する",
+        "scrobbleForceSubmit": "強制 Scrobble"
     },
     "setting": {
         "crossfadeStyle_description": "オーディオプレーヤーが使用するクロスフェードのスタイルを選択します",
@@ -85,7 +86,7 @@
         "hotkey_zoomIn": "拡大",
         "scrobble_description": "再生した音楽をメディアサーバーから Scrobble します",
         "hotkey_browserForward": "ブラウザ 進む",
-        "audioExclusiveMode_description": "排他出力モードを有効にします。このモードでは、システムの他の出力がロックされ、MPV のみがオーディオを出力できるようになります",
+        "audioExclusiveMode_description": "排他出力モードを有効にします。このモードでは、システムの他の出力がロックされ、MPV のみがオーディオを出力できるようになります。このモードが有効になっている間は、ビジュアライザーやシステムオーディオのキャプチャ機能は動作しません",
         "discordUpdateInterval": "{{discord}} Rich Presence の更新間隔",
         "themeLight": "テーマ (ライト)",
         "fontType_optionBuiltIn": "組み込みフォント",
@@ -271,7 +272,7 @@
         "customCss": "カスタム CSS",
         "customCssEnable_description": "カスタム CSS の記述を許可します",
         "customCssEnable": "カスタム CSS を有効にする",
-        "customCssNotice": "警告: ある程度のサニタイズ (url() と content: の禁止) はありますが、カスタム CSS を使用するとインターフェースの変更によりリスクが生じる可能性があります",
+        "customCssNotice": "警告: ある程度のサニタイズ (URL() と content: の禁止) はありますが、カスタム CSS を使用するとインターフェースの変更によりリスクが生じる可能性があります",
         "releaseChannel_optionBeta": "ベータ",
         "releaseChannel_optionLatest": "最新",
         "releaseChannel": "リリースチャンネル",
@@ -314,7 +315,6 @@
         "exportImportSettings_importSuccess": "設定が正常にインポートされました!",
         "exportImportSettings_importModalTitle": "Feishin 設定をインポート",
         "exportImportSettings_importBtn": "設定をインポート",
-        "autoDJ_description": "類似の曲を自動でキューに追加します",
         "autoDJ": "自動 DJ",
         "autoDJ_itemCount_description": "自動 DJ が有効なときにキューに追加しようとした曲数",
         "autoDJ_itemCount": "曲数",
@@ -425,7 +425,12 @@
         "sidePlayQueueLayout_optionHorizontal": "水平",
         "sidePlayQueueLayout_optionVertical": "垂直",
         "waveformLoadingDelay": "波形読み込みの遅延",
-        "waveformLoadingDelay_description": "波形を読み込むまでの遅延時間（秒単位）を設定します。Web プレーヤー使用時にカクつきが発生する場合は、この値を増やしてください。"
+        "waveformLoadingDelay_description": "波形を読み込むまでの遅延時間（秒単位）を設定します。Web プレーヤー使用時にカクつきが発生する場合は、この値を増やしてください。",
+        "playerbarWaveformStretch": "波形伸縮",
+        "playerbarWaveformStretch_description": "波形を伸縮させて、利用可能なスペースを埋めます",
+        "preventSuspendOnPlayback_description": "音楽再生中にアプリケーションが停止しないようにします",
+        "preventSuspendOnPlayback": "再生の中断を防止する",
+        "hotkey_listShowPlayingSong": "再生中の曲をリストに表示"
     },
     "action": {
         "editPlaylist": "$t(entity.playlist, {\"count\": 1}) を編集",
@@ -469,7 +474,9 @@
         "openApplicationDirectory": "アプリケーションディレクトリを開く",
         "selectRangeOfItems": "項目の範囲を選択",
         "addOrRemoveFromSelection": "選択に追加または削除",
-        "goToCurrent": "現在の項目へ移動"
+        "goToCurrent": "現在の項目へ移動",
+        "collapseAllFolders": "すべてのフォルダーを折りたたむ",
+        "expandAllFolders": "すべてのフォルダーを展開する"
     },
     "common": {
         "backward": "戻る",
@@ -501,7 +508,7 @@
         "name": "名前",
         "maximize": "最大化",
         "decrease": "減少",
-        "ok": "OK",
+        "ok": "Ok",
         "description": "説明",
         "configure": "設定",
         "path": "パス",
@@ -590,7 +597,8 @@
         "rename": "名前を変更",
         "newVersionAvailable": "新しいバージョンが利用可能です",
         "numberOfResults": "{{numberOfResults}} 件の結果",
-        "grouping": "グループ化"
+        "grouping": "グループ化",
+        "back": "戻る"
     },
     "table": {
         "config": {
@@ -677,7 +685,7 @@
             "rating": "評価",
             "favorite": "お気に入り",
             "playCount": "再生回数",
-            "albumCount": "$t(entity.album, {\"count\": 2})",
+            "albumCount": "アルバム",
             "releaseYear": "年",
             "lastPlayed": "最後に再生",
             "biography": "バイオグラフィー",
@@ -686,18 +694,18 @@
             "title": "タイトル",
             "bpm": "BPM",
             "dateAdded": "追加日",
-            "artist": "$t(entity.artist, {\"count\": 1})",
-            "songCount": "$t(entity.track, {\"count\": 2})",
+            "artist": "アーティスト",
+            "songCount": "トラック",
             "trackNumber": "トラック",
-            "genre": "$t(entity.genre, {\"count\": 1})",
+            "genre": "ジャンル",
             "albumArtist": "アルバムアーティスト",
             "path": "パス",
             "discNumber": "ディスク",
-            "channels": "$t(common.channel, {\"count\": 2})",
-            "size": "$t(common.size)",
-            "codec": "$t(common.codec)",
-            "bitDepth": "$t(common.bitDepth)",
-            "sampleRate": "$t(common.sampleRate)",
+            "channels": "チャンネル",
+            "size": "サイズ",
+            "codec": "コーデック",
+            "bitDepth": "ビット深度",
+            "sampleRate": "サンプリング周波数",
             "owner": "所有者"
         }
     },
@@ -808,7 +816,7 @@
                 "dynamicBackground": "ダイナミック背景",
                 "synchronized": "同期",
                 "followCurrentLyric": "歌詞を再生位置に追従",
-                "opacity": "非透過率",
+                "opacity": "不透明度",
                 "lyricSize": "歌詞のサイズ",
                 "showLyricProvider": "歌詞の提供元を表示",
                 "unsynchronized": "非同期",
@@ -817,7 +825,9 @@
                 "lyricGap": "歌詞の間隔",
                 "dynamicImageBlur": "画像のぼかしサイズ",
                 "dynamicIsImage": "背景画像を有効にする",
-                "lyricOffset": "歌詞のオフセット (ms)"
+                "lyricOffset": "歌詞のオフセット (ms)",
+                "lyricOpacityNonActive": "非アクティブな歌詞の不透明度",
+                "lyricScaleNonActive": "非アクティブな歌詞のスケール"
             },
             "upNext": "次へ",
             "lyrics": "歌詞",
@@ -1033,7 +1043,8 @@
             "input_skipDuplicates": "重複をスキップ",
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "create": "$t(entity.playlist, {\"count\": 1}) {{playlist}} を作成する",
-            "searchOrCreate": "$t(entity.playlist, {\"count\": 2}) を検索するか、入力して新しいプレイリストを作成してください"
+            "searchOrCreate": "$t(entity.playlist, {\"count\": 2}) を検索するか、入力して新しいプレイリストを作成してください",
+            "noneAdded": "$t(entity.playlist, {\"count\": 1}) {{playlist}} にトラックが追加されませんでした"
         },
         "updateServer": {
             "title": "サーバーをアップデート",
@@ -1341,6 +1352,7 @@
         "systemAudioConsentDecline": "拒否",
         "systemAudioConsentTitle": "システムオーディオへのアクセスを許可しますか？",
         "systemAudioCaptureFailed": "キャプチャを開始できませんでした: {{message}}",
-        "systemAudioNoAudioTrack": "音声トラックが返されませんでした。プロンプトが表示されたら、音声キャプチャが有効になっていることを確認してください。"
+        "systemAudioNoAudioTrack": "音声トラックが返されませんでした。プロンプトが表示されたら、音声キャプチャが有効になっていることを確認してください。",
+        "systemAudioExclusiveModeNotSupported": "オーディオ排他モードが有効になっている間は、ビジュアライザーは利用できません。MPV の設定でオーディオ排他モードを無効にしてから、もう一度お試しください。"
     }
 }

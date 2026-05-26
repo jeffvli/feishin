@@ -13,6 +13,7 @@ export enum ServerFeature {
     PLAYLIST_IMAGE_UPLOAD = 'playlistImageUpload',
     PLAYLISTS_SMART = 'playlistsSmart',
     PUBLIC_PLAYLIST = 'publicPlaylist',
+    REPORT_PLAYBACK = 'reportPlayback',
     SERVER_PLAY_QUEUE = 'serverPlayQueue',
     SHARING_ALBUM_SONG = 'sharingAlbumSong',
     SIMILAR_SONGS_MUSIC_FOLDER = 'similarSongsMusicFolder',

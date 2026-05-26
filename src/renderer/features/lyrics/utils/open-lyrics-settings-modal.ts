@@ -19,7 +19,7 @@ export const openLyricsSettingsModal = (settingsKey: string = 'default') => {
                 width: '100%',
             },
         },
-        title: i18n.t('common.setting', { count: 2, postProcess: 'titleCase' }),
+        title: i18n.t('common.setting', { count: 2 }),
         transitionProps: {
             transition: 'pop',
         },

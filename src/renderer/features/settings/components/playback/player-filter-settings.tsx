@@ -37,57 +37,57 @@ type FilterFieldConfig = {
 
 const getFilterFields = (t: (key: string, options?: any) => string): FilterFieldConfig[] => [
     {
-        label: t('table.config.label.title', { postProcess: 'titleCase' }),
+        label: t('table.config.label.title'),
         type: 'string',
         value: 'name',
     },
     {
-        label: t('table.config.label.albumArtist', { postProcess: 'titleCase' }),
+        label: t('table.config.label.albumArtist'),
         type: 'string',
         value: 'albumArtist',
     },
     {
-        label: t('table.config.label.artist', { postProcess: 'titleCase' }),
+        label: t('table.config.label.artist'),
         type: 'string',
         value: 'artist',
     },
     {
-        label: t('table.config.label.duration', { postProcess: 'titleCase' }),
+        label: t('table.config.label.duration'),
         type: 'number',
         value: 'duration',
     },
     {
-        label: t('table.config.label.genre', { postProcess: 'titleCase' }),
+        label: t('table.config.label.genre'),
         type: 'string',
         value: 'genre',
     },
     {
-        label: t('table.config.label.year', { postProcess: 'titleCase' }),
+        label: t('table.config.label.year'),
         type: 'number',
         value: 'year',
     },
     {
-        label: t('table.config.label.note', { postProcess: 'titleCase' }),
+        label: t('table.config.label.note'),
         type: 'string',
         value: 'note',
     },
     {
-        label: t('table.config.label.path', { postProcess: 'titleCase' }),
+        label: t('table.config.label.path'),
         type: 'string',
         value: 'path',
     },
     {
-        label: t('table.config.label.playCount', { postProcess: 'titleCase' }),
+        label: t('table.config.label.playCount'),
         type: 'number',
         value: 'playCount',
     },
     {
-        label: t('table.config.label.favorite', { postProcess: 'titleCase' }),
+        label: t('table.config.label.favorite'),
         type: 'boolean',
         value: 'favorite',
     },
     {
-        label: t('table.config.label.rating', { postProcess: 'titleCase' }),
+        label: t('table.config.label.rating'),
         type: 'number',
         value: 'rating',
     },
@@ -118,7 +118,7 @@ const getOperatorsForFieldType = (
             startsWith: 'filterOperator.startsWith',
         };
 
-        return t(operatorKeyMap[operator] || operator, { postProcess: 'titleCase' });
+        return t(operatorKeyMap[operator] || operator);
     };
 
     switch (type) {
@@ -413,23 +413,17 @@ export const PlayerFilterSettings = memo(() => {
                     )}
                     <Group grow>
                         <Button onClick={handleAddFilter} variant="filled">
-                            {t('common.add', { postProcess: 'titleCase' })}
+                            {t('common.add')}
                         </Button>
                     </Group>
                 </Stack>
             ),
             description: t('setting.playerFilters', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.playerFilters', { postProcess: 'sentenceCase' }),
+            title: t('setting.playerFilters'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={filterOptions}
-            title={t('page.setting.playerFilters', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={filterOptions} title={t('page.setting.playerFilters')} />;
 });

@@ -27,7 +27,7 @@ const DISPLAY_TYPES = [
         label: (
             <Group align="center" justify="center" p="sm">
                 <Icon icon="layoutTable" size="lg" />
-                {i18n.t('table.config.view.table', { postProcess: 'sentenceCase' }) as string}
+                {i18n.t('table.config.view.table') as string}
             </Group>
         ),
         value: ListDisplayType.TABLE,
@@ -36,7 +36,7 @@ const DISPLAY_TYPES = [
         label: (
             <Group align="center" justify="center" p="sm">
                 <Icon icon="layoutGrid" size="lg" />
-                {i18n.t('table.config.view.grid', { postProcess: 'sentenceCase' }) as string}
+                {i18n.t('table.config.view.grid') as string}
             </Group>
         ),
         value: ListDisplayType.GRID,
@@ -45,7 +45,7 @@ const DISPLAY_TYPES = [
         label: (
             <Group align="center" justify="center" p="sm">
                 <Icon icon="layoutDetail" size="lg" />
-                {i18n.t('table.config.view.detail', { postProcess: 'sentenceCase' }) as string}
+                {i18n.t('table.config.view.detail') as string}
             </Group>
         ),
         value: ListDisplayType.DETAIL,
@@ -55,7 +55,7 @@ const DISPLAY_TYPES = [
     //     label: (
     //         <Stack align="center" p="sm">
     //             <Icon icon="layoutList" size="lg" />
-    //             {i18n.t('table.config.view.list', { postProcess: 'sentenceCase' }) as string}
+    //             {i18n.t('table.config.view.list') as string}
     //         </Stack>
     //     ),
     //     value: ListDisplayType.LIST,
@@ -148,12 +148,7 @@ export const ListConfigMenu = (props: ListConfigMenuProps) => {
     return (
         <>
             <SettingsButton {...props.buttonProps} onClick={handlers.toggle} />
-            <Modal
-                handlers={handlers}
-                opened={isOpen}
-                size="xl"
-                title={t('common.configure', { postProcess: 'sentenceCase' })}
-            >
+            <Modal handlers={handlers} opened={isOpen} size="xl" title={t('common.configure')}>
                 <Stack gap="xs">
                     {availableDisplayTypes.length > 1 && (
                         <ListConfigTable
@@ -174,9 +169,7 @@ export const ListConfigMenu = (props: ListConfigMenuProps) => {
                                         />
                                     ),
                                     id: 'displayType',
-                                    label: t('table.config.general.displayType', {
-                                        postProcess: 'sentenceCase',
-                                    }),
+                                    label: t('table.config.general.displayType'),
                                 },
                             ]}
                         />

@@ -18,6 +18,7 @@ import {
     useIsRadioActive,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useAppStore,
@@ -34,7 +35,6 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
-import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 export const LeftControls = () => {
@@ -130,12 +130,7 @@ export const LeftControls = () => {
                                 role="button"
                                 transition={{ duration: 0.2, ease: 'easeIn' }}
                             >
-                                <Tooltip
-                                    label={t('player.toggleFullscreenPlayer', {
-                                        postProcess: 'sentenceCase',
-                                    })}
-                                    openDelay={0}
-                                >
+                                <Tooltip label={t('player.toggleFullscreenPlayer')} openDelay={0}>
                                     {isRadioMode && hasRadioStationImage ? (
                                         <ItemImage
                                             className={clsx(
@@ -192,9 +187,7 @@ export const LeftControls = () => {
                                             top: 2,
                                         }}
                                         tooltip={{
-                                            label: t('common.expand', {
-                                                postProcess: 'titleCase',
-                                            }),
+                                            label: t('common.expand'),
                                             openDelay: 0,
                                         }}
                                     />

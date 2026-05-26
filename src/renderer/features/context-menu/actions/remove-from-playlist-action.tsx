@@ -39,12 +39,12 @@ export const RemoveFromPlaylistAction = ({ items }: RemoveFromPlaylistActionProp
             });
 
             toast.success({
-                message: t('action.removeFromPlaylist', { postProcess: 'sentenceCase' }),
+                message: t('action.removeFromPlaylist'),
             });
         } catch (err: any) {
             toast.error({
                 message: err.message,
-                title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                title: t('error.genericError'),
             });
         }
 
@@ -57,10 +57,10 @@ export const RemoveFromPlaylistAction = ({ items }: RemoveFromPlaylistActionProp
         openModal({
             children: (
                 <ConfirmModal onConfirm={handleRemoveFromPlaylist}>
-                    <Text>{t('common.areYouSure', { postProcess: 'sentenceCase' })}</Text>
+                    <Text>{t('common.areYouSure')}</Text>
                 </ConfirmModal>
             ),
-            title: t('action.removeFromPlaylist', { postProcess: 'sentenceCase' }),
+            title: t('action.removeFromPlaylist'),
         });
     }, [handleRemoveFromPlaylist, ids, playlistId, t]);
 
@@ -68,7 +68,7 @@ export const RemoveFromPlaylistAction = ({ items }: RemoveFromPlaylistActionProp
 
     return (
         <ContextMenu.Item leftIcon="remove" onSelect={openRemoveFromPlaylistModal}>
-            {t('action.removeFromPlaylist', { postProcess: 'sentenceCase' })}
+            {t('action.removeFromPlaylist')}
         </ContextMenu.Item>
     );
 };

@@ -27,10 +27,10 @@ export const DisplayTypeToggleButton = ({
             onClick={onToggle}
             tooltip={{
                 label: isGrid
-                    ? t('table.config.view.grid', { postProcess: 'sentenceCase' })
+                    ? t('table.config.view.grid')
                     : isDetail
-                      ? t('table.config.view.detail', { postProcess: 'sentenceCase' })
-                      : t('table.config.view.table', { postProcess: 'sentenceCase' }),
+                      ? t('table.config.view.detail')
+                      : t('table.config.view.table'),
             }}
             variant="subtle"
             {...buttonProps}

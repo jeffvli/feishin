@@ -31,9 +31,7 @@ export const ExportImportSettings = memo(() => {
         openModal({
             children: <ExportImportSettingsModal />,
             size: 'lg',
-            title: t('setting.exportImportSettings_importModalTitle', {
-                postProcess: 'sentenceCase',
-            }),
+            title: t('setting.exportImportSettings_importModalTitle'),
         });
     };
 
@@ -42,30 +40,17 @@ export const ExportImportSettings = memo(() => {
             control: (
                 <>
                     <Button onClick={onExportSettings} size="compact-sm">
-                        {t('setting.exportImportSettings_control_exportText', {
-                            postProcess: 'sentenceCase',
-                        })}
+                        {t('setting.exportImportSettings_control_exportText')}
                     </Button>
                     <Button onClick={openImportModal} size="compact-sm">
-                        {t('setting.exportImportSettings_control_importText', {
-                            postProcess: 'sentenceCase',
-                        })}
+                        {t('setting.exportImportSettings_control_importText')}
                     </Button>
                 </>
             ),
-            description: t('setting.exportImportSettings_control_description', {
-                postProcess: 'sentenceCase',
-            }),
-            title: t('setting.exportImportSettings_control_title', {
-                postProcess: 'sentenceCase',
-            }),
+            description: t('setting.exportImportSettings_control_description'),
+            title: t('setting.exportImportSettings_control_title'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={options}
-            title={t('page.setting.exportImport', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={options} title={t('page.setting.exportImport')} />;
 });

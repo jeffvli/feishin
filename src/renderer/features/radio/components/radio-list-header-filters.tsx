@@ -38,7 +38,7 @@ export const RadioListHeaderFilters = () => {
             {permissions.radio.create && (
                 <Group gap="sm" wrap="nowrap">
                     <Button onClick={handleCreateRadioStationModal} variant="subtle">
-                        {t('action.createRadioStation', { postProcess: 'sentenceCase' })}
+                        {t('action.createRadioStation')}
                     </Button>
                 </Group>
             )}

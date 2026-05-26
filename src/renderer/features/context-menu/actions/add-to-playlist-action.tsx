@@ -165,7 +165,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
     );
 
     const handleAddToPlaylist = useCallback(
-        async (playlistId: string) => {
+        async (playlistId: string, playlistName: string) => {
             if (items.length === 0 || !serverId) return;
 
             try {
@@ -202,12 +202,8 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 }
 
                 if (allSongIds.length === 0) {
-                    toast.success({
-                        message: t('form.addToPlaylist.success', {
-                            message: 0,
-                            numOfPlaylists: 1,
-                            postProcess: 'sentenceCase',
-                        }),
+                    toast.info({
+                        message: t('form.addToPlaylist.noneAdded', { playlist: playlistName }),
                     });
                     return;
                 }
@@ -245,12 +241,8 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 }
 
                 if (songsToAdd.length === 0) {
-                    toast.success({
-                        message: t('form.addToPlaylist.success', {
-                            message: 0,
-                            numOfPlaylists: 1,
-                            postProcess: 'sentenceCase',
-                        }),
+                    toast.info({
+                        message: t('form.addToPlaylist.noneAdded', { playlist: playlistName }),
                     });
                     return;
                 }
@@ -269,7 +261,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                         onError: (err) => {
                             toast.error({
                                 message: err.message,
-                                title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                                title: t('error.genericError'),
                             });
                         },
                         onSuccess: () => {},
@@ -280,13 +272,12 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                     message: t('form.addToPlaylist.success', {
                         message: songsToAdd.length,
                         numOfPlaylists: 1,
-                        postProcess: 'sentenceCase',
                     }),
                 });
             } catch (error) {
                 toast.error({
                     message: (error as Error).message,
-                    title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                    title: t('error.genericError'),
                 });
             }
         },
@@ -349,7 +340,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
             },
             modal: 'addToPlaylist',
             size: 'lg',
-            title: t('page.contextMenu.addToPlaylist', { postProcess: 'sentenceCase' }),
+            title: t('page.contextMenu.addToPlaylist'),
         });
     }, [itemType, items, t]);
 
@@ -363,12 +354,11 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
             onKeyDown={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
             pb="xs"
-            placeholder={t('common.search', { postProcess: 'sentenceCase' })}
+            placeholder={t('common.search')}
             rightSection={
                 <Tooltip
                     label={t('form.addToPlaylist.input', {
                         context: 'skipDuplicates',
-                        postProcess: 'titleCase',
                     })}
                 >
                     <Checkbox
@@ -395,7 +385,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                     onSelect={handleOpenModal}
                     rightIcon="arrowRightS"
                 >
-                    {t('page.contextMenu.addToPlaylist', { postProcess: 'sentenceCase' })}
+                    {t('page.contextMenu.addToPlaylist')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuTarget>
             <ContextMenu.SubmenuContent stickyContent={searchInput}>
@@ -405,15 +395,15 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                     </ContextMenu.Item>
                 )}
                 {playlistsQuery.isError && (
-                    <ContextMenu.Item disabled>
-                        {t('error.genericError', { postProcess: 'sentenceCase' })}
-                    </ContextMenu.Item>
+                    <ContextMenu.Item disabled>{t('error.genericError')}</ContextMenu.Item>
                 )}
                 {recentPlaylist && (
                     <>
                         <ContextMenu.Item
                             key={recentPlaylist.id}
-                            onSelect={() => handleAddToPlaylist(recentPlaylist.id)}
+                            onSelect={() =>
+                                handleAddToPlaylist(recentPlaylist.id, recentPlaylist.name)
+                            }
                         >
                             {recentPlaylist.name}
                         </ContextMenu.Item>
@@ -421,14 +411,12 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                     </>
                 )}
                 {filteredPlaylists.length === 0 && !playlistsQuery.isLoading && (
-                    <ContextMenu.Item disabled>
-                        {t('common.noResultsFromQuery', { postProcess: 'sentenceCase' })}
-                    </ContextMenu.Item>
+                    <ContextMenu.Item disabled>{t('common.noResultsFromQuery')}</ContextMenu.Item>
                 )}
                 {filteredPlaylists.map((playlist) => (
                     <ContextMenu.Item
                         key={playlist.id}
-                        onSelect={() => handleAddToPlaylist(playlist.id)}
+                        onSelect={() => handleAddToPlaylist(playlist.id, playlist.name)}
                     >
                         {playlist.name}
                     </ContextMenu.Item>

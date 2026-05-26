@@ -46,11 +46,11 @@ const PlaylistSongListFiltersSidebar = () => {
         <Stack h="100%" style={{ minHeight: 0 }}>
             <Group justify="space-between" pb={0} pl="md" pr="md" pt="md">
                 <Text fw={500} size="xl">
-                    {t('common.filters', { postProcess: 'sentenceCase' })}
+                    {t('common.filters')}
                 </Text>
                 <Group gap="xs">
                     <Button onClick={clear} size="compact-sm" variant="subtle">
-                        {t('common.reset', { postProcess: 'sentenceCase' })}
+                        {t('common.reset')}
                     </Button>
                     {setIsSidebarOpen && (
                         <ActionIcon
@@ -170,7 +170,7 @@ const PlaylistDetailSongListRoute = () => {
                     serverId={detailQuery?.data?._serverId || ''}
                 />
             ),
-            title: t('common.saveAs', { postProcess: 'sentenceCase' }),
+            title: t('common.saveAs'),
         });
     };
 
@@ -189,9 +189,7 @@ const PlaylistDetailSongListRoute = () => {
                                 onError: (err) => {
                                     toast.error({
                                         message: err.message,
-                                        title: t('error.genericError', {
-                                            postProcess: 'sentenceCase',
-                                        }),
+                                        title: t('error.genericError'),
                                     });
                                 },
                                 onSuccess: () => {
@@ -205,7 +203,7 @@ const PlaylistDetailSongListRoute = () => {
                     <Text>Are you sure you want to delete this playlist?</Text>
                 </ConfirmModal>
             ),
-            title: t('form.deletePlaylist.title', { postProcess: 'sentenceCase' }),
+            title: t('form.deletePlaylist.title'),
         });
     };
 

@@ -48,11 +48,11 @@ const RouterErrorFallback = ({ error, resetErrorBoundary }: RouterErrorFallbackP
                     <Group gap="xs">
                         <Icon fill="error" icon="error" size="lg" />
                         <TextTitle fw={700} order={3}>
-                            {t('error.genericError', { postProcess: 'sentenceCase' })}
+                            {t('error.genericError')}
                         </TextTitle>
                     </Group>
                     <Text style={{ wordBreak: 'break-word' }}>
-                        {error?.message || t('error.genericError', { postProcess: 'sentenceCase' })}
+                        {error?.message || t('error.genericError')}
                     </Text>
                     {process.env.NODE_ENV === 'development' && error?.stack && (
                         <Code
@@ -70,10 +70,10 @@ const RouterErrorFallback = ({ error, resetErrorBoundary }: RouterErrorFallbackP
                     )}
                     <Group grow>
                         <Button onClick={resetErrorBoundary} size="md" variant="default">
-                            {t('common.reload', { postProcess: 'sentenceCase' })}
+                            {t('common.reload')}
                         </Button>
                         <Button onClick={handleRefresh} size="md" variant="filled">
-                            {t('common.refresh', { postProcess: 'sentenceCase' })}
+                            {t('common.refresh')}
                         </Button>
                     </Group>
                 </Stack>

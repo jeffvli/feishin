@@ -158,8 +158,8 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 children: (
                     <ConfirmModal
                         labels={{
-                            cancel: t('common.cancel', { postProcess: 'titleCase' }),
-                            confirm: t('common.confirm', { postProcess: 'titleCase' }),
+                            cancel: t('common.cancel'),
+                            confirm: t('common.confirm'),
                         }}
                         onCancel={() => {
                             resolve(false);
@@ -171,15 +171,9 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                         }}
                     >
                         <Stack>
-                            <Text>
-                                {t('form.largeFetchConfirmation.description', {
-                                    postProcess: 'sentenceCase',
-                                })}
-                            </Text>
+                            <Text>{t('form.largeFetchConfirmation.description')}</Text>
                             <Checkbox
-                                label={t('common.doNotShowAgain', {
-                                    postProcess: 'sentenceCase',
-                                })}
+                                label={t('common.doNotShowAgain')}
                                 onChange={(event) => {
                                     setDoNotShowAgain(event.currentTarget.checked);
                                 }}
@@ -187,9 +181,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                         </Stack>
                     </ConfirmModal>
                 ),
-                title: t('form.largeFetchConfirmation.title', {
-                    postProcess: 'sentenceCase',
-                }),
+                title: t('form.largeFetchConfirmation.title'),
             });
         });
     }, [doNotShowAgain, setDoNotShowAgain, t]);
@@ -236,9 +228,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 [fetchId]: setTimeout(() => {
                     toastId = toast.info({
                         autoClose: false,
-                        message: t('player.playbackFetchCancel', {
-                            postProcess: 'sentenceCase',
-                        }),
+                        message: t('player.playbackFetchCancel'),
                         onClose: () => {
                             queryClient.cancelQueries({
                                 exact: false,
@@ -250,9 +240,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                                 queryKey: queryKeys.player.fetch(),
                             });
                         },
-                        title: t('player.playbackFetchInProgress', {
-                            postProcess: 'sentenceCase',
-                        }),
+                        title: t('player.playbackFetchInProgress'),
                     });
                 }, 2000),
             };
@@ -312,7 +300,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
                 toast.error({
                     message: err.message,
-                    title: t('error.genericError', { postProcess: 'sentenceCase' }) as string,
+                    title: t('error.genericError') as string,
                 });
             }
         },
@@ -401,9 +389,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                     [fetchId]: setTimeout(() => {
                         toastId = toast.info({
                             autoClose: false,
-                            message: t('player.playbackFetchCancel', {
-                                postProcess: 'sentenceCase',
-                            }),
+                            message: t('player.playbackFetchCancel'),
                             onClose: () => {
                                 logFn.debug(logMsg[LogCategory.PLAYER].cancelledFetch, {
                                     category: LogCategory.PLAYER,
@@ -420,9 +406,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                                     queryKey: queryKeys.player.fetch(),
                                 });
                             },
-                            title: t('player.playbackFetchInProgress', {
-                                postProcess: 'sentenceCase',
-                            }),
+                            title: t('player.playbackFetchInProgress'),
                         });
                     }, 2000),
                 };
@@ -497,7 +481,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
                 toast.error({
                     message: err.message,
-                    title: t('error.genericError', { postProcess: 'sentenceCase' }) as string,
+                    title: t('error.genericError') as string,
                 });
             }
         },

@@ -123,10 +123,10 @@ const CollectionRow = ({
                             </DropdownMenu.Target>
                             <DropdownMenu.Dropdown>
                                 <DropdownMenu.Item onClick={handleRenameOpen}>
-                                    {t('common.rename', { postProcess: 'sentenceCase' })}
+                                    {t('common.rename')}
                                 </DropdownMenu.Item>
                                 <DropdownMenu.Item color="red" onClick={handleDelete}>
-                                    {t('common.delete', { postProcess: 'sentenceCase' })}
+                                    {t('common.delete')}
                                 </DropdownMenu.Item>
                             </DropdownMenu.Dropdown>
                         </DropdownMenu>
@@ -144,10 +144,10 @@ const CollectionRow = ({
                         />
                         <Group gap="xs" justify="flex-end">
                             <Button onClick={renameHandlers.close} type="button" variant="subtle">
-                                {t('common.cancel', { postProcess: 'sentenceCase' })}
+                                {t('common.cancel')}
                             </Button>
                             <Button type="submit" variant="filled">
-                                {t('common.save', { postProcess: 'sentenceCase' })}
+                                {t('common.save')}
                             </Button>
                         </Group>
                     </Stack>
@@ -176,7 +176,7 @@ export const SidebarCollectionList = () => {
     return (
         <Accordion.Item value="collections">
             <Accordion.Control component="div" role="button" style={{ userSelect: 'none' }}>
-                <Text fw={500}>{t('page.sidebar.collections', { postProcess: 'titleCase' })}</Text>
+                <Text fw={500}>{t('page.sidebar.collections')}</Text>
             </Accordion.Control>
             <Accordion.Panel>
                 {collections.map((collection) => (

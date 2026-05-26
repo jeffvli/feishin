@@ -73,18 +73,18 @@ export const PlayAlbumRadioAction = ({ album, disabled }: PlayAlbumRadioActionPr
                     onSelect={defaultPlayAlbumRadioAction}
                     rightIcon="arrowRightS"
                 >
-                    {t('player.albumRadio', { postProcess: 'sentenceCase' })}
+                    {t('player.albumRadio')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuTarget>
             <ContextMenu.SubmenuContent>
                 <ContextMenu.Item leftIcon="mediaPlay" onSelect={handlePlayAlbumRadioNow}>
-                    {t('player.play', { postProcess: 'sentenceCase' })}
+                    {t('player.play')}
                 </ContextMenu.Item>
                 <ContextMenu.Item leftIcon="mediaPlayNext" onSelect={handlePlayAlbumRadioNext}>
-                    {t('player.addNext', { postProcess: 'sentenceCase' })}
+                    {t('player.addNext')}
                 </ContextMenu.Item>
                 <ContextMenu.Item leftIcon="mediaPlayLast" onSelect={handlePlayAlbumRadioLast}>
-                    {t('player.addLast', { postProcess: 'sentenceCase' })}
+                    {t('player.addLast')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuContent>
         </ContextMenu.Submenu>

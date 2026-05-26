@@ -24,10 +24,7 @@ export const AlbumArtistDetailFavoriteSongsListHeader = ({
             <LibraryHeaderBar ignoreMaxWidth>
                 <LibraryHeaderBar.PlayButton itemType={LibraryItem.SONG} songs={data} />
                 <LibraryHeaderBar.Title order={2}>
-                    {t('page.albumArtistDetail.favoriteSongsFrom', {
-                        postProcess: 'titleCase',
-                        title,
-                    })}
+                    {t('page.albumArtistDetail.favoriteSongsFrom', { title })}
                 </LibraryHeaderBar.Title>
                 <Badge>
                     {itemCount === null || itemCount === undefined ? <SpinnerIcon /> : itemCount}

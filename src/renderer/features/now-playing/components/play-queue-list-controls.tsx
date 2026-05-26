@@ -108,21 +108,21 @@ const QueuePlaybackIcons = ({ tableRef }: { tableRef: RefObject<ItemListHandle |
                 icon="mediaShuffle"
                 iconProps={{ size: 'lg' }}
                 onClick={handleShuffleQueue}
-                tooltip={{ label: t('player.shuffle', { postProcess: 'sentenceCase' }) }}
+                tooltip={{ label: t('player.shuffle') }}
                 variant="subtle"
             />
             <ActionIcon
                 icon="x"
                 iconProps={{ size: 'lg' }}
                 onClick={handleClearQueue}
-                tooltip={{ label: t('action.clearQueue', { postProcess: 'sentenceCase' }) }}
+                tooltip={{ label: t('action.clearQueue') }}
                 variant="subtle"
             />
             <ActionIcon
                 icon="goToItem"
                 iconProps={{ size: 'lg' }}
                 onClick={handleJumpToCurrent}
-                tooltip={{ label: t('action.goToCurrent', { postProcess: 'sentenceCase' }) }}
+                tooltip={{ label: t('action.goToCurrent') }}
                 variant="subtle"
             />
         </>
@@ -152,9 +152,7 @@ const QueueRestoreActions = () => {
                 loading={isSavingQueue}
                 onClick={() => handleSaveQueue()}
                 tooltip={{
-                    label: t('player.saveQueueToServer', {
-                        postProcess: 'sentenceCase',
-                    }),
+                    label: t('player.saveQueueToServer'),
                 }}
                 variant="subtle"
             />
@@ -165,9 +163,7 @@ const QueueRestoreActions = () => {
                 loading={Boolean(isFetching)}
                 onClick={handleRestoreQueue}
                 tooltip={{
-                    label: t('player.restoreQueueFromServer', {
-                        postProcess: 'sentenceCase',
-                    }),
+                    label: t('player.restoreQueueFromServer'),
                 }}
                 variant="subtle"
             />

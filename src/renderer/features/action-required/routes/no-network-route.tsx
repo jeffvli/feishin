@@ -28,12 +28,10 @@ const NoNetworkRoute = () => {
                     <Icon icon="wifiOff" size="4rem" />
                     <Stack gap="md">
                         <Text size="xl" weight={600}>
-                            {t('error.noNetwork', { postProcess: 'sentenceCase' })}
+                            {t('error.noNetwork')}
                         </Text>
                         <Text c="dimmed" size="sm">
-                            {t('error.noNetworkDescription', {
-                                postProcess: 'sentenceCase',
-                            })}
+                            {t('error.noNetworkDescription')}
                         </Text>
                     </Stack>
                     <Button
@@ -41,7 +39,7 @@ const NoNetworkRoute = () => {
                         onClick={handleRetry}
                         variant="filled"
                     >
-                        {t('common.retry', { postProcess: 'sentenceCase' })}
+                        {t('common.retry')}
                     </Button>
                 </Stack>
             </Center>

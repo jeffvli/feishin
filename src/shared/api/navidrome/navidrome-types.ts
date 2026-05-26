@@ -87,6 +87,7 @@ export const NDSongQueryFields = [
     { label: 'Artist Date Rated', type: 'date', value: 'artistdaterated' },
     { label: 'Artist Is Favorite', type: 'boolean', value: 'artistloved' },
     { label: 'Artist Play Count', type: 'number', value: 'artistplaycount' },
+    { label: 'Artist Rating', type: 'number', value: 'artistrating' },
     { label: 'Artists', type: 'string', value: 'artists' },
     { label: 'ASIN', type: 'string', value: 'asin' },
     { label: 'Average Rating', type: 'number', value: 'averagerating' },
@@ -158,7 +159,7 @@ export const NDSongQueryFields = [
     { label: 'MusicBrainz Work Id', type: 'string', value: 'musicbrainz_workid' },
     { label: 'Name', type: 'string', value: 'title' },
     { label: 'Original Date', type: 'date', value: 'originaldate' },
-    { label: 'Original Year', type: 'date', value: 'originalyear' },
+    { label: 'Original Year', type: 'number', value: 'originalyear' },
     { label: 'Performer', type: 'string', value: 'performer' },
     { label: 'Play Count', type: 'number', value: 'playcount' },
     { label: 'Playlist', type: 'playlist', value: 'id' },
@@ -178,18 +179,18 @@ export const NDSongQueryFields = [
     { label: 'ReplayGain Track Peak', type: 'number', value: 'replaygain_track_peak' },
     { label: 'Remixer', type: 'string', value: 'remixer' },
     { label: 'Script', type: 'string', value: 'script' },
-    { label: 'Sample Rate', type: 'number', value: 'sampleRate' },
+    { label: 'Sample Rate', type: 'number', value: 'samplerate' },
     { label: 'Size', type: 'number', value: 'size' },
-    { label: 'Sort Album', type: 'string', value: 'albumsort' },
-    { label: 'Sort Album Artist', type: 'string', value: 'albumartistsort' },
+    { label: 'Sort Album', type: 'string', value: 'sortalbum' },
+    { label: 'Sort Album Artist', type: 'string', value: 'sortalbumartist' },
     { label: 'Sort Album Artists', type: 'string', value: 'albumartistssort' },
-    { label: 'Sort Artist', type: 'string', value: 'artistsort' },
+    { label: 'Sort Artist', type: 'string', value: 'sortartist' },
     { label: 'Sort Artists', type: 'string', value: 'artistssort' },
     { label: 'Sort Composer', type: 'string', value: 'composersort' },
     { label: 'Sort Lyricist', type: 'string', value: 'lyricistsort' },
-    { label: 'Sort Name', type: 'string', value: 'titlesort' },
+    { label: 'Sort Name', type: 'string', value: 'sorttitle' },
     { label: 'Subtitle', type: 'string', value: 'subtitle' },
-    { label: 'Track Number', type: 'number', value: 'track' },
+    { label: 'Track Number', type: 'number', value: 'tracknumber' },
     { label: 'Track Total', type: 'number', value: 'tracktotal' },
     { label: 'Website', type: 'string', value: 'website' },
     { label: 'Work', type: 'string', value: 'work' },
@@ -206,123 +207,123 @@ export const NDSongQueryFieldsLabelMap: Record<string, string> = NDSongQueryFiel
 
 export const NDSongQueryPlaylistOperators = [
     {
-        label: i18n.t('filterOperator.inPlaylist', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.inPlaylist'),
         value: 'inPlaylist',
     },
     {
-        label: i18n.t('filterOperator.notInPlaylist', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.notInPlaylist'),
         value: 'notInPlaylist',
     },
 ];
 
 export const NDSongQueryDateOperators = [
     {
-        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.is'),
         value: 'is',
     },
     {
-        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
     {
-        label: i18n.t('filterOperator.before', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.before'),
         value: 'before',
     },
     {
-        label: i18n.t('filterOperator.after', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.after'),
         value: 'after',
     },
     {
-        label: i18n.t('filterOperator.inTheLast', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.inTheLast'),
         value: 'inTheLast',
     },
     {
-        label: i18n.t('filterOperator.notInTheLast', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.notInTheLast'),
         value: 'notInTheLast',
     },
     {
-        label: i18n.t('filterOperator.inTheRange', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.inTheRange'),
         value: 'inTheRange',
     },
     {
-        label: i18n.t('filterOperator.beforeDate', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.beforeDate'),
         value: 'beforeDate',
     },
     {
-        label: i18n.t('filterOperator.afterDate', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.afterDate'),
         value: 'afterDate',
     },
     {
-        label: i18n.t('filterOperator.inTheRangeDate', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.inTheRangeDate'),
         value: 'inTheRangeDate',
     },
 ];
 
 export const NDSongQueryStringOperators = [
     {
-        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.is'),
         value: 'is',
     },
     {
-        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
     {
-        label: i18n.t('filterOperator.contains', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.contains'),
         value: 'contains',
     },
     {
-        label: i18n.t('filterOperator.notContains', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.notContains'),
         value: 'notContains',
     },
     {
-        label: i18n.t('filterOperator.startsWith', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.startsWith'),
         value: 'startsWith',
     },
     {
-        label: i18n.t('filterOperator.endsWith', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.endsWith'),
         value: 'endsWith',
     },
 ];
 
 export const NDSongQueryBooleanOperators = [
     {
-        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.is'),
         value: 'is',
     },
     {
-        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
 ];
 
 export const NDSongQueryNumberOperators = [
     {
-        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.is'),
         value: 'is',
     },
     {
-        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
     {
-        label: i18n.t('filterOperator.contains', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.contains'),
         value: 'contains',
     },
     {
-        label: i18n.t('filterOperator.notContains', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.notContains'),
         value: 'notContains',
     },
     {
-        label: i18n.t('filterOperator.isGreaterThan', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isGreaterThan'),
         value: 'gt',
     },
     {
-        label: i18n.t('filterOperator.isLessThan', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isLessThan'),
         value: 'lt',
     },
     {
-        label: i18n.t('filterOperator.inTheRange', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.inTheRange'),
         value: 'inTheRange',
     },
 ];

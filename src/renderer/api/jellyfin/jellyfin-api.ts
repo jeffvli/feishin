@@ -404,11 +404,12 @@ export const createAuthHeader = (): string => {
 };
 
 export const jfApiClient = (args: {
+    forceRemoteUrl?: boolean;
     server: null | ServerListItemWithCredential;
     signal?: AbortSignal;
     url?: string;
 }) => {
-    const { server, signal, url } = args;
+    const { forceRemoteUrl, server, signal, url } = args;
 
     return initClient(contract, {
         api: async ({ body, headers, method, path }) => {
@@ -418,7 +419,7 @@ export const jfApiClient = (args: {
             const { params, path: api } = parsePath(path);
 
             if (server) {
-                const serverUrl = getServerUrl(server);
+                const serverUrl = getServerUrl(server, forceRemoteUrl);
                 baseUrl = serverUrl;
                 token = server?.credential;
             } else {
@@ -447,11 +448,7 @@ export const jfApiClient = (args: {
             } catch (e: any | AxiosError | Error) {
                 if (isAxiosError(e)) {
                     if (e.code === 'ERR_NETWORK') {
-                        throw new Error(
-                            i18n.t('error.networkError', {
-                                postProcess: 'sentenceCase',
-                            }) as string,
-                        );
+                        throw new Error(i18n.t('error.networkError') as string);
                     }
 
                     const error = e as AxiosError;

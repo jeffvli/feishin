@@ -60,10 +60,9 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.windowBarStyle', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.windowBarStyle', { postProcess: 'sentenceCase' }),
+            title: t('setting.windowBarStyle'),
         },
         {
             control: (
@@ -99,13 +98,10 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.trayEnabled', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            note: t('common.restartRequired', {
-                postProcess: 'sentenceCase',
-            }),
-            title: t('setting.trayEnabled', { postProcess: 'sentenceCase' }),
+            note: t('common.restartRequired'),
+            title: t('setting.trayEnabled'),
         },
         {
             control: (
@@ -126,10 +122,9 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.minimizeToTray', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron() || !settings.tray,
-            title: t('setting.minimizeToTray', { postProcess: 'sentenceCase' }),
+            title: t('setting.minimizeToTray'),
         },
         {
             control: (
@@ -150,10 +145,9 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.exitToTray', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron() || !settings.tray,
-            title: t('setting.exitToTray', { postProcess: 'sentenceCase' }),
+            title: t('setting.exitToTray'),
         },
         {
             control: (
@@ -174,17 +168,16 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.startMinimized', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron() || !settings.tray,
-            title: t('setting.startMinimized', { postProcess: 'sentenceCase' }),
+            title: t('setting.startMinimized'),
         },
         {
             control: (
                 <Switch
                     aria-label="Toggle prevent sleep on playback"
                     defaultChecked={settings.preventSleepOnPlayback}
-                    disabled={!isElectron()}
+                    disabled={!isElectron() || settings.preventSuspendOnPlayback}
                     onChange={(e) => {
                         if (!e) return;
                         localSettings?.set(
@@ -201,17 +194,38 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.preventSleepOnPlayback', {
                 context: 'description',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.preventSleepOnPlayback'),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label="Toggle prevent suspend on playback"
+                    defaultChecked={settings.preventSuspendOnPlayback}
+                    disabled={!isElectron() || settings.preventSleepOnPlayback}
+                    onChange={(e) => {
+                        if (!e) return;
+                        localSettings?.set(
+                            'window_prevent_suspend_on_playback',
+                            e.currentTarget.checked,
+                        );
+                        setSettings({
+                            window: {
+                                preventSuspendOnPlayback: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.preventSuspendOnPlayback', {
+                context: 'description',
                 postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.preventSleepOnPlayback', { postProcess: 'sentenceCase' }),
+            title: t('setting.preventSuspendOnPlayback', { postProcess: 'sentenceCase' }),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={windowOptions}
-            title={t('page.setting.application', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={windowOptions} title={t('page.setting.application')} />;
 });

@@ -7,8 +7,10 @@ import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import {
+    SidebarPlaylistAddDragContext,
     SidebarPlaylistList,
     SidebarSharedPlaylistList,
+    useSidebarPlaylistAddDragMonitor,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
 import {
     SidebarItemType,
@@ -20,23 +22,34 @@ import { Group } from '/@/shared/components/group/group';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Text } from '/@/shared/components/text/text';
 
+const MobileSidebarPlaylistSection = () => {
+    const isAddDragActive = useSidebarPlaylistAddDragMonitor();
+
+    return (
+        <SidebarPlaylistAddDragContext.Provider value={isAddDragActive}>
+            <SidebarPlaylistList />
+            <SidebarSharedPlaylistList />
+        </SidebarPlaylistAddDragContext.Provider>
+    );
+};
+
 export const MobileSidebar = () => {
     const { t } = useTranslation();
     const sidebarPlaylistList = useSidebarPlaylistList();
 
     const translatedSidebarItemMap = useMemo(
         () => ({
-            Albums: t('page.sidebar.albums', { postProcess: 'titleCase' }),
-            Artists: t('page.sidebar.albumArtists', { postProcess: 'titleCase' }),
-            'Artists-all': t('page.sidebar.artists', { postProcess: 'titleCase' }),
-            Favorites: t('page.sidebar.favorites', { postProcess: 'titleCase' }),
-            Genres: t('page.sidebar.genres', { postProcess: 'titleCase' }),
-            Home: t('page.sidebar.home', { postProcess: 'titleCase' }),
-            'Now Playing': t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
-            Playlists: t('page.sidebar.playlists', { postProcess: 'titleCase' }),
-            Search: t('page.sidebar.search', { postProcess: 'titleCase' }),
-            Settings: t('page.sidebar.settings', { postProcess: 'titleCase' }),
-            Tracks: t('page.sidebar.tracks', { postProcess: 'titleCase' }),
+            Albums: t('page.sidebar.albums'),
+            Artists: t('page.sidebar.albumArtists'),
+            'Artists-all': t('page.sidebar.artists'),
+            Favorites: t('page.sidebar.favorites'),
+            Genres: t('page.sidebar.genres'),
+            Home: t('page.sidebar.home'),
+            'Now Playing': t('page.sidebar.nowPlaying'),
+            Playlists: t('page.sidebar.playlists'),
+            Search: t('page.sidebar.search'),
+            Settings: t('page.sidebar.settings'),
+            Tracks: t('page.sidebar.tracks'),
         }),
         [t],
     );
@@ -77,9 +90,7 @@ export const MobileSidebar = () => {
                     <Accordion.Item value="library">
                         <Accordion.Control>
                             <Text fw={600} variant="secondary">
-                                {t('page.sidebar.myLibrary', {
-                                    postProcess: 'titleCase',
-                                })}
+                                {t('page.sidebar.myLibrary')}
                             </Text>
                         </Accordion.Control>
                         <Accordion.Panel>
@@ -95,12 +106,7 @@ export const MobileSidebar = () => {
                             })}
                         </Accordion.Panel>
                     </Accordion.Item>
-                    {sidebarPlaylistList && (
-                        <>
-                            <SidebarPlaylistList />
-                            <SidebarSharedPlaylistList />
-                        </>
-                    )}
+                    {sidebarPlaylistList && <MobileSidebarPlaylistSection />}
                 </Accordion>
             </ScrollArea>
         </div>

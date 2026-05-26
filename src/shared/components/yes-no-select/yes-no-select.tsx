@@ -12,11 +12,11 @@ export const YesNoSelect = ({ ...props }: YesNoSelectProps) => {
             clearable
             data={[
                 {
-                    label: t('common.no', { postProcess: 'sentenceCase' }),
+                    label: t('common.no'),
                     value: 'false',
                 },
                 {
-                    label: t('common.yes', { postProcess: 'sentenceCase' }),
+                    label: t('common.yes'),
                     value: 'true',
                 },
             ]}

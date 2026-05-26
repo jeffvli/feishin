@@ -57,17 +57,13 @@ const SearchResult = ({ data, isSelected, onClick }: SearchResultProps) => {
 
     const syncStatus = useMemo(() => {
         if (isSync === true) {
-            return t('page.fullscreenPlayer.config.synchronized', {
-                postProcess: 'sentenceCase',
-            });
+            return t('page.fullscreenPlayer.config.synchronized');
         }
         if (isSync === false) {
-            return t('page.fullscreenPlayer.config.unsynchronized', {
-                postProcess: 'sentenceCase',
-            });
+            return t('page.fullscreenPlayer.config.unsynchronized');
         }
 
-        return t('common.unknown', { postProcess: 'titleCase' });
+        return t('common.unknown');
     }, [isSync, t]);
 
     return (
@@ -186,7 +182,6 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
                         data-autofocus
                         label={t('form.lyricSearch.input', {
                             context: 'name',
-                            postProcess: 'titleCase',
                         })}
                         rightSection={
                             form.values.name ? (
@@ -203,7 +198,6 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
                     <TextInput
                         label={t('form.lyricSearch.input', {
                             context: 'artist',
-                            postProcess: 'titleCase',
                         })}
                         rightSection={
                             form.values.artist ? (
@@ -288,11 +282,7 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
                                 </div>
                             ) : (
                                 <Center>
-                                    <Text isMuted>
-                                        {t('page.fullscreenPlayer.noLyrics', {
-                                            postProcess: 'sentenceCase',
-                                        })}
-                                    </Text>
+                                    <Text isMuted>{t('page.fullscreenPlayer.noLyrics')}</Text>
                                 </Center>
                             )}
                         </ScrollArea>
@@ -302,17 +292,17 @@ export const LyricsSearchForm = ({ artist, name, onSearchOverride }: LyricSearch
             <Divider />
             <Group justify="flex-end">
                 <Button onClick={() => closeAllModals()} variant="default">
-                    {t('common.cancel', { postProcess: 'titleCase' })}
+                    {t('common.cancel')}
                 </Button>
                 <Button
                     disabled={!selectedResult || !previewData}
                     onClick={handleExport}
                     variant="default"
                 >
-                    {t('form.lyricsExport.export', { postProcess: 'titleCase' })}
+                    {t('form.lyricsExport.export')}
                 </Button>
                 <Button disabled={!selectedResult} onClick={handleApply} variant="filled">
-                    {t('common.confirm', { postProcess: 'titleCase' })}
+                    {t('common.confirm')}
                 </Button>
             </Group>
         </Stack>
@@ -330,6 +320,6 @@ export const openLyricSearchModal = ({ artist, name, onSearchOverride }: LyricSe
                 height: '600px',
             },
         },
-        title: i18n.t('form.lyricSearch.title', { postProcess: 'titleCase' }) as string,
+        title: i18n.t('form.lyricSearch.title') as string,
     });
 };

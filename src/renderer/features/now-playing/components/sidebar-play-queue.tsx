@@ -313,7 +313,7 @@ const PanelReorderControls = ({ panelType }: { panelType: 'lyrics' | 'visualizer
                     onClick={handleMoveUp}
                     size="xs"
                     tooltip={{
-                        label: t('action.moveUp', { postProcess: 'sentenceCase' }),
+                        label: t('action.moveUp'),
                     }}
                     variant="subtle"
                 />
@@ -324,7 +324,7 @@ const PanelReorderControls = ({ panelType }: { panelType: 'lyrics' | 'visualizer
                     onClick={handleMoveDown}
                     size="xs"
                     tooltip={{
-                        label: t('action.moveDown', { postProcess: 'sentenceCase' }),
+                        label: t('action.moveDown'),
                     }}
                     variant="subtle"
                 />
@@ -334,7 +334,7 @@ const PanelReorderControls = ({ panelType }: { panelType: 'lyrics' | 'visualizer
                     onClick={handleClose}
                     size="xs"
                     tooltip={{
-                        label: t('common.close', { postProcess: 'sentenceCase' }),
+                        label: t('common.close'),
                     }}
                     variant="subtle"
                 />

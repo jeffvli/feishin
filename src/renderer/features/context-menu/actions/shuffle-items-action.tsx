@@ -29,15 +29,15 @@ export const ShuffleItemsAction = ({ items }: ShuffleItemsActionProps) => {
                     onSelect={(e) => e.preventDefault()}
                     rightIcon="arrowRightS"
                 >
-                    {t('action.shuffle', { postProcess: 'sentenceCase' })}
+                    {t('action.shuffle')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuTarget>
             <ContextMenu.SubmenuContent>
                 <ContextMenu.Item onSelect={handleShuffleSelected}>
-                    {t('action.shuffleSelected', { postProcess: 'sentenceCase' })}
+                    {t('action.shuffleSelected')}
                 </ContextMenu.Item>
                 <ContextMenu.Item onSelect={handleShuffleAll}>
-                    {t('action.shuffleAll', { postProcess: 'sentenceCase' })}
+                    {t('action.shuffleAll')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuContent>
         </ContextMenu.Submenu>

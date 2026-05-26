@@ -128,15 +128,15 @@ export const NavidromeSongFilters = ({
     const segmentedControlData = useMemo(
         () => [
             {
-                label: t('common.none', { postProcess: 'titleCase' }),
+                label: t('common.none'),
                 value: 'none',
             },
             {
-                label: t('common.yes', { postProcess: 'titleCase' }),
+                label: t('common.yes'),
                 value: 'true',
             },
             {
-                label: t('common.no', { postProcess: 'titleCase' }),
+                label: t('common.no'),
                 value: 'false',
             },
         ],
@@ -189,16 +189,16 @@ export const NavidromeSongFilters = ({
         return (
             <Group gap="xs" justify="space-between" w="100%">
                 <Text fw={500} size="sm">
-                    {t('entity.genre', { count: 2, postProcess: 'sentenceCase' })}
+                    {t('entity.genre', { count: 2 })}
                 </Text>
                 <SegmentedControl
                     data={[
                         {
-                            label: t('common.filter_single', { postProcess: 'titleCase' }),
+                            label: t('common.filter_single'),
                             value: 'single',
                         },
                         {
-                            label: t('common.filter_multiple', { postProcess: 'titleCase' }),
+                            label: t('common.filter_multiple'),
                             value: 'multi',
                         },
                     ]}
@@ -242,16 +242,16 @@ export const NavidromeSongFilters = ({
         return (
             <Group gap="xs" justify="space-between" w="100%">
                 <Text fw={500} size="sm">
-                    {t('entity.artist', { count: 2, postProcess: 'sentenceCase' })}
+                    {t('entity.artist', { count: 2 })}
                 </Text>
                 <SegmentedControl
                     data={[
                         {
-                            label: t('common.filter_single', { postProcess: 'titleCase' }),
+                            label: t('common.filter_single'),
                             value: 'single',
                         },
                         {
-                            label: t('common.filter_multiple', { postProcess: 'titleCase' }),
+                            label: t('common.filter_multiple'),
                             value: 'multi',
                         },
                     ]}
@@ -278,7 +278,7 @@ export const NavidromeSongFilters = ({
         <Stack px="md" py="md">
             <Stack gap="xs">
                 <Text size="sm" weight={500}>
-                    {t('filter.isFavorited', { postProcess: 'sentenceCase' })}
+                    {t('filter.isFavorited')}
                 </Text>
                 <SegmentedControl
                     data={segmentedControlData}
@@ -295,7 +295,7 @@ export const NavidromeSongFilters = ({
                     <Divider my="md" />
                     <Stack gap="xs">
                         <Text size="sm" weight={500}>
-                            {t('filter.isRated', { postProcess: 'sentenceCase' })}
+                            {t('filter.isRated')}
                         </Text>
                         <SegmentedControl
                             data={segmentedControlData}
@@ -339,7 +339,7 @@ export const NavidromeSongFilters = ({
             )}
             <NumberInput
                 hideControls={false}
-                label={t('common.year', { postProcess: 'titleCase' })}
+                label={t('common.year')}
                 max={5000}
                 min={0}
                 onChange={(e) => debouncedHandleYearFilter(e)}

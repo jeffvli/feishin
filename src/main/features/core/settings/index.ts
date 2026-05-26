@@ -1,7 +1,18 @@
 import type { TitleTheme } from '/@/shared/types/types';
+import type { FSWatcher } from 'fs';
 
-import { app, dialog, ipcMain, nativeTheme, OpenDialogOptions, safeStorage } from 'electron';
+import {
+    app,
+    BrowserWindow,
+    dialog,
+    ipcMain,
+    nativeTheme,
+    OpenDialogOptions,
+    safeStorage,
+    shell,
+} from 'electron';
 import Store from 'electron-store';
+import { promises as fs, watch as fsWatch } from 'fs';
 import path from 'path';
 
 const getFrame = () => {
@@ -25,6 +36,67 @@ const defaultUserDataPath = app.getPath('userData');
 const storePath = isDevelopment
     ? path.normalize(`${defaultUserDataPath}-dev`)
     : path.normalize(defaultUserDataPath);
+
+const CUSTOM_CSS_FILENAME = 'custom.css';
+const customCssPath = path.join(storePath, CUSTOM_CSS_FILENAME);
+let customCssWatcher: FSWatcher | null = null;
+let customCssDebounce: NodeJS.Timeout | null = null;
+
+const readCustomCss = async (): Promise<{ content: string; exists: boolean }> => {
+    try {
+        const content = await fs.readFile(customCssPath, 'utf8');
+        return { content, exists: true };
+    } catch (error) {
+        const fsError = error as NodeJS.ErrnoException;
+        if (fsError.code === 'ENOENT') {
+            return { content: '', exists: false };
+        }
+
+        console.error('Failed to read custom css file', error);
+        return { content: '', exists: false };
+    }
+};
+
+const notifyCustomCssUpdate = async () => {
+    const { content, exists } = await readCustomCss();
+    BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('custom-css-updated', {
+            content,
+            exists,
+            path: customCssPath,
+        });
+    });
+};
+
+const scheduleCustomCssUpdate = () => {
+    if (customCssDebounce) {
+        clearTimeout(customCssDebounce);
+    }
+
+    customCssDebounce = setTimeout(() => {
+        notifyCustomCssUpdate().catch((error) => {
+            console.error('Failed to broadcast custom css update', error);
+        });
+    }, 100);
+};
+
+const startCustomCssWatcher = async () => {
+    if (customCssWatcher) return;
+
+    try {
+        await fs.mkdir(storePath, { recursive: true });
+        customCssWatcher = fsWatch(storePath, (eventType, filename) => {
+            if (!filename) return;
+            if (filename.toString() !== CUSTOM_CSS_FILENAME) return;
+
+            if (eventType === 'change' || eventType === 'rename') {
+                scheduleCustomCssUpdate();
+            }
+        });
+    } catch (error) {
+        console.error('Failed to watch custom css file', error);
+    }
+};
 
 export const store = new Store<any>({
     beforeEachMigration: (_store, context) => {
@@ -119,4 +191,43 @@ ipcMain.handle('open-file-selector', async (_event, options: OpenDialogOptions) 
     });
 
     return result.filePaths[0] || null;
+});
+
+ipcMain.handle('custom-css-get', async () => {
+    const { content, exists } = await readCustomCss();
+    return {
+        content,
+        exists,
+        path: customCssPath,
+    };
+});
+
+ipcMain.handle('custom-css-save', async (_event, data: { content: string }) => {
+    const content = typeof data?.content === 'string' ? data.content : '';
+    await fs.mkdir(storePath, { recursive: true });
+    await fs.writeFile(customCssPath, content, 'utf8');
+    await notifyCustomCssUpdate();
+    return true;
+});
+
+ipcMain.handle('custom-css-open-folder', async () => {
+    await fs.mkdir(storePath, { recursive: true });
+    await shell.openPath(storePath);
+    return true;
+});
+
+app.whenReady()
+    .then(() => startCustomCssWatcher())
+    .catch((error) => console.error('Failed to start custom css watcher', error));
+
+app.on('before-quit', () => {
+    if (customCssWatcher) {
+        customCssWatcher.close();
+        customCssWatcher = null;
+    }
+
+    if (customCssDebounce) {
+        clearTimeout(customCssDebounce);
+        customCssDebounce = null;
+    }
 });

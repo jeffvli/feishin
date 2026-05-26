@@ -407,7 +407,7 @@ export const LibraryHeaderMenu = ({
                         size="md"
                         variant="transparent"
                     >
-                        {t('player.albumRadio', { postProcess: 'sentenceCase' })}
+                        {t('player.albumRadio')}
                     </Button>
                 )}
                 {onArtistRadio && (
@@ -424,7 +424,7 @@ export const LibraryHeaderMenu = ({
                         size="md"
                         variant="transparent"
                     >
-                        {t('player.artistRadio', { postProcess: 'sentenceCase' })}
+                        {t('player.artistRadio')}
                     </Button>
                 )}
             </Group>

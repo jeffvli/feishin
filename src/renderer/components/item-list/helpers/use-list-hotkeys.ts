@@ -6,8 +6,8 @@ import {
     ItemListStateItemWithRequiredProperties,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls } from '/@/renderer/components/item-list/types';
+import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { useHotkeySettings, usePlayButtonBehavior } from '/@/renderer/store';
-import { useHotkeys } from '/@/shared/hooks/use-hotkeys';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
@@ -16,11 +16,13 @@ export const useListHotkeys = ({
     focused,
     internalState,
     itemType,
+    onShowPlayingSong,
 }: {
     controls: ItemControls;
     focused: boolean;
     internalState: ItemListStateActions;
     itemType: LibraryItem;
+    onShowPlayingSong?: () => void;
 }) => {
     const { bindings } = useHotkeySettings();
     const playButtonBehavior = usePlayButtonBehavior();
@@ -117,6 +119,12 @@ export const useListHotkeys = ({
                 if (path) {
                     navigate(path, { state: { item } });
                 }
+            },
+        ],
+        [
+            bindings.listShowPlayingSong.hotkey,
+            () => {
+                onShowPlayingSong?.();
             },
         ],
     ]);

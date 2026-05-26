@@ -110,7 +110,7 @@ export const JellyfinSongFilters = ({
 
     const yesNoFilters = [
         {
-            label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
+            label: t('filter.isFavorited'),
             onChange: (favorite: boolean | undefined) => {
                 setFavorite(favorite ?? null);
             },
@@ -203,16 +203,16 @@ export const JellyfinSongFilters = ({
         return (
             <Group gap="xs" justify="space-between" w="100%">
                 <Text fw={500} size="sm">
-                    {t('entity.artist', { count: 2, postProcess: 'sentenceCase' })}
+                    {t('entity.artist', { count: 2 })}
                 </Text>
                 <SegmentedControl
                     data={[
                         {
-                            label: t('common.filter_single', { postProcess: 'titleCase' }),
+                            label: t('common.filter_single'),
                             value: 'single',
                         },
                         {
-                            label: t('common.filter_multiple', { postProcess: 'titleCase' }),
+                            label: t('common.filter_multiple'),
                             value: 'multi',
                         },
                     ]}
@@ -251,16 +251,16 @@ export const JellyfinSongFilters = ({
         return (
             <Group gap="xs" justify="space-between" w="100%">
                 <Text fw={500} size="sm">
-                    {t('entity.genre', { count: 2, postProcess: 'sentenceCase' })}
+                    {t('entity.genre', { count: 2 })}
                 </Text>
                 <SegmentedControl
                     data={[
                         {
-                            label: t('common.filter_single', { postProcess: 'titleCase' }),
+                            label: t('common.filter_single'),
                             value: 'single',
                         },
                         {
-                            label: t('common.filter_multiple', { postProcess: 'titleCase' }),
+                            label: t('common.filter_multiple'),
                             value: 'multi',
                         },
                     ]}
@@ -317,7 +317,7 @@ export const JellyfinSongFilters = ({
             <Group grow>
                 <NumberInput
                     hideControls={false}
-                    label={t('filter.fromYear', { postProcess: 'sentenceCase' })}
+                    label={t('filter.fromYear')}
                     max={2300}
                     min={1700}
                     onChange={(e) => debouncedHandleMinYearFilter(e)}
@@ -326,7 +326,7 @@ export const JellyfinSongFilters = ({
                 />
                 <NumberInput
                     hideControls={false}
-                    label={t('filter.toYear', { postProcess: 'sentenceCase' })}
+                    label={t('filter.toYear')}
                     max={2300}
                     min={1700}
                     onChange={(e) => debouncedHandleMaxYearFilter(e)}

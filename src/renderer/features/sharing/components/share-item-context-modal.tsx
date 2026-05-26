@@ -38,11 +38,7 @@ export const ShareItemContextModal = ({
         },
         validate: {
             expires: (value) =>
-                dayjs(value).isAfter(dayjs())
-                    ? null
-                    : t('form.shareItem.expireInvalid', {
-                          postProcess: 'sentenceCase',
-                      }),
+                dayjs(value).isAfter(dayjs()) ? null : t('form.shareItem.expireInvalid'),
         },
     });
 
@@ -61,9 +57,7 @@ export const ShareItemContextModal = ({
             {
                 onError: () => {
                     toast.error({
-                        message: t('form.shareItem.createFailed', {
-                            postProcess: 'sentenceCase',
-                        }),
+                        message: t('form.shareItem.createFailed'),
                     });
                 },
                 onSuccess: (_data) => {
@@ -86,9 +80,7 @@ export const ShareItemContextModal = ({
                             canUseClipboard
                                 ? 'form.shareItem.success'
                                 : 'form.shareItem.successMustClick',
-                            {
-                                postProcess: 'sentenceCase',
-                            },
+                            {},
                         ),
                         onClick: (a) => {
                             if (!(a.target instanceof HTMLElement)) return;
@@ -113,9 +105,7 @@ export const ShareItemContextModal = ({
             <Stack>
                 <DateTimePicker
                     clearable
-                    label={t('form.shareItem.setExpiration', {
-                        postProcess: 'titleCase',
-                    })}
+                    label={t('form.shareItem.setExpiration')}
                     minDate={new Date()}
                     placeholder={defaultDate}
                     popoverProps={{ withinPortal: true }}
@@ -124,17 +114,13 @@ export const ShareItemContextModal = ({
                 />
                 <Textarea
                     autosize
-                    label={t('form.shareItem.description', {
-                        postProcess: 'titleCase',
-                    })}
+                    label={t('form.shareItem.description')}
                     minRows={5}
                     {...form.getInputProps('description')}
                 />
                 <Switch
                     defaultChecked={false}
-                    label={t('form.shareItem.allowDownloading', {
-                        postProcess: 'titleCase',
-                    })}
+                    label={t('form.shareItem.allowDownloading')}
                     {...form.getInputProps('allowDownloading')}
                 />
 

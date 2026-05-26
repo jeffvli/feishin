@@ -41,7 +41,7 @@ export const SetRatingAction = ({ ids, itemType }: SetRatingActionProps) => {
                     onSelect={(e) => e.preventDefault()}
                     rightIcon="arrowRightS"
                 >
-                    {t('action.setRating', { postProcess: 'sentenceCase' })}
+                    {t('action.setRating')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuTarget>
             <ContextMenu.SubmenuContent>

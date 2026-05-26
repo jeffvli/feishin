@@ -6,7 +6,7 @@ import styles from './drag-preview.module.css';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { Icon } from '/@/shared/components/icon/icon';
 import { LibraryItem } from '/@/shared/types/domain-types';
-import { DragData } from '/@/shared/types/drag-and-drop';
+import { DragData, DragTarget } from '/@/shared/types/drag-and-drop';
 
 interface DragPreviewProps {
     data: DragData;
@@ -29,7 +29,8 @@ export const DragPreview = memo(({ data }: DragPreviewProps) => {
     const { t } = useTranslation();
     const itemCount = items.length;
     const firstItem = items[0];
-    const itemName = firstItem ? getItemName(firstItem) : 'Item';
+    const folderName = data.type === DragTarget.SIDEBAR_PLAYLIST_FOLDER ? data.id[0] : undefined;
+    const itemName = folderName || (firstItem ? getItemName(firstItem) : 'Item');
 
     const itemImage = useItemImageUrl({
         id: (firstItem as { imageId: string })?.imageId,
@@ -50,6 +51,9 @@ export const DragPreview = memo(({ data }: DragPreviewProps) => {
                         </div>
                     ) : (
                         <div className={styles['icon-container']}>
+                            {data.type === DragTarget.SIDEBAR_PLAYLIST_FOLDER && (
+                                <Icon icon="folder" size="xl" />
+                            )}
                             {data.itemType === LibraryItem.ALBUM && <Icon icon="album" size="xl" />}
                             {data.itemType === LibraryItem.SONG && (
                                 <Icon icon="itemSong" size="xl" />

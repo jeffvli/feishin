@@ -1,7 +1,8 @@
 import { openContextModal } from '@mantine/modals';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { memo, MouseEvent, useCallback, useMemo, useState } from 'react';
+import { motion } from 'motion/react';
+import { createContext, memo, MouseEvent, useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 
@@ -12,27 +13,38 @@ import { ContextMenuController } from '/@/renderer/features/context-menu/context
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { openCreatePlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
+import { useIsMutatingSidebarPlaylistFolderMove } from '/@/renderer/features/playlists/mutations/sidebar-playlist-folder-move-mutation';
+import { ItemRowPlayControls } from '/@/renderer/features/shared/components/item-row-play-controls';
 import {
-    LONG_PRESS_PLAY_BEHAVIOR,
-    PlayTooltip,
-} from '/@/renderer/features/shared/components/play-button-group';
-import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-button-click';
+    collectFolderPaths,
+    PlaylistFolderDragExpandProvider,
+    PlaylistFolderViews,
+    PlaylistRootAccordionControl,
+    usePlaylistFolderState,
+    usePlaylistFolderViewState,
+    usePlaylistNavigationState,
+} from '/@/renderer/features/sidebar/components/playlist-folder-tree';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
+import { useDragMonitor } from '/@/renderer/hooks/use-drag-monitor';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useCurrentServer,
     useCurrentServerId,
     usePermissions,
     useSidebarPlaylistListFilterRegex,
+    useSidebarPlaylistMode,
     useSidebarPlaylistSorting,
 } from '/@/renderer/store';
 import { formatDurationString } from '/@/renderer/utils';
 import { Accordion } from '/@/shared/components/accordion/accordion';
-import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { animationProps } from '/@/shared/components/animations/animation-props';
+import { animationVariants } from '/@/shared/components/animations/animation-variants';
 import { ButtonProps } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Image } from '/@/shared/components/image/image';
+import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
 import { Text } from '/@/shared/components/text/text';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import {
@@ -42,15 +54,51 @@ import {
     Song,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
+import { DragData, DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
 import { Play } from '/@/shared/types/types';
+
+const MotionLink = motion.create(Link);
+
+const playlistRowDimVariants = animationVariants.combine(animationVariants.fadeIn, {
+    hidden: { opacity: 0.5 },
+});
 
 const getPlaylistOrderKey = (serverId: string | undefined, scope: 'owned' | 'shared') => {
     const sid = serverId || 'local';
     return `playlist_order:${sid}:${scope}`;
 };
 
-interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'onPlay'> {
+export const SidebarPlaylistAddDragContext = createContext(false);
+
+const isAddToPlaylistDragSource = (source: DragData) => {
+    return (
+        source.itemType !== undefined &&
+        source.type !== DragTarget.PLAYLIST &&
+        (source.operation?.includes(DragOperation.ADD) ?? false)
+    );
+};
+
+export const useSidebarPlaylistAddDragMonitor = () => {
+    const [isAddDragActive, setIsAddDragActive] = useState(false);
+
+    const handleAddDragStart = useCallback(() => {
+        setIsAddDragActive(true);
+    }, []);
+
+    const handleAddDragDrop = useCallback(() => {
+        setIsAddDragActive(false);
+    }, []);
+
+    useDragMonitor({
+        canMonitor: isAddToPlaylistDragSource,
+        onDragStart: handleAddDragStart,
+        onDrop: handleAddDragDrop,
+    });
+
+    return isAddDragActive;
+};
+
+export interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'onPlay'> {
     item: Playlist;
     name: string;
     onContextMenu: (e: MouseEvent<HTMLAnchorElement>, item: Playlist) => void;
@@ -58,7 +106,7 @@ interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'on
     to: string;
 }
 
-const PlaylistRowButton = memo(
+export const PlaylistRowButton = memo(
     ({ item, name, onContextMenu, onReorder, to }: PlaylistRowButtonProps) => {
         const url = {
             pathname: generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: to }),
@@ -66,8 +114,12 @@ const PlaylistRowButton = memo(
         };
         const { t } = useTranslation();
         const sidebarPlaylistSorting = useSidebarPlaylistSorting();
+        const sidebarPlaylistMode = useSidebarPlaylistMode();
+        const isCompact = sidebarPlaylistMode === 'compact';
 
         const [isHovered, setIsHovered] = useState(false);
+        const isSmartPlaylist = Boolean(item.rules);
+        const isAddDragActive = useContext(SidebarPlaylistAddDragContext);
 
         const { isDraggedOver, isDragging, ref } = useDragDrop<HTMLAnchorElement>({
             drag: {
@@ -85,6 +137,7 @@ const PlaylistRowButton = memo(
                 canDrop: (args) => {
                     // Allow dropping items into a playlist (ADD)
                     const canAdd =
+                        !isSmartPlaylist &&
                         args.source.itemType !== undefined &&
                         args.source.type !== DragTarget.PLAYLIST &&
                         (args.source.operation?.includes(DragOperation.ADD) ?? false);
@@ -106,6 +159,7 @@ const PlaylistRowButton = memo(
                     };
                 },
                 onDrag: () => {
+                    console.log('started drag');
                     return;
                 },
                 onDragLeave: () => {
@@ -135,6 +189,10 @@ const PlaylistRowButton = memo(
                         }
 
                         onReorder(sourceIds, to, args.edge);
+                        return;
+                    }
+
+                    if (isSmartPlaylist) {
                         return;
                     }
 
@@ -185,7 +243,7 @@ const PlaylistRowButton = memo(
                         innerProps: modalProps,
                         modal: 'addToPlaylist',
                         size: 'lg',
-                        title: t('form.addToPlaylist.title', { postProcess: 'titleCase' }),
+                        title: t('form.addToPlaylist.title'),
                     });
                 },
             },
@@ -210,12 +268,18 @@ const PlaylistRowButton = memo(
             type: 'table',
         });
 
+        const isDimmed = isDragging || (isSmartPlaylist && isAddDragActive);
+
         return (
-            <Link
+            <MotionLink
+                {...animationProps.fadeIn}
+                animate={isDimmed ? 'hidden' : 'show'}
                 className={clsx(styles.row, {
-                    [styles.rowDraggedOver]: isDraggedOver,
+                    [styles.rowCompact]: isCompact,
+                    [styles.rowDraggedOver]: isDraggedOver && !isSmartPlaylist,
                     [styles.rowHover]: isHovered,
                 })}
+                initial={false}
                 onContextMenu={(e: MouseEvent<HTMLAnchorElement>) => {
                     e.preventDefault();
                     onContextMenu(e, item);
@@ -223,135 +287,79 @@ const PlaylistRowButton = memo(
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 ref={ref}
-                style={{
-                    opacity: isDragging ? 0.5 : 1,
-                }}
                 to={url}
+                variants={playlistRowDimVariants}
             >
-                <div className={styles.rowGroup}>
-                    <Image containerClassName={styles.imageContainer} src={imageUrl} />
-                    <div className={styles.metadata}>
-                        <Text className={styles.name} fw={500} size="md">
+                {isCompact ? (
+                    <>
+                        <Text className={styles.compactName} fw={500} size="md">
                             {name}
                         </Text>
-                        <div className={styles.metadataGroup}>
-                            <div
-                                className={clsx(
-                                    styles.metadataGroupItem,
-                                    styles.metadataGroupItemNoShrink,
-                                )}
-                            >
-                                <Icon color="muted" icon="itemSong" size="sm" />
-                                <Text isMuted size="sm">
-                                    {item.songCount || 0}
+                        {isHovered && (
+                            <ItemRowPlayControls
+                                className={clsx(styles.controls, styles.controlsCompact)}
+                                onPlay={(playType) => handlePlay(to, playType)}
+                            />
+                        )}
+                    </>
+                ) : (
+                    <>
+                        <div className={styles.rowGroup}>
+                            <Image containerClassName={styles.imageContainer} src={imageUrl} />
+                            <div className={styles.metadata}>
+                                <Text className={styles.name} fw={500} size="md">
+                                    {name}
                                 </Text>
-                            </div>
-                            <div className={styles.metadataGroupItem}>
-                                <Icon color="muted" icon="duration" size="sm" />
-                                <Text isMuted size="sm">
-                                    {formatDurationString(item.duration ?? 0)}
-                                </Text>
-                            </div>
-                            {item.ownerId === permissions.userId && Boolean(item.public) && (
-                                <div className={styles.metadataGroupItem}>
-                                    <Text isMuted size="sm">
-                                        {t('common.public', { postProcess: 'titleCase' })}
-                                    </Text>
+                                <div className={styles.metadataGroup}>
+                                    <div
+                                        className={clsx(
+                                            styles.metadataGroupItem,
+                                            styles.metadataGroupItemNoShrink,
+                                        )}
+                                    >
+                                        <Icon color="muted" icon="itemSong" size="sm" />
+                                        <Text isMuted size="sm">
+                                            {item.songCount || 0}
+                                        </Text>
+                                    </div>
+                                    <div className={styles.metadataGroupItem}>
+                                        <Icon color="muted" icon="duration" size="sm" />
+                                        <Text isMuted size="sm">
+                                            {formatDurationString(item.duration ?? 0)}
+                                        </Text>
+                                    </div>
+                                    {item.ownerId === permissions.userId &&
+                                        Boolean(item.public) && (
+                                            <div className={styles.metadataGroupItem}>
+                                                <Text isMuted size="sm">
+                                                    {t('common.public')}
+                                                </Text>
+                                            </div>
+                                        )}
+                                    {item.ownerId !== permissions.userId && (
+                                        <div className={styles.metadataGroupItem}>
+                                            <Icon color="muted" icon="user" size="sm" />
+                                            <Text isMuted size="sm">
+                                                {item.owner}
+                                            </Text>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                            {item.ownerId !== permissions.userId && (
-                                <div className={styles.metadataGroupItem}>
-                                    <Icon color="muted" icon="user" size="sm" />
-                                    <Text isMuted size="sm">
-                                        {item.owner}
-                                    </Text>
-                                </div>
-                            )}
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                {isHovered && <RowControls id={to} onPlay={handlePlay} />}
-            </Link>
+                        {isHovered && (
+                            <ItemRowPlayControls
+                                className={styles.controls}
+                                onPlay={(playType) => handlePlay(to, playType)}
+                            />
+                        )}
+                    </>
+                )}
+            </MotionLink>
         );
     },
 );
-
-const RowControls = ({
-    id,
-    onPlay,
-}: {
-    id: string;
-    onPlay: (id: string, playType: Play) => void;
-}) => {
-    const handlePlayNext = usePlayButtonClick({
-        onClick: () => {
-            onPlay(id, Play.NEXT);
-        },
-        onLongPress: () => {
-            onPlay(id, LONG_PRESS_PLAY_BEHAVIOR[Play.NEXT]);
-        },
-    });
-
-    const handlePlayNow = usePlayButtonClick({
-        onClick: () => {
-            onPlay(id, Play.NOW);
-        },
-        onLongPress: () => {
-            onPlay(id, LONG_PRESS_PLAY_BEHAVIOR[Play.NOW]);
-        },
-    });
-
-    const handlePlayLast = usePlayButtonClick({
-        onClick: () => {
-            onPlay(id, Play.LAST);
-        },
-        onLongPress: () => {
-            onPlay(id, LONG_PRESS_PLAY_BEHAVIOR[Play.LAST]);
-        },
-    });
-
-    return (
-        <ActionIconGroup className={styles.controls}>
-            <PlayTooltip type={Play.NOW}>
-                <ActionIcon
-                    icon="mediaPlay"
-                    iconProps={{
-                        size: 'md',
-                    }}
-                    size="xs"
-                    variant="subtle"
-                    {...handlePlayNow.handlers}
-                    {...handlePlayNow.props}
-                />
-            </PlayTooltip>
-            <PlayTooltip type={Play.NEXT}>
-                <ActionIcon
-                    icon="mediaPlayNext"
-                    iconProps={{
-                        size: 'md',
-                    }}
-                    size="xs"
-                    variant="subtle"
-                    {...handlePlayNext.handlers}
-                    {...handlePlayNext.props}
-                />
-            </PlayTooltip>
-            <PlayTooltip type={Play.LAST}>
-                <ActionIcon
-                    icon="mediaPlayLast"
-                    iconProps={{
-                        size: 'md',
-                    }}
-                    size="xs"
-                    variant="subtle"
-                    {...handlePlayLast.handlers}
-                    {...handlePlayLast.props}
-                />
-            </PlayTooltip>
-        </ActionIconGroup>
-    );
-};
 
 export const SidebarPlaylistList = () => {
     const player = usePlayer();
@@ -485,16 +493,64 @@ export const SidebarPlaylistList = () => {
         openCreatePlaylistModal(server, e);
     };
 
+    const folderViewState = usePlaylistFolderViewState(playlistItems?.items ?? []);
+    const { folderView, groups, tree } = folderViewState;
+    const navigation = usePlaylistNavigationState();
+    const inNavigation = folderView === 'navigation' && navigation.pathStack.length > 0;
+
+    const folderPaths = useMemo(() => {
+        if (folderView === 'single') {
+            return groups.reduce<string[]>((acc, g) => {
+                if (g.type === 'folder') acc.push(g.name);
+                return acc;
+            }, []);
+        }
+        return collectFolderPaths(tree);
+    }, [folderView, groups, tree]);
+
+    const { expandedSet, setMany, toggle } = usePlaylistFolderState('owned');
+    const allExpanded =
+        folderPaths.length > 0 && folderPaths.every((path) => expandedSet.has(path));
+
+    const handleToggleAllFolders = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            setMany(folderPaths, !allExpanded);
+        },
+        [setMany, folderPaths, allExpanded],
+    );
+
+    const handleNavigateUp = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            navigation.goUp();
+        },
+        [navigation],
+    );
+
+    const showExpandAll = folderView !== 'navigation' && folderPaths.length > 0;
+    const isFolderMovePending = useIsMutatingSidebarPlaylistFolderMove();
+
     return (
         <Accordion.Item value="playlists">
-            <Accordion.Control component="div" role="button" style={{ userSelect: 'none' }}>
-                <Group justify="space-between" pr="var(--theme-spacing-md)">
-                    <Text fw={500}>
-                        {t('page.sidebar.playlists', {
-                            postProcess: 'titleCase',
-                        })}
-                    </Text>
-                    <Group gap="xs">
+            <PlaylistRootAccordionControl allPlaylists={playlistItems?.items ?? []}>
+                <Group gap="xs" justify="space-between" pr="var(--theme-spacing-md)" wrap="nowrap">
+                    <Group gap="xs" style={{ minWidth: 0 }} wrap="nowrap">
+                        {inNavigation && (
+                            <ActionIcon
+                                icon="arrowLeftS"
+                                iconProps={{ size: 'lg' }}
+                                onClick={handleNavigateUp}
+                                size="xs"
+                                tooltip={{ label: t('common.back') }}
+                                variant="subtle"
+                            />
+                        )}
+                        <Text className={styles.name} fw={500}>
+                            {inNavigation ? navigation.currentName : t('page.sidebar.playlists')}
+                        </Text>
+                    </Group>
+                    <Group gap="xs" wrap="nowrap">
                         <ActionIcon
                             icon="add"
                             iconProps={{
@@ -503,12 +559,31 @@ export const SidebarPlaylistList = () => {
                             onClick={handleCreatePlaylistModal}
                             size="xs"
                             tooltip={{
-                                label: t('action.createPlaylist', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('action.createPlaylist'),
                             }}
                             variant="subtle"
                         />
+                        {showExpandAll && (
+                            <ActionIcon
+                                icon={allExpanded ? 'collapseAll' : 'expandAll'}
+                                iconProps={{
+                                    size: 'lg',
+                                }}
+                                onClick={handleToggleAllFolders}
+                                size="xs"
+                                tooltip={{
+                                    label: t(
+                                        allExpanded
+                                            ? 'action.collapseAllFolders'
+                                            : 'action.expandAllFolders',
+                                        {
+                                            postProcess: 'sentenceCase',
+                                        },
+                                    ),
+                                }}
+                                variant="subtle"
+                            />
+                        )}
                         <ActionIcon
                             component={Link}
                             icon="list"
@@ -519,26 +594,26 @@ export const SidebarPlaylistList = () => {
                             size="xs"
                             to={AppRoute.PLAYLISTS}
                             tooltip={{
-                                label: t('action.viewPlaylists', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('action.viewPlaylists'),
                             }}
                             variant="subtle"
                         />
                     </Group>
                 </Group>
-            </Accordion.Control>
-            <Accordion.Panel>
-                {playlistItems?.items?.map((item, index) => (
-                    <PlaylistRowButton
-                        item={item}
-                        key={index}
-                        name={item.name}
+            </PlaylistRootAccordionControl>
+            <Accordion.Panel className={styles.panel}>
+                <LoadingOverlay pos="absolute" visible={isFolderMovePending} />
+                <PlaylistFolderDragExpandProvider expandedSet={expandedSet} setMany={setMany}>
+                    <PlaylistFolderViews
+                        {...folderViewState}
+                        allPlaylists={playlistItems?.items ?? []}
+                        expandedSet={expandedSet}
+                        navigation={navigation}
                         onContextMenu={handleContextMenu}
                         onReorder={handleReorder}
-                        to={item.id}
+                        onToggleFolder={toggle}
                     />
-                ))}
+                </PlaylistFolderDragExpandProvider>
             </Accordion.Panel>
         </Accordion.Item>
     );
@@ -676,30 +751,58 @@ export const SidebarSharedPlaylistList = () => {
         setPlaylistOrder(reorderedIds);
     };
 
+    const folderViewState = usePlaylistFolderViewState(playlistItems?.items ?? []);
+    const navigation = usePlaylistNavigationState();
+    const { expandedSet, setMany, toggle } = usePlaylistFolderState('shared');
+    const inNavigation =
+        folderViewState.folderView === 'navigation' && navigation.pathStack.length > 0;
+
+    const handleNavigateUp = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            navigation.goUp();
+        },
+        [navigation],
+    );
+
+    const isFolderMovePending = useIsMutatingSidebarPlaylistFolderMove();
+
     if (playlistItems?.items?.length === 0) {
         return null;
     }
 
     return (
         <Accordion.Item value="shared-playlists">
-            <Accordion.Control>
-                <Text fw={500} variant="secondary">
-                    {t('page.sidebar.shared', {
-                        postProcess: 'titleCase',
-                    })}
-                </Text>
+            <Accordion.Control component="motion.div" role="button" style={{ userSelect: 'none' }}>
+                <Group gap="xs" style={{ minWidth: 0 }} wrap="nowrap">
+                    {inNavigation && (
+                        <ActionIcon
+                            icon="arrowLeftS"
+                            iconProps={{ size: 'lg' }}
+                            onClick={handleNavigateUp}
+                            size="xs"
+                            tooltip={{ label: t('common.back') }}
+                            variant="subtle"
+                        />
+                    )}
+                    <Text className={styles.name} fw={500} variant="secondary">
+                        {inNavigation ? navigation.currentName : t('page.sidebar.shared')}
+                    </Text>
+                </Group>
             </Accordion.Control>
-            <Accordion.Panel>
-                {playlistItems?.items?.map((item, index) => (
-                    <PlaylistRowButton
-                        item={item}
-                        key={index}
-                        name={item.name}
+            <Accordion.Panel className={styles.panel}>
+                <LoadingOverlay pos="absolute" visible={isFolderMovePending} />
+                <PlaylistFolderDragExpandProvider expandedSet={expandedSet} setMany={setMany}>
+                    <PlaylistFolderViews
+                        {...folderViewState}
+                        allPlaylists={playlistItems?.items ?? []}
+                        expandedSet={expandedSet}
+                        navigation={navigation}
                         onContextMenu={handleContextMenu}
                         onReorder={handleReorder}
-                        to={item.id}
+                        onToggleFolder={toggle}
                     />
-                ))}
+                </PlaylistFolderDragExpandProvider>
             </Accordion.Panel>
         </Accordion.Item>
     );

@@ -1,33 +1,28 @@
-import { ipcRenderer, IpcRendererEvent } from 'electron';
+import { ipcRenderer } from 'electron';
 
 import { QueueSong } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
 const requestFavorite = (
-    cb: (
-        event: IpcRendererEvent,
-        data: { favorite: boolean; id: string; serverId: string },
-    ) => void,
+    cb: (data: { favorite: boolean; id: string; serverId: string }) => void,
 ) => {
-    ipcRenderer.on('request-favorite', cb);
+    ipcRenderer.on('request-favorite', (_, data) => cb(data));
 };
 
-const requestPosition = (cb: (event: IpcRendererEvent, data: { position: number }) => void) => {
-    ipcRenderer.on('request-position', cb);
+const requestPosition = (cb: (data: { position: number }) => void) => {
+    ipcRenderer.on('request-position', (_, data) => cb(data));
 };
 
-const requestRating = (
-    cb: (event: IpcRendererEvent, data: { id: string; rating: number; serverId: string }) => void,
-) => {
-    ipcRenderer.on('request-rating', cb);
+const requestRating = (cb: (data: { id: string; rating: number; serverId: string }) => void) => {
+    ipcRenderer.on('request-rating', (_, data) => cb(data));
 };
 
-const requestSeek = (cb: (event: IpcRendererEvent, data: { offset: number }) => void) => {
-    ipcRenderer.on('request-seek', cb);
+const requestSeek = (cb: (data: { offset: number }) => void) => {
+    ipcRenderer.on('request-seek', (_, data) => cb(data));
 };
 
-const requestVolume = (cb: (event: IpcRendererEvent, data: { volume: number }) => void) => {
-    ipcRenderer.on('request-volume', cb);
+const requestVolume = (cb: (data: { volume: number }) => void) => {
+    ipcRenderer.on('request-volume', (_, data) => cb(data));
 };
 
 const setRemoteEnabled = (enabled: boolean): Promise<null | string> => {

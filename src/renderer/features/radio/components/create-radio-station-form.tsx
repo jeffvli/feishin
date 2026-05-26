@@ -42,9 +42,7 @@ export const CreateRadioStationForm = ({ onCancel }: CreateRadioStationFormProps
                 onError: (error) => {
                     toast.error({
                         message: (error as Error).message,
-                        title: t('error.genericError', {
-                            postProcess: 'sentenceCase',
-                        }) as string,
+                        title: t('error.genericError') as string,
                     });
                 },
                 onSuccess: () => {
@@ -60,7 +58,6 @@ export const CreateRadioStationForm = ({ onCancel }: CreateRadioStationFormProps
                 <TextInput
                     label={t('form.createRadioStation.input', {
                         context: 'name',
-                        postProcess: 'titleCase',
                     })}
                     required
                     {...form.getInputProps('name')}
@@ -68,7 +65,6 @@ export const CreateRadioStationForm = ({ onCancel }: CreateRadioStationFormProps
                 <TextInput
                     label={t('form.createRadioStation.input', {
                         context: 'streamUrl',
-                        postProcess: 'titleCase',
                     })}
                     required
                     {...form.getInputProps('streamUrl')}
@@ -76,16 +72,15 @@ export const CreateRadioStationForm = ({ onCancel }: CreateRadioStationFormProps
                 <TextInput
                     label={t('form.createRadioStation.input', {
                         context: 'homepageUrl',
-                        postProcess: 'titleCase',
                     })}
                     {...form.getInputProps('homepageUrl')}
                 />
                 <Group justify="flex-end">
                     <ModalButton onClick={onCancel} variant="subtle">
-                        {t('common.cancel', { postProcess: 'sentenceCase' })}
+                        {t('common.cancel')}
                     </ModalButton>
                     <ModalButton loading={mutation.isPending} type="submit" variant="filled">
-                        {t('common.create', { postProcess: 'sentenceCase' })}
+                        {t('common.create')}
                     </ModalButton>
                 </Group>
             </Stack>
@@ -101,13 +96,13 @@ export const openCreateRadioStationModal = (
 
     if (!server) {
         toast.error({
-            message: t('common.error.noServer', { postProcess: 'sentenceCase' }) as string,
+            message: t('common.error.noServer') as string,
         });
         return;
     }
 
     openModal({
         children: <CreateRadioStationForm onCancel={closeAllModals} />,
-        title: t('action.createRadioStation', { postProcess: 'titleCase' }) as string,
+        title: t('action.createRadioStation') as string,
     });
 };

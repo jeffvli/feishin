@@ -137,7 +137,7 @@ export const SubsonicAlbumFilters = ({
     const genreFilterLabel = useMemo(() => {
         return (
             <Text fw={500} size="sm">
-                {t('entity.genre', { count: 1, postProcess: 'sentenceCase' })}
+                {t('entity.genre', { count: 1 })}
             </Text>
         );
     }, [t]);
@@ -145,7 +145,7 @@ export const SubsonicAlbumFilters = ({
     const toggleFilters = useMemo(
         () => [
             {
-                label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
+                label: t('filter.isFavorited'),
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
                     if (isFavoriteDisabled && e.target.checked) return; // Prevent setting if disabled
                     const favoriteValue = e.target.checked ? true : undefined;
@@ -229,16 +229,16 @@ export const SubsonicAlbumFilters = ({
         return (
             <Group gap="xs" justify="space-between" w="100%">
                 <Text fw={500} size="sm">
-                    {t('entity.artist', { count: 2, postProcess: 'sentenceCase' })}
+                    {t('entity.artist', { count: 2 })}
                 </Text>
                 <SegmentedControl
                     data={[
                         {
-                            label: t('common.filter_single', { postProcess: 'titleCase' }),
+                            label: t('common.filter_single'),
                             value: 'single',
                         },
                         {
-                            label: t('common.filter_multiple', { postProcess: 'titleCase' }),
+                            label: t('common.filter_multiple'),
                             value: 'multi',
                         },
                     ]}
@@ -302,7 +302,7 @@ export const SubsonicAlbumFilters = ({
                 <NumberInput
                     disabled={isYearDisabled}
                     hideControls={false}
-                    label={t('filter.fromYear', { postProcess: 'sentenceCase' })}
+                    label={t('filter.fromYear')}
                     max={5000}
                     min={0}
                     onChange={(e) => debouncedHandleMinYearFilter(e)}
@@ -311,7 +311,7 @@ export const SubsonicAlbumFilters = ({
                 <NumberInput
                     disabled={isYearDisabled}
                     hideControls={false}
-                    label={t('filter.toYear', { postProcess: 'sentenceCase' })}
+                    label={t('filter.toYear')}
                     max={5000}
                     min={0}
                     onChange={(e) => debouncedHandleMaxYearFilter(e)}

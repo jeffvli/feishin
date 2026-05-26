@@ -6,12 +6,8 @@ import { Link, NavLink, useNavigate } from 'react-router';
 
 import styles from './collapsed-sidebar.module.css';
 
-import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
-import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
-import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { CollapsedSidebarButton } from '/@/renderer/features/sidebar/components/collapsed-sidebar-button';
 import { CollapsedSidebarItem } from '/@/renderer/features/sidebar/components/collapsed-sidebar-item';
-import { ServerSelectorItems } from '/@/renderer/features/sidebar/components/server-selector-items';
 import { getCollectionTo } from '/@/renderer/features/sidebar/components/sidebar-collection-list';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
@@ -19,7 +15,6 @@ import { AppRoute } from '/@/renderer/router/routes';
 import {
     SidebarItemType,
     useCollections,
-    useCurrentServer,
     useSidebarCollapsedNavigation,
     useSidebarItems,
     useWindowSettings,
@@ -30,7 +25,7 @@ import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Stack } from '/@/shared/components/stack/stack';
-import { LibraryItem, ServerType } from '/@/shared/types/domain-types';
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
 
 export const CollapsedSidebar = () => {
@@ -40,27 +35,22 @@ export const CollapsedSidebar = () => {
     const { windowBarStyle } = useWindowSettings();
     const sidebarCollapsedNavigation = useSidebarCollapsedNavigation();
     const sidebarItems = useSidebarItems();
-    const currentServer = useCurrentServer();
-
     const translatedSidebarItemMap = useMemo(
         () => ({
-            Albums: t('page.sidebar.albums', { postProcess: 'titleCase' }),
-            Artists: t('page.sidebar.albumArtists', { postProcess: 'titleCase' }).replace(
-                ' ',
-                '\n',
-            ),
-            'Artists-all': t('page.sidebar.artists', { postProcess: 'titleCase' }),
-            Collections: t('page.sidebar.collections', { postProcess: 'titleCase' }),
-            Favorites: t('page.sidebar.favorites', { postProcess: 'titleCase' }),
-            Folders: t('page.sidebar.folders', { postProcess: 'titleCase' }),
-            Genres: t('page.sidebar.genres', { postProcess: 'titleCase' }),
-            Home: t('page.sidebar.home', { postProcess: 'titleCase' }),
-            'Now Playing': t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
-            Playlists: t('page.sidebar.playlists', { postProcess: 'titleCase' }),
-            Radio: t('page.sidebar.radio', { postProcess: 'titleCase' }),
-            Search: t('page.sidebar.search', { postProcess: 'titleCase' }),
-            Settings: t('page.sidebar.settings', { postProcess: 'titleCase' }),
-            Tracks: t('page.sidebar.tracks', { postProcess: 'titleCase' }),
+            Albums: t('page.sidebar.albums'),
+            Artists: t('page.sidebar.albumArtists').replace(' ', '\n'),
+            'Artists-all': t('page.sidebar.artists'),
+            Collections: t('page.sidebar.collections'),
+            Favorites: t('page.sidebar.favorites'),
+            Folders: t('page.sidebar.folders'),
+            Genres: t('page.sidebar.genres'),
+            Home: t('page.sidebar.home'),
+            'Now Playing': t('page.sidebar.nowPlaying'),
+            Playlists: t('page.sidebar.playlists'),
+            Radio: t('page.sidebar.radio'),
+            Search: t('page.sidebar.search'),
+            Settings: t('page.sidebar.settings'),
+            Tracks: t('page.sidebar.tracks'),
         }),
         [t],
     );
@@ -105,7 +95,7 @@ export const CollapsedSidebar = () => {
                             activeIcon={null}
                             component={Flex}
                             icon={<Icon fill="muted" icon="menu" size="3xl" />}
-                            label={t('common.menu', { postProcess: 'titleCase' })}
+                            label={t('common.menu')}
                             style={{
                                 cursor: 'pointer',
                                 padding: 'var(--theme-spacing-md) 0',
@@ -173,38 +163,6 @@ export const CollapsedSidebar = () => {
                             to={item.route}
                         />
                     ),
-                )}
-                {currentServer && (
-                    <DropdownMenu offset={0} position="right-end" width={240}>
-                        <DropdownMenu.Target>
-                            <CollapsedSidebarItem
-                                activeIcon={null}
-                                component={Flex}
-                                icon={
-                                    <img
-                                        className={styles.serverIcon}
-                                        src={
-                                            currentServer.type === ServerType.NAVIDROME
-                                                ? NavidromeLogo
-                                                : currentServer.type === ServerType.JELLYFIN
-                                                  ? JellyfinLogo
-                                                  : OpenSubsonicLogo
-                                        }
-                                    />
-                                }
-                                label={''}
-                                py="md"
-                                style={{
-                                    cursor: 'pointer',
-                                }}
-                            />
-                        </DropdownMenu.Target>
-                        <DropdownMenu.Dropdown>
-                            <ScrollArea style={{ maxHeight: '95vh' }}>
-                                <ServerSelectorItems />
-                            </ScrollArea>
-                        </DropdownMenu.Dropdown>
-                    </DropdownMenu>
                 )}
             </ScrollArea>
         </motion.div>

@@ -33,18 +33,18 @@ export const MoveQueueItemsAction = ({ items }: MoveQueueItemsActionProps) => {
                     onSelect={(e) => e.preventDefault()}
                     rightIcon="arrowRightS"
                 >
-                    {t('page.contextMenu.moveItems', { postProcess: 'sentenceCase' })}
+                    {t('page.contextMenu.moveItems')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuTarget>
             <ContextMenu.SubmenuContent>
                 <ContextMenu.Item leftIcon="arrowUpToLine" onSelect={handleMoveToTop}>
-                    {t('page.contextMenu.moveToTop', { postProcess: 'sentenceCase' })}
+                    {t('page.contextMenu.moveToTop')}
                 </ContextMenu.Item>
                 <ContextMenu.Item leftIcon="mediaPlayNext" onSelect={handleMoveToNext}>
-                    {t('page.contextMenu.moveToNext', { postProcess: 'sentenceCase' })}
+                    {t('page.contextMenu.moveToNext')}
                 </ContextMenu.Item>
                 <ContextMenu.Item leftIcon="arrowDownToLine" onSelect={handleMoveToBottom}>
-                    {t('page.contextMenu.moveToBottom', { postProcess: 'sentenceCase' })}
+                    {t('page.contextMenu.moveToBottom')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuContent>
         </ContextMenu.Submenu>

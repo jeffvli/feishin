@@ -73,15 +73,11 @@ export const GridConfig = ({
                     <SegmentedControl
                         data={[
                             {
-                                label: t('table.config.general.pagination_infinite', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.pagination_infinite'),
                                 value: ListPaginationType.INFINITE,
                             },
                             {
-                                label: t('table.config.general.pagination_paginate', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.pagination_paginate'),
                                 value: ListPaginationType.PAGINATED,
                             },
                         ]}
@@ -97,7 +93,7 @@ export const GridConfig = ({
                     />
                 ),
                 id: 'pagination',
-                label: t('table.config.general.pagination', { postProcess: 'sentenceCase' }),
+                label: t('table.config.general.pagination'),
                 size: 'sm',
             },
             {
@@ -125,9 +121,7 @@ export const GridConfig = ({
                 id: 'itemsPerPage',
                 label: (
                     <Group>
-                        {t('table.config.general.pagination_itemsPerPage', {
-                            postProcess: 'sentenceCase',
-                        })}
+                        {t('table.config.general.pagination_itemsPerPage')}
                         <Badge>{list.itemsPerPage}</Badge>
                     </Group>
                 ),
@@ -186,7 +180,7 @@ export const GridConfig = ({
                 id: 'itemGap',
                 label: (
                     <Group>
-                        {t('table.config.general.gap', { postProcess: 'sentenceCase' })}
+                        {t('table.config.general.gap')}
                         <Badge>{grid.itemGap}</Badge>
                     </Group>
                 ),
@@ -205,12 +199,12 @@ export const GridConfig = ({
                 label: (
                     <Group justify="space-between" w="100%" wrap="nowrap">
                         <Group>
-                            {t('table.config.general.itemsPerRow', { postProcess: 'sentenceCase' })}
+                            {t('table.config.general.itemsPerRow')}
                             <Badge>{grid.itemsPerRow}</Badge>
                         </Group>
                         <Checkbox
                             checked={grid.itemsPerRowEnabled}
-                            label={t('common.enable', { postProcess: 'titleCase' })}
+                            label={t('common.enable')}
                             onChange={(e) =>
                                 setList(listKey, {
                                     grid: { itemsPerRowEnabled: e.target.checked },
@@ -227,21 +221,15 @@ export const GridConfig = ({
                     <SegmentedControl
                         data={[
                             {
-                                label: t('table.config.general.size_compact', {
-                                    postProcess: 'titleCase',
-                                }),
+                                label: t('table.config.general.size_compact'),
                                 value: 'compact',
                             },
                             {
-                                label: t('table.config.general.size_default', {
-                                    postProcess: 'titleCase',
-                                }),
+                                label: t('table.config.general.size_default'),
                                 value: 'default',
                             },
                             {
-                                label: t('table.config.general.size_large', {
-                                    postProcess: 'titleCase',
-                                }),
+                                label: t('table.config.general.size_large'),
                                 value: 'large',
                             },
                         ]}
@@ -256,7 +244,7 @@ export const GridConfig = ({
                     />
                 ),
                 id: 'size',
-                label: t('table.config.general.size', { postProcess: 'sentenceCase' }),
+                label: t('table.config.general.size'),
                 size: 'sm',
             },
 
@@ -419,12 +407,10 @@ const GridRowConfig = ({
     return (
         <Stack gap="xs">
             <Group justify="space-between" mb="md">
-                <Text size="sm">{t('common.gridRows', { postProcess: 'sentenceCase' })}</Text>
+                <Text size="sm">{t('common.gridRows')}</Text>
                 <TextInput
                     onChange={(e) => setSearchRows(e.currentTarget.value)}
-                    placeholder={t('common.search', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    placeholder={t('common.search')}
                     size="xs"
                 />
             </Group>
@@ -592,9 +578,7 @@ const GridRowItem = memo(
                             onClick={() => handleMoveUp(item)}
                             size="xs"
                             tooltip={{
-                                label: t('table.config.general.moveUp', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.moveUp'),
                             }}
                             variant="subtle"
                         />
@@ -604,9 +588,7 @@ const GridRowItem = memo(
                             onClick={() => handleMoveDown(item)}
                             size="xs"
                             tooltip={{
-                                label: t('table.config.general.moveDown', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.moveDown'),
                             }}
                             variant="subtle"
                         />
@@ -618,9 +600,7 @@ const GridRowItem = memo(
                             onClick={() => handleAlignLeft(item)}
                             size="xs"
                             tooltip={{
-                                label: t('table.config.general.alignLeft', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.alignLeft'),
                             }}
                             variant={item.align === 'start' ? 'filled' : 'subtle'}
                         />
@@ -630,9 +610,7 @@ const GridRowItem = memo(
                             onClick={() => handleAlignCenter(item)}
                             size="xs"
                             tooltip={{
-                                label: t('table.config.general.alignCenter', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.alignCenter'),
                             }}
                             variant={item.align === 'center' ? 'filled' : 'subtle'}
                         />
@@ -642,9 +620,7 @@ const GridRowItem = memo(
                             onClick={() => handleAlignRight(item)}
                             size="xs"
                             tooltip={{
-                                label: t('table.config.general.alignRight', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.alignRight'),
                             }}
                             variant={item.align === 'end' ? 'filled' : 'subtle'}
                         />

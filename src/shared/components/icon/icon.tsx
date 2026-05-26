@@ -34,7 +34,10 @@ import {
     LuChevronLast,
     LuChevronLeft,
     LuChevronRight,
+    LuChevronsDownUp,
+    LuChevronsUpDown,
     LuChevronUp,
+    LuCircle,
     LuCircleCheck,
     LuCircleX,
     LuClipboardCopy,
@@ -51,6 +54,7 @@ import {
     LuExternalLink,
     LuFileJson,
     LuFlag,
+    LuFolderClosed,
     LuFolderOpen,
     LuGauge,
     LuGithub,
@@ -247,7 +251,9 @@ export const AppIcon = {
     brandSpotify: SpotifyLogoIcon,
     cache: LuCloudDownload,
     check: LuCheck,
+    circle: LuCircle,
     clipboardCopy: LuClipboardCopy,
+    collapseAll: LuChevronsDownUp,
     collection: LuPackage2,
     delete: LuTrash,
     disc: LuDisc,
@@ -267,11 +273,13 @@ export const AppIcon = {
     emptySongImage: LuMusic,
     error: LuShieldAlert,
     expand: LuExpand,
+    expandAll: LuChevronsUpDown,
     externalLink: LuExternalLink,
     favorite: LuHeart,
     fileJson: LuFileJson,
     filter: LuListFilter,
     folder: LuFolderOpen,
+    folderClosed: LuFolderClosed,
     genre: LuFlag,
     goToItem: LuCornerDownRight,
     hash: LuHash,
@@ -384,6 +392,7 @@ type IconColor =
     | 'muted'
     | 'primary'
     | 'success'
+    | 'transparent'
     | 'warn';
 
 const _Icon = forwardRef<HTMLDivElement, IconProps>((props, ref) => {
@@ -391,17 +400,19 @@ const _Icon = forwardRef<HTMLDivElement, IconProps>((props, ref) => {
 
     const IconComponent: ComponentType<any> = AppIcon[icon];
 
+    const colorClassToken = color ?? (fill && fill !== 'transparent' ? fill : undefined);
+
     const classNames = useMemo(
         () =>
             clsx(className, {
                 [styles.fill]: true,
                 [styles.pulse]: animate === 'pulse',
                 [styles.spin]: animate === 'spin',
-                [styles[`color-${color || fill}`]]: color || fill,
+                [styles[`color-${colorClassToken}`]]: colorClassToken,
                 [styles[`fill-${fill}`]]: fill,
                 [styles[`size-${size}`]]: true,
             }),
-        [animate, className, color, fill, size],
+        [animate, className, colorClassToken, fill, size],
     );
 
     return (

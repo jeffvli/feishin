@@ -29,9 +29,8 @@ export const useRemote = () => {
 
     // Initialize the remote
     useEffect(() => {
-        if (!isRemoteEnabled) {
-            return;
-        }
+        // we must send this EVEN IF the remote is disabled, as this is what
+        // makes sure that the main process gets the port/username/password on startup
 
         logFn.debug(logMsg[LogCategory.REMOTE].initializingRemoteSettings, {
             category: LogCategory.REMOTE,
@@ -65,7 +64,7 @@ export const useRemote = () => {
             return;
         }
 
-        remote.requestPosition((_e: unknown, data: { position: number }) => {
+        remote.requestPosition((data: { position: number }) => {
             logFn.debug(logMsg[LogCategory.REMOTE].requestPositionReceived, {
                 category: LogCategory.REMOTE,
                 meta: { position: data.position },
@@ -74,7 +73,7 @@ export const useRemote = () => {
             player.mediaSeekToTimestamp(newTime);
         });
 
-        remote.requestSeek((_e: unknown, data: { offset: number }) => {
+        remote.requestSeek((data: { offset: number }) => {
             logFn.debug(logMsg[LogCategory.REMOTE].requestSeekReceived, {
                 category: LogCategory.REMOTE,
                 meta: { offset: data.offset },
@@ -82,17 +81,15 @@ export const useRemote = () => {
             mediaSkipForward(data.offset);
         });
 
-        remote.requestRating(
-            (_e: unknown, data: { id: string; rating: number; serverId: string }) => {
-                logFn.debug(logMsg[LogCategory.REMOTE].requestRatingReceived, {
-                    category: LogCategory.REMOTE,
-                    meta: { id: data.id, rating: data.rating, serverId: data.serverId },
-                });
-                setRating(data.serverId, [data.id], LibraryItem.SONG, data.rating);
-            },
-        );
+        remote.requestRating((data: { id: string; rating: number; serverId: string }) => {
+            logFn.debug(logMsg[LogCategory.REMOTE].requestRatingReceived, {
+                category: LogCategory.REMOTE,
+                meta: { id: data.id, rating: data.rating, serverId: data.serverId },
+            });
+            setRating(data.serverId, [data.id], LibraryItem.SONG, data.rating);
+        });
 
-        remote.requestVolume((_e: unknown, data: { volume: number }) => {
+        remote.requestVolume((data: { volume: number }) => {
             logFn.debug(logMsg[LogCategory.REMOTE].requestVolumeReceived, {
                 category: LogCategory.REMOTE,
                 meta: { volume: data.volume },
@@ -100,24 +97,20 @@ export const useRemote = () => {
             setVolume(data.volume);
         });
 
-        remote.requestFavorite(
-            (_e: unknown, data: { favorite: boolean; id: string; serverId: string }) => {
-                logFn.debug(logMsg[LogCategory.REMOTE].requestFavoriteReceived, {
-                    category: LogCategory.REMOTE,
-                    meta: { favorite: data.favorite, id: data.id, serverId: data.serverId },
-                });
-                const mutator = data.favorite
-                    ? addToFavoritesMutation
-                    : removeFromFavoritesMutation;
-                mutator.mutate({
-                    apiClientProps: { serverId: data.serverId },
-                    query: {
-                        id: [data.id],
-                        type: LibraryItem.SONG,
-                    },
-                });
-            },
-        );
+        remote.requestFavorite((data: { favorite: boolean; id: string; serverId: string }) => {
+            logFn.debug(logMsg[LogCategory.REMOTE].requestFavoriteReceived, {
+                category: LogCategory.REMOTE,
+                meta: { favorite: data.favorite, id: data.id, serverId: data.serverId },
+            });
+            const mutator = data.favorite ? addToFavoritesMutation : removeFromFavoritesMutation;
+            mutator.mutate({
+                apiClientProps: { serverId: data.serverId },
+                query: {
+                    id: [data.id],
+                    type: LibraryItem.SONG,
+                },
+            });
+        });
 
         return () => {
             ipc?.removeAllListeners('request-position');

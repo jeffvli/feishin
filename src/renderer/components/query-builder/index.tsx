@@ -79,14 +79,12 @@ export const QueryBuilder = ({
         {
             label: t('form.queryEditor.input', {
                 context: 'optionMatchAll',
-                postProcess: 'sentenceCase',
             }),
             value: 'all',
         },
         {
             label: t('form.queryEditor.input', {
                 context: 'optionMatchAny',
-                postProcess: 'sentenceCase',
             }),
             value: 'any',
         },
@@ -146,9 +144,7 @@ export const QueryBuilder = ({
                                     leftSection={<Icon icon="add" />}
                                     onClick={handleAddRuleGroup}
                                 >
-                                    {t('form.queryEditor.addRuleGroup', {
-                                        postProcess: 'sentenceCase',
-                                    })}
+                                    {t('form.queryEditor.addRuleGroup')}
                                 </DropdownMenu.Item>
 
                                 {level > 0 && (
@@ -156,9 +152,7 @@ export const QueryBuilder = ({
                                         leftSection={<Icon icon="delete" />}
                                         onClick={handleDeleteRuleGroup}
                                     >
-                                        {t('form.queryEditor.removeRuleGroup', {
-                                            postProcess: 'sentenceCase',
-                                        })}
+                                        {t('form.queryEditor.removeRuleGroup')}
                                     </DropdownMenu.Item>
                                 )}
                                 {level === 0 && (
@@ -169,18 +163,14 @@ export const QueryBuilder = ({
                                             leftSection={<Icon color="error" icon="refresh" />}
                                             onClick={onResetFilters}
                                         >
-                                            {t('form.queryEditor.resetToDefault', {
-                                                postProcess: 'sentenceCase',
-                                            })}
+                                            {t('form.queryEditor.resetToDefault')}
                                         </DropdownMenu.Item>
                                         <DropdownMenu.Item
                                             isDanger
                                             leftSection={<Icon color="error" icon="delete" />}
                                             onClick={onClearFilters}
                                         >
-                                            {t('form.queryEditor.clearFilters', {
-                                                postProcess: 'sentenceCase',
-                                            })}
+                                            {t('form.queryEditor.clearFilters')}
                                         </DropdownMenu.Item>
                                     </>
                                 )}

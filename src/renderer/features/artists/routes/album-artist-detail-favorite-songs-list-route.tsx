@@ -2,6 +2,7 @@ import { useSuspenseQueries } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useParams } from 'react-router';
 
+import { playSongFromItemListControl } from '/@/renderer/components/item-list/helpers/play-row-from-list';
 import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
 import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { ItemTableList } from '/@/renderer/components/item-list/item-table-list/item-table-list';
@@ -24,7 +25,7 @@ import { useCurrentServer } from '/@/renderer/store/auth.store';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import { sortSongList } from '/@/shared/api/utils';
 import { LibraryItem, Song } from '/@/shared/types/domain-types';
-import { ItemListKey, Play } from '/@/shared/types/types';
+import { ItemListKey } from '/@/shared/types/types';
 
 const AlbumArtistDetailFavoriteSongsListRoute = () => {
     const { albumArtistId, artistId } = useParams() as {
@@ -96,12 +97,13 @@ const AlbumArtistDetailFavoriteSongsListRoute = () => {
                     return;
                 }
 
-                const playType = (meta?.playType as Play) || Play.NOW;
-                const items = internalState?.getData() as Song[];
-
-                if (index !== undefined) {
-                    player.addToQueueByData(items, playType, item.id);
-                }
+                playSongFromItemListControl({
+                    index,
+                    internalState,
+                    item: item as Song,
+                    meta,
+                    player,
+                });
             },
         };
     }, [player]);

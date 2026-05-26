@@ -4,6 +4,7 @@ import type ReactPlayer from 'react-player';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { eventEmitter } from '/@/renderer/events/event-emitter';
 import {
     WebPlayerEngine,
     WebPlayerEngineHandle,
@@ -20,12 +21,13 @@ import {
     usePlayerData,
     usePlayerMuted,
     usePlayerProperties,
+    usePlayerRepeat,
     usePlayerStoreBase,
     usePlayerVolume,
 } from '/@/renderer/store';
 import { toast } from '/@/shared/components/toast/toast';
 import { QueueSong } from '/@/shared/types/domain-types';
-import { CrossfadeStyle, PlayerStatus, PlayerStyle } from '/@/shared/types/types';
+import { CrossfadeStyle, PlayerRepeat, PlayerStatus, PlayerStyle } from '/@/shared/types/types';
 
 const PLAY_PAUSE_FADE_DURATION = 300;
 const PLAY_PAUSE_FADE_INTERVAL = 10;
@@ -34,6 +36,8 @@ export function WebPlayer() {
     const playerRef = useRef<null | WebPlayerEngineHandle>(null);
     const { t } = useTranslation();
     const { num, player1, player2, status } = usePlayerData();
+    const repeat = usePlayerRepeat();
+    const repeatOneProgressRef = useRef({ player1: 0, player2: 0 });
     const { mediaAutoNext, mediaPause, setTimestamp } = usePlayerActions();
     const playback = useMpvSettings();
     const { webAudio } = useWebAudio();
@@ -97,9 +101,34 @@ export function WebPlayer() {
         [],
     );
 
+    const handleRepeatOne = useCallback(
+        (playerId: 1 | 2, playedSeconds: number, duration: number) => {
+            if (repeat !== PlayerRepeat.ONE || duration <= 0 || num !== playerId) {
+                return;
+            }
+
+            const key = playerId === 1 ? 'player1' : 'player2';
+            const last = repeatOneProgressRef.current[key];
+            repeatOneProgressRef.current[key] = playedSeconds;
+
+            if (last > duration * 0.85 && playedSeconds < duration * 0.15) {
+                setTimestamp(0);
+                eventEmitter.emit('PLAYER_REPEATED', {
+                    index: usePlayerStoreBase.getState().player.index,
+                });
+            }
+        },
+        [num, repeat, setTimestamp],
+    );
+
     const onProgressPlayer1 = useCallback(
         (e: PlayerOnProgressProps) => {
             if (!playerRef.current?.player1()) {
+                return;
+            }
+
+            if (repeat === PlayerRepeat.ONE) {
+                handleRepeatOne(1, e.playedSeconds, getDuration(playerRef.current.player1().ref));
                 return;
             }
 
@@ -132,12 +161,27 @@ export function WebPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, crossfadeStyle, isTransitioning, num, player2, transitionType, volume],
+        [
+            crossfadeDuration,
+            crossfadeStyle,
+            handleRepeatOne,
+            isTransitioning,
+            num,
+            player2,
+            repeat,
+            transitionType,
+            volume,
+        ],
     );
 
     const onProgressPlayer2 = useCallback(
         (e: PlayerOnProgressProps) => {
             if (!playerRef.current?.player2()) {
+                return;
+            }
+
+            if (repeat === PlayerRepeat.ONE) {
+                handleRepeatOne(2, e.playedSeconds, getDuration(playerRef.current.player2().ref));
                 return;
             }
 
@@ -170,7 +214,17 @@ export function WebPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, crossfadeStyle, isTransitioning, num, player1, transitionType, volume],
+        [
+            crossfadeDuration,
+            crossfadeStyle,
+            handleRepeatOne,
+            isTransitioning,
+            num,
+            player1,
+            repeat,
+            transitionType,
+            volume,
+        ],
     );
 
     const handleOnEndedPlayer1 = useCallback(() => {
@@ -240,10 +294,16 @@ export function WebPlayer() {
                     }
                 }
 
+                let type: 'fraction' | 'seconds' | undefined = undefined;
+
+                if (timestamp < 1) {
+                    type = 'seconds';
+                }
+
                 if (num === 1) {
-                    playerRef.current?.player1()?.ref?.seekTo(timestamp);
+                    playerRef.current?.player1()?.ref?.seekTo(timestamp, type);
                 } else {
-                    playerRef.current?.player2()?.ref?.seekTo(timestamp);
+                    playerRef.current?.player2()?.ref?.seekTo(timestamp, type);
                 }
             },
             onPlayerStatus: async (properties) => {
@@ -464,14 +524,19 @@ export function WebPlayer() {
     const handleOnErrorPause = useCallback(() => {
         mediaPause();
         toast.error({
-            message: t('error.playbackPausedDueToError', { postProcess: 'sentenceCase' }),
+            message: t('error.playbackPausedDueToError'),
         });
     }, [mediaPause, t]);
+
+    const loopPlayer1 = repeat === PlayerRepeat.ONE && num === 1;
+    const loopPlayer2 = repeat === PlayerRepeat.ONE && num === 2;
 
     return (
         <WebPlayerEngine
             isMuted={isMuted}
             isTransitioning={Boolean(isTransitioning)}
+            loopPlayer1={loopPlayer1}
+            loopPlayer2={loopPlayer2}
             onEndedPlayer1={handleOnEndedPlayer1}
             onEndedPlayer2={handleOnEndedPlayer2}
             onErrorPause={handleOnErrorPause}
