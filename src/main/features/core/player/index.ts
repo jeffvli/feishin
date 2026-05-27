@@ -120,8 +120,14 @@ const createMpv = async (data: {
 }): Promise<MpvAPI> => {
     const { binaryPath, extraParameters, properties } = data;
     const resolvedBinaryPath = await resolveMpvBinaryPath(binaryPath);
+    const normalizedExtraParameters = (extraParameters ?? [])
+        .map((param) => param.trim())
+        .filter((param) => param.length > 0);
 
-    const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
+    const params = uniq([
+        ...DEFAULT_MPV_PARAMETERS(normalizedExtraParameters),
+        ...normalizedExtraParameters,
+    ]);
 
     const mpv = new MpvAPI(
         {

@@ -235,7 +235,7 @@
         "customCssEnable_description": "Permite escribir CSS personalizado",
         "customCss": "CSS personalizado",
         "customCssNotice": "Aviso: mientras hay alguna sanitización (rechazar URL() y content:), usar CSS personalizado puede aún entrañar riesgos cambiando la interfaz",
-        "customCss_description": "Content CSS personalizado. Nota: content y urls remotas son propiedades rechazadas. Una vista previa de tu content se muestra debajo. Las entradas adicionales que no estableciste están presentes debido a la sanitización",
+        "customCss_description": "Content CSS personalizado. Nota: content y remote urls son propiedades rechazadas. Una vista previa de tu content se muestra debajo. Las entradas adicionales que no estableciste están presentes debido a la sanitización. Escritorio: Feishin lee y escribe custom.css en el directorio de configuración de la aplicación y lo recarga cuando cambia el archivo",
         "webAudio": "Usar audio web",
         "webAudio_description": "Utilizar audio web. Esto habilita funciones avanzadas como ReplayGain. Desactiva esta opción si tienes problemas",
         "transcode_description": "Permite la transcodificación a distintos formatos",
@@ -345,7 +345,7 @@
         "playerbarSlider_description": "La forma de onda no es recomendable en una conexión a Internet lenta o medida",
         "autoDJ": "DJ Automático",
         "autoDJ_itemCount": "Recuento de elementos",
-        "autoDJ_itemCount_description": "El número de elementos que se ha intentado añadir a la cola cuando DJ automático está activado",
+        "autoDJ_itemCount_description": "El número de elementos que se ha intentado añadir a la cola",
         "autoDJ_timing_description": "El número de canciones restantes en la cola antes de que DJ automático se dispare",
         "autoDJ_timing": "Tiempo",
         "logLevel": "Nivel de registro",
@@ -447,7 +447,16 @@
         "sidebarPlaylistMode_optionCompact": "Compacto",
         "sidebarPlaylistMode_optionExpanded": "Expandido",
         "sidebarPlaylistMode_description": "Cómo se muestra cada lista de reproducción en la lista de la barra lateral",
-        "sidebarPlaylistFolderTreeIndent_description": "Píxeles que está sangrado cada nivel del árbol"
+        "sidebarPlaylistFolderTreeIndent_description": "Píxeles que está sangrado cada nivel del árbol",
+        "autoDJ_mode": "Modo",
+        "autoDJ_mode_albums": "Álbumes",
+        "autoDJ_mode_songs": "Canciones",
+        "autoDJ_enabled": "Activar DJ automático",
+        "autoDJ_albumStrategy": "Modo de selección de álbum",
+        "autoDJ_songStrategy": "Modo de selección de canción",
+        "autoDJ_strategy_option_library_random": "Aleatorio",
+        "autoDJ_strategy_option_similar": "Similar",
+        "autoDJ_mode_description": "Elegir para añadir canciones o álbumes enteros a la cola"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",
@@ -623,7 +632,8 @@
         "newVersionAvailable": "Una nueva versión está disponible",
         "numberOfResults": "{{numberOfResults}} resultados",
         "grouping": "Agrupar",
-        "back": "Atrás"
+        "back": "Atrás",
+        "openFolder": "Abrir carpeta"
     },
     "error": {
         "remotePortWarning": "Reiniciar el servidor para aplicar el nuevo puerto",
@@ -1013,7 +1023,12 @@
             "input_played": "Reproducir filtro",
             "input_played_optionAll": "Todas las pistas",
             "input_played_optionUnplayed": "Solo las pistas sin reproducir",
-            "input_played_optionPlayed": "Solo las pistas reproducidas"
+            "input_played_optionPlayed": "Solo las pistas reproducidas",
+            "input_kind_albums": "Álbumes",
+            "input_kind_songs": "Canciones",
+            "input_limit_albums": "¿Cuántos álbumes?",
+            "input_limit_songs": "¿Cuántas canciones?",
+            "input_kind": "Selecciones aleatorias"
         },
         "saveQueue": {
             "success": "Cola de reproducción guardada en el servidor"

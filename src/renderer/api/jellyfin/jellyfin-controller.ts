@@ -411,8 +411,12 @@ export const JellyfinController: InternalControllerEndpoint = {
             throw new Error('Failed to get album detail');
         }
 
+        // Workaround for Jellyfin bug that returns items that share the same album name
+        const albumIdSet = new Set([query.id]);
+        const songs = songsRes.body.Items.filter((item) => albumIdSet.has(item.AlbumId!));
+
         return jfNormalize.album(
-            { ...res.body, Songs: songsRes.body.Items },
+            { ...res.body, Songs: songs },
             apiClientProps.server,
             args.context?.pathReplace,
             args.context?.pathReplaceWith,

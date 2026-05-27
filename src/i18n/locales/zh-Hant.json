@@ -715,8 +715,8 @@
         "playerFilters": "從佇列中過濾歌曲",
         "playerFilters_description": "根據以下條件，排除要新增至佇列中的歌曲",
         "autoDJ": "Auto DJ",
-        "autoDJ_itemCount": "歌曲數量",
-        "autoDJ_itemCount_description": "在啟用Auto DJ時嘗試加入佇列的歌曲數量",
+        "autoDJ_itemCount": "項目數量",
+        "autoDJ_itemCount_description": "嘗試加入佇列的項目數量",
         "autoDJ_timing_description": "佇列中剩餘多少歌曲時啟動 Auto DJ",
         "autoDJ_timing": "觸發時機",
         "logLevel": "Log等級",
@@ -818,7 +818,16 @@
         "sidebarPlaylistMode_description": "各播放清單在側邊欄列表中的顯示方式",
         "sidebarPlaylistMode": "側邊欄播放清單模式",
         "sidebarPlaylistMode_optionCompact": "緊湊",
-        "sidebarPlaylistMode_optionExpanded": "展開"
+        "sidebarPlaylistMode_optionExpanded": "展開",
+        "autoDJ_mode": "模式",
+        "autoDJ_mode_albums": "專輯",
+        "autoDJ_mode_description": "選擇將歌曲或整張專輯加入佇列",
+        "autoDJ_mode_songs": "歌曲",
+        "autoDJ_enabled": "啟用Auto DJ",
+        "autoDJ_albumStrategy": "專輯選擇模式",
+        "autoDJ_songStrategy": "歌曲選擇模式",
+        "autoDJ_strategy_option_library_random": "隨機",
+        "autoDJ_strategy_option_similar": "相似"
     },
     "table": {
         "config": {
@@ -1137,7 +1146,12 @@
             "input_played": "播放過濾器",
             "input_played_optionAll": "所有曲目",
             "input_played_optionUnplayed": "僅未播放的曲目",
-            "input_played_optionPlayed": "僅播放過的曲目"
+            "input_played_optionPlayed": "僅播放過的曲目",
+            "input_kind_albums": "專輯",
+            "input_kind_songs": "歌曲",
+            "input_kind": "隨機選取",
+            "input_limit_albums": "專輯數量？",
+            "input_limit_songs": "歌曲數量？"
         },
         "createRadioStation": {
             "success": "電台建立成功",

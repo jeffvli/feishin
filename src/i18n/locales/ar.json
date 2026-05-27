@@ -331,7 +331,10 @@
         "serverRequired": "يتطلب خادم",
         "sessionExpiredError": "انتهت صلاحية جلستك",
         "systemFontError": "حدث خطأ أثناء محاولة الحصول على خطوط النظام",
-        "settingsSyncError": "تم اكتشاف تعارضات بين إعدادات العارض والعملية الرئيسية. أعد تشغيل التطبيق لتطبيق التغييرات"
+        "settingsSyncError": "تم اكتشاف تعارضات بين إعدادات العارض والعملية الرئيسية. أعد تشغيل التطبيق لتطبيق التغييرات",
+        "invalidJson": "JSON غير صالح",
+        "invalidServer": "خادم غير صالح",
+        "localFontAccessDenied": "تم رفض الوصول إلى الخطوط المحلية"
     },
     "filter": {
         "album": "$t(entity.album, {\"count\": 1})",
@@ -372,7 +375,8 @@
         "sortName": "أسم الفرز",
         "title": "العنوان",
         "toYear": "إلى سنة",
-        "trackNumber": "مقطع"
+        "trackNumber": "مقطع",
+        "isCompilation": "تجميعة"
     },
     "datetime": {
         "minuteShort": "د",
@@ -413,14 +417,19 @@
             "input_url": "الرابط",
             "input_username": "أسم المستخدم",
             "success": "تمت إضافة الخادم بنجاح",
-            "title": "إضافة خادم"
+            "title": "إضافة خادم",
+            "input_preferInstantMix": "تفضيل الميكس الفوري",
+            "input_preferInstantMixDescription": "استخدم الميكس الفوري فقط للحصول على أغاني مشابهة. مفيد إذا كان لديك إضافات تعدّل هذا السلوك",
+            "input_remoteUrlPlaceholder": "اختياري: عنوان URL عام للميزات الخارجية"
         },
         "largeFetchConfirmation": {
-            "title": "أضف العناصر إلى قائمة التشغيل"
+            "title": "أضف العناصر إلى قائمة التشغيل",
+            "description": "سيقوم هذا الإجراء بإضافة جميع العناصر في العرض المفلتر الحالي"
         },
         "addToPlaylist": {
             "input_skipDuplicates": "تخطي العناصر المكررة",
-            "title": "أضف إلى $t(entity.playlist, {\"count\": 1})"
+            "title": "أضف إلى $t(entity.playlist, {\"count\": 1})",
+            "create": "إنشاء $t(entity.playlist, {\"count\": 1}) {{playlist}}"
         },
         "createPlaylist": {
             "input_public": "عام"
@@ -428,7 +437,9 @@
         "createRadioStation": {
             "input_homepageUrl": "رابط الرئيسية",
             "input_name": "الأسم",
-            "input_streamUrl": "رابط البث"
+            "input_streamUrl": "رابط البث",
+            "success": "تم إنشاء محطة راديو جديدة بنجاح",
+            "title": "إنشاء محطة راديو"
         },
         "editRadioStation": {
             "success": "تم تحديث محطة الراديو بنجاح"
@@ -440,7 +451,8 @@
         },
         "editPlaylist": {
             "success": "تم تحديث $t(entity.playlist, {\"count\": 1}) بنجاح",
-            "title": "تعديل $t(entity.playlist, {\"count\": 1})"
+            "title": "تعديل $t(entity.playlist, {\"count\": 1})",
+            "publicJellyfinNote": "لسبب ما، لا يكشف Jellyfin عما إذا كانت قائمة التشغيل عامة أم لا. إذا كنت ترغب في إبقائها عامة، يرجى التأكد من تحديد الخيار التالي"
         },
         "lyricsExport": {
             "export": "تصدير الكلمات",
@@ -451,7 +463,32 @@
         },
         "queryEditor": {
             "input_optionMatchAll": "تطابق الجميع",
-            "input_optionMatchAny": "تطابق أي"
+            "input_optionMatchAny": "تطابق أي",
+            "title": "محرر الاستعلامات",
+            "addRuleGroup": "إضافة مجموعة قواعد",
+            "removeRuleGroup": "إزالة مجموعة قواعد",
+            "resetToDefault": "استعادة الإعدادات الافتراضية"
+        },
+        "shareItem": {
+            "allowDownloading": "السماح بالتحميل",
+            "description": "الوصف"
+        },
+        "shuffleAll": {
+            "title": "تشغيل عشوائي",
+            "input_kind_albums": "ألبومات",
+            "input_kind_songs": "أغاني",
+            "input_kind": "إختيارات عشوائية",
+            "input_minYear": "من سنة",
+            "input_maxYear": "إلى سنة"
+        },
+        "updateServer": {
+            "success": "تم تحديث الخادم بنجاح",
+            "title": "تحديث الخادم"
+        }
+    },
+    "page": {
+        "albumArtistDetail": {
+            "favoriteSongs": "الأغاني المفضلة"
         }
     }
 }

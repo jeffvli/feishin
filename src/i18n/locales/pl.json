@@ -410,7 +410,12 @@
             "input_played": "Filtr odtwarzania",
             "input_played_optionAll": "Wszystkie utwory",
             "input_played_optionUnplayed": "Tylko nieodtworzone utwory",
-            "input_played_optionPlayed": "Tylko odtworzone utwory"
+            "input_played_optionPlayed": "Tylko odtworzone utwory",
+            "input_kind_albums": "Albumy",
+            "input_kind_songs": "Piosenki",
+            "input_kind": "Losowy wybór",
+            "input_limit_albums": "Ile albumów?",
+            "input_limit_songs": "Ile piosenek?"
         },
         "saveQueue": {
             "success": "Zapisano kolejkę odtwarzania na serwerze"
@@ -991,7 +996,7 @@
         "audioFadeOnStatusChange_description": "Umożliwia zanikanie lub pojawianie się dźwięku gdy zmieni się status play/pauza",
         "autoDJ": "Automatyczny DJ",
         "autoDJ_itemCount": "Liczba elementów",
-        "autoDJ_itemCount_description": "Liczba elementów, które będzie próbować dodać do kolejki kiedy automatyczny DJ jest włączony",
+        "autoDJ_itemCount_description": "Liczba elementów, które będzie próbować dodać do kolejki",
         "autoDJ_timing": "Czas dodawania",
         "autoDJ_timing_description": "Ilość piosenek pozostałych w kolejce przed tym gdy zostanie włączony automatyczny DJ",
         "logLevel": "Poziom logów",
@@ -1093,7 +1098,16 @@
         "sidebarPlaylistMode_description": "Jak każda z playlist jest wyświetlana w liście w pasku bocznym",
         "sidebarPlaylistMode": "Tryb playlist bocznego paska",
         "sidebarPlaylistMode_optionCompact": "Kompaktowy",
-        "sidebarPlaylistMode_optionExpanded": "Rozszerzony"
+        "sidebarPlaylistMode_optionExpanded": "Rozszerzony",
+        "autoDJ_mode": "Tryb",
+        "autoDJ_mode_albums": "Albumy",
+        "autoDJ_mode_description": "Wybierz dodawanie piosenek lub całych albumów do kolejki",
+        "autoDJ_mode_songs": "Piosenki",
+        "autoDJ_enabled": "Włącz Auto DJ",
+        "autoDJ_albumStrategy": "Tryb wyboru albumów",
+        "autoDJ_songStrategy": "Tryb wyboru piosenek",
+        "autoDJ_strategy_option_library_random": "Losowo",
+        "autoDJ_strategy_option_similar": "Podobne"
     },
     "table": {
         "config": {

@@ -234,7 +234,7 @@
         "customCssEnable": "Povolit vlastní CSS",
         "customCssEnable_description": "Umožnit psaní vlastního CSS",
         "customCssNotice": "Varování: i když provádíme určitou sanitizaci (zakázáním URL() a content:), může používání CSS stále představovat riziko změnami rozhraní",
-        "customCss_description": "Vlastní CSS obsah. Upozornění: vlastnosti content a vzdálené URL jsou zakázané. Níže je zobrazen náhled vašeho obsahu. Další pole, která jste nenastavili, jsou přítomna z důvodu sanitizace",
+        "customCss_description": "Vlastní CSS obsah. Upozornění: vlastnosti content a vzdálené URL jsou zakázané. Níže je zobrazen náhled vašeho obsahu. Další pole, která jste nenastavili, jsou přítomna z důvodu sanitizace. Počítačový Feishin čte a zapisuje soubor custom.css do konfiguračního adresáře aplikace a znovu jej načte po jeho změně",
         "customCss": "Vlastní css",
         "webAudio": "Použít webový zvuk",
         "webAudio_description": "Použít webový zvuk. Tím povolíte pokročilé funkce jako ReplayGain. Zakažte, pokud se objeví problémy",
@@ -345,7 +345,7 @@
         "playerbarSlider_description": "Vlnová křivka není doporučena, pokud se nacházíte na pomalém nebo měřeném internetovém připojení",
         "autoDJ": "Automatický DJ",
         "autoDJ_itemCount": "Počet položek",
-        "autoDJ_itemCount_description": "Počet položek, které se pokusíme přidat do fronty po povolení automatického DJ",
+        "autoDJ_itemCount_description": "Počet položek, které se pokusíme přidat do fronty",
         "autoDJ_timing": "Časování",
         "autoDJ_timing_description": "Počet skladeb zbývajících ve frontě před spuštěním automatického DJ",
         "logLevel": "Úroveň protokolu",
@@ -447,7 +447,16 @@
         "sidebarPlaylistMode_description": "Jak je každý seznam skladeb zobrazen v seznamu v postranní liště",
         "sidebarPlaylistMode": "Režim seznamů skladeb v postranní liště",
         "sidebarPlaylistMode_optionCompact": "Kompaktní",
-        "sidebarPlaylistMode_optionExpanded": "Rozšířený"
+        "sidebarPlaylistMode_optionExpanded": "Rozšířený",
+        "autoDJ_mode": "Režim",
+        "autoDJ_mode_albums": "Alba",
+        "autoDJ_mode_description": "Vyberte, zda do fronty přidávat skladby nebo celá alba",
+        "autoDJ_mode_songs": "Skladby",
+        "autoDJ_enabled": "Povolit automatického DJ",
+        "autoDJ_albumStrategy": "Režim výběru alb",
+        "autoDJ_songStrategy": "Režim výběru skladeb",
+        "autoDJ_strategy_option_library_random": "Náhodně",
+        "autoDJ_strategy_option_similar": "Podobné"
     },
     "action": {
         "editPlaylist": "Upravit $t(entity.playlist, {\"count\": 1})",
@@ -623,7 +632,8 @@
         "newVersionAvailable": "Je dostupná nová verze",
         "numberOfResults": "{{numberOfResults}} výsledků",
         "grouping": "Seskupování",
-        "back": "Zpět"
+        "back": "Zpět",
+        "openFolder": "Otevřít složku"
     },
     "table": {
         "config": {
@@ -1122,7 +1132,12 @@
             "input_played": "Přehrát filtr",
             "input_played_optionAll": "Všechny skladby",
             "input_played_optionUnplayed": "Pouze nepřehrané skladby",
-            "input_played_optionPlayed": "Pouze přehrané skladby"
+            "input_played_optionPlayed": "Pouze přehrané skladby",
+            "input_kind_albums": "Alba",
+            "input_kind_songs": "Skladby",
+            "input_kind": "Náhodný výběr",
+            "input_limit_albums": "Kolik alb?",
+            "input_limit_songs": "Kolik skladeb?"
         },
         "saveQueue": {
             "success": "Fronta přehrávání uložena na server"

@@ -61,7 +61,7 @@ export const ScrobbleStatus = ({ formattedTime }: { formattedTime: string }) => 
     );
 
     return (
-        <HoverCard position="top" width={280}>
+        <HoverCard openDelay={500} position="top" width={280}>
             <HoverCard.Target>
                 <Group
                     align="center"
