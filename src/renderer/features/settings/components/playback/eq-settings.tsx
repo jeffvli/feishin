@@ -1,5 +1,5 @@
 import isElectron from 'is-electron';
-import { memo, useCallback, useContext, useState } from 'react';
+import { memo, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import {
     buildMpvAudioFilters,
@@ -8,26 +8,37 @@ import {
 } from './mpv-audio-filters';
 
 import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-context';
+import {
+    SettingOption,
+    SettingsSection,
+} from '/@/renderer/features/settings/components/settings-section';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
+import { Group } from '/@/shared/components/group/group';
 import { Select } from '/@/shared/components/select/select';
+import { Slider } from '/@/shared/components/slider/slider';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
+import { TextInput } from '/@/shared/components/text-input/text-input';
 import { PlayerType } from '/@/shared/types/types';
 
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 
 const BAND_LABELS = [
     '31.5',
-    '63',
-    '125',
-    '250',
-    '500',
-    '1k',
-    '2k',
-    '3k',
-    '4k',
-    '6.3k',
-    '10k',
-    '16k',
+'63',
+'125',
+'250',
+'500',
+'1k',
+'2k',
+'3k',
+'4k',
+'6.3k',
+'10k',
+'16k',
 ];
 
 // ─── Built-in EQ presets ──────────────────────────────────────────────────────
@@ -62,7 +73,7 @@ const COMP_PRESETS: Record<string, CompressorPreset> = {
     Moderate: { attack: 20, knee: 3, makeup: 5, ratio: 4, release: 300, threshold: -24 },
 };
 
-// ─── Storage helpers (localStorage, keyed separately from main store) ─────────
+// ─── Storage helpers ──────────────────────────────────────────────────────────
 const LS_EQ_PRESETS = 'feishin_eq_custom_presets';
 const LS_COMP_PRESETS = 'feishin_comp_custom_presets';
 
@@ -78,277 +89,54 @@ function saveCustomPresets<T>(key: string, presets: Record<string, T>) {
     localStorage.setItem(key, JSON.stringify(presets));
 }
 
-// ─── Shared style tokens ──────────────────────────────────────────────────────
-const BTN: React.CSSProperties = {
-    background: 'transparent',
-    border: '1px solid rgba(255,255,255,0.18)',
-    borderRadius: 4,
-    color: 'inherit',
-    cursor: 'pointer',
-    fontSize: 12,
-    padding: '3px 10px',
-};
+// ─── Vertical EQ band slider ──────────────────────────────────────────────────
+// Mantine v8 does not support orientation="vertical" on Slider (added in v9).
+// We rotate the existing themed Slider 270deg so it inherits all app theme
+// tokens (thumb colour, track, label) without any custom styling.
+// The outer div is sized to the slider's rendered height so the rotated
+// element does not overflow its grid cell.
+const SLIDER_WIDTH = 120;
+const SLIDER_HEIGHT = 28;
 
-const BTN_DANGER: React.CSSProperties = {
-    ...BTN,
-    border: '1px solid rgba(220,80,80,0.5)',
-    color: 'rgba(220,80,80,0.9)',
-};
-
-const PANEL: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.04)',
-    borderRadius: 8,
-    padding: '14px 16px',
-    width: '100%',
-};
-
-const ROW: React.CSSProperties = {
-    alignItems: 'center',
-    display: 'flex',
-    flexWrap: 'wrap' as const,
-    gap: 8,
-};
-
-// ─── Horizontal slider ────────────────────────────────────────────────────────
-function HSlider({
-    max,
-    min,
-    onChange,
-    onRelease,
-    step,
-    value,
-    width = 160,
-}: {
-    max: number;
-    min: number;
-    onChange: (v: number) => void;
-    onRelease: (v: number) => void;
-    step: number;
-    value: number;
-    width?: number;
-}) {
-    return (
-        <input
-            max={max}
-            min={min}
-            onChange={(e) => onChange(Number(e.target.value))}
-            onMouseUp={(e) => onRelease(Number((e.target as HTMLInputElement).value))}
-            onTouchEnd={(e) => onRelease(Number((e.target as HTMLInputElement).value))}
-            step={step}
-            style={{ cursor: 'pointer', flexShrink: 0, width }}
-            type="range"
-            value={value}
-        />
-    );
-}
-
-// ─── Preset selector + save/delete ───────────────────────────────────────────
-function PresetBar<T>({
-    builtins,
-    customs,
-    onDelete,
-    onSave,
-    onSelect,
-}: {
-    builtins: Record<string, T>;
-    customs: Record<string, T>;
-    onDelete: (name: string) => void;
-    onSave: (name: string) => void;
-    onSelect: (preset: T) => void;
-}) {
-    const [saveName, setSaveName] = useState('');
-    const [selectedPreset, setSelectedPreset] = useState<null | string>(null);
-    const builtinNames = Object.keys(builtins);
-    const customNames = Object.keys(customs);
-
-    const handlePresetChange = (name: null | string) => {
-        if (!name) return;
-        setSelectedPreset(name);
-        const isCustom = name in customs;
-        const preset = isCustom ? customs[name] : builtins[name];
-        onSelect(preset);
-    };
-
-    const selectData = [
-        {
-            group: 'Built-in',
-            items: builtinNames.map((name) => ({
-                label: name,
-                value: name,
-            })),
-        },
-        {
-            group: 'Custom ★',
-            items: customNames.map((name) => ({
-                label: name,
-                value: name,
-            })),
-        },
-    ].filter((group) => group.items.length > 0);
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {/* Preset dropdown */}
-            <div style={{ alignItems: 'center', display: 'flex', gap: 8 }}>
-                <label style={{ fontSize: 14, fontWeight: 500 }}>Preset:</label>
-                <Select
-                    clearable
-                    data={selectData}
-                    onChange={handlePresetChange}
-                    placeholder="-- Select a preset --"
-                    searchable
-                    value={selectedPreset}
-                    width={200}
-                />
-                {selectedPreset && customNames.includes(selectedPreset) && (
-                    <button
-                        onClick={() => {
-                            onDelete(selectedPreset);
-                            setSelectedPreset(null);
-                        }}
-                        style={{ ...BTN_DANGER, fontSize: 12, padding: '6px 10px' }}
-                        title={`Delete "${selectedPreset}"`}
-                        type="button"
-                    >
-                        Delete
-                    </button>
-                )}
-            </div>
-
-            {/* Save custom preset */}
-            <div style={{ alignItems: 'center', display: 'flex', gap: 6 }}>
-                <input
-                    onChange={(e) => setSaveName(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' && saveName.trim()) {
-                            onSave(saveName.trim());
-                            setSaveName('');
-                        }
-                    }}
-                    placeholder="Save current as preset…"
-                    style={{
-                        background: 'rgba(255,255,255,0.07)',
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        borderRadius: 4,
-                        color: 'inherit',
-                        fontSize: 12,
-                        outline: 'none',
-                        padding: '6px 8px',
-                        width: 200,
-                    }}
-                    type="text"
-                    value={saveName}
-                />
-                <button
-                    onClick={() => {
-                        if (saveName.trim()) {
-                            onSave(saveName.trim());
-                            setSaveName('');
-                        }
-                    }}
-                    style={BTN}
-                    type="button"
-                >
-                    Save
-                </button>
-            </div>
-        </div>
-    );
-}
-
-// ─── Toggle switch ────────────────────────────────────────────────────────────
-function Toggle({
-    checked,
+function EqBandSlider({
+    freq,
+    gain,
     label,
-    onChange,
+    onChangeEnd,
 }: {
-    checked: boolean;
+    freq: number;
+    gain: number;
     label: string;
-    onChange: (v: boolean) => void;
+    onChangeEnd: (v: number) => void;
 }) {
     return (
-        <label
-            style={{
-                alignItems: 'center',
-                cursor: 'pointer',
-                display: 'flex',
-                gap: 10,
-                userSelect: 'none',
-            }}
-        >
-            <button
-                onClick={() => onChange(!checked)}
-                style={{
-                    background: checked
-                        ? 'var(--primary-color, #3574fc)'
-                        : 'rgba(255,255,255,0.15)',
-                    border: 'none',
-                    borderRadius: 12,
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                    height: 22,
-                    padding: 0,
-                    position: 'relative',
-                    transition: 'background 0.2s',
-                    width: 40,
-                }}
-                type="button"
-            >
-                <div
-                    style={{
-                        background: '#fff',
-                        borderRadius: '50%',
-                        height: 16,
-                        left: checked ? 20 : 3,
-                        position: 'absolute',
-                        top: 3,
-                        transition: 'left 0.2s',
-                        width: 16,
-                    }}
-                />
-            </button>
-            <span style={{ fontSize: 14, fontWeight: 500 }}>{label}</span>
-        </label>
-    );
-}
-
-// ─── Vertical slider ──────────────────────────────────────────────────────────
-function VerticalSlider({
-    max,
-    min,
-    onChange,
-    onRelease,
-    step,
-    value,
-}: {
-    max: number;
-    min: number;
-    onChange: (v: number) => void;
-    onRelease: (v: number) => void;
-    step: number;
-    value: number;
-}) {
-    return (
-        <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <input
-                max={max}
-                min={min}
-                onChange={(e) => onChange(Number(e.target.value))}
-                onMouseUp={(e) => onRelease(Number((e.target as HTMLInputElement).value))}
-                onTouchEnd={(e) => onRelease(Number((e.target as HTMLInputElement).value))}
-                step={step}
-                style={
-                    {
-                        cursor: 'pointer',
-                        height: 100,
-                        WebkitAppearance: 'slider-vertical',
-                        width: 24,
-                    } as React.CSSProperties
-                }
-                type="range"
-                value={value}
-            />
+        <Stack align="center" gap={4}>
+        <Text size="xs" style={{ minHeight: 16, textAlign: 'center' }}>
+        {gain > 0 ? `+${gain}` : gain}
+        </Text>
+        {/* Outer div reserves space for the rotated slider */}
+        <div style={{ height: SLIDER_WIDTH, position: 'relative', width: SLIDER_HEIGHT }}>
+        <Slider
+        key={`${freq}-${gain}`}
+        defaultValue={gain}
+        label={(v) => `${v > 0 ? '+' : ''}${v} dB`}
+        max={12}
+        min={-12}
+        step={0.5}
+        style={{
+            left: '50%',
+            position: 'absolute',
+            top: '50%',
+            transform: 'translate(-50%, -50%) rotate(270deg)',
+            width: SLIDER_WIDTH,
+        }}
+        onChangeEnd={onChangeEnd}
+        />
         </div>
+        <Text isMuted size="xs" style={{ textAlign: 'center' }}>
+        {label}
+        </Text>
+        </Stack>
     );
 }
 
@@ -356,15 +144,25 @@ function VerticalSlider({
 export const EqSettings = memo(() => {
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
-    const webAudioContext = useContext(WebAudioContext);
 
-    // Custom preset state (stored in localStorage, not Zustand)
+    // Ref pattern to avoid stale closure when reading webAudio DSP nodes.
+    // webAudio?.dsp is undefined at callback creation time and the closure
+    // would capture that undefined value even after AudioContext initialises.
+    const webAudioContext = useContext(WebAudioContext);
+    const webAudioContextRef = useRef(webAudioContext);
+    useEffect(() => {
+        webAudioContextRef.current = webAudioContext;
+    }, [webAudioContext]);
+
+    // Custom preset state — stored in localStorage separately from main store
     const [customEqPresets, setCustomEqPresets] = useState<Record<string, number[]>>(() =>
-        loadCustomPresets<number[]>(LS_EQ_PRESETS),
+    loadCustomPresets<number[]>(LS_EQ_PRESETS),
     );
     const [customCompPresets, setCustomCompPresets] = useState<Record<string, CompressorPreset>>(
         () => loadCustomPresets<CompressorPreset>(LS_COMP_PRESETS),
     );
+    const [saveEqName, setSaveEqName] = useState('');
+    const [saveCompName, setSaveCompName] = useState('');
 
     const applyFilters = useCallback(
         (eq: EqSettingsType, compressor: CompressorSettings) => {
@@ -376,9 +174,13 @@ export const EqSettings = memo(() => {
             }
 
             // ── Web Audio player ──────────────────────────────────────────
-            // Mutations to Web Audio API nodes are intentional side effects, not React state mutations
-            const dsp = webAudioContext.webAudio?.dsp;
+            // Read from ref so we always get the current AudioContext state,
+            // not the stale value captured when this callback was created.
+            const dsp = webAudioContextRef.current.webAudio?.dsp;
             if (!dsp) return;
+
+            // Mutations to Web Audio API AudioParam values are intentional
+            // side effects on the live audio graph, not React state mutations.
             // eslint-disable-next-line react-hooks/immutability
             dsp.preampGain.gain.value = eq.enabled ? Math.pow(10, eq.preamp / 20) : 1;
 
@@ -403,33 +205,37 @@ export const EqSettings = memo(() => {
                 dsp.compressor.knee.value = 0;
             }
         },
-        [settings.type, webAudioContext],
+        // settings.type is the only reactive dep — webAudioContextRef is a
+        // stable ref that always holds the latest context value.
+        [settings.type],
     );
 
-    // ── EQ handlers ────────────────────────────────────────────────────────────
+    // Re-apply filters when switching to Web Audio so DSP nodes reflect
+    // persisted settings immediately without requiring a slider interaction.
+    useEffect(() => {
+        if (settings.type === PlayerType.WEB) {
+            applyFilters(settings.equalizer, settings.compressor);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [settings.type]);
+
+    // ── EQ handlers ──────────────────────────────────────────────────────────
     const handleEqToggle = (enabled: boolean) => {
         const newEq = { ...settings.equalizer, enabled };
         setSettings({ playback: { equalizer: newEq } });
         applyFilters(newEq, settings.compressor);
     };
 
-    const handlePreampChange = (preamp: number) => {
-        setSettings({ playback: { equalizer: { ...settings.equalizer, preamp } } });
-    };
-
-    const handlePreampRelease = (preamp: number) => {
+    const handlePreampChangeEnd = (preamp: number) => {
         const newEq = { ...settings.equalizer, preamp };
         setSettings({ playback: { equalizer: newEq } });
         applyFilters(newEq, settings.compressor);
     };
 
-    const handleBandChange = (index: number, gain: number) => {
-        const newBands = settings.equalizer.bands.map((b, i) => (i === index ? { ...b, gain } : b));
-        setSettings({ playback: { equalizer: { ...settings.equalizer, bands: newBands } } });
-    };
-
-    const handleBandRelease = (index: number, gain: number) => {
-        const newBands = settings.equalizer.bands.map((b, i) => (i === index ? { ...b, gain } : b));
+    const handleBandChangeEnd = (index: number, gain: number) => {
+        const newBands = settings.equalizer.bands.map((b, i) =>
+        i === index ? { ...b, gain } : b,
+        );
         const newEq = { ...settings.equalizer, bands: newBands };
         setSettings({ playback: { equalizer: newEq } });
         applyFilters(newEq, settings.compressor);
@@ -442,42 +248,41 @@ export const EqSettings = memo(() => {
         applyFilters(newEq, settings.compressor);
     };
 
-    const saveEqPreset = (name: string) => {
+    const handleSaveEqPreset = () => {
+        const name = saveEqName.trim();
+        if (!name) return;
         const gains = settings.equalizer.bands.map((b) => b.gain);
         const updated = { ...customEqPresets, [name]: gains };
         setCustomEqPresets(updated);
         saveCustomPresets(LS_EQ_PRESETS, updated);
+        setSaveEqName('');
     };
 
-    const deleteEqPreset = (name: string) => {
+    const handleDeleteEqPreset = (name: string) => {
         const updated = { ...customEqPresets };
         delete updated[name];
         setCustomEqPresets(updated);
         saveCustomPresets(LS_EQ_PRESETS, updated);
     };
 
-    const resetEq = () => {
+    const handleResetEq = () => {
         const newEq = {
             ...settings.equalizer,
             bands: settings.equalizer.bands.map((b) => ({ ...b, gain: 0 })),
-            preamp: 0,
+                               preamp: 0,
         };
         setSettings({ playback: { equalizer: newEq } });
         applyFilters(newEq, settings.compressor);
     };
 
-    // ── Compressor handlers ────────────────────────────────────────────────────
+    // ── Compressor handlers ───────────────────────────────────────────────────
     const handleCompToggle = (enabled: boolean) => {
         const newComp = { ...settings.compressor, enabled };
         setSettings({ playback: { compressor: newComp } });
         applyFilters(settings.equalizer, newComp);
     };
 
-    const handleCompChange = (key: keyof CompressorSettings, value: number) => {
-        setSettings({ playback: { compressor: { ...settings.compressor, [key]: value } } });
-    };
-
-    const handleCompRelease = (key: keyof CompressorSettings, value: number) => {
+    const handleCompChangeEnd = (key: keyof CompressorSettings, value: number) => {
         const newComp = { ...settings.compressor, [key]: value };
         setSettings({ playback: { compressor: newComp } });
         applyFilters(settings.equalizer, newComp);
@@ -489,23 +294,26 @@ export const EqSettings = memo(() => {
         applyFilters(settings.equalizer, newComp);
     };
 
-    const saveCompPreset = (name: string) => {
+    const handleSaveCompPreset = () => {
+        const name = saveCompName.trim();
+        if (!name) return;
         const rest = Object.fromEntries(
             Object.entries(settings.compressor).filter(([key]) => key !== 'enabled'),
         ) as CompressorPreset;
         const updated = { ...customCompPresets, [name]: rest };
         setCustomCompPresets(updated);
         saveCustomPresets(LS_COMP_PRESETS, updated);
+        setSaveCompName('');
     };
 
-    const deleteCompPreset = (name: string) => {
+    const handleDeleteCompPreset = (name: string) => {
         const updated = { ...customCompPresets };
         delete updated[name];
         setCustomCompPresets(updated);
         saveCustomPresets(LS_COMP_PRESETS, updated);
     };
 
-    const resetComp = () => {
+    const handleResetComp = () => {
         const newComp = {
             attack: 20,
             enabled: settings.compressor.enabled,
@@ -519,272 +327,358 @@ export const EqSettings = memo(() => {
         applyFilters(settings.equalizer, newComp);
     };
 
-    // EQ and compressor work on both MPV (lavfi) and Web Audio (BiquadFilter/DynamicsCompressor)
+    // ── Preset select data ────────────────────────────────────────────────────
+    const eqPresetSelectData = [
+        {
+            group: 'Built-in',
+            items: Object.keys(EQ_PRESETS).map((name) => ({ label: name, value: name })),
+        },
+        ...(Object.keys(customEqPresets).length > 0
+        ? [
+            {
+                group: 'Custom',
+                items: Object.keys(customEqPresets).map((name) => ({
+                    label: name,
+                    value: name,
+                })),
+            },
+        ]
+        : []),
+    ];
 
+    const compPresetSelectData = [
+        {
+            group: 'Built-in',
+            items: Object.keys(COMP_PRESETS).map((name) => ({ label: name, value: name })),
+        },
+        ...(Object.keys(customCompPresets).length > 0
+        ? [
+            {
+                group: 'Custom',
+                items: Object.keys(customCompPresets).map((name) => ({
+                    label: name,
+                    value: name,
+                })),
+            },
+        ]
+        : []),
+    ];
+
+    // ── EQ SettingsSection options ────────────────────────────────────────────
+    const eqOptions: SettingOption[] = [
+        {
+            control: (
+                <Switch
+                defaultChecked={settings.equalizer.enabled}
+                onChange={(e) => handleEqToggle(e.currentTarget.checked)}
+                />
+            ),
+            description:
+            settings.type === PlayerType.LOCAL
+            ? 'Parametric equalizer via FFmpeg lavfi (MPV)'
+            : 'Parametric equalizer via Web Audio API',
+            title: 'Equalizer',
+        },
+        ...(settings.equalizer.enabled
+        ? ([
+            {
+                control: (
+                    <Group gap="xs">
+                    <Select
+                    clearable
+                    data={eqPresetSelectData}
+                    onChange={(name) => {
+                        if (!name) return;
+                        const preset =
+                        customEqPresets[name] ?? EQ_PRESETS[name];
+                        if (preset) applyEqPreset(preset);
+                    }}
+                    placeholder="Select preset"
+                    searchable
+                    value={null}
+                    w={180}
+                    />
+                    {Object.keys(customEqPresets).length > 0 && (
+                        <Select
+                        clearable
+                        data={Object.keys(customEqPresets).map((name) => ({
+                            label: name,
+                            value: name,
+                        }))}
+                        onChange={(name) => {
+                            if (!name) return;
+                            handleDeleteEqPreset(name);
+                        }}
+                        placeholder="Delete custom..."
+                        value={null}
+                        w={160}
+                        />
+                    )}
+                    </Group>
+                ),
+                description: 'Apply a built-in or saved custom EQ curve',
+                title: 'Preset',
+            },
+           {
+               control: (
+                   <Group gap="xs">
+                   <TextInput
+                   onChange={(e) => setSaveEqName(e.currentTarget.value)}
+                   onKeyDown={(e) => {
+                       if (e.key === 'Enter') handleSaveEqPreset();
+                   }}
+                   placeholder="Preset name..."
+                   value={saveEqName}
+                   w={180}
+                   />
+                   <Button
+                   disabled={!saveEqName.trim()}
+                   variant="subtle"
+                   onClick={handleSaveEqPreset}
+                   >
+                   Save
+                   </Button>
+                   </Group>
+               ),
+               description: 'Save current EQ settings as a named preset',
+               title: 'Save preset',
+           },
+           {
+               control: (
+                   <Group gap="xs">
+                   <Slider
+                   key={settings.equalizer.preamp}
+                   defaultValue={settings.equalizer.preamp}
+                   label={(v) => `${v > 0 ? '+' : ''}${v} dB`}
+                   max={12}
+                   min={-12}
+                   step={0.5}
+                   w={200}
+                   onChangeEnd={handlePreampChangeEnd}
+                   />
+                   <Button variant="subtle" onClick={handleResetEq}>
+                   Reset all
+                   </Button>
+                   </Group>
+               ),
+               description:
+               'Input gain before EQ bands. Set negative when boosting bands to prevent clipping (MPV).',
+           title: 'Preamp',
+           },
+           {
+               control: (
+                   // Mantine v8 does not support orientation="vertical" on Slider.
+                   // Each band slider is rotated 270deg via CSS transform so it
+                   // renders vertically while inheriting all app theme tokens.
+                   // The outer div reserves the correct amount of space so the
+                   // rotated element does not overflow its grid cell.
+                   <Group align="flex-end" gap={2} wrap="nowrap">
+                   {settings.equalizer.bands.map((band, i) => (
+                       <EqBandSlider
+                       key={band.freq}
+                       freq={band.freq}
+                       gain={band.gain}
+                       label={BAND_LABELS[i] ?? String(band.freq)}
+                       onChangeEnd={(v) => handleBandChangeEnd(i, v)}
+                       />
+                   ))}
+                   </Group>
+               ),
+               description: 'Per-band gain adjustment. Range: -12 to +12 dB.',
+               title: 'Bands',
+           },
+        ] as SettingOption[])
+        : []),
+    ];
+
+    // ── Compressor SettingsSection options ────────────────────────────────────
     const compParams: {
+        description: string;
         key: keyof CompressorSettings;
-        label: string;
         max: number;
         min: number;
         step: number;
+        title: string;
         unit: string;
     }[] = [
-        { key: 'threshold', label: 'Threshold', max: 0, min: -60, step: 1, unit: 'dB' },
-        { key: 'ratio', label: 'Ratio', max: 20, min: 1, step: 0.5, unit: ':1' },
-        { key: 'attack', label: 'Attack', max: 2000, min: 0.1, step: 1, unit: 'ms' },
-        { key: 'release', label: 'Release', max: 9000, min: 1, step: 10, unit: 'ms' },
-        { key: 'makeup', label: 'Makeup', max: 30, min: 0, step: 0.5, unit: 'dB' },
-        { key: 'knee', label: 'Knee', max: 10, min: 1, step: 0.5, unit: 'dB' },
+        {
+            description: 'Signal level above which compression begins.',
+            key: 'threshold',
+            max: 0,
+            min: -60,
+            step: 1,
+            title: 'Threshold',
+            unit: 'dB',
+        },
+        {
+            description: 'Compression ratio, e.g. 4 = 4:1.',
+            key: 'ratio',
+            max: 20,
+            min: 1,
+            step: 0.5,
+            title: 'Ratio',
+            unit: ':1',
+        },
+        {
+            description:
+            'How quickly the compressor engages after the signal exceeds the threshold.',
+            key: 'attack',
+            max: 2000,
+            min: 0.1,
+            step: 1,
+            title: 'Attack',
+            unit: 'ms',
+        },
+        {
+            description:
+            'How quickly the compressor releases after the signal drops below the threshold.',
+            key: 'release',
+            max: 9000,
+            min: 1,
+            step: 10,
+            title: 'Release',
+            unit: 'ms',
+        },
+        {
+            description: 'Output gain applied after compression to restore loudness.',
+            key: 'makeup',
+            max: 30,
+            min: 0,
+            step: 0.5,
+            title: 'Makeup Gain',
+            unit: 'dB',
+        },
+        {
+            description:
+            'Soft-knee width. Higher values make the transition into compression more gradual.',
+            key: 'knee',
+            max: 10,
+            min: 1,
+            step: 0.5,
+            title: 'Knee',
+            unit: 'dB',
+        },
+    ];
+
+    const compressorOptions: SettingOption[] = [
+        {
+            control: (
+                <Switch
+                defaultChecked={settings.compressor.enabled}
+                onChange={(e) => handleCompToggle(e.currentTarget.checked)}
+                />
+            ),
+            description:
+            settings.type === PlayerType.LOCAL
+            ? 'Dynamic range compressor via FFmpeg acompressor (MPV)'
+            : 'Dynamic range compressor via Web Audio API',
+            title: 'Compressor',
+        },
+        ...(settings.compressor.enabled
+        ? ([
+            {
+                control: (
+                    <Group gap="xs">
+                    <Select
+                    clearable
+                    data={compPresetSelectData}
+                    onChange={(name) => {
+                        if (!name) return;
+                        const preset =
+                        customCompPresets[name] ?? COMP_PRESETS[name];
+                        if (preset) applyCompPreset(preset);
+                    }}
+                    placeholder="Select preset"
+                    searchable
+                    value={null}
+                    w={180}
+                    />
+                    {Object.keys(customCompPresets).length > 0 && (
+                        <Select
+                        clearable
+                        data={Object.keys(customCompPresets).map((name) => ({
+                            label: name,
+                            value: name,
+                        }))}
+                        onChange={(name) => {
+                            if (!name) return;
+                            handleDeleteCompPreset(name);
+                        }}
+                        placeholder="Delete custom..."
+                        value={null}
+                        w={160}
+                        />
+                    )}
+                    </Group>
+                ),
+                description: 'Apply a built-in or saved custom compressor setting',
+                title: 'Preset',
+            },
+           {
+               control: (
+                   <Group gap="xs">
+                   <TextInput
+                   onChange={(e) => setSaveCompName(e.currentTarget.value)}
+                   onKeyDown={(e) => {
+                       if (e.key === 'Enter') handleSaveCompPreset();
+                   }}
+                   placeholder="Preset name..."
+                   value={saveCompName}
+                   w={180}
+                   />
+                   <Button
+                   disabled={!saveCompName.trim()}
+                   variant="subtle"
+                   onClick={handleSaveCompPreset}
+                   >
+                   Save
+                   </Button>
+                   </Group>
+               ),
+               description: 'Save current compressor settings as a named preset',
+               title: 'Save preset',
+           },
+           ...compParams.map(({ key, title, description, min, max, step, unit }) => ({
+               control: (
+                   <Group align="center" gap="xs">
+                   <Slider
+                   key={settings.compressor[key] as number}
+                   defaultValue={settings.compressor[key] as number}
+                   label={(v) => `${v}${unit}`}
+                   max={max}
+                   min={min}
+                   step={step}
+                   w={200}
+                   onChangeEnd={(v) => handleCompChangeEnd(key, v)}
+                   />
+                   <Text isMuted size="xs" style={{ minWidth: 52, textAlign: 'right' }}>
+                   {settings.compressor[key] as number}
+                   {unit}
+                   </Text>
+                   </Group>
+               ),
+               description,
+               title,
+           })),
+           {
+               control: (
+                   <Button variant="subtle" onClick={handleResetComp}>
+                   Reset to defaults
+                   </Button>
+               ),
+               description: 'Restore all compressor parameters to their default values',
+               title: 'Reset',
+           },
+        ] as SettingOption[])
+        : []),
     ];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0, width: '100%' }}>
-            <Divider />
-
-            {/* ══════════ EQUALIZER PANEL ══════════ */}
-            <div style={{ padding: '16px 20px', width: '100%' }}>
-                <div style={PANEL}>
-                    {/* Header row */}
-                    <div
-                        style={{
-                            alignItems: 'center',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            marginBottom: 14,
-                        }}
-                    >
-                        <Toggle
-                            checked={settings.equalizer.enabled}
-                            label="Equalizer"
-                            onChange={handleEqToggle}
-                        />
-                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>
-                            {settings.type === PlayerType.LOCAL
-                                ? 'Graphical EQ · FFmpeg lavfi · MPV'
-                                : 'Graphical EQ · Web Audio API'}
-                        </span>
-                    </div>
-
-                    {settings.equalizer.enabled && (
-                        <>
-                            {/* Presets */}
-                            <div style={{ marginBottom: 14 }}>
-                                <div
-                                    style={{
-                                        color: 'rgba(255,255,255,0.5)',
-                                        fontSize: 11,
-                                        marginBottom: 6,
-                                        textTransform: 'uppercase',
-                                    }}
-                                >
-                                    Presets
-                                </div>
-                                <PresetBar
-                                    builtins={EQ_PRESETS}
-                                    customs={customEqPresets}
-                                    onDelete={deleteEqPreset}
-                                    onSave={saveEqPreset}
-                                    onSelect={(gains) => applyEqPreset(gains)}
-                                />
-                            </div>
-
-                            <div
-                                style={{
-                                    background: 'rgba(255,255,255,0.06)',
-                                    height: 1,
-                                    margin: '12px 0',
-                                }}
-                            />
-
-                            {/* Preamp row */}
-                            <div style={{ ...ROW, marginBottom: 16 }}>
-                                <span
-                                    style={{ fontSize: 13, minWidth: 64 }}
-                                    title="Set negative when boosting bands to prevent clipping"
-                                >
-                                    Preamp
-                                </span>
-                                <HSlider
-                                    max={12}
-                                    min={-12}
-                                    onChange={handlePreampChange}
-                                    onRelease={handlePreampRelease}
-                                    step={0.5}
-                                    value={settings.equalizer.preamp}
-                                    width={200}
-                                />
-                                <span style={{ fontSize: 13, minWidth: 52, textAlign: 'right' }}>
-                                    {settings.equalizer.preamp > 0
-                                        ? `+${settings.equalizer.preamp}`
-                                        : settings.equalizer.preamp}{' '}
-                                    dB
-                                </span>
-                                <button onClick={resetEq} style={BTN} type="button">
-                                    Reset all
-                                </button>
-                            </div>
-
-                            {/* Band sliders — full width, evenly distributed */}
-                            <div
-                                style={{
-                                    display: 'grid',
-                                    gap: 4,
-                                    gridTemplateColumns: `repeat(${settings.equalizer.bands.length}, 1fr)`,
-                                    width: '100%',
-                                }}
-                            >
-                                {settings.equalizer.bands.map((band, i) => (
-                                    <div
-                                        key={band.freq}
-                                        style={{
-                                            alignItems: 'center',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            gap: 3,
-                                        }}
-                                    >
-                                        <span
-                                            style={{
-                                                fontSize: 11,
-                                                height: 16,
-                                                lineHeight: '16px',
-                                                textAlign: 'center',
-                                            }}
-                                        >
-                                            {band.gain > 0 ? `+${band.gain}` : band.gain}
-                                        </span>
-                                        <VerticalSlider
-                                            max={12}
-                                            min={-12}
-                                            onChange={(v) => handleBandChange(i, v)}
-                                            onRelease={(v) => handleBandRelease(i, v)}
-                                            step={0.5}
-                                            value={band.gain}
-                                        />
-                                        {/* Zero-line tick */}
-                                        <div
-                                            style={{
-                                                background: 'rgba(255,255,255,0.2)',
-                                                height: 1,
-                                                width: '60%',
-                                            }}
-                                        />
-                                        <span
-                                            style={{
-                                                color: 'rgba(255,255,255,0.5)',
-                                                fontSize: 10,
-                                                textAlign: 'center',
-                                            }}
-                                        >
-                                            {BAND_LABELS[i]}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-
-            <Divider />
-
-            {/* ══════════ COMPRESSOR PANEL ══════════ */}
-            <div style={{ padding: '16px 20px', width: '100%' }}>
-                <div style={PANEL}>
-                    {/* Header row */}
-                    <div
-                        style={{
-                            alignItems: 'center',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            marginBottom: 14,
-                        }}
-                    >
-                        <Toggle
-                            checked={settings.compressor.enabled}
-                            label="Compressor"
-                            onChange={handleCompToggle}
-                        />
-                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11 }}>
-                            {settings.type === PlayerType.LOCAL
-                                ? 'Dynamic range · FFmpeg acompressor · MPV'
-                                : 'Dynamic range · Web Audio API'}
-                        </span>
-                    </div>
-
-                    {settings.compressor.enabled && (
-                        <>
-                            {/* Presets */}
-                            <div style={{ marginBottom: 14 }}>
-                                <div
-                                    style={{
-                                        color: 'rgba(255,255,255,0.5)',
-                                        fontSize: 11,
-                                        marginBottom: 6,
-                                        textTransform: 'uppercase',
-                                    }}
-                                >
-                                    Presets
-                                </div>
-                                <PresetBar
-                                    builtins={COMP_PRESETS}
-                                    customs={customCompPresets}
-                                    onDelete={deleteCompPreset}
-                                    onSave={saveCompPreset}
-                                    onSelect={applyCompPreset}
-                                />
-                            </div>
-
-                            <div
-                                style={{
-                                    background: 'rgba(255,255,255,0.06)',
-                                    height: 1,
-                                    margin: '12px 0',
-                                }}
-                            />
-
-                            {/* Parameter sliders */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                {compParams.map(({ key, label, max, min, step, unit }) => {
-                                    const val = settings.compressor[key] as number;
-                                    return (
-                                        <div key={key} style={ROW}>
-                                            <span style={{ fontSize: 13, minWidth: 84 }}>
-                                                {label}
-                                            </span>
-                                            <HSlider
-                                                max={max}
-                                                min={min}
-                                                onChange={(v) => handleCompChange(key, v)}
-                                                onRelease={(v) => handleCompRelease(key, v)}
-                                                step={step}
-                                                value={val}
-                                                width={220}
-                                            />
-                                            <span
-                                                style={{
-                                                    fontSize: 13,
-                                                    minWidth: 72,
-                                                    textAlign: 'right',
-                                                }}
-                                            >
-                                                {val}
-                                                {unit}
-                                            </span>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            <div style={{ marginTop: 12 }}>
-                                <button onClick={resetComp} style={BTN} type="button">
-                                    Reset to defaults
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
+        <>
+        <Divider />
+        <SettingsSection options={eqOptions} />
+        <Divider />
+        <SettingsSection options={compressorOptions} />
+        </>
     );
 });
