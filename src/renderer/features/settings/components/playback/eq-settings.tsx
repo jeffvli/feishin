@@ -20,25 +20,25 @@ import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
-import { Text } from '/@/shared/components/text/text';
 import { TextInput } from '/@/shared/components/text-input/text-input';
+import { Text } from '/@/shared/components/text/text';
 import { PlayerType } from '/@/shared/types/types';
 
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 
 const BAND_LABELS = [
     '31.5',
-'63',
-'125',
-'250',
-'500',
-'1k',
-'2k',
-'3k',
-'4k',
-'6.3k',
-'10k',
-'16k',
+    '63',
+    '125',
+    '250',
+    '500',
+    '1k',
+    '2k',
+    '3k',
+    '4k',
+    '6.3k',
+    '10k',
+    '16k',
 ];
 
 // ─── Built-in EQ presets ──────────────────────────────────────────────────────
@@ -111,31 +111,31 @@ function EqBandSlider({
 }) {
     return (
         <Stack align="center" gap={4}>
-        <Text size="xs" style={{ minHeight: 16, textAlign: 'center' }}>
-        {gain > 0 ? `+${gain}` : gain}
-        </Text>
-        {/* Outer div reserves space for the rotated slider */}
-        <div style={{ height: SLIDER_WIDTH, position: 'relative', width: SLIDER_HEIGHT }}>
-        <Slider
-        key={`${freq}-${gain}`}
-        defaultValue={gain}
-        label={(v) => `${v > 0 ? '+' : ''}${v} dB`}
-        max={12}
-        min={-12}
-        step={0.5}
-        style={{
-            left: '50%',
-            position: 'absolute',
-            top: '50%',
-            transform: 'translate(-50%, -50%) rotate(270deg)',
-            width: SLIDER_WIDTH,
-        }}
-        onChangeEnd={onChangeEnd}
-        />
-        </div>
-        <Text isMuted size="xs" style={{ textAlign: 'center' }}>
-        {label}
-        </Text>
+            <Text size="xs" style={{ minHeight: 16, textAlign: 'center' }}>
+                {gain > 0 ? `+${gain}` : gain}
+            </Text>
+            {/* Outer div reserves space for the rotated slider */}
+            <div style={{ height: SLIDER_WIDTH, position: 'relative', width: SLIDER_HEIGHT }}>
+                <Slider
+                    defaultValue={gain}
+                    key={`${freq}-${gain}`}
+                    label={(v) => `${v > 0 ? '+' : ''}${v} dB`}
+                    max={12}
+                    min={-12}
+                    onChangeEnd={onChangeEnd}
+                    step={0.5}
+                    style={{
+                        left: '50%',
+                        position: 'absolute',
+                        top: '50%',
+                        transform: 'translate(-50%, -50%) rotate(270deg)',
+                        width: SLIDER_WIDTH,
+                    }}
+                />
+            </div>
+            <Text isMuted size="xs" style={{ textAlign: 'center' }}>
+                {label}
+            </Text>
         </Stack>
     );
 }
@@ -156,7 +156,7 @@ export const EqSettings = memo(() => {
 
     // Custom preset state — stored in localStorage separately from main store
     const [customEqPresets, setCustomEqPresets] = useState<Record<string, number[]>>(() =>
-    loadCustomPresets<number[]>(LS_EQ_PRESETS),
+        loadCustomPresets<number[]>(LS_EQ_PRESETS),
     );
     const [customCompPresets, setCustomCompPresets] = useState<Record<string, CompressorPreset>>(
         () => loadCustomPresets<CompressorPreset>(LS_COMP_PRESETS),
@@ -181,7 +181,7 @@ export const EqSettings = memo(() => {
 
             // Mutations to Web Audio API AudioParam values are intentional
             // side effects on the live audio graph, not React state mutations.
-            // eslint-disable-next-line react-hooks/immutability
+
             dsp.preampGain.gain.value = eq.enabled ? Math.pow(10, eq.preamp / 20) : 1;
 
             dsp.eqFilters.forEach((filter, i) => {
@@ -233,9 +233,7 @@ export const EqSettings = memo(() => {
     };
 
     const handleBandChangeEnd = (index: number, gain: number) => {
-        const newBands = settings.equalizer.bands.map((b, i) =>
-        i === index ? { ...b, gain } : b,
-        );
+        const newBands = settings.equalizer.bands.map((b, i) => (i === index ? { ...b, gain } : b));
         const newEq = { ...settings.equalizer, bands: newBands };
         setSettings({ playback: { equalizer: newEq } });
         applyFilters(newEq, settings.compressor);
@@ -269,7 +267,7 @@ export const EqSettings = memo(() => {
         const newEq = {
             ...settings.equalizer,
             bands: settings.equalizer.bands.map((b) => ({ ...b, gain: 0 })),
-                               preamp: 0,
+            preamp: 0,
         };
         setSettings({ playback: { equalizer: newEq } });
         applyFilters(newEq, settings.compressor);
@@ -334,16 +332,16 @@ export const EqSettings = memo(() => {
             items: Object.keys(EQ_PRESETS).map((name) => ({ label: name, value: name })),
         },
         ...(Object.keys(customEqPresets).length > 0
-        ? [
-            {
-                group: 'Custom',
-                items: Object.keys(customEqPresets).map((name) => ({
-                    label: name,
-                    value: name,
-                })),
-            },
-        ]
-        : []),
+            ? [
+                  {
+                      group: 'Custom',
+                      items: Object.keys(customEqPresets).map((name) => ({
+                          label: name,
+                          value: name,
+                      })),
+                  },
+              ]
+            : []),
     ];
 
     const compPresetSelectData = [
@@ -352,16 +350,16 @@ export const EqSettings = memo(() => {
             items: Object.keys(COMP_PRESETS).map((name) => ({ label: name, value: name })),
         },
         ...(Object.keys(customCompPresets).length > 0
-        ? [
-            {
-                group: 'Custom',
-                items: Object.keys(customCompPresets).map((name) => ({
-                    label: name,
-                    value: name,
-                })),
-            },
-        ]
-        : []),
+            ? [
+                  {
+                      group: 'Custom',
+                      items: Object.keys(customCompPresets).map((name) => ({
+                          label: name,
+                          value: name,
+                      })),
+                  },
+              ]
+            : []),
     ];
 
     // ── EQ SettingsSection options ────────────────────────────────────────────
@@ -369,126 +367,125 @@ export const EqSettings = memo(() => {
         {
             control: (
                 <Switch
-                defaultChecked={settings.equalizer.enabled}
-                onChange={(e) => handleEqToggle(e.currentTarget.checked)}
+                    defaultChecked={settings.equalizer.enabled}
+                    onChange={(e) => handleEqToggle(e.currentTarget.checked)}
                 />
             ),
             description:
-            settings.type === PlayerType.LOCAL
-            ? 'Parametric equalizer via FFmpeg lavfi (MPV)'
-            : 'Parametric equalizer via Web Audio API',
+                settings.type === PlayerType.LOCAL
+                    ? 'Parametric equalizer via FFmpeg lavfi (MPV)'
+                    : 'Parametric equalizer via Web Audio API',
             title: 'Equalizer',
         },
         ...(settings.equalizer.enabled
-        ? ([
-            {
-                control: (
-                    <Group gap="xs">
-                    <Select
-                    clearable
-                    data={eqPresetSelectData}
-                    onChange={(name) => {
-                        if (!name) return;
-                        const preset =
-                        customEqPresets[name] ?? EQ_PRESETS[name];
-                        if (preset) applyEqPreset(preset);
-                    }}
-                    placeholder="Select preset"
-                    searchable
-                    value={null}
-                    w={180}
-                    />
-                    {Object.keys(customEqPresets).length > 0 && (
-                        <Select
-                        clearable
-                        data={Object.keys(customEqPresets).map((name) => ({
-                            label: name,
-                            value: name,
-                        }))}
-                        onChange={(name) => {
-                            if (!name) return;
-                            handleDeleteEqPreset(name);
-                        }}
-                        placeholder="Delete custom..."
-                        value={null}
-                        w={160}
-                        />
-                    )}
-                    </Group>
-                ),
-                description: 'Apply a built-in or saved custom EQ curve',
-                title: 'Preset',
-            },
-           {
-               control: (
-                   <Group gap="xs">
-                   <TextInput
-                   onChange={(e) => setSaveEqName(e.currentTarget.value)}
-                   onKeyDown={(e) => {
-                       if (e.key === 'Enter') handleSaveEqPreset();
-                   }}
-                   placeholder="Preset name..."
-                   value={saveEqName}
-                   w={180}
-                   />
-                   <Button
-                   disabled={!saveEqName.trim()}
-                   variant="subtle"
-                   onClick={handleSaveEqPreset}
-                   >
-                   Save
-                   </Button>
-                   </Group>
-               ),
-               description: 'Save current EQ settings as a named preset',
-               title: 'Save preset',
-           },
-           {
-               control: (
-                   <Group gap="xs">
-                   <Slider
-                   key={settings.equalizer.preamp}
-                   defaultValue={settings.equalizer.preamp}
-                   label={(v) => `${v > 0 ? '+' : ''}${v} dB`}
-                   max={12}
-                   min={-12}
-                   step={0.5}
-                   w={200}
-                   onChangeEnd={handlePreampChangeEnd}
-                   />
-                   <Button variant="subtle" onClick={handleResetEq}>
-                   Reset all
-                   </Button>
-                   </Group>
-               ),
-               description:
-               'Input gain before EQ bands. Set negative when boosting bands to prevent clipping (MPV).',
-           title: 'Preamp',
-           },
-           {
-               control: (
-                   // Mantine v8 does not support orientation="vertical" on Slider.
-                   // Each band slider is rotated 270deg via CSS transform so it
-                   // renders vertically while inheriting all app theme tokens.
-                   // The outer div reserves the correct amount of space so the
-                   // rotated element does not overflow its grid cell.
-                   <Group align="flex-end" gap={2} wrap="nowrap">
-                   {settings.equalizer.bands.map((band, i) => (
-                       <EqBandSlider
-                       key={band.freq}
-                       freq={band.freq}
-                       gain={band.gain}
-                       label={BAND_LABELS[i] ?? String(band.freq)}
-                       onChangeEnd={(v) => handleBandChangeEnd(i, v)}
-                       />
-                   ))}
-                   </Group>
-               ),
-               description: 'Per-band gain adjustment. Range: -12 to +12 dB.',
-               title: 'Bands',
-           },
-        ] as SettingOption[])
-        : []),
+            ? ([
+                  {
+                      control: (
+                          <Group gap="xs">
+                              <Select
+                                  clearable
+                                  data={eqPresetSelectData}
+                                  onChange={(name) => {
+                                      if (!name) return;
+                                      const preset = customEqPresets[name] ?? EQ_PRESETS[name];
+                                      if (preset) applyEqPreset(preset);
+                                  }}
+                                  placeholder="Select preset"
+                                  searchable
+                                  value={null}
+                                  w={180}
+                              />
+                              {Object.keys(customEqPresets).length > 0 && (
+                                  <Select
+                                      clearable
+                                      data={Object.keys(customEqPresets).map((name) => ({
+                                          label: name,
+                                          value: name,
+                                      }))}
+                                      onChange={(name) => {
+                                          if (!name) return;
+                                          handleDeleteEqPreset(name);
+                                      }}
+                                      placeholder="Delete custom..."
+                                      value={null}
+                                      w={160}
+                                  />
+                              )}
+                          </Group>
+                      ),
+                      description: 'Apply a built-in or saved custom EQ curve',
+                      title: 'Preset',
+                  },
+                  {
+                      control: (
+                          <Group gap="xs">
+                              <TextInput
+                                  onChange={(e) => setSaveEqName(e.currentTarget.value)}
+                                  onKeyDown={(e) => {
+                                      if (e.key === 'Enter') handleSaveEqPreset();
+                                  }}
+                                  placeholder="Preset name..."
+                                  value={saveEqName}
+                                  w={180}
+                              />
+                              <Button
+                                  disabled={!saveEqName.trim()}
+                                  onClick={handleSaveEqPreset}
+                                  variant="subtle"
+                              >
+                                  Save
+                              </Button>
+                          </Group>
+                      ),
+                      description: 'Save current EQ settings as a named preset',
+                      title: 'Save preset',
+                  },
+                  {
+                      control: (
+                          <Group gap="xs">
+                              <Slider
+                                  defaultValue={settings.equalizer.preamp}
+                                  key={settings.equalizer.preamp}
+                                  label={(v) => `${v > 0 ? '+' : ''}${v} dB`}
+                                  max={12}
+                                  min={-12}
+                                  onChangeEnd={handlePreampChangeEnd}
+                                  step={0.5}
+                                  w={200}
+                              />
+                              <Button onClick={handleResetEq} variant="subtle">
+                                  Reset all
+                              </Button>
+                          </Group>
+                      ),
+                      description:
+                          'Input gain before EQ bands. Set negative when boosting bands to prevent clipping (MPV).',
+                      title: 'Preamp',
+                  },
+                  {
+                      control: (
+                          // Mantine v8 does not support orientation="vertical" on Slider.
+                          // Each band slider is rotated 270deg via CSS transform so it
+                          // renders vertically while inheriting all app theme tokens.
+                          // The outer div reserves the correct amount of space so the
+                          // rotated element does not overflow its grid cell.
+                          <Group align="flex-end" gap={2} wrap="nowrap">
+                              {settings.equalizer.bands.map((band, i) => (
+                                  <EqBandSlider
+                                      freq={band.freq}
+                                      gain={band.gain}
+                                      key={band.freq}
+                                      label={BAND_LABELS[i] ?? String(band.freq)}
+                                      onChangeEnd={(v) => handleBandChangeEnd(i, v)}
+                                  />
+                              ))}
+                          </Group>
+                      ),
+                      description: 'Per-band gain adjustment. Range: -12 to +12 dB.',
+                      title: 'Bands',
+                  },
+              ] as SettingOption[])
+            : []),
     ];
 
     // ── Compressor SettingsSection options ────────────────────────────────────
@@ -521,7 +518,7 @@ export const EqSettings = memo(() => {
         },
         {
             description:
-            'How quickly the compressor engages after the signal exceeds the threshold.',
+                'How quickly the compressor engages after the signal exceeds the threshold.',
             key: 'attack',
             max: 2000,
             min: 0.1,
@@ -531,7 +528,7 @@ export const EqSettings = memo(() => {
         },
         {
             description:
-            'How quickly the compressor releases after the signal drops below the threshold.',
+                'How quickly the compressor releases after the signal drops below the threshold.',
             key: 'release',
             max: 9000,
             min: 1,
@@ -550,7 +547,7 @@ export const EqSettings = memo(() => {
         },
         {
             description:
-            'Soft-knee width. Higher values make the transition into compression more gradual.',
+                'Soft-knee width. Higher values make the transition into compression more gradual.',
             key: 'knee',
             max: 10,
             min: 1,
@@ -564,121 +561,120 @@ export const EqSettings = memo(() => {
         {
             control: (
                 <Switch
-                defaultChecked={settings.compressor.enabled}
-                onChange={(e) => handleCompToggle(e.currentTarget.checked)}
+                    defaultChecked={settings.compressor.enabled}
+                    onChange={(e) => handleCompToggle(e.currentTarget.checked)}
                 />
             ),
             description:
-            settings.type === PlayerType.LOCAL
-            ? 'Dynamic range compressor via FFmpeg acompressor (MPV)'
-            : 'Dynamic range compressor via Web Audio API',
+                settings.type === PlayerType.LOCAL
+                    ? 'Dynamic range compressor via FFmpeg acompressor (MPV)'
+                    : 'Dynamic range compressor via Web Audio API',
             title: 'Compressor',
         },
         ...(settings.compressor.enabled
-        ? ([
-            {
-                control: (
-                    <Group gap="xs">
-                    <Select
-                    clearable
-                    data={compPresetSelectData}
-                    onChange={(name) => {
-                        if (!name) return;
-                        const preset =
-                        customCompPresets[name] ?? COMP_PRESETS[name];
-                        if (preset) applyCompPreset(preset);
-                    }}
-                    placeholder="Select preset"
-                    searchable
-                    value={null}
-                    w={180}
-                    />
-                    {Object.keys(customCompPresets).length > 0 && (
-                        <Select
-                        clearable
-                        data={Object.keys(customCompPresets).map((name) => ({
-                            label: name,
-                            value: name,
-                        }))}
-                        onChange={(name) => {
-                            if (!name) return;
-                            handleDeleteCompPreset(name);
-                        }}
-                        placeholder="Delete custom..."
-                        value={null}
-                        w={160}
-                        />
-                    )}
-                    </Group>
-                ),
-                description: 'Apply a built-in or saved custom compressor setting',
-                title: 'Preset',
-            },
-           {
-               control: (
-                   <Group gap="xs">
-                   <TextInput
-                   onChange={(e) => setSaveCompName(e.currentTarget.value)}
-                   onKeyDown={(e) => {
-                       if (e.key === 'Enter') handleSaveCompPreset();
-                   }}
-                   placeholder="Preset name..."
-                   value={saveCompName}
-                   w={180}
-                   />
-                   <Button
-                   disabled={!saveCompName.trim()}
-                   variant="subtle"
-                   onClick={handleSaveCompPreset}
-                   >
-                   Save
-                   </Button>
-                   </Group>
-               ),
-               description: 'Save current compressor settings as a named preset',
-               title: 'Save preset',
-           },
-           ...compParams.map(({ key, title, description, min, max, step, unit }) => ({
-               control: (
-                   <Group align="center" gap="xs">
-                   <Slider
-                   key={settings.compressor[key] as number}
-                   defaultValue={settings.compressor[key] as number}
-                   label={(v) => `${v}${unit}`}
-                   max={max}
-                   min={min}
-                   step={step}
-                   w={200}
-                   onChangeEnd={(v) => handleCompChangeEnd(key, v)}
-                   />
-                   <Text isMuted size="xs" style={{ minWidth: 52, textAlign: 'right' }}>
-                   {settings.compressor[key] as number}
-                   {unit}
-                   </Text>
-                   </Group>
-               ),
-               description,
-               title,
-           })),
-           {
-               control: (
-                   <Button variant="subtle" onClick={handleResetComp}>
-                   Reset to defaults
-                   </Button>
-               ),
-               description: 'Restore all compressor parameters to their default values',
-               title: 'Reset',
-           },
-        ] as SettingOption[])
-        : []),
+            ? ([
+                  {
+                      control: (
+                          <Group gap="xs">
+                              <Select
+                                  clearable
+                                  data={compPresetSelectData}
+                                  onChange={(name) => {
+                                      if (!name) return;
+                                      const preset = customCompPresets[name] ?? COMP_PRESETS[name];
+                                      if (preset) applyCompPreset(preset);
+                                  }}
+                                  placeholder="Select preset"
+                                  searchable
+                                  value={null}
+                                  w={180}
+                              />
+                              {Object.keys(customCompPresets).length > 0 && (
+                                  <Select
+                                      clearable
+                                      data={Object.keys(customCompPresets).map((name) => ({
+                                          label: name,
+                                          value: name,
+                                      }))}
+                                      onChange={(name) => {
+                                          if (!name) return;
+                                          handleDeleteCompPreset(name);
+                                      }}
+                                      placeholder="Delete custom..."
+                                      value={null}
+                                      w={160}
+                                  />
+                              )}
+                          </Group>
+                      ),
+                      description: 'Apply a built-in or saved custom compressor setting',
+                      title: 'Preset',
+                  },
+                  {
+                      control: (
+                          <Group gap="xs">
+                              <TextInput
+                                  onChange={(e) => setSaveCompName(e.currentTarget.value)}
+                                  onKeyDown={(e) => {
+                                      if (e.key === 'Enter') handleSaveCompPreset();
+                                  }}
+                                  placeholder="Preset name..."
+                                  value={saveCompName}
+                                  w={180}
+                              />
+                              <Button
+                                  disabled={!saveCompName.trim()}
+                                  onClick={handleSaveCompPreset}
+                                  variant="subtle"
+                              >
+                                  Save
+                              </Button>
+                          </Group>
+                      ),
+                      description: 'Save current compressor settings as a named preset',
+                      title: 'Save preset',
+                  },
+                  ...compParams.map(({ description, key, max, min, step, title, unit }) => ({
+                      control: (
+                          <Group align="center" gap="xs">
+                              <Slider
+                                  defaultValue={settings.compressor[key] as number}
+                                  key={settings.compressor[key] as number}
+                                  label={(v) => `${v}${unit}`}
+                                  max={max}
+                                  min={min}
+                                  onChangeEnd={(v) => handleCompChangeEnd(key, v)}
+                                  step={step}
+                                  w={200}
+                              />
+                              <Text isMuted size="xs" style={{ minWidth: 52, textAlign: 'right' }}>
+                                  {settings.compressor[key] as number}
+                                  {unit}
+                              </Text>
+                          </Group>
+                      ),
+                      description,
+                      title,
+                  })),
+                  {
+                      control: (
+                          <Button onClick={handleResetComp} variant="subtle">
+                              Reset to defaults
+                          </Button>
+                      ),
+                      description: 'Restore all compressor parameters to their default values',
+                      title: 'Reset',
+                  },
+              ] as SettingOption[])
+            : []),
     ];
 
     return (
         <>
-        <Divider />
-        <SettingsSection options={eqOptions} />
-        <Divider />
-        <SettingsSection options={compressorOptions} />
+            <Divider />
+            <SettingsSection options={eqOptions} />
+            <Divider />
+            <SettingsSection options={compressorOptions} />
         </>
     );
 });
