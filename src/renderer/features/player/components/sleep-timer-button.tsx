@@ -149,7 +149,7 @@ const useSleepTimer = () => {
             return;
         }
 
-        if (mode !== 'endOfSong') {
+        if (mode === 'endOfSong') {
             usePlayerStoreBase.getState().setPauseOnNextSongEnd(true);
 
             return () => {
@@ -298,7 +298,7 @@ export const SleepTimerButton = () => {
                                 </Text>
                             ) : mode === 'endOfAlbum' ? (
                                 <Text c="primary" size="sm">
-                                    {t('player.sleeptimer_endOfAlbum')}
+                                    {t('player.sleepTimer_endOfAlbum')}
                                 </Text>
                             ) : (
                                 <Text c="primary" fw="600" size="lg">
