@@ -699,6 +699,7 @@
         "viewQueue": "View queue",
         "sleepTimer": "Sleep timer",
         "sleepTimer_endOfSong": "End of current song",
+        "sleepTimer_endOfAlbum": "End of current album",
         "sleepTimer_minutes": "{{count}} min",
         "sleepTimer_hours": "{{count}} hr",
         "sleepTimer_custom": "Custom",
