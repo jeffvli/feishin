@@ -1,11 +1,13 @@
 import { useShallow } from 'zustand/react/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
-export type SleepTimerMode = 'endOfSong' | 'timed';
+export type SleepTimerMode = 'endOfAlbum' | 'endOfSong' | 'timed';
 
 interface SleepTimerActions {
     cancelTimer: () => void;
     setRemaining: (remaining: number) => void;
+    setTargetAlbumId: (albumId: null | string) => void;
+    startEndOfAlbumTimer: () => void;
     startEndOfSongTimer: () => void;
     startTimedTimer: (durationSeconds: number) => void;
 }
@@ -17,6 +19,8 @@ interface SleepTimerState {
     mode: SleepTimerMode;
     /** Remaining seconds (only ticks while playing) */
     remaining: number;
+    /** Album Id for song when mode activated */
+    targetAlbumId: null | string;
 }
 
 export const useSleepTimerStore = createWithEqualityFn<SleepTimerActions & SleepTimerState>()(
@@ -27,6 +31,7 @@ export const useSleepTimerStore = createWithEqualityFn<SleepTimerActions & Sleep
                 active: false,
                 mode: 'timed',
                 remaining: 0,
+                targetAlbumId: null,
             });
         },
         mode: 'timed',
@@ -36,11 +41,25 @@ export const useSleepTimerStore = createWithEqualityFn<SleepTimerActions & Sleep
             set({ remaining });
         },
 
+        setTargetAlbumId: (albumId: null | string) => {
+            set({ targetAlbumId: albumId });
+        },
+
+        startEndOfAlbumTimer: () => {
+            set({
+                active: true,
+                mode: 'endOfAlbum',
+                remaining: 0,
+                targetAlbumId: null,
+            });
+        },
+
         startEndOfSongTimer: () => {
             set({
                 active: true,
                 mode: 'endOfSong',
                 remaining: 0,
+                targetAlbumId: null,
             });
         },
 
@@ -49,8 +68,11 @@ export const useSleepTimerStore = createWithEqualityFn<SleepTimerActions & Sleep
                 active: true,
                 mode: 'timed',
                 remaining: durationSeconds,
+                targetAlbumId: null,
             });
         },
+
+        targetAlbumId: null,
     }),
 );
 
@@ -63,6 +85,8 @@ export const useSleepTimerActions = () =>
         useShallow((s) => ({
             cancelTimer: s.cancelTimer,
             setRemaining: s.setRemaining,
+            setTargetAlbumId: s.setTargetAlbumId,
+            startEndOfAlbumTimer: s.startEndOfAlbumTimer,
             startEndOfSongTimer: s.startEndOfSongTimer,
             startTimedTimer: s.startTimedTimer,
         })),
