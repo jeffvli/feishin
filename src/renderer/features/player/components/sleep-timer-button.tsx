@@ -176,17 +176,15 @@ export const SleepTimerButton = () => {
 
     const getPresetLabel = (option: (typeof PRESET_OPTIONS)[number]) => {
         if (option.mode === 'endOfSong') {
-            return t('player.sleepTimer_endOfSong', { postProcess: 'sentenceCase' });
+            return t('player.sleepTimer_endOfSong');
         }
         if (option.minutes >= 60) {
             return t('player.sleepTimer_hours', {
                 count: option.minutes / 60,
-                postProcess: 'sentenceCase',
             });
         }
         return t('player.sleepTimer_minutes', {
             count: option.minutes,
-            postProcess: 'sentenceCase',
         });
     };
 
@@ -205,7 +203,7 @@ export const SleepTimerButton = () => {
                     }}
                     size="sm"
                     tooltip={{
-                        label: t('player.sleepTimer', { postProcess: 'titleCase' }),
+                        label: t('player.sleepTimer'),
                         openDelay: 0,
                     }}
                     variant="subtle"
@@ -214,7 +212,7 @@ export const SleepTimerButton = () => {
             <Popover.Dropdown>
                 <Stack gap="xs" p="xs">
                     <Text fw="600" pb="md" size="sm" ta="center">
-                        {t('player.sleepTimer', { postProcess: 'titleCase' })}
+                        {t('player.sleepTimer')}
                     </Text>
 
                     {active && (
@@ -231,9 +229,7 @@ export const SleepTimerButton = () => {
                         >
                             {mode === 'endOfSong' ? (
                                 <Text c="primary" size="sm">
-                                    {t('player.sleepTimer_endOfSong', {
-                                        postProcess: 'sentenceCase',
-                                    })}
+                                    {t('player.sleepTimer_endOfSong')}
                                 </Text>
                             ) : (
                                 <Text c="primary" fw="600" size="lg">
@@ -248,7 +244,7 @@ export const SleepTimerButton = () => {
                                 size="compact-xs"
                                 variant="subtle"
                             >
-                                {t('player.sleepTimer_cancel', { postProcess: 'titleCase' })}
+                                {t('player.sleepTimer_cancel')}
                             </Button>
                         </Flex>
                     )}
@@ -309,7 +305,7 @@ export const SleepTimerButton = () => {
                             ta="center"
                             variant="outline"
                         >
-                            {t('player.sleepTimer_custom', { postProcess: 'sentenceCase' })}
+                            {t('player.sleepTimer_custom')}
                         </Button>
                     ) : (
                         <Stack gap="xs">
@@ -350,7 +346,7 @@ export const SleepTimerButton = () => {
                                     size="xs"
                                     variant="filled"
                                 >
-                                    {t('player.sleepTimer_setCustom', { postProcess: 'titleCase' })}
+                                    {t('player.sleepTimer_setCustom')}
                                 </Button>
                                 <Button
                                     onClick={(e) => {
@@ -360,7 +356,7 @@ export const SleepTimerButton = () => {
                                     size="xs"
                                     variant="default"
                                 >
-                                    {t('common.cancel', { postProcess: 'titleCase' })}
+                                    {t('common.cancel')}
                                 </Button>
                             </Group>
                         </Stack>

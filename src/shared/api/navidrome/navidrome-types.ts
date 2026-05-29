@@ -207,123 +207,123 @@ export const NDSongQueryFieldsLabelMap: Record<string, string> = NDSongQueryFiel
 
 export const NDSongQueryPlaylistOperators = [
     {
-        label: i18n.t('filterOperator.inPlaylist', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.inPlaylist'),
         value: 'inPlaylist',
     },
     {
-        label: i18n.t('filterOperator.notInPlaylist', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.notInPlaylist'),
         value: 'notInPlaylist',
     },
 ];
 
 export const NDSongQueryDateOperators = [
     {
-        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.is'),
         value: 'is',
     },
     {
-        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
     {
-        label: i18n.t('filterOperator.before', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.before'),
         value: 'before',
     },
     {
-        label: i18n.t('filterOperator.after', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.after'),
         value: 'after',
     },
     {
-        label: i18n.t('filterOperator.inTheLast', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.inTheLast'),
         value: 'inTheLast',
     },
     {
-        label: i18n.t('filterOperator.notInTheLast', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.notInTheLast'),
         value: 'notInTheLast',
     },
     {
-        label: i18n.t('filterOperator.inTheRange', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.inTheRange'),
         value: 'inTheRange',
     },
     {
-        label: i18n.t('filterOperator.beforeDate', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.beforeDate'),
         value: 'beforeDate',
     },
     {
-        label: i18n.t('filterOperator.afterDate', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.afterDate'),
         value: 'afterDate',
     },
     {
-        label: i18n.t('filterOperator.inTheRangeDate', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.inTheRangeDate'),
         value: 'inTheRangeDate',
     },
 ];
 
 export const NDSongQueryStringOperators = [
     {
-        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.is'),
         value: 'is',
     },
     {
-        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
     {
-        label: i18n.t('filterOperator.contains', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.contains'),
         value: 'contains',
     },
     {
-        label: i18n.t('filterOperator.notContains', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.notContains'),
         value: 'notContains',
     },
     {
-        label: i18n.t('filterOperator.startsWith', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.startsWith'),
         value: 'startsWith',
     },
     {
-        label: i18n.t('filterOperator.endsWith', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.endsWith'),
         value: 'endsWith',
     },
 ];
 
 export const NDSongQueryBooleanOperators = [
     {
-        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.is'),
         value: 'is',
     },
     {
-        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
 ];
 
 export const NDSongQueryNumberOperators = [
     {
-        label: i18n.t('filterOperator.is', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.is'),
         value: 'is',
     },
     {
-        label: i18n.t('filterOperator.isNot', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
     {
-        label: i18n.t('filterOperator.contains', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.contains'),
         value: 'contains',
     },
     {
-        label: i18n.t('filterOperator.notContains', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.notContains'),
         value: 'notContains',
     },
     {
-        label: i18n.t('filterOperator.isGreaterThan', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isGreaterThan'),
         value: 'gt',
     },
     {
-        label: i18n.t('filterOperator.isLessThan', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.isLessThan'),
         value: 'lt',
     },
     {
-        label: i18n.t('filterOperator.inTheRange', { postProcess: 'titleCase' }),
+        label: i18n.t('filterOperator.inTheRange'),
         value: 'inTheRange',
     },
 ];

@@ -4,27 +4,27 @@ import React, { useCallback, useEffect } from 'react';
 import { usePlayerStatus, useSettingsStore, useWindowSettings } from '/@/renderer/store';
 import { PlayerStatus } from '/@/shared/types/types';
 
-const ipc = isElectron() ? window.api.ipc : null;
+const utils = isElectron() ? window.api.utils : null;
 
 export const usePowerSaveBlocker = () => {
     const status = usePlayerStatus();
     const { preventSleepOnPlayback, preventSuspendOnPlayback } = useWindowSettings();
 
     const startPowerSaveBlocker = useCallback(async () => {
-        if (!ipc) return;
+        if (!utils) return;
 
         try {
-            await ipc.invoke('power-save-blocker-start', { full: preventSleepOnPlayback });
+            await utils.startPowerSaveBlocker(preventSleepOnPlayback);
         } catch (error) {
             console.error('Failed to start power save blocker:', error);
         }
     }, [preventSleepOnPlayback]);
 
     const stopPowerSaveBlocker = useCallback(async () => {
-        if (!ipc) return;
+        if (!utils) return;
 
         try {
-            await ipc.invoke('power-save-blocker-stop');
+            await utils.stopPowerSaveBlocker();
         } catch (error) {
             console.error('Failed to stop power save blocker:', error);
         }

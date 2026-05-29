@@ -54,6 +54,7 @@ import { TextColumn } from '/@/renderer/components/item-list/item-table-list/col
 import { TitleArtistColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-artist-column';
 import { TitleColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-column';
 import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-combined-column';
+import { TrackNumberColumn } from '/@/renderer/components/item-list/item-table-list/columns/track-number-column';
 import { YearColumn } from '/@/renderer/components/item-list/item-table-list/columns/year-column';
 import { useItemDragDropState } from '/@/renderer/components/item-list/item-table-list/hooks/use-item-drag-drop-state';
 import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
@@ -239,7 +240,6 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
             case TableColumn.CHANNELS:
             case TableColumn.DISC_NUMBER:
             case TableColumn.SAMPLE_RATE:
-            case TableColumn.TRACK_NUMBER:
                 return <NumericColumn {...props} {...dragProps} controls={controls} type={type} />;
 
             case TableColumn.COMPOSER:
@@ -300,6 +300,11 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
                         controls={controls}
                         type={type}
                     />
+                );
+
+            case TableColumn.TRACK_NUMBER:
+                return (
+                    <TrackNumberColumn {...props} {...dragProps} controls={controls} type={type} />
                 );
 
             case TableColumn.USER_FAVORITE:

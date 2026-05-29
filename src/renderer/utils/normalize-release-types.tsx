@@ -35,15 +35,9 @@ export const normalizeReleaseTypes = (types: string[], t: TFunction) => {
         const lower = type.toLocaleLowerCase();
 
         if (lower in PRIMARY_MAPPING) {
-            primary.push(
-                t(`releaseType.primary.${PRIMARY_MAPPING[lower]}`, { postProcess: 'sentenceCase' }),
-            );
+            primary.push(t(`releaseType.primary.${PRIMARY_MAPPING[lower]}`));
         } else if (lower in SECONDARY_MAPPING) {
-            secondary.push(
-                t(`releaseType.secondary.${SECONDARY_MAPPING[lower]}`, {
-                    postProcess: 'sentenceCase',
-                }),
-            );
+            secondary.push(t(`releaseType.secondary.${SECONDARY_MAPPING[lower]}`, {}));
         } else {
             unknown.push(titleCase(type));
         }
@@ -61,17 +55,13 @@ export const normalizeToPrimaryReleaseTypes = (types: string[], t: TFunction) =>
     for (const type of types) {
         const lower = type.toLocaleLowerCase();
         if (lower in PRIMARY_MAPPING) {
-            primary.push(
-                t(`releaseType.primary.${PRIMARY_MAPPING[lower]}`, { postProcess: 'sentenceCase' }),
-            );
+            primary.push(t(`releaseType.primary.${PRIMARY_MAPPING[lower]}`));
         }
     }
 
     // If no primary types found, use "other" category
     if (primary.length === 0) {
-        primary.push(
-            t(`releaseType.primary.${PRIMARY_MAPPING.other}`, { postProcess: 'sentenceCase' }),
-        );
+        primary.push(t(`releaseType.primary.${PRIMARY_MAPPING.other}`));
     }
 
     return primary;
@@ -82,11 +72,7 @@ export const normalizeToSecondaryReleaseTypes = (types: string[], t: TFunction) 
     for (const type of types) {
         const lower = type.toLocaleLowerCase();
         if (lower in SECONDARY_MAPPING) {
-            secondary.push(
-                t(`releaseType.secondary.${SECONDARY_MAPPING[lower]}`, {
-                    postProcess: 'sentenceCase',
-                }),
-            );
+            secondary.push(t(`releaseType.secondary.${SECONDARY_MAPPING[lower]}`, {}));
         }
     }
 

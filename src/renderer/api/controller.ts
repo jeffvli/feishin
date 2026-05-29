@@ -34,10 +34,8 @@ const apiController = <K extends keyof ControllerEndpoint>(
 
     if (!serverType) {
         toast.error({
-            message: i18n.t('error.serverNotSelectedError', {
-                postProcess: 'sentenceCase',
-            }) as string,
-            title: i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' }) as string,
+            message: i18n.t('error.serverNotSelectedError') as string,
+            title: i18n.t('error.apiRouteError') as string,
         });
         throw new Error(`No server selected`);
     }
@@ -47,13 +45,13 @@ const apiController = <K extends keyof ControllerEndpoint>(
     if (typeof controllerFn !== 'function') {
         toast.error({
             message: `Endpoint ${endpoint} is not implemented for ${serverType}`,
-            title: i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' }) as string,
+            title: i18n.t('error.apiRouteError') as string,
         });
 
         throw new Error(
             i18n.t('error.endpointNotImplementedError', {
                 endpoint,
-                postProcess: 'sentenceCase',
+
                 serverType,
             }) as string,
         );
@@ -92,9 +90,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: addToPlaylist`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: addToPlaylist`);
         }
 
         return apiController(
@@ -109,9 +105,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: createFavorite`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: createFavorite`);
         }
 
         return apiController(
@@ -123,9 +117,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: createInternetRadioStation`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: createInternetRadioStation`);
         }
 
         return apiController(
@@ -137,9 +129,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: createPlaylist`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: createPlaylist`);
         }
 
         return apiController(
@@ -151,9 +141,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: deleteArtistImage`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: deleteArtistImage`);
         }
 
         return apiController(
@@ -165,9 +153,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: deleteFavorite`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: deleteFavorite`);
         }
 
         return apiController(
@@ -179,9 +165,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: deleteInternetRadioStation`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: deleteInternetRadioStation`);
         }
 
         return apiController(
@@ -193,9 +177,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: deleteInternetRadioStationImage`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: deleteInternetRadioStationImage`);
         }
 
         return apiController(
@@ -207,9 +189,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: deletePlaylist`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: deletePlaylist`);
         }
 
         return apiController(
@@ -221,9 +201,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: deletePlaylistImage`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: deletePlaylistImage`);
         }
 
         return apiController(
@@ -235,9 +213,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getAlbumArtistDetail`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getAlbumArtistDetail`);
         }
 
         return apiController(
@@ -261,9 +237,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getAlbumArtistList`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getAlbumArtistList`);
         }
 
         return apiController(
@@ -281,9 +255,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getAlbumArtistListCount`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getAlbumArtistListCount`);
         }
 
         return apiController(
@@ -301,9 +273,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getAlbumDetail`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getAlbumDetail`);
         }
 
         return apiController(
@@ -315,9 +285,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getAlbumInfo`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getAlbumInfo`);
         }
 
         return apiController(
@@ -329,9 +297,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getAlbumList`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getAlbumList`);
         }
 
         return apiController(
@@ -349,9 +315,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getAlbumListCount`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getAlbumListCount`);
         }
 
         return apiController(
@@ -369,9 +333,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getAlbumRadio`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getAlbumRadio`);
         }
 
         return apiController(
@@ -383,9 +345,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getArtistList`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getArtistList`);
         }
 
         return apiController(
@@ -403,9 +363,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getArtistListCount`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getArtistListCount`);
         }
 
         return apiController(
@@ -423,9 +381,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getArtistRadio`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getArtistRadio`);
         }
 
         return apiController(
@@ -437,9 +393,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getDownloadUrl`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getDownloadUrl`);
         }
 
         return apiController(
@@ -451,9 +405,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getFolder`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getFolder`);
         }
 
         return apiController(
@@ -471,9 +423,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getGenreList`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getGenreList`);
         }
 
         return apiController(
@@ -529,9 +479,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getInternetRadioStations`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getInternetRadioStations`);
         }
         return apiController(
             'getInternetRadioStations',
@@ -542,9 +490,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getLyrics`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getLyrics`);
         }
 
         return apiController(
@@ -556,9 +502,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getMusicFolderList`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getMusicFolderList`);
         }
 
         return apiController(
@@ -570,9 +514,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getPlaylistDetail`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getPlaylistDetail`);
         }
 
         return apiController(
@@ -584,9 +526,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getPlaylistList`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getPlaylistList`);
         }
 
         return apiController(
@@ -598,9 +538,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getPlaylistListCount`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getPlaylistListCount`);
         }
 
         return apiController(
@@ -612,9 +550,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getPlaylistSongList`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getPlaylistSongList`);
         }
 
         return apiController(
@@ -626,9 +562,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getPlayQueue`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getPlayQueue`);
         }
 
         return apiController(
@@ -640,9 +574,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getRandomSongList`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getRandomSongList`);
         }
 
         return apiController(
@@ -660,9 +592,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getRoles`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getRoles`);
         }
 
         return apiController(
@@ -674,9 +604,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getServerInfo`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getServerInfo`);
         }
 
         return apiController(
@@ -688,9 +616,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getSimilarSongs`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getSimilarSongs`);
         }
 
         return apiController(
@@ -708,9 +634,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getSongDetail`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getSongDetail`);
         }
 
         return apiController(
@@ -722,9 +646,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getSongList`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getSongList`);
         }
 
         return apiController(
@@ -742,9 +664,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getSongListCount`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getSongListCount`);
         }
 
         return apiController(
@@ -762,9 +682,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getStreamUrl`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getStreamUrl`);
         }
 
         return apiController(
@@ -776,9 +694,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getStructuredLyrics`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getStructuredLyrics`);
         }
 
         return apiController(
@@ -790,9 +706,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getTags`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getTags`);
         }
 
         return apiController(
@@ -804,9 +718,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getTopSongs`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getTopSongs`);
         }
 
         return apiController(
@@ -818,9 +730,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getUserInfo`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getUserInfo`);
         }
 
         return apiController(
@@ -832,9 +742,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getUserList`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: getUserList`);
         }
 
         return apiController(
@@ -846,9 +754,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: movePlaylistItem`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: movePlaylistItem`);
         }
 
         return apiController(
@@ -860,9 +766,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: removeFromPlaylist`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: removeFromPlaylist`);
         }
 
         return apiController(
@@ -874,9 +778,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: replacePlaylist`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: replacePlaylist`);
         }
 
         return apiController(
@@ -888,9 +790,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: savePlayQueue`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: savePlayQueue`);
         }
 
         return apiController(
@@ -902,9 +802,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: scrobble`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: scrobble`);
         }
 
         return apiController(
@@ -916,9 +814,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: search`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: search`);
         }
 
         return apiController(
@@ -936,9 +832,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: setPlaylistSongs`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: setPlaylistSongs`);
         }
 
         return apiController(
@@ -950,9 +844,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: setRating`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: setRating`);
         }
 
         return apiController(
@@ -964,9 +856,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: shareItem`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: shareItem`);
         }
 
         return apiController(
@@ -978,9 +868,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: updateInternetRadioStation`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: updateInternetRadioStation`);
         }
 
         return apiController(
@@ -992,9 +880,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: updatePlaylist`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: updatePlaylist`);
         }
 
         return apiController(
@@ -1006,9 +892,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: uploadArtistImage`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: uploadArtistImage`);
         }
 
         return apiController(
@@ -1020,9 +904,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: uploadInternetRadioStationImage`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: uploadInternetRadioStationImage`);
         }
 
         return apiController(
@@ -1034,9 +916,7 @@ export const controller: GeneralController = {
         const server = getServerById(args.apiClientProps.serverId);
 
         if (!server) {
-            throw new Error(
-                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: uploadPlaylistImage`,
-            );
+            throw new Error(`${i18n.t('error.apiRouteError')}: uploadPlaylistImage`);
         }
 
         return apiController(

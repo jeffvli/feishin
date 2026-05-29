@@ -60,9 +60,7 @@ export const useAudioDevices = (playbackType: PlayerType) => {
                     })
                     .catch(() =>
                         toast.error({
-                            message: t('error.audioDeviceFetchError', {
-                                postProcess: 'sentenceCase',
-                            }),
+                            message: t('error.audioDeviceFetchError'),
                         }),
                     );
             } else if (playbackType === PlayerType.LOCAL && mpvPlayer) {
@@ -74,9 +72,7 @@ export const useAudioDevices = (playbackType: PlayerType) => {
                     setAudioDevices(uniqueDevices);
                 } catch {
                     toast.error({
-                        message: t('error.audioDeviceFetchError', {
-                            postProcess: 'sentenceCase',
-                        }),
+                        message: t('error.audioDeviceFetchError'),
                     });
                 }
             }
@@ -124,14 +120,10 @@ export const AudioSettings = memo(() => {
             ),
             description: t('setting.audioPlayer', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            note:
-                status === PlayerStatus.PLAYING
-                    ? t('common.playerMustBePaused', { postProcess: 'sentenceCase' })
-                    : undefined,
-            title: t('setting.audioPlayer', { postProcess: 'sentenceCase' }),
+            note: status === PlayerStatus.PLAYING ? t('common.playerMustBePaused') : undefined,
+            title: t('setting.audioPlayer'),
         },
         {
             control: (
@@ -152,10 +144,9 @@ export const AudioSettings = memo(() => {
             ),
             description: t('setting.audioDevice', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.audioDevice', { postProcess: 'sentenceCase' }),
+            title: t('setting.audioDevice'),
         },
         {
             control: (
@@ -170,13 +161,10 @@ export const AudioSettings = memo(() => {
             ),
             description: t('setting.webAudio', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: settings.type !== PlayerType.WEB,
-            note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
-            title: t('setting.webAudio', {
-                postProcess: 'sentenceCase',
-            }),
+            note: t('common.restartRequired'),
+            title: t('setting.webAudio'),
         },
         {
             control: (
@@ -191,12 +179,9 @@ export const AudioSettings = memo(() => {
             ),
             description: t('setting.preservePitch', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: settings.type !== PlayerType.WEB,
-            title: t('setting.preservePitch', {
-                postProcess: 'sentenceCase',
-            }),
+            title: t('setting.preservePitch'),
         },
         {
             control: (
@@ -213,18 +198,10 @@ export const AudioSettings = memo(() => {
             ),
             description: t('setting.audioFadeOnStatusChange', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.audioFadeOnStatusChange', {
-                postProcess: 'sentenceCase',
-            }),
+            title: t('setting.audioFadeOnStatusChange'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={audioOptions}
-            title={t('page.setting.audio', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={audioOptions} title={t('page.setting.audio')} />;
 });

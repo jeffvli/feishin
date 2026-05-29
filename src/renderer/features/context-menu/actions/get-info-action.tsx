@@ -35,15 +35,14 @@ export const GetInfoAction = ({ disabled, items }: GetInfoActionProps) => {
             },
             title:
                 filteredItems.length === 1
-                    ? filteredItems[0]?.name ||
-                      t('page.contextMenu.showDetails', { postProcess: 'sentenceCase' })
-                    : t('page.contextMenu.showDetails', { postProcess: 'sentenceCase' }),
+                    ? filteredItems[0]?.name || t('page.contextMenu.showDetails')
+                    : t('page.contextMenu.showDetails'),
         });
     }, [items, server, t]);
 
     return (
         <ContextMenu.Item disabled={disabled} leftIcon="info" onSelect={onSelect}>
-            {t('page.contextMenu.showDetails', { postProcess: 'sentenceCase' })}
+            {t('page.contextMenu.showDetails')}
         </ContextMenu.Item>
     );
 };

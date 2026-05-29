@@ -2,30 +2,38 @@ import clsx from 'clsx';
 
 import styles from './row-index-column.module.css';
 
+import { isRowPlayControlColumn } from '/@/renderer/components/item-list/helpers/get-row-play-control-column';
+import { RowPlayControlCell } from '/@/renderer/components/item-list/item-table-list/columns/row-play-control-cell';
+import { useRowPlayControl } from '/@/renderer/components/item-list/item-table-list/columns/use-row-play-control';
 import {
     ItemTableListInnerColumn,
     TableColumnContainer,
     TableColumnTextContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
-import { useIsActiveRow } from '/@/renderer/components/item-list/item-table-list/item-table-list-context';
 import { ItemListItem } from '/@/renderer/components/item-list/types';
-import { usePlayerStatus } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
-import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
-import { PlayerStatus } from '/@/shared/types/types';
+import { LibraryItem } from '/@/shared/types/domain-types';
+import { TableColumn } from '/@/shared/types/types';
 
 const RowIndexColumnBase = (props: ItemTableListInnerColumn) => {
     const { itemType } = props;
 
+    if (!isRowPlayControlColumn(TableColumn.ROW_INDEX, props.columns)) {
+        return <DefaultRowIndexColumn {...props} />;
+    }
+
     switch (itemType) {
+        case LibraryItem.ALBUM:
+        case LibraryItem.ALBUM_ARTIST:
+        case LibraryItem.ARTIST:
         case LibraryItem.FOLDER:
         case LibraryItem.PLAYLIST_SONG:
         case LibraryItem.QUEUE_SONG:
         case LibraryItem.SONG:
-            return <QueueSongRowIndexColumn {...props} />;
+            return <PlayableRowIndexColumn {...props} />;
         default:
             return <DefaultRowIndexColumn {...props} />;
     }
@@ -88,12 +96,8 @@ const DefaultRowIndexColumn = (props: ItemTableListInnerColumn) => {
     return <TableColumnTextContainer {...props}>{adjustedRowIndex}</TableColumnTextContainer>;
 };
 
-const QueueSongRowIndexColumn = (props: ItemTableListInnerColumn) => {
-    const status = usePlayerStatus();
-    const song = (props.getRowItem?.(props.rowIndex) ?? props.data[props.rowIndex]) as QueueSong;
-    const isActive = useIsActiveRow(song?.id, song?._uniqueId);
-
-    const isActiveAndPlaying = isActive && status === PlayerStatus.PLAYING;
+const PlayableRowIndexColumn = (props: ItemTableListInnerColumn) => {
+    const { handlePlay, isActive, isPlaying, showPlayControls } = useRowPlayControl(props);
 
     let adjustedRowIndex =
         props.getAdjustedRowIndex?.(props.rowIndex) ??
@@ -104,38 +108,20 @@ const QueueSongRowIndexColumn = (props: ItemTableListInnerColumn) => {
         adjustedRowIndex = props.startRowIndex + adjustedRowIndex;
     }
 
-    return (
-        <InnerQueueSongRowIndexColumn
-            {...props}
-            adjustedRowIndex={adjustedRowIndex}
-            isActive={isActive}
-            isPlaying={isActiveAndPlaying}
-        />
+    const indexContent = isActive ? (
+        <Flex className={styles.indexContent}>
+            <Icon fill="primary" icon={isPlaying ? 'mediaPlay' : 'mediaPause'} />
+        </Flex>
+    ) : (
+        adjustedRowIndex
     );
-};
 
-const InnerQueueSongRowIndexColumn = (
-    props: ItemTableListInnerColumn & {
-        adjustedRowIndex: number;
-        isActive: boolean;
-        isPlaying: boolean;
-    },
-) => {
     return (
-        <TableColumnTextContainer {...props}>
-            {props.isActive ? (
-                props.isPlaying ? (
-                    <Flex>
-                        <Icon fill="primary" icon="mediaPlay" />
-                    </Flex>
-                ) : (
-                    <Flex>
-                        <Icon fill="primary" icon="mediaPause" />
-                    </Flex>
-                )
-            ) : (
-                props.adjustedRowIndex
-            )}
-        </TableColumnTextContainer>
+        <RowPlayControlCell
+            {...props}
+            indexContent={indexContent}
+            onPlay={handlePlay}
+            showPlayControls={showPlayControls}
+        />
     );
 };

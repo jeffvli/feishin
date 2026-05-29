@@ -234,7 +234,7 @@ const DummyAlbumDetailRoute = () => {
                             <Group mr={5}>
                                 <Icon fill="error" icon="error" size={30} />
                             </Group>
-                            <h2>{t('error.badAlbum', { postProcess: 'sentenceCase' })}</h2>
+                            <h2>{t('error.badAlbum')}</h2>
                         </Center>
                     </section>
                 </div>

@@ -16,6 +16,7 @@ import {
     protocol,
     Rectangle,
     screen,
+    session,
     shell,
     Tray,
 } from 'electron';
@@ -30,18 +31,12 @@ import packageJson from '../../package.json';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
+import { canHandleVisualizerDisplayMedia } from './features/core/visualizer';
 import MenuBuilder, { MenuPlaybackState } from './menu';
-import {
-    autoUpdaterLogInterface,
-    createLog,
-    disableAutoUpdates,
-    hotkeyToElectronAccelerator,
-    isLinux,
-    isMacOS,
-    isWindows,
-} from './utils';
 import './features';
+import { autoUpdaterLogInterface, createLog, hotkeyToElectronAccelerator } from './utils';
 
+import { disableAutoUpdates, isLinux, isMacOS, isWindows } from '/@/main/env';
 import { PlayerRepeat, PlayerStatus, PlayerType, TitleTheme } from '/@/shared/types/types';
 
 const ALPHA_UPDATER_CONFIG: {
@@ -285,6 +280,16 @@ let currentRepeatMode: PlayerRepeat = PlayerRepeat.NONE;
 let currentSidebarCollapsed = false;
 let currentShuffleEnabled = false;
 let playbackMenuAccelerators: MenuPlaybackState['accelerators'] = {};
+let inputFocused = false;
+
+ipcMain.on('input-focus-state', (_event, focused: boolean) => {
+    const next = !!focused;
+    if (inputFocused === next) return;
+    inputFocused = next;
+    if (isMacOS()) {
+        rebuildMainMenu();
+    }
+});
 
 if (process.env.NODE_ENV === 'production') {
     import('source-map-support').then((sourceMapSupport) => {
@@ -330,7 +335,7 @@ if (isDevelopment) {
 }
 
 const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
+    ? path.join(path.dirname(app.getAppPath()), 'assets')
     : path.join(__dirname, '../../assets');
 
 const getAssetPath = (...paths: string[]): string => {
@@ -345,7 +350,7 @@ const rebuildMainMenu = () => {
     if (!menuBuilder || !mainWindow) return;
 
     menuBuilder.buildMenu({
-        accelerators: playbackMenuAccelerators,
+        accelerators: inputFocused ? {} : playbackMenuAccelerators,
         playbackStatus: currentPlaybackStatus,
         privateMode: currentPrivateMode,
         repeatMode: currentRepeatMode,
@@ -476,6 +481,15 @@ const createTray = () => {
     tray.setContextMenu(contextMenu);
 };
 
+const validateUrl = (url: string): boolean => {
+    // Minor security, really. Enforce only loading websites (http/https). file://
+    // URLs and the like should've already been blocked, but this is another check.
+    // Note that arbitrary web URLs are still allowed under this scheme, although
+    // that should really only be hit by Subsonic share url (or if artist homepage
+    // is allowed for ND extensions)
+    return url.startsWith('http://') || url.startsWith('https://');
+};
+
 async function createWindow(first = true): Promise<void> {
     if (isDevelopment) {
         await installExtensions().catch(console.log);
@@ -515,9 +529,9 @@ async function createWindow(first = true): Promise<void> {
             backgroundThrottling: false,
             contextIsolation: true,
             devTools: true,
-            nodeIntegration: true,
+            nodeIntegration: false,
             preload: join(__dirname, '../preload/index.js'),
-            sandbox: false,
+            sandbox: true,
             webSecurity: !store.get('ignore_cors'),
         },
         width: 1440,
@@ -729,11 +743,18 @@ async function createWindow(first = true): Promise<void> {
 
     // Open URLs in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
-        shell.openExternal(edata.url);
+        if (validateUrl(edata.url)) {
+            shell.openExternal(edata.url);
+        }
         return { action: 'deny' };
     });
 
     mainWindow.webContents.session.setDisplayMediaRequestHandler((_request, callback) => {
+        if (!canHandleVisualizerDisplayMedia()) {
+            callback({});
+            return;
+        }
+
         if (!isMacOS()) {
             callback({ audio: 'loopback' });
             return;
@@ -764,7 +785,9 @@ async function createWindow(first = true): Promise<void> {
     nativeTheme.themeSource = theme || 'dark';
 
     mainWindow.webContents.setWindowOpenHandler((details) => {
-        shell.openExternal(details.url);
+        if (validateUrl(details.url)) {
+            shell.openExternal(details.url);
+        }
         return { action: 'deny' };
     });
 
@@ -1009,6 +1032,17 @@ if (!singleInstance) {
                 }
 
                 return response;
+            });
+
+            session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+                callback({
+                    responseHeaders: {
+                        ...details.responseHeaders,
+                        'Content-Security-Policy': [
+                            "script-src 'self' 'unsafe-inline' https://umami.jeffvli.org; style-src 'self' 'unsafe-inline'; media-src 'self' http: https: data: blob:; img-src 'self' http: https: data: blob:; connect-src 'self' http: https: ws: wss:; default-src 'self';",
+                        ],
+                    },
+                });
             });
 
             createWindow();

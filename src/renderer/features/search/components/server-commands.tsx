@@ -25,7 +25,7 @@ export const ServerCommands = ({ handleClose, setPages, setQuery }: ServerComman
     const handleManageServersModal = useCallback(() => {
         openModal({
             children: <ServerList />,
-            title: t('page.appMenu.manageServers', { postProcess: 'sentenceCase' }),
+            title: t('page.appMenu.manageServers'),
         });
         handleClose();
         setQuery('');
@@ -45,9 +45,7 @@ export const ServerCommands = ({ handleClose, setPages, setQuery }: ServerComman
 
     return (
         <>
-            <Command.Group
-                heading={t('page.appMenu.selectServer', { postProcess: 'sentenceCase' })}
-            >
+            <Command.Group heading={t('page.appMenu.selectServer')}>
                 {Object.keys(serverList).map((key) => (
                     <Command.Item
                         key={key}
@@ -56,9 +54,9 @@ export const ServerCommands = ({ handleClose, setPages, setQuery }: ServerComman
                 ))}
             </Command.Group>
             {!isServerLock() && (
-                <Command.Group heading={t('common.manage', { postProcess: 'sentenceCase' })}>
+                <Command.Group heading={t('common.manage')}>
                     <Command.Item onSelect={handleManageServersModal}>
-                        {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}...
+                        {t('page.appMenu.manageServers')}...
                     </Command.Item>
                 </Command.Group>
             )}

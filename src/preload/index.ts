@@ -1,5 +1,4 @@
-import { electronAPI } from '@electron-toolkit/preload';
-import { contextBridge } from 'electron';
+import { contextBridge, webUtils } from 'electron';
 
 import { autodiscover } from './autodiscover';
 import { browser } from './browser';
@@ -12,6 +11,7 @@ import { mpris } from './mpris';
 import { mpvPlayer, mpvPlayerListener } from './mpv-player';
 import { remote } from './remote';
 import { utils } from './utils';
+import { visualizer } from './visualizer';
 
 // Custom APIs for renderer
 const api = {
@@ -20,6 +20,7 @@ const api = {
     discordRpc,
     dlnaPlayer,
     dlnaPlayerListener,
+    getPathForFile: webUtils.getPathForFile,
     ipc,
     localSettings,
     lyrics,
@@ -28,6 +29,7 @@ const api = {
     mpvPlayerListener,
     remote,
     utils,
+    visualizer,
 };
 
 export type PreloadApi = typeof api;
@@ -37,14 +39,11 @@ export type PreloadApi = typeof api;
 // just add to the DOM global.
 if (process.contextIsolated) {
     try {
-        contextBridge.exposeInMainWorld('electron', electronAPI);
         contextBridge.exposeInMainWorld('api', api);
     } catch (error) {
         console.error(error);
     }
 } else {
-    // @ts-ignore (define in dts)
-    window.electron = electronAPI;
     // @ts-ignore (define in dts)
     window.api = api;
 }

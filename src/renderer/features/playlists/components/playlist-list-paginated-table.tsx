@@ -87,6 +87,7 @@ export const PlaylistListPaginatedTable = ({
                 columns={columns}
                 data={data || []}
                 enableAlternateRowColors={enableAlternateRowColors}
+                enableExpansion={false}
                 enableHeader={enableHeader}
                 enableHorizontalBorders={enableHorizontalBorders}
                 enableRowHoverHighlight={enableRowHoverHighlight}

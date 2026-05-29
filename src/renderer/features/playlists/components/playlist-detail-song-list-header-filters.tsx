@@ -100,10 +100,10 @@ const PlaylistSongListFiltersModal = () => {
                                     variant="subtle"
                                 />
                             )}
-                            {t('common.filters', { postProcess: 'sentenceCase' })}
+                            {t('common.filters')}
                         </Group>
                         <Button onClick={clear} size="compact-sm" variant="subtle">
-                            {t('common.reset', { postProcess: 'sentenceCase' })}
+                            {t('common.reset')}
                         </Button>
                     </Group>
                 }
@@ -145,8 +145,8 @@ export const PlaylistDetailSongListHeaderFilters = ({
             : ItemListKey.PLAYLIST_SONG);
     const isAlbumMode = listKey === ItemListKey.PLAYLIST_ALBUM;
     const toggleChoice = isAlbumMode
-        ? t('entity.album', { count: 2, postProcess: 'titleCase' })
-        : t('entity.track', { count: 2, postProcess: 'titleCase' });
+        ? t('entity.album', { count: 2 })
+        : t('entity.track', { count: 2 });
 
     const handleToggleDisplayMode = useCallback(() => {
         setPlaylistBehavior(
@@ -209,16 +209,10 @@ export const PlaylistDetailSongListHeaderFilters = ({
                         uppercase
                         variant={mode === 'edit' ? 'state-error' : 'subtle'}
                     >
-                        {mode === 'edit'
-                            ? t('common.cancel', { postProcess: 'titleCase' })
-                            : t('common.edit', { postProcess: 'titleCase' })}
+                        {mode === 'edit' ? t('common.cancel') : t('common.edit')}
                     </Button>
                 )}
-                <Tooltip
-                    label={t(`common.${collapsed ? 'expand' : 'collapse'}`, {
-                        postProcess: 'titleCase',
-                    })}
-                >
+                <Tooltip label={t(`common.${collapsed ? 'expand' : 'collapse'}`, {})}>
                     <ActionIcon
                         icon={collapsed ? 'arrowDownS' : 'arrowUpS'}
                         iconProps={{ size: 'xl' }}
@@ -260,7 +254,7 @@ export const openSaveAndReplaceModal = (
         innerProps: { onSuccess, playlistId, songIds },
         modal: 'saveAndReplace',
         size: 'sm',
-        title: i18n.t('common.saveAndReplace', { postProcess: 'titleCase' }) as string,
+        title: i18n.t('common.saveAndReplace') as string,
     });
 };
 
@@ -290,7 +284,7 @@ const SaveAndReplaceButton = ({ mode, songIds }: { mode?: 'edit' | 'view'; songI
             size="sm"
             variant="subtle"
         >
-            {t('common.saveAndReplace', { postProcess: 'titleCase' })}
+            {t('common.saveAndReplace')}
         </Button>
     );
 };

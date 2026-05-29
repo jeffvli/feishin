@@ -38,8 +38,8 @@ export const AlbumListHeaderFilters = ({ toggleGenreTarget }: { toggleGenreTarge
 
     const choice = useMemo(() => {
         return target === GenreTarget.ALBUM
-            ? t('entity.album', { count: 2, postProcess: 'titleCase' })
-            : t('entity.track', { count: 2, postProcess: 'titleCase' });
+            ? t('entity.album', { count: 2 })
+            : t('entity.track', { count: 2 });
     }, [target, t]);
 
     const handleToggleGenreTarget = useCallback(() => {

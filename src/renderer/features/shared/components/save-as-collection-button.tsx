@@ -98,9 +98,7 @@ export const SaveAsCollectionButton = ({ fullWidth, itemType }: SaveAsCollection
             <Popover.Target>
                 {fullWidth ? (
                     <Button fullWidth onClick={handleOpen} variant="default">
-                        {t('page.collections.saveAsCollection', {
-                            postProcess: 'sentenceCase',
-                        })}
+                        {t('page.collections.saveAsCollection')}
                     </Button>
                 ) : (
                     <ActionIcon
@@ -108,9 +106,7 @@ export const SaveAsCollectionButton = ({ fullWidth, itemType }: SaveAsCollection
                         iconProps={{ size: 'lg' }}
                         onClick={handleOpen}
                         tooltip={{
-                            label: t('page.collections.saveAsCollection', {
-                                postProcess: 'sentenceCase',
-                            }),
+                            label: t('page.collections.saveAsCollection'),
                         }}
                         variant="subtle"
                     />
@@ -120,9 +116,7 @@ export const SaveAsCollectionButton = ({ fullWidth, itemType }: SaveAsCollection
                 <form onKeyDown={handleFormKeyDown} onSubmit={handleSubmit} ref={formRef}>
                     <Stack gap="sm">
                         <Text fw={500} size="sm" ta="center">
-                            {t('page.collections.overrideExisting', {
-                                postProcess: 'sentenceCase',
-                            })}
+                            {t('page.collections.overrideExisting')}
                         </Text>
                         <div className={styles.list}>
                             <ScrollArea>
@@ -146,10 +140,10 @@ export const SaveAsCollectionButton = ({ fullWidth, itemType }: SaveAsCollection
                         <TextInput autoFocus maxLength={128} {...form.getInputProps('name')} />
                         <Group gap="xs" justify="flex-end">
                             <Button onClick={handlers.close} type="button" variant="subtle">
-                                {t('common.cancel', { postProcess: 'sentenceCase' })}
+                                {t('common.cancel')}
                             </Button>
                             <Button type="submit" variant="filled">
-                                {t('common.save', { postProcess: 'sentenceCase' })}
+                                {t('common.save')}
                             </Button>
                         </Group>
                     </Stack>

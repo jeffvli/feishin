@@ -96,15 +96,11 @@ export const TableConfig = ({
                     <SegmentedControl
                         data={[
                             {
-                                label: t('table.config.general.pagination_infinite', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.pagination_infinite'),
                                 value: ListPaginationType.INFINITE,
                             },
                             {
-                                label: t('table.config.general.pagination_paginate', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.pagination_paginate'),
                                 value: ListPaginationType.PAGINATED,
                             },
                         ]}
@@ -117,7 +113,7 @@ export const TableConfig = ({
                     />
                 ),
                 id: 'pagination',
-                label: t('table.config.general.pagination', { postProcess: 'sentenceCase' }),
+                label: t('table.config.general.pagination'),
                 size: 'sm',
             },
             {
@@ -145,9 +141,7 @@ export const TableConfig = ({
                 id: 'itemsPerPage',
                 label: (
                     <Group>
-                        {t('table.config.general.pagination_itemsPerPage', {
-                            postProcess: 'sentenceCase',
-                        })}
+                        {t('table.config.general.pagination_itemsPerPage')}
                         <Badge>{list.itemsPerPage}</Badge>
                     </Group>
                 ),
@@ -157,21 +151,15 @@ export const TableConfig = ({
                     <SegmentedControl
                         data={[
                             {
-                                label: t('table.config.general.size_compact', {
-                                    postProcess: 'titleCase',
-                                }),
+                                label: t('table.config.general.size_compact'),
                                 value: 'compact',
                             },
                             {
-                                label: t('table.config.general.size_default', {
-                                    postProcess: 'titleCase',
-                                }),
+                                label: t('table.config.general.size_default'),
                                 value: 'default',
                             },
                             {
-                                label: t('table.config.general.size_large', {
-                                    postProcess: 'titleCase',
-                                }),
+                                label: t('table.config.general.size_large'),
                                 value: 'large',
                             },
                         ]}
@@ -186,9 +174,7 @@ export const TableConfig = ({
                     />
                 ),
                 id: 'size',
-                label: t('table.config.general.size', {
-                    postProcess: 'titleCase',
-                }),
+                label: t('table.config.general.size'),
             },
             {
                 component: (
@@ -198,9 +184,7 @@ export const TableConfig = ({
                     />
                 ),
                 id: 'enableHeader',
-                label: t('table.config.general.showHeader', {
-                    postProcess: 'sentenceCase',
-                }),
+                label: t('table.config.general.showHeader'),
             },
             {
                 component: (
@@ -210,9 +194,7 @@ export const TableConfig = ({
                     />
                 ),
                 id: 'enableRowHoverHighlight',
-                label: t('table.config.general.rowHoverHighlight', {
-                    postProcess: 'sentenceCase',
-                }),
+                label: t('table.config.general.rowHoverHighlight'),
             },
             {
                 component: (
@@ -222,9 +204,7 @@ export const TableConfig = ({
                     />
                 ),
                 id: 'enableAlternateRowColors',
-                label: t('table.config.general.alternateRowColors', {
-                    postProcess: 'sentenceCase',
-                }),
+                label: t('table.config.general.alternateRowColors'),
             },
             {
                 component: (
@@ -234,9 +214,7 @@ export const TableConfig = ({
                     />
                 ),
                 id: 'enableHorizontalBorders',
-                label: t('table.config.general.horizontalBorders', {
-                    postProcess: 'sentenceCase',
-                }),
+                label: t('table.config.general.horizontalBorders'),
             },
             {
                 component: (
@@ -246,9 +224,7 @@ export const TableConfig = ({
                     />
                 ),
                 id: 'enableVerticalBorders',
-                label: t('table.config.general.verticalBorders', {
-                    postProcess: 'sentenceCase',
-                }),
+                label: t('table.config.general.verticalBorders'),
             },
             {
                 component: (
@@ -260,7 +236,7 @@ export const TableConfig = ({
                     />
                 ),
                 id: 'autoFitColumns',
-                label: t('table.config.general.autoFitColumns', { postProcess: 'sentenceCase' }),
+                label: t('table.config.general.autoFitColumns'),
             },
             ...(extraOptions || []),
         ];
@@ -494,12 +470,10 @@ const TableColumnConfig = ({
     return (
         <Stack gap="xs">
             <Group justify="space-between" mb="md">
-                <Text size="sm">{t('common.tableColumns', { postProcess: 'sentenceCase' })}</Text>
+                <Text size="sm">{t('common.tableColumns')}</Text>
                 <TextInput
                     onChange={(e) => setSearchColumns(e.currentTarget.value)}
-                    placeholder={t('common.search', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    placeholder={t('common.search')}
                     size="xs"
                 />
             </Group>
@@ -684,9 +658,7 @@ const TableColumnItem = memo(
                             onClick={() => handleMoveUp(item)}
                             size="xs"
                             tooltip={{
-                                label: t('table.config.general.moveUp', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.moveUp'),
                             }}
                             variant="subtle"
                         />
@@ -696,9 +668,7 @@ const TableColumnItem = memo(
                             onClick={() => handleMoveDown(item)}
                             size="xs"
                             tooltip={{
-                                label: t('table.config.general.moveDown', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.moveDown'),
                             }}
                             variant="subtle"
                         />
@@ -711,9 +681,7 @@ const TableColumnItem = memo(
                                 onClick={() => handlePinToLeft(item)}
                                 size="xs"
                                 tooltip={{
-                                    label: t('table.config.general.pinToLeft', {
-                                        postProcess: 'sentenceCase',
-                                    }),
+                                    label: t('table.config.general.pinToLeft'),
                                 }}
                                 variant={item.pinned === 'left' ? 'filled' : 'subtle'}
                             />
@@ -723,9 +691,7 @@ const TableColumnItem = memo(
                                 onClick={() => handlePinToRight(item)}
                                 size="xs"
                                 tooltip={{
-                                    label: t('table.config.general.pinToRight', {
-                                        postProcess: 'sentenceCase',
-                                    }),
+                                    label: t('table.config.general.pinToRight'),
                                 }}
                                 variant={item.pinned === 'right' ? 'filled' : 'subtle'}
                             />
@@ -738,9 +704,7 @@ const TableColumnItem = memo(
                             onClick={() => handleAlignLeft(item)}
                             size="xs"
                             tooltip={{
-                                label: t('table.config.general.alignLeft', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.alignLeft'),
                             }}
                             variant={item.align === 'start' ? 'filled' : 'subtle'}
                         />
@@ -750,9 +714,7 @@ const TableColumnItem = memo(
                             onClick={() => handleAlignCenter(item)}
                             size="xs"
                             tooltip={{
-                                label: t('table.config.general.alignCenter', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.alignCenter'),
                             }}
                             variant={item.align === 'center' ? 'filled' : 'subtle'}
                         />
@@ -762,9 +724,7 @@ const TableColumnItem = memo(
                             onClick={() => handleAlignRight(item)}
                             size="xs"
                             tooltip={{
-                                label: t('table.config.general.alignRight', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                label: t('table.config.general.alignRight'),
                             }}
                             variant={item.align === 'end' ? 'filled' : 'subtle'}
                         />
@@ -773,11 +733,7 @@ const TableColumnItem = memo(
                         className={clsx(styles.group, styles.numberInput)}
                         hideControls={false}
                         leftSection={
-                            <Tooltip
-                                label={t('table.config.general.autosize', {
-                                    postProcess: 'sentenceCase',
-                                })}
-                            >
+                            <Tooltip label={t('table.config.general.autosize')}>
                                 <Checkbox
                                     checked={item.autoSize}
                                     id={item.id}

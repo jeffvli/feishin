@@ -95,7 +95,7 @@ const RadioStopButton = ({ disabled }: { disabled?: boolean }) => {
             icon={<Icon fill="default" icon="mediaStop" size={buttonSize - 2} />}
             onClick={stop}
             tooltip={{
-                label: t('player.stop', { postProcess: 'sentenceCase' }),
+                label: t('player.stop'),
                 openDelay: 0,
             }}
             variant="tertiary"
@@ -114,7 +114,7 @@ const StopButton = ({ disabled }: { disabled?: boolean }) => {
             icon={<Icon fill="default" icon="mediaStop" size={buttonSize - 2} />}
             onClick={() => mediaStop()}
             tooltip={{
-                label: t('player.stop', { postProcess: 'sentenceCase' }),
+                label: t('player.stop'),
                 openDelay: 0,
             }}
             variant="tertiary"
@@ -145,9 +145,8 @@ const ShuffleButton = ({ disabled }: { disabled?: boolean }) => {
                     shuffle === PlayerShuffle.NONE
                         ? t('player.shuffle', {
                               context: 'off',
-                              postProcess: 'sentenceCase',
                           })
-                        : t('player.shuffle', { postProcess: 'sentenceCase' }),
+                        : t('player.shuffle'),
                 openDelay: 0,
             }}
             variant="tertiary"
@@ -166,7 +165,7 @@ const PreviousButton = ({ disabled }: { disabled?: boolean }) => {
             icon={<Icon fill="default" icon="mediaPrevious" size={buttonSize} />}
             onClick={mediaPrevious}
             tooltip={{
-                label: t('player.previous', { postProcess: 'sentenceCase' }),
+                label: t('player.previous'),
                 openDelay: 0,
             }}
             variant="secondary"
@@ -187,7 +186,6 @@ const SkipBackwardButton = ({ disabled }: { disabled?: boolean }) => {
             tooltip={{
                 label: t('player.skip', {
                     context: 'back',
-                    postProcess: 'sentenceCase',
                 }),
                 openDelay: 0,
             }}
@@ -224,7 +222,6 @@ const SkipForwardButton = ({ disabled }: { disabled?: boolean }) => {
             tooltip={{
                 label: t('player.skip', {
                     context: 'forward',
-                    postProcess: 'sentenceCase',
                 }),
                 openDelay: 0,
             }}
@@ -244,7 +241,7 @@ const NextButton = ({ disabled }: { disabled?: boolean }) => {
             icon={<Icon fill="default" icon="mediaNext" size={buttonSize} />}
             onClick={mediaNext}
             tooltip={{
-                label: t('player.next', { postProcess: 'sentenceCase' }),
+                label: t('player.next'),
                 openDelay: 0,
             }}
             variant="secondary"
@@ -279,16 +276,13 @@ const RepeatButton = ({ disabled }: { disabled?: boolean }) => {
                     repeat === PlayerRepeat.NONE
                         ? t('player.repeat', {
                               context: 'off',
-                              postProcess: 'sentenceCase',
                           })
                         : repeat === PlayerRepeat.ALL
                           ? t('player.repeat', {
                                 context: 'all',
-                                postProcess: 'sentenceCase',
                             })
                           : t('player.repeat', {
                                 context: 'one',
-                                postProcess: 'sentenceCase',
                             })
                 }`,
                 openDelay: 0,
@@ -308,7 +302,7 @@ const ShuffleAllButton = ({ disabled }: { disabled?: boolean }) => {
             icon={<Icon fill="default" icon="mediaRandom" size={buttonSize} />}
             onClick={() => openShuffleAllModal()}
             tooltip={{
-                label: t('form.shuffleAll.title', { postProcess: 'sentenceCase' }),
+                label: t('form.shuffleAll.title'),
                 openDelay: 0,
             }}
             variant="tertiary"

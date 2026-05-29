@@ -447,6 +447,14 @@
     padding-left: 0;
 }
 
+.row .track-cell-play-control {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+}
+
 .track-row-dragging {
     opacity: 0.5;
 }

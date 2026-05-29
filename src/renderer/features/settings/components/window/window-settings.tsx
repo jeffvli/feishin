@@ -36,13 +36,12 @@ export const WindowSettings = memo(() => {
                         if (!e) return;
 
                         // Platform.LINUX is used as the native frame option regardless of the actual platform
-                        const hasFrame = localSettings?.get('window_has_frame') as
-                            | boolean
-                            | undefined;
-                        const isSwitchingToFrame = !hasFrame && e === Platform.LINUX;
-                        const isSwitchingToNoFrame = hasFrame && e !== Platform.LINUX;
-
-                        const requireRestart = isSwitchingToFrame || isSwitchingToNoFrame;
+                        const previousWindowBarStyle = settings.windowBarStyle;
+                        const isSwitchingToNative =
+                            previousWindowBarStyle !== Platform.LINUX && e === Platform.LINUX;
+                        const isSwitchingFromNative =
+                            previousWindowBarStyle === Platform.LINUX && e !== Platform.LINUX;
+                        const requireRestart = isSwitchingToNative || isSwitchingFromNative;
 
                         if (requireRestart) {
                             openRestartRequiredToast();
@@ -60,10 +59,9 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.windowBarStyle', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.windowBarStyle', { postProcess: 'sentenceCase' }),
+            title: t('setting.windowBarStyle'),
         },
         {
             control: (
@@ -99,13 +97,10 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.trayEnabled', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            note: t('common.restartRequired', {
-                postProcess: 'sentenceCase',
-            }),
-            title: t('setting.trayEnabled', { postProcess: 'sentenceCase' }),
+            note: t('common.restartRequired'),
+            title: t('setting.trayEnabled'),
         },
         {
             control: (
@@ -126,10 +121,9 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.minimizeToTray', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron() || !settings.tray,
-            title: t('setting.minimizeToTray', { postProcess: 'sentenceCase' }),
+            title: t('setting.minimizeToTray'),
         },
         {
             control: (
@@ -150,10 +144,9 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.exitToTray', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron() || !settings.tray,
-            title: t('setting.exitToTray', { postProcess: 'sentenceCase' }),
+            title: t('setting.exitToTray'),
         },
         {
             control: (
@@ -174,10 +167,9 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.startMinimized', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron() || !settings.tray,
-            title: t('setting.startMinimized', { postProcess: 'sentenceCase' }),
+            title: t('setting.startMinimized'),
         },
         {
             control: (
@@ -201,10 +193,9 @@ export const WindowSettings = memo(() => {
             ),
             description: t('setting.preventSleepOnPlayback', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.preventSleepOnPlayback', { postProcess: 'sentenceCase' }),
+            title: t('setting.preventSleepOnPlayback'),
         },
         {
             control: (
@@ -235,10 +226,5 @@ export const WindowSettings = memo(() => {
         },
     ];
 
-    return (
-        <SettingsSection
-            options={windowOptions}
-            title={t('page.setting.application', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={windowOptions} title={t('page.setting.application')} />;
 });

@@ -33,6 +33,7 @@ import styles from './item-detail-list.module.css';
 import { ItemCardControls } from '/@/renderer/components/item-card/item-card-controls';
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
+import { isRowPlayControlColumn } from '/@/renderer/components/item-list/helpers/get-row-play-control-column';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
     ItemListStateActions,
@@ -365,6 +366,7 @@ const TrackRow = memo(
                     const isTitleColumn = col.id === TableColumn.TITLE;
                     const isImageColumn = col.id === TableColumn.IMAGE;
                     const isIconActionColumn = isNoHorizontalPaddingColumn(col.id);
+                    const isPlayControlColumn = isRowPlayControlColumn(col.id, columns);
                     const showHoverContent = shouldShowHoverOnlyColumnContent(
                         col.id,
                         isRowHovered,
@@ -374,6 +376,7 @@ const TrackRow = memo(
                     const content = isSongsLoading ? null : showHoverContent ? (
                         <CellComponent
                             columnId={col.id}
+                            columns={columns}
                             controls={controls}
                             internalState={internalState}
                             isMutatingFavorite={isMutatingFavorite}
@@ -393,6 +396,7 @@ const TrackRow = memo(
                                 [styles.trackCellImage]: isImageColumn,
                                 [styles.trackCellMuted]: !isTitleColumn,
                                 [styles.trackCellNoHPadding]: isIconActionColumn,
+                                [styles.trackCellPlayControl]: isPlayControlColumn,
                                 [styles.trackCellVerticalBorderVisible]:
                                     enableVerticalBorders && !isLastColumn,
                                 [styles.trackCellWithVerticalBorder]: !isLastColumn,

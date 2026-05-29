@@ -90,12 +90,12 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                 onError: (err) => {
                     toast.error({
                         message: err.message,
-                        title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                        title: t('error.genericError'),
                     });
                 },
                 onSuccess: () => {
                     toast.success({
-                        message: t('form.createPlaylist.success', { postProcess: 'sentenceCase' }),
+                        message: t('form.createPlaylist.success'),
                     });
                     onCancel();
                 },
@@ -115,7 +115,6 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                             data-autofocus
                             label={t('form.createPlaylist.input', {
                                 context: 'name',
-                                postProcess: 'titleCase',
                             })}
                             required
                             {...form.getInputProps('name')}
@@ -125,7 +124,6 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                                 autosize
                                 label={t('form.createPlaylist.input', {
                                     context: 'description',
-                                    postProcess: 'titleCase',
                                 })}
                                 minRows={5}
                                 {...form.getInputProps('comment')}
@@ -136,7 +134,6 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                                 <Switch
                                     label={t('form.createPlaylist.input', {
                                         context: 'public',
-                                        postProcess: 'titleCase',
                                     })}
                                     {...form.getInputProps('public', {
                                         type: 'checkbox',
@@ -189,9 +186,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                         type="submit"
                         variant="filled"
                     >
-                        {isSmartPlaylist && step === 1
-                            ? t('common.confirm', { postProcess: 'sentenceCase' })
-                            : t('common.create')}
+                        {isSmartPlaylist && step === 1 ? t('common.confirm') : t('common.create')}
                     </ModalButton>
                 </Group>
             </Stack>
@@ -208,6 +203,6 @@ export const openCreatePlaylistModal = (
     openModal({
         children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
         size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
-        title: t('form.createPlaylist.title', { postProcess: 'titleCase' }),
+        title: t('form.createPlaylist.title'),
     });
 };

@@ -399,9 +399,9 @@ export const ClientSideSongFilters = () => {
 
     const segmentedControlData = useMemo(
         () => [
-            { label: t('common.none', { postProcess: 'titleCase' }), value: 'none' },
-            { label: t('common.yes', { postProcess: 'titleCase' }), value: 'true' },
-            { label: t('common.no', { postProcess: 'titleCase' }), value: 'false' },
+            { label: t('common.none'), value: 'none' },
+            { label: t('common.yes'), value: 'true' },
+            { label: t('common.no'), value: 'false' },
         ],
         [t],
     );
@@ -528,22 +528,22 @@ export const ClientSideSongFilters = () => {
     const queryMinYear = query[FILTER_KEYS.SONG.MIN_YEAR] as number | undefined;
     const queryMaxYear = query[FILTER_KEYS.SONG.MAX_YEAR] as number | undefined;
 
-    const matchAndLabel = t('filter.matchAnd', { postProcess: 'titleCase' });
-    const matchOrLabel = t('filter.matchOr', { postProcess: 'titleCase' });
-    const filterSingleLabel = t('common.filter_single', { postProcess: 'titleCase' });
-    const filterMultipleLabel = t('common.filter_multiple', { postProcess: 'titleCase' });
+    const matchAndLabel = t('filter.matchAnd');
+    const matchOrLabel = t('filter.matchOr');
+    const filterSingleLabel = t('common.filter_single');
+    const filterMultipleLabel = t('common.filter_multiple');
 
     return (
         <Stack px="md" py="md">
             <BooleanSegmentFilter
-                label={t('filter.isFavorited', { postProcess: 'sentenceCase' })}
+                label={t('filter.isFavorited')}
                 onChange={setFavorite}
                 segmentData={segmentedControlData}
                 value={queryFavorite}
             />
             <Stack gap="xs" mt="md">
                 <BooleanSegmentFilter
-                    label={t('filter.isRated', { postProcess: 'sentenceCase' })}
+                    label={t('filter.isRated')}
                     onChange={setHasRating}
                     segmentData={segmentedControlData}
                     value={queryHasRating}
@@ -555,7 +555,7 @@ export const ClientSideSongFilters = () => {
                 label={
                     <MultiSelectFilterLabel
                         andOrValue={artistIdsMode}
-                        entityLabel={t('entity.artist', { count: 2, postProcess: 'sentenceCase' })}
+                        entityLabel={t('entity.artist', { count: 2 })}
                         filterMultipleLabel={filterMultipleLabel}
                         filterSingleLabel={filterSingleLabel}
                         matchAndLabel={matchAndLabel}
@@ -580,7 +580,6 @@ export const ClientSideSongFilters = () => {
                         andOrValue={albumArtistIdsMode}
                         entityLabel={t('entity.albumArtist', {
                             count: 2,
-                            postProcess: 'sentenceCase',
                         })}
                         filterMultipleLabel={filterMultipleLabel}
                         filterSingleLabel={filterSingleLabel}
@@ -604,7 +603,7 @@ export const ClientSideSongFilters = () => {
                 label={
                     <MultiSelectFilterLabel
                         andOrValue={genreIdsMode}
-                        entityLabel={t('entity.genre', { count: 2, postProcess: 'sentenceCase' })}
+                        entityLabel={t('entity.genre', { count: 2 })}
                         filterMultipleLabel={filterMultipleLabel}
                         filterSingleLabel={filterSingleLabel}
                         matchAndLabel={matchAndLabel}
@@ -623,12 +622,12 @@ export const ClientSideSongFilters = () => {
             />
             <Divider my="md" />
             <YearRangeFilter
-                fromYearLabel={t('filter.fromYear', { postProcess: 'titleCase' })}
+                fromYearLabel={t('filter.fromYear')}
                 maxYear={queryMaxYear}
                 minYear={queryMinYear}
                 onMaxYear={debouncedHandleMaxYear}
                 onMinYear={debouncedHandleMinYear}
-                toYearLabel={t('filter.toYear', { postProcess: 'titleCase' })}
+                toYearLabel={t('filter.toYear')}
             />
         </Stack>
     );

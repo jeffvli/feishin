@@ -7,14 +7,28 @@ import {
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { ColorInput } from '/@/shared/components/color-input/color-input';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
+
+type FolderView = 'navigation' | 'single' | 'tree';
+type PlaylistMode = 'compact' | 'expanded';
 
 export const SidebarSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
+
+    const handleSetSidebarPlaylistFolders = (e: ChangeEvent<HTMLInputElement>) => {
+        setSettings({
+            general: {
+                sidebarPlaylistFolders: e.target.checked,
+            },
+        });
+    };
 
     const handleSetSidebarPlaylistList = (e: ChangeEvent<HTMLInputElement>) => {
         setSettings({
@@ -56,6 +70,60 @@ export const SidebarSettings = memo(() => {
         });
     }, 500);
 
+    const [localSeparator, setLocalSeparator] = useState(settings.sidebarPlaylistFolderSeparator);
+
+    useEffect(() => {
+        setLocalSeparator(settings.sidebarPlaylistFolderSeparator);
+    }, [settings.sidebarPlaylistFolderSeparator]);
+
+    const debouncedSetSeparator = useDebouncedCallback((value: string) => {
+        if (value.length === 0) return;
+        setSettings({
+            general: {
+                sidebarPlaylistFolderSeparator: value,
+            },
+        });
+    }, 500);
+
+    const folderViewOptions: Array<{ label: string; value: FolderView }> = [
+        {
+            label: t('setting.sidebarPlaylistFolderView_optionSingle', {
+                postProcess: 'sentenceCase',
+            }),
+            value: 'single',
+        },
+        {
+            label: t('setting.sidebarPlaylistFolderView_optionTree', {
+                postProcess: 'sentenceCase',
+            }),
+            value: 'tree',
+        },
+        {
+            label: t('setting.sidebarPlaylistFolderView_optionNavigation', {
+                postProcess: 'sentenceCase',
+            }),
+            value: 'navigation',
+        },
+    ];
+
+    const playlistModeOptions: Array<{ label: string; value: PlaylistMode }> = [
+        {
+            label: t('setting.sidebarPlaylistMode_optionCompact', {
+                postProcess: 'sentenceCase',
+            }),
+            value: 'compact',
+        },
+        {
+            label: t('setting.sidebarPlaylistMode_optionExpanded', {
+                postProcess: 'sentenceCase',
+            }),
+            value: 'expanded',
+        },
+    ];
+
+    const foldersEnabled = settings.sidebarPlaylistFolders;
+    const isTreeView = settings.sidebarPlaylistFolderView === 'tree';
+
     const options: SettingOption[] = [
         {
             control: (
@@ -66,9 +134,8 @@ export const SidebarSettings = memo(() => {
             ),
             description: t('setting.sidebarPlaylistList', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.sidebarPlaylistList', { postProcess: 'sentenceCase' }),
+            title: t('setting.sidebarPlaylistList'),
         },
         {
             control: (
@@ -78,17 +145,14 @@ export const SidebarSettings = memo(() => {
                         setLocalFilterRegex(value);
                         debouncedSetFilterRegex(value);
                     }}
-                    placeholder={t('setting.sidebarPlaylistListFilterRegex_placeholder', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    placeholder={t('setting.sidebarPlaylistListFilterRegex_placeholder')}
                     value={localFilterRegex}
                 />
             ),
             description: t('setting.sidebarPlaylistListFilterRegex', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.sidebarPlaylistListFilterRegex', { postProcess: 'sentenceCase' }),
+            title: t('setting.sidebarPlaylistListFilterRegex'),
         },
         {
             control: (
@@ -99,9 +163,139 @@ export const SidebarSettings = memo(() => {
             ),
             description: t('setting.sidebarPlaylistSorting', {
                 context: 'description',
+            }),
+            title: t('setting.sidebarPlaylistSorting'),
+        },
+        {
+            control: (
+                <Select
+                    data={playlistModeOptions}
+                    onChange={(value) => {
+                        if (!value) return;
+                        setSettings({
+                            general: {
+                                sidebarPlaylistMode: value as PlaylistMode,
+                            },
+                        });
+                    }}
+                    value={settings.sidebarPlaylistMode}
+                    width={200}
+                />
+            ),
+            description: t('setting.sidebarPlaylistMode', {
+                context: 'description',
                 postProcess: 'sentenceCase',
             }),
-            title: t('setting.sidebarPlaylistSorting', { postProcess: 'sentenceCase' }),
+            title: t('setting.sidebarPlaylistMode', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Switch
+                    checked={settings.sidebarPlaylistFolders}
+                    onChange={handleSetSidebarPlaylistFolders}
+                />
+            ),
+            description: t('setting.sidebarPlaylistFolders', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            title: t('setting.sidebarPlaylistFolders', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <TextInput
+                    onChange={(e) => {
+                        const value = e.currentTarget.value;
+                        setLocalSeparator(value);
+                        debouncedSetSeparator(value);
+                    }}
+                    value={localSeparator}
+                    width={120}
+                />
+            ),
+            description: t('setting.sidebarPlaylistFolderSeparator', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            indent: true,
+            isHidden: !foldersEnabled,
+            title: t('setting.sidebarPlaylistFolderSeparator', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <Select
+                    data={folderViewOptions}
+                    onChange={(value) => {
+                        if (!value) return;
+                        setSettings({
+                            general: {
+                                sidebarPlaylistFolderView: value as FolderView,
+                            },
+                        });
+                    }}
+                    value={settings.sidebarPlaylistFolderView}
+                    width={200}
+                />
+            ),
+            description: t('setting.sidebarPlaylistFolderView', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            indent: true,
+            isHidden: !foldersEnabled,
+            title: t('setting.sidebarPlaylistFolderView', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <NumberInput
+                    max={64}
+                    min={0}
+                    onBlur={(e) => {
+                        const value = Number(e.currentTarget.value);
+                        if (Number.isFinite(value)) {
+                            setSettings({
+                                general: {
+                                    sidebarPlaylistFolderTreeIndent: Math.max(
+                                        0,
+                                        Math.min(64, Math.round(value)),
+                                    ),
+                                },
+                            });
+                        }
+                    }}
+                    value={settings.sidebarPlaylistFolderTreeIndent}
+                    width={100}
+                />
+            ),
+            description: t('setting.sidebarPlaylistFolderTreeIndent', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            indent: true,
+            isHidden: !foldersEnabled || !isTreeView,
+            title: t('setting.sidebarPlaylistFolderTreeIndent', { postProcess: 'sentenceCase' }),
+        },
+        {
+            control: (
+                <ColorInput
+                    format="rgba"
+                    onChangeEnd={(value) => {
+                        setSettings({
+                            general: {
+                                sidebarPlaylistFolderTreeLineColor: value,
+                            },
+                        });
+                    }}
+                    value={settings.sidebarPlaylistFolderTreeLineColor}
+                />
+            ),
+            description: t('setting.sidebarPlaylistFolderTreeLineColor', {
+                context: 'description',
+                postProcess: 'sentenceCase',
+            }),
+            indent: true,
+            isHidden: !foldersEnabled || !isTreeView,
+            title: t('setting.sidebarPlaylistFolderTreeLineColor', { postProcess: 'sentenceCase' }),
         },
         {
             control: (
@@ -112,9 +306,8 @@ export const SidebarSettings = memo(() => {
             ),
             description: t('setting.sidebarCollapsedNavigation', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.sidebarCollapsedNavigation', { postProcess: 'sentenceCase' }),
+            title: t('setting.sidebarCollapsedNavigation'),
         },
         {
             control: (
@@ -132,9 +325,8 @@ export const SidebarSettings = memo(() => {
             ),
             description: t('setting.showLyricsInSidebar', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.showLyricsInSidebar', { postProcess: 'sentenceCase' }),
+            title: t('setting.showLyricsInSidebar'),
         },
         {
             control: (
@@ -152,9 +344,8 @@ export const SidebarSettings = memo(() => {
             ),
             description: t('setting.showVisualizerInSidebar', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.showVisualizerInSidebar', { postProcess: 'sentenceCase' }),
+            title: t('setting.showVisualizerInSidebar'),
         },
         {
             control: (
@@ -172,9 +363,8 @@ export const SidebarSettings = memo(() => {
             ),
             description: t('setting.combinedLyricsAndVisualizer', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.combinedLyricsAndVisualizer', { postProcess: 'sentenceCase' }),
+            title: t('setting.combinedLyricsAndVisualizer'),
         },
     ];
 
@@ -182,7 +372,7 @@ export const SidebarSettings = memo(() => {
         <SettingsSection
             extra={<SidebarReorder />}
             options={options}
-            title={t('page.setting.sidebar', { postProcess: 'sentenceCase' })}
+            title={t('page.setting.sidebar')}
         />
     );
 });

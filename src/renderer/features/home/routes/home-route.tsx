@@ -50,35 +50,35 @@ const HomeRoute = () => {
             itemType: isJellyfin ? LibraryItem.SONG : LibraryItem.ALBUM,
             sortBy: isJellyfin ? SongListSort.PLAY_COUNT : AlbumListSort.PLAY_COUNT,
             sortOrder: SortOrder.DESC,
-            title: t('page.home.mostPlayed', { postProcess: 'sentenceCase' }),
+            title: t('page.home.mostPlayed'),
         },
         [HomeItem.RANDOM]: {
             enableRefresh: true,
             itemType: LibraryItem.ALBUM,
             sortBy: AlbumListSort.RANDOM,
             sortOrder: SortOrder.ASC,
-            title: t('page.home.explore', { postProcess: 'sentenceCase' }),
+            title: t('page.home.explore'),
         },
         [HomeItem.RECENTLY_ADDED]: {
             enableRefresh: true,
             itemType: LibraryItem.ALBUM,
             sortBy: AlbumListSort.RECENTLY_ADDED,
             sortOrder: SortOrder.DESC,
-            title: t('page.home.newlyAdded', { postProcess: 'sentenceCase' }),
+            title: t('page.home.newlyAdded'),
         },
         [HomeItem.RECENTLY_PLAYED]: {
             enableRefresh: true,
             itemType: isJellyfin ? LibraryItem.SONG : LibraryItem.ALBUM,
             sortBy: isJellyfin ? SongListSort.RECENTLY_PLAYED : AlbumListSort.RECENTLY_PLAYED,
             sortOrder: SortOrder.DESC,
-            title: t('page.home.recentlyPlayed', { postProcess: 'sentenceCase' }),
+            title: t('page.home.recentlyPlayed'),
         },
         [HomeItem.RECENTLY_RELEASED]: {
             enableRefresh: true,
             itemType: LibraryItem.ALBUM,
             sortBy: AlbumListSort.RELEASE_DATE,
             sortOrder: SortOrder.DESC,
-            title: t('page.home.recentlyReleased', { postProcess: 'sentenceCase' }),
+            title: t('page.home.recentlyReleased'),
         },
     };
 
@@ -98,9 +98,7 @@ const HomeRoute = () => {
                     backgroundColor: 'var(--theme-colors-background)',
                     children: (
                         <LibraryHeaderBar>
-                            <LibraryHeaderBar.Title>
-                                {t('page.home.title', { postProcess: 'titleCase' })}
-                            </LibraryHeaderBar.Title>
+                            <LibraryHeaderBar.Title>{t('page.home.title')}</LibraryHeaderBar.Title>
                         </LibraryHeaderBar>
                     ),
                     offset: 200,

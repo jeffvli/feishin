@@ -15,7 +15,12 @@ import { useCheckForUpdates } from '/@/renderer/hooks/use-check-for-updates';
 import { useNativeMenuSync } from '/@/renderer/hooks/use-native-menu-sync';
 import { useSyncSettingsToMain } from '/@/renderer/hooks/use-sync-settings-to-main';
 import { AppRouter } from '/@/renderer/router/app-router';
-import { useCssSettings, useHotkeySettings, useLanguage } from '/@/renderer/store';
+import {
+    useCssSettings,
+    useHotkeySettings,
+    useLanguage,
+    useSettingsStoreActions,
+} from '/@/renderer/store';
 import { useAppTheme } from '/@/renderer/themes/use-app-theme';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { WebAudio } from '/@/shared/types/types';
@@ -31,6 +36,7 @@ const UpdateAvailableDialog = lazy(() =>
 );
 
 const ipc = isElectron() ? window.api.ipc : null;
+const utils = isElectron() ? window.api.utils : null;
 
 export const App = () => {
     return <ThemedApp />;
@@ -89,10 +95,12 @@ const AppEffects = () => (
     <>
         <SyncSettingsEffect />
         <UpdateCheckEffect />
+        <CustomCssFileEffect />
         <CssSettingsEffect />
         <GlobalShortcutsEffect />
         <LanguageEffect />
         <NativeMenuSyncEffect />
+        <InputFocusEffect />
     </>
 );
 
@@ -141,6 +149,71 @@ const CssSettingsEffect = () => {
     return null;
 };
 
+const CustomCssFileEffect = () => {
+    const { setSettings } = useSettingsStoreActions();
+    const { content } = useCssSettings();
+    const latestContentRef = useRef(content);
+
+    useEffect(() => {
+        latestContentRef.current = content;
+    }, [content]);
+
+    useEffect(() => {
+        if (!isElectron() || !utils) return;
+
+        let disposed = false;
+
+        const applyContent = (rawContent: string | undefined) => {
+            const sanitized = sanitizeCss(`<style>${rawContent ?? ''}`);
+            if (sanitized !== latestContentRef.current) {
+                setSettings({
+                    css: {
+                        content: sanitized,
+                    },
+                });
+            }
+        };
+
+        const loadCustomCss = async () => {
+            try {
+                const result = await utils.getCustomCss();
+
+                if (disposed || !result) return;
+
+                if (!result.exists && latestContentRef.current) {
+                    await utils.saveCustomCss(latestContentRef.current);
+                    return;
+                }
+
+                applyContent(result.content);
+            } catch (error) {
+                console.error('Failed to load custom css', error);
+            }
+        };
+
+        const handleCustomCssUpdated = (data: { content?: string; exists?: boolean }) => {
+            if (disposed) return;
+            if (data?.exists === false) {
+                applyContent('');
+                return;
+            }
+
+            applyContent(data?.content);
+        };
+
+        const removeCustomCssUpdatedListener =
+            utils.customCssUpdatedListener(handleCustomCssUpdated);
+        loadCustomCss();
+
+        return () => {
+            disposed = true;
+            removeCustomCssUpdatedListener();
+        };
+    }, [setSettings]);
+
+    return null;
+};
+
 const GlobalShortcutsEffect = () => {
     const { bindings } = useHotkeySettings();
 
@@ -167,6 +240,45 @@ const LanguageEffect = () => {
 
 const NativeMenuSyncEffect = () => {
     useNativeMenuSync();
+
+    return null;
+};
+
+const InputFocusEffect = () => {
+    useEffect(() => {
+        if (!isElectron()) return;
+
+        const handleFocusIn = (e: FocusEvent) => {
+            const target = e.target as Element | null;
+            if (
+                target instanceof HTMLInputElement ||
+                target instanceof HTMLTextAreaElement ||
+                (target instanceof HTMLElement && target.isContentEditable)
+            ) {
+                window.api?.utils?.setInputFocused?.(true);
+            }
+        };
+
+        const handleFocusOut = (e: FocusEvent) => {
+            const related = e.relatedTarget as Element | null;
+            if (
+                related instanceof HTMLInputElement ||
+                related instanceof HTMLTextAreaElement ||
+                (related instanceof HTMLElement && related.isContentEditable)
+            ) {
+                return;
+            }
+            window.api?.utils?.setInputFocused?.(false);
+        };
+
+        document.addEventListener('focusin', handleFocusIn);
+        document.addEventListener('focusout', handleFocusOut);
+
+        return () => {
+            document.removeEventListener('focusin', handleFocusIn);
+            document.removeEventListener('focusout', handleFocusOut);
+        };
+    }, []);
 
     return null;
 };

@@ -79,9 +79,7 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                     <Stack gap={0} style={{ cursor: 'pointer' }}>
                                         <Group>
                                             <TextTitle isNoSelect order={3}>
-                                                {t('page.favorites.title', {
-                                                    postProcess: 'sentenceCase',
-                                                })}
+                                                {t('page.favorites.title')}
                                             </TextTitle>
                                             <Icon icon="dropdown" size="xl" />
                                         </Group>
@@ -89,17 +87,14 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                             {itemType === LibraryItem.ALBUM &&
                                                 t('entity.album', {
                                                     count: 2,
-                                                    postProcess: 'sentenceCase',
                                                 })}
                                             {itemType === LibraryItem.ALBUM_ARTIST &&
                                                 t('entity.artist', {
                                                     count: 2,
-                                                    postProcess: 'sentenceCase',
                                                 })}
                                             {itemType === LibraryItem.SONG &&
                                                 t('entity.track', {
                                                     count: 2,
-                                                    postProcess: 'sentenceCase',
                                                 })}
                                         </Text>
                                     </Stack>
@@ -112,7 +107,6 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                     >
                                         {t('entity.track', {
                                             count: 2,
-                                            postProcess: 'sentenceCase',
                                         })}
                                     </DropdownMenu.Item>
                                     <DropdownMenu.Item
@@ -122,7 +116,6 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                     >
                                         {t('entity.album', {
                                             count: 2,
-                                            postProcess: 'sentenceCase',
                                         })}
                                     </DropdownMenu.Item>
                                     <DropdownMenu.Item
@@ -134,7 +127,6 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                     >
                                         {t('entity.artist', {
                                             count: 2,
-                                            postProcess: 'sentenceCase',
                                         })}
                                     </DropdownMenu.Item>
                                 </DropdownMenu.Dropdown>

@@ -155,9 +155,9 @@ const AlbumPropertyMapping: ItemDetailRow<Album>[] = [
         label: 'filter.explicitStatus',
         render: (album, t) =>
             album.explicitStatus === ExplicitStatus.EXPLICIT
-                ? t('common.explicit', { postProcess: 'sentenceCase' })
+                ? t('common.explicit')
                 : album.explicitStatus === ExplicitStatus.CLEAN
-                  ? t('common.clean', { postProcess: 'sentenceCase' })
+                  ? t('common.clean')
                   : null,
     },
     { label: 'filter.isCompilation', render: (album) => BoolField(album.isCompilation || false) },
@@ -309,9 +309,9 @@ const SongPropertyMapping: ItemDetailRow<Song>[] = [
         label: 'filter.explicitStatus',
         render: (song, t) =>
             song.explicitStatus === ExplicitStatus.EXPLICIT
-                ? t('common.explicit', { postProcess: 'sentenceCase' })
+                ? t('common.explicit')
                 : song.explicitStatus === ExplicitStatus.CLEAN
-                  ? t('common.clean', { postProcess: 'sentenceCase' })
+                  ? t('common.clean')
                   : null,
     },
     { count: 2, label: 'entity.genre', render: FormatGenre },
@@ -379,7 +379,7 @@ const handleTags = (item: Album | Song, t: TFunction) => {
         if (tags.length) {
             return [
                 <Table.Tr key="tags">
-                    <Table.Th>{t('common.tags', { postProcess: 'sentenceCase' })}</Table.Th>
+                    <Table.Th>{t('common.tags')}</Table.Th>
                     <Table.Td>{tags.length}</Table.Td>
                 </Table.Tr>,
             ].concat(tags);
@@ -406,11 +406,7 @@ const handleParticipants = (item: Album | Song, t: TFunction) => {
         if (participants.length) {
             return [
                 <Table.Tr key="participants">
-                    <Table.Th>
-                        {t('common.additionalParticipants', {
-                            postProcess: 'sentenceCase',
-                        })}
-                    </Table.Th>
+                    <Table.Th>{t('common.additionalParticipants')}</Table.Th>
                     <Table.Td>{participants.length}</Table.Td>
                 </Table.Tr>,
             ].concat(participants);
@@ -431,9 +427,7 @@ export const ItemDetailsModal = ({ item, items }: ItemDetailsModalProps) => {
 
     const selectData = useMemo(() => {
         return allItems.map((it, index) => ({
-            label:
-                it.name ||
-                `${t('common.item', { defaultValue: 'Item', postProcess: 'sentenceCase' })} ${index + 1}`,
+            label: it.name || `${t('common.item', { defaultValue: 'Item' })} ${index + 1}`,
             value: String(index),
         }));
     }, [allItems, t]);

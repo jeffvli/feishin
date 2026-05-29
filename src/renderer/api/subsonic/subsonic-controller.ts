@@ -1460,6 +1460,10 @@ export const SubsonicController: InternalControllerEndpoint = {
             features.serverPlayQueue = [1];
         }
 
+        if (subsonicFeatures[SubsonicExtensions.PLAYBACK_REPORT]) {
+            features.reportPlayback = [1];
+        }
+
         return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };
     },
     getSimilarSongs: async (args) => {
@@ -2297,6 +2301,57 @@ export const SubsonicController: InternalControllerEndpoint = {
     },
     scrobble: async (args) => {
         const { apiClientProps, query } = args;
+
+        if (hasFeature(apiClientProps.server, ServerFeature.REPORT_PLAYBACK)) {
+            if (query.submission) {
+                const res = await ssApiClient(apiClientProps).scrobble({
+                    query: {
+                        id: query.id,
+                        submission: query.submission,
+                    },
+                });
+
+                if (res.status !== 200) {
+                    throw new Error('Failed to scrobble');
+                }
+
+                return null;
+            }
+
+            let state: 'paused' | 'playing' | 'starting' | 'stopped' = 'playing';
+
+            switch (query.event) {
+                case 'pause':
+                    state = 'paused';
+                    break;
+                case 'start':
+                    state = 'starting';
+                    break;
+                case 'timeupdate':
+                case 'unpause':
+                    state = 'playing';
+                    break;
+                default:
+                    state = 'playing';
+            }
+
+            const res = await ssApiClient(apiClientProps).reportPlayback({
+                query: {
+                    ignoreScrobble: true,
+                    mediaId: query.id,
+                    mediaType: query.mediaType,
+                    playbackRate: query.playbackRate,
+                    positionMs: query.position ?? 0,
+                    state,
+                },
+            });
+
+            if (res.status !== 200) {
+                throw new Error('Failed to report playback');
+            }
+
+            return null;
+        }
 
         const res = await ssApiClient(apiClientProps).scrobble({
             query: {

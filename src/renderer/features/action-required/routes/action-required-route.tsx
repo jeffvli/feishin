@@ -31,12 +31,12 @@ const ActionRequiredRoute = () => {
     const checks = [
         {
             component: <ServerCredentialRequired />,
-            title: t('error.credentialsRequired', { postProcess: 'sentenceCase' }),
+            title: t('error.credentialsRequired'),
             valid: !isCredentialRequired,
         },
         {
             component: <ServerRequired />,
-            title: t('error.serverRequired', { postProcess: 'serverRequired' }),
+            title: t('error.serverRequired'),
             valid: !isServerRequired,
         },
     ];
@@ -47,7 +47,7 @@ const ActionRequiredRoute = () => {
     const handleManageServersModal = () => {
         openModal({
             children: <ServerList />,
-            title: t('page.appMenu.manageServers', { postProcess: 'sentenceCase' }),
+            title: t('page.appMenu.manageServers'),
         });
     };
 
@@ -79,9 +79,7 @@ const ActionRequiredRoute = () => {
                                         onClick={handleManageServersModal}
                                         variant="filled"
                                     >
-                                        {t('page.appMenu.manageServers', {
-                                            postProcess: 'sentenceCase',
-                                        })}
+                                        {t('page.appMenu.manageServers')}
                                     </Button>
                                 </Group>
                             )}

@@ -4,6 +4,11 @@ permissions: write-all
 
 on:
     workflow_dispatch:
+        inputs:
+            tag:
+                description: 'Docker image tag (e.g. 1.12.0 or latest)'
+                required: true
+                type: string
     push:
         tags:
             - 'v*.*.*'
@@ -33,11 +38,10 @@ jobs:
               with:
                   images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
                   tags: |
-                      type=ref,event=branch
-                      type=ref,event=pr
-                      type=semver,pattern={{version}}
-                      type=semver,pattern={{major}}.{{minor}}
-                      type=semver,pattern={{major}}
+                      type=raw,value=${{ inputs.tag }},enable=${{ github.event_name == 'workflow_dispatch' }}
+                      type=semver,pattern={{version}},enable=${{ github.event_name == 'push' }}
+                      type=semver,pattern={{major}}.{{minor}},enable=${{ github.event_name == 'push' }}
+                      type=semver,pattern={{major}},enable=${{ github.event_name == 'push' }}
             - name: Set up QEMU
               uses: docker/setup-qemu-action@v3
             - name: Setup Docker buildx

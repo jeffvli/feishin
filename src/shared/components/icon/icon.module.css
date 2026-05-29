@@ -79,6 +79,10 @@ img.size-5xl {
     color: rgb(255 49 49);
 }
 
+.color-transparent {
+    color: transparent;
+}
+
 .fill {
     fill: transparent;
 }
@@ -121,6 +125,10 @@ img.size-5xl {
 
 .fill-favorite {
     fill: rgb(255 49 49);
+}
+
+.fill-transparent {
+    fill: transparent;
 }
 
 .spin {

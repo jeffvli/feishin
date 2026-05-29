@@ -4,6 +4,7 @@ import { lazy, Suspense } from 'react';
 import { PlayerbarSeekSlider } from './playerbar-seek-slider';
 import styles from './playerbar-slider.module.css';
 
+import { ScrobbleStatus } from '/@/renderer/features/player/components/scrobble-status';
 import {
     useAppStore,
     useAppStoreActions,
@@ -42,16 +43,7 @@ export const PlayerbarSlider = () => {
         <>
             <div className={styles.sliderContainer}>
                 <div className={styles.sliderValueWrapper}>
-                    <Text
-                        className={PlaybackSelectors.elapsedTime}
-                        fw={600}
-                        isMuted
-                        isNoSelect
-                        size="xs"
-                        style={{ userSelect: 'none' }}
-                    >
-                        {formattedTime}
-                    </Text>
+                    <ScrobbleStatus formattedTime={formattedTime} />
                 </div>
                 <div className={styles.sliderWrapper}>
                     {isWaveform ? (
@@ -89,7 +81,6 @@ export const CustomPlayerbarSlider = ({ ...props }: SliderProps) => {
                 label: styles.label,
                 root: styles.root,
                 thumb: styles.thumb,
-                track: styles.track,
             }}
             {...props}
             size={6}

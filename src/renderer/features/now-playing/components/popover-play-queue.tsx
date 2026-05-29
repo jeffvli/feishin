@@ -51,7 +51,7 @@ export const PopoverPlayQueue = ({
                     onClick={handleToggle}
                     size="sm"
                     tooltip={{
-                        label: t('player.viewQueue', { postProcess: 'titleCase' }),
+                        label: t('player.viewQueue'),
                         openDelay: 0,
                     }}
                     variant="subtle"

@@ -12,6 +12,7 @@ export enum DragTarget {
     GRID_ROW = 'gridRow',
     PLAYLIST = LibraryItem.PLAYLIST,
     QUEUE_SONG = LibraryItem.QUEUE_SONG,
+    SIDEBAR_PLAYLIST_FOLDER = 'sidebarPlaylistFolder',
     SONG = LibraryItem.SONG,
     TABLE_COLUMN = 'tableColumn',
 }

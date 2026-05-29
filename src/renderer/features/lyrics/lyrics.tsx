@@ -318,9 +318,7 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
                                 >
                                     <Group>
                                         <Text fw={500} isMuted isNoSelect>
-                                            {t('page.fullscreenPlayer.noLyrics', {
-                                                postProcess: 'sentenceCase',
-                                            })}
+                                            {t('page.fullscreenPlayer.noLyrics')}
                                         </Text>
                                     </Group>
                                 </motion.div>

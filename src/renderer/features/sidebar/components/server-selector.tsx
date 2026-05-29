@@ -42,13 +42,12 @@ export const ServerSelector = () => {
 
     const musicFolderDisplayText = (() => {
         if (selectedMusicFolders.length === 0) {
-            return t('page.appMenu.noMusicFolder', { postProcess: 'sentenceCase' });
+            return t('page.appMenu.noMusicFolder');
         }
 
         if (supportsMultiSelect && selectedMusicFolders.length > 1) {
             return t('page.appMenu.multipleMusicFolders', {
                 count: selectedMusicFolders.length,
-                postProcess: 'sentenceCase',
             });
         }
 

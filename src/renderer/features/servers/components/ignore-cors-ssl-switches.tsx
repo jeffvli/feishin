@@ -39,18 +39,14 @@ export function IgnoreCorsSslSwitches() {
             <Group>
                 <Switch
                     checked={ignoreCORS === 'true'}
-                    label={t('form.addServer.ignoreCors', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    label={t('form.addServer.ignoreCors')}
                     onChange={handleUpdateIgnoreCORS}
                 />
             </Group>
             <Group>
                 <Switch
                     checked={ignoreSSL === 'true'}
-                    label={t('form.addServer.ignoreSsl', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    label={t('form.addServer.ignoreSsl')}
                     onChange={handleUpdateIgnoreSSL}
                 />
             </Group>

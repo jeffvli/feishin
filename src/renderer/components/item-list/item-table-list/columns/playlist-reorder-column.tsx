@@ -313,12 +313,10 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
                             <>
                                 <Stack gap="xs" justify="center">
                                     <Text fw={500} ta="center">
-                                        {t('action.moveUp', { postProcess: 'sentenceCase' })}
+                                        {t('action.moveUp')}
                                     </Text>
                                     <Text fw={500} isMuted size="xs" ta="center">
-                                        {t('action.holdToMoveToTop', {
-                                            postProcess: 'sentenceCase',
-                                        })}
+                                        {t('action.holdToMoveToTop')}
                                     </Text>
                                 </Stack>
                             </>
@@ -336,12 +334,10 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
                             <>
                                 <Stack gap="xs" justify="center">
                                     <Text fw={500} ta="center">
-                                        {t('action.moveDown', { postProcess: 'sentenceCase' })}
+                                        {t('action.moveDown')}
                                     </Text>
                                     <Text fw={500} isMuted size="xs" ta="center">
-                                        {t('action.holdToMoveToBottom', {
-                                            postProcess: 'sentenceCase',
-                                        })}
+                                        {t('action.holdToMoveToBottom')}
                                     </Text>
                                 </Stack>
                             </>

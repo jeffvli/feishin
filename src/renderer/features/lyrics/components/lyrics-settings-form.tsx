@@ -79,7 +79,6 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             description: '',
             title: t(
                 `${t('page.fullscreenPlayer.config.lyricSize')} (${t('page.fullscreenPlayer.config.synchronized')})`,
-                { postProcess: 'sentenceCase' },
             ),
         },
         {
@@ -102,7 +101,6 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             description: '',
             title: t(
                 `${t('page.fullscreenPlayer.config.lyricSize')} (${t('page.fullscreenPlayer.config.unsynchronized')})`,
-                { postProcess: 'sentenceCase' },
             ),
         },
         {
@@ -125,7 +123,6 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             description: '',
             title: t(
                 `${t('page.fullscreenPlayer.config.lyricGap')} (${t('page.fullscreenPlayer.config.synchronized')})`,
-                { postProcess: 'sentenceCase' },
             ),
         },
         {
@@ -148,19 +145,18 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             description: '',
             title: t(
                 `${t('page.fullscreenPlayer.config.lyricGap')} (${t('page.fullscreenPlayer.config.unsynchronized')})`,
-                { postProcess: 'sentenceCase' },
             ),
         },
         {
             control: (
                 <SegmentedControl
                     data={[
-                        { label: t('common.left', { postProcess: 'titleCase' }), value: 'left' },
+                        { label: t('common.left'), value: 'left' },
                         {
-                            label: t('common.center', { postProcess: 'titleCase' }),
+                            label: t('common.center'),
                             value: 'center',
                         },
-                        { label: t('common.right', { postProcess: 'titleCase' }), value: 'right' },
+                        { label: t('common.right'), value: 'right' },
                     ]}
                     onChange={(value) =>
                         updateLyricsSetting({ alignment: value as 'center' | 'left' | 'right' })
@@ -169,9 +165,7 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
                 />
             ),
             description: '',
-            title: t('page.fullscreenPlayer.config.lyricAlignment', {
-                postProcess: 'sentenceCase',
-            }),
+            title: t('page.fullscreenPlayer.config.lyricAlignment'),
         },
         {
             control: (
@@ -182,9 +176,7 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
                 />
             ),
             description: '',
-            title: t('page.fullscreenPlayer.config.followCurrentLyric', {
-                postProcess: 'sentenceCase',
-            }),
+            title: t('page.fullscreenPlayer.config.followCurrentLyric'),
         },
         {
             control: (
@@ -203,9 +195,7 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
                 />
             ),
             description: '',
-            title: t(`${t('page.fullscreenPlayer.config.lyricOpacityNonActive')}`, {
-                postProcess: 'sentenceCase',
-            }),
+            title: t(`${t('page.fullscreenPlayer.config.lyricOpacityNonActive')}`, {}),
         },
         {
             control: (
@@ -224,9 +214,7 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
                 />
             ),
             description: '',
-            title: t(`${t('page.fullscreenPlayer.config.lyricScaleNonActive')}`, {
-                postProcess: 'sentenceCase',
-            }),
+            title: t(`${t('page.fullscreenPlayer.config.lyricScaleNonActive')}`, {}),
         },
         {
             control: (
@@ -237,9 +225,7 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
                 />
             ),
             description: '',
-            title: t('page.fullscreenPlayer.config.showLyricMatch', {
-                postProcess: 'sentenceCase',
-            }),
+            title: t('page.fullscreenPlayer.config.showLyricMatch'),
         },
         {
             control: (
@@ -250,9 +236,7 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
                 />
             ),
             description: '',
-            title: t('page.fullscreenPlayer.config.showLyricProvider', {
-                postProcess: 'sentenceCase',
-            }),
+            title: t('page.fullscreenPlayer.config.showLyricProvider'),
         },
     ];
 
@@ -269,10 +253,9 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             ),
             description: t('setting.preferLocalLyrics', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.preferLocalLyrics', { postProcess: 'sentenceCase' }),
+            title: t('setting.preferLocalLyrics'),
         },
         {
             control: (
@@ -284,10 +267,9 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             ),
             description: t('setting.lyricFetch', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.lyricFetch', { postProcess: 'sentenceCase' }),
+            title: t('setting.lyricFetch'),
         },
         {
             control: (
@@ -305,10 +287,9 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             ),
             description: t('setting.lyricFetchProvider', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.lyricFetchProvider', { postProcess: 'sentenceCase' }),
+            title: t('setting.lyricFetchProvider'),
         },
         {
             control: (
@@ -324,10 +305,9 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             ),
             description: t('setting.neteaseTranslation', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.neteaseTranslation', { postProcess: 'sentenceCase' }),
+            title: t('setting.neteaseTranslation'),
         },
         {
             control: (
@@ -343,10 +323,9 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             ),
             description: t('setting.lyricOffset', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.lyricOffset', { postProcess: 'sentenceCase' }),
+            title: t('setting.lyricOffset'),
         },
         {
             control: (
@@ -360,10 +339,9 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             ),
             description: t('setting.translationTargetLanguage', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.translationTargetLanguage', { postProcess: 'sentenceCase' }),
+            title: t('setting.translationTargetLanguage'),
         },
         {
             control: (
@@ -378,10 +356,9 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             ),
             description: t('setting.translationApiProvider', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.translationApiProvider', { postProcess: 'sentenceCase' }),
+            title: t('setting.translationApiProvider'),
         },
         {
             control: (
@@ -394,10 +371,9 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             ),
             description: t('setting.translationApiKey', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.translationApiKey', { postProcess: 'sentenceCase' }),
+            title: t('setting.translationApiKey'),
         },
         {
             control: (
@@ -411,19 +387,18 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             ),
             description: t('setting.enableAutoTranslation', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.enableAutoTranslation', { postProcess: 'sentenceCase' }),
+            title: t('setting.enableAutoTranslation'),
         },
     ];
 
     return (
         <Stack gap="md" p="md">
-            <Fieldset legend={t('page.setting.lyricsDisplay', { postProcess: 'sentenceCase' })}>
+            <Fieldset legend={t('page.setting.lyricsDisplay')}>
                 <SettingsSection options={displayOptions} />
             </Fieldset>
-            <Fieldset legend={t('page.setting.lyrics', { postProcess: 'sentenceCase' })}>
+            <Fieldset legend={t('page.setting.lyrics')}>
                 <SettingsSection options={lyricOptions} />
             </Fieldset>
         </Stack>

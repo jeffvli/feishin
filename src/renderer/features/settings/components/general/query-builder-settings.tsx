@@ -82,9 +82,7 @@ export const QueryBuilderSettings = memo(() => {
                                         }
                                         placeholder={t(
                                             'setting.queryBuilderCustomFields_inputLabel',
-                                            {
-                                                postProcess: 'sentenceCase',
-                                            },
+                                            {},
                                         )}
                                         value={field.label}
                                         width="30%"
@@ -107,9 +105,7 @@ export const QueryBuilderSettings = memo(() => {
                                         }
                                         placeholder={t(
                                             'setting.queryBuilderCustomFields_inputTag',
-                                            {
-                                                postProcess: 'sentenceCase',
-                                            },
+                                            {},
                                         )}
                                         value={field.value}
                                         width="30%"
@@ -126,27 +122,17 @@ export const QueryBuilderSettings = memo(() => {
                     )}
                     <Group grow>
                         <Button onClick={handleAddCustomField} variant="filled">
-                            {t('common.add', { postProcess: 'titleCase' })}
+                            {t('common.add')}
                         </Button>
                     </Group>
                 </Stack>
             ),
             description: t('setting.queryBuilderCustomFields', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.queryBuilderCustomFields', {
-                postProcess: 'sentenceCase',
-            }),
+            title: t('setting.queryBuilderCustomFields'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={customFieldsOptions}
-            title={t('page.setting.queryBuilder', {
-                postProcess: 'sentenceCase',
-            })}
-        />
-    );
+    return <SettingsSection options={customFieldsOptions} title={t('page.setting.queryBuilder')} />;
 });

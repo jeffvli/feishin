@@ -1,8 +1,11 @@
 declare global {
     interface Window {
         ANALYTICS_DISABLED?: boolean | string;
+        FS_AUTO_DJ_ALBUM_STRATEGY?: string;
         FS_AUTO_DJ_ENABLED?: string;
         FS_AUTO_DJ_ITEM_COUNT?: string;
+        FS_AUTO_DJ_MODE?: string;
+        FS_AUTO_DJ_SONG_STRATEGY?: string;
         FS_AUTO_DJ_TIMING?: string;
         FS_CSS_CONTENT?: string;
         FS_CSS_ENABLED?: string;
@@ -46,7 +49,13 @@ declare global {
         FS_GENERAL_SIDE_QUEUE_TYPE?: string;
         FS_GENERAL_SIDEBAR_COLLAPSE_SHARED?: string;
         FS_GENERAL_SIDEBAR_COLLAPSED_NAVIGATION?: string;
+        FS_GENERAL_SIDEBAR_PLAYLIST_FOLDER_SEPARATOR?: string;
+        FS_GENERAL_SIDEBAR_PLAYLIST_FOLDER_TREE_INDENT?: string;
+        FS_GENERAL_SIDEBAR_PLAYLIST_FOLDER_TREE_LINE_COLOR?: string;
+        FS_GENERAL_SIDEBAR_PLAYLIST_FOLDER_VIEW?: string;
+        FS_GENERAL_SIDEBAR_PLAYLIST_FOLDERS?: string;
         FS_GENERAL_SIDEBAR_PLAYLIST_LIST?: string;
+        FS_GENERAL_SIDEBAR_PLAYLIST_MODE?: string;
         FS_GENERAL_SIDEBAR_PLAYLIST_SORTING?: string;
         FS_GENERAL_THEME?: string;
         FS_GENERAL_THEME_DARK?: string;
@@ -65,13 +74,16 @@ declare global {
         FS_LYRICS_TRANSLATION_API_KEY?: string;
         FS_LYRICS_TRANSLATION_TARGET_LANGUAGE?: string;
         FS_PLAYBACK_AUDIO_FADE_ON_STATUS_CHANGE?: string;
+        FS_PLAYBACK_FILTERS?: string;
         FS_PLAYBACK_MEDIA_SESSION?: string;
         FS_PLAYBACK_PRESERVE_PITCH?: string;
         FS_PLAYBACK_SCROBBLE_AT_DURATION?: string;
         FS_PLAYBACK_SCROBBLE_AT_PERCENTAGE?: string;
         FS_PLAYBACK_SCROBBLE_ENABLED?: string;
         FS_PLAYBACK_SCROBBLE_NOTIFY?: string;
+        FS_PLAYBACK_TRANSCODE_BITRATE?: string;
         FS_PLAYBACK_TRANSCODE_ENABLED?: string;
+        FS_PLAYBACK_TRANSCODE_FORMAT?: string;
         FS_PLAYBACK_WEB_AUDIO?: string;
         LEGACY_AUTHENTICATION?: boolean | string;
         REMOTE_URL?: string;

@@ -41,28 +41,24 @@ export const LoggerSettings = memo(() => {
                         {
                             label: t('setting.logLevel', {
                                 context: 'optionDebug',
-                                postProcess: 'titleCase',
                             }),
                             value: 'debug',
                         },
                         {
                             label: t('setting.logLevel', {
                                 context: 'optionInfo',
-                                postProcess: 'titleCase',
                             }),
                             value: 'info',
                         },
                         {
                             label: t('setting.logLevel', {
                                 context: 'optionWarn',
-                                postProcess: 'titleCase',
                             }),
                             value: 'warn',
                         },
                         {
                             label: t('setting.logLevel', {
                                 context: 'optionError',
-                                postProcess: 'titleCase',
                             }),
                             value: 'error',
                         },
@@ -73,16 +69,10 @@ export const LoggerSettings = memo(() => {
             ),
             description: t('setting.logLevel', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.logLevel', { postProcess: 'sentenceCase' }),
+            title: t('setting.logLevel'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={loggerOptions}
-            title={t('page.setting.logger', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={loggerOptions} title={t('page.setting.logger')} />;
 });

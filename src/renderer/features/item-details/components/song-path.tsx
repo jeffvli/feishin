@@ -27,9 +27,7 @@ export const SongPath = ({ path }: SongPathProps) => {
                     <Tooltip
                         label={t(
                             copied ? 'page.itemDetail.copiedPath' : 'page.itemDetail.copyPath',
-                            {
-                                postProcess: 'sentenceCase',
-                            },
+                            {},
                         )}
                         withinPortal
                     >
@@ -40,19 +38,14 @@ export const SongPath = ({ path }: SongPathProps) => {
                 )}
             </CopyButton>
             {util && (
-                <Tooltip
-                    label={t('page.itemDetail.openFile', { postProcess: 'sentenceCase' })}
-                    withinPortal
-                >
+                <Tooltip label={t('page.itemDetail.openFile')} withinPortal>
                     <ActionIcon
                         icon="externalLink"
                         onClick={() => {
                             util.openItem(path).catch((error) => {
                                 toast.error({
                                     message: (error as Error).message,
-                                    title: t('error.openError', {
-                                        postProcess: 'sentenceCase',
-                                    }),
+                                    title: t('error.openError'),
                                 });
                             });
                         }}
