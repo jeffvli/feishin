@@ -1,4 +1,3 @@
-import { Paper } from '@mantine/core';
 import { t } from 'i18next';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useMemo, useRef, useState, WheelEvent } from 'react';
@@ -446,7 +445,7 @@ const GroupMemberVolumeRow = ({
                             label: isSonos
                                 ? t('dlna.speakerProperties.longPressHint')
                                 : muted
-                                  ? t('player.muted', { postProcess: 'titleCase' })
+                                  ? t('player.muted')
                                   : member.volume,
                             openDelay: 0,
                         }}
@@ -794,7 +793,7 @@ const VolumeButton = () => {
                             label: coordinatorIsSonos
                                 ? t('dlna.speakerProperties.longPressHint')
                                 : muted
-                                  ? t('player.muted', { postProcess: 'titleCase' })
+                                  ? t('player.muted')
                                   : volume,
                             openDelay: 0,
                         }}
@@ -1180,106 +1179,6 @@ const RatingButton = () => {
                     value={currentSong?.userRating || 0}
                 />
             )}
-        </>
-    );
-};
-
-const VolumeButton = () => {
-    const { bindings } = useHotkeySettings();
-    const volume = usePlayerVolume();
-    const muted = usePlayerMuted();
-    const volumeWheelStep = useVolumeWheelStep();
-    const volumeWidth = useVolumeWidth();
-    const { decreaseVolume, increaseVolume, mediaToggleMute, setVolume } = usePlayer();
-    const isMinWidth = useMediaQuery('(max-width: 480px)');
-
-    const [sliderValue, setSliderValue] = useState(volume);
-
-    const throttledVolume = useThrottledValue(sliderValue, 100);
-
-    // Sync throttled value to actual volume
-    useEffect(() => {
-        setVolume(throttledVolume);
-    }, [throttledVolume, setVolume]);
-
-    // Sync external volume changes to local state
-    useEffect(() => {
-        setSliderValue(volume);
-    }, [volume]);
-
-    const handleVolumeDown = useCallback(() => {
-        decreaseVolume(volumeWheelStep);
-    }, [decreaseVolume, volumeWheelStep]);
-
-    const handleVolumeUp = useCallback(() => {
-        increaseVolume(volumeWheelStep);
-    }, [increaseVolume, volumeWheelStep]);
-
-    const handleVolumeSlider = useCallback((e: number) => {
-        setSliderValue(e);
-    }, []);
-
-    const handleMute = useCallback(() => {
-        mediaToggleMute();
-    }, [mediaToggleMute]);
-
-    const handleVolumeWheel = useCallback(
-        (e: WheelEvent<HTMLButtonElement | HTMLDivElement>) => {
-            let volumeToSet;
-            if (e.deltaY > 0 || e.deltaX > 0) {
-                volumeToSet = calculateVolumeDown(volume, volumeWheelStep);
-            } else {
-                volumeToSet = calculateVolumeUp(volume, volumeWheelStep);
-            }
-
-            setVolume(volumeToSet);
-        },
-        [setVolume, volume, volumeWheelStep],
-    );
-
-    const handleVolumeDownThrottled = useThrottledCallback(handleVolumeDown, 100);
-    const handleVolumeUpThrottled = useThrottledCallback(handleVolumeUp, 100);
-
-    useHotkeys([
-        [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDownThrottled],
-        [bindings.volumeUp.isGlobal ? '' : bindings.volumeUp.hotkey, handleVolumeUpThrottled],
-        [bindings.volumeMute.isGlobal ? '' : bindings.volumeMute.hotkey, handleMute],
-    ]);
-
-    return (
-        <>
-            <ActionIcon
-                icon={muted ? 'volumeMute' : volume > 50 ? 'volumeMax' : 'volumeNormal'}
-                iconProps={{
-                    color: muted ? 'muted' : undefined,
-                    size: 'xl',
-                }}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    handleMute();
-                }}
-                onWheel={handleVolumeWheel}
-                size="sm"
-                tooltip={{
-                    label: muted ? t('player.muted') : volume,
-                    openDelay: 0,
-                }}
-                variant="subtle"
-            />
-            {!isMinWidth ? (
-                <CustomPlayerbarSlider
-                    max={100}
-                    min={0}
-                    onChange={handleVolumeSlider}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                    }}
-                    onWheel={handleVolumeWheel}
-                    size={6}
-                    value={sliderValue}
-                    w={volumeWidth}
-                />
-            ) : null}
         </>
     );
 };

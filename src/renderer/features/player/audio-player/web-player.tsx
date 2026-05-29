@@ -728,9 +728,6 @@ function gaplessHandler(args: {
     if (!hasNextSong) {
         nextPlayer.ref?.getInternalPlayer()?.pause();
         if (isTransitioning) setIsTransitioning(false);
-    if (!hasNextSong) {
-        nextPlayer.ref?.getInternalPlayer()?.pause();
-        if (isTransitioning) setIsTransitioning(false);
         return null;
     }
 

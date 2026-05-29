@@ -256,6 +256,7 @@ export const AppIcon = {
     cast: LuCast,
     check: LuCheck,
     circle: LuCircle,
+    circleSlash: LuCircleSlash,
     clipboardCopy: LuClipboardCopy,
     collapseAll: LuChevronsDownUp,
     collection: LuPackage2,
