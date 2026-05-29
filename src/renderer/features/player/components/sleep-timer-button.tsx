@@ -193,8 +193,8 @@ export const SleepTimerButton = () => {
         useSleepTimerActions();
     const { mediaPause } = usePlayer();
     const shuffle = usePlayerShuffle();
-    // Track level shuffle scatters and ablum across a play queue makin 'end-of-album'
-    // meaningless. Ablum shuffle keeps each album intact, so keep 'end-of-'album
+    // Track level shuffle scatters and album across a play queue making 'end-of-album'
+    // meaningless. Album shuffle keeps each album intact, so keep 'end-of-'album
     // enabled there
     const isTrackShuffle = shuffle === PlayerShuffle.TRACK;
 
