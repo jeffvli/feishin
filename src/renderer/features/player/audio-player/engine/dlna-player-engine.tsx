@@ -10,12 +10,13 @@ import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/
 import { getSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { AudioPlayer } from '/@/renderer/features/player/audio-player/types';
 import {
+    TranscodingConfig,
     usePlaybackSettings,
     usePlayerActions,
     usePlayerStore,
     useSettingsStore,
 } from '/@/renderer/store';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
 export interface DlnaPlayerEngineHandle extends AudioPlayer {}
@@ -59,13 +60,34 @@ const FORMAT_MIME_MAP: Record<string, string> = {
     raw: '',
 };
 
+async function getDlnaUrl(
+    song: QueueSong,
+    transcode: TranscodingConfig,
+): Promise<string | undefined> {
+    const { contentType, suffix } = song as unknown as SongWithAudioMeta;
+    if (isOpusByMetadata({ contentType, suffix })) {
+        const mp3Url = await getSongUrl(song, { ...transcode, enabled: true, format: 'mp3' });
+        return mp3Url;
+    }
+    // Detection falls back to a probe of the actual stream if there isn't a positive from the initial metadata/suffix test
+    const probeUrl = await getSongUrl(song, { ...transcode, enabled: false }, true);
+    if (probeUrl) {
+        const isOpus = await probeIsOpusOgg(probeUrl);
+        if (isOpus) {
+            const mp3Url = await getSongUrl(song, { ...transcode, enabled: true, format: 'mp3' });
+            return mp3Url ?? probeUrl;
+        }
+    }
+    const playbackUrl = await getSongUrl(song, transcode);
+    return playbackUrl;
+}
+
 function getMimeType(url: string, contentType?: null | string, suffix?: null | string): string {
     const formatMatch = url.match(/[?&]format=([^&]+)/i);
     if (formatMatch) {
         const fmt = formatMatch[1].toLowerCase();
         const mime = FORMAT_MIME_MAP[fmt];
         if (mime) return mime;
-        if (mime === '') return 'audio/mpeg';
     }
     if (contentType?.startsWith('audio/')) return contentType;
     if (suffix) {
@@ -77,6 +99,60 @@ function getMimeType(url: string, contentType?: null | string, suffix?: null | s
         if (path.endsWith(`.${ext}`)) return mime;
     }
     return 'audio/mpeg';
+}
+
+function isOpusByMetadata(song: SongWithAudioMeta): boolean {
+    if (song.suffix?.toLowerCase() === 'opus') return true;
+    if (song.contentType?.toLowerCase().includes('opus')) return true;
+    return false;
+}
+
+// Identification here is by looking at the first 36 bytes in the OGG stream for the OPUS magic header in bytes 28-35
+// Obviously, doing this client-side isn't ideal, but this was the only thing that worked with my files.
+// I think that all of the providers detect OPUS on their side anyway, so at some point, I'll modify the APIs instead.
+async function probeIsOpusOgg(url: string): Promise<boolean> {
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 2000);
+    try {
+        const res = await fetch(url, {
+            headers: { Range: 'bytes=0-35' },
+            signal: controller.signal,
+        });
+        if (!res.ok && res.status !== 206) {
+            return false;
+        }
+        if (!res.body) {
+            return false;
+        }
+        const reader = res.body.getReader();
+        const bytes = new Uint8Array(36);
+        let offset = 0;
+        while (offset < 36) {
+            const { done, value } = await reader.read();
+            if (done || !value) break;
+            const copy = Math.min(value.length, 36 - offset);
+            bytes.set(value.subarray(0, copy), offset);
+            offset += copy;
+        }
+        reader.cancel();
+        if (offset < 36) {
+            return false;
+        }
+        const result =
+            bytes[28] === 0x4f &&
+            bytes[29] === 0x70 && // 'O' 'p'
+            bytes[30] === 0x75 &&
+            bytes[31] === 0x73 && // 'u' 's'
+            bytes[32] === 0x48 &&
+            bytes[33] === 0x65 && // 'H' 'e'
+            bytes[34] === 0x61 &&
+            bytes[35] === 0x64; // 'a' 'd'
+        return result;
+    } catch {
+        return false;
+    } finally {
+        clearTimeout(tid);
+    }
 }
 
 async function resolveMimeType(
@@ -136,7 +212,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         const song = playerData.currentSong;
         if (!song) return;
         const currentSpeed = usePlayerStore.getState().player.speed || 1;
-        const rawUrl = await getSongUrl(song, transcode);
+        const rawUrl = await getDlnaUrl(song, transcode);
         if (!rawUrl) return;
         let urlToPlay = rawUrl;
         let isProxy = false;
@@ -226,7 +302,9 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             // Pre-load the next track for gapless playback
             const nextSong = freshState.nextSong;
             if (nextSong && currentSpeed === 1) {
-                const nextUrl = await getSongUrl(nextSong, transcode);
+                const { contentType: nextContentType, suffix: nextSuffix } =
+                    nextSong as unknown as SongWithAudioMeta;
+                const nextUrl = await getDlnaUrl(nextSong, transcode);
                 if (nextUrl) {
                     sameUriLoopQueuedRef.current = nextUrl === rawUrl;
                     let nextArtUrl: string | undefined;
@@ -243,8 +321,6 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                     } catch {
                         // Ignore image URL errors
                     }
-                    const { contentType: nextContentType, suffix: nextSuffix } =
-                        nextSong as unknown as SongWithAudioMeta;
                     const nextMimeType = await resolveMimeType(
                         nextUrl,
                         nextContentType,
@@ -286,7 +362,9 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         const playerData = usePlayerStore.getState().getPlayerData();
         const nextSong = playerData.nextSong;
         if (!nextSong) return;
-        const nextUrl = await getSongUrl(nextSong, transcode);
+        const { contentType: nextContentType, suffix: nextSuffix } =
+            nextSong as unknown as SongWithAudioMeta;
+        const nextUrl = await getDlnaUrl(nextSong, transcode);
         if (!nextUrl) return;
         sameUriLoopQueuedRef.current = nextUrl === lastSentUrlRef.current;
         let nextArtUrl: string | undefined;
@@ -303,8 +381,6 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         } catch {
             // Ignore image URL errors
         }
-        const { contentType: nextContentType, suffix: nextSuffix } =
-            nextSong as unknown as SongWithAudioMeta;
         const mimeType = await resolveMimeType(nextUrl, nextContentType, nextSuffix);
         dlnaPlayer.setNextUrl(nextUrl, {
             albumArtUrl: nextArtUrl,
@@ -373,7 +449,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             for (const song of candidates) {
                 if (!song) continue;
                 try {
-                    const url = await getSongUrl(song, transcode);
+                    const url = await getDlnaUrl(song, transcode);
                     if (!url) continue;
                     const feishinId = extractId(url);
                     const matches = feishinId
@@ -502,8 +578,9 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             if (hasPlayedRef.current) {
                 const check = async () => {
                     const playerData = usePlayerStore.getState().getPlayerData();
-                    const currentUrl = playerData.currentSong
-                        ? await getSongUrl(playerData.currentSong, transcode)
+                    const currentSong = playerData.currentSong;
+                    const currentUrl = currentSong
+                        ? await getDlnaUrl(currentSong, transcode)
                         : undefined;
                     if (currentUrl && currentUrl !== lastSentRawUrlRef.current) {
                         skipNextSendRef.current = false;
