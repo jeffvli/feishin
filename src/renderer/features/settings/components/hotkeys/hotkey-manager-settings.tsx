@@ -18,6 +18,10 @@ import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Table } from '/@/shared/components/table/table';
 import { TextInput } from '/@/shared/components/text-input/text-input';
+import {
+    keyboardCodeToHotkeyKey,
+    MODIFIER_KEY_CODES,
+} from '/@/shared/utils/keyboard-code-to-hotkey';
 
 const ipc = isElectron() ? window.api.ipc : null;
 
@@ -112,25 +116,16 @@ export const HotkeyManagerSettings = memo(() => {
     const debouncedSetHotkey = debounce(
         (binding: BindingActions, e: KeyboardEvent<HTMLInputElement>) => {
             e.preventDefault();
-            const IGNORED_KEYS = ['Control', 'Alt', 'Shift', 'Meta', ' ', 'Escape'];
             const keys: string[] = [];
             if (e.ctrlKey) keys.push('mod');
             if (e.altKey) keys.push('alt');
             if (e.shiftKey) keys.push('shift');
             if (e.metaKey) keys.push('meta');
-            if (e.key === ' ') keys.push('space');
-            if (!IGNORED_KEYS.includes(e.key)) {
-                if (e.code.includes('Numpad')) {
-                    if (e.key === '+') keys.push('numpadadd');
-                    else if (e.key === '-') keys.push('numpadsubtract');
-                    else if (e.key === '*') keys.push('numpadmultiply');
-                    else if (e.key === '/') keys.push('numpaddivide');
-                    else if (e.key === '.') keys.push('numpaddecimal');
-                    else keys.push(`numpad${e.key}`.toLowerCase());
-                } else if (e.key === '+') {
-                    keys.push('equal');
-                } else {
-                    keys.push(e.key?.toLowerCase());
+
+            if (!MODIFIER_KEY_CODES.has(e.code) && e.code !== 'Escape') {
+                const hotkeyKey = keyboardCodeToHotkeyKey(e.code);
+                if (hotkeyKey) {
+                    keys.push(hotkeyKey);
                 }
             }
 

@@ -10,6 +10,7 @@ import { createWithEqualityFn } from 'zustand/traditional';
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { useGenreList } from '/@/renderer/features/genres/api/genres-api';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { PlayButtonGroup } from '/@/renderer/features/shared/components/play-button-group';
@@ -18,9 +19,18 @@ import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Select } from '/@/shared/components/select/select';
 import { Stack } from '/@/shared/components/stack/stack';
-import { Played, RandomSongListQuery, ServerType } from '/@/shared/types/domain-types';
+import {
+    AlbumListQuery,
+    AlbumListSort,
+    LibraryItem,
+    Played,
+    RandomSongListQuery,
+    ServerType,
+    SortOrder,
+} from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface ShuffleAllSlice extends RandomSongListQuery {
@@ -29,6 +39,7 @@ interface ShuffleAllSlice extends RandomSongListQuery {
     };
     enableMaxYear: boolean;
     enableMinYear: boolean;
+    playbackKind: 'albums' | 'songs';
 }
 
 const useShuffleAllStore = createWithEqualityFn<ShuffleAllSlice>()(
@@ -42,16 +53,28 @@ const useShuffleAllStore = createWithEqualityFn<ShuffleAllSlice>()(
             enableMaxYear: false,
             enableMinYear: false,
             genre: '',
+            limit: 100,
             maxYear: 2020,
             minYear: 2000,
             musicFolder: '',
+            playbackKind: 'songs',
             played: Played.All,
-            songCount: 100,
         })),
         {
             merge: (persistedState, currentState) => merge(currentState, persistedState),
+            migrate: (persisted, version: number) => {
+                if (!persisted) {
+                    return persisted;
+                }
+
+                if (version >= 2) {
+                    return persisted;
+                }
+
+                return persisted;
+            },
             name: 'store_shuffle_all',
-            version: 1,
+            version: 2,
         },
     ),
 );
@@ -66,13 +89,24 @@ export const useShuffleAllStoreActions = () => useShuffleAllStore((state) => sta
 
 export const ShuffleAllContextModal = () => {
     const server = useCurrentServer();
-    const { addToQueueByData } = usePlayer();
+    const { addToQueueByData, addToQueueByFetch } = usePlayer();
     const { t } = useTranslation();
-    const { enableMaxYear, enableMinYear, genre, limit, maxYear, minYear, musicFolderId, played } =
-        useShuffleAllStore();
+    const {
+        enableMaxYear,
+        enableMinYear,
+        genre,
+        limit,
+        maxYear,
+        minYear,
+        musicFolderId,
+        playbackKind,
+        played,
+    } = useShuffleAllStore();
     const { setStore } = useShuffleAllStoreActions();
 
-    const { isFetching, refetch } = useQuery({
+    const clampedLimit = Math.min(500, Math.max(1, limit || 100));
+
+    const { isFetching: isFetchingSongs, refetch: refetchSongs } = useQuery({
         ...randomFetchQuery({
             query: {
                 genre: genre || undefined,
@@ -89,22 +123,75 @@ export const ShuffleAllContextModal = () => {
         staleTime: 0,
     });
 
+    const { isFetching: isFetchingAlbums, refetch: refetchAlbums } = useQuery({
+        ...shuffleAlbumListQuery({
+            query: {
+                genreIds: genre ? [genre] : undefined,
+                limit: clampedLimit,
+                minYear: enableMinYear ? minYear || undefined : undefined,
+                musicFolderId: musicFolderId || undefined,
+                sortBy: AlbumListSort.RANDOM,
+                sortOrder: SortOrder.ASC,
+                startIndex: 0,
+            },
+            serverId: server.id,
+        }),
+        enabled: false,
+        gcTime: 0,
+        staleTime: 0,
+    });
+
     const fetchTypeRef = useRef<Play>(null);
 
     const handlePlay = async (playType: Play) => {
         fetchTypeRef.current = playType;
 
-        const { data } = await refetch();
+        if (playbackKind === 'albums') {
+            const { data } = await refetchAlbums();
 
-        addToQueueByData(data?.items || [], playType);
+            addToQueueByFetch(
+                server.id,
+                data?.items.map((a) => a.id) ?? [],
+                LibraryItem.ALBUM,
+                playType,
+            );
+        } else {
+            const { data } = await refetchSongs();
+
+            addToQueueByData(data?.items || [], playType);
+        }
 
         closeAllModals();
     };
 
     return (
         <Stack gap="md">
+            <SegmentedControl
+                data={[
+                    {
+                        label: t('form.shuffleAll.input_kind_songs'),
+                        value: 'songs',
+                    },
+                    {
+                        label: t('form.shuffleAll.input_kind_albums'),
+                        value: 'albums',
+                    },
+                ]}
+                onChange={(value) =>
+                    setStore({
+                        playbackKind: value as 'albums' | 'songs',
+                    })
+                }
+                size="sm"
+                value={playbackKind}
+                w="100%"
+            />
             <NumberInput
-                label={t('form.shuffleAll.input_limit')}
+                label={
+                    playbackKind === 'albums'
+                        ? t('form.shuffleAll.input_limit_albums')
+                        : t('form.shuffleAll.input_limit_songs')
+                }
                 max={500}
                 min={1}
                 onChange={(e) => setStore({ limit: e ? Number(e) : 500 })}
@@ -127,6 +214,7 @@ export const ShuffleAllContextModal = () => {
                     value={minYear}
                 />
                 <NumberInput
+                    disabled={playbackKind === 'albums'}
                     label={t('form.shuffleAll.input_maxYear')}
                     max={2050}
                     min={1850}
@@ -134,6 +222,7 @@ export const ShuffleAllContextModal = () => {
                     rightSection={
                         <Checkbox
                             checked={enableMaxYear}
+                            disabled={playbackKind === 'albums'}
                             onChange={(e) => setStore({ enableMaxYear: e.currentTarget.checked })}
                             style={{ marginRight: '0.5rem' }}
                         />
@@ -144,7 +233,7 @@ export const ShuffleAllContextModal = () => {
             <Suspense fallback={<Select data={[]} />}>
                 <GenreSelect />
             </Suspense>
-            {server?.type === ServerType.JELLYFIN && (
+            {server?.type === ServerType.JELLYFIN && playbackKind === 'songs' && (
                 <Select
                     clearable
                     data={PLAYED_DATA}
@@ -156,10 +245,7 @@ export const ShuffleAllContextModal = () => {
                 />
             )}
             <Divider />
-            <PlayButtonGroup
-                loading={(isFetching && fetchTypeRef.current) || false}
-                onPlay={handlePlay}
-            />
+            <PlayButtonGroup loading={isFetchingSongs || isFetchingAlbums} onPlay={handlePlay} />
         </Stack>
     );
 };
@@ -183,6 +269,13 @@ const randomFetchQuery = (args: {
             });
         },
         queryKey: queryKeys.player.fetch(),
+    });
+};
+
+const shuffleAlbumListQuery = (args: { query: AlbumListQuery; serverId: string }) => {
+    return albumQueries.list({
+        query: args.query,
+        serverId: args.serverId,
     });
 };
 

@@ -173,7 +173,8 @@
         "newVersionAvailable": "Nowa wersja jest dostępna",
         "numberOfResults": "{{numberOfResults}} wyników",
         "grouping": "Grupowanie",
-        "back": "Wstecz"
+        "back": "Wstecz",
+        "openFolder": "Otwórz folder"
     },
     "entity": {
         "genre_one": "Gatunek",
@@ -409,7 +410,12 @@
             "input_played": "Filtr odtwarzania",
             "input_played_optionAll": "Wszystkie utwory",
             "input_played_optionUnplayed": "Tylko nieodtworzone utwory",
-            "input_played_optionPlayed": "Tylko odtworzone utwory"
+            "input_played_optionPlayed": "Tylko odtworzone utwory",
+            "input_kind_albums": "Albumy",
+            "input_kind_songs": "Piosenki",
+            "input_kind": "Losowy wybór",
+            "input_limit_albums": "Ile albumów?",
+            "input_limit_songs": "Ile piosenek?"
         },
         "saveQueue": {
             "success": "Zapisano kolejkę odtwarzania na serwerze"
@@ -883,7 +889,7 @@
         "customCssEnable": "Włącz niestandardowy CSS",
         "customCssEnable_description": "Pozwalaj na pisanie niestandardowego CSS",
         "customCssNotice": "Ostrzeżenie: chociaż istnieje pewne filtrowanie (uniemożliwia używanie URL() i content:), używanie niestandardowego CSS-a może stwarzać ryzyko przez zmiany w interfejsie",
-        "customCss_description": "Zawartość niestandardowego CSS. Uwaga: content i zdalne URL są niedozwolonymi właściwościami. Podgląd twojej zawartości jest pokazana poniżej. Dodatkowe pola których nie ustawiłeś, są obecne z powodu sanityzacji",
+        "customCss_description": "Zawartość niestandardowego CSS. Uwaga: content i zdalne URL są niedozwolonymi właściwościami. Podgląd twojej zawartości jest pokazany poniżej. Dodatkowe pola których nie ustawiłeś są obecne z powodu sanityzacji. Aplikacja komputerowa: feishin odczytuje i zapisuje custom.css w katalogu ustawień aplikacji i przeładowuje go gdy plik się zmieni",
         "customCss": "Niestandardowy css",
         "trayEnabled_description": "Pokaż/ukryj ikonę/menu w zasobniku. jeżeli wyłączone, wyłącza też minimalizowanie.wyjście do zasobnika",
         "webAudio_description": "Używaj web audio. Włącza to zaawansowane funkcje takie jak ReplayGain. Wyłącz jeżeli nie działa poprawnie",
@@ -973,7 +979,7 @@
         "preservePitch": "Utrzymuj ton",
         "preventSleepOnPlayback_description": "Powstrzymuje ekran przed uśpieniem, gdy muzyka jest odtwarzana",
         "preventSleepOnPlayback": "Powstrzymuj uśpienie podczas odtwarzania",
-        "mediaSession_description": "Włącza integrację z Media Session, wyświetlając sterowanie mediami i metadane w systemowym oknie zmiany głośności i na ekranie blokady",
+        "mediaSession_description": "Włącza integrację z Media Session, wyświetlając sterowanie mediami i metadane w systemowym oknie zmiany głośności i na ekranie blokad. Wymaga odtwarzacza web audio.",
         "mediaSession": "Włącz media session",
         "transcode": "Włącz transkodowanie",
         "queryBuilder": "Kreator zaptań",
@@ -989,9 +995,8 @@
         "audioFadeOnStatusChange": "Przenikanie dźwięku przy zmianie statusu",
         "audioFadeOnStatusChange_description": "Umożliwia zanikanie lub pojawianie się dźwięku gdy zmieni się status play/pauza",
         "autoDJ": "Automatyczny DJ",
-        "autoDJ_description": "Automatycznie dodawaj podobne piosenki do kolejki",
         "autoDJ_itemCount": "Liczba elementów",
-        "autoDJ_itemCount_description": "Liczba elementów, które będzie próbować dodać do kolejki kiedy automatyczny DJ jest włączony",
+        "autoDJ_itemCount_description": "Liczba elementów, które będzie próbować dodać do kolejki",
         "autoDJ_timing": "Czas dodawania",
         "autoDJ_timing_description": "Ilość piosenek pozostałych w kolejce przed tym gdy zostanie włączony automatyczny DJ",
         "logLevel": "Poziom logów",
@@ -1093,7 +1098,16 @@
         "sidebarPlaylistMode_description": "Jak każda z playlist jest wyświetlana w liście w pasku bocznym",
         "sidebarPlaylistMode": "Tryb playlist bocznego paska",
         "sidebarPlaylistMode_optionCompact": "Kompaktowy",
-        "sidebarPlaylistMode_optionExpanded": "Rozszerzony"
+        "sidebarPlaylistMode_optionExpanded": "Rozszerzony",
+        "autoDJ_mode": "Tryb",
+        "autoDJ_mode_albums": "Albumy",
+        "autoDJ_mode_description": "Wybierz dodawanie piosenek lub całych albumów do kolejki",
+        "autoDJ_mode_songs": "Piosenki",
+        "autoDJ_enabled": "Włącz Auto DJ",
+        "autoDJ_albumStrategy": "Tryb wyboru albumów",
+        "autoDJ_songStrategy": "Tryb wyboru piosenek",
+        "autoDJ_strategy_option_library_random": "Losowo",
+        "autoDJ_strategy_option_similar": "Podobne"
     },
     "table": {
         "config": {

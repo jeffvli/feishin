@@ -44,6 +44,7 @@ import { FavoriteColumn } from '/@/renderer/components/item-list/item-table-list
 import { GenreBadgeColumn } from '/@/renderer/components/item-list/item-table-list/columns/genre-badge-column';
 import { GenreColumn } from '/@/renderer/components/item-list/item-table-list/columns/genre-column';
 import { ImageColumn } from '/@/renderer/components/item-list/item-table-list/columns/image-column';
+import { NumericColumn } from '/@/renderer/components/item-list/item-table-list/columns/numeric-column';
 import { PathColumn } from '/@/renderer/components/item-list/item-table-list/columns/path-column';
 import { PlaylistReorderColumn } from '/@/renderer/components/item-list/item-table-list/columns/playlist-reorder-column';
 import { RatingColumn } from '/@/renderer/components/item-list/item-table-list/columns/rating-column';
@@ -239,10 +240,7 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
             case TableColumn.CHANNELS:
             case TableColumn.DISC_NUMBER:
             case TableColumn.SAMPLE_RATE:
-            case TableColumn.TRACK_NUMBER:
-                return (
-                    <TrackNumberColumn {...props} {...dragProps} controls={controls} type={type} />
-                );
+                return <NumericColumn {...props} {...dragProps} controls={controls} type={type} />;
 
             case TableColumn.COMPOSER:
                 return <ComposerColumn {...props} {...dragProps} controls={controls} type={type} />;
@@ -302,6 +300,11 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
                         controls={controls}
                         type={type}
                     />
+                );
+
+            case TableColumn.TRACK_NUMBER:
+                return (
+                    <TrackNumberColumn {...props} {...dragProps} controls={controls} type={type} />
                 );
 
             case TableColumn.USER_FAVORITE:

@@ -862,7 +862,6 @@
         "sampleRate": "Rasio sampel",
         "savePlayQueue": "Simpan antrean pemutaran",
         "autoDJ": "DJ Otomatis",
-        "autoDJ_description": "Tambahkan lagu serupa secara otomatis ke antrean",
         "autoDJ_itemCount": "Jumlah item",
         "autoDJ_itemCount_description": "Jumlah item yang dicoba ditambahkan ke antrean saat DJ otomatis diaktifkan",
         "autoDJ_timing": "Waktu",

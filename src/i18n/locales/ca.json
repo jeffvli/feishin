@@ -827,7 +827,6 @@
         "notify_description": "Mostra notificacions quan la cançó actual canviï",
         "transcode": "Activa la transcodificació",
         "autoDJ": "DJ automàtic",
-        "autoDJ_description": "Afegeix cançons similars a la cua automàticament",
         "autoDJ_itemCount": "Número d'elements",
         "autoDJ_itemCount_description": "El nombre d'elements que s'intenten afegir a la cua quan el DJ automàtic està activat",
         "autoDJ_timing": "Temps",

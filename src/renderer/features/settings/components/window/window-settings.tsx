@@ -36,13 +36,12 @@ export const WindowSettings = memo(() => {
                         if (!e) return;
 
                         // Platform.LINUX is used as the native frame option regardless of the actual platform
-                        const hasFrame = localSettings?.get('window_has_frame') as
-                            | boolean
-                            | undefined;
-                        const isSwitchingToFrame = !hasFrame && e === Platform.LINUX;
-                        const isSwitchingToNoFrame = hasFrame && e !== Platform.LINUX;
-
-                        const requireRestart = isSwitchingToFrame || isSwitchingToNoFrame;
+                        const previousWindowBarStyle = settings.windowBarStyle;
+                        const isSwitchingToNative =
+                            previousWindowBarStyle !== Platform.LINUX && e === Platform.LINUX;
+                        const isSwitchingFromNative =
+                            previousWindowBarStyle === Platform.LINUX && e !== Platform.LINUX;
+                        const requireRestart = isSwitchingToNative || isSwitchingFromNative;
 
                         if (requireRestart) {
                             openRestartRequiredToast();

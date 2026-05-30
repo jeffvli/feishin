@@ -214,7 +214,14 @@ export const SidebarPlayQueue = () => {
                     ))}
                 </SplitPane>
             ) : (
-                <Stack gap={0} h="100%" w="100%">
+                <Stack
+                    gap={0}
+                    style={{
+                        flex: 1,
+                        minHeight: 0,
+                    }}
+                    w="100%"
+                >
                     <PlayQueueListControls
                         handleSearch={setSearch}
                         searchTerm={search}

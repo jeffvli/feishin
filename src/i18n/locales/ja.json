@@ -315,7 +315,6 @@
         "exportImportSettings_importSuccess": "設定が正常にインポートされました!",
         "exportImportSettings_importModalTitle": "Feishin 設定をインポート",
         "exportImportSettings_importBtn": "設定をインポート",
-        "autoDJ_description": "類似の曲を自動でキューに追加します",
         "autoDJ": "自動 DJ",
         "autoDJ_itemCount_description": "自動 DJ が有効なときにキューに追加しようとした曲数",
         "autoDJ_itemCount": "曲数",

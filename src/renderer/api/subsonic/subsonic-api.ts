@@ -289,6 +289,14 @@ export const contract = c.router({
             200: ssType._response.removeFavorite,
         },
     },
+    reportPlayback: {
+        method: 'GET',
+        path: 'reportPlayback.view',
+        query: ssType._parameters.reportPlayback,
+        responses: {
+            200: ssType._response.reportPlayback,
+        },
+    },
     savePlayQueue: {
         method: 'GET',
         path: 'savePlayQueue.view',

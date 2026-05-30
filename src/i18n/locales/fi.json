@@ -630,7 +630,6 @@
         "releaseChannel_description": "Valitse vakaiden ja beetaversioiden välillä automaattisille päivityksille",
         "discordDisplayType_artistname": "Artistin nimi / artistien nimet",
         "autoDJ": "Auto DJ",
-        "autoDJ_description": "Lisää automaattisesti samanlaisia kappaleita jonoon",
         "autoDJ_itemCount": "Kohteiden määrä",
         "autoDJ_itemCount_description": "Jonoon lisättäväksi yritettyjen kohteiden määrä, kun auto DJ on käytössä",
         "autoDJ_timing": "Ajastus"

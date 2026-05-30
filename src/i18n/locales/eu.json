@@ -658,7 +658,6 @@
         "transcodeFormat": "Transkodetzeko formatua",
         "queryBuilderCustomFields_inputLabel": "Etiketa",
         "autoDJ": "DJ automatikoa",
-        "autoDJ_description": "Automatikoki gehitu antzeko abestiak ilaran",
         "autoDJ_itemCount_description": "DJ automatikoa gaituta dagoenean ilaran gehitzen saiatu diren elementuen kopurua",
         "autoDJ_timing_description": "DJ automatikoa aktibatu aurretik ilaran geratzen diren abestien kopurua",
         "analyticsDisable": "Erabileran oinarritutako analisiei uko egin",

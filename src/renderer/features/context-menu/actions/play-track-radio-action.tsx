@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
-import { useCurrentServerId, usePlayButtonBehavior } from '/@/renderer/store';
+import { useArtistRadioCount, useCurrentServerId, usePlayButtonBehavior } from '/@/renderer/store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
@@ -27,6 +27,8 @@ export const PlayTrackRadioAction = ({
     const queryClient = useQueryClient();
     const playButtonBehavior = usePlayButtonBehavior();
 
+    const radioCount = useArtistRadioCount();
+
     const handlePlayTrackRadio = useCallback(
         async (playType: Play) => {
             if (!serverId || !song) return;
@@ -35,6 +37,7 @@ export const PlayTrackRadioAction = ({
                 const similarSongs = await queryClient.fetchQuery({
                     ...songsQueries.similar({
                         query: {
+                            count: radioCount,
                             songId: song.id,
                         },
                         serverId,
@@ -53,7 +56,7 @@ export const PlayTrackRadioAction = ({
                 console.error('Failed to load track radio:', error);
             }
         },
-        [player, queryClient, serverId, skipFirstSong, song],
+        [player, queryClient, radioCount, serverId, skipFirstSong, song],
     );
 
     const handlePlayTrackRadioNow = useCallback(() => {

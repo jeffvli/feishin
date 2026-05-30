@@ -695,7 +695,6 @@
     },
     "setting": {
         "autoDJ": "Auto-DJ",
-        "autoDJ_description": "Tilføj automatisk lignende sange til køen",
         "autoDJ_itemCount": "Antal elementer",
         "autoDJ_itemCount_description": "Antallet af elementer der forsøges tilføjet til køen, når auto-DJ er aktiveret",
         "autoDJ_timing": "Tidspunkt",

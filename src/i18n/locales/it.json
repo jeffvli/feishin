@@ -438,7 +438,6 @@
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} con {{lastfm}} fallback",
         "autoDJ": "Auto DJ",
-        "autoDJ_description": "Aggiungi automaticamente canzoni simili alla coda",
         "autoDJ_itemCount": "Conteggio elementi",
         "analyticsDisable_description": "Alcuni dati anonimi sull'utilizzo vengono inviati allo sviluppatore per migliorare l'applicazione",
         "artistBackground": "Immagine dello sfondo dell'artista",

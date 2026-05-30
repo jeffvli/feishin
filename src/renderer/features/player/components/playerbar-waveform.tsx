@@ -9,7 +9,13 @@ import styles from './playerbar-waveform.module.css';
 import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { PlayerbarSeekSlider } from '/@/renderer/features/player/components/playerbar-seek-slider';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { BarAlign, usePlayerbarSlider, usePlayerSong, usePlayerTimestamp } from '/@/renderer/store';
+import {
+    BarAlign,
+    usePlaybackSettings,
+    usePlayerbarSlider,
+    usePlayerSong,
+    usePlayerTimestamp,
+} from '/@/renderer/store';
 import { useAppThemeColors, useColorScheme } from '/@/renderer/themes/use-app-theme';
 import { Text } from '/@/shared/components/text/text';
 
@@ -30,7 +36,12 @@ export const PlayerbarWaveform = () => {
 
     const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
 
-    const streamUrl = useSongUrl(currentSong, true, { bitrate: 64, enabled: false, format: 'mp3' });
+    const { transcode } = usePlaybackSettings();
+    const streamUrl = useSongUrl(currentSong, true, {
+        bitrate: 64,
+        enabled: transcode.enabled,
+        format: 'mp3',
+    });
 
     const { color } = useAppThemeColors();
     const primaryColor = (color['--theme-colors-primary'] as string) || 'rgb(53, 116, 252)';

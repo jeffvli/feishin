@@ -812,7 +812,6 @@
         "queryBuilderCustomFields": "Champs personnalisé",
         "queryBuilderCustomFields_description": "Ajouter des champs personnalisés à utiliser dans les constructeurs de requêtes",
         "autoDJ": "DJ auto",
-        "autoDJ_description": "Ajouter automatiquement des titres similaire à la file d'attente",
         "autoDJ_itemCount": "Nombre d'entrée",
         "autoDJ_itemCount_description": "Le nombre d'entrées tentées d'être ajoutées à la file d'attente lorsque le DJ auto est activé",
         "autoDJ_timing": "Timing",

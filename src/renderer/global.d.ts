@@ -1,8 +1,11 @@
 declare global {
     interface Window {
         ANALYTICS_DISABLED?: boolean | string;
+        FS_AUTO_DJ_ALBUM_STRATEGY?: string;
         FS_AUTO_DJ_ENABLED?: string;
         FS_AUTO_DJ_ITEM_COUNT?: string;
+        FS_AUTO_DJ_MODE?: string;
+        FS_AUTO_DJ_SONG_STRATEGY?: string;
         FS_AUTO_DJ_TIMING?: string;
         FS_CSS_CONTENT?: string;
         FS_CSS_ENABLED?: string;
