@@ -13,19 +13,11 @@ export const usePlaybackHotkeys = () => {
         const bindingHandlers: Array<{
             binding: (typeof bindings)[keyof typeof bindings];
             handler: () => void;
-            options?: {
-                preventDefault?: boolean;
-                usePhysicalKeys?: boolean;
-            };
         }> = [
             { binding: bindings.next, handler: () => player.mediaNext() },
             { binding: bindings.pause, handler: () => player.mediaPause() },
             { binding: bindings.play, handler: () => player.mediaPlay() },
-            {
-                binding: bindings.playPause,
-                handler: () => player.mediaTogglePlayPause(),
-                options: { preventDefault: true },
-            },
+            { binding: bindings.playPause, handler: () => player.mediaTogglePlayPause() },
             { binding: bindings.previous, handler: () => player.mediaPrevious() },
             { binding: bindings.skipBackward, handler: () => player.mediaSkipBackward() },
             { binding: bindings.skipForward, handler: () => player.mediaSkipForward() },
@@ -35,9 +27,9 @@ export const usePlaybackHotkeys = () => {
         ];
 
         // Filter and map to hotkey items
-        bindingHandlers.forEach(({ binding, handler, options }) => {
+        bindingHandlers.forEach(({ binding, handler }) => {
             if (!binding.isGlobal && binding.hotkey && binding.hotkey !== '') {
-                hotkeyItems.push([binding.hotkey, handler, options]);
+                hotkeyItems.push([binding.hotkey, handler, { preventDefault: true }]); // Prevent default to avoid conflicts with shortcuts
             }
         });
 
