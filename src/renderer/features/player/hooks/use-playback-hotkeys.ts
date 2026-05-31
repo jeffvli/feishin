@@ -29,7 +29,7 @@ export const usePlaybackHotkeys = () => {
         // Filter and map to hotkey items
         bindingHandlers.forEach(({ binding, handler }) => {
             if (!binding.isGlobal && binding.hotkey && binding.hotkey !== '') {
-                hotkeyItems.push([binding.hotkey, handler, { preventDefault: true }]); // Prevent default to avoid conflicts with shortcuts
+                hotkeyItems.push([binding.hotkey, handler]);
             }
         });
 

@@ -33,5 +33,5 @@ export const withPhysicalKeys = (hotkeys: HotkeyItem[]): HotkeyItem[] =>
     hotkeys.map(([hotkey, handler, options]) => [
         toPhysicalHotkey(hotkey),
         handler,
-        { ...options, usePhysicalKeys: true },
+        { ...options, preventDefault: true, usePhysicalKeys: true },
     ]);
