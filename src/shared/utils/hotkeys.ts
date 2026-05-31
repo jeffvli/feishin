@@ -2,6 +2,20 @@ import type { HotkeyItem } from '@mantine/hooks';
 
 const RESERVED_KEYS = new Set(['alt', 'ctrl', 'meta', 'mod', 'shift']);
 
+const PUNCTUATION_KEY_TO_PHYSICAL: Record<string, string> = {
+    "'": 'Quote',
+    ',': 'Comma',
+    '-': 'Minus',
+    '.': 'Period',
+    '/': 'Slash',
+    ';': 'Semicolon',
+    '=': 'Equal',
+    '[': 'BracketLeft',
+    '\\': 'Backslash',
+    ']': 'BracketRight',
+    '`': 'Backquote',
+};
+
 /**
  * Converts stored hotkey strings to Mantine's physical-key format.
  * Mantine matches KeyboardEvent.code via normalizeKey, which turns Digit1 into
@@ -23,6 +37,11 @@ export const toPhysicalHotkey = (hotkey: string): string =>
 
             if (/^\d$/.test(part)) {
                 return `Digit${part}`;
+            }
+
+            const punctuationPhysical = PUNCTUATION_KEY_TO_PHYSICAL[part];
+            if (punctuationPhysical) {
+                return punctuationPhysical;
             }
 
             return part;
