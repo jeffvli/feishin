@@ -1185,8 +1185,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     });
                 },
                 mediaSeekToTimestamp: (timestamp: number) => {
-                    // Optimistically reflect the new position immediately so the UI
-                    // (seek bar, lyrics) doesn't lag behind the ~500ms engine poll.
+                    // See mediaSkipBackward: update the timestamp store right away to
+                    // avoid the stale-read left by the ~500ms engine poll.
                     setTimestampStore(timestamp);
                     set((state) => {
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(timestamp);
@@ -1199,9 +1199,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const currentTimestamp = useTimestampStoreBase.getState().timestamp;
                     const newTimestamp = Math.max(0, currentTimestamp - timeToSkip);
 
-                    // Update the timestamp store right away so rapid presses compute
-                    // from the new position instead of the stale, poll-lagged value
-                    // (otherwise mashing repeatedly seeks to the same time).
+                    // Update the timestamp store right away so the UI and any
+                    // subsequent seek compute from the new position instead of the
+                    // stale value left by the ~500ms engine poll (otherwise mashing
+                    // the seek keys repeatedly lands on the same time).
                     setTimestampStore(newTimestamp);
                     set((state) => {
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(newTimestamp);
@@ -1224,8 +1225,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const currentTimestamp = useTimestampStoreBase.getState().timestamp;
                     const newTimestamp = Math.min(duration - 1, currentTimestamp + timeToSkip);
 
-                    // See mediaSkipBackward: avoid the stale-read that makes rapid
-                    // presses seek to the same time.
+                    // See mediaSkipBackward: update the timestamp store right away to
+                    // avoid the stale-read left by the ~500ms engine poll.
                     setTimestampStore(newTimestamp);
                     set((state) => {
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(newTimestamp);
