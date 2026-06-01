@@ -110,7 +110,7 @@ export const useItemListInfiniteLoader = ({
 
     const fetchPage = useCallback(
         async (pageNumber: number) => {
-            const existingData = queryClient.getQueryData(dataQueryKey);
+            const existingData = queryClient.getQueryData<InfiniteLoaderCacheData>(dataQueryKey);
             if (existingData?.pagesLoaded?.[pageNumber]) {
                 lastFetchedPageRef.current = Math.max(lastFetchedPageRef.current, pageNumber);
                 return;
@@ -169,7 +169,7 @@ export const useItemListInfiniteLoader = ({
 
         // If data already exists in the cache (survived component unmount),
         // preserve it and skip the reset to avoid reshuffling random order
-        const existingData = queryClient.getQueryData(dataQueryKey);
+        const existingData = queryClient.getQueryData<InfiniteLoaderCacheData>(dataQueryKey);
         if (existingData?.dataMap?.size > 0) {
             previousDataQueryKeyRef.current = currentDataQueryKey;
             return;
