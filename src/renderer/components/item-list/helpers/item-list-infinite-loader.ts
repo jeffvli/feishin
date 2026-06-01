@@ -169,8 +169,8 @@ export const useItemListInfiniteLoader = ({
 
         // If data already exists in the cache (survived component unmount),
         // preserve it and skip the reset to avoid reshuffling random order
-        const existingData = queryClient.getQueryData<InfiniteLoaderCacheData>(dataQueryKey);
-        if (existingData?.dataMap?.size > 0) {
+        const existingData = queryClient.getQueryData<InfiniteLoaderCacheData | undefined>(dataQueryKey);
+        if (existingData?.dataMap && existingData.dataMap.size > 0) {
             previousDataQueryKeyRef.current = currentDataQueryKey;
             return;
         }
