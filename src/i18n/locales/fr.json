@@ -861,6 +861,8 @@
         "homeFeatureStyle": "Style du carrousel de la page d’accueil",
         "homeFeatureStyle_optionMultiple": "Multiple",
         "homeFeatureStyle_optionSingle": "Simple",
+        "favoritesInitialType_description": "Contrôle le type d'élément favori à afficher initialement",
+        "favoritesInitialType": "Affichage initial des favoris",
         "blurExplicitImages": "Flouter les images explicites",
         "blurExplicitImages_description": "Les pochettes de titre et d'albums étiquetées comme explicites seront floutées",
         "enableGridMultiSelect": "Activer la sélection multiple dans la grille",

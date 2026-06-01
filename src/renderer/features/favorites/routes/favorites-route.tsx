@@ -6,12 +6,14 @@ import { FavoritesContent } from '/@/renderer/features/favorites/components/favo
 import { FavoritesHeader } from '/@/renderer/features/favorites/components/favorites-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
+import { useFavoritesInitialType } from '/@/renderer/store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
 const FavoritesRoute = () => {
     const [searchParams] = useSearchParams();
-    const itemType = (searchParams.get('type') as LibraryItem) || LibraryItem.SONG;
+    const initialType = useFavoritesInitialType();
+    const itemType = (searchParams.get('type') as LibraryItem) || initialType;
 
     const [itemCount, setItemCount] = useState<number | undefined>(undefined);
 

@@ -1,7 +1,9 @@
-node_modules
-dist
-out
+*.log*
 .DS_Store
 .eslintcache
-*.log*
+.nvmrc
+dist
+node_modules
+out
+pnpm-workspace.yaml
 release

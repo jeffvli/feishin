@@ -17,6 +17,7 @@ import {
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import {
+    FavoritesInitialType,
     HomeFeatureStyle,
     SideQueueLayout,
     SideQueueType,
@@ -32,6 +33,7 @@ import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Switch } from '/@/shared/components/switch/switch';
 import { toast } from '/@/shared/components/toast/toast';
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { FontType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
@@ -51,6 +53,27 @@ const HOME_FEATURE_STYLE_OPTIONS = [
             context: 'optionMultiple',
         }),
         value: HomeFeatureStyle.MULTIPLE,
+    },
+];
+
+const FAVORITES_INITIAL_TYPE_OPTIONS = [
+    {
+        label: t('entity.artist', {
+            count: 2,
+        }),
+        value: LibraryItem.ALBUM_ARTIST,
+    },
+    {
+        label: t('entity.album', {
+            count: 2,
+        }),
+        value: LibraryItem.ALBUM,
+    },
+    {
+        label: t('entity.track', {
+            count: 2,
+        }),
+        value: LibraryItem.SONG,
     },
 ];
 
@@ -396,6 +419,27 @@ export const ApplicationSettings = memo(() => {
             }),
             isHidden: false,
             title: t('setting.homeFeatureStyle'),
+        },
+        {
+            control: (
+                <Select
+                    data={FAVORITES_INITIAL_TYPE_OPTIONS}
+                    defaultValue={settings.favoritesInitialType}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                favoritesInitialType: e as FavoritesInitialType,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.favoritesInitialType', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.favoritesInitialType'),
         },
         {
             control: (

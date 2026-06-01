@@ -856,6 +856,8 @@
         "exportImportSettings_offendingKeyError": "\"{{offendingKey}}\" is incorrect - {{reason}}",
         "externalLinks_description": "Enables showing external links (Last.fm, MusicBrainz) on artist/album pages",
         "externalLinks": "Show external links",
+        "favoritesInitialType_description": "Sets the initial type of item to display in the favorites",
+        "favoritesInitialType": "Favorites initial type",
         "followCurrentSong_description": "Automatically scroll the play queue to the current playing song",
         "followCurrentSong": "Follow current song",
         "followLyric_description": "Scroll the lyric to the current playing position",

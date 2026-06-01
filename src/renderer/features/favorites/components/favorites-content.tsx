@@ -27,11 +27,31 @@ export const FavoritesContent = ({ itemType }: FavoritesContentProps) => {
     return (
         <AnimatedPage>
             <Suspense fallback={<Spinner container />}>
+                {itemType === LibraryItem.ALBUM_ARTIST && <ArtistFavorites />}
                 {itemType === LibraryItem.ALBUM && <AlbumFavorites />}
                 {itemType === LibraryItem.SONG && <SongFavorites />}
-                {itemType === LibraryItem.ALBUM_ARTIST && <ArtistFavorites />}
             </Suspense>
         </AnimatedPage>
+    );
+};
+
+const ArtistFavorites = () => {
+    const { display, grid, itemsPerPage, pagination, table } = useListSettings(ItemListKey.ARTIST);
+    const { customFilters } = useListContext();
+
+    const albumArtistQuery: OverrideAlbumArtistListQuery = {
+        ...(customFilters as OverrideAlbumArtistListQuery),
+    };
+
+    return (
+        <AlbumArtistListView
+            display={display}
+            grid={grid}
+            itemsPerPage={itemsPerPage}
+            overrideQuery={albumArtistQuery}
+            pagination={pagination}
+            table={table}
+        />
     );
 };
 
@@ -69,26 +89,6 @@ const SongFavorites = () => {
             grid={grid}
             itemsPerPage={itemsPerPage}
             overrideQuery={songQuery}
-            pagination={pagination}
-            table={table}
-        />
-    );
-};
-
-const ArtistFavorites = () => {
-    const { display, grid, itemsPerPage, pagination, table } = useListSettings(ItemListKey.ARTIST);
-    const { customFilters } = useListContext();
-
-    const albumArtistQuery: OverrideAlbumArtistListQuery = {
-        ...(customFilters as OverrideAlbumArtistListQuery),
-    };
-
-    return (
-        <AlbumArtistListView
-            display={display}
-            grid={grid}
-            itemsPerPage={itemsPerPage}
-            overrideQuery={albumArtistQuery}
             pagination={pagination}
             table={table}
         />

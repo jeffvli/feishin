@@ -163,6 +163,12 @@ const BindingActionsSchema = z.enum([
     'listShowPlayingSong',
 ]);
 
+const FavoritesInitialTypeSchema = z.enum([
+    LibraryItem.ALBUM_ARTIST,
+    LibraryItem.ARTIST,
+    LibraryItem.SONG,
+]);
+
 const DiscordDisplayTypeSchema = z.enum(['artist', 'feishin', 'song']);
 
 const DiscordLinkTypeSchema = z.enum(['last_fm', 'musicbrainz', 'musicbrainz_last_fm', 'none']);
@@ -467,6 +473,7 @@ export const GeneralSettingsSchema = z.object({
     disabledContextMenu: z.record(z.string(), z.boolean()),
     enableGridMultiSelect: z.boolean(),
     externalLinks: z.boolean(),
+    favoritesInitialType: FavoritesInitialTypeSchema,
     followCurrentSong: z.boolean(),
     followSystemTheme: z.boolean(),
     genreTarget: GenreTargetSchema,
@@ -891,6 +898,9 @@ export type DataGridProps = {
 };
 
 export type DataTableProps = z.infer<typeof ItemTableListPropsSchema>;
+
+export type FavoritesInitialType = z.infer<typeof FavoritesInitialTypeSchema>;
+
 export type ItemDetailListProps = z.infer<typeof ItemDetailListPropsSchema>;
 export type ItemListSettings = {
     detail?: ItemDetailListProps;
@@ -1157,6 +1167,7 @@ const initialState: SettingsState = {
         disabledContextMenu: {},
         enableGridMultiSelect: false,
         externalLinks: true,
+        favoritesInitialType: LibraryItem.SONG,
         followCurrentSong: true,
         followSystemTheme: false,
         genreTarget: GenreTarget.TRACK,
@@ -2605,6 +2616,9 @@ export const useThemeSettings = () =>
         }),
         shallow,
     );
+
+export const useFavoritesInitialType = () =>
+    useSettingsStore((state) => state.general.favoritesInitialType, shallow);
 
 export const useSideQueueType = () =>
     useSettingsStore((state) => state.general.sideQueueType, shallow);

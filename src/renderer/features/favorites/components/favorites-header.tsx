@@ -31,8 +31,8 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
     const { customFilters, itemCount } = useListContext();
     const navigate = useNavigate();
 
-    const albumFilters = useAlbumListFilters();
     const albumArtistFilters = useAlbumArtistListFilters();
+    const albumFilters = useAlbumListFilters();
     const songFilters = useSongListFilters();
 
     const playQuery = useMemo(() => {
@@ -53,18 +53,18 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
             ...query,
             ...(customFilters ?? {}),
         };
-    }, [albumFilters.query, albumArtistFilters.query, songFilters.query, customFilters, itemType]);
+    }, [albumArtistFilters.query, albumFilters.query, songFilters.query, customFilters, itemType]);
 
     const handleItemTypeChange = useCallback(
         (type: LibraryItem) => {
+            albumArtistFilters.clear();
             albumFilters.clear();
             songFilters.clear();
-            albumArtistFilters.clear();
 
             // Clear all URL search params except 'type'
             navigate(`?type=${type}`, { replace: true });
         },
-        [albumFilters, albumArtistFilters, songFilters, navigate],
+        [albumArtistFilters, albumFilters, songFilters, navigate],
     );
 
     return (
@@ -84,12 +84,12 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                             <Icon icon="dropdown" size="xl" />
                                         </Group>
                                         <Text isMuted size="sm">
-                                            {itemType === LibraryItem.ALBUM &&
-                                                t('entity.album', {
-                                                    count: 2,
-                                                })}
                                             {itemType === LibraryItem.ALBUM_ARTIST &&
                                                 t('entity.artist', {
+                                                    count: 2,
+                                                })}
+                                            {itemType === LibraryItem.ALBUM &&
+                                                t('entity.album', {
                                                     count: 2,
                                                 })}
                                             {itemType === LibraryItem.SONG &&
@@ -101,11 +101,13 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                 </DropdownMenu.Target>
                                 <DropdownMenu.Dropdown>
                                     <DropdownMenu.Item
-                                        isSelected={itemType === LibraryItem.SONG}
-                                        leftSection={<Icon icon="track" size="xl" />}
-                                        onClick={() => handleItemTypeChange(LibraryItem.SONG)}
+                                        isSelected={itemType === LibraryItem.ALBUM_ARTIST}
+                                        leftSection={<Icon icon="artist" size="xl" />}
+                                        onClick={() =>
+                                            handleItemTypeChange(LibraryItem.ALBUM_ARTIST)
+                                        }
                                     >
-                                        {t('entity.track', {
+                                        {t('entity.artist', {
                                             count: 2,
                                         })}
                                     </DropdownMenu.Item>
@@ -119,13 +121,11 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                         })}
                                     </DropdownMenu.Item>
                                     <DropdownMenu.Item
-                                        isSelected={itemType === LibraryItem.ALBUM_ARTIST}
-                                        leftSection={<Icon icon="artist" size="xl" />}
-                                        onClick={() =>
-                                            handleItemTypeChange(LibraryItem.ALBUM_ARTIST)
-                                        }
+                                        isSelected={itemType === LibraryItem.SONG}
+                                        leftSection={<Icon icon="track" size="xl" />}
+                                        onClick={() => handleItemTypeChange(LibraryItem.SONG)}
                                     >
-                                        {t('entity.artist', {
+                                        {t('entity.track', {
                                             count: 2,
                                         })}
                                     </DropdownMenu.Item>
@@ -142,8 +142,8 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                 </Flex>
             </PageHeader>
             <FilterBar>
-                {itemType === LibraryItem.ALBUM && <AlbumListHeaderFilters />}
                 {itemType === LibraryItem.ALBUM_ARTIST && <AlbumArtistListHeaderFilters />}
+                {itemType === LibraryItem.ALBUM && <AlbumListHeaderFilters />}
                 {itemType === LibraryItem.SONG && <SongListHeaderFilters />}
             </FilterBar>
         </Stack>
