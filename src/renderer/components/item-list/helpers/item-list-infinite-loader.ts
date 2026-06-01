@@ -110,6 +110,12 @@ export const useItemListInfiniteLoader = ({
 
     const fetchPage = useCallback(
         async (pageNumber: number) => {
+            const existingData = queryClient.getQueryData(dataQueryKey);
+            if (existingData?.pagesLoaded?.[pageNumber]) {
+                lastFetchedPageRef.current = Math.max(lastFetchedPageRef.current, pageNumber);
+                return;
+            }
+
             const startIndex = pageNumber * itemsPerPage;
             const queryParams = {
                 limit: itemsPerPage,
@@ -160,6 +166,14 @@ export const useItemListInfiniteLoader = ({
     // Reset the loaded pages and refetch current page when the query changes
     useEffect(() => {
         const currentDataQueryKey = JSON.stringify(dataQueryKey);
+
+        // If data already exists in the cache (survived component unmount),
+        // preserve it and skip the reset to avoid reshuffling random order
+        const existingData = queryClient.getQueryData(dataQueryKey);
+        if (existingData?.dataMap?.size > 0) {
+            previousDataQueryKeyRef.current = currentDataQueryKey;
+            return;
+        }
 
         if (previousDataQueryKeyRef.current === currentDataQueryKey || isRefetchingRef.current) {
             return;
