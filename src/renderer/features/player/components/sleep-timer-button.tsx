@@ -63,7 +63,7 @@ const useSleepTimer = () => {
 
     // End of album mode. Set the pauseOnNextSongEnd flag whenever the current track
     // is the last one of the target album.
-    const evaluteEndOfAlbum = useCallback(() => {
+    const evaluateEndOfAlbum = useCallback(() => {
         const { currentSong, nextSong } = usePlayerStoreBase.getState().getPlayerData();
 
         if (!currentSong) {
@@ -101,9 +101,9 @@ const useSleepTimer = () => {
 
         // Cancel and pause song change in end-of-album mode
         if (mode === 'endOfAlbum') {
-            evaluteEndOfAlbum();
+            evaluateEndOfAlbum();
         }
-    }, [active, mode, cancelTimer, evaluteEndOfAlbum, mediaPauseRef]);
+    }, [active, mode, cancelTimer, evaluateEndOfAlbum, mediaPauseRef]);
 
     const status = usePlayerStatus();
 
@@ -158,7 +158,7 @@ const useSleepTimer = () => {
         }
 
         if (mode === 'endOfAlbum') {
-            evaluteEndOfAlbum();
+            evaluateEndOfAlbum();
 
             return () => {
                 usePlayerStoreBase.getState().setPauseOnNextSongEnd(false);
@@ -166,7 +166,7 @@ const useSleepTimer = () => {
         }
 
         return undefined;
-    }, [active, mode, evaluteEndOfAlbum]);
+    }, [active, mode, evaluateEndOfAlbum]);
 };
 
 export const SleepTimerHookInner = () => {
