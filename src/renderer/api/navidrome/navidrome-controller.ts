@@ -576,6 +576,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             ),
         );
     },
+    getCoverArt: SubsonicController.getImageUrl,
     getDownloadUrl: SubsonicController.getDownloadUrl,
     getFolder: SubsonicController.getFolder,
     getGenreList: async (args) => {

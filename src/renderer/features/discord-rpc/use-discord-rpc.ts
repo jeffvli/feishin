@@ -265,20 +265,19 @@ export const useDiscordRpc = () => {
                         song._serverType === ServerType.NAVIDROME ||
                         song._serverType === ServerType.SUBSONIC
                     ) {
-                        try {
-                            const info = await api.controller.getAlbumInfo({
-                                apiClientProps: {
-                                    forceRemoteUrl: true,
-                                    serverId: song._serverId,
-                                },
-                                query: { id: song.albumId },
-                            });
+                        const coverArtUrl = api.controller.getCoverArt({
+                            apiClientProps: {
+                                forceRemoteUrl: true,
+                                serverId: song._serverId,
+                            },
+                            query: {
+                                id: song.id,
+                                itemType: LibraryItem.SONG,
+                            },
+                        });
 
-                            if (info.imageUrl) {
-                                activity.largeImageKey = info.imageUrl;
-                            }
-                        } catch {
-                            /* empty */
+                        if (coverArtUrl) {
+                            activity.largeImageKey = coverArtUrl;
                         }
                     }
                 }

@@ -1004,6 +1004,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             ),
         );
     },
+    getCoverArt: (args) => getSubsonicImageRequest(args)?.url || null,
     getDownloadUrl: (args) => {
         const { apiClientProps, query } = args;
 

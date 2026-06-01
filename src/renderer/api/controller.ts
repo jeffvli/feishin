@@ -389,6 +389,25 @@ export const controller: GeneralController = {
             server.type,
         )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
     },
+    getCoverArt(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(`${i18n.t('error.apiRouteError')}: getCoverArt`);
+        }
+
+        return (
+            apiController(
+                'getCoverArt',
+                server.type,
+            )?.(
+                addContext({
+                    ...args,
+                    apiClientProps: { ...args.apiClientProps, server },
+                }),
+            ) || null
+        );
+    },
     getDownloadUrl(args) {
         const server = getServerById(args.apiClientProps.serverId);
 
