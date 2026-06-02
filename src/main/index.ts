@@ -252,7 +252,9 @@ function createAlphaUpdaterInstance(): AppImageUpdater | MacUpdater | NsisUpdate
     return new NsisUpdater(ALPHA_UPDATER_CONFIG);
 }
 
-protocol.registerSchemesAsPrivileged([{ privileges: { bypassCSP: true }, scheme: 'feishin' }]);
+protocol.registerSchemesAsPrivileged([
+    { privileges: { bypassCSP: true, corsEnabled: true }, scheme: 'feishin' },
+]);
 
 process.on('uncaughtException', (error: any) => {
     console.error('Error in main process', error);
@@ -989,14 +991,24 @@ app.on('window-all-closed', () => {
     }
 });
 
-const FONT_HEADERS = [
+const FONT_HEADERS = new Set([
     'font/collection',
     'font/otf',
     'font/sfnt',
     'font/ttf',
     'font/woff',
     'font/woff2',
-];
+]);
+
+const FONT_FOUR_BYTE_MAGIC_NUMBERS = new Set([
+    '4F54544F', // font/otf
+    '774F4632', // font/woff2
+    '774F4646', // font/woff
+]);
+
+const FONT_FIVE_BYTE_MAGIC_NUMBERS = new Set([
+    '0001000000', // ttf, collection, sfnt
+]);
 
 const singleInstance = isDevelopment ? true : app.requestSingleInstanceLock();
 
@@ -1017,12 +1029,9 @@ if (!singleInstance) {
 
     app.whenReady()
         .then(() => {
-            protocol.handle('feishin', async (request) => {
-                const filePath = `file:${request.url.slice('feishin:'.length)}`;
-                const response = await net.fetch(filePath);
-                const contentType = response.headers.get('content-type');
-
-                if (!contentType || !FONT_HEADERS.includes(contentType)) {
+            protocol.handle('feishin', async () => {
+                const filePath = store.get('local_font_path');
+                if (typeof filePath !== 'string') {
                     getMainWindow()?.webContents.send('custom-font-error', filePath);
 
                     return new Response(null, {
@@ -1031,7 +1040,39 @@ if (!singleInstance) {
                     });
                 }
 
-                return response;
+                const response = await net.fetch('file:' + filePath);
+                const contentType = response.headers.get('content-type');
+
+                // On Linux, the mime type is included in the response header
+                // In this case, we can forward the response with no further processing
+                if (contentType && FONT_HEADERS.has(contentType)) {
+                    return response;
+                }
+
+                // Otherwise, let's check the magic number to see if
+                // the file is a font type. This is either four or five bytes
+                const payload = await response.arrayBuffer();
+
+                const fiveBytes = new Uint8Array(payload).slice(0, 5);
+                const fiveString = fiveBytes.toHex().toUpperCase();
+                const fourString = fiveBytes.slice(0, 4).toHex().toUpperCase();
+
+                if (
+                    FONT_FIVE_BYTE_MAGIC_NUMBERS.has(fiveString) ||
+                    FONT_FOUR_BYTE_MAGIC_NUMBERS.has(fourString)
+                ) {
+                    // We have to create a new response with the payload, since it has been read now
+                    return new Response(payload, {
+                        headers: response.headers,
+                    });
+                }
+
+                getMainWindow()?.webContents.send('custom-font-error', filePath);
+
+                return new Response(null, {
+                    status: 403,
+                    statusText: 'Forbidden',
+                });
             });
 
             session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
