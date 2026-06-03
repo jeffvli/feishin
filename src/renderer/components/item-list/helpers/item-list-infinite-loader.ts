@@ -103,6 +103,8 @@ export const useItemListInfiniteLoader = ({
         setItemCount(totalItemCount);
     }, [setItemCount, totalItemCount]);
 
+    const isRandomSort = query?.sortBy === 'random';
+
     const dataQueryKey = useMemo(
         () => [serverId, 'item-list-infinite-loader', itemType, query],
         [serverId, itemType, query],
@@ -110,10 +112,13 @@ export const useItemListInfiniteLoader = ({
 
     const fetchPage = useCallback(
         async (pageNumber: number) => {
-            const existingData = queryClient.getQueryData<InfiniteLoaderCacheData>(dataQueryKey);
-            if (existingData?.pagesLoaded?.[pageNumber]) {
-                lastFetchedPageRef.current = Math.max(lastFetchedPageRef.current, pageNumber);
-                return;
+            if (isRandomSort) {
+                const existingData =
+                    queryClient.getQueryData<InfiniteLoaderCacheData>(dataQueryKey);
+                if (existingData?.pagesLoaded?.[pageNumber]) {
+                    lastFetchedPageRef.current = Math.max(lastFetchedPageRef.current, pageNumber);
+                    return;
+                }
             }
 
             const startIndex = pageNumber * itemsPerPage;
@@ -167,14 +172,14 @@ export const useItemListInfiniteLoader = ({
     useEffect(() => {
         const currentDataQueryKey = JSON.stringify(dataQueryKey);
 
-        // If data already exists in the cache (survived component unmount),
-        // preserve it and skip the reset to avoid reshuffling random order
-        const existingData = queryClient.getQueryData<InfiniteLoaderCacheData | undefined>(
-            dataQueryKey,
-        );
-        if (existingData?.dataMap && existingData.dataMap.size > 0) {
-            previousDataQueryKeyRef.current = currentDataQueryKey;
-            return;
+        if (isRandomSort) {
+            const existingData = queryClient.getQueryData<InfiniteLoaderCacheData | undefined>(
+                dataQueryKey,
+            );
+            if (existingData?.dataMap && existingData.dataMap.size > 0) {
+                previousDataQueryKeyRef.current = currentDataQueryKey;
+                return;
+            }
         }
 
         if (previousDataQueryKeyRef.current === currentDataQueryKey || isRefetchingRef.current) {
