@@ -17,7 +17,7 @@ import { PlayerStatus } from '/@/shared/types/types';
 
 export function JukeboxPlayer() {
     const playerRef = useRef<JukeboxPlayerEngineHandle>(null);
-    const { status } = usePlayerData();
+    const { currentSong, status } = usePlayerData();
     const { mediaAutoNext, setTimestamp } = usePlayerActions();
     const isMuted = usePlayerMuted();
     const volume = usePlayerVolume();
@@ -25,6 +25,8 @@ export function JukeboxPlayer() {
 
     const credential = useAuthStore((state) => state.currentServer?.credential ?? '');
     const serverUrl = useAuthStore((state) => state.currentServer?.url ?? '');
+
+    const currentTrackId = currentSong?.id ?? null;
 
     usePlayerEvents(
         {
@@ -51,6 +53,7 @@ export function JukeboxPlayer() {
     return (
         <JukeboxPlayerEngine
             credential={credential}
+            currentTrackId={currentTrackId}
             isMuted={isMuted}
             onEnded={mediaAutoNext}
             onTick={(positionSeconds) => {
