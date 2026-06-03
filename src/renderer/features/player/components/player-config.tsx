@@ -203,12 +203,13 @@ const AudioPlayerTypeConfig = () => {
         <Select
             comboboxProps={{ withinPortal: false }}
             data={[
-                {
-                    disabled: !isElectron(),
-                    label: 'MPV',
-                    value: PlayerType.LOCAL,
-                },
+            {
+                disabled: !isElectron(),
+                label: 'MPV',
+                value: PlayerType.LOCAL,
+            },
                 { label: 'Web', value: PlayerType.WEB },
+                { label: 'Jukebox', value: PlayerType.JUKEBOX },
             ]}
             defaultValue={playbackSettings.type}
             disabled={status === PlayerStatus.PLAYING}

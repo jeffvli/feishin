@@ -41,7 +41,7 @@ import { logFn } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerType } from '/@/shared/types/types';
-
+import { JukeboxPlayer } from '/@/renderer/features/player/audio-player/jukebox-player';
 const CODEC_PROBES = [
     { codec: 'mp3', container: 'mp3', mime: 'audio/mpeg' },
 
@@ -273,6 +273,7 @@ const AudioPlayersContent = ({
         <>
             {playbackType === PlayerType.WEB && <WebPlayer />}
             {playbackType === PlayerType.LOCAL && <MpvPlayer />}
+            {playbackType === PlayerType.JUKEBOX && <JukeboxPlayer />}
         </>
     );
 };
