@@ -103,12 +103,12 @@ export const useItemListInfiniteLoader = ({
         setItemCount(totalItemCount);
     }, [setItemCount, totalItemCount]);
 
-    const isRandomSort = query?.sortBy === 'random';
-
     const dataQueryKey = useMemo(
         () => [serverId, 'item-list-infinite-loader', itemType, query],
         [serverId, itemType, query],
     );
+
+    const isRandomSort = dataQueryKey[3]?.sortBy === 'random';
 
     const fetchPage = useCallback(
         async (pageNumber: number) => {
