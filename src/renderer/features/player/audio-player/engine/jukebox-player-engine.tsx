@@ -19,7 +19,8 @@ interface JukeboxPlayerEngineProps {
 }
 
 export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
-    const { credential, isMuted, onEnded, onTick, playerRef, playerStatus, serverUrl, volume } = props;
+    const { credential, isMuted, onEnded, onTick, playerRef, playerStatus, serverUrl, volume } =
+        props;
 
     const pollRef = useRef<NodeJS.Timeout | null>(null);
     const lastPositionRef = useRef<number>(-1);
@@ -28,17 +29,15 @@ export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
 
     const callApi = async (action: string, extra = '') => {
         if (!serverUrl || !credential) {
-            
             return null;
         }
         const url = `${serverUrl}/rest/jukeboxControl?${credential}&v=1.13.0&c=Feishin&f=json&action=${action}${extra ? '&' + extra : ''}`;
-        
+
         try {
             const r = await fetch(url);
             const d = await r.json();
             return d['subsonic-response'];
-        } catch (e) {
-            
+        } catch {
             return null;
         }
     };
@@ -50,14 +49,14 @@ export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
         } else {
             callApi('stop');
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playerStatus]);
 
     // Volume/mute
     useEffect(() => {
         const gain = isMuted ? 0 : gainValue;
         callApi('setGain', `gain=${gain.toFixed(2)}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [gainValue, isMuted]);
 
     // Poll for position + track-end detection
@@ -69,7 +68,7 @@ export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
             const res = await callApi('get');
             if (!res?.jukeboxPlaylist) return;
 
-            const { currentIndex, position, playing } = res.jukeboxPlaylist;
+            const { currentIndex, playing, position } = res.jukeboxPlaylist;
 
             // Track ended: server stopped on its own
             if (!playing && lastPositionRef.current >= 0) {
@@ -91,7 +90,7 @@ export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
         return () => {
             if (pollRef.current) clearInterval(pollRef.current);
         };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playerStatus]);
 
     useImperativeHandle<JukeboxPlayerEngineHandle, JukeboxPlayerEngineHandle>(playerRef, () => ({
@@ -103,8 +102,12 @@ export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
             const next = Math.min(1, gainValue + by / 100);
             setGainValue(next);
         },
-        pause() { callApi('stop'); },
-        play() { callApi('start'); },
+        pause() {
+            callApi('stop');
+        },
+        play() {
+            callApi('start');
+        },
         seekTo(seconds: number) {
             const idx = lastIndexRef.current >= 0 ? lastIndexRef.current : 0;
             callApi('skip', `index=${idx}&offset=${Math.floor(seconds)}`);
