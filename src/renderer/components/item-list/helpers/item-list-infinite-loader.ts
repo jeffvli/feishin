@@ -13,7 +13,7 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { getListRefreshMutationKey } from '/@/renderer/features/shared/components/list-refresh-button';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { LibraryItem, SortKeyRandom } from '/@/shared/types/domain-types';
 
 export const getListQueryKeyName = (itemType: LibraryItem): string => {
     switch (itemType) {
@@ -108,7 +108,7 @@ export const useItemListInfiniteLoader = ({
         [serverId, itemType, query],
     );
 
-    const isRandomSort = query?.sortBy === 'random';
+    const isRandomSort = query?.sortBy === SortKeyRandom;
 
     const fetchPage = useCallback(
         async (pageNumber: number) => {
