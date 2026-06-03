@@ -157,6 +157,7 @@ export enum PlayerStyle {
 }
 
 export enum PlayerType {
+    JUKEBOX = 'jukebox',
     LOCAL = 'local',
     WEB = 'web',
 }
