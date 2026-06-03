@@ -108,7 +108,7 @@ export const useItemListInfiniteLoader = ({
         [serverId, itemType, query],
     );
 
-    const isRandomSort = dataQueryKey[3]?.sortBy === 'random';
+    const isRandomSort = query?.sortBy === 'random';
 
     const fetchPage = useCallback(
         async (pageNumber: number) => {
