@@ -69,7 +69,7 @@ export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
             const res = await callApi('get');
             if (!res?.jukeboxPlaylist) return;
 
-            const { currentIndex, entry, position, playing } = res.jukeboxPlaylist;
+            const { currentIndex, position, playing } = res.jukeboxPlaylist;
 
             // Track ended: server stopped on its own
             if (!playing && lastPositionRef.current >= 0) {
