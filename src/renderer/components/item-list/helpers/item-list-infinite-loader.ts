@@ -129,6 +129,7 @@ export const useItemListInfiniteLoader = ({
             };
 
             const result = await queryClient.fetchQuery({
+                gcTime: isRandomSort ? 1000 * 60 * 10 : 1000 * 15,
                 queryFn: async ({ signal }) => {
                     const result = await listQueryFn({
                         apiClientProps: { serverId, signal },
@@ -138,6 +139,7 @@ export const useItemListInfiniteLoader = ({
                     return result;
                 },
                 queryKey: queryKeys[getListQueryKeyName(itemType)].list(serverId, queryParams),
+                staleTime: isRandomSort ? 1000 * 60 * 10 : 1000 * 15,
             });
 
             // Update the query data with the fetched page
