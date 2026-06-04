@@ -165,7 +165,16 @@ export const useItemListInfiniteLoader = ({
             // Track the last fetched page
             lastFetchedPageRef.current = Math.max(lastFetchedPageRef.current, pageNumber);
         },
-        [itemsPerPage, query, queryClient, serverId, dataQueryKey, listQueryFn, itemType],
+        [
+            itemsPerPage,
+            query,
+            queryClient,
+            serverId,
+            dataQueryKey,
+            listQueryFn,
+            itemType,
+            isRandomSort,
+        ],
     );
 
     // Reset the loaded pages and refetch current page when the query changes
