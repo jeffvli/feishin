@@ -88,7 +88,7 @@ export const useItemListPaginatedLoader = ({
     );
 
     const { data } = useQuery({
-        gcTime: isRandomSort ? 1000 * 60 * 60 : 1000 * 15,
+        gcTime: isRandomSort ? 1000 * 60 * 10 : 1000 * 15,
         placeholderData: { items: getInitialData(itemsPerPage) },
         queryFn: async ({ signal }) => {
             const result = await listQueryFn({
@@ -99,7 +99,7 @@ export const useItemListPaginatedLoader = ({
             return result;
         },
         queryKey: queryKeys[getQueryKeyName(itemType)].list(serverId, queryParams),
-        staleTime: isRandomSort ? 1000 * 60 * 60 : 1000 * 15,
+        staleTime: isRandomSort ? 1000 * 60 * 10 : 1000 * 15,
     });
 
     const refreshMutation = useMutation({
