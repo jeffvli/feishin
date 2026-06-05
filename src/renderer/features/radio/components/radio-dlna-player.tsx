@@ -6,6 +6,7 @@ import { usePlayerActions, usePlayerMuted, usePlayerVolume } from '/@/renderer/s
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const ipc = isElectron() ? window.api.ipc : null;
+const dlnaPlayerListener = isElectron() ? window.api.dlnaPlayerListener : null;
 
 export function RadioDlnaPlayer() {
     const { currentStreamUrl, stationName } = useRadioPlayer();
@@ -22,23 +23,23 @@ export function RadioDlnaPlayer() {
         };
     }, []);
     useEffect(() => {
-        if (!ipc) return;
+        if (!dlnaPlayerListener) return;
         const handler = (_event: any, vol: number) => setVolume(vol);
-        ipc.on('renderer-dlna-volume', handler);
+        dlnaPlayerListener.rendererDlnaVolume(handler);
         return () => {
-            ipc.removeAllListeners('renderer-dlna-volume');
+            ipc?.removeAllListeners('renderer-dlna-volume');
         };
     }, [setVolume]);
     useEffect(() => {
-        if (!ipc) return;
+        if (!dlnaPlayerListener) return;
         const handler = (_event: any, state: string) => {
             if (state === 'STOPPED' || state === 'PAUSED_PLAYBACK') {
                 useRadioStore.getState().actions.stop();
             }
         };
-        ipc.on('renderer-dlna-transport-state', handler);
+        dlnaPlayerListener.rendererDlnaTransportState(handler);
         return () => {
-            ipc.removeAllListeners('renderer-dlna-transport-state');
+            ipc?.removeAllListeners('renderer-dlna-transport-state');
         };
     }, []);
     const { isPlaying } = useRadioPlayer();

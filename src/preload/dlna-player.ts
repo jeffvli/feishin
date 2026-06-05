@@ -65,10 +65,42 @@ const setGroupMemberVolume = (deviceId: string, vol: number) =>
 const setGroupMemberMute = (deviceId: string, muted: boolean) =>
     ipcRenderer.send('dlna-group-member-mute', { deviceId, muted });
 const getGroupState = (): Promise<GroupMember[]> => ipcRenderer.invoke('dlna-group-get-state');
+function singleOn<T extends (...args: any[]) => void>(channel: string, cb: T): void {
+    ipcRenderer.removeAllListeners(channel);
+    ipcRenderer.on(channel, cb);
+}
+
 const rendererCurrentTime = (cb: (event: IpcRendererEvent, time: number) => void) =>
-    ipcRenderer.on('renderer-dlna-current-time', cb);
-const rendererTrackEnded = (cb: (event: IpcRendererEvent) => void) =>
-    ipcRenderer.on('renderer-dlna-track-ended', cb);
+    singleOn('renderer-dlna-current-time', cb);
+const rendererDlnaTrackEnded = (cb: (event: IpcRendererEvent) => void) =>
+    singleOn('renderer-dlna-track-ended', cb);
+const rendererTrackEnded = rendererDlnaTrackEnded;
+const rendererDlnaConnectPlayback = (
+    cb: (
+        event: IpcRendererEvent,
+        info: { duration: number; position: number; transportState: string; uri: string },
+    ) => void,
+) => singleOn('renderer-dlna-connect-playback', cb);
+const rendererDlnaTransportState = (cb: (event: IpcRendererEvent, state: string) => void) =>
+    singleOn('renderer-dlna-transport-state', cb);
+const rendererDlnaPrevTrack = (cb: (event: IpcRendererEvent) => void) =>
+    singleOn('renderer-dlna-prev-track', cb);
+const rendererDlnaVolume = (cb: (event: IpcRendererEvent, volume: number) => void) =>
+    singleOn('renderer-dlna-volume', cb);
+const rendererDlnaToast = (
+    cb: (
+        event: IpcRendererEvent,
+        payload: { message: string; type: 'error' | 'info' | 'warning' },
+    ) => void,
+) => singleOn('renderer-dlna-toast', cb);
+const rendererDlnaGroupState = (cb: (event: IpcRendererEvent, state: GroupMember[]) => void) =>
+    singleOn('renderer-dlna-group-state', cb);
+const rendererDlnaGroupMemberVolume = (
+    cb: (event: IpcRendererEvent, payload: { deviceId: string; volume: number }) => void,
+) => singleOn('renderer-dlna-group-member-volume', cb);
+const rendererDlnaDiscoveryUpdate = (
+    cb: (event: IpcRendererEvent, devices: DlnaDevice[]) => void,
+) => singleOn('renderer-dlna-discovery-update', cb);
 const prepareSpeedFile = (data: {
     offset: number;
     preservePitch: boolean;
@@ -131,6 +163,15 @@ export const dlnaPlayer = {
 
 export const dlnaPlayerListener = {
     rendererCurrentTime,
+    rendererDlnaConnectPlayback,
+    rendererDlnaDiscoveryUpdate,
+    rendererDlnaGroupMemberVolume,
+    rendererDlnaGroupState,
+    rendererDlnaPrevTrack,
+    rendererDlnaToast,
+    rendererDlnaTrackEnded,
+    rendererDlnaTransportState,
+    rendererDlnaVolume,
     rendererTrackEnded,
 };
 

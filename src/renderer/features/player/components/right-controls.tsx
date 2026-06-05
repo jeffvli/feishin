@@ -55,6 +55,7 @@ import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const ipc = isElectron() ? window.api.ipc : null;
+const dlnaPlayerListener = isElectron() ? window.api.dlnaPlayerListener : null;
 
 interface DlnaGroupMember {
     device: { id: string; isPair?: boolean; name: string };
@@ -126,111 +127,110 @@ const SpeakerPropertiesPopover = ({
         ipc?.send('dlna-set-speaker-property', { deviceId, property: key, value });
     };
     return (
-        <Paper
-            data-speaker-props-popover
-            onClick={(e) => e.stopPropagation()}
-            radius="md"
-            shadow="xl"
-            style={{
-                background: 'var(--theme-colors-background)',
-                border: '2px solid var(--theme-colors-border)',
-                borderRadius: 'var(--theme-radius-md)',
-                bottom: `${bottom}px`,
-                boxShadow: '2px 2px 10px 2px rgb(0 0 0 / 40%)',
-                color: 'var(--theme-colors-foreground)',
-                filter: 'drop-shadow(0 0 5px rgb(0 0 0 / 50%))',
-                left: `${left}px`,
-                minWidth: 280,
-                padding: '12px 16px 14px',
-                position: 'fixed',
-                transform: 'translateX(-50%)',
-                zIndex: 9999,
-            }}
-        >
-            <div
+        <div data-speaker-props-popover onClick={(e) => e.stopPropagation()}>
+            <Paper
+                radius="md"
+                shadow="xl"
                 style={{
-                    alignItems: 'center',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginBottom: 10,
+                    background: 'var(--theme-colors-background)',
+                    border: '2px solid var(--theme-colors-border)',
+                    borderRadius: 'var(--theme-radius-md)',
+                    bottom: `${bottom}px`,
+                    boxShadow: '2px 2px 10px 2px rgb(0 0 0 / 40%)',
+                    color: 'var(--theme-colors-foreground)',
+                    filter: 'drop-shadow(0 0 5px rgb(0 0 0 / 50%))',
+                    left: `${left}px`,
+                    minWidth: 280,
+                    padding: '12px 16px 14px',
+                    position: 'fixed',
+                    transform: 'translateX(-50%)',
+                    zIndex: 9999,
                 }}
             >
-                <span
-                    style={{
-                        color: 'var(--theme-colors-primary, #6c9fff)',
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        maxWidth: 240,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                    }}
-                >
-                    {deviceName}
-                </span>
-            </div>
-
-            {loading && (
                 <div
                     style={{
-                        color: 'var(--mantine-color-dimmed)',
-                        fontSize: '0.75rem',
-                        textAlign: 'center',
+                        alignItems: 'center',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginBottom: 10,
                     }}
                 >
-                    {t('dlna.speakerProperties.loading')}
+                    <span
+                        style={{
+                            color: 'var(--theme-colors-primary, #6c9fff)',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            maxWidth: 240,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                        }}
+                    >
+                        {deviceName}
+                    </span>
                 </div>
-            )}
-            {!loading && !speakerProps && (
-                <div
-                    style={{
-                        color: 'var(--mantine-color-red-4, #ff6b6b)',
-                        fontSize: '0.75rem',
-                        textAlign: 'center',
-                    }}
-                >
-                    {t('dlna.speakerProperties.loadFailed')}
-                </div>
-            )}
-            {!loading && speakerProps && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    <PropSlider
-                        label={t('dlna.speakerProperties.bass')}
-                        max={10}
-                        min={-10}
-                        onChange={(v) => set('bass', v)}
-                        value={speakerProps.bass}
-                    />
-                    <PropSlider
-                        label={t('dlna.speakerProperties.treble')}
-                        max={10}
-                        min={-10}
-                        onChange={(v) => set('treble', v)}
-                        value={speakerProps.treble}
-                    />
-                    <PropToggle
-                        label={t('dlna.speakerProperties.loudness')}
-                        onChange={(v) => set('loudness', v)}
-                        value={speakerProps.loudness}
-                    />
-                    <PropToggle
-                        label={t('dlna.speakerProperties.crossfade')}
-                        onChange={(v) => set('crossfade', v)}
-                        value={speakerProps.crossfade}
-                    />
-                    <PropToggle
-                        label={t('dlna.speakerProperties.ledState')}
-                        onChange={(v) => set('ledState', v)}
-                        value={speakerProps.ledState}
-                    />
-                    <PropToggle
-                        label={t('dlna.speakerProperties.touchControls')}
-                        onChange={(v) => set('touchControls', v)}
-                        value={speakerProps.touchControls}
-                    />
-                </div>
-            )}
-        </Paper>
+                {loading && (
+                    <div
+                        style={{
+                            color: 'var(--mantine-color-dimmed)',
+                            fontSize: '0.75rem',
+                            textAlign: 'center',
+                        }}
+                    >
+                        {t('dlna.speakerProperties.loading')}
+                    </div>
+                )}
+                {!loading && !speakerProps && (
+                    <div
+                        style={{
+                            color: 'var(--mantine-color-red-4, #ff6b6b)',
+                            fontSize: '0.75rem',
+                            textAlign: 'center',
+                        }}
+                    >
+                        {t('dlna.speakerProperties.loadFailed')}
+                    </div>
+                )}
+                {!loading && speakerProps && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        <PropSlider
+                            label={t('dlna.speakerProperties.bass')}
+                            max={10}
+                            min={-10}
+                            onChange={(v) => set('bass', v)}
+                            value={speakerProps.bass}
+                        />
+                        <PropSlider
+                            label={t('dlna.speakerProperties.treble')}
+                            max={10}
+                            min={-10}
+                            onChange={(v) => set('treble', v)}
+                            value={speakerProps.treble}
+                        />
+                        <PropToggle
+                            label={t('dlna.speakerProperties.loudness')}
+                            onChange={(v) => set('loudness', v)}
+                            value={speakerProps.loudness}
+                        />
+                        <PropToggle
+                            label={t('dlna.speakerProperties.crossfade')}
+                            onChange={(v) => set('crossfade', v)}
+                            value={speakerProps.crossfade}
+                        />
+                        <PropToggle
+                            label={t('dlna.speakerProperties.ledState')}
+                            onChange={(v) => set('ledState', v)}
+                            value={speakerProps.ledState}
+                        />
+                        <PropToggle
+                            label={t('dlna.speakerProperties.touchControls')}
+                            onChange={(v) => set('touchControls', v)}
+                            value={speakerProps.touchControls}
+                        />
+                    </div>
+                )}
+            </Paper>
+        </div>
     );
 };
 
@@ -523,7 +523,7 @@ const VolumeButton = () => {
     }, []);
 
     useEffect(() => {
-        if (!ipc) return;
+        if (!dlnaPlayerListener) return;
         const handleGroupState = (_: unknown, state: DlnaGroupMember[]) => {
             groupMembersRef.current = state;
             setGroupMembers(state);
@@ -542,11 +542,11 @@ const VolumeButton = () => {
                 return next;
             });
         };
-        ipc.on('renderer-dlna-group-state', handleGroupState);
-        ipc.on('renderer-dlna-group-member-volume', handleMemberVolume);
+        dlnaPlayerListener.rendererDlnaGroupState(handleGroupState);
+        dlnaPlayerListener.rendererDlnaGroupMemberVolume(handleMemberVolume);
         return () => {
-            ipc.removeAllListeners('renderer-dlna-group-state');
-            ipc.removeAllListeners('renderer-dlna-group-member-volume');
+            ipc?.removeAllListeners('renderer-dlna-group-state');
+            ipc?.removeAllListeners('renderer-dlna-group-member-volume');
         };
     }, []);
 

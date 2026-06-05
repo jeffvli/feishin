@@ -27,6 +27,7 @@ import { PlayerType } from '/@/shared/types/types';
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const ipc = isElectron() ? window.api.ipc : null;
+const dlnaPlayerListener = isElectron() ? window.api.dlnaPlayerListener : null;
 
 type Screen = 'connected' | 'connecting' | 'expand-group' | 'group' | 'group-build' | 'idle';
 
@@ -68,7 +69,7 @@ export const DlnaCastButton = () => {
         };
     }, [showPopover]);
     useEffect(() => {
-        if (!ipc) return;
+        if (!dlnaPlayerListener) return;
         const handler = (
             _: unknown,
             payload: { message: string; type: 'error' | 'info' | 'warning' },
@@ -81,13 +82,14 @@ export const DlnaCastButton = () => {
                 toast.info?.({ message: payload.message });
             }
         };
-        ipc.on('renderer-dlna-toast', handler);
+        dlnaPlayerListener.rendererDlnaToast(handler);
         return () => {
-            ipc.removeAllListeners('renderer-dlna-toast');
+            ipc?.removeAllListeners('renderer-dlna-toast');
         };
     }, []);
 
     useEffect(() => {
+        if (!dlnaPlayerListener) return;
         if (!ipc) return;
         const handleGroupState = (_: unknown, state: GroupMember[]) => {
             setGroupMemberList(state);
@@ -108,13 +110,13 @@ export const DlnaCastButton = () => {
                 }
             }
         };
-        ipc.on('renderer-dlna-group-state', handleGroupState);
+        dlnaPlayerListener.rendererDlnaGroupState(handleGroupState);
         return () => {
-            ipc.removeAllListeners('renderer-dlna-group-state');
+            ipc?.removeAllListeners('renderer-dlna-group-state');
         };
     }, [t]);
     useEffect(() => {
-        if (!ipc) return;
+        if (!dlnaPlayerListener) return;
         const handleDiscoveryUpdate = (_: unknown, updated: DlnaDevice[]) => {
             setDevices((current) => {
                 if (screen !== 'idle') return current;
@@ -123,9 +125,9 @@ export const DlnaCastButton = () => {
                 return updated;
             });
         };
-        ipc.on('renderer-dlna-discovery-update', handleDiscoveryUpdate);
+        dlnaPlayerListener.rendererDlnaDiscoveryUpdate(handleDiscoveryUpdate);
         return () => {
-            ipc.removeAllListeners('renderer-dlna-discovery-update');
+            ipc?.removeAllListeners('renderer-dlna-discovery-update');
         };
     }, [screen]);
 
@@ -167,14 +169,14 @@ export const DlnaCastButton = () => {
                 coordinatorRef.current = device;
                 setVolume(result.volume);
                 if (result.currentUri && result.currentTransportState !== 'STOPPED') {
-                    playerHandoff.pendingDlnaSeek = -1;
-                    playerHandoff.deviceAlreadyPlaying = true;
-                    ipc?.send('renderer-dlna-connect-playback', {
-                        duration: result.currentDuration,
-                        position: result.currentPosition,
-                        transportState: result.currentTransportState,
-                        uri: result.currentUri,
-                    });
+                    if (result.currentTransportState === 'PAUSED_PLAYBACK') {
+                        playerHandoff.deviceAlreadyPlaying = true;
+                        playerHandoff.deviceWasPaused = true;
+                    } else {
+                        playerHandoff.pendingDlnaSeek = -1;
+                        playerHandoff.deviceAlreadyPlaying = true;
+                        playerHandoff.deviceWasPaused = false;
+                    }
                 }
                 setSettings({
                     playback: {

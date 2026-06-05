@@ -62,6 +62,9 @@ let lastQueuedNextUri = '';
 let lastFinishedUri = '';
 let lastAppSeekAt = 0;
 let lastPlayCommandAt = 0;
+let lastPauseCommandAt = 0;
+let lastClearNextAt = 0;
+let lastLoadedFromUri = '';
 let pendingPrevTrack = false;
 let isRadioMode = false;
 let groupMembers: DlnaDevice[] = [];
@@ -620,13 +623,7 @@ function handleEventNotify(body: string): void {
         lastKnownPosition = 0;
         getMainWindow()?.webContents.send('renderer-dlna-track-ended', { gapless: true });
     } else {
-        dlnaLog('Event: device went to previous track');
-        lastCommandedUri = newUri;
-        lastQueuedNextUri = '';
-        hasStartedPlaying = true;
-        trackLoadedAt = Date.now();
-        lastKnownPosition = 0;
-        getMainWindow()?.webContents.send('renderer-dlna-prev-track');
+        dlnaLog('Event: URI is now unknown');
     }
 }
 
@@ -951,15 +948,17 @@ function startPositionPolling() {
             const recentAppSeek = Date.now() - lastAppSeekAt < 3000;
             // Detect gapless transition: position jumped backward significantly
             if (!isRadioMode) {
-                const isGracePeriod = Date.now() - trackLoadedAt < 4000;
                 const isSameUriLoop =
                     lastQueuedNextUri === lastCommandedUri && lastQueuedNextUri !== '';
+                if (posInfo.trackUri === lastCommandedUri) {
+                    lastLoadedFromUri = '';
+                }
 
                 if (
-                    !isGracePeriod &&
                     hasStartedPlaying &&
                     uriReportedByDevice &&
                     posInfo.trackUri !== lastCommandedUri &&
+                    posInfo.trackUri !== lastLoadedFromUri &&
                     lastQueuedNextUri &&
                     posInfo.trackUri === lastQueuedNextUri
                 ) {
@@ -972,7 +971,6 @@ function startPositionPolling() {
                         gapless: true,
                     });
                 } else if (
-                    !isGracePeriod &&
                     hasStartedPlaying &&
                     isSameUriLoop &&
                     uriReportedByDevice &&
@@ -990,10 +988,10 @@ function startPositionPolling() {
                         gapless: true,
                     });
                 }
-
+                const isGracePeriod = Date.now() - trackLoadedAt < 4000;
                 if (pendingPrevTrack) {
                     pendingPrevTrack = false;
-                    if (transportState !== 'STOPPED') {
+                    if (!isGracePeriod && transportState !== 'STOPPED') {
                         dlnaLog(`Position-based prev confirmed`);
                         trackLoadedAt = Date.now();
                         lastKnownPosition = 0;
@@ -1001,6 +999,7 @@ function startPositionPolling() {
                     }
                 }
                 if (
+                    !isGracePeriod &&
                     !pendingPrevTrack &&
                     hasStartedPlaying &&
                     transportState !== 'STOPPED' &&
@@ -1016,7 +1015,7 @@ function startPositionPolling() {
                     );
                     pendingPrevTrack = true;
                 }
-                const recentPlayCommand = Date.now() - lastPlayCommandAt < 4000;
+                const recentClearNext = Date.now() - lastClearNextAt < 3000;
                 let justFiredTrackEnded = false;
                 if (posInfo.duration > 0) lastKnownDuration = posInfo.duration;
                 if (
@@ -1046,9 +1045,8 @@ function startPositionPolling() {
                 if (
                     hasStartedPlaying &&
                     transportState === 'STOPPED' &&
-                    !isGracePeriod &&
                     !isPausedIntentionally &&
-                    !recentPlayCommand
+                    !recentClearNext
                 ) {
                     const isResumeFailure =
                         previousPosition < 15 ||
@@ -1089,7 +1087,6 @@ function startPositionPolling() {
                     !justFiredTrackEnded &&
                     transportState === 'STOPPED' &&
                     !isPausedIntentionally &&
-                    !isGracePeriod &&
                     lastCommandedUri
                 ) {
                     const isStuck =
@@ -1112,7 +1109,14 @@ function startPositionPolling() {
 
             if (transportState !== lastKnownTransportState && transportState !== 'TRANSITIONING') {
                 lastKnownTransportState = transportState;
-                getMainWindow()?.webContents.send('renderer-dlna-transport-state', transportState);
+                const recentPauseOrPlay =
+                    Date.now() - lastPauseCommandAt < 2000 || Date.now() - lastPlayCommandAt < 2000;
+                if (!recentPauseOrPlay) {
+                    getMainWindow()?.webContents.send(
+                        'renderer-dlna-transport-state',
+                        transportState,
+                    );
+                }
             }
 
             try {
@@ -1393,6 +1397,14 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
         }
 
         sendGroupStateToRenderer();
+        if (currentUri && currentTransportState !== 'STOPPED') {
+            getMainWindow()?.webContents.send('renderer-dlna-connect-playback', {
+                duration: currentDuration,
+                position: currentPosition,
+                transportState: currentTransportState,
+                uri: currentUri,
+            });
+        }
         return {
             currentDuration,
             currentPosition,
@@ -1550,7 +1562,6 @@ ipcMain.on(
             lastKnownPosition = 0;
             isPausedIntentionally = data.metadata.autoPlay === false;
             lastAppSeekAt = Date.now();
-            trackLoadedAt = Date.now();
             lastKnownDuration = 0;
             nearEndStallCount = 0;
             const lanUrl = rewriteUrlForLan(data.url);
@@ -1570,6 +1581,8 @@ ipcMain.on(
                 }
                 return;
             }
+            trackLoadedAt = Date.now();
+            lastLoadedFromUri = lastCommandedUri;
             lastCommandedUri = lanUrl;
             lastQueuedNextUri = '';
             const lanArtUrl = data.metadata.albumArtUrl
@@ -1681,6 +1694,8 @@ ipcMain.on('dlna-play', async () => {
         isPausedIntentionally = false;
         trackLoadedAt = Date.now();
         lastPlayCommandAt = Date.now();
+        lastPauseCommandAt = 0;
+        lastKnownTransportState = 'PLAYING';
         await play(connectedDevice);
     } catch (err) {
         dlnaLog('Failed to resume playback', err);
@@ -1692,6 +1707,8 @@ ipcMain.on('dlna-pause', async () => {
     if (!connectedDevice) return;
     try {
         isPausedIntentionally = true;
+        lastPauseCommandAt = Date.now();
+        lastKnownTransportState = 'PAUSED_PLAYBACK';
         if (isRadioMode) {
             lastCommandedUri = '';
             lastQueuedNextUri = '';
@@ -1712,6 +1729,7 @@ ipcMain.on('dlna-pause', async () => {
 ipcMain.on('dlna-clear-next', async () => {
     if (!connectedDevice) return;
     lastQueuedNextUri = '';
+    lastClearNextAt = Date.now();
     try {
         await clearNextAVTransportURI(connectedDevice);
         dlnaLog('Cleared next track');
