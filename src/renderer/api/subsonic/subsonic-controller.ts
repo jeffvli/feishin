@@ -366,7 +366,10 @@ export const SubsonicController: InternalControllerEndpoint = {
                     query.type === LibraryItem.ALBUM_ARTIST || query.type === LibraryItem.ARTIST
                         ? query.id
                         : undefined,
-                id: query.type === LibraryItem.SONG ? query.id : undefined,
+                id:
+                    query.type === LibraryItem.SONG || query.type === LibraryItem.PLAYLIST_SONG
+                        ? query.id
+                        : undefined,
             },
         });
 
@@ -419,7 +422,10 @@ export const SubsonicController: InternalControllerEndpoint = {
                     query.type === LibraryItem.ALBUM_ARTIST || query.type === LibraryItem.ARTIST
                         ? query.id
                         : undefined,
-                id: query.type === LibraryItem.SONG ? query.id : undefined,
+                id:
+                    query.type === LibraryItem.SONG || query.type === LibraryItem.PLAYLIST_SONG
+                        ? query.id
+                        : undefined,
             },
         });
 
@@ -2327,7 +2333,6 @@ export const SubsonicController: InternalControllerEndpoint = {
                 case 'start':
                     state = 'starting';
                     break;
-                case 'timeupdate':
                 case 'unpause':
                     state = 'playing';
                     break;

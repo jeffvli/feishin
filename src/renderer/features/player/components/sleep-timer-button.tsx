@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next';
 
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { usePlayerStatus, usePlayerStoreBase } from '/@/renderer/store/player.store';
+import {
+    usePlayerShuffle,
+    usePlayerStatus,
+    usePlayerStoreBase,
+} from '/@/renderer/store/player.store';
 import {
     useSleepTimerActions,
     useSleepTimerActive,
@@ -21,10 +25,11 @@ import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Popover } from '/@/shared/components/popover/popover';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
-import { PlayerStatus } from '/@/shared/types/types';
+import { PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
 const PRESET_OPTIONS = [
     { minutes: 0, mode: 'endOfSong' as const },
+    { minutes: 0, mode: 'endOfAlbum' as const },
     { minutes: 5, mode: 'timed' as const },
     { minutes: 10, mode: 'timed' as const },
     { minutes: 15, mode: 'timed' as const },
@@ -50,11 +55,37 @@ function formatRemaining(totalSeconds: number): string {
 const useSleepTimer = () => {
     const active = useSleepTimerActive();
     const mode = useSleepTimerMode();
-    const { cancelTimer, setRemaining } = useSleepTimerActions();
+    const { cancelTimer, setRemaining, setTargetAlbumId } = useSleepTimerActions();
     const { mediaPause } = usePlayer();
 
     const mediaPauseRef = useRef(mediaPause);
     mediaPauseRef.current = mediaPause;
+
+    // End of album mode. Set the pauseOnNextSongEnd flag whenever the current track
+    // is the last one of the target album.
+    const evaluateEndOfAlbum = useCallback(() => {
+        const { currentSong, nextSong } = usePlayerStoreBase.getState().getPlayerData();
+
+        if (!currentSong) {
+            return;
+        }
+
+        let target = useSleepTimerStore.getState().targetAlbumId;
+
+        if (target === null) {
+            target = currentSong.albumId;
+            setTargetAlbumId(target);
+        }
+
+        if (currentSong.albumId !== target) {
+            usePlayerStoreBase.getState().setPauseOnNextSongEnd(false);
+            cancelTimer();
+            return;
+        }
+
+        const isLastOfAlbum = !nextSong || nextSong.albumId !== currentSong.albumId;
+        usePlayerStoreBase.getState().setPauseOnNextSongEnd(isLastOfAlbum);
+    }, [cancelTimer, setTargetAlbumId]);
 
     const handleOnCurrentSongChange = useCallback(() => {
         if (!active) {
@@ -65,8 +96,14 @@ const useSleepTimer = () => {
         if (mode === 'endOfSong') {
             cancelTimer();
             mediaPauseRef.current();
+            return;
         }
-    }, [active, mode, cancelTimer, mediaPauseRef]);
+
+        // Cancel and pause song change in end-of-album mode
+        if (mode === 'endOfAlbum') {
+            evaluateEndOfAlbum();
+        }
+    }, [active, mode, cancelTimer, evaluateEndOfAlbum, mediaPauseRef]);
 
     const status = usePlayerStatus();
 
@@ -104,15 +141,32 @@ const useSleepTimer = () => {
     // mediaAutoNext returns PAUSED status when the current song ends.
     // This is a generic player mechanism — the web player handles it
     // without needing to know about the sleep timer.
+    // End-of-album mode: set the same flag conditionally, here we run
+    // the intial evaluation in case the timer was started while already
+    // on the last track of the album
     useEffect(() => {
-        if (!active || mode !== 'endOfSong') return;
+        if (!active) {
+            return;
+        }
 
-        usePlayerStoreBase.getState().setPauseOnNextSongEnd(true);
+        if (mode === 'endOfSong') {
+            usePlayerStoreBase.getState().setPauseOnNextSongEnd(true);
 
-        return () => {
-            usePlayerStoreBase.getState().setPauseOnNextSongEnd(false);
-        };
-    }, [active, mode]);
+            return () => {
+                usePlayerStoreBase.getState().setPauseOnNextSongEnd(false);
+            };
+        }
+
+        if (mode === 'endOfAlbum') {
+            evaluateEndOfAlbum();
+
+            return () => {
+                usePlayerStoreBase.getState().setPauseOnNextSongEnd(false);
+            };
+        }
+
+        return undefined;
+    }, [active, mode, evaluateEndOfAlbum]);
 };
 
 export const SleepTimerHookInner = () => {
@@ -135,8 +189,14 @@ export const SleepTimerButton = () => {
     const active = useSleepTimerActive();
     const mode = useSleepTimerMode();
     const remaining = useSleepTimerRemaining();
-    const { cancelTimer, startEndOfSongTimer, startTimedTimer } = useSleepTimerActions();
+    const { cancelTimer, startEndOfAlbumTimer, startEndOfSongTimer, startTimedTimer } =
+        useSleepTimerActions();
     const { mediaPause } = usePlayer();
+    const shuffle = usePlayerShuffle();
+    // Track level shuffle scatters and album across a play queue making 'end-of-album'
+    // meaningless. Album shuffle keeps each album intact, so keep 'end-of-'album
+    // enabled there
+    const isTrackShuffle = shuffle === PlayerShuffle.TRACK;
 
     const [showCustom, setShowCustom] = useState(false);
     const [customHours, setCustomHours] = useState<number>(0);
@@ -151,13 +211,15 @@ export const SleepTimerButton = () => {
         (option: (typeof PRESET_OPTIONS)[number]) => {
             if (option.mode === 'endOfSong') {
                 startEndOfSongTimer();
+            } else if (option.mode === 'endOfAlbum') {
+                startEndOfAlbumTimer();
             } else {
                 startTimedTimer(option.minutes * 60);
             }
             setShowCustom(false);
             setOpened(false);
         },
-        [startEndOfSongTimer, startTimedTimer],
+        [startEndOfAlbumTimer, startEndOfSongTimer, startTimedTimer],
     );
 
     const handleCustomStart = useCallback(() => {
@@ -177,6 +239,9 @@ export const SleepTimerButton = () => {
     const getPresetLabel = (option: (typeof PRESET_OPTIONS)[number]) => {
         if (option.mode === 'endOfSong') {
             return t('player.sleepTimer_endOfSong');
+        }
+        if (option.mode === 'endOfAlbum') {
+            return t('player.sleepTimer_endOfAlbum');
         }
         if (option.minutes >= 60) {
             return t('player.sleepTimer_hours', {
@@ -231,6 +296,10 @@ export const SleepTimerButton = () => {
                                 <Text c="primary" size="sm">
                                     {t('player.sleepTimer_endOfSong')}
                                 </Text>
+                            ) : mode === 'endOfAlbum' ? (
+                                <Text c="primary" size="sm">
+                                    {t('player.sleepTimer_endOfAlbum')}
+                                </Text>
                             ) : (
                                 <Text c="primary" fw="600" size="lg">
                                     {formatRemaining(remaining)}
@@ -249,12 +318,17 @@ export const SleepTimerButton = () => {
                         </Flex>
                     )}
 
-                    {PRESET_OPTIONS.filter((option) => option.mode === 'endOfSong').map(
-                        (option, index) => (
+                    {PRESET_OPTIONS.filter(
+                        (option) => option.mode === 'endOfSong' || option.mode === 'endOfAlbum',
+                    ).map((option) => {
+                        const disabled = option.mode === 'endOfAlbum' && isTrackShuffle;
+
+                        return (
                             <Button
+                                disabled={disabled}
                                 fullWidth
                                 justify="flex-start"
-                                key={index}
+                                key={option.mode}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handlePreset(option);
@@ -264,8 +338,8 @@ export const SleepTimerButton = () => {
                             >
                                 {getPresetLabel(option)}
                             </Button>
-                        ),
-                    )}
+                        );
+                    })}
 
                     <Divider my="md" />
 

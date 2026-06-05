@@ -47,6 +47,7 @@ export const THEME_DATA = [
     { label: 'Rosé Pine', type: 'dark', value: AppTheme.ROSE_PINE },
     { label: 'Rosé Pine Moon', type: 'dark', value: AppTheme.ROSE_PINE_MOON },
     { label: 'Rosé Pine Dawn', type: 'light', value: AppTheme.ROSE_PINE_DAWN },
+    { label: 'Zenburn', type: 'dark', value: AppTheme.ZENBURN },
 ];
 
 export const useAppTheme = (overrideTheme?: AppTheme) => {
@@ -134,6 +135,11 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
                 document.body.appendChild(textStyleRef.current);
             }
 
+            // Note: we change the url to bust caches when changing the path
+            // The url provided here does NOT matter, validation is done
+            // on the main process. Any feishin:/ url will fetch the same
+            // item, which the renderer will check via magic number to be
+            // some font item
             textStyleRef.current.textContent = `
             @font-face {
                 font-family: "dynamic-font";

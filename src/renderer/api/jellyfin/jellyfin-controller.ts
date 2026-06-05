@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { set } from 'idb-keyval';
 import chunk from 'lodash/chunk';
 import filter from 'lodash/filter';
@@ -13,6 +14,10 @@ import { getFeatures, hasFeature, sortSongList, VersionInfo } from '/@/shared/ap
 import {
     albumArtistListSortMap,
     albumListSortMap,
+    DeleteArtistImageArgs,
+    DeleteArtistImageResponse,
+    DeletePlaylistImageArgs,
+    DeletePlaylistImageResponse,
     Folder,
     genreListSortMap,
     ImageArgs,
@@ -29,6 +34,10 @@ import {
     SortOrder,
     sortOrderMap,
     Tag,
+    UploadArtistImageArgs,
+    UploadArtistImageResponse,
+    UploadPlaylistImageArgs,
+    UploadPlaylistImageResponse,
 } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 
@@ -63,6 +72,94 @@ const formatCommaDelimitedString = (value: string[]) => {
     return value.join(',');
 };
 
+const getImageContentType = (bytes: Uint8Array): string => {
+    if (bytes[0] === 0x89 && bytes[1] === 0x50) {
+        return 'image/png';
+    }
+    if (bytes[0] === 0xff && bytes[1] === 0xd8) {
+        return 'image/jpeg';
+    }
+    if (bytes[0] === 0x47 && bytes[1] === 0x49) {
+        return 'image/gif';
+    }
+    if (bytes[0] === 0x52 && bytes[1] === 0x49) {
+        return 'image/webp';
+    }
+
+    return 'image/jpeg';
+};
+
+const uint8ArrayToBase64 = (bytes: Uint8Array): string => {
+    let binary = '';
+    const chunkSize = 0x8000;
+
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+        const chunk = bytes.subarray(i, i + chunkSize);
+        binary += String.fromCharCode(...chunk);
+    }
+
+    return btoa(binary);
+};
+
+type JellyfinApiClientProps = DeletePlaylistImageArgs['apiClientProps'];
+
+const deleteItemPrimaryImage = async (
+    apiClientProps: JellyfinApiClientProps,
+    id: string,
+    errorMessage: string,
+): Promise<boolean> => {
+    const res = await jfApiClient({
+        ...apiClientProps,
+        server: apiClientProps.server ?? null,
+    }).deleteArtistImage({
+        params: {
+            id,
+        },
+    });
+
+    if (res.status !== 204) {
+        throw new Error(errorMessage);
+    }
+
+    return true;
+};
+
+const uploadItemPrimaryImage = async (
+    apiClientProps: JellyfinApiClientProps,
+    id: string,
+    image: Uint8Array,
+    errorMessage: string,
+): Promise<boolean> => {
+    const server = apiClientProps.server;
+    const serverUrl = getServerUrl(server);
+
+    if (!serverUrl) {
+        throw new Error('Server is required');
+    }
+
+    const contentType = getImageContentType(image);
+    const base64 = uint8ArrayToBase64(image);
+
+    const authHeader = createAuthHeader();
+    const authorization = server?.credential
+        ? authHeader.concat(`, Token="${server.credential}"`)
+        : authHeader;
+
+    const res = await axios.post(`${serverUrl}/Items/${id}/Images/Primary`, base64, {
+        headers: {
+            Authorization: authorization,
+            'Content-Type': contentType,
+        },
+        signal: apiClientProps.signal,
+    });
+
+    if (res.status !== 204) {
+        throw new Error(errorMessage);
+    }
+
+    return true;
+};
+
 // Limit the query to 50 at a time to be *extremely* conservative on the
 // length of the full URL, since the ids are part of the query string and
 // not the POST body
@@ -80,7 +177,14 @@ const VERSION_INFO: VersionInfo = [
             [ServerFeature.PUBLIC_PLAYLIST]: [1],
         },
     ],
-    ['10.0.0', { [ServerFeature.TAGS]: [1] }],
+    [
+        '10.0.0',
+        {
+            [ServerFeature.ARTIST_IMAGE_UPLOAD]: [1],
+            [ServerFeature.PLAYLIST_IMAGE_UPLOAD]: [1],
+            [ServerFeature.TAGS]: [1],
+        },
+    ],
 ];
 
 const JF_FIELDS = {
@@ -231,6 +335,11 @@ export const JellyfinController: InternalControllerEndpoint = {
             id: res.body.Id,
         };
     },
+    deleteArtistImage: async (args: DeleteArtistImageArgs): Promise<DeleteArtistImageResponse> => {
+        const { apiClientProps, query } = args;
+
+        return deleteItemPrimaryImage(apiClientProps, query.id, 'Failed to delete artist image');
+    },
     deleteFavorite: async (args) => {
         const { apiClientProps, query } = args;
 
@@ -280,6 +389,13 @@ export const JellyfinController: InternalControllerEndpoint = {
         }
 
         return null;
+    },
+    deletePlaylistImage: async (
+        args: DeletePlaylistImageArgs,
+    ): Promise<DeletePlaylistImageResponse> => {
+        const { apiClientProps, query } = args;
+
+        return deleteItemPrimaryImage(apiClientProps, query.id, 'Failed to delete playlist image');
     },
     getAlbumArtistDetail: async (args) => {
         const { apiClientProps, query } = args;
@@ -1846,6 +1962,28 @@ export const JellyfinController: InternalControllerEndpoint = {
         }
 
         return null;
+    },
+    uploadArtistImage: async (args: UploadArtistImageArgs): Promise<UploadArtistImageResponse> => {
+        const { apiClientProps, body, query } = args;
+
+        return uploadItemPrimaryImage(
+            apiClientProps,
+            query.id,
+            body.image,
+            'Failed to upload artist image',
+        );
+    },
+    uploadPlaylistImage: async (
+        args: UploadPlaylistImageArgs,
+    ): Promise<UploadPlaylistImageResponse> => {
+        const { apiClientProps, body, query } = args;
+
+        return uploadItemPrimaryImage(
+            apiClientProps,
+            query.id,
+            body.image,
+            'Failed to upload playlist image',
+        );
     },
 };
 

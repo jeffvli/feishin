@@ -49,7 +49,8 @@
         "sleepTimer_endOfSong": "Fin de la canción actual",
         "sleepTimer": "Temporizador de apagado",
         "albumRadio": "Radio del álbum",
-        "scrobbleForceSubmit": "Forzar scrobble"
+        "scrobbleForceSubmit": "Forzar scrobble",
+        "sleepTimer_endOfAlbum": "Fin del álbum actual"
     },
     "setting": {
         "crossfadeStyle_description": "Selecciona el estilo de crossfade a usar por el reproductor de audio",
@@ -296,7 +297,7 @@
         "releaseChannel_description": "Elige entre lanzamientos estables, beta, o alpha (nightly) para las actualizaciones automáticas",
         "artistBackground_description": "Añade una imagen de fondo para las páginas de artistas que contienen el arte de los artistas",
         "mediaSession": "Activar sesión de medios",
-        "mediaSession_description": "Activa la integración de la sesión de medios, mostrando los controles de medios y los metadatos en la superposición del volumen del sistema y en la pantalla de bloqueo",
+        "mediaSession_description": "Activa la integración de la sesión de medios, mostrando los controles de medios y los metadatos en la superposición del volumen del sistema y en la pantalla de bloqueo. Requiere el Reproductor Web de Audio.",
         "exportImportSettings_control_description": "Exporta e importa la configuración a través de JSON",
         "exportImportSettings_control_exportText": "Exportar configuración",
         "exportImportSettings_control_importText": "Importar configuración",

@@ -45,7 +45,7 @@ const getPositionValue = (seconds: number, useTicks: boolean) => {
         return Math.round(seconds * 1e7);
     }
 
-    return seconds;
+    return seconds * 1000;
 };
 
 /*
@@ -459,12 +459,14 @@ export const useScrobble = () => {
             lastProgressEventRef.current = properties.timestamp;
             lastSeekEventRef.current = now;
 
+            const currentStatus = usePlayerStore.getState().player.status;
+
             sendScrobble.mutate(
                 {
                     apiClientProps: { serverId: currentSong._serverId || '' },
                     query: {
                         albumId: currentSong.albumId,
-                        event: 'timeupdate',
+                        event: currentStatus === PlayerStatus.PLAYING ? 'unpause' : 'pause',
                         id: currentSong.id,
                         mediaType: mediaType,
                         playbackRate: playbackRate,

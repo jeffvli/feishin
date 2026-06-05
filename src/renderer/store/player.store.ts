@@ -1185,6 +1185,9 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     });
                 },
                 mediaSeekToTimestamp: (timestamp: number) => {
+                    // See mediaSkipBackward: update the timestamp store right away to
+                    // avoid the stale-read left by the ~500ms engine poll.
+                    setTimestampStore(timestamp);
                     set((state) => {
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(timestamp);
                     });
@@ -1196,6 +1199,11 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const currentTimestamp = useTimestampStoreBase.getState().timestamp;
                     const newTimestamp = Math.max(0, currentTimestamp - timeToSkip);
 
+                    // Update the timestamp store right away so the UI and any
+                    // subsequent seek compute from the new position instead of the
+                    // stale value left by the ~500ms engine poll (otherwise mashing
+                    // the seek keys repeatedly lands on the same time).
+                    setTimestampStore(newTimestamp);
                     set((state) => {
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(newTimestamp);
                     });
@@ -1217,6 +1225,9 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const currentTimestamp = useTimestampStoreBase.getState().timestamp;
                     const newTimestamp = Math.min(duration - 1, currentTimestamp + timeToSkip);
 
+                    // See mediaSkipBackward: update the timestamp store right away to
+                    // avoid the stale-read left by the ~500ms engine poll.
+                    setTimestampStore(newTimestamp);
                     set((state) => {
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(newTimestamp);
                     });

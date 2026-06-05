@@ -1363,7 +1363,7 @@ export type ScrobbleArgs = BaseEndpointArgs & {
 
 export type ScrobbleQuery = {
     albumId?: string;
-    event?: 'pause' | 'start' | 'timeupdate' | 'unpause';
+    event?: 'pause' | 'start' | 'unpause';
     id: string;
     mediaType: 'podcast' | 'song';
     playbackRate: number;

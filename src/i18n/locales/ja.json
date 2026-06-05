@@ -49,7 +49,8 @@
         "albumRadio": "アルバム・ラジオ",
         "artistRadio": "アーティストラジオ",
         "trackRadio": "ラジオを追跡する",
-        "scrobbleForceSubmit": "強制 Scrobble"
+        "scrobbleForceSubmit": "強制 Scrobble",
+        "sleepTimer_endOfAlbum": "現在のアルバムの終了"
     },
     "setting": {
         "crossfadeStyle_description": "オーディオプレーヤーが使用するクロスフェードのスタイルを選択します",
@@ -430,7 +431,16 @@
         "playerbarWaveformStretch_description": "波形を伸縮させて、利用可能なスペースを埋めます",
         "preventSuspendOnPlayback_description": "音楽再生中にアプリケーションが停止しないようにします",
         "preventSuspendOnPlayback": "再生の中断を防止する",
-        "hotkey_listShowPlayingSong": "再生中の曲をリストに表示"
+        "hotkey_listShowPlayingSong": "再生中の曲をリストに表示",
+        "autoDJ_mode": "モード",
+        "autoDJ_mode_albums": "アルバム",
+        "autoDJ_mode_description": "キューに曲を追加するか、アルバム全体を追加するかを選択してください。",
+        "autoDJ_mode_songs": "曲",
+        "autoDJ_enabled": "Auto DJを有効にする",
+        "autoDJ_albumStrategy": "アルバム選択モード",
+        "autoDJ_songStrategy": "選曲モード",
+        "autoDJ_strategy_option_library_random": "ランダム",
+        "autoDJ_strategy_option_similar": "類似"
     },
     "action": {
         "editPlaylist": "$t(entity.playlist, {\"count\": 1}) を編集",
@@ -598,7 +608,8 @@
         "newVersionAvailable": "新しいバージョンが利用可能です",
         "numberOfResults": "{{numberOfResults}} 件の結果",
         "grouping": "グループ化",
-        "back": "戻る"
+        "back": "戻る",
+        "openFolder": "フォルダーを開く"
     },
     "table": {
         "config": {
@@ -1109,7 +1120,12 @@
             "input_played_optionAll": "すべてのトラック",
             "input_played_optionUnplayed": "未再生のトラックのみ",
             "input_played_optionPlayed": "再生されたトラックのみ",
-            "input_played": "再生フィルター"
+            "input_played": "再生フィルター",
+            "input_kind_albums": "アルバム",
+            "input_kind_songs": "曲",
+            "input_kind": "ランダムピック",
+            "input_limit_albums": "アルバムは何枚ですか？",
+            "input_limit_songs": "何曲ですか？"
         },
         "saveQueue": {
             "success": "プレイキューをサーバーに保存しました"

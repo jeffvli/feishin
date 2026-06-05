@@ -169,7 +169,8 @@
         "tableColumns": "Стовпці таблиці",
         "itemsMore": "{{count}} більше",
         "numberOfResults": "{{numberOfResults}} результатів",
-        "newVersionAvailable": "Доступна нова версія"
+        "newVersionAvailable": "Доступна нова версія",
+        "back": "Повернутися"
     },
     "entity": {
         "album_one": "Альбом",
