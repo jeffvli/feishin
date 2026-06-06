@@ -3,6 +3,7 @@ import { contextBridge, webUtils } from 'electron';
 import { autodiscover } from './autodiscover';
 import { browser } from './browser';
 import { discordRpc } from './discord-rpc';
+import { downloads } from './downloads';
 import { ipc } from './ipc';
 import { localSettings } from './local-settings';
 import { lyrics } from './lyrics';
@@ -17,6 +18,7 @@ const api = {
     autodiscover,
     browser,
     discordRpc,
+    downloads,
     getPathForFile: webUtils.getPathForFile,
     ipc,
     localSettings,

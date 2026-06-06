@@ -69,6 +69,7 @@ export const Sidebar = () => {
             Artists: t('page.sidebar.albumArtists'),
             'Artists-all': t('page.sidebar.artists'),
             Collections: t('page.sidebar.collections'),
+            Downloads: t('page.sidebar.downloads', { defaultValue: 'Downloads' }),
             Favorites: t('page.sidebar.favorites'),
             Folders: t('page.sidebar.folders'),
             Genres: t('page.sidebar.genres'),

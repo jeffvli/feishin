@@ -2,8 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 
 import { api } from '/@/renderer/api';
-import { TranscodingConfig } from '/@/renderer/store';
+import { TranscodingConfig, useDownloadedSong, useDownloadsStore } from '/@/renderer/store';
 import { QueueSong } from '/@/shared/types/domain-types';
+import { downloadKey } from '/@/shared/types/downloads';
+
+const localUrlFor = (serverId: string, songId: string) =>
+    `feishin-local://song/${encodeURIComponent(serverId)}/${encodeURIComponent(songId)}`;
 
 export function useSongUrl(
     song: QueueSong | undefined,
@@ -11,12 +15,16 @@ export function useSongUrl(
     transcode: Partial<TranscodingConfig>,
 ): string | undefined {
     const prior = useRef(['', '']);
+    const downloaded = useDownloadedSong(song?._serverId, song?.id);
+
     const shouldReusePrior = Boolean(
         song?._serverId && current && prior.current[0] === song._uniqueId && prior.current[1],
     );
 
+    const useLocal = Boolean(downloaded && song?._serverId);
+
     const { data: queryStreamUrl } = useQuery({
-        enabled: Boolean(song?._serverId) && !shouldReusePrior,
+        enabled: Boolean(song?._serverId) && !shouldReusePrior && !useLocal,
         queryFn: () =>
             api.controller.getStreamUrl({
                 apiClientProps: { serverId: song!._serverId },
@@ -38,19 +46,17 @@ export function useSongUrl(
         staleTime: 60 * 1000,
     });
 
+    const resolvedRemote = shouldReusePrior ? prior.current[1] : queryStreamUrl;
+    const finalUrl = useLocal ? localUrlFor(song!._serverId, song!.id) : resolvedRemote;
+
     useEffect(() => {
         if (!song?._serverId) {
             prior.current = ['', ''];
             return;
         }
-
-        if (!queryStreamUrl) {
-            return;
-        }
-
-        // Save resolved URL to avoid restarting current track on transcode setting changes.
-        prior.current = [song._uniqueId, queryStreamUrl];
-    }, [song?._serverId, song?._uniqueId, queryStreamUrl]);
+        if (!finalUrl) return;
+        prior.current = [song._uniqueId, finalUrl];
+    }, [song?._serverId, song?._uniqueId, finalUrl]);
 
     useEffect(() => {
         if (!song?._serverId) {
@@ -58,7 +64,7 @@ export function useSongUrl(
         }
     }, [song?._serverId]);
 
-    return shouldReusePrior ? prior.current[1] : queryStreamUrl;
+    return finalUrl;
 }
 
 export const getSongUrl = async (
@@ -66,6 +72,11 @@ export const getSongUrl = async (
     transcode: Partial<TranscodingConfig>,
     skipAutoTranscode?: boolean,
 ) => {
+    const downloaded = useDownloadsStore.getState().songs[downloadKey(song._serverId, song.id)];
+    if (downloaded?.absolutePath) {
+        return downloaded.absolutePath;
+    }
+
     const url = await api.controller.getStreamUrl({
         apiClientProps: { serverId: song._serverId },
         query: {

@@ -1014,6 +1014,12 @@ export const sidebarItems: SidebarItemType[] = [
     },
     {
         disabled: false,
+        id: 'Downloads',
+        label: i18n.t('page.sidebar.downloads', { defaultValue: 'Downloads' }),
+        route: AppRoute.DOWNLOADS,
+    },
+    {
+        disabled: false,
         id: 'Albums',
         label: i18n.t('page.sidebar.albums'),
         route: AppRoute.LIBRARY_ALBUMS,
@@ -1301,6 +1307,7 @@ const initialState: SettingsState = {
                         TableColumn.TRACK_NUMBER,
                         TableColumn.TITLE,
                         TableColumn.DURATION,
+                        TableColumn.DOWNLOAD_STATUS,
                         TableColumn.USER_FAVORITE,
                     ],
                 }),
@@ -2480,10 +2487,54 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     );
                 }
 
+                // Idempotent: always inject the Downloads sidebar item and the
+                // DOWNLOAD_STATUS table column if they're missing. Bump version
+                // every time we extend this block so users who upgraded across
+                // intermediate versions still pick it up.
+                if (version <= 30) {
+                    if (
+                        state.general?.sidebarItems &&
+                        !state.general.sidebarItems.some((i) => i.id === 'Downloads')
+                    ) {
+                        state.general.sidebarItems.push({
+                            disabled: false,
+                            id: 'Downloads',
+                            label: i18n.t('page.sidebar.downloads', {
+                                defaultValue: 'Downloads',
+                            }),
+                            route: AppRoute.DOWNLOADS,
+                        });
+                    }
+
+                    const downloadColumn: ItemTableListColumnConfig = {
+                        align: 'center',
+                        autoSize: false,
+                        id: TableColumn.DOWNLOAD_STATUS,
+                        isEnabled: true,
+                        pinned: null,
+                        width: 44,
+                    };
+                    const injectIfMissing = (cols?: ItemTableListColumnConfig[]) => {
+                        if (!cols) return;
+                        if (cols.some((c) => c.id === TableColumn.DOWNLOAD_STATUS)) return;
+                        const favIdx = cols.findIndex((c) => c.id === TableColumn.USER_FAVORITE);
+                        const insertAt = favIdx >= 0 ? favIdx : cols.length;
+                        cols.splice(insertAt, 0, { ...downloadColumn });
+                    };
+                    if (state.lists) {
+                        injectIfMissing(state.lists[LibraryItem.SONG]?.table.columns);
+                        injectIfMissing(state.lists[LibraryItem.PLAYLIST_SONG]?.table.columns);
+                        injectIfMissing(state.lists[LibraryItem.QUEUE_SONG]?.table.columns);
+                        injectIfMissing(state.lists.albumDetail?.table.columns);
+                        injectIfMissing(state.lists.fullScreen?.table.columns);
+                        injectIfMissing(state.lists.sideQueue?.table.columns);
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 28,
+            version: 31,
         },
     ),
 );

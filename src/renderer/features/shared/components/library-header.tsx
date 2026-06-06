@@ -328,9 +328,14 @@ export const calculateTitleSize = (title: string) => {
 };
 
 interface LibraryHeaderMenuProps {
+    downloadActive?: number;
+    downloadDone?: number;
+    downloadStatus?: 'completed' | 'in-progress' | 'none' | 'partial';
+    downloadTotal?: number;
     favorite?: boolean;
     onAlbumRadio?: () => void;
     onArtistRadio?: () => void;
+    onDownload?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     onFavorite?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     onMore?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     onPlay?: (type: Play) => void;
@@ -340,9 +345,14 @@ interface LibraryHeaderMenuProps {
 }
 
 export const LibraryHeaderMenu = ({
+    downloadActive,
+    downloadDone,
+    downloadStatus,
+    downloadTotal,
     favorite,
     onAlbumRadio,
     onArtistRadio,
+    onDownload,
     onFavorite,
     onMore,
     onPlay,
@@ -437,6 +447,15 @@ export const LibraryHeaderMenu = ({
                         value={rating || 0}
                     />
                 )}
+                {onDownload && (
+                    <DownloadHeaderButton
+                        active={downloadActive}
+                        done={downloadDone}
+                        onClick={onDownload}
+                        status={downloadStatus}
+                        total={downloadTotal}
+                    />
+                )}
                 {onFavorite && (
                     <ActionIcon
                         disabled={isMutatingFavorite}
@@ -459,5 +478,54 @@ export const LibraryHeaderMenu = ({
                 )}
             </Group>
         </div>
+    );
+};
+
+interface DownloadHeaderButtonProps {
+    active?: number;
+    done?: number;
+    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    status?: 'completed' | 'in-progress' | 'none' | 'partial';
+    total?: number;
+}
+
+const DownloadHeaderButton = ({
+    active,
+    done,
+    onClick,
+    status,
+    total,
+}: DownloadHeaderButtonProps) => {
+    const { t } = useTranslation();
+    const showCount = typeof total === 'number' && total > 0 && status !== 'completed';
+    const isCompleted = status === 'completed';
+    const isActive = status === 'in-progress';
+    const title = isCompleted
+        ? t('common.downloadedNTotal', { total: total ?? '' })
+        : isActive
+          ? t('common.downloadingNOfM', { active: active ?? 0, total: total ?? 0 })
+          : showCount && done && done > 0
+            ? t('common.downloadedNOfM', { done, total })
+            : t('common.downloadAll');
+
+    return (
+        <Group gap={4} title={title} wrap="nowrap">
+            <ActionIcon
+                disabled={isActive}
+                icon="download"
+                iconProps={{
+                    color: isCompleted ? 'primary' : undefined,
+                    fill: isCompleted ? 'primary' : undefined,
+                }}
+                onClick={onClick}
+                size="lg"
+                variant="transparent"
+            />
+            {showCount && (
+                <Text fw={500} isMuted size="xs">
+                    {done ?? 0}/{total}
+                </Text>
+            )}
+        </Group>
     );
 };

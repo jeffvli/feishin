@@ -178,6 +178,7 @@ export enum TableColumn {
     COMPOSER = 'composer',
     DATE_ADDED = 'createdAt',
     DISC_NUMBER = 'discNumber',
+    DOWNLOAD_STATUS = 'downloadStatus',
     DURATION = 'duration',
     GENRE = 'genres',
     GENRE_BADGE = 'genreBadge',
