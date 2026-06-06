@@ -933,12 +933,12 @@ export const NavidromeController: InternalControllerEndpoint = {
             totalRecordCount: albums.totalRecordCount,
         };
     },
-
     getSongListCount: async ({ apiClientProps, query }) =>
         NavidromeController.getSongList({
             apiClientProps,
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
+
     getStreamUrl: SubsonicController.getStreamUrl,
     getStructuredLyrics: SubsonicController.getStructuredLyrics,
     getTagList: async (args) => {
@@ -1081,6 +1081,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
     },
+    jukeboxControl: SubsonicController.jukeboxControl,
     movePlaylistItem: async (args) => {
         const { apiClientProps, query } = args;
 
