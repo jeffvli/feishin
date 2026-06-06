@@ -1520,6 +1520,7 @@ export type ControllerEndpoint = {
     getTopSongs: (args: TopSongListArgs) => Promise<TopSongListResponse>;
     getUserInfo: (args: UserInfoArgs) => Promise<UserInfoResponse>;
     getUserList?: (args: UserListArgs) => Promise<UserListResponse>;
+    jukeboxControl?: (args: JukeboxControlArgs) => Promise<JukeboxControlResponse>;
     movePlaylistItem?: (args: MoveItemArgs) => Promise<void>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
     replacePlaylist: (args: ReplacePlaylistArgs) => Promise<ReplacePlaylistResponse>;
@@ -1682,6 +1683,9 @@ export type InternalControllerEndpoint = {
     getTopSongs: (args: ReplaceApiClientProps<TopSongListArgs>) => Promise<TopSongListResponse>;
     getUserInfo: (args: ReplaceApiClientProps<UserInfoArgs>) => Promise<UserInfoResponse>;
     getUserList?: (args: ReplaceApiClientProps<UserListArgs>) => Promise<UserListResponse>;
+    jukeboxControl?: (
+        args: ReplaceApiClientProps<JukeboxControlArgs>,
+    ) => Promise<JukeboxControlResponse>;
     movePlaylistItem?: (args: ReplaceApiClientProps<MoveItemArgs>) => Promise<void>;
     removeFromPlaylist: (
         args: ReplaceApiClientProps<RemoveFromPlaylistArgs>,
@@ -1712,6 +1716,54 @@ export type InternalControllerEndpoint = {
     uploadPlaylistImage?: (
         args: ReplaceApiClientProps<UploadPlaylistImageArgs>,
     ) => Promise<UploadPlaylistImageResponse>;
+};
+
+export type JukeboxControlAction =
+    | 'add'
+    | 'clear'
+    | 'get'
+    | 'remove'
+    | 'set'
+    | 'setGain'
+    | 'shuffle'
+    | 'skip'
+    | 'start'
+    | 'status'
+    | 'stop';
+
+export type JukeboxControlArgs = BaseEndpointArgs & { query: JukeboxControlQuery };
+
+export type JukeboxControlQuery = {
+    action: JukeboxControlAction;
+    gain?: number;
+    id?: string;
+    index?: number;
+    offset?: number;
+};
+
+export type JukeboxControlResponse = null | {
+    jukeboxPlaylist?: {
+        currentIndex?: number;
+        entry?: Array<{
+            album?: string;
+            artist?: string;
+            coverArt?: string;
+            duration?: number;
+            id: string;
+            isDir: boolean;
+            parent?: string;
+            title: string;
+        }>;
+        gain: number;
+        playing: boolean;
+        position?: number;
+    };
+    jukeboxStatus?: {
+        currentIndex?: number;
+        gain: number;
+        playing: boolean;
+        position?: number;
+    };
 };
 
 export type LyricGetQuery = {

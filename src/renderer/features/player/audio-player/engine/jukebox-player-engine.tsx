@@ -2,35 +2,27 @@ import type { RefObject } from 'react';
 
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 
+import { useJukeboxControl } from '/@/renderer/features/player/audio-player/hooks/use-jukebox-control';
 import { AudioPlayer } from '/@/renderer/features/player/audio-player/types';
+import { JukeboxControlAction, JukeboxControlQuery } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
 export interface JukeboxPlayerEngineHandle extends AudioPlayer {}
 
 interface JukeboxPlayerEngineProps {
-    credential: string;
     currentTrackId: null | string;
     isMuted: boolean;
     onEnded: () => void;
     onTick: (positionSeconds: number) => void;
     playerRef: RefObject<JukeboxPlayerEngineHandle | null>;
     playerStatus: PlayerStatus;
-    serverUrl: string;
+    serverId: string;
     volume: number;
 }
 
 export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
-    const {
-        credential,
-        currentTrackId,
-        isMuted,
-        onEnded,
-        onTick,
-        playerRef,
-        playerStatus,
-        serverUrl,
-        volume,
-    } = props;
+    const { currentTrackId, isMuted, onEnded, onTick, playerRef, playerStatus, serverId, volume } =
+        props;
 
     const pollRef = useRef<NodeJS.Timeout | null>(null);
     const lastPositionRef = useRef<number>(-1);
@@ -38,13 +30,21 @@ export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
     const isChangingTrackRef = useRef<boolean>(false); // 👈 Blocks skip/seek API calls during track setup
     const [gainValue, setGainValue] = useState(volume / 100);
 
-    const callApi = async (action: string, extra = '') => {
-        if (!serverUrl || !credential) return null;
-        const url = `${serverUrl}/rest/jukeboxControl?${credential}&v=1.16.1&c=Feishin&f=json&action=${action}${extra ? '&' + extra : ''}`;
+    const jukeboxControlMutation = useJukeboxControl();
+
+    const callApi = async (
+        action: JukeboxControlAction,
+        queryParams: Omit<JukeboxControlQuery, 'action'> = {},
+    ) => {
+        if (!serverId) return null;
         try {
-            const r = await fetch(url);
-            const d = await r.json();
-            return d['subsonic-response'];
+            return await jukeboxControlMutation.mutateAsync({
+                apiClientProps: { serverId },
+                query: {
+                    action,
+                    ...queryParams,
+                },
+            });
         } catch {
             return null;
         }
@@ -66,7 +66,7 @@ export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
                 lastPositionRef.current = -1;
 
                 // Let 'set' clear and replace the playlist context simultaneously
-                await callApi('set', `id=${currentTrackId}`);
+                await callApi('set', { id: currentTrackId });
 
                 if (playerStatus === PlayerStatus.PLAYING) {
                     await callApi('start');
@@ -97,7 +97,7 @@ export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
     // 3. Audio Level Matcher
     useEffect(() => {
         const gain = isMuted ? 0 : gainValue;
-        callApi('setGain', `gain=${gain.toFixed(2)}`);
+        callApi('setGain', { gain });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [gainValue, isMuted]);
 
@@ -150,12 +150,12 @@ export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
         seekTo(seconds: number) {
             // Guard clause: Discard seek requests if Navidrome playlist array length is 0
             if (isChangingTrackRef.current) return;
-            callApi('skip', `index=0&offset=${Math.floor(seconds)}`);
+            callApi('skip', { index: 0, offset: Math.floor(seconds) });
         },
         setVolume(vol: number) {
             const gain = vol / 100;
             setGainValue(gain);
-            callApi('setGain', `gain=${gain.toFixed(2)}`);
+            callApi('setGain', { gain });
         },
     }));
 

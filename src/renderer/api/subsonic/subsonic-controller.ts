@@ -2175,6 +2175,25 @@ export const SubsonicController: InternalControllerEndpoint = {
             name: res.body.user.username,
         };
     },
+    jukeboxControl: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const res = await ssApiClient(apiClientProps).jukeboxControl({
+            query: {
+                action: query.action,
+                gain: query.gain,
+                id: query.id,
+                index: query.index,
+                offset: query.offset,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to control jukebox');
+        }
+
+        return res.body;
+    },
     removeFromPlaylist: async ({ apiClientProps, query }) => {
         const res = await ssApiClient(apiClientProps).updatePlaylist({
             query: {

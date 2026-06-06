@@ -7,7 +7,7 @@ import {
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
-    useAuthStore,
+    useCurrentServerId,
     usePlayerActions,
     usePlayerData,
     usePlayerMuted,
@@ -23,8 +23,7 @@ export function JukeboxPlayer() {
     const volume = usePlayerVolume();
     const player = usePlayer();
 
-    const credential = useAuthStore((state) => state.currentServer?.credential ?? '');
-    const serverUrl = useAuthStore((state) => state.currentServer?.url ?? '');
+    const serverId = useCurrentServerId();
 
     const currentTrackId = currentSong?.id ?? null;
 
@@ -52,7 +51,6 @@ export function JukeboxPlayer() {
 
     return (
         <JukeboxPlayerEngine
-            credential={credential}
             currentTrackId={currentTrackId}
             isMuted={isMuted}
             onEnded={mediaAutoNext}
@@ -61,7 +59,7 @@ export function JukeboxPlayer() {
             }}
             playerRef={playerRef}
             playerStatus={status}
-            serverUrl={serverUrl}
+            serverId={serverId}
             volume={volume}
         />
     );
