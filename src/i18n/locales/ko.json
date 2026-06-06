@@ -694,7 +694,8 @@
             "broadcast": "방송",
             "ep": "ep앨범",
             "other": "기타",
-            "single": "싱글"
+            "single": "싱글",
+            "album": "$t(entity.album, {\"count\": 1})"
         },
         "secondary": {
             "audiobook": "오디오북",
@@ -737,5 +738,8 @@
         "notInPlaylist": "~ 안에 있지 않다",
         "notInTheLast": "마지막에 있지 않다",
         "startsWith": "~로 시작함"
+    },
+    "queryBuilder": {
+        "customTags": "사용자 정의 태그"
     }
 }

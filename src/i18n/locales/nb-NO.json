@@ -3,7 +3,9 @@
         "openIn": {
             "lastfm": "Åpne i Last.fm",
             "musicbrainz": "Åpne i MusicBrainz",
-            "spotify": "Åpne i Spotify"
+            "spotify": "Åpne i Spotify",
+            "listenbrainz": "Åpne i ListenBrainz",
+            "qobuz": "Åpne i Qobuz"
         },
         "moveToBottom": "Flytt til bunnen",
         "deletePlaylist": "Slett $t(entity.playlist, {\"count\": 1})",
@@ -38,7 +40,10 @@
         "shuffleAll": "Tilfelding avspilling av alt",
         "shuffleSelected": "Tilfelding avspilling av utvalgte",
         "viewMore": "Se mer",
-        "openApplicationDirectory": "Åpne applikasjonskatalogen"
+        "openApplicationDirectory": "Åpne applikasjonskatalogen",
+        "goToCurrent": "Gå til gjeldende element",
+        "collapseAllFolders": "Skjul alle mapper",
+        "expandAllFolders": "Utvid alle mapper"
     },
     "common": {
         "bpm": "Bpm",
@@ -161,7 +166,11 @@
         "tableColumns": "Tabellkolonner",
         "itemsMore": "{{count}} fler",
         "explicitStatus": "Grovhetsstatus",
-        "newVersionAvailable": "En ny version er tilgjengelig"
+        "newVersionAvailable": "En ny version er tilgjengelig",
+        "back": "Tilbake",
+        "openFolder": "Åpne mappe",
+        "grouping": "Grupper",
+        "numberOfResults": "{{numberOfResults}} resultater"
     },
     "entity": {
         "smartPlaylist": "Smart $t(entity.playlist, {\"count\": 1})",
@@ -667,7 +676,19 @@
                 "b": "B",
                 "c": "C",
                 "d": "D",
-                "z": "Z"
+                "z": "Z",
+                "none": "Ingen"
+            },
+            "frequencyScale": {
+                "linear": "Lineær skala",
+                "log": "Logaritmisk skala"
+            },
+            "channelLayout": {
+                "single": "Enkel"
+            },
+            "gradient": {
+                "rainbow": "Regnbue",
+                "prism": "Prisme"
             }
         }
     }
