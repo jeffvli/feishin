@@ -97,7 +97,7 @@ export const useServerAuthenticated = () => {
                         isAdmin: userInfo.isAdmin,
                     });
 
-                    // Fetch and update server version and features
+                    // Fetch and update server version and featuresauthenticateServer
                     try {
                         const serverInfo = await controller.getServerInfo({
                             apiClientProps: {
@@ -298,6 +298,7 @@ export const useServerAuthenticated = () => {
                     await new Promise((resolve) => setTimeout(resolve, NETWORK_RETRY_DELAY_MS));
 
                     // Retry authentication
+                    // eslint-disable-next-line react-hooks/immutability
                     return authenticateServer(serverWithAuth, nextRetry);
                 }
 
