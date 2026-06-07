@@ -6,7 +6,7 @@ body:
     - type: checkboxes
       id: check-duplicate
       attributes:
-          label: I have already checked through the existing bug reports and found no duplicates
+          label: I have already checked through the existing (both open AND closed) bug reports and found no duplicates
           options:
               - label: 'Yes'
                 required: true

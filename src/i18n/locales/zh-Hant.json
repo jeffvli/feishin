@@ -420,7 +420,8 @@
         "sleepTimer_setCustom": "設定定時器",
         "sleepTimer_cancel": "取消定時器",
         "albumRadio": "專輯電台",
-        "scrobbleForceSubmit": "強制紀錄"
+        "scrobbleForceSubmit": "強制紀錄",
+        "sleepTimer_endOfAlbum": "專輯播完時"
     },
     "setting": {
         "audioPlayer_description": "選擇用於播放的音訊播放器",
@@ -666,7 +667,7 @@
         "preventSleepOnPlayback": "防止播放時進入睡眠狀態",
         "preventSleepOnPlayback_description": "在音樂播放時防止螢幕進入睡眠狀態",
         "mediaSession": "啟用 Media Session",
-        "mediaSession_description": "啟用 Media Session 整合功能，於系統音量 Overlay 和鎖定畫面中顯示媒體資料與控制面板",
+        "mediaSession_description": "啟用 Media Session 整合功能，在系統音量疊加層和鎖定畫面上顯示媒體控制項與中繼資料。此功能需要使用網頁播放器。",
         "releaseChannel": "發佈通道",
         "analyticsDisable": "選擇退出使用情況分析",
         "analyticsDisable_description": "經過匿名處理的使用情況資料將傳送給開發者，以協助改進應用程式",

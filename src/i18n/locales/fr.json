@@ -49,7 +49,8 @@
         "sleepTimer_setCustom": "Définir le minuteur",
         "sleepTimer_cancel": "Annuler le minuteur",
         "albumRadio": "Radio d'album",
-        "scrobbleForceSubmit": "Forcer le scrobble"
+        "scrobbleForceSubmit": "Forcer le scrobble",
+        "sleepTimer_endOfAlbum": "Fin de l'album actuel"
     },
     "action": {
         "editPlaylist": "Éditer $t(entity.playlist, {\"count\": 1})",
@@ -226,7 +227,8 @@
         "rename": "Renommer",
         "newVersionAvailable": "Une nouvelle version est disponible",
         "numberOfResults": "{{numberOfResults}} résultats",
-        "back": "Retour"
+        "back": "Retour",
+        "openFolder": "Ouvrir le dossier"
     },
     "error": {
         "remotePortWarning": "Redémarrer le serveur pour appliquer le nouveau port",
@@ -728,7 +730,7 @@
         "translationTargetLanguage": "Langue cible de traduction",
         "trayEnabled": "Afficher la barre d’état système",
         "translationApiProvider_description": "Fournisseur d'API pour la traduction",
-        "customCss_description": "Contenu CSS personnalisé. Remarque : les propriétés 'content' et les URL distantes ne sont pas autorisées. Un aperçu de votre contenu est affiché ci-dessous. Des champs supplémentaires que vous n'avez pas définis sont présents en raison d'assainissement",
+        "customCss_description": "Contenu CSS personnalisé. Remarque : les propriétés 'content' et les URL distantes ne sont pas autorisées. Un aperçu de votre contenu est affiché ci-dessous. Des champs supplémentaires que vous n'avez pas définis sont présents en raison d'assainissement. Application de Bureau uniquement: feishin lit et écrit le fichier custom.css dans le répertoire de configuration de l'application et le recharge lorsque celui-ci est modifié",
         "translationApiKey": "Clé API de traduction",
         "translationTargetLanguage_description": "Langue cible pour la traduction",
         "trayEnabled_description": "Afficher/masquer l’icône/le menu dans la barre d’état système. si désactivé, désactive également la réduction/fermeture vers la barre d’état système",
@@ -813,7 +815,7 @@
         "queryBuilderCustomFields_description": "Ajouter des champs personnalisés à utiliser dans les constructeurs de requêtes",
         "autoDJ": "DJ auto",
         "autoDJ_itemCount": "Nombre d'entrée",
-        "autoDJ_itemCount_description": "Le nombre d'entrées tentées d'être ajoutées à la file d'attente lorsque le DJ auto est activé",
+        "autoDJ_itemCount_description": "Le nombre d'entrées tentées d'être ajoutées à la file d'attente",
         "autoDJ_timing": "Timing",
         "autoDJ_timing_description": "Le nombre de titres restant dans la file d'attente avant le déclenchement du DJ auto",
         "followCurrentSong_description": "Défiler automatiquement la file d'attente jusqu'au titre en cours",
@@ -915,7 +917,16 @@
         "sidebarPlaylistFolderTreeIndent": "Indentation de l'arbre",
         "sidebarPlaylistMode_description": "Comment chaque liste de lecture est affichée dans la barre latérale",
         "sidebarPlaylistMode": "Mode de liste de lecture de la barre latérale",
-        "sidebarPlaylistMode_optionCompact": "Compacte"
+        "sidebarPlaylistMode_optionCompact": "Compacte",
+        "autoDJ_mode": "Mode",
+        "autoDJ_mode_albums": "Albums",
+        "autoDJ_mode_description": "Choisissez d'ajouter des titres ou des albums entiers à la file d'attente",
+        "autoDJ_mode_songs": "Titres",
+        "autoDJ_enabled": "Activer le DJ auto",
+        "autoDJ_albumStrategy": "Mode de sélection d'album",
+        "autoDJ_songStrategy": "Mode de sélection de titre",
+        "autoDJ_strategy_option_library_random": "Aléatoire",
+        "autoDJ_strategy_option_similar": "Similaire"
     },
     "form": {
         "deletePlaylist": {
@@ -1009,7 +1020,12 @@
             "input_played": "Filtre de lecture",
             "input_played_optionAll": "Toutes les pistes",
             "input_played_optionUnplayed": "Seulement les pistes non jouées",
-            "input_played_optionPlayed": "Seulement les pistes jouées"
+            "input_played_optionPlayed": "Seulement les pistes jouées",
+            "input_kind_songs": "Titres",
+            "input_kind_albums": "Albums",
+            "input_kind": "Sélections aléatoires",
+            "input_limit_albums": "Combien d'albums ?",
+            "input_limit_songs": "Combien de titres ?"
         },
         "createRadioStation": {
             "success": "Station radio créée avec succès",

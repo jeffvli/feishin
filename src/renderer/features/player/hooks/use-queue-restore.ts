@@ -19,6 +19,8 @@ import {
 import { toast } from '/@/shared/components/toast/toast';
 import { PlayerStatus } from '/@/shared/types/types';
 
+let startupRestoreSessionHandled = false;
+
 export const useQueueRestoreTimestamp = () => {
     const { mediaSeekToTimestamp } = usePlayerActions();
 
@@ -51,28 +53,65 @@ export const useInitialTimestampRestore = () => {
 
     const startupRestoreInitializedRef = useRef(false);
     const startupSeekArmedRef = useRef<null | number>(null);
+    const startupSeekTargetUniqueIdRef = useRef<null | string>(null);
     const startupSeekAppliedRef = useRef(false);
 
-    const applyStartupSeek = useCallback(() => {
+    const cancelStartupSeek = useCallback(() => {
         if (startupSeekAppliedRef.current) {
-            return;
-        }
-
-        const seekTimestamp = startupSeekArmedRef.current;
-        if (!seekTimestamp || seekTimestamp <= 0) {
             return;
         }
 
         startupSeekAppliedRef.current = true;
         startupSeekArmedRef.current = null;
+        startupSeekTargetUniqueIdRef.current = null;
+    }, []);
+
+    const applyStartupSeek = useCallback(() => {
+        const seekTimestamp = startupSeekArmedRef.current;
+
+        if (startupSeekAppliedRef.current) {
+            return;
+        }
+
+        if (!seekTimestamp || seekTimestamp <= 0) {
+            return;
+        }
+
+        const targetUniqueId = startupSeekTargetUniqueIdRef.current;
+        const currentUniqueId = usePlayerStore.getState().getQueue().items[
+            usePlayerStore.getState().player.index
+        ]?._uniqueId;
+
+        if (targetUniqueId && currentUniqueId !== targetUniqueId) {
+            cancelStartupSeek();
+            return;
+        }
+
+        startupSeekAppliedRef.current = true;
+        startupSeekArmedRef.current = null;
+        startupSeekTargetUniqueIdRef.current = null;
 
         setTimeout(() => {
             mediaSeekToTimestamp(seekTimestamp);
         }, 100);
-    }, [mediaSeekToTimestamp]);
+    }, [cancelStartupSeek, mediaSeekToTimestamp]);
 
     useEffect(() => {
-        if (startupRestoreInitializedRef.current) {
+        const targetUniqueId = startupSeekTargetUniqueIdRef.current;
+        if (
+            !targetUniqueId ||
+            startupSeekAppliedRef.current ||
+            !currentSong ||
+            currentSong._uniqueId === targetUniqueId
+        ) {
+            return;
+        }
+
+        cancelStartupSeek();
+    }, [cancelStartupSeek, currentSong]);
+
+    useEffect(() => {
+        if (startupRestoreInitializedRef.current || startupRestoreSessionHandled) {
             return;
         }
 
@@ -81,9 +120,11 @@ export const useInitialTimestampRestore = () => {
         }
 
         startupRestoreInitializedRef.current = true;
+        startupRestoreSessionHandled = true;
 
         if (timestamp > 0) {
             startupSeekArmedRef.current = timestamp;
+            startupSeekTargetUniqueIdRef.current = currentSong._uniqueId;
         }
 
         if (playerStatus === PlayerStatus.PLAYING) {
@@ -129,26 +170,20 @@ export const useSaveQueue = () => {
                 throw new Error(`${t('error.multipleServerSaveQueueError')}`);
             }
 
-            try {
-                await api.controller.savePlayQueue({
-                    apiClientProps: { serverId },
-                    query: {
-                        currentIndex: queue.items.length > 0 ? state.player.index : undefined,
-                        positionMs: useTimestampStoreBase.getState().timestamp * 1000,
-                        songs: queue.items.map((item) => item.id),
-                    },
-                });
-
-                toast.success({
-                    message: t('form.saveQueue.success'),
-                });
-            } catch (error) {
-                toast.error({
-                    message: (error as Error).message,
-                    title: t('error.saveQueueFailed'),
-                });
-                throw error;
-            }
+            return api.controller.savePlayQueue({
+                apiClientProps: { serverId },
+                query: {
+                    currentIndex: queue.items.length > 0 ? state.player.index : undefined,
+                    positionMs: useTimestampStoreBase.getState().timestamp * 1000,
+                    songs: queue.items.map((item) => item.id),
+                },
+            });
+        },
+        onError: (error) => {
+            toast.error({
+                message: (error as Error).message,
+                title: t('error.saveQueueFailed'),
+            });
         },
     });
 

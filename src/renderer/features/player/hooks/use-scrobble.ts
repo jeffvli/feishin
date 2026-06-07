@@ -45,7 +45,7 @@ const getPositionValue = (seconds: number, useTicks: boolean) => {
         return Math.round(seconds * 1e7);
     }
 
-    return seconds;
+    return seconds * 1000;
 };
 
 /*
@@ -67,8 +67,9 @@ Jellyfin progress APIs still use playback position (ticks), not listen time:
   - pause / unpause
 
 Other events:
-  - When the song changes: sends 'start' when the new track is playing;
-    clears submission flag and listen accumulator for the new track.
+  - When the song changes: sends 'stop' for the previous track; sends 'start'
+    when the new track is playing; clears submission flag and listen accumulator
+    for the new track.
 
   - When the song is restarted (near 0 after 10s+): clears submission flag
     and listen accumulator.
@@ -129,6 +130,7 @@ export const useScrobble = () => {
 
     const previousSongRef = useRef<QueueSong | undefined>(undefined);
     const previousTimestampRef = useRef<number>(0);
+    const stopPositionRef = useRef<number>(0);
     const lastProgressEventRef = useRef<number>(0);
     const lastSeekEventRef = useRef<number>(0);
     const songChangeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -180,9 +182,6 @@ export const useScrobble = () => {
 
             const currentSong = usePlayerStore.getState().getCurrentSong();
             const mediaType = currentSong?._itemType.includes('song') ? 'song' : 'podcast';
-            const serverId = currentSong?._serverId;
-            const server = getServerById(serverId);
-            const hasPlaybackReport = hasFeature(server, ServerFeature.REPORT_PLAYBACK);
             const useTicks = currentSong?._serverType === ServerType.JELLYFIN;
             const currentStatus = usePlayerStore.getState().player.status;
             const currentTime = properties.timestamp;
@@ -239,36 +238,36 @@ export const useScrobble = () => {
             }
 
             // Send progress events every 10 seconds
-            if (hasPlaybackReport) {
-                const timeSinceLastProgress = currentTime - lastProgressEventRef.current;
-                if (timeSinceLastProgress >= 10) {
-                    sendScrobble.mutate(
-                        {
-                            apiClientProps: { serverId: serverId || '' },
-                            query: {
-                                albumId: currentSong.albumId,
-                                event: 'timeupdate',
-                                id: currentSong.id,
-                                mediaType: mediaType,
-                                playbackRate,
-                                position: getPositionValue(currentTime, useTicks),
-                                submission: false,
-                            },
-                        },
-                        {
-                            onSuccess: () => {
-                                logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledTimeupdate, {
-                                    category: LogCategory.SCROBBLE,
-                                    meta: {
-                                        id: currentSong.id,
-                                    },
-                                });
-                            },
-                        },
-                    );
-                    lastProgressEventRef.current = currentTime;
-                }
-            }
+            // if (hasPlaybackReport) {
+            //     const timeSinceLastProgress = currentTime - lastProgressEventRef.current;
+            //     if (timeSinceLastProgress >= 10) {
+            //         sendScrobble.mutate(
+            //             {
+            //                 apiClientProps: { serverId: serverId || '' },
+            //                 query: {
+            //                     albumId: currentSong.albumId,
+            //                     event: 'timeupdate',
+            //                     id: currentSong.id,
+            //                     mediaType: mediaType,
+            //                     playbackRate,
+            //                     position: getPositionValue(currentTime, useTicks),
+            //                     submission: false,
+            //                 },
+            //             },
+            //             {
+            //                 onSuccess: () => {
+            //                     logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledTimeupdate, {
+            //                         category: LogCategory.SCROBBLE,
+            //                         meta: {
+            //                             id: currentSong.id,
+            //                         },
+            //                     });
+            //                 },
+            //             },
+            //         );
+            //         lastProgressEventRef.current = currentTime;
+            //     }
+            // }
 
             // Check if we should submit scrobble based on listened time
             if (!isCurrentSongScrobbledRef.current) {
@@ -319,7 +318,10 @@ export const useScrobble = () => {
         ) => {
             const currentSong = properties.song;
             const previousSong = previousSongRef.current;
+            const previousPositionSec = stopPositionRef.current;
             const mediaType = currentSong?._itemType.includes('song') ? 'song' : 'podcast';
+            const previousMediaType = previousSong?._itemType.includes('song') ? 'song' : 'podcast';
+            const useTicksForPrevious = previousSong?._serverType === ServerType.JELLYFIN;
 
             // Handle notifications
             if (scrobbleSettings?.notify && currentSong?.id) {
@@ -355,6 +357,7 @@ export const useScrobble = () => {
             if (!isScrobbleEnabled || isPrivateModeEnabled) {
                 previousSongRef.current = currentSong;
                 previousTimestampRef.current = 0;
+                stopPositionRef.current = 0;
                 listenedMsRef.current = 0;
                 lastListenSampleTimeRef.current = null;
                 flushScrobbleDebug();
@@ -398,10 +401,42 @@ export const useScrobble = () => {
                         },
                     );
                 }
+
+                // Send stop scrobble for the track that was playing before the change
+                if (previousSong?.id) {
+                    sendScrobble.mutate(
+                        {
+                            apiClientProps: { serverId: previousSong._serverId || '' },
+                            query: {
+                                albumId: previousSong.albumId,
+                                event: 'stop',
+                                id: previousSong.id,
+                                mediaType: previousMediaType,
+                                playbackRate: playbackRate,
+                                position: getPositionValue(
+                                    previousPositionSec,
+                                    useTicksForPrevious,
+                                ),
+                                submission: false,
+                            },
+                        },
+                        {
+                            onSuccess: () => {
+                                logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledStop, {
+                                    category: LogCategory.SCROBBLE,
+                                    meta: {
+                                        id: previousSong.id,
+                                    },
+                                });
+                            },
+                        },
+                    );
+                }
             }, 2000);
 
             previousSongRef.current = currentSong;
             previousTimestampRef.current = 0;
+            stopPositionRef.current = 0;
             flushScrobbleDebug();
         },
         [
@@ -462,12 +497,14 @@ export const useScrobble = () => {
             lastProgressEventRef.current = properties.timestamp;
             lastSeekEventRef.current = now;
 
+            const currentStatus = usePlayerStore.getState().player.status;
+
             sendScrobble.mutate(
                 {
                     apiClientProps: { serverId: currentSong._serverId || '' },
                     query: {
                         albumId: currentSong.albumId,
-                        event: 'timeupdate',
+                        event: currentStatus === PlayerStatus.PLAYING ? 'unpause' : 'pause',
                         id: currentSong.id,
                         mediaType: mediaType,
                         playbackRate: playbackRate,
@@ -592,6 +629,7 @@ export const useScrobble = () => {
         isCurrentSongScrobbledRef.current = false;
         lastProgressEventRef.current = 0;
         previousTimestampRef.current = 0;
+        stopPositionRef.current = 0;
         listenedMsRef.current = 0;
         lastListenSampleTimeRef.current = null;
 
@@ -626,6 +664,17 @@ export const useScrobble = () => {
     // Update previous timestamp on progress for use in status change handler
     const handleProgressUpdate = useCallback(
         (properties: { timestamp: number }, prev: { timestamp: number }) => {
+            // Preserve last playback position when the playhead resets to the start
+            // (song change can fire after progress already reports 0 for the new track).
+            if (
+                properties.timestamp < SCROBBLE_TRACK_BEGIN_SEC &&
+                prev.timestamp >= SCROBBLE_TRACK_BEGIN_SEC
+            ) {
+                stopPositionRef.current = prev.timestamp;
+            } else {
+                stopPositionRef.current = properties.timestamp;
+            }
+
             previousTimestampRef.current = properties.timestamp;
             handleScrobbleFromProgress(properties, prev);
             flushScrobbleDebug();

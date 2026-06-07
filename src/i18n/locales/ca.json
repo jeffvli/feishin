@@ -341,7 +341,8 @@
         "rename": "Reanomena",
         "newVersionAvailable": "Hi ha una nova versió disponible",
         "numberOfResults": "{{numberOfResults}} resultats",
-        "back": "Enrere"
+        "back": "Enrere",
+        "openFolder": "Obre la carpeta"
     },
     "entity": {
         "album_one": "Àlbum",
@@ -462,7 +463,7 @@
             "expireInvalid": "La data d'expiració ha de ser al futur",
             "createFailed": "No s'ha pogut crear el recurs compartit (està habilitat, l'ús compartit?)",
             "copyToClipboard": "Copiar al porta-retalls: Ctrl+C, enter",
-            "successMustClick": "Compartició creada correctament. Feu clic aquí per obrir-la."
+            "successMustClick": "Compartició creada correctament. Feu clic aquí per obrir-la"
         },
         "updateServer": {
             "success": "S'ha actualitzat el servidor amb èxit",
@@ -495,7 +496,12 @@
             "input_played": "Reprodueix el filtre",
             "input_played_optionAll": "Totes les pistes",
             "input_played_optionUnplayed": "Només les pistes sense reproduir",
-            "input_played_optionPlayed": "Només les pistes reproduïdes"
+            "input_played_optionPlayed": "Només les pistes reproduïdes",
+            "input_kind_albums": "Àlbums",
+            "input_kind_songs": "Cançons",
+            "input_kind": "Seleccions a l'atzar",
+            "input_limit_albums": "Quants àlbums?",
+            "input_limit_songs": "Quantes cançons?"
         },
         "createRadioStation": {
             "success": "Emissora de ràdio creada amb èxit",
@@ -626,7 +632,7 @@
         "customCssEnable_description": "Permet escriure CSS personalitzat",
         "customCssNotice": "Atenció: tot i que hi ha un filtre (no es permet ni URL() ni content:), l'ús de CSS personalitzat pot presentar riscs si canvieu la interfície",
         "customCss": "Css personalitzat",
-        "customCss_description": "Contingut del CSS personalitzat. Nota: la propietat \"content\" i els urls remots no es permeten. A sota hi teniu una previsualització. Els camps addicionals que no establiu hi apareixin pel filtre",
+        "customCss_description": "Contingut del CSS personalitzat. Nota: la propietat \"content\" i els urls remots no es permeten. A sota hi teniu una previsualització. Els camps addicionals que no establiu hi apareixen a causa de la sanitització. Escriptori: Feishin llegeix i escriu custom.css al directori de configuració de l'aplicació i el recarrega quan el fitxer canvia",
         "customFontPath": "Ruta de font personalitzada",
         "customFontPath_description": "Estableix la ruta a una font personalitzada per utilitzar-la a l'aplicació",
         "discordApplicationId": "ID d'aplicació de {{discord}}",
@@ -807,7 +813,7 @@
         "releaseChannel": "Canal de versions",
         "releaseChannel_description": "Trieu entre versions estables i beta o alfa (diàries) per les actualitzacions automàtiques",
         "mediaSession": "Activa media session",
-        "mediaSession_description": "Activa la integració amb Media Session per mostrar els controls multimèdia i les metadades a l'indicador de volum del sistema i la pantalla de bloqueig",
+        "mediaSession_description": "Activa la integració amb Media Session per mostrar els controls multimèdia i les metadades a l'indicador de volum del sistema i la pantalla de bloqueig. Requereix el Reproductor Web d'Àudio.",
         "crossfadeStyle": "Estil de fosa encadenada",
         "discordRichPresence": "Estat d'activitat de {{discord}}",
         "enableAutoTranslation_description": "Activa la traducció automàtica en carregar la lletra",
@@ -828,7 +834,7 @@
         "transcode": "Activa la transcodificació",
         "autoDJ": "DJ automàtic",
         "autoDJ_itemCount": "Número d'elements",
-        "autoDJ_itemCount_description": "El nombre d'elements que s'intenten afegir a la cua quan el DJ automàtic està activat",
+        "autoDJ_itemCount_description": "El nombre d'elements que s'intenten afegir a la cua",
         "autoDJ_timing": "Temps",
         "autoDJ_timing_description": "El nombre de cançons que han de quedar a la cua per activar el DJ automàtic",
         "analyticsDisable": "Desactiva les analítiques basades en l'ús",
@@ -958,7 +964,16 @@
         "sidebarPlaylistMode_description": "Com es mostra cada llista de reproducció a la llista de la barra lateral",
         "sidebarPlaylistMode": "Mode de llista de reproducció a la barra lateral",
         "sidebarPlaylistMode_optionCompact": "Compacte",
-        "sidebarPlaylistMode_optionExpanded": "Expandit"
+        "sidebarPlaylistMode_optionExpanded": "Expandit",
+        "autoDJ_mode": "Mode",
+        "autoDJ_mode_albums": "Àlbums",
+        "autoDJ_mode_description": "Trieu si voleu afegir cançons o àlbums sencers a la cua",
+        "autoDJ_mode_songs": "Cançons",
+        "autoDJ_enabled": "Activa el DJ automàtic",
+        "autoDJ_albumStrategy": "Mode de selecció d'àlbum",
+        "autoDJ_songStrategy": "Mode de selecció de cançó",
+        "autoDJ_strategy_option_library_random": "A l'atzar",
+        "autoDJ_strategy_option_similar": "Similar"
     },
     "table": {
         "column": {

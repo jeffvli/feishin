@@ -12,7 +12,8 @@ jobs:
             pull-requests: write
         runs-on: ubuntu-latest
         steps:
-            - uses: dessant/lock-threads@v5
+            - uses: dessant/lock-threads@v6
+
               with:
                   process-only: 'issues, prs'
                   issue-inactive-days: 120
@@ -29,15 +30,15 @@ jobs:
                   days-before-pr-close: 30
                   stale-issue-message: >
                       This issue has been automatically marked as stale because it has not had recent activity. The resources of the Feishin team are limited, and so we are asking for your help.
-
+                      
                       If this is a **bug** and you can still reproduce this error on the <code>development</code> branch, please reply with all of the information you have about it in order to keep the issue open.
-
+                      
                       This issue will automatically be closed in the near future if no further activity occurs. Thank you for all your contributions.
 
 
                   stale-pr-message: >
                       This PR has been automatically marked as stale because it has not had recent activity. The resources of the Feishin team are limited, and so we are asking for your help.
-
+                      
                       This PR will automatically be closed in the near future if no further activity occurs. Thank you for all your contributions.
 
 
