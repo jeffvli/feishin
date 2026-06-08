@@ -107,6 +107,7 @@ export const logMsg = {
     [LogCategory.SCROBBLE]: {
         scrobbledPause: 'Scrobbled a pause event',
         scrobbledStart: 'Scrobbled a start event',
+        scrobbledStop: 'Scrobbled a stop event',
         scrobbledSubmission: 'Scrobbled a submission event',
         scrobbledTimeupdate: 'Scrobbled a timeupdate event',
         scrobbledUnpause: 'Scrobbled an unpause event',
