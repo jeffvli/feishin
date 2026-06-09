@@ -13,6 +13,7 @@ import {
 import {
     DiscordDisplayType,
     DiscordLinkType,
+    DiscordServerType,
     useAppStore,
     useDiscordSettings,
     useLastfmApiKey,
@@ -256,7 +257,7 @@ export const useDiscordRpc = () => {
                 activity.smallImageText = sentenceCase(current[2]);
             }
 
-            if (discordSettings.showServerImage && song) {
+            if (discordSettings.serverType == DiscordServerType.MUSIC_SERVER && song) {
                 if (song._uniqueId === currentSong?._uniqueId && imageUrlRef.current) {
                     if (song._serverType === ServerType.JELLYFIN) {
                         activity.largeImageKey = imageUrlRef.current;
@@ -335,7 +336,7 @@ export const useDiscordRpc = () => {
         },
         [
             discordSettings.showAsListening,
-            discordSettings.showServerImage,
+            discordSettings.serverType,
             discordSettings.showStateIcon,
             discordSettings.showPaused,
             lastfmApiKey,

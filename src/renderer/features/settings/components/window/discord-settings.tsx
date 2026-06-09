@@ -9,6 +9,7 @@ import {
 import {
     DiscordDisplayType,
     DiscordLinkType,
+    DiscordServerType,
     useDiscordSettings,
     useGeneralSettings,
     useSettingsStoreActions,
@@ -213,24 +214,60 @@ export const DiscordSettings = memo(() => {
         },
         {
             control: (
-                <Switch
-                    checked={settings.showServerImage}
+                <Select
+                    aria-label={t('setting.discordServerType')}
+                    clearable={false}
+                    data={[
+                        {
+                            label: t('setting.discordServerType_none'),
+                            value: DiscordServerType.NONE,
+                        },
+                        { label: 'Music server', value: DiscordServerType.MUSIC_SERVER },
+                        {
+                            label: t('setting.discordServerType_imageproxy'),
+                            value: DiscordServerType.IMAGE_PROXY,
+                        },
+                    ]}
+                    defaultValue={settings.serverType}
                     onChange={(e) => {
+                        if (!e) return;
                         setSettings({
                             discord: {
-                                showServerImage: e.currentTarget.checked,
+                                serverType: e as DiscordServerType,
                             },
                         });
                     }}
                 />
             ),
-            description: t('setting.discordServeImage', {
+            description: t('setting.discordServerType', {
                 context: 'description',
 
                 discord: 'Discord',
             }),
             isHidden: !isElectron(),
-            title: t('setting.discordServeImage', {
+            title: t('setting.discordServerType', {
+                discord: 'Discord',
+            }),
+        },
+        {
+            control: (
+                <TextInput
+                    defaultValue={settings.imageProxyServerLink}
+                    onBlur={(e) => {
+                        setSettings({
+                            discord: {
+                                imageProxyServerLink: e.currentTarget.value,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.discordImageProxyServerLink', {
+                context: 'description',
+                discord: 'Discord',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.discordImageProxyServerLink', {
                 discord: 'Discord',
             }),
         },

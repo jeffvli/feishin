@@ -181,6 +181,8 @@ const DiscordDisplayTypeSchema = z.enum(['artist', 'feishin', 'song']);
 
 const DiscordLinkTypeSchema = z.enum(['last_fm', 'musicbrainz', 'musicbrainz_last_fm', 'none']);
 
+const DiscordServerTypeSchema = z.enum(['image_proxy', 'music_server', 'none']);
+
 const GenreTargetSchema = z.enum(['album', 'track']);
 
 const PlaylistTargetSchema = z.enum(['album', 'track']);
@@ -315,10 +317,11 @@ const DiscordSettingsSchema = z.object({
     clientId: z.string(),
     displayType: DiscordDisplayTypeSchema,
     enabled: z.boolean(),
+    imageProxyServerLink: z.string(),
     linkType: DiscordLinkTypeSchema,
+    serverType: DiscordServerTypeSchema,
     showAsListening: z.boolean(),
     showPaused: z.boolean(),
-    showServerImage: z.boolean(),
     showStateIcon: z.boolean(),
 });
 
@@ -926,6 +929,12 @@ export enum DiscordLinkType {
     NONE = 'none',
 }
 
+export enum DiscordServerType {
+    IMAGE_PROXY = 'image_proxy',
+    MUSIC_SERVER = 'music_server',
+    NONE = 'none',
+}
+
 export enum GenreTarget {
     ALBUM = 'album',
     TRACK = 'track',
@@ -1238,10 +1247,11 @@ const initialState: SettingsState = {
         clientId: '1165957668758900787',
         displayType: DiscordDisplayType.FEISHIN,
         enabled: false,
+        imageProxyServerLink: '',
         linkType: DiscordLinkType.NONE,
+        serverType: DiscordServerType.NONE,
         showAsListening: false,
         showPaused: true,
-        showServerImage: false,
         showStateIcon: true,
     },
     font: {
