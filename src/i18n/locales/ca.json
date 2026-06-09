@@ -1182,7 +1182,8 @@
         "sleepTimer_setCustom": "Configura el temporitzador",
         "sleepTimer_cancel": "Cancel·la el temporitzador",
         "albumRadio": "Ràdio d'àlbums",
-        "scrobbleForceSubmit": "Força l'scrobble"
+        "scrobbleForceSubmit": "Força l'scrobble",
+        "sleepTimer_endOfAlbum": "Final de l'àlbum actual"
     },
     "error": {
         "credentialsRequired": "Credencials requerides",
