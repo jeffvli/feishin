@@ -559,20 +559,24 @@ export const EqSettings = memo(() => {
                       control: (
                           <Group gap="xs">
                               <Slider
-                                  defaultValue={settings.equalizer.preamp}
-                                  key={settings.equalizer.preamp}
                                   label={(v) => `${v > 0 ? '+' : ''}${v} dB`}
                                   max={EQ_MAX}
                                   min={EQ_MIN}
+                                  onChange={(v) => {
+                                      setSettings({
+                                          playback: {
+                                              equalizer: { ...settings.equalizer, preamp: v },
+                                          },
+                                      });
+                                  }}
                                   onChangeEnd={handlePreampChangeEnd}
                                   step={EQ_STEP}
+                                  value={settings.equalizer.preamp}
                                   w={200}
                               />
                               {/* Manual preamp input */}
                               <NumberInput
-                                  defaultValue={settings.equalizer.preamp}
                                   hideControls
-                                  key={settings.equalizer.preamp}
                                   max={EQ_MAX}
                                   min={EQ_MIN}
                                   onBlur={(e) => {
@@ -592,6 +596,7 @@ export const EqSettings = memo(() => {
                                   }
                                   size="sm"
                                   step={EQ_STEP}
+                                  value={settings.equalizer.preamp}
                                   w={70}
                               />
                               <Button onClick={handleResetEq} variant="subtle">
@@ -780,21 +785,25 @@ export const EqSettings = memo(() => {
                       control: (
                           <Group align="center" gap="xs">
                               <Slider
-                                  defaultValue={settings.compressor[key] as number}
-                                  key={settings.compressor[key] as number}
                                   label={(v) => `${v}${unit}`}
                                   max={max}
                                   min={min}
+                                  onChange={(v) => {
+                                      setSettings({
+                                          playback: {
+                                              compressor: { ...settings.compressor, [key]: v },
+                                          },
+                                      });
+                                  }}
                                   onChangeEnd={(v) => handleCompChangeEnd(key, v)}
                                   step={step}
+                                  value={settings.compressor[key] as number}
                                   w={200}
                               />
                               {/* Manual value input — remounts with new defaultValue
                        when settings change (preset applied, slider moved) */}
                               <NumberInput
-                                  defaultValue={settings.compressor[key] as number}
                                   hideControls
-                                  key={settings.compressor[key] as number}
                                   max={max}
                                   min={min}
                                   onBlur={(e) => {
@@ -814,6 +823,7 @@ export const EqSettings = memo(() => {
                                   }
                                   size="sm"
                                   step={step}
+                                  value={settings.compressor[key] as number}
                                   w={80}
                               />
                           </Group>
