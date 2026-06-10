@@ -64,6 +64,7 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                       return draggedItems;
                   },
                   itemType,
+                  metadata: { playlistId },
                   onDragStart: () => {
                       if (!item || !isDataRow) {
                           return;
@@ -248,10 +249,15 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                               case DragTarget.SONG: {
                                   const sourceItems = (args.source.item || []) as Song[];
                                   if (sourceItems.length > 0) {
-                                      playerContext.addToQueueByData(sourceItems, {
-                                          edge: args.edge,
-                                          uniqueId: droppedOnUniqueId,
-                                      });
+                                      const sourcePlaylistId = args.source.metadata?.playlistId as
+                                          | string
+                                          | undefined;
+                                      playerContext.addToQueueByData(
+                                          sourceItems,
+                                          { edge: args.edge, uniqueId: droppedOnUniqueId },
+                                          undefined,
+                                          sourcePlaylistId ?? null,
+                                      );
                                   }
                                   break;
                               }

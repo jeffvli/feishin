@@ -39,7 +39,12 @@ import {
 import { Play, PlayerRepeat, PlayerShuffle } from '/@/shared/types/types';
 
 export interface PlayerContext {
-    addToQueueByData: (data: Song[], type: AddToQueueType, playSongId?: string) => void;
+    addToQueueByData: (
+        data: Song[],
+        type: AddToQueueType,
+        playSongId?: string,
+        contextPlaylistId?: null | string,
+    ) => void;
     addToQueueByFetch: (
         serverId: string,
         id: string[],
@@ -149,6 +154,13 @@ const inferPlaylistContextFromUrl = (): null | string => {
     return match ? match[1] : null;
 };
 
+// Stamps each song with the playlist it was queued from, so the sidebar highlight
+// can be derived from whichever song is currently playing (see useCurrentPlaylistContextId).
+const tagPlaylistContext = (songs: Song[], contextPlaylistId: null | string): Song[] =>
+    contextPlaylistId
+        ? songs.map((song) => ({ ...song, _contextPlaylistId: contextPlaylistId }))
+        : songs;
+
 export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
@@ -199,13 +211,18 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     }, [doNotShowAgain, setDoNotShowAgain, t]);
 
     const addToQueueByData = useCallback(
-        (data: Song[], type: AddToQueueType, playSongId?: string) => {
+        (
+            data: Song[],
+            type: AddToQueueType,
+            playSongId?: string,
+            contextPlaylistId?: null | string,
+        ) => {
             const filters = useSettingsStore.getState().playback.filters;
             const filteredData = filterSongsByPlayerFilters(data, filters);
-
-            if (isReplaceQueueType(type)) {
-                storeActions.setCurrentPlaylistContextId(inferPlaylistContextFromUrl());
-            }
+            const resolvedContextId =
+                contextPlaylistId ??
+                (isReplaceQueueType(type) ? inferPlaylistContextFromUrl() : null);
+            const tagged = tagPlaylistContext(filteredData, resolvedContextId);
 
             if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
                 const edge = type.edge === 'top' ? 'top' : 'bottom';
@@ -221,14 +238,14 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                     },
                 });
 
-                storeActions.addToQueueByUniqueId(filteredData, type.uniqueId, edge, playSongId);
+                storeActions.addToQueueByUniqueId(tagged, type.uniqueId, edge, playSongId);
             } else {
                 logFn.debug(logMsg[LogCategory.PLAYER].addToQueueByType, {
                     category: LogCategory.PLAYER,
                     meta: { data: data.length, filtered: filteredData.length, type },
                 });
 
-                storeActions.addToQueueByType(filteredData, type as Play, playSongId);
+                storeActions.addToQueueByType(tagged, type as Play, playSongId);
             }
         },
         [storeActions],
@@ -297,19 +314,17 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 const filters = useSettingsStore.getState().playback.filters;
                 const filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
 
-                if (isReplaceQueueType(type)) {
-                    const explicitId =
-                        itemType === LibraryItem.PLAYLIST && id.length === 1 ? id[0] : null;
-                    storeActions.setCurrentPlaylistContextId(
-                        explicitId ?? inferPlaylistContextFromUrl(),
-                    );
-                }
+                const explicitId =
+                    itemType === LibraryItem.PLAYLIST && id.length === 1 ? id[0] : null;
+                const resolvedContextId =
+                    explicitId ?? (isReplaceQueueType(type) ? inferPlaylistContextFromUrl() : null);
+                const taggedSongs = tagPlaylistContext(filteredSongs, resolvedContextId);
 
                 if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
                     const edge = type.edge === 'top' ? 'top' : 'bottom';
-                    storeActions.addToQueueByUniqueId(filteredSongs, type.uniqueId, edge);
+                    storeActions.addToQueueByUniqueId(taggedSongs, type.uniqueId, edge);
                 } else {
-                    storeActions.addToQueueByType(filteredSongs, type as Play);
+                    storeActions.addToQueueByType(taggedSongs, type as Play);
                 }
             } catch (err: any) {
                 if (instanceOfCancellationError(err)) {
