@@ -15,6 +15,7 @@ import {
     DiscordLinkType,
     useAppStore,
     useDiscordSettings,
+    useGeneralSettings,
     useLastfmApiKey,
     usePlayerSong,
     usePlayerStore,
@@ -47,6 +48,7 @@ const truncate = (field: string) =>
 
 export const useDiscordRpc = () => {
     const discordSettings = useDiscordSettings();
+    const generalSettings = useGeneralSettings();
     const lastfmApiKey = useLastfmApiKey();
     const privateMode = useAppStore((state) => state.privateMode);
     const [lastUniqueId, setlastUniqueId] = useState('');
@@ -285,7 +287,8 @@ export const useDiscordRpc = () => {
             }
 
             if (
-                activity.largeImageKey === undefined &&
+                (activity.largeImageKey === undefined ||
+                    (generalSettings.lastfmApiKey && !discordSettings.showServerImage)) &&
                 lastfmApiKey &&
                 song?.album &&
                 song?.albumArtists.length
