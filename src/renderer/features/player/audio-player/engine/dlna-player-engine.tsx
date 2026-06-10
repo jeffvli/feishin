@@ -207,6 +207,9 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     const preservePitchRef = useRef(useSettingsStore.getState().playback?.preservePitch ?? true);
     const isAutoAdvancingRef = useRef(false);
     const devicePassiveModeRef = useRef(false);
+    const repeatChangedAtRef = useRef(0);
+    const speakerSidePlayPauseRef = useRef(false);
+    const mountHandoffInProgressRef = useRef(false);
     useEffect(() => {
         const unsubscribe = useSettingsStore.subscribe(
             (state) => state.playback.preservePitch,
@@ -363,6 +366,8 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         if (sendNextTrackDebounceRef.current !== null) {
             clearTimeout(sendNextTrackDebounceRef.current);
         }
+        const msSinceRepeatChange = Date.now() - repeatChangedAtRef.current;
+        const debounceMs = msSinceRepeatChange < 2000 ? 2000 - msSinceRepeatChange + 100 : 80;
         sendNextTrackDebounceRef.current = setTimeout(async () => {
             sendNextTrackDebounceRef.current = null;
             if (!dlnaPlayer) return;
@@ -402,48 +407,14 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 mimeType,
                 title: nextSong.name,
             });
-        }, 80);
+        }, debounceMs);
     }, [transcode]);
 
     useEffect(() => {
         if (playerHandoff.deviceAlreadyPlaying) {
             playerHandoff.deviceAlreadyPlaying = false;
-            hasPlayedRef.current = true;
-            if (playerHandoff.deviceWasPaused) {
-                playerHandoff.deviceWasPaused = false;
-                devicePassiveModeRef.current = false;
-                (async () => {
-                    playerHandoff.pendingDlnaSeek = -1;
-                    const playerData = usePlayerStore.getState().getPlayerData();
-                    const song = playerData.currentSong;
-                    if (song) {
-                        try {
-                            const url = await getDlnaUrl(song, transcode);
-                            const deviceUri = playerHandoff.deviceCurrentUri ?? '';
-                            const uriMatches =
-                                url &&
-                                deviceUri &&
-                                (url === deviceUri ||
-                                    extractDlnaId(url) === extractDlnaId(deviceUri) ||
-                                    url.split('?')[0] === deviceUri.split('?')[0]);
-                            if (uriMatches) {
-                                lastSentRawUrlRef.current = url;
-                                lastSentUrlRef.current = url;
-                                return;
-                            }
-                        } catch {
-                            // Catch
-                        }
-                    }
-                    playerHandoff.pendingDlnaSeek = -1;
-                    pendingInitialSeek.value = -1;
-                    if (playerStatus === PlayerStatus.PLAYING) {
-                        sendCurrentTrackToDlna();
-                    }
-                })();
-            } else {
-                devicePassiveModeRef.current = true;
-            }
+            playerHandoff.deviceWasPaused = false;
+            mountHandoffInProgressRef.current = true;
             return;
         }
         if (playerStatus === PlayerStatus.PLAYING) {
@@ -477,48 +448,56 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             _event: any,
             info: { duration: number; position: number; transportState: string; uri: string },
         ) => {
-            if (!info.uri) return;
-            const extractId = (url: string) => {
-                try {
-                    const u = new URL(url);
-                    return (
-                        u.searchParams.get('id') ||
-                        u.searchParams.get('itemId') ||
-                        u.searchParams.get('Id') ||
-                        ''
-                    );
-                } catch {
-                    return '';
-                }
-            };
-            const deviceId = extractId(info.uri);
-            const playerData = usePlayerStore.getState().getPlayerData();
-            const candidates = [playerData.currentSong, playerData.nextSong].filter(Boolean);
-            for (const song of candidates) {
-                if (!song) continue;
-                try {
-                    const url = await getDlnaUrl(song, transcode);
-                    if (!url) continue;
-                    const feishinId = extractId(url);
-                    const matches = feishinId
-                        ? feishinId === deviceId
-                        : url.split('?')[0] === info.uri.split('?')[0];
-                    if (matches) {
-                        if (info.position > 0) {
-                            setTimestamp(Math.floor(info.position));
+            mountHandoffInProgressRef.current = true;
+            hasPlayedRef.current = true;
+            devicePassiveModeRef.current = false;
+            if (info.uri) {
+                const deviceId = extractDlnaId(info.uri);
+                const playerData = usePlayerStore.getState().getPlayerData();
+                const candidates = [playerData.currentSong, playerData.nextSong].filter(Boolean);
+                for (const song of candidates) {
+                    if (!song) continue;
+                    try {
+                        const url = await getDlnaUrl(song, transcode);
+                        if (!url) continue;
+                        const feishinId = extractDlnaId(url);
+                        const matches = feishinId
+                            ? feishinId === deviceId
+                            : url.split('?')[0] === info.uri.split('?')[0];
+                        if (matches) {
+                            lastSentRawUrlRef.current = url;
+                            lastSentUrlRef.current = url;
+                            if (info.position > 0) setTimestamp(Math.floor(info.position));
+                            mountHandoffInProgressRef.current = false;
+                            if (playerStatus === PlayerStatus.PLAYING) {
+                                if (pendingInitialSeek.value >= 0) {
+                                    const seekTarget = pendingInitialSeek.value;
+                                    pendingInitialSeek.value = -1;
+                                    dlnaPlayer?.seek(seekTarget);
+                                }
+                                dlnaPlayer?.play();
+                            }
+                            return;
                         }
-                        return;
+                    } catch {
+                        // Many won't be able to be resolved
                     }
-                } catch {
-                    // Many won't be able to be resolved
                 }
+            } else {
+                await new Promise<void>((resolve) => setTimeout(resolve, 50));
+            }
+            lastSentRawUrlRef.current = '';
+            lastSentUrlRef.current = '';
+            mountHandoffInProgressRef.current = false;
+            if (playerStatus === PlayerStatus.PLAYING) {
+                sendCurrentTrackToDlna();
             }
         };
         dlnaPlayerListener.rendererDlnaConnectPlayback(handler);
         return () => {
             ipc?.removeAllListeners('renderer-dlna-connect-playback');
         };
-    }, [transcode, setTimestamp]);
+    }, [transcode, setTimestamp, playerStatus, sendCurrentTrackToDlna]);
     // Send just the next track (for after gapless transition)
     useEffect(() => {
         if (!dlnaPlayerListener) return;
@@ -534,8 +513,10 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 lastSentAtRef.current === 0 ? Infinity : Date.now() - lastSentAtRef.current;
             if (msSinceLastSend < 2000 && state !== 'PLAYING') return;
             if (state === 'PLAYING') {
+                speakerSidePlayPauseRef.current = true;
                 mediaPlay?.();
             } else if (state === 'PAUSED_PLAYBACK') {
+                speakerSidePlayPauseRef.current = true;
                 mediaPause?.();
             } else if (state === 'STOPPED') {
                 mediaPause?.();
@@ -636,9 +617,12 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             }
             return;
         }
+        const isSpeakerSideChange = speakerSidePlayPauseRef.current;
+        speakerSidePlayPauseRef.current = false;
         if (playerStatus === PlayerStatus.PLAYING) {
             if (hasPlayedRef.current) {
                 const check = async () => {
+                    if (mountHandoffInProgressRef.current) return;
                     const playerData = usePlayerStore.getState().getPlayerData();
                     const currentSong = playerData.currentSong;
                     const currentUrl = currentSong
@@ -647,7 +631,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                     if (currentUrl && currentUrl !== lastSentRawUrlRef.current) {
                         skipNextSendRef.current = false;
                         sendCurrentTrackToDlna();
-                    } else {
+                    } else if (!isSpeakerSideChange) {
                         if (Date.now() - lastSentAtRef.current > 2000) {
                             dlnaPlayer.play();
                         }
@@ -658,7 +642,9 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 sendCurrentTrackToDlna();
             }
         } else if (playerStatus === PlayerStatus.PAUSED) {
-            dlnaPlayer.pause();
+            if (!isSpeakerSideChange) {
+                dlnaPlayer.pause();
+            }
         }
     }, [playerStatus, transcode, sendCurrentTrackToDlna]);
     // Handle volume
@@ -688,6 +674,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 sendCurrentTrackToDlna();
             },
             onPlayerPlay: () => {
+                if (mountHandoffInProgressRef.current) return;
                 devicePassiveModeRef.current = false;
                 skipNextSendRef.current = false;
                 sendCurrentTrackToDlna();
@@ -716,10 +703,8 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             (state) => state.player.repeat,
             () => {
                 if (!hasPlayedRef.current || !dlnaPlayer) return;
-                const playerData = usePlayerStore.getState().getPlayerData();
-                if (!playerData.nextSong) {
-                    dlnaPlayer.clearNextUrl();
-                }
+                repeatChangedAtRef.current = Date.now();
+                sendNextTrackToDlna();
             },
         );
     }, [sendNextTrackToDlna]);
@@ -729,11 +714,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             (nextId, prevId) => {
                 if (!hasPlayedRef.current || !dlnaPlayer) return;
                 if (nextId === prevId) return;
-                if (nextId) {
-                    sendNextTrackToDlna();
-                } else {
-                    dlnaPlayer.clearNextUrl();
-                }
+                sendNextTrackToDlna();
             },
         );
     }, [sendNextTrackToDlna]);
@@ -743,6 +724,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             (nextId, prevId) => {
                 if (!hasPlayedRef.current || !dlnaPlayer) return;
                 if (nextId === prevId) return;
+                if (mountHandoffInProgressRef.current) return;
                 sendCurrentTrackToDlna();
             },
         );
