@@ -12,6 +12,7 @@ import styles from './album-detail-content.module.css';
 
 import { useGridCarouselContainerQuery } from '/@/renderer/components/grid-carousel/grid-carousel-v2';
 import { useItemListStateSubscription } from '/@/renderer/components/item-list/helpers/item-list-state';
+import { playSongFromItemListControl } from '/@/renderer/components/item-list/helpers/play-row-from-list';
 import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
 import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-list/default-columns';
@@ -60,7 +61,7 @@ import {
     SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { ItemListKey, ListDisplayType, Play } from '/@/shared/types/types';
+import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 
 const MetadataPillGroup = ({
     items,
@@ -830,13 +831,13 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                     return;
                 }
 
-                const playType = (meta?.playType as Play) || Play.NOW;
-
-                const items = internalState?.getData() as Song[];
-
-                if (index !== undefined) {
-                    player.addToQueueByData(items, playType, item.id);
-                }
+                playSongFromItemListControl({
+                    index,
+                    internalState,
+                    item: item as Song,
+                    meta,
+                    player,
+                });
             },
         };
     }, [player]);

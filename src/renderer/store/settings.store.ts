@@ -675,9 +675,28 @@ const QueryBuilderSettingsSchema = z.object({
     tag: z.array(QueryBuilderCustomFieldSchema),
 });
 
+export const AUTO_DJ_MODE = {
+    ALBUMS: 'albums',
+    SONGS: 'songs',
+} as const;
+
+export type AutoDJMode = (typeof AUTO_DJ_MODE)[keyof typeof AUTO_DJ_MODE];
+
+export const AUTO_DJ_STRATEGY = {
+    LIBRARY_RANDOM: 'library_random',
+    SIMILAR: 'similar',
+} as const;
+
+export type AutoDJStrategy = (typeof AUTO_DJ_STRATEGY)[keyof typeof AUTO_DJ_STRATEGY];
+
+const autoDjStrategyEnum = z.enum(['similar', 'library_random']);
+
 const AutoDJSettingsSchema = z.object({
+    albumStrategy: autoDjStrategyEnum,
     enabled: z.boolean(),
     itemCount: z.number(),
+    mode: z.enum(['songs', 'albums']),
+    songStrategy: autoDjStrategyEnum,
     timing: z.number(),
 });
 
@@ -1091,8 +1110,11 @@ const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle
 
 const initialState: SettingsState = {
     autoDJ: {
+        albumStrategy: AUTO_DJ_STRATEGY.SIMILAR,
         enabled: false,
         itemCount: 5,
+        mode: 'songs',
+        songStrategy: AUTO_DJ_STRATEGY.SIMILAR,
         timing: 1,
     },
     css: {
@@ -2427,10 +2449,41 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
+                if (version < 28) {
+                    if (!state.autoDJ) {
+                        state.autoDJ = { ...initialState.autoDJ };
+                    }
+
+                    if (state.autoDJ.mode !== 'albums' && state.autoDJ.mode !== 'songs') {
+                        state.autoDJ.mode = initialState.autoDJ.mode;
+                    }
+
+                    const normalizeAutoDjStrategy = (stored: unknown) => {
+                        if (stored === 'library_random') {
+                            return AUTO_DJ_STRATEGY.LIBRARY_RANDOM;
+                        }
+
+                        if (
+                            stored === 'similar' ||
+                            stored === 'default' ||
+                            stored === 'similar_forward'
+                        ) {
+                            return AUTO_DJ_STRATEGY.SIMILAR;
+                        }
+
+                        return initialState.autoDJ.songStrategy;
+                    };
+
+                    state.autoDJ.songStrategy = normalizeAutoDjStrategy(state.autoDJ.songStrategy);
+                    state.autoDJ.albumStrategy = normalizeAutoDjStrategy(
+                        state.autoDJ.albumStrategy,
+                    );
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 27,
+            version: 28,
         },
     ),
 );

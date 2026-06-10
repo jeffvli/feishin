@@ -1,23 +1,40 @@
 import styles from './row-index-column.module.css';
+import { ItemDetailRowPlayControlCell } from './row-play-control-cell';
 import { ItemDetailListCellProps } from './types';
+import { useDetailRowPlayControl } from './use-detail-row-play-control';
 
-import { useIsCurrentSong } from '/@/renderer/features/player/hooks/use-is-current-song';
-import { usePlayerStatus } from '/@/renderer/store';
+import { isRowPlayControlColumn } from '/@/renderer/components/item-list/helpers/get-row-play-control-column';
 import { Icon } from '/@/shared/components/icon/icon';
-import { PlayerStatus } from '/@/shared/types/types';
+import { TableColumn } from '/@/shared/types/types';
 
-export const RowIndexColumn = ({ rowIndex, song }: ItemDetailListCellProps) => {
-    const status = usePlayerStatus();
-    const { isActive } = useIsCurrentSong(song);
-    const isPlaying = isActive && status === PlayerStatus.PLAYING;
+const DefaultRowIndexColumn = ({ rowIndex }: ItemDetailListCellProps) => {
+    return <>{String((rowIndex ?? 0) + 1)}</>;
+};
 
-    if (isActive) {
-        return (
-            <div className={styles.iconWrapper}>
-                <Icon fill="primary" icon={isPlaying ? 'mediaPlay' : 'mediaPause'} />
-            </div>
-        );
+const PlayableRowIndexColumn = (props: ItemDetailListCellProps) => {
+    const { handlePlay, isActive, isPlaying, showPlayControls } = useDetailRowPlayControl(props);
+
+    const indexContent = isActive ? (
+        <div className={styles.iconWrapper}>
+            <Icon fill="primary" icon={isPlaying ? 'mediaPlay' : 'mediaPause'} />
+        </div>
+    ) : (
+        String((props.rowIndex ?? 0) + 1)
+    );
+
+    return (
+        <ItemDetailRowPlayControlCell
+            indexContent={indexContent}
+            onPlay={handlePlay}
+            showPlayControls={showPlayControls}
+        />
+    );
+};
+
+export const RowIndexColumn = (props: ItemDetailListCellProps) => {
+    if (!props.columns || !isRowPlayControlColumn(TableColumn.ROW_INDEX, props.columns)) {
+        return <DefaultRowIndexColumn {...props} />;
     }
 
-    return <>{String((rowIndex ?? 0) + 1)}</>;
+    return <PlayableRowIndexColumn {...props} />;
 };

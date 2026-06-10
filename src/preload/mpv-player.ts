@@ -1,4 +1,4 @@
-import { ipcRenderer, IpcRendererEvent } from 'electron';
+import { ipcRenderer } from 'electron';
 
 import { PlayerData } from '/@/shared/types/domain-types';
 
@@ -102,76 +102,76 @@ const getAudioDevices = async () => {
     return ipcRenderer.invoke('player-get-audio-devices');
 };
 
-const rendererAutoNext = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-auto-next', cb);
+const rendererAutoNext = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-auto-next', (_, data) => cb(data));
 };
 
-const rendererCurrentTime = (cb: (event: IpcRendererEvent, data: number) => void) => {
-    ipcRenderer.on('renderer-player-current-time', cb);
+const rendererCurrentTime = (cb: (data: number) => void) => {
+    ipcRenderer.on('renderer-player-current-time', (_, data) => cb(data));
 };
 
-const rendererNext = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-next', cb);
+const rendererNext = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-next', (_, data) => cb(data));
 };
 
-const rendererPause = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-pause', cb);
+const rendererPause = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-pause', (_, data) => cb(data));
 };
 
-const rendererPlay = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-play', cb);
+const rendererPlay = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-play', (_, data) => cb(data));
 };
 
-const rendererPlayPause = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-play-pause', cb);
+const rendererPlayPause = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-play-pause', (_, data) => cb(data));
 };
 
-const rendererPrevious = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-previous', cb);
+const rendererPrevious = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-previous', (_, data) => cb(data));
 };
 
-const rendererStop = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-stop', cb);
+const rendererStop = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-stop', (_, data) => cb(data));
 };
 
-const rendererSkipForward = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-skip-forward', cb);
+const rendererSkipForward = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-skip-forward', (_, data) => cb(data));
 };
 
-const rendererSkipBackward = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-skip-backward', cb);
+const rendererSkipBackward = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-skip-backward', (_, data) => cb(data));
 };
 
-const rendererVolumeUp = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-volume-up', cb);
+const rendererVolumeUp = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-volume-up', (_, data) => cb(data));
 };
 
-const rendererVolumeDown = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-volume-down', cb);
+const rendererVolumeDown = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-volume-down', (_, data) => cb(data));
 };
 
-const rendererVolumeMute = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-volume-mute', cb);
+const rendererVolumeMute = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-volume-mute', (_, data) => cb(data));
 };
 
-const rendererToggleRepeat = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-toggle-repeat', cb);
+const rendererToggleRepeat = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-toggle-repeat', (_, data) => cb(data));
 };
 
-const rendererToggleShuffle = (cb: (event: IpcRendererEvent, data: PlayerData) => void) => {
-    ipcRenderer.on('renderer-player-toggle-shuffle', cb);
+const rendererToggleShuffle = (cb: (data: PlayerData) => void) => {
+    ipcRenderer.on('renderer-player-toggle-shuffle', (_, data) => cb(data));
 };
 
-const rendererQuit = (cb: (event: IpcRendererEvent) => void) => {
-    ipcRenderer.on('renderer-player-quit', cb);
+const rendererQuit = (cb: () => void) => {
+    ipcRenderer.on('renderer-player-quit', () => cb());
 };
 
-const rendererError = (cb: (event: IpcRendererEvent, data: string) => void) => {
-    ipcRenderer.on('renderer-player-error', cb);
+const rendererError = (cb: (data: string) => void) => {
+    ipcRenderer.on('renderer-player-error', (_, data) => cb(data));
 };
 
-const rendererPlayerFallback = (cb: (event: IpcRendererEvent, data: boolean) => void) => {
-    ipcRenderer.on('renderer-player-fallback', cb);
+const rendererPlayerFallback = (cb: (data: boolean) => void) => {
+    ipcRenderer.on('renderer-player-fallback', (_, data) => cb(data));
 };
 
 export const mpvPlayer = {

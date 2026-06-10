@@ -1,4 +1,6 @@
+import { openContextModal } from '@mantine/modals';
 import { CSSProperties, useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import styles from './library-command-item.module.css';
 
@@ -13,6 +15,7 @@ import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Text } from '/@/shared/components/text/text';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { ExplicitStatus, LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
@@ -61,6 +64,7 @@ export const LibraryCommandItem = ({
 }: LibraryCommandItemProps) => {
     const { addToQueueByData, addToQueueByFetch } = usePlayer();
     const server = useCurrentServer();
+    const { t } = useTranslation();
 
     const handlePlay = useCallback(
         (playType: Play) => {
@@ -102,6 +106,39 @@ export const LibraryCommandItem = ({
             handlePlay(LONG_PRESS_PLAY_BEHAVIOR[Play.LAST]);
         },
     });
+
+    const handleOpenPlaylistModal = useCallback(() => {
+        const modalProps: {
+            albumId?: string[];
+            artistId?: string[];
+            songId?: string[];
+        } = {};
+
+        switch (itemType) {
+            case LibraryItem.ALBUM:
+                modalProps.albumId = [id];
+                break;
+            case LibraryItem.ALBUM_ARTIST:
+            case LibraryItem.ARTIST:
+                modalProps.artistId = [id];
+                break;
+            case LibraryItem.QUEUE_SONG:
+            case LibraryItem.SONG:
+                modalProps.songId = [id];
+                break;
+            default:
+                return;
+        }
+
+        openContextModal({
+            innerProps: {
+                ...modalProps,
+            },
+            modal: 'addToPlaylist',
+            size: 'lg',
+            title: t('page.contextMenu.addToPlaylist'),
+        });
+    }, [id, itemType, t]);
 
     const [isHovered, setIsHovered] = useState(false);
 
@@ -180,6 +217,29 @@ export const LibraryCommandItem = ({
                             )}
                         />
                     </PlayTooltip>
+                    <Tooltip disabled={disabled} label={t('action.addToPlaylist')}>
+                        <ActionIcon
+                            icon="playlistAdd"
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                event.preventDefault();
+                                handleOpenPlaylistModal();
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === ' ' || e.key === 'Enter') {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (!disabled) {
+                                        handleOpenPlaylistModal();
+                                    }
+                                } else if (e.key === 'Tab') {
+                                    e.stopPropagation();
+                                }
+                            }}
+                            size="xs"
+                            variant="default"
+                        />
+                    </Tooltip>
                 </ActionIconGroup>
             )}
         </Flex>

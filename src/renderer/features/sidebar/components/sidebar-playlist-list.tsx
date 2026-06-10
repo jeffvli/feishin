@@ -1,7 +1,8 @@
 import { openContextModal } from '@mantine/modals';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { memo, MouseEvent, useCallback, useMemo, useState } from 'react';
+import { motion } from 'motion/react';
+import { createContext, memo, MouseEvent, useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 
@@ -12,11 +13,8 @@ import { ContextMenuController } from '/@/renderer/features/context-menu/context
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { openCreatePlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
-import {
-    LONG_PRESS_PLAY_BEHAVIOR,
-    PlayTooltip,
-} from '/@/renderer/features/shared/components/play-button-group';
-import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-button-click';
+import { useIsMutatingSidebarPlaylistFolderMove } from '/@/renderer/features/playlists/mutations/sidebar-playlist-folder-move-mutation';
+import { ItemRowPlayControls } from '/@/renderer/features/shared/components/item-row-play-controls';
 import {
     collectFolderPaths,
     PlaylistFolderDragExpandProvider,
@@ -27,6 +25,7 @@ import {
     usePlaylistNavigationState,
 } from '/@/renderer/features/sidebar/components/playlist-folder-tree';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
+import { useDragMonitor } from '/@/renderer/hooks/use-drag-monitor';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useCurrentPlaylistContextId,
@@ -39,11 +38,14 @@ import {
 } from '/@/renderer/store';
 import { formatDurationString } from '/@/renderer/utils';
 import { Accordion } from '/@/shared/components/accordion/accordion';
-import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { animationProps } from '/@/shared/components/animations/animation-props';
+import { animationVariants } from '/@/shared/components/animations/animation-variants';
 import { ButtonProps } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Image } from '/@/shared/components/image/image';
+import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
 import { Text } from '/@/shared/components/text/text';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import {
@@ -53,12 +55,48 @@ import {
     Song,
     SortOrder,
 } from '/@/shared/types/domain-types';
-import { DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
+import { DragData, DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
 import { Play } from '/@/shared/types/types';
+
+const MotionLink = motion.create(Link);
+
+const playlistRowDimVariants = animationVariants.combine(animationVariants.fadeIn, {
+    hidden: { opacity: 0.5 },
+});
 
 const getPlaylistOrderKey = (serverId: string | undefined, scope: 'owned' | 'shared') => {
     const sid = serverId || 'local';
     return `playlist_order:${sid}:${scope}`;
+};
+
+export const SidebarPlaylistAddDragContext = createContext(false);
+
+const isAddToPlaylistDragSource = (source: DragData) => {
+    return (
+        source.itemType !== undefined &&
+        source.type !== DragTarget.PLAYLIST &&
+        (source.operation?.includes(DragOperation.ADD) ?? false)
+    );
+};
+
+export const useSidebarPlaylistAddDragMonitor = () => {
+    const [isAddDragActive, setIsAddDragActive] = useState(false);
+
+    const handleAddDragStart = useCallback(() => {
+        setIsAddDragActive(true);
+    }, []);
+
+    const handleAddDragDrop = useCallback(() => {
+        setIsAddDragActive(false);
+    }, []);
+
+    useDragMonitor({
+        canMonitor: isAddToPlaylistDragSource,
+        onDragStart: handleAddDragStart,
+        onDrop: handleAddDragDrop,
+    });
+
+    return isAddDragActive;
 };
 
 export interface PlaylistRowButtonProps extends Omit<ButtonProps, 'onContextMenu' | 'onPlay'> {
@@ -83,6 +121,8 @@ export const PlaylistRowButton = memo(
         const isActive = activePlaylistId === item.id;
 
         const [isHovered, setIsHovered] = useState(false);
+        const isSmartPlaylist = Boolean(item.rules);
+        const isAddDragActive = useContext(SidebarPlaylistAddDragContext);
 
         const { isDraggedOver, isDragging, ref } = useDragDrop<HTMLAnchorElement>({
             drag: {
@@ -100,6 +140,7 @@ export const PlaylistRowButton = memo(
                 canDrop: (args) => {
                     // Allow dropping items into a playlist (ADD)
                     const canAdd =
+                        !isSmartPlaylist &&
                         args.source.itemType !== undefined &&
                         args.source.type !== DragTarget.PLAYLIST &&
                         (args.source.operation?.includes(DragOperation.ADD) ?? false);
@@ -121,6 +162,7 @@ export const PlaylistRowButton = memo(
                     };
                 },
                 onDrag: () => {
+                    console.log('started drag');
                     return;
                 },
                 onDragLeave: () => {
@@ -150,6 +192,10 @@ export const PlaylistRowButton = memo(
                         }
 
                         onReorder(sourceIds, to, args.edge);
+                        return;
+                    }
+
+                    if (isSmartPlaylist) {
                         return;
                     }
 
@@ -225,13 +271,18 @@ export const PlaylistRowButton = memo(
             type: 'table',
         });
 
+        const isDimmed = isDragging || (isSmartPlaylist && isAddDragActive);
+
         return (
-            <Link
+            <MotionLink
+                {...animationProps.fadeIn}
+                animate={isDimmed ? 'hidden' : 'show'}
                 className={clsx(styles.row, {
                     [styles.rowCompact]: isCompact,
-                    [styles.rowDraggedOver]: isDraggedOver,
+                    [styles.rowDraggedOver]: isDraggedOver && !isSmartPlaylist,
                     [styles.rowHover]: isHovered,
                 })}
+                initial={false}
                 onContextMenu={(e: MouseEvent<HTMLAnchorElement>) => {
                     e.preventDefault();
                     onContextMenu(e, item);
@@ -239,10 +290,8 @@ export const PlaylistRowButton = memo(
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 ref={ref}
-                style={{
-                    opacity: isDragging ? 0.5 : 1,
-                }}
                 to={url}
+                variants={playlistRowDimVariants}
             >
                 {isCompact ? (
                     <>
@@ -255,7 +304,12 @@ export const PlaylistRowButton = memo(
                         >
                             {name}
                         </Text>
-                        {isHovered && <RowControls id={to} onPlay={handlePlay} variant="compact" />}
+                        {isHovered && (
+                            <ItemRowPlayControls
+                                className={clsx(styles.controls, styles.controlsCompact)}
+                                onPlay={(playType) => handlePlay(to, playType)}
+                            />
+                        )}
                     </>
                 ) : (
                     <>
@@ -309,95 +363,18 @@ export const PlaylistRowButton = memo(
                             </div>
                         </div>
 
-                        {isHovered && <RowControls id={to} onPlay={handlePlay} />}
+                        {isHovered && (
+                            <ItemRowPlayControls
+                                className={styles.controls}
+                                onPlay={(playType) => handlePlay(to, playType)}
+                            />
+                        )}
                     </>
                 )}
-            </Link>
+            </MotionLink>
         );
     },
 );
-
-const RowControls = ({
-    id,
-    onPlay,
-    variant = 'expanded',
-}: {
-    id: string;
-    onPlay: (id: string, playType: Play) => void;
-    variant?: 'compact' | 'expanded';
-}) => {
-    const handlePlayNext = usePlayButtonClick({
-        onClick: () => {
-            onPlay(id, Play.NEXT);
-        },
-        onLongPress: () => {
-            onPlay(id, LONG_PRESS_PLAY_BEHAVIOR[Play.NEXT]);
-        },
-    });
-
-    const handlePlayNow = usePlayButtonClick({
-        onClick: () => {
-            onPlay(id, Play.NOW);
-        },
-        onLongPress: () => {
-            onPlay(id, LONG_PRESS_PLAY_BEHAVIOR[Play.NOW]);
-        },
-    });
-
-    const handlePlayLast = usePlayButtonClick({
-        onClick: () => {
-            onPlay(id, Play.LAST);
-        },
-        onLongPress: () => {
-            onPlay(id, LONG_PRESS_PLAY_BEHAVIOR[Play.LAST]);
-        },
-    });
-
-    return (
-        <ActionIconGroup
-            className={clsx(styles.controls, {
-                [styles.controlsCompact]: variant === 'compact',
-            })}
-        >
-            <PlayTooltip type={Play.NOW}>
-                <ActionIcon
-                    icon="mediaPlay"
-                    iconProps={{
-                        size: 'md',
-                    }}
-                    size="xs"
-                    variant="subtle"
-                    {...handlePlayNow.handlers}
-                    {...handlePlayNow.props}
-                />
-            </PlayTooltip>
-            <PlayTooltip type={Play.NEXT}>
-                <ActionIcon
-                    icon="mediaPlayNext"
-                    iconProps={{
-                        size: 'md',
-                    }}
-                    size="xs"
-                    variant="subtle"
-                    {...handlePlayNext.handlers}
-                    {...handlePlayNext.props}
-                />
-            </PlayTooltip>
-            <PlayTooltip type={Play.LAST}>
-                <ActionIcon
-                    icon="mediaPlayLast"
-                    iconProps={{
-                        size: 'md',
-                    }}
-                    size="xs"
-                    variant="subtle"
-                    {...handlePlayLast.handlers}
-                    {...handlePlayLast.props}
-                />
-            </PlayTooltip>
-        </ActionIconGroup>
-    );
-};
 
 export const SidebarPlaylistList = () => {
     const player = usePlayer();
@@ -567,6 +544,7 @@ export const SidebarPlaylistList = () => {
     );
 
     const showExpandAll = folderView !== 'navigation' && folderPaths.length > 0;
+    const isFolderMovePending = useIsMutatingSidebarPlaylistFolderMove();
 
     return (
         <Accordion.Item value="playlists">
@@ -638,7 +616,8 @@ export const SidebarPlaylistList = () => {
                     </Group>
                 </Group>
             </PlaylistRootAccordionControl>
-            <Accordion.Panel>
+            <Accordion.Panel className={styles.panel}>
+                <LoadingOverlay pos="absolute" visible={isFolderMovePending} />
                 <PlaylistFolderDragExpandProvider expandedSet={expandedSet} setMany={setMany}>
                     <PlaylistFolderViews
                         {...folderViewState}
@@ -801,6 +780,8 @@ export const SidebarSharedPlaylistList = () => {
         [navigation],
     );
 
+    const isFolderMovePending = useIsMutatingSidebarPlaylistFolderMove();
+
     if (playlistItems?.items?.length === 0) {
         return null;
     }
@@ -824,7 +805,8 @@ export const SidebarSharedPlaylistList = () => {
                     </Text>
                 </Group>
             </Accordion.Control>
-            <Accordion.Panel>
+            <Accordion.Panel className={styles.panel}>
+                <LoadingOverlay pos="absolute" visible={isFolderMovePending} />
                 <PlaylistFolderDragExpandProvider expandedSet={expandedSet} setMany={setMany}>
                     <PlaylistFolderViews
                         {...folderViewState}

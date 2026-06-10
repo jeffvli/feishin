@@ -1,6 +1,6 @@
 {
     "name": "feishin",
-    "version": "1.11.0",
+    "version": "1.13.0",
     "description": "A modern self-hosted music player.",
     "keywords": [
         "subsonic",
@@ -160,7 +160,7 @@
         "babel-plugin-react-compiler": "^1.0.0",
         "concurrently": "^9.2.1",
         "cross-env": "^10.1.0",
-        "electron": "^39.8.6",
+        "electron": "^41.7.0",
         "electron-builder": "^26.8.2",
         "electron-devtools-installer": "^4.0.0",
         "electron-vite": "^4.0.1",
@@ -189,6 +189,7 @@
     "pnpm": {
         "onlyBuiltDependencies": [
             "electron",
+            "electron-winstaller",
             "esbuild"
         ]
     },

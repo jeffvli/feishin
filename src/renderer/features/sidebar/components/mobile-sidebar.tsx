@@ -7,8 +7,10 @@ import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import {
+    SidebarPlaylistAddDragContext,
     SidebarPlaylistList,
     SidebarSharedPlaylistList,
+    useSidebarPlaylistAddDragMonitor,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
 import {
     SidebarItemType,
@@ -19,6 +21,17 @@ import { Accordion } from '/@/shared/components/accordion/accordion';
 import { Group } from '/@/shared/components/group/group';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Text } from '/@/shared/components/text/text';
+
+const MobileSidebarPlaylistSection = () => {
+    const isAddDragActive = useSidebarPlaylistAddDragMonitor();
+
+    return (
+        <SidebarPlaylistAddDragContext.Provider value={isAddDragActive}>
+            <SidebarPlaylistList />
+            <SidebarSharedPlaylistList />
+        </SidebarPlaylistAddDragContext.Provider>
+    );
+};
 
 export const MobileSidebar = () => {
     const { t } = useTranslation();
@@ -93,12 +106,7 @@ export const MobileSidebar = () => {
                             })}
                         </Accordion.Panel>
                     </Accordion.Item>
-                    {sidebarPlaylistList && (
-                        <>
-                            <SidebarPlaylistList />
-                            <SidebarSharedPlaylistList />
-                        </>
-                    )}
+                    {sidebarPlaylistList && <MobileSidebarPlaylistSection />}
                 </Accordion>
             </ScrollArea>
         </div>

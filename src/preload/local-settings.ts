@@ -1,4 +1,4 @@
-import { ipcRenderer, IpcRendererEvent, OpenDialogOptions, webFrame } from 'electron';
+import { ipcRenderer, OpenDialogOptions, webFrame } from 'electron';
 
 import { TitleTheme } from '/@/shared/types/types';
 
@@ -7,6 +7,13 @@ const set = (
     value: boolean | Record<string, unknown> | string | string[] | undefined,
 ) => {
     ipcRenderer.send('settings-set', { property, value });
+};
+
+const setSync = async (
+    property: string,
+    value: boolean | null | Record<string, unknown> | string | string[],
+) => {
+    return ipcRenderer.invoke('settings-set-sync', { property, value });
 };
 
 const get = async (property: string) => {
@@ -41,8 +48,8 @@ const setZoomFactor = (zoomFactor: number) => {
     webFrame.setZoomFactor(zoomFactor / 100);
 };
 
-const fontError = (cb: (event: IpcRendererEvent, file: string) => void) => {
-    ipcRenderer.on('custom-font-error', cb);
+const fontError = (cb: (file: string) => void) => {
+    ipcRenderer.on('custom-font-error', (_, file) => cb(file));
 };
 
 const themeSet = (theme: TitleTheme): void => {
@@ -99,6 +106,7 @@ export const localSettings = {
     passwordSet,
     restart,
     set,
+    setSync,
     setZoomFactor,
     themeSet,
 };

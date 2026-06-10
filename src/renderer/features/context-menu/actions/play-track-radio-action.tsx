@@ -5,22 +5,29 @@ import { useTranslation } from 'react-i18next';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
-import { useCurrentServerId, usePlayButtonBehavior } from '/@/renderer/store';
+import { useArtistRadioCount, useCurrentServerId, usePlayButtonBehavior } from '/@/renderer/store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface PlayTrackRadioActionProps {
     disabled?: boolean;
+    skipFirstSong?: boolean;
     song: Song;
 }
 
-export const PlayTrackRadioAction = ({ disabled, song }: PlayTrackRadioActionProps) => {
+export const PlayTrackRadioAction = ({
+    disabled,
+    skipFirstSong,
+    song,
+}: PlayTrackRadioActionProps) => {
     const { t } = useTranslation();
     const player = usePlayer();
     const serverId = useCurrentServerId();
     const queryClient = useQueryClient();
     const playButtonBehavior = usePlayButtonBehavior();
+
+    const radioCount = useArtistRadioCount();
 
     const handlePlayTrackRadio = useCallback(
         async (playType: Play) => {
@@ -30,6 +37,7 @@ export const PlayTrackRadioAction = ({ disabled, song }: PlayTrackRadioActionPro
                 const similarSongs = await queryClient.fetchQuery({
                     ...songsQueries.similar({
                         query: {
+                            count: radioCount,
                             songId: song.id,
                         },
                         serverId,
@@ -38,13 +46,17 @@ export const PlayTrackRadioAction = ({ disabled, song }: PlayTrackRadioActionPro
                 });
 
                 if (similarSongs && similarSongs.length > 0) {
-                    player.addToQueueByData([song, ...similarSongs], playType);
+                    // We need to skip the first song when adding to the queue as NEXT or LAST, otherwise you will have a duplicate song
+                    const shouldSkipFirstSong =
+                        skipFirstSong && (playType === Play.NEXT || playType === Play.LAST);
+                    const queueSongs = shouldSkipFirstSong ? similarSongs : [song, ...similarSongs];
+                    player.addToQueueByData(queueSongs, playType);
                 }
             } catch (error) {
                 console.error('Failed to load track radio:', error);
             }
         },
-        [player, queryClient, serverId, song],
+        [player, queryClient, radioCount, serverId, skipFirstSong, song],
     );
 
     const handlePlayTrackRadioNow = useCallback(() => {

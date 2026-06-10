@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,18 +15,39 @@ export const StylesSettings = memo(() => {
     const [open, setOpen] = useState(false);
     const { t } = useTranslation();
 
+    const utils = isElectron() ? window.api.utils : null;
+    const isDesktop = isElectron();
+
     const { content, enabled } = useCssSettings();
     const [css, setCss] = useState(content);
 
     const { setSettings } = useSettingsStoreActions();
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setSettings({
             css: {
                 content: css,
                 enabled,
             },
         });
+
+        if (utils) {
+            try {
+                await utils.saveCustomCss(css);
+            } catch (error) {
+                console.error('Failed to save custom css file', error);
+            }
+        }
+    };
+
+    const handleOpenFolder = async () => {
+        if (!utils) return;
+
+        try {
+            await utils.openCustomCssFolder();
+        } catch (error) {
+            console.error('Failed to open custom css folder', error);
+        }
     };
 
     useEffect(() => {
@@ -62,6 +84,15 @@ export const StylesSettings = memo(() => {
                     <SettingsOptions
                         control={
                             <>
+                                {isDesktop && (
+                                    <Button
+                                        onClick={handleOpenFolder}
+                                        size="compact-md"
+                                        variant="subtle"
+                                    >
+                                        {t('common.openFolder', { postProcess: 'titleCase' })}
+                                    </Button>
+                                )}
                                 {open && (
                                     <Button
                                         onClick={handleSave}

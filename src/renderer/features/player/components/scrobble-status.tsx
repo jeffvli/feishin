@@ -22,6 +22,12 @@ const scrobbleProgressProps = {
 
 const clampPct = (n: number) => Math.min(100, Math.max(0, n));
 
+const capForDisplay = (value: number, limit: number) =>
+    limit > 0 ? Math.min(value, limit) : value;
+
+const progressTowardLimit = (current: number, limit: number) =>
+    limit > 0 ? clampPct((current / limit) * 100) : 0;
+
 const ScrobbleConditionProgress = ({ value }: { value: number }) => (
     <Progress {...scrobbleProgressProps} value={value} w="100%" />
 );
@@ -34,21 +40,28 @@ export const ScrobbleStatus = ({ formattedTime }: { formattedTime: string }) => 
 
     const hookInactive = !scrobbleEnabled || privateMode;
 
-    const listenedSec = (snapshot.listenedMs / 1000).toFixed(1);
-    const listenPercentOfTrack =
-        snapshot.trackDurationMs > 0 ? (snapshot.listenedMs / snapshot.trackDurationMs) * 100 : 0;
+    const listenedSecRaw = snapshot.listenedMs / 1000;
+    const listenedSecDisplay = snapshot.submitted
+        ? snapshot.targetDurationSec
+        : capForDisplay(listenedSecRaw, snapshot.targetDurationSec);
 
-    const durationConditionPct =
-        snapshot.targetDurationSec > 0
-            ? clampPct((snapshot.listenedMs / 1000 / snapshot.targetDurationSec) * 100)
-            : 0;
-    const percentConditionPct =
-        snapshot.targetPercentage > 0 && snapshot.trackDurationMs > 0
-            ? clampPct((listenPercentOfTrack / snapshot.targetPercentage) * 100)
-            : 0;
+    const listenPercentOfTrackRaw =
+        snapshot.trackDurationMs > 0 ? (snapshot.listenedMs / snapshot.trackDurationMs) * 100 : 0;
+    const listenPercentDisplay = snapshot.submitted
+        ? snapshot.targetPercentage
+        : capForDisplay(listenPercentOfTrackRaw, snapshot.targetPercentage);
+
+    const durationConditionPct = progressTowardLimit(
+        listenedSecDisplay,
+        snapshot.targetDurationSec,
+    );
+    const percentConditionPct = progressTowardLimit(
+        listenPercentDisplay,
+        snapshot.targetPercentage,
+    );
 
     return (
-        <HoverCard position="top" width={280}>
+        <HoverCard openDelay={500} position="top" width={280}>
             <HoverCard.Target>
                 <Group
                     align="center"
@@ -87,13 +100,13 @@ export const ScrobbleStatus = ({ formattedTime }: { formattedTime: string }) => 
                         <>
                             <Stack gap="xs">
                                 <Text size="xs">
-                                    {`${listenedSec}s / ${snapshot.targetDurationSec}s`}
+                                    {`${listenedSecDisplay.toFixed(1)}s / ${snapshot.targetDurationSec}s`}
                                 </Text>
                                 <ScrobbleConditionProgress value={durationConditionPct} />
                             </Stack>
                             <Stack gap="xs">
                                 <Text size="xs">
-                                    {`${listenPercentOfTrack.toFixed(1)}% / ${snapshot.targetPercentage}%`}
+                                    {`${listenPercentDisplay.toFixed(1)}% / ${snapshot.targetPercentage}%`}
                                 </Text>
                                 <ScrobbleConditionProgress value={percentConditionPct} />
                             </Stack>

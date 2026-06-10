@@ -14,6 +14,7 @@ import styles from './album-artist-detail-content.module.css';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { DataRow, MemoizedItemCard } from '/@/renderer/components/item-card/item-card';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
+import { playSongFromItemListControl } from '/@/renderer/components/item-list/helpers/play-row-from-list';
 import { useGridRows } from '/@/renderer/components/item-list/helpers/use-grid-rows';
 import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
 import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
@@ -365,12 +366,13 @@ const AlbumArtistMetadataTopSongsContent = ({
                     return;
                 }
 
-                const playType = (meta?.playType as Play) || Play.NOW;
-                const items = internalState?.getData() as Song[];
-
-                if (index !== undefined) {
-                    player.addToQueueByData(items, playType, item.id);
-                }
+                playSongFromItemListControl({
+                    index,
+                    internalState,
+                    item: item as Song,
+                    meta,
+                    player,
+                });
             },
         };
     }, [player]);
@@ -657,12 +659,13 @@ const AlbumArtistMetadataFavoriteSongs = ({
                     return;
                 }
 
-                const playType = (meta?.playType as Play) || Play.NOW;
-                const items = internalState?.getData() as Song[];
-
-                if (index !== undefined) {
-                    player.addToQueueByData(items, playType, item.id);
-                }
+                playSongFromItemListControl({
+                    index,
+                    internalState,
+                    item: item as Song,
+                    meta,
+                    player,
+                });
             },
         };
     }, [player]);

@@ -1,5 +1,5 @@
 import { t } from 'i18next';
-import { useCallback, useEffect, useState, WheelEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PopoverPlayQueue } from '/@/renderer/features/now-playing/components/popover-play-queue';
@@ -12,6 +12,9 @@ import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import {
+    AUTO_DJ_MODE,
+    AUTO_DJ_STRATEGY,
+    type AutoDJStrategy,
     useAppStoreActions,
     useAutoDJSettings,
     useCurrentServer,
@@ -34,7 +37,15 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
+import { NumberInput } from '/@/shared/components/number-input/number-input';
+import { Paper } from '/@/shared/components/paper/paper';
+import { Popover } from '/@/shared/components/popover/popover';
 import { Rating } from '/@/shared/components/rating/rating';
+import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
+import { Select } from '/@/shared/components/select/select';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
 import { useMediaQuery } from '/@/shared/hooks/use-media-query';
 import { useThrottledCallback } from '/@/shared/hooks/use-throttled-callback';
 import { useThrottledValue } from '/@/shared/hooks/use-throttled-value';
@@ -90,28 +101,148 @@ const AutoDJButton = () => {
     const settings = useAutoDJSettings();
     const { setSettings } = useSettingsStoreActions();
 
-    const toggleAutoDJ = () => {
-        setSettings({
-            autoDJ: {
-                ...settings,
-                enabled: !settings.enabled,
+    const itemLabels = useMemo(() => {
+        return {
+            description: t('setting.autoDJ_itemCount_description'),
+            title: t('setting.autoDJ_itemCount'),
+        };
+    }, [t]);
+
+    const strategySelectData = useMemo(
+        () => [
+            {
+                label: t('setting.autoDJ_strategy_option_similar'),
+                value: AUTO_DJ_STRATEGY.SIMILAR,
             },
-        });
-    };
+            {
+                label: t('setting.autoDJ_strategy_option_library_random'),
+                value: AUTO_DJ_STRATEGY.LIBRARY_RANDOM,
+            },
+        ],
+        [t],
+    );
+
+    const strategyLabels =
+        settings.mode === AUTO_DJ_MODE.ALBUMS
+            ? {
+                  description: '',
+                  title: t('setting.autoDJ_albumStrategy'),
+              }
+            : {
+                  description: '',
+                  title: t('setting.autoDJ_songStrategy'),
+              };
+
+    const strategyValue =
+        settings.mode === AUTO_DJ_MODE.ALBUMS
+            ? (settings.albumStrategy ?? AUTO_DJ_STRATEGY.SIMILAR)
+            : (settings.songStrategy ?? AUTO_DJ_STRATEGY.SIMILAR);
 
     return (
-        <Button
-            onClick={(e) => {
-                e.stopPropagation();
-                toggleAutoDJ();
-            }}
-            size="compact-xs"
-            style={{ color: settings.enabled ? 'var(--theme-colors-primary)' : undefined }}
-            uppercase
-            variant="transparent"
-        >
-            {t('setting.autoDJ')}
-        </Button>
+        <Popover position="top-end" withArrow>
+            <Popover.Target>
+                <Button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                    }}
+                    size="compact-xs"
+                    style={{ color: settings.enabled ? 'var(--theme-colors-primary)' : undefined }}
+                    uppercase
+                    variant="transparent"
+                >
+                    {t('setting.autoDJ')}
+                </Button>
+            </Popover.Target>
+            <Popover.Dropdown maw={320} miw={260} onClick={(e) => e.stopPropagation()} p="sm">
+                <Stack gap="sm">
+                    <Paper p="md" radius="md">
+                        <Group align="center" gap="xs" justify="space-between" wrap="nowrap">
+                            <Text fw={600} isNoSelect size="sm">
+                                {t('setting.autoDJ_enabled')}
+                            </Text>
+                            <Switch
+                                checked={settings.enabled}
+                                onChange={(e) =>
+                                    setSettings({
+                                        autoDJ: { enabled: e.currentTarget.checked },
+                                    })
+                                }
+                            />
+                        </Group>
+                    </Paper>
+                    <SegmentedControl
+                        data={[
+                            { label: t('setting.autoDJ_mode_songs'), value: AUTO_DJ_MODE.SONGS },
+                            {
+                                label: t('setting.autoDJ_mode_albums'),
+                                value: AUTO_DJ_MODE.ALBUMS,
+                            },
+                        ]}
+                        onChange={(value) =>
+                            setSettings({
+                                autoDJ: {
+                                    mode: value as 'albums' | 'songs',
+                                },
+                            })
+                        }
+                        value={settings.mode}
+                        w="100%"
+                    />
+                    <Select
+                        comboboxProps={{ withinPortal: false }}
+                        data={strategySelectData}
+                        description={strategyLabels.description}
+                        label={strategyLabels.title}
+                        onChange={(value) => {
+                            if (!value) return;
+                            setSettings({
+                                autoDJ:
+                                    settings.mode === AUTO_DJ_MODE.ALBUMS
+                                        ? { albumStrategy: value as AutoDJStrategy }
+                                        : { songStrategy: value as AutoDJStrategy },
+                            });
+                        }}
+                        size="md"
+                        value={strategyValue}
+                        w="100%"
+                    />
+                    <NumberInput
+                        aria-label={itemLabels.title}
+                        description={itemLabels.description}
+                        hideControls={false}
+                        label={itemLabels.title}
+                        max={50}
+                        min={1}
+                        onChange={(e) =>
+                            setSettings({
+                                autoDJ: {
+                                    itemCount: Number(e),
+                                },
+                            })
+                        }
+                        size="md"
+                        value={Number(settings.itemCount)}
+                    />
+                    <NumberInput
+                        aria-label={t('setting.autoDJ_timing')}
+                        description={t('setting.autoDJ_timing_description')}
+                        hideControls={false}
+                        label={t('setting.autoDJ_timing')}
+                        max={5}
+                        min={1}
+                        onChange={(e) =>
+                            setSettings({
+                                autoDJ: {
+                                    timing: Number(e),
+                                },
+                            })
+                        }
+                        size="md"
+                        value={Number(settings.timing)}
+                    />
+                </Stack>
+            </Popover.Dropdown>
+        </Popover>
     );
 };
 

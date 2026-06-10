@@ -917,7 +917,6 @@
         "queryBuilderCustomFields_description": "Egyéni mezők hozzáadása a lekérdezés-építőhöz",
         "autoDJ": "Auto DJ",
         "autoDJ_timing": "Időzítés",
-        "autoDJ_description": "Hasonló dalokat automatikusan hozzáad a műsorlistához",
         "autoDJ_itemCount": "Elem szám",
         "autoDJ_itemCount_description": "Az auto DJ engedélyezésekor a műsorsorba felvenni kívánt elemek száma",
         "autoDJ_timing_description": "Az auto DJ elindulása előtt a műsorlistában maradt dalok száma",

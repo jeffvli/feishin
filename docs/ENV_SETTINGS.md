@@ -114,8 +114,11 @@ These variables override app settings **on first run** when no persisted setting
 
 | Setting path | Default | Env variable | Available values / Description |
 |-------------|---------|--------------|--------------------------------|
+| `autoDJ.albumStrategy` | `similar` | `FS_AUTO_DJ_ALBUM_STRATEGY` | `similar` / `library_random`. |
 | `autoDJ.enabled` | `false` | `FS_AUTO_DJ_ENABLED` | `true` / `false`. |
 | `autoDJ.itemCount` | `5` | `FS_AUTO_DJ_ITEM_COUNT` | Number of items to add. |
+| `autoDJ.mode` | `songs` | `FS_AUTO_DJ_MODE` | `songs` / `albums`. |
+| `autoDJ.songStrategy` | `similar` | `FS_AUTO_DJ_SONG_STRATEGY` | `similar` / `library_random`. |
 | `autoDJ.timing` | `1` | `FS_AUTO_DJ_TIMING` | Timing value (number). |
 
 ---

@@ -508,7 +508,6 @@
         "combinedLyricsAndVisualizer_description": "将歌词和可视化界面合并到同一面板中",
         "queryBuilderCustomFields_description": "在查询构建器添加自定义字段",
         "combinedLyricsAndVisualizer": "在播放器侧边栏合并歌词和可视化界面",
-        "autoDJ_description": "自动添加相似歌曲到队列中",
         "notify_description": "歌曲变更时显示通知",
         "mpvExtraParameters_description": "向MPV传递额外参数",
         "audioFadeOnStatusChange": "音频改变时淡入淡出",

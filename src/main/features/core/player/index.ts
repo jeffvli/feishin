@@ -7,9 +7,10 @@ import { pid } from 'node:process';
 import process from 'process';
 
 import { getMainWindow, sendToastToRenderer } from '../../../index';
-import { createLog, isMacOS, isWindows } from '../../../utils';
+import { createLog } from '../../../utils';
 import { store } from '../settings';
 
+import { isMacOS, isWindows } from '/@/main/env';
 import { PlayerData } from '/@/shared/types/domain-types';
 
 declare module 'node-mpv';
@@ -119,8 +120,14 @@ const createMpv = async (data: {
 }): Promise<MpvAPI> => {
     const { binaryPath, extraParameters, properties } = data;
     const resolvedBinaryPath = await resolveMpvBinaryPath(binaryPath);
+    const normalizedExtraParameters = (extraParameters ?? [])
+        .map((param) => param.trim())
+        .filter((param) => param.length > 0);
 
-    const params = uniq([...DEFAULT_MPV_PARAMETERS(extraParameters), ...(extraParameters || [])]);
+    const params = uniq([
+        ...DEFAULT_MPV_PARAMETERS(normalizedExtraParameters),
+        ...normalizedExtraParameters,
+    ]);
 
     const mpv = new MpvAPI(
         {

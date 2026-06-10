@@ -141,6 +141,25 @@ export function calculateNextSong(
     }
 }
 
+export function getDualPlayerSongs(
+    playerNum: 1 | 2,
+    currentSong: QueueSong | undefined,
+    nextSong: QueueSong | undefined,
+    repeat: PlayerRepeat,
+): { player1: QueueSong | undefined; player2: QueueSong | undefined } {
+    if (repeat === PlayerRepeat.ONE) {
+        return {
+            player1: playerNum === 1 ? currentSong : undefined,
+            player2: playerNum === 2 ? currentSong : undefined,
+        };
+    }
+
+    return {
+        player1: playerNum === 1 ? currentSong : nextSong,
+        player2: playerNum === 2 ? currentSong : nextSong,
+    };
+}
+
 // Helper function to check if shuffle is enabled
 export function isShuffleEnabled(state: {
     player: { shuffle: PlayerShuffle };
@@ -206,7 +225,7 @@ function calculateNextIndex(
     } else {
         // Repeat none: move to next track, or pause if at the end
         if (isLastTrack) {
-            return { nextIndex: 0, shouldPause: true };
+            return { nextIndex: currentIndex, shouldPause: true };
         } else {
             return { nextIndex: currentIndex + 1, shouldPause: false };
         }
@@ -804,13 +823,20 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         nextSong = calculateNextSong(queueIndex, queue.items, repeat);
                     }
 
+                    const { player1, player2 } = getDualPlayerSongs(
+                        state.player.playerNum,
+                        currentSong,
+                        nextSong,
+                        repeat,
+                    );
+
                     return {
                         currentSong,
                         index: queueIndex, // Return the actual queue position for display
                         nextSong,
                         num: state.player.playerNum,
-                        player1: state.player.playerNum === 1 ? currentSong : nextSong,
-                        player2: state.player.playerNum === 2 ? currentSong : nextSong,
+                        player1,
+                        player2,
                         previousSong,
                         queueLength: state.queue.default.length,
                         status: state.player.status,
@@ -899,19 +925,30 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         ? stateSnapshot.queue.shuffled.length
                         : queue.items.length;
 
-                    const newPlayerNum = player.playerNum === 1 ? 2 : 1;
                     const { nextIndex: nextPlaybackIndex, shouldPause } = calculateNextIndex(
                         currentIndex,
                         playbackLength,
                         repeat,
                     );
+                    const isRepeatOneSameTrack =
+                        repeat === PlayerRepeat.ONE && nextPlaybackIndex === currentIndex;
+                    // Dual web players alternate for gapless/crossfade between tracks. Repeat-one
+                    // replays the same track — keep playerNum so Chromium stays bound to the same
+                    // <audio> element and hardware media keys keep working.
+                    const newPlayerNum = isRepeatOneSameTrack
+                        ? player.playerNum
+                        : player.playerNum === 1
+                          ? 2
+                          : 1;
                     const pauseOnNext = player.pauseOnNextSongEnd;
                     const newStatus =
                         shouldPause || pauseOnNext ? PlayerStatus.PAUSED : PlayerStatus.PLAYING;
+                    const shouldKeepCurrentPlayer = newStatus === PlayerStatus.PAUSED;
+                    const shouldSwapPlayer = !isRepeatOneSameTrack && !shouldKeepCurrentPlayer;
 
                     set((state) => {
                         state.player.index = nextPlaybackIndex;
-                        state.player.playerNum = newPlayerNum;
+                        state.player.playerNum = shouldSwapPlayer ? newPlayerNum : player.playerNum;
                         setTimestampStore(0);
                         state.player.status = newStatus;
 
@@ -967,13 +1004,20 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             currentQueueIndex > 0 ? queue.items[currentQueueIndex - 1] : undefined;
                     }
 
+                    const { player1, player2 } = getDualPlayerSongs(
+                        shouldSwapPlayer ? newPlayerNum : player.playerNum,
+                        currentSong,
+                        nextSong,
+                        repeat,
+                    );
+
                     return {
                         currentSong,
                         index: currentQueueIndex,
                         nextSong,
-                        num: newPlayerNum,
-                        player1: newPlayerNum === 1 ? currentSong : nextSong,
-                        player2: newPlayerNum === 2 ? currentSong : nextSong,
+                        num: shouldSwapPlayer ? newPlayerNum : player.playerNum,
+                        player1,
+                        player2,
                         previousSong,
                         queueLength: queue.items.length,
                         status: newStatus,
@@ -1145,6 +1189,9 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     });
                 },
                 mediaSeekToTimestamp: (timestamp: number) => {
+                    // See mediaSkipBackward: update the timestamp store right away to
+                    // avoid the stale-read left by the ~500ms engine poll.
+                    setTimestampStore(timestamp);
                     set((state) => {
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(timestamp);
                     });
@@ -1156,6 +1203,11 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const currentTimestamp = useTimestampStoreBase.getState().timestamp;
                     const newTimestamp = Math.max(0, currentTimestamp - timeToSkip);
 
+                    // Update the timestamp store right away so the UI and any
+                    // subsequent seek compute from the new position instead of the
+                    // stale value left by the ~500ms engine poll (otherwise mashing
+                    // the seek keys repeatedly lands on the same time).
+                    setTimestampStore(newTimestamp);
                     set((state) => {
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(newTimestamp);
                     });
@@ -1177,6 +1229,9 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const currentTimestamp = useTimestampStoreBase.getState().timestamp;
                     const newTimestamp = Math.min(duration - 1, currentTimestamp + timeToSkip);
 
+                    // See mediaSkipBackward: update the timestamp store right away to
+                    // avoid the stale-read left by the ~500ms engine poll.
+                    setTimestampStore(newTimestamp);
                     set((state) => {
                         state.player.seekToTimestamp = uniqueSeekToTimestamp(newTimestamp);
                     });
@@ -1973,13 +2028,20 @@ export const usePlayerData = (): PlayerData => {
                 nextSong = calculateNextSong(queueIndex, queue.items, repeat);
             }
 
+            const { player1, player2 } = getDualPlayerSongs(
+                state.player.playerNum,
+                currentSong,
+                nextSong,
+                repeat,
+            );
+
             return {
                 currentSong,
                 index: queueIndex, // Return the actual queue position for display
                 nextSong,
                 num: state.player.playerNum,
-                player1: state.player.playerNum === 1 ? currentSong : nextSong,
-                player2: state.player.playerNum === 2 ? currentSong : nextSong,
+                player1,
+                player2,
                 previousSong,
                 queueLength: state.queue.default.length,
                 status: state.player.status,

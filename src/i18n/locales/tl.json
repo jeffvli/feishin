@@ -1,0 +1,14 @@
+{
+    "action": {
+        "addToFavorites": "Idagdag sa $t(entity.favorite, {\"count\": 2})",
+        "addToPlaylist": "Idagdag sa $t(entity.playlist, {\"count\": 1})",
+        "addOrRemoveFromSelection": "Idagdag o alisin sa pinili",
+        "collapseAllFolders": "Isara lahat ng mga folder",
+        "expandAllFolders": "Buksan lahat ng mga folder",
+        "createPlaylist": "Gumawa $t(entity.playlist, {\"count\": 1})",
+        "createRadioStation": "Gumawa $t(entity.radioStation, {\"count\": 1})",
+        "selectAll": "Piliin lahat",
+        "deselectAll": "Huwag piliin lahat",
+        "downloadStarted": "Nagsimulang mag-dowload ng {{count}} (mga) aytem"
+    }
+}

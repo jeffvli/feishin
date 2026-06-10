@@ -16,8 +16,10 @@ import { SidebarCollectionList } from '/@/renderer/features/sidebar/components/s
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import {
+    SidebarPlaylistAddDragContext,
     SidebarPlaylistList,
     SidebarSharedPlaylistList,
+    useSidebarPlaylistAddDragMonitor,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
 import {
     useAppStore,
@@ -44,6 +46,17 @@ import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { ExplicitStatus, LibraryItem } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
+
+const SidebarPlaylistSection = () => {
+    const isAddDragActive = useSidebarPlaylistAddDragMonitor();
+
+    return (
+        <SidebarPlaylistAddDragContext.Provider value={isAddDragActive}>
+            <SidebarPlaylistList />
+            <SidebarSharedPlaylistList />
+        </SidebarPlaylistAddDragContext.Provider>
+    );
+};
 
 export const Sidebar = () => {
     const { t } = useTranslation();
@@ -140,12 +153,7 @@ export const Sidebar = () => {
                         </Accordion.Panel>
                     </Accordion.Item>
                     <SidebarCollectionList />
-                    {sidebarPlaylistList && (
-                        <>
-                            <SidebarPlaylistList />
-                            <SidebarSharedPlaylistList />
-                        </>
-                    )}
+                    {sidebarPlaylistList && <SidebarPlaylistSection />}
                 </Accordion>
             </ScrollArea>
             <AnimatePresence initial={false} mode="popLayout">

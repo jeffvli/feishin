@@ -366,7 +366,10 @@ export const SubsonicController: InternalControllerEndpoint = {
                     query.type === LibraryItem.ALBUM_ARTIST || query.type === LibraryItem.ARTIST
                         ? query.id
                         : undefined,
-                id: query.type === LibraryItem.SONG ? query.id : undefined,
+                id:
+                    query.type === LibraryItem.SONG || query.type === LibraryItem.PLAYLIST_SONG
+                        ? query.id
+                        : undefined,
             },
         });
 
@@ -419,7 +422,10 @@ export const SubsonicController: InternalControllerEndpoint = {
                     query.type === LibraryItem.ALBUM_ARTIST || query.type === LibraryItem.ARTIST
                         ? query.id
                         : undefined,
-                id: query.type === LibraryItem.SONG ? query.id : undefined,
+                id:
+                    query.type === LibraryItem.SONG || query.type === LibraryItem.PLAYLIST_SONG
+                        ? query.id
+                        : undefined,
             },
         });
 
@@ -1460,6 +1466,10 @@ export const SubsonicController: InternalControllerEndpoint = {
             features.serverPlayQueue = [1];
         }
 
+        if (subsonicFeatures[SubsonicExtensions.PLAYBACK_REPORT]) {
+            features.reportPlayback = [1];
+        }
+
         return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };
     },
     getSimilarSongs: async (args) => {
@@ -2297,6 +2307,72 @@ export const SubsonicController: InternalControllerEndpoint = {
     },
     scrobble: async (args) => {
         const { apiClientProps, query } = args;
+
+        if (hasFeature(apiClientProps.server, ServerFeature.REPORT_PLAYBACK)) {
+            if (query.submission || query.event === 'start') {
+                const res = await ssApiClient(apiClientProps).scrobble({
+                    query: {
+                        id: query.id,
+                        submission: query.submission,
+                    },
+                });
+
+                if (res.status !== 200) {
+                    throw new Error('Failed to scrobble');
+                }
+
+                if (query.submission) {
+                    return null;
+                }
+            }
+
+            const defaultParams = {
+                ignoreScrobble: true,
+                mediaId: query.id,
+                mediaType: query.mediaType,
+                playbackRate: query.playbackRate,
+                positionMs: query.position ?? 0,
+            };
+
+            const reportPlayback = (state: 'paused' | 'playing' | 'starting' | 'stopped') => {
+                return ssApiClient(apiClientProps).reportPlayback({
+                    query: {
+                        ...defaultParams,
+                        state,
+                    },
+                });
+            };
+
+            const promises: Promise<any>[] = [];
+
+            switch (query.event) {
+                case 'pause':
+                    promises.push(reportPlayback('paused'));
+                    break;
+                case 'start':
+                    promises.push(reportPlayback('starting'));
+                    promises.push(reportPlayback('playing'));
+                    break;
+                case 'stop':
+                    promises.push(reportPlayback('stopped'));
+                    break;
+                case 'unpause':
+                    promises.push(reportPlayback('playing'));
+                    break;
+                default:
+                    break;
+            }
+
+            for (const promise of promises) {
+                const res = await promise;
+
+                if (res.status !== 200) {
+                    throw new Error('Failed to report playback');
+                }
+            }
+
+            return null;
+        }
 
         const res = await ssApiClient(apiClientProps).scrobble({
             query: {

@@ -20,8 +20,25 @@
         "viewPlaylists": "Ver $t(entity.playlist, {\"count\": 2})",
         "openIn": {
             "lastfm": "Abrir em Last.fm",
-            "musicbrainz": "Abrir em MusicBrainz"
-        }
+            "musicbrainz": "Abrir em MusicBrainz",
+            "listenbrainz": "Abrir no ListenBrainz",
+            "qobuz": "Abrir no Qobuz",
+            "spotify": "Abrir no Spotify"
+        },
+        "addOrRemoveFromSelection": "Adicionar ou remover da seleção",
+        "goToCurrent": "Ir para o elemento atual",
+        "collapseAllFolders": "Colapsar todas as pastas",
+        "expandAllFolders": "Expandir todas as pastas",
+        "createRadioStation": "Criar $t(entity.radioStation, {\"count\": 1})",
+        "deleteRadioStation": "Apagar $t(entity.radioStation, {\"count\": 1})",
+        "selectAll": "Selecionar tudo",
+        "moveUp": "Mover para cima",
+        "moveDown": "Mover para baixo",
+        "holdToMoveToTop": "Segure para ir ao topo",
+        "holdToMoveToBottom": "Mover para ir ao fundo",
+        "moveItems": "Mover elementos",
+        "viewMore": "Ver mais",
+        "openApplicationDirectory": "Abrir a pasta da aplicação"
     },
     "common": {
         "action_one": "Ação",
@@ -122,7 +139,21 @@
         "unknown": "Desconhecido",
         "version": "Versão",
         "year": "Ano",
-        "yes": "Sim"
+        "yes": "Sim",
+        "countSelected": "{{count}} selecionado",
+        "bitDepth": "Profundidade de bits",
+        "example": "Exemplo",
+        "externalLinks": "Ligações externas",
+        "mood": "Humor",
+        "private": "Privado",
+        "public": "Público",
+        "retry": "Tentar novamente",
+        "rename": "Renomear",
+        "sampleRate": "Taxa de amostragem",
+        "sort": "Ordenar",
+        "clean": "Limpar",
+        "itemsMore": "{{count}} mais",
+        "newVersionAvailable": "Uma nova versão está disponível"
     },
     "entity": {
         "album_one": "Álbum",
@@ -201,7 +232,9 @@
         "serverNotSelectedError": "Nenhum servidor selecionado",
         "serverRequired": "Servidor necessário",
         "sessionExpiredError": "A sua sessão expirou",
-        "systemFontError": "Ocorreu um erro ao tentar obter fontes do sistema"
+        "systemFontError": "Ocorreu um erro ao tentar obter fontes do sistema",
+        "invalidJson": "JSON inválido",
+        "noNetwork": "Servidor não disponível"
     },
     "filter": {
         "album": "$t(entity.album, {\"count\": 1})",
@@ -245,7 +278,10 @@
         "songCount": "Contador de músicas",
         "title": "Titulo",
         "toYear": "Até o ano",
-        "trackNumber": "Faixa"
+        "trackNumber": "Faixa",
+        "matchAnd": "E",
+        "matchOr": "Ou",
+        "sortName": "Ordenar por nome"
     },
     "form": {
         "addServer": {
@@ -259,7 +295,8 @@
             "input_url": "Url",
             "input_username": "Nome de utilizador",
             "success": "Servidor adicionado com sucesso",
-            "title": "Adicionar servidor"
+            "title": "Adicionar servidor",
+            "input_remoteUrl": "URL público"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
@@ -292,7 +329,9 @@
         },
         "queryEditor": {
             "input_optionMatchAll": "Corresponder todos",
-            "input_optionMatchAny": "Corresponder qualquer um"
+            "input_optionMatchAny": "Corresponder qualquer um",
+            "resetToDefault": "Restaurar à predefinição",
+            "clearFilters": "Limpar filtros"
         },
         "shareItem": {
             "allowDownloading": "Permitir descargas",
@@ -305,6 +344,21 @@
         "updateServer": {
             "success": "Servidor atualizado com sucesso",
             "title": "Atualizar servidor"
+        },
+        "createRadioStation": {
+            "title": "Criar estação de rádio",
+            "input_name": "Nome"
+        },
+        "lyricsExport": {
+            "input_synced": "Exportar letras sincronizadas"
+        },
+        "shuffleAll": {
+            "title": "Tocar aleatório",
+            "input_minYear": "A partir do ano",
+            "input_maxYear": "Até o ano"
+        },
+        "privateMode": {
+            "title": "Modo Privado"
         }
     },
     "page": {
@@ -317,7 +371,9 @@
             "topSongs": "Músicas mais tocadas",
             "topSongsFrom": "Músicas mais tocadas de {{title}}",
             "viewAll": "Ver tudo",
-            "viewAllTracks": "Ver todas as $t(entity.track, {\"count\": 2})"
+            "viewAllTracks": "Ver todas as $t(entity.track, {\"count\": 2})",
+            "topSongsCommunity": "Comunidade",
+            "topSongsPersonal": "Pessoal"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -374,7 +430,8 @@
             "setRating": "$t(action.setRating)",
             "playShuffled": "$t(player.shuffle)",
             "shareItem": "Partilhar elemento",
-            "showDetails": "Obter informações"
+            "showDetails": "Obter informações",
+            "goTo": "Ir para"
         },
         "fullscreenPlayer": {
             "config": {
@@ -417,7 +474,8 @@
             "mostPlayed": "Mais tocado",
             "newlyAdded": "Lançamentos recém-adicionados",
             "recentlyPlayed": "Tocado recentemente",
-            "title": "$t(common.home)"
+            "title": "$t(common.home)",
+            "genres": "$t(entity.genre, {\"count\": 2})"
         },
         "itemDetail": {
             "copyPath": "Copiar caminho para a área de transferência",
@@ -435,7 +493,18 @@
             "generalTab": "Geral",
             "hotkeysTab": "Teclas de atalho",
             "playbackTab": "Reprodução",
-            "windowTab": "Janela"
+            "windowTab": "Janela",
+            "application": "Aplicação",
+            "queryBuilder": "Construtor de Consultas",
+            "theme": "Tema",
+            "controls": "Controles",
+            "sidebar": "Barra lateral",
+            "remote": "Remoto",
+            "exportImport": "Importar/exportar",
+            "audio": "Áudio",
+            "lyrics": "Letras",
+            "transcoding": "Transcodificar",
+            "discord": "Discord"
         },
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
@@ -450,12 +519,19 @@
             "search": "$t(common.search)",
             "settings": "$t(common.setting, {\"count\": 2})",
             "shared": "$t(entity.playlist, {\"count\": 2}) partilhada",
-            "tracks": "$t(entity.track, {\"count\": 2})"
+            "tracks": "$t(entity.track, {\"count\": 2})",
+            "collections": "Coleções"
         },
         "trackList": {
             "artistTracks": "Faixas de {{artist}}",
             "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})",
             "title": "$t(entity.track, {\"count\": 2})"
+        },
+        "radioList": {
+            "title": "Estações de rádio"
+        },
+        "folderList": {
+            "title": "$t(entity.folder, {\"count\": 2})"
         }
     },
     "player": {
@@ -489,7 +565,11 @@
         "toggleFullscreenPlayer": "Alternar player de ecrã cheio",
         "unfavorite": "Remover favorito",
         "pause": "Pausar",
-        "viewQueue": "Ver fila"
+        "viewQueue": "Ver fila",
+        "lyrics": "Letra",
+        "sleepTimer_minutes": "{{count}} min",
+        "sleepTimer_hours": "{{count}} hr",
+        "sleepTimer_off": "Desligado"
     },
     "setting": {
         "accentColor": "Cor de realce",
@@ -528,18 +608,269 @@
         "discordApplicationId": "{{discord}} ID da aplicação",
         "discordIdleStatus_description": "Quando ativado, atualiza o estado enquanto o player está ocioso",
         "discordUpdateInterval_description": "O tempo em segundos entre cada atualização (mínimo 15 segundos)",
-        "playButtonBehavior_description": "Define o comportamento padrão do botão play ao adicionar músicas à fila"
+        "playButtonBehavior_description": "Define o comportamento padrão do botão play ao adicionar músicas à fila",
+        "autoDJ_itemCount": "Número de elementos",
+        "autoDJ_timing": "Tempo",
+        "customCss_description": "Conteúdo CSS personalizado. Observação: conteúdo e urls remotas são propriedades não permitidas. Uma pré-visualização do seu conteúdo é exibida abaixo. Campos adicionais que não definiu estão presentes devido à sanitização",
+        "automaticUpdates": "Atualizações automáticas",
+        "releaseChannel_optionBeta": "Beta",
+        "releaseChannel_optionLatest": "Mais recente",
+        "discordApplicationId_description": "O ID da aplicação para o rich presence do {{discord}} (defaults: {{defaultId}})",
+        "discordDisplayType_artistname": "Nome(s) do(s) artista(s)",
+        "discordDisplayType": "Tipo de exibição da presença do {{discord}}",
+        "discordIdleStatus": "Mostrar estado ocioso do rich presence",
+        "discordLinkType_mbz_lastfm": "{{musicbrainz}} com alternativa para {{lastfm}}",
+        "discordLinkType_none": "$t(common.none)",
+        "discordLinkType": "Ligações de presença do {{discord}}",
+        "discordServeImage_description": "Partilhar a capa para o rich presence do {{discord}} a partir do próprio servidor, disponível apenas para Jellyfin e Navidrome. O {{discord}} usa um bot para buscar imagens, portanto o seu servidor deve estar acessível pela internet pública",
+        "discordUpdateInterval": "Intervalo de atualização do rich presence do {{discord}}",
+        "exportImportSettings_control_importText": "Importar configurações",
+        "exportImportSettings_control_title": "Importar / exportar configurações",
+        "exportImportSettings_importBtn": "Importar configurações",
+        "exportImportSettings_importModalTitle": "Importar configurações do Feishin",
+        "externalLinks": "Mostrar ligações externas",
+        "font": "Fonte",
+        "fontType_optionBuiltIn": "Fonte embutida",
+        "fontType_optionCustom": "Fonte personalizada",
+        "fontType_optionSystem": "Fonte do sistema",
+        "fontType": "Tipo da fonte",
+        "homeFeatureStyle_optionMultiple": "Múltiplos",
+        "hotkey_globalSearch": "Pequisa global",
+        "hotkey_playbackPause": "Pausar",
+        "hotkey_playbackPlay": "Tocar",
+        "hotkey_playbackPlayPause": "Play / pausar",
+        "hotkey_playbackStop": "Parar",
+        "hotkey_volumeMute": "Volume mudo",
+        "hotkey_volumeUp": "Aumentar volume",
+        "hotkey_zoomIn": "Aproximar",
+        "hotkey_zoomOut": "Afastar",
+        "imageAspectRatio_description": "Se ativado, a capa será exibida usando a sua proporção nativa. Para capas que não forem 1:1, o espaço restante ficará vazio",
+        "imageAspectRatio": "Usar proporção nativa da capa",
+        "language_description": "Define o idioma da aplicação ($t(common.restartRequired))",
+        "lastfm_description": "Exibir ligações para o Last.fm nas páginas de artista/álbum",
+        "lastfm": "Mostrar ligações do Last.fm",
+        "lastfmApiKey_description": "A chave de API para {{lastfm}}. Necessária para capas de álbuns",
+        "lastfmApiKey": "{{lastfm}} chave API",
+        "lyricFetch_description": "Buscar letras em várias fontes da internet",
+        "lyricFetch": "Buscar letras na internet",
+        "lyricFetchProvider": "Provedores para buscar letras",
+        "lyricOffset_description": "Compensar a letra pelo valor especificado em milissegundos",
+        "lyricOffset": "Compensação da letra (ms)",
+        "minimizeToTray_description": "Minimizar a aplicação para a bandeja do sistema",
+        "minimizeToTray": "Minimizar para a bandeja",
+        "minimumScrobblePercentage_description": "O percentual mínimo da música que deve ser reproduzido antes de ser scrobblada",
+        "minimumScrobblePercentage": "Duração mínima para scrobble (percentual)",
+        "minimumScrobbleSeconds_description": "A duração mínima em segundos da música que deve ser reproduzida antes de ser scrobblada",
+        "minimumScrobbleSeconds": "Scrobble mínimo (segundos)",
+        "mpvExecutablePath": "Caminho do executável do mpv",
+        "mpvExtraParameters_help": "Um por linha",
+        "musicbrainz_description": "Exibir ligações para o MusicBrainz nas páginas de artista/álbum, quando o ID do MusicBrainz existir",
+        "musicbrainz": "Mostrar ligações do MusicBrainz",
+        "neteaseTranslation_description": "Quando ativado, busca e exibe letras traduzidas do NetEase, se disponíveis",
+        "neteaseTranslation": "Ativar traduções do NetEase",
+        "passwordStore_description": "Qual armazenamento de palavras-passe/segredos usar. Altere isto se tem problemas para armazenar palavras-passe",
+        "playbackStyle_description": "Selecione o estilo de reprodução a ser usado pelo reprodutor de áudio",
+        "playbackStyle_optionCrossFade": "Transição suave",
+        "playbackStyle_optionNormal": "Normal",
+        "playbackStyle": "Estilo de reprodução",
+        "playButtonBehavior_optionAddLast": "$t(player.addLast)",
+        "playButtonBehavior_optionAddNext": "$t(player.addNext)",
+        "playButtonBehavior_optionPlay": "$t(player.play)",
+        "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
+        "playButtonBehavior": "Comportamento do botão de reprodução",
+        "imageResolution_optionSidebar": "Barra lateral",
+        "imageResolution_optionHeader": "Cabeçalho",
+        "imageResolution_optionFullScreenPlayer": "Reprodutor de ecrã cheio",
+        "playerbarOpenDrawer_description": "Permite clicar na barra do reprodutor para abrir o reprodutor em ecrã cheio",
+        "playerbarOpenDrawer": "Alternar ecrã cheio na barra do reprodutor",
+        "playerbarSliderType_optionWaveform": "Forma de onda",
+        "playerbarWaveformAlign_optionTop": "Topo",
+        "playerbarWaveformAlign_optionCenter": "Centro",
+        "playerbarWaveformAlign_optionBottom": "Fundo",
+        "showRatings_description": "Exibir ou ocultar as avaliações por estrelas",
+        "showRatings": "Exibir avaliações por estrelas",
+        "remotePassword_description": "Define a palavra-passe do servidor de controlo remoto. Estas credenciais, por padrão, são transferidas de forma insegura — use uma palavra-passe única da qualnão dependa",
+        "remotePort": "Porta do servidor de controlo remoto",
+        "replayGainClipping_description": "Evitar clipping causado pelo {{ReplayGain}} reduzindo automaticamente o ganho",
+        "replayGainClipping": "Clipping do {{ReplayGain}}",
+        "replayGainFallback": "Fallback do {{ReplayGain}}",
+        "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
+        "replayGainMode_optionNone": "$t(common.none)",
+        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
+        "replayGainMode": "Modo {{ReplayGain}}",
+        "replayGainPreamp": "Pré-amplificador {{ReplayGain}} (db)",
+        "sampleRate": "Taxa de amostragem",
+        "sidebarPlaylistFolderView_optionNavigation": "Vista de navegação",
+        "sidebarPlaylistMode_optionCompact": "Compacto",
+        "sidebarPlaylistMode_optionExpanded": "Expandido",
+        "sidePlayQueueStyle_optionAttached": "Anexado",
+        "sidePlayQueueLayout_optionHorizontal": "Horizontal",
+        "sidePlayQueueLayout_optionVertical": "Vertical",
+        "startMinimized": "Abrir minimizado",
+        "theme": "Tema",
+        "themeDark": "Tema (escuro)",
+        "transcode": "Ativar transcodificação",
+        "translationTargetLanguage": "Idioma de destino para tradução",
+        "useSystemTheme": "Usar tema do sistema",
+        "queryBuilderCustomFields_inputLabel": "Etiqueta"
     },
     "table": {
         "column": {
             "discNumber": "Disco",
-            "size": "$t(common.size)",
-            "title": "Titulo"
+            "size": "Tamanho",
+            "title": "Titulo",
+            "album": "Álbum",
+            "albumArtist": "Artista do álbum",
+            "albumCount": "Álbuns",
+            "artist": "Artista",
+            "biography": "Bibliografia",
+            "bitDepth": "Profundidade de Bits",
+            "bitrate": "Bitrate",
+            "bpm": "Bpm",
+            "channels": "Canais",
+            "codec": "Codec",
+            "comment": "Comentário",
+            "dateAdded": "Data Adicionada",
+            "favorite": "Favorito",
+            "genre": "Gênero",
+            "lastPlayed": "Última tocada",
+            "path": "Caminho",
+            "playCount": "Reproduções",
+            "rating": "Avaliação",
+            "releaseDate": "Data de Lançamento",
+            "releaseYear": "Ano",
+            "sampleRate": "Taxa de amostragem",
+            "trackNumber": "Faixa",
+            "owner": "Dono"
         },
         "config": {
             "label": {
                 "discNumber": "Numero do disco",
-                "titleCombined": "$t(common.title) (combinado)"
+                "titleCombined": "$t(common.title) (combinado)",
+                "album": "$t(entity.album, {\"count\": 1})",
+                "albumCount": "$t(entity.album, {\"count\": 2})",
+                "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+                "artist": "$t(entity.artist, {\"count\": 1})",
+                "biography": "$t(common.biography)",
+                "bitrate": "$t(common.bitrate)",
+                "bpm": "$t(common.bpm)",
+                "codec": "$t(common.codec)",
+                "composer": "Compositor",
+                "duration": "$t(common.duration)",
+                "favorite": "$t(common.favorite)",
+                "genre": "$t(entity.genre, {\"count\": 1})",
+                "image": "Imagem",
+                "lastPlayed": "Última reprodução",
+                "note": "$t(common.note)",
+                "owner": "$t(common.owner)",
+                "path": "$t(common.path)",
+                "playCount": "Contador de Reprodução",
+                "rating": "$t(common.rating)",
+                "releaseDate": "Data de Lançamento",
+                "size": "$t(common.size)",
+                "songCount": "$t(entity.track, {\"count\": 2})",
+                "title": "$t(common.title)",
+                "year": "$t(common.year)"
+            },
+            "general": {
+                "advancedSettings": "Configurações avançadas",
+                "moveUp": "Mover para cima",
+                "moveDown": "Mover para baixo",
+                "alignLeft": "Alinhar à esquerda",
+                "alignCenter": "Alinhar ao centro",
+                "alignRight": "Alinhar à direita",
+                "displayType": "Tipo do ecrã",
+                "gap": "$t(common.gap)",
+                "size": "$t(common.size)",
+                "size_default": "Predefinição",
+                "size_compact": "Compacto",
+                "size_large": "Grande",
+                "tableColumns": "Colunas das tabelas",
+                "pagination": "Paginação",
+                "pagination_itemsPerPage": "Elementos por página",
+                "pagination_infinite": "Infinito",
+                "pagination_paginate": "Paginado",
+                "showHeader": "Exibir cabeçalho"
+            },
+            "view": {
+                "grid": "Grade"
+            }
+        }
+    },
+    "filterOperator": {
+        "contains": "Contém",
+        "endsWith": "Termina com",
+        "is": "É",
+        "isNot": "Não é",
+        "isGreaterThan": "É maior que",
+        "isLessThan": "É menor que",
+        "notContains": "Não contém",
+        "startsWith": "Começa com"
+    },
+    "releaseType": {
+        "primary": {
+            "broadcast": "Broadcast",
+            "ep": "EP",
+            "other": "Outros",
+            "single": "Simples"
+        },
+        "secondary": {
+            "compilation": "Compilação",
+            "djMix": "Mixagem de DJ",
+            "demo": "Demo",
+            "interview": "Entrevista",
+            "live": "Ao Vivo"
+        }
+    },
+    "visualizer": {
+        "systemAudioConsentAllow": "Permitir",
+        "systemAudioConsentDecline": "Recusar",
+        "ignoredPresets": "Predefinições Ignoradas",
+        "selectedPresets": "84",
+        "presets": "Predefinições",
+        "applyPreset": "Aplicar Predefinição",
+        "saveAsPreset": "Gravar como Predefinição",
+        "updatePreset": "Atualizar Predefinição",
+        "copyConfiguration": "Copiar Configuração",
+        "pasteConfiguration": "Colar Configuração",
+        "presetNamePlaceholder": "Digite o nome da predefinição",
+        "general": "Geral",
+        "mode": "Modo",
+        "mode1To8": "Modo 1 - 8",
+        "mode10": "Modo 10",
+        "lineWidth": "Largura da Linha",
+        "opacity": "Opacidade",
+        "vertical": "Vertical",
+        "horizontal": "Horizontal",
+        "level": "Nível",
+        "remove": "Remover",
+        "custom": "Personalizado",
+        "builtIn": "Embutido",
+        "colors": "Cores",
+        "gradient": "Gradiente",
+        "smoothing": "Suavizamento",
+        "sensitivity": "Sensibilidade",
+        "gravity": "Gravidade",
+        "radial": "Radial",
+        "radius": "Raio",
+        "options": {
+            "colorMode": {
+                "gradient": "Gradiente"
+            },
+            "gradient": {
+                "classic": "Clássico",
+                "rainbow": "Arco-íris"
+            },
+            "frequencyScale": {
+                "none": "Nenhum"
+            },
+            "weightingFilter": {
+                "none": "Nenhum",
+                "a": "A",
+                "b": "B",
+                "c": "C",
+                "d": "D",
+                "z": "Z"
             }
         }
     }

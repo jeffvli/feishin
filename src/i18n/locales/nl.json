@@ -653,7 +653,6 @@
         "globalMediaHotkeys_description": "Het gebruik van systeem mediahotkeys voor controle van afspelen aan-/uitzetten",
         "globalMediaHotkeys": "Globale mediasneltoetsen",
         "autoDJ": "Auto-DJ",
-        "autoDJ_description": "Soortgelijke nummers automatisch aan wachtrij toevoegen",
         "autoDJ_itemCount": "Aantal items",
         "autoDJ_itemCount_description": "Het aantal items dat aan de wachtrij wordt geprobeerd toe te voegen als auto-DJ is ingeschakeld",
         "autoDJ_timing": "Timing",

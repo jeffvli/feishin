@@ -111,6 +111,8 @@ const SIDE_QUEUE_TYPES = new Set(['sideDrawerQueue', 'sideQueue']);
 const SIDE_QUEUE_LAYOUTS = new Set(['horizontal', 'vertical']);
 const SIDEBAR_PLAYLIST_FOLDER_VIEWS = new Set(['navigation', 'single', 'tree']);
 const SIDEBAR_PLAYLIST_MODES = new Set(['compact', 'expanded']);
+const AUTO_DJ_MODES = new Set(['albums', 'songs']);
+const AUTO_DJ_STRATEGIES = new Set(['library_random', 'similar']);
 
 export type EnvSettingsOverrides = DeepPartial<
     Pick<SettingsState, 'autoDJ' | 'css' | 'discord' | 'font' | 'general' | 'lyrics' | 'playback'>
@@ -422,8 +424,21 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
         path: ['lyrics', 'alignment'],
         type: 'enum',
     },
+    {
+        enumSet: AUTO_DJ_STRATEGIES,
+        key: 'FS_AUTO_DJ_ALBUM_STRATEGY',
+        path: ['autoDJ', 'albumStrategy'],
+        type: 'enum',
+    },
     { key: 'FS_AUTO_DJ_ENABLED', path: ['autoDJ', 'enabled'], type: 'bool' },
     { key: 'FS_AUTO_DJ_ITEM_COUNT', path: ['autoDJ', 'itemCount'], type: 'num' },
+    { enumSet: AUTO_DJ_MODES, key: 'FS_AUTO_DJ_MODE', path: ['autoDJ', 'mode'], type: 'enum' },
+    {
+        enumSet: AUTO_DJ_STRATEGIES,
+        key: 'FS_AUTO_DJ_SONG_STRATEGY',
+        path: ['autoDJ', 'songStrategy'],
+        type: 'enum',
+    },
     { key: 'FS_AUTO_DJ_TIMING', path: ['autoDJ', 'timing'], type: 'num' },
     {
         key: 'FS_CSS_CONTENT',

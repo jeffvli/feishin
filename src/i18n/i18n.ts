@@ -8,6 +8,7 @@ import cs from './locales/cs.json';
 import de from './locales/de.json';
 import en from './locales/en.json';
 import es from './locales/es.json';
+import et from './locales/et.json';
 import eu from './locales/eu.json';
 import fa from './locales/fa.json';
 import fi from './locales/fi.json';
@@ -27,6 +28,8 @@ import sl from './locales/sl.json';
 import sr from './locales/sr.json';
 import sv from './locales/sv.json';
 import ta from './locales/ta.json';
+import th from './locales/th.json';
+import tl from './locales/tl.json';
 import tr from './locales/tr.json';
 import zhHans from './locales/zh-Hans.json';
 import zhHant from './locales/zh-Hant.json';
@@ -38,6 +41,7 @@ const resources = {
     de: { translation: de },
     en: { translation: en },
     es: { translation: es },
+    et: { translation: et },
     eu: { translation: eu },
     fa: { translation: fa },
     fi: { translation: fi },
@@ -57,6 +61,8 @@ const resources = {
     sr: { translation: sr },
     sv: { translation: sv },
     ta: { translation: ta },
+    th: { translation: th },
+    tl: { translation: tl },
     tr: { translation: tr },
     'zh-Hans': { translation: zhHans },
     'zh-Hant': { translation: zhHant },
@@ -86,6 +92,10 @@ export const languages = [
     {
         label: 'Español',
         value: 'es',
+    },
+    {
+        label: 'Eesti',
+        value: 'et',
     },
     {
         label: 'Basque',
@@ -162,6 +172,14 @@ export const languages = [
     {
         label: 'Tamil',
         value: 'ta',
+    },
+    {
+        label: 'Thai',
+        value: 'th',
+    },
+    {
+        label: 'Tagalog',
+        value: 'tl',
     },
     {
         label: 'Türkçe',

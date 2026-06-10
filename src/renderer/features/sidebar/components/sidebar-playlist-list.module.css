@@ -4,6 +4,10 @@
     padding: var(--theme-spacing-sm) var(--theme-spacing-md);
 }
 
+.panel {
+    position: relative;
+}
+
 .row {
     position: relative;
     display: flex;
@@ -29,12 +33,11 @@
 .compact-name {
     flex: 1;
     min-width: 0;
-    padding:  0;
+    padding: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-
 
 .controls {
     position: absolute;
@@ -44,7 +47,6 @@
     background: var(--theme-colors-surface);
     transform: translateY(-50%);
 }
-
 
 .controls-compact {
     position: absolute;
@@ -56,13 +58,12 @@
     transform: translateY(-50%);
 }
 
-
 .row-dragged-over::after {
     position: absolute;
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    content: "";
+    content: '';
     border: 2px solid var(--theme-colors-primary);
     border-radius: var(--theme-radius-md);
     opacity: 0.8;

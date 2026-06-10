@@ -112,7 +112,7 @@ export const useMainPlayerListener = () => {
             decreaseVolume(volumeWheelStep);
         });
 
-        mpvPlayerListener.rendererError((_event: any, message: string) => {
+        mpvPlayerListener.rendererError((message: string) => {
             handleMpvError(message);
         });
 
