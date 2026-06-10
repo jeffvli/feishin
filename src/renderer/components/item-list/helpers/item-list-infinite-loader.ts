@@ -13,7 +13,7 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { getListRefreshMutationKey } from '/@/renderer/features/shared/components/list-refresh-button';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { LibraryItem, SortKeyRandom } from '/@/shared/types/domain-types';
 
 export const getListQueryKeyName = (itemType: LibraryItem): string => {
     switch (itemType) {
@@ -108,8 +108,19 @@ export const useItemListInfiniteLoader = ({
         [serverId, itemType, query],
     );
 
+    const isRandomSort = query?.sortBy === SortKeyRandom;
+
     const fetchPage = useCallback(
         async (pageNumber: number) => {
+            if (isRandomSort) {
+                const existingData =
+                    queryClient.getQueryData<InfiniteLoaderCacheData>(dataQueryKey);
+                if (existingData?.pagesLoaded?.[pageNumber]) {
+                    lastFetchedPageRef.current = Math.max(lastFetchedPageRef.current, pageNumber);
+                    return;
+                }
+            }
+
             const startIndex = pageNumber * itemsPerPage;
             const queryParams = {
                 limit: itemsPerPage,
@@ -118,6 +129,7 @@ export const useItemListInfiniteLoader = ({
             };
 
             const result = await queryClient.fetchQuery({
+                gcTime: isRandomSort ? 1000 * 60 * 10 : 1000 * 15,
                 queryFn: async ({ signal }) => {
                     const result = await listQueryFn({
                         apiClientProps: { serverId, signal },
@@ -127,6 +139,7 @@ export const useItemListInfiniteLoader = ({
                     return result;
                 },
                 queryKey: queryKeys[getListQueryKeyName(itemType)].list(serverId, queryParams),
+                staleTime: isRandomSort ? 1000 * 60 * 10 : 1000 * 15,
             });
 
             // Update the query data with the fetched page
@@ -154,12 +167,31 @@ export const useItemListInfiniteLoader = ({
             // Track the last fetched page
             lastFetchedPageRef.current = Math.max(lastFetchedPageRef.current, pageNumber);
         },
-        [itemsPerPage, query, queryClient, serverId, dataQueryKey, listQueryFn, itemType],
+        [
+            itemsPerPage,
+            query,
+            queryClient,
+            serverId,
+            dataQueryKey,
+            listQueryFn,
+            itemType,
+            isRandomSort,
+        ],
     );
 
     // Reset the loaded pages and refetch current page when the query changes
     useEffect(() => {
         const currentDataQueryKey = JSON.stringify(dataQueryKey);
+
+        if (isRandomSort) {
+            const existingData = queryClient.getQueryData<InfiniteLoaderCacheData | undefined>(
+                dataQueryKey,
+            );
+            if (existingData?.dataMap && existingData.dataMap.size > 0) {
+                previousDataQueryKeyRef.current = currentDataQueryKey;
+                return;
+            }
+        }
 
         if (previousDataQueryKeyRef.current === currentDataQueryKey || isRefetchingRef.current) {
             return;

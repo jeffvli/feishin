@@ -72,7 +72,7 @@ export const orderSearchResults = (args: {
 
         searchResults = Array.from(combinedResults.values());
     } else {
-        searchResults = fuse.search<InternetProviderLyricSearchResponse>({
+        searchResults = fuse.search({
             ...(params.artist && { artist: params.artist }),
             ...(params.name && { name: params.name }),
         });

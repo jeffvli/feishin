@@ -43,6 +43,6 @@ jobs:
 
 
                   stale-issue-label: 'stale'
-                  exempt-issue-labels: 'keep,security'
+                  exempt-issue-labels: 'keep,security,enhancement'
                   stale-pr-label: 'stale'
                   exempt-pr-labels: 'keep,security'

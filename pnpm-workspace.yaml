@@ -1,0 +1,9 @@
+allowBuilds:
+  abstract-socket: true
+  electron: true
+  electron-winstaller: true
+  esbuild: true
+
+overrides:
+  "xml2js": "0.5.0"
+  "react-router": "7.14.0"
