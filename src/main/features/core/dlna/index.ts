@@ -83,6 +83,7 @@ let currentTranscodeFile = '';
 let lastKnownDuration = 0;
 let nearEndStallCount = 0;
 let resumeKickCount = 0;
+let lastPlayUrlSentAt = 0;
 
 cleanupTempFiles();
 
@@ -1111,7 +1112,11 @@ function startPositionPolling() {
                 lastKnownTransportState = transportState;
                 const recentPauseOrPlay =
                     Date.now() - lastPauseCommandAt < 2000 || Date.now() - lastPlayCommandAt < 2000;
-                if (!recentPauseOrPlay) {
+                const newTrackSentSincePause = lastPlayUrlSentAt > lastPauseCommandAt;
+                if (
+                    !recentPauseOrPlay ||
+                    (transportState === 'PLAYING' && newTrackSentSincePause)
+                ) {
                     getMainWindow()?.webContents.send(
                         'renderer-dlna-transport-state',
                         transportState,
@@ -1582,6 +1587,7 @@ ipcMain.on(
                 return;
             }
             trackLoadedAt = Date.now();
+            lastPlayUrlSentAt = Date.now();
             lastLoadedFromUri = lastCommandedUri;
             lastCommandedUri = lanUrl;
             lastQueuedNextUri = '';

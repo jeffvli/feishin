@@ -522,7 +522,7 @@ export const DlnaCastButton = () => {
                                     size="xs"
                                     style={{
                                         color: isShiftDown
-                                            ? 'var(--mantine-color-white, #ffffff)'
+                                            ? undefined
                                             : 'var(--mantine-color-red-4, #ff6b6b)',
                                     }}
                                     variant="outline"
@@ -603,7 +603,7 @@ export const DlnaCastButton = () => {
                                     size="xs"
                                     style={{
                                         color: isShiftDown
-                                            ? 'var(--mantine-color-white, #ffffff)'
+                                            ? undefined
                                             : 'var(--mantine-color-red-4, #ff6b6b)',
                                     }}
                                     variant="outline"
