@@ -296,7 +296,7 @@ export const EqSettings = memo(() => {
 
             // Mutations to Web Audio API AudioParam values are intentional
             // side effects on the live audio graph, not React state mutations.
-
+            // eslint-disable-next-line react-hooks/immutability
             dsp.preampGain.gain.value = eq.enabled ? Math.pow(10, eq.preamp / 20) : 1;
 
             dsp.eqFilters.forEach((filter, i) => {
