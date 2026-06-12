@@ -2,6 +2,7 @@ import { Client, SetActivity } from '@xhayper/discord-rpc';
 import { ipcMain } from 'electron';
 
 import log from '/@/main/logger';
+import { toast } from '/@/shared/components/toast/toast';
 
 const FEISHIN_DISCORD_APPLICATION_ID = '1165957668758900787';
 
@@ -45,6 +46,28 @@ const quit = () => {
     }
 };
 
+const postImageProxyRequest = async (imageProxyServerLink: string, arrayBuffer: ArrayBuffer) => {
+    const buffer = Buffer.from(arrayBuffer);
+
+    const formData = new FormData();
+    formData.append('files[]', new Blob([buffer]));
+
+    const fileUploadResponse = await fetch(imageProxyServerLink, {
+        body: formData,
+        method: 'POST',
+    });
+
+    if (!fileUploadResponse.ok) {
+        toast.error({
+            message: 'Cover art image could not be uploaded to specified image proxy server',
+        });
+        throw new Error();
+    }
+
+    const json = await fileUploadResponse.json();
+    return json.files[0].url;
+};
+
 ipcMain.handle('discord-rpc-initialize', async (_event, clientId?: string) => {
     try {
         await createClient(clientId);
@@ -57,6 +80,10 @@ ipcMain.handle('discord-rpc-initialize', async (_event, clientId?: string) => {
 
 ipcMain.handle('discord-rpc-is-connected', () => {
     return isConnected();
+});
+
+ipcMain.handle('discord-rpc-post-image-proxy-request', (_event, imageProxyServerLink, formData) => {
+    return postImageProxyRequest(imageProxyServerLink, formData);
 });
 
 ipcMain.handle('discord-rpc-set-activity', (_event, activity: SetActivity) => {
@@ -77,6 +104,7 @@ export const discordRpc = {
     clearActivity,
     createClient,
     isConnected,
+    postImageProxyRequest,
     quit,
     setActivity,
 };

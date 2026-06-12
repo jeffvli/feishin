@@ -25,7 +25,6 @@ import {
 import { sentenceCase } from '/@/renderer/utils';
 import { LogCategory, logFn, logger } from '/@/renderer/utils/logger';
 import { logMsg } from '/@/renderer/utils/logger-message';
-import { toast } from '/@/shared/components/toast/toast';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
@@ -272,43 +271,33 @@ export const useDiscordRpc = () => {
                     ) {
                         // TODO: clean up error logging
                         try {
-                            const url = getItemImageUrl({
+                            const serverImageUrl = getItemImageUrl({
                                 id: song.id,
                                 itemType: LibraryItem.SONG,
                                 type: 'fullScreenPlayer',
                             });
-                            if (!url) {
+                            if (!serverImageUrl) {
                                 logFn.error('Failed getting image URL');
                                 throw new Error();
                             }
 
-                            const imageResponse = await fetch(url);
+                            const imageResponse = await fetch(serverImageUrl);
                             if (!imageResponse.ok) {
                                 logFn.error('Failed fetching image URL from music server');
                                 throw new Error();
                             }
-                            const imageBlob = await imageResponse.blob();
-                            const formData = new FormData();
-                            formData.append('files[]', imageBlob);
 
-                            const fileUploadResponse = await fetch(
+                            const imageBlob = await imageResponse.blob();
+                            const arrayBuffer = await imageBlob.arrayBuffer();
+
+                            const globalImageUrl = await discordRpc?.postImageProxyRequest(
                                 discordSettings.imageProxyServerLink,
-                                {
-                                    body: formData,
-                                    method: 'POST',
-                                },
+                                arrayBuffer,
                             );
 
-                            if (!fileUploadResponse.ok) {
-                                toast.error({
-                                    message:
-                                        'Cover art image could not be uploaded to specified image proxy server',
-                                });
-                                throw new Error();
+                            if (globalImageUrl) {
+                                activity.largeImageKey = globalImageUrl;
                             }
-
-                            const json = await fileUploadResponse.json();
-                            activity.largeImageKey = json.files[0].url;
                         } catch {
                             /* empty */
                         }

@@ -16,6 +16,15 @@ const clearActivity = () => {
     ipcRenderer.invoke('discord-rpc-clear-activity');
 };
 
+const postImageProxyRequest = (imageProxyServerLink: string, arrayBuffer: ArrayBuffer) => {
+    const url = ipcRenderer.invoke(
+        'discord-rpc-post-image-proxy-request',
+        imageProxyServerLink,
+        arrayBuffer,
+    );
+    return url;
+};
+
 const setActivity = (activity: SetActivity) => {
     ipcRenderer.invoke('discord-rpc-set-activity', activity);
 };
@@ -28,6 +37,7 @@ export const discordRpc = {
     clearActivity,
     initialize,
     isConnected,
+    postImageProxyRequest,
     quit,
     setActivity,
 };
