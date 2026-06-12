@@ -4,7 +4,7 @@ import isElectron from 'is-electron';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { api } from '/@/renderer/api';
-import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { getItemImageUrl, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import {
     useIsRadioActive,
@@ -23,7 +23,9 @@ import {
     useTimestampStoreBase,
 } from '/@/renderer/store';
 import { sentenceCase } from '/@/renderer/utils';
-import { logger } from '/@/renderer/utils/logger';
+import { LogCategory, logFn, logger } from '/@/renderer/utils/logger';
+import { logMsg } from '/@/renderer/utils/logger-message';
+import { toast } from '/@/shared/components/toast/toast';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
@@ -257,8 +259,62 @@ export const useDiscordRpc = () => {
                 activity.smallImageText = sentenceCase(current[2]);
             }
 
-            if (discordSettings.serverType == DiscordServerType.MUSIC_SERVER && song) {
-                if (song._uniqueId === currentSong?._uniqueId && imageUrlRef.current) {
+            if (song && song._uniqueId === currentSong?._uniqueId && imageUrlRef.current) {
+                if (
+                    discordSettings.serverType == DiscordServerType.IMAGE_PROXY &&
+                    discordSettings.imageProxyServerLink
+                ) {
+                    if (song._serverType === ServerType.JELLYFIN) {
+                        activity.largeImageKey = imageUrlRef.current;
+                    } else if (
+                        song._serverType === ServerType.NAVIDROME ||
+                        song._serverType === ServerType.SUBSONIC
+                    ) {
+                        // TODO: clean up error logging
+                        try {
+                            const url = getItemImageUrl({
+                                id: song.id,
+                                itemType: LibraryItem.SONG,
+                                type: 'fullScreenPlayer',
+                            });
+                            if (!url) {
+                                logFn.error('Failed getting image URL');
+                                throw new Error();
+                            }
+
+                            const imageResponse = await fetch(url);
+                            if (!imageResponse.ok) {
+                                logFn.error('Failed fetching image URL from music server');
+                                throw new Error();
+                            }
+                            const imageBlob = await imageResponse.blob();
+                            const formData = new FormData();
+                            formData.append('files[]', imageBlob);
+
+                            const fileUploadResponse = await fetch(
+                                discordSettings.imageProxyServerLink,
+                                {
+                                    body: formData,
+                                    method: 'POST',
+                                },
+                            );
+
+                            if (!fileUploadResponse.ok) {
+                                toast.error({
+                                    message:
+                                        'Cover art image could not be uploaded to specified image proxy server',
+                                });
+                                throw new Error();
+                            }
+
+                            const json = await fileUploadResponse.json();
+                            activity.largeImageKey = json.files[0].url;
+                        } catch {
+                            /* empty */
+                        }
+                    }
+                }
+                if (discordSettings.serverType == DiscordServerType.MUSIC_SERVER) {
                     if (song._serverType === ServerType.JELLYFIN) {
                         activity.largeImageKey = imageUrlRef.current;
                     } else if (
