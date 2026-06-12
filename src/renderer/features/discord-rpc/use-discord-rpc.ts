@@ -287,6 +287,8 @@ export const useDiscordRpc = () => {
                             }
 
                             const imageBlob = await imageResponse.blob();
+
+                            // Convert blob to ArrayBuffer to enable IPC communication
                             const arrayBuffer = await imageBlob.arrayBuffer();
 
                             const globalImageUrl = await discordRpc?.postImageProxyRequest(

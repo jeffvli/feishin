@@ -65,6 +65,8 @@ const postImageProxyRequest = async (imageProxyServerLink: string, arrayBuffer: 
     }
 
     const json = await fileUploadResponse.json();
+
+    // Location within json for uguu.se
     return json.files[0].url;
 };
 
