@@ -269,21 +269,20 @@ export const useDiscordRpc = () => {
                         song._serverType === ServerType.NAVIDROME ||
                         song._serverType === ServerType.SUBSONIC
                     ) {
-                        // TODO: clean up error logging
                         try {
                             const serverImageUrl = getItemImageUrl({
                                 id: song.id,
                                 itemType: LibraryItem.SONG,
                                 type: 'fullScreenPlayer',
                             });
-                            if (!serverImageUrl) {
-                                logFn.error('Failed getting image URL');
-                                throw new Error();
-                            }
 
-                            const imageResponse = await fetch(serverImageUrl);
+                            const imageResponse = await fetch(serverImageUrl ?? '');
                             if (!imageResponse.ok) {
                                 logFn.error('Failed fetching image URL from music server');
+                                logFn.error(logMsg[LogCategory.EXTERNAL].discordRpcFailedFetch, {
+                                    category: LogCategory.EXTERNAL,
+                                    meta: { imageUrl: serverImageUrl },
+                                });
                                 throw new Error();
                             }
 
