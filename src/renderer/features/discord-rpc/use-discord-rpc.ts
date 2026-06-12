@@ -2,6 +2,7 @@ import type { SetActivity } from '@xhayper/discord-rpc';
 
 import isElectron from 'is-electron';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { api } from '/@/renderer/api';
 import { getItemImageUrl, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
@@ -25,6 +26,7 @@ import {
 import { sentenceCase } from '/@/renderer/utils';
 import { LogCategory, logFn, logger } from '/@/renderer/utils/logger';
 import { logMsg } from '/@/renderer/utils/logger-message';
+import { toast } from '/@/shared/components/toast/toast';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
@@ -47,6 +49,7 @@ const truncate = (field: string) =>
     field.length <= MAX_FIELD_LENGTH ? field : field.substring(0, MAX_FIELD_LENGTH - 1) + '…';
 
 export const useDiscordRpc = () => {
+    const { t } = useTranslation();
     const discordSettings = useDiscordSettings();
     const lastfmApiKey = useLastfmApiKey();
     const privateMode = useAppStore((state) => state.privateMode);
@@ -296,9 +299,12 @@ export const useDiscordRpc = () => {
                                 arrayBuffer,
                             );
 
-                            if (globalImageUrl) {
-                                activity.largeImageKey = globalImageUrl;
+                            if (!globalImageUrl) {
+                                toast.error({
+                                    message: t('error.discordImageProxyUploadFailed'),
+                                });
                             }
+                            activity.largeImageKey = globalImageUrl;
                         } catch {
                             /* empty */
                         }
@@ -397,6 +403,7 @@ export const useDiscordRpc = () => {
             radioMetadata?.title,
             radioMetadata?.artist,
             stationName,
+            t,
         ],
     );
 

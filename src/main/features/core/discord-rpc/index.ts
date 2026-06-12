@@ -58,10 +58,7 @@ const postImageProxyRequest = async (imageProxyServerLink: string, arrayBuffer: 
     });
 
     if (!fileUploadResponse.ok) {
-        toast.error({
-            message: 'Cover art image could not be uploaded to specified image proxy server',
-        });
-        throw new Error();
+        return null;
     }
 
     const json = await fileUploadResponse.json();

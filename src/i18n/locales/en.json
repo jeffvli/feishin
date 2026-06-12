@@ -227,6 +227,7 @@
         "badAlbum": "You are seeing this page because this song is not part of an album. You are most likely seeing this issue if you have a song at the top level of your music folder. Jellyfin only groups tracks if they are in a folder",
         "badValue": "Invalid option \"{{value}}\". This value no longer exists",
         "credentialsRequired": "Credentials required",
+        "discordImageProxyUploadFailed": "Cover art image could not be uploaded to specified image proxy server",
         "endpointNotImplementedError": "Endpoint {{endpoint}} is not implemented for {{serverType}}",
         "genericError": "An error occurred",
         "invalidJson": "Invalid JSON",
