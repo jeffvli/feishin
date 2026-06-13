@@ -224,25 +224,26 @@ export const PlaylistQueryEditor = ({
         return detailQuery?.data?.rules?.order || 'asc';
     }, [detailQuery?.data?.rules?.order, detailQuery?.data?.rules?.sort]);
 
+    const appliedQuery = appliedJsonState?.query;
+    const detailQueryRules = detailQuery?.data?.rules;
     const effectiveQuery = useMemo(
         () =>
-            appliedJsonState?.query ??
-            (detailQuery?.data?.rules?.all
-                ? { all: detailQuery.data.rules.all }
-                : detailQuery?.data?.rules?.any
-                  ? { any: detailQuery.data.rules.any }
-                  : detailQuery?.data?.rules),
-        [appliedJsonState?.query, detailQuery?.data?.rules],
+            appliedQuery ??
+            (detailQueryRules?.all
+                ? { all: detailQueryRules.all }
+                : detailQueryRules?.any
+                  ? { any: detailQueryRules.any }
+                  : detailQueryRules),
+        [appliedQuery, detailQueryRules],
     );
     const effectiveLimit = appliedJsonState?.limit ?? detailQuery?.data?.rules?.limit;
     const effectiveLimitPercent =
         appliedJsonState?.limitPercent ?? detailQuery?.data?.rules?.limitPercent;
+
+    const appliedSort = appliedJsonState?.sort;
     const effectiveSortBy = useMemo(
-        () =>
-            (appliedJsonState?.sort ? [appliedJsonState.sort] : parseSortBy()) as
-                | SongListSort
-                | SongListSort[],
-        [appliedJsonState?.sort, parseSortBy],
+        () => (appliedSort ? [appliedSort] : parseSortBy()) as SongListSort | SongListSort[],
+        [appliedSort, parseSortBy],
     );
     const effectiveSortOrder = appliedJsonState?.sort
         ? appliedJsonState.sort.startsWith('-')
