@@ -44,7 +44,11 @@ import { useTableKeyboardNavigation } from '/@/renderer/components/item-list/ite
 import { useTablePaneSync } from '/@/renderer/components/item-list/item-table-list/hooks/use-table-pane-sync';
 import { useTableRowModel } from '/@/renderer/components/item-list/item-table-list/hooks/use-table-row-model';
 import { useTableScrollToIndex } from '/@/renderer/components/item-list/item-table-list/hooks/use-table-scroll-to-index';
-import { ItemTableListColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
+import {
+    getAlbumGroupRowCount,
+    isLastInAlbumGroup,
+    ItemTableListColumn,
+} from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import {
     ItemTableListColumnResizeLiveProvider,
     type ItemTableListConfig,
@@ -66,7 +70,7 @@ import {
     ItemTableListColumnConfig,
 } from '/@/renderer/components/item-list/types';
 import { PlayerContext, usePlayer } from '/@/renderer/features/player/context/player-context';
-import { usePlayerStore } from '/@/renderer/store';
+import { useAlbumGroupImageSize, usePlayerStore } from '/@/renderer/store';
 import { animationProps } from '/@/shared/components/animations/animation-props';
 import { useFocusWithin } from '/@/shared/hooks/use-focus-within';
 import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
@@ -215,6 +219,7 @@ const VirtualizedTableGrid = ({
     totalRowCount,
 }: VirtualizedTableGridProps) => {
     const { enableHeader, enableRowHoverHighlight, getRowHeight, groups } = tableConfig;
+    const albumGroupImageSize = useAlbumGroupImageSize();
     const hoverDelegateRef = useRef<HTMLDivElement | null>(null);
 
     useRowInteractionDelegate({
@@ -403,6 +408,7 @@ const VirtualizedTableGrid = ({
 
     const itemProps: TableItemProps = useMemo(
         () => ({
+            albumGroupImageSize,
             cellPadding: tableConfig.cellPadding,
             columns: tableConfig.columns,
             controls: tableConfig.controls,
@@ -427,7 +433,7 @@ const VirtualizedTableGrid = ({
             tableId: tableConfig.tableId,
             ...gridOnlyProps,
         }),
-        [gridOnlyProps, tableConfig],
+        [albumGroupImageSize, gridOnlyProps, tableConfig],
     );
 
     const pinnedLeftGridMinWidthPx = useMemo(() => {
@@ -760,6 +766,7 @@ export interface TableGroupHeader {
 
 export interface TableItemProps {
     adjustedRowIndexMap?: Map<number, number>;
+    albumGroupImageSize?: number;
     calculatedColumnWidths?: number[];
     cellPadding?: ItemTableListProps['cellPadding'];
     columns: ItemTableListColumnConfig[];
@@ -1275,6 +1282,7 @@ const BaseItemTableList = ({
 }: ItemTableListProps) => {
     const { playlistId: routePlaylistId } = useParams() as { playlistId?: string };
     const tableId = useId();
+    const albumGroupImageSize = useAlbumGroupImageSize();
     const baseItemCount = itemCount ?? data.length;
     const totalItemCount = enableHeader ? baseItemCount + 1 : baseItemCount;
     const [centerContainerWidth, setCenterContainerWidth] = useState(0);
@@ -1434,9 +1442,38 @@ const BaseItemTableList = ({
                 return headerHeight;
             }
 
+            // When an album image is enlarged beyond the album group's combined
+            // row height, grow the group's LAST row to reserve the leftover
+            // space (so the following album isn't clipped). Other rows keep
+            // their standard height.
+            if (
+                albumGroupImageSize > baseHeight &&
+                cellProps?.hasAlbumGroupColumn &&
+                isLastInAlbumGroup(
+                    index,
+                    cellProps.getRowItem,
+                    cellProps.enableHeader,
+                    cellProps.data.length,
+                )
+            ) {
+                const item = cellProps.getRowItem?.(index) as null | undefined | { album?: string };
+                if (item?.album) {
+                    const groupRowCount = getAlbumGroupRowCount(
+                        index,
+                        cellProps.getRowItem,
+                        cellProps.enableHeader,
+                        cellProps.data.length,
+                    );
+                    const lastRowHeight = albumGroupImageSize - (groupRowCount - 1) * baseHeight;
+                    if (lastRowHeight > baseHeight) {
+                        return lastRowHeight;
+                    }
+                }
+            }
+
             return baseHeight;
         },
-        [enableHeader, headerHeight, rowHeight, pinnedRowCount, size],
+        [albumGroupImageSize, enableHeader, headerHeight, rowHeight, pinnedRowCount, size],
     );
 
     // Create a wrapper for getRowHeight that doesn't require cellProps (for sticky group rows hook)

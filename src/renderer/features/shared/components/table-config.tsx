@@ -29,6 +29,7 @@ import {
 } from '/@/renderer/store';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
+import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -41,7 +42,7 @@ import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { useDebouncedState } from '/@/shared/hooks/use-debounced-state';
 import { dndUtils, DragData, DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
-import { ItemListKey, ListPaginationType } from '/@/shared/types/types';
+import { ItemListKey, ListPaginationType, TableColumn } from '/@/shared/types/types';
 
 interface TableConfigProps {
     enablePinColumnButtons?: boolean;
@@ -72,9 +73,17 @@ export const TableConfig = ({
     const { t } = useTranslation();
 
     const list = useSettingsStore((state) => state.lists[listKey]) as ItemListSettings;
-    const { setList } = useSettingsStoreActions();
+    const albumGroupImageSize = useSettingsStore((state) => state.general.albumGroupImageSize);
+    const imageResTable = useSettingsStore((state) => state.general.imageRes.table);
+    const { setList, setSettings } = useSettingsStoreActions();
+    const [albumGroupOpen, setAlbumGroupOpen] = useState(false);
 
     const table = tableKey === 'detail' ? (list?.detail ?? list?.table) : list?.table;
+
+    const hasAlbumGroupColumn = useMemo(
+        () => table.columns.some((column) => column.id === TableColumn.ALBUM_GROUP),
+        [table.columns],
+    );
 
     const setTableUpdate = useCallback(
         (patch: Partial<DataTableProps>) => {
@@ -90,6 +99,73 @@ export const TableConfig = ({
     );
 
     const advancedSettings = useMemo(() => {
+        const albumGroupOptions =
+            hasAlbumGroupColumn && tableKey === 'main'
+                ? [
+                      {
+                          component: (
+                              <Group justify="flex-end" w="100%">
+                                  <Button
+                                      onClick={() => setAlbumGroupOpen((prev) => !prev)}
+                                      size="compact-md"
+                                      variant={albumGroupOpen ? 'subtle' : 'filled'}
+                                  >
+                                      {t(albumGroupOpen ? 'common.close' : 'common.edit')}
+                                  </Button>
+                              </Group>
+                          ),
+                          id: 'albumGroupConfig',
+                          label: t('table.config.general.albumGroupConfig'),
+                      },
+                      ...(albumGroupOpen
+                          ? [
+                                {
+                                    component: (
+                                        <Group justify="flex-end" w="100%">
+                                            <NumberInput
+                                                max={2000}
+                                                min={0}
+                                                onChange={(value) => {
+                                                    const size = Math.max(
+                                                        0,
+                                                        Math.min(
+                                                            2000,
+                                                            typeof value === 'number' ? value : 0,
+                                                        ),
+                                                    );
+                                                    setSettings({
+                                                        general: {
+                                                            albumGroupImageSize: size,
+                                                            // Source table art must be at least as
+                                                            // large as the displayed album image.
+                                                            ...(size >= imageResTable
+                                                                ? { imageRes: { table: size } }
+                                                                : {}),
+                                                        },
+                                                    });
+                                                }}
+                                                rightSection={
+                                                    <Text isMuted isNoSelect pr="lg" size="sm">
+                                                        px
+                                                    </Text>
+                                                }
+                                                value={albumGroupImageSize}
+                                                width={90}
+                                            />
+                                        </Group>
+                                    ),
+                                    id: 'albumImageSize',
+                                    label: (
+                                        <Text pl="md">
+                                            {t('table.config.general.albumImageSize')}
+                                        </Text>
+                                    ),
+                                },
+                            ]
+                          : []),
+                  ]
+                : [];
+
         const allOptions = [
             {
                 component: (
@@ -238,6 +314,7 @@ export const TableConfig = ({
                 id: 'autoFitColumns',
                 label: t('table.config.general.autoFitColumns'),
             },
+            ...albumGroupOptions,
             ...(extraOptions || []),
         ];
 
@@ -262,6 +339,11 @@ export const TableConfig = ({
         listKey,
         setTableUpdate,
         optionsConfig,
+        hasAlbumGroupColumn,
+        albumGroupOpen,
+        albumGroupImageSize,
+        imageResTable,
+        setSettings,
     ]);
 
     return (

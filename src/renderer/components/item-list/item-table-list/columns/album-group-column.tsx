@@ -64,6 +64,12 @@ export const AlbumGroupColumn = (props: ItemTableListInnerColumn) => {
                     ...(needsBorder
                         ? { borderBottom: '1px solid var(--theme-colors-border)' }
                         : {}),
+                    // When the cover is enlarged it overflows down from the
+                    // group's first row into these cells; let hover/click pass
+                    // through to reach it.
+                    ...((props.albumGroupImageSize ?? 0) > 0
+                        ? { pointerEvents: 'none' as const }
+                        : {}),
                 }}
             />
         );
