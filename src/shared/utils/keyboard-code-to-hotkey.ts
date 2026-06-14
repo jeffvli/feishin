@@ -61,6 +61,10 @@ export const keyboardCodeToHotkeyKey = (code: string): null | string => {
         return code.slice(5);
     }
 
+    if (/^F([1-9]|1\d|2[0-4])$/.test(code)) {
+        return code.toLowerCase();
+    }
+
     if (code.startsWith('Numpad')) {
         const suffix = code.slice(6);
         const numpadMapped = NUMPAD_CODE_TO_HOTKEY_KEY[suffix];
