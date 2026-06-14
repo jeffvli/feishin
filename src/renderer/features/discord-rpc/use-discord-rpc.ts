@@ -192,16 +192,28 @@ export const useDiscordRpc = () => {
                 [DiscordDisplayType.SONG_NAME]: DiscordStatusDisplayType.DETAILS,
             };
 
+            // Fallback `name` for Discord clients that ignore `status_display_type`.
+            const detailsText = truncate((song?.name && song.name.padEnd(2, ' ')) || 'Idle');
+            const stateText = truncate(
+                (artists && artists.padEnd(2, ' ')) || 'Unknown artist',
+            );
+            const nameByDisplayType: Record<DiscordDisplayType, string | undefined> = {
+                [DiscordDisplayType.ARTIST_NAME]: stateText,
+                [DiscordDisplayType.FEISHIN]: undefined,
+                [DiscordDisplayType.SONG_NAME]: detailsText,
+            };
+
             const activity: SetActivity = {
-                details: truncate((song?.name && song.name.padEnd(2, ' ')) || 'Idle'),
+                details: detailsText,
                 instance: false,
                 largeImageKey: undefined,
                 largeImageText: truncate(
                     (song?.album && song.album.padEnd(2, ' ')) || 'Unknown album',
                 ),
+                name: nameByDisplayType[discordSettings.displayType],
                 smallImageKey: undefined,
                 smallImageText: undefined,
-                state: truncate((artists && artists.padEnd(2, ' ')) || 'Unknown artist'),
+                state: stateText,
                 statusDisplayType: statusDisplayMap[discordSettings.displayType],
                 // I would love to use the actual type as opposed to hardcoding to 2,
                 // but manually installing the discord-types package appears to break things
