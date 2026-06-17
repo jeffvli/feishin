@@ -7,14 +7,14 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { usePlaybackType, usePlayerStatus, useServerList } from '/@/renderer/store';
+import { usePlaybackType, usePlayerStatus, useCurrentServer } from '/@/renderer/store';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
 import { toast } from '/@/shared/components/toast/toast';
 import { ServerFeature } from '/@/shared/types/features-types';
 import { PlayerStatus, PlayerType } from '/@/shared/types/types';
-
+import { hasFeature } from /@/shared/api/utils';
 const ipc = isElectron() ? window.api.ipc : null;
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 
@@ -92,13 +92,9 @@ export const AudioSettings = memo(() => {
     const status = usePlayerStatus();
     const playbackType = usePlaybackType();
 
-    // Cast the store hook result to handle the structural list mismatch smoothly
-    const { activeServerId, servers } = useServerList() as any;
-
-    // Ensure servers is treated safely as an array for the lookup
-    const serversArray = Array.isArray(servers) ? servers : Object.values(servers || {});
-    const currentServer = serversArray.find((s: any) => s.id === activeServerId);
-    const isJukeboxSupported = !!(currentServer as any)?.features?.[ServerFeature.JUKEBOX];
+    // Cleaned up server feature logic via requested hooks/utilities
+    const currentServer = useCurrentServer();
+    const isJukeboxSupported = hasFeature(currentServer, ServerFeature.JUKEBOX);
 
     const audioDevices = useAudioDevices(playbackType);
     const audioDeviceId =
