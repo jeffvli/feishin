@@ -841,6 +841,8 @@
         "discordUpdateInterval_description": "The time in seconds between each update (minimum 15 seconds)",
         "enableAutoTranslation_description": "Enable translation automatically when lyrics are loaded",
         "enableAutoTranslation": "Enable auto translation",
+        "enableFurigana_description": "Display pronunciation guides (furigana) over Japanese kanji lyrics.",
+        "enableFurigana": "Enable furigana generation",
         "enableRemote_description": "Enables the remote control server to allow other devices to control the application",
         "enableRemote": "Enable remote control server",
         "exitToTray_description": "Exit the application to the system tray",

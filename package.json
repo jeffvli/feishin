@@ -114,6 +114,8 @@
         "idb-keyval": "^6.2.5",
         "immer": "^10.2.0",
         "is-electron": "^2.2.2",
+        "kuroshiro": "^1.2.0",
+        "kuroshiro-analyzer-kuromoji": "^1.1.0",
         "lodash": "^4.18.1",
         "md5": "^2.3.0",
         "motion": "^12.40.0",

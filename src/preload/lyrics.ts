@@ -26,7 +26,12 @@ const getRemoteLyricsByRemoteId = (id: LyricGetQuery) => {
     return result;
 };
 
+const convertFurigana = (text: string): Promise<string> => {
+    return ipcRenderer.invoke('lyric-convert-furigana', text);
+};
+
 export const lyrics = {
+    convertFurigana,
     getRemoteLyricsByRemoteId,
     getRemoteLyricsBySong,
     searchRemoteLyrics,
