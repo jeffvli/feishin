@@ -7,14 +7,14 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { usePlaybackType, usePlayerStatus, useCurrentServer } from '/@/renderer/store';
+import { useCurrentServer, usePlaybackType, usePlayerStatus } from '/@/renderer/store';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import { hasFeature } from '/@/shared/api/utils';
 import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
 import { toast } from '/@/shared/components/toast/toast';
 import { ServerFeature } from '/@/shared/types/features-types';
 import { PlayerStatus, PlayerType } from '/@/shared/types/types';
-import { hasFeature } from '/@/shared/api/utils';
 const ipc = isElectron() ? window.api.ipc : null;
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 
