@@ -3,11 +3,12 @@ import isElectron from 'is-electron';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ServerFeature } from '/@/shared/types/features-types';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { usePlaybackType, usePlayerStatus } from '/@/renderer/store';
+import { usePlaybackType, usePlayerStatus, useServerList } from '/@/renderer/store';
 import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
@@ -90,23 +91,38 @@ export const AudioSettings = memo(() => {
     const { setSettings } = useSettingsStoreActions();
     const status = usePlayerStatus();
     const playbackType = usePlaybackType();
+    
+    // Cast the store hook result to handle the structural list mismatch smoothly
+    const { servers, activeServerId } = useServerList() as any;
+    
+    // Ensure servers is treated safely as an array for the lookup
+    const serversArray = Array.isArray(servers) ? servers : Object.values(servers || {});
+    const currentServer = serversArray.find((s: any) => s.id === activeServerId);
+    const isJukeboxSupported = !!(currentServer as any)?.features?.[ServerFeature.JUKEBOX];
 
     const audioDevices = useAudioDevices(playbackType);
     const audioDeviceId =
         playbackType === PlayerType.LOCAL ? settings.mpvAudioDeviceId : settings.audioDeviceId;
 
+    // Dynamically build the options for the dropdown
+    const selectData = [
+        {
+            disabled: !isElectron(),
+            label: 'MPV',
+            value: PlayerType.LOCAL,
+        },
+        { label: 'Web', value: PlayerType.WEB },
+    ];
+
+    if (isJukeboxSupported) {
+        selectData.push({ label: 'Jukebox', value: PlayerType.JUKEBOX });
+    }
+
     const audioOptions: SettingOption[] = [
         {
             control: (
                 <Select
-                    data={[
-                        {
-                            disabled: !isElectron(),
-                            label: 'MPV',
-                            value: PlayerType.LOCAL,
-                        },
-                        { label: 'Web', value: PlayerType.WEB },
-                    ]}
+                    data={selectData}
                     defaultValue={settings.type}
                     disabled={status === PlayerStatus.PLAYING}
                     onChange={(e) => {
@@ -115,10 +131,8 @@ export const AudioSettings = memo(() => {
                     }}
                 />
             ),
-            description: t('setting.audioPlayer', {
-                context: 'description',
-            }),
-            isHidden: !isElectron(),
+            description: t('setting.audioPlayer', { context: 'description' }),
+            isHidden: !isElectron() && !isJukeboxSupported,
             note: status === PlayerStatus.PLAYING ? t('common.playerMustBePaused') : undefined,
             title: t('setting.audioPlayer'),
         },
@@ -139,9 +153,7 @@ export const AudioSettings = memo(() => {
                     }
                 />
             ),
-            description: t('setting.audioDevice', {
-                context: 'description',
-            }),
+            description: t('setting.audioDevice', { context: 'description' }),
             isHidden: !isElectron(),
             title: t('setting.audioDevice'),
         },
@@ -156,9 +168,7 @@ export const AudioSettings = memo(() => {
                     }}
                 />
             ),
-            description: t('setting.webAudio', {
-                context: 'description',
-            }),
+            description: t('setting.webAudio', { context: 'description' }),
             isHidden: settings.type !== PlayerType.WEB,
             note: t('common.restartRequired'),
             title: t('setting.webAudio'),
@@ -174,9 +184,7 @@ export const AudioSettings = memo(() => {
                     }}
                 />
             ),
-            description: t('setting.preservePitch', {
-                context: 'description',
-            }),
+            description: t('setting.preservePitch', { context: 'description' }),
             isHidden: settings.type !== PlayerType.WEB,
             title: t('setting.preservePitch'),
         },
@@ -186,16 +194,12 @@ export const AudioSettings = memo(() => {
                     defaultChecked={settings.audioFadeOnStatusChange}
                     onChange={(e) => {
                         setSettings({
-                            playback: {
-                                audioFadeOnStatusChange: e.currentTarget.checked,
-                            },
+                            playback: { audioFadeOnStatusChange: e.currentTarget.checked },
                         });
                     }}
                 />
             ),
-            description: t('setting.audioFadeOnStatusChange', {
-                context: 'description',
-            }),
+            description: t('setting.audioFadeOnStatusChange', { context: 'description' }),
             title: t('setting.audioFadeOnStatusChange'),
         },
     ];
