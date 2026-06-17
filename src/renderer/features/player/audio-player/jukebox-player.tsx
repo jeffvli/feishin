@@ -16,6 +16,7 @@ import {
     usePlayerStore,
     usePlayerVolume,
 } from '/@/renderer/store';
+import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
 
 export function JukeboxPlayer() {
     const playerRef = useRef<JukeboxPlayerEngineHandle>(null);
@@ -66,19 +67,27 @@ export function JukeboxPlayer() {
         [mediaPause, mediaPlay, mediaPlayByIndex, setTimestamp, setVolume, volume],
     );
 
+    const debouncedSeekToTimestamp = useDebouncedCallback((timestamp: number) => {
+        playerRef.current?.seekTo(timestamp);
+    }, 300);
+
+    const debouncedSetVolume = useDebouncedCallback((nextVolume: number) => {
+        playerRef.current?.setVolume(nextVolume);
+    }, 300);
+
     usePlayerEvents(
         {
             onPlayerSeekToTimestamp: (properties) => {
-                playerRef.current?.seekTo(properties.timestamp);
+                debouncedSeekToTimestamp(properties.timestamp);
             },
             onPlayerVolume: (properties) => {
-                playerRef.current?.setVolume(properties.volume);
+                debouncedSetVolume(properties.volume);
             },
             onQueueCleared: () => {
                 player.mediaStop();
             },
         },
-        [volume],
+        [debouncedSeekToTimestamp, debouncedSetVolume, player],
     );
 
     return (
