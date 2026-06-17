@@ -1736,7 +1736,7 @@ export type JukeboxControlArgs = BaseEndpointArgs & { query: JukeboxControlQuery
 export type JukeboxControlQuery = {
     action: JukeboxControlAction;
     gain?: number;
-    id?: string;
+    id?: string | string[];
     index?: number;
     offset?: number;
 };

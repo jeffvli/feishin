@@ -19,7 +19,7 @@ import {
 
 export function JukeboxPlayer() {
     const playerRef = useRef<JukeboxPlayerEngineHandle>(null);
-    const { currentSong, status } = usePlayerData();
+    const { currentSong, nextSong, status } = usePlayerData();
     const { mediaAutoNext, mediaPause, mediaPlay, mediaPlayByIndex, setTimestamp, setVolume } =
         usePlayerActions();
     const isMuted = usePlayerMuted();
@@ -30,6 +30,7 @@ export function JukeboxPlayer() {
     const serverId = useCurrentServerId();
 
     const currentTrackId = currentSong?.id ?? null;
+    const nextTrackId = nextSong?.id ?? null;
 
     const handleServerStateSynced = useCallback(
         (state: JukeboxServerState) => {
@@ -85,6 +86,7 @@ export function JukeboxPlayer() {
             currentTrackId={currentTrackId}
             enabled={playerHydrated && Boolean(serverId)}
             isMuted={isMuted}
+            nextTrackId={nextTrackId}
             onEnded={mediaAutoNext}
             onServerStateSynced={handleServerStateSynced}
             onTick={(positionSeconds) => {

@@ -820,7 +820,7 @@ const jukeboxControlParameters = z.object({
         'status',
     ]),
     gain: z.number().optional(),
-    id: z.string().optional(),
+    id: z.union([z.string(), z.array(z.string())]).optional(),
     index: z.number().optional(),
     offset: z.number().optional(),
 });
