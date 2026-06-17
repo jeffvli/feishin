@@ -32,13 +32,6 @@ export function JukeboxPlayer() {
             onPlayerSeekToTimestamp: (properties) => {
                 playerRef.current?.seekTo(properties.timestamp);
             },
-            onPlayerStatus: (properties) => {
-                if (properties.status === PlayerStatus.PAUSED) {
-                    playerRef.current?.pause();
-                } else if (properties.status === PlayerStatus.PLAYING) {
-                    playerRef.current?.play();
-                }
-            },
             onPlayerVolume: (properties) => {
                 playerRef.current?.setVolume(properties.volume);
             },
