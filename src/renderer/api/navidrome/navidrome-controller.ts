@@ -793,8 +793,8 @@ export const NavidromeController: InternalControllerEndpoint = {
             ...navidromeFeatures,
             publicPlaylist: [1],
             [ServerFeature.ALBUM_YES_NO_RATING_FILTER]: [1],
-            [ServerFeature.MUSIC_FOLDER_MULTISELECT]: [1],
             [ServerFeature.JUKEBOX]: [1],
+            [ServerFeature.MUSIC_FOLDER_MULTISELECT]: [1],
         };
 
         if (subsonicArgs.features.serverPlayQueue && navidromeFeatures.serverPlayQueue) {

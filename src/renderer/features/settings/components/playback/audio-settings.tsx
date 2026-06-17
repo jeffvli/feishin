@@ -3,7 +3,6 @@ import isElectron from 'is-electron';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ServerFeature } from '/@/shared/types/features-types';
 import {
     SettingOption,
     SettingsSection,
@@ -13,6 +12,7 @@ import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/
 import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
 import { toast } from '/@/shared/components/toast/toast';
+import { ServerFeature } from '/@/shared/types/features-types';
 import { PlayerStatus, PlayerType } from '/@/shared/types/types';
 
 const ipc = isElectron() ? window.api.ipc : null;
@@ -91,10 +91,10 @@ export const AudioSettings = memo(() => {
     const { setSettings } = useSettingsStoreActions();
     const status = usePlayerStatus();
     const playbackType = usePlaybackType();
-    
+
     // Cast the store hook result to handle the structural list mismatch smoothly
-    const { servers, activeServerId } = useServerList() as any;
-    
+    const { activeServerId, servers } = useServerList() as any;
+
     // Ensure servers is treated safely as an array for the lookup
     const serversArray = Array.isArray(servers) ? servers : Object.values(servers || {});
     const currentServer = serversArray.find((s: any) => s.id === activeServerId);
