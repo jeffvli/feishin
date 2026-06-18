@@ -271,6 +271,26 @@ const MpvSettingsSchema = z.object({
     replayGainMode: z.enum(['album', 'no', 'track']),
     replayGainPreampDB: z.number().optional(),
 });
+const EqSettingsSchema = z.object({
+    bands: z.array(
+        z.object({
+            freq: z.number(),
+            gain: z.number(),
+        }),
+    ),
+    enabled: z.boolean(),
+    preamp: z.number(),
+});
+
+const CompressorSettingsSchema = z.object({
+    attack: z.number(),
+    enabled: z.boolean(),
+    knee: z.number(),
+    makeup: z.number(),
+    ratio: z.number(),
+    release: z.number(),
+    threshold: z.number(),
+});
 
 const CssSettingsSchema = z.object({
     content: z.string().transform((val) => sanitizeCss(`<style>${val}`)),
@@ -625,6 +645,8 @@ const PlayerFilterSchema = z.object({
 const PlaybackSettingsSchema = z.object({
     audioDeviceId: z.string().nullable().optional(),
     audioFadeOnStatusChange: z.boolean(),
+    compressor: CompressorSettingsSchema,
+    equalizer: EqSettingsSchema,
     filters: z.array(PlayerFilterSchema),
     mediaSession: z.boolean(),
     mpvAudioDeviceId: z.string().nullable().optional(),
@@ -1849,6 +1871,33 @@ const initialState: SettingsState = {
     playback: {
         audioDeviceId: undefined,
         audioFadeOnStatusChange: true,
+        compressor: {
+            attack: 20,
+            enabled: false,
+            knee: 2.83,
+            makeup: 6,
+            ratio: 4,
+            release: 250,
+            threshold: -24,
+        },
+        equalizer: {
+            bands: [
+                { freq: 31.5, gain: 0 },
+                { freq: 63, gain: 0 },
+                { freq: 125, gain: 0 },
+                { freq: 250, gain: 0 },
+                { freq: 500, gain: 0 },
+                { freq: 1000, gain: 0 },
+                { freq: 2000, gain: 0 },
+                { freq: 3000, gain: 0 },
+                { freq: 4000, gain: 0 },
+                { freq: 6300, gain: 0 },
+                { freq: 10000, gain: 0 },
+                { freq: 16000, gain: 0 },
+            ],
+            enabled: false,
+            preamp: 0,
+        },
         filters: [],
         mediaSession: false,
         mpvAudioDeviceId: undefined,
