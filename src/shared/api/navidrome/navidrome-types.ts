@@ -224,8 +224,8 @@ const NDPresenceOperators = [
     {
         label: i18n.t('filterOperator.isPresent'),
         value: 'isPresent',
-    }
-]
+    },
+];
 
 export const NDSongQueryDateOperators = [
     {
