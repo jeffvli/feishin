@@ -314,6 +314,8 @@
         "inTheRangeDate": "Is in the range (date)",
         "is": "Is",
         "isNot": "Is not",
+        "isMissing": "Is missing",
+        "isPresent": "Is present",
         "isGreaterThan": "Is greater than",
         "isLessThan": "Is less than",
         "matchesRegex": "Matches regex",
