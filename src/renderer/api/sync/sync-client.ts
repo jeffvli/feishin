@@ -1,0 +1,207 @@
+// SyncSocket: the low-level WebSocket client for the listen-together server.
+// It owns the connection lifecycle, authentication, NTP-style clock sync, and
+// reconnect. It is framework-agnostic (no React, no store) — sync.store.ts wraps
+// it and exposes the session to the UI.
+//
+// Modeled on Feishin's existing remote-control client (src/remote/store/index.ts).
+
+import {
+    SyncClientEvent,
+    SyncRoomState,
+    SyncServerEvent,
+    SyncTransportInput,
+} from '/@/shared/types/sync-types';
+
+export interface SyncCredentials {
+    // The Subsonic credential string Feishin stores: "u=<user>&s=<salt>&t=<token>".
+    credential: string;
+    serverUrl: string;
+}
+
+export interface SyncSocketCallbacks {
+    onAuthenticated?: (memberId: string) => void;
+    onClockOffset?: (offsetMs: number) => void;
+    onConnectedChange?: (connected: boolean) => void;
+    onControlRequested?: (fromMemberId: string, fromUsername: string) => void;
+    onError?: (message: string) => void;
+    onRoomState?: (state: SyncRoomState) => void;
+}
+
+interface StatefulWebSocket extends WebSocket {
+    natural: boolean;
+}
+
+const PING_INTERVAL_MS = 10_000;
+const MAX_BACKOFF_MS = 15_000;
+
+export class SyncSocket {
+    get clockOffsetMs(): number {
+        return this.best.offset;
+    }
+    get currentMemberId(): string {
+        return this.memberId;
+    }
+    private backoff = 1000;
+    private best = { offset: 0, rtt: Number.POSITIVE_INFINITY };
+    private readonly callbacks: SyncSocketCallbacks;
+    private closedByUser = false;
+    private creds: SyncCredentials;
+    private desired: { roomId?: string; type: 'create' | 'join' | 'none' } = { type: 'none' };
+    private memberId = '';
+    private pingTimer?: ReturnType<typeof setInterval>;
+    private reconnectTimer?: ReturnType<typeof setTimeout>;
+
+    private socket?: StatefulWebSocket;
+
+    private readonly url: string;
+
+    constructor(url: string, creds: SyncCredentials, callbacks: SyncSocketCallbacks) {
+        this.url = url;
+        this.creds = creds;
+        this.callbacks = callbacks;
+    }
+
+    close(): void {
+        this.closedByUser = true;
+        this.clearTimers();
+        if (this.socket) {
+            this.socket.natural = true;
+            this.socket.close();
+            this.socket = undefined;
+        }
+        this.callbacks.onConnectedChange?.(false);
+    }
+
+    connect(): void {
+        this.closedByUser = false;
+        this.open();
+    }
+
+    createRoom(): void {
+        this.desired = { type: 'create' };
+        this.send({ event: 'createRoom' });
+    }
+
+    joinRoom(roomId: string): void {
+        this.desired = { roomId, type: 'join' };
+        this.send({ data: { roomId }, event: 'joinRoom' });
+    }
+
+    leaveRoom(): void {
+        this.desired = { type: 'none' };
+        this.send({ event: 'leaveRoom' });
+    }
+
+    passControl(toMemberId: string): void {
+        this.send({ data: { toMemberId }, event: 'passControl' });
+    }
+
+    requestControl(): void {
+        this.send({ event: 'requestControl' });
+    }
+
+    sendTransport(input: SyncTransportInput): void {
+        this.send({ data: input, event: 'transport' });
+    }
+
+    private clearTimers(): void {
+        if (this.pingTimer) clearInterval(this.pingTimer);
+        if (this.reconnectTimer) clearTimeout(this.reconnectTimer);
+        this.pingTimer = undefined;
+        this.reconnectTimer = undefined;
+    }
+
+    private handleMessage(raw: string): void {
+        let msg: SyncServerEvent;
+        try {
+            msg = JSON.parse(raw) as SyncServerEvent;
+        } catch {
+            return;
+        }
+        switch (msg.event) {
+            case 'authenticated': {
+                this.memberId = msg.data.memberId;
+                this.callbacks.onAuthenticated?.(msg.data.memberId);
+                this.startClockSync();
+                // Re-establish room membership after a reconnect.
+                if (this.desired.type === 'create') this.send({ event: 'createRoom' });
+                else if (this.desired.type === 'join' && this.desired.roomId) {
+                    this.send({ data: { roomId: this.desired.roomId }, event: 'joinRoom' });
+                }
+                break;
+            }
+            case 'controlRequested':
+                this.callbacks.onControlRequested?.(msg.data.fromMemberId, msg.data.fromUsername);
+                break;
+            case 'error':
+                this.callbacks.onError?.(msg.data.message);
+                break;
+            case 'pong': {
+                const t2 = Date.now();
+                const rtt = t2 - msg.data.t0;
+                const offset = msg.data.serverTimeMs - (msg.data.t0 + t2) / 2;
+                if (rtt < this.best.rtt) {
+                    this.best = { offset, rtt };
+                    this.callbacks.onClockOffset?.(offset);
+                }
+                break;
+            }
+            case 'roomState':
+                this.callbacks.onRoomState?.(msg.data);
+                break;
+        }
+    }
+
+    private open(): void {
+        const socket = new WebSocket(this.url) as StatefulWebSocket;
+        socket.natural = false;
+        this.socket = socket;
+
+        socket.addEventListener('open', () => {
+            this.backoff = 1000;
+            const params = new URLSearchParams(this.creds.credential);
+            this.send({
+                data: {
+                    salt: params.get('s') ?? undefined,
+                    serverUrl: this.creds.serverUrl,
+                    token: params.get('t') ?? undefined,
+                    username: params.get('u') ?? '',
+                },
+                event: 'authenticate',
+            });
+            this.callbacks.onConnectedChange?.(true);
+        });
+
+        socket.addEventListener('message', (e) => this.handleMessage(e.data as string));
+
+        socket.addEventListener('close', () => {
+            this.clearTimers();
+            this.best = { offset: 0, rtt: Number.POSITIVE_INFINITY };
+            this.callbacks.onConnectedChange?.(false);
+            if (!socket.natural && !this.closedByUser) this.scheduleReconnect();
+        });
+
+        socket.addEventListener('error', () => socket.close());
+    }
+
+    private scheduleReconnect(): void {
+        this.reconnectTimer = setTimeout(() => this.open(), this.backoff);
+        this.backoff = Math.min(this.backoff * 2, MAX_BACKOFF_MS);
+    }
+
+    private send(event: SyncClientEvent): void {
+        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            this.socket.send(JSON.stringify(event));
+        }
+    }
+
+    private startClockSync(): void {
+        if (this.pingTimer) clearInterval(this.pingTimer);
+        const ping = () => this.send({ data: { t0: Date.now() }, event: 'ping' });
+        ping();
+        // A quick burst right after connect helps the offset converge fast.
+        setTimeout(ping, 300);
+        setTimeout(ping, 800);
+        this.pingTimer = setInterval(ping, PING_INTERVAL_MS);
+    }
+}
