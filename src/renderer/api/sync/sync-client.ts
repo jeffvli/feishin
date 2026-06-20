@@ -33,6 +33,10 @@ interface StatefulWebSocket extends WebSocket {
 
 const PING_INTERVAL_MS = 10_000;
 const MAX_BACKOFF_MS = 15_000;
+// How long a min-RTT clock sample stays "best". Within the window the lowest-RTT
+// sample wins (most accurate offset); past it we take the next sample regardless
+// so the offset keeps re-converging as machine clocks drift over a long session.
+const CLOCK_SAMPLE_TTL_MS = 60_000;
 
 export class SyncSocket {
     get clockOffsetMs(): number {
@@ -43,6 +47,7 @@ export class SyncSocket {
     }
     private backoff = 1000;
     private best = { offset: 0, rtt: Number.POSITIVE_INFINITY };
+    private bestAt = 0;
     private readonly callbacks: SyncSocketCallbacks;
     private closedByUser = false;
     private creds: SyncCredentials;
@@ -101,7 +106,9 @@ export class SyncSocket {
     }
 
     sendTransport(input: SyncTransportInput): void {
-        this.send({ data: input, event: 'transport' });
+        // Stamp a fresh monotonic clock at actual send time so the server can
+        // drop transports that arrive out of order.
+        this.send({ data: { ...input, clientTimeMs: Date.now() }, event: 'transport' });
     }
 
     private clearTimers(): void {
@@ -140,8 +147,12 @@ export class SyncSocket {
                 const t2 = Date.now();
                 const rtt = t2 - msg.data.t0;
                 const offset = msg.data.serverTimeMs - (msg.data.t0 + t2) / 2;
-                if (rtt < this.best.rtt) {
+                // Take the sample if it has a lower RTT (more accurate) or if the
+                // current best has aged out, so the offset re-converges over time.
+                const stale = t2 - this.bestAt > CLOCK_SAMPLE_TTL_MS;
+                if (rtt < this.best.rtt || stale) {
                     this.best = { offset, rtt };
+                    this.bestAt = t2;
                     this.callbacks.onClockOffset?.(offset);
                 }
                 break;
@@ -177,6 +188,7 @@ export class SyncSocket {
         socket.addEventListener('close', () => {
             this.clearTimers();
             this.best = { offset: 0, rtt: Number.POSITIVE_INFINITY };
+            this.bestAt = 0;
             this.callbacks.onConnectedChange?.(false);
             if (!socket.natural && !this.closedByUser) this.scheduleReconnect();
         });

@@ -33,6 +33,11 @@ import { PlayerStatus } from '/@/shared/types/types';
 
 const DRIFT_THRESHOLD_SEC = 0.25;
 
+// After applying remote state we hold the echo guard briefly so the player-store
+// mutations we just made have settled before this client could (if it becomes
+// host via pass-control) emit them back out as a fresh transport.
+const ECHO_GUARD_RELEASE_MS = 100;
+
 async function resolveSongsByIds(serverId: string, ids: string[]): Promise<Song[]> {
     if (!serverId || ids.length === 0) return [];
     const results = await Promise.all(
@@ -88,11 +93,23 @@ export const useSyncSession = (): void => {
 
                 const currentId = playerDataRef.current.currentSong?.id;
                 if (t.trackId && t.trackId !== currentId) {
-                    const songs = await resolveSongsByIds(serverIdRef.current, t.queue);
-                    if (songs.length) {
-                        const index = Math.max(0, t.queueIndex);
-                        a.setQueue(songs, index, expectedSec);
+                    const index = Math.max(0, t.queueIndex);
+                    const loadedIds = queueRef.current.map((s) => s.id);
+                    const sameQueue =
+                        loadedIds.length === t.queue.length &&
+                        loadedIds.every((id, i) => id === t.queue[i]);
+                    if (sameQueue) {
+                        // Queue is already loaded (e.g. the host skipped within the
+                        // shared queue): just switch track + seek, no need to
+                        // re-resolve every song's metadata.
                         a.mediaPlayByIndex(index);
+                        a.mediaSeekToTimestamp(expectedSec);
+                    } else {
+                        const songs = await resolveSongsByIds(serverIdRef.current, t.queue);
+                        if (songs.length) {
+                            a.setQueue(songs, index, expectedSec);
+                            a.mediaPlayByIndex(index);
+                        }
                     }
                 } else {
                     const currentSec = useTimestampStoreBase.getState().timestamp;
@@ -109,7 +126,7 @@ export const useSyncSession = (): void => {
                 // changes don't bounce back out as a host transport.
                 setTimeout(() => {
                     applyingRemoteRef.current = false;
-                }, 50);
+                }, ECHO_GUARD_RELEASE_MS);
             }
         };
 

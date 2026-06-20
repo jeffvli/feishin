@@ -55,6 +55,9 @@ export interface SyncTransport {
 }
 
 export interface SyncTransportInput {
+    // Monotonic logical clock stamped at send time; lets the server drop
+    // out-of-order transports. Filled in by SyncSocket.sendTransport.
+    clientTimeMs?: number;
     playing: boolean;
     positionMs: number;
     queue: string[];
