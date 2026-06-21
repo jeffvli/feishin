@@ -154,6 +154,9 @@ export const useSyncSession = (): void => {
 
         // Re-send the full queue on the first emit after becoming host.
         lastSentQueueRef.current = [];
+        // Becoming host clears any "detached" follow-state, so if control is later
+        // handed back we resume following instead of staying silently detached.
+        useSyncStore.getState().actions.setFollowing(true);
 
         const emit = () => {
             if (applyingRemoteRef.current) return;
