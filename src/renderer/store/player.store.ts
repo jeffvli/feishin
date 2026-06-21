@@ -1154,6 +1154,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                     // If timestamp is greater than 10 seconds, restart current song
                     if (currentTimestamp > 10) {
+                        // Update the timestamp store right away (as mediaSeekToTimestamp and
+                        // mediaSkipBackward do) so readers don't see the stale pre-restart
+                        // position until the ~500ms engine poll catches up.
+                        setTimestampStore(0);
                         set((state) => {
                             state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
                         });
