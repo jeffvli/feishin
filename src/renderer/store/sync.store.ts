@@ -23,11 +23,21 @@ import {
 
 let socket: SyncSocket | undefined;
 
+// Hysteresis for the in-sync/correcting badge: enter "correcting" only past a
+// clear divergence, and return to "in sync" only once well back under it. Without
+// this the badge flips constantly, because the player's reported position updates
+// coarsely (rounded / ~500ms polled) so the measured drift jitters around any
+// single threshold.
+const SYNC_DIVERGE_MS = 1500;
+const SYNC_RECOVER_MS = 600;
+
 export interface SyncSlice extends SyncState {
     actions: {
+        approveControlRequest: () => void;
         connect: () => void;
         createRoom: () => void;
         disconnect: () => void;
+        dismissControlRequest: () => void;
         joinRoom: (roomId: string) => void;
         leaveRoom: () => void;
         passControl: (toMemberId: string) => void;
@@ -49,14 +59,18 @@ interface SyncState {
     following: boolean;
     hostMemberId: string;
     // Signed drift (ms) measured at the last applied sync; positive = we were
-    // ahead of the host. Surfaced as an in-sync/correcting indicator.
+    // ahead of the host. Drives the hysteretic `syncing` flag below.
     lastDriftMs: number;
     lastTransport: null | SyncTransport;
     memberId: string;
     members: SyncMember[];
+    // A follower's pending request to take control, awaiting the host's decision.
+    pendingControlRequest: null | { memberId: string; username: string };
     roomId: string;
     seq: number;
     sidecarUrl: string;
+    // Hysteretic "actively catching up" flag for the badge (see thresholds above).
+    syncing: boolean;
 }
 
 const initialState: SyncState = {
@@ -69,9 +83,11 @@ const initialState: SyncState = {
     lastTransport: null,
     memberId: '',
     members: [],
+    pendingControlRequest: null,
     roomId: '',
     seq: -1,
     sidecarUrl: '',
+    syncing: false,
 };
 
 export const useSyncStore = createWithEqualityFn<SyncSlice>()(
@@ -79,6 +95,11 @@ export const useSyncStore = createWithEqualityFn<SyncSlice>()(
         devtools(
             immer((set, get) => ({
                 actions: {
+                    approveControlRequest: () => {
+                        const req = get().pendingControlRequest;
+                        if (req) socket?.passControl(req.memberId);
+                        set({ pendingControlRequest: null });
+                    },
                     connect: () => {
                         if (socket) return;
                         const server = useAuthStore.getState().currentServer;
@@ -95,11 +116,8 @@ export const useSyncStore = createWithEqualityFn<SyncSlice>()(
                                 onAuthenticated: (memberId) => set({ memberId }),
                                 onClockOffset: (clockOffsetMs) => set({ clockOffsetMs }),
                                 onConnectedChange: (connected) => set({ connected }),
-                                onControlRequested: (_id, username) =>
-                                    toast.info({
-                                        message: t('listenTogether.controlRequested', { username }),
-                                        title: t('listenTogether.title'),
-                                    }),
+                                onControlRequested: (memberId, username) =>
+                                    set({ pendingControlRequest: { memberId, username } }),
                                 onError: (message) =>
                                     toast.error({ message, title: t('listenTogether.title') }),
                                 onRoomClosed: () =>
@@ -109,8 +127,10 @@ export const useSyncStore = createWithEqualityFn<SyncSlice>()(
                                         lastDriftMs: 0,
                                         lastTransport: null,
                                         members: [],
+                                        pendingControlRequest: null,
                                         roomId: '',
                                         seq: -1,
+                                        syncing: false,
                                     }),
                                 onRoomState: (rs: SyncRoomState) => {
                                     set({
@@ -139,6 +159,7 @@ export const useSyncStore = createWithEqualityFn<SyncSlice>()(
                             sidecarUrl: get().sidecarUrl,
                         });
                     },
+                    dismissControlRequest: () => set({ pendingControlRequest: null }),
                     joinRoom: (roomId: string) => {
                         get().actions.connect();
                         set({ following: true });
@@ -152,12 +173,21 @@ export const useSyncStore = createWithEqualityFn<SyncSlice>()(
                             lastDriftMs: 0,
                             lastTransport: null,
                             members: [],
+                            pendingControlRequest: null,
                             roomId: '',
                             seq: -1,
+                            syncing: false,
                         });
                     },
                     passControl: (toMemberId: string) => socket?.passControl(toMemberId),
-                    reportDrift: (driftMs: number) => set({ lastDriftMs: driftMs }),
+                    reportDrift: (driftMs: number) => {
+                        const mag = Math.abs(driftMs);
+                        // Hysteresis so the badge doesn't flip on coarse-position jitter.
+                        const syncing = get().syncing
+                            ? mag >= SYNC_RECOVER_MS
+                            : mag > SYNC_DIVERGE_MS;
+                        set({ lastDriftMs: driftMs, syncing });
+                    },
                     requestControl: () => socket?.requestControl(),
                     sendTransport: (input: SyncTransportInput) => socket?.sendTransport(input),
                     setEnabled: (enabled: boolean) => {
@@ -206,6 +236,8 @@ export const useSyncFollowing = () => useSyncStore((state) => state.following);
 
 export const useSyncHealth = () =>
     useSyncStore(
-        (state) => ({ clockOffsetMs: state.clockOffsetMs, lastDriftMs: state.lastDriftMs }),
+        (state) => ({ clockOffsetMs: state.clockOffsetMs, syncing: state.syncing }),
         shallow,
     );
+
+export const usePendingControlRequest = () => useSyncStore((state) => state.pendingControlRequest);

@@ -1448,6 +1448,10 @@
         "statusLive": "live",
         "statusOffline": "offline",
         "title": "Listen Together",
-        "you": "(you)"
+        "you": "(you)",
+        "cancel": "Cancel",
+        "controlRequestBody": "{{username}} wants to control playback.",
+        "controlRequestTitle": "Control requested",
+        "setUrlInSettings": "Set the sync server URL in Settings → Playback."
     }
 }
