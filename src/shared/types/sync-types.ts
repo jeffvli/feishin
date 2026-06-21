@@ -60,7 +60,9 @@ export interface SyncTransportInput {
     clientTimeMs?: number;
     playing: boolean;
     positionMs: number;
-    queue: string[];
+    // Omitted when unchanged since the last send so play/pause/seek don't resend
+    // the full track-id list; the server then keeps the room's current queue.
+    queue?: string[];
     queueIndex: number;
     trackId: string;
 }

@@ -10,6 +10,7 @@ import debounce from 'lodash/debounce';
 import { useEffect, useRef } from 'react';
 
 import { api } from '/@/renderer/api';
+import { idsEqual } from '/@/renderer/api/sync/sync-util';
 import {
     subscribeCurrentTrack,
     subscribePlayerQueue,
@@ -106,9 +107,7 @@ export const useSyncSession = (): void => {
                 if (t.trackId && t.trackId !== currentId) {
                     const index = Math.max(0, t.queueIndex);
                     const loadedIds = queueRef.current.map((s) => s.id);
-                    const sameQueue =
-                        loadedIds.length === t.queue.length &&
-                        loadedIds.every((id, i) => id === t.queue[i]);
+                    const sameQueue = idsEqual(loadedIds, t.queue);
                     if (sameQueue) {
                         // Queue is already loaded (e.g. the host skipped within the
                         // shared queue): just switch track + seek, no need to
@@ -149,20 +148,28 @@ export const useSyncSession = (): void => {
     }, [seq, isHost, following]);
 
     // ---- Host: emit transport on local playback changes ----
+    const lastSentQueueRef = useRef<string[]>([]);
     useEffect(() => {
         if (!connected || !isHost) return;
+
+        // Re-send the full queue on the first emit after becoming host.
+        lastSentQueueRef.current = [];
 
         const emit = () => {
             if (applyingRemoteRef.current) return;
             const data = playerDataRef.current;
             const queueIds = queueRef.current.map((s) => s.id);
             const positionMs = Math.round(useTimestampStoreBase.getState().timestamp * 1000);
+            // Only include the queue when it actually changed; otherwise omit it so
+            // the server keeps the current one (saves resending it on every seek).
+            const queueChanged = !idsEqual(queueIds, lastSentQueueRef.current);
+            if (queueChanged) lastSentQueueRef.current = queueIds;
             sendTransport({
                 playing: data.status === PlayerStatus.PLAYING,
                 positionMs,
-                queue: queueIds,
                 queueIndex: data.index,
                 trackId: data.currentSong?.id ?? '',
+                ...(queueChanged ? { queue: queueIds } : {}),
             });
         };
 
