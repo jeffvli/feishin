@@ -32,6 +32,8 @@
         "postinstall": "electron-builder install-app-deps",
         "lint": "pnpm run typecheck && pnpm run lint-code && pnpm run lint-styles",
         "lint:fix": "pnpm run lint-code:fix && pnpm run lint-styles:fix",
+        "test": "vitest run",
+        "test:watch": "vitest",
         "lint-code": "eslint --max-warnings=0 --cache .",
         "lint-code:fix": "eslint --cache --fix .",
         "lint-styles": "stylelint --max-warnings=0 'src/**/*.{css,scss}'",
@@ -183,7 +185,8 @@
         "vite-plugin-conditional-import": "^0.1.7",
         "vite-plugin-dynamic-import": "^1.6.0",
         "vite-plugin-ejs": "^1.7.0",
-        "vite-plugin-pwa": "^1.3.0"
+        "vite-plugin-pwa": "^1.3.0",
+        "vitest": "^3.2.6"
     },
     "packageManager": "pnpm@11.5.2",
     "productName": "feishin"
