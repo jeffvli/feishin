@@ -30,9 +30,11 @@ export interface SyncSlice extends SyncState {
         joinRoom: (roomId: string) => void;
         leaveRoom: () => void;
         passControl: (toMemberId: string) => void;
+        reportDrift: (driftMs: number) => void;
         requestControl: () => void;
         sendTransport: (input: SyncTransportInput) => void;
         setEnabled: (enabled: boolean) => void;
+        setFollowing: (following: boolean) => void;
         setSidecarUrl: (url: string) => void;
     };
 }
@@ -41,7 +43,13 @@ interface SyncState {
     clockOffsetMs: number;
     connected: boolean;
     enabled: boolean;
+    // Whether this client applies the host's transport. Followers can toggle this
+    // off to detach temporarily (e.g. take a call) without leaving the room.
+    following: boolean;
     hostMemberId: string;
+    // Signed drift (ms) measured at the last applied sync; positive = we were
+    // ahead of the host. Surfaced as an in-sync/correcting indicator.
+    lastDriftMs: number;
     lastTransport: null | SyncTransport;
     memberId: string;
     members: SyncMember[];
@@ -54,7 +62,9 @@ const initialState: SyncState = {
     clockOffsetMs: 0,
     connected: false,
     enabled: false,
+    following: true,
     hostMemberId: '',
+    lastDriftMs: 0,
     lastTransport: null,
     memberId: '',
     members: [],
@@ -91,6 +101,16 @@ export const useSyncStore = createWithEqualityFn<SyncSlice>()(
                                     }),
                                 onError: (message) =>
                                     toast.error({ message, title: 'Listen Together' }),
+                                onRoomClosed: () =>
+                                    set({
+                                        following: true,
+                                        hostMemberId: '',
+                                        lastDriftMs: 0,
+                                        lastTransport: null,
+                                        members: [],
+                                        roomId: '',
+                                        seq: -1,
+                                    }),
                                 onRoomState: (rs: SyncRoomState) => {
                                     set({
                                         hostMemberId: rs.hostMemberId,
@@ -106,6 +126,7 @@ export const useSyncStore = createWithEqualityFn<SyncSlice>()(
                     },
                     createRoom: () => {
                         get().actions.connect();
+                        set({ following: true });
                         socket?.createRoom();
                     },
                     disconnect: () => {
@@ -119,12 +140,15 @@ export const useSyncStore = createWithEqualityFn<SyncSlice>()(
                     },
                     joinRoom: (roomId: string) => {
                         get().actions.connect();
+                        set({ following: true });
                         socket?.joinRoom(roomId.trim().toUpperCase());
                     },
                     leaveRoom: () => {
                         socket?.leaveRoom();
                         set({
+                            following: true,
                             hostMemberId: '',
+                            lastDriftMs: 0,
                             lastTransport: null,
                             members: [],
                             roomId: '',
@@ -132,12 +156,14 @@ export const useSyncStore = createWithEqualityFn<SyncSlice>()(
                         });
                     },
                     passControl: (toMemberId: string) => socket?.passControl(toMemberId),
+                    reportDrift: (driftMs: number) => set({ lastDriftMs: driftMs }),
                     requestControl: () => socket?.requestControl(),
                     sendTransport: (input: SyncTransportInput) => socket?.sendTransport(input),
                     setEnabled: (enabled: boolean) => {
                         set({ enabled });
                         if (!enabled) get().actions.disconnect();
                     },
+                    setFollowing: (following: boolean) => set({ following }),
                     setSidecarUrl: (sidecarUrl: string) => set({ sidecarUrl }),
                 },
                 ...initialState,
@@ -174,3 +200,11 @@ export const useSyncSettings = () =>
 
 export const useIsSyncHost = () =>
     useSyncStore((state) => !!state.memberId && state.memberId === state.hostMemberId);
+
+export const useSyncFollowing = () => useSyncStore((state) => state.following);
+
+export const useSyncHealth = () =>
+    useSyncStore(
+        (state) => ({ clockOffsetMs: state.clockOffsetMs, lastDriftMs: state.lastDriftMs }),
+        shallow,
+    );

@@ -5,6 +5,7 @@ import { shallow } from 'zustand/shallow';
 import { AudioSettings } from '/@/renderer/features/settings/components/playback/audio-settings';
 import { AutoDJSettings } from '/@/renderer/features/settings/components/playback/auto-dj-settings';
 import { EqSettings } from '/@/renderer/features/settings/components/playback/eq-settings';
+import { ListenTogetherSettings } from '/@/renderer/features/settings/components/playback/listen-together-settings';
 import { PlayerFilterSettings } from '/@/renderer/features/settings/components/playback/player-filter-settings';
 import { TranscodeSettings } from '/@/renderer/features/settings/components/playback/transcode-settings';
 import { useSettingsStore } from '/@/renderer/store';
@@ -45,6 +46,8 @@ export const PlaybackTab = memo(() => {
             <PlayerFilterSettings />
             <Divider />
             <AutoDJSettings />
+            <Divider />
+            <ListenTogetherSettings />
         </Stack>
     );
 });

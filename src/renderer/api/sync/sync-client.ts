@@ -24,6 +24,9 @@ export interface SyncSocketCallbacks {
     onConnectedChange?: (connected: boolean) => void;
     onControlRequested?: (fromMemberId: string, fromUsername: string) => void;
     onError?: (message: string) => void;
+    // Fired when a pending create/join fails (e.g. the room was reaped while we
+    // were briefly disconnected). The consumer should clear its room state.
+    onRoomClosed?: () => void;
     onRoomState?: (state: SyncRoomState) => void;
 }
 
@@ -53,6 +56,9 @@ export class SyncSocket {
     private creds: SyncCredentials;
     private desired: { roomId?: string; type: 'create' | 'join' | 'none' } = { type: 'none' };
     private memberId = '';
+    // True between sending a create/join and getting the resulting roomState, so a
+    // failure in that window can be surfaced as a room-closed event.
+    private pendingRoomOp = false;
     private pingTimer?: ReturnType<typeof setInterval>;
     private reconnectTimer?: ReturnType<typeof setTimeout>;
 
@@ -84,16 +90,19 @@ export class SyncSocket {
 
     createRoom(): void {
         this.desired = { type: 'create' };
+        this.pendingRoomOp = true;
         this.send({ event: 'createRoom' });
     }
 
     joinRoom(roomId: string): void {
         this.desired = { roomId, type: 'join' };
+        this.pendingRoomOp = true;
         this.send({ data: { roomId }, event: 'joinRoom' });
     }
 
     leaveRoom(): void {
         this.desired = { type: 'none' };
+        this.pendingRoomOp = false;
         this.send({ event: 'leaveRoom' });
     }
 
@@ -131,8 +140,11 @@ export class SyncSocket {
                 this.callbacks.onAuthenticated?.(msg.data.memberId);
                 this.startClockSync();
                 // Re-establish room membership after a reconnect.
-                if (this.desired.type === 'create') this.send({ event: 'createRoom' });
-                else if (this.desired.type === 'join' && this.desired.roomId) {
+                if (this.desired.type === 'create') {
+                    this.pendingRoomOp = true;
+                    this.send({ event: 'createRoom' });
+                } else if (this.desired.type === 'join' && this.desired.roomId) {
+                    this.pendingRoomOp = true;
                     this.send({ data: { roomId: this.desired.roomId }, event: 'joinRoom' });
                 }
                 break;
@@ -142,6 +154,14 @@ export class SyncSocket {
                 break;
             case 'error':
                 this.callbacks.onError?.(msg.data.message);
+                // A failure while a create/join is in flight (e.g. the room was
+                // reaped during a brief disconnect) means we have no valid room:
+                // stop trying to rejoin it and tell the consumer to clear state.
+                if (this.pendingRoomOp) {
+                    this.pendingRoomOp = false;
+                    this.desired = { type: 'none' };
+                    this.callbacks.onRoomClosed?.();
+                }
                 break;
             case 'pong': {
                 const t2 = Date.now();
@@ -158,6 +178,7 @@ export class SyncSocket {
                 break;
             }
             case 'roomState':
+                this.pendingRoomOp = false;
                 this.callbacks.onRoomState?.(msg.data);
                 break;
         }

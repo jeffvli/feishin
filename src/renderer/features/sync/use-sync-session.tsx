@@ -25,6 +25,7 @@ import {
     useIsSyncHost,
     useSyncActions,
     useSyncConnected,
+    useSyncFollowing,
     useSyncStore,
 } from '/@/renderer/store/sync.store';
 import { Song } from '/@/shared/types/domain-types';
@@ -53,6 +54,7 @@ async function resolveSongsByIds(serverId: string, ids: string[]): Promise<Song[
 export const useSyncSession = (): void => {
     const isHost = useIsSyncHost();
     const connected = useSyncConnected();
+    const following = useSyncFollowing();
     const seq = useSyncStore((s) => s.seq);
     const { sendTransport } = useSyncActions();
     const serverId = useCurrentServerId();
@@ -72,11 +74,20 @@ export const useSyncSession = (): void => {
 
     const applyingRemoteRef = useRef(false);
     const lastAppliedSeqRef = useRef(-1);
+    const prevFollowingRef = useRef(true);
 
     // ---- Followers: apply inbound roomState ----
     useEffect(() => {
         if (isHost) return;
-        if (seq < 0 || seq <= lastAppliedSeqRef.current) return;
+
+        // Detect a detach→resume transition so re-enabling "follow" re-applies the
+        // latest transport even when seq hasn't advanced since we detached.
+        const justResumed = following && !prevFollowingRef.current;
+        prevFollowingRef.current = following;
+
+        if (!following) return;
+        if (seq < 0) return;
+        if (!justResumed && seq <= lastAppliedSeqRef.current) return;
         const transport = useSyncStore.getState().lastTransport;
         if (!transport) return;
         lastAppliedSeqRef.current = seq;
@@ -111,8 +122,12 @@ export const useSyncSession = (): void => {
                             a.mediaPlayByIndex(index);
                         }
                     }
+                    // We just (re)seeked to the host's position, so report ~0 drift.
+                    useSyncStore.getState().actions.reportDrift(0);
                 } else {
                     const currentSec = useTimestampStoreBase.getState().timestamp;
+                    const driftMs = Math.round((currentSec - expectedSec) * 1000);
+                    useSyncStore.getState().actions.reportDrift(driftMs);
                     if (Math.abs(currentSec - expectedSec) > DRIFT_THRESHOLD_SEC) {
                         a.mediaSeekToTimestamp(expectedSec);
                     }
@@ -131,7 +146,7 @@ export const useSyncSession = (): void => {
         };
 
         void apply(transport);
-    }, [seq, isHost]);
+    }, [seq, isHost, following]);
 
     // ---- Host: emit transport on local playback changes ----
     useEffect(() => {

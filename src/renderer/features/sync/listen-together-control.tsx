@@ -1,6 +1,12 @@
 import { useState } from 'react';
 
-import { useSyncActions, useSyncRoom, useSyncSettings } from '/@/renderer/store/sync.store';
+import {
+    useSyncActions,
+    useSyncFollowing,
+    useSyncHealth,
+    useSyncRoom,
+    useSyncSettings,
+} from '/@/renderer/store/sync.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Button } from '/@/shared/components/button/button';
@@ -13,6 +19,12 @@ import { Switch } from '/@/shared/components/switch/switch';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
+
+// Drift below this (ms) is treated as "in sync" for the status badge. Mirrors the
+// DRIFT_THRESHOLD_SEC the follower uses before hard-seeking in use-sync-session.
+const DRIFT_OK_MS = 250;
+
+const formatOffset = (ms: number) => `${ms >= 0 ? '+' : ''}${Math.round(ms)} ms`;
 
 export const ListenTogetherControl = () => {
     const { enabled, sidecarUrl } = useSyncSettings();
@@ -117,71 +129,103 @@ interface RoomPanelProps {
     room: ReturnType<typeof useSyncRoom>;
 }
 
-const RoomPanel = ({ actions, room }: RoomPanelProps) => (
-    <Stack gap="xs">
-        <Group justify="space-between">
-            <Group gap="xs">
-                <Text isMuted size="sm">
-                    Code
-                </Text>
-                <Text fw={700}>{room.roomId}</Text>
-            </Group>
-            <Group gap="xs">
-                <CopyButton value={room.roomId}>
-                    {({ copied, copy }) => (
-                        <Button onClick={copy} size="compact-xs" variant="default">
-                            {copied ? 'Copied' : 'Copy'}
-                        </Button>
-                    )}
-                </CopyButton>
-                <Badge color={room.connected ? 'teal' : 'red'} variant="light">
-                    {room.connected ? 'live' : 'offline'}
-                </Badge>
-            </Group>
-        </Group>
+const RoomPanel = ({ actions, room }: RoomPanelProps) => {
+    const health = useSyncHealth();
+    const following = useSyncFollowing();
 
-        <Stack gap={4} style={{ maxHeight: 160, overflowY: 'auto' }}>
-            {room.members.map((m) => {
-                const isMemberHost = m.id === room.hostMemberId;
-                const isMe = m.id === room.memberId;
-                return (
-                    <Group justify="space-between" key={m.id}>
-                        <Group gap="xs">
-                            <Text size="sm">
-                                {m.username}
-                                {isMe ? ' (you)' : ''}
-                            </Text>
-                            {isMemberHost && (
-                                <Badge color="blue" size="xs" variant="light">
-                                    host
-                                </Badge>
+    const inSync = Math.abs(health.lastDriftMs) <= DRIFT_OK_MS;
+    const syncLabel = !following ? 'detached' : inSync ? 'in sync' : 'correcting';
+    const syncColor = !following ? 'gray' : inSync ? 'teal' : 'yellow';
+
+    return (
+        <Stack gap="xs">
+            <Group justify="space-between">
+                <Group gap="xs">
+                    <Text isMuted size="sm">
+                        Code
+                    </Text>
+                    <Text fw={700}>{room.roomId}</Text>
+                </Group>
+                <Group gap="xs">
+                    <CopyButton value={room.roomId}>
+                        {({ copied, copy }) => (
+                            <Button onClick={copy} size="compact-xs" variant="default">
+                                {copied ? 'Copied' : 'Copy'}
+                            </Button>
+                        )}
+                    </CopyButton>
+                    <Badge color={room.connected ? 'teal' : 'red'} variant="light">
+                        {room.connected ? 'live' : 'offline'}
+                    </Badge>
+                </Group>
+            </Group>
+
+            <Group justify="space-between">
+                <Text isMuted size="xs">
+                    Clock offset
+                </Text>
+                <Group gap="xs">
+                    <Text size="xs">{formatOffset(health.clockOffsetMs)}</Text>
+                    {!room.isHost && (
+                        <Badge color={syncColor} size="xs" variant="light">
+                            {syncLabel}
+                        </Badge>
+                    )}
+                </Group>
+            </Group>
+
+            <Stack gap={4} style={{ maxHeight: 160, overflowY: 'auto' }}>
+                {room.members.map((m) => {
+                    const isMemberHost = m.id === room.hostMemberId;
+                    const isMe = m.id === room.memberId;
+                    return (
+                        <Group justify="space-between" key={m.id}>
+                            <Group gap="xs">
+                                <Text size="sm">
+                                    {m.username}
+                                    {isMe ? ' (you)' : ''}
+                                </Text>
+                                {isMemberHost && (
+                                    <Badge color="blue" size="xs" variant="light">
+                                        host
+                                    </Badge>
+                                )}
+                            </Group>
+                            {room.isHost && !isMemberHost && (
+                                <Tooltip label="Give control">
+                                    <ActionIcon
+                                        onClick={() => actions.passControl(m.id)}
+                                        size="sm"
+                                        variant="subtle"
+                                    >
+                                        ⇄
+                                    </ActionIcon>
+                                </Tooltip>
                             )}
                         </Group>
-                        {room.isHost && !isMemberHost && (
-                            <Tooltip label="Give control">
-                                <ActionIcon
-                                    onClick={() => actions.passControl(m.id)}
-                                    size="sm"
-                                    variant="subtle"
-                                >
-                                    ⇄
-                                </ActionIcon>
-                            </Tooltip>
-                        )}
-                    </Group>
-                );
-            })}
-        </Stack>
+                    );
+                })}
+            </Stack>
 
-        <Group grow>
             {!room.isHost && (
-                <Button onClick={() => actions.requestControl()} variant="default">
-                    Request control
-                </Button>
+                <Switch
+                    aria-label="Follow host playback"
+                    checked={following}
+                    label="Follow host"
+                    onChange={(e) => actions.setFollowing(e.currentTarget.checked)}
+                />
             )}
-            <Button onClick={() => actions.leaveRoom()} variant="state-error">
-                Leave
-            </Button>
-        </Group>
-    </Stack>
-);
+
+            <Group grow>
+                {!room.isHost && (
+                    <Button onClick={() => actions.requestControl()} variant="default">
+                        Request control
+                    </Button>
+                )}
+                <Button onClick={() => actions.leaveRoom()} variant="state-error">
+                    Leave
+                </Button>
+            </Group>
+        </Stack>
+    );
+};
