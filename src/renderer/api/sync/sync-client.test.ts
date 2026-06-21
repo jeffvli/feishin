@@ -157,8 +157,10 @@ describe('SyncSocket', () => {
         s.close();
     });
 
-    it('reconnects after an unexpected close', () => {
+    it('reconnects (with jittered backoff) after an unexpected close', () => {
         vi.useFakeTimers();
+        // Pin the jitter so the scheduled delay is deterministic: 0.5 * 1000ms backoff.
+        vi.spyOn(Math, 'random').mockReturnValue(0.5);
         const s = new SyncSocket(WS_URL, CREDS, {});
         s.connect();
         const ws1 = lastSocket();
@@ -166,7 +168,9 @@ describe('SyncSocket', () => {
 
         ws1.close(); // unnatural close schedules a reconnect
         expect(FakeWebSocket.last).toBe(ws1);
-        vi.advanceTimersByTime(1000); // default backoff
+        vi.advanceTimersByTime(499); // before the jittered 500ms delay: no reconnect yet
+        expect(FakeWebSocket.last).toBe(ws1);
+        vi.advanceTimersByTime(1); // now past it
         expect(FakeWebSocket.last).not.toBe(ws1);
         s.close();
     });

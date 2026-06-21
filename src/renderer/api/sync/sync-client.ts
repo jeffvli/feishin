@@ -218,7 +218,11 @@ export class SyncSocket {
     }
 
     private scheduleReconnect(): void {
-        this.reconnectTimer = setTimeout(() => this.open(), this.backoff);
+        // Full jitter: wait a random time in (0, backoff]. A server restart drops
+        // every client at once; jitter spreads the reconnects out instead of
+        // hammering it in lockstep. The backoff ceiling still doubles up to the cap.
+        const delay = Math.random() * this.backoff;
+        this.reconnectTimer = setTimeout(() => this.open(), delay);
         this.backoff = Math.min(this.backoff * 2, MAX_BACKOFF_MS);
     }
 
