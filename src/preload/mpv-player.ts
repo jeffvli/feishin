@@ -174,6 +174,10 @@ const rendererPlayerFallback = (cb: (data: boolean) => void) => {
     ipcRenderer.on('renderer-player-fallback', (_, data) => cb(data));
 };
 
+const rendererMpvReconnect = (cb: () => void) => {
+    ipcRenderer.on('renderer-mpv-reconnect', () => cb());
+};
+
 export const mpvPlayer = {
     autoNext,
     cleanup,
@@ -205,6 +209,7 @@ export const mpvPlayerListener = {
     rendererAutoNext,
     rendererCurrentTime,
     rendererError,
+    rendererMpvReconnect,
     rendererNext,
     rendererPause,
     rendererPlay,

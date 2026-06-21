@@ -68,9 +68,13 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
         };
 
         eventEmitter.on('MPV_RELOAD', handleMpvReload);
+        // The main process notifies us after the OS resumes from sleep, since the
+        // stream mpv had open is likely on a now-dead connection.
+        mpvPlayerListener?.rendererMpvReconnect(handleMpvReload);
 
         return () => {
             eventEmitter.off('MPV_RELOAD', handleMpvReload);
+            ipc?.removeAllListeners('renderer-mpv-reconnect');
         };
     }, []);
 
