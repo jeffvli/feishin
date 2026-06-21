@@ -630,7 +630,8 @@
             "transcoding": "Transcoding",
             "discord": "Discord",
             "logger": "Logger",
-            "playerFilters": "Player Filters"
+            "playerFilters": "Player Filters",
+            "listenTogether": "Listen Together"
         },
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
@@ -1143,7 +1144,11 @@
         "queryBuilderCustomFields_inputLabel": "Label",
         "queryBuilderCustomFields_inputTag": "Tag",
         "queryBuilderCustomFields": "Custom fields",
-        "queryBuilderCustomFields_description": "Add custom fields to use in query builders"
+        "queryBuilderCustomFields_description": "Add custom fields to use in query builders",
+        "enableListenTogether": "Enable Listen Together",
+        "enableListenTogether_description": "Synchronize playback with friends in a shared room. Adds a Listen Together control to the player bar. Turning this off leaves any active room and disconnects.",
+        "listenTogetherUrl": "Sync server URL",
+        "listenTogetherUrl_description": "Base URL of the listen-together server. The ws(s):// endpoint is derived automatically."
     },
     "table": {
         "column": {
@@ -1414,5 +1419,35 @@
                 "z": "Z"
             }
         }
+    },
+    "listenTogether": {
+        "clockOffset": "Clock offset",
+        "code": "Code",
+        "controlRequested": "{{username}} requested control",
+        "copied": "Copied",
+        "copy": "Copy",
+        "createRoom": "Create a room",
+        "enabled": "Enabled",
+        "followHost": "Follow host",
+        "giveControl": "Give control",
+        "hostBadge": "host",
+        "join": "Join",
+        "leave": "Leave",
+        "orJoin": "or join",
+        "requestControl": "Request control",
+        "room": "Room {{code}}",
+        "roomCode": "Room code",
+        "roomCodePlaceholder": "G7KQ2M",
+        "save": "Save",
+        "serverUrl": "Sync server URL",
+        "serverUrlPlaceholder": "https://party.example.com",
+        "setUrlFirst": "Set a sync server URL and select a server first",
+        "statusCorrecting": "correcting",
+        "statusDetached": "detached",
+        "statusInSync": "in sync",
+        "statusLive": "live",
+        "statusOffline": "offline",
+        "title": "Listen Together",
+        "you": "(you)"
     }
 }

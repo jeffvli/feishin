@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
     useSyncActions,
@@ -27,6 +28,7 @@ const DRIFT_OK_MS = 250;
 const formatOffset = (ms: number) => `${ms >= 0 ? '+' : ''}${Math.round(ms)} ms`;
 
 export const ListenTogetherControl = () => {
+    const { t } = useTranslation();
     const { enabled, sidecarUrl } = useSyncSettings();
     const room = useSyncRoom();
     const actions = useSyncActions();
@@ -52,18 +54,20 @@ export const ListenTogetherControl = () => {
                     size="compact-sm"
                     variant={inRoom ? 'filled' : 'subtle'}
                 >
-                    {inRoom ? `Room ${room.roomId}` : 'Listen Together'}
+                    {inRoom
+                        ? t('listenTogether.room', { code: room.roomId })
+                        : t('listenTogether.title')}
                 </Button>
             </Popover.Target>
 
             <Popover.Dropdown>
                 <Stack gap="sm">
                     <Group justify="space-between">
-                        <Text fw={600}>Listen Together</Text>
+                        <Text fw={600}>{t('listenTogether.title')}</Text>
                         <Switch
-                            aria-label="Enable Listen Together"
+                            aria-label={t('listenTogether.enabled')}
                             checked={enabled}
-                            label="Enabled"
+                            label={t('listenTogether.enabled')}
                             onChange={(e) => actions.setEnabled(e.currentTarget.checked)}
                         />
                     </Group>
@@ -72,9 +76,9 @@ export const ListenTogetherControl = () => {
                         <>
                             <Group align="flex-end" gap="xs" wrap="nowrap">
                                 <TextInput
-                                    label="Sync server URL"
+                                    label={t('listenTogether.serverUrl')}
                                     onChange={(e) => setUrlDraft(e.currentTarget.value)}
-                                    placeholder="https://party.example.com"
+                                    placeholder={t('listenTogether.serverUrlPlaceholder')}
                                     style={{ flex: 1 }}
                                     value={urlDraft}
                                 />
@@ -84,7 +88,7 @@ export const ListenTogetherControl = () => {
                                     size="compact-sm"
                                     variant="default"
                                 >
-                                    Save
+                                    {t('listenTogether.save')}
                                 </Button>
                             </Group>
 
@@ -93,16 +97,19 @@ export const ListenTogetherControl = () => {
                             ) : (
                                 <>
                                     <Button fullWidth onClick={() => actions.createRoom()}>
-                                        Create a room
+                                        {t('listenTogether.createRoom')}
                                     </Button>
-                                    <Divider label="or join" labelPosition="center" />
+                                    <Divider
+                                        label={t('listenTogether.orJoin')}
+                                        labelPosition="center"
+                                    />
                                     <Group align="flex-end" gap="xs" wrap="nowrap">
                                         <TextInput
-                                            label="Room code"
+                                            label={t('listenTogether.roomCode')}
                                             onChange={(e) =>
                                                 setJoinCode(e.currentTarget.value.toUpperCase())
                                             }
-                                            placeholder="G7KQ2M"
+                                            placeholder={t('listenTogether.roomCodePlaceholder')}
                                             style={{ flex: 1 }}
                                             value={joinCode}
                                         />
@@ -111,7 +118,7 @@ export const ListenTogetherControl = () => {
                                             onClick={() => actions.joinRoom(joinCode)}
                                             size="compact-sm"
                                         >
-                                            Join
+                                            {t('listenTogether.join')}
                                         </Button>
                                     </Group>
                                 </>
@@ -130,11 +137,16 @@ interface RoomPanelProps {
 }
 
 const RoomPanel = ({ actions, room }: RoomPanelProps) => {
+    const { t } = useTranslation();
     const health = useSyncHealth();
     const following = useSyncFollowing();
 
     const inSync = Math.abs(health.lastDriftMs) <= DRIFT_OK_MS;
-    const syncLabel = !following ? 'detached' : inSync ? 'in sync' : 'correcting';
+    const syncLabel = !following
+        ? t('listenTogether.statusDetached')
+        : inSync
+          ? t('listenTogether.statusInSync')
+          : t('listenTogether.statusCorrecting');
     const syncColor = !following ? 'gray' : inSync ? 'teal' : 'yellow';
 
     return (
@@ -142,7 +154,7 @@ const RoomPanel = ({ actions, room }: RoomPanelProps) => {
             <Group justify="space-between">
                 <Group gap="xs">
                     <Text isMuted size="sm">
-                        Code
+                        {t('listenTogether.code')}
                     </Text>
                     <Text fw={700}>{room.roomId}</Text>
                 </Group>
@@ -150,19 +162,21 @@ const RoomPanel = ({ actions, room }: RoomPanelProps) => {
                     <CopyButton value={room.roomId}>
                         {({ copied, copy }) => (
                             <Button onClick={copy} size="compact-xs" variant="default">
-                                {copied ? 'Copied' : 'Copy'}
+                                {copied ? t('listenTogether.copied') : t('listenTogether.copy')}
                             </Button>
                         )}
                     </CopyButton>
                     <Badge color={room.connected ? 'teal' : 'red'} variant="light">
-                        {room.connected ? 'live' : 'offline'}
+                        {room.connected
+                            ? t('listenTogether.statusLive')
+                            : t('listenTogether.statusOffline')}
                     </Badge>
                 </Group>
             </Group>
 
             <Group justify="space-between">
                 <Text isMuted size="xs">
-                    Clock offset
+                    {t('listenTogether.clockOffset')}
                 </Text>
                 <Group gap="xs">
                     <Text size="xs">{formatOffset(health.clockOffsetMs)}</Text>
@@ -183,16 +197,16 @@ const RoomPanel = ({ actions, room }: RoomPanelProps) => {
                             <Group gap="xs">
                                 <Text size="sm">
                                     {m.username}
-                                    {isMe ? ' (you)' : ''}
+                                    {isMe ? ` ${t('listenTogether.you')}` : ''}
                                 </Text>
                                 {isMemberHost && (
                                     <Badge color="blue" size="xs" variant="light">
-                                        host
+                                        {t('listenTogether.hostBadge')}
                                     </Badge>
                                 )}
                             </Group>
                             {room.isHost && !isMemberHost && (
-                                <Tooltip label="Give control">
+                                <Tooltip label={t('listenTogether.giveControl')}>
                                     <ActionIcon
                                         onClick={() => actions.passControl(m.id)}
                                         size="sm"
@@ -209,9 +223,9 @@ const RoomPanel = ({ actions, room }: RoomPanelProps) => {
 
             {!room.isHost && (
                 <Switch
-                    aria-label="Follow host playback"
+                    aria-label={t('listenTogether.followHost')}
                     checked={following}
-                    label="Follow host"
+                    label={t('listenTogether.followHost')}
                     onChange={(e) => actions.setFollowing(e.currentTarget.checked)}
                 />
             )}
@@ -219,11 +233,11 @@ const RoomPanel = ({ actions, room }: RoomPanelProps) => {
             <Group grow>
                 {!room.isHost && (
                     <Button onClick={() => actions.requestControl()} variant="default">
-                        Request control
+                        {t('listenTogether.requestControl')}
                     </Button>
                 )}
                 <Button onClick={() => actions.leaveRoom()} variant="state-error">
-                    Leave
+                    {t('listenTogether.leave')}
                 </Button>
             </Group>
         </Stack>

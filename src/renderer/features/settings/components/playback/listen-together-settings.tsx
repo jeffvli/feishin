@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
     SettingOption,
@@ -12,6 +13,7 @@ import { TextInput } from '/@/shared/components/text-input/text-input';
 // store backs both, so the enable toggle and sidecar URL stay in sync wherever
 // they're edited.
 export const ListenTogetherSettings = memo(() => {
+    const { t } = useTranslation();
     const { enabled, sidecarUrl } = useSyncSettings();
     const actions = useSyncActions();
 
@@ -19,14 +21,13 @@ export const ListenTogetherSettings = memo(() => {
         {
             control: (
                 <Switch
-                    aria-label="Enable Listen Together"
+                    aria-label={t('setting.enableListenTogether')}
                     checked={enabled}
                     onChange={(e) => actions.setEnabled(e.currentTarget.checked)}
                 />
             ),
-            description:
-                'Synchronize playback with friends in a shared room. Adds a "Listen Together" control to the player bar. Turning this off leaves any active room and disconnects.',
-            title: 'Enable Listen Together',
+            description: t('setting.enableListenTogether', { context: 'description' }),
+            title: t('setting.enableListenTogether'),
         },
         {
             control: (
@@ -37,15 +38,14 @@ export const ListenTogetherSettings = memo(() => {
                         if (url === sidecarUrl) return;
                         actions.setSidecarUrl(url);
                     }}
-                    placeholder="https://party.example.com"
+                    placeholder={t('listenTogether.serverUrlPlaceholder')}
                 />
             ),
-            description:
-                'Base URL of the listen-together server. The ws(s):// endpoint is derived automatically.',
+            description: t('setting.listenTogetherUrl', { context: 'description' }),
             isHidden: !enabled,
-            title: 'Sync server URL',
+            title: t('setting.listenTogetherUrl'),
         },
     ];
 
-    return <SettingsSection options={options} title="Listen Together" />;
+    return <SettingsSection options={options} title={t('page.setting.listenTogether')} />;
 });

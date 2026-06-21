@@ -5,6 +5,7 @@
 // gets serialized by `persist`. The hook in features/sync/use-sync-session.ts
 // applies inbound transport to the player and emits the host's transport.
 
+import { t } from 'i18next';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
@@ -83,7 +84,7 @@ export const useSyncStore = createWithEqualityFn<SyncSlice>()(
                         const server = useAuthStore.getState().currentServer;
                         const url = get().sidecarUrl.trim();
                         if (!server || !url) {
-                            toast.error({ message: 'Set a sidecar URL and select a server first' });
+                            toast.error({ message: t('listenTogether.setUrlFirst') });
                             return;
                         }
                         const wsUrl = url.replace(/^http/, 'ws').replace(/\/$/, '') + '/ws';
@@ -96,11 +97,11 @@ export const useSyncStore = createWithEqualityFn<SyncSlice>()(
                                 onConnectedChange: (connected) => set({ connected }),
                                 onControlRequested: (_id, username) =>
                                     toast.info({
-                                        message: `${username} requested control`,
-                                        title: 'Listen Together',
+                                        message: t('listenTogether.controlRequested', { username }),
+                                        title: t('listenTogether.title'),
                                     }),
                                 onError: (message) =>
-                                    toast.error({ message, title: 'Listen Together' }),
+                                    toast.error({ message, title: t('listenTogether.title') }),
                                 onRoomClosed: () =>
                                     set({
                                         following: true,
