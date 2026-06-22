@@ -20,6 +20,16 @@ interface LyricsExportFormProps {
     synced: boolean;
 }
 
+const stripLyricsMarkup = (text: string) => {
+    if (!text.includes('<')) return text;
+
+    const template = document.createElement('template');
+    template.innerHTML = text;
+    template.content.querySelectorAll('rt, rp').forEach((node) => node.remove());
+
+    return template.content.textContent ?? text;
+};
+
 export const LyricsExportForm = ({ lyrics, offsetMs, synced }: LyricsExportFormProps) => {
     const { t } = useTranslation();
 
@@ -35,7 +45,7 @@ export const LyricsExportForm = ({ lyrics, offsetMs, synced }: LyricsExportFormP
             const contents = lyrics.lyrics
                 .map(
                     (lyric) =>
-                        `[${formatDuration(lyric[0], { leading: true, ms: true })}]${lyric[1]}`,
+                        `[${formatDuration(lyric[0], { leading: true, ms: true })}]${stripLyricsMarkup(lyric[1])}`,
                 )
                 .join('\n');
 
@@ -46,9 +56,9 @@ ${contents}
 `;
         } else {
             if (Array.isArray(lyrics.lyrics)) {
-                return lyrics.lyrics.map((lyric) => lyric[1]).join('\n') + '\n';
+                return lyrics.lyrics.map((lyric) => stripLyricsMarkup(lyric[1])).join('\n') + '\n';
             }
-            return lyrics.lyrics;
+            return stripLyricsMarkup(lyrics.lyrics);
         }
     }, [
         form.values.offsetMs,
