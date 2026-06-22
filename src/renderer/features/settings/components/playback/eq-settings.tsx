@@ -602,7 +602,7 @@ export const EqSettings = memo(() => {
                                   w={70}
                               />
                               <Button onClick={handleResetEq} variant="subtle">
-                                  {t('setting.equalizerResetAll')}
+                                  {t('common.reset')}
                               </Button>
                           </Group>
                       ),
@@ -831,11 +831,11 @@ export const EqSettings = memo(() => {
                   {
                       control: (
                           <Button onClick={handleResetComp} variant="subtle">
-                              {t('setting.compressorResetDefaults')}
+                              {t('common.resetToDefault')}
                           </Button>
                       ),
                       description: t('setting.compressorReset', { context: 'description' }),
-                      title: t('setting.compressorReset'),
+                      title: t('common.reset'),
                   },
               ] as SettingOption[])
             : []),
