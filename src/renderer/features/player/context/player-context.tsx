@@ -156,10 +156,8 @@ const inferPlaylistContextFromUrl = (): null | string => {
 
 // Stamps each song with the playlist it was queued from, so the sidebar highlight
 // can be derived from whichever song is currently playing (see useCurrentPlaylistContextId).
-const tagPlaylistContext = (songs: Song[], contextPlaylistId: null | string): Song[] =>
-    contextPlaylistId
-        ? songs.map((song) => ({ ...song, _contextPlaylistId: contextPlaylistId }))
-        : songs;
+const tagPlaylistContext = (songs: Song[], contextPlaylistId: string): Song[] =>
+    songs.map((song) => ({ ...song, _contextPlaylistId: contextPlaylistId }));
 
 export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const { t } = useTranslation();
@@ -218,11 +216,13 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
             contextPlaylistId?: null | string,
         ) => {
             const filters = useSettingsStore.getState().playback.filters;
-            const filteredData = filterSongsByPlayerFilters(data, filters);
+            let filteredData = filterSongsByPlayerFilters(data, filters);
             const resolvedContextId =
                 contextPlaylistId ??
                 (isReplaceQueueType(type) ? inferPlaylistContextFromUrl() : null);
-            const tagged = tagPlaylistContext(filteredData, resolvedContextId);
+            if (resolvedContextId) {
+                filteredData = tagPlaylistContext(filteredData, resolvedContextId);
+            }
 
             if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
                 const edge = type.edge === 'top' ? 'top' : 'bottom';
@@ -238,14 +238,14 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                     },
                 });
 
-                storeActions.addToQueueByUniqueId(tagged, type.uniqueId, edge, playSongId);
+                storeActions.addToQueueByUniqueId(filteredData, type.uniqueId, edge, playSongId);
             } else {
                 logFn.debug(logMsg[LogCategory.PLAYER].addToQueueByType, {
                     category: LogCategory.PLAYER,
                     meta: { data: data.length, filtered: filteredData.length, type },
                 });
 
-                storeActions.addToQueueByType(tagged, type as Play, playSongId);
+                storeActions.addToQueueByType(filteredData, type as Play, playSongId);
             }
         },
         [storeActions],
@@ -312,19 +312,27 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 }
 
                 const filters = useSettingsStore.getState().playback.filters;
-                const filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
+                let filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
 
+                // Songs from multiple playlists are merged together, so there is no single
+                // playlist to attribute them to: skip tagging (and URL inference) entirely.
+                const isMultiPlaylist = itemType === LibraryItem.PLAYLIST && id.length > 1;
                 const explicitId =
                     itemType === LibraryItem.PLAYLIST && id.length === 1 ? id[0] : null;
                 const resolvedContextId =
-                    explicitId ?? (isReplaceQueueType(type) ? inferPlaylistContextFromUrl() : null);
-                const taggedSongs = tagPlaylistContext(filteredSongs, resolvedContextId);
+                    explicitId ??
+                    (!isMultiPlaylist && isReplaceQueueType(type)
+                        ? inferPlaylistContextFromUrl()
+                        : null);
+                if (resolvedContextId) {
+                    filteredSongs = tagPlaylistContext(filteredSongs, resolvedContextId);
+                }
 
                 if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
                     const edge = type.edge === 'top' ? 'top' : 'bottom';
-                    storeActions.addToQueueByUniqueId(taggedSongs, type.uniqueId, edge);
+                    storeActions.addToQueueByUniqueId(filteredSongs, type.uniqueId, edge);
                 } else {
-                    storeActions.addToQueueByType(taggedSongs, type as Play);
+                    storeActions.addToQueueByType(filteredSongs, type as Play);
                 }
             } catch (err: any) {
                 if (instanceOfCancellationError(err)) {
