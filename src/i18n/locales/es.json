@@ -1270,7 +1270,9 @@
         "notInPlaylist": "No está en",
         "notInTheLast": "No está en el último",
         "startsWith": "Empieza con",
-        "matchesRegex": "Coincide con expresión regular"
+        "matchesRegex": "Coincide con expresión regular",
+        "isPresent": "Está presente",
+        "isMissing": "Falta"
     },
     "datetime": {
         "minuteShort": "M",

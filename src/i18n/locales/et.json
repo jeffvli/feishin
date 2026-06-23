@@ -314,7 +314,9 @@
         "after": "On pärast",
         "notInPlaylist": "Ei ole",
         "startsWith": "Algab",
-        "notInTheLast": "Pole viimase"
+        "notInTheLast": "Pole viimase",
+        "isMissing": "Puudub",
+        "isPresent": "On olemas"
     },
     "form": {
         "addServer": {
@@ -456,7 +458,7 @@
             "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "Veel esitajalt $t(entity.artist, {\"count\": 1})",
+            "moreFromArtist": "Veel $t(entity.artist, {\"count\": 1}) albumeid",
             "moreFromGeneric": "Veel: {{item}}",
             "released": "Avaldatud"
         },
@@ -618,7 +620,7 @@
             "audio": "Heli",
             "lyrics": "Laulusõnad",
             "lyricsDisplay": "Laulusõnade kuvamine",
-            "transcoding": "Transkoodimine",
+            "transcoding": "Teisendamine",
             "discord": "Discord",
             "logger": "Logija",
             "playerFilters": "Mängija filtrid",
@@ -1101,12 +1103,12 @@
         "themeDark": "Teema (tume)",
         "themeLight_description": "Määrab rakenduses kasutatava heleda teema",
         "themeLight": "Teema (hele)",
-        "transcode": "Luba transkoodimine",
-        "transcode_description": "Võimaldab transkoodimise erinevatesse vormingutesse",
-        "transcodeBitrate_description": "Valib transkoodimise bitikiiruse. 0 tähendab, et server valib ise",
-        "transcodeBitrate": "Transkoodimise bitikiirus",
-        "transcodeFormat_description": "Valib transkoodimise vormingu. Jäta tühjaks, et lasta serveril otsustada",
-        "transcodeFormat": "Transkoodimise vorming",
+        "transcode": "Luba teisendamine",
+        "transcode_description": "Võimaldab teisendamise erinevatesse vormingutesse",
+        "transcodeBitrate_description": "Valib teisendamise bitikiiruse. 0 tähendab, et server valib ise",
+        "transcodeBitrate": "Teisendamise bitikiirus",
+        "transcodeFormat_description": "Valib teisendamise vormingu. Jäta tühjaks, et lasta serveril otsustada",
+        "transcodeFormat": "Treisendamise vorming",
         "translationApiKey_description": "API-võti tõlkimiseks (ainult globaalse teenuse lõpp-punkt)",
         "translationApiKey": "Tõlketeenuse API-võti",
         "translationApiProvider_description": "Tõlketeenuse API pakkuja",

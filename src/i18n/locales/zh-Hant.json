@@ -1224,7 +1224,9 @@
         "notInPlaylist": "不在…之中",
         "startsWith": "以…開頭",
         "inTheLast": "在最後",
-        "notInTheLast": "不在最後"
+        "notInTheLast": "不在最後",
+        "isMissing": "不存在",
+        "isPresent": "存在"
     },
     "datetime": {
         "minuteShort": "分",

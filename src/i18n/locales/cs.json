@@ -265,7 +265,7 @@
         "lastfmApiKey_description": "Klíč API pro {{lastfm}}. Vyžadováno pro obaly alb",
         "discordServeImage": "Načítat obrázky {{discord}} ze serveru",
         "discordServeImage_description": "Sdílet obaly alb pro {{discord}} rich presence ze samotného serveru, dostupné pouze pro Jellyfin a Navidrome. {{discord}} používá bota pro získávání obrázků, váš server tudíž musí být dosažitelný z veřejného internetu",
-        "lastfm": "Zobrazit odkazy na last.fm",
+        "lastfm": "Zobrazit odkazy na Last.fm",
         "lastfm_description": "Na stránkách umělců a alb zobrazit odkazy na Last.fm",
         "musicbrainz": "Zobrazit odkazy na MusicBrainz",
         "musicbrainz_description": "Na stránkách umělců a alb, kde existuje MusicBrainz ID, zobrazit odkazy na MusicBrainz",
@@ -1270,7 +1270,9 @@
         "notContains": "Neobsahuje",
         "notInPlaylist": "Není v",
         "notInTheLast": "Není v posledním",
-        "startsWith": "Začíná na"
+        "startsWith": "Začíná na",
+        "isMissing": "Chybí",
+        "isPresent": "Je přítomen"
     },
     "datetime": {
         "minuteShort": "min.",

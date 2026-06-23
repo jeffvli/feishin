@@ -450,33 +450,36 @@ export function WebPlayer() {
     );
 
     useEffect(() => {
-        if (!webAudio) return;
+        if (!webAudio || !player1 || !player1Source) return;
 
-        if (player1 && player1Source && num === 1) {
-            const newGain = calculateReplayGain(player1);
+        const newGain = calculateReplayGain(player1);
 
-            // This error SHOULD never happen, as calculateReplayGain is expected to
-            // always return a real value. However, to prevent app crash, check this just in case
-            try {
-                webAudio.gains[0].gain.setValueAtTime(Math.max(0, newGain), 0);
-            } catch (error) {
-                console.error('Error setting gain', error);
-            }
+        // Apply per player slot whenever its song/source is ready so pre-started
+        // inactive players have correct gain before gapless/crossfade transitions.
+        try {
+            webAudio.gains[0].gain.setValueAtTime(
+                Math.max(0, newGain),
+                webAudio.context.currentTime,
+            );
+        } catch (error) {
+            console.error('Error setting gain', error);
         }
-    }, [calculateReplayGain, num, player1, player1Source, volume, webAudio]);
+    }, [calculateReplayGain, player1, player1Source, webAudio]);
 
     useEffect(() => {
-        if (!webAudio) return;
+        if (!webAudio || !player2 || !player2Source) return;
 
-        if (player2 && player2Source && num === 2) {
-            const newGain = calculateReplayGain(player2);
-            try {
-                webAudio.gains[1].gain.setValueAtTime(Math.max(0, newGain), 0);
-            } catch (error) {
-                console.error('Error setting gain', error);
-            }
+        const newGain = calculateReplayGain(player2);
+
+        try {
+            webAudio.gains[1].gain.setValueAtTime(
+                Math.max(0, newGain),
+                webAudio.context.currentTime,
+            );
+        } catch (error) {
+            console.error('Error setting gain', error);
         }
-    }, [calculateReplayGain, num, player1, player2Source, player2, volume, webAudio]);
+    }, [calculateReplayGain, player2, player2Source, webAudio]);
 
     const player1Url = useSongUrl(player1, num === 1, transcode);
     const player2Url = useSongUrl(player2, num === 2, transcode);

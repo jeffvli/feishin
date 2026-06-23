@@ -9,7 +9,10 @@
         "viewPlaylists": "$t(entity.playlist, {\"count\": 2}) listesini görüntüle",
         "openIn": {
             "lastfm": "Last.fm'de aç",
-            "musicbrainz": "MusicBrainz'da aç"
+            "musicbrainz": "MusicBrainz'da aç",
+            "spotify": "Spotify'da aç",
+            "listenbrainz": "ListenBrainz'de aç",
+            "qobuz": "Qobuz'da aç"
         },
         "addToFavorites": "$t(entity.favorite, {\"count\": 2}) listesine ekle",
         "addToPlaylist": "$t(entity.playlist, {\"count\": 1}) listesine ekle",
@@ -29,7 +32,17 @@
         "selectAll": "Tümünü seç",
         "downloadStarted": "{{count}} öğenin indirilmesine başlandı",
         "moveUp": "Yukarı kaydır",
-        "moveDown": "Aşağı kaydır"
+        "moveDown": "Aşağı kaydır",
+        "collapseAllFolders": "Tüm klasörleri kapat",
+        "expandAllFolders": "Tüm klasörleri genişlet",
+        "holdToMoveToTop": "En üste taşımak için basılı tut",
+        "holdToMoveToBottom": "En aşağıya taşımak için basılı tut",
+        "moveItems": "Öğeleri taşı",
+        "shuffle": "Karışık çal",
+        "shuffleAll": "Tümünü karıştır",
+        "shuffleSelected": "Seçilileri karıştır",
+        "viewMore": "Daha fazlasını görüntüle",
+        "openApplicationDirectory": "Uygulama dizinini aç"
     },
     "common": {
         "action_one": "Eylem",
@@ -51,7 +64,7 @@
         "clear": "Temizle",
         "close": "Kapat",
         "codec": "Codec",
-        "comingSoon": "ÇOK yakında…",
+        "comingSoon": "Çok yakında…",
         "configure": "Yapılandır",
         "confirm": "Onayla",
         "create": "Oluştur",
@@ -108,8 +121,8 @@
         "saveAndReplace": "Kaydet ve değiştir",
         "saveAs": "Farklı kaydet",
         "search": "Arama",
-        "setting_one": "Ayarlar",
-        "setting_other": "",
+        "setting_one": "Ayar",
+        "setting_other": "Ayarlar",
         "share": "Paylaş",
         "size": "Boyut",
         "sortOrder": "Sıralama düzeni",
@@ -131,15 +144,38 @@
         "private": "Gizli",
         "clean": "Temiz",
         "countSelected": "{{count}} adet seçildi",
-        "public": "Herkese açık"
+        "public": "Herkese açık",
+        "doNotShowAgain": "Tekrar gösterme",
+        "view": "Görüntüle",
+        "example": "Örnek",
+        "externalLinks": "Dış bağlantılar",
+        "openFolder": "Klasörü aç",
+        "filter_single": "Tekli",
+        "filter_multiple": "Çoklu",
+        "numberOfResults": "{{numberOfResults}} sonuç",
+        "retry": "Tekrar dene",
+        "releaseType": "Yayın türü",
+        "rename": "Adını değiştir",
+        "slower": "Daha yavaş",
+        "sort": "Sıralama",
+        "explicit": "Sansürsüz",
+        "tableColumns": "Tablo sütunları",
+        "itemsMore": "{{count}} fazla",
+        "newVersionAvailable": "Yeni bir sürüm mevcut",
+        "explicitStatus": "Sansür durumu",
+        "back": "Geri",
+        "faster": "Daha hızlı",
+        "grouping": "Gruplandırma",
+        "mood": "Ruh hali",
+        "noFilters": "Hiçbir filtre yapılandırılmadı"
     },
     "entity": {
         "album_one": "Albüm",
         "album_other": "Albümler",
-        "albumArtist_one": "Albüm sanatçısı",
-        "albumArtist_other": "Albüm sanatçıları",
+        "albumArtist_one": "Albüm Sanatçısı",
+        "albumArtist_other": "Albüm Sanatçıları",
         "albumArtistCount_one": "{{count}} albüm sanatçısı",
-        "albumArtistCount_other": "{{count}} albüm sanatçıları",
+        "albumArtistCount_other": "{{count}} albüm sanatçısı",
         "albumWithCount_one": "{{count}} albüm",
         "albumWithCount_other": "{{count}} albüm",
         "artist_one": "Sanatçı",
@@ -155,10 +191,10 @@
         "genre_one": "Tür",
         "genre_other": "Türler",
         "genreWithCount_one": "{{count}} tür",
-        "genreWithCount_other": "{{count}} türler",
+        "genreWithCount_other": "{{count}} tür",
         "playlist_one": "Çalma listesi",
         "playlist_other": "Çalma listeleri",
-        "play_one": "{{count}} oynat",
+        "play_one": "{{count}} oynatma",
         "play_other": "{{count}} oynatma",
         "playlistWithCount_one": "{{count}} oynatma listesi",
         "playlistWithCount_other": "{{count}} oynatma listesi",
@@ -169,8 +205,10 @@
         "song_other": "Şarkılar",
         "trackWithCount_one": "{{count}} parça",
         "trackWithCount_other": "{{count}} parça",
-        "radioStation_one": "Radyo istasyonu",
-        "radioStation_other": "Radyo istasyonları"
+        "radioStation_one": "Radyo İstasyonu",
+        "radioStation_other": "Radyo İstasyonları",
+        "radioStationWithCount_one": "{{count}} radyo istasyonu",
+        "radioStationWithCount_other": "{{count}} radyo istasyonu"
     },
     "error": {
         "apiRouteError": "İstek yönlendirilemiyor",
@@ -196,7 +234,11 @@
         "playbackError": "Medya oynatmayı çalışırken bir hata meydana geldi",
         "credentialsRequired": "Ki̇mli̇k bi̇lgi̇leri̇ gerekli",
         "remoteDisableError": "Uzak sunucuyu $t(common.disable) yapmaya çalışırken bir hata oluştu",
-        "remoteEnableError": "Uzak sunucuyu $t(common.enable) yapmaya çalışırken bir hata oluştu"
+        "remoteEnableError": "Uzak sunucuyu $t(common.enable) yapmaya çalışırken bir hata oluştu",
+        "invalidJson": "Geçersiz JSON",
+        "noNetwork": "Sunucu erişilemez durumda",
+        "noNetworkDescription": "Sunucuya bağlanılamadı",
+        "playbackPausedDueToError": "Bir hata nedeniyle oynatma duraklatıldı"
     },
     "filter": {
         "albumCount": "$t(entity.album, {\"count\": 2}) sayısı",
@@ -218,7 +260,7 @@
         "isRated": "Oylandı",
         "isRecentlyPlayed": "Yakın zamanda çalındı",
         "lastPlayed": "Son çalınan",
-        "mostPlayed": "En çOK çalınan",
+        "mostPlayed": "En çok çalınan",
         "name": "İsim",
         "note": "Not",
         "owner": "$t(common.owner)",
@@ -240,7 +282,9 @@
         "album": "$t(entity.album, {\"count\": 1})",
         "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
         "artist": "$t(entity.artist, {\"count\": 1})",
-        "channels": "$t(common.channel_other)"
+        "channels": "$t(common.channel, {\"count\": 2})",
+        "sortName": "Adı sırala",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "form": {
         "addServer": {
@@ -256,13 +300,18 @@
             "success": "Sunucu başarıyla eklendi",
             "title": "Sunucu ekle",
             "input_preferInstantMix": "Anında mix tercih et",
-            "input_preferInstantMixDescription": "Sadece benzer şarkılari bulmak icin anında mix kullan. Bu davranışı değiştiren eklentilere sahipseniz faydalı"
+            "input_preferInstantMixDescription": "Sadece benzer şarkılari bulmak icin anında mix kullan. Bu davranışı değiştiren eklentilere sahipseniz faydalı",
+            "input_preferRemoteUrl": "Herkese Açık URL'yi Tercih Et",
+            "input_remoteUrl": "Herkese Açık URL",
+            "input_remoteUrlPlaceholder": "İsteğe bağlı: Dışardan erişim özellikleri için genel URL"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "input_skipDuplicates": "Kopyaları atla",
             "title": "$t(entity.playlist, {\"count\": 1}) listesine ekle",
-            "success": "$t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} }) $t(entity.trackWithCount, {\"count\": {{message}} }) eklendi"
+            "success": "$t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} }) $t(entity.trackWithCount, {\"count\": {{message}} }) eklendi",
+            "create": "$t(entity.playlist, {\"count\": 1}) {{playlist}} oluştur",
+            "noneAdded": "$t(entity.playlist, {\"count\": 1}) {{playlist}} çalma listesine parça eklenmedi"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
@@ -290,7 +339,10 @@
         "queryEditor": {
             "title": "Sorgu düzenleyici",
             "input_optionMatchAll": "Hepsini eşleştir",
-            "input_optionMatchAny": "Herhangi biriyle eşleştir"
+            "input_optionMatchAny": "Herhangi biriyle eşleştir",
+            "removeRuleGroup": "Kural grubunu kaldır",
+            "resetToDefault": "Varsayılan ayarlara dön",
+            "clearFilters": "Filtreleri temizle"
         },
         "shareItem": {
             "allowDownloading": "İndirmeye izin ver",
@@ -298,7 +350,9 @@
             "setExpiration": "Sona erme tarihi ayarla",
             "success": "Paylaşma bağlantısı panoya kopyalandı (veya açmak için buraya tıklayın)",
             "expireInvalid": "Son kullanma tarihi gelecekte olmalı",
-            "createFailed": "Paylaşım oluşturulamadı (paylaşım etkin mi?)"
+            "createFailed": "Paylaşım oluşturulamadı (paylaşım etkin mi?)",
+            "copyToClipboard": "Panoya kopyala: Ctrl+C, Enter",
+            "successMustClick": "Paylaşım başarıyla oluşturuldu. Görüntülemek için tıklayın"
         },
         "updateServer": {
             "success": "Sunucu başarıyla güncellendi",
@@ -308,6 +362,24 @@
             "enabled": "Gizli mod etkinleştirildi, oynatma durumu artık harici eklentilerden gizlendi",
             "disabled": "Gizli mod devre dışı bırakıldı, oynatma durumu artık etkinleştirilmiş harici eklentiler tarafından görülebilir",
             "title": "Gizli mod"
+        },
+        "largeFetchConfirmation": {
+            "title": "Öğeleri oynatma kuyruğuna ekle",
+            "description": "Bu işlem, mevcut filtrelenmiş görünümdeki tüm öğeleri kuyruğa ekler"
+        },
+        "lyricsExport": {
+            "input_synced": "Senkronize şarkı sözlerini dışa aktar"
+        },
+        "saveQueue": {
+            "success": "Oynatma kuyruğu sunucuya kaydedildi"
+        },
+        "shuffleAll": {
+            "title": "Rastgele çal",
+            "input_kind_albums": "Albümler",
+            "input_kind_songs": "Şarkılar",
+            "input_kind": "Karışık seçimler",
+            "input_limit_albums": "Kaç tane albüm?",
+            "input_limit_songs": "Kaç tane şarkı?"
         }
     },
     "page": {
@@ -320,7 +392,8 @@
             "topSongs": "En iyi şarkılar",
             "viewAll": "Tümünü görüntüle",
             "viewAllTracks": "Tüm $t(entity.track, {\"count\": 2}) görüntüle",
-            "topSongsFrom": "{{title}} tarafından en iyi şarkılar"
+            "topSongsFrom": "{{title}} tarafından en iyi şarkılar",
+            "favoriteSongsFrom": "{{title}}’dan favori şarkılar"
         },
         "contextMenu": {
             "addLast": "$t(player.addLast)",
@@ -397,7 +470,8 @@
             "mostPlayed": "En çok çalınan",
             "newlyAdded": "Yeni eklenenler",
             "recentlyPlayed": "Yakınlarda çalınanlar",
-            "title": "$t(common.home)"
+            "title": "$t(common.home)",
+            "recentlyReleased": "Son çıkanlar"
         },
         "itemDetail": {
             "copyPath": "Yolu panoya kopyala",
@@ -415,7 +489,13 @@
             "generalTab": "Genel",
             "hotkeysTab": "Kısayol tuşları",
             "playbackTab": "Oynatma",
-            "windowTab": "Pencere"
+            "windowTab": "Pencere",
+            "analytics": "Analitik",
+            "updates": "Güncelleme",
+            "cache": "Önbellek",
+            "application": "Uygulama",
+            "exportImport": "İçe/dışa aktarma",
+            "lyrics": "Sözler"
         },
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
@@ -430,7 +510,8 @@
             "search": "$t(common.search)",
             "settings": "$t(common.setting, {\"count\": 2})",
             "shared": "Paylaşılan $t(entity.playlist, {\"count\": 2})",
-            "tracks": "$t(entity.track, {\"count\": 2})"
+            "tracks": "$t(entity.track, {\"count\": 2})",
+            "collections": "Koleksiyonlar"
         },
         "trackList": {
             "artistTracks": "{{artist}} parçaları",
@@ -463,6 +544,17 @@
             "version": "{{version}} sürümü",
             "privateModeOff": "Gizli modu kapat",
             "privateModeOn": "Gizli modu aç"
+        },
+        "radioList": {
+            "title": "Radyo istasyonları"
+        },
+        "releasenotes": {
+            "commitsSinceStable": "{{stable}}’dan sonraki commit’ler",
+            "noNewCommits": "Bu aralıkta yeni commit yok",
+            "noStableReleaseToCompare": "Karşılaştırılacak stabil sürüm bulunamadı"
+        },
+        "favorites": {
+            "title": "$t(entity.favorite, {\"count\": 2})"
         }
     },
     "player": {
@@ -496,7 +588,15 @@
         "toggleFullscreenPlayer": "Tam ekran oynatıcıya geç",
         "unfavorite": "Favoriden kaldır",
         "pause": "Durdur",
-        "viewQueue": "Kuyruğu görüntüle"
+        "viewQueue": "Kuyruğu görüntüle",
+        "albumRadio": "Aldüm radyosu",
+        "artistRadio": "Sanatçı radyosu",
+        "holdToShuffle": "Karıştırmak için basılı tut",
+        "lyrics": "Sözler",
+        "sleepTimer_endOfAlbum": "Mevcut albümün sonu",
+        "sleepTimer_minutes": "{{count}} dakika",
+        "sleepTimer_hours": "{{count}} saat",
+        "sleepTimer_cancel": "Zamanlayıcıyı iptal et"
     },
     "setting": {
         "accentColor": "Vurgu rengi",
@@ -545,7 +645,7 @@
         "discordListening_description": "Durumu çalma yerine dinleme olarak göster",
         "discordRichPresence_description": "{{discord}} \"Rich Presence\" oynatma durumunu etkinleştirin. Görüntü tuşları şunlardır: {{icon}}, {{playing}} ve {{paused}}",
         "discordServeImage": "Sunucudan {{discord}} resimleri servis et",
-        "discordServeImage_description": "Sunucudan {{discord}} rich presence için kapak resmi paylaşın, yalnızca Jellyfin ve Navidrome için kullanılabilir",
+        "discordServeImage_description": "{{discord}} zengin durum bilgisi için kapak görselini sunucudan paylaşır. Yalnızca Jellyfin ve Navidrome için kullanılabilir. {{discord}}, görselleri almak için bir bot kullanır, bu nedenle sunucunuzun internet üzerinden erişilebilir olması gerekir",
         "discordUpdateInterval": "{{discord}} rich presence güncelleme aralığı",
         "discordUpdateInterval_description": "Her güncelleme arasındaki saniye cinsinden süre (minimum 15 saniye)",
         "gaplessAudio": "Aralıksız ses",
@@ -733,31 +833,87 @@
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel_optionLatest": "En son",
         "language": "Dil",
-        "notify": "Müzik bildirimi aktivleştir"
+        "notify": "Müzik bildirimi aktivleştir",
+        "autoDJ": "Otomatik DJ",
+        "autoDJ_itemCount": "Öğe sayısı",
+        "autoDJ_itemCount_description": "Kuyruğa eklenmeye çalışılan öğe sayısı",
+        "autoDJ_timing": "Zamanlama",
+        "autoDJ_timing_description": "Otomatik DJ başlamadan önce kuyrukta kalan şarkı sayısı",
+        "autoDJ_songStrategy": "Şarkı seçim modu",
+        "autoDJ_strategy_option_library_random": "Rastgele",
+        "autoDJ_strategy_option_similar": "Benzer",
+        "autosave": "Oynatma kuyruğunu otomatik kaydet",
+        "autosave_description": "Oynatma kuyruğunu sunucunuza otomatik olarak kaydetmeyi etkinleştirin. Bu özellik yalnızca Navidrome/Subsonic kullanırken mümkündür ve karışık bir oynatma kuyruğu kullanamazsınız.",
+        "autosaveCount": "Oynatma kuyruğu otomatik kaydetme sıklığı",
+        "autosaveCount_description": "Kuyruğun kaydedilmesinden önce kaç parça değişikliği yapılmalı. 1 (minimum) her şarkı değişiminde kaydeder",
+        "useThemeAccentColor": "Tema ana rengini kullan",
+        "useThemeAccentColor_description": "Özel vurgu rengi yerine seçili temada tanımlı ana rengi kullanın",
+        "useThemePrimaryShade": "Tema ana renginin tonunu kullan",
+        "artistReleaseTypeConfiguration_description": "Albüm sanatçısı sayfasında hangi yayın türlerinin gösterileceğini ve hangi sırayla listeleneceğini yapılandırın",
+        "automaticUpdates_description": "Güncellemeleri otomatik olarak kontrol et ve yükle",
+        "releaseChannel_description": "Otomatik güncellemeler için stable, beta veya alfa (nightly) sürümler arasından seçim yapın",
+        "discordLinkType_description": "Şarkı ve sanatçı alanlarına {{discord}} zengin durum bilgisinde {{lastfm}} veya {{musicbrainz}} için harici bağlantılar ekler. {{musicbrainz}} en doğru seçenektir ancak etiketlere ihtiyaç duyar ve sanatçı bağlantısı sağlamaz; buna karşılık {{lastfm}} her zaman bir bağlantı sunar. Ekstra ağ isteği oluşturmaz",
+        "discordLinkType_mbz_lastfm": "{{musicbrainz}} kullan, {{lastfm}} yedek olarak",
+        "discordLinkType_none": "$t(common.none)",
+        "discordLinkType": "{{discord}} zengin durum bağlantıları",
+        "exportImportSettings_control_exportText": "Ayarları dışa aktar",
+        "exportImportSettings_control_importText": "Ayarları içe aktar",
+        "exportImportSettings_control_title": "Ayarları içe / dışa aktar",
+        "exportImportSettings_destructiveWarning": "Ayarları içe aktarmak geri alınamaz bir işlemdir, lütfen yukarıdakileri gözden geçirin ve ardından aşağıdaki \"İçe Aktar\" butonuna tıklayın!",
+        "exportImportSettings_importBtn": "Ayarları içe aktar",
+        "exportImportSettings_importModalTitle": "Feishin ayarlarını içe aktar",
+        "exportImportSettings_importSuccess": "Ayarlar başarı ile içeri aktarıldı!",
+        "exportImportSettings_notValidJSON": "Yüklenen dosya geçerli JSON formatında değil",
+        "listenbrainz": "ListenBrainz bağlantılarını göster",
+        "logLevel": "Log seviyesi",
+        "logLevel_description": "Görüntülenecek minimum log seviyesini ayarlar. Debug tüm logları gösterir, error yalnızca hataları gösterir",
+        "logLevel_optionDebug": "Hata ayıklama",
+        "logLevel_optionError": "Hata",
+        "logLevel_optionInfo": "Bilgilendirme",
+        "logLevel_optionWarn": "Uyarı",
+        "pathReplace_description": "Sunucunun varsayılan dosya yolunu değiştir",
+        "pathReplace_optionRemovePrefix": "Öneki kaldır",
+        "pathReplace_optionAddPrefix": "Ön ek ekle",
+        "imageResolution": "Resim çözünürlüğü",
+        "imageResolution_description": "Uygulama genelinde kullanılan görsellerin çözünürlüğü. 0 değeri kullanılırsa varsayılan olarak görselin orijinal çözünürlüğü kullanılır",
+        "imageResolution_optionTable": "Tablo",
+        "playerbarWaveformAlign_optionCenter": "Orta",
+        "showLyricsInSidebar": "Oynatıcı yan panelinde şarkı sözlerini göster",
+        "blurExplicitImages": "Müstehcen görselleri bulanıklaştır",
+        "blurExplicitImages_description": "Sansürsüz olarak işaretlenen albüm ve şarkı kapakları bulanıklaştırılır",
+        "enableGridMultiSelect": "Izgara çoklu seçimi etkinleştir",
+        "enableGridMultiSelect_description": "Etkinleştirildiğinde, ızgara görünümünde birden fazla öğe seçmeye izin verir. Devre dışı bırakıldığında, ızgara öğelerinin görsellerine tıklamak öğe sayfasına yönlendirir",
+        "showVisualizerInSidebar_description": "Oynatıcı yan paneline görselleştiriciyi gösteren bir panel eklenecektir",
+        "showVisualizerInSidebar": "Oynatıcı yan panelinde görselleştiriciyi göster",
+        "combinedLyricsAndVisualizer_description": "Şarkı sözleri ve görselleştiriciyi aynı panelde birleştir",
+        "combinedLyricsAndVisualizer": "Şarkı sözleri ve görselleştiriciyi oynatıcı yan panelinde birleştir",
+        "sidebarPlaylistFolderSeparator": "Klasör ayırıcı",
+        "sidebarPlaylistFolderView_optionSingle": "Tek klasör",
+        "sidebarPlaylistFolderView_optionTree": "Ağaç liste görünümü"
     },
     "table": {
         "column": {
             "album": "Albüm",
             "albumArtist": "Albüm sanatçısı",
-            "albumCount": "$t(entity.album, {\"count\": 2})",
-            "artist": "$t(entity.artist, {\"count\": 1})",
+            "albumCount": "Albümler",
+            "artist": "Sanatçı",
             "biography": "Biyografi",
             "bitrate": "Bit hızı",
             "bpm": "BPM (dakika başına vuruş)",
-            "channels": "$t(common.channel_other)",
-            "codec": "$t(common.codec)",
+            "channels": "Kanallar",
+            "codec": "Kodek",
             "comment": "Yorum",
             "dateAdded": "Tarih eklendi",
             "discNumber": "Disk",
             "favorite": "Favori",
-            "genre": "$t(entity.genre, {\"count\": 1})",
+            "genre": "Tür",
             "lastPlayed": "Son çalınan",
             "path": "Yol",
             "playCount": "Oynatılıyor",
             "rating": "Derecelendirme",
             "releaseDate": "Çıkış tarihi",
             "releaseYear": "Yıl",
-            "size": "$t(common.size)",
+            "size": "Boyut",
             "songCount": "$t(entity.track, {\"count\": 2})",
             "title": "Başlık",
             "trackNumber": "Parça"
@@ -814,11 +970,31 @@
         "secondary": {
             "demo": "Demo",
             "live": "Canlı",
-            "remix": "Remix"
+            "remix": "Remix",
+            "audiobook": "Sesli kitap"
+        },
+        "primary": {
+            "album": "$t(entity.album, {\"count\": 1})",
+            "broadcast": "Yayın",
+            "ep": "EP",
+            "other": "Diğer",
+            "single": "Single"
         }
     },
     "dragDropZone": {
         "error_oneFileOnly": "Lütfen sadece 1 dosya seç",
         "error_readingFile": "Bu dosyayi okurken bir sorun oluştu :{{errorMessage}}"
+    },
+    "datetime": {
+        "minuteShort": "dk",
+        "secondShort": "sn",
+        "hourShort": "sa",
+        "dayShort": "g"
+    },
+    "filterOperator": {
+        "notContains": "İçermez"
+    },
+    "queryBuilder": {
+        "customTags": "Özel etiketler"
     }
 }

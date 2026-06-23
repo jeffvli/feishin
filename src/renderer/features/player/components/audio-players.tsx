@@ -29,6 +29,7 @@ import {
 } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { RemoteHook } from '/@/renderer/features/remote/hooks/use-remote';
 import { VisualizerSystemAudioBridgeHook } from '/@/renderer/features/visualizer/components/visualizer-system-audio-bridge';
+import { useSettingsStore } from '/@/renderer/store';
 import {
     updateQueueFavorites,
     updateQueueRatings,
@@ -196,11 +197,66 @@ const AudioPlayersContent = ({
             }
 
             const gains = [context.createGain(), context.createGain()];
-            for (const gain of gains) {
-                gain.connect(context.destination);
+
+            // Build DSP chain from persisted settings so EQ/compressor
+            // are active immediately on first playback, not just after
+            // the user opens the settings panel.
+            const { compressor, equalizer } = useSettingsStore.getState().playback;
+
+            // Preamp gain — converts dB to linear
+            const preampGain = context.createGain();
+            preampGain.gain.value = equalizer.enabled ? Math.pow(10, equalizer.preamp / 20) : 1;
+
+            // One peaking BiquadFilterNode per EQ band
+            const eqFilters: BiquadFilterNode[] = equalizer.bands.map((band) => {
+                const filter = context.createBiquadFilter();
+                filter.type = 'peaking';
+                filter.frequency.value = band.freq;
+                // Q of 1.41 gives roughly 1-octave bandwidth per band
+                filter.Q.value = 1.41;
+                filter.gain.value = equalizer.enabled ? band.gain : 0;
+                return filter;
+            });
+
+            // DynamicsCompressorNode — always present, pass-through when disabled
+            // (ratio=1, threshold=0 = mathematically transparent)
+            const compressorNode = context.createDynamicsCompressor();
+            if (compressor.enabled) {
+                compressorNode.threshold.value = compressor.threshold;
+                compressorNode.ratio.value = compressor.ratio;
+                compressorNode.attack.value = compressor.attack / 1000;
+                compressorNode.release.value = compressor.release / 1000;
+                compressorNode.knee.value = compressor.knee;
+            } else {
+                compressorNode.threshold.value = 0;
+                compressorNode.ratio.value = 1;
+                compressorNode.attack.value = 0;
+                compressorNode.release.value = 0.25;
+                compressorNode.knee.value = 0;
             }
 
-            setWebAudio!({ context, gains });
+            // Wire: each gain → preamp → eq[0] → eq[1] → ... → compressor → destination
+            for (const gain of gains) {
+                gain.connect(preampGain);
+            }
+
+            if (eqFilters.length > 0) {
+                preampGain.connect(eqFilters[0]);
+                for (let i = 0; i < eqFilters.length - 1; i++) {
+                    eqFilters[i].connect(eqFilters[i + 1]);
+                }
+                eqFilters[eqFilters.length - 1].connect(compressorNode);
+            } else {
+                preampGain.connect(compressorNode);
+            }
+
+            compressorNode.connect(context.destination);
+
+            setWebAudio!({
+                context,
+                dsp: { compressor: compressorNode, eqFilters, preampGain },
+                gains,
+            });
         }
 
         // Intentionally ignore the sample rate dependency, as it makes things really messy

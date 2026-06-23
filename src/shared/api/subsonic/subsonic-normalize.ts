@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { coerceYear, parsePartialIsoDate } from '/@/shared/api/partial-iso-date';
 import { ssType } from '/@/shared/api/subsonic/subsonic-types';
-import { replacePathPrefix } from '/@/shared/api/utils';
 import {
     Album,
     AlbumArtist,
@@ -163,8 +162,6 @@ const subsonicReleaseFields = (item: {
 const normalizeSong = (
     item: z.infer<typeof ssType._response.song>,
     server?: null | ServerListItemWithCredential,
-    pathReplace?: string,
-    pathReplaceWith?: string,
     playlistIndex?: number,
     discTitleMap?: Map<number, string>,
 ): Song => {
@@ -221,7 +218,7 @@ const normalizeSong = (
         mbzTrackId: null,
         name: item.title,
         participants,
-        path: replacePathPrefix(item.path || '', pathReplace, pathReplaceWith),
+        path: item.path || '',
         peak:
             item.replayGain && (item.replayGain.albumPeak || item.replayGain.trackPeak)
                 ? {
@@ -305,8 +302,6 @@ const getReleaseType = (
 const normalizeAlbum = (
     item: z.infer<typeof ssType._response.album> | z.infer<typeof ssType._response.albumListEntry>,
     server?: null | ServerListItemWithCredential,
-    pathReplace?: string,
-    pathReplaceWith?: string,
 ): Album => {
     const discTitleMap = new Map<number, string>();
 
@@ -354,7 +349,7 @@ const normalizeAlbum = (
         songCount: item.songCount,
         songs:
             (item as z.infer<typeof ssType._response.album>).song?.map((song) =>
-                normalizeSong(song, server, pathReplace, pathReplaceWith, undefined, discTitleMap),
+                normalizeSong(song, server, undefined, discTitleMap),
             ) || [],
         sortName: item.title,
         tags: null,
@@ -410,8 +405,6 @@ const normalizeGenre = (
 const normalizeFolder = (
     item: z.infer<typeof ssType._response.directory>,
     server?: null | ServerListItemWithCredential,
-    pathReplace?: string,
-    pathReplaceWith?: string,
 ): Folder => {
     const results = item.child?.reduce(
         (acc: { folders: Folder[]; songs: Song[] }, item) => {
@@ -421,7 +414,7 @@ const normalizeFolder = (
                 const folder = normalizeFolder(item, server);
                 acc.folders.push(folder);
             } else {
-                const song = normalizeSong(item, server, pathReplace, pathReplaceWith);
+                const song = normalizeSong(item, server);
                 acc.songs.push(song);
             }
 

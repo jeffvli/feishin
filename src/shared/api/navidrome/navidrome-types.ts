@@ -216,6 +216,17 @@ export const NDSongQueryPlaylistOperators = [
     },
 ];
 
+const NDPresenceOperators = [
+    {
+        label: i18n.t('filterOperator.isMissing'),
+        value: 'isMissing',
+    },
+    {
+        label: i18n.t('filterOperator.isPresent'),
+        value: 'isPresent',
+    },
+];
+
 export const NDSongQueryDateOperators = [
     {
         label: i18n.t('filterOperator.is'),
@@ -225,6 +236,7 @@ export const NDSongQueryDateOperators = [
         label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
+    ...NDPresenceOperators,
     {
         label: i18n.t('filterOperator.before'),
         value: 'before',
@@ -268,6 +280,7 @@ export const NDSongQueryStringOperators = [
         label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
+    ...NDPresenceOperators,
     {
         label: i18n.t('filterOperator.contains'),
         value: 'contains',
@@ -295,6 +308,7 @@ export const NDSongQueryBooleanOperators = [
         label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
+    ...NDPresenceOperators,
 ];
 
 export const NDSongQueryNumberOperators = [
@@ -306,6 +320,7 @@ export const NDSongQueryNumberOperators = [
         label: i18n.t('filterOperator.isNot'),
         value: 'isNot',
     },
+    ...NDPresenceOperators,
     {
         label: i18n.t('filterOperator.contains'),
         value: 'contains',
