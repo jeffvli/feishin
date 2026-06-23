@@ -14,6 +14,7 @@ import {
     type LyricsQueryResult,
 } from '/@/renderer/features/lyrics/api/lyrics-api';
 import { openLyricsExportModal } from '/@/renderer/features/lyrics/components/lyrics-export-form';
+import { useFuriganaLyrics } from '/@/renderer/features/lyrics/hooks/use-furigana-lyrics';
 import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 import {
     SynchronizedLyrics,
@@ -49,6 +50,7 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
 
     const {
         enableAutoTranslation,
+        enableFurigana,
         preferLocalLyrics,
         translationApiKey,
         translationApiProvider,
@@ -116,7 +118,15 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
         return computeSelectedFromResult(data, preferLocalLyrics, indexToUse);
     }, [data, indexToUse, preferLocalLyrics]);
 
-    const displayLyrics = isLyricsDisabled ? null : lyrics;
+    const { data: furiganaConvertedLyrics } = useFuriganaLyrics(lyrics?.lyrics, !!enableFurigana);
+
+    const displayLyrics = useMemo(() => {
+        if (isLyricsDisabled || !lyrics) return null;
+        if (enableFurigana && furiganaConvertedLyrics) {
+            return { ...lyrics, lyrics: furiganaConvertedLyrics };
+        }
+        return lyrics;
+    }, [enableFurigana, isLyricsDisabled, lyrics, furiganaConvertedLyrics]);
 
     const currentOffsetMs = useMemo(() => {
         if (!data) return 0;

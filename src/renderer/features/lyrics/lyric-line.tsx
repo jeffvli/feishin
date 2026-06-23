@@ -3,6 +3,7 @@ import { ComponentPropsWithoutRef, memo, useMemo } from 'react';
 
 import styles from './lyric-line.module.css';
 
+import { sanitize } from '/@/renderer/utils/sanitize';
 import { Box } from '/@/shared/components/box/box';
 import { Stack } from '/@/shared/components/stack/stack';
 
@@ -28,7 +29,7 @@ export const LyricLine = memo(
             <Box className={clsx(styles.lyricLine, className)} style={style} {...props}>
                 <Stack gap={0}>
                     {lines.map((line, index) => (
-                        <span key={index}>{line}</span>
+                        <span dangerouslySetInnerHTML={{ __html: sanitize(line) }} key={index} />
                     ))}
                 </Stack>
             </Box>

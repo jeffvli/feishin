@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { jfType } from '/@/shared/api/jellyfin/jellyfin-types';
 import { coerceYear, parsePartialIsoDateFromApi } from '/@/shared/api/partial-iso-date';
-import { replacePathPrefix } from '/@/shared/api/utils';
 import {
     Album,
     AlbumArtist,
@@ -156,8 +155,6 @@ const jellyfinPremiereFields = (item: {
 const normalizeSong = (
     item: z.infer<typeof jfType._response.song>,
     server: null | ServerListItem,
-    pathReplace?: string,
-    pathReplaceWith?: string,
 ): Song => {
     let bitDepth: null | number = null;
     let bitRate = 0;
@@ -257,7 +254,7 @@ const normalizeSong = (
         mbzTrackId: item.ProviderIds?.MusicBrainzTrack || null,
         name: item.Name,
         participants,
-        path: replacePathPrefix(path || '', pathReplace, pathReplaceWith),
+        path: path || '',
         peak: null,
         playCount: (item.UserData && item.UserData.PlayCount) || 0,
         playlistItemId: item.PlaylistItemId,
@@ -278,8 +275,6 @@ const normalizeSong = (
 const normalizeAlbum = (
     item: z.infer<typeof jfType._response.album>,
     server: null | ServerListItem,
-    pathReplace?: string,
-    pathReplaceWith?: string,
 ): Album => {
     const { originalYear, releaseDate, releaseYear } = jellyfinPremiereFields(item);
 
@@ -342,7 +337,7 @@ const normalizeAlbum = (
         releaseYear,
         size: null,
         songCount: item?.ChildCount || null,
-        songs: item.Songs?.map((song) => normalizeSong(song, server, pathReplace, pathReplaceWith)),
+        songs: item.Songs?.map((song) => normalizeSong(song, server)),
         sortName: item.SortName || item.Name,
         tags: getTags(item),
         updatedAt: item?.DateLastMediaAdded || item.DateCreated,

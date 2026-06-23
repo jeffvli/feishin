@@ -1270,7 +1270,9 @@
         "notContains": "Nie zawiera",
         "notInPlaylist": "Nie jest w",
         "notInTheLast": "Nie jest w ostatnim",
-        "startsWith": "Zaczyna się od"
+        "startsWith": "Zaczyna się od",
+        "isMissing": "brakuje",
+        "isPresent": "jest"
     },
     "datetime": {
         "minuteShort": "Min",

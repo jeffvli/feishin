@@ -414,10 +414,8 @@ export type Song = {
     userRating: null | number;
 };
 
-type ApiContext = {
-    pathReplace?: string;
-    pathReplaceWith?: string;
-};
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+type ApiContext = {};
 
 type BaseEndpointArgs = {
     apiClientProps: {

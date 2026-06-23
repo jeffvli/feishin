@@ -96,6 +96,20 @@ export const LyricSettings = memo(() => {
         {
             control: (
                 <Switch
+                    aria-label="Enable furigana generation"
+                    defaultChecked={settings.enableFurigana}
+                    onChange={(e) => updateSetting({ enableFurigana: e.currentTarget.checked })}
+                />
+            ),
+            description: t('setting.enableFurigana', {
+                context: 'description',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.enableFurigana'),
+        },
+        {
+            control: (
+                <Switch
                     aria-label="Enable NetEase translations"
                     defaultChecked={settings.enableNeteaseTranslation}
                     onChange={(e) => {
