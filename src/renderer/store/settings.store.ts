@@ -2533,17 +2533,10 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     );
                 }
 
-                if (version <= 28) {
-                    if (state.general.albumGroupImageSize === undefined) {
-                        state.general.albumGroupImageSize =
-                            initialState.general.albumGroupImageSize;
-                    }
-                }
-
                 return persistedState;
             },
             name: 'store_settings',
-            version: 29,
+            version: 28,
         },
     ),
 );

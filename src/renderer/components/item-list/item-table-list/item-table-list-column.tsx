@@ -824,6 +824,8 @@ export const TableColumnContainer = (
                 [styles.large]: props.size === 'large',
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
                 [styles.noHorizontalPadding]: isNoHorizontalPaddingColumn(props.type),
+                [styles.noVerticalPadding]:
+                    props.type === TableColumn.ALBUM_GROUP && (props.albumGroupImageSize ?? 0) > 0,
                 [styles.paddingLg]: props.cellPadding === 'lg',
                 [styles.paddingMd]: props.cellPadding === 'md',
                 [styles.paddingSm]: props.cellPadding === 'sm',

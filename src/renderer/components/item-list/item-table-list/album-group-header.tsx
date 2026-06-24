@@ -49,7 +49,6 @@ export const AlbumGroupHeader = ({
             ? {
                   aspectRatio: 'auto',
                   height: `${albumImageSize}px`,
-                  // Small vertical gap so adjacent album covers don't touch.
                   paddingBottom: 'var(--theme-spacing-xs)',
                   paddingTop: 'var(--theme-spacing-xs)',
                   position: 'relative' as const,
