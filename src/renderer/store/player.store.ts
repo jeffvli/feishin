@@ -1640,6 +1640,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 const excludedPlayerKeys = ['playerNum', 'seekToTimestamp', 'status'];
 
                 // If we're not restoring the play queue, we don't need the index property
+                // (it is meaningless without the queue)
                 if (!shouldRestorePlayQueue) {
                     excludedPlayerKeys.push('index');
                 }
@@ -2076,11 +2077,16 @@ export const updateQueueSong = (songId: string, updatedSong: Song) => {
                 const uniqueId = song._uniqueId;
                 state.queue.songs[song._uniqueId] = {
                     ...updatedSong,
+                    _contextPlaylistId: song._contextPlaylistId,
                     _uniqueId: uniqueId,
                 };
             }
         });
     });
+};
+
+export const useCurrentPlaylistContextId = () => {
+    return usePlayerStoreBase((state) => state.getCurrentSong()?._contextPlaylistId ?? null);
 };
 
 export const usePlayerMuted = () => {

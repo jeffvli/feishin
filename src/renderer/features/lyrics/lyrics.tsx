@@ -293,10 +293,10 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
     }, [isLoadingLyrics, hasNoLyrics, fadeOutNoLyricsMessage]);
 
     const handleExportLyrics = useCallback(() => {
-        if (displayLyrics) {
-            openLyricsExportModal({ lyrics: displayLyrics, offsetMs: currentOffsetMs, synced });
+        if (lyrics && !isLyricsDisabled) {
+            openLyricsExportModal({ lyrics, offsetMs: currentOffsetMs, synced });
         }
-    }, [currentOffsetMs, displayLyrics, synced]);
+    }, [currentOffsetMs, isLyricsDisabled, lyrics, synced]);
 
     const handleOpenSettings = () => {
         openLyricsSettingsModal(settingsKey);

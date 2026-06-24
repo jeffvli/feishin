@@ -40,7 +40,10 @@
             "listenbrainz": "Відкрити у ListenBrainz",
             "qobuz": "Відкрити у Qobuz",
             "spotify": "Відкрити у Spotify"
-        }
+        },
+        "goToCurrent": "Перейти до поточного елементу",
+        "collapseAllFolders": "Згорнути всі папки",
+        "expandAllFolders": "Розгорнути всі папки"
     },
     "common": {
         "countSelected": "Вибрано {{count}}",
@@ -170,7 +173,8 @@
         "itemsMore": "{{count}} більше",
         "numberOfResults": "{{numberOfResults}} результатів",
         "newVersionAvailable": "Доступна нова версія",
-        "back": "Повернутися"
+        "back": "Повернутися",
+        "openFolder": "Відкрити папку"
     },
     "entity": {
         "album_one": "Альбом",
@@ -338,7 +342,9 @@
         "notContains": "Не містить",
         "notInPlaylist": "Немає в",
         "notInTheLast": "Не є в останньому",
-        "startsWith": "Починається з"
+        "startsWith": "Починається з",
+        "isMissing": "Загублений",
+        "isPresent": "Присутній"
     },
     "form": {
         "addServer": {
@@ -369,7 +375,8 @@
             "input_skipDuplicates": "Пропустити дублікати",
             "searchOrCreate": "Шукайте $t(entity.playlist, {\"count\": 2}) або пишіть, щоб створити новий",
             "success": "Додано $t(entity.trackWithCount, {\"count\": {{message}} }) до $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
-            "title": "Додати до $t(entity.playlist, {\"count\": 1})"
+            "title": "Додати до $t(entity.playlist, {\"count\": 1})",
+            "noneAdded": "Ніяких треків не було додано до $t(entity.playlist, {\"count\": 1}) '{{playlist}}'"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
@@ -437,7 +444,12 @@
             "input_played": "Відтворити фільтр",
             "input_played_optionAll": "Всі треки",
             "input_played_optionUnplayed": "Тільки не відтворені треки",
-            "input_played_optionPlayed": "Тільки відтворені треки"
+            "input_played_optionPlayed": "Тільки відтворені треки",
+            "input_kind_albums": "Альбоми",
+            "input_kind_songs": "Треки",
+            "input_kind": "Випадкові вибори",
+            "input_limit_albums": "Скільки альбомів?",
+            "input_limit_songs": "Скільки треків?"
         },
         "updateServer": {
             "success": "Сервер успішно оновлено",
@@ -453,7 +465,57 @@
         }
     },
     "player": {
-        "skip": "Пропустити"
+        "skip": "Пропустити",
+        "repeat": "Повторювати",
+        "repeat_all": "Повторювати всі",
+        "repeat_off": "Повторювання вимкнено",
+        "restoreQueueFromServer": "Відновити чергу з серверу",
+        "saveQueueToServer": "Зберегти чергу до серверу",
+        "shuffle": "Грати (перемішано)",
+        "shuffle_off": "Перемішування вимкнено",
+        "addLast": "Останній",
+        "addNext": "Наступним",
+        "addLastShuffled": "Останнім (перемішано)",
+        "addNextShuffled": "Наступним (перемішано)",
+        "albumRadio": "Радіо альбому",
+        "artistRadio": "Радіо артиста",
+        "holdToShuffle": "Утримуйте щоб перемішати",
+        "favorite": "Додати до вибраних",
+        "lyrics": "Тексти пісень",
+        "mute": "Вимкнути звук",
+        "muted": "Звук вимкнено",
+        "next": "Наступний",
+        "play": "Грати",
+        "playbackFetchCancel": "Будь ласка, трошки почекайте... закрийте повідомлення, щоб скасувати",
+        "playbackFetchInProgress": "Завантаження треків…",
+        "playbackFetchNoResults": "Треків не знайдено",
+        "playbackSpeed": "Швидкість відтворення",
+        "playRandom": "Грати випадково",
+        "playSimilarSongs": "Грати схожі треки",
+        "previous": "Попередній",
+        "queue_clear": "Очистити чергу",
+        "queue_moveToBottom": "Пересунути виділені вниз",
+        "queue_moveToTop": "Пересунути виділені угору",
+        "queue_remove": "Видалити виділені",
+        "skip_back": "Перемотати назад",
+        "skip_forward": "Перемотати вперед",
+        "stop": "Зупинити",
+        "toggleFullscreenPlayer": "Перемкнути повноекранний плеєр",
+        "trackRadio": "Радіо треку",
+        "unfavorite": "Прибрати з вибраних",
+        "pause": "Пауза",
+        "viewQueue": "Переглянути чергу",
+        "sleepTimer": "Таймер сну",
+        "sleepTimer_endOfSong": "Кінець поточного треку",
+        "sleepTimer_endOfAlbum": "Кінець поточного альбому",
+        "sleepTimer_minutes": "{{count}} хв",
+        "sleepTimer_hours": "{{count}} г",
+        "sleepTimer_custom": "Користувацький",
+        "sleepTimer_off": "Вимкнено",
+        "sleepTimer_timeRemaining": "{{time}} залишилось",
+        "sleepTimer_setCustom": "Встановити таймер",
+        "sleepTimer_cancel": "Скасувати таймер",
+        "scrobbleForceSubmit": "Змусити скробблинути"
     },
     "page": {
         "albumArtistDetail": {
@@ -570,7 +632,9 @@
                 "showLyricProvider": "Показувати джерело тексту пісень",
                 "synchronized": "Синхронізовано",
                 "unsynchronized": "Несинхронізовано",
-                "useImageAspectRatio": "Використовувати співвідношення сторін зображення"
+                "useImageAspectRatio": "Використовувати співвідношення сторін зображення",
+                "lyricOpacityNonActive": "Непрозорість неактивних слів",
+                "lyricScaleNonActive": "Масштаб неактивних слів"
             },
             "lyrics": "Текст пісні",
             "related": "Пов'язані",
@@ -599,7 +663,102 @@
             "genres": "$t(entity.genre, {\"count\": 2})",
             "mostPlayed": "Найбільш відтворені",
             "newlyAdded": "Нещодавно додані релізи",
-            "recentlyPlayed": "Нещодавно відтворені"
+            "recentlyPlayed": "Нещодавно відтворені",
+            "recentlyReleased": "Нещодавно випущені",
+            "title": "$t(common.home)"
+        },
+        "itemDetail": {
+            "copyPath": "Скопіювати шлях до буфера обміну",
+            "copiedPath": "Шлях успішно скопійовано",
+            "openFile": "Показати трек у файловому менеджері"
+        },
+        "setting": {
+            "sidebar": "Бічна панель",
+            "remote": "Віддалений",
+            "exportImport": "Імпортувати/експортувати",
+            "scrobble": "Скробблінг",
+            "audio": "Аудіо",
+            "lyrics": "Тексти пісень",
+            "lyricsDisplay": "Відображення текстів пісень",
+            "transcoding": "Транскодування",
+            "discord": "Діскорд",
+            "logger": "Логгер",
+            "playerFilters": "Фільтри плеєра"
+        },
+        "sidebar": {
+            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
+            "albums": "$t(entity.album, {\"count\": 2})",
+            "collections": "Колекції",
+            "artists": "$t(entity.artist, {\"count\": 2})",
+            "favorites": "$t(entity.favorite, {\"count\": 2})",
+            "folders": "$t(entity.folder, {\"count\": 2})",
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "home": "$t(common.home)",
+            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "myLibrary": "Моя бібліотека",
+            "nowPlaying": "Зараз грає",
+            "playlists": "$t(entity.playlist, {\"count\": 2})",
+            "search": "$t(common.search)",
+            "settings": "$t(common.setting, {\"count\": 2})",
+            "shared": "Поширено $t(entity.playlist, {\"count\": 2})",
+            "tracks": "$t(entity.track, {\"count\": 2})"
+        },
+        "trackList": {
+            "artistTracks": "Треки {{artist}}",
+            "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.track, {\"count\": 2})"
         }
+    },
+    "queryBuilder": {
+        "standardTags": "Стандартні теги",
+        "customTags": "Користувацькі теги"
+    },
+    "releaseType": {
+        "primary": {
+            "album": "$t(entity.album, {\"count\": 1})",
+            "broadcast": "Транслювати",
+            "ep": "Міні-альбом",
+            "other": "Інші",
+            "single": "Сінгл"
+        },
+        "secondary": {
+            "audiobook": "Аудіокнига",
+            "audioDrama": "Радіоп'єса",
+            "compilation": "Збірка",
+            "djMix": "DJ мікс",
+            "demo": "Демо",
+            "fieldRecording": "Запис поза студією",
+            "interview": "Інтерв'ю",
+            "live": "Наживо",
+            "mixtape": "Мікстейп",
+            "remix": "Ремікс",
+            "soundtrack": "Саундтрек",
+            "spokenWord": "Усне слово"
+        }
+    },
+    "setting": {
+        "autoDJ": "Авто DJ",
+        "autoDJ_itemCount": "Кількість елементів",
+        "autoDJ_itemCount_description": "Кількість елементів, які будуть додані до черги",
+        "autoDJ_timing": "Таймінг",
+        "autoDJ_timing_description": "Кількість треків залишившихся в черзі перед тим, як авто DJ запрацює",
+        "autoDJ_mode": "Режим",
+        "autoDJ_mode_albums": "Альбоми",
+        "autoDJ_mode_description": "Оберіть, додавати треки чи цілі альбоми до черги",
+        "autoDJ_mode_songs": "Треки",
+        "autoDJ_enabled": "Увімкнути Авто DJ",
+        "autoDJ_albumStrategy": "Режим вибора альбомів",
+        "autoDJ_songStrategy": "Режим вибора треків",
+        "autoDJ_strategy_option_library_random": "Випадково",
+        "autoDJ_strategy_option_similar": "Схожі",
+        "autosave": "Автоматично зберігати чергу відтворення",
+        "autosave_description": "Увімкнути автоматичне збереження черги відтворення до вашого серверу. Це можливо тільки коли використовується Navidrome/Subsonic.Також, ви не можете мати міксовану чергу відтворення.",
+        "autosaveCount": "Частота автоматичного збереження черги відтворення",
+        "autosaveCount_description": "Кількість зміни трека перед збереженням черги. 1 (мінімум) означає змінення кожного трека",
+        "accentColor_description": "Встановлює акцентний колір для застосунка",
+        "accentColor": "Акцентний колір",
+        "useThemeAccentColor": "Використовувати акцентний колір теми",
+        "useThemeAccentColor_description": "Використовувати основний колір визначений у обраній темі замість користувацького акцентного коліру",
+        "useThemePrimaryShade": "Використовувати основний відтінок теми"
     }
 }

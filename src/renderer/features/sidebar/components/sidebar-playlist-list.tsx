@@ -28,6 +28,7 @@ import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { useDragMonitor } from '/@/renderer/hooks/use-drag-monitor';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
+    useCurrentPlaylistContextId,
     useCurrentServer,
     useCurrentServerId,
     usePermissions,
@@ -116,6 +117,8 @@ export const PlaylistRowButton = memo(
         const sidebarPlaylistSorting = useSidebarPlaylistSorting();
         const sidebarPlaylistMode = useSidebarPlaylistMode();
         const isCompact = sidebarPlaylistMode === 'compact';
+        const activePlaylistId = useCurrentPlaylistContextId();
+        const isActive = activePlaylistId === item.id;
 
         const [isHovered, setIsHovered] = useState(false);
         const isSmartPlaylist = Boolean(item.rules);
@@ -292,7 +295,13 @@ export const PlaylistRowButton = memo(
             >
                 {isCompact ? (
                     <>
-                        <Text className={styles.compactName} fw={500} size="md">
+                        <Text
+                            className={clsx(styles.compactName, {
+                                [styles.nameActive]: isActive,
+                            })}
+                            fw={500}
+                            size="md"
+                        >
                             {name}
                         </Text>
                         {isHovered && (
@@ -307,7 +316,13 @@ export const PlaylistRowButton = memo(
                         <div className={styles.rowGroup}>
                             <Image containerClassName={styles.imageContainer} src={imageUrl} />
                             <div className={styles.metadata}>
-                                <Text className={styles.name} fw={500} size="md">
+                                <Text
+                                    className={clsx(styles.name, {
+                                        [styles.nameActive]: isActive,
+                                    })}
+                                    fw={500}
+                                    size="md"
+                                >
                                     {name}
                                 </Text>
                                 <div className={styles.metadataGroup}>
