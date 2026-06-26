@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 
 import { store } from '../settings';
-import { convertFurigana } from './furigana';
+import { convertFurigana, convertRomaji } from './furigana';
 import { getLyricsBySongId as getGenius, getSearchResults as searchGenius } from './genius';
 import { getLyricsBySongId as getLrcLib, getSearchResults as searchLrcLib } from './lrclib';
 import { getLyricsBySongId as getNetease, getSearchResults as searchNetease } from './netease';
@@ -235,4 +235,8 @@ ipcMain.handle('lyric-by-remote-id', async (_event, params: LyricGetQuery) => {
 
 ipcMain.handle('lyric-convert-furigana', async (_event, text: string) => {
     return await convertFurigana(text);
+});
+
+ipcMain.handle('lyric-convert-romaji', async (_event, text: string) => {
+    return await convertRomaji(text);
 });

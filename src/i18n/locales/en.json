@@ -845,6 +845,8 @@
         "enableAutoTranslation": "Enable auto translation",
         "enableFurigana_description": "Display pronunciation guides (furigana) over Japanese kanji lyrics.",
         "enableFurigana": "Enable furigana generation",
+        "enableRomaji_description": "Display a romaji pronunciation line under Japanese lyrics.",
+        "enableRomaji": "Enable romaji generation",
         "equalizer_descriptionMpv": "Parametric equalizer via FFmpeg lavfi (MPV)",
         "equalizer_descriptionWebAudio": "Parametric equalizer via Web Audio API",
         "equalizer": "Equalizer",

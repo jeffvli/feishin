@@ -7,16 +7,19 @@ let kuroshiroInstance: any = null;
 let initPromise: null | Promise<void> = null;
 
 const getKuroshiro = async () => {
-    if (kuroshiroInstance) return kuroshiroInstance;
     if (initPromise) {
         await initPromise;
         return kuroshiroInstance;
     }
 
+    if (kuroshiroInstance) return kuroshiroInstance;
+
     const KuroshiroClass = (Kuroshiro as any).default || Kuroshiro;
     kuroshiroInstance = new KuroshiroClass();
     initPromise = kuroshiroInstance.init(new KuromojiAnalyzer());
     await initPromise;
+
+    initPromise = null;
     return kuroshiroInstance;
 };
 
@@ -32,6 +35,20 @@ export const convertFurigana = async (text: string): Promise<string> => {
         return await kuroshiro.convert(text, { mode: 'furigana', to: 'hiragana' });
     } catch (e) {
         console.error('Furigana conversion error: ', e);
+        return text;
+    }
+};
+
+export const convertRomaji = async (text: string): Promise<string> => {
+    const KuroshiroClass = (Kuroshiro as any).default || Kuroshiro;
+
+    if (!KuroshiroClass.Util.hasKana(text)) return text;
+
+    try {
+        const kuroshiro = await getKuroshiro();
+        return await kuroshiro.convert(text, { mode: 'spaced', to: 'romaji' });
+    } catch (e) {
+        console.error('Romaji conversion error: ', e);
         return text;
     }
 };

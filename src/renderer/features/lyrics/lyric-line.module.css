@@ -25,3 +25,8 @@
 .lyric-line:global(.synchronized) {
     cursor: pointer;
 }
+
+.romaji-line {
+    font-size: 0.8em;
+    font-weight: 600;
+}

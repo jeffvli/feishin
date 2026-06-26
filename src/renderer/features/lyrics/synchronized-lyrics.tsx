@@ -23,6 +23,7 @@ const mpris = isElectron() && utils?.isLinux() ? window.api.mpris : null;
 export interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     lyrics: SynchronizedLyricsArray;
     offsetMs?: number;
+    romajiLyrics?: null | SynchronizedLyricsArray;
     settingsKey?: string;
     style?: React.CSSProperties;
     translatedLyrics?: null | string;
@@ -34,6 +35,7 @@ export const SynchronizedLyrics = ({
     name,
     offsetMs,
     remote,
+    romajiLyrics,
     settingsKey = 'default',
     source,
     style,
@@ -368,10 +370,9 @@ export const SynchronizedLyrics = ({
                             handleSeek(time / 1000);
                         }
                     }}
-                    text={
-                        text +
-                        (translatedLyrics ? `_BREAK_${translatedLyrics.split('\n')[idx]}` : '')
-                    }
+                    romajiText={romajiLyrics?.[idx]?.[1]}
+                    text={text}
+                    translatedText={translatedLyrics?.split('\n')[idx]}
                 />
             ))}
         </div>

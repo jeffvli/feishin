@@ -310,6 +310,20 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
         {
             control: (
                 <Switch
+                    aria-label="Enable romaji"
+                    defaultChecked={lyricsSettings.enableRomaji}
+                    onChange={(e) => updateLyricsSetting({ enableRomaji: e.currentTarget.checked })}
+                />
+            ),
+            description: t('setting.enableRomaji', {
+                context: 'description',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.enableRomaji'),
+        },
+        {
+            control: (
+                <Switch
                     aria-label="Enable NetEase translations"
                     defaultChecked={lyricsSettings.enableNeteaseTranslation}
                     onChange={(e) => {
