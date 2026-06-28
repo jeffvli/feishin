@@ -683,6 +683,11 @@ export const NavidromeController: InternalControllerEndpoint = {
             apiClientProps,
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
+    getPlaylistSongIds: async (args) =>
+        NavidromeController.getPlaylistSongList(args).then((result) => ({
+            ...result,
+            items: result.items.map((song) => song.id),
+        })),
     getPlaylistSongList: async (args: PlaylistSongListArgs): Promise<PlaylistSongListResponse> => {
         const { apiClientProps, query } = args;
 

@@ -620,6 +620,8 @@ export type AlbumInfo = {
     notes: null | string;
 };
 
+export type SongIdListResponse = BasePaginatedResponse<string[]>;
+
 export type SongListArgs = BaseEndpointArgs & { query: SongListQuery };
 
 export type SongListCountArgs = BaseEndpointArgs & { query: ListCountQuery<SongListQuery> };
@@ -1506,6 +1508,7 @@ export type ControllerEndpoint = {
     getPlaylistDetail: (args: PlaylistDetailArgs) => Promise<PlaylistDetailResponse>;
     getPlaylistList: (args: PlaylistListArgs) => Promise<PlaylistListResponse>;
     getPlaylistListCount: (args: PlaylistListCountArgs) => Promise<number>;
+    getPlaylistSongIds: (args: PlaylistSongListArgs) => Promise<SongIdListResponse>;
     getPlaylistSongList: (args: PlaylistSongListArgs) => Promise<SongListResponse>;
     getPlayQueue: (args: GetQueueArgs) => Promise<GetQueueResponse>;
     getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
@@ -1660,6 +1663,9 @@ export type InternalControllerEndpoint = {
         args: ReplaceApiClientProps<PlaylistListArgs>,
     ) => Promise<PlaylistListResponse>;
     getPlaylistListCount: (args: ReplaceApiClientProps<PlaylistListCountArgs>) => Promise<number>;
+    getPlaylistSongIds: (
+        args: ReplaceApiClientProps<PlaylistSongListArgs>,
+    ) => Promise<SongIdListResponse>;
     getPlaylistSongList: (
         args: ReplaceApiClientProps<PlaylistSongListArgs>,
     ) => Promise<SongListResponse>;

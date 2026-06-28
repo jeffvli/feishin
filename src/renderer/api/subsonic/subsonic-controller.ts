@@ -1223,6 +1223,11 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return results.length;
     },
+    getPlaylistSongIds: async (args) =>
+        SubsonicController.getPlaylistSongList(args).then((result) => ({
+            ...result,
+            items: result.items.map((song) => song.id),
+        })),
     getPlaylistSongList: async ({ apiClientProps, query }) => {
         const res = await ssApiClient(apiClientProps).getPlaylist({
             query: {
