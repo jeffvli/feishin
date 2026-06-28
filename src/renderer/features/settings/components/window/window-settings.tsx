@@ -66,6 +66,30 @@ export const WindowSettings = memo(() => {
         {
             control: (
                 <Switch
+                    aria-label="Toggle track info in Window Bar"
+                    defaultChecked={settings.windowBarTrackinfo}
+                    onChange={(e) => {
+                        if (!e) return;
+                        setSettings({
+                            window: {
+                                windowBarTrackinfo: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.windowBarTrackinfo', {
+                context: 'description',
+            }),
+            // tab is hidden entirely right now
+            // but if it was shown we would want to show this option
+            // as it also controls the tab title in web
+            isHidden: false,
+            title: t('setting.windowBarTrackinfo'),
+        },
+        {
+            control: (
+                <Switch
                     aria-label="toggle hiding tray"
                     defaultChecked={settings.tray}
                     disabled={!isElectron()}
