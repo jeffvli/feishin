@@ -1175,6 +1175,8 @@
         "webAudio": "Use web audio",
         "windowBarStyle_description": "Select the style of the window bar",
         "windowBarStyle": "Window bar style",
+        "windowBarTrackinfo": "Track info in Window Title",
+        "windowBarTrackinfo_description": "Show current track's title and artist, queue position, and Playing/Paused state in the Window's Title.",
         "zoom_description": "Sets the zoom percentage for the application",
         "zoom": "Zoom percentage",
         "queryBuilder": "Query builder",
