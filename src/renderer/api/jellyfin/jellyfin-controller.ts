@@ -1068,7 +1068,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                 id: query.id,
             },
             query: {
-                Fields: JF_FIELDS.SONG,
+                Fields: JF_FIELDS.PLAYLIST_DETAIL,
                 IncludeItemTypes: 'Audio',
                 UserId: apiClientProps.server?.userId,
             },
