@@ -28,3 +28,27 @@ export const useFuriganaLyrics = (lyrics: LyricsResponse | null | undefined, ena
         staleTime: Infinity,
     });
 };
+
+export const useRomajiLyrics = (lyrics: LyricsResponse | null | undefined, enabled: boolean) => {
+    return useQuery({
+        enabled: enabled && !!lyrics && !!lyricsApi,
+        queryFn: async () => {
+            if (!lyrics || !lyricsApi || !enabled) return lyrics;
+
+            if (typeof lyrics === 'string') {
+                return await lyricsApi.convertRomaji(lyrics);
+            } else if (Array.isArray(lyrics)) {
+                const text = lyrics.map(([, line]) => line).join('\n');
+                const converted = await lyricsApi.convertRomaji(text);
+                const convertedLines = converted.split('\n');
+                return lyrics.map(([time], i) => [
+                    time,
+                    convertedLines[i] ?? lyrics[i][1],
+                ]) as SynchronizedLyricsArray;
+            }
+            return lyrics;
+        },
+        queryKey: ['romaji', lyrics],
+        staleTime: Infinity,
+    });
+};

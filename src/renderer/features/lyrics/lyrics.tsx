@@ -14,7 +14,10 @@ import {
     type LyricsQueryResult,
 } from '/@/renderer/features/lyrics/api/lyrics-api';
 import { openLyricsExportModal } from '/@/renderer/features/lyrics/components/lyrics-export-form';
-import { useFuriganaLyrics } from '/@/renderer/features/lyrics/hooks/use-furigana-lyrics';
+import {
+    useFuriganaLyrics,
+    useRomajiLyrics,
+} from '/@/renderer/features/lyrics/hooks/use-furigana-lyrics';
 import { LyricsActions } from '/@/renderer/features/lyrics/lyrics-actions';
 import {
     SynchronizedLyrics,
@@ -51,6 +54,7 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
     const {
         enableAutoTranslation,
         enableFurigana,
+        enableRomaji,
         preferLocalLyrics,
         translationApiKey,
         translationApiProvider,
@@ -119,6 +123,7 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
     }, [data, indexToUse, preferLocalLyrics]);
 
     const { data: furiganaConvertedLyrics } = useFuriganaLyrics(lyrics?.lyrics, !!enableFurigana);
+    const { data: romajiConvertedLyrics } = useRomajiLyrics(lyrics?.lyrics, !!enableRomaji);
 
     const displayLyrics = useMemo(() => {
         if (isLyricsDisabled || !lyrics) return null;
@@ -344,12 +349,22 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
                                     <SynchronizedLyrics
                                         {...(displayLyrics as SynchronizedLyricsProps)}
                                         offsetMs={displayOffsetMs}
+                                        romajiLyrics={
+                                            enableRomaji
+                                                ? (romajiConvertedLyrics as SynchronizedLyricsProps['romajiLyrics'])
+                                                : null
+                                        }
                                         settingsKey={settingsKey}
                                         translatedLyrics={showTranslation ? translatedLyrics : null}
                                     />
                                 ) : (
                                     <UnsynchronizedLyrics
                                         {...(displayLyrics as UnsynchronizedLyricsProps)}
+                                        romajiLyrics={
+                                            enableRomaji
+                                                ? (romajiConvertedLyrics as UnsynchronizedLyricsProps['romajiLyrics'])
+                                                : null
+                                        }
                                         settingsKey={settingsKey}
                                         translatedLyrics={showTranslation ? translatedLyrics : null}
                                     />

@@ -1,5 +1,5 @@
 import console from 'console';
-import { app, ipcMain } from 'electron';
+import { app, ipcMain, powerMonitor } from 'electron';
 import { access, rm } from 'fs/promises';
 import uniq from 'lodash/uniq';
 import MpvAPI from 'node-mpv';
@@ -83,6 +83,19 @@ const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
 
     if (!extraParameters?.some((param) => prefetchPlaylistParams.includes(param))) {
         parameters.push('--prefetch-playlist=yes');
+    }
+
+    // Without these, mpv/ffmpeg will block indefinitely on a dead TCP connection
+    // instead of failing or reconnecting. This commonly happens when the OS network
+    // adapter resets after the system wakes from sleep while a stream is open.
+    if (!extraParameters?.some((param) => param.startsWith('--network-timeout'))) {
+        parameters.push('--network-timeout=10');
+    }
+
+    if (!extraParameters?.some((param) => param.startsWith('--stream-lavf-o'))) {
+        parameters.push(
+            '--stream-lavf-o=reconnect=1,reconnect_streamed=1,reconnect_at_eof=1,reconnect_delay_max=5',
+        );
     }
 
     return parameters;
@@ -191,21 +204,44 @@ export const getMpvInstance = () => {
     return mpvInstance;
 };
 
+const QUIT_TIMEOUT_MS = 3000;
+
+const killMpvProcess = (mpv: MpvAPI) => {
+    const mpvProcess = (mpv as any).process || (mpv as any).mpvProcess;
+    if (mpvProcess && typeof mpvProcess.kill === 'function') {
+        try {
+            mpvProcess.kill('SIGTERM');
+        } catch (killErr) {
+            mpvLog({ action: 'Failed to kill mpv process' }, killErr as NodeMpvError);
+        }
+    }
+};
+
 const quit = async (instance?: MpvAPI | null) => {
     const mpv = instance || getMpvInstance();
     if (mpv) {
         try {
-            await mpv.quit();
+            // mpv.quit() resolves only when mpv replies over IPC. If mpv's command queue
+            // is wedged (e.g. blocked on a dead network stream after the system resumes
+            // from sleep), that reply never arrives, so this must not be allowed to hang
+            // forever - fall back to killing the process directly.
+            let timedOut = false;
+            await Promise.race([
+                mpv.quit(),
+                new Promise((resolve) => {
+                    setTimeout(() => {
+                        timedOut = true;
+                        resolve(undefined);
+                    }, QUIT_TIMEOUT_MS);
+                }),
+            ]);
+
+            if (timedOut) {
+                killMpvProcess(mpv);
+            }
         } catch {
             // If quit() fails, try to kill the process directly
-            const mpvProcess = (mpv as any).process || (mpv as any).mpvProcess;
-            if (mpvProcess && typeof mpvProcess.kill === 'function') {
-                try {
-                    mpvProcess.kill('SIGTERM');
-                } catch (killErr) {
-                    mpvLog({ action: 'Failed to kill mpv process' }, killErr as NodeMpvError);
-                }
-            }
+            killMpvProcess(mpv);
         }
         if (!isWindows()) {
             try {
@@ -665,6 +701,17 @@ const cleanupMpv = async (force = false) => {
         }
     }
 };
+
+// When the OS resumes from sleep, any network stream mpv had open is likely dead
+// (the connection silently dropped while the network adapter was suspended). Tell
+// the renderer to reload mpv so it reconnects with a fresh stream instead of staying
+// stuck on the old, now-dead connection until the app is manually restarted.
+powerMonitor.on('resume', () => {
+    if (getMpvInstance()) {
+        mpvLog({ action: 'System resumed from sleep, reloading mpv' });
+        getMainWindow()?.webContents.send('renderer-mpv-reconnect');
+    }
+});
 
 app.on('before-quit', async (event) => {
     switch (mpvState) {

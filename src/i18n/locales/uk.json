@@ -683,7 +683,19 @@
             "transcoding": "Транскодування",
             "discord": "Діскорд",
             "logger": "Логгер",
-            "playerFilters": "Фільтри плеєра"
+            "playerFilters": "Фільтри плеєра",
+            "advanced": "Розширені",
+            "analytics": "Аналітика",
+            "generalTab": "Загальні",
+            "hotkeysTab": "Гарячі клавіші",
+            "playbackTab": "Відтворення",
+            "windowTab": "Вікно",
+            "updates": "Оновлення",
+            "cache": "Кеш",
+            "application": "Застосунок",
+            "queryBuilder": "Конструктор черги",
+            "theme": "Тема",
+            "controls": "Керування"
         },
         "sidebar": {
             "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
@@ -707,6 +719,13 @@
             "artistTracks": "Треки {{artist}}",
             "genreTracks": "\"{{genre}}\" $t(entity.track, {\"count\": 2})",
             "title": "$t(entity.track, {\"count\": 2})"
+        },
+        "playlistList": {
+            "title": "$t(entity.playlist, {\"count\": 2})"
+        },
+        "collections": {
+            "overrideExisting": "Перевизначити існуючі",
+            "saveAsCollection": "Зберегти як колекцію"
         }
     },
     "queryBuilder": {
