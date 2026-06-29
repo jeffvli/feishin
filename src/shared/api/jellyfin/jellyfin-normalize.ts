@@ -119,19 +119,6 @@ const normalizeSong = (
         console.warn('Jellyfin song retrieved with no media sources', item);
     }
 
-    const artists = (item?.ArtistItems?.length ? item.ArtistItems : item.AlbumArtists)?.map(
-        (entry) => {
-            return {
-                id: entry.Id,
-                imageId: null,
-                imageUrl: null,
-                name: entry.Name,
-                userFavorite: false,
-                userRating: null,
-            };
-        },
-    );
-
     const { releaseDate, releaseYear } = jellyfinPremiereFields(item);
 
     return {
@@ -150,7 +137,16 @@ const normalizeSong = (
         })),
         albumId: item.AlbumId || `dummy/${item.Id}`,
         artistName: item?.ArtistItems?.map((entry) => entry.Name).join(', ') || '',
-        artists,
+        artists: (item?.ArtistItems?.length ? item.ArtistItems : item.AlbumArtists)?.map(
+            (entry) => ({
+                id: entry.Id,
+                imageId: null,
+                imageUrl: null,
+                name: entry.Name,
+                userFavorite: false,
+                userRating: null,
+            }),
+        ),
         bitDepth,
         bitRate,
         bpm: null,
