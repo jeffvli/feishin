@@ -387,6 +387,7 @@ export type Song = {
     compilation: boolean | null;
     container: null | string;
     createdAt: string;
+    date: null | PartialIsoDateString;
     discNumber: number;
     discSubtitle: null | string;
     duration: number;
@@ -417,6 +418,7 @@ export type Song = {
     updatedAt: string;
     userFavorite: boolean;
     userRating: null | number;
+    year: null | number;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

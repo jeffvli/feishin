@@ -555,6 +555,7 @@ const song = z.object({
     comment: z.string().optional(),
     compilation: z.boolean(),
     createdAt: z.string(),
+    date: z.string().optional(),
     discNumber: z.number(),
     discSubtitle: z.string().optional(),
     duration: z.number(),

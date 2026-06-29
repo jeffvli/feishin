@@ -268,6 +268,7 @@
         "comment": "Comment",
         "communityRating": "Community rating",
         "criticRating": "Critic rating",
+        "date": "Date",
         "dateAdded": "Date added",
         "disc": "Disc",
         "duration": "Duration",
@@ -300,6 +301,7 @@
         "title": "Title",
         "toYear": "To year",
         "trackNumber": "Track",
+        "year": "Year",
         "explicitStatus": "$t(common.explicitStatus)"
     },
     "datetime": {

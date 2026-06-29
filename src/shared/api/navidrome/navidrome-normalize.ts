@@ -215,6 +215,9 @@ const normalizeSong = (
     const releaseYear: null | number =
         fromSongRelease.year > 0 ? fromSongRelease.year : songApiYear > 0 ? songApiYear : null;
     const releaseDate = fromSongRelease.date ?? (songApiYear > 0 ? String(songApiYear) : null);
+    const fromSongDate = parsePartialIsoDate(item.date);
+    const date = fromSongDate.date != String(fromSongDate.year) ? fromSongDate.date : null;
+    const year = fromSongDate.year;
 
     return {
         album: item.album,
@@ -233,6 +236,7 @@ const normalizeSong = (
         compilation: item.compilation,
         container: item.suffix,
         createdAt: item.createdAt,
+        date,
         discNumber: item.discNumber,
         discSubtitle: item.discSubtitle ? item.discSubtitle : null,
         duration: item.duration * 1000,
@@ -285,6 +289,7 @@ const normalizeSong = (
         updatedAt: item.updatedAt,
         userFavorite: item.starred || false,
         userRating: item.rating || null,
+        year,
     };
 };
 

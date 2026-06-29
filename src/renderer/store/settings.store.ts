@@ -96,10 +96,12 @@ const PlayerItemSchema = z.enum([
     'sample_rate',
     'track_number',
     'codec',
+    'date',
     'release_year',
     'release_type',
     'release_date',
     'genres',
+    'year',
 ]);
 
 const ArtistItemSchema = z.enum([
@@ -947,6 +949,7 @@ export enum PlayerItem {
     BIT_RATE = 'bit_rate',
     BPM = 'bpm',
     CODEC = 'codec',
+    DATE = 'date',
     DISC_NUMBER = 'disc_number',
     GENRES = 'genres',
     RELEASE_DATE = 'release_date',
@@ -954,6 +957,7 @@ export enum PlayerItem {
     RELEASE_YEAR = 'release_year',
     SAMPLE_RATE = 'sample_rate',
     TRACK_NUMBER = 'track_number',
+    YEAR = 'year',
 }
 
 export enum PlaylistTarget {

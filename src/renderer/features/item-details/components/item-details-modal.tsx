@@ -304,6 +304,8 @@ const SongPropertyMapping: ItemDetailRow<Song>[] = [
     },
     { key: 'discNumber', label: 'common.disc' },
     { key: 'trackNumber', label: 'common.trackNumber' },
+    { key: 'date', label: 'filter.date' },
+    { key: 'year', label: 'filter.year' },
     { key: 'releaseYear', label: 'filter.releaseYear' },
     {
         label: 'filter.explicitStatus',
