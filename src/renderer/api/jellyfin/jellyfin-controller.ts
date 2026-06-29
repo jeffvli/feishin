@@ -197,8 +197,8 @@ const JF_FIELDS = {
         'SortName',
         'ProviderIds',
     ],
-    ALBUM_DETAIL: ['Genres', 'DateCreated', 'ChildCount', 'People', 'Tags', 'ProviderIds'],
-    ALBUM_LIST: ['People', 'Tags', 'Studios', 'SortName', 'ProviderIds', 'ChildCount'],
+    ALBUM_DETAIL: ['Genres', 'DateCreated', 'ChildCount', 'Tags', 'ProviderIds'],
+    ALBUM_LIST: ['Tags', 'Studios', 'SortName', 'ProviderIds', 'ChildCount'],
     FOLDER: ['Genres', 'DateCreated', 'MediaSources', 'ParentId'],
     GENRE: ['ItemCounts'],
     PLAYLIST_DETAIL: [
@@ -210,16 +210,7 @@ const JF_FIELDS = {
         'SortName',
     ],
     PLAYLIST_LIST: ['ChildCount', 'Genres', 'DateCreated', 'ParentId', 'Overview'],
-    SONG: [
-        'Genres',
-        'DateCreated',
-        'MediaSources',
-        'ParentId',
-        'People',
-        'Tags',
-        'SortName',
-        'ProviderIds',
-    ],
+    SONG: ['Genres', 'DateCreated', 'MediaSources', 'ParentId', 'Tags', 'SortName', 'ProviderIds'],
 } as const;
 
 export const JellyfinController: InternalControllerEndpoint = {
