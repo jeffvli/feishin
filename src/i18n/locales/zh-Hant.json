@@ -864,7 +864,9 @@
         "compressorReset_description": "將所有壓縮器參數恢復為預設值",
         "compressorSavePreset_description": "將目前壓縮器設定儲存為具名預設",
         "compressorThreshold_description": "開始進行壓縮的訊號電平。",
-        "compressorThreshold": "閥值"
+        "compressorThreshold": "閥值",
+        "enableRomaji_description": "在日文歌詞下方顯示羅馬拼音。",
+        "enableRomaji": "啟用羅馬拼音顯示"
     },
     "table": {
         "config": {

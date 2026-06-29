@@ -493,7 +493,9 @@
         "compressorMakeupGain_description": "Ganancia de salida aplicada tras la compresión para recuperar el volumen.",
         "compressorMakeupGain": "Ganancia de compensación",
         "compressorAttack_description": "La rapidez con la que el compresor entra en acción una vez que la señal supera el umbral.",
-        "compressorAttack": "Ataque"
+        "compressorAttack": "Ataque",
+        "enableRomaji_description": "Muestra una línea de pronunciación en romaji debajo de las letras japonesas.",
+        "enableRomaji": "Activar generación de romaji"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",

@@ -493,7 +493,9 @@
         "compressorReset_description": "Obnovit všechny parametry kompresoru na jejich výchozí hodnoty",
         "compressorSavePreset_description": "Uložit aktuální nastavení kompresoru jako pojmenovanou předvolbu",
         "compressorThreshold_description": "Úroveň signálu, nad kterou začne komprese.",
-        "compressorThreshold": "Hranice"
+        "compressorThreshold": "Hranice",
+        "enableRomaji_description": "Zobrazit rómadži výslovnost pod japonskými texty.",
+        "enableRomaji": "Povolit generování rómadži"
     },
     "action": {
         "editPlaylist": "Upravit $t(entity.playlist, {\"count\": 1})",
