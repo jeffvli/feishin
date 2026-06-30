@@ -43,7 +43,7 @@ export const useRomajiLyrics = (lyrics: LyricsResponse | null | undefined, enabl
                 const convertedLines = converted.split('\n');
                 return lyrics.map(([time], i) => [
                     time,
-                    convertedLines[i] ?? lyrics[i][1],
+                    convertedLines[i] ?? '',
                 ]) as SynchronizedLyricsArray;
             }
             return lyrics;

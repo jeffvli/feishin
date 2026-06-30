@@ -42,13 +42,13 @@ export const convertFurigana = async (text: string): Promise<string> => {
 export const convertRomaji = async (text: string): Promise<string> => {
     const KuroshiroClass = (Kuroshiro as any).default || Kuroshiro;
 
-    if (!KuroshiroClass.Util.hasKana(text)) return text;
+    if (!KuroshiroClass.Util.hasKana(text)) return '';
 
     try {
         const kuroshiro = await getKuroshiro();
         return await kuroshiro.convert(text, { mode: 'spaced', to: 'romaji' });
     } catch (e) {
         console.error('Romaji conversion error: ', e);
-        return text;
+        return '';
     }
 };
