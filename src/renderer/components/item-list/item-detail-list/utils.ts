@@ -11,6 +11,7 @@ const FIXED_TRACK_COLUMN_WIDTHS: Partial<Record<TableColumn, number>> = {
     [TableColumn.DISC_NUMBER]: 36,
     [TableColumn.DURATION]: 72,
     [TableColumn.RELEASE_DATE]: 128,
+    [TableColumn.RELEASE_YEAR]: 128,
     [TableColumn.SAMPLE_RATE]: 112,
     [TableColumn.TRACK_NUMBER]: 64,
     [TableColumn.USER_FAVORITE]: 32,

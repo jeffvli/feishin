@@ -26,6 +26,7 @@ import { PathColumn } from './path-column';
 import { PlayCountColumn } from './play-count-column';
 import { RatingColumn } from './rating-column';
 import { ReleaseDateColumn } from './release-date-column';
+import { ReleaseYearColumn } from './release-year-column';
 import { RowIndexColumn } from './row-index-column';
 import { ItemDetailRowPlayControlCell } from './row-play-control-cell';
 import { SampleRateColumn } from './sample-rate-column';
@@ -62,6 +63,7 @@ const COLUMN_MAP: Partial<Record<TableColumn, CellComponent>> = {
     [TableColumn.PATH]: PathColumn,
     [TableColumn.PLAY_COUNT]: PlayCountColumn,
     [TableColumn.RELEASE_DATE]: ReleaseDateColumn,
+    [TableColumn.RELEASE_YEAR]: ReleaseYearColumn,
     [TableColumn.ROW_INDEX]: RowIndexColumn,
     [TableColumn.SAMPLE_RATE]: SampleRateColumn,
     [TableColumn.SIZE]: SizeColumn,
@@ -118,6 +120,7 @@ export {
     PlayCountColumn,
     RatingColumn,
     ReleaseDateColumn,
+    ReleaseYearColumn,
     RowIndexColumn,
     SampleRateColumn,
     SizeColumn,

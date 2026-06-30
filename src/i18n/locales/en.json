@@ -1258,13 +1258,14 @@
             "playCount": "Plays",
             "rating": "Rating",
             "releaseDate": "Release Date",
-            "releaseYear": "Year",
+            "releaseYear": "Release year",
             "sampleRate": "Sample Rate",
             "size": "Size",
             "songCount": "Tracks",
             "title": "Title",
             "trackNumber": "Track",
-            "owner": "Owner"
+            "owner": "Owner",
+            "year": "Year"
         },
         "config": {
             "general": {
@@ -1332,6 +1333,7 @@
                 "playCount": "Play Count",
                 "rating": "$t(common.rating)",
                 "releaseDate": "Release Date",
+                "releaseYear": "Release Year",
                 "rowIndex": "Row Index",
                 "sampleRate": "$t(common.sampleRate)",
                 "size": "$t(common.size)",

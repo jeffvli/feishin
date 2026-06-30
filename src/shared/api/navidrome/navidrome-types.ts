@@ -59,6 +59,7 @@ export enum NDSongListSort {
     RANDOM = 'random',
     RATING = 'rating',
     RECENTLY_ADDED = 'createdAt',
+    RELEASE_YEAR = 'releaseYear',
     TITLE = 'title',
     TRACK = 'track',
     YEAR = 'year',

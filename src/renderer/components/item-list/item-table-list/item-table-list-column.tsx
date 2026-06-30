@@ -48,6 +48,7 @@ import { NumericColumn } from '/@/renderer/components/item-list/item-table-list/
 import { PathColumn } from '/@/renderer/components/item-list/item-table-list/columns/path-column';
 import { PlaylistReorderColumn } from '/@/renderer/components/item-list/item-table-list/columns/playlist-reorder-column';
 import { RatingColumn } from '/@/renderer/components/item-list/item-table-list/columns/rating-column';
+import { ReleaseYearColumn } from '/@/renderer/components/item-list/item-table-list/columns/release-year-column';
 import { RowIndexColumn } from '/@/renderer/components/item-list/item-table-list/columns/row-index-column';
 import { SizeColumn } from '/@/renderer/components/item-list/item-table-list/columns/size-column';
 import { TextColumn } from '/@/renderer/components/item-list/item-table-list/columns/text-column';
@@ -279,6 +280,11 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
             case TableColumn.RELEASE_DATE:
                 return (
                     <AbsoluteDateColumn {...props} {...dragProps} controls={controls} type={type} />
+                );
+
+            case TableColumn.RELEASE_YEAR:
+                return (
+                    <ReleaseYearColumn {...props} {...dragProps} controls={controls} type={type} />
                 );
 
             case TableColumn.ROW_INDEX:
@@ -1304,6 +1310,9 @@ export const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.RELEASE_DATE]: i18n.t('table.column.releaseDate', {
         postProcess: 'upperCase',
     }) as string,
+    [TableColumn.RELEASE_YEAR]: i18n.t('table.column.releaseYear', {
+        postProcess: 'upperCase',
+    }) as string,
     [TableColumn.ROW_INDEX]: (
         <Flex className={styles.headerIconWrapper}>
             <Icon icon="hash" />
@@ -1339,7 +1348,7 @@ export const columnLabelMap: Record<TableColumn, ReactNode | string> = {
             <Icon icon="star" />
         </Flex>
     ),
-    [TableColumn.YEAR]: i18n.t('table.column.releaseYear', { postProcess: 'upperCase' }) as string,
+    [TableColumn.YEAR]: i18n.t('table.column.year', { postProcess: 'upperCase' }) as string,
 };
 
 export const ColumnNullFallback = (props: ItemTableListInnerColumn) => {
