@@ -1,10 +1,5 @@
 export function shuffle<T>(array: T[]): T[] {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(cryptoRandom() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
+    return shuffleInPlace(array.slice());
 }
 
 export function shuffleInPlace<T>(array: T[]): T[] {
@@ -15,8 +10,13 @@ export function shuffleInPlace<T>(array: T[]): T[] {
     return array;
 }
 
+const randomBuffer = new Uint32Array(1);
+
+/**
+ * Returns a cryptographically secure random float in [0, 1),
+ * matching the contract of Math.random().
+ */
 function cryptoRandom(): number {
-    const buf = new Uint32Array(1);
-    crypto.getRandomValues(buf);
-    return buf[0] / 0x100000000; // Normalize to [0, 1], same contract as Math.random()
+    crypto.getRandomValues(randomBuffer);
+    return randomBuffer[0] / 0x100000000;
 }
