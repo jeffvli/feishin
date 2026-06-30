@@ -192,6 +192,7 @@ const normalizeSong = (
         compilation: null,
         container: item.contentType.startsWith('audio/') ? item.contentType.split('/')[1] : null,
         createdAt: item.created,
+        date: null,
         discNumber: item.discNumber || 1,
         discSubtitle: discTitleMap?.get(item.discNumber ?? 1) ?? null,
         duration: item.duration ? item.duration * 1000 : 0,
@@ -239,6 +240,7 @@ const normalizeSong = (
         updatedAt: '',
         userFavorite: Boolean(item.starred) || false,
         userRating: item.userRating || null,
+        year: null,
     };
 };
 

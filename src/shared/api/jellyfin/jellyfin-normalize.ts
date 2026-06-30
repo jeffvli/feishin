@@ -155,6 +155,7 @@ const normalizeSong = (
         compilation: null,
         container,
         createdAt: item.DateCreated,
+        date: null,
         discNumber: (item.ParentIndexNumber && item.ParentIndexNumber) || 1,
         discSubtitle: null,
         duration: item.RunTimeTicks / TICKS_PER_MS,
@@ -209,6 +210,7 @@ const normalizeSong = (
         updatedAt: item.DateCreated,
         userFavorite: (item.UserData && item.UserData.IsFavorite) || false,
         userRating: null,
+        year: null,
     };
 };
 

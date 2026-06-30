@@ -81,6 +81,7 @@ export const useMPRIS = () => {
             compilation: null,
             container: null,
             createdAt: '',
+            date: null,
             discNumber: 0,
             discSubtitle: null,
             duration: 0,
@@ -110,6 +111,7 @@ export const useMPRIS = () => {
             updatedAt: new Date().toISOString(),
             userFavorite: false,
             userRating: null,
+            year: null,
         };
     }, [isRadioActive, isRadioPlaying, radioMetadata, stationName]);
 
