@@ -97,8 +97,8 @@ export const PlayerConfig = () => {
                 id: 'playbackSpeed',
                 label: t('player.playbackSpeed'),
             },
-            !preservePitch && {
-                component: <PitchControls />,
+            {
+                component: !preservePitch && <PitchControls />,
                 id: 'pitchControls',
             },
             {
@@ -445,7 +445,7 @@ export const PitchControls = () => {
                     -10ct
                 </Button>
             )}
-            <Text size="xs" style={{ fontFamily: 'monospace' }} ta="center">
+            <Text size="xs" style={{ fontFamily: 'monospace' }} ta="center" w="60px">
                 {speed.toFixed(2)}% {speedToPitch(speed) > 0 && '+'}
                 {speedToPitch(speed) == 0 && '±'}
                 {speedToPitch(speed).toFixed(2)}st
