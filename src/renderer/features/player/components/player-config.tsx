@@ -98,8 +98,9 @@ export const PlayerConfig = () => {
                 label: t('player.playbackSpeed'),
             },
             {
-                component: !preservePitch && <PitchControls />,
+                component: !preservePitch ? <PitchControls /> : <></>,
                 id: 'pitchControls',
+                label: '',
             },
             {
                 component: (
