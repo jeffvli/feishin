@@ -3,7 +3,6 @@ import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useAudioDevices } from '/@/renderer/features/settings/components/playback/audio-settings';
-import { useMicrotonalPitchControls } from '/@/renderer/store/settings.store';
 import { ListConfigTable } from '/@/renderer/features/shared/components/list-config-menu';
 import {
     usePlaybackType,
@@ -15,6 +14,7 @@ import {
 } from '/@/renderer/store';
 import {
     useCombinedLyricsAndVisualizer,
+    useMicrotonalPitchControls,
     usePlaybackSettings,
     useSettingsStore,
     useSettingsStoreActions,
@@ -97,7 +97,7 @@ export const PlayerConfig = () => {
                 id: 'playbackSpeed',
                 label: t('player.playbackSpeed'),
             },
-            {
+            !preservePitch && {
                 component: <PitchControls />,
                 id: 'pitchControls',
             },
@@ -410,8 +410,6 @@ export const PitchControls = () => {
     const microtonal = useMicrotonalPitchControls();
     const speed = usePlayerSpeed();
     const { setSpeed } = usePlayerActions();
-
-    // get current semitone value
 
     const speedToPitch = (speed: number) => {
         return 12 * Math.log2(speed);
