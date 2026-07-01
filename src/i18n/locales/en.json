@@ -1183,7 +1183,9 @@
         "queryBuilderCustomFields_inputLabel": "Label",
         "queryBuilderCustomFields_inputTag": "Tag",
         "queryBuilderCustomFields": "Custom fields",
-        "queryBuilderCustomFields_description": "Add custom fields to use in query builders"
+        "queryBuilderCustomFields_description": "Add custom fields to use in query builders",
+        "microtonalPitchControls": "Microtonal pitch controls",
+        "microtonalPitchControls_description": "Add more pitch controls to go between semi-tones"
     },
     "table": {
         "column": {
