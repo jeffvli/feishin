@@ -428,7 +428,7 @@ export const PitchControls = () => {
     };
 
     return (
-        <Group gap="xs" my="sm" w="100%" wrap="nowrap">
+        <Group gap={microtonal ? 'xs' : 'md'} my="sm" w="100%" wrap="nowrap">
             <Button
                 aria-label="-1 semitone"
                 fullWidth
