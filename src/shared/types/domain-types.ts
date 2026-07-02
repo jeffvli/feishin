@@ -207,6 +207,7 @@ export type Album = {
     songs?: Song[];
     sortName: string;
     tags: null | Record<string, string[]>;
+    trackYearRange: null | { max: number; min: number };
     updatedAt: string;
     userFavorite: boolean;
     userRating: null | number;

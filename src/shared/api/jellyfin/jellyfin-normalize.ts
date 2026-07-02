@@ -282,6 +282,7 @@ const normalizeAlbum = (
         songs: item.Songs?.map((song) => normalizeSong(song, server)),
         sortName: item.SortName || item.Name,
         tags: getTags(item),
+        trackYearRange: null,
         updatedAt: item?.DateLastMediaAdded || item.DateCreated,
         userFavorite: item.UserData?.IsFavorite || false,
         userRating: null,

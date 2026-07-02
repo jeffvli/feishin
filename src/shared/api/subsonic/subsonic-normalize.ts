@@ -355,6 +355,7 @@ const normalizeAlbum = (
             ) || [],
         sortName: item.title,
         tags: null,
+        trackYearRange: null,
         updatedAt: item.created,
         userFavorite: Boolean(item.starred) || false,
         userRating: item.userRating || null,
