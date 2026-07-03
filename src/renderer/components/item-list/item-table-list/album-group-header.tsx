@@ -10,9 +10,15 @@ import {
     LONG_PRESS_PLAY_BEHAVIOR,
     PlayTooltip,
 } from '/@/renderer/features/shared/components/play-button-group';
-import { useAlbumGroupImageSize, usePlayButtonBehavior } from '/@/renderer/store';
+import {
+    useAlbumGroupImageSize,
+    usePlayButtonBehavior,
+    usePlayerActions,
+    usePlayerSong,
+    usePlayerStatus,
+} from '/@/renderer/store';
 import { LibraryItem, Song } from '/@/shared/types/domain-types';
-import { Play } from '/@/shared/types/types';
+import { Play, PlayerStatus } from '/@/shared/types/types';
 
 interface AlbumGroupHeaderProps {
     groupRowCount?: number;
@@ -30,6 +36,11 @@ export const AlbumGroupHeader = ({
     const [isHovered, setIsHovered] = useState(false);
     const playButtonBehavior = usePlayButtonBehavior();
     const albumImageSize = useAlbumGroupImageSize();
+    const currentSong = usePlayerSong();
+    const playerStatus = usePlayerStatus();
+    const { mediaTogglePlayPause } = usePlayerActions();
+    const isActive = !!song?.albumId && currentSong?.albumId === song.albumId;
+    const isPlaying = isActive && playerStatus === PlayerStatus.PLAYING;
     const rowHeight = {
         compact: TableItemSize.COMPACT,
         large: TableItemSize.LARGE,
@@ -76,11 +87,16 @@ export const AlbumGroupHeader = ({
                 />
                 {isHovered && onPlay && (
                     <div className={imageColumnStyles.playButtonOverlay}>
-                        <PlayTooltip type={playButtonBehavior}>
+                        <PlayTooltip disabled={isActive} type={playButtonBehavior}>
                             <PlayButton
                                 fill
+                                icon={isPlaying ? 'mediaPause' : 'mediaPlay'}
                                 onClick={(e) => {
                                     e.stopPropagation();
+                                    if (isActive) {
+                                        mediaTogglePlayPause();
+                                        return;
+                                    }
                                     onPlay(playButtonBehavior);
                                 }}
                                 onLongPress={(e) => {

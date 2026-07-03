@@ -14,6 +14,7 @@ import {
     AlbumArtist,
     Artist,
     LibraryItem,
+    Playlist,
     QueueSong,
     Song,
 } from '/@/shared/types/domain-types';
@@ -54,6 +55,7 @@ export const useRowPlayControl = (props: ItemTableListInnerColumn) => {
     const song = rowItem as QueueSong;
     const album = rowItem as Album;
     const artist = rowItem as AlbumArtist | Artist;
+    const playlist = rowItem as Playlist;
 
     const isActiveFromRow = useIsActiveRow(song?.id, song?._uniqueId);
     const isActive = (() => {
@@ -72,6 +74,8 @@ export const useRowPlayControl = (props: ItemTableListInnerColumn) => {
                     !!artist?.id &&
                     !!currentSong?.artists?.some((relatedArtist) => relatedArtist.id === artist.id)
                 );
+            case LibraryItem.PLAYLIST:
+                return !!playlist?.id && currentSong?._contextPlaylistId === playlist.id;
             default:
                 return isActiveFromRow;
         }

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import styles from './image-column.module.css';
 
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
+import { useRowPlayControl } from '/@/renderer/components/item-list/item-table-list/columns/use-row-play-control';
 import {
     ItemTableListInnerColumn,
     TableColumnContainer,
@@ -13,7 +14,7 @@ import {
     LONG_PRESS_PLAY_BEHAVIOR,
     PlayTooltip,
 } from '/@/renderer/features/shared/components/play-button-group';
-import { usePlayButtonBehavior } from '/@/renderer/store';
+import { usePlayButtonBehavior, usePlayerActions } from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Folder, LibraryItem } from '/@/shared/types/domain-types';
@@ -26,6 +27,8 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
     const playButtonBehavior = usePlayButtonBehavior();
     const internalState = (props as any).internalState;
     const [isHovered, setIsHovered] = useState(false);
+    const { isActive, isPlaying } = useRowPlayControl(props);
+    const { mediaTogglePlayPause } = usePlayerActions();
 
     const isFolder = (rowItem as unknown as Folder)?._itemType === LibraryItem.FOLDER;
     const shouldShowFolderIcon = isFolder && !item?.imageId && !item?.imageUrl;
@@ -104,12 +107,20 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
                             })}
                         >
                             <PlayTooltip
-                                disabled={props.itemType === LibraryItem.QUEUE_SONG}
+                                disabled={isActive || props.itemType === LibraryItem.QUEUE_SONG}
                                 type={playButtonBehavior}
                             >
                                 <PlayButton
                                     fill
-                                    onClick={(e) => handlePlay(playButtonBehavior, e)}
+                                    icon={isPlaying ? 'mediaPause' : 'mediaPlay'}
+                                    onClick={(e) => {
+                                        if (isActive) {
+                                            e.stopPropagation();
+                                            mediaTogglePlayPause();
+                                            return;
+                                        }
+                                        handlePlay(playButtonBehavior, e);
+                                    }}
                                     onLongPress={(e) =>
                                         handlePlay(LONG_PRESS_PLAY_BEHAVIOR[playButtonBehavior], e)
                                     }
