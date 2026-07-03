@@ -95,16 +95,18 @@ const TooltipLabel = ({ label }: { label: React.ReactNode | string; type: Play }
 export const PlayTooltip = ({
     children,
     disabled,
+    label,
     type,
 }: {
     children: React.ReactNode;
     disabled?: boolean;
+    label?: string;
     type: Play;
 }) => {
     return (
         <Tooltip
             disabled={disabled}
-            label={<TooltipLabel label={PLAY_BEHAVIOR_TO_LABEL[type]} type={type} />}
+            label={<TooltipLabel label={label ?? PLAY_BEHAVIOR_TO_LABEL[type]} type={type} />}
         >
             {children}
         </Tooltip>

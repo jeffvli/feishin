@@ -4,6 +4,7 @@ import { memo, MouseEvent, useCallback, useMemo } from 'react';
 
 import styles from './item-card-controls.module.css';
 
+import i18n from '/@/i18n/i18n';
 import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls } from '/@/renderer/components/item-list/types';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
@@ -270,11 +271,9 @@ export const ItemCardControls = ({
             case LibraryItem.ALBUM:
                 return currentSong.albumId === item.id;
             case LibraryItem.ALBUM_ARTIST:
+                return currentSong.albumArtists?.some((a) => a.id === item.id) ?? false;
             case LibraryItem.ARTIST:
-                return (
-                    (currentSong.albumArtists?.some((a) => a.id === item.id) ?? false) ||
-                    (currentSong.artists?.some((a) => a.id === item.id) ?? false)
-                );
+                return currentSong.artists?.some((a) => a.id === item.id) ?? false;
             case LibraryItem.PLAYLIST:
                 return currentSong._contextPlaylistId === item.id;
             case LibraryItem.PLAYLIST_SONG:
@@ -302,7 +301,14 @@ export const ItemCardControls = ({
         <motion.div className={clsx(styles.container)} {...containerProps[type]}>
             {controls?.onPlay && (
                 <Tooltip.Group>
-                    <PlayTooltip disabled={isActiveItem} type={Play.NOW}>
+                    <PlayTooltip
+                        label={
+                            isActiveItem
+                                ? i18n.t(isActiveAndPlaying ? 'player.pause' : 'player.play')
+                                : undefined
+                        }
+                        type={Play.NOW}
+                    >
                         <PlayButton
                             classNames={clsx(styles.playButton, styles.primary)}
                             icon={isActiveAndPlaying ? 'mediaPause' : 'mediaPlay'}

@@ -4,6 +4,7 @@ import imageColumnStyles from '../item-detail-list/columns/image-column.module.c
 import styles from './album-group-header.module.css';
 import { TableItemSize } from './item-table-list';
 
+import i18n from '/@/i18n/i18n';
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import {
@@ -87,7 +88,14 @@ export const AlbumGroupHeader = ({
                 />
                 {isHovered && onPlay && (
                     <div className={imageColumnStyles.playButtonOverlay}>
-                        <PlayTooltip disabled={isActive} type={playButtonBehavior}>
+                        <PlayTooltip
+                            label={
+                                isActive
+                                    ? i18n.t(isPlaying ? 'player.pause' : 'player.play')
+                                    : undefined
+                            }
+                            type={playButtonBehavior}
+                        >
                             <PlayButton
                                 fill
                                 icon={isPlaying ? 'mediaPause' : 'mediaPlay'}

@@ -5,6 +5,7 @@ import styles from './image-column.module.css';
 import { ItemDetailListCellProps } from './types';
 import { useDetailRowPlayControl } from './use-detail-row-play-control';
 
+import i18n from '/@/i18n/i18n';
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import {
@@ -58,7 +59,14 @@ export const ImageColumn = ({
             />
             {isHovered && (
                 <div className={clsx(styles.playButtonOverlay)}>
-                    <PlayTooltip disabled={isActive} type={playButtonBehavior}>
+                    <PlayTooltip
+                        label={
+                            isActive
+                                ? i18n.t(isPlaying ? 'player.pause' : 'player.play')
+                                : undefined
+                        }
+                        type={playButtonBehavior}
+                    >
                         <PlayButton
                             fill
                             icon={isPlaying ? 'mediaPause' : 'mediaPlay'}

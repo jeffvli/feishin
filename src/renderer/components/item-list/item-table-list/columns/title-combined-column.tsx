@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 
 import styles from './title-combined-column.module.css';
 
+import i18n from '/@/i18n/i18n';
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { getTitlePath } from '/@/renderer/components/item-list/helpers/get-title-path';
 import { useRowPlayControl } from '/@/renderer/components/item-list/item-table-list/columns/use-row-play-control';
@@ -20,12 +21,12 @@ import {
     LONG_PRESS_PLAY_BEHAVIOR,
     PlayTooltip,
 } from '/@/renderer/features/shared/components/play-button-group';
-import { usePlayButtonBehavior, usePlayerActions } from '/@/renderer/store';
+import { usePlayButtonBehavior, usePlayerActions, usePlayerStatus } from '/@/renderer/store';
 import { ExplicitIndicator } from '/@/shared/components/explicit-indicator/explicit-indicator';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { Folder, LibraryItem, QueueSong } from '/@/shared/types/domain-types';
-import { Play } from '/@/shared/types/types';
+import { Play, PlayerStatus } from '/@/shared/types/types';
 
 export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
     const rowItem = props.getRowItem?.(props.rowIndex) ?? (props.data as any[])[props.rowIndex];
@@ -127,7 +128,12 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                                 })}
                             >
                                 <PlayTooltip
-                                    disabled={isActive || props.itemType === LibraryItem.QUEUE_SONG}
+                                    disabled={props.itemType === LibraryItem.QUEUE_SONG}
+                                    label={
+                                        isActive
+                                            ? i18n.t(isPlaying ? 'player.pause' : 'player.play')
+                                            : undefined
+                                    }
                                     type={playButtonBehavior}
                                 >
                                     <PlayButton
@@ -135,7 +141,6 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                                         icon={isPlaying ? 'mediaPause' : 'mediaPlay'}
                                         onClick={(e) => {
                                             if (isActive) {
-                                                e.stopPropagation();
                                                 mediaTogglePlayPause();
                                                 return;
                                             }
@@ -195,7 +200,8 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
     const playButtonBehavior = usePlayButtonBehavior();
     const [isHovered, setIsHovered] = useState(false);
     const isActive = useIsActiveRow(song?.id, song?._uniqueId);
-    const { isPlaying } = useRowPlayControl(props);
+    const playerStatus = usePlayerStatus();
+    const isPlaying = isActive && playerStatus === PlayerStatus.PLAYING;
     const { mediaTogglePlayPause } = usePlayerActions();
 
     const handlePlay = (playType: Play, event: React.MouseEvent<HTMLButtonElement>) => {
@@ -288,7 +294,12 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
                                 })}
                             >
                                 <PlayTooltip
-                                    disabled={isActive || props.itemType === LibraryItem.QUEUE_SONG}
+                                    disabled={props.itemType === LibraryItem.QUEUE_SONG}
+                                    label={
+                                        isActive
+                                            ? i18n.t(isPlaying ? 'player.pause' : 'player.play')
+                                            : undefined
+                                    }
                                     type={playButtonBehavior}
                                 >
                                     <PlayButton
@@ -296,7 +307,6 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
                                         icon={isPlaying ? 'mediaPause' : 'mediaPlay'}
                                         onClick={(e) => {
                                             if (isActive) {
-                                                e.stopPropagation();
                                                 mediaTogglePlayPause();
                                                 return;
                                             }

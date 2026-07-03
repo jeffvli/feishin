@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import styles from './image-column.module.css';
 
+import i18n from '/@/i18n/i18n';
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { useRowPlayControl } from '/@/renderer/components/item-list/item-table-list/columns/use-row-play-control';
 import {
@@ -107,7 +108,12 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
                             })}
                         >
                             <PlayTooltip
-                                disabled={isActive || props.itemType === LibraryItem.QUEUE_SONG}
+                                disabled={props.itemType === LibraryItem.QUEUE_SONG}
+                                label={
+                                    isActive
+                                        ? i18n.t(isPlaying ? 'player.pause' : 'player.play')
+                                        : undefined
+                                }
                                 type={playButtonBehavior}
                             >
                                 <PlayButton
@@ -115,7 +121,6 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
                                     icon={isPlaying ? 'mediaPause' : 'mediaPlay'}
                                     onClick={(e) => {
                                         if (isActive) {
-                                            e.stopPropagation();
                                             mediaTogglePlayPause();
                                             return;
                                         }
