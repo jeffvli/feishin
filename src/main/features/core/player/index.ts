@@ -483,10 +483,12 @@ ipcMain.on('player-auto-next', async (_event, url?: string) => {
     }
 });
 
-// Sets the volume to the given value (0-100)
+// Sets the volume to the given value. mpv clamps to its effective --volume-max
+// (default 130, hard ceiling 1000), so the upper bound here is just a sanity
+// guard; mpv itself is the final authority on how loud it will actually go.
 ipcMain.on('player-volume', async (_event, value: number) => {
     try {
-        if (!value || value < 0 || value > 100) {
+        if (value == null || Number.isNaN(value) || value < 0 || value > 1000) {
             return;
         }
 
