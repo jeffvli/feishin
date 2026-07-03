@@ -181,6 +181,7 @@ export const FullScreenPlayerImage = () => {
             </Badge>
         ),
         codec: currentSong?.container && <Badge>{currentSong?.container}</Badge>,
+        date: currentSong?.date && <Badge>{currentSong?.date}</Badge>,
         disc_number: currentSong?.discNumber && (
             <Badge>
                 {t('common.disc')} {currentSong?.discNumber}
@@ -202,6 +203,7 @@ export const FullScreenPlayerImage = () => {
                 {t('common.trackNumber')} {currentSong?.trackNumber}
             </Badge>
         ),
+        year: currentSong?.year && <Badge>{currentSong?.year}</Badge>,
     };
 
     return (

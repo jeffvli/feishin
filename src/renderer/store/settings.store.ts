@@ -1065,6 +1065,10 @@ export const playerItems: SortableItem<PlayerItem>[] = [
     },
     {
         disabled: true,
+        id: PlayerItem.DATE,
+    },
+    {
+        disabled: true,
         id: PlayerItem.DISC_NUMBER,
     },
     {
@@ -1090,6 +1094,10 @@ export const playerItems: SortableItem<PlayerItem>[] = [
     {
         disabled: true,
         id: PlayerItem.TRACK_NUMBER,
+    },
+    {
+        disabled: true,
+        id: PlayerItem.YEAR,
     },
 ];
 
