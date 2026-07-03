@@ -338,6 +338,9 @@ export const queryKeys: Record<
 
             return [serverId, 'playlists', 'songList'] as const;
         },
+        songListIds: (serverId: string, id: string) => {
+            return [serverId, 'playlists', 'songListIds', id] as const;
+        },
     },
     radio: {
         list: (serverId: string) => [serverId, 'radio', 'list'] as const,

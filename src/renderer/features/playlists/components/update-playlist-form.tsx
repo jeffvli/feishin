@@ -108,13 +108,13 @@ export const UpdatePlaylistContextModal = ({
             }
 
             toast.success({
-                message: t('form.editPlaylist.success', { postProcess: 'sentenceCase' }),
+                message: t('form.editPlaylist.success'),
             });
             closeModal(id);
         } catch (err: any) {
             toast.error({
                 message: err?.message,
-                title: t('error.genericError', { postProcess: 'sentenceCase' }),
+                title: t('error.genericError'),
             });
         } finally {
             setIsSaving(false);
@@ -134,7 +134,6 @@ export const UpdatePlaylistContextModal = ({
             key="name"
             label={t('form.createPlaylist.input', {
                 context: 'name',
-                postProcess: 'titleCase',
             })}
             required
             {...form.getInputProps('name')}
@@ -148,7 +147,6 @@ export const UpdatePlaylistContextModal = ({
                 key="comment"
                 label={t('form.createPlaylist.input', {
                     context: 'description',
-                    postProcess: 'titleCase',
                 })}
                 minRows={5}
                 {...form.getInputProps('comment')}
@@ -163,11 +161,7 @@ export const UpdatePlaylistContextModal = ({
     if (isPublicDisplayed) {
         if (server?.type === ServerType.JELLYFIN) {
             fieldNodes.push(
-                <div key="jellyfin-public-note">
-                    {t('form.editPlaylist.publicJellyfinNote', {
-                        postProcess: 'sentenceCase',
-                    })}
-                </div>,
+                <div key="jellyfin-public-note">{t('form.editPlaylist.publicJellyfinNote')}</div>,
             );
         }
         fieldNodes.push(
@@ -175,7 +169,6 @@ export const UpdatePlaylistContextModal = ({
                 key="public"
                 label={t('form.createPlaylist.input', {
                     context: 'public',
-                    postProcess: 'titleCase',
                 })}
                 {...form.getInputProps('public', { type: 'checkbox' })}
             />,
@@ -377,7 +370,6 @@ const OwnerSelect = ({ form }: { form: ReturnType<typeof useForm<UpdatePlaylistB
             {...form.getInputProps('ownerId')}
             label={t('form.createPlaylist.input', {
                 context: 'owner',
-                postProcess: 'titleCase',
             })}
         />
     );

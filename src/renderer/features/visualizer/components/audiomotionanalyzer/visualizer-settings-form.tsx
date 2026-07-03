@@ -695,11 +695,11 @@ const PresetSettings = () => {
             const configJson = JSON.stringify(config, null, 2);
             await navigator.clipboard.writeText(configJson);
             toast.success({
-                message: t('visualizer.configCopied', { postProcess: 'sentenceCase' }),
+                message: t('visualizer.configCopied'),
             });
         } catch {
             toast.error({
-                message: t('visualizer.configCopyFailed', { postProcess: 'sentenceCase' }),
+                message: t('visualizer.configCopyFailed'),
             });
         }
     };
@@ -817,14 +817,14 @@ const PresetSettings = () => {
             });
 
             toast.success({
-                message: t('visualizer.configPasted', { postProcess: 'sentenceCase' }),
+                message: t('visualizer.configPasted'),
             });
 
             setPasteValue('');
             setIsPasting(false);
         } catch {
             toast.error({
-                message: t('visualizer.configPasteFailed', { postProcess: 'sentenceCase' }),
+                message: t('visualizer.configPasteFailed'),
             });
         }
     };
@@ -836,7 +836,7 @@ const PresetSettings = () => {
             setIsPasting(true);
         } catch {
             toast.error({
-                message: t('visualizer.configPasteReadFailed', { postProcess: 'sentenceCase' }),
+                message: t('visualizer.configPasteReadFailed'),
             });
         }
     };
@@ -876,14 +876,14 @@ const PresetSettings = () => {
                         />
                         <Group style={{ alignSelf: 'flex-end' }}>
                             <Button onClick={() => setIsSaving(false)} variant="subtle">
-                                {t('common.cancel', { postProcess: 'titleCase' })}
+                                {t('common.cancel')}
                             </Button>
                             <Button
                                 disabled={!newPresetName.trim()}
                                 onClick={handleSavePreset}
                                 variant="filled"
                             >
-                                {t('common.save', { postProcess: 'titleCase' })}
+                                {t('common.save')}
                             </Button>
                         </Group>
                     </Group>
@@ -906,14 +906,14 @@ const PresetSettings = () => {
                         />
                         <Group style={{ alignSelf: 'flex-end' }}>
                             <Button onClick={() => setIsRenaming(false)} variant="subtle">
-                                {t('common.cancel', { postProcess: 'titleCase' })}
+                                {t('common.cancel')}
                             </Button>
                             <Button
                                 disabled={!newPresetName.trim()}
                                 onClick={handleUpdatePreset}
                                 variant="filled"
                             >
-                                {t('common.save', { postProcess: 'titleCase' })}
+                                {t('common.save')}
                             </Button>
                         </Group>
                     </Group>
@@ -934,7 +934,7 @@ const PresetSettings = () => {
                                 {t('visualizer.pasteFromClipboard')}
                             </Button>
                             <Button onClick={() => setIsPasting(false)} variant="subtle">
-                                {t('common.cancel', { postProcess: 'titleCase' })}
+                                {t('common.cancel')}
                             </Button>
                             <Button
                                 disabled={!pasteValue.trim()}
@@ -967,7 +967,7 @@ const PresetSettings = () => {
                                     {t('visualizer.updatePreset')}
                                 </Button>
                                 <Button onClick={handleDeletePreset} variant="subtle">
-                                    {t('common.delete', { postProcess: 'titleCase' })}
+                                    {t('common.delete')}
                                 </Button>
                             </>
                         )}
@@ -1428,14 +1428,14 @@ const CustomGradientsManager = () => {
                                         size="xs"
                                         variant="default"
                                     >
-                                        {t('common.edit', { postProcess: 'titleCase' })}
+                                        {t('common.edit')}
                                     </Button>
                                     <Button
                                         onClick={() => handleDeleteGradient(index)}
                                         size="xs"
                                         variant="state-error"
                                     >
-                                        {t('common.delete', { postProcess: 'titleCase' })}
+                                        {t('common.delete')}
                                     </Button>
                                 </Group>
                             </Group>
@@ -1449,14 +1449,14 @@ const CustomGradientsManager = () => {
                             {t('visualizer.addCustomGradient')}
                         </Button>
                         <Button onClick={() => setIsPasting(true)} size="sm" variant="outline">
-                            {t('visualizer.pasteGradient', { postProcess: 'titleCase' })}
+                            {t('visualizer.pasteGradient')}
                         </Button>
                     </Group>
                 ) : isPasting ? (
                     <Stack>
                         <Textarea
                             autosize
-                            label={t('visualizer.pasteGradient', { postProcess: 'titleCase' })}
+                            label={t('visualizer.pasteGradient')}
                             maxRows={10}
                             minRows={5}
                             onChange={(e) => setPasteValue(e.currentTarget.value)}
@@ -1466,14 +1466,14 @@ const CustomGradientsManager = () => {
                         />
                         <Group>
                             <Button onClick={() => setIsPasting(false)} variant="subtle">
-                                {t('common.cancel', { postProcess: 'titleCase' })}
+                                {t('common.cancel')}
                             </Button>
                             <Button
                                 disabled={!pasteValue.trim()}
                                 onClick={handlePasteGradient}
                                 variant="filled"
                             >
-                                {t('common.add', { postProcess: 'titleCase' })}
+                                {t('common.add')}
                             </Button>
                         </Group>
                     </Stack>
@@ -1600,7 +1600,7 @@ const CustomGradientsManager = () => {
                             </Stack>
                             <Group grow>
                                 <Button onClick={handleCancel} size="sm" variant="subtle">
-                                    {t('common.cancel', { postProcess: 'titleCase' })}
+                                    {t('common.cancel')}
                                 </Button>
                                 <Button
                                     disabled={!newGradient.name.trim()}
@@ -1610,9 +1610,7 @@ const CustomGradientsManager = () => {
                                     size="sm"
                                     variant="filled"
                                 >
-                                    {editingIndex !== null
-                                        ? t('common.save', { postProcess: 'titleCase' })
-                                        : t('common.add', { postProcess: 'titleCase' })}
+                                    {editingIndex !== null ? t('common.save') : t('common.add')}
                                 </Button>
                             </Group>
                         </Stack>

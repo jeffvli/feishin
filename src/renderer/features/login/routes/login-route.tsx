@@ -7,6 +7,10 @@ import { Navigate } from 'react-router';
 import { api } from '/@/renderer/api';
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import {
+    findExistingServerLockServer,
+    normalizeServerUrl,
+} from '/@/renderer/features/action-required/utils/server-lock';
+import {
     isLegacyAuth,
     isServerLock,
 } from '/@/renderer/features/action-required/utils/window-properties';
@@ -19,6 +23,7 @@ import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-e
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     getServerById,
+    useAuthStore,
     useAuthStoreActions,
     useCurrentServer,
     useServerList,
@@ -51,12 +56,10 @@ const SERVER_NAMES: Record<ServerType, string> = {
     [ServerType.SUBSONIC]: 'OpenSubsonic',
 };
 
-const normalizeUrl = (url: string) => url.replace(/\/$/, '');
-
 const LoginRoute = () => {
     const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
-    const { addServer, setCurrentServer, updateServer } = useAuthStoreActions();
+    const { addServer, deleteServer, setCurrentServer, updateServer } = useAuthStoreActions();
     const currentServer = useCurrentServer();
     const serverList = useServerList();
 
@@ -115,12 +118,8 @@ const LoginRoute = () => {
                 <PageHeader />
                 <Center style={{ height: '100%', width: '100vw' }}>
                     <Stack>
-                        <TextTitle fw={600}>
-                            {t('error.genericError', { postProcess: 'sentenceCase' })}
-                        </TextTitle>
-                        <Text fw={500}>
-                            {t('error.serverNotSelectedError', { postProcess: 'sentenceCase' })}
-                        </Text>
+                        <TextTitle fw={600}>{t('error.genericError')}</TextTitle>
+                        <Text fw={500}>{t('error.serverNotSelectedError')}</Text>
                         <Code block>{JSON.stringify(config, null, 2)}</Code>
                     </Stack>
                 </Center>
@@ -133,7 +132,7 @@ const LoginRoute = () => {
 
         if (!authFunction) {
             return toast.error({
-                message: t('error.invalidServer', { postProcess: 'sentenceCase' }),
+                message: t('error.invalidServer'),
             });
         }
 
@@ -151,19 +150,20 @@ const LoginRoute = () => {
 
             if (!data) {
                 return toast.error({
-                    message: t('error.authenticationFailed', { postProcess: 'sentenceCase' }),
+                    message: t('error.authenticationFailed'),
                 });
             }
 
-            const normalizedUrl = normalizeUrl(serverUrl);
-            const normalizedRemoteURL = normalizeUrl(remoteUrl);
-            const existingServer =
-                serverLock &&
-                Object.values(serverList).find((s) => normalizeUrl(s.url) === normalizedUrl);
+            const normalizedUrl = normalizeServerUrl(serverUrl);
+            const normalizedRemoteURL = normalizeServerUrl(remoteUrl);
+            const existingServer = serverLock
+                ? findExistingServerLockServer(serverList, normalizedUrl, serverType)
+                : undefined;
 
+            const serverId = existingServer?.id ?? nanoid();
             const serverItem: ServerListItemWithCredential = {
                 credential: data.credential,
-                id: nanoid(),
+                id: serverId,
                 isAdmin: data.isAdmin,
                 name: serverName,
                 remoteUrl: normalizedRemoteURL,
@@ -177,6 +177,9 @@ const LoginRoute = () => {
                 const updates: Partial<ServerListItemWithCredential> = {
                     credential: data.credential,
                     isAdmin: data.isAdmin,
+                    name: serverName,
+                    remoteUrl: normalizedRemoteURL,
+                    url: normalizedUrl,
                     userId: data.userId,
                     username: data.username,
                 };
@@ -194,17 +197,24 @@ const LoginRoute = () => {
                 setCurrentServer(serverItem);
             }
 
+            if (serverLock) {
+                Object.values(useAuthStore.getState().serverList).forEach((server) => {
+                    if (server.id !== serverId) {
+                        deleteServer(server.id);
+                    }
+                });
+            }
+
             toast.success({
-                message: t('form.addServer.success', { postProcess: 'sentenceCase' }),
+                message: t('form.addServer.success'),
             });
 
             if (localSettings && values.password) {
-                const saved = await localSettings.passwordSet(values.password, serverItem.id);
+                const saved = await localSettings.passwordSet(values.password, serverId);
                 if (!saved) {
                     toast.error({
                         message: t('form.addServer.error', {
                             context: 'savePassword',
-                            postProcess: 'sentenceCase',
                         }),
                     });
                 }
@@ -250,7 +260,6 @@ const LoginRoute = () => {
                                     data-autofocus
                                     label={t('form.addServer.input', {
                                         context: 'username',
-                                        postProcess: 'titleCase',
                                     })}
                                     required
                                     variant="filled"
@@ -259,7 +268,6 @@ const LoginRoute = () => {
                                 <PasswordInput
                                     label={t('form.addServer.input', {
                                         context: 'password',
-                                        postProcess: 'titleCase',
                                     })}
                                     required
                                     variant="filled"
@@ -277,7 +285,6 @@ const LoginRoute = () => {
                             >
                                 {t('common.login', {
                                     defaultValue: 'Login',
-                                    postProcess: 'titleCase',
                                 })}
                             </Button>
                         </Stack>

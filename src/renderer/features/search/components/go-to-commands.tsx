@@ -30,37 +30,37 @@ export const GoToCommands = ({ handleClose, setPages, setQuery }: GoToCommandsPr
         <>
             <Command.Group>
                 <Command.Item onSelect={() => goTo(AppRoute.HOME)}>
-                    {t('page.sidebar.home', { postProcess: 'titleCase' })}
+                    {t('page.sidebar.home')}
                 </Command.Item>
                 <Command.Item onSelect={() => goTo(AppRoute.SEARCH)}>
-                    {t('page.sidebar.search', { postProcess: 'titleCase' })}
+                    {t('page.sidebar.search')}
                 </Command.Item>
                 <Command.Item
                     onSelect={() => {
                         openSettingsModal();
                     }}
                 >
-                    {t('page.sidebar.settings', { postProcess: 'titleCase' })}
+                    {t('page.sidebar.settings')}
                 </Command.Item>
             </Command.Group>
             <Command.Group heading="Library">
                 <Command.Item onSelect={() => goTo(AppRoute.LIBRARY_ALBUMS)}>
-                    {t('page.sidebar.albums', { postProcess: 'titleCase' })}
+                    {t('page.sidebar.albums')}
                 </Command.Item>
                 <Command.Item onSelect={() => goTo(AppRoute.LIBRARY_SONGS)}>
-                    {t('page.sidebar.tracks', { postProcess: 'titleCase' })}
+                    {t('page.sidebar.tracks')}
                 </Command.Item>
                 <Command.Item onSelect={() => goTo(AppRoute.LIBRARY_ALBUM_ARTISTS)}>
-                    {t('page.sidebar.albumArtists', { postProcess: 'titleCase' })}
+                    {t('page.sidebar.albumArtists')}
                 </Command.Item>
                 <Command.Item onSelect={() => goTo(AppRoute.LIBRARY_GENRES)}>
-                    {t('page.sidebar.genres', { postProcess: 'titleCase' })}
+                    {t('page.sidebar.genres')}
                 </Command.Item>
                 <Command.Item onSelect={() => goTo(AppRoute.LIBRARY_FOLDERS)}>
-                    {t('page.sidebar.folders', { postProcess: 'titleCase' })}
+                    {t('page.sidebar.folders')}
                 </Command.Item>
                 <Command.Item onSelect={() => goTo(AppRoute.PLAYLISTS)}>
-                    {t('page.sidebar.playlists', { postProcess: 'titleCase' })}
+                    {t('page.sidebar.playlists')}
                 </Command.Item>
             </Command.Group>
             <Command.Separator />

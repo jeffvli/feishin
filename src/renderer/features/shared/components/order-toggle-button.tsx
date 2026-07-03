@@ -27,10 +27,7 @@ export const OrderToggleButton = ({
             }}
             onClick={onToggle}
             tooltip={{
-                label:
-                    sortOrder === SortOrder.ASC
-                        ? t('common.ascending', { postProcess: 'sentenceCase' })
-                        : t('common.descending', { postProcess: 'sentenceCase' }),
+                label: sortOrder === SortOrder.ASC ? t('common.ascending') : t('common.descending'),
             }}
             variant="subtle"
             {...buttonProps}

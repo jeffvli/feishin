@@ -56,7 +56,7 @@ export const FolderListHeaderFilters = () => {
             onClick: () => void;
         }> = [];
 
-        const homeLabel = t('common.home', { postProcess: 'titleCase' });
+        const homeLabel = t('common.home');
         items.push({
             fullLabel: homeLabel,
             id: 'folder-root',

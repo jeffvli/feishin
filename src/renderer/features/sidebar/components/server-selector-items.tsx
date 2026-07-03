@@ -85,15 +85,13 @@ export const ServerSelectorItems = () => {
     const handleManageServersModal = () => {
         openModal({
             children: <ServerList />,
-            title: t('page.manageServers.title', { postProcess: 'titleCase' }),
+            title: t('page.manageServers.title'),
         });
     };
 
     return (
         <>
-            <DropdownMenu.Label>
-                {t('page.appMenu.selectServer', { postProcess: 'titleCase' })}
-            </DropdownMenu.Label>
+            <DropdownMenu.Label>{t('page.appMenu.selectServer')}</DropdownMenu.Label>
             {Object.values(serverList).map((server) => {
                 const isNavidromeExpired =
                     server.type === ServerType.NAVIDROME && !server.ndCredential;
@@ -127,21 +125,19 @@ export const ServerSelectorItems = () => {
                     leftSection={<Icon icon="edit" />}
                     onClick={handleManageServersModal}
                 >
-                    {t('page.appMenu.manageServers', { postProcess: 'sentenceCase' })}
+                    {t('page.appMenu.manageServers')}
                 </DropdownMenu.Item>
             )}
             {musicFolders && musicFolders.items.length > 0 && (
                 <>
                     <DropdownMenu.Divider />
-                    <DropdownMenu.Label>
-                        {t('page.appMenu.selectMusicFolder', { postProcess: 'sentenceCase' })}
-                    </DropdownMenu.Label>
+                    <DropdownMenu.Label>{t('page.appMenu.selectMusicFolder')}</DropdownMenu.Label>
                     <DropdownMenu.Item
                         isSelected={selectedMusicFolders.length === 0}
                         leftSection={<Icon icon="minus" />}
                         onClick={handleClearMusicFolders}
                     >
-                        {t('common.none', { postProcess: 'titleCase' })}
+                        {t('common.none')}
                     </DropdownMenu.Item>
                     {musicFolders.items.map((folder) => {
                         const isSelected = supportsMultiSelect

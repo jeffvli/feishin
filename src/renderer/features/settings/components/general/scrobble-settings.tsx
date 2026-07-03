@@ -35,9 +35,8 @@ export const ScrobbleSettings = memo(() => {
             ),
             description: t('setting.scrobble', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.scrobble', { postProcess: 'sentenceCase' }),
+            title: t('setting.scrobble'),
         },
         {
             control: (
@@ -61,9 +60,8 @@ export const ScrobbleSettings = memo(() => {
             ),
             description: t('setting.minimumScrobblePercentage', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.minimumScrobblePercentage', { postProcess: 'sentenceCase' }),
+            title: t('setting.minimumScrobblePercentage'),
         },
         {
             control: (
@@ -87,9 +85,8 @@ export const ScrobbleSettings = memo(() => {
             ),
             description: t('setting.minimumScrobbleSeconds', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.minimumScrobbleSeconds', { postProcess: 'sentenceCase' }),
+            title: t('setting.minimumScrobbleSeconds'),
         },
         {
             control: (
@@ -99,9 +96,7 @@ export const ScrobbleSettings = memo(() => {
                     onChange={async (e) => {
                         if (Notification.permission === 'denied') {
                             toast.error({
-                                message: t('error.notificationDenied', {
-                                    postProcess: 'sentenceCase',
-                                }),
+                                message: t('error.notificationDenied'),
                             });
                             return;
                         }
@@ -110,9 +105,7 @@ export const ScrobbleSettings = memo(() => {
                             const permissions = await Notification.requestPermission();
                             if (permissions !== 'granted') {
                                 toast.error({
-                                    message: t('error.notificationDenied', {
-                                        postProcess: 'sentenceCase',
-                                    }),
+                                    message: t('error.notificationDenied'),
                                 });
                                 return;
                             }
@@ -130,17 +123,11 @@ export const ScrobbleSettings = memo(() => {
             ),
             description: t('setting.notify', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !('Notification' in window),
-            title: t('setting.notify', { postProcess: 'sentenceCase' }),
+            title: t('setting.notify'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={scrobbleOptions}
-            title={t('page.setting.scrobble', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={scrobbleOptions} title={t('page.setting.scrobble')} />;
 });

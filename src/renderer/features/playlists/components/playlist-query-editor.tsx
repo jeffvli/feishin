@@ -141,7 +141,7 @@ export const PlaylistQueryEditor = ({
         const payload = getFiltersForSave();
         if (!payload) {
             if (editorMode === 'json') {
-                toast.error({ message: t('error.invalidJson', { postProcess: 'sentenceCase' }) });
+                toast.error({ message: t('error.invalidJson') });
             }
             return;
         }
@@ -156,7 +156,7 @@ export const PlaylistQueryEditor = ({
         openModal({
             children: <JsonPreview value={previewValue} />,
             size: 'xl',
-            title: t('common.preview', { postProcess: 'titleCase' }),
+            title: t('common.preview'),
         });
     }, [editorMode, getFiltersForSave, t]);
 
@@ -165,7 +165,7 @@ export const PlaylistQueryEditor = ({
         const payload = getFiltersForSave();
         if (!payload) {
             if (editorMode === 'json') {
-                toast.error({ message: t('error.invalidJson', { postProcess: 'sentenceCase' }) });
+                toast.error({ message: t('error.invalidJson') });
             }
             return;
         }
@@ -177,10 +177,10 @@ export const PlaylistQueryEditor = ({
                         closeAllModals();
                     }}
                 >
-                    <Text>{t('common.areYouSure', { postProcess: 'sentenceCase' })}</Text>
+                    <Text>{t('common.areYouSure')}</Text>
                 </ConfirmModal>
             ),
-            title: t('common.saveAndReplace', { postProcess: 'titleCase' }),
+            title: t('common.saveAndReplace'),
         });
     }, [editorMode, getFiltersForSave, handleSave, isQueryBuilderExpanded, t]);
 
@@ -224,25 +224,26 @@ export const PlaylistQueryEditor = ({
         return detailQuery?.data?.rules?.order || 'asc';
     }, [detailQuery?.data?.rules?.order, detailQuery?.data?.rules?.sort]);
 
+    const appliedQuery = appliedJsonState?.query;
+    const detailQueryRules = detailQuery?.data?.rules;
     const effectiveQuery = useMemo(
         () =>
-            appliedJsonState?.query ??
-            (detailQuery?.data?.rules?.all
-                ? { all: detailQuery.data.rules.all }
-                : detailQuery?.data?.rules?.any
-                  ? { any: detailQuery.data.rules.any }
-                  : detailQuery?.data?.rules),
-        [appliedJsonState?.query, detailQuery?.data?.rules],
+            appliedQuery ??
+            (detailQueryRules?.all
+                ? { all: detailQueryRules.all }
+                : detailQueryRules?.any
+                  ? { any: detailQueryRules.any }
+                  : detailQueryRules),
+        [appliedQuery, detailQueryRules],
     );
     const effectiveLimit = appliedJsonState?.limit ?? detailQuery?.data?.rules?.limit;
     const effectiveLimitPercent =
         appliedJsonState?.limitPercent ?? detailQuery?.data?.rules?.limitPercent;
+
+    const appliedSort = appliedJsonState?.sort;
     const effectiveSortBy = useMemo(
-        () =>
-            (appliedJsonState?.sort ? [appliedJsonState.sort] : parseSortBy()) as
-                | SongListSort
-                | SongListSort[],
-        [appliedJsonState?.sort, parseSortBy],
+        () => (appliedSort ? [appliedSort] : parseSortBy()) as SongListSort | SongListSort[],
+        [appliedSort, parseSortBy],
     );
     const effectiveSortOrder = appliedJsonState?.sort
         ? appliedJsonState.sort.startsWith('-')
@@ -285,9 +286,7 @@ export const PlaylistQueryEditor = ({
                         });
                     } catch {
                         toast.error({
-                            message: t('error.invalidJson', {
-                                postProcess: 'sentenceCase',
-                            }),
+                            message: t('error.invalidJson'),
                         });
                         return;
                     }
@@ -326,9 +325,7 @@ export const PlaylistQueryEditor = ({
                             size="sm"
                             variant="subtle"
                         >
-                            {t('form.queryEditor.title', {
-                                postProcess: 'titleCase',
-                            })}
+                            {t('form.queryEditor.title')}
                         </Button>
                         {isQueryBuilderExpanded && (
                             <SegmentedControl
@@ -358,7 +355,7 @@ export const PlaylistQueryEditor = ({
                     </Group>
                     <Group gap="xs">
                         <Button onClick={openPreviewModal} size="sm" variant="subtle">
-                            {t('common.preview', { postProcess: 'titleCase' })}
+                            {t('common.preview')}
                         </Button>
                         <Button
                             disabled={!isQueryBuilderExpanded}
@@ -371,16 +368,14 @@ export const PlaylistQueryEditor = ({
                                     handleSaveAs(payload.filter, payload.extraFilters);
                                 } else if (editorMode === 'json') {
                                     toast.error({
-                                        message: t('error.invalidJson', {
-                                            postProcess: 'sentenceCase',
-                                        }),
+                                        message: t('error.invalidJson'),
                                     });
                                 }
                             }}
                             size="sm"
                             variant="subtle"
                         >
-                            {t('common.saveAs', { postProcess: 'titleCase' })}
+                            {t('common.saveAs')}
                         </Button>
                         <Button
                             disabled={!isQueryBuilderExpanded}
@@ -389,9 +384,7 @@ export const PlaylistQueryEditor = ({
                             size="sm"
                             variant="subtle"
                         >
-                            {t('common.saveAndReplace', {
-                                postProcess: 'titleCase',
-                            })}
+                            {t('common.saveAndReplace')}
                         </Button>
                     </Group>
                 </Group>

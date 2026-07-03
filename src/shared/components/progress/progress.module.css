@@ -1,0 +1,7 @@
+.root {
+    width: 100%;
+}
+
+.section {
+    transition: width 0.15s ease-out;
+}

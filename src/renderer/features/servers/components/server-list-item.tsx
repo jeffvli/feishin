@@ -69,19 +69,11 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                         <Table layout="fixed" variant="vertical" withTableBorder>
                             <Table.Tbody>
                                 <Table.Tr>
-                                    <Table.Th>
-                                        {t('page.manageServers.url', {
-                                            postProcess: 'sentenceCase',
-                                        })}
-                                    </Table.Th>
+                                    <Table.Th>{t('page.manageServers.url')}</Table.Th>
                                     <Table.Td>{server.url}</Table.Td>
                                 </Table.Tr>
                                 <Table.Tr>
-                                    <Table.Th>
-                                        {t('page.manageServers.username', {
-                                            postProcess: 'sentenceCase',
-                                        })}
-                                    </Table.Th>
+                                    <Table.Th>{t('page.manageServers.username')}</Table.Th>
                                     <Table.Td>{server.username}</Table.Td>
                                 </Table.Tr>
                             </Table.Tbody>
@@ -91,12 +83,10 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                                 leftSection={<Icon icon="edit" />}
                                 onClick={() => handleEdit()}
                                 tooltip={{
-                                    label: t('page.manageServers.editServerDetailsTooltip', {
-                                        postProcess: 'sentenceCase',
-                                    }),
+                                    label: t('page.manageServers.editServerDetailsTooltip'),
                                 }}
                             >
-                                {t('common.edit', { postProcess: 'titleCase' })}
+                                {t('common.edit')}
                             </Button>
                         </Group>
                     </Stack>
@@ -108,7 +98,7 @@ export const ServerListItem = ({ server }: ServerListItemProps) => {
                 timeoutProps={{ callback: handleDeleteServer, duration: 1000 }}
                 variant="state-error"
             >
-                {t('page.manageServers.removeServer', { postProcess: 'sentenceCase' })}
+                {t('page.manageServers.removeServer')}
             </TimeoutButton>
         </Stack>
     );

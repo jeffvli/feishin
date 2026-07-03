@@ -36,18 +36,14 @@ export const SaveAndReplaceContextModal = ({
                     console.error(err);
                     toast.error({
                         message: err.message,
-                        title: t('error.genericError', {
-                            postProcess: 'sentenceCase',
-                        }),
+                        title: t('error.genericError'),
                     });
                 },
                 onSuccess: () => {
                     onSuccess();
                     closeAllModals();
                     toast.success({
-                        message: t('form.editPlaylist.success', {
-                            postProcess: 'sentenceCase',
-                        }),
+                        message: t('form.editPlaylist.success'),
                     });
                 },
             },
@@ -56,7 +52,7 @@ export const SaveAndReplaceContextModal = ({
 
     return (
         <ConfirmModal loading={updatePlaylistMutation.isPending} onConfirm={handleConfirm}>
-            <Text>{t('common.areYouSure', { postProcess: 'sentenceCase' })}</Text>
+            <Text>{t('common.areYouSure')}</Text>
         </ConfirmModal>
     );
 };

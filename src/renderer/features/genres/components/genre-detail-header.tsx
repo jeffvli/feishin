@@ -23,7 +23,7 @@ export const GenreDetailHeader = ({ title }: GenreDetailHeaderProps) => {
     const { t } = useTranslation();
 
     const { itemCount } = useListContext();
-    const pageTitle = title || t('page.genreList.title', { postProcess: 'titleCase' });
+    const pageTitle = title || t('page.genreList.title');
 
     const genreTarget = useGenreTarget();
 

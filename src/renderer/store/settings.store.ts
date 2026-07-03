@@ -160,6 +160,7 @@ const BindingActionsSchema = z.enum([
     'listPlayNext',
     'listPlayLast',
     'listNavigateToPage',
+    'listShowPlayingSong',
 ]);
 
 const DiscordDisplayTypeSchema = z.enum(['artist', 'feishin', 'song']);
@@ -174,6 +175,10 @@ const SideQueueTypeSchema = z.enum(['sideDrawerQueue', 'sideQueue']);
 const SideQueueLayoutSchema = z.enum(['horizontal', 'vertical']);
 
 const SidebarPanelTypeSchema = z.enum(['queue', 'lyrics', 'visualizer']);
+
+const SidebarPlaylistFolderViewSchema = z.enum(['single', 'tree', 'navigation']);
+
+const SidebarPlaylistModeSchema = z.enum(['compact', 'expanded']);
 
 const CollectionSchema = z.object({
     filterQueryString: z.string(),
@@ -265,6 +270,26 @@ const MpvSettingsSchema = z.object({
     replayGainFallbackDB: z.number().optional(),
     replayGainMode: z.enum(['album', 'no', 'track']),
     replayGainPreampDB: z.number().optional(),
+});
+const EqSettingsSchema = z.object({
+    bands: z.array(
+        z.object({
+            freq: z.number(),
+            gain: z.number(),
+        }),
+    ),
+    enabled: z.boolean(),
+    preamp: z.number(),
+});
+
+const CompressorSettingsSchema = z.object({
+    attack: z.number(),
+    enabled: z.boolean(),
+    knee: z.number(),
+    makeup: z.number(),
+    ratio: z.number(),
+    release: z.number(),
+    threshold: z.number(),
 });
 
 const CssSettingsSchema = z.object({
@@ -449,6 +474,7 @@ export const GeneralSettingsSchema = z.object({
         ),
     albumBackground: z.boolean(),
     albumBackgroundBlur: z.number(),
+    albumGroupImageSize: z.number(),
     artistBackground: z.boolean(),
     artistBackgroundBlur: z.number(),
     artistItems: z.array(SortableItemSchema(ArtistItemSchema)),
@@ -500,8 +526,14 @@ export const GeneralSettingsSchema = z.object({
     sidebarCollapseShared: z.boolean(),
     sidebarItems: z.array(SidebarItemTypeSchema),
     sidebarPanelOrder: z.array(SidebarPanelTypeSchema),
+    sidebarPlaylistFolders: z.boolean(),
+    sidebarPlaylistFolderSeparator: z.string().min(1),
+    sidebarPlaylistFolderTreeIndent: z.number().int().min(0).max(64),
+    sidebarPlaylistFolderTreeLineColor: z.string(),
+    sidebarPlaylistFolderView: SidebarPlaylistFolderViewSchema,
     sidebarPlaylistList: z.boolean(),
     sidebarPlaylistListFilterRegex: z.string(),
+    sidebarPlaylistMode: SidebarPlaylistModeSchema,
     sidebarPlaylistSorting: z.boolean(),
     sideQueueLayout: SideQueueLayoutSchema,
     sideQueueType: SideQueueTypeSchema,
@@ -545,7 +577,9 @@ const LyricsSettingsSchema = z.object({
     alignment: z.enum(['center', 'left', 'right']),
     delayMs: z.number(),
     enableAutoTranslation: z.boolean(),
+    enableFurigana: z.boolean().optional(),
     enableNeteaseTranslation: z.boolean(),
+    enableRomaji: z.boolean().optional(),
     fetch: z.boolean(),
     follow: z.boolean(),
     preferLocalLyrics: z.boolean(),
@@ -614,6 +648,8 @@ const PlayerFilterSchema = z.object({
 const PlaybackSettingsSchema = z.object({
     audioDeviceId: z.string().nullable().optional(),
     audioFadeOnStatusChange: z.boolean(),
+    compressor: CompressorSettingsSchema,
+    equalizer: EqSettingsSchema,
     filters: z.array(PlayerFilterSchema),
     mediaSession: z.boolean(),
     mpvAudioDeviceId: z.string().nullable().optional(),
@@ -643,6 +679,7 @@ const WindowSettingsSchema = z.object({
     startMinimized: z.boolean(),
     tray: z.boolean(),
     windowBarStyle: z.nativeEnum(Platform),
+    windowBarTrackinfo: z.boolean(),
 });
 
 const QueryValueInputTypeSchema = z.enum([
@@ -664,9 +701,28 @@ const QueryBuilderSettingsSchema = z.object({
     tag: z.array(QueryBuilderCustomFieldSchema),
 });
 
+export const AUTO_DJ_MODE = {
+    ALBUMS: 'albums',
+    SONGS: 'songs',
+} as const;
+
+export type AutoDJMode = (typeof AUTO_DJ_MODE)[keyof typeof AUTO_DJ_MODE];
+
+export const AUTO_DJ_STRATEGY = {
+    LIBRARY_RANDOM: 'library_random',
+    SIMILAR: 'similar',
+} as const;
+
+export type AutoDJStrategy = (typeof AUTO_DJ_STRATEGY)[keyof typeof AUTO_DJ_STRATEGY];
+
+const autoDjStrategyEnum = z.enum(['similar', 'library_random']);
+
 const AutoDJSettingsSchema = z.object({
+    albumStrategy: autoDjStrategyEnum,
     enabled: z.boolean(),
     itemCount: z.number(),
+    mode: z.enum(['songs', 'albums']),
+    songStrategy: autoDjStrategyEnum,
     timing: z.number(),
 });
 
@@ -756,6 +812,7 @@ export enum BindingActions {
     LIST_PLAY_LAST = 'listPlayLast',
     LIST_PLAY_NEXT = 'listPlayNext',
     LIST_PLAY_NOW = 'listPlayNow',
+    LIST_SHOW_PLAYING_SONG = 'listShowPlayingSong',
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
     NAVIGATE_HOME = 'navigateHome',
@@ -1079,8 +1136,11 @@ const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle
 
 const initialState: SettingsState = {
     autoDJ: {
+        albumStrategy: AUTO_DJ_STRATEGY.SIMILAR,
         enabled: false,
         itemCount: 5,
+        mode: 'songs',
+        songStrategy: AUTO_DJ_STRATEGY.SIMILAR,
         timing: 1,
     },
     css: {
@@ -1107,6 +1167,7 @@ const initialState: SettingsState = {
         accent: 'rgb(53, 116, 252)',
         albumBackground: false,
         albumBackgroundBlur: 3,
+        albumGroupImageSize: 0,
         artistBackground: true,
         artistBackgroundBlur: 3,
         artistItems,
@@ -1169,8 +1230,14 @@ const initialState: SettingsState = {
         sidebarCollapseShared: false,
         sidebarItems,
         sidebarPanelOrder: ['queue', 'lyrics', 'visualizer'],
+        sidebarPlaylistFolders: true,
+        sidebarPlaylistFolderSeparator: '/',
+        sidebarPlaylistFolderTreeIndent: 16,
+        sidebarPlaylistFolderTreeLineColor: '',
+        sidebarPlaylistFolderView: 'tree',
         sidebarPlaylistList: true,
         sidebarPlaylistListFilterRegex: '',
+        sidebarPlaylistMode: 'expanded',
         sidebarPlaylistSorting: false,
         sideQueueLayout: 'horizontal',
         sideQueueType: 'sideQueue',
@@ -1205,6 +1272,7 @@ const initialState: SettingsState = {
             listPlayLast: { allowGlobal: false, hotkey: '', isGlobal: false },
             listPlayNext: { allowGlobal: false, hotkey: '', isGlobal: false },
             listPlayNow: { allowGlobal: false, hotkey: '', isGlobal: false },
+            listShowPlayingSong: { allowGlobal: false, hotkey: 'mod+l', isGlobal: false },
             localSearch: { allowGlobal: false, hotkey: 'mod+f', isGlobal: false },
             navigateHome: { allowGlobal: false, hotkey: '', isGlobal: false },
             next: { allowGlobal: true, hotkey: '', isGlobal: false },
@@ -1782,7 +1850,9 @@ const initialState: SettingsState = {
         alignment: 'center',
         delayMs: 0,
         enableAutoTranslation: false,
+        enableFurigana: false,
         enableNeteaseTranslation: false,
+        enableRomaji: false,
         fetch: true,
         follow: true,
         preferLocalLyrics: true,
@@ -1806,6 +1876,33 @@ const initialState: SettingsState = {
     playback: {
         audioDeviceId: undefined,
         audioFadeOnStatusChange: true,
+        compressor: {
+            attack: 20,
+            enabled: false,
+            knee: 2.83,
+            makeup: 6,
+            ratio: 4,
+            release: 250,
+            threshold: -24,
+        },
+        equalizer: {
+            bands: [
+                { freq: 31.5, gain: 0 },
+                { freq: 63, gain: 0 },
+                { freq: 125, gain: 0 },
+                { freq: 250, gain: 0 },
+                { freq: 500, gain: 0 },
+                { freq: 1000, gain: 0 },
+                { freq: 2000, gain: 0 },
+                { freq: 3000, gain: 0 },
+                { freq: 4000, gain: 0 },
+                { freq: 6300, gain: 0 },
+                { freq: 10000, gain: 0 },
+                { freq: 16000, gain: 0 },
+            ],
+            enabled: false,
+            preamp: 0,
+        },
         filters: [],
         mediaSession: false,
         mpvAudioDeviceId: undefined,
@@ -1920,6 +2017,7 @@ const initialState: SettingsState = {
         startMinimized: false,
         tray: true,
         windowBarStyle: platformDefaultWindowBarStyle,
+        windowBarTrackinfo: true,
     },
 };
 
@@ -2408,10 +2506,41 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
+                if (version < 28) {
+                    if (!state.autoDJ) {
+                        state.autoDJ = { ...initialState.autoDJ };
+                    }
+
+                    if (state.autoDJ.mode !== 'albums' && state.autoDJ.mode !== 'songs') {
+                        state.autoDJ.mode = initialState.autoDJ.mode;
+                    }
+
+                    const normalizeAutoDjStrategy = (stored: unknown) => {
+                        if (stored === 'library_random') {
+                            return AUTO_DJ_STRATEGY.LIBRARY_RANDOM;
+                        }
+
+                        if (
+                            stored === 'similar' ||
+                            stored === 'default' ||
+                            stored === 'similar_forward'
+                        ) {
+                            return AUTO_DJ_STRATEGY.SIMILAR;
+                        }
+
+                        return initialState.autoDJ.songStrategy;
+                    };
+
+                    state.autoDJ.songStrategy = normalizeAutoDjStrategy(state.autoDJ.songStrategy);
+                    state.autoDJ.albumStrategy = normalizeAutoDjStrategy(
+                        state.autoDJ.albumStrategy,
+                    );
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 27,
+            version: 28,
         },
     ),
 );
@@ -2434,6 +2563,9 @@ export const useWindowSettings = () => useSettingsStore((state) => state.window,
 
 export const useWindowBarStyle = () =>
     useSettingsStore((state) => state.window.windowBarStyle, shallow);
+
+export const useWindowBarTrackinfo = () =>
+    useSettingsStore((state) => state.window.windowBarTrackinfo, shallow);
 
 export const useHotkeySettings = () => useSettingsStore((state) => state.hotkeys, shallow);
 
@@ -2515,6 +2647,9 @@ export const useSkipButtons = () => useSettingsStore((state) => state.general.sk
 
 export const useImageRes = () => useSettingsStore((state) => state.general.imageRes, shallow);
 
+export const useAlbumGroupImageSize = () =>
+    useSettingsStore((state) => state.general.albumGroupImageSize);
+
 export const useVolumeWidth = () => useSettingsStore((state) => state.general.volumeWidth, shallow);
 
 export const useFollowCurrentSong = () =>
@@ -2552,8 +2687,26 @@ export const useCollections = () => {
     );
 };
 
+export const useSidebarPlaylistFolders = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistFolders, shallow);
+
+export const useSidebarPlaylistFolderSeparator = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistFolderSeparator, shallow);
+
+export const useSidebarPlaylistFolderView = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistFolderView, shallow);
+
+export const useSidebarPlaylistFolderTreeIndent = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistFolderTreeIndent, shallow);
+
+export const useSidebarPlaylistFolderTreeLineColor = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistFolderTreeLineColor, shallow);
+
 export const useSidebarPlaylistList = () =>
     useSettingsStore((state) => state.general.sidebarPlaylistList, shallow);
+
+export const useSidebarPlaylistMode = () =>
+    useSettingsStore((state) => state.general.sidebarPlaylistMode, shallow);
 
 export const useSidebarPlaylistSorting = () =>
     useSettingsStore((state) => state.general.sidebarPlaylistSorting, shallow);

@@ -518,8 +518,9 @@ export const sortAlbumList = (albums: Album[], sortBy: AlbumListSort, sortOrder:
                         }
                         return 0;
                     },
+                    (v) => v.name.toLowerCase(),
                 ],
-                [order, order],
+                [order, order, 'asc'],
             );
             break;
         case AlbumListSort.SONG_COUNT:

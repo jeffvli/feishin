@@ -54,10 +54,9 @@ export const WindowHotkeySettings = memo(() => {
             ),
             description: t('setting.globalMediaHotkeys', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.globalMediaHotkeys', { postProcess: 'sentenceCase' }),
+            title: t('setting.globalMediaHotkeys'),
         },
     ];
 

@@ -27,7 +27,7 @@ export const EditPlaylistAction = ({ disabled, items }: EditPlaylistActionProps)
 
     return (
         <ContextMenu.Item disabled={disabled} leftIcon="edit" onSelect={handleEditPlaylist}>
-            {t('action.editPlaylist', { postProcess: 'sentenceCase' })}
+            {t('action.editPlaylist')}
         </ContextMenu.Item>
     );
 };

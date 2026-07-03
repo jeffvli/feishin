@@ -28,11 +28,7 @@ export const SelectWithInvalidData = ({ data, defaultValue, ...props }: SelectPr
         <Select
             data={fullData}
             defaultValue={defaultValue}
-            error={
-                hasError
-                    ? t('error.badValue', { postProcess: 'sentenceCase', value: defaultValue })
-                    : undefined
-            }
+            error={hasError ? t('error.badValue', { value: defaultValue }) : undefined}
             {...props}
         />
     );
@@ -74,10 +70,7 @@ export const MultiSelectWithInvalidData = ({
     }, [data, currentValue]);
 
     const error = useMemo(
-        () =>
-            missing.length
-                ? t('error.badValue', { postProcess: 'sentenceCase', value: missing })
-                : undefined,
+        () => (missing.length ? t('error.badValue', { value: missing }) : undefined),
         [missing, t],
     );
 

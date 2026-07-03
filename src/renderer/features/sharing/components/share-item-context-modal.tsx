@@ -38,17 +38,23 @@ export const ShareItemContextModal = ({
         },
         validate: {
             expires: (value) =>
-                dayjs(value).isAfter(dayjs())
-                    ? null
-                    : t('form.shareItem.expireInvalid', {
-                          postProcess: 'sentenceCase',
-                      }),
+                dayjs(value).isAfter(dayjs()) ? null : t('form.shareItem.expireInvalid'),
         },
     });
 
     const handleSubmit = form.onSubmit(async (values) => {
-        shareItemMutation.mutate(
-            {
+        const canUseClipboard = Boolean(navigator.clipboard) && window.isSecureContext;
+
+        // The share URL only exists once the create request resolves. Calling
+        // navigator.clipboard.writeText() from that async callback runs outside
+        // the click's user activation, so Firefox/Safari reject it ("Clipboard
+        // write was blocked due to lack of user activation") and nothing is
+        // copied. Instead, call clipboard.write() synchronously within this
+        // gesture with a ClipboardItem whose value is a promise that resolves to
+        // the URL — this preserves the activation while the share is created.
+        // Falls back to writeText, then to the "click to open" toast.
+        const shareUrlPromise = shareItemMutation
+            .mutateAsync({
                 apiClientProps: { serverId: server?.id || '' },
                 body: {
                     description: values.description,
@@ -57,55 +63,63 @@ export const ShareItemContextModal = ({
                     resourceIds: itemIds.join(),
                     resourceType,
                 },
-            },
-            {
-                onError: () => {
-                    toast.error({
-                        message: t('form.shareItem.createFailed', {
-                            postProcess: 'sentenceCase',
+            })
+            .then((data) => {
+                if (!server) throw new Error('Server not found');
+                if (!data?.id) throw new Error('Failed to share item');
+
+                const serverUrl = getServerUrl(server, true);
+                if (!serverUrl) throw new Error('Server URL not found');
+                return `${serverUrl}/share/${data.id}`;
+            });
+
+        let copied = false;
+        if (canUseClipboard) {
+            try {
+                if (typeof ClipboardItem !== 'undefined') {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({
+                            'text/plain': shareUrlPromise.then(
+                                (url) => new Blob([url], { type: 'text/plain' }),
+                            ),
                         }),
-                    });
-                },
-                onSuccess: (_data) => {
-                    if (!server) throw new Error('Server not found');
-                    if (!_data?.id) throw new Error('Failed to share item');
+                    ]);
+                } else {
+                    await navigator.clipboard.writeText(await shareUrlPromise);
+                }
+                copied = true;
+            } catch {
+                copied = false;
+            }
+        }
 
-                    const serverUrl = getServerUrl(server, true);
-                    if (!serverUrl) throw new Error('Server URL not found');
-                    const shareUrl = `${serverUrl}/share/${_data.id}`;
+        let shareUrl: string;
+        try {
+            shareUrl = await shareUrlPromise;
+        } catch {
+            toast.error({
+                message: t('form.shareItem.createFailed'),
+            });
+            closeModal(id);
+            return;
+        }
 
-                    const canUseClipboard = navigator.clipboard && window.isSecureContext;
-                    if (canUseClipboard) {
-                        navigator.clipboard.writeText(shareUrl);
-                    }
+        toast.success({
+            autoClose: copied ? 5000 : 15000,
+            id: 'share-item-toast',
+            message: t(copied ? 'form.shareItem.success' : 'form.shareItem.successMustClick', {}),
+            onClick: (a) => {
+                if (!(a.target instanceof HTMLElement)) return;
 
-                    toast.success({
-                        autoClose: canUseClipboard ? 5000 : 15000,
-                        id: 'share-item-toast',
-                        message: t(
-                            canUseClipboard
-                                ? 'form.shareItem.success'
-                                : 'form.shareItem.successMustClick',
-                            {
-                                postProcess: 'sentenceCase',
-                            },
-                        ),
-                        onClick: (a) => {
-                            if (!(a.target instanceof HTMLElement)) return;
-
-                            // Make sure we weren't clicking close (otherwise clicking close /also/ opens the url)
-                            if (a.target.nodeName !== 'svg') {
-                                window.open(shareUrl);
-                                toast.hide('share-item-toast');
-                            }
-                        },
-                    });
-                },
+                // Make sure we weren't clicking close (otherwise clicking close /also/ opens the url)
+                if (a.target.nodeName !== 'svg') {
+                    window.open(shareUrl);
+                    toast.hide('share-item-toast');
+                }
             },
-        );
+        });
 
         closeModal(id);
-        return null;
     });
 
     return (
@@ -113,9 +127,7 @@ export const ShareItemContextModal = ({
             <Stack>
                 <DateTimePicker
                     clearable
-                    label={t('form.shareItem.setExpiration', {
-                        postProcess: 'titleCase',
-                    })}
+                    label={t('form.shareItem.setExpiration')}
                     minDate={new Date()}
                     placeholder={defaultDate}
                     popoverProps={{ withinPortal: true }}
@@ -124,17 +136,13 @@ export const ShareItemContextModal = ({
                 />
                 <Textarea
                     autosize
-                    label={t('form.shareItem.description', {
-                        postProcess: 'titleCase',
-                    })}
+                    label={t('form.shareItem.description')}
                     minRows={5}
                     {...form.getInputProps('description')}
                 />
                 <Switch
                     defaultChecked={false}
-                    label={t('form.shareItem.allowDownloading', {
-                        postProcess: 'titleCase',
-                    })}
+                    label={t('form.shareItem.allowDownloading')}
                     {...form.getInputProps('allowDownloading')}
                 />
 

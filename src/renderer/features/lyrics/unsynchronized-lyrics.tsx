@@ -8,6 +8,7 @@ import { FullLyricsMetadata } from '/@/shared/types/domain-types';
 
 export interface UnsynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     lyrics: string;
+    romajiLyrics?: null | string;
     settingsKey?: string;
     translatedLyrics?: null | string;
 }
@@ -17,6 +18,7 @@ export const UnsynchronizedLyrics = ({
     lyrics,
     name,
     remote,
+    romajiLyrics,
     settingsKey = 'default',
     source,
     translatedLyrics,
@@ -41,6 +43,10 @@ export const UnsynchronizedLyrics = ({
     const translatedLines = useMemo(() => {
         return translatedLyrics ? translatedLyrics.split('\n') : [];
     }, [translatedLyrics]);
+
+    const romajiLines = useMemo(() => {
+        return romajiLyrics ? romajiLyrics.split('\n') : [];
+    }, [romajiLyrics]);
 
     return (
         <div className={styles.container} style={{ gap: `${settings.gapUnsync}px` }}>
@@ -67,7 +73,9 @@ export const UnsynchronizedLyrics = ({
                     fontSize={settings.fontSizeUnsync}
                     id={`lyric-${idx}`}
                     key={idx}
-                    text={text + (translatedLines[idx] ? `_BREAK_${translatedLines[idx]}` : '')}
+                    romajiText={romajiLines[idx]}
+                    text={text}
+                    translatedText={translatedLines[idx]}
                 />
             ))}
         </div>

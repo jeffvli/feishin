@@ -100,7 +100,7 @@ export const SubsonicSongFilters = ({
     const artistFilterLabel = useMemo(() => {
         return (
             <Text fw={500} size="sm">
-                {t('entity.artist', { count: 2, postProcess: 'sentenceCase' })}
+                {t('entity.artist', { count: 2 })}
             </Text>
         );
     }, [t]);
@@ -120,7 +120,7 @@ export const SubsonicSongFilters = ({
     const genreFilterLabel = useMemo(() => {
         return (
             <Text fw={500} size="sm">
-                {t('entity.genre', { count: 1, postProcess: 'sentenceCase' })}
+                {t('entity.genre', { count: 1 })}
             </Text>
         );
     }, [t]);
@@ -128,7 +128,7 @@ export const SubsonicSongFilters = ({
     const toggleFilters = useMemo(
         () => [
             {
-                label: t('filter.isFavorited', { postProcess: 'sentenceCase' }),
+                label: t('filter.isFavorited'),
                 onChange: (e: ChangeEvent<HTMLInputElement>) => {
                     if (isFavoriteDisabled && e.target.checked) return;
                     const favoriteValue = e.target.checked ? true : undefined;

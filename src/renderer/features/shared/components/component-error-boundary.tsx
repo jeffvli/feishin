@@ -24,12 +24,12 @@ const ComponentErrorFallback = ({ resetErrorBoundary }: ComponentErrorFallbackPr
                     <Group gap="xs">
                         <Icon fill="error" icon="error" size="lg" />
                         <TextTitle fw={600} order={4}>
-                            {t('error.genericError', { postProcess: 'sentenceCase' })}
+                            {t('error.genericError')}
                         </TextTitle>
                     </Group>
                     <Group grow>
                         <Button onClick={resetErrorBoundary} size="xs" variant="default">
-                            {t('common.reload', { postProcess: 'sentenceCase' })}
+                            {t('common.reload')}
                         </Button>
                     </Group>
                 </Stack>

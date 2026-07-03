@@ -149,6 +149,7 @@ export enum PlayerShuffle {
 export enum PlayerStatus {
     PAUSED = 'paused',
     PLAYING = 'playing',
+    STOPPED = 'stopped',
 }
 
 export enum PlayerStyle {
@@ -288,6 +289,11 @@ export interface UniqueId {
 
 export type WebAudio = {
     context: AudioContext;
+    dsp: null | {
+        compressor: DynamicsCompressorNode;
+        eqFilters: BiquadFilterNode[];
+        preampGain: GainNode;
+    };
     gains: GainNode[];
     visualizerInputs?: AudioNode[];
 };

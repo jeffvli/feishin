@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { useCurrentServerId, useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { useResolvedSongPath } from '/@/renderer/utils/resolve-song-path';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Code } from '/@/shared/components/code/code';
 import { Group } from '/@/shared/components/group/group';
@@ -27,6 +28,7 @@ export const PathSettings = memo(() => {
 
     const { pathReplace, pathReplaceWith } = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
+    const resolvedPreviewPath = useResolvedSongPath(randomSong.data?.items[0]?.path);
 
     const [localPathReplace, setLocalPathReplace] = useState(pathReplace);
     const [localPathReplaceWith, setLocalPathReplaceWith] = useState(pathReplaceWith);
@@ -45,8 +47,6 @@ export const PathSettings = memo(() => {
                 pathReplace: value,
             },
         });
-
-        randomSong.refetch();
     }, 500);
 
     const debouncedSetPathReplaceWith = useDebouncedCallback((value: string) => {
@@ -55,14 +55,12 @@ export const PathSettings = memo(() => {
                 pathReplaceWith: value,
             },
         });
-
-        randomSong.refetch();
     }, 500);
 
     return (
         <Stack>
             <Group>
-                <Text>{t('setting.pathReplace', { postProcess: 'sentenceCase' })}</Text>
+                <Text>{t('setting.pathReplace')}</Text>
                 <ActionIcon
                     icon="refresh"
                     loading={randomSong.isFetching}
@@ -73,7 +71,7 @@ export const PathSettings = memo(() => {
             </Group>
             <Code>
                 <Text isMuted size="md">
-                    {randomSong.data?.items[0]?.path || ''}
+                    {resolvedPreviewPath || ''}
                 </Text>
             </Code>
             <Group grow>
@@ -83,9 +81,7 @@ export const PathSettings = memo(() => {
                         setLocalPathReplace(value);
                         debouncedSetPathReplace(value);
                     }}
-                    placeholder={t('setting.pathReplace_optionRemovePrefix', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    placeholder={t('setting.pathReplace_optionRemovePrefix')}
                     value={localPathReplace}
                 />
                 <TextInput
@@ -94,9 +90,7 @@ export const PathSettings = memo(() => {
                         setLocalPathReplaceWith(value);
                         debouncedSetPathReplaceWith(value);
                     }}
-                    placeholder={t('setting.pathReplace_optionAddPrefix', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    placeholder={t('setting.pathReplace_optionAddPrefix')}
                     value={localPathReplaceWith}
                 />
             </Group>

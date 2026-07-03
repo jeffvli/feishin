@@ -23,6 +23,8 @@ export interface WebPlayerEngineHandle extends AudioPlayer {
 interface WebPlayerEngineProps {
     isMuted: boolean;
     isTransitioning: boolean;
+    loopPlayer1: boolean;
+    loopPlayer2: boolean;
     onEndedPlayer1: () => void;
     onEndedPlayer2: () => void;
     onErrorPause: () => void;
@@ -55,6 +57,8 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
     const {
         isMuted,
         isTransitioning,
+        loopPlayer1,
+        loopPlayer2,
         onEndedPlayer1,
         onEndedPlayer2,
         onErrorPause,
@@ -292,8 +296,9 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 controls={false}
                 height={0}
                 id="web-player-1"
+                loop={loopPlayer1}
                 muted={isMuted}
-                onEnded={src1 ? () => onEndedPlayer1() : undefined}
+                onEnded={src1 && !loopPlayer1 ? () => onEndedPlayer1() : undefined}
                 onError={handleOnError(
                     player1Ref,
                     () => onEndedPlayer1(),
@@ -317,8 +322,9 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 controls={false}
                 height={0}
                 id="web-player-2"
+                loop={loopPlayer2}
                 muted={isMuted}
-                onEnded={src2 ? () => onEndedPlayer2() : undefined}
+                onEnded={src2 && !loopPlayer2 ? () => onEndedPlayer2() : undefined}
                 onError={handleOnError(
                     player2Ref,
                     () => onEndedPlayer2(),

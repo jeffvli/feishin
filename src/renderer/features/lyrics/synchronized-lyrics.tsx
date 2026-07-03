@@ -23,6 +23,7 @@ const mpris = isElectron() && utils?.isLinux() ? window.api.mpris : null;
 export interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     lyrics: SynchronizedLyricsArray;
     offsetMs?: number;
+    romajiLyrics?: null | SynchronizedLyricsArray;
     settingsKey?: string;
     style?: React.CSSProperties;
     translatedLyrics?: null | string;
@@ -34,6 +35,7 @@ export const SynchronizedLyrics = ({
     name,
     offsetMs,
     remote,
+    romajiLyrics,
     settingsKey = 'default',
     source,
     style,
@@ -93,6 +95,7 @@ export const SynchronizedLyrics = ({
     const scrollTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const programmaticScrollRef = useRef(false);
+    const programmaticScrollTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null);
 
     const getCurrentLyric = (timeInMs: number) => {
         const activeLyrics = lyricRef.current;
@@ -176,9 +179,6 @@ export const SynchronizedLyrics = ({
             if (followRef.current && !userScrollingRef.current) {
                 programmaticScrollRef.current = true;
                 doc?.scroll({ behavior: 'smooth', top: offsetTop });
-                setTimeout(() => {
-                    programmaticScrollRef.current = false;
-                }, 600);
             }
 
             if (index !== lyricRef.current!.length - 1) {
@@ -285,6 +285,14 @@ export const SynchronizedLyrics = ({
         const handleScroll = () => {
             // Ignore programmatic scrolls (auto-scroll)
             if (programmaticScrollRef.current) {
+                if (programmaticScrollTimeoutRef.current) {
+                    clearTimeout(programmaticScrollTimeoutRef.current);
+                }
+
+                programmaticScrollTimeoutRef.current = setTimeout(() => {
+                    programmaticScrollRef.current = false;
+                }, 150);
+
                 return;
             }
 
@@ -306,6 +314,10 @@ export const SynchronizedLyrics = ({
             container.removeEventListener('scroll', handleScroll);
             if (scrollTimeoutRef.current) {
                 clearTimeout(scrollTimeoutRef.current);
+            }
+
+            if (programmaticScrollTimeoutRef.current) {
+                clearTimeout(programmaticScrollTimeoutRef.current);
             }
         };
     }, []);
@@ -368,10 +380,9 @@ export const SynchronizedLyrics = ({
                             handleSeek(time / 1000);
                         }
                     }}
-                    text={
-                        text +
-                        (translatedLyrics ? `_BREAK_${translatedLyrics.split('\n')[idx]}` : '')
-                    }
+                    romajiText={romajiLyrics?.[idx]?.[1]}
+                    text={text}
+                    translatedText={translatedLyrics?.split('\n')[idx]}
                 />
             ))}
         </div>

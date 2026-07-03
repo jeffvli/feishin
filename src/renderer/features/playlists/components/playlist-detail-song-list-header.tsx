@@ -122,8 +122,7 @@ export const PlaylistDetailSongListHeader = ({
     const uploadPlaylistImageMutation = useUploadPlaylistImage({});
 
     const handlePlay = (type?: Play) => {
-        const songs = (listData as Song[]).map((s) => ({ ...s, _playlistId: playlistId }));
-        player.addToQueueByData(songs, type || Play.NOW);
+        player.addToQueueByData(listData as Song[], type || Play.NOW, undefined, playlistId);
     };
 
     const canUploadPlaylistImage =

@@ -82,9 +82,7 @@ export const MobilePlayerbar = () => {
                                     transition={{ duration: 0.2, ease: 'easeIn' }}
                                 >
                                     <Tooltip
-                                        label={t('player.toggleFullscreenPlayer', {
-                                            postProcess: 'sentenceCase',
-                                        })}
+                                        label={t('player.toggleFullscreenPlayer')}
                                         openDelay={0}
                                     >
                                         <ItemImage
@@ -208,14 +206,14 @@ export const MobilePlayerbar = () => {
                         mediaPrevious();
                     }}
                     tooltip={{
-                        label: t('player.previous', { postProcess: 'sentenceCase' }),
+                        label: t('player.previous'),
                         openDelay: 0,
                     }}
                     variant="tertiary"
                 />
                 <MainPlayButton
                     disabled={currentSong?.id === undefined}
-                    isPaused={status === PlayerStatus.PAUSED}
+                    isPaused={status !== PlayerStatus.PLAYING}
                     onClick={(e) => {
                         e.stopPropagation();
                         mediaTogglePlayPause();
@@ -228,7 +226,7 @@ export const MobilePlayerbar = () => {
                         mediaNext();
                     }}
                     tooltip={{
-                        label: t('player.next', { postProcess: 'sentenceCase' }),
+                        label: t('player.next'),
                         openDelay: 0,
                     }}
                     variant="tertiary"

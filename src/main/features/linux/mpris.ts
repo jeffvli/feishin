@@ -124,7 +124,12 @@ ipcMain.on('update-volume', (_event, volume) => {
 });
 
 ipcMain.on('update-playback', (_event, status: PlayerStatus) => {
-    mprisPlayer.playbackStatus = status === PlayerStatus.PLAYING ? 'Playing' : 'Paused';
+    mprisPlayer.playbackStatus =
+        status === PlayerStatus.PLAYING
+            ? 'Playing'
+            : status === PlayerStatus.STOPPED
+              ? 'Stopped'
+              : 'Paused';
 });
 
 const REPEAT_TO_MPRIS: Record<PlayerRepeat, string> = {

@@ -53,10 +53,9 @@ export const ControlSettings = memo(() => {
             ),
             description: t('setting.buttonSize', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.buttonSize', { postProcess: 'sentenceCase' }),
+            title: t('setting.buttonSize'),
         },
         {
             control: (
@@ -78,15 +77,14 @@ export const ControlSettings = memo(() => {
             ),
             description: t('setting.showSkipButtons', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.showSkipButtons', { postProcess: 'sentenceCase' }),
+            title: t('setting.showSkipButtons'),
         },
         {
             control: (
                 <Group>
-                    <Tooltip label={t('common.backward', { postProcess: 'titleCase' })}>
+                    <Tooltip label={t('common.backward')}>
                         <NumberInput
                             defaultValue={settings.skipButtons.skipBackwardSeconds}
                             min={0}
@@ -106,7 +104,7 @@ export const ControlSettings = memo(() => {
                             width={75}
                         />
                     </Tooltip>
-                    <Tooltip label={t('common.forward', { postProcess: 'titleCase' })}>
+                    <Tooltip label={t('common.forward')}>
                         <NumberInput
                             defaultValue={settings.skipButtons.skipForwardSeconds}
                             min={0}
@@ -130,10 +128,9 @@ export const ControlSettings = memo(() => {
             ),
             description: t('setting.skipDuration', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.skipDuration', { postProcess: 'sentenceCase' }),
+            title: t('setting.skipDuration'),
         },
         {
             control: (
@@ -142,28 +139,24 @@ export const ControlSettings = memo(() => {
                         {
                             label: t('setting.playButtonBehavior', {
                                 context: 'optionPlay',
-                                postProcess: 'titleCase',
                             }),
                             value: Play.NOW,
                         },
                         {
                             label: t('setting.playButtonBehavior', {
                                 context: 'optionAddNext',
-                                postProcess: 'titleCase',
                             }),
                             value: Play.NEXT,
                         },
                         {
                             label: t('setting.playButtonBehavior', {
                                 context: 'optionAddLast',
-                                postProcess: 'titleCase',
                             }),
                             value: Play.LAST,
                         },
                         {
                             label: t('setting.playButtonBehavior', {
                                 context: 'optionPlayShuffled',
-                                postProcess: 'titleCase',
                             }),
                             value: Play.SHUFFLE,
                         },
@@ -181,10 +174,9 @@ export const ControlSettings = memo(() => {
             ),
             description: t('setting.playButtonBehavior', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.playButtonBehavior', { postProcess: 'sentenceCase' }),
+            title: t('setting.playButtonBehavior'),
         },
         {
             control: (
@@ -203,10 +195,9 @@ export const ControlSettings = memo(() => {
             ),
             description: t('setting.followCurrentSong', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.followCurrentSong', { postProcess: 'sentenceCase' }),
+            title: t('setting.followCurrentSong'),
         },
         {
             control: (
@@ -231,10 +222,9 @@ export const ControlSettings = memo(() => {
             ),
             description: t('setting.artistRadioCount', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.artistRadioCount', { postProcess: 'sentenceCase' }),
+            title: t('setting.artistRadioCount'),
         },
         {
             control: (
@@ -255,10 +245,9 @@ export const ControlSettings = memo(() => {
             ),
             description: t('setting.volumeWheelStep', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.volumeWheelStep', { postProcess: 'sentenceCase' }),
+            title: t('setting.volumeWheelStep'),
         },
         {
             control: (
@@ -278,10 +267,9 @@ export const ControlSettings = memo(() => {
             ),
             description: t('setting.volumeWidth', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.volumeWidth', { postProcess: 'sentenceCase' }),
+            title: t('setting.volumeWidth'),
         },
         {
             control: (
@@ -290,14 +278,12 @@ export const ControlSettings = memo(() => {
                         {
                             label: t('setting.playerbarSliderType', {
                                 context: 'optionSlider',
-                                postProcess: 'titleCase',
                             }),
                             value: PlayerbarSliderType.SLIDER,
                         },
                         {
                             label: t('setting.playerbarSliderType', {
                                 context: 'optionWaveform',
-                                postProcess: 'titleCase',
                             }),
                             value: PlayerbarSliderType.WAVEFORM,
                         },
@@ -320,10 +306,9 @@ export const ControlSettings = memo(() => {
             ),
             description: t('setting.playerbarSlider', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.playerbarSlider', { postProcess: 'sentenceCase' }),
+            title: t('setting.playerbarSlider'),
         },
         ...(playerbarSlider?.type === PlayerbarSliderType.WAVEFORM
             ? [
@@ -334,21 +319,18 @@ export const ControlSettings = memo(() => {
                                   {
                                       label: t('setting.playerbarWaveformAlign', {
                                           context: 'optionTop',
-                                          postProcess: 'titleCase',
                                       }),
                                       value: BarAlign.TOP,
                                   },
                                   {
                                       label: t('setting.playerbarWaveformAlign', {
                                           context: 'optionCenter',
-                                          postProcess: 'titleCase',
                                       }),
                                       value: BarAlign.CENTER,
                                   },
                                   {
                                       label: t('setting.playerbarWaveformAlign', {
                                           context: 'optionBottom',
-                                          postProcess: 'titleCase',
                                       }),
                                       value: BarAlign.BOTTOM,
                                   },
@@ -371,12 +353,9 @@ export const ControlSettings = memo(() => {
                       ),
                       description: t('setting.playerbarWaveformAlign', {
                           context: 'description',
-                          postProcess: 'sentenceCase',
                       }),
                       isHidden: false,
-                      title: t('setting.playerbarWaveformAlign', {
-                          postProcess: 'sentenceCase',
-                      }),
+                      title: t('setting.playerbarWaveformAlign'),
                   },
                   {
                       control: (
@@ -404,12 +383,9 @@ export const ControlSettings = memo(() => {
                       ),
                       description: t('setting.playerbarWaveformBarWidth', {
                           context: 'description',
-                          postProcess: 'sentenceCase',
                       }),
                       isHidden: false,
-                      title: t('setting.playerbarWaveformBarWidth', {
-                          postProcess: 'sentenceCase',
-                      }),
+                      title: t('setting.playerbarWaveformBarWidth'),
                   },
                   {
                       control: (
@@ -437,12 +413,9 @@ export const ControlSettings = memo(() => {
                       ),
                       description: t('setting.playerbarWaveformGap', {
                           context: 'description',
-                          postProcess: 'sentenceCase',
                       }),
                       isHidden: false,
-                      title: t('setting.playerbarWaveformGap', {
-                          postProcess: 'sentenceCase',
-                      }),
+                      title: t('setting.playerbarWaveformGap'),
                   },
                   {
                       control: (
@@ -470,12 +443,9 @@ export const ControlSettings = memo(() => {
                       ),
                       description: t('setting.playerbarWaveformRadius', {
                           context: 'description',
-                          postProcess: 'sentenceCase',
                       }),
                       isHidden: false,
-                      title: t('setting.playerbarWaveformRadius', {
-                          postProcess: 'sentenceCase',
-                      }),
+                      title: t('setting.playerbarWaveformRadius'),
                   },
                   {
                       control: (
@@ -496,12 +466,9 @@ export const ControlSettings = memo(() => {
                       ),
                       description: t('setting.playerbarWaveformStretch', {
                           context: 'description',
-                          postProcess: 'sentenceCase',
                       }),
                       isHidden: false,
-                      title: t('setting.playerbarWaveformStretch', {
-                          postProcess: 'sentenceCase',
-                      }),
+                      title: t('setting.playerbarWaveformStretch'),
                   },
                   {
                       control: (
@@ -528,19 +495,13 @@ export const ControlSettings = memo(() => {
                       ),
                       description: t('setting.waveformLoadingDelay', {
                           context: 'description',
-                          postProcess: 'sentenceCase',
                       }),
                       isHidden: false,
-                      title: t('setting.waveformLoadingDelay', { postProcess: 'sentenceCase' }),
+                      title: t('setting.waveformLoadingDelay'),
                   },
               ]
             : []),
     ];
 
-    return (
-        <SettingsSection
-            options={controlOptions}
-            title={t('page.setting.controls', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={controlOptions} title={t('page.setting.controls')} />;
 });

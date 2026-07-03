@@ -69,7 +69,7 @@ export function SearchSongsSection({
     return (
         <CollapsibleCommandGroup
             expanded={expanded}
-            heading={t('entity.track', { count: 2, postProcess: 'titleCase' })}
+            heading={t('entity.track', { count: 2 })}
             onToggle={onToggle}
             subtitle={
                 isFetched ? (
@@ -147,9 +147,7 @@ export function SearchSongsSection({
                                     {isFetchingNextPage ? (
                                         <Spinner />
                                     ) : (
-                                        <Text size="sm">
-                                            {t('action.viewMore', { postProcess: 'titleCase' })}
-                                        </Text>
+                                        <Text size="sm">{t('action.viewMore')}</Text>
                                     )}
                                 </div>
                             )}

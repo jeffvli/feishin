@@ -276,7 +276,7 @@ export const ItemCardControls = ({
                     (currentSong.artists?.some((a) => a.id === item.id) ?? false)
                 );
             case LibraryItem.PLAYLIST:
-                return currentSong._playlistId === item.id;
+                return currentSong._contextPlaylistId === item.id;
             case LibraryItem.PLAYLIST_SONG:
             case LibraryItem.SONG:
                 return currentSong.id === item.id;

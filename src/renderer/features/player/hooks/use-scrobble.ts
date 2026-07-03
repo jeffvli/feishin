@@ -1,48 +1,92 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useSendScrobble } from '/@/renderer/features/player/mutations/scrobble-mutation';
 import {
+    getServerById,
+    publishScrobbleDebug,
     useAppStore,
     usePlaybackSettings,
     usePlayerSong,
+    usePlayerSpeed,
     usePlayerStore,
     useSettingsStore,
     useTimestampStoreBase,
 } from '/@/renderer/store';
 import { LogCategory, logFn } from '/@/renderer/utils/logger';
 import { logMsg } from '/@/renderer/utils/logger-message';
+import { hasFeature } from '/@/shared/api/utils';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
+import { ServerFeature } from '/@/shared/types/features-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
+type ScrobbleManualHandlers = {
+    forceSubmitScrobble: () => void;
+    resetListenedState: () => void;
+};
+
+let scrobbleManualHandlers: null | ScrobbleManualHandlers = null;
+
+export const registerScrobbleManualHandlers = (next: null | ScrobbleManualHandlers) => {
+    scrobbleManualHandlers = next;
+};
+
+export const invokeScrobbleForceSubmit = () => {
+    scrobbleManualHandlers?.forceSubmitScrobble();
+};
+
+export const invokeScrobbleResetListenedState = () => {
+    scrobbleManualHandlers?.resetListenedState();
+};
+
+const getPositionValue = (seconds: number, useTicks: boolean) => {
+    if (useTicks) {
+        return Math.round(seconds * 1e7);
+    }
+
+    return seconds * 1000;
+};
+
 /*
- Scrobble Conditions (match any):
-  - If the song has been played for the required percentage
-  - If the song has been played for the required duration
+ Submission (Last.fm / etc.) eligibility uses accumulated listen time:
+  - If listened time meets the required percentage of track duration
+  - If listened time meets the required duration (seconds)
 
-Scrobble Events:
-  - On song timestamp update:
-      - If the song has been played for the required percentage
-      - If the song has been played for the required duration
+Listen time advances only while PLAYING, from consecutive timestamp deltas.
+Seeks and other timeline jumps re-baseline the next sample without counting
+the jump as listen time; accumulated listen time is kept across seeks.
 
-  - When the song changes (or is completed):
-    - Current song: Sends the 'playing' scrobble event
-    - Resets the 'isCurrentSongScrobbled' state to false
+Listen time and submission state reset when the playhead returns to the start
+of the track (position before SCROBBLE_TRACK_BEGIN_SEC), e.g. seek-to-start or
+restart-from-near-zero. Song change and repeat still reset for a new play-through.
 
-  - When the song is restarted:
-    - Sends the 'submission' scrobble event if conditions are met AND the 'isCurrentSongScrobbled' state is false
-    - Resets the 'isCurrentSongScrobbled' state to false
+Jellyfin progress APIs still use playback position (ticks), not listen time:
+  - Periodic timeupdate while playing
+  - timeupdate on seek
+  - pause / unpause
 
-  - When the song is seeked:
-    - Sends the 'timeupdate' scrobble event (Jellyfin only)
+Other events:
+  - When the song changes: sends 'stop' for the previous track; sends 'start'
+    when the new track is playing; clears submission flag and listen accumulator
+    for the new track.
 
+  - When the song is restarted (near 0 after 10s+): clears submission flag
+    and listen accumulator.
 
-Progress Events:
-  - When the song is playing (Jellyfin only):
-    - Sends the 'progress' scrobble event on an interval
-
+  - When the song is seeked: Jellyfin sends timeupdate (throttled). Seeking from
+    at/after the intro into the start of the track clears listen accumulator and
+    submission flag; other seeks keep accumulated listen time.
 */
+
+// Positions before this time (seconds) count as the start of the track for listen/scrobble resets.
+const SCROBBLE_TRACK_BEGIN_SEC = 5;
+
+// Min previous position (seconds) to treat a jump to the start as a full restart.
+const SCROBBLE_RESTART_PREVIOUS_MIN_SEC = 10;
+
+// Max seconds between timestamp samples to count as continuous play (above poll interval, below a teleport).
+const MAX_LISTEN_DELTA_SEC = 5;
 
 const checkScrobbleConditions = (args: {
     scrobbleAtDurationMs: number;
@@ -56,10 +100,10 @@ const checkScrobbleConditions = (args: {
         ? (songCompletedDurationMs / songDurationMs) * 100
         : 0;
 
-    const shouldScrobbleBasedOnPercetange = percentageOfSongCompleted >= scrobbleAtPercentage;
+    const shouldScrobbleBasedOnPercentage = percentageOfSongCompleted >= scrobbleAtPercentage;
     const shouldScrobbleBasedOnDuration = songCompletedDurationMs >= scrobbleAtDurationMs;
 
-    return shouldScrobbleBasedOnPercetange || shouldScrobbleBasedOnDuration;
+    return shouldScrobbleBasedOnPercentage || shouldScrobbleBasedOnDuration;
 };
 
 export const useScrobble = () => {
@@ -68,6 +112,7 @@ export const useScrobble = () => {
     const isPrivateModeEnabled = useAppStore((state) => state.privateMode);
     const sendScrobble = useSendScrobble();
     const currentSong = usePlayerSong();
+    const playbackRate = usePlayerSpeed();
 
     const imageUrl = useItemImageUrl({
         id: currentSong?.imageId || undefined,
@@ -77,9 +122,16 @@ export const useScrobble = () => {
     });
 
     const imageUrlRef = useRef<null | string | undefined>(imageUrl);
-    const [isCurrentSongScrobbled, setIsCurrentSongScrobbled] = useState(false);
+    const isCurrentSongScrobbledRef = useRef(false);
+    const listenedMsRef = useRef(0);
+    const lastListenSampleTimeRef = useRef<null | number>(null);
+    const scrobbleAtDurationMsRef = useRef(0);
+    const scrobbleAtPercentageRef = useRef(75);
+
     const previousSongRef = useRef<QueueSong | undefined>(undefined);
     const previousTimestampRef = useRef<number>(0);
+    const stopPositionRef = useRef<number>(0);
+    const stoppedSongIdRef = useRef<string | undefined>(undefined);
     const lastProgressEventRef = useRef<number>(0);
     const lastSeekEventRef = useRef<number>(0);
     const songChangeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -89,85 +141,154 @@ export const useScrobble = () => {
         imageUrlRef.current = imageUrl;
     }, [imageUrl]);
 
+    useEffect(() => {
+        scrobbleAtDurationMsRef.current = (scrobbleSettings?.scrobbleAtDuration ?? 0) * 1000;
+        scrobbleAtPercentageRef.current = scrobbleSettings?.scrobbleAtPercentage ?? 75;
+    }, [scrobbleSettings?.scrobbleAtDuration, scrobbleSettings?.scrobbleAtPercentage]);
+
+    const flushScrobbleDebug = useCallback(() => {
+        const song = usePlayerStore.getState().getCurrentSong();
+        const status = usePlayerStore.getState().player.status;
+        const positionSec = useTimestampStoreBase.getState().timestamp;
+        const trackDurationMs = song?.duration ?? 0;
+
+        const eligibilityMet = Boolean(
+            song?.id &&
+            checkScrobbleConditions({
+                scrobbleAtDurationMs: scrobbleAtDurationMsRef.current,
+                scrobbleAtPercentage: scrobbleAtPercentageRef.current,
+                songCompletedDurationMs: listenedMsRef.current,
+                songDurationMs: trackDurationMs,
+            }),
+        );
+
+        publishScrobbleDebug({
+            eligibilityMet,
+            lastListenSampleTimeSec: lastListenSampleTimeRef.current,
+            listenedMs: listenedMsRef.current,
+            playerStatus: status,
+            positionSec,
+            songId: song?.id,
+            songName: song?.name,
+            submitted: isCurrentSongScrobbledRef.current,
+            targetDurationSec: scrobbleAtDurationMsRef.current / 1000,
+            targetPercentage: scrobbleAtPercentageRef.current,
+            trackDurationMs,
+        });
+    }, []);
+
     const handleScrobbleFromProgress = useCallback(
         (properties: { timestamp: number }, prev: { timestamp: number }) => {
             if (!isScrobbleEnabled || isPrivateModeEnabled) return;
 
             const currentSong = usePlayerStore.getState().getCurrentSong();
+            const mediaType = currentSong?._itemType.includes('song') ? 'song' : 'podcast';
+            const useTicks = currentSong?._serverType === ServerType.JELLYFIN;
             const currentStatus = usePlayerStore.getState().player.status;
-
-            if (!currentSong?.id || currentStatus !== PlayerStatus.PLAYING) return;
-
             const currentTime = properties.timestamp;
             const previousTime = prev.timestamp;
 
-            // Detect song restart: when timestamp resets to near 0 and was playing for at least 10 seconds
-            if (
-                currentTime < previousTime &&
-                currentTime < 5 && // Reset to near 0
-                previousTime >= 10 // Was playing for at least 10 seconds
-            ) {
-                setIsCurrentSongScrobbled(false);
-                lastProgressEventRef.current = 0;
-                previousTimestampRef.current = 0;
+            if (!currentSong?.id) {
                 return;
             }
 
-            // Send Jellyfin progress events every 10 seconds
-            if (currentSong._serverType === ServerType.JELLYFIN) {
-                const timeSinceLastProgress = currentTime - lastProgressEventRef.current;
-                if (timeSinceLastProgress >= 10) {
-                    const position = currentTime * 1e7;
-                    sendScrobble.mutate(
-                        {
-                            apiClientProps: { serverId: currentSong._serverId || '' },
-                            query: {
-                                albumId: currentSong.albumId,
-                                event: 'timeupdate',
-                                id: currentSong.id,
-                                position,
-                                submission: false,
-                            },
-                        },
-                        {
-                            onSuccess: () => {
-                                logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledTimeupdate, {
-                                    category: LogCategory.SCROBBLE,
-                                    meta: {
-                                        id: currentSong.id,
-                                    },
-                                });
-                            },
-                        },
-                    );
-                    lastProgressEventRef.current = currentTime;
+            if (currentStatus !== PlayerStatus.PLAYING) {
+                lastListenSampleTimeRef.current = currentTime;
+                return;
+            }
+
+            // Detect song restart: when timestamp resets to near 0 and was playing past the intro
+            if (
+                currentTime < previousTime &&
+                currentTime < SCROBBLE_TRACK_BEGIN_SEC &&
+                previousTime >= SCROBBLE_RESTART_PREVIOUS_MIN_SEC
+            ) {
+                isCurrentSongScrobbledRef.current = false;
+                lastProgressEventRef.current = 0;
+                previousTimestampRef.current = 0;
+                listenedMsRef.current = 0;
+                lastListenSampleTimeRef.current = null;
+                return;
+            }
+
+            const lastSample = lastListenSampleTimeRef.current;
+            if (lastSample === null) {
+                const prevSec = prev.timestamp;
+                if (currentTime > prevSec && currentTime - prevSec <= MAX_LISTEN_DELTA_SEC) {
+                    listenedMsRef.current += (currentTime - prevSec) * 1000;
+                }
+                lastListenSampleTimeRef.current = currentTime;
+            } else {
+                const deltaSec = currentTime - lastSample;
+                const jumpedBackToTrackStart =
+                    currentTime < lastSample &&
+                    currentTime < SCROBBLE_TRACK_BEGIN_SEC &&
+                    lastSample >= SCROBBLE_TRACK_BEGIN_SEC;
+
+                if (jumpedBackToTrackStart) {
+                    listenedMsRef.current = 0;
+                    isCurrentSongScrobbledRef.current = false;
+                    lastProgressEventRef.current = 0;
+                    lastListenSampleTimeRef.current = currentTime;
+                } else if (currentTime < lastSample || deltaSec > MAX_LISTEN_DELTA_SEC) {
+                    lastListenSampleTimeRef.current = currentTime;
+                } else if (deltaSec > 0) {
+                    listenedMsRef.current += deltaSec * 1000;
+                    lastListenSampleTimeRef.current = currentTime;
                 }
             }
 
-            // Check if we should submit scrobble based on conditions
-            if (!isCurrentSongScrobbled) {
+            // Send progress events every 10 seconds
+            // if (hasPlaybackReport) {
+            //     const timeSinceLastProgress = currentTime - lastProgressEventRef.current;
+            //     if (timeSinceLastProgress >= 10) {
+            //         sendScrobble.mutate(
+            //             {
+            //                 apiClientProps: { serverId: serverId || '' },
+            //                 query: {
+            //                     albumId: currentSong.albumId,
+            //                     event: 'timeupdate',
+            //                     id: currentSong.id,
+            //                     mediaType: mediaType,
+            //                     playbackRate,
+            //                     position: getPositionValue(currentTime, useTicks),
+            //                     submission: false,
+            //                 },
+            //             },
+            //             {
+            //                 onSuccess: () => {
+            //                     logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledTimeupdate, {
+            //                         category: LogCategory.SCROBBLE,
+            //                         meta: {
+            //                             id: currentSong.id,
+            //                         },
+            //                     });
+            //                 },
+            //             },
+            //         );
+            //         lastProgressEventRef.current = currentTime;
+            //     }
+            // }
+
+            // Check if we should submit scrobble based on listened time
+            if (!isCurrentSongScrobbledRef.current) {
                 const shouldSubmitScrobble = checkScrobbleConditions({
-                    scrobbleAtDurationMs: (scrobbleSettings?.scrobbleAtDuration ?? 0) * 1000,
-                    scrobbleAtPercentage: scrobbleSettings?.scrobbleAtPercentage,
-                    songCompletedDurationMs: currentTime * 1000,
+                    scrobbleAtDurationMs: scrobbleAtDurationMsRef.current,
+                    scrobbleAtPercentage: scrobbleAtPercentageRef.current,
+                    songCompletedDurationMs: listenedMsRef.current,
                     songDurationMs: currentSong.duration,
                 });
 
                 if (shouldSubmitScrobble) {
-                    // Since jellyfin-plugin-lastfm uses the submission Position to determine if the song should actually scrobble
-                    // we just send the full duration of the song when it matches the local scrobble conditions
-                    const position =
-                        currentSong._serverType === ServerType.JELLYFIN
-                            ? currentSong.duration * 1e7
-                            : undefined;
-
                     sendScrobble.mutate(
                         {
                             apiClientProps: { serverId: currentSong._serverId || '' },
                             query: {
                                 albumId: currentSong.albumId,
                                 id: currentSong.id,
-                                position,
+                                mediaType: mediaType,
+                                playbackRate: playbackRate,
+                                position: getPositionValue(currentSong.duration ?? 0, useTicks),
                                 submission: true,
                             },
                         },
@@ -177,25 +298,18 @@ export const useScrobble = () => {
                                     category: LogCategory.SCROBBLE,
                                     meta: {
                                         id: currentSong.id,
-                                        reason: 'from song progress',
+                                        reason: 'from listened time',
                                     },
                                 });
                             },
                         },
                     );
 
-                    setIsCurrentSongScrobbled(true);
+                    isCurrentSongScrobbledRef.current = true;
                 }
             }
         },
-        [
-            isScrobbleEnabled,
-            isPrivateModeEnabled,
-            scrobbleSettings?.scrobbleAtDuration,
-            scrobbleSettings?.scrobbleAtPercentage,
-            isCurrentSongScrobbled,
-            sendScrobble,
-        ],
+        [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble, playbackRate],
     );
 
     const handleScrobbleFromSongChange = useCallback(
@@ -205,6 +319,10 @@ export const useScrobble = () => {
         ) => {
             const currentSong = properties.song;
             const previousSong = previousSongRef.current;
+            const previousPositionSec = stopPositionRef.current;
+            const mediaType = currentSong?._itemType.includes('song') ? 'song' : 'podcast';
+            const previousMediaType = previousSong?._itemType.includes('song') ? 'song' : 'podcast';
+            const useTicksForPrevious = previousSong?._serverType === ServerType.JELLYFIN;
 
             // Handle notifications
             if (scrobbleSettings?.notify && currentSong?.id) {
@@ -240,11 +358,17 @@ export const useScrobble = () => {
             if (!isScrobbleEnabled || isPrivateModeEnabled) {
                 previousSongRef.current = currentSong;
                 previousTimestampRef.current = 0;
+                stopPositionRef.current = 0;
+                listenedMsRef.current = 0;
+                lastListenSampleTimeRef.current = null;
+                flushScrobbleDebug();
                 return;
             }
 
-            setIsCurrentSongScrobbled(false);
+            isCurrentSongScrobbledRef.current = false;
             lastProgressEventRef.current = 0;
+            listenedMsRef.current = 0;
+            lastListenSampleTimeRef.current = null;
 
             // Use a timeout to prevent spamming the server when switching songs quickly
             clearTimeout(songChangeTimeoutRef.current);
@@ -260,6 +384,8 @@ export const useScrobble = () => {
                                 albumId: currentSong.albumId,
                                 event: 'start',
                                 id: currentSong.id,
+                                mediaType: mediaType,
+                                playbackRate: playbackRate,
                                 position: 0,
                                 submission: false,
                             },
@@ -276,12 +402,52 @@ export const useScrobble = () => {
                         },
                     );
                 }
+
+                // Send stop scrobble for the track that was playing before the change
+                if (previousSong?.id) {
+                    sendScrobble.mutate(
+                        {
+                            apiClientProps: { serverId: previousSong._serverId || '' },
+                            query: {
+                                albumId: previousSong.albumId,
+                                event: 'stop',
+                                id: previousSong.id,
+                                mediaType: previousMediaType,
+                                playbackRate: playbackRate,
+                                position: getPositionValue(
+                                    previousPositionSec,
+                                    useTicksForPrevious,
+                                ),
+                                submission: false,
+                            },
+                        },
+                        {
+                            onSuccess: () => {
+                                logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledStop, {
+                                    category: LogCategory.SCROBBLE,
+                                    meta: {
+                                        id: previousSong.id,
+                                    },
+                                });
+                            },
+                        },
+                    );
+                }
             }, 2000);
 
             previousSongRef.current = currentSong;
             previousTimestampRef.current = 0;
+            stopPositionRef.current = 0;
+            flushScrobbleDebug();
         },
-        [scrobbleSettings?.notify, isScrobbleEnabled, isPrivateModeEnabled, sendScrobble],
+        [
+            scrobbleSettings?.notify,
+            isScrobbleEnabled,
+            isPrivateModeEnabled,
+            flushScrobbleDebug,
+            sendScrobble,
+            playbackRate,
+        ],
     );
 
     const handleScrobbleFromSeek = useCallback(
@@ -292,13 +458,31 @@ export const useScrobble = () => {
             }
 
             const currentSong = usePlayerStore.getState().getCurrentSong();
+            const mediaType = currentSong?._itemType.includes('song') ? 'song' : 'podcast';
+            const serverId = currentSong?._serverId;
+            const server = getServerById(serverId);
+            const hasPlaybackReport = hasFeature(server, ServerFeature.REPORT_PLAYBACK);
+            const useTicks = currentSong?._serverType === ServerType.JELLYFIN;
 
             if (!currentSong?.id) {
                 return;
             }
 
+            const sampleBeforeSeek = lastListenSampleTimeRef.current;
+            lastListenSampleTimeRef.current = properties.timestamp;
+
+            if (
+                properties.timestamp < SCROBBLE_TRACK_BEGIN_SEC &&
+                (sampleBeforeSeek === null || sampleBeforeSeek >= SCROBBLE_TRACK_BEGIN_SEC)
+            ) {
+                listenedMsRef.current = 0;
+                isCurrentSongScrobbledRef.current = false;
+                lastProgressEventRef.current = 0;
+            }
+
             // Position scrobbles are only relevant for Jellyfin
-            if (currentSong._serverType !== ServerType.JELLYFIN) {
+            if (!hasPlaybackReport) {
+                flushScrobbleDebug();
                 return;
             }
 
@@ -307,22 +491,31 @@ export const useScrobble = () => {
 
             // Only allow seek scrobble once per second
             if (timeSinceLastSeek < 1000) {
+                flushScrobbleDebug();
                 return;
             }
 
-            const position = properties.timestamp * 1e7;
-
             lastProgressEventRef.current = properties.timestamp;
             lastSeekEventRef.current = now;
+
+            const currentStatus = usePlayerStore.getState().player.status;
+
+            // Stop resets seek position; the stop event is reported by handleScrobbleFromStatus.
+            if (currentStatus === PlayerStatus.STOPPED) {
+                flushScrobbleDebug();
+                return;
+            }
 
             sendScrobble.mutate(
                 {
                     apiClientProps: { serverId: currentSong._serverId || '' },
                     query: {
                         albumId: currentSong.albumId,
-                        event: 'timeupdate',
+                        event: currentStatus === PlayerStatus.PLAYING ? 'unpause' : 'pause',
                         id: currentSong.id,
-                        position,
+                        mediaType: mediaType,
+                        playbackRate: playbackRate,
+                        position: getPositionValue(properties.timestamp, useTicks),
                         submission: false,
                     },
                 },
@@ -337,8 +530,9 @@ export const useScrobble = () => {
                     },
                 },
             );
+            flushScrobbleDebug();
         },
-        [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble],
+        [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble, playbackRate, flushScrobbleDebug],
     );
 
     const handleScrobbleFromStatus = useCallback(
@@ -348,18 +542,22 @@ export const useScrobble = () => {
             }
 
             const currentSong = usePlayerStore.getState().getCurrentSong();
+            const mediaType = currentSong?._itemType.includes('song') ? 'song' : 'podcast';
+            const serverId = currentSong?._serverId;
+            const server = getServerById(serverId);
+            const hasPlaybackReport = hasFeature(server, ServerFeature.REPORT_PLAYBACK);
+            const useTicks = currentSong?._serverType === ServerType.JELLYFIN;
 
             if (!currentSong?.id) {
                 return;
             }
 
             // Only apply to Jellyfin controller scrobble
-            if (currentSong._serverType !== ServerType.JELLYFIN) {
+            if (!hasPlaybackReport) {
                 return;
             }
 
             const currentTimestamp = useTimestampStoreBase.getState().timestamp;
-            const position = currentTimestamp * 1e7;
 
             // Send pause event when status changes to paused
             if (properties.status === PlayerStatus.PAUSED && prev.status === PlayerStatus.PLAYING) {
@@ -370,7 +568,9 @@ export const useScrobble = () => {
                             albumId: currentSong.albumId,
                             event: 'pause',
                             id: currentSong.id,
-                            position,
+                            mediaType: mediaType,
+                            playbackRate: playbackRate,
+                            position: getPositionValue(currentTimestamp, useTicks),
                             submission: false,
                         },
                     },
@@ -396,7 +596,9 @@ export const useScrobble = () => {
                             albumId: currentSong.albumId,
                             event: 'unpause',
                             id: currentSong.id,
-                            position,
+                            mediaType: mediaType,
+                            playbackRate: playbackRate,
+                            position: getPositionValue(currentTimestamp, useTicks),
                             submission: false,
                         },
                     },
@@ -412,8 +614,75 @@ export const useScrobble = () => {
                     },
                 );
             }
+
+            // Send start event when resuming the same song that was stopped.
+            if (
+                properties.status === PlayerStatus.PLAYING &&
+                prev.status === PlayerStatus.STOPPED &&
+                stoppedSongIdRef.current === currentSong._uniqueId
+            ) {
+                stoppedSongIdRef.current = undefined;
+                sendScrobble.mutate(
+                    {
+                        apiClientProps: { serverId: currentSong._serverId || '' },
+                        query: {
+                            albumId: currentSong.albumId,
+                            event: 'start',
+                            id: currentSong.id,
+                            mediaType: mediaType,
+                            playbackRate: playbackRate,
+                            position: getPositionValue(currentTimestamp, useTicks),
+                            submission: false,
+                        },
+                    },
+                    {
+                        onSuccess: () => {
+                            logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledStart, {
+                                category: LogCategory.SCROBBLE,
+                                meta: {
+                                    id: currentSong.id,
+                                },
+                            });
+                        },
+                    },
+                );
+            }
+
+            // Send stop event when status changes to stopped (from an active state)
+            if (
+                properties.status === PlayerStatus.STOPPED &&
+                prev.status !== PlayerStatus.STOPPED
+            ) {
+                stoppedSongIdRef.current = currentSong._uniqueId;
+                sendScrobble.mutate(
+                    {
+                        apiClientProps: { serverId: currentSong._serverId || '' },
+                        query: {
+                            albumId: currentSong.albumId,
+                            event: 'stop',
+                            id: currentSong.id,
+                            mediaType: mediaType,
+                            playbackRate: playbackRate,
+                            position: getPositionValue(currentTimestamp, useTicks),
+                            submission: false,
+                        },
+                    },
+                    {
+                        onSuccess: () => {
+                            logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledStop, {
+                                category: LogCategory.SCROBBLE,
+                                meta: {
+                                    id: currentSong.id,
+                                },
+                            });
+                        },
+                    },
+                );
+            }
+
+            flushScrobbleDebug();
         },
-        [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble],
+        [isScrobbleEnabled, isPrivateModeEnabled, flushScrobbleDebug, sendScrobble, playbackRate],
     );
 
     const handleScrobbleFromRepeat = useCallback(() => {
@@ -423,14 +692,18 @@ export const useScrobble = () => {
 
         const currentSong = usePlayerStore.getState().getCurrentSong();
         const currentStatus = usePlayerStore.getState().player.status;
+        const mediaType = currentSong?._itemType.includes('song') ? 'song' : 'podcast';
 
         if (currentStatus !== PlayerStatus.PLAYING || !currentSong?.id) {
             return;
         }
 
-        setIsCurrentSongScrobbled(false);
+        isCurrentSongScrobbledRef.current = false;
         lastProgressEventRef.current = 0;
         previousTimestampRef.current = 0;
+        stopPositionRef.current = 0;
+        listenedMsRef.current = 0;
+        lastListenSampleTimeRef.current = null;
 
         sendScrobble.mutate(
             {
@@ -439,6 +712,8 @@ export const useScrobble = () => {
                     albumId: currentSong.albumId,
                     event: 'start',
                     id: currentSong.id,
+                    mediaType: mediaType,
+                    playbackRate: playbackRate,
                     position: 0,
                     submission: false,
                 },
@@ -455,16 +730,93 @@ export const useScrobble = () => {
                 },
             },
         );
-    }, [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble]);
+        flushScrobbleDebug();
+    }, [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble, playbackRate, flushScrobbleDebug]);
 
     // Update previous timestamp on progress for use in status change handler
     const handleProgressUpdate = useCallback(
         (properties: { timestamp: number }, prev: { timestamp: number }) => {
+            // Preserve last playback position when the playhead resets to the start
+            // (song change can fire after progress already reports 0 for the new track).
+            if (
+                properties.timestamp < SCROBBLE_TRACK_BEGIN_SEC &&
+                prev.timestamp >= SCROBBLE_TRACK_BEGIN_SEC
+            ) {
+                stopPositionRef.current = prev.timestamp;
+            } else {
+                stopPositionRef.current = properties.timestamp;
+            }
+
             previousTimestampRef.current = properties.timestamp;
             handleScrobbleFromProgress(properties, prev);
+            flushScrobbleDebug();
         },
-        [handleScrobbleFromProgress],
+        [flushScrobbleDebug, handleScrobbleFromProgress],
     );
+
+    useEffect(() => {
+        registerScrobbleManualHandlers({
+            forceSubmitScrobble: () => {
+                if (!isScrobbleEnabled || isPrivateModeEnabled) {
+                    return;
+                }
+
+                const song = usePlayerStore.getState().getCurrentSong();
+                const mediaType = song?._itemType.includes('song') ? 'song' : 'podcast';
+                const useTicks = song?._serverType === ServerType.JELLYFIN;
+
+                if (!song?.id) {
+                    return;
+                }
+
+                sendScrobble.mutate(
+                    {
+                        apiClientProps: { serverId: song._serverId || '' },
+                        query: {
+                            albumId: song.albumId,
+                            id: song.id,
+                            mediaType: mediaType,
+                            playbackRate: playbackRate,
+                            position: getPositionValue(song.duration ?? 0, useTicks),
+                            submission: true,
+                        },
+                    },
+                    {
+                        onSuccess: () => {
+                            logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledSubmission, {
+                                category: LogCategory.SCROBBLE,
+                                meta: {
+                                    id: song.id,
+                                    reason: 'forced from UI',
+                                },
+                            });
+                        },
+                    },
+                );
+
+                isCurrentSongScrobbledRef.current = true;
+                flushScrobbleDebug();
+            },
+            resetListenedState: () => {
+                if (!isScrobbleEnabled || isPrivateModeEnabled) {
+                    return;
+                }
+
+                const song = usePlayerStore.getState().getCurrentSong();
+                if (!song?.id) {
+                    return;
+                }
+
+                listenedMsRef.current = 0;
+                isCurrentSongScrobbledRef.current = false;
+                lastProgressEventRef.current = 0;
+                lastListenSampleTimeRef.current = useTimestampStoreBase.getState().timestamp;
+                flushScrobbleDebug();
+            },
+        });
+
+        return () => registerScrobbleManualHandlers(null);
+    }, [flushScrobbleDebug, isPrivateModeEnabled, isScrobbleEnabled, playbackRate, sendScrobble]);
 
     usePlayerEvents(
         {

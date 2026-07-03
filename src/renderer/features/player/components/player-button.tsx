@@ -80,9 +80,7 @@ export const MainPlayButton = forwardRef<HTMLButtonElement, PlayButtonProps>(
                 }}
                 ref={ref}
                 tooltip={{
-                    label: isPaused
-                        ? (t('player.play', { postProcess: 'sentenceCase' }) as string)
-                        : (t('player.pause', { postProcess: 'sentenceCase' }) as string),
+                    label: isPaused ? (t('player.play') as string) : (t('player.pause') as string),
                     openDelay: 0,
                 }}
                 {...props}

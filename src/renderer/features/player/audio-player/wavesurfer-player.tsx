@@ -60,12 +60,12 @@ export function WaveSurferPlayer() {
                 }, PLAY_PAUSE_FADE_INTERVAL);
             });
 
-            if (status === PlayerStatus.PAUSED) {
-                await promise;
-                setLocalPlayerStatus(status);
-            } else if (status === PlayerStatus.PLAYING) {
+            if (status === PlayerStatus.PLAYING) {
                 setLocalPlayerStatus(status);
                 await promise;
+            } else {
+                await promise;
+                setLocalPlayerStatus(status);
             }
         },
         [isTransitioning],
@@ -190,10 +190,10 @@ export function WaveSurferPlayer() {
             },
             onPlayerStatus: async (properties) => {
                 const status = properties.status;
-                if (status === PlayerStatus.PAUSED) {
-                    fadeAndSetStatus(volume, 0, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PAUSED);
-                } else if (status === PlayerStatus.PLAYING) {
+                if (status === PlayerStatus.PLAYING) {
                     fadeAndSetStatus(0, volume, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PLAYING);
+                } else {
+                    fadeAndSetStatus(volume, 0, PLAY_PAUSE_FADE_DURATION, status);
                 }
             },
             onPlayerVolume: (properties) => {

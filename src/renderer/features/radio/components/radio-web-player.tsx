@@ -136,6 +136,8 @@ export function RadioWebPlayer() {
         <WebPlayerEngine
             isMuted={isMuted}
             isTransitioning={false}
+            loopPlayer1={false}
+            loopPlayer2={false}
             onEndedPlayer1={onEndedPlayer1}
             onEndedPlayer2={() => {}}
             onErrorPause={() => {}}

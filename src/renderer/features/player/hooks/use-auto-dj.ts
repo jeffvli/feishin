@@ -1,11 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useEffect } from 'react';
 
-import { queryKeys } from '/@/renderer/api/query-keys';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
+import { runAutoDjAlbumIds } from '/@/renderer/features/player/auto-dj/auto-dj-albums';
+import { runAutoDjSongs } from '/@/renderer/features/player/auto-dj/auto-dj-songs';
 import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/context/player-context';
-import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import {
+    AUTO_DJ_STRATEGY,
     isShuffleEnabled,
     mapShuffledToQueueIndex,
     useAutoDJSettings,
@@ -17,9 +18,8 @@ import {
 } from '/@/renderer/store';
 import { LogCategory, logFn } from '/@/renderer/utils/logger';
 import { logMsg } from '/@/renderer/utils/logger-message';
-import { shuffleInPlace } from '/@/renderer/utils/shuffle';
 import { hasFeature } from '/@/shared/api/utils';
-import { Played, Song, SongListSort, SortOrder } from '/@/shared/types/domain-types';
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 import { Play } from '/@/shared/types/types';
 
@@ -34,6 +34,9 @@ export const useAutoDJ = () => {
     const hasSimilarSongsMusicFolder = hasFeature(server, ServerFeature.SIMILAR_SONGS_MUSIC_FOLDER);
 
     useEffect(() => {
+        const albumStrategy = settings.albumStrategy ?? AUTO_DJ_STRATEGY.SIMILAR;
+        const songStrategy = settings.songStrategy ?? AUTO_DJ_STRATEGY.SIMILAR;
+
         const unsubscribe = usePlayerStoreBase.subscribe(
             (state) => {
                 const queue = state.getQueue();
@@ -54,7 +57,6 @@ export const useAutoDJ = () => {
                     return;
                 }
 
-                // If no current song, don't autoplay
                 if (!properties.song?.id) {
                     return;
                 }
@@ -70,142 +72,76 @@ export const useAutoDJ = () => {
 
                 try {
                     const queue = usePlayerStore.getState().getQueue();
-                    const queueSongIdSet = new Set(queue.items.map((item) => item.id));
-                    let uniqueSimilarSongs: Song[] = [];
 
                     const hasMusicFolder = server?.musicFolderId && server.musicFolderId.length > 0;
+                    const musicFolderId =
+                        hasMusicFolder && server?.musicFolderId ? server.musicFolderId : undefined;
                     const trySimilarSongs =
                         !hasMusicFolder || (hasMusicFolder && hasSimilarSongsMusicFolder);
 
-                    // Skip similar songs fetch if a music folder is selected and does not support musicFolderId on similar songs
-                    if (trySimilarSongs) {
-                        // First, try to fetch similar songs based on the current song
-                        const similarSongs = await queryClient.fetchQuery({
-                            ...songsQueries.similar({
-                                query: {
-                                    count: settings.itemCount,
-                                    songId: properties.song?.id,
-                                },
-                                serverId,
-                            }),
-                            queryKey: queryKeys.player.fetch({ similarSongs: properties.song?.id }),
+                    const runnerDepsBase = {
+                        itemCount: settings.itemCount,
+                        musicFolderId,
+                        queryClient,
+                        server,
+                        serverId,
+                        trySimilarSongs,
+                    };
+
+                    if (settings.mode === 'albums') {
+                        if (!serverId) {
+                            return;
+                        }
+
+                        const queueAlbumIdSet = new Set(
+                            queue.items
+                                .map((item) => item.albumId)
+                                .filter((id): id is string => Boolean(id)),
+                        );
+
+                        const albumsToAdd = await runAutoDjAlbumIds({
+                            ...runnerDepsBase,
+                            albumStrategy,
+                            currentSong: properties.song,
+                            queueAlbumIdSet,
                         });
 
-                        uniqueSimilarSongs = similarSongs.filter(
-                            (song) => !queueSongIdSet.has(song.id),
-                        );
-                    }
-
-                    // If not enough songs, try to fetch more similar songs based on the genre of the current song
-                    if (uniqueSimilarSongs.length < settings.itemCount) {
-                        const genre = properties.song?.genres?.[0];
-
-                        if (genre) {
-                            const genreLimit = 50;
-                            const genreSimilarSongs = await queryClient.fetchQuery({
-                                ...songsQueries.random({
-                                    query: {
-                                        genre: genre.id,
-                                        limit: genreLimit,
-                                        played: Played.All,
-                                    },
-                                    serverId,
-                                }),
-                                queryKey: queryKeys.player.fetch({
-                                    genre,
-                                    similarSongs: properties.song?.id,
-                                }),
-                            });
-
-                            const genreSongs = genreSimilarSongs.items.filter(
-                                (song) => !queueSongIdSet.has(song.id),
-                            );
-
-                            // If trySimilarSongs is false, add variation by mixing in random songs
-                            if (!trySimilarSongs) {
-                                // Calculate how many random songs we need: 20% or at least 1
-                                const randomSongCount = Math.max(1, Math.ceil(genreLimit * 0.2));
-
-                                const randomSongs = await queryClient.fetchQuery({
-                                    ...songsQueries.random({
-                                        query: { limit: randomSongCount, played: Played.All },
-                                        serverId,
-                                    }),
-                                });
-
-                                const uniqueRandomSongs = randomSongs.items.filter(
-                                    (song) => !queueSongIdSet.has(song.id),
-                                );
-
-                                // Add minimum required random songs for variation
-                                const randomSongsToAdd = uniqueRandomSongs.slice(
-                                    0,
-                                    randomSongCount,
-                                );
-                                uniqueSimilarSongs.push(...randomSongsToAdd, ...genreSongs);
-                            } else {
-                                uniqueSimilarSongs.push(...genreSongs);
-                            }
-                        }
-                    }
-
-                    // If not enough songs, try to fetch more similar songs based on the album artist of the current song
-                    if (uniqueSimilarSongs.length < settings.itemCount) {
-                        const albumArtist = properties.song?.albumArtists?.[0];
-
-                        if (albumArtist) {
-                            const albumArtistSimilarSongs = await queryClient.fetchQuery({
-                                ...songsQueries.list({
-                                    query: {
-                                        albumArtistIds: [albumArtist.id],
-                                        limit: 50,
-                                        sortBy: SongListSort.RANDOM,
-                                        sortOrder: SortOrder.ASC,
-                                        startIndex: 0,
-                                    },
-                                    serverId,
-                                }),
-                                queryKey: queryKeys.player.fetch({
-                                    albumArtist,
-                                    similarSongs: properties.song?.id,
-                                }),
-                            });
-
-                            uniqueSimilarSongs.push(
-                                ...albumArtistSimilarSongs.items.filter(
-                                    (song) => !queueSongIdSet.has(song.id),
-                                ),
-                            );
-                        }
-                    }
-
-                    // If not enough songs, just fetch fully random songs
-                    if (uniqueSimilarSongs.length < settings.itemCount) {
-                        const randomSongs = await queryClient.fetchQuery({
-                            ...songsQueries.random({
-                                query: { limit: 50, played: Played.All },
+                        if (albumsToAdd.length > 0) {
+                            await player.addToQueueByFetch(
                                 serverId,
-                            }),
-                        });
+                                albumsToAdd,
+                                LibraryItem.ALBUM,
+                                Play.LAST,
+                            );
 
-                        uniqueSimilarSongs.push(
-                            ...randomSongs.items.filter((song) => !queueSongIdSet.has(song.id)),
-                        );
+                            eventEmitter.emit('AUTODJ_QUEUE_ADDED', {
+                                songCount: albumsToAdd.length,
+                            });
+                        }
+
+                        return;
                     }
 
-                    // Shuffle the songs and then add to the queue
-                    const shuffledSongs = shuffleInPlace(uniqueSimilarSongs);
+                    if (!serverId) {
+                        return;
+                    }
 
-                    // Splice the first itemCount songs and add to the queue
-                    const songsToAdd = shuffledSongs.slice(0, settings.itemCount);
+                    const queueSongIdSet = new Set(queue.items.map((item) => item.id));
 
-                    // Add to the end of the queue
-                    player.addToQueueByData(songsToAdd, Play.LAST);
-
-                    // Emit event to trigger queue follow
-                    eventEmitter.emit('AUTODJ_QUEUE_ADDED', {
-                        songCount: songsToAdd.length,
+                    const songsToAdd = await runAutoDjSongs({
+                        ...runnerDepsBase,
+                        currentSong: properties.song,
+                        queueSongIdSet,
+                        songStrategy,
                     });
+
+                    if (songsToAdd.length > 0) {
+                        player.addToQueueByData(songsToAdd, Play.LAST);
+
+                        eventEmitter.emit('AUTODJ_QUEUE_ADDED', {
+                            songCount: songsToAdd.length,
+                        });
+                    }
                 } catch (error) {
                     logFn.error(logMsg[LogCategory.PLAYER].autoPlayFailed, {
                         category: LogCategory.PLAYER,
@@ -229,7 +165,10 @@ export const useAutoDJ = () => {
         server,
         serverId,
         settings.enabled,
+        settings.albumStrategy,
         settings.itemCount,
+        settings.mode,
+        settings.songStrategy,
         settings.timing,
     ]);
 };

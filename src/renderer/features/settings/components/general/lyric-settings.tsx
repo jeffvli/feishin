@@ -42,9 +42,8 @@ export const LyricSettings = memo(() => {
             ),
             description: t('setting.followLyric', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.followLyric', { postProcess: 'sentenceCase' }),
+            title: t('setting.followLyric'),
         },
         {
             control: (
@@ -56,10 +55,9 @@ export const LyricSettings = memo(() => {
             ),
             description: t('setting.preferLocalLyrics', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.preferLocalLyrics', { postProcess: 'sentenceCase' }),
+            title: t('setting.preferLocalLyrics'),
         },
         {
             control: (
@@ -71,10 +69,9 @@ export const LyricSettings = memo(() => {
             ),
             description: t('setting.lyricFetch', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.lyricFetch', { postProcess: 'sentenceCase' }),
+            title: t('setting.lyricFetch'),
         },
         {
             control: (
@@ -92,10 +89,37 @@ export const LyricSettings = memo(() => {
             ),
             description: t('setting.lyricFetchProvider', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.lyricFetchProvider', { postProcess: 'sentenceCase' }),
+            title: t('setting.lyricFetchProvider'),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label="Enable furigana generation"
+                    defaultChecked={settings.enableFurigana}
+                    onChange={(e) => updateSetting({ enableFurigana: e.currentTarget.checked })}
+                />
+            ),
+            description: t('setting.enableFurigana', {
+                context: 'description',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.enableFurigana'),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label="Enable romaji generation"
+                    defaultChecked={settings.enableRomaji}
+                    onChange={(e) => updateSetting({ enableRomaji: e.currentTarget.checked })}
+                />
+            ),
+            description: t('setting.enableRomaji', {
+                context: 'description',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.enableRomaji'),
         },
         {
             control: (
@@ -111,10 +135,9 @@ export const LyricSettings = memo(() => {
             ),
             description: t('setting.neteaseTranslation', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.neteaseTranslation', { postProcess: 'sentenceCase' }),
+            title: t('setting.neteaseTranslation'),
         },
         {
             control: (
@@ -130,10 +153,9 @@ export const LyricSettings = memo(() => {
             ),
             description: t('setting.lyricOffset', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.lyricOffset', { postProcess: 'sentenceCase' }),
+            title: t('setting.lyricOffset'),
         },
         {
             control: (
@@ -147,10 +169,9 @@ export const LyricSettings = memo(() => {
             ),
             description: t('setting.translationTargetLanguage', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.translationTargetLanguage', { postProcess: 'sentenceCase' }),
+            title: t('setting.translationTargetLanguage'),
         },
         {
             control: (
@@ -165,10 +186,9 @@ export const LyricSettings = memo(() => {
             ),
             description: t('setting.translationApiProvider', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.translationApiProvider', { postProcess: 'sentenceCase' }),
+            title: t('setting.translationApiProvider'),
         },
         {
             control: (
@@ -181,10 +201,9 @@ export const LyricSettings = memo(() => {
             ),
             description: t('setting.translationApiKey', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.translationApiKey', { postProcess: 'sentenceCase' }),
+            title: t('setting.translationApiKey'),
         },
         {
             control: (
@@ -198,17 +217,11 @@ export const LyricSettings = memo(() => {
             ),
             description: t('setting.enableAutoTranslation', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.enableAutoTranslation', { postProcess: 'sentenceCase' }),
+            title: t('setting.enableAutoTranslation'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={lyricOptions}
-            title={t('page.setting.lyrics', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={lyricOptions} title={t('page.setting.lyrics')} />;
 });

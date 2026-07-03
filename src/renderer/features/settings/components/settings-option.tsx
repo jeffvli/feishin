@@ -1,5 +1,7 @@
 import React, { memo } from 'react';
 
+import styles from './settings-option.module.css';
+
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -9,15 +11,20 @@ import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 interface SettingsOptionProps {
     control: React.ReactNode;
     description?: React.ReactNode | string;
+    indent?: boolean;
     note?: string;
     title: React.ReactNode | string;
 }
 
 export const SettingsOptions = memo(
-    ({ control, description, note, title }: SettingsOptionProps) => {
+    ({ control, description, indent, note, title }: SettingsOptionProps) => {
         return (
             <>
-                <Group justify="space-between" style={{ alignItems: 'center' }} wrap="nowrap">
+                <Group
+                    className={indent ? styles.rowIndented : styles.row}
+                    justify="space-between"
+                    wrap="nowrap"
+                >
                     <Stack
                         gap="xs"
                         style={{

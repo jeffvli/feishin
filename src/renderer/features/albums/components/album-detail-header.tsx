@@ -138,12 +138,10 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
 
         const playCount = album?.playCount;
 
-        const releasePrefix = originalDifferentFromRelease
-            ? t('page.albumDetail.released', { postProcess: 'sentenceCase' })
-            : '♫';
+        const releasePrefix = originalDifferentFromRelease ? t('page.albumDetail.released') : '♫';
 
         const releaseYearPrefix = originalYearDifferentFromRelease
-            ? t('page.albumDetail.released', { postProcess: 'sentenceCase' })
+            ? t('page.albumDetail.released')
             : '♫';
 
         if (album.originalDate) {

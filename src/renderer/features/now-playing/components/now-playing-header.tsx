@@ -9,9 +9,7 @@ export const NowPlayingHeader = () => {
     return (
         <PageHeader>
             <LibraryHeaderBar ignoreMaxWidth>
-                <LibraryHeaderBar.Title>
-                    {t('page.sidebar.nowPlaying', { postProcess: 'titleCase' })}
-                </LibraryHeaderBar.Title>
+                <LibraryHeaderBar.Title>{t('page.sidebar.nowPlaying')}</LibraryHeaderBar.Title>
             </LibraryHeaderBar>
         </PageHeader>
     );

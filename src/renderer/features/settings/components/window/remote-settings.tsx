@@ -32,9 +32,7 @@ export const RemoteSettings = memo(() => {
         } else {
             toast.error({
                 message: errorMsg,
-                title: enabled
-                    ? t('error.remoteEnableError', { postProcess: 'sentenceCase' })
-                    : t('error.remoteDisableError', { postProcess: 'sentenceCase' }),
+                title: enabled ? t('error.remoteEnableError') : t('error.remoteDisableError'),
             });
         }
     }, 50);
@@ -48,12 +46,12 @@ export const RemoteSettings = memo(() => {
                 },
             });
             toast.warn({
-                message: t('error.remotePortWarning', { postProcess: 'sentenceCase' }),
+                message: t('error.remotePortWarning'),
             });
         } else {
             toast.error({
                 message: errorMsg,
-                title: t('error.remotePortError', { postProcess: 'sentenceCase' }),
+                title: t('error.remotePortError'),
             });
         }
     }, 100);
@@ -75,7 +73,6 @@ export const RemoteSettings = memo(() => {
                 <Text isMuted isNoSelect size="sm">
                     {t('setting.enableRemote', {
                         context: 'description',
-                        postProcess: 'sentenceCase',
                     })}{' '}
                     <a href={url} rel="noreferrer noopener" target="_blank">
                         {url}
@@ -83,7 +80,7 @@ export const RemoteSettings = memo(() => {
                 </Text>
             ),
             isHidden,
-            title: t('setting.enableRemote', { postProcess: 'sentenceCase' }),
+            title: t('setting.enableRemote'),
         },
         {
             control: (
@@ -99,10 +96,9 @@ export const RemoteSettings = memo(() => {
             ),
             description: t('setting.remotePort', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden,
-            title: t('setting.remotePort', { postProcess: 'sentenceCase' }),
+            title: t('setting.remotePort'),
         },
         {
             control: (
@@ -122,10 +118,9 @@ export const RemoteSettings = memo(() => {
             ),
             description: t('setting.remoteUsername', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden,
-            title: t('setting.remoteUsername', { postProcess: 'sentenceCase' }),
+            title: t('setting.remoteUsername'),
         },
         {
             control: (
@@ -145,17 +140,11 @@ export const RemoteSettings = memo(() => {
             ),
             description: t('setting.remotePassword', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden,
-            title: t('setting.remotePassword', { postProcess: 'sentenceCase' }),
+            title: t('setting.remotePassword'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={controlOptions}
-            title={t('page.setting.remote', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={controlOptions} title={t('page.setting.remote')} />;
 });

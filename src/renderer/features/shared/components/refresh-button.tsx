@@ -19,7 +19,7 @@ export const RefreshButton = ({ loading, onClick, ...props }: RefreshButtonProps
             loading={loading}
             onClick={onClick}
             tooltip={{
-                label: t('common.refresh', { postProcess: 'sentenceCase' }),
+                label: t('common.refresh'),
                 ...props.tooltip,
             }}
             variant="subtle"

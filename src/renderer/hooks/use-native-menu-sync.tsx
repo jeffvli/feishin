@@ -68,7 +68,7 @@ export const useNativeMenuSync = () => {
         window.api.utils.rendererOpenManageServers(() => {
             openModal({
                 children: <ServerList />,
-                title: t('page.manageServers.title', { postProcess: 'titleCase' }),
+                title: t('page.manageServers.title'),
             });
         });
 
@@ -142,10 +142,7 @@ export const useNativeMenuSync = () => {
 
         window.api.utils.rendererOpenReleaseNotes(() => {
             openReleaseNotesModal(
-                t('common.newVersion', {
-                    postProcess: 'sentenceCase',
-                    version: packageJson.version,
-                }) as string,
+                t('common.newVersion', { version: packageJson.version }) as string,
             );
         });
 

@@ -19,7 +19,7 @@ export const RemoveFromQueueAction = ({ items }: RemoveFromQueueActionProps) => 
 
     return (
         <ContextMenu.Item leftIcon="remove" onSelect={onSelect}>
-            {t('action.removeFromQueue', { postProcess: 'sentenceCase' })}
+            {t('action.removeFromQueue')}
         </ContextMenu.Item>
     );
 };

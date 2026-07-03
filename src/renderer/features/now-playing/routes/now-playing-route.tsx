@@ -6,7 +6,7 @@ import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queu
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
-import { useAppStoreActions } from '/@/renderer/store';
+import { useAppStore, useAppStoreActions } from '/@/renderer/store';
 import { ItemListKey } from '/@/shared/types/types';
 
 const NowPlayingRoute = () => {
@@ -15,12 +15,16 @@ const NowPlayingRoute = () => {
     const tableRef = useRef<ItemListHandle | null>(null);
 
     useEffect(() => {
+        const wasExpanded = useAppStore.getState().sidebar.rightExpanded;
+
         // On page enter, set rightExpanded to false
         setSideBar({ rightExpanded: false });
 
         return () => {
-            // On page exit, set rightExpanded to true
-            setSideBar({ rightExpanded: true });
+            if (wasExpanded) {
+                // On page exit, set rightExpanded to true if it was previously expanded
+                setSideBar({ rightExpanded: true });
+            }
         };
     }, [setSideBar]);
 

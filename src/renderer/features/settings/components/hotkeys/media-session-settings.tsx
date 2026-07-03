@@ -54,11 +54,10 @@ export const MediaSessionSettings = memo(() => {
             ),
             description: t('setting.mediaSession', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: isLinux || !isDesktop,
-            note: t('common.restartRequired', { postProcess: 'sentenceCase' }),
-            title: t('setting.mediaSession', { postProcess: 'sentenceCase' }),
+            note: t('common.restartRequired'),
+            title: t('setting.mediaSession'),
         },
     ];
 

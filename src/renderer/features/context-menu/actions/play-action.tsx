@@ -75,28 +75,28 @@ export const PlayAction = ({ ids, itemType, songs }: PlayActionProps) => {
                     onSelect={defaultPlayAction}
                     rightIcon="arrowRightS"
                 >
-                    {t('player.play', { postProcess: 'sentenceCase' })}
+                    {t('player.play')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuTarget>
             <ContextMenu.SubmenuContent>
                 <ContextMenu.Item leftIcon="mediaPlay" onSelect={handlePlayNow}>
-                    {t('player.play', { postProcess: 'sentenceCase' })}
+                    {t('player.play')}
                 </ContextMenu.Item>
                 <ContextMenu.Item leftIcon="mediaPlayNext" onSelect={handlePlayNext}>
-                    {t('player.addNext', { postProcess: 'sentenceCase' })}
+                    {t('player.addNext')}
                 </ContextMenu.Item>
                 <ContextMenu.Item leftIcon="mediaPlayLast" onSelect={handlePlayLast}>
-                    {t('player.addLast', { postProcess: 'sentenceCase' })}
+                    {t('player.addLast')}
                 </ContextMenu.Item>
                 <ContextMenu.Divider />
                 <ContextMenu.Item leftIcon="mediaShuffle" onSelect={handlePlayShuffled}>
-                    {t('player.shuffle', { postProcess: 'sentenceCase' })}
+                    {t('player.shuffle')}
                 </ContextMenu.Item>
                 <ContextMenu.Item leftIcon="mediaPlayNext" onSelect={handlePlayNextShuffled}>
-                    {t('player.addNextShuffled', { postProcess: 'sentenceCase' })}
+                    {t('player.addNextShuffled')}
                 </ContextMenu.Item>
                 <ContextMenu.Item leftIcon="mediaPlayLast" onSelect={handlePlayLastShuffled}>
-                    {t('player.addLastShuffled', { postProcess: 'sentenceCase' })}
+                    {t('player.addLastShuffled')}
                 </ContextMenu.Item>
             </ContextMenu.SubmenuContent>
         </ContextMenu.Submenu>

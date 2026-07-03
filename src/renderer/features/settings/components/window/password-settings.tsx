@@ -46,10 +46,9 @@ export const PasswordSettings = memo(() => {
             ),
             description: t('setting.passwordStore', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.passwordStore', { postProcess: 'sentenceCase' }),
+            title: t('setting.passwordStore'),
         },
     ];
 

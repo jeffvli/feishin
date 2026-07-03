@@ -1,6 +1,7 @@
 import { forwardRef, useMemo } from 'react';
 import { useEffect } from 'react';
 
+import { playSongFromItemListControl } from '/@/renderer/components/item-list/helpers/play-row-from-list';
 import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
 import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
 import { useItemListScrollPersist } from '/@/renderer/components/item-list/helpers/use-item-list-scroll-persist';
@@ -21,7 +22,7 @@ import {
     PlaylistSongListResponse,
     Song,
 } from '/@/shared/types/domain-types';
-import { ItemListKey, Play, TableColumn } from '/@/shared/types/types';
+import { ItemListKey, TableColumn } from '/@/shared/types/types';
 
 interface PlaylistDetailSongListTableProps extends Omit<
     ItemListTableComponentProps<PlaylistSongListQuery>,
@@ -103,12 +104,13 @@ export const PlaylistDetailSongListTable = forwardRef<any, PlaylistDetailSongLis
                         return;
                     }
 
-                    const playType = (meta?.playType as Play) || Play.NOW;
-                    const items = internalState?.getData() as Song[];
-
-                    if (index !== undefined) {
-                        player.addToQueueByData(items, playType, item.id);
-                    }
+                    playSongFromItemListControl({
+                        index,
+                        internalState,
+                        item: item as Song,
+                        meta,
+                        player,
+                    });
                 },
             };
         }, [player]);
@@ -228,12 +230,13 @@ export const PlaylistDetailSongListEditTable = forwardRef<any, PlaylistDetailSon
                         return;
                     }
 
-                    const playType = (meta?.playType as Play) || Play.NOW;
-                    const items = internalState?.getData() as Song[];
-
-                    if (index !== undefined) {
-                        player.addToQueueByData(items, playType, item.id);
-                    }
+                    playSongFromItemListControl({
+                        index,
+                        internalState,
+                        item: item as Song,
+                        meta,
+                        player,
+                    });
                 },
             };
         }, [player]);

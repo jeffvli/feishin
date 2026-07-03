@@ -1,19 +1,19 @@
 {
     "common": {
-        "confirm": "confirmă",
-        "create": "creează",
-        "biography": "biografie",
-        "areYouSure": "ești sigur?",
-        "no": "nu",
-        "name": "nume",
-        "ok": "ok",
-        "note": "notă",
-        "yes": "da",
-        "explicit": "explicit",
-        "year": "an",
-        "menu": "meniu"
+        "confirm": "Confirmă",
+        "create": "Creează",
+        "biography": "Biografie",
+        "areYouSure": "Ești sigur?",
+        "no": "Nu",
+        "name": "Nume",
+        "ok": "Ok",
+        "note": "Notă",
+        "yes": "Da",
+        "explicit": "Explicit",
+        "year": "An",
+        "menu": "Meniu"
     },
     "filter": {
-        "biography": "biografie"
+        "biography": "Biografie"
     }
 }

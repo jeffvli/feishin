@@ -37,23 +37,20 @@ export const CollapsedSidebar = () => {
     const sidebarItems = useSidebarItems();
     const translatedSidebarItemMap = useMemo(
         () => ({
-            Albums: t('page.sidebar.albums', { postProcess: 'titleCase' }),
-            Artists: t('page.sidebar.albumArtists', { postProcess: 'titleCase' }).replace(
-                ' ',
-                '\n',
-            ),
-            'Artists-all': t('page.sidebar.artists', { postProcess: 'titleCase' }),
-            Collections: t('page.sidebar.collections', { postProcess: 'titleCase' }),
-            Favorites: t('page.sidebar.favorites', { postProcess: 'titleCase' }),
-            Folders: t('page.sidebar.folders', { postProcess: 'titleCase' }),
-            Genres: t('page.sidebar.genres', { postProcess: 'titleCase' }),
-            Home: t('page.sidebar.home', { postProcess: 'titleCase' }),
-            'Now Playing': t('page.sidebar.nowPlaying', { postProcess: 'titleCase' }),
-            Playlists: t('page.sidebar.playlists', { postProcess: 'titleCase' }),
-            Radio: t('page.sidebar.radio', { postProcess: 'titleCase' }),
-            Search: t('page.sidebar.search', { postProcess: 'titleCase' }),
-            Settings: t('page.sidebar.settings', { postProcess: 'titleCase' }),
-            Tracks: t('page.sidebar.tracks', { postProcess: 'titleCase' }),
+            Albums: t('page.sidebar.albums'),
+            Artists: t('page.sidebar.albumArtists').replace(' ', '\n'),
+            'Artists-all': t('page.sidebar.artists'),
+            Collections: t('page.sidebar.collections'),
+            Favorites: t('page.sidebar.favorites'),
+            Folders: t('page.sidebar.folders'),
+            Genres: t('page.sidebar.genres'),
+            Home: t('page.sidebar.home'),
+            'Now Playing': t('page.sidebar.nowPlaying'),
+            Playlists: t('page.sidebar.playlists'),
+            Radio: t('page.sidebar.radio'),
+            Search: t('page.sidebar.search'),
+            Settings: t('page.sidebar.settings'),
+            Tracks: t('page.sidebar.tracks'),
         }),
         [t],
     );
@@ -98,7 +95,7 @@ export const CollapsedSidebar = () => {
                             activeIcon={null}
                             component={Flex}
                             icon={<Icon fill="muted" icon="menu" size="3xl" />}
-                            label={t('common.menu', { postProcess: 'titleCase' })}
+                            label={t('common.menu')}
                             style={{
                                 cursor: 'pointer',
                                 padding: 'var(--theme-spacing-md) 0',

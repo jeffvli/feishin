@@ -16,11 +16,13 @@ export const useListHotkeys = ({
     focused,
     internalState,
     itemType,
+    onShowPlayingSong,
 }: {
     controls: ItemControls;
     focused: boolean;
     internalState: ItemListStateActions;
     itemType: LibraryItem;
+    onShowPlayingSong?: () => void;
 }) => {
     const { bindings } = useHotkeySettings();
     const playButtonBehavior = usePlayButtonBehavior();
@@ -117,6 +119,12 @@ export const useListHotkeys = ({
                 if (path) {
                     navigate(path, { state: { item } });
                 }
+            },
+        ],
+        [
+            bindings.listShowPlayingSong.hotkey,
+            () => {
+                onShowPlayingSong?.();
             },
         ],
     ]);

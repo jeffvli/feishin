@@ -39,7 +39,12 @@ import {
 import { Play, PlayerRepeat, PlayerShuffle } from '/@/shared/types/types';
 
 export interface PlayerContext {
-    addToQueueByData: (data: Song[], type: AddToQueueType, playSongId?: string) => void;
+    addToQueueByData: (
+        data: Song[],
+        type: AddToQueueType,
+        playSongId?: string,
+        contextPlaylistId?: null | string,
+    ) => void;
     addToQueueByFetch: (
         serverId: string,
         id: string[],
@@ -137,6 +142,23 @@ const getRootQueryKey = (itemType: LibraryItem, serverId: string) => {
     }
 };
 
+const isReplaceQueueType = (type: AddToQueueType): boolean => {
+    if (typeof type === 'object') return false;
+    return type === Play.NOW || type === Play.SHUFFLE;
+};
+
+// HashRouter puts the route in location.hash, not pathname.
+const inferPlaylistContextFromUrl = (): null | string => {
+    const route = window.location.hash.replace(/^#/, '');
+    const match = route.match(/^\/playlists\/([^/]+)/);
+    return match ? match[1] : null;
+};
+
+// Stamps each song with the playlist it was queued from, so the sidebar highlight
+// can be derived from whichever song is currently playing (see useCurrentPlaylistContextId).
+const tagPlaylistContext = (songs: Song[], contextPlaylistId: string): Song[] =>
+    songs.map((song) => ({ ...song, _contextPlaylistId: contextPlaylistId }));
+
 export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
@@ -158,8 +180,8 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 children: (
                     <ConfirmModal
                         labels={{
-                            cancel: t('common.cancel', { postProcess: 'titleCase' }),
-                            confirm: t('common.confirm', { postProcess: 'titleCase' }),
+                            cancel: t('common.cancel'),
+                            confirm: t('common.confirm'),
                         }}
                         onCancel={() => {
                             resolve(false);
@@ -171,15 +193,9 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                         }}
                     >
                         <Stack>
-                            <Text>
-                                {t('form.largeFetchConfirmation.description', {
-                                    postProcess: 'sentenceCase',
-                                })}
-                            </Text>
+                            <Text>{t('form.largeFetchConfirmation.description')}</Text>
                             <Checkbox
-                                label={t('common.doNotShowAgain', {
-                                    postProcess: 'sentenceCase',
-                                })}
+                                label={t('common.doNotShowAgain')}
                                 onChange={(event) => {
                                     setDoNotShowAgain(event.currentTarget.checked);
                                 }}
@@ -187,17 +203,26 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                         </Stack>
                     </ConfirmModal>
                 ),
-                title: t('form.largeFetchConfirmation.title', {
-                    postProcess: 'sentenceCase',
-                }),
+                title: t('form.largeFetchConfirmation.title'),
             });
         });
     }, [doNotShowAgain, setDoNotShowAgain, t]);
 
     const addToQueueByData = useCallback(
-        (data: Song[], type: AddToQueueType, playSongId?: string) => {
+        (
+            data: Song[],
+            type: AddToQueueType,
+            playSongId?: string,
+            contextPlaylistId?: null | string,
+        ) => {
             const filters = useSettingsStore.getState().playback.filters;
-            const filteredData = filterSongsByPlayerFilters(data, filters);
+            let filteredData = filterSongsByPlayerFilters(data, filters);
+            const resolvedContextId =
+                contextPlaylistId ??
+                (isReplaceQueueType(type) ? inferPlaylistContextFromUrl() : null);
+            if (resolvedContextId) {
+                filteredData = tagPlaylistContext(filteredData, resolvedContextId);
+            }
 
             if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
                 const edge = type.edge === 'top' ? 'top' : 'bottom';
@@ -236,9 +261,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 [fetchId]: setTimeout(() => {
                     toastId = toast.info({
                         autoClose: false,
-                        message: t('player.playbackFetchCancel', {
-                            postProcess: 'sentenceCase',
-                        }),
+                        message: t('player.playbackFetchCancel'),
                         onClose: () => {
                             queryClient.cancelQueries({
                                 exact: false,
@@ -250,9 +273,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                                 queryKey: queryKeys.player.fetch(),
                             });
                         },
-                        title: t('player.playbackFetchInProgress', {
-                            postProcess: 'sentenceCase',
-                        }),
+                        title: t('player.playbackFetchInProgress'),
                     });
                 }, 2000),
             };
@@ -291,18 +312,27 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 }
 
                 const filters = useSettingsStore.getState().playback.filters;
-                const filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
+                let filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
 
-                const taggedSongs =
-                    itemType === LibraryItem.PLAYLIST && id.length === 1
-                        ? filteredSongs.map((s) => ({ ...s, _playlistId: id[0] }))
-                        : filteredSongs;
+                // Songs from multiple playlists are merged together, so there is no single
+                // playlist to attribute them to: skip tagging (and URL inference) entirely.
+                const isMultiPlaylist = itemType === LibraryItem.PLAYLIST && id.length > 1;
+                const explicitId =
+                    itemType === LibraryItem.PLAYLIST && id.length === 1 ? id[0] : null;
+                const resolvedContextId =
+                    explicitId ??
+                    (!isMultiPlaylist && isReplaceQueueType(type)
+                        ? inferPlaylistContextFromUrl()
+                        : null);
+                if (resolvedContextId) {
+                    filteredSongs = tagPlaylistContext(filteredSongs, resolvedContextId);
+                }
 
                 if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
                     const edge = type.edge === 'top' ? 'top' : 'bottom';
-                    storeActions.addToQueueByUniqueId(taggedSongs, type.uniqueId, edge);
+                    storeActions.addToQueueByUniqueId(filteredSongs, type.uniqueId, edge);
                 } else {
-                    storeActions.addToQueueByType(taggedSongs, type as Play);
+                    storeActions.addToQueueByType(filteredSongs, type as Play);
                 }
             } catch (err: any) {
                 if (instanceOfCancellationError(err)) {
@@ -317,7 +347,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
                 toast.error({
                     message: err.message,
-                    title: t('error.genericError', { postProcess: 'sentenceCase' }) as string,
+                    title: t('error.genericError') as string,
                 });
             }
         },
@@ -406,9 +436,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                     [fetchId]: setTimeout(() => {
                         toastId = toast.info({
                             autoClose: false,
-                            message: t('player.playbackFetchCancel', {
-                                postProcess: 'sentenceCase',
-                            }),
+                            message: t('player.playbackFetchCancel'),
                             onClose: () => {
                                 logFn.debug(logMsg[LogCategory.PLAYER].cancelledFetch, {
                                     category: LogCategory.PLAYER,
@@ -425,9 +453,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                                     queryKey: queryKeys.player.fetch(),
                                 });
                             },
-                            title: t('player.playbackFetchInProgress', {
-                                postProcess: 'sentenceCase',
-                            }),
+                            title: t('player.playbackFetchInProgress'),
                         });
                     }, 2000),
                 };
@@ -502,7 +528,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
                 toast.error({
                     message: err.message,
-                    title: t('error.genericError', { postProcess: 'sentenceCase' }) as string,
+                    title: t('error.genericError') as string,
                 });
             }
         },

@@ -58,7 +58,7 @@ export const FullScreenPlayerQueue = () => {
         if (webAudio) {
             items.push({
                 active: activeTab === 'visualizer',
-                label: t('page.fullscreenPlayer.visualizer', { postProcess: 'titleCase' }),
+                label: t('page.fullscreenPlayer.visualizer'),
                 onClick: () => setStore({ activeTab: 'visualizer' }),
             });
         }

@@ -15,7 +15,7 @@ export const SettingsButton = ({ ...props }: SettingsButtonProps) => {
                 ...props.iconProps,
             }}
             tooltip={{
-                label: t('common.configure', { postProcess: 'sentenceCase' }),
+                label: t('common.configure'),
                 ...props.tooltip,
             }}
             variant="subtle"

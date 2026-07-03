@@ -30,9 +30,8 @@ export const ExternalLinksSettings = memo(() => {
             ),
             description: t('setting.externalLinks', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.externalLinks', { postProcess: 'sentenceCase' }),
+            title: t('setting.externalLinks'),
         },
         {
             control: (
@@ -50,10 +49,9 @@ export const ExternalLinksSettings = memo(() => {
             ),
             description: t('setting.lastfm', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !settings.externalLinks,
-            title: t('setting.lastfm', { postProcess: 'sentenceCase' }),
+            title: t('setting.lastfm'),
         },
         {
             control: (
@@ -71,10 +69,9 @@ export const ExternalLinksSettings = memo(() => {
             ),
             description: t('setting.listenbrainz', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !settings.externalLinks,
-            title: t('setting.listenbrainz', { postProcess: 'sentenceCase' }),
+            title: t('setting.listenbrainz'),
         },
         {
             control: (
@@ -92,10 +89,9 @@ export const ExternalLinksSettings = memo(() => {
             ),
             description: t('setting.musicbrainz', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !settings.externalLinks,
-            title: t('setting.musicbrainz', { postProcess: 'sentenceCase' }),
+            title: t('setting.musicbrainz'),
         },
         {
             control: (
@@ -113,10 +109,9 @@ export const ExternalLinksSettings = memo(() => {
             ),
             description: t('setting.qobuz', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !settings.externalLinks,
-            title: t('setting.qobuz', { postProcess: 'sentenceCase' }),
+            title: t('setting.qobuz'),
         },
         {
             control: (
@@ -134,10 +129,9 @@ export const ExternalLinksSettings = memo(() => {
             ),
             description: t('setting.spotify', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !settings.externalLinks,
-            title: t('setting.spotify', { postProcess: 'sentenceCase' }),
+            title: t('setting.spotify'),
         },
         {
             control: (
@@ -155,17 +149,11 @@ export const ExternalLinksSettings = memo(() => {
             ),
             description: t('setting.nativeSpotify', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !settings.externalLinks || !settings.spotify,
-            title: t('setting.nativeSpotify', { postProcess: 'sentenceCase' }),
+            title: t('setting.nativeSpotify'),
         },
     ];
 
-    return (
-        <SettingsSection
-            options={options}
-            title={t('common.externalLinks', { postProcess: 'sentenceCase' })}
-        />
-    );
+    return <SettingsSection options={options} title={t('common.externalLinks')} />;
 });

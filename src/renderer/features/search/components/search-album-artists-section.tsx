@@ -69,7 +69,7 @@ export function SearchAlbumArtistsSection({
     return (
         <CollapsibleCommandGroup
             expanded={expanded}
-            heading={t('entity.albumArtist', { count: 2, postProcess: 'titleCase' })}
+            heading={t('entity.albumArtist', { count: 2 })}
             onToggle={onToggle}
             subtitle={
                 isFetched ? (
@@ -147,9 +147,7 @@ export function SearchAlbumArtistsSection({
                                     {isFetchingNextPage ? (
                                         <Spinner />
                                     ) : (
-                                        <Text size="sm">
-                                            {t('action.viewMore', { postProcess: 'titleCase' })}
-                                        </Text>
+                                        <Text size="sm">{t('action.viewMore')}</Text>
                                     )}
                                 </Text>
                             )}

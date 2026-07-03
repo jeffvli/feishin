@@ -53,30 +53,22 @@ export const HomeCommands = ({
 
     return (
         <>
-            <Command.Group heading={t('page.globalSearch.title', { postProcess: 'titleCase' })}>
-                <Command.Item
-                    onSelect={handleSearch}
-                    value={t('common.search', { postProcess: 'sentenceCase' })}
-                >
+            <Command.Group heading={t('page.globalSearch.title')}>
+                <Command.Item onSelect={handleSearch} value={t('common.search')}>
                     {query
-                        ? t('page.globalSearch.commands.searchFor', {
-                              postProcess: 'sentenceCase',
-                              query,
-                          })
-                        : `${t('common.search', { postProcess: 'sentenceCase' })}...`}
+                        ? t('page.globalSearch.commands.searchFor', { query })
+                        : `${t('common.search')}...`}
                 </Command.Item>
                 <Command.Item onSelect={handleCreatePlaylistModal}>
-                    {t('action.createPlaylist', { postProcess: 'sentenceCase' })}...
+                    {t('action.createPlaylist')}...
                 </Command.Item>
                 <Command.Item onSelect={() => setPages([...pages, CommandPalettePages.GO_TO])}>
-                    {t('page.globalSearch.commands.goToPage', { postProcess: 'sentenceCase' })}...
+                    {t('page.globalSearch.commands.goToPage')}...
                 </Command.Item>
                 <Command.Item
                     onSelect={() => setPages([...pages, CommandPalettePages.MANAGE_SERVERS])}
                 >
-                    {t('page.globalSearch.commands.serverCommands', {
-                        postProcess: 'sentenceCase',
-                    })}
+                    {t('page.globalSearch.commands.serverCommands')}
                     ...
                 </Command.Item>
             </Command.Group>

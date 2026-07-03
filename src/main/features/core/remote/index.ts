@@ -9,8 +9,8 @@ import { deflate, gzip } from 'zlib';
 
 import manifest from './manifest.json';
 
+import { isLinux } from '/@/main/env';
 import { getMainWindow } from '/@/main/index';
-import { isLinux } from '/@/main/utils';
 import { QueueSong } from '/@/shared/types/domain-types';
 import { ClientEvent, ServerEvent } from '/@/shared/types/remote-types';
 import { PlayerRepeat, PlayerStatus, SongState } from '/@/shared/types/types';

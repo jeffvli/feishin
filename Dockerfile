@@ -3,9 +3,7 @@ FROM node:23-alpine AS builder
 WORKDIR /app
 
 # Copy package.json first to cache node_modules
-COPY package.json pnpm-lock.yaml .
-
-RUN npm install -g pnpm
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .
 
 RUN pnpm install
 

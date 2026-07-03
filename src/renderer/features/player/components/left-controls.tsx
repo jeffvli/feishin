@@ -130,12 +130,7 @@ export const LeftControls = () => {
                                 role="button"
                                 transition={{ duration: 0.2, ease: 'easeIn' }}
                             >
-                                <Tooltip
-                                    label={t('player.toggleFullscreenPlayer', {
-                                        postProcess: 'sentenceCase',
-                                    })}
-                                    openDelay={0}
-                                >
+                                <Tooltip label={t('player.toggleFullscreenPlayer')} openDelay={0}>
                                     {isRadioMode && hasRadioStationImage ? (
                                         <ItemImage
                                             className={clsx(
@@ -192,9 +187,7 @@ export const LeftControls = () => {
                                             top: 2,
                                         }}
                                         tooltip={{
-                                            label: t('common.expand', {
-                                                postProcess: 'titleCase',
-                                            }),
+                                            label: t('common.expand'),
                                             openDelay: 0,
                                         }}
                                     />

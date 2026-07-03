@@ -39,7 +39,7 @@ export const useDeleteFavorite = (args: MutationHookArgs) => {
 
             toast.show({
                 message: _error.message,
-                title: t('error.genericError', { postProcess: 'sentenceCase' }) as string,
+                title: t('error.genericError') as string,
                 type: 'error',
             });
 

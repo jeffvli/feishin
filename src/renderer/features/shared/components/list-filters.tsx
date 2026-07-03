@@ -93,10 +93,10 @@ export const ListFiltersModal = ({ isActive, itemType }: ListFiltersProps) => {
                                 />
                             )}
 
-                            {t('common.filters', { postProcess: 'sentenceCase' })}
+                            {t('common.filters')}
                         </Group>
                         <Button onClick={handleReset} size="compact-sm" variant="subtle">
-                            {t('common.reset', { postProcess: 'sentenceCase' })}
+                            {t('common.reset')}
                         </Button>
                     </Group>
                 }
@@ -159,11 +159,11 @@ export const ListFiltersTitle = ({ itemType }: ListFiltersTitleProps) => {
     return (
         <Group justify="space-between" pb={0} pl="md" pr="md" pt="md">
             <Text fw={500} size="xl">
-                {t('common.filters', { postProcess: 'sentenceCase' })}
+                {t('common.filters')}
             </Text>
             <Group gap="xs">
                 <Button onClick={clear} size="compact-sm" variant="subtle">
-                    {t('common.reset', { postProcess: 'sentenceCase' })}
+                    {t('common.reset')}
                 </Button>
                 {canUnpin && (
                     <ActionIcon

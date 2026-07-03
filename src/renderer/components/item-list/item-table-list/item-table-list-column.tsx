@@ -54,9 +54,13 @@ import { TextColumn } from '/@/renderer/components/item-list/item-table-list/col
 import { TitleArtistColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-artist-column';
 import { TitleColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-column';
 import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-combined-column';
+import { TrackNumberColumn } from '/@/renderer/components/item-list/item-table-list/columns/track-number-column';
 import { YearColumn } from '/@/renderer/components/item-list/item-table-list/columns/year-column';
 import { useItemDragDropState } from '/@/renderer/components/item-list/item-table-list/hooks/use-item-drag-drop-state';
-import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
+import {
+    TableItemProps,
+    TableItemSize,
+} from '/@/renderer/components/item-list/item-table-list/item-table-list';
 import { useItemTableListColumnResizeLive } from '/@/renderer/components/item-list/item-table-list/item-table-list-context';
 import { ItemControls, ItemListItem } from '/@/renderer/components/item-list/types';
 import { Flex } from '/@/shared/components/flex/flex';
@@ -239,7 +243,6 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
             case TableColumn.CHANNELS:
             case TableColumn.DISC_NUMBER:
             case TableColumn.SAMPLE_RATE:
-            case TableColumn.TRACK_NUMBER:
                 return <NumericColumn {...props} {...dragProps} controls={controls} type={type} />;
 
             case TableColumn.COMPOSER:
@@ -300,6 +303,11 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
                         controls={controls}
                         type={type}
                     />
+                );
+
+            case TableColumn.TRACK_NUMBER:
+                return (
+                    <TrackNumberColumn {...props} {...dragProps} controls={controls} type={type} />
                 );
 
             case TableColumn.USER_FAVORITE:
@@ -376,6 +384,36 @@ export const ItemTableListColumn = memo(ItemTableListColumnBase, (prevProps, nex
 
 const NonMutedColumns = [TableColumn.TITLE, TableColumn.TITLE_ARTIST, TableColumn.TITLE_COMBINED];
 
+// Counts how many consecutive rows belong to the same album group as `rowIndex`.
+export function getAlbumGroupRowCount(
+    rowIndex: number,
+    getRowItem: ((index: number) => unknown) | undefined,
+    enableHeader: boolean | undefined,
+    dataLength: number,
+): number {
+    const item = getRowItem?.(rowIndex) as null | undefined | { album?: string };
+    if (!item?.album) return 1;
+
+    const firstDataRow = enableHeader ? 1 : 0;
+    const maxRow = enableHeader ? dataLength + 1 : dataLength;
+
+    let start = rowIndex;
+    while (start > firstDataRow) {
+        const prevItem = getRowItem?.(start - 1) as null | undefined | { album?: string };
+        if (!prevItem || prevItem.album !== item.album) break;
+        start--;
+    }
+
+    let end = rowIndex;
+    while (end + 1 < maxRow) {
+        const nextItem = getRowItem?.(end + 1) as null | undefined | { album?: string };
+        if (!nextItem || nextItem.album !== item.album) break;
+        end++;
+    }
+
+    return end - start + 1;
+}
+
 export function isAlbumGroupingActive(columns: { id: string; isEnabled?: boolean }[]): boolean {
     return columns.some((col) => col.id === TableColumn.ALBUM_GROUP && col.isEnabled);
 }
@@ -395,6 +433,106 @@ export function isLastInAlbumGroup(
 
     const nextItem = getRowItem?.(nextRowIndex) as null | undefined | { album?: string };
     return !nextItem || nextItem.album !== item.album;
+}
+
+function baseRowHeightForSize(size: ItemTableListColumn['size']): number {
+    if (size === 'compact') return TableItemSize.COMPACT;
+    if (size === 'large') return TableItemSize.LARGE;
+    return TableItemSize.DEFAULT;
+}
+
+// Wraps a clamped cell with the spacer that fills the reserved (grown) height
+// below it. The spacer carries the group's bottom/right borders so they align
+// across all columns.
+function ClampedCell({
+    cell,
+    clampHeight,
+    outerStyle,
+    showHorizontalBorder,
+    showVerticalBorder,
+}: {
+    cell: ReactElement;
+    clampHeight: null | number;
+    outerStyle?: CSSProperties;
+    showHorizontalBorder: boolean;
+    showVerticalBorder: boolean;
+}): ReactElement {
+    const grownHeight = typeof outerStyle?.height === 'number' ? outerStyle.height : 0;
+    const spacerHeight = clampHeight !== null ? grownHeight - clampHeight : 0;
+
+    if (clampHeight === null || spacerHeight <= 0) return cell;
+
+    return (
+        <div style={outerStyle}>
+            {cell}
+            <div
+                aria-hidden
+                style={{
+                    borderBottom: showHorizontalBorder
+                        ? '1px solid var(--theme-colors-border)'
+                        : undefined,
+                    borderRight: showVerticalBorder
+                        ? '1px solid var(--theme-colors-border)'
+                        : undefined,
+                    height: spacerHeight,
+                }}
+            />
+        </div>
+    );
+}
+
+// When an enlarged album image extends past the album group's combined row
+// height, the last row of the group is grown (in getRowHeight) to reserve the
+// leftover space. This returns the standard (un-grown) height to clamp that
+// row's non-album cells to, so the track content + hover/selection stay at
+// standard height and the reserved space below is left empty (uniform
+// background) for the overflowing album image.
+function getAlbumGroupClampHeight(props: ItemTableListInnerColumn): null | number {
+    const albumImageSize = props.albumGroupImageSize ?? 0;
+
+    if (albumImageSize <= 0) return null;
+    if (props.type === TableColumn.ALBUM_GROUP) return null;
+    if (!isAlbumGroupingActive(props.columns)) return null;
+
+    const isDataRow = props.enableHeader ? props.rowIndex > 0 : true;
+    if (!isDataRow) return null;
+
+    const item = props.getRowItem?.(props.rowIndex) as null | undefined | { album?: string };
+    if (!item?.album) return null;
+
+    if (
+        !isLastInAlbumGroup(props.rowIndex, props.getRowItem, props.enableHeader, props.data.length)
+    ) {
+        return null;
+    }
+
+    const baseHeight = baseRowHeightForSize(props.size);
+    const groupRowCount = getAlbumGroupRowCount(
+        props.rowIndex,
+        props.getRowItem,
+        props.enableHeader,
+        props.data.length,
+    );
+
+    // Only clamp when the row was actually grown to fit the image.
+    if (albumImageSize <= groupRowCount * baseHeight) return null;
+
+    return baseHeight;
+}
+
+function showHorizontalBorderFor(props: ItemTableListInnerColumn, isLastRow: boolean): boolean {
+    if (!props.enableHorizontalBorders || !props.enableHeader || props.rowIndex <= 0) {
+        return false;
+    }
+    if (isAlbumGroupingActive(props.columns)) {
+        return isLastInAlbumGroup(
+            props.rowIndex,
+            props.getRowItem,
+            !!props.enableHeader,
+            props.data.length,
+        );
+    }
+    return props.rowIndex === 1 || !isLastRow;
 }
 
 export const TableColumnTextContainer = (
@@ -420,6 +558,7 @@ export const TableColumnTextContainer = (
             ? props.internalState.extractRowId(item)
             : undefined;
     const isSelected = useItemSelectionState(props.internalState, itemRowId || undefined);
+    const clampHeight = getAlbumGroupClampHeight(props);
 
     const isDragging = props.isDragging ?? false;
     const mergedRef = useMergedRef(containerRef, props.dragRef ?? null);
@@ -502,7 +641,10 @@ export const TableColumnTextContainer = (
         }
     };
 
-    return (
+    const showHorizontalBorder = showHorizontalBorderFor(props, isLastRow);
+    const showVerticalBorder = !!props.enableVerticalBorders && !isLastColumn;
+
+    const cell = (
         <div
             className={clsx(styles.container, props.containerClassName, {
                 [styles.alternateRowEven]:
@@ -524,25 +666,16 @@ export const TableColumnTextContainer = (
                 [styles.right]: props.columns[props.columnIndex].align === 'end',
                 [styles.rowHoverHighlightEnabled]: isDataRow && props.enableRowHoverHighlight,
                 [styles.rowSelected]: isDataRow && isSelected,
-                [styles.withHorizontalBorder]:
-                    props.enableHorizontalBorders &&
-                    props.enableHeader &&
-                    props.rowIndex > 0 &&
-                    (isAlbumGroupingActive(props.columns)
-                        ? isLastInAlbumGroup(
-                              props.rowIndex,
-                              props.getRowItem,
-                              !!props.enableHeader,
-                              props.data.length,
-                          )
-                        : props.rowIndex === 1 || !isLastRow),
-                [styles.withVerticalBorder]: props.enableVerticalBorders && !isLastColumn,
+                // When clamped, the bottom border is drawn on the spacer below
+                // instead.
+                [styles.withHorizontalBorder]: showHorizontalBorder && clampHeight === null,
+                [styles.withVerticalBorder]: showVerticalBorder,
             })}
             data-row-index={isDataRow ? `${props.tableId}-${props.rowIndex}` : undefined}
             onClick={handleClick}
             onContextMenu={handleContextMenu}
             ref={mergedRef}
-            style={props.style}
+            style={clampHeight !== null ? { height: clampHeight } : props.style}
         >
             <Text
                 className={clsx(styles.content, props.className, {
@@ -555,6 +688,16 @@ export const TableColumnTextContainer = (
                 {props.children}
             </Text>
         </div>
+    );
+
+    return (
+        <ClampedCell
+            cell={cell}
+            clampHeight={clampHeight}
+            outerStyle={props.style}
+            showHorizontalBorder={showHorizontalBorder}
+            showVerticalBorder={showVerticalBorder}
+        />
     );
 };
 
@@ -581,6 +724,7 @@ export const TableColumnContainer = (
             ? props.internalState.extractRowId(item)
             : undefined;
     const isSelected = useItemSelectionState(props.internalState, itemRowId || undefined);
+    const clampHeight = getAlbumGroupClampHeight(props);
 
     const isDragging = props.isDragging ?? false;
     const mergedRef = useMergedRef(containerRef, props.dragRef ?? null);
@@ -663,7 +807,10 @@ export const TableColumnContainer = (
         }
     };
 
-    return (
+    const showHorizontalBorder = showHorizontalBorderFor(props, isLastRow);
+    const showVerticalBorder = !!props.enableVerticalBorders && !isLastColumn;
+
+    const cell = (
         <div
             className={clsx(styles.container, props.className, {
                 [styles.alternateRowEven]:
@@ -677,6 +824,8 @@ export const TableColumnContainer = (
                 [styles.large]: props.size === 'large',
                 [styles.left]: props.columns[props.columnIndex].align === 'start',
                 [styles.noHorizontalPadding]: isNoHorizontalPaddingColumn(props.type),
+                [styles.noVerticalPadding]:
+                    props.type === TableColumn.ALBUM_GROUP && (props.albumGroupImageSize ?? 0) > 0,
                 [styles.paddingLg]: props.cellPadding === 'lg',
                 [styles.paddingMd]: props.cellPadding === 'md',
                 [styles.paddingSm]: props.cellPadding === 'sm',
@@ -689,28 +838,32 @@ export const TableColumnContainer = (
                     props.type !== TableColumn.ALBUM_GROUP,
                 [styles.rowSelected]:
                     isDataRow && isSelected && props.type !== TableColumn.ALBUM_GROUP,
-                [styles.withHorizontalBorder]:
-                    props.enableHorizontalBorders &&
-                    props.enableHeader &&
-                    props.rowIndex > 0 &&
-                    (isAlbumGroupingActive(props.columns)
-                        ? isLastInAlbumGroup(
-                              props.rowIndex,
-                              props.getRowItem,
-                              !!props.enableHeader,
-                              props.data.length,
-                          )
-                        : props.rowIndex === 1 || !isLastRow),
-                [styles.withVerticalBorder]: props.enableVerticalBorders && !isLastColumn,
+                // When clamped, the bottom border is drawn on the spacer below instead.
+                [styles.withHorizontalBorder]: showHorizontalBorder && clampHeight === null,
+                [styles.withVerticalBorder]: showVerticalBorder,
             })}
             data-row-index={isDataRow ? `${props.tableId}-${props.rowIndex}` : undefined}
             onClick={handleClick}
             onContextMenu={handleContextMenu}
             ref={mergedRef}
-            style={{ ...props.containerStyle, ...props.style }}
+            style={
+                clampHeight !== null
+                    ? { ...props.containerStyle, height: clampHeight }
+                    : { ...props.containerStyle, ...props.style }
+            }
         >
             {props.children}
         </div>
+    );
+
+    return (
+        <ClampedCell
+            cell={cell}
+            clampHeight={clampHeight}
+            outerStyle={props.style}
+            showHorizontalBorder={showHorizontalBorder}
+            showVerticalBorder={showVerticalBorder}
+        />
     );
 };
 

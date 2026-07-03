@@ -21,9 +21,7 @@ const InvalidRoute = () => {
                 <Stack>
                     <Group justify="center" wrap="nowrap">
                         <Icon color="warn" icon="error" />
-                        <Text size="xl">
-                            {t('error.apiRouteError', { postProcess: 'sentenceCase' })}
-                        </Text>
+                        <Text size="xl">{t('error.apiRouteError')}</Text>
                     </Group>
                     <Text>{location.pathname}</Text>
                     <ActionIcon icon="arrowLeftS" onClick={() => navigate(-1)} variant="filled" />

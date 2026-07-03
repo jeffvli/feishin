@@ -7,7 +7,7 @@ import { ArtistListSort } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
 export const useArtistListFilters = () => {
-    const { sortBy } = useSortByFilter<ArtistListSort>(null, ItemListKey.ARTIST);
+    const { sortBy } = useSortByFilter<ArtistListSort>(ArtistListSort.NAME, ItemListKey.ARTIST);
 
     const { sortOrder } = useSortOrderFilter(null, ItemListKey.ARTIST);
 

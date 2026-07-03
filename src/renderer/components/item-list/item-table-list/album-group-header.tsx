@@ -10,7 +10,7 @@ import {
     LONG_PRESS_PLAY_BEHAVIOR,
     PlayTooltip,
 } from '/@/renderer/features/shared/components/play-button-group';
-import { usePlayButtonBehavior } from '/@/renderer/store';
+import { useAlbumGroupImageSize, usePlayButtonBehavior } from '/@/renderer/store';
 import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
@@ -29,12 +29,33 @@ export const AlbumGroupHeader = ({
 }: AlbumGroupHeaderProps): ReactElement => {
     const [isHovered, setIsHovered] = useState(false);
     const playButtonBehavior = usePlayButtonBehavior();
+    const albumImageSize = useAlbumGroupImageSize();
     const rowHeight = {
         compact: TableItemSize.COMPACT,
         large: TableItemSize.LARGE,
         normal: TableItemSize.DEFAULT,
     }[size];
-    const infoHeight = groupRowCount !== undefined ? groupRowCount * rowHeight : undefined;
+    // The album group spans the combined row height, but when the image is
+    // enlarged the group's last row is grown so the total reaches the img size.
+    const infoHeight =
+        groupRowCount !== undefined
+            ? albumImageSize > 0
+                ? Math.max(albumImageSize, groupRowCount * rowHeight)
+                : groupRowCount * rowHeight
+            : undefined;
+
+    const imageContainerStyle =
+        albumImageSize > 0
+            ? {
+                  aspectRatio: 'auto',
+                  height: `${albumImageSize}px`,
+                  paddingBottom: 'var(--theme-spacing-xs)',
+                  paddingTop: 'var(--theme-spacing-xs)',
+                  position: 'relative' as const,
+                  width: `${albumImageSize}px`,
+                  zIndex: 1,
+              }
+            : undefined;
 
     return (
         <div className={styles.container}>
@@ -42,6 +63,7 @@ export const AlbumGroupHeader = ({
                 className={styles.imageContainer}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
+                style={imageContainerStyle}
             >
                 <ItemImage
                     className={imageColumnStyles.compactImage}

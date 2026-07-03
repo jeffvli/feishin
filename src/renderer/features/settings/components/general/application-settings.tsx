@@ -1,5 +1,3 @@
-import type { IpcRendererEvent } from 'electron';
-
 import { t } from 'i18next';
 import isElectron from 'is-electron';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -38,21 +36,20 @@ import { FontType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 const ipc = isElectron() ? window.api.ipc : null;
+const utils = isElectron() ? window.api.utils : null;
 // Electron 32+ removed file.path, use this which is exposed in preload to get real path
-const webUtils = isElectron() ? window.electron.webUtils : null;
+const getPathForFile = isElectron() ? window.api.getPathForFile : null;
 
 const HOME_FEATURE_STYLE_OPTIONS = [
     {
         label: t('setting.homeFeatureStyle', {
             context: 'optionSingle',
-            postProcess: 'sentenceCase',
         }),
         value: HomeFeatureStyle.SINGLE,
     },
     {
         label: t('setting.homeFeatureStyle', {
             context: 'optionMultiple',
-            postProcess: 'sentenceCase',
         }),
         value: HomeFeatureStyle.MULTIPLE,
     },
@@ -62,14 +59,12 @@ const SIDE_QUEUE_OPTIONS = [
     {
         label: t('setting.sidePlayQueueStyle', {
             context: 'optionAttached',
-            postProcess: 'sentenceCase',
         }),
         value: 'sideQueue',
     },
     {
         label: t('setting.sidePlayQueueStyle', {
             context: 'optionDetached',
-            postProcess: 'sentenceCase',
         }),
         value: 'sideDrawerQueue',
     },
@@ -79,14 +74,12 @@ const SIDE_QUEUE_LAYOUT_OPTIONS = [
     {
         label: t('setting.sidePlayQueueLayout', {
             context: 'optionHorizontal',
-            postProcess: 'sentenceCase',
         }),
         value: 'horizontal',
     },
     {
         label: t('setting.sidePlayQueueLayout', {
             context: 'optionVertical',
-            postProcess: 'sentenceCase',
         }),
         value: 'vertical',
     },
@@ -96,7 +89,6 @@ const FONT_TYPES: Font[] = [
     {
         label: i18n.t('setting.fontType', {
             context: 'optionBuiltIn',
-            postProcess: 'sentenceCase',
         }),
         value: FontType.BUILT_IN,
     },
@@ -104,14 +96,14 @@ const FONT_TYPES: Font[] = [
 
 if (window.queryLocalFonts) {
     FONT_TYPES.push({
-        label: i18n.t('setting.fontType', { context: 'optionSystem', postProcess: 'sentenceCase' }),
+        label: i18n.t('setting.fontType', { context: 'optionSystem' }),
         value: FontType.SYSTEM,
     });
 }
 
 if (isElectron()) {
     FONT_TYPES.push({
-        label: i18n.t('setting.fontType', { context: 'optionCustom', postProcess: 'sentenceCase' }),
+        label: i18n.t('setting.fontType', { context: 'optionCustom' }),
         value: FontType.CUSTOM,
     });
 }
@@ -131,7 +123,7 @@ export const ApplicationSettings = memo(() => {
     // }, [fontSettings.custom]);
 
     const onFontError = useCallback(
-        (_: IpcRendererEvent, file: string) => {
+        (file: string) => {
             toast.error({
                 message: `${file} is not a valid font file`,
             });
@@ -173,9 +165,7 @@ export const ApplicationSettings = memo(() => {
                     });
 
                     if (status.state === 'denied') {
-                        throw new Error(
-                            t('error.localFontAccessDenied', { postProcess: 'sentenceCase' }),
-                        );
+                        throw new Error(t('error.localFontAccessDenied'));
                     }
 
                     const data = await window.queryLocalFonts();
@@ -188,7 +178,7 @@ export const ApplicationSettings = memo(() => {
                 } catch (error) {
                     console.error('Failed to get local fonts', error);
                     toast.error({
-                        message: t('error.systemFontError', { postProcess: 'sentenceCase' }),
+                        message: t('error.systemFontError'),
                     });
 
                     setSettings({
@@ -227,10 +217,9 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.language', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.language', { postProcess: 'sentenceCase' }),
+            title: t('setting.language'),
         },
         {
             control: (
@@ -250,10 +239,9 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.fontType', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: FONT_TYPES.length === 1,
-            title: t('setting.fontType', { postProcess: 'sentenceCase' }),
+            title: t('setting.fontType'),
         },
         {
             control: (
@@ -272,9 +260,9 @@ export const ApplicationSettings = memo(() => {
                     value={fontSettings.builtIn}
                 />
             ),
-            description: t('setting.font', { context: 'description', postProcess: 'sentenceCase' }),
+            description: t('setting.font', { context: 'description' }),
             isHidden: localFonts && fontSettings.type !== FontType.BUILT_IN,
-            title: t('setting.font', { postProcess: 'sentenceCase' }),
+            title: t('setting.font'),
         },
         {
             control: (
@@ -294,31 +282,38 @@ export const ApplicationSettings = memo(() => {
                     w={300}
                 />
             ),
-            description: t('setting.font', { context: 'description', postProcess: 'sentenceCase' }),
+            description: t('setting.font', { context: 'description' }),
             isHidden: !localFonts || fontSettings.type !== FontType.SYSTEM,
-            title: t('setting.font', { postProcess: 'sentenceCase' }),
+            title: t('setting.font'),
         },
         {
             control: (
                 <FileInput
                     accept=".ttc,.ttf,.otf,.woff,.woff2"
-                    onChange={(e) =>
+                    clearable
+                    defaultValue={
+                        fontSettings.custom
+                            ? new File([], fontSettings.custom.split(utils?.separator || '').pop()!)
+                            : null
+                    }
+                    onChange={async (e) => {
+                        const custom = e ? getPathForFile?.(e) || null : null;
+                        await localSettings?.setSync('local_font_path', custom);
                         setSettings({
                             font: {
                                 ...fontSettings,
-                                custom: e ? webUtils?.getPathForFile(e) || null : null,
+                                custom,
                             },
-                        })
-                    }
+                        });
+                    }}
                     w={300}
                 />
             ),
             description: t('setting.customFontPath', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            isHidden: fontSettings.type !== FontType.CUSTOM,
-            title: t('setting.customFontPath', { postProcess: 'sentenceCase' }),
+            isHidden: !isElectron() || fontSettings.type !== FontType.CUSTOM,
+            title: t('setting.customFontPath'),
         },
         {
             control: (
@@ -343,12 +338,9 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.zoom', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.zoom', {
-                postProcess: 'sentenceCase',
-            }),
+            title: t('setting.zoom'),
         },
         {
             control: (
@@ -367,15 +359,14 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.savePlayQueue', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !isElectron(),
-            title: t('setting.savePlayQueue', { postProcess: 'sentenceCase' }),
+            title: t('setting.savePlayQueue'),
         },
         {
             control: (
                 <Switch
-                    aria-label={t('setting.homeFeature', { postProcess: 'sentenceCase' })}
+                    aria-label={t('setting.homeFeature')}
                     defaultChecked={settings.homeFeature}
                     onChange={(e) =>
                         setSettings({
@@ -389,15 +380,14 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.homeFeature', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.homeFeature', { postProcess: 'sentenceCase' }),
+            title: t('setting.homeFeature'),
         },
         {
             control: (
                 <SegmentedControl
-                    aria-label={t('setting.homeFeatureStyle', { postProcess: 'sentenceCase' })}
+                    aria-label={t('setting.homeFeatureStyle')}
                     data={HOME_FEATURE_STYLE_OPTIONS}
                     defaultValue={settings.homeFeatureStyle}
                     onChange={(e) =>
@@ -412,15 +402,14 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.homeFeatureStyle', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.homeFeatureStyle', { postProcess: 'sentenceCase' }),
+            title: t('setting.homeFeatureStyle'),
         },
         {
             control: (
                 <Switch
-                    aria-label={t('setting.albumBackground', { postProcess: 'sentenceCase' })}
+                    aria-label={t('setting.albumBackground')}
                     defaultChecked={settings.albumBackground}
                     onChange={(e) =>
                         setSettings({
@@ -434,10 +423,9 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.albumBackground', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.albumBackground', { postProcess: 'sentenceCase' }),
+            title: t('setting.albumBackground'),
         },
         {
             control: (
@@ -460,15 +448,14 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.albumBackgroundBlur', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !settings.albumBackground,
-            title: t('setting.albumBackgroundBlur', { postProcess: 'sentenceCase' }),
+            title: t('setting.albumBackgroundBlur'),
         },
         {
             control: (
                 <Switch
-                    aria-label={t('setting.artistBackground', { postProcess: 'sentenceCase' })}
+                    aria-label={t('setting.artistBackground')}
                     defaultChecked={settings.artistBackground}
                     onChange={(e) =>
                         setSettings({
@@ -482,10 +469,9 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.artistBackground', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.artistBackground', { postProcess: 'sentenceCase' }),
+            title: t('setting.artistBackground'),
         },
         {
             control: (
@@ -508,10 +494,9 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.artistBackgroundBlur', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !settings.artistBackground,
-            title: t('setting.artistBackgroundBlur', { postProcess: 'sentenceCase' }),
+            title: t('setting.artistBackgroundBlur'),
         },
         {
             control: (
@@ -530,10 +515,9 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.imageAspectRatio', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.imageAspectRatio', { postProcess: 'sentenceCase' }),
+            title: t('setting.imageAspectRatio'),
         },
         {
             control: (
@@ -552,15 +536,14 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.sidePlayQueueStyle', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.sidePlayQueueStyle', { postProcess: 'sentenceCase' }),
+            title: t('setting.sidePlayQueueStyle'),
         },
         {
             control: (
                 <SegmentedControl
-                    aria-label={t('setting.sidePlayQueueLayout', { postProcess: 'sentenceCase' })}
+                    aria-label={t('setting.sidePlayQueueLayout')}
                     data={SIDE_QUEUE_LAYOUT_OPTIONS}
                     defaultValue={settings.sideQueueLayout}
                     onChange={(e) =>
@@ -575,10 +558,9 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.sidePlayQueueLayout', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: settings.sideQueueType !== 'sideQueue',
-            title: t('setting.sidePlayQueueLayout', { postProcess: 'sentenceCase' }),
+            title: t('setting.sidePlayQueueLayout'),
         },
         {
             control: (
@@ -596,15 +578,14 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.showRatings', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.showRatings', { postProcess: 'sentenceCase' }),
+            title: t('setting.showRatings'),
         },
         {
             control: (
                 <Switch
-                    aria-label={t('setting.blurExplicitImages', { postProcess: 'sentenceCase' })}
+                    aria-label={t('setting.blurExplicitImages')}
                     defaultChecked={settings.blurExplicitImages}
                     onChange={(e) =>
                         setSettings({
@@ -618,15 +599,14 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.blurExplicitImages', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.blurExplicitImages', { postProcess: 'sentenceCase' }),
+            title: t('setting.blurExplicitImages'),
         },
         {
             control: (
                 <Switch
-                    aria-label={t('setting.enableGridMultiSelect', { postProcess: 'sentenceCase' })}
+                    aria-label={t('setting.enableGridMultiSelect')}
                     defaultChecked={settings.enableGridMultiSelect}
                     onChange={(e) =>
                         setSettings({
@@ -640,15 +620,14 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.enableGridMultiSelect', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.enableGridMultiSelect', { postProcess: 'sentenceCase' }),
+            title: t('setting.enableGridMultiSelect'),
         },
         {
             control: (
                 <Switch
-                    aria-label={t('setting.playerbarOpenDrawer', { postProcess: 'sentenceCase' })}
+                    aria-label={t('setting.playerbarOpenDrawer')}
                     defaultChecked={settings.playerbarOpenDrawer}
                     onChange={(e) =>
                         setSettings({
@@ -662,15 +641,14 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.playerbarOpenDrawer', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: false,
-            title: t('setting.playerbarOpenDrawer', { postProcess: 'sentenceCase' }),
+            title: t('setting.playerbarOpenDrawer'),
         },
         {
             control: (
                 <Switch
-                    aria-label={t('setting.autosave', { postProcess: 'sentenceCase' })}
+                    aria-label={t('setting.autosave')}
                     defaultChecked={settings.autoSave.enabled}
                     onChange={(e) => {
                         setSettings({
@@ -687,9 +665,8 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.autosave', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
-            title: t('setting.autosave', { postProcess: 'sentenceCase' }),
+            title: t('setting.autosave'),
         },
         {
             control: (
@@ -715,10 +692,9 @@ export const ApplicationSettings = memo(() => {
             ),
             description: t('setting.autosaveCount', {
                 context: 'description',
-                postProcess: 'sentenceCase',
             }),
             isHidden: !settings.autoSave.enabled,
-            title: t('setting.autosaveCount', { postProcess: 'sentenceCase' }),
+            title: t('setting.autosaveCount'),
         },
     ];
 
@@ -735,7 +711,7 @@ export const ApplicationSettings = memo(() => {
                 </>
             }
             options={options}
-            title={t('page.setting.application', { postProcess: 'sentenceCase' })}
+            title={t('page.setting.application')}
         />
     );
 });

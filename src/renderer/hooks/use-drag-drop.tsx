@@ -37,7 +37,7 @@ interface UseDraggableProps {
     drop?: {
         canDrop: (args: { source: DragData }) => boolean;
         getData: () => DragData;
-        onDrag: (args: { edge: Edge | null }) => void;
+        onDrag: (args: { edge: Edge | null; source: DragData }) => void;
         onDragLeave: () => void;
         onDrop: (args: { edge: Edge | null; self: DragData; source: DragData }) => void;
     };
@@ -139,10 +139,14 @@ export const useDragDrop = <TElement extends HTMLElement>({
                     },
                     onDrag: (args) => {
                         const closestEdgeOfTarget: Edge | null = extractClosestEdge(args.self.data);
-                        drop.onDrag?.({ edge: closestEdgeOfTarget });
+                        drop.onDrag?.({
+                            edge: closestEdgeOfTarget,
+                            source: args.source.data as unknown as DragData,
+                        });
                         setIsDraggedOver(closestEdgeOfTarget);
                     },
                     onDragLeave: () => {
+                        drop.onDragLeave?.();
                         setIsDraggedOver(null);
                     },
                     onDrop: (args) => {

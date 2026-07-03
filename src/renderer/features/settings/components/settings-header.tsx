@@ -30,10 +30,10 @@ export const SettingsHeader = ({ setSearch }: SettingsHeaderProps) => {
         openModal({
             children: (
                 <ConfirmModal onConfirm={handleResetToDefault}>
-                    <Text>{t('common.areYouSure', { postProcess: 'sentenceCase' })}</Text>
+                    <Text>{t('common.areYouSure')}</Text>
                 </ConfirmModal>
             ),
-            title: t('common.resetToDefault', { postProcess: 'sentenceCase' }),
+            title: t('common.resetToDefault'),
         });
     };
 
@@ -44,7 +44,7 @@ export const SettingsHeader = ({ setSearch }: SettingsHeaderProps) => {
                     <Group wrap="nowrap">
                         <Icon icon="settings" size="5xl" />
                         <LibraryHeaderBar.Title>
-                            {t('common.setting', { count: 2, postProcess: 'titleCase' })}
+                            {t('common.setting', { count: 2 })}
                         </LibraryHeaderBar.Title>
                     </Group>
                     <Group>
@@ -53,7 +53,7 @@ export const SettingsHeader = ({ setSearch }: SettingsHeaderProps) => {
                             onChange={(event) => setSearch(event.target.value.toLocaleLowerCase())}
                         />
                         <Button onClick={openResetConfirmModal} variant="default">
-                            {t('common.resetToDefault', { postProcess: 'sentenceCase' })}
+                            {t('common.resetToDefault')}
                         </Button>
                     </Group>
                 </Flex>

@@ -54,12 +54,12 @@ export const PlayerConfig = () => {
             {
                 component: <AudioPlayerTypeConfig />,
                 id: 'audioPlayerType',
-                label: t('setting.audioPlayer', { postProcess: 'titleCase' }),
+                label: t('setting.audioPlayer'),
             },
             {
                 component: <AudioDeviceConfig />,
                 id: 'audioDevice',
-                label: t('setting.audioDevice', { postProcess: 'titleCase' }),
+                label: t('setting.audioDevice'),
             },
             {
                 component: null,
@@ -70,23 +70,17 @@ export const PlayerConfig = () => {
             {
                 component: <TransitionTypeConfig />,
                 id: 'transitionType',
-                label: t('setting.playbackStyle', {
-                    postProcess: 'titleCase',
-                }),
+                label: t('setting.playbackStyle'),
             },
             {
                 component: <CrossfadeStyleConfig />,
                 id: 'crossfadeStyle',
-                label: t('setting.crossfadeStyle', {
-                    postProcess: 'titleCase',
-                }),
+                label: t('setting.crossfadeStyle'),
             },
             {
                 component: <CrossfadeDurationConfig />,
                 id: 'crossfadeDuration',
-                label: t('setting.crossfadeDuration', {
-                    postProcess: 'titleCase',
-                }),
+                label: t('setting.crossfadeDuration'),
             },
             {
                 component: null,
@@ -97,7 +91,7 @@ export const PlayerConfig = () => {
             {
                 component: <PlaybackSpeedSlider />,
                 id: 'playbackSpeed',
-                label: t('player.playbackSpeed', { postProcess: 'titleCase' }),
+                label: t('player.playbackSpeed'),
             },
             {
                 component: (
@@ -107,7 +101,7 @@ export const PlayerConfig = () => {
                     />
                 ),
                 id: 'preservePitch',
-                label: t('setting.preservePitch', { postProcess: 'titleCase' }),
+                label: t('setting.preservePitch'),
             },
             {
                 component: null,
@@ -129,7 +123,7 @@ export const PlayerConfig = () => {
                     />
                 ),
                 id: 'showLyricsInSidebar',
-                label: t('setting.showLyricsInSidebar', { postProcess: 'titleCase' }),
+                label: t('setting.showLyricsInSidebar'),
             },
             {
                 component: (
@@ -145,7 +139,7 @@ export const PlayerConfig = () => {
                     />
                 ),
                 id: 'showVisualizerInSidebar',
-                label: t('setting.showVisualizerInSidebar', { postProcess: 'titleCase' }),
+                label: t('setting.showVisualizerInSidebar'),
             },
             {
                 component: (
@@ -161,7 +155,7 @@ export const PlayerConfig = () => {
                     />
                 ),
                 id: 'combinedLyricsAndVisualizer',
-                label: t('setting.combinedLyricsAndVisualizer', { postProcess: 'titleCase' }),
+                label: t('setting.combinedLyricsAndVisualizer'),
             },
         ];
 
@@ -187,7 +181,7 @@ export const PlayerConfig = () => {
                     size="sm"
                     stopsPropagation
                     tooltip={{
-                        label: t('common.setting', { count: 2, postProcess: 'titleCase' }),
+                        label: t('common.setting', { count: 2 }),
                         openDelay: 0,
                     }}
                     variant="subtle"
@@ -279,14 +273,12 @@ const TransitionTypeConfig = () => {
                 {
                     label: t('setting.playbackStyle', {
                         context: 'optionNormal',
-                        postProcess: 'titleCase',
                     }),
                     value: PlayerStyle.GAPLESS,
                 },
                 {
                     label: t('setting.playbackStyle', {
                         context: 'optionCrossFade',
-                        postProcess: 'titleCase',
                     }),
                     value: PlayerStyle.CROSSFADE,
                 },
