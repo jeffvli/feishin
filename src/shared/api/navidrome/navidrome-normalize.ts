@@ -256,6 +256,7 @@ const normalizeSong = (
     const fromSongDate = parsePartialIsoDate(item.date);
     const date = fromSongDate.date ?? (songApiYear > 0 ? String(songApiYear) : null);
     const year = fromSongDate.year > 0 ? fromSongDate.year : releaseYear;
+
     return {
         album: item.album,
         albumId: item.albumId,
