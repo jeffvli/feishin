@@ -78,9 +78,7 @@ export const useInitialTimestampRestore = () => {
         }
 
         const targetUniqueId = startupSeekTargetUniqueIdRef.current;
-        const currentUniqueId = usePlayerStore.getState().getQueue().items[
-            usePlayerStore.getState().player.index
-        ]?._uniqueId;
+        const currentUniqueId = usePlayerStore.getState().getCurrentSong()?._uniqueId;
 
         if (targetUniqueId && currentUniqueId !== targetUniqueId) {
             cancelStartupSeek();
