@@ -55,6 +55,7 @@ import { TextColumn } from '/@/renderer/components/item-list/item-table-list/col
 import { TitleArtistColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-artist-column';
 import { TitleColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-column';
 import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-combined-column';
+import { TrackDateColumn } from '/@/renderer/components/item-list/item-table-list/columns/track-date-column';
 import { TrackNumberColumn } from '/@/renderer/components/item-list/item-table-list/columns/track-number-column';
 import { YearColumn } from '/@/renderer/components/item-list/item-table-list/columns/year-column';
 import { useItemDragDropState } from '/@/renderer/components/item-list/item-table-list/hooks/use-item-drag-drop-state';
@@ -248,6 +249,11 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
 
             case TableColumn.COMPOSER:
                 return <ComposerColumn {...props} {...dragProps} controls={controls} type={type} />;
+
+            case TableColumn.DATE:
+                return (
+                    <TrackDateColumn {...props} {...dragProps} controls={controls} type={type} />
+                );
 
             case TableColumn.DATE_ADDED:
                 return <DateColumn {...props} {...dragProps} controls={controls} type={type} />;
@@ -1272,6 +1278,9 @@ export const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.CODEC]: i18n.t('table.column.codec', { postProcess: 'upperCase' }) as string,
     [TableColumn.COMMENT]: i18n.t('table.column.comment', { postProcess: 'upperCase' }) as string,
     [TableColumn.COMPOSER]: i18n.t('table.config.label.composer', {
+        postProcess: 'upperCase',
+    }) as string,
+    [TableColumn.DATE]: i18n.t('table.column.date', {
         postProcess: 'upperCase',
     }) as string,
     [TableColumn.DATE_ADDED]: i18n.t('table.column.dateAdded', {

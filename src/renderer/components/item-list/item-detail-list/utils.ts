@@ -7,6 +7,7 @@ const FIXED_TRACK_COLUMN_WIDTHS: Partial<Record<TableColumn, number>> = {
     [TableColumn.BPM]: 56,
     [TableColumn.CHANNELS]: 80,
     [TableColumn.CODEC]: 80,
+    [TableColumn.DATE]: 128,
     [TableColumn.DATE_ADDED]: 128,
     [TableColumn.DISC_NUMBER]: 36,
     [TableColumn.DURATION]: 72,

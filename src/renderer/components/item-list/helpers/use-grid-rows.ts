@@ -59,6 +59,7 @@ const getRowIdFromTableColumn = (tableColumn: TableColumn): null | string => {
         [TableColumn.CODEC]: null,
         [TableColumn.COMMENT]: null,
         [TableColumn.COMPOSER]: null,
+        [TableColumn.DATE]: 'date',
         [TableColumn.DATE_ADDED]: 'createdAt',
         [TableColumn.DISC_NUMBER]: null,
         [TableColumn.DURATION]: 'duration',

@@ -14,6 +14,7 @@ import { CodecColumn } from './codec-column';
 import { CommentColumn } from './comment-column';
 import { ComposerColumn } from './composer-column';
 import { DateAddedColumn } from './date-added-column';
+import { DateColumn } from './date-column';
 import { DefaultColumn } from './default-column';
 import { DiscNumberColumn } from './disc-number-column';
 import { DurationColumn } from './duration-column';
@@ -53,6 +54,7 @@ const COLUMN_MAP: Partial<Record<TableColumn, CellComponent>> = {
     [TableColumn.CODEC]: CodecColumn,
     [TableColumn.COMMENT]: CommentColumn,
     [TableColumn.COMPOSER]: ComposerColumn,
+    [TableColumn.DATE]: DateColumn,
     [TableColumn.DATE_ADDED]: DateAddedColumn,
     [TableColumn.DISC_NUMBER]: DiscNumberColumn,
     [TableColumn.DURATION]: DurationColumn,
@@ -107,6 +109,7 @@ export {
     CommentColumn,
     ComposerColumn,
     DateAddedColumn,
+    DateColumn,
     DefaultColumn,
     DiscNumberColumn,
     DurationColumn,

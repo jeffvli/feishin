@@ -178,6 +178,7 @@ export enum TableColumn {
     CODEC = 'container',
     COMMENT = 'comment',
     COMPOSER = 'composer',
+    DATE = 'date',
     DATE_ADDED = 'createdAt',
     DISC_NUMBER = 'discNumber',
     DURATION = 'duration',

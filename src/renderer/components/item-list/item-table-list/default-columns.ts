@@ -113,6 +113,15 @@ export const SONG_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 300,
     },
     {
+        align: 'center',
+        autoSize: false,
+        isEnabled: false,
+        label: i18n.t('table.config.label.date'),
+        pinned: null,
+        value: TableColumn.DATE,
+        width: 240,
+    },
+    {
         align: 'start',
         autoSize: false,
         isEnabled: true,
