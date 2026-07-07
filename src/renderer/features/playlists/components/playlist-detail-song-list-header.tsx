@@ -6,6 +6,7 @@ import { useLocation, useParams } from 'react-router';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { useListContext } from '/@/renderer/context/list-context';
+import { useDownloadCollection } from '/@/renderer/features/downloads/hooks/use-download-collection';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { PlaylistDetailSongListHeaderFilters } from '/@/renderer/features/playlists/components/playlist-detail-song-list-header-filters';
@@ -125,6 +126,15 @@ export const PlaylistDetailSongListHeader = ({
         player.addToQueueByData(listData as Song[], type || Play.NOW);
     };
 
+    const {
+        activeCount: downloadActiveCount,
+        downloadedCount: downloadDoneCount,
+        downloadStatus,
+        enabled: downloadEnabled,
+        totalCount: downloadTotalCount,
+        triggerDownload,
+    } = useDownloadCollection(LibraryItem.PLAYLIST, playlistId, listData as Song[]);
+
     const canUploadPlaylistImage =
         hasFeature(server, ServerFeature.PLAYLIST_IMAGE_UPLOAD) &&
         Boolean(detailQuery?.data?._serverId);
@@ -222,6 +232,11 @@ export const PlaylistDetailSongListHeader = ({
                             </Spoiler>
                         ) : null}
                         <LibraryHeaderMenu
+                            downloadActive={downloadActiveCount}
+                            downloadDone={downloadDoneCount}
+                            downloadStatus={downloadStatus}
+                            downloadTotal={downloadTotalCount}
+                            onDownload={downloadEnabled ? () => triggerDownload() : undefined}
                             onPlay={(type) => handlePlay(type)}
                             onShuffle={() => handlePlay(Play.SHUFFLE)}
                         />

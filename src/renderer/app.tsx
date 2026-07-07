@@ -10,6 +10,8 @@ import isElectron from 'is-electron';
 import { lazy, memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import i18n from '/@/i18n/i18n';
+import { DownloadsPanel } from '/@/renderer/features/downloads/components/downloads-panel';
+import { useDownloadBridge } from '/@/renderer/features/downloads/hooks/use-download-bridge';
 import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-context';
 import { useCheckForUpdates } from '/@/renderer/hooks/use-check-for-updates';
 import { useNativeMenuSync } from '/@/renderer/hooks/use-native-menu-sync';
@@ -84,6 +86,7 @@ const AppShell = memo(function AppShell() {
                 </PlayerProvider>
             </WebAudioContext.Provider>
             <ReleaseNotesModal />
+            <DownloadsPanel />
             <Suspense fallback={null}>
                 <UpdateAvailableDialog />
             </Suspense>
@@ -101,8 +104,15 @@ const AppEffects = () => (
         <LanguageEffect />
         <NativeMenuSyncEffect />
         <InputFocusEffect />
+        <DownloadBridgeEffect />
     </>
 );
+
+const DownloadBridgeEffect = () => {
+    useDownloadBridge();
+
+    return null;
+};
 
 const SyncSettingsEffect = () => {
     useSyncSettingsToMain();

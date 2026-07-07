@@ -28,6 +28,7 @@ import path, { join } from 'path';
 import semver from 'semver';
 
 import packageJson from '../../package.json';
+import { initDownloads } from './features/core/downloads';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
@@ -254,6 +255,17 @@ function createAlphaUpdaterInstance(): AppImageUpdater | MacUpdater | NsisUpdate
 
 protocol.registerSchemesAsPrivileged([
     { privileges: { bypassCSP: true, corsEnabled: true }, scheme: 'feishin' },
+    {
+        privileges: {
+            bypassCSP: true,
+            corsEnabled: true,
+            secure: true,
+            standard: true,
+            stream: true,
+            supportFetchAPI: true,
+        },
+        scheme: 'feishin-local',
+    },
 ]);
 
 process.on('uncaughtException', (error: any) => {
@@ -1037,6 +1049,9 @@ if (!singleInstance) {
     });
 
     app.whenReady()
+        .then(async () => {
+            await initDownloads();
+        })
         .then(() => {
             protocol.handle('feishin', async () => {
                 const filePath = store.get('local_font_path');
@@ -1088,7 +1103,7 @@ if (!singleInstance) {
                     responseHeaders: {
                         ...details.responseHeaders,
                         'Content-Security-Policy': [
-                            "script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://umami.jeffvli.org; style-src 'self' 'unsafe-inline'; media-src 'self' http: https: data: blob:; img-src 'self' http: https: data: blob:; connect-src 'self' http: https: ws: wss:; default-src 'self';",
+                            "script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://umami.jeffvli.org; style-src 'self' 'unsafe-inline'; media-src 'self' http: https: data: blob: feishin-local:; img-src 'self' http: https: data: blob:; connect-src 'self' http: https: ws: wss: feishin-local:; default-src 'self';",
                         ],
                     },
                 });

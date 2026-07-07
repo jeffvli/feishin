@@ -42,7 +42,7 @@ export const QueueContextMenu = ({ items }: QueueContextMenuProps) => {
             <SetFavoriteAction ids={ids} itemType={LibraryItem.SONG} />
             <SetRatingAction ids={ids} itemType={LibraryItem.SONG} />
             <ContextMenu.Divider />
-            <DownloadAction ids={ids} />
+            <DownloadAction ids={ids} items={items} itemType={LibraryItem.SONG} />
             <ShareAction ids={ids} itemType={LibraryItem.SONG} />
             <ContextMenu.Divider />
             <GoToAction items={items} />

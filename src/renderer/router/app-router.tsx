@@ -81,6 +81,7 @@ const RadioListRoute = lazy(() => import('/@/renderer/features/radio/routes/radi
 
 const SearchRoute = lazy(() => import('/@/renderer/features/search/routes/search-route'));
 
+const DownloadsRoute = lazy(() => import('/@/renderer/features/downloads/routes/downloads-route'));
 const FavoritesRoute = lazy(() => import('/@/renderer/features/favorites/routes/favorites-route'));
 
 const SettingsRoute = lazy(() => import('/@/renderer/features/settings/routes/settings-route'));
@@ -203,6 +204,10 @@ export const AppRouter = () => {
                                         <Route
                                             element={<FavoritesRoute />}
                                             path={AppRoute.FAVORITES}
+                                        />
+                                        <Route
+                                            element={<DownloadsRoute />}
+                                            path={AppRoute.DOWNLOADS}
                                         />
                                         <Route
                                             element={<SettingsRoute />}
