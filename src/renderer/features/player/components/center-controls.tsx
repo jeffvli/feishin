@@ -163,7 +163,7 @@ const PreviousButton = ({ disabled }: { disabled?: boolean }) => {
         <PlayerButton
             disabled={disabled}
             icon={<Icon fill="default" icon="mediaPrevious" size={buttonSize} />}
-            onClick={mediaPrevious}
+            onClick={(e) => mediaPrevious(e.altKey)}
             tooltip={{
                 label: t('player.previous'),
                 openDelay: 0,
@@ -239,7 +239,7 @@ const NextButton = ({ disabled }: { disabled?: boolean }) => {
         <PlayerButton
             disabled={disabled}
             icon={<Icon fill="default" icon="mediaNext" size={buttonSize} />}
-            onClick={mediaNext}
+            onClick={(e) => mediaNext(e.altKey)}
             tooltip={{
                 label: t('player.next'),
                 openDelay: 0,
