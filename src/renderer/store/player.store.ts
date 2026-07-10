@@ -1076,15 +1076,25 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     let { nextIndex } = nextIndexProps;
                     const { shouldStop } = nextIndexProps;
 
-                    if (toNextAlbum && !shouldStop && repeat === PlayerRepeat.NONE) {
-                        const queueStartingFromCurrent = queue.items.slice(currentIndex);
+                    if (toNextAlbum && !shouldStop) {
                         const currentItem = queue.items[currentIndex];
-                        const nextIndexWithNextAlbum = queueStartingFromCurrent.findIndex(
-                            (i) => i.albumId !== currentItem.albumId,
-                        );
-                        nextIndex =
-                            nextIndexWithNextAlbum +
-                            (queue.items.length - queueStartingFromCurrent.length);
+                        const [start, end] = findLastAlbumRange(queue.items);
+                        const isOnLastAlbum = start <= currentIndex && currentIndex <= end;
+                        if (isOnLastAlbum) {
+                            const nextIndexWithNextAlbum = queue.items.findIndex(
+                                (i) => i.albumId !== currentItem.albumId,
+                            );
+
+                            nextIndex = nextIndexWithNextAlbum;
+                        } else {
+                            const queueStartingFromCurrent = queue.items.slice(currentIndex);
+                            const nextIndexWithNextAlbum = queueStartingFromCurrent.findIndex(
+                                (i) => i.albumId !== currentItem.albumId,
+                            );
+                            nextIndex =
+                                nextIndexWithNextAlbum +
+                                (queue.items.length - queueStartingFromCurrent.length);
+                        }
                     }
 
                     if (shouldStop) {
@@ -2290,6 +2300,22 @@ function findIndexWithPreviousAlbum(queueItems: QueueSong[], currentIndex: numbe
     }
 
     return prevIndex;
+}
+
+function findLastAlbumRange(queueItems: QueueSong[]) {
+    const lastAlbumId = queueItems.at(-1)?.albumId;
+    const rangeEnd = queueItems.length - 1;
+    let rangeStart = rangeEnd;
+
+    for (let index = rangeEnd; index > -1; index--) {
+        const element = queueItems[index];
+        rangeStart = index;
+        if (element.albumId !== lastAlbumId) {
+            break;
+        }
+    }
+
+    return [rangeStart + 1, rangeEnd];
 }
 
 function parseUniqueSeekToTimestamp(timestamp: string) {
