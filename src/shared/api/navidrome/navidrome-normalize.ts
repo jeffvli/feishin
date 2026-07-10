@@ -250,10 +250,11 @@ const normalizeSong = (
 
     const fromSongRelease = parsePartialIsoDate(item.releaseDate);
     const songApiYear = coerceYear(item.year);
+    const fromSongDate = parsePartialIsoDate(item.date);
     const releaseYear: null | number =
         fromSongRelease.year > 0 ? fromSongRelease.year : songApiYear > 0 ? songApiYear : null;
-    const releaseDate = fromSongRelease.date ?? (songApiYear > 0 ? String(songApiYear) : null);
-    const fromSongDate = parsePartialIsoDate(item.date);
+    const releaseDate =
+        fromSongRelease.date ?? fromSongDate.date ?? (songApiYear > 0 ? String(songApiYear) : null);
     const date = fromSongDate.date ?? (songApiYear > 0 ? String(songApiYear) : null);
     const year = fromSongDate.year > 0 ? fromSongDate.year : releaseYear;
 

@@ -634,6 +634,7 @@ const PlayerFilterFieldSchema = z.enum([
     'duration',
     'genre',
     'year',
+    'releaseYear',
     'note',
     'path',
     'playCount',
@@ -1096,7 +1097,7 @@ export const playerItems: SortableItem<PlayerItem>[] = [
         id: PlayerItem.TRACK_NUMBER,
     },
     {
-        disabled: true,
+        disabled: false,
         id: PlayerItem.YEAR,
     },
 ];

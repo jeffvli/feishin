@@ -67,6 +67,11 @@ const getFilterFields = (t: (key: string, options?: any) => string): FilterField
         value: 'year',
     },
     {
+        label: t('table.config.label.releaseYear'),
+        type: 'number',
+        value: 'releaseYear',
+    },
+    {
         label: t('table.config.label.note'),
         type: 'string',
         value: 'note',
