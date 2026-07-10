@@ -2708,6 +2708,92 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     );
                 }
 
+                if (version < 29) {
+                    const dateColumn: ItemTableListColumnConfig = {
+                        align: 'center',
+                        autoSize: false,
+                        id: TableColumn.DATE,
+                        isEnabled: false,
+                        pinned: null,
+                        width: 240,
+                    };
+                    const yearColumn: ItemTableListColumnConfig = {
+                        align: 'center',
+                        autoSize: false,
+                        id: TableColumn.YEAR,
+                        isEnabled: false,
+                        pinned: null,
+                        width: 200,
+                    };
+
+                    const listKeysToUpdate: ItemListKey[] = [
+                        ItemListKey.SONG,
+                        ItemListKey.ALBUM_DETAIL,
+                        ItemListKey.FOLDER,
+                        ItemListKey.PLAYLIST_SONG,
+                        ItemListKey.ALBUM_ARTIST_SONG,
+                        ItemListKey.GENRE_SONG,
+                        ItemListKey.QUEUE_SONG,
+                        ItemListKey.FULL_SCREEN,
+                        ItemListKey.SIDE_QUEUE,
+                    ];
+
+                    listKeysToUpdate.forEach((listKey) => {
+                        const listConfig = state.lists[listKey];
+                        if (listConfig?.table?.columns) {
+                            const columns = listConfig.table.columns;
+                            const hasYear = columns.some((col) => col.id === TableColumn.YEAR);
+                            if (!hasYear) {
+                                const releaseYearIndex = columns.findIndex(
+                                    (col) => col.id === TableColumn.RELEASE_YEAR,
+                                );
+                                if (releaseYearIndex >= 0) {
+                                    columns.splice(releaseYearIndex, 0, yearColumn);
+                                } else {
+                                    columns.push(yearColumn);
+                                }
+                            }
+                            const hasDate = columns.some((col) => col.id === TableColumn.DATE);
+                            if (!hasDate) {
+                                const releaseDateIndex = columns.findIndex(
+                                    (col) => col.id === TableColumn.RELEASE_DATE,
+                                );
+                                if (releaseDateIndex >= 0) {
+                                    columns.splice(releaseDateIndex, 0, dateColumn);
+                                } else {
+                                    columns.push(dateColumn);
+                                }
+                            }
+                        }
+                    });
+                    const listConfig = state.lists[ItemListKey.ALBUM];
+                    if (listConfig?.detail?.columns) {
+                        const columns = listConfig.detail.columns;
+                        const hasYear = columns.some((col) => col.id === TableColumn.YEAR);
+                        if (!hasYear) {
+                            const releaseYearIndex = columns.findIndex(
+                                (col) => col.id === TableColumn.RELEASE_YEAR,
+                            );
+                            if (releaseYearIndex >= 0) {
+                                columns.splice(releaseYearIndex, 0, yearColumn);
+                            } else {
+                                columns.push(yearColumn);
+                            }
+                        }
+                        const hasDate = columns.some((col) => col.id === TableColumn.DATE);
+                        if (!hasDate) {
+                            const releaseDateIndex = columns.findIndex(
+                                (col) => col.id === TableColumn.RELEASE_DATE,
+                            );
+                            if (releaseDateIndex >= 0) {
+                                columns.splice(releaseDateIndex, 0, dateColumn);
+                            } else {
+                                columns.push(dateColumn);
+                            }
+                        }
+                    }
+                }
+
                 if (version < 30) {
                     for (const [key, displaySettings] of Object.entries(state.lyricsDisplay)) {
                         const legacySettings = displaySettings as typeof displaySettings & {
