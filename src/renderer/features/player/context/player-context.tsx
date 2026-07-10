@@ -60,6 +60,7 @@ export interface PlayerContext {
     clearQueue: () => void;
     clearSelected: (items: QueueSong[]) => void;
     decreaseVolume: (amount: number) => void;
+    getQueue: () => QueueSong[];
     increaseVolume: (amount: number) => void;
     mediaNext: () => void;
     mediaPause: () => void;
@@ -95,6 +96,7 @@ export const PlayerContext = createContext<PlayerContext>({
     clearQueue: () => {},
     clearSelected: () => {},
     decreaseVolume: () => {},
+    getQueue: () => {},
     increaseVolume: () => {},
     mediaNext: () => {},
     mediaPause: () => {},
@@ -567,6 +569,15 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         [storeActions],
     );
 
+    const getQueue = useCallback(() => {
+        logFn.debug(logMsg[LogCategory.PLAYER].clearQueue, {
+            category: LogCategory.PLAYER,
+        });
+
+        const queue = storeActions.getQueue();
+        return queue.items;
+    }, [storeActions]);
+
     const increaseVolume = useCallback(
         (amount: number) => {
             logFn.debug(logMsg[LogCategory.PLAYER].increaseVolume, {
@@ -847,6 +858,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
             clearQueue,
             clearSelected,
             decreaseVolume,
+            getQueue,
             increaseVolume,
             mediaNext,
             mediaPause,
@@ -881,6 +893,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
             clearQueue,
             clearSelected,
             decreaseVolume,
+            getQueue,
             increaseVolume,
             mediaNext,
             mediaPause,

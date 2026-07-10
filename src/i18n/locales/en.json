@@ -9,6 +9,7 @@
         "collapseAllFolders": "Collapse all folders",
         "expandAllFolders": "Expand all folders",
         "createPlaylist": "Create $t(entity.playlist, {\"count\": 1})",
+        "createPlaylistFromQueue": "Create $t(entity.playlist, {\"count\": 1}) from queue",
         "createRadioStation": "Create $t(entity.radioStation, {\"count\": 1})",
         "deletePlaylist": "Delete $t(entity.playlist, {\"count\": 1})",
         "deleteRadioStation": "Delete $t(entity.radioStation, {\"count\": 1})",
@@ -364,6 +365,9 @@
             "input_public": "Public",
             "success": "$t(entity.playlist, {\"count\": 1}) created successfully",
             "title": "Create $t(entity.playlist, {\"count\": 1})"
+        },
+        "createPrefilledPlaylist": {
+            "title": "Create $t(entity.playlist, {\"count\": 1}) from selected songs"
         },
         "createRadioStation": {
             "success": "Radio station created successfully",
