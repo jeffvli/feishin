@@ -266,7 +266,7 @@ export const DiscordSettings = memo(() => {
                 context: 'description',
                 discord: 'Discord',
             }),
-            isHidden: !isElectron(),
+            isHidden: !isElectron() || settings.serverType !== DiscordServerType.IMAGE_PROXY,
             title: t('setting.discordImageProxyServerLink', {
                 discord: 'Discord',
             }),
