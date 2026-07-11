@@ -240,9 +240,22 @@ const loadThemesFromDisk = async (): Promise<CustomTheme[]> => {
 
     const entries = await fs.readdir(themesPath, { withFileTypes: true });
 
-    const jsonFiles = entries.filter(
-        (entry) => entry.isFile() && entry.name.toLowerCase().endsWith(JSON_EXTENSION),
-    );
+    const jsonFiles: typeof entries = [];
+
+    for (const entry of entries) {
+        if (!entry.name.toLowerCase().endsWith(JSON_EXTENSION)) continue;
+
+        const fullPath = path.join(themesPath, entry.name);
+
+        try {
+            const stat = await fs.stat(fullPath); // follows symlinks
+            if (stat.isFile()) {
+                jsonFiles.push(entry);
+            }
+        } catch {
+            // broken symlink or inaccessible file
+        }
+    }
 
     const byId = new Map<string, RawCustomTheme & { themeDir: string }>();
     const parseErrors = new Map<string, string>();
