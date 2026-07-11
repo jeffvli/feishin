@@ -9,7 +9,7 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { useCustomThemesStore, useCustomThemes } from '/@/renderer/store/custom-themes.store';
+import { useCustomThemes, useCustomThemesStore } from '/@/renderer/store/custom-themes.store';
 import { useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { THEME_DATA, useSetColorScheme } from '/@/renderer/themes/use-app-theme';
 import { Button } from '/@/shared/components/button/button';
@@ -114,11 +114,18 @@ const CustomThemesManager = memo(() => {
             <SettingsOptions
                 control={
                     <Group gap="xs">
-                        <Button onClick={() => openThemesFolder()} size="compact-md" variant="subtle">
+                        <Button
+                            onClick={() => openThemesFolder()}
+                            size="compact-md"
+                            variant="subtle"
+                        >
                             {t('common.openFolder', { postProcess: 'titleCase' })}
                         </Button>
                         <Button onClick={() => refresh()} size="compact-md" variant="subtle">
-                            {t('common.reload', { defaultValue: 'Reload', postProcess: 'titleCase' })}
+                            {t('common.reload', {
+                                defaultValue: 'Reload',
+                                postProcess: 'titleCase',
+                            })}
                         </Button>
                     </Group>
                 }
@@ -130,7 +137,12 @@ const CustomThemesManager = memo(() => {
                     control={
                         <Stack gap={4}>
                             {erroredThemes.map((theme) => (
-                                <Text isNoSelect key={theme.id} size="sm" style={{ color: 'var(--theme-colors-state-error)' }}>
+                                <Text
+                                    isNoSelect
+                                    key={theme.id}
+                                    size="sm"
+                                    style={{ color: 'var(--theme-colors-state-error)' }}
+                                >
                                     {theme.id}: {theme.error}
                                 </Text>
                             ))}

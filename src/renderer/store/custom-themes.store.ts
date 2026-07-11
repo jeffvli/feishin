@@ -12,16 +12,16 @@ export interface CustomThemeMeta {
     warnings?: string[];
 }
 
+interface CustomThemesActions {
+    openThemesFolder: () => Promise<void>;
+    refresh: () => Promise<void>;
+}
+
 interface CustomThemesState {
     // Metadata for populating theme pickers (id/label/mode/error/warnings),
     // separate from the full AppThemeConfiguration objects which live in
     // the shared registry consumed by getAppTheme.
     themes: CustomThemeMeta[];
-}
-
-interface CustomThemesActions {
-    openThemesFolder: () => Promise<void>;
-    refresh: () => Promise<void>;
 }
 
 const customThemesApi = isElectron() ? window.api.customThemes : null;
@@ -71,20 +71,18 @@ const toRegistry = (rawThemes: RawCustomTheme[]): Record<string, AppThemeConfigu
     return registry;
 };
 
-export const useCustomThemesStore = create<CustomThemesActions & CustomThemesState>()(
-    (set, get) => ({
-        openThemesFolder: async () => {
-            await customThemesApi?.openFolder();
-        },
-        refresh: async () => {
-            if (!customThemesApi) return;
-            const rawThemes = (await customThemesApi.get()) as unknown as RawCustomTheme[];
-            setCustomThemeRegistry(toRegistry(rawThemes));
-            set({ themes: rawThemes.map(toMeta) });
-        },
-        themes: [],
-    }),
-);
+export const useCustomThemesStore = create<CustomThemesActions & CustomThemesState>()((set) => ({
+    openThemesFolder: async () => {
+        await customThemesApi?.openFolder();
+    },
+    refresh: async () => {
+        if (!customThemesApi) return;
+        const rawThemes = (await customThemesApi.get()) as unknown as RawCustomTheme[];
+        setCustomThemeRegistry(toRegistry(rawThemes));
+        set({ themes: rawThemes.map(toMeta) });
+    },
+    themes: [],
+}));
 
 let unsubscribeFromUpdates: (() => void) | null = null;
 

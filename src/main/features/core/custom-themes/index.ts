@@ -3,8 +3,7 @@ import type { FSWatcher } from 'fs';
 import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import { promises as fs, watch as fsWatch } from 'fs';
 import path from 'path';
-
-import validateColor from 'validate-color';
+import { validateHTMLColor } from 'validate-color';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
@@ -27,7 +26,7 @@ const MAX_EXTENDS_DEPTH = 10;
 
 const isValidCssColor = (value: unknown): value is string => {
     if (typeof value !== 'string' || !value.trim()) return false;
-    return validateColor.default(value);
+    return validateHTMLColor(value); // treats color names as invalid
 };
 
 // Validates every value in a theme's `colors` object, dropping (and
@@ -56,19 +55,6 @@ const sanitizeColors = (
     return { invalidKeys, sanitized };
 };
 
-interface RawCustomTheme {
-    app?: Record<string, unknown>;
-    colors?: Record<string, unknown>;
-    // Name (without .json) of another custom theme, or a built-in theme id,
-    // to merge on top of. Custom themes always win over what they extend.
-    extends?: string;
-    mantineOverride?: Record<string, unknown>;
-    mode?: 'dark' | 'light';
-    // Paths to .css files, relative to the theme's own json file, that
-    // should be inlined into the app's stylesheet when this theme is active.
-    stylesheets?: string[];
-}
-
 export interface CustomTheme {
     app?: Record<string, unknown>;
     colors?: Record<string, unknown>;
@@ -87,6 +73,19 @@ export interface CustomTheme {
     // values that were dropped). The theme still loads and can be
     // selected; this is surfaced in Settings so the user can fix it.
     warnings?: string[];
+}
+
+interface RawCustomTheme {
+    app?: Record<string, unknown>;
+    colors?: Record<string, unknown>;
+    // Name (without .json) of another custom theme, or a built-in theme id,
+    // to merge on top of. Custom themes always win over what they extend.
+    extends?: string;
+    mantineOverride?: Record<string, unknown>;
+    mode?: 'dark' | 'light';
+    // Paths to .css files, relative to the theme's own json file, that
+    // should be inlined into the app's stylesheet when this theme is active.
+    stylesheets?: string[];
 }
 
 let watcher: FSWatcher | null = null;
@@ -278,7 +277,6 @@ const loadThemesFromDisk = async (): Promise<CustomTheme[]> => {
             continue;
         }
 
-        const raw = byId.get(id)!;
         const { extendsBuiltIn, fields, invalidColorKeys } = resolveExtends(id, byId);
         const stylesheetContents = await readStylesheetContents(fields.stylesheetPaths ?? []);
 

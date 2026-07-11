@@ -4,13 +4,13 @@ import { generateColors } from '@mantine/colors-generator';
 import { useMantineColorScheme } from '@mantine/core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useCustomThemes } from '/@/renderer/store/custom-themes.store';
 import {
     useAccent,
     useFontSettings,
     useNativeAspectRatio,
     useThemeSettings,
 } from '/@/renderer/store/settings.store';
-import { useCustomThemes } from '/@/renderer/store/custom-themes.store';
 import { createMantineTheme } from '/@/renderer/themes/mantine-theme';
 import { getAppTheme } from '/@/shared/themes/app-theme';
 import { AppTheme, AppThemeConfiguration } from '/@/shared/themes/app-theme-types';
@@ -182,14 +182,7 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
                 ...(effectivePrimaryShade != null && { primaryShade: effectivePrimaryShade }),
             },
         };
-    }, [
-        accent,
-        customThemes,
-        primaryShade,
-        selectedTheme,
-        useThemeAccentColor,
-        useThemePrimaryShade,
-    ]);
+    }, [accent, primaryShade, selectedTheme, useThemeAccentColor, useThemePrimaryShade]);
 
     useEffect(() => {
         const root = document.documentElement;
