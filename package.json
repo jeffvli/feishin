@@ -139,6 +139,7 @@
         "react-window-v2": "npm:react-window@^2.2.7",
         "semver": "^7.8.2",
         "string-to-color": "^2.2.2",
+        "validate-color": "^2.2.4",
         "wavesurfer.js": "^7.12.7",
         "ws": "^8.21.0",
         "zod": "^3.25.76",

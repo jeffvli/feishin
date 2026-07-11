@@ -553,9 +553,14 @@ export const GeneralSettingsSchema = z.object({
     sideQueueType: SideQueueTypeSchema,
     skipButtons: SkipButtonsSchema,
     spotify: z.boolean(),
-    theme: z.nativeEnum(AppTheme),
-    themeDark: z.nativeEnum(AppTheme),
-    themeLight: z.nativeEnum(AppTheme),
+    // Accepts either a built-in AppTheme id or a custom theme id (the
+    // filename, without extension, of a JSON file in the themes folder).
+    // Custom theme ids aren't statically known, so this can't be a
+    // nativeEnum(AppTheme) any more; getAppTheme() falls back to the
+    // default theme if the stored id doesn't resolve to anything.
+    theme: z.string(),
+    themeDark: z.string(),
+    themeLight: z.string(),
     useThemeAccentColor: z.boolean(),
     useThemePrimaryShade: z.boolean(),
     volumeWheelStep: z.number(),

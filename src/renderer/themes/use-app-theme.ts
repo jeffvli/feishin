@@ -10,6 +10,7 @@ import {
     useNativeAspectRatio,
     useThemeSettings,
 } from '/@/renderer/store/settings.store';
+import { useCustomThemes } from '/@/renderer/store/custom-themes.store';
 import { createMantineTheme } from '/@/renderer/themes/mantine-theme';
 import { getAppTheme } from '/@/shared/themes/app-theme';
 import { AppTheme, AppThemeConfiguration } from '/@/shared/themes/app-theme-types';
@@ -54,6 +55,9 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
     const accent = useAccent();
     const nativeImageAspect = useNativeAspectRatio();
     const { builtIn, custom, system, type } = useFontSettings();
+    // Not read directly, but its identity changes whenever the custom
+    // themes folder is reloaded, which is what we want to react to below.
+    const customThemes = useCustomThemes();
     const textStyleRef = useRef<HTMLStyleElement | null>(null);
     const themeInlineStylesRef = useRef<HTMLStyleElement | null>(null);
     const getCurrentTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -178,7 +182,14 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
                 ...(effectivePrimaryShade != null && { primaryShade: effectivePrimaryShade }),
             },
         };
-    }, [accent, primaryShade, selectedTheme, useThemeAccentColor, useThemePrimaryShade]);
+    }, [
+        accent,
+        customThemes,
+        primaryShade,
+        selectedTheme,
+        useThemeAccentColor,
+        useThemePrimaryShade,
+    ]);
 
     useEffect(() => {
         const root = document.documentElement;
@@ -204,6 +215,7 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
         root.style.setProperty('--theme-colors-primary', primaryAtShade);
     }, [
         accent,
+        customThemes,
         isDarkTheme,
         primaryShade,
         selectedTheme,

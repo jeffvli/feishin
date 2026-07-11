@@ -72,12 +72,28 @@ export const appTheme: Record<AppTheme, AppThemeConfiguration> = {
     [AppTheme.ZENBURN]: zenburn,
 };
 
-export const getAppTheme = (theme: AppTheme): AppThemeConfiguration => {
+// Custom themes loaded from disk (see custom-themes-store.ts) are registered
+// here at runtime so getAppTheme can resolve `theme` values that aren't part
+// of the built-in AppTheme enum. Kept separate from `appTheme` above so the
+// built-in theme map stays a plain, statically-known record.
+let customThemeRegistry: Record<string, AppThemeConfiguration> = {};
+
+export const setCustomThemeRegistry = (registry: Record<string, AppThemeConfiguration>) => {
+    customThemeRegistry = registry;
+};
+
+const resolveThemeConfig = (theme: string): AppThemeConfiguration | undefined => {
+    return (appTheme as Record<string, AppThemeConfiguration>)[theme] ?? customThemeRegistry[theme];
+};
+
+export const getAppTheme = (theme: AppTheme | string): AppThemeConfiguration => {
+    const themeConfig = resolveThemeConfig(theme) ?? appTheme[AppTheme.DEFAULT_DARK];
+
     return {
-        app: merge({}, defaultTheme.app, appTheme[theme].app),
-        colors: merge({}, defaultTheme.colors, appTheme[theme].colors),
-        mantineOverride: merge({}, defaultTheme.mantineOverride, appTheme[theme].mantineOverride),
-        mode: appTheme[theme].mode,
-        stylesheets: appTheme[theme].stylesheets,
+        app: merge({}, defaultTheme.app, themeConfig.app),
+        colors: merge({}, defaultTheme.colors, themeConfig.colors),
+        mantineOverride: merge({}, defaultTheme.mantineOverride, themeConfig.mantineOverride),
+        mode: themeConfig.mode,
+        stylesheets: themeConfig.stylesheets,
     };
 };
