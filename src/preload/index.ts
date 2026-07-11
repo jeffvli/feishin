@@ -9,6 +9,7 @@ import { lyrics } from './lyrics';
 import { mpris } from './mpris';
 import { mpvPlayer, mpvPlayerListener } from './mpv-player';
 import { remote } from './remote';
+import { sonos } from './sonos';
 import { utils } from './utils';
 import { visualizer } from './visualizer';
 
@@ -25,11 +26,10 @@ const api = {
     mpvPlayer,
     mpvPlayerListener,
     remote,
+    sonos,
     utils,
     visualizer,
 };
-
-export type PreloadApi = typeof api;
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

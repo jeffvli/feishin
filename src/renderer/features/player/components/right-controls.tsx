@@ -6,6 +6,7 @@ import { PopoverPlayQueue } from '/@/renderer/features/now-playing/components/po
 import { PlayerConfig } from '/@/renderer/features/player/components/player-config';
 import { CustomPlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { SleepTimerButton } from '/@/renderer/features/player/components/sleep-timer-button';
+import { SonosButton } from '/@/renderer/features/player/components/sonos-button';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
@@ -88,6 +89,7 @@ export const RightControls = () => {
                 <PlayerConfig />
                 <LyricsButton />
                 <FavoriteButton />
+                <SonosButton />
                 <QueueButton />
                 <VolumeButton />
             </Group>

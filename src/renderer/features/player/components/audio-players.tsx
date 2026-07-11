@@ -6,6 +6,7 @@ import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/ev
 import { DiscordRpcHook } from '/@/renderer/features/discord-rpc/use-discord-rpc';
 import { MainPlayerListenerHook } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
+import { SonosPlayer } from '/@/renderer/features/player/audio-player/sonos-player';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
 import { SleepTimerHook } from '/@/renderer/features/player/components/sleep-timer-button';
 import { AutoDJHook } from '/@/renderer/features/player/hooks/use-auto-dj';
@@ -325,10 +326,15 @@ const AudioPlayersContent = ({
         return <RadioWebPlayer />;
     }
 
+    if (isRadioActive && playbackType === PlayerType.SONOS) {
+        return <RadioWebPlayer />;
+    }
+
     return (
         <>
             {playbackType === PlayerType.WEB && <WebPlayer />}
             {playbackType === PlayerType.LOCAL && <MpvPlayer />}
+            {playbackType === PlayerType.SONOS && <SonosPlayer />}
         </>
     );
 };
