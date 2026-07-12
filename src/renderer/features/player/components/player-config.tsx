@@ -208,6 +208,7 @@ const AudioPlayerTypeConfig = () => {
                     label: 'MPV',
                     value: PlayerType.LOCAL,
                 },
+                { label: 'Sonos', value: PlayerType.SONOS },
                 { label: 'Web', value: PlayerType.WEB },
             ]}
             defaultValue={playbackSettings.type}

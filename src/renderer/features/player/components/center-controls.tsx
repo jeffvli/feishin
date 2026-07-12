@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './center-controls.module.css';
@@ -23,8 +24,30 @@ import {
 import { Icon } from '/@/shared/components/icon/icon';
 import { PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
+function useSonosConnected() {
+    const [isSonosConnected, setIsSonosConnected] = useState(false);
+
+    useEffect(() => {
+        const check = async () => {
+            try {
+                const api = (window as any).api;
+                if (!api?.ipc?.invoke) return;
+                const connected = await api.ipc.invoke('sonos:get-connection-status');
+                setIsSonosConnected(!!connected);
+            } catch {}
+        };
+        check();
+        const interval = setInterval(check, 2000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return isSonosConnected;
+}
+
 export const CenterControls = () => {
     const skip = useSkipButtons();
+
+    const isSonosConnected = useSonosConnected();
 
     const isRadioActive = useIsRadioActive();
 
@@ -63,7 +86,7 @@ export const CenterControls = () => {
                     <ShuffleAllButton />
                 </div>
             </div>
-            <PlayerbarSlider />
+            {!isSonosConnected && <PlayerbarSlider />}
         </>
     );
 };

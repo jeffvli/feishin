@@ -159,6 +159,7 @@ export enum PlayerStyle {
 
 export enum PlayerType {
     LOCAL = 'local',
+    SONOS = 'sonos',
     WEB = 'web',
 }
 

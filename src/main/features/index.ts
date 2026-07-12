@@ -1,4 +1,7 @@
 import './core';
+import { registerSonosIpc } from './sonos';
+
+registerSonosIpc();
 
 if (process.platform === 'linux') {
     import('./linux');

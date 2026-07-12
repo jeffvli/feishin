@@ -21,6 +21,12 @@ import {
     Tray,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
+
+// Electron sandbox requires chrome-sandbox to be setuid root on Linux.
+// In development this is often not configured, so disable sandboxing.
+if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
+    app.commandLine.appendSwitch('no-sandbox');
+}
 import log from 'electron-log/main';
 import { AppImageUpdater, autoUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
 import { access, constants } from 'fs';
@@ -533,7 +539,7 @@ async function createWindow(first = true): Promise<void> {
             devTools: true,
             nodeIntegration: false,
             preload: join(__dirname, '../preload/index.js'),
-            sandbox: true,
+            sandbox: false,
             webSecurity: !store.get('ignore_cors'),
         },
         width: 1440,
