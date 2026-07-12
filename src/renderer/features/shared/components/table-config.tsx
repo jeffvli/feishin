@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './table-config.module.css';
 
 import { ItemTableListColumnConfig } from '/@/renderer/components/item-list/types';
+import { AlbumGroupMetadataConfig } from '/@/renderer/features/shared/components/album-group-metadata-config';
 import {
     ListConfigBooleanControl,
     ListConfigTable,
@@ -74,6 +75,9 @@ export const TableConfig = ({
 
     const list = useSettingsStore((state) => state.lists[listKey]) as ItemListSettings;
     const albumGroupImageSize = useSettingsStore((state) => state.general.albumGroupImageSize);
+    const albumGroupShowFavoriteRating = useSettingsStore(
+        (state) => state.general.albumGroupShowFavoriteRating,
+    );
     const imageResTable = useSettingsStore((state) => state.general.imageRes.table);
     const { setList, setSettings } = useSettingsStoreActions();
     const [albumGroupOpen, setAlbumGroupOpen] = useState(false);
@@ -156,8 +160,28 @@ export const TableConfig = ({
                                     ),
                                     id: 'albumImageSize',
                                     label: (
-                                        <Text pl="md">
+                                        <Text fw={500} pl="md" size="sm">
                                             {t('table.config.general.albumImageSize')}
+                                        </Text>
+                                    ),
+                                },
+                                {
+                                    component: (
+                                        <ListConfigBooleanControl
+                                            onChange={(value) =>
+                                                setSettings({
+                                                    general: {
+                                                        albumGroupShowFavoriteRating: value,
+                                                    },
+                                                })
+                                            }
+                                            value={albumGroupShowFavoriteRating}
+                                        />
+                                    ),
+                                    id: 'albumGroupShowFavoriteRating',
+                                    label: (
+                                        <Text fw={500} pl="md" size="sm">
+                                            {t('table.config.general.albumGroupShowFavoriteRating')}
                                         </Text>
                                     ),
                                 },
@@ -342,6 +366,7 @@ export const TableConfig = ({
         hasAlbumGroupColumn,
         albumGroupOpen,
         albumGroupImageSize,
+        albumGroupShowFavoriteRating,
         imageResTable,
         setSettings,
     ]);
@@ -349,6 +374,9 @@ export const TableConfig = ({
     return (
         <>
             <ListConfigTable options={advancedSettings} />
+            {hasAlbumGroupColumn && tableKey === 'main' && albumGroupOpen && (
+                <AlbumGroupMetadataConfig />
+            )}
             <Divider />
             <TableColumnConfig
                 data={tableColumnsData}

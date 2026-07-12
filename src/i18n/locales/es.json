@@ -497,7 +497,10 @@
         "enableRomaji_description": "Muestra una línea de pronunciación en romaji debajo de las letras japonesas.",
         "enableRomaji": "Activar generación de romaji",
         "windowBarTrackinfo": "Información de la pista en el título de la ventana",
-        "windowBarTrackinfo_description": "Muestra el título y artista de la pista actual, posición en la cola, y estado reproduciendo/pausado en el título de la ventana."
+        "windowBarTrackinfo_description": "Muestra el título y artista de la pista actual, posición en la cola, y estado reproduciendo/pausado en el título de la ventana.",
+        "audioDeviceDefault": "Predeterminado del sistema",
+        "microtonalPitchControls": "Controles de tono microtonales",
+        "microtonalPitchControls_description": "Añade más controles de tono para moverse entre semitonos"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",
@@ -850,7 +853,11 @@
                 "dynamicIsImage": "Habilitar imagen de fondo",
                 "lyricOffset": "Desplazamiento de letras (ms)",
                 "lyricScaleNonActive": "Escala de letra no activa",
-                "lyricOpacityNonActive": "Opacidad de letra no activa"
+                "lyricOpacityNonActive": "Opacidad de letra no activa",
+                "lyricPaddingLeft": "Relleno a la izquierda de las letras (%)",
+                "lyricPaddingRight": "Relleno a la derecha de las letras (%)",
+                "lyricLineLeadTime": "Tiempo de respuesta de la línea (ms)",
+                "lyricFollowScrollAlignment": "Las letras siguen la alineación"
             },
             "lyrics": "Letras",
             "related": "Relacionado",

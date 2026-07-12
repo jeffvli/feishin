@@ -1,43 +1,63 @@
 import clsx from 'clsx';
-import { ReactElement, useLayoutEffect, useRef, useState } from 'react';
+import { ReactElement, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 
 import imageColumnStyles from '../item-detail-list/columns/image-column.module.css';
 import { AlbumGroupControls } from './album-group-controls';
 import styles from './album-group-header.module.css';
+import {
+    AlbumGroupMetadata,
+    AlbumGroupTextSize,
+    renderAlbumGroupMetadataItem,
+} from './album-group-metadata';
 import { TableItemSize } from './item-table-list';
 
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
-import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import {
     LONG_PRESS_PLAY_BEHAVIOR,
     PlayTooltip,
 } from '/@/renderer/features/shared/components/play-button-group';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useAlbumGroupImageSize, usePlayButtonBehavior } from '/@/renderer/store';
+import {
+    useAlbumGroupImageSize,
+    useAlbumGroupItems,
+    useAlbumGroupShowFavoriteRating,
+    usePlayButtonBehavior,
+} from '/@/renderer/store';
+import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface AlbumGroupHeaderProps {
+    groupKey?: string;
     groupRowCount?: number;
+    metadata: AlbumGroupMetadata;
     onPlay?: (playType: Play) => void;
-    rowIndex?: number;
-    setAlbumGroupContentHeight?: (rowIndex: number, height: number) => void;
-    size?: 'compact' | 'large' | 'normal';
+    setAlbumGroupContentHeight?: (groupKey: string, height: number) => void;
+    size?: AlbumGroupTextSize;
     song: Song | undefined;
+    storedContentHeight?: number;
 }
 
 export const AlbumGroupHeader = ({
+    groupKey,
     groupRowCount,
+    metadata,
     onPlay,
-    rowIndex,
     setAlbumGroupContentHeight,
     size = 'normal',
     song,
+    storedContentHeight,
 }: AlbumGroupHeaderProps): ReactElement => {
+    const { t } = useTranslation();
+    const albumGroupItems = useAlbumGroupItems();
+    const showFavoriteRating = useAlbumGroupShowFavoriteRating();
     const [isHovered, setIsHovered] = useState(false);
-    const [resolvedInfoHeight, setResolvedInfoHeight] = useState<number | undefined>();
+    const [resolved, setResolved] = useState<null | { forInfoHeight: number; height: number }>(
+        null,
+    );
     const playButtonBehavior = usePlayButtonBehavior();
     const albumImageSize = useAlbumGroupImageSize();
     const rowHeight = {
@@ -50,6 +70,16 @@ export const AlbumGroupHeader = ({
         ? generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: song.albumId })
         : null;
 
+    const metadataRows = useMemo(() => {
+        return albumGroupItems
+            .filter((item) => !item.disabled)
+            .map((item) => ({
+                content: renderAlbumGroupMetadataItem(item.id, song, metadata, t),
+                id: item.id,
+            }))
+            .filter((item) => item.content != null);
+    }, [albumGroupItems, metadata, song, t]);
+
     // The album group spans the combined row height, but when the image is
     // enlarged the group's last row is grown so the total reaches the img size.
     const infoHeight =
@@ -57,6 +87,13 @@ export const AlbumGroupHeader = ({
             ? albumImageSize > 0
                 ? Math.max(albumImageSize, groupRowCount * rowHeight)
                 : groupRowCount * rowHeight
+            : undefined;
+
+    // Ignore resolved height from a previous (larger) group span so minHeight
+    // cannot keep scrollHeight measurement stuck after a split/shrink.
+    const resolvedInfoHeight =
+        resolved && infoHeight !== undefined && resolved.forInfoHeight === infoHeight
+            ? resolved.height
             : undefined;
 
     const imageContainerStyle =
@@ -80,12 +117,14 @@ export const AlbumGroupHeader = ({
 
         const measure = () => {
             const contentHeight = infoEl.scrollHeight;
-            const resolved = Math.max(infoHeight ?? 0, contentHeight);
+            const resolvedHeight = Math.max(infoHeight ?? 0, contentHeight);
 
-            setResolvedInfoHeight(resolved);
+            if (infoHeight !== undefined) {
+                setResolved({ forInfoHeight: infoHeight, height: resolvedHeight });
+            }
 
-            if (rowIndex !== undefined && setAlbumGroupContentHeight) {
-                setAlbumGroupContentHeight(rowIndex, contentHeight);
+            if (groupKey !== undefined && setAlbumGroupContentHeight) {
+                setAlbumGroupContentHeight(groupKey, contentHeight);
             }
         };
 
@@ -95,7 +134,14 @@ export const AlbumGroupHeader = ({
         resizeObserver.observe(infoEl);
 
         return () => resizeObserver.disconnect();
-    }, [infoHeight, rowIndex, setAlbumGroupContentHeight]);
+    }, [
+        groupKey,
+        groupRowCount,
+        infoHeight,
+        metadataRows.length,
+        setAlbumGroupContentHeight,
+        storedContentHeight,
+    ]);
 
     return (
         <div
@@ -136,31 +182,36 @@ export const AlbumGroupHeader = ({
                 ref={infoRef}
                 style={{ minHeight: resolvedInfoHeight ?? infoHeight }}
             >
-                <div className={styles.albumName}>
-                    {song?.albumId && albumPath ? (
-                        <Link state={{ item: song }} to={albumPath}>
-                            {song.album ?? ''}
-                        </Link>
+                {song?.album &&
+                    (song.albumId && albumPath ? (
+                        <Text
+                            className={styles.albumTitle}
+                            component={Link}
+                            isLink
+                            isNoSelect
+                            state={{ item: song }}
+                            to={albumPath}
+                        >
+                            {song.album}
+                        </Text>
                     ) : (
-                        (song?.album ?? '')
-                    )}
-                </div>
-                <div className={styles.artistName}>
-                    <JoinedArtists
-                        artistName={song?.albumArtistName ?? ''}
-                        artists={song?.albumArtists ?? []}
-                        linkProps={{ fw: 400 }}
-                        rootTextProps={{ fw: 400, size: 'xs' }}
-                    />
-                </div>
-                <div className={styles.controlsRow}>
-                    <AlbumGroupControls
-                        albumId={song?.albumId}
-                        isGroupHovered={isHovered}
-                        serverId={song?._serverId}
-                        serverType={song?._serverType}
-                    />
-                </div>
+                        <Text className={styles.albumTitle} isNoSelect>
+                            {song.album}
+                        </Text>
+                    ))}
+                {metadataRows.map((row) => (
+                    <div key={row.id}>{row.content}</div>
+                ))}
+                {showFavoriteRating && (
+                    <div className={styles.controlsRow}>
+                        <AlbumGroupControls
+                            albumId={song?.albumId}
+                            isGroupHovered={isHovered}
+                            serverId={song?._serverId}
+                            serverType={song?._serverType}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

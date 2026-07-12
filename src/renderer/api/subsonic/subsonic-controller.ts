@@ -2181,7 +2181,10 @@ export const SubsonicController: InternalControllerEndpoint = {
         if (hasFeature(apiClientProps.server, ServerFeature.SERVER_PLAY_QUEUE)) {
             const res = await ssApiClient(apiClientProps).savePlayQueueByIndex({
                 query: {
-                    currentIndex: query.currentIndex !== undefined ? query.currentIndex : undefined,
+                    currentIndex:
+                        query.currentIndex !== undefined && query.currentIndex < query.songs.length
+                            ? Math.max(0, query.currentIndex)
+                            : undefined,
                     id: query.songs,
                     position: query.positionMs,
                 },
@@ -2233,7 +2236,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                 mediaId: query.id,
                 mediaType: query.mediaType,
                 playbackRate: query.playbackRate,
-                positionMs: query.position ?? 0,
+                positionMs: Math.round(query.position ?? 0),
             };
 
             const reportPlayback = (state: 'paused' | 'playing' | 'starting' | 'stopped') => {

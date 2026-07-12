@@ -17,6 +17,18 @@ type ApiStructuredLyric = NonNullable<
     ? T
     : never;
 
+const getCueTrailingGap = (
+    lineValue: string,
+    byteEnd: number,
+    nextByteStart: number | undefined,
+): string => {
+    if (nextByteStart === undefined || nextByteStart <= byteEnd + 1) {
+        return '';
+    }
+
+    return sliceUtf8Bytes(lineValue, byteEnd + 1, nextByteStart - 1);
+};
+
 const mapCueWords = (
     apiCueLine: NonNullable<ApiStructuredLyric['cueLine']>[number],
 ): SyncedWordCue[] => {
@@ -24,11 +36,17 @@ const mapCueWords = (
         return [];
     }
 
-    return apiCueLine.cue.map((cue) => ({
-        endMs: cue.end,
-        startMs: cue.start,
-        text: cue.value || sliceUtf8Bytes(apiCueLine.value, cue.byteStart, cue.byteEnd),
-    }));
+    return apiCueLine.cue.map((cue, cueIndex) => {
+        const nextCue = apiCueLine.cue?.[cueIndex + 1];
+        const wordText = cue.value || sliceUtf8Bytes(apiCueLine.value, cue.byteStart, cue.byteEnd);
+        const trailingGap = getCueTrailingGap(apiCueLine.value, cue.byteEnd, nextCue?.byteStart);
+
+        return {
+            endMs: cue.end,
+            startMs: cue.start,
+            text: wordText + trailingGap,
+        };
+    });
 };
 
 const mapCueLine = (

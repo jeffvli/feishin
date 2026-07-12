@@ -1,5 +1,5 @@
 import isElectron from 'is-electron';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
 import {
     animateLyricsScrollTo,
@@ -22,6 +22,8 @@ const utils = isElectron() ? window.api.utils : null;
 const mpris = isElectron() && utils?.isLinux() ? window.api.mpris : null;
 
 export const LYRICS_SCROLL_CONTAINER_ID = 'sychronized-lyrics-scroll-container';
+export const MANUAL_SCROLL_PAUSE_MS = 2000;
+const MANUAL_SCROLL_DRIFT_PX = 3;
 
 export const useSynchronizedLyricsBase = (settingsKey = 'default', offsetMs?: number) => {
     const playbackType = usePlaybackType();
@@ -129,6 +131,19 @@ export const useSynchronizedLyricsBase = (settingsKey = 'default', offsetMs?: nu
         resumeLyricsAutoscroll(scrollAnimStateRef.current);
     }, []);
 
+    const pauseManualScrollFollow = useCallback(() => {
+        userScrollingRef.current = true;
+        handleLyricsUserScroll(scrollAnimStateRef.current, MANUAL_SCROLL_PAUSE_MS);
+
+        if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
+        }
+
+        scrollTimeoutRef.current = setTimeout(() => {
+            userScrollingRef.current = false;
+        }, MANUAL_SCROLL_PAUSE_MS);
+    }, []);
+
     const containerStyle = useMemo(
         () =>
             ({
@@ -170,13 +185,37 @@ export const useSynchronizedLyricsBase = (settingsKey = 'default', offsetMs?: nu
         delayMsRef.current = newOffset;
     }, [offsetMs]);
 
-    useEffect(() => {
-        const container =
-            containerRef.current ||
-            (document.getElementById(LYRICS_SCROLL_CONTAINER_ID) as HTMLElement);
-        if (!container) return;
+    useLayoutEffect(() => {
+        const container = containerRef.current;
+        if (!container) {
+            return;
+        }
+
+        const handleWheel = (event: WheelEvent) => {
+            if (event.deltaX === 0 && event.deltaY === 0) {
+                return;
+            }
+
+            pauseManualScrollFollow();
+        };
+
+        const handleTouchStart = () => {
+            pauseManualScrollFollow();
+        };
 
         const handleScroll = () => {
+            const scrollState = scrollAnimStateRef.current.scroll;
+            const isProgrammatic = Date.now() < scrollState.programmaticScrollUntil;
+
+            if (
+                !isProgrammatic &&
+                scrollState.scrollPos >= 0 &&
+                Math.abs(container.scrollTop - scrollState.scrollPos) > MANUAL_SCROLL_DRIFT_PX
+            ) {
+                pauseManualScrollFollow();
+                return;
+            }
+
             if (shouldSkipLyricsScrollEvent(scrollAnimStateRef.current)) {
                 return;
             }
@@ -193,22 +232,18 @@ export const useSynchronizedLyricsBase = (settingsKey = 'default', offsetMs?: nu
                 return;
             }
 
-            userScrollingRef.current = true;
-            handleLyricsUserScroll(scrollAnimStateRef.current);
-
-            if (scrollTimeoutRef.current) {
-                clearTimeout(scrollTimeoutRef.current);
-            }
-
-            scrollTimeoutRef.current = setTimeout(() => {
-                userScrollingRef.current = false;
-            }, 3000);
+            pauseManualScrollFollow();
         };
 
+        container.addEventListener('wheel', handleWheel, { passive: true });
+        container.addEventListener('touchstart', handleTouchStart, { passive: true });
         container.addEventListener('scroll', handleScroll, { passive: true });
 
         return () => {
+            container.removeEventListener('wheel', handleWheel);
+            container.removeEventListener('touchstart', handleTouchStart);
             container.removeEventListener('scroll', handleScroll);
+
             if (scrollTimeoutRef.current) {
                 clearTimeout(scrollTimeoutRef.current);
             }
@@ -217,7 +252,7 @@ export const useSynchronizedLyricsBase = (settingsKey = 'default', offsetMs?: nu
                 clearTimeout(programmaticScrollTimeoutRef.current);
             }
         };
-    }, []);
+    }, [pauseManualScrollFollow]);
 
     return {
         containerRef,

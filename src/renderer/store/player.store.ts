@@ -1323,6 +1323,11 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     });
                 },
                 mediaTogglePlayPause: () => {
+                    // Restarting from STOPPED (e.g. end of queue) needs a full play
+                    // event so engines like mpv can reload the current track — play()
+                    // alone is a no-op when mpv's playlist-pos is -1.
+                    const wasStopped = get().player.status === PlayerStatus.STOPPED;
+
                     set((state) => {
                         if (state.player.status === PlayerStatus.PLAYING) {
                             state.player.status = PlayerStatus.PAUSED;
@@ -1330,6 +1335,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             state.player.status = PlayerStatus.PLAYING;
                         }
                     });
+
+                    if (wasStopped) {
+                        emitPlayerPlayEvent(undefined, set, get);
+                    }
                 },
                 moveSelectedTo: (items: QueueSong[], uniqueId: string, edge: 'bottom' | 'top') => {
                     const itemUniqueIds = items.map((item) => item._uniqueId);

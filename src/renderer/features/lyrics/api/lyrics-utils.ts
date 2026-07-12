@@ -100,12 +100,20 @@ export const getLineEndMs = (line: SynchronizedLyricLine): number => {
 export const lyricsHasWordCues = (lyrics: SynchronizedLyrics): boolean =>
     lyrics.some((line) => line.cueLines?.some((cueLine) => cueLine.words.length > 0));
 
-export const findOverlayLineByTime = (
+export const findOverlayLineMatchByTime = (
     overlayLyrics: null | SynchronizedLyrics | undefined,
     startMs: number,
-): string | undefined => {
+    lineIndex?: number,
+): SynchronizedLyricLine | undefined => {
     if (!overlayLyrics?.length) {
         return undefined;
+    }
+
+    if (lineIndex !== undefined && lineIndex >= 0 && lineIndex < overlayLyrics.length) {
+        const indexedLine = normalizeLyricsLine(overlayLyrics[lineIndex]);
+        if (indexedLine.startMs <= startMs) {
+            return indexedLine;
+        }
     }
 
     let match: SynchronizedLyricLine | undefined;
@@ -120,12 +128,36 @@ export const findOverlayLineByTime = (
         break;
     }
 
-    return match?.text;
+    return match;
+};
+
+export const findOverlayLineByTime = (
+    overlayLyrics: null | SynchronizedLyrics | undefined,
+    startMs: number,
+    lineIndex?: number,
+): string | undefined => findOverlayLineMatchByTime(overlayLyrics, startMs, lineIndex)?.text;
+
+export const overlayLineHasWordCues = (line: SynchronizedLyricLine | undefined): boolean =>
+    !!line?.cueLines?.some((cueLine) => cueLine.words.length > 0);
+
+export const getOverlayCueLinesForLine = (
+    overlayLyrics: null | SynchronizedLyrics | undefined,
+    mainLineStartMs: number,
+    lineIndex?: number,
+): null | SyncedCueLine[] => {
+    const match = findOverlayLineMatchByTime(overlayLyrics, mainLineStartMs, lineIndex);
+
+    if (!match?.cueLines?.length || !overlayLineHasWordCues(match)) {
+        return null;
+    }
+
+    return match.cueLines;
 };
 
 export type LyricsLayers = {
     main: StructuredLyric[];
     others: StructuredLyric[];
+    overlayLayers: StructuredLyric[];
     pronunciation: null | StructuredLyric;
     translation: null | StructuredLyric;
 };
@@ -141,6 +173,7 @@ const getStructuredKind = (lyric: StructuredLyric): LyricsKind => {
 export const getLyricsLayers = (local: StructuredLyric[]): LyricsLayers => {
     const main: StructuredLyric[] = [];
     const others: StructuredLyric[] = [];
+    const overlayLayers: StructuredLyric[] = [];
     let pronunciation: null | StructuredLyric = null;
     let translation: null | StructuredLyric = null;
 
@@ -151,6 +184,10 @@ export const getLyricsLayers = (local: StructuredLyric[]): LyricsLayers => {
             main.push(lyric);
         } else {
             others.push(lyric);
+
+            if (lyric.synced) {
+                overlayLayers.push(lyric);
+            }
         }
 
         if (kind === 'translation' && !translation) {
@@ -162,7 +199,7 @@ export const getLyricsLayers = (local: StructuredLyric[]): LyricsLayers => {
         }
     }
 
-    return { main, others, pronunciation, translation };
+    return { main, others, overlayLayers, pronunciation, translation };
 };
 
 export const getDefaultStructuredIndex = (local: StructuredLyric[]): number => {
@@ -171,6 +208,11 @@ export const getDefaultStructuredIndex = (local: StructuredLyric[]): number => {
     );
 
     return mainIndex >= 0 ? mainIndex : 0;
+};
+
+export const getOverlayLayerKey = (lyric: StructuredLyric): string => {
+    const kind = getStructuredKind(lyric);
+    return `${kind}:${lyric.lang}`;
 };
 
 export const formatStructuredLyricLabel = (lyric: StructuredLyric): string => {

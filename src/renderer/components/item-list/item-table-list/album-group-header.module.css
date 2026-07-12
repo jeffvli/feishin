@@ -13,7 +13,6 @@
     flex-shrink: 0;
     height: 100%;
     aspect-ratio: 1;
-    padding-top: calc(var(--theme-spacing-xs) * 0.5);
     overflow: hidden;
     border-radius: var(--theme-radius-md);
 
@@ -43,39 +42,29 @@
 }
 
 .info {
-    display: grid;
-    grid-template-rows: auto auto auto;
+    display: flex;
+    flex-direction: column;
     gap: 0;
     align-content: start;
     min-width: 0;
     padding: 0;
-    padding-top: calc(var(--theme-spacing-xs) * 0.5);
 }
 
 .info.enlarged-image {
     padding-top: var(--theme-spacing-xs);
 }
 
-.album-name {
-    font-size: var(--theme-font-size-sm);
-    line-height: 1.25;
+.album-title {
+    font-weight: 500;
     overflow-wrap: anywhere;
+    white-space: normal;
 }
 
-.album-name a {
-    color: inherit;
-    text-decoration: none;
-
-    &:hover {
-        text-decoration: underline;
-    }
-}
-
-.artist-name {
+.metadata-row {
     font-size: var(--theme-font-size-xs);
-    line-height: 1.25;
+    color: var(--theme-colors-foreground-muted);
     overflow-wrap: anywhere;
-    opacity: 0.7;
+    white-space: normal;
 }
 
 .controls-row {

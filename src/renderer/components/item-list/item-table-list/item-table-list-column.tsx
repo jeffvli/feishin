@@ -384,6 +384,22 @@ export const ItemTableListColumn = memo(ItemTableListColumnBase, (prevProps, nex
 
 const NonMutedColumns = [TableColumn.TITLE, TableColumn.TITLE_ARTIST, TableColumn.TITLE_COMBINED];
 
+/** Stable key for album-group content heights (survives row moves; not row index). */
+export function getAlbumGroupHeightKey(item: unknown, groupRowCount?: number): string | undefined {
+    if (!item || typeof item !== 'object') return undefined;
+
+    let itemKey: string | undefined;
+    if ('_uniqueId' in item && typeof (item as { _uniqueId?: unknown })._uniqueId === 'string') {
+        itemKey = (item as { _uniqueId: string })._uniqueId;
+    } else if ('id' in item && typeof (item as { id?: unknown }).id === 'string') {
+        itemKey = (item as { id: string }).id;
+    }
+
+    if (!itemKey) return undefined;
+    if (groupRowCount === undefined) return itemKey;
+    return `${itemKey}:${groupRowCount}`;
+}
+
 // Counts how many consecutive rows belong to the same album group as `rowIndex`.
 export function getAlbumGroupRowCount(
     rowIndex: number,
@@ -550,7 +566,10 @@ function getAlbumGroupClampHeight(props: ItemTableListInnerColumn): null | numbe
         props.getRowItem,
         props.enableHeader,
     );
-    const contentHeight = props.albumGroupContentHeights?.get(groupStartRowIndex) ?? 0;
+    const groupStartItem = props.getRowItem?.(groupStartRowIndex);
+    const groupHeightKey = getAlbumGroupHeightKey(groupStartItem, groupRowCount);
+    const contentHeight =
+        (groupHeightKey ? props.albumGroupContentHeights?.get(groupHeightKey) : undefined) ?? 0;
     const totalGroupHeight = getAlbumGroupSpanHeight(
         groupRowCount,
         baseHeight,

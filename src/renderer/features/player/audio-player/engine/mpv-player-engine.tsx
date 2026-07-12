@@ -278,7 +278,9 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
 
         const handleTrackEnded = () => {
             const { player } = usePlayerStore.getState();
-            if (player.status !== PlayerStatus.PLAYING) {
+            // mpv often emits `stopped` before this event, which already set STOPPED
+            // via mediaStop. Still run mediaAutoNext so end-of-queue seek/reset runs.
+            if (player.status !== PlayerStatus.PLAYING && player.status !== PlayerStatus.STOPPED) {
                 return;
             }
 

@@ -26,6 +26,7 @@ import {
 import { PlayerStatus } from '/@/shared/types/types';
 
 export interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
+    extraOverlayLyrics?: SynchronizedLyricsData[];
     lyrics: SynchronizedLyricsData;
     offsetMs?: number;
     pronunciationLyrics?: null | SynchronizedLyricsData;
@@ -44,7 +45,6 @@ export const SynchronizedLyrics = ({
     name,
     offsetMs,
     pronunciationLyrics,
-    remote,
     romajiLyrics,
     settingsKey = 'default',
     source,
@@ -126,6 +126,8 @@ export const SynchronizedLyrics = ({
             const timeInMs = timestamp * 1000 + delayMsRef.current;
 
             if (Math.abs(timeInMs - lastSyncedTimeRef.current) > SEEK_DETECT_THRESHOLD_MS) {
+                resumeAutoscroll();
+                resumeEngineAutoscroll();
                 syncAtTime(timeInMs, true, true);
             } else {
                 syncAtTime(timeInMs, true);
@@ -135,7 +137,7 @@ export const SynchronizedLyrics = ({
         };
 
         rafRef.current = requestAnimationFrame(runTick);
-    }, [delayMsRef, stopRaf, syncAtTime]);
+    }, [delayMsRef, resumeAutoscroll, resumeEngineAutoscroll, stopRaf, syncAtTime]);
 
     const syncFromCurrentTimestamp = useCallback(() => {
         const timestamp = useTimestampStoreBase.getState().timestamp;
@@ -205,12 +207,14 @@ export const SynchronizedLyrics = ({
             }
 
             if (Math.abs(timeInMs - lastSyncedTimeRef.current) > SEEK_DETECT_THRESHOLD_MS) {
+                resumeAutoscroll();
+                resumeEngineAutoscroll();
                 syncAtTime(timeInMs, true, true);
             }
         });
 
         return unsubscribe;
-    }, [delayMsRef, syncAtTime]);
+    }, [delayMsRef, resumeAutoscroll, resumeEngineAutoscroll, syncAtTime]);
 
     const handleContainerClick = useCallback(
         (event: React.MouseEvent<HTMLDivElement>) => {
@@ -224,10 +228,11 @@ export const SynchronizedLyrics = ({
     const getOverlayText = (
         overlayLyrics: null | SynchronizedLyricsData | undefined,
         startMs: number,
+        lineIndex: number,
         fallback?: null | string,
     ) => {
         if (overlayLyrics) {
-            return findOverlayLineByTime(overlayLyrics, startMs);
+            return findOverlayLineByTime(overlayLyrics, startMs, lineIndex);
         }
 
         return fallback;
@@ -253,15 +258,15 @@ export const SynchronizedLyrics = ({
                         alignment={settings.alignment}
                         className="lyric-credit"
                         fontSize={settings.fontSize}
-                        text={`Provided by ${source}`}
+                        text={`${source}`}
                     />
                 )}
-                {settings.showMatch && remote && (
+                {settings.showMatch && (
                     <LyricLine
                         alignment={settings.alignment}
                         className="lyric-credit"
                         fontSize={settings.fontSize}
-                        text={`"${name} by ${artist}"`}
+                        text={`${name} — ${artist}`}
                     />
                 )}
                 {normalizedLyrics.map((rawLine, idx) => {
@@ -270,11 +275,13 @@ export const SynchronizedLyrics = ({
                     const pronunciationText = getOverlayText(
                         pronunciationLyrics,
                         lineStartMs,
+                        idx,
                         romajiLyrics?.[idx] ? getLyricLineText(romajiLyrics[idx]) : undefined,
                     );
                     const translationText = getOverlayText(
                         translationLyrics,
                         lineStartMs,
+                        idx,
                         translatedLyrics?.split('\n')[idx],
                     );
 

@@ -18,7 +18,6 @@ export const UnsynchronizedLyrics = ({
     artist,
     lyrics,
     name,
-    remote,
     romajiLyrics,
     settingsKey = 'default',
     source,
@@ -62,15 +61,15 @@ export const UnsynchronizedLyrics = ({
                         alignment={settings.alignment}
                         className="lyric-credit"
                         fontSize={settings.fontSizeUnsync}
-                        text={`Provided by ${source}`}
+                        text={`${source}`}
                     />
                 )}
-                {settings.showMatch && remote && (
+                {settings.showMatch && (
                     <LyricLine
                         alignment={settings.alignment}
                         className="lyric-credit"
                         fontSize={settings.fontSizeUnsync}
-                        text={`"${name} by ${artist}"`}
+                        text={`${name} — ${artist}`}
                     />
                 )}
                 {lines.map((text, idx) => (

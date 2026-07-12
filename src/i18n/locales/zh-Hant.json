@@ -237,13 +237,21 @@
                 "dynamicIsImage": "啟用背景圖片",
                 "lyricOffset": "歌詞偏移時間 (ms)",
                 "lyricOpacityNonActive": "非活躍歌詞的不透明度",
-                "lyricScaleNonActive": "非活躍歌詞的比例"
+                "lyricScaleNonActive": "非活躍歌詞的比例",
+                "lyricFollowScrollAlignment": "歌詞跟隨滾動對齊",
+                "lyricLineLeadTime": "歌詞提前顯示時間 (ms)",
+                "lyricPaddingLeft": "歌詞左側邊距 (%)",
+                "lyricPaddingRight": "歌詞右側邊距 (%)"
             },
             "lyrics": "歌詞",
             "related": "相關",
             "upNext": "即將播放",
             "visualizer": "視覺化",
-            "noLyrics": "未找到歌詞"
+            "noLyrics": "未找到歌詞",
+            "lyricLayers": "歌詞圖層",
+            "lyricLanguage": "語言",
+            "showPronunciation": "發音",
+            "showTranslation": "翻譯"
         },
         "playlistList": {
             "title": "$t(entity.playlist, {\"count\": 2})"
@@ -868,7 +876,10 @@
         "enableRomaji_description": "在日文歌詞下方顯示羅馬拼音。",
         "enableRomaji": "啟用羅馬拼音顯示",
         "windowBarTrackinfo": "在視窗標題列顯示曲目資訊",
-        "windowBarTrackinfo_description": "在視窗標題列中顯示目前播放曲目的標題與藝人、播放佇列中的位置，以及播放/暫停狀態。"
+        "windowBarTrackinfo_description": "在視窗標題列中顯示目前播放曲目的標題與藝人、播放佇列中的位置，以及播放/暫停狀態。",
+        "audioDeviceDefault": "系統預設",
+        "microtonalPitchControls": "微音程音高控制",
+        "microtonalPitchControls_description": "新增更多音高控制選項，以在半音之間進行微調"
     },
     "table": {
         "config": {
@@ -904,7 +915,9 @@
                 "verticalBorders": "列邊框線",
                 "showHeader": "顯示標題",
                 "albumGroupConfig": "專輯群組設定",
-                "albumImageSize": "專輯圖片大小"
+                "albumImageSize": "專輯圖片大小",
+                "albumGroupMetadata": "中繼資料欄位",
+                "albumGroupShowFavoriteRating": "顯示最愛與評分"
             },
             "label": {
                 "actions": "$t(common.action, {\"count\": 2})",

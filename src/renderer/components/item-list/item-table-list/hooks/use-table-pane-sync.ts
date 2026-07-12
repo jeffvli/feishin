@@ -7,6 +7,26 @@ import { useEffect } from 'react';
 
 import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
 
+const getPaneScrollViewport = (ref: React.RefObject<HTMLDivElement | null>) =>
+    ref.current?.firstElementChild as HTMLDivElement | undefined;
+
+const getPaneElements = ({
+    pinnedLeftColumnRef,
+    pinnedRightColumnRef,
+    pinnedRowRef,
+    rowRef,
+}: {
+    pinnedLeftColumnRef: React.RefObject<HTMLDivElement | null>;
+    pinnedRightColumnRef: React.RefObject<HTMLDivElement | null>;
+    pinnedRowRef: React.RefObject<HTMLDivElement | null>;
+    rowRef: React.RefObject<HTMLDivElement | null>;
+}) => ({
+    header: getPaneScrollViewport(pinnedRowRef),
+    pinnedLeft: getPaneScrollViewport(pinnedLeftColumnRef),
+    pinnedRight: getPaneScrollViewport(pinnedRightColumnRef),
+    row: getPaneScrollViewport(rowRef),
+});
+
 export const useTablePaneSync = ({
     enableDrag,
     enableDragScroll,
@@ -21,6 +41,7 @@ export const useTablePaneSync = ({
     rowRef,
     scrollContainerRef,
     scrollShadowStore,
+    scrollSyncKey,
 }: {
     enableDrag: boolean | undefined;
     enableDragScroll: boolean | undefined;
@@ -37,6 +58,7 @@ export const useTablePaneSync = ({
     rowRef: React.RefObject<HTMLDivElement | null>;
     scrollContainerRef: React.RefObject<HTMLDivElement | null>;
     scrollShadowStore: TableScrollShadowStore;
+    scrollSyncKey: string;
 }) => {
     // Main grid overlayscrollbars - only handle X-axis if right-pinned columns exist
     const [initialize, osInstance] = useOverlayScrollbars({
@@ -144,6 +166,7 @@ export const useTablePaneSync = ({
         osInstance,
         pinnedRightColumnCount,
         scrollContainerRef,
+        scrollSyncKey,
     ]);
 
     useEffect(() => {
@@ -235,222 +258,294 @@ export const useTablePaneSync = ({
         osInstanceRightPinned,
         pinnedRightColumnCount,
         pinnedRightColumnRef,
+        scrollSyncKey,
     ]);
 
     useEffect(() => {
-        const header = pinnedRowRef.current?.childNodes[0] as HTMLDivElement;
-        const row = rowRef.current?.childNodes[0] as HTMLDivElement;
-        const pinnedLeft = pinnedLeftColumnRef.current?.childNodes[0] as HTMLDivElement;
-        const pinnedRight = pinnedRightColumnRef.current?.childNodes[0] as HTMLDivElement;
+        let disposed = false;
+        let cleanup: (() => void) | undefined;
+        let setupFrameId = 0;
 
-        if (!row) return;
+        const resolvePaneRefs = () =>
+            getPaneElements({
+                pinnedLeftColumnRef,
+                pinnedRightColumnRef,
+                pinnedRowRef,
+                rowRef,
+            });
 
-        // Ensure all containers have the same height
-        const syncHeights = () => {
-            const rowHeight = row.scrollHeight;
-            let targetHeight = rowHeight;
+        const isVerticalScrollHostReady = (
+            row: HTMLDivElement,
+            pinnedRight: HTMLDivElement | undefined,
+        ) => {
+            const verticalScrollHost = pinnedRightColumnCount > 0 ? pinnedRight : row;
 
-            if (pinnedLeft) {
-                const pinnedLeftHeight = pinnedLeft.scrollHeight;
-                targetHeight = Math.max(targetHeight, pinnedLeftHeight);
+            if (!verticalScrollHost) {
+                return false;
             }
 
-            if (pinnedRight) {
-                const pinnedRightHeight = pinnedRight.scrollHeight;
-                targetHeight = Math.max(targetHeight, pinnedRightHeight);
+            if (pinnedRightColumnCount > 0) {
+                return verticalScrollHost.scrollHeight > verticalScrollHost.clientHeight;
             }
 
-            if (pinnedLeft && pinnedLeft.style.height !== `${targetHeight}px`) {
-                pinnedLeft.style.height = `${targetHeight}px`;
-            }
-            if (pinnedRight && pinnedRight.style.height !== `${targetHeight}px`) {
-                pinnedRight.style.height = `${targetHeight}px`;
-            }
-            if (row.style.height !== `${targetHeight}px`) {
-                row.style.height = `${targetHeight}px`;
-            }
+            return verticalScrollHost.scrollHeight > 0;
         };
 
-        const timeoutId = setTimeout(syncHeights, 0);
-
-        const activeElement = { element: null } as { element: HTMLDivElement | null };
-        const scrollingElements = new Set<HTMLDivElement>();
-        const scrollTimeouts = new Map<HTMLDivElement, NodeJS.Timeout>();
-
-        const setActiveElement = (e: HTMLElementEventMap['pointermove']) => {
-            activeElement.element = e.currentTarget as HTMLDivElement;
-        };
-        const setActiveElementFromWheel = (e: HTMLElementEventMap['wheel']) => {
-            activeElement.element = e.currentTarget as HTMLDivElement;
-        };
-
-        const markElementAsScrolling = (element: HTMLDivElement) => {
-            scrollingElements.add(element);
-
-            const existingTimeout = scrollTimeouts.get(element);
-            if (existingTimeout) {
-                clearTimeout(existingTimeout);
+        const setupScrollSync = () => {
+            if (disposed) {
+                return;
             }
 
-            const timeout = setTimeout(() => {
-                scrollingElements.delete(element);
+            cleanup?.();
 
-                const hasRightPinnedColumns = pinnedRightColumnCount > 0;
-                const scrollElement = hasRightPinnedColumns && pinnedRight ? pinnedRight : row;
+            const { header, pinnedLeft, pinnedRight, row } = resolvePaneRefs();
 
-                if (scrollElement && onScrollEndRef.current) {
-                    onScrollEndRef.current(
-                        scrollElement.scrollTop,
-                        (handleRef.current?.internalState ??
-                            (undefined as any)) as ItemListStateActions,
-                    );
+            if (!row || !isVerticalScrollHostReady(row, pinnedRight)) {
+                setupFrameId = requestAnimationFrame(setupScrollSync);
+                return;
+            }
+
+            const syncHeights = () => {
+                const panes = resolvePaneRefs();
+                const syncRow = panes.row;
+                const syncPinnedLeft = panes.pinnedLeft;
+                const syncPinnedRight = panes.pinnedRight;
+
+                if (!syncRow) {
+                    return;
                 }
 
-                scrollTimeouts.delete(element);
-            }, 150);
+                const rowHeight = syncRow.scrollHeight;
+                let targetHeight = rowHeight;
 
-            scrollTimeouts.set(element, timeout);
-        };
+                if (syncPinnedLeft) {
+                    targetHeight = Math.max(targetHeight, syncPinnedLeft.scrollHeight);
+                }
 
-        const syncScroll = (e: HTMLElementEventMap['scroll']) => {
-            const currentElement = e.currentTarget as HTMLDivElement;
-            markElementAsScrolling(currentElement);
+                if (syncPinnedRight) {
+                    targetHeight = Math.max(targetHeight, syncPinnedRight.scrollHeight);
+                }
 
-            const shouldSync =
-                currentElement === activeElement.element || scrollingElements.has(currentElement);
-            if (!shouldSync) return;
+                if (targetHeight <= 0) {
+                    return;
+                }
 
-            const scrollTop = (e.currentTarget as HTMLDivElement).scrollTop;
-            const scrollLeft = (e.currentTarget as HTMLDivElement).scrollLeft;
-
-            const isScrolling = {
-                header: false,
-                pinnedLeft: false,
-                pinnedRight: false,
-                row: false,
+                if (syncPinnedLeft && syncPinnedLeft.style.height !== `${targetHeight}px`) {
+                    syncPinnedLeft.style.height = `${targetHeight}px`;
+                }
+                if (syncPinnedRight && syncPinnedRight.style.height !== `${targetHeight}px`) {
+                    syncPinnedRight.style.height = `${targetHeight}px`;
+                }
+                if (rowHeight > 0 && syncRow.style.height !== `${targetHeight}px`) {
+                    syncRow.style.height = `${targetHeight}px`;
+                }
             };
 
-            const hasRightPinnedColumns = pinnedRightColumnCount > 0;
+            const timeoutId = setTimeout(syncHeights, 0);
 
-            if (header && e.currentTarget === header && !isScrolling.row) {
-                isScrolling.row = true;
-                row.scrollTo({ behavior: 'instant', left: scrollLeft });
-                isScrolling.row = false;
-            }
+            const activeElement = { element: null } as { element: HTMLDivElement | null };
+            const scrollingElements = new Set<HTMLDivElement>();
+            const scrollTimeouts = new Map<HTMLDivElement, NodeJS.Timeout>();
 
-            if (
-                e.currentTarget === row &&
-                !isScrolling.header &&
-                !isScrolling.pinnedLeft &&
-                !isScrolling.pinnedRight
-            ) {
-                if (header) {
-                    isScrolling.header = true;
-                    header.scrollTo({ behavior: 'instant', left: scrollLeft });
+            const setActiveElement = (e: HTMLElementEventMap['pointermove']) => {
+                activeElement.element = e.currentTarget as HTMLDivElement;
+            };
+            const setActiveElementFromWheel = (e: HTMLElementEventMap['wheel']) => {
+                activeElement.element = e.currentTarget as HTMLDivElement;
+            };
+
+            const markElementAsScrolling = (element: HTMLDivElement) => {
+                scrollingElements.add(element);
+
+                const existingTimeout = scrollTimeouts.get(element);
+                if (existingTimeout) {
+                    clearTimeout(existingTimeout);
                 }
-                if (hasRightPinnedColumns && pinnedRight) {
-                    isScrolling.pinnedRight = true;
-                    pinnedRight.scrollTo({ behavior: 'instant', top: scrollTop });
-                    isScrolling.pinnedRight = false;
-                } else {
-                    if (pinnedLeft) {
-                        isScrolling.pinnedLeft = true;
-                        pinnedLeft.scrollTo({ behavior: 'instant', top: scrollTop });
-                    }
-                    if (pinnedRight) {
-                        isScrolling.pinnedRight = true;
-                        pinnedRight.scrollTo({ behavior: 'instant', top: scrollTop });
-                    }
-                }
-                isScrolling.header = false;
-                isScrolling.pinnedLeft = false;
-            }
 
-            if (pinnedLeft && e.currentTarget === pinnedLeft && !isScrolling.row) {
-                if (hasRightPinnedColumns && pinnedRight) {
-                    isScrolling.pinnedRight = true;
-                    pinnedRight.scrollTo({ behavior: 'instant', top: scrollTop });
-                    isScrolling.pinnedRight = false;
-                } else {
+                const timeout = setTimeout(() => {
+                    scrollingElements.delete(element);
+
+                    const panes = resolvePaneRefs();
+                    const hasRightPinnedColumns = pinnedRightColumnCount > 0;
+                    const scrollElement =
+                        hasRightPinnedColumns && panes.pinnedRight ? panes.pinnedRight : panes.row;
+
+                    if (scrollElement && onScrollEndRef.current) {
+                        onScrollEndRef.current(
+                            scrollElement.scrollTop,
+                            (handleRef.current?.internalState ??
+                                (undefined as any)) as ItemListStateActions,
+                        );
+                    }
+
+                    scrollTimeouts.delete(element);
+                }, 150);
+
+                scrollTimeouts.set(element, timeout);
+            };
+
+            const syncScroll = (e: HTMLElementEventMap['scroll']) => {
+                const currentElement = e.currentTarget as HTMLDivElement;
+                markElementAsScrolling(currentElement);
+
+                const panes = resolvePaneRefs();
+                const syncHeader = panes.header;
+                const syncRow = panes.row;
+                const syncPinnedLeft = panes.pinnedLeft;
+                const syncPinnedRight = panes.pinnedRight;
+
+                if (!syncRow) {
+                    return;
+                }
+
+                const shouldSync =
+                    currentElement === activeElement.element ||
+                    scrollingElements.has(currentElement);
+
+                if (!shouldSync) return;
+
+                const scrollTop = currentElement.scrollTop;
+                const scrollLeft = currentElement.scrollLeft;
+
+                const isScrolling = {
+                    header: false,
+                    pinnedLeft: false,
+                    pinnedRight: false,
+                    row: false,
+                };
+
+                const hasRightPinnedColumns = pinnedRightColumnCount > 0;
+
+                if (syncHeader && currentElement === syncHeader && !isScrolling.row) {
                     isScrolling.row = true;
-                    row.scrollTo({ behavior: 'instant', top: scrollTop });
+                    syncRow.scrollTo({ behavior: 'instant', left: scrollLeft });
                     isScrolling.row = false;
                 }
-            }
 
-            if (pinnedRight && e.currentTarget === pinnedRight && !isScrolling.row) {
-                isScrolling.row = true;
-                row.scrollTo({ behavior: 'instant', top: scrollTop });
-                isScrolling.row = false;
-                if (pinnedLeft) {
-                    isScrolling.pinnedLeft = true;
-                    pinnedLeft.scrollTo({ behavior: 'instant', top: scrollTop });
+                if (
+                    currentElement === syncRow &&
+                    !isScrolling.header &&
+                    !isScrolling.pinnedLeft &&
+                    !isScrolling.pinnedRight
+                ) {
+                    if (syncHeader) {
+                        isScrolling.header = true;
+                        syncHeader.scrollTo({ behavior: 'instant', left: scrollLeft });
+                    }
+                    if (hasRightPinnedColumns && syncPinnedRight) {
+                        isScrolling.pinnedRight = true;
+                        syncPinnedRight.scrollTo({ behavior: 'instant', top: scrollTop });
+                        isScrolling.pinnedRight = false;
+                    } else {
+                        if (syncPinnedLeft) {
+                            isScrolling.pinnedLeft = true;
+                            syncPinnedLeft.scrollTo({ behavior: 'instant', top: scrollTop });
+                        }
+                        if (syncPinnedRight) {
+                            isScrolling.pinnedRight = true;
+                            syncPinnedRight.scrollTo({ behavior: 'instant', top: scrollTop });
+                        }
+                    }
+                    isScrolling.header = false;
                     isScrolling.pinnedLeft = false;
                 }
-            }
-        };
 
-        if (header) {
-            header.addEventListener('pointermove', setActiveElement);
-            header.addEventListener('wheel', setActiveElementFromWheel);
-            header.addEventListener('scroll', syncScroll);
-        }
-        row.addEventListener('pointermove', setActiveElement);
-        row.addEventListener('wheel', setActiveElementFromWheel);
-        row.addEventListener('scroll', syncScroll);
-        if (pinnedLeft) {
-            pinnedLeft.addEventListener('pointermove', setActiveElement);
-            pinnedLeft.addEventListener('wheel', setActiveElementFromWheel);
-            pinnedLeft.addEventListener('scroll', syncScroll);
-        }
-        if (pinnedRight) {
-            pinnedRight.addEventListener('pointermove', setActiveElement);
-            pinnedRight.addEventListener('wheel', setActiveElementFromWheel);
-            pinnedRight.addEventListener('scroll', syncScroll);
-        }
+                if (syncPinnedLeft && currentElement === syncPinnedLeft && !isScrolling.row) {
+                    if (hasRightPinnedColumns && syncPinnedRight) {
+                        isScrolling.pinnedRight = true;
+                        syncPinnedRight.scrollTo({ behavior: 'instant', top: scrollTop });
+                        isScrolling.pinnedRight = false;
+                    } else {
+                        isScrolling.row = true;
+                        syncRow.scrollTo({ behavior: 'instant', top: scrollTop });
+                        isScrolling.row = false;
+                    }
+                }
 
-        let heightSyncDebounceTimeout: NodeJS.Timeout | null = null;
-        const resizeObserver = new ResizeObserver(() => {
-            if (heightSyncDebounceTimeout) {
-                clearTimeout(heightSyncDebounceTimeout);
-            }
-            heightSyncDebounceTimeout = setTimeout(() => {
-                syncHeights();
-            }, 100);
-        });
-
-        resizeObserver.observe(row);
-        if (pinnedLeft) resizeObserver.observe(pinnedLeft);
-        if (pinnedRight) resizeObserver.observe(pinnedRight);
-
-        return () => {
-            clearTimeout(timeoutId);
-            scrollTimeouts.forEach((timeout) => clearTimeout(timeout));
-            scrollTimeouts.clear();
-            scrollingElements.clear();
+                if (syncPinnedRight && currentElement === syncPinnedRight && !isScrolling.row) {
+                    isScrolling.row = true;
+                    syncRow.scrollTo({ behavior: 'instant', top: scrollTop });
+                    isScrolling.row = false;
+                    if (syncPinnedLeft) {
+                        isScrolling.pinnedLeft = true;
+                        syncPinnedLeft.scrollTo({ behavior: 'instant', top: scrollTop });
+                        isScrolling.pinnedLeft = false;
+                    }
+                }
+            };
 
             if (header) {
-                header.removeEventListener('pointermove', setActiveElement);
-                header.removeEventListener('wheel', setActiveElementFromWheel);
-                header.removeEventListener('scroll', syncScroll);
+                header.addEventListener('pointermove', setActiveElement);
+                header.addEventListener('wheel', setActiveElementFromWheel);
+                header.addEventListener('scroll', syncScroll);
             }
-            row.removeEventListener('pointermove', setActiveElement);
-            row.removeEventListener('wheel', setActiveElementFromWheel);
-            row.removeEventListener('scroll', syncScroll);
+            row.addEventListener('pointermove', setActiveElement);
+            row.addEventListener('wheel', setActiveElementFromWheel);
+            row.addEventListener('scroll', syncScroll);
             if (pinnedLeft) {
-                pinnedLeft.removeEventListener('pointermove', setActiveElement);
-                pinnedLeft.removeEventListener('wheel', setActiveElementFromWheel);
-                pinnedLeft.removeEventListener('scroll', syncScroll);
+                pinnedLeft.addEventListener('pointermove', setActiveElement);
+                pinnedLeft.addEventListener('wheel', setActiveElementFromWheel);
+                pinnedLeft.addEventListener('scroll', syncScroll);
             }
             if (pinnedRight) {
-                pinnedRight.removeEventListener('pointermove', setActiveElement);
-                pinnedRight.removeEventListener('wheel', setActiveElementFromWheel);
-                pinnedRight.removeEventListener('scroll', syncScroll);
+                pinnedRight.addEventListener('pointermove', setActiveElement);
+                pinnedRight.addEventListener('wheel', setActiveElementFromWheel);
+                pinnedRight.addEventListener('scroll', syncScroll);
             }
-            if (heightSyncDebounceTimeout) {
-                clearTimeout(heightSyncDebounceTimeout);
-            }
-            resizeObserver.disconnect();
+
+            let heightSyncDebounceTimeout: NodeJS.Timeout | null = null;
+            const resizeObserver = new ResizeObserver(() => {
+                if (heightSyncDebounceTimeout) {
+                    clearTimeout(heightSyncDebounceTimeout);
+                }
+                heightSyncDebounceTimeout = setTimeout(() => {
+                    syncHeights();
+                }, 100);
+            });
+
+            resizeObserver.observe(row);
+            if (pinnedLeft) resizeObserver.observe(pinnedLeft);
+            if (pinnedRight) resizeObserver.observe(pinnedRight);
+
+            cleanup = () => {
+                clearTimeout(timeoutId);
+                scrollTimeouts.forEach((timeout) => clearTimeout(timeout));
+                scrollTimeouts.clear();
+                scrollingElements.clear();
+
+                if (header) {
+                    header.removeEventListener('pointermove', setActiveElement);
+                    header.removeEventListener('wheel', setActiveElementFromWheel);
+                    header.removeEventListener('scroll', syncScroll);
+                }
+                row.removeEventListener('pointermove', setActiveElement);
+                row.removeEventListener('wheel', setActiveElementFromWheel);
+                row.removeEventListener('scroll', syncScroll);
+                if (pinnedLeft) {
+                    pinnedLeft.removeEventListener('pointermove', setActiveElement);
+                    pinnedLeft.removeEventListener('wheel', setActiveElementFromWheel);
+                    pinnedLeft.removeEventListener('scroll', syncScroll);
+                }
+                if (pinnedRight) {
+                    pinnedRight.removeEventListener('pointermove', setActiveElement);
+                    pinnedRight.removeEventListener('wheel', setActiveElementFromWheel);
+                    pinnedRight.removeEventListener('scroll', syncScroll);
+                }
+                if (heightSyncDebounceTimeout) {
+                    clearTimeout(heightSyncDebounceTimeout);
+                }
+                resizeObserver.disconnect();
+            };
+        };
+
+        setupFrameId = requestAnimationFrame(() => {
+            setupFrameId = requestAnimationFrame(setupScrollSync);
+        });
+
+        return () => {
+            disposed = true;
+            cancelAnimationFrame(setupFrameId);
+            cleanup?.();
         };
     }, [
         handleRef,
@@ -461,6 +556,7 @@ export const useTablePaneSync = ({
         pinnedRightColumnRef,
         pinnedRowRef,
         rowRef,
+        scrollSyncKey,
     ]);
 
     // Handle left and right shadow visibility based on horizontal scroll

@@ -1,33 +1,15 @@
-/* Container-level line context blur/fade (line-sync only) */
-.synchronized-lyrics .lyric-line {
-    transition:
-        filter 0.2s ease,
-        opacity 0.2s ease,
-        transform 0.2s ease;
-}
-
-.synchronized-lyrics:has(.lyrics-line-active)
-    .lyric-line:not(.lyrics-line-active, .lyrics-line-active ~ .lyric-line) {
-    opacity: var(--lyric-opacity, 0.3);
-    filter: blur(2.5px);
-}
-
 .synchronized-lyrics .lyric-line.lyrics-line-active {
     opacity: 1 !important;
-    filter: blur(0);
 }
 
-.synchronized-lyrics:has(.lyrics-line-active) .lyric-line.lyrics-line-active ~ .lyric-line {
+.synchronized-lyrics:has(.lyrics-line-active) .lyric-line:not(.lyrics-line-active) {
     opacity: var(--lyric-opacity, 0.3);
-    filter: blur(0);
 }
 
 .synchronized-lyrics .lyric-line.lyrics-line-animating {
     opacity: 1 !important;
-    filter: blur(0) !important;
 }
 
 .synchronized-lyrics .lyric-line:hover {
     opacity: 1 !important;
-    filter: blur(0) !important;
 }

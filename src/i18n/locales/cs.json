@@ -497,7 +497,10 @@
         "enableRomaji_description": "Zobrazit rómadži výslovnost pod japonskými texty.",
         "enableRomaji": "Povolit generování rómadži",
         "windowBarTrackinfo_description": "Zobrazit v titulku okna umělce a název aktuální skladby, její pozici ve frontě a stav Přehrává se/Pozastaveno.",
-        "windowBarTrackinfo": "Informace o skladbě v titulku okna"
+        "windowBarTrackinfo": "Informace o skladbě v titulku okna",
+        "audioDeviceDefault": "Podle systému",
+        "microtonalPitchControls": "Ovládání mikrotonální výšky tónu",
+        "microtonalPitchControls_description": "Přidat další ovládání výšky mezi půltóny"
     },
     "action": {
         "editPlaylist": "Upravit $t(entity.playlist, {\"count\": 1})",
@@ -905,7 +908,11 @@
                 "dynamicIsImage": "Povolit obrázek na pozadí",
                 "lyricOffset": "Posunutí textů (ms)",
                 "lyricOpacityNonActive": "Neprůhlednost neaktivních textů",
-                "lyricScaleNonActive": "Velikost neaktivních textů"
+                "lyricScaleNonActive": "Velikost neaktivních textů",
+                "lyricFollowScrollAlignment": "Zarovnání sledování textů",
+                "lyricLineLeadTime": "Doba vedení řádku (ms)",
+                "lyricPaddingLeft": "Odsazení textů zleva (%)",
+                "lyricPaddingRight": "Odsazení textů zprava (%)"
             },
             "upNext": "Další",
             "lyrics": "Texty",

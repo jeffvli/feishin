@@ -11,36 +11,21 @@
     initial-value: 0;
 }
 
-/* Container-level line context blur/fade (karaoke sync only) */
-.synchronized-karaoke-lyrics:has(.lyrics-line-active)
-    :is(.karaoke-line, .lyric-line):not(
-        .lyrics-line-active,
-        .lyrics-line-active ~ :is(.karaoke-line, .lyric-line)
-    ) {
-    opacity: var(--lyric-opacity, 0.3);
-    filter: blur(2.5px);
-}
-
 .synchronized-karaoke-lyrics :is(.karaoke-line, .lyric-line).lyrics-line-active {
     opacity: 1 !important;
-    filter: blur(0);
 }
 
 .synchronized-karaoke-lyrics:has(.lyrics-line-active)
-    :is(.karaoke-line, .lyric-line).lyrics-line-active
-    ~ :is(.karaoke-line, .lyric-line) {
+    :is(.karaoke-line, .lyric-line):not(.lyrics-line-active) {
     opacity: var(--lyric-opacity, 0.3);
-    filter: blur(0);
 }
 
 .synchronized-karaoke-lyrics :is(.karaoke-line, .lyric-line).lyrics-line-animating {
     opacity: 1 !important;
-    filter: blur(0) !important;
 }
 
 .synchronized-karaoke-lyrics :is(.karaoke-line, .lyric-line):hover {
     opacity: 1 !important;
-    filter: blur(0) !important;
 }
 
 /* Word highlight via stacked text twin + gradient swipe */
@@ -58,8 +43,14 @@
     vertical-align: baseline;
 }
 
-.karaoke-word.sung {
-    color: var(--theme-colors-foreground);
+:is(.karaoke-line, .lyric-line).lyrics-line-active
+    .karaoke-word.sung:not(.lyrics-word-animating, .lyrics-word-pre-animating)
+    .karaoke-word-highlight {
+    opacity: 1;
+    transition: none;
+
+    --lyric-transition-amount-start: 1.4;
+    --lyric-transition-amount-end: 1.5;
 }
 
 .karaoke-line.lyrics-line-pre-animating {
@@ -71,9 +62,24 @@
     font-weight: 400;
 }
 
-.karaoke-word.karaoke-romaji-word {
+.karaoke-word.karaoke-overlay-word {
     font-size: inherit;
     font-weight: 600;
+}
+
+.karaoke-word.karaoke-overlay-pronunciation {
+    font-size: inherit;
+    font-weight: 600;
+}
+
+.karaoke-word.karaoke-overlay-translation {
+    font-size: inherit;
+    font-weight: 500;
+}
+
+.karaoke-word.karaoke-overlay-generic {
+    font-size: inherit;
+    font-weight: 500;
 }
 
 .karaoke-word-text,
@@ -145,10 +151,6 @@
         var(--theme-colors-foreground) calc(100% * var(--lyric-transition-amount-start)),
         #0000 calc(100% * var(--lyric-transition-amount-end) + 1px)
     );
-}
-
-.karaoke-word.sung .karaoke-word-highlight {
-    opacity: 0;
 }
 
 .karaoke-word ruby {

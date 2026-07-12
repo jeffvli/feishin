@@ -8,6 +8,7 @@ import {
     findOverlayLineByTime,
     getLyricLineStartMs,
     getLyricLineText,
+    getOverlayCueLinesForLine,
     normalizeLyrics,
 } from '/@/renderer/features/lyrics/api/lyrics-utils';
 import { LyricsScrollContent } from '/@/renderer/features/lyrics/components/lyrics-scroll-content';
@@ -30,6 +31,7 @@ import { PlayerStatus } from '/@/shared/types/types';
 
 export interface SynchronizedKaraokeLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     agents?: LyricAgent[];
+    extraOverlayLyrics?: SynchronizedLyricsData[];
     lyrics: SynchronizedLyricsData;
     offsetMs?: number;
     pronunciationLyrics?: null | SynchronizedLyricsData;
@@ -46,11 +48,11 @@ const SEEK_DETECT_THRESHOLD_MS = 500;
 export const SynchronizedKaraokeLyrics = ({
     agents,
     artist,
+    extraOverlayLyrics,
     lyrics,
     name,
     offsetMs,
     pronunciationLyrics,
-    remote,
     romajiLyrics,
     settingsKey = 'default',
     source,
@@ -148,7 +150,9 @@ export const SynchronizedKaraokeLyrics = ({
                 eventCreationTime: options?.eventCreationTime ?? Date.now(),
                 forceResync: options?.forceResync ?? false,
             });
-            lastSyncedTimeRef.current = timeInMs;
+            const eventCreationTime = options?.eventCreationTime ?? Date.now();
+            const interpolatedOffsetMs = isPlaying ? Date.now() - eventCreationTime : 0;
+            lastSyncedTimeRef.current = timeInMs + interpolatedOffsetMs;
         },
         [rebuildLyricsData, reset, tick],
     );
@@ -230,6 +234,28 @@ export const SynchronizedKaraokeLyrics = ({
         syncFromCurrentTimestamp();
     }, [offsetMs, syncFromCurrentTimestamp]);
 
+    // Rebuild animation state when async romaji overlay data arrives after initial mount.
+    // Without this, overlayParts stay empty until a pause/resume triggers rebuildLyricsData().
+    useEffect(() => {
+        if (syncedRomajiLyrics == null) {
+            return;
+        }
+
+        const frame = requestAnimationFrame(() => {
+            rebuildLyricsData();
+
+            const timestamp = useTimestampStoreBase.getState().timestamp;
+            const isPlaying = statusRef.current === PlayerStatus.PLAYING;
+            syncAtTime(timestamp * 1000 + delayMsRef.current, isPlaying, {
+                eventCreationTime: playbackAnchorRef.current.eventCreationTime,
+                forceReset: true,
+                forceResync: true,
+            });
+        });
+
+        return () => cancelAnimationFrame(frame);
+    }, [delayMsRef, rebuildLyricsData, syncAtTime, syncedRomajiLyrics]);
+
     useEffect(() => {
         statusRef.current = usePlayerStoreBase.getState().player.status;
 
@@ -265,6 +291,8 @@ export const SynchronizedKaraokeLyrics = ({
             }
 
             if (isSeek) {
+                resumeAutoscroll();
+                resumeEngineAutoscroll();
                 syncAtTime(timeInMs, true, {
                     eventCreationTime: playbackAnchorRef.current.eventCreationTime,
                     forceReset: true,
@@ -274,15 +302,16 @@ export const SynchronizedKaraokeLyrics = ({
         });
 
         return unsubscribe;
-    }, [delayMsRef, syncAtTime, updatePlaybackAnchor]);
+    }, [delayMsRef, resumeAutoscroll, resumeEngineAutoscroll, syncAtTime, updatePlaybackAnchor]);
 
     const getOverlayText = (
         overlayLyrics: null | SynchronizedLyricsData | undefined,
         startMs: number,
+        lineIndex: number,
         fallback?: null | string,
     ) => {
         if (overlayLyrics) {
-            return findOverlayLineByTime(overlayLyrics, startMs);
+            return findOverlayLineByTime(overlayLyrics, startMs, lineIndex);
         }
 
         return fallback;
@@ -308,29 +337,49 @@ export const SynchronizedKaraokeLyrics = ({
                         alignment={settings.alignment}
                         className="lyric-credit"
                         fontSize={settings.fontSize}
-                        text={`Provided by ${source}`}
+                        text={`${source}`}
                     />
                 )}
-                {settings.showMatch && remote && (
+                {settings.showMatch && (
                     <LyricLine
                         alignment={settings.alignment}
                         className="lyric-credit"
                         fontSize={settings.fontSize}
-                        text={`"${name} by ${artist}"`}
+                        text={`${name} — ${artist}`}
                     />
                 )}
                 {normalizedLyrics.map((rawLine, idx) => {
                     const lineStartMs = getLyricLineStartMs(rawLine);
+                    const pronunciationCueLines = getOverlayCueLinesForLine(
+                        pronunciationLyrics,
+                        lineStartMs,
+                        idx,
+                    );
+                    const translationCueLines = getOverlayCueLinesForLine(
+                        translationLyrics,
+                        lineStartMs,
+                        idx,
+                    );
+                    const lineLevelRomaji =
+                        syncedRomajiLyrics == null && romajiLyrics?.[idx]
+                            ? getLyricLineText(romajiLyrics[idx])
+                            : undefined;
                     const pronunciationText = getOverlayText(
                         pronunciationLyrics,
                         lineStartMs,
-                        romajiLyrics?.[idx] ? getLyricLineText(romajiLyrics[idx]) : undefined,
+                        idx,
+                        lineLevelRomaji,
                     );
                     const translationText = getOverlayText(
                         translationLyrics,
                         lineStartMs,
+                        idx,
                         translatedLyrics?.split('\n')[idx],
                     );
+                    const extraOverlays = extraOverlayLyrics?.map((overlayLyrics) => ({
+                        cueLines: getOverlayCueLinesForLine(overlayLyrics, lineStartMs, idx),
+                        text: getOverlayText(overlayLyrics, lineStartMs, idx),
+                    }));
 
                     if (!rawLine.cueLines?.length) {
                         return (
@@ -355,13 +404,20 @@ export const SynchronizedKaraokeLyrics = ({
                             className="synchronized"
                             cueLines={rawLine.cueLines}
                             data-lyric-time={lineStartMs}
+                            extraOverlays={extraOverlays}
                             fontSize={settings.fontSize}
                             id={`karaoke-line-${idx}`}
                             key={idx}
                             lineIndex={idx}
-                            romajiCueLines={syncedRomajiLyrics?.[idx] ?? null}
-                            romajiText={pronunciationText}
+                            pronunciationCueLines={pronunciationCueLines}
+                            pronunciationText={pronunciationText}
+                            romajiCueLines={
+                                syncedRomajiLyrics != null
+                                    ? (syncedRomajiLyrics[idx] ?? null)
+                                    : undefined
+                            }
                             translatedText={translationText}
+                            translationCueLines={translationCueLines}
                         />
                     );
                 })}

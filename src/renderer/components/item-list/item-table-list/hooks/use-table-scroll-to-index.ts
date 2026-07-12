@@ -19,7 +19,7 @@ export const useTableScrollToIndex = ({
     rowRef,
     scrollCellProps,
 }: {
-    albumGroupContentHeights: Map<number, number>;
+    albumGroupContentHeights: Map<string, number>;
     autoScrollToActiveRow: boolean;
     enableHeader: boolean;
     getRowHeight: (index: number, cellProps: TableItemProps) => number;

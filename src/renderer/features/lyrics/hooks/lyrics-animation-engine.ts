@@ -51,6 +51,7 @@ export interface LineData {
     isScrolled: boolean;
     isSelected: boolean;
     lastAnimSetupAt: number;
+    overlayParts: PartData[];
     parts: PartData[];
     position: number;
     time: number;
@@ -143,7 +144,7 @@ export const resetAnimEngine = (state: AnimEngineState): void => {
 
 const collectLineParts = (lineElement: HTMLElement): PartData[] => {
     const words = lineElement.querySelectorAll<HTMLElement>(
-        '.karaoke-word[data-duration]:not(.karaoke-romaji-word)',
+        '.karaoke-word[data-duration]:not(.karaoke-overlay-word)',
     );
 
     return Array.from(words).map((element) => ({
@@ -155,32 +156,16 @@ const collectLineParts = (lineElement: HTMLElement): PartData[] => {
     }));
 };
 
-const getRomajiCounterparts = (mainElement: HTMLElement): HTMLElement[] => {
-    const line = mainElement.closest('.karaoke-line');
-    if (!line) {
-        return [];
-    }
+const collectOverlayParts = (lineElement: HTMLElement): PartData[] => {
+    const words = lineElement.querySelectorAll<HTMLElement>('.karaoke-overlay-word[data-duration]');
 
-    const mainStart = Number.parseFloat(mainElement.dataset.time ?? 'NaN');
-    const mainDuration = Number.parseFloat(mainElement.dataset.duration ?? '0');
-    if (!Number.isFinite(mainStart)) {
-        return [];
-    }
-
-    const mainEnd = mainStart + mainDuration;
-
-    return Array.from(
-        line.querySelectorAll<HTMLElement>('.karaoke-romaji-word[data-time][data-duration]'),
-    ).filter((element) => {
-        const start = Number.parseFloat(element.dataset.time ?? 'NaN');
-        const duration = Number.parseFloat(element.dataset.duration ?? '0');
-        if (!Number.isFinite(start)) {
-            return false;
-        }
-
-        const end = start + duration;
-        return start < mainEnd && mainStart < end;
-    });
+    return Array.from(words).map((element) => ({
+        animationStartTimeMs: Number.POSITIVE_INFINITY,
+        duration: Number.parseFloat(element.dataset.duration ?? '0'),
+        element,
+        isAnimating: false,
+        time: Number.parseFloat(element.dataset.time ?? '0'),
+    }));
 };
 
 const cancelSungAnimationCleanup = (element: HTMLElement): void => {
@@ -246,79 +231,74 @@ const clearElementAnimation = (element: HTMLElement): void => {
     element.classList.remove(PAUSED_CLASS);
 };
 
-const setupElementAnimation = (
-    element: HTMLElement,
-    time: number,
-    duration: number,
-    interpolatedTimeSec: number,
-): void => {
-    const partTimeDelta = interpolatedTimeSec - time;
-
-    element.classList.remove(ANIMATING_CLASS);
-    element.classList.remove(PAUSED_CLASS);
-    element.style.setProperty('--karaoke-swipe-delay', `${-partTimeDelta - duration * 0.1}s`);
-    element.style.setProperty('--karaoke-anim-delay', `${-partTimeDelta}s`);
-    element.classList.add(PRE_ANIMATING_CLASS);
-
-    reflow(element);
-
-    element.classList.add(ANIMATING_CLASS);
+const clearWordSungState = (part: PartData): void => {
+    part.element.classList.remove('sung');
 };
 
-const syncRomajiAnimation = (
-    mainElement: HTMLElement,
-    interpolatedTimeSec: number,
-    action: 'clear' | 'clearSung' | 'pause' | 'resume' | 'setup' | 'sung',
-): void => {
-    for (const element of getRomajiCounterparts(mainElement)) {
-        const time = Number.parseFloat(element.dataset.time ?? '0');
-        const duration = Number.parseFloat(element.dataset.duration ?? '0');
-        const end = time + duration;
+const markWordSung = (part: PartData, interpolatedTimeSec: number): void => {
+    part.animationStartTimeMs = Number.POSITIVE_INFINITY;
+    part.isAnimating = false;
+    part.element.classList.add('sung');
+    scheduleSungAnimationCleanup(part.element, part.duration, part.time, interpolatedTimeSec);
+};
 
-        switch (action) {
-            case 'clear':
-                clearElementAnimation(element);
-                if (interpolatedTimeSec < time) {
-                    element.classList.remove('sung');
-                }
-                break;
-            case 'clearSung':
-                element.classList.remove('sung');
-                break;
-            case 'pause':
-                if (element.classList.contains(ANIMATING_CLASS)) {
-                    element.classList.add(PAUSED_CLASS);
-                }
-                break;
-            case 'resume':
-                element.classList.remove(PAUSED_CLASS);
-                break;
-            case 'setup':
-                if (
-                    element.classList.contains(ANIMATING_CLASS) ||
-                    element.classList.contains('sung') ||
-                    interpolatedTimeSec < time ||
-                    interpolatedTimeSec >= end
-                ) {
-                    break;
-                }
+const setupPartAnimation = (part: PartData, interpolatedTimeSec: number, now: number): void => {
+    const partTimeDelta = interpolatedTimeSec - part.time;
 
-                setupElementAnimation(element, time, duration, interpolatedTimeSec);
-                break;
-            case 'sung':
-                if (interpolatedTimeSec >= end) {
-                    element.classList.add('sung');
-                    scheduleSungAnimationCleanup(element, duration, time, interpolatedTimeSec);
-                }
-                break;
-            default:
-                break;
+    part.element.classList.remove(ANIMATING_CLASS);
+    part.element.classList.remove(PAUSED_CLASS);
+    part.element.style.setProperty(
+        '--karaoke-swipe-delay',
+        `${-partTimeDelta - part.duration * 0.1}s`,
+    );
+    part.element.style.setProperty('--karaoke-anim-delay', `${-partTimeDelta}s`);
+    part.element.classList.add(PRE_ANIMATING_CLASS);
+
+    reflow(part.element);
+
+    part.element.classList.add(ANIMATING_CLASS);
+    part.animationStartTimeMs = now - partTimeDelta * 1000;
+    part.isAnimating = true;
+};
+
+const animateWordParts = (parts: PartData[], interpolatedTimeSec: number, now: number): void => {
+    for (const part of parts) {
+        const partEnd = part.time + part.duration;
+
+        if (interpolatedTimeSec >= partEnd) {
+            if (!part.element.classList.contains('sung')) {
+                markWordSung(part, interpolatedTimeSec);
+            }
+        } else if (interpolatedTimeSec < part.time) {
+            if (part.isAnimating || part.element.classList.contains('sung')) {
+                clearPartAnimation(part);
+                clearWordSungState(part);
+            }
+        } else if (!part.isAnimating) {
+            setupPartAnimation(part, interpolatedTimeSec, now);
         }
     }
 };
 
-const clearLineRomajiState = (lineElement: HTMLElement): void => {
-    for (const element of lineElement.querySelectorAll<HTMLElement>('.karaoke-romaji-word')) {
+const clearWordParts = (parts: PartData[], interpolatedTimeSec: number): void => {
+    for (const part of parts) {
+        if (interpolatedTimeSec >= part.time + part.duration) {
+            markWordSung(part, interpolatedTimeSec);
+        } else {
+            clearPartAnimation(part);
+            clearWordSungState(part);
+        }
+    }
+};
+
+const resumeWordParts = (parts: PartData[]): void => {
+    for (const part of parts) {
+        part.element.classList.remove(PAUSED_CLASS);
+    }
+};
+
+const clearLineOverlayState = (lineElement: HTMLElement): void => {
+    for (const element of lineElement.querySelectorAll<HTMLElement>('.karaoke-overlay-word')) {
         clearElementAnimation(element);
         element.classList.remove('sung');
     }
@@ -343,6 +323,7 @@ export const buildLyricsDataFromDom = ({
         const endMs = getLineEndMs(line);
         const durationMs = Math.max(0, endMs - startMs);
         const parts = hasWordCues && line.cueLines?.length ? collectLineParts(lineElement) : [];
+        const overlayParts = collectOverlayParts(lineElement);
 
         lines.push({
             accumulatedOffsetMs: 0,
@@ -356,6 +337,7 @@ export const buildLyricsDataFromDom = ({
             isScrolled: false,
             isSelected: false,
             lastAnimSetupAt: 0,
+            overlayParts,
             parts,
             position: -1,
             time: startMs / 1000,
@@ -411,37 +393,23 @@ const clearLineAnimation = (line: LineData): void => {
     line.animationStartTimeMs = Number.POSITIVE_INFINITY;
 };
 
-const clearWordSungState = (part: PartData): void => {
-    part.element.classList.remove('sung');
-    syncRomajiAnimation(part.element, 0, 'clearSung');
-};
+const clearLineKaraokeHighlights = (lineData: LineData, interpolatedTimeSec: number): void => {
+    if (lineData.hasWordCues) {
+        for (const part of lineData.parts) {
+            clearPartAnimation(part);
+            clearWordSungState(part);
+        }
+    } else {
+        clearLineAnimation(lineData);
+    }
 
-const markWordSung = (part: PartData, interpolatedTimeSec: number): void => {
-    part.animationStartTimeMs = Number.POSITIVE_INFINITY;
-    part.isAnimating = false;
-    part.element.classList.add('sung');
-    scheduleSungAnimationCleanup(part.element, part.duration, part.time, interpolatedTimeSec);
-    syncRomajiAnimation(part.element, interpolatedTimeSec, 'sung');
-};
+    if (lineData.overlayParts.length) {
+        clearWordParts(lineData.overlayParts, interpolatedTimeSec);
+    }
 
-const setupPartAnimation = (part: PartData, interpolatedTimeSec: number, now: number): void => {
-    const partTimeDelta = interpolatedTimeSec - part.time;
-
-    part.element.classList.remove(ANIMATING_CLASS);
-    part.element.classList.remove(PAUSED_CLASS);
-    part.element.style.setProperty(
-        '--karaoke-swipe-delay',
-        `${-partTimeDelta - part.duration * 0.1}s`,
-    );
-    part.element.style.setProperty('--karaoke-anim-delay', `${-partTimeDelta}s`);
-    part.element.classList.add(PRE_ANIMATING_CLASS);
-
-    reflow(part.element);
-
-    part.element.classList.add(ANIMATING_CLASS);
-    part.animationStartTimeMs = now - partTimeDelta * 1000;
-    part.isAnimating = true;
-    syncRomajiAnimation(part.element, interpolatedTimeSec, 'setup');
+    lineData.isSelected = false;
+    lineData.isAnimating = false;
+    lineData.isAnimationPlayStatePlaying = false;
 };
 
 const setupLineAnimation = (line: LineData, interpolatedTimeSec: number, now: number): void => {
@@ -461,22 +429,6 @@ const setupLineAnimation = (line: LineData, interpolatedTimeSec: number, now: nu
     line.lastAnimSetupAt = now;
     line.isAnimationPlayStatePlaying = true;
     line.accumulatedOffsetMs = 0;
-};
-
-const clearLineKaraokeHighlights = (lineData: LineData, interpolatedTimeSec: number): void => {
-    if (lineData.hasWordCues) {
-        for (const part of lineData.parts) {
-            clearPartAnimation(part);
-            clearWordSungState(part);
-            syncRomajiAnimation(part.element, interpolatedTimeSec, 'clear');
-        }
-    } else {
-        clearLineAnimation(lineData);
-    }
-
-    lineData.isSelected = false;
-    lineData.isAnimating = false;
-    lineData.isAnimationPlayStatePlaying = false;
 };
 
 const decaySkipScrolls = (state: ScrollState, now: number): void => {
@@ -593,9 +545,15 @@ export const tickLyricsAnimation = (state: AnimEngineState, opts: TickOptions): 
                     clearPartAnimation(part);
                     clearWordSungState(part);
                 }
-                clearLineRomajiState(lineData.element);
             } else {
                 clearLineAnimation(lineData);
+            }
+
+            if (lineData.overlayParts.length) {
+                for (const part of lineData.overlayParts) {
+                    clearPartAnimation(part);
+                    clearWordSungState(part);
+                }
             }
         }
 
@@ -698,12 +656,13 @@ export const tickLyricsAnimation = (state: AnimEngineState, opts: TickOptions): 
             lineData.isSelected = true;
 
             if (lineData.hasWordCues) {
-                for (const part of lineData.parts) {
-                    part.element.classList.remove(PAUSED_CLASS);
-                    syncRomajiAnimation(part.element, interpolatedTimeSec, 'resume');
-                }
+                resumeWordParts(lineData.parts);
             } else {
                 lineData.element.classList.remove(PAUSED_CLASS);
+            }
+
+            if (lineData.overlayParts.length) {
+                resumeWordParts(lineData.overlayParts);
             }
 
             lineData.isAnimationPlayStatePlaying = true;
@@ -713,37 +672,21 @@ export const tickLyricsAnimation = (state: AnimEngineState, opts: TickOptions): 
             }
 
             if (lineData.hasWordCues) {
-                for (const part of lineData.parts) {
-                    const partEnd = part.time + part.duration;
+                animateWordParts(lineData.parts, interpolatedTimeSec, now);
+            }
 
-                    if (interpolatedTimeSec >= partEnd) {
-                        if (!part.element.classList.contains('sung')) {
-                            markWordSung(part, interpolatedTimeSec);
-                        }
-                    } else if (interpolatedTimeSec < part.time) {
-                        if (part.isAnimating || part.element.classList.contains('sung')) {
-                            clearPartAnimation(part);
-                            clearWordSungState(part);
-                            syncRomajiAnimation(part.element, interpolatedTimeSec, 'clear');
-                        }
-                    } else if (!part.isAnimating) {
-                        setupPartAnimation(part, interpolatedTimeSec, now);
-                    }
-                }
+            if (lineData.overlayParts.length) {
+                animateWordParts(lineData.overlayParts, interpolatedTimeSec, now);
             }
         } else if (lineData.isSelected) {
             if (lineData.hasWordCues) {
-                for (const part of lineData.parts) {
-                    if (interpolatedTimeSec >= part.time + part.duration) {
-                        markWordSung(part, interpolatedTimeSec);
-                    } else {
-                        clearPartAnimation(part);
-                        clearWordSungState(part);
-                        syncRomajiAnimation(part.element, interpolatedTimeSec, 'clear');
-                    }
-                }
+                clearWordParts(lineData.parts, interpolatedTimeSec);
             } else {
                 clearLineAnimation(lineData);
+            }
+
+            if (lineData.overlayParts.length) {
+                clearWordParts(lineData.overlayParts, interpolatedTimeSec);
             }
 
             lineData.isSelected = false;
@@ -754,8 +697,7 @@ export const tickLyricsAnimation = (state: AnimEngineState, opts: TickOptions): 
 
     const ss = state.scroll;
     const scrollPausedByUser = ss.scrollResumeTime >= now;
-    const canAutoscroll =
-        follow && (!scrollPausedByUser || ss.pendingScroll || ss.scrollPos === -1);
+    const canAutoscroll = follow && !scrollPausedByUser;
 
     if (canAutoscroll) {
         if (activeElems.length === 0 && lines.length > 0) {
@@ -811,14 +753,20 @@ export const tickLyricsAnimation = (state: AnimEngineState, opts: TickOptions): 
 
     if (ss.wasUserScrolling && ss.scrollResumeTime < now) {
         ss.wasUserScrolling = false;
+        ss.pendingScroll = true;
     }
 
     return activeLineIndex;
 };
 
 export const handleLyricsUserScroll = (state: AnimEngineState, pauseDurationMs = 3000): void => {
-    state.scroll.wasUserScrolling = true;
-    state.scroll.scrollResumeTime = Date.now() + pauseDurationMs;
+    const ss = state.scroll;
+    cancelActiveLyricsScroll(ss);
+    ss.programmaticScrollUntil = 0;
+    ss.skipScrolls = 0;
+    ss.skipScrollsDecayTimes = [];
+    ss.wasUserScrolling = true;
+    ss.scrollResumeTime = Date.now() + pauseDurationMs;
 };
 
 export const resumeLyricsAutoscroll = (state: AnimEngineState): void => {
@@ -861,7 +809,12 @@ export const resetLyricsAnimationDom = (lyricsData: LyricsData | null): void => 
             clearWordSungState(part);
         }
 
-        clearLineRomajiState(line.element);
+        for (const part of line.overlayParts) {
+            clearPartAnimation(part);
+            clearWordSungState(part);
+        }
+
+        clearLineOverlayState(line.element);
         clearLineAnimation(line);
     }
 };

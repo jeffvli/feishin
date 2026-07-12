@@ -567,6 +567,10 @@
                 "useImageAspectRatio": "Use image aspect ratio"
             },
             "lyrics": "Lyrics",
+            "lyricLayers": "Lyric layers",
+            "lyricLanguage": "Language",
+            "showPronunciation": "Pronunciation",
+            "showTranslation": "Translation",
             "related": "Related",
             "upNext": "Up next",
             "visualizer": "Visualizer",
@@ -1227,6 +1231,8 @@
             "general": {
                 "advancedSettings": "Advanced settings",
                 "albumGroupConfig": "Album Group configuration",
+                "albumGroupMetadata": "Metadata fields",
+                "albumGroupShowFavoriteRating": "Show favorites and ratings",
                 "albumImageSize": "Album image size",
                 "autoFitColumns": "Auto fit columns",
                 "autosize": "Autosize",
