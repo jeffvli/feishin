@@ -35,6 +35,10 @@ const getKuroshiro = async () => {
 };
 
 export const convertFurigana = async (text: string): Promise<string> => {
+    if (typeof text !== 'string' || !text) {
+        return text;
+    }
+
     const KuroshiroClass = (Kuroshiro as any).default || Kuroshiro;
 
     // check if the text contains any Japanese kana (to distinguish Japanese from Chinese text, which shares Kanji)
@@ -51,7 +55,11 @@ export const convertFurigana = async (text: string): Promise<string> => {
 };
 
 export const convertFuriganaFragment = async (text: string): Promise<string> => {
-    if (!text || !hasJapanese(text)) {
+    if (typeof text !== 'string' || !text) {
+        return text;
+    }
+
+    if (!hasJapanese(text)) {
         return text;
     }
 
@@ -65,6 +73,10 @@ export const convertFuriganaFragment = async (text: string): Promise<string> => 
 };
 
 export const convertRomaji = async (text: string): Promise<string> => {
+    if (typeof text !== 'string' || !text) {
+        return text;
+    }
+
     const KuroshiroClass = (Kuroshiro as any).default || Kuroshiro;
 
     if (!KuroshiroClass.Util.hasKana(text)) return '';
@@ -79,7 +91,7 @@ export const convertRomaji = async (text: string): Promise<string> => {
 };
 
 export const parseLyricsTextTokens = async (text: string): Promise<LyricTextToken[]> => {
-    if (!text || !hasJapanese(text)) {
+    if (typeof text !== 'string' || !text || !hasJapanese(text)) {
         return [];
     }
 
@@ -108,6 +120,10 @@ export const parseLyricsTextTokens = async (text: string): Promise<LyricTextToke
 };
 
 export const convertRomajiTokens = async (text: string): Promise<RomajiToken[]> => {
+    if (typeof text !== 'string' || !text) {
+        return [];
+    }
+
     const KuroshiroClass = (Kuroshiro as any).default || Kuroshiro;
 
     if (!KuroshiroClass.Util.hasKana(text)) {

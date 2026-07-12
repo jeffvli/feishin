@@ -7,6 +7,7 @@ import {
     LyricTextToken,
     RomajiToken,
 } from '/@/renderer/features/lyrics/api/lyric-conversion';
+import { normalizeLyrics } from '/@/renderer/features/lyrics/api/lyrics-utils';
 import { LyricsResponse, SyncedCueLine, SynchronizedLyrics } from '/@/shared/types/domain-types';
 
 const lyricsApi = isElectron() ? window.api.lyrics : null;
@@ -19,7 +20,7 @@ const convertSyncedLyricsFurigana = async (
     }
 
     return Promise.all(
-        lyrics.map(async (line) => ({
+        normalizeLyrics(lyrics).map(async (line) => ({
             ...line,
             cueLines: line.cueLines
                 ? await Promise.all(
@@ -53,7 +54,7 @@ const convertSyncedLyricsRomaji = async (
     convert: (text: string) => Promise<string>,
 ): Promise<SynchronizedLyrics> =>
     Promise.all(
-        lyrics.map(async (line) => ({
+        normalizeLyrics(lyrics).map(async (line) => ({
             ...line,
             cueLines: line.cueLines
                 ? await Promise.all(
