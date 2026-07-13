@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { motion } from 'motion/react';
 import { CSSProperties, lazy, Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,8 +12,9 @@ import {
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
 } from '/@/renderer/store/full-screen-player.store';
-import { Button } from '/@/shared/components/button/button';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
+import { AppIcon } from '/@/shared/components/icon/icon';
 import { ItemListKey } from '/@/shared/types/types';
 
 const AudioMotionAnalyzerVisualizer = lazy(() =>
@@ -29,27 +29,36 @@ const ButterchurnVisualizer = lazy(() =>
     })),
 );
 
-export const FullScreenPlayerQueue = () => {
+interface ControlItem {
+    active: boolean;
+    icon: keyof typeof AppIcon;
+    label: string;
+    onClick: () => void;
+}
+
+const Controls = () => {
     const { t } = useTranslation();
-    const { activeTab, opacity } = useFullScreenPlayerStore();
+    const { activeTab } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { webAudio } = usePlaybackSettings();
-    const visualizerType = useSettingsStore((store) => store.visualizer.type);
 
     const headerItems = useMemo(() => {
-        const items = [
+        const items: ControlItem[] = [
             {
                 active: activeTab === 'queue',
+                icon: 'queue',
                 label: t('page.fullscreenPlayer.upNext'),
                 onClick: () => setStore({ activeTab: 'queue' }),
             },
             {
                 active: activeTab === 'related',
+                icon: 'related',
                 label: t('page.fullscreenPlayer.related'),
                 onClick: () => setStore({ activeTab: 'related' }),
             },
             {
                 active: activeTab === 'lyrics',
+                icon: 'microphone',
                 label: t('page.fullscreenPlayer.lyrics'),
                 onClick: () => setStore({ activeTab: 'lyrics' }),
             },
@@ -58,6 +67,7 @@ export const FullScreenPlayerQueue = () => {
         if (webAudio) {
             items.push({
                 active: activeTab === 'visualizer',
+                icon: 'audioLines',
                 label: t('page.fullscreenPlayer.visualizer'),
                 onClick: () => setStore({ activeTab: 'visualizer' }),
             });
@@ -67,67 +77,75 @@ export const FullScreenPlayerQueue = () => {
     }, [activeTab, setStore, t, webAudio]);
 
     return (
-        <div
-            className={clsx(styles.gridContainer, 'full-screen-player-queue-container')}
-            style={
-                {
-                    '--opacity': opacity / 100,
-                } as CSSProperties
-            }
+        <Group
+            className="full-screen-player-queue-header"
+            gap="xs"
+            p="1rem"
+            pos="absolute"
+            style={{
+                bottom: 0,
+                right: 0,
+            }}
         >
-            <Group
-                align="center"
-                className="full-screen-player-queue-header"
-                gap={0}
-                grow
-                justify="center"
-                pb="md"
+            {headerItems.map((item) => (
+                <div key={`tab-${item.label}`}>
+                    <ActionIcon
+                        icon={item.icon}
+                        iconProps={{
+                            fill: item.active ? 'primary' : undefined,
+                            size: 'lg',
+                        }}
+                        onClick={item.onClick}
+                        tooltip={{ label: item.label }}
+                        variant="subtle"
+                    ></ActionIcon>
+                </div>
+            ))}
+        </Group>
+    );
+};
+
+export const FullScreenPlayerQueue = () => {
+    const { activeTab, opacity } = useFullScreenPlayerStore();
+    const { webAudio } = usePlaybackSettings();
+    const visualizerType = useSettingsStore((store) => store.visualizer.type);
+
+    return (
+        <>
+            <div
+                className={clsx(styles.gridContainer, 'full-screen-player-queue-container')}
+                style={
+                    {
+                        '--opacity': opacity / 100,
+                    } as CSSProperties
+                }
             >
-                {headerItems.map((item) => (
-                    <div className={styles.headerItemWrapper} key={`tab-${item.label}`}>
-                        <Button
-                            flex={1}
-                            fw="600"
-                            onClick={item.onClick}
-                            pos="relative"
-                            size="lg"
-                            uppercase
-                            variant="transparent"
-                        >
-                            {item.label}
-                        </Button>
-                        {item.active ? (
-                            <motion.div
-                                className={styles.activeTabIndicator}
-                                layoutId="underline"
-                            />
-                        ) : null}
+                {activeTab === 'queue' ? (
+                    <div className={styles.queueContainer}>
+                        <PlayQueue
+                            enableScrollShadow={false}
+                            listKey={ItemListKey.FULL_SCREEN}
+                            searchTerm={undefined}
+                        />
                     </div>
-                ))}
-            </Group>
-            {activeTab === 'queue' ? (
-                <div className={styles.queueContainer}>
-                    <PlayQueue
-                        enableScrollShadow={false}
-                        listKey={ItemListKey.FULL_SCREEN}
-                        searchTerm={undefined}
-                    />
-                </div>
-            ) : activeTab === 'related' ? (
-                <div className={styles.queueContainer}>
-                    <FullScreenSimilarSongs />
-                </div>
-            ) : activeTab === 'lyrics' ? (
-                <Lyrics fadeOutNoLyricsMessage={false} />
-            ) : activeTab === 'visualizer' && webAudio ? (
-                <Suspense fallback={<></>}>
-                    {visualizerType === 'butterchurn' ? (
-                        <ButterchurnVisualizer />
-                    ) : (
-                        <AudioMotionAnalyzerVisualizer />
-                    )}
-                </Suspense>
-            ) : null}
-        </div>
+                ) : activeTab === 'related' ? (
+                    <div className={styles.queueContainer}>
+                        <FullScreenSimilarSongs />
+                    </div>
+                ) : activeTab === 'lyrics' ? (
+                    <Lyrics fadeOutNoLyricsMessage={false} />
+                ) : activeTab === 'visualizer' && webAudio ? (
+                    <Suspense fallback={<></>}>
+                        {visualizerType === 'butterchurn' ? (
+                            <ButterchurnVisualizer />
+                        ) : (
+                            <AudioMotionAnalyzerVisualizer />
+                        )}
+                    </Suspense>
+                ) : null}
+            </div>
+
+            <Controls />
+        </>
     );
 };

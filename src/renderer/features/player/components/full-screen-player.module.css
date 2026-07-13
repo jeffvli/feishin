@@ -48,7 +48,8 @@
     gap: 2rem;
     width: 100%;
     max-width: 2560px;
-    margin-top: 5rem;
+    margin-top: 3rem;
+    margin-bottom: 2rem;
 
     @media screen and (orientation: portrait) {
         grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
