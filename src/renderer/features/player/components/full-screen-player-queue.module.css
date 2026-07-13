@@ -30,9 +30,7 @@
 
 .grid-container {
     position: relative;
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
-    grid-template-columns: 1fr;
+    display: block;
     width: 100%;
     min-width: 0;
     padding: 1rem;
