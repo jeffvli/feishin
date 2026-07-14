@@ -274,6 +274,48 @@ export const DiscordSettings = memo(() => {
         {
             control: (
                 <TextInput
+                    defaultValue={settings.fileFieldName}
+                    onBlur={(e) => {
+                        setSettings({
+                            discord: {
+                                fileFieldName: e.currentTarget.value,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.discordImageProxyFileField', {
+                context: 'description',
+            }),
+            isHidden: !isElectron() || settings.serverType !== DiscordServerType.IMAGE_PROXY,
+            title: t('setting.discordImageProxyFileField', {
+                discord: 'Discord',
+            }),
+        },
+        {
+            control: (
+                <TextInput
+                    defaultValue={settings.jsonPath}
+                    onBlur={(e) => {
+                        setSettings({
+                            discord: {
+                                jsonPath: e.currentTarget.value,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.discordImageProxyJsonPath', {
+                context: 'description',
+            }),
+            isHidden: !isElectron() || settings.serverType !== DiscordServerType.IMAGE_PROXY,
+            title: t('setting.discordImageProxyJsonPath', {
+                discord: 'Discord',
+            }),
+        },
+        {
+            control: (
+                <TextInput
                     defaultValue={generalSettings.lastfmApiKey}
                     onBlur={(e) => {
                         setSettings({
