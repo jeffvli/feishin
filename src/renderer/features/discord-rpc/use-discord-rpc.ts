@@ -296,6 +296,8 @@ export const useDiscordRpc = () => {
 
                             const globalImageUrl = await discordRpc?.postImageProxyRequest(
                                 discordSettings.imageProxyServerLink,
+                                discordSettings.fileFieldName,
+                                discordSettings.jsonPath,
                                 arrayBuffer,
                             );
 
@@ -398,6 +400,8 @@ export const useDiscordRpc = () => {
             discordSettings.clientId,
             discordSettings.serverType,
             discordSettings.imageProxyServerLink,
+            discordSettings.fileFieldName,
+            discordSettings.jsonPath,
             currentSong?._uniqueId,
             lastfmApiKey,
             radioMetadata?.title,

@@ -16,10 +16,17 @@ const clearActivity = () => {
     ipcRenderer.invoke('discord-rpc-clear-activity');
 };
 
-const postImageProxyRequest = (imageProxyServerLink: string, arrayBuffer: ArrayBuffer) => {
+const postImageProxyRequest = (
+    imageProxyServerLink: string,
+    fileFieldName: string,
+    jsonPath: string,
+    arrayBuffer: ArrayBuffer,
+) => {
     const url = ipcRenderer.invoke(
         'discord-rpc-post-image-proxy-request',
         imageProxyServerLink,
+        fileFieldName,
+        jsonPath,
         arrayBuffer,
     );
     return url;
