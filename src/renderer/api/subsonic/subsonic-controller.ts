@@ -2213,24 +2213,24 @@ export const SubsonicController: InternalControllerEndpoint = {
     scrobble: async (args) => {
         const { apiClientProps, query } = args;
 
-        if (hasFeature(apiClientProps.server, ServerFeature.REPORT_PLAYBACK)) {
-            if (query.submission || query.event === 'start') {
-                const res = await ssApiClient(apiClientProps).scrobble({
-                    query: {
-                        id: query.id,
-                        submission: query.submission,
-                    },
-                });
+        if (query.submission || query.event === 'start') {
+            const res = await ssApiClient(apiClientProps).scrobble({
+                query: {
+                    id: query.id,
+                    submission: query.submission,
+                },
+            });
 
-                if (res.status !== 200) {
-                    throw new Error('Failed to scrobble');
-                }
-
-                if (query.submission) {
-                    return null;
-                }
+            if (res.status !== 200) {
+                throw new Error('Failed to scrobble');
             }
 
+            if (query.submission) {
+                return null;
+            }
+        }
+
+        if (hasFeature(apiClientProps.server, ServerFeature.REPORT_PLAYBACK)) {
             const defaultParams = {
                 ignoreScrobble: true,
                 mediaId: query.id,
@@ -2277,17 +2277,6 @@ export const SubsonicController: InternalControllerEndpoint = {
             }
 
             return null;
-        }
-
-        const res = await ssApiClient(apiClientProps).scrobble({
-            query: {
-                id: query.id,
-                submission: query.submission,
-            },
-        });
-
-        if (res.status !== 200) {
-            throw new Error('Failed to scrobble');
         }
 
         return null;
