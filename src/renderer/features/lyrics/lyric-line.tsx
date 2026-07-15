@@ -11,7 +11,7 @@ interface LyricLineProps extends ComponentPropsWithoutRef<'div'> {
     alignment: 'center' | 'left' | 'right';
     fontSize: number;
     romajiText?: null | string;
-    text: string;
+    text?: string;
     translatedText?: null | string;
 }
 
@@ -25,7 +25,7 @@ export const LyricLine = memo(
         translatedText,
         ...props
     }: LyricLineProps) => {
-        const lines = useMemo(() => text.split('_BREAK_'), [text]);
+        const lines = useMemo(() => (text ?? '').split('_BREAK_'), [text]);
 
         const style = useMemo(
             () => ({

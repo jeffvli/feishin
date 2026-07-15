@@ -384,6 +384,48 @@ export const ItemTableListColumn = memo(ItemTableListColumnBase, (prevProps, nex
 
 const NonMutedColumns = [TableColumn.TITLE, TableColumn.TITLE_ARTIST, TableColumn.TITLE_COMBINED];
 
+/**
+ * Stable content-height estimate for album-group info (title + metadata + controls).
+ * Used by the virtualizer before a group header mounts/measures, so scrolling in
+ * new groups does not jump when measured height is written later.
+ * Keep in sync with album-group-header styles (title line-clamp, metadata xs, controls).
+ */
+export function estimateAlbumGroupContentHeight({
+    metadataRowCount,
+    showControls,
+}: {
+    metadataRowCount: number;
+    showControls: boolean;
+}): number {
+    // Prefer a single title line for the pre-measure floor. Wrapped titles are
+    // picked up by the measured content height after mount.
+    const TITLE_LINE_HEIGHT = 20;
+    const METADATA_LINE_HEIGHT = 18;
+    const CONTROLS_HEIGHT = 38;
+
+    return (
+        TITLE_LINE_HEIGHT +
+        Math.max(0, metadataRowCount) * METADATA_LINE_HEIGHT +
+        (showControls ? CONTROLS_HEIGHT : 0)
+    );
+}
+
+/** Stable key for album-group content heights (survives row moves; not row index). */
+export function getAlbumGroupHeightKey(item: unknown, groupRowCount?: number): string | undefined {
+    if (!item || typeof item !== 'object') return undefined;
+
+    let itemKey: string | undefined;
+    if ('_uniqueId' in item && typeof (item as { _uniqueId?: unknown })._uniqueId === 'string') {
+        itemKey = (item as { _uniqueId: string })._uniqueId;
+    } else if ('id' in item && typeof (item as { id?: unknown }).id === 'string') {
+        itemKey = (item as { id: string }).id;
+    }
+
+    if (!itemKey) return undefined;
+    if (groupRowCount === undefined) return itemKey;
+    return `${itemKey}:${groupRowCount}`;
+}
+
 // Counts how many consecutive rows belong to the same album group as `rowIndex`.
 export function getAlbumGroupRowCount(
     rowIndex: number,
@@ -412,6 +454,55 @@ export function getAlbumGroupRowCount(
     }
 
     return end - start + 1;
+}
+
+export const ALBUM_GROUP_STACK_GAP = 8;
+export const ALBUM_GROUP_CELL_PADDING = 8;
+
+export function getAlbumGroupSpanHeight(
+    groupRowCount: number,
+    baseHeight: number,
+    albumGroupImageSize: number,
+    contentHeight = 0,
+    options?: { isVertical?: boolean },
+): number {
+    const rowSpanHeight = groupRowCount * baseHeight;
+    const isVertical = options?.isVertical ?? false;
+    const paddingY = ALBUM_GROUP_CELL_PADDING * 2;
+
+    if (isVertical) {
+        const imageSize = albumGroupImageSize > 0 ? albumGroupImageSize : 96;
+        return Math.max(
+            rowSpanHeight,
+            imageSize + ALBUM_GROUP_STACK_GAP + contentHeight + paddingY,
+        );
+    }
+
+    const imageSpanHeight =
+        albumGroupImageSize > 0
+            ? Math.max(albumGroupImageSize + paddingY, rowSpanHeight)
+            : rowSpanHeight;
+
+    return Math.max(imageSpanHeight, contentHeight > 0 ? contentHeight + paddingY : 0);
+}
+
+export function getAlbumGroupStartRowIndex(
+    rowIndex: number,
+    getRowItem: ((index: number) => unknown) | undefined,
+    enableHeader: boolean | undefined,
+): number {
+    const item = getRowItem?.(rowIndex) as null | undefined | { album?: string };
+    if (!item?.album) return rowIndex;
+
+    const firstDataRow = enableHeader ? 1 : 0;
+    let start = rowIndex;
+    while (start > firstDataRow) {
+        const prevItem = getRowItem?.(start - 1) as null | undefined | { album?: string };
+        if (!prevItem || prevItem.album !== item.album) break;
+        start--;
+    }
+
+    return start;
 }
 
 export function isAlbumGroupingActive(columns: { id: string; isEnabled?: boolean }[]): boolean {
@@ -488,9 +579,6 @@ function ClampedCell({
 // standard height and the reserved space below is left empty (uniform
 // background) for the overflowing album image.
 function getAlbumGroupClampHeight(props: ItemTableListInnerColumn): null | number {
-    const albumImageSize = props.albumGroupImageSize ?? 0;
-
-    if (albumImageSize <= 0) return null;
     if (props.type === TableColumn.ALBUM_GROUP) return null;
     if (!isAlbumGroupingActive(props.columns)) return null;
 
@@ -506,6 +594,8 @@ function getAlbumGroupClampHeight(props: ItemTableListInnerColumn): null | numbe
         return null;
     }
 
+    const albumImageSize = props.albumGroupImageSize ?? 0;
+    const isVertical = props.albumGroupVerticalLayout ?? false;
     const baseHeight = baseRowHeightForSize(props.size);
     const groupRowCount = getAlbumGroupRowCount(
         props.rowIndex,
@@ -513,9 +603,30 @@ function getAlbumGroupClampHeight(props: ItemTableListInnerColumn): null | numbe
         props.enableHeader,
         props.data.length,
     );
+    const groupStartRowIndex = getAlbumGroupStartRowIndex(
+        props.rowIndex,
+        props.getRowItem,
+        props.enableHeader,
+    );
+    const groupStartItem = props.getRowItem?.(groupStartRowIndex);
+    const groupHeightKey = getAlbumGroupHeightKey(groupStartItem, groupRowCount);
+    const measuredContentHeight = groupHeightKey
+        ? props.albumGroupContentHeights?.get(groupHeightKey)
+        : undefined;
+    // Prefer measured info height once available. The controls row keeps a
+    // min-height placeholder while the album query loads, so early measures
+    // already reserve favorites/ratings space.
+    const contentHeight = measuredContentHeight ?? props.estimatedAlbumGroupContentHeight ?? 0;
+    const totalGroupHeight = getAlbumGroupSpanHeight(
+        groupRowCount,
+        baseHeight,
+        albumImageSize,
+        contentHeight,
+        { isVertical },
+    );
 
-    // Only clamp when the row was actually grown to fit the image.
-    if (albumImageSize <= groupRowCount * baseHeight) return null;
+    // Only clamp when the row was actually grown to fit the image or wrapped text.
+    if (totalGroupHeight <= groupRowCount * baseHeight) return null;
 
     return baseHeight;
 }
@@ -524,7 +635,9 @@ function showHorizontalBorderFor(props: ItemTableListInnerColumn, isLastRow: boo
     if (!props.enableHorizontalBorders || !props.enableHeader || props.rowIndex <= 0) {
         return false;
     }
-    if (isAlbumGroupingActive(props.columns)) {
+    // Album group uses group top/bottom edges only (no mid-group lines that would
+    // cut through artwork). Other columns keep per-row borders.
+    if (props.type === TableColumn.ALBUM_GROUP) {
         return isLastInAlbumGroup(
             props.rowIndex,
             props.getRowItem,
@@ -642,7 +755,8 @@ export const TableColumnTextContainer = (
     };
 
     const showHorizontalBorder = showHorizontalBorderFor(props, isLastRow);
-    const showVerticalBorder = !!props.enableVerticalBorders && !isLastColumn;
+    const showVerticalBorder =
+        !!props.enableVerticalBorders && !isLastColumn && props.type !== TableColumn.ALBUM_GROUP;
 
     const cell = (
         <div
@@ -808,7 +922,8 @@ export const TableColumnContainer = (
     };
 
     const showHorizontalBorder = showHorizontalBorderFor(props, isLastRow);
-    const showVerticalBorder = !!props.enableVerticalBorders && !isLastColumn;
+    const showVerticalBorder =
+        !!props.enableVerticalBorders && !isLastColumn && props.type !== TableColumn.ALBUM_GROUP;
 
     const cell = (
         <div
@@ -842,6 +957,7 @@ export const TableColumnContainer = (
                 [styles.withHorizontalBorder]: showHorizontalBorder && clampHeight === null,
                 [styles.withVerticalBorder]: showVerticalBorder,
             })}
+            data-exclude-row-drag-border={props.type === TableColumn.ALBUM_GROUP ? true : undefined}
             data-row-index={isDataRow ? `${props.tableId}-${props.rowIndex}` : undefined}
             onClick={handleClick}
             onContextMenu={handleContextMenu}
@@ -1136,9 +1252,7 @@ export const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.ALBUM_COUNT]: i18n.t('table.column.albumCount', {
         postProcess: 'upperCase',
     }) as string,
-    [TableColumn.ALBUM_GROUP]: i18n.t('table.config.label.albumGroup', {
-        postProcess: 'upperCase',
-    }) as string,
+    [TableColumn.ALBUM_GROUP]: '',
     [TableColumn.ARTIST]: i18n.t('table.column.artist', { postProcess: 'upperCase' }) as string,
     [TableColumn.BIOGRAPHY]: i18n.t('table.column.biography', {
         postProcess: 'upperCase',

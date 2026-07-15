@@ -974,7 +974,8 @@
             "input_preferInstantMixDescription": "Utiliser uniquement le mix instantané pour jouer des titres similaires. utile si vous avez des plugins qui modifient ce comportement",
             "input_preferRemoteUrl": "Préférer une URL publique",
             "input_remoteUrl": "URL publique",
-            "input_remoteUrlPlaceholder": "Optionnel : URL publique pour les fonctionnalités externes"
+            "input_remoteUrlPlaceholder": "Optionnel : URL publique pour les fonctionnalités externes",
+            "input_passwordNoSSO": "L'authentification par proxy inverse (SSO) n'est pas prise en charge. Seules l'authentification par nom d'utilisateur/mot de passe et l'authentification Subsonic sont prises en charge"
         },
         "addToPlaylist": {
             "success": "$t(entity.trackWithCount, {\"count\": {{message}} }) ajouté à $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",

@@ -348,7 +348,8 @@
             "input_preferInstantMixDescription": "Używaj tylko natychmiastowego mixu, by otrzymać podobne piosenki. przydatne gdy masz wtyczki które zmieniają to zachowanie",
             "input_preferRemoteUrl": "Preferuj publiczny url",
             "input_remoteUrl": "Publiczny url",
-            "input_remoteUrlPlaceholder": "Opcjonalne: publiczny url dla funkcji zewnętrznych"
+            "input_remoteUrlPlaceholder": "Opcjonalne: publiczny url dla funkcji zewnętrznych",
+            "input_passwordNoSSO": "Autoryzacja przez reverse proxy (SSO) nie jest obsługiwana. Tylko autoryzacja nazwą użytkownika/hasłem i autoryzacja Subsonic są obsługiwane"
         },
         "addToPlaylist": {
             "success": "Dodano $t(entity.trackWithCount, {\"count\": {{message}} }) do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -454,13 +455,21 @@
                 "dynamicIsImage": "Włącz obraz w tle",
                 "lyricOffset": "Opóźnienie tekstów (ms)",
                 "lyricOpacityNonActive": "Przezroczystość nieaktywnego tekstu",
-                "lyricScaleNonActive": "Skala nieaktywnego tekstu"
+                "lyricScaleNonActive": "Skala nieaktywnego tekstu",
+                "lyricPaddingLeft": "Odstęp tekstu z lewej (%)",
+                "lyricPaddingRight": "Odstęp tekstu z prawej (%)",
+                "lyricFollowScrollAlignment": "Wyrównywanie tekstu",
+                "lyricLineLeadTime": "Czas przed linijką (ms)"
             },
             "upNext": "Następne",
             "lyrics": "Tekst",
             "related": "Powiązane",
             "visualizer": "Wizualizer",
-            "noLyrics": "Nie znaleziono tekstu"
+            "noLyrics": "Nie znaleziono tekstu",
+            "lyricLayers": "Warstwy tekstu",
+            "lyricLanguage": "Język",
+            "showPronunciation": "Wymowa",
+            "showTranslation": "Tłumaczenie"
         },
         "appMenu": {
             "selectServer": "Wybierz serwer",
@@ -1148,7 +1157,10 @@
         "enableRomaji_description": "Wyświetlaj linijkę z wymową romaji pod japońskim tekstem.",
         "enableRomaji": "Włącz generowanie romaji",
         "windowBarTrackinfo": "Informacje o utworze w tytule okna",
-        "windowBarTrackinfo_description": "Wyświetlaj tytuł, wykonawcę, pozycję w kolejce i stan Odtwarzania/Wstrzymania w tytule okna."
+        "windowBarTrackinfo_description": "Wyświetlaj tytuł, wykonawcę, pozycję w kolejce i stan Odtwarzania/Wstrzymania w tytule okna.",
+        "audioDeviceDefault": "Domyślne systemu",
+        "microtonalPitchControls": "Mikrotonowe sterowanie wysokością dźwięku",
+        "microtonalPitchControls_description": "Dodaj więcej sterowania wysokością dźwięku pomiędzy półtonami"
     },
     "table": {
         "config": {
@@ -1190,7 +1202,9 @@
                 "verticalBorders": "Obwódki kolumn",
                 "showHeader": "Pokaż nagłówek",
                 "albumImageSize": "Rozmiar obrazów albumów",
-                "albumGroupConfig": "Konfiguracja grupy albumów"
+                "albumGroupConfig": "Konfiguracja grupy albumów",
+                "albumGroupMetadata": "Pola metadanych",
+                "albumGroupShowFavoriteRating": "Pokaż ulubione i oceny"
             },
             "label": {
                 "releaseDate": "Data premiery",

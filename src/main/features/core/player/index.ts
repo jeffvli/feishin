@@ -161,19 +161,29 @@ const createMpv = async (data: {
         await mpv.setMultipleProperties(properties || {});
     }
 
+    let previousPlaylistPos: number | undefined;
+
     mpv.on('status', (status) => {
         if (status.property === 'playlist-pos') {
+            const currentPos = typeof status.value === 'number' ? status.value : undefined;
+
             // mpv uses playlist-pos = -1 when nothing is playing (ended, cleared, load failure, etc).
-            if (status.value === -1) {
+            if (currentPos === -1) {
+                if (previousPlaylistPos === 0) {
+                    getMainWindow()?.webContents.send('renderer-player-track-ended');
+                }
                 mpv?.pause();
+                previousPlaylistPos = currentPos;
                 return;
             }
 
             // In our 2-item queue model, playlist-pos should normally be 0.
             // When mpv auto-advances to the next track it becomes > 0 (typically 1).
-            if (typeof status.value === 'number' && status.value > 0) {
+            if (typeof currentPos === 'number' && currentPos > 0) {
                 getMainWindow()?.webContents.send('renderer-player-auto-next');
             }
+
+            previousPlaylistPos = currentPos;
         }
     });
 

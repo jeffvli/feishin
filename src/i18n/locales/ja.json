@@ -440,7 +440,30 @@
         "autoDJ_albumStrategy": "アルバム選択モード",
         "autoDJ_songStrategy": "選曲モード",
         "autoDJ_strategy_option_library_random": "ランダム",
-        "autoDJ_strategy_option_similar": "類似"
+        "autoDJ_strategy_option_similar": "類似",
+        "enableFurigana_description": "日本語の漢字歌詞の上にふりがなを表示します。",
+        "enableFurigana": "ふりがなの表示を有効にする",
+        "enableRomaji_description": "日本語の歌詞の下にローマ字の発音表記を表示します。",
+        "enableRomaji": "ローマ字の表示を有効にする",
+        "equalizer": "イコライザー",
+        "equalizerBands_description": "バンドごとのゲイン。上下にドラッグするか、値を入力してください。範囲: -12 ~ +12 dB。",
+        "equalizerBands": "バンド",
+        "equalizerPreset": "プリセット",
+        "equalizerPresetGroupBuiltIn": "内蔵",
+        "equalizerPresetGroupCustom": "カスタム",
+        "equalizerPresetSelectPlaceholder": "プリセットを選択",
+        "equalizerSavePreset_description": "現在のイコライザー設定を名前付きプリセットとして保存します",
+        "equalizerSavePreset": "プリセットを保存",
+        "equalizerPreset_description": "内蔵または保存済みのカスタムイコライザーカーブを適用します",
+        "compressor": "コンプレッサー",
+        "compressorAttack_description": "信号が閾値を超えた後、コンプレッサーが作動するまでの時間を設定します。",
+        "sidebarPlaylistFolders": "フォルダーを有効化",
+        "sidebarPlaylistFolderSeparator_description": "プレイリスト名でフォルダー階層を区切る文字（または文字列）を設定します",
+        "sidebarPlaylistFolderSeparator": "フォルダーセパレーター",
+        "sidebarPlaylistFolders_description": "設定済みの区切り文字が名前に含まれるプレイリストのフォルダービューを作成します",
+        "sidebarPlaylistFolderTreeIndent": "ツリーのインデント",
+        "sidebarPlaylistMode_optionCompact": "コンパクト",
+        "sidebarPlaylistMode_optionExpanded": "拡張"
     },
     "action": {
         "editPlaylist": "$t(entity.playlist, {\"count\": 1}) を編集",
@@ -1213,7 +1236,9 @@
         "isGreaterThan": "より大きい",
         "isLessThan": "より小さい",
         "notInPlaylist": "いずれでもない",
-        "notInTheLast": "より前"
+        "notInTheLast": "より前",
+        "isMissing": "欠落している",
+        "isPresent": "存在する"
     },
     "visualizer": {
         "visualizerType": "ビジュアライザーの種類",

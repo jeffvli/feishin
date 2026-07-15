@@ -7,6 +7,7 @@ import { PlayerConfig } from '/@/renderer/features/player/components/player-conf
 import { CustomPlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { SleepTimerButton } from '/@/renderer/features/player/components/sleep-timer-button';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
+import { useAudioDevices } from '/@/renderer/features/settings/components/playback/audio-settings';
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
@@ -21,6 +22,8 @@ import {
     useFullScreenPlayerStore,
     useGeneralSettings,
     useHotkeySettings,
+    usePlaybackSettings,
+    usePlaybackType,
     usePlayerData,
     usePlayerMuted,
     usePlayerSong,
@@ -36,6 +39,7 @@ import {
 import { useFullScreenPlayerStoreActions } from '/@/renderer/store/full-screen-player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
+import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
@@ -51,6 +55,7 @@ import { useMediaQuery } from '/@/shared/hooks/use-media-query';
 import { useThrottledCallback } from '/@/shared/hooks/use-throttled-callback';
 import { useThrottledValue } from '/@/shared/hooks/use-throttled-value';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
+import { PlayerType } from '/@/shared/types/types';
 
 const calculateVolumeUp = (volume: number, volumeWheelStep: number, volumeMax: number) => {
     let volumeToSet: number;
@@ -508,6 +513,28 @@ const VolumeButton = () => {
     const { decreaseVolume, increaseVolume, mediaToggleMute, setVolume } = usePlayer();
     const isMinWidth = useMediaQuery('(max-width: 480px)');
 
+    const playbackType = usePlaybackType();
+    const playbackSettings = usePlaybackSettings();
+    const { setSettings } = useSettingsStoreActions();
+    const audioDevices = useAudioDevices(playbackType);
+
+    const currentAudioDeviceId =
+        playbackType === PlayerType.LOCAL
+            ? playbackSettings.mpvAudioDeviceId
+            : playbackSettings.audioDeviceId;
+
+    const handleSelectAudioDevice = useCallback(
+        (deviceId: null | string) => {
+            setSettings({
+                playback:
+                    playbackType === PlayerType.LOCAL
+                        ? { mpvAudioDeviceId: deviceId }
+                        : { audioDeviceId: deviceId },
+            });
+        },
+        [playbackType, setSettings],
+    );
+
     const [sliderValue, setSliderValue] = useState(volume);
 
     const throttledVolume = useThrottledValue(sliderValue, 100);
@@ -563,24 +590,54 @@ const VolumeButton = () => {
 
     return (
         <>
-            <ActionIcon
-                icon={muted ? 'volumeMute' : volume > 50 ? 'volumeMax' : 'volumeNormal'}
-                iconProps={{
-                    color: muted ? 'muted' : undefined,
-                    size: 'xl',
-                }}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    handleMute();
-                }}
-                onWheel={handleVolumeWheel}
-                size="sm"
-                tooltip={{
-                    label: muted ? t('player.muted') : volume,
-                    openDelay: 0,
-                }}
-                variant="subtle"
-            />
+            <ContextMenu>
+                <ContextMenu.Target>
+                    {/*
+                     * ActionIcon renders a Mantine Tooltip wrapper, which does not
+                     * forward the onContextMenu/ref that Radix injects via asChild to
+                     * the underlying button. Wrap in a real DOM node so right-click
+                     * reliably opens the menu.
+                     */}
+                    <div style={{ alignItems: 'center', display: 'flex' }}>
+                        <ActionIcon
+                            icon={muted ? 'volumeMute' : volume > 50 ? 'volumeMax' : 'volumeNormal'}
+                            iconProps={{
+                                color: muted ? 'muted' : undefined,
+                                size: 'xl',
+                            }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleMute();
+                            }}
+                            onWheel={handleVolumeWheel}
+                            size="sm"
+                            tooltip={{
+                                label: muted ? t('player.muted') : volume,
+                                openDelay: 0,
+                            }}
+                            variant="subtle"
+                        />
+                    </div>
+                </ContextMenu.Target>
+                <ContextMenu.Content>
+                    <ContextMenu.Item
+                        isSelected={!currentAudioDeviceId}
+                        onSelect={() => handleSelectAudioDevice(null)}
+                    >
+                        {t('setting.audioDeviceDefault', { defaultValue: 'System default' })}
+                    </ContextMenu.Item>
+                    {audioDevices.length > 0 && <ContextMenu.Divider />}
+                    {audioDevices.map((device) => (
+                        <ContextMenu.Item
+                            isSelected={device.value === currentAudioDeviceId}
+                            key={device.value}
+                            onSelect={() => handleSelectAudioDevice(device.value)}
+                        >
+                            {device.label || device.value}
+                        </ContextMenu.Item>
+                    ))}
+                </ContextMenu.Content>
+            </ContextMenu>
             {!isMinWidth ? (
                 <CustomPlayerbarSlider
                     max={volumeMax}

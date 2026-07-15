@@ -83,23 +83,46 @@ export const useRowInteractionDelegate = ({
         let pending: null | { edge: 'bottom' | 'top' | null; rowKey: string } = null;
         let rafId: null | number = null;
 
+        const isExcludedFromDragBorder = (el: HTMLElement) =>
+            el.hasAttribute('data-exclude-row-drag-border');
+
         const clearRow = (rowKey: string) => {
             root.querySelectorAll(`[data-row-index="${rowKey}"]`).forEach((node) => {
                 const el = node as HTMLElement;
                 el.removeAttribute('data-row-dragged-over');
                 el.removeAttribute('data-row-dragged-over-first');
+                el.removeAttribute('data-exclude-row-drag-left');
             });
         };
 
         const applyRow = (rowKey: string, edge: 'bottom' | 'top') => {
-            const nodes = root.querySelectorAll(`[data-row-index="${rowKey}"]`);
-            nodes.forEach((node, idx) => {
+            const nodes = Array.from(root.querySelectorAll(`[data-row-index="${rowKey}"]`));
+            const eligibleNodes = nodes.filter(
+                (node) => !isExcludedFromDragBorder(node as HTMLElement),
+            );
+            const hasExcludedBeforeFirst = eligibleNodes.length < nodes.length;
+
+            nodes.forEach((node) => {
+                if (!isExcludedFromDragBorder(node as HTMLElement)) return;
+                const el = node as HTMLElement;
+                el.removeAttribute('data-row-dragged-over');
+                el.removeAttribute('data-row-dragged-over-first');
+                el.removeAttribute('data-exclude-row-drag-left');
+            });
+
+            eligibleNodes.forEach((node, idx) => {
                 const el = node as HTMLElement;
                 el.setAttribute('data-row-dragged-over', edge);
                 if (idx === 0) {
                     el.setAttribute('data-row-dragged-over-first', 'true');
+                    if (hasExcludedBeforeFirst) {
+                        el.setAttribute('data-exclude-row-drag-left', 'true');
+                    } else {
+                        el.removeAttribute('data-exclude-row-drag-left');
+                    }
                 } else {
                     el.removeAttribute('data-row-dragged-over-first');
+                    el.removeAttribute('data-exclude-row-drag-left');
                 }
             });
         };

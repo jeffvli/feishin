@@ -8,6 +8,7 @@ import md5 from 'md5';
 import { z } from 'zod';
 
 import { contract, ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
+import { mapStructuredLyric } from '/@/renderer/api/subsonic/subsonic-structured-lyrics';
 import {
     getDefaultTranscodingProfiles,
     getDirectPlayProfiles,
@@ -21,7 +22,13 @@ import {
     ssType,
     SubsonicExtensions,
 } from '/@/shared/api/subsonic/subsonic-types';
-import { hasFeature, sortAlbumArtistList, sortAlbumList, sortSongList } from '/@/shared/api/utils';
+import {
+    hasFeature,
+    hasFeatureWithVersion,
+    sortAlbumArtistList,
+    sortAlbumList,
+    sortSongList,
+} from '/@/shared/api/utils';
 import {
     AlbumListSort,
     GenreListSort,
@@ -1381,7 +1388,7 @@ export const SubsonicController: InternalControllerEndpoint = {
         }
 
         if (subsonicFeatures[SubsonicExtensions.SONG_LYRICS]) {
-            features.lyricsMultipleStructured = [1];
+            features.lyricsMultipleStructured = subsonicFeatures[SubsonicExtensions.SONG_LYRICS];
         }
 
         if (subsonicFeatures[SubsonicExtensions.FORM_POST]) {
@@ -1394,6 +1401,22 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         if (subsonicFeatures[SubsonicExtensions.PLAYBACK_REPORT]) {
             features.reportPlayback = [1];
+        }
+        try {
+            const jukeboxStatus = await ssApiClient(apiClientProps).jukeboxControl({
+                query: { action: 'status' },
+            });
+
+            if (jukeboxStatus.status === 200 && !(jukeboxStatus.body as any)?.error) {
+                features[ServerFeature.JUKEBOX] = [1];
+            } else {
+                console.log(
+                    'Jukebox endpoint returned an error payload:',
+                    (jukeboxStatus.body as any)?.error,
+                );
+            }
+        } catch (error) {
+            console.log('Jukebox is not supported by this server:', error);
         }
 
         return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };
@@ -1945,9 +1968,16 @@ export const SubsonicController: InternalControllerEndpoint = {
     },
     getStructuredLyrics: async (args) => {
         const { apiClientProps, query } = args;
+        const server = apiClientProps.server;
+        const supportsEnhancedLyrics = hasFeatureWithVersion(
+            server,
+            ServerFeature.LYRICS_MULTIPLE_STRUCTURED,
+            2,
+        );
 
         const res = await ssApiClient(apiClientProps).getStructuredLyrics({
             query: {
+                enhanced: supportsEnhancedLyrics ? true : undefined,
                 id: query.songId,
             },
         });
@@ -1962,28 +1992,9 @@ export const SubsonicController: InternalControllerEndpoint = {
             return [];
         }
 
-        return lyrics.map((lyric) => {
-            const baseLyric = {
-                artist: lyric.displayArtist || '',
-                lang: lyric.lang,
-                name: lyric.displayTitle || '',
-                remote: false,
-                source: apiClientProps.server?.name || 'music server',
-            };
+        const source = apiClientProps.server?.name || 'music server';
 
-            if (lyric.synced) {
-                return {
-                    ...baseLyric,
-                    lyrics: lyric.line.map((line) => [line.start!, line.value]),
-                    synced: true,
-                };
-            }
-            return {
-                ...baseLyric,
-                lyrics: lyric.line.map((line) => [line.value]).join('\n'),
-                synced: false,
-            };
-        });
+        return lyrics.map((lyric) => mapStructuredLyric(lyric, source));
     },
     getTopSongs: async (args) => {
         const { apiClientProps, query } = args;
@@ -2051,6 +2062,25 @@ export const SubsonicController: InternalControllerEndpoint = {
             isAdmin: Boolean(res.body.user.adminRole),
             name: res.body.user.username,
         };
+    },
+    jukeboxControl: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const res = await ssApiClient(apiClientProps).jukeboxControl({
+            query: {
+                action: query.action,
+                gain: query.gain,
+                id: query.id,
+                index: query.index,
+                offset: query.offset,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to control jukebox');
+        }
+
+        return res.body;
     },
     removeFromPlaylist: async ({ apiClientProps, query }) => {
         const res = await ssApiClient(apiClientProps).updatePlaylist({
@@ -2151,7 +2181,10 @@ export const SubsonicController: InternalControllerEndpoint = {
         if (hasFeature(apiClientProps.server, ServerFeature.SERVER_PLAY_QUEUE)) {
             const res = await ssApiClient(apiClientProps).savePlayQueueByIndex({
                 query: {
-                    currentIndex: query.currentIndex !== undefined ? query.currentIndex : undefined,
+                    currentIndex:
+                        query.currentIndex !== undefined && query.currentIndex < query.songs.length
+                            ? Math.max(0, query.currentIndex)
+                            : undefined,
                     id: query.songs,
                     position: query.positionMs,
                 },
@@ -2180,30 +2213,30 @@ export const SubsonicController: InternalControllerEndpoint = {
     scrobble: async (args) => {
         const { apiClientProps, query } = args;
 
-        if (hasFeature(apiClientProps.server, ServerFeature.REPORT_PLAYBACK)) {
-            if (query.submission || query.event === 'start') {
-                const res = await ssApiClient(apiClientProps).scrobble({
-                    query: {
-                        id: query.id,
-                        submission: query.submission,
-                    },
-                });
+        if (query.submission || query.event === 'start') {
+            const res = await ssApiClient(apiClientProps).scrobble({
+                query: {
+                    id: query.id,
+                    submission: query.submission,
+                },
+            });
 
-                if (res.status !== 200) {
-                    throw new Error('Failed to scrobble');
-                }
-
-                if (query.submission) {
-                    return null;
-                }
+            if (res.status !== 200) {
+                throw new Error('Failed to scrobble');
             }
 
+            if (query.submission) {
+                return null;
+            }
+        }
+
+        if (hasFeature(apiClientProps.server, ServerFeature.REPORT_PLAYBACK)) {
             const defaultParams = {
                 ignoreScrobble: true,
                 mediaId: query.id,
                 mediaType: query.mediaType,
                 playbackRate: query.playbackRate,
-                positionMs: query.position ?? 0,
+                positionMs: Math.round(query.position ?? 0),
             };
 
             const reportPlayback = (state: 'paused' | 'playing' | 'starting' | 'stopped') => {
@@ -2244,17 +2277,6 @@ export const SubsonicController: InternalControllerEndpoint = {
             }
 
             return null;
-        }
-
-        const res = await ssApiClient(apiClientProps).scrobble({
-            query: {
-                id: query.id,
-                submission: query.submission,
-            },
-        });
-
-        if (res.status !== 200) {
-            throw new Error('Failed to scrobble');
         }
 
         return null;

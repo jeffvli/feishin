@@ -141,13 +141,21 @@
                 "showLyricProvider": "Mostra el proveïdor de la lletra",
                 "lyricGap": "Espera entre lletres",
                 "lyricOpacityNonActive": "Opacitat de la lletra inactiva",
-                "lyricScaleNonActive": "Escala de la lletra inactiva"
+                "lyricScaleNonActive": "Escala de la lletra inactiva",
+                "lyricFollowScrollAlignment": "Les lletres segueixen l'alineament",
+                "lyricLineLeadTime": "Temps de resposta de la línia (ms)",
+                "lyricPaddingLeft": "Espai a l'esquerra de la lletra (%)",
+                "lyricPaddingRight": "Espai a la dreta de la lletra (%)"
             },
             "lyrics": "Lletres",
             "visualizer": "Visualitzador",
             "noLyrics": "No s'ha trobat cap lletra",
             "related": "Relacionat",
-            "upNext": "A continuació"
+            "upNext": "A continuació",
+            "lyricLayers": "Capes de lletra",
+            "lyricLanguage": "Llengua",
+            "showPronunciation": "Pronunciació",
+            "showTranslation": "Traducció"
         },
         "setting": {
             "advanced": "Avançat",
@@ -453,7 +461,8 @@
             "input_preferInstantMixDescription": "Utilitza només el mix instantani per obtenir cançons similars. útil si teniu complements que modifiquin aquest comportament",
             "input_preferRemoteUrl": "Prefereix l'url públic",
             "input_remoteUrl": "Url públic",
-            "input_remoteUrlPlaceholder": "Opcional: url públic per característiques externes"
+            "input_remoteUrlPlaceholder": "Opcional: url públic per característiques externes",
+            "input_passwordNoSSO": "No s'admet l'autenticació de proxy invers (SSO). Només s'admeten les autenticacions amb usuari/contrasenya i amb Subsonic"
         },
         "shareItem": {
             "description": "Descripció",
@@ -1013,7 +1022,10 @@
         "enableRomaji_description": "Mostra la pronunciació en romaji a sota de la lletra en japonès.",
         "enableRomaji": "Activa la generació de romaji",
         "windowBarTrackinfo": "Títol de la finestra d'informació de la pista",
-        "windowBarTrackinfo_description": "Mostra el títol i l'artista de la pista actual, la posició a la cua i l'estat de reproducció al títol de la finestra."
+        "windowBarTrackinfo_description": "Mostra el títol i l'artista de la pista actual, la posició a la cua i l'estat de reproducció al títol de la finestra.",
+        "audioDeviceDefault": "Predeterminat del sistema",
+        "microtonalPitchControls": "Controls de to microtonals",
+        "microtonalPitchControls_description": "Afegeix més controls de to per moure's entre semitons"
     },
     "table": {
         "column": {
@@ -1076,7 +1088,11 @@
                 "horizontalBorders": "Vores de fila",
                 "rowHoverHighlight": "Ressalta en passar el cursor per la fila",
                 "verticalBorders": "Vores de columna",
-                "showHeader": "Mostra l'encapçalament"
+                "showHeader": "Mostra l'encapçalament",
+                "albumGroupConfig": "Configuració del grup de l'àlbum",
+                "albumGroupMetadata": "Camps de metadades",
+                "albumGroupShowFavoriteRating": "Mostra preferits i qualificacions",
+                "albumImageSize": "Mida de la imatge de l'àlbum"
             },
             "label": {
                 "actions": "$t(common.action, {\"count\": 2})",

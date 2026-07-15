@@ -497,7 +497,10 @@
         "enableRomaji_description": "Muestra una línea de pronunciación en romaji debajo de las letras japonesas.",
         "enableRomaji": "Activar generación de romaji",
         "windowBarTrackinfo": "Información de la pista en el título de la ventana",
-        "windowBarTrackinfo_description": "Muestra el título y artista de la pista actual, posición en la cola, y estado reproduciendo/pausado en el título de la ventana."
+        "windowBarTrackinfo_description": "Muestra el título y artista de la pista actual, posición en la cola, y estado reproduciendo/pausado en el título de la ventana.",
+        "audioDeviceDefault": "Predeterminado del sistema",
+        "microtonalPitchControls": "Controles de tono microtonales",
+        "microtonalPitchControls_description": "Añade más controles de tono para moverse entre semitonos"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",
@@ -850,12 +853,20 @@
                 "dynamicIsImage": "Habilitar imagen de fondo",
                 "lyricOffset": "Desplazamiento de letras (ms)",
                 "lyricScaleNonActive": "Escala de letra no activa",
-                "lyricOpacityNonActive": "Opacidad de letra no activa"
+                "lyricOpacityNonActive": "Opacidad de letra no activa",
+                "lyricPaddingLeft": "Relleno a la izquierda de las letras (%)",
+                "lyricPaddingRight": "Relleno a la derecha de las letras (%)",
+                "lyricLineLeadTime": "Tiempo de respuesta de la línea (ms)",
+                "lyricFollowScrollAlignment": "Las letras siguen la alineación"
             },
             "lyrics": "Letras",
             "related": "Relacionado",
             "visualizer": "Visualizador",
-            "noLyrics": "Sin letras"
+            "noLyrics": "Sin letras",
+            "lyricLayers": "Capas de letra",
+            "lyricLanguage": "Idioma",
+            "showPronunciation": "Pronunciación",
+            "showTranslation": "Traducción"
         },
         "albumDetail": {
             "moreFromArtist": "Más de este $t(entity.artist, {\"count\": 1})",
@@ -1002,7 +1013,8 @@
             "input_preferInstantMixDescription": "Usa solo el mix instantáneo para obtener canciones similares. Útil si tienes complementos que modifican este comportamiento",
             "input_remoteUrl": "URL Pública",
             "input_preferRemoteUrl": "Preferir URL Pública",
-            "input_remoteUrlPlaceholder": "Opcional: URL pública para características externas"
+            "input_remoteUrlPlaceholder": "Opcional: URL pública para características externas",
+            "input_passwordNoSSO": "La autenticación de proxy inverso (SSO) no está soportada. Solo está soportada la autenticación por usuario/contraseña y la autenticación de Subsonic"
         },
         "addToPlaylist": {
             "success": "Añadido $t(entity.trackWithCount, {\"count\": {{message}} }) a $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -1191,7 +1203,9 @@
                 "rowHoverHighlight": "Resaltar al pasar el cursor por la fila",
                 "showHeader": "Mostrar cabecera",
                 "albumImageSize": "Tamaño de la imagen del álbum",
-                "albumGroupConfig": "Configuración del grupo del álbum"
+                "albumGroupConfig": "Configuración del grupo del álbum",
+                "albumGroupMetadata": "Campos de metadatos",
+                "albumGroupShowFavoriteRating": "Mostrar favoritos y calificaciones"
             },
             "view": {
                 "table": "Tabla",

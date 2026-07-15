@@ -37,16 +37,23 @@ export const AlbumArtistListInfiniteGrid = ({
 
     const listQueryFn = api.controller.getAlbumArtistList;
 
-    const { dataVersion, getItem, getItemIndex, itemCount, loadedItems, onRangeChanged } =
-        useItemListInfiniteLoader({
-            eventKey: ItemListKey.ALBUM_ARTIST,
-            itemsPerPage,
-            itemType: LibraryItem.ALBUM_ARTIST,
-            listCountQuery,
-            listQueryFn,
-            query,
-            serverId,
-        });
+    const {
+        dataVersion,
+        getItem,
+        getItemIndex,
+        getLoadedItems,
+        itemCount,
+        loadedItems,
+        onRangeChanged,
+    } = useItemListInfiniteLoader({
+        eventKey: ItemListKey.ALBUM_ARTIST,
+        itemsPerPage,
+        itemType: LibraryItem.ALBUM_ARTIST,
+        listCountQuery,
+        listQueryFn,
+        query,
+        serverId,
+    });
 
     const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
         enabled: saveScrollOffset,
@@ -63,6 +70,7 @@ export const AlbumArtistListInfiniteGrid = ({
             gap={gap}
             getItem={getItem}
             getItemIndex={getItemIndex}
+            getLoadedItems={getLoadedItems}
             initialTop={{
                 to: scrollOffset ?? 0,
                 type: 'offset',

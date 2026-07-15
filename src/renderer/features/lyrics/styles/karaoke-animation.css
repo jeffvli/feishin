@@ -1,0 +1,169 @@
+/* Register animatable custom properties for gradient swipe */
+@property --lyric-transition-amount-start {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 0;
+}
+
+@property --lyric-transition-amount-end {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 0;
+}
+
+.synchronized-karaoke-lyrics :is(.karaoke-line, .lyric-line).lyrics-line-active {
+    opacity: 1 !important;
+}
+
+.synchronized-karaoke-lyrics:has(.lyrics-line-active)
+    :is(.karaoke-line, .lyric-line):not(.lyrics-line-active) {
+    opacity: var(--lyric-opacity, 0.3);
+}
+
+.synchronized-karaoke-lyrics :is(.karaoke-line, .lyric-line).lyrics-line-animating {
+    opacity: 1 !important;
+}
+
+.synchronized-karaoke-lyrics :is(.karaoke-line, .lyric-line):hover {
+    opacity: 1 !important;
+}
+
+/* Word highlight via stacked text twin + gradient swipe */
+.karaoke-word {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    color: rgb(from var(--theme-colors-foreground) r g b / var(--lyric-opacity, 0.3));
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.karaoke-word:has(.karaoke-word-highlight) {
+    display: inline-grid;
+    vertical-align: baseline;
+}
+
+:is(.karaoke-line, .lyric-line).lyrics-line-active
+    .karaoke-word.sung:not(.lyrics-word-animating, .lyrics-word-pre-animating)
+    .karaoke-word-highlight {
+    opacity: 1;
+    transition: none;
+
+    --lyric-transition-amount-start: 1.4;
+    --lyric-transition-amount-end: 1.5;
+}
+
+.karaoke-line.lyrics-line-pre-animating {
+    will-change: transform;
+}
+
+.karaoke-word.karaoke-bg-vocal {
+    font-size: 0.675em;
+    font-weight: 400;
+}
+
+.karaoke-word.karaoke-overlay-word {
+    font-size: inherit;
+    font-weight: 600;
+}
+
+.karaoke-word.karaoke-overlay-pronunciation {
+    font-size: inherit;
+    font-weight: 600;
+}
+
+.karaoke-word.karaoke-overlay-translation {
+    font-size: inherit;
+    font-weight: 500;
+}
+
+.karaoke-word.karaoke-overlay-generic {
+    font-size: inherit;
+    font-weight: 500;
+}
+
+.karaoke-word-text,
+.karaoke-word-highlight {
+    grid-area: 1 / 1;
+}
+
+.karaoke-word-highlight {
+    color: transparent;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    pointer-events: none;
+    background-image: linear-gradient(
+        90deg,
+        var(--theme-colors-foreground) calc(100% * var(--lyric-transition-amount-start)),
+        #0000 calc(100% * var(--lyric-transition-amount-end) + 1px)
+    );
+    background-clip: text;
+    opacity: 0;
+    transition:
+        --lyric-transition-amount-start 1s linear 1000s,
+        --lyric-transition-amount-end 1s linear 1000s,
+        opacity 0.5s ease;
+
+    --lyric-transition-amount-start: -0.2;
+    --lyric-transition-amount-end: -0.1;
+}
+
+.karaoke-word.lyrics-word-pre-animating:not(.lyrics-word-animating) .karaoke-word-highlight {
+    opacity: 0;
+    transition: none;
+
+    --lyric-transition-amount-start: -0.2;
+    --lyric-transition-amount-end: -0.1;
+}
+
+.karaoke-word.lyrics-word-pre-animating:not(.lyrics-word-animating, .karaoke-zero-dur)
+    .karaoke-word-highlight {
+    opacity: 1;
+}
+
+.karaoke-word.lyrics-word-animating .karaoke-word-highlight {
+    opacity: 1;
+    transition-delay:
+        var(--karaoke-swipe-delay, 0s), var(--karaoke-swipe-delay, 0s),
+        var(--karaoke-anim-delay, 0s);
+    transition-timing-function: linear, linear, ease;
+    transition-duration:
+        calc(var(--karaoke-duration, 1ms) * 1.6), calc(var(--karaoke-duration, 1ms) * 1.6),
+        var(--karaoke-highlight-fade-in-duration, 0.33s);
+    transition-property: --lyric-transition-amount-start, --lyric-transition-amount-end, opacity;
+    will-change: --lyric-transition-amount-start, --lyric-transition-amount-end, opacity;
+
+    --lyric-transition-amount-start: 1.4;
+    --lyric-transition-amount-end: 1.5;
+}
+
+.karaoke-word.lyrics-word-animating.lyrics-word-paused .karaoke-word-highlight {
+    opacity: 0.5;
+    transition-duration: 100000000s, 100000000s, 100000000s;
+
+    --lyric-transition-amount-start: 10;
+    --lyric-transition-amount-end: 10;
+}
+
+.karaoke-word.karaoke-rtl .karaoke-word-highlight {
+    background-image: linear-gradient(
+        270deg,
+        var(--theme-colors-foreground) calc(100% * var(--lyric-transition-amount-start)),
+        #0000 calc(100% * var(--lyric-transition-amount-end) + 1px)
+    );
+}
+
+.karaoke-word ruby {
+    ruby-position: over;
+}
+
+.karaoke-word ruby rt {
+    font-size: 0.55em;
+    font-weight: 500;
+    line-height: 1;
+    user-select: none;
+}
+
+.karaoke-word ruby rp {
+    display: none;
+}

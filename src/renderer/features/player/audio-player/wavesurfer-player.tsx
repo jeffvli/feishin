@@ -16,6 +16,7 @@ import {
     usePlayerData,
     usePlayerMuted,
     usePlayerProperties,
+    usePlayerStoreBase,
     usePlayerVolume,
 } from '/@/renderer/store';
 import { PlayerStatus, PlayerStyle } from '/@/shared/types/types';
@@ -77,6 +78,10 @@ export function WaveSurferPlayer() {
                 return;
             }
 
+            if (num === 1) {
+                setTimestamp(e.playedSeconds);
+            }
+
             switch (transitionType) {
                 case PlayerStyle.CROSSFADE:
                     crossfadeHandler({
@@ -105,13 +110,17 @@ export function WaveSurferPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, isTransitioning, num, player2, transitionType, volume],
+        [crossfadeDuration, isTransitioning, num, player2, setTimestamp, transitionType, volume],
     );
 
     const onProgressPlayer2 = useCallback(
         (e: PlayerOnProgressProps) => {
             if (!playerRef.current?.player2()) {
                 return;
+            }
+
+            if (num === 2) {
+                setTimestamp(e.playedSeconds);
             }
 
             switch (transitionType) {
@@ -142,7 +151,7 @@ export function WaveSurferPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, isTransitioning, num, player1, transitionType, volume],
+        [crossfadeDuration, isTransitioning, num, player1, setTimestamp, transitionType, volume],
     );
 
     const handleOnEndedPlayer1 = useCallback(() => {
@@ -153,7 +162,13 @@ export function WaveSurferPlayer() {
 
         promise.then(() => {
             playerRef.current?.player1()?.ref?.pause();
-            playerRef.current?.setVolume(volume);
+
+            const currentStatus = usePlayerStoreBase.getState().player.status;
+            if (currentStatus !== PlayerStatus.PLAYING) {
+                playerRef.current?.pause();
+            } else {
+                playerRef.current?.setVolume(volume);
+            }
             setIsTransitioning(false);
         });
     }, [mediaAutoNext, volume]);
@@ -166,7 +181,13 @@ export function WaveSurferPlayer() {
 
         promise.then(() => {
             playerRef.current?.player2()?.ref?.pause();
-            playerRef.current?.setVolume(volume);
+
+            const currentStatus = usePlayerStoreBase.getState().player.status;
+            if (currentStatus !== PlayerStatus.PLAYING) {
+                playerRef.current?.pause();
+            } else {
+                playerRef.current?.setVolume(volume);
+            }
             setIsTransitioning(false);
         });
     }, [mediaAutoNext, volume]);
@@ -224,7 +245,7 @@ export function WaveSurferPlayer() {
                 transitionType === PlayerStyle.CROSSFADE ||
                 transitionType === PlayerStyle.GAPLESS
             ) {
-                setTimestamp(Number(currentTime.toFixed(0)));
+                setTimestamp(currentTime);
             }
         }, 500);
 

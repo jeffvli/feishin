@@ -34,16 +34,29 @@
 }
 
 .title {
-    display: inline-block;
+    display: block;
     width: 100%;
+    min-width: 0;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    --text-text-wrap: nowrap;
 }
 
 a.title {
-    width: auto;
+    width: 100%;
+    max-width: 100%;
+}
+
+.track-subtitle {
+    font-size: var(--theme-font-size-sm);
+    color: var(--theme-colors-foreground-muted);
+}
+
+.track-subtitle.active {
+    color: inherit;
 }
 
 

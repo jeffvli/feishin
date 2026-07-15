@@ -277,10 +277,23 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             handleMpvAutoNext(transcode);
         };
 
+        const handleTrackEnded = () => {
+            const { player } = usePlayerStore.getState();
+            // mpv often emits `stopped` before this event, which already set STOPPED
+            // via mediaStop. Still run mediaAutoNext so end-of-queue seek/reset runs.
+            if (player.status !== PlayerStatus.PLAYING && player.status !== PlayerStatus.STOPPED) {
+                return;
+            }
+
+            mediaAutoNext();
+        };
+
         mpvPlayerListener.rendererAutoNext(handleOnAutoNext);
+        mpvPlayerListener.rendererTrackEnded(handleTrackEnded);
 
         return () => {
             ipc?.removeAllListeners('renderer-player-auto-next');
+            ipc?.removeAllListeners('renderer-player-track-ended');
         };
     }, [mediaAutoNext, onEnded, transcode]);
 

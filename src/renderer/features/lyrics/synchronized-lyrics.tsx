@@ -1,390 +1,305 @@
 import clsx from 'clsx';
-import isElectron from 'is-electron';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import styles from './synchronized-lyrics.module.css';
 
-import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
+import '/@/renderer/features/lyrics/styles/synchronized-lyrics-animation.css';
 import {
-    useLyricsDisplaySettings,
-    useLyricsSettings,
-    usePlaybackType,
-    usePlayerActions,
-    usePlayerStatus,
-} from '/@/renderer/store';
-import { usePlayerTimestamp } from '/@/renderer/store/timestamp.store';
-import { FullLyricsMetadata, SynchronizedLyricsArray } from '/@/shared/types/domain-types';
-import { PlayerStatus, PlayerType } from '/@/shared/types/types';
-
-const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
-const utils = isElectron() ? window.api.utils : null;
-const mpris = isElectron() && utils?.isLinux() ? window.api.mpris : null;
+    findOverlayLineByTime,
+    getLyricLineStartMs,
+    getLyricLineText,
+    normalizeLyrics,
+} from '/@/renderer/features/lyrics/api/lyrics-utils';
+import { LyricsScrollContent } from '/@/renderer/features/lyrics/components/lyrics-scroll-content';
+import { useLyricsAnimationEngine } from '/@/renderer/features/lyrics/hooks/use-lyrics-animation-engine';
+import {
+    LYRICS_SCROLL_CONTAINER_ID,
+    useSynchronizedLyricsBase,
+} from '/@/renderer/features/lyrics/hooks/use-synchronized-lyrics-base';
+import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
+import { subscribePlayerStatus, usePlayerStoreBase } from '/@/renderer/store';
+import { subscribePlayerProgress, useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
+import {
+    FullLyricsMetadata,
+    SynchronizedLyrics as SynchronizedLyricsData,
+} from '/@/shared/types/domain-types';
+import { PlayerStatus } from '/@/shared/types/types';
 
 export interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
-    lyrics: SynchronizedLyricsArray;
+    extraOverlayLyrics?: SynchronizedLyricsData[];
+    lyrics: SynchronizedLyricsData;
     offsetMs?: number;
-    romajiLyrics?: null | SynchronizedLyricsArray;
+    pronunciationLyrics?: null | SynchronizedLyricsData;
+    romajiLyrics?: null | SynchronizedLyricsData;
     settingsKey?: string;
     style?: React.CSSProperties;
     translatedLyrics?: null | string;
+    translationLyrics?: null | SynchronizedLyricsData;
 }
+
+const SEEK_DETECT_THRESHOLD_MS = 500;
 
 export const SynchronizedLyrics = ({
     artist,
     lyrics,
     name,
     offsetMs,
-    remote,
+    pronunciationLyrics,
     romajiLyrics,
     settingsKey = 'default',
     source,
     style,
     translatedLyrics,
+    translationLyrics,
 }: SynchronizedLyricsProps) => {
-    const playbackType = usePlaybackType();
-    const lyricsSettings = useLyricsSettings();
-    const displaySettings = useLyricsDisplaySettings(settingsKey);
-    const settings = {
-        ...lyricsSettings,
-        fontSize:
-            displaySettings.fontSize && displaySettings.fontSize !== 0
-                ? displaySettings.fontSize
-                : 24,
-        gap: displaySettings.gap && displaySettings.gap !== 0 ? displaySettings.gap : 24,
-        opacityNonActive: displaySettings.opacityNonActive,
-        scaleNonActive:
-            displaySettings.scaleNonActive && displaySettings.scaleNonActive !== 0
-                ? displaySettings.scaleNonActive
-                : 0.95,
-    };
-    const { mediaSeekToTimestamp } = usePlayerActions();
-    const status = usePlayerStatus();
-    const timestamp = usePlayerTimestamp();
+    const {
+        containerRef,
+        containerStyle,
+        delayMsRef,
+        followRef,
+        followScrollAlignmentRef,
+        handleLineClick,
+        hideScrollbar,
+        lineLeadTimeMsRef,
+        lyricRef,
+        resumeAutoscroll,
+        scrollAnimStateRef,
+        settings,
+        showScrollbar,
+    } = useSynchronizedLyricsBase(settingsKey, offsetMs);
 
-    const effectiveOffsetMs = offsetMs ?? 0;
+    const normalizedLyrics = useMemo(() => normalizeLyrics(lyrics), [lyrics]);
+    const rafRef = useRef<null | number>(null);
+    const statusRef = useRef(usePlayerStoreBase.getState().player.status);
+    const lastSyncedTimeRef = useRef(0);
 
-    const handleSeek = useCallback(
-        (time: number) => {
-            if (playbackType === PlayerType.LOCAL && mpvPlayer) {
-                mpvPlayer.seekTo(time);
-            } else {
-                mpris?.updateSeek(time);
-                mediaSeekToTimestamp(time);
+    const {
+        rebuildLyricsData,
+        reset,
+        resumeAutoscroll: resumeEngineAutoscroll,
+        tick,
+    } = useLyricsAnimationEngine({
+        animStateRef: scrollAnimStateRef,
+        containerRef,
+        followRef,
+        followScrollAlignmentRef,
+        fontSize: settings.fontSize,
+        gap: settings.gap,
+        lineIdPrefix: 'lyric',
+        lineLeadTimeMsRef,
+        lyrics: normalizedLyrics,
+        paddingLeft: settings.paddingLeft,
+        paddingRight: settings.paddingRight,
+        scrollContainerId: LYRICS_SCROLL_CONTAINER_ID,
+    });
+
+    const syncAtTime = useCallback(
+        (timeInMs: number, isPlaying: boolean, forceReset = false) => {
+            if (forceReset) {
+                reset();
+                rebuildLyricsData();
             }
+
+            tick(timeInMs, isPlaying);
+            lastSyncedTimeRef.current = timeInMs;
         },
-        [mediaSeekToTimestamp, playbackType],
+        [rebuildLyricsData, reset, tick],
     );
 
-    // const seeked = useSeeked();
-
-    // A reference to the timeout handler
-    const lyricTimer = useRef<null | ReturnType<typeof setTimeout>>(null);
-
-    // A reference to the lyrics. This is necessary for the
-    // timers, which are not part of react necessarily, to always
-    // have the most updated values
-    const lyricRef = useRef<null | SynchronizedLyricsArray>(null);
-
-    // A constantly increasing value, used to tell timers that may be out of date
-    // whether to proceed or stop
-    const timerEpoch = useRef(0);
-
-    const delayMsRef = useRef(effectiveOffsetMs);
-    const followRef = useRef(settings.follow);
-    const userScrollingRef = useRef(false);
-    const scrollTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null);
-    const containerRef = useRef<HTMLDivElement | null>(null);
-    const programmaticScrollRef = useRef(false);
-    const programmaticScrollTimeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null);
-
-    const getCurrentLyric = (timeInMs: number) => {
-        const activeLyrics = lyricRef.current;
-        if (!activeLyrics?.length) {
-            return -1;
+    const stopRaf = useCallback(() => {
+        if (rafRef.current !== null) {
+            cancelAnimationFrame(rafRef.current);
+            rafRef.current = null;
         }
-
-        let index = -1;
-        for (let idx = 0; idx < activeLyrics.length; idx += 1) {
-            if (timeInMs < activeLyrics[idx][0]) {
-                break;
-            }
-            index = idx;
-        }
-
-        return index;
-    };
-
-    const setCurrentLyricRef = useRef<
-        (timeInMs: number, epoch?: number, targetIndex?: number) => void
-    >(() => {});
-
-    const setCurrentLyric = useCallback(
-        (timeInMs: number, epoch?: number, targetIndex?: number) => {
-            const start = performance.now();
-            let nextEpoch: number;
-
-            if (epoch === undefined) {
-                timerEpoch.current = (timerEpoch.current + 1) % 10000;
-                nextEpoch = timerEpoch.current;
-            } else if (epoch !== timerEpoch.current) {
-                return;
-            } else {
-                nextEpoch = epoch;
-            }
-
-            let index: number;
-
-            if (targetIndex === undefined) {
-                index = getCurrentLyric(timeInMs);
-            } else {
-                index = targetIndex;
-            }
-
-            // Directly modify the dom instead of using react to prevent rerender
-            document
-                .querySelectorAll('.synchronized-lyrics .active')
-                .forEach((node) => node.classList.remove('active'));
-
-            if (index === -1) {
-                const activeLyrics = lyricRef.current;
-                if (!activeLyrics?.length) {
-                    return;
-                }
-
-                const firstTime = activeLyrics[0][0];
-                if (timeInMs < firstTime) {
-                    const elapsed = performance.now() - start;
-                    const delay = Math.max(0, firstTime - timeInMs - elapsed);
-                    lyricTimer.current = setTimeout(() => {
-                        setCurrentLyricRef.current(firstTime, nextEpoch, 0);
-                    }, delay);
-                }
-
-                return;
-            }
-
-            const doc = document.getElementById(
-                'sychronized-lyrics-scroll-container',
-            ) as HTMLElement;
-            const currentLyric = document.querySelector(`#lyric-${index}`) as HTMLElement;
-
-            const offsetTop = currentLyric?.offsetTop - doc?.clientHeight / 2 || 0;
-
-            if (currentLyric === null) {
-                return;
-            }
-
-            currentLyric.classList.add('active');
-
-            if (followRef.current && !userScrollingRef.current) {
-                programmaticScrollRef.current = true;
-                doc?.scroll({ behavior: 'smooth', top: offsetTop });
-            }
-
-            if (index !== lyricRef.current!.length - 1) {
-                const nextTime = lyricRef.current![index + 1][0];
-
-                const elapsed = performance.now() - start;
-
-                lyricTimer.current = setTimeout(
-                    () => {
-                        setCurrentLyricRef.current(nextTime, nextEpoch, index + 1);
-                    },
-                    nextTime - timeInMs - elapsed,
-                );
-            }
-        },
-        [],
-    );
-
-    // Store the callback in a ref so it can be called recursively
-    useEffect(() => {
-        setCurrentLyricRef.current = setCurrentLyric;
-    }, [setCurrentLyric]);
-
-    useEffect(() => {
-        // Copy the follow settings into a ref that can be accessed in the timeout
-        followRef.current = settings.follow;
-    }, [settings.follow]);
-
-    useEffect(() => {
-        // This handler is used to handle when lyrics change. It is in some sense the
-        // 'primary' handler for parsing lyrics, as unlike the other callbacks, it will
-        // ALSO remove listeners on close.
-        lyricRef.current = lyrics;
-
-        if (status === PlayerStatus.PLAYING) {
-            // Use the current timestamp from player events
-            setCurrentLyric(timestamp * 1000 + delayMsRef.current);
-
-            return () => {
-                // Cleanup: clear the timer when lyrics change or component unmounts
-                if (lyricTimer.current) clearTimeout(lyricTimer.current);
-            };
-        }
-
-        return () => {};
-    }, [lyrics, setCurrentLyric, status, timestamp]);
-
-    useEffect(() => {
-        // This handler is used to deal with changes to the current delay. If the offset
-        // changes, we should immediately stop the current listening set and calculate
-        // the correct one using the new offset. Afterwards, timing can be calculated like normal
-        const newOffset = offsetMs ?? 0;
-        const changed = delayMsRef.current !== newOffset;
-
-        if (!changed) {
-            return;
-        }
-
-        if (lyricTimer.current) {
-            clearTimeout(lyricTimer.current);
-        }
-
-        delayMsRef.current = newOffset;
-
-        // Use the current timestamp from player events
-        setCurrentLyric(timestamp * 1000 + delayMsRef.current);
-    }, [setCurrentLyric, offsetMs, timestamp]);
-
-    useEffect(() => {
-        // This handler is used specifically for dealing with seeking and progress updates.
-        // When the timestamp changes, update the current lyric position.
-        if (status !== PlayerStatus.PLAYING) {
-            if (lyricTimer.current) {
-                clearTimeout(lyricTimer.current);
-            }
-
-            return;
-        }
-
-        if (lyricTimer.current) {
-            clearTimeout(lyricTimer.current);
-        }
-
-        setCurrentLyric(timestamp * 1000 + delayMsRef.current);
-    }, [timestamp, setCurrentLyric, status]);
-
-    useEffect(() => {
-        // Guaranteed cleanup; stop the timer, and just in case also increment
-        // the epoch to instruct any dangling timers to stop
-        if (lyricTimer.current) {
-            clearTimeout(lyricTimer.current);
-        }
-
-        timerEpoch.current += 1;
     }, []);
 
-    // Handle manual scrolling - pause auto-scroll when user scrolls
-    useEffect(() => {
-        const container =
-            containerRef.current ||
-            (document.getElementById('sychronized-lyrics-scroll-container') as HTMLElement);
-        if (!container) return;
+    const startRaf = useCallback(() => {
+        stopRaf();
 
-        const handleScroll = () => {
-            // Ignore programmatic scrolls (auto-scroll)
-            if (programmaticScrollRef.current) {
-                if (programmaticScrollTimeoutRef.current) {
-                    clearTimeout(programmaticScrollTimeoutRef.current);
-                }
-
-                programmaticScrollTimeoutRef.current = setTimeout(() => {
-                    programmaticScrollRef.current = false;
-                }, 150);
-
+        const runTick = () => {
+            if (statusRef.current !== PlayerStatus.PLAYING) {
+                stopRaf();
                 return;
             }
 
-            userScrollingRef.current = true;
+            const timestamp = useTimestampStoreBase.getState().timestamp;
+            const timeInMs = timestamp * 1000 + delayMsRef.current;
 
-            if (scrollTimeoutRef.current) {
-                clearTimeout(scrollTimeoutRef.current);
+            if (Math.abs(timeInMs - lastSyncedTimeRef.current) > SEEK_DETECT_THRESHOLD_MS) {
+                resumeAutoscroll();
+                resumeEngineAutoscroll();
+                syncAtTime(timeInMs, true, true);
+            } else {
+                syncAtTime(timeInMs, true);
             }
 
-            // Re-enable auto-scroll after 3 seconds of no scrolling
-            scrollTimeoutRef.current = setTimeout(() => {
-                userScrollingRef.current = false;
-            }, 3000);
+            rafRef.current = requestAnimationFrame(runTick);
         };
 
-        container.addEventListener('scroll', handleScroll, { passive: true });
+        rafRef.current = requestAnimationFrame(runTick);
+    }, [delayMsRef, resumeAutoscroll, resumeEngineAutoscroll, stopRaf, syncAtTime]);
+
+    const syncFromCurrentTimestamp = useCallback(() => {
+        const timestamp = useTimestampStoreBase.getState().timestamp;
+        const isPlaying = statusRef.current === PlayerStatus.PLAYING;
+        syncAtTime(timestamp * 1000 + delayMsRef.current, isPlaying, true);
+    }, [delayMsRef, syncAtTime]);
+
+    useEffect(() => {
+        lyricRef.current = normalizedLyrics;
+        lastSyncedTimeRef.current = 0;
+
+        const frame = requestAnimationFrame(() => {
+            rebuildLyricsData();
+
+            if (statusRef.current === PlayerStatus.PLAYING) {
+                startRaf();
+            } else {
+                syncFromCurrentTimestamp();
+            }
+        });
 
         return () => {
-            container.removeEventListener('scroll', handleScroll);
-            if (scrollTimeoutRef.current) {
-                clearTimeout(scrollTimeoutRef.current);
-            }
-
-            if (programmaticScrollTimeoutRef.current) {
-                clearTimeout(programmaticScrollTimeoutRef.current);
-            }
+            cancelAnimationFrame(frame);
+            stopRaf();
+            reset();
         };
-    }, []);
+    }, [
+        lyricRef,
+        normalizedLyrics,
+        rebuildLyricsData,
+        reset,
+        startRaf,
+        stopRaf,
+        syncFromCurrentTimestamp,
+    ]);
 
-    const hideScrollbar = () => {
-        const doc = document.getElementById('sychronized-lyrics-scroll-container') as HTMLElement;
-        doc.classList.add('hide-scrollbar');
-    };
+    useEffect(() => {
+        syncFromCurrentTimestamp();
+    }, [offsetMs, syncFromCurrentTimestamp]);
 
-    const showScrollbar = () => {
-        const doc = document.getElementById('sychronized-lyrics-scroll-container') as HTMLElement;
-        doc.classList.remove('hide-scrollbar');
+    useEffect(() => {
+        statusRef.current = usePlayerStoreBase.getState().player.status;
+
+        const unsubscribe = subscribePlayerStatus(({ status }) => {
+            statusRef.current = status;
+
+            if (status !== PlayerStatus.PLAYING) {
+                stopRaf();
+                syncFromCurrentTimestamp();
+                return;
+            }
+
+            startRaf();
+        });
+
+        return unsubscribe;
+    }, [startRaf, stopRaf, syncFromCurrentTimestamp]);
+
+    useEffect(() => {
+        const unsubscribe = subscribePlayerProgress(({ timestamp }) => {
+            const timeInMs = timestamp * 1000 + delayMsRef.current;
+            const isPlaying = statusRef.current === PlayerStatus.PLAYING;
+
+            if (!isPlaying) {
+                syncAtTime(timeInMs, false, true);
+                return;
+            }
+
+            if (Math.abs(timeInMs - lastSyncedTimeRef.current) > SEEK_DETECT_THRESHOLD_MS) {
+                resumeAutoscroll();
+                resumeEngineAutoscroll();
+                syncAtTime(timeInMs, true, true);
+            }
+        });
+
+        return unsubscribe;
+    }, [delayMsRef, resumeAutoscroll, resumeEngineAutoscroll, syncAtTime]);
+
+    const handleContainerClick = useCallback(
+        (event: React.MouseEvent<HTMLDivElement>) => {
+            resumeAutoscroll();
+            resumeEngineAutoscroll();
+            handleLineClick(event);
+        },
+        [handleLineClick, resumeAutoscroll, resumeEngineAutoscroll],
+    );
+
+    const getOverlayText = (
+        overlayLyrics: null | SynchronizedLyricsData | undefined,
+        startMs: number,
+        lineIndex: number,
+        fallback?: null | string,
+    ) => {
+        if (overlayLyrics) {
+            return findOverlayLineByTime(overlayLyrics, startMs, lineIndex);
+        }
+
+        return fallback;
     };
 
     return (
         <div
             className={clsx(styles.container, 'synchronized-lyrics overlay-scrollbar')}
-            id="sychronized-lyrics-scroll-container"
+            id={LYRICS_SCROLL_CONTAINER_ID}
+            onClick={handleContainerClick}
             onMouseEnter={showScrollbar}
             onMouseLeave={hideScrollbar}
             ref={containerRef}
-            style={
-                {
-                    // opacity/scale is set here for every lyric,
-                    // and then overwritten by CSS for active lyrics
-                    // to prevent expensive rerenders each lyric
-                    '--lyric-opacity': settings.opacityNonActive,
-                    '--lyric-scale': settings.scaleNonActive,
-                    '--lyric-scale-origin': settings.alignment,
-                    gap: `${settings.gap}px`,
-                    ...style,
-                } as React.CSSProperties
-            }
+            style={{ ...containerStyle, ...style }}
         >
-            {settings.showProvider && source && (
-                <LyricLine
-                    alignment={settings.alignment}
-                    className="lyric-credit"
-                    fontSize={settings.fontSize}
-                    text={`Provided by ${source}`}
-                />
-            )}
-            {settings.showMatch && remote && (
-                <LyricLine
-                    alignment={settings.alignment}
-                    className="lyric-credit"
-                    fontSize={settings.fontSize}
-                    text={`"${name} by ${artist}"`}
-                />
-            )}
-            {lyrics.map(([time, text], idx) => (
-                <LyricLine
-                    alignment={settings.alignment}
-                    className="lyric-line synchronized"
-                    fontSize={settings.fontSize}
-                    id={`lyric-${idx}`}
-                    key={idx}
-                    onClick={() => {
-                        if (time > 0 && Number.isFinite(time)) {
-                            handleSeek(time / 1000);
-                        }
-                    }}
-                    romajiText={romajiLyrics?.[idx]?.[1]}
-                    text={text}
-                    translatedText={translatedLyrics?.split('\n')[idx]}
-                />
-            ))}
+            <LyricsScrollContent
+                gap={settings.gap}
+                paddingLeft={settings.paddingLeft}
+                paddingRight={settings.paddingRight}
+            >
+                {settings.showProvider && source && (
+                    <LyricLine
+                        alignment={settings.alignment}
+                        className="lyric-credit"
+                        fontSize={settings.fontSize}
+                        text={`${source}`}
+                    />
+                )}
+                {settings.showMatch && (
+                    <LyricLine
+                        alignment={settings.alignment}
+                        className="lyric-credit"
+                        fontSize={settings.fontSize}
+                        text={`${name} — ${artist}`}
+                    />
+                )}
+                {normalizedLyrics.map((rawLine, idx) => {
+                    const lineStartMs = getLyricLineStartMs(rawLine);
+                    const lineText = getLyricLineText(rawLine);
+                    const pronunciationText = getOverlayText(
+                        pronunciationLyrics,
+                        lineStartMs,
+                        idx,
+                        romajiLyrics?.[idx] ? getLyricLineText(romajiLyrics[idx]) : undefined,
+                    );
+                    const translationText = getOverlayText(
+                        translationLyrics,
+                        lineStartMs,
+                        idx,
+                        translatedLyrics?.split('\n')[idx],
+                    );
+
+                    return (
+                        <LyricLine
+                            alignment={settings.alignment}
+                            className="lyric-line synchronized"
+                            data-lyric-time={lineStartMs}
+                            fontSize={settings.fontSize}
+                            id={`lyric-${idx}`}
+                            key={idx}
+                            romajiText={pronunciationText}
+                            text={lineText}
+                            translatedText={translationText}
+                        />
+                    );
+                })}
+            </LyricsScrollContent>
         </div>
     );
 };

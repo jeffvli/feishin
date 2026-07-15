@@ -495,7 +495,12 @@
         "compressorThreshold_description": "Úroveň signálu, nad kterou začne komprese.",
         "compressorThreshold": "Hranice",
         "enableRomaji_description": "Zobrazit rómadži výslovnost pod japonskými texty.",
-        "enableRomaji": "Povolit generování rómadži"
+        "enableRomaji": "Povolit generování rómadži",
+        "windowBarTrackinfo_description": "Zobrazit v titulku okna umělce a název aktuální skladby, její pozici ve frontě a stav Přehrává se/Pozastaveno.",
+        "windowBarTrackinfo": "Informace o skladbě v titulku okna",
+        "audioDeviceDefault": "Podle systému",
+        "microtonalPitchControls": "Ovládání mikrotonální výšky tónu",
+        "microtonalPitchControls_description": "Přidat další ovládání výšky mezi půltóny"
     },
     "action": {
         "editPlaylist": "Upravit $t(entity.playlist, {\"count\": 1})",
@@ -712,7 +717,11 @@
                 "horizontalBorders": "Okraje řádků",
                 "rowHoverHighlight": "Zvýraznění řádku při přejetí myší",
                 "verticalBorders": "Okraje sloupců",
-                "showHeader": "Zobrazit záhlaví"
+                "showHeader": "Zobrazit záhlaví",
+                "albumImageSize": "Velikost obrázku alba",
+                "albumGroupConfig": "Nastavení skupiny alb",
+                "albumGroupShowFavoriteRating": "Zobrazit oblíbené a hodnocení",
+                "albumGroupMetadata": "Pole metadat"
             },
             "label": {
                 "releaseDate": "Datum vydání",
@@ -901,13 +910,21 @@
                 "dynamicIsImage": "Povolit obrázek na pozadí",
                 "lyricOffset": "Posunutí textů (ms)",
                 "lyricOpacityNonActive": "Neprůhlednost neaktivních textů",
-                "lyricScaleNonActive": "Velikost neaktivních textů"
+                "lyricScaleNonActive": "Velikost neaktivních textů",
+                "lyricFollowScrollAlignment": "Zarovnání sledování textů",
+                "lyricLineLeadTime": "Doba vedení řádku (ms)",
+                "lyricPaddingLeft": "Odsazení textů zleva (%)",
+                "lyricPaddingRight": "Odsazení textů zprava (%)"
             },
             "upNext": "Další",
             "lyrics": "Texty",
             "related": "Související",
             "visualizer": "Vizualizér",
-            "noLyrics": "Nenalezeny žádné texty"
+            "noLyrics": "Nenalezeny žádné texty",
+            "lyricLanguage": "Jazyk",
+            "showPronunciation": "Výslovnost",
+            "showTranslation": "Překlad",
+            "lyricLayers": "Vrstvy textů"
         },
         "appMenu": {
             "selectServer": "Vybrat server",
@@ -1109,7 +1126,8 @@
             "input_preferInstantMixDescription": "Pro získání podobných skladeb použít pouze instantní mix. užitečné, pokud máte doplňky, které upravují toto chování",
             "input_preferRemoteUrl": "Preferovat veřejnou adresu url",
             "input_remoteUrl": "Veřejná adresa url",
-            "input_remoteUrlPlaceholder": "Volitelné: veřejná adresa url pro externí funkce"
+            "input_remoteUrlPlaceholder": "Volitelné: veřejná adresa url pro externí funkce",
+            "input_passwordNoSSO": "Autentifikace skrze reverzní proxy (SSO) není podporována. Podporována je pouze autentifikace pomocí uživatelského jména a hesla s Subsonic"
         },
         "addToPlaylist": {
             "success": "$t(entity.trackWithCount, {\"count\": {{message}} }) přidáno do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",

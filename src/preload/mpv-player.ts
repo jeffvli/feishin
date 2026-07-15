@@ -102,6 +102,10 @@ const getAudioDevices = async () => {
     return ipcRenderer.invoke('player-get-audio-devices');
 };
 
+const rendererTrackEnded = (cb: () => void) => {
+    ipcRenderer.on('renderer-player-track-ended', () => cb());
+};
+
 const rendererAutoNext = (cb: (data: PlayerData) => void) => {
     ipcRenderer.on('renderer-player-auto-next', (_, data) => cb(data));
 };
@@ -222,6 +226,7 @@ export const mpvPlayerListener = {
     rendererStop,
     rendererToggleRepeat,
     rendererToggleShuffle,
+    rendererTrackEnded,
     rendererVolumeDown,
     rendererVolumeMute,
     rendererVolumeUp,

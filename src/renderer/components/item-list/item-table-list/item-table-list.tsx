@@ -45,7 +45,11 @@ import { useTablePaneSync } from '/@/renderer/components/item-list/item-table-li
 import { useTableRowModel } from '/@/renderer/components/item-list/item-table-list/hooks/use-table-row-model';
 import { useTableScrollToIndex } from '/@/renderer/components/item-list/item-table-list/hooks/use-table-scroll-to-index';
 import {
+    estimateAlbumGroupContentHeight,
+    getAlbumGroupHeightKey,
     getAlbumGroupRowCount,
+    getAlbumGroupSpanHeight,
+    getAlbumGroupStartRowIndex,
     isLastInAlbumGroup,
     ItemTableListColumn,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
@@ -70,7 +74,13 @@ import {
     ItemTableListColumnConfig,
 } from '/@/renderer/components/item-list/types';
 import { PlayerContext, usePlayer } from '/@/renderer/features/player/context/player-context';
-import { useAlbumGroupImageSize, usePlayerStore } from '/@/renderer/store';
+import {
+    useAlbumGroupImageSize,
+    useAlbumGroupItems,
+    useAlbumGroupShowFavoriteRating,
+    useAlbumGroupVerticalLayout,
+    usePlayerStore,
+} from '/@/renderer/store';
 import { animationProps } from '/@/shared/components/animations/animation-props';
 import { useFocusWithin } from '/@/shared/hooks/use-focus-within';
 import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
@@ -116,25 +126,6 @@ export enum TableItemSize {
     LARGE = 88,
 }
 
-const ItemTableScrollShadowTop = memo(function ItemTableScrollShadowTop({
-    enableHeader,
-    enableScrollShadow,
-    scrollShadowStore,
-}: {
-    enableHeader: boolean;
-    enableScrollShadow: boolean;
-    scrollShadowStore: TableScrollShadowStore;
-}) {
-    const { showTopShadow } = useSyncExternalStore(
-        scrollShadowStore.subscribe,
-        scrollShadowStore.getSnapshot,
-    );
-    if (!enableHeader || !enableScrollShadow || !showTopShadow) return null;
-    return <div className={styles.itemTableTopScrollShadow} />;
-});
-
-ItemTableScrollShadowTop.displayName = 'ItemTableScrollShadowTop';
-
 const ItemTableScrollShadowLeft = memo(function ItemTableScrollShadowLeft({
     enableScrollShadow,
     pinnedLeftColumnCount,
@@ -174,11 +165,13 @@ const ItemTableScrollShadowRight = memo(function ItemTableScrollShadowRight({
 ItemTableScrollShadowRight.displayName = 'ItemTableScrollShadowRight';
 
 interface VirtualizedTableGridProps {
+    albumGroupContentHeights: Map<string, number>;
     calculatedColumnWidths: number[];
     CellComponent: JSXElementConstructor<CellComponentProps<TableItemProps>>;
     data: unknown[];
     dataWithGroups: (null | unknown)[];
     enableScrollShadow: boolean;
+    estimatedAlbumGroupContentHeight: number;
     getItem?: (index: number) => undefined | unknown;
     headerHeight: number;
     mergedRowRef: React.Ref<HTMLDivElement>;
@@ -191,17 +184,20 @@ interface VirtualizedTableGridProps {
     pinnedRowCount: number;
     pinnedRowRef: React.RefObject<HTMLDivElement | null>;
     scrollShadowStore: TableScrollShadowStore;
+    setAlbumGroupContentHeight: (groupKey: string, height: number) => void;
     tableConfig: ItemTableListConfig;
     totalColumnCount: number;
     totalRowCount: number;
 }
 
 const VirtualizedTableGrid = ({
+    albumGroupContentHeights,
     calculatedColumnWidths,
     CellComponent,
     data,
     dataWithGroups,
     enableScrollShadow,
+    estimatedAlbumGroupContentHeight,
     getItem,
     headerHeight,
     mergedRowRef,
@@ -214,12 +210,14 @@ const VirtualizedTableGrid = ({
     pinnedRowCount,
     pinnedRowRef,
     scrollShadowStore,
+    setAlbumGroupContentHeight,
     tableConfig,
     totalColumnCount,
     totalRowCount,
 }: VirtualizedTableGridProps) => {
     const { enableHeader, enableRowHoverHighlight, getRowHeight, groups } = tableConfig;
     const albumGroupImageSize = useAlbumGroupImageSize();
+    const albumGroupVerticalLayout = useAlbumGroupVerticalLayout();
     const hoverDelegateRef = useRef<HTMLDivElement | null>(null);
 
     useRowInteractionDelegate({
@@ -377,41 +375,16 @@ const VirtualizedTableGrid = ({
         ],
     );
 
-    const gridOnlyProps = useMemo(
-        () => ({
-            calculatedColumnWidths,
-            data: dataWithGroups,
-            getAdjustedRowIndex,
-            getGroupRenderData,
-            getRowItem,
-            groupHeaderInfoByRowIndex,
-            hasAlbumGroupColumn: parsedColumns.some((col) => col.id === TableColumn.ALBUM_GROUP),
-            pinnedLeftColumnCount,
-            pinnedLeftColumnWidths,
-            pinnedRightColumnCount,
-            pinnedRightColumnWidths,
-        }),
-        [
-            calculatedColumnWidths,
-            dataWithGroups,
-            getRowItem,
-            getAdjustedRowIndex,
-            getGroupRenderData,
-            groupHeaderInfoByRowIndex,
-            parsedColumns,
-            pinnedLeftColumnCount,
-            pinnedLeftColumnWidths,
-            pinnedRightColumnCount,
-            pinnedRightColumnWidths,
-        ],
-    );
-
     const itemProps: TableItemProps = useMemo(
         () => ({
+            albumGroupContentHeights,
             albumGroupImageSize,
+            albumGroupVerticalLayout,
+            calculatedColumnWidths,
             cellPadding: tableConfig.cellPadding,
             columns: tableConfig.columns,
             controls: tableConfig.controls,
+            data: dataWithGroups,
             enableAlternateRowColors: tableConfig.enableAlternateRowColors,
             enableColumnReorder: tableConfig.enableColumnReorder,
             enableColumnResize: tableConfig.enableColumnResize,
@@ -422,18 +395,46 @@ const VirtualizedTableGrid = ({
             enableRowHoverHighlight: tableConfig.enableRowHoverHighlight,
             enableSelection: tableConfig.enableSelection,
             enableVerticalBorders: tableConfig.enableVerticalBorders,
+            estimatedAlbumGroupContentHeight,
+            getAdjustedRowIndex,
+            getGroupRenderData,
             getRowHeight: tableConfig.getRowHeight,
+            getRowItem,
+            groupHeaderInfoByRowIndex,
             groups: tableConfig.groups,
+            hasAlbumGroupColumn: parsedColumns.some((col) => col.id === TableColumn.ALBUM_GROUP),
             internalState: tableConfig.internalState,
             itemType: tableConfig.itemType,
+            pinnedLeftColumnCount,
+            pinnedLeftColumnWidths,
+            pinnedRightColumnCount,
+            pinnedRightColumnWidths,
             playerContext: tableConfig.playerContext,
             playlistId: tableConfig.playlistId,
+            setAlbumGroupContentHeight,
             size: tableConfig.size,
             startRowIndex: tableConfig.startRowIndex,
             tableId: tableConfig.tableId,
-            ...gridOnlyProps,
         }),
-        [albumGroupImageSize, gridOnlyProps, tableConfig],
+        [
+            albumGroupContentHeights,
+            albumGroupImageSize,
+            albumGroupVerticalLayout,
+            calculatedColumnWidths,
+            dataWithGroups,
+            estimatedAlbumGroupContentHeight,
+            getAdjustedRowIndex,
+            getGroupRenderData,
+            getRowItem,
+            groupHeaderInfoByRowIndex,
+            parsedColumns,
+            pinnedLeftColumnCount,
+            pinnedLeftColumnWidths,
+            pinnedRightColumnCount,
+            pinnedRightColumnWidths,
+            setAlbumGroupContentHeight,
+            tableConfig,
+        ],
     );
 
     const pinnedLeftGridMinWidthPx = useMemo(() => {
@@ -565,11 +566,6 @@ const VirtualizedTableGrid = ({
                         />
                     </div>
                 )}
-                <ItemTableScrollShadowTop
-                    enableHeader={!!enableHeader}
-                    enableScrollShadow={enableScrollShadow}
-                    scrollShadowStore={scrollShadowStore}
-                />
                 {!!pinnedLeftColumnCount && (
                     <div
                         className={styles.itemTablePinnedColumnsContainer}
@@ -624,11 +620,6 @@ const VirtualizedTableGrid = ({
                         />
                     </div>
                 )}
-                <ItemTableScrollShadowTop
-                    enableHeader={!!enableHeader}
-                    enableScrollShadow={enableScrollShadow}
-                    scrollShadowStore={scrollShadowStore}
-                />
                 <div className={styles.itemTableGridContainer} ref={mergedRowRef}>
                     <Grid
                         cellComponent={RowCell}
@@ -687,11 +678,6 @@ const VirtualizedTableGrid = ({
                             />
                         </div>
                     )}
-                    <ItemTableScrollShadowTop
-                        enableHeader={!!enableHeader}
-                        enableScrollShadow={enableScrollShadow}
-                        scrollShadowStore={scrollShadowStore}
-                    />
                     <div
                         className={styles.itemTablePinnedRightColumnsContainer}
                         ref={pinnedRightColumnRef}
@@ -729,6 +715,9 @@ const MemoizedVirtualizedTableGrid = memo(VirtualizedTableGrid, (prevProps, next
             prevProps.calculatedColumnWidths,
             nextProps.calculatedColumnWidths,
         ) &&
+        prevProps.albumGroupContentHeights === nextProps.albumGroupContentHeights &&
+        prevProps.estimatedAlbumGroupContentHeight === nextProps.estimatedAlbumGroupContentHeight &&
+        prevProps.setAlbumGroupContentHeight === nextProps.setAlbumGroupContentHeight &&
         prevProps.tableConfig === nextProps.tableConfig &&
         prevProps.data === nextProps.data &&
         prevProps.dataWithGroups === nextProps.dataWithGroups &&
@@ -766,7 +755,9 @@ export interface TableGroupHeader {
 
 export interface TableItemProps {
     adjustedRowIndexMap?: Map<number, number>;
+    albumGroupContentHeights?: Map<string, number>;
     albumGroupImageSize?: number;
+    albumGroupVerticalLayout?: boolean;
     calculatedColumnWidths?: number[];
     cellPadding?: ItemTableListProps['cellPadding'];
     columns: ItemTableListColumnConfig[];
@@ -783,6 +774,7 @@ export interface TableItemProps {
     enableRowHoverHighlight?: ItemTableListProps['enableRowHoverHighlight'];
     enableSelection?: ItemTableListProps['enableSelection'];
     enableVerticalBorders?: ItemTableListProps['enableVerticalBorders'];
+    estimatedAlbumGroupContentHeight?: number;
     getAdjustedRowIndex?: (rowIndex: number) => number;
     getGroupRenderData?: () => unknown[];
     getRowHeight: (index: number, cellProps: TableItemProps) => number;
@@ -799,6 +791,7 @@ export interface TableItemProps {
     pinnedRightColumnWidths?: number[];
     playerContext: PlayerContext;
     playlistId?: string;
+    setAlbumGroupContentHeight?: (groupKey: string, height: number) => void;
     size?: ItemTableListProps['size'];
     startRowIndex?: number;
     tableId: string;
@@ -807,6 +800,7 @@ export interface TableItemProps {
 interface ItemTableListProps {
     activeRowId?: string;
     autoFitColumns?: boolean;
+    autoScrollToActiveRow?: boolean;
     CellComponent?: JSXElementConstructor<CellComponentProps<TableItemProps>>;
     cellPadding?: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     columns: ItemTableListColumnConfig[];
@@ -827,6 +821,7 @@ interface ItemTableListProps {
     enableVerticalBorders?: boolean;
     getItem?: (index: number) => undefined | unknown;
     getItemIndex?: (rowId: string) => number | undefined;
+    getLoadedItems?: () => unknown[];
     getRowId?: ((item: unknown) => string) | string;
     groups?: TableGroupHeader[];
     headerHeight?: number;
@@ -1245,6 +1240,7 @@ ItemTableListStickyUI.displayName = 'ItemTableListStickyUI';
 const BaseItemTableList = ({
     activeRowId,
     autoFitColumns = false,
+    autoScrollToActiveRow = false,
     CellComponent = ItemTableListColumn,
     cellPadding = 'sm',
     columns,
@@ -1264,6 +1260,7 @@ const BaseItemTableList = ({
     enableVerticalBorders = false,
     getItem,
     getItemIndex,
+    getLoadedItems,
     getRowId,
     groups,
     headerHeight = 40,
@@ -1283,7 +1280,39 @@ const BaseItemTableList = ({
     const { playlistId: routePlaylistId } = useParams() as { playlistId?: string };
     const tableId = useId();
     const albumGroupImageSize = useAlbumGroupImageSize();
+    const albumGroupItems = useAlbumGroupItems();
+    const albumGroupShowFavoriteRating = useAlbumGroupShowFavoriteRating();
+    const albumGroupVerticalLayout = useAlbumGroupVerticalLayout();
+    const albumGroupMetadataRowCount = useMemo(
+        () => albumGroupItems.filter((item) => !item.disabled).length,
+        [albumGroupItems],
+    );
+    const estimatedAlbumGroupContentHeight = useMemo(
+        () =>
+            estimateAlbumGroupContentHeight({
+                metadataRowCount: albumGroupMetadataRowCount,
+                showControls: albumGroupShowFavoriteRating,
+            }),
+        [albumGroupMetadataRowCount, albumGroupShowFavoriteRating],
+    );
     const baseItemCount = itemCount ?? data.length;
+    const [albumGroupContentHeights, setAlbumGroupContentHeights] = useState(
+        () => new Map<string, number>(),
+    );
+
+    const setAlbumGroupContentHeight = useCallback((groupKey: string, height: number) => {
+        setAlbumGroupContentHeights((prev) => {
+            if (prev.get(groupKey) === height) return prev;
+            const next = new Map(prev);
+            next.set(groupKey, height);
+            return next;
+        });
+    }, []);
+
+    useEffect(() => {
+        setAlbumGroupContentHeights(new Map());
+    }, [albumGroupShowFavoriteRating, albumGroupVerticalLayout, baseItemCount]);
+
     const totalItemCount = enableHeader ? baseItemCount + 1 : baseItemCount;
     const [centerContainerWidth, setCenterContainerWidth] = useState(0);
     const [totalContainerWidth, setTotalContainerWidth] = useState(0);
@@ -1383,47 +1412,10 @@ const BaseItemTableList = ({
         onScrollEndRef.current = onScrollEnd;
     }, [onScrollEnd]);
 
-    const {
-        calculateScrollTopForIndex,
-        DEFAULT_ROW_HEIGHT,
-        scrollToTableIndex,
-        scrollToTableOffset,
-    } = useTableScrollToIndex({
-        cellPadding,
-        columns: parsedColumns,
-        data,
-        enableAlternateRowColors,
-        enableExpansion,
-        enableHeader,
-        enableHorizontalBorders,
-        enableRowHoverHighlight,
-        enableSelection,
-        enableVerticalBorders,
-        itemType,
-        pinnedLeftColumnRef,
-        pinnedRightColumnRef,
-        playerContext,
-        rowHeight,
-        rowRef,
-        size,
-        tableId,
-    });
-
-    useTablePaneSync({
-        enableDrag,
-        enableDragScroll,
-        enableHeader,
-        handleRef,
-        onScrollEndRef,
-        pinnedLeftColumnCount,
-        pinnedLeftColumnRef,
-        pinnedRightColumnCount,
-        pinnedRightColumnRef,
-        pinnedRowRef,
-        rowRef,
-        scrollContainerRef,
-        scrollShadowStore,
-    });
+    const hasAlbumGroupColumn = useMemo(
+        () => parsedColumns.some((col) => col.id === TableColumn.ALBUM_GROUP),
+        [parsedColumns],
+    );
 
     const getRowHeight = useCallback(
         (index: number, cellProps: TableItemProps) => {
@@ -1442,12 +1434,10 @@ const BaseItemTableList = ({
                 return headerHeight;
             }
 
-            // When an album image is enlarged beyond the album group's combined
-            // row height, grow the group's LAST row to reserve the leftover
-            // space (so the following album isn't clipped). Other rows keep
-            // their standard height.
+            // Grow the group's LAST row when the album image or wrapped album
+            // info (title + artists + controls) needs more than the standard
+            // combined row height. Other rows keep their standard height.
             if (
-                albumGroupImageSize > baseHeight &&
                 cellProps?.hasAlbumGroupColumn &&
                 isLastInAlbumGroup(
                     index,
@@ -1464,7 +1454,28 @@ const BaseItemTableList = ({
                         cellProps.enableHeader,
                         cellProps.data.length,
                     );
-                    const lastRowHeight = albumGroupImageSize - (groupRowCount - 1) * baseHeight;
+                    const groupStartRowIndex = getAlbumGroupStartRowIndex(
+                        index,
+                        cellProps.getRowItem,
+                        cellProps.enableHeader,
+                    );
+                    const groupStartItem = cellProps.getRowItem?.(groupStartRowIndex);
+                    const groupHeightKey = getAlbumGroupHeightKey(groupStartItem, groupRowCount);
+                    const measuredContentHeight = groupHeightKey
+                        ? cellProps.albumGroupContentHeights?.get(groupHeightKey)
+                        : undefined;
+                    // Prefer measured info height once available; otherwise reserve with a
+                    // stable estimate so newly virtualized groups do not jump after mount.
+                    // Controls-row min-height covers favorites/ratings before the album loads.
+                    const contentHeight = measuredContentHeight ?? estimatedAlbumGroupContentHeight;
+                    const totalGroupHeight = getAlbumGroupSpanHeight(
+                        groupRowCount,
+                        baseHeight,
+                        albumGroupImageSize,
+                        contentHeight,
+                        { isVertical: albumGroupVerticalLayout },
+                    );
+                    const lastRowHeight = totalGroupHeight - (groupRowCount - 1) * baseHeight;
                     if (lastRowHeight > baseHeight) {
                         return lastRowHeight;
                     }
@@ -1473,8 +1484,125 @@ const BaseItemTableList = ({
 
             return baseHeight;
         },
-        [albumGroupImageSize, enableHeader, headerHeight, rowHeight, pinnedRowCount, size],
+        [
+            albumGroupImageSize,
+            albumGroupVerticalLayout,
+            enableHeader,
+            estimatedAlbumGroupContentHeight,
+            headerHeight,
+            rowHeight,
+            pinnedRowCount,
+            size,
+        ],
     );
+
+    const scrollCellProps = useMemo<TableItemProps>(
+        () => ({
+            albumGroupContentHeights,
+            albumGroupImageSize,
+            albumGroupVerticalLayout,
+            cellPadding,
+            columns: parsedColumns,
+            controls: {} as ItemControls,
+            data: dataWithGroups,
+            enableAlternateRowColors,
+            enableExpansion,
+            enableHeader,
+            enableHorizontalBorders,
+            enableRowHoverHighlight,
+            enableSelection,
+            enableVerticalBorders,
+            estimatedAlbumGroupContentHeight,
+            getRowHeight,
+            getRowItem: (rowIndex: number) => {
+                if (shouldUseAccessor && getItem) {
+                    if (enableHeader && rowIndex === 0) {
+                        return null;
+                    }
+
+                    const dataIndex = enableHeader ? rowIndex - 1 : rowIndex;
+                    return getItem(dataIndex);
+                }
+
+                return dataWithGroups[rowIndex];
+            },
+            hasAlbumGroupColumn,
+            internalState: {} as ItemListStateActions,
+            itemType,
+            playerContext,
+            size,
+            tableId,
+        }),
+        [
+            albumGroupContentHeights,
+            albumGroupImageSize,
+            albumGroupVerticalLayout,
+            cellPadding,
+            dataWithGroups,
+            enableAlternateRowColors,
+            enableExpansion,
+            enableHeader,
+            enableHorizontalBorders,
+            enableRowHoverHighlight,
+            enableSelection,
+            enableVerticalBorders,
+            estimatedAlbumGroupContentHeight,
+            getItem,
+            getRowHeight,
+            hasAlbumGroupColumn,
+            itemType,
+            parsedColumns,
+            playerContext,
+            shouldUseAccessor,
+            size,
+            tableId,
+        ],
+    );
+
+    const {
+        calculateScrollTopForIndex,
+        getRowHeightAtIndex,
+        scrollToTableIndex,
+        scrollToTableOffset,
+    } = useTableScrollToIndex({
+        albumGroupContentHeights,
+        autoScrollToActiveRow,
+        enableHeader,
+        getRowHeight,
+        hasAlbumGroupColumn,
+        pinnedLeftColumnRef,
+        pinnedRightColumnRef,
+        pinnedRowCount,
+        rowRef,
+        scrollCellProps,
+    });
+
+    const scrollSyncKey = useMemo(
+        () =>
+            parsedColumns
+                .map(
+                    (col) =>
+                        `${col.id}:${col.pinned ?? 'none'}:${col.width}:${col.isEnabled !== false}`,
+                )
+                .join('|'),
+        [parsedColumns],
+    );
+
+    useTablePaneSync({
+        enableDrag,
+        enableDragScroll,
+        handleRef,
+        onScrollEndRef,
+        pinnedLeftColumnCount,
+        pinnedLeftColumnRef,
+        pinnedRightColumnCount,
+        pinnedRightColumnRef,
+        pinnedRowRef,
+        rowRef,
+        scrollContainerRef,
+        scrollShadowStore,
+        scrollSyncKey,
+    });
 
     // Create a wrapper for getRowHeight that doesn't require cellProps (for sticky group rows hook)
     const getRowHeightWrapper = useCallback(
@@ -1498,9 +1626,18 @@ const BaseItemTableList = ({
         [enableHeader, headerHeight, rowHeight, pinnedRowCount, size],
     );
 
+    const dataRef = useRef(data);
+    const getLoadedItemsRef = useRef(getLoadedItems);
+    dataRef.current = data;
+    getLoadedItemsRef.current = getLoadedItems;
+
     const getDataFn = useCallback(() => {
-        return data;
-    }, [data]);
+        const loadedItems = getLoadedItemsRef.current?.();
+        if (loadedItems?.length) {
+            return loadedItems;
+        }
+        return dataRef.current ?? [];
+    }, []);
 
     const extractRowId = useMemo(() => createExtractRowId(getRowId), [getRowId]);
 
@@ -1526,28 +1663,21 @@ const BaseItemTableList = ({
 
     const { handleKeyDown } = useTableKeyboardNavigation({
         calculateScrollTopForIndex,
-        cellPadding,
         data,
-        DEFAULT_ROW_HEIGHT,
         enableHeader,
         enableSelection,
         extractRowId,
         getItem,
         getItemIndex,
+        getRowHeightAtIndex,
         getStateItem,
         hasRequiredStateItemProperties,
         internalState,
         itemCount: baseItemCount,
-        itemType,
-        parsedColumns,
         pinnedRightColumnCount,
         pinnedRightColumnRef,
-        playerContext,
-        rowHeight,
         rowRef,
         scrollToTableIndex,
-        size,
-        tableId,
     });
 
     useTableInitialScroll({
@@ -1558,6 +1688,7 @@ const BaseItemTableList = ({
     });
 
     useTableImperativeHandle({
+        autoScrollToActiveRow,
         enableHeader,
         handleRef,
         internalState,
@@ -1646,6 +1777,7 @@ const BaseItemTableList = ({
 
     useListHotkeys({
         controls,
+        focusContainerRef: containerRef,
         focused,
         internalState,
         itemType,
@@ -1763,11 +1895,13 @@ const BaseItemTableList = ({
                 totalColumnCount={totalColumnCount}
             />
             <MemoizedVirtualizedTableGrid
+                albumGroupContentHeights={albumGroupContentHeights}
                 calculatedColumnWidths={displayColumnWidths}
                 CellComponent={optimizedCellComponent}
                 data={data}
                 dataWithGroups={dataWithGroups}
                 enableScrollShadow={enableScrollShadow}
+                estimatedAlbumGroupContentHeight={estimatedAlbumGroupContentHeight}
                 getItem={getItem}
                 headerHeight={headerHeight}
                 mergedRowRef={mergedRowRef}
@@ -1780,6 +1914,7 @@ const BaseItemTableList = ({
                 pinnedRowCount={pinnedRowCount}
                 pinnedRowRef={pinnedRowRef}
                 scrollShadowStore={scrollShadowStore}
+                setAlbumGroupContentHeight={setAlbumGroupContentHeight}
                 tableConfig={tableConfigValue}
                 totalColumnCount={totalColumnCount}
                 totalRowCount={totalRowCount}

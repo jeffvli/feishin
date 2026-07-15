@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import styles from './unsynchronized-lyrics.module.css';
 
+import { LyricsScrollContent } from '/@/renderer/features/lyrics/components/lyrics-scroll-content';
 import { LyricLine } from '/@/renderer/features/lyrics/lyric-line';
 import { useLyricsDisplaySettings, useLyricsSettings } from '/@/renderer/store';
 import { FullLyricsMetadata } from '/@/shared/types/domain-types';
@@ -17,7 +18,6 @@ export const UnsynchronizedLyrics = ({
     artist,
     lyrics,
     name,
-    remote,
     romajiLyrics,
     settingsKey = 'default',
     source,
@@ -49,35 +49,42 @@ export const UnsynchronizedLyrics = ({
     }, [romajiLyrics]);
 
     return (
-        <div className={styles.container} style={{ gap: `${settings.gapUnsync}px` }}>
-            {settings.showProvider && source && (
-                <LyricLine
-                    alignment={settings.alignment}
-                    className="lyric-credit"
-                    fontSize={settings.fontSizeUnsync}
-                    text={`Provided by ${source}`}
-                />
-            )}
-            {settings.showMatch && remote && (
-                <LyricLine
-                    alignment={settings.alignment}
-                    className="lyric-credit"
-                    fontSize={settings.fontSizeUnsync}
-                    text={`"${name} by ${artist}"`}
-                />
-            )}
-            {lines.map((text, idx) => (
-                <LyricLine
-                    alignment={settings.alignment}
-                    className="lyric-line unsynchronized"
-                    fontSize={settings.fontSizeUnsync}
-                    id={`lyric-${idx}`}
-                    key={idx}
-                    romajiText={romajiLines[idx]}
-                    text={text}
-                    translatedText={translatedLines[idx]}
-                />
-            ))}
+        <div className={styles.container}>
+            <LyricsScrollContent
+                bottomScrollPadding="6vh"
+                gap={settings.gapUnsync}
+                paddingLeft={displaySettings.paddingLeft ?? 0}
+                paddingRight={displaySettings.paddingRight ?? 0}
+            >
+                {settings.showProvider && source && (
+                    <LyricLine
+                        alignment={settings.alignment}
+                        className="lyric-credit"
+                        fontSize={settings.fontSizeUnsync}
+                        text={`${source}`}
+                    />
+                )}
+                {settings.showMatch && (
+                    <LyricLine
+                        alignment={settings.alignment}
+                        className="lyric-credit"
+                        fontSize={settings.fontSizeUnsync}
+                        text={`${name} — ${artist}`}
+                    />
+                )}
+                {lines.map((text, idx) => (
+                    <LyricLine
+                        alignment={settings.alignment}
+                        className="lyric-line unsynchronized"
+                        fontSize={settings.fontSizeUnsync}
+                        id={`lyric-${idx}`}
+                        key={idx}
+                        romajiText={romajiLines[idx]}
+                        text={text}
+                        translatedText={translatedLines[idx]}
+                    />
+                ))}
+            </LyricsScrollContent>
         </div>
     );
 };

@@ -1,0 +1,23 @@
+.controls {
+    display: flex;
+    gap: var(--theme-spacing-xs);
+    align-items: center;
+    min-height: calc(1.875rem * var(--mantine-scale, 1));
+}
+
+.favorite {
+    width: auto !important;
+    min-width: 0 !important;
+    height: calc(1.875rem * var(--mantine-scale, 1)) !important;
+    min-height: calc(1.875rem * var(--mantine-scale, 1)) !important;
+    padding-inline: var(--theme-spacing-xs);
+}
+
+.rating {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    height: calc(1.875rem * var(--mantine-scale, 1));
+    padding-block: var(--theme-spacing-xs);
+    padding-inline: var(--theme-spacing-xs) !important;
+}

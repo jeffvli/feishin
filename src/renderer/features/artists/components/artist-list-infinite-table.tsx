@@ -44,7 +44,7 @@ export const ArtistListInfiniteTable = ({
 
     const listQueryFn = api.controller.getArtistList;
 
-    const { getItem, getItemIndex, itemCount, loadedItems, onRangeChanged } =
+    const { getItem, getItemIndex, getLoadedItems, itemCount, loadedItems, onRangeChanged } =
         useItemListInfiniteLoader({
             eventKey: ItemListKey.ARTIST,
             itemsPerPage,
@@ -82,6 +82,7 @@ export const ArtistListInfiniteTable = ({
             enableVerticalBorders={enableVerticalBorders}
             getItem={getItem}
             getItemIndex={getItemIndex}
+            getLoadedItems={getLoadedItems}
             initialTop={{
                 to: scrollOffset ?? 0,
                 type: 'offset',

@@ -1463,6 +1463,7 @@ export const ItemDetailList = ({
 
     useListHotkeys({
         controls,
+        focusContainerRef: containerRef,
         focused,
         internalState,
         itemType: LibraryItem.SONG,

@@ -127,6 +127,10 @@ export function WebPlayer() {
                 return;
             }
 
+            if (num === 1) {
+                setTimestamp(e.playedSeconds);
+            }
+
             if (repeat === PlayerRepeat.ONE) {
                 handleRepeatOne(1, e.playedSeconds, getDuration(playerRef.current.player1().ref));
                 return;
@@ -170,6 +174,7 @@ export function WebPlayer() {
             num,
             player2,
             repeat,
+            setTimestamp,
             transitionType,
             volume,
         ],
@@ -179,6 +184,10 @@ export function WebPlayer() {
         (e: PlayerOnProgressProps) => {
             if (!playerRef.current?.player2()) {
                 return;
+            }
+
+            if (num === 2) {
+                setTimestamp(e.playedSeconds);
             }
 
             if (repeat === PlayerRepeat.ONE) {
@@ -224,6 +233,7 @@ export function WebPlayer() {
             num,
             player1,
             repeat,
+            setTimestamp,
             transitionType,
             volume,
         ],
@@ -238,7 +248,7 @@ export function WebPlayer() {
         promise.then(() => {
             playerRef.current?.player1()?.ref?.getInternalPlayer().pause();
 
-            // If mediaAutoNext resulted in a paused state (e.g. end of queue,
+            // If mediaAutoNext resulted in a stopped/paused state (e.g. end of queue,
             // or pauseOnNextSongEnd flag), stop all audio instead of restoring volume.
             const currentStatus = usePlayerStoreBase.getState().player.status;
             if (currentStatus !== PlayerStatus.PLAYING) {
@@ -388,7 +398,7 @@ export function WebPlayer() {
                 transitionType === PlayerStyle.CROSSFADE ||
                 transitionType === PlayerStyle.GAPLESS
             ) {
-                setTimestamp(Number(currentTime.toFixed(0)));
+                setTimestamp(currentTime);
             }
         }, 500);
 

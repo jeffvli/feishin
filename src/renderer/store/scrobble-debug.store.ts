@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { PlayerStatus } from '/@/shared/types/types';
+
+const SCROBBLE_DEBUG_POLL_INTERVAL_MS = 1000;
 
 export type ScrobbleDebugSnapshot = {
     eligibilityMet: boolean;
@@ -37,6 +40,26 @@ type ScrobbleDebugStore = {
 export const useScrobbleDebugStore = createWithEqualityFn<ScrobbleDebugStore>()(() => ({
     snapshot: initialSnapshot,
 }));
+
+export const useScrobbleDebugSnapshot = () => {
+    const [snapshot, setLocalSnapshot] = useState(() => useScrobbleDebugStore.getState().snapshot);
+
+    useEffect(() => {
+        const syncSnapshot = () => {
+            const nextSnapshot = useScrobbleDebugStore.getState().snapshot;
+            setLocalSnapshot((prevSnapshot) =>
+                prevSnapshot !== nextSnapshot ? nextSnapshot : prevSnapshot,
+            );
+        };
+
+        syncSnapshot();
+        const interval = setInterval(syncSnapshot, SCROBBLE_DEBUG_POLL_INTERVAL_MS);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return snapshot;
+};
 
 export const publishScrobbleDebug = (partial: Partial<ScrobbleDebugSnapshot>) => {
     useScrobbleDebugStore.setState((state) => ({

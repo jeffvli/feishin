@@ -4,37 +4,26 @@ import {
     ItemListStateActions,
     ItemListStateItemWithRequiredProperties,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
-import { TableItemProps } from '/@/renderer/components/item-list/item-table-list/item-table-list';
-import { ItemControls } from '/@/renderer/components/item-list/types';
-import { PlayerContext } from '/@/renderer/features/player/context/player-context';
-import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface UseTableKeyboardNavigationProps {
     calculateScrollTopForIndex: (index: number) => number;
-    cellPadding: TableItemProps['cellPadding'];
     data: unknown[];
-    DEFAULT_ROW_HEIGHT: number;
     enableHeader: boolean;
     enableSelection: boolean;
     extractRowId: (item: unknown) => string | undefined;
     getItem?: (index: number) => undefined | unknown;
     getItemIndex?: (rowId: string) => number | undefined;
+    getRowHeightAtIndex: (index: number) => number;
     getStateItem: (item: any) => ItemListStateItemWithRequiredProperties | null;
     hasRequiredStateItemProperties: (
         item: unknown,
     ) => item is ItemListStateItemWithRequiredProperties;
     internalState: ItemListStateActions;
     itemCount?: number;
-    itemType: LibraryItem;
-    parsedColumns: TableItemProps['columns'];
     pinnedRightColumnCount: number;
     pinnedRightColumnRef: React.RefObject<HTMLDivElement | null>;
-    playerContext: PlayerContext;
-    rowHeight: ((index: number, cellProps: TableItemProps) => number) | number | undefined;
     rowRef: React.RefObject<HTMLDivElement | null>;
     scrollToTableIndex: (index: number, options?: { align?: 'bottom' | 'center' | 'top' }) => void;
-    size: TableItemProps['size'];
-    tableId: string;
 }
 
 /**
@@ -42,28 +31,21 @@ interface UseTableKeyboardNavigationProps {
  */
 export const useTableKeyboardNavigation = ({
     calculateScrollTopForIndex,
-    cellPadding,
     data,
-    DEFAULT_ROW_HEIGHT,
     enableHeader,
     enableSelection,
     extractRowId,
     getItem,
     getItemIndex,
+    getRowHeightAtIndex,
     getStateItem,
     hasRequiredStateItemProperties,
     internalState,
     itemCount,
-    itemType,
-    parsedColumns,
     pinnedRightColumnCount,
     pinnedRightColumnRef,
-    playerContext,
-    rowHeight,
     rowRef,
     scrollToTableIndex,
-    size,
-    tableId,
 }: UseTableKeyboardNavigationProps) => {
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -122,42 +104,7 @@ export const useTableKeyboardNavigation = ({
                 const viewportBottom = viewportTop + viewportHeight;
 
                 const rowTop = calculateScrollTopForIndex(gridIndex);
-                const adjustedIndex = enableHeader ? Math.max(0, newIndex - 1) : newIndex;
-                const mockCellProps: TableItemProps = {
-                    cellPadding,
-                    columns: parsedColumns,
-                    controls: {} as ItemControls,
-                    data: enableHeader ? [null] : [],
-                    enableAlternateRowColors: false,
-                    enableExpansion: false,
-                    enableHeader,
-                    enableHorizontalBorders: false,
-                    enableRowHoverHighlight: false,
-                    enableSelection,
-                    enableVerticalBorders: false,
-                    getRowHeight: () => DEFAULT_ROW_HEIGHT,
-                    getRowItem: (rowIndex: number) => {
-                        if (!getItem) return undefined;
-                        if (enableHeader && rowIndex === 0) return null;
-                        const dataIndex = enableHeader ? rowIndex - 1 : rowIndex;
-                        return getItem(dataIndex);
-                    },
-                    internalState: {} as ItemListStateActions,
-                    itemType,
-                    playerContext,
-                    size,
-                    tableId,
-                };
-
-                let calculatedRowHeight: number;
-                if (typeof rowHeight === 'number') {
-                    calculatedRowHeight = rowHeight;
-                } else if (typeof rowHeight === 'function') {
-                    calculatedRowHeight = rowHeight(adjustedIndex, mockCellProps);
-                } else {
-                    calculatedRowHeight = DEFAULT_ROW_HEIGHT;
-                }
-
+                const calculatedRowHeight = getRowHeightAtIndex(gridIndex);
                 const rowBottom = rowTop + calculatedRowHeight;
 
                 // Check if row is fully visible within viewport
@@ -187,28 +134,21 @@ export const useTableKeyboardNavigation = ({
         },
         [
             calculateScrollTopForIndex,
-            cellPadding,
             data,
             getItem,
             getItemIndex,
-            DEFAULT_ROW_HEIGHT,
             enableHeader,
             enableSelection,
             extractRowId,
+            getRowHeightAtIndex,
             getStateItem,
             hasRequiredStateItemProperties,
             internalState,
             itemCount,
-            itemType,
-            parsedColumns,
             pinnedRightColumnCount,
             pinnedRightColumnRef,
-            playerContext,
-            rowHeight,
             rowRef,
             scrollToTableIndex,
-            size,
-            tableId,
         ],
     );
 

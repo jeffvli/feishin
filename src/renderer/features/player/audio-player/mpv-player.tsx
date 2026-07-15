@@ -162,7 +162,7 @@ export function MpvPlayer() {
             try {
                 const time = await mpvPlayer.getCurrentTime();
                 if (time !== undefined) {
-                    setTimestamp(Number(time.toFixed(0)));
+                    setTimestamp(time);
                 }
             } catch {
                 // Do nothing

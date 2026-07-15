@@ -160,15 +160,19 @@ const normalizeSong = (
         duration: item.RunTimeTicks / TICKS_PER_MS,
         explicitStatus: null,
         gain:
-            item.NormalizationGain !== undefined
+            item.AlbumNormalizationGain !== undefined ||
+            item.NormalizationGain !== undefined ||
+            item.LUFS !== undefined
                 ? {
-                      track: item.NormalizationGain,
+                      album: item.AlbumNormalizationGain,
+                      track:
+                          item.NormalizationGain !== undefined
+                              ? item.NormalizationGain
+                              : item.LUFS !== undefined
+                                ? -18 - item.LUFS
+                                : undefined,
                   }
-                : item.LUFS
-                  ? {
-                        track: -18 - item.LUFS,
-                    }
-                  : null,
+                : null,
         genres: item.GenreItems?.map((entry) => ({
             _itemType: LibraryItem.GENRE,
             _serverId: server?.id || '',

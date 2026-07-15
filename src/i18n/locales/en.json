@@ -332,6 +332,7 @@
             "input_legacyAuthentication": "Enable legacy authentication",
             "input_name": "Server Name",
             "input_password": "Password",
+            "input_passwordNoSSO": "Reverse proxy (SSO) authentication is not supported. Only username/password authentication and Subsonic authentication are supported",
             "input_preferInstantMix": "Prefer Instant Mix",
             "input_preferInstantMixDescription": "Only use instant mix to get similar songs. Useful if you have plugins that modify this behavior",
             "input_preferRemoteUrl": "Prefer Public URL",
@@ -548,9 +549,13 @@
                 "dynamicImageBlur": "Image blur size",
                 "dynamicIsImage": "Enable background image",
                 "followCurrentLyric": "Follow current lyric",
+                "lyricFollowScrollAlignment": "Lyrics follow alignment",
                 "lyricAlignment": "Lyric alignment",
                 "lyricOffset": "Lyrics offset (ms)",
                 "lyricGap": "Lyric gap",
+                "lyricLineLeadTime": "Line lead time (ms)",
+                "lyricPaddingLeft": "Lyrics left padding (%)",
+                "lyricPaddingRight": "Lyrics right padding (%)",
                 "lyricSize": "Lyric size",
                 "lyricOpacityNonActive": "Non-active lyric opacity",
                 "lyricScaleNonActive": "Non-active lyric scale",
@@ -562,6 +567,10 @@
                 "useImageAspectRatio": "Use image aspect ratio"
             },
             "lyrics": "Lyrics",
+            "lyricLayers": "Lyric layers",
+            "lyricLanguage": "Language",
+            "showPronunciation": "Pronunciation",
+            "showTranslation": "Translation",
             "related": "Related",
             "upNext": "Up next",
             "visualizer": "Visualizer",
@@ -783,6 +792,7 @@
         "artistConfiguration_description": "Configure what items are shown, and in what order, on the album artist page",
         "artistReleaseTypeConfiguration": "Artist release type configuration",
         "artistReleaseTypeConfiguration_description": "Configure what release types are shown, and in what order, on the album artist page",
+        "audioDeviceDefault": "System default",
         "audioDevice_description": "Select the audio device to use for playback",
         "audioDevice": "Audio device",
         "audioExclusiveMode_description": "Enable exclusive output mode. In this mode, the system is usually locked out, and only mpv will be able to output audio. Visualizer system audio capture will not work while this is enabled",
@@ -1183,7 +1193,9 @@
         "queryBuilderCustomFields_inputLabel": "Label",
         "queryBuilderCustomFields_inputTag": "Tag",
         "queryBuilderCustomFields": "Custom fields",
-        "queryBuilderCustomFields_description": "Add custom fields to use in query builders"
+        "queryBuilderCustomFields_description": "Add custom fields to use in query builders",
+        "microtonalPitchControls": "Microtonal pitch controls",
+        "microtonalPitchControls_description": "Add more pitch controls to go between semi-tones"
     },
     "table": {
         "column": {
@@ -1219,6 +1231,9 @@
             "general": {
                 "advancedSettings": "Advanced settings",
                 "albumGroupConfig": "Album Group configuration",
+                "albumGroupMetadata": "Metadata fields",
+                "albumGroupShowFavoriteRating": "Show favorites and ratings",
+                "albumGroupVerticalLayout": "Vertical layout",
                 "albumImageSize": "Album image size",
                 "autoFitColumns": "Auto fit columns",
                 "autosize": "Autosize",

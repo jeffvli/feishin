@@ -20,7 +20,7 @@ export const SONG_TABLE_COLUMNS: DefaultTableColumn[] = [
         label: i18n.t('table.config.label.albumGroup'),
         pinned: 'left',
         value: TableColumn.ALBUM_GROUP,
-        width: 200,
+        width: 240,
     },
     {
         align: 'center',

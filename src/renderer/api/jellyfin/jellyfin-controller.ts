@@ -956,7 +956,10 @@ export const JellyfinController: InternalControllerEndpoint = {
             return res.body.Lyrics.map((lyric) => lyric.Text).join('\n');
         }
 
-        return res.body.Lyrics.map((lyric) => [lyric.Start! / 1e4, lyric.Text]);
+        return res.body.Lyrics.map((lyric) => ({
+            startMs: lyric.Start! / 1e4,
+            text: lyric.Text,
+        }));
     },
     getMusicFolderList: async (args) => {
         const { apiClientProps } = args;

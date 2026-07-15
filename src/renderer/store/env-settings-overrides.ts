@@ -115,7 +115,10 @@ const AUTO_DJ_MODES = new Set(['albums', 'songs']);
 const AUTO_DJ_STRATEGIES = new Set(['library_random', 'similar']);
 
 export type EnvSettingsOverrides = DeepPartial<
-    Pick<SettingsState, 'autoDJ' | 'css' | 'discord' | 'font' | 'general' | 'lyrics' | 'playback'>
+    Pick<
+        SettingsState,
+        'autoDJ' | 'css' | 'discord' | 'font' | 'general' | 'lyrics' | 'lyricsDisplay' | 'playback'
+    >
 >;
 
 type DeepPartial<T> = {
@@ -403,6 +406,16 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
     { key: 'FS_LYRICS_FETCH', path: ['lyrics', 'fetch'], type: 'bool' },
     { key: 'FS_LYRICS_FOLLOW', path: ['lyrics', 'follow'], type: 'bool' },
     { key: 'FS_LYRICS_DELAY_MS', path: ['lyrics', 'delayMs'], type: 'num' },
+    { key: 'FS_LYRICS_LINE_LEAD_TIME_MS', path: ['lyrics', 'lineLeadTimeMs'], type: 'num' },
+    {
+        key: 'FS_LYRICS_FOLLOW_SCROLL_ALIGNMENT',
+        path: ['lyrics', 'followScrollAlignment'],
+        transform: (s) => {
+            const n = parseNum(s);
+            return n !== undefined ? Math.min(50, Math.max(-50, Math.round(n))) : undefined;
+        },
+        type: 'num',
+    },
     { key: 'FS_LYRICS_PREFER_LOCAL', path: ['lyrics', 'preferLocalLyrics'], type: 'bool' },
     { key: 'FS_LYRICS_SHOW_MATCH', path: ['lyrics', 'showMatch'], type: 'bool' },
     { key: 'FS_LYRICS_SHOW_PROVIDER', path: ['lyrics', 'showProvider'], type: 'bool' },
@@ -423,6 +436,24 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
         key: 'FS_LYRICS_ALIGNMENT',
         path: ['lyrics', 'alignment'],
         type: 'enum',
+    },
+    {
+        key: 'FS_LYRICS_PADDING_LEFT',
+        path: ['lyricsDisplay', 'default', 'paddingLeft'],
+        transform: (s) => {
+            const n = parseNum(s);
+            return n !== undefined ? Math.min(20, Math.max(0, Math.round(n))) : undefined;
+        },
+        type: 'num',
+    },
+    {
+        key: 'FS_LYRICS_PADDING_RIGHT',
+        path: ['lyricsDisplay', 'default', 'paddingRight'],
+        transform: (s) => {
+            const n = parseNum(s);
+            return n !== undefined ? Math.min(20, Math.max(0, Math.round(n))) : undefined;
+        },
+        type: 'num',
     },
     {
         enumSet: AUTO_DJ_STRATEGIES,
