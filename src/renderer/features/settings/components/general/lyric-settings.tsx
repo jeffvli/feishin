@@ -104,7 +104,6 @@ export const LyricSettings = memo(() => {
             description: t('setting.enableFurigana', {
                 context: 'description',
             }),
-            isHidden: !isElectron(),
             title: t('setting.enableFurigana'),
         },
         {
@@ -118,7 +117,6 @@ export const LyricSettings = memo(() => {
             description: t('setting.enableRomaji', {
                 context: 'description',
             }),
-            isHidden: !isElectron(),
             title: t('setting.enableRomaji'),
         },
         {

@@ -372,7 +372,6 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             description: t('setting.enableFurigana', {
                 context: 'description',
             }),
-            isHidden: !isElectron(),
             title: t('setting.enableFurigana'),
         },
         {
@@ -386,7 +385,6 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             description: t('setting.enableRomaji', {
                 context: 'description',
             }),
-            isHidden: !isElectron(),
             title: t('setting.enableRomaji'),
         },
         {

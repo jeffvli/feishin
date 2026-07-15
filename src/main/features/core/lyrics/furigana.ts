@@ -17,6 +17,14 @@ export type RomajiToken = LyricTextToken & {
 let kuroshiroInstance: any = null;
 let initPromise: null | Promise<void> = null;
 
+const getDictionaryPath = (): string | undefined => {
+    if (typeof document === 'undefined') {
+        return undefined;
+    }
+
+    return new URL('./assets/kuromoji/', document.baseURI).href;
+};
+
 const getKuroshiro = async () => {
     if (initPromise) {
         await initPromise;
@@ -26,8 +34,13 @@ const getKuroshiro = async () => {
     if (kuroshiroInstance) return kuroshiroInstance;
 
     const KuroshiroClass = (Kuroshiro as any).default || Kuroshiro;
+    const dictionaryPath = getDictionaryPath();
+    const analyzer = dictionaryPath
+        ? new KuromojiAnalyzer({ dictPath: dictionaryPath })
+        : new KuromojiAnalyzer();
+
     kuroshiroInstance = new KuroshiroClass();
-    initPromise = kuroshiroInstance.init(new KuromojiAnalyzer());
+    initPromise = kuroshiroInstance.init(analyzer);
     await initPromise;
 
     initPromise = null;

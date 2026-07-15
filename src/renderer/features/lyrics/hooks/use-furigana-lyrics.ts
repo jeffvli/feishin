@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import isElectron from 'is-electron';
 
+import * as browserLyricsApi from '/@/main/features/core/lyrics/furigana';
 import {
     alignFuriganaToWordCues,
     alignRomajiTokensToWordCues,
@@ -10,15 +11,11 @@ import {
 import { normalizeLyrics } from '/@/renderer/features/lyrics/api/lyrics-utils';
 import { LyricsResponse, SyncedCueLine, SynchronizedLyrics } from '/@/shared/types/domain-types';
 
-const lyricsApi = isElectron() ? window.api.lyrics : null;
+const lyricsApi = isElectron() ? window.api.lyrics : browserLyricsApi;
 
 const convertSyncedLyricsFurigana = async (
     lyrics: SynchronizedLyrics,
 ): Promise<SynchronizedLyrics> => {
-    if (!lyricsApi) {
-        return lyrics;
-    }
-
     return Promise.all(
         normalizeLyrics(lyrics).map(async (line) => ({
             ...line,
@@ -76,9 +73,9 @@ const convertSyncedLyricsRomaji = async (
 
 export const useFuriganaLyrics = (lyrics: LyricsResponse | null | undefined, enabled: boolean) => {
     return useQuery({
-        enabled: enabled && !!lyrics && !!lyricsApi,
+        enabled: enabled && !!lyrics,
         queryFn: async () => {
-            if (!lyrics || !lyricsApi || !enabled) return lyrics;
+            if (!lyrics || !enabled) return lyrics;
 
             if (typeof lyrics === 'string') {
                 return await lyricsApi.convertFurigana(lyrics);
@@ -97,9 +94,9 @@ export const useFuriganaLyrics = (lyrics: LyricsResponse | null | undefined, ena
 
 export const useRomajiLyrics = (lyrics: LyricsResponse | null | undefined, enabled: boolean) => {
     return useQuery({
-        enabled: enabled && !!lyrics && !!lyricsApi,
+        enabled: enabled && !!lyrics,
         queryFn: async () => {
-            if (!lyrics || !lyricsApi || !enabled) return lyrics;
+            if (!lyrics || !enabled) return lyrics;
 
             if (typeof lyrics === 'string') {
                 return await lyricsApi.convertRomaji(lyrics);
@@ -129,10 +126,6 @@ const buildSyncedRomajiLine = async (
             continue;
         }
 
-        if (!lyricsApi) {
-            return cueLines.map(() => null);
-        }
-
         const tokens = (await lyricsApi.convertRomajiTokens(cueLine.value)) as RomajiToken[];
         if (!tokens.length) {
             romajiCueLines.push(null);
@@ -160,9 +153,9 @@ export const useSyncedRomajiLyrics = (
     enabled: boolean,
 ) => {
     return useQuery({
-        enabled: enabled && !!lyrics && !!lyricsApi,
+        enabled: enabled && !!lyrics,
         queryFn: async (): Promise<null | SyncedRomajiLyrics> => {
-            if (!lyrics || !lyricsApi || !enabled) {
+            if (!lyrics || !enabled) {
                 return null;
             }
 

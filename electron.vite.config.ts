@@ -4,6 +4,7 @@ import conditionalImportPlugin from 'vite-plugin-conditional-import';
 import dynamicImportPlugin from 'vite-plugin-dynamic-import';
 import { ViteEjsPlugin } from 'vite-plugin-ejs';
 
+import { kuromojiDictionaryPlugin } from './vite.kuromoji-plugin';
 import { createReactPlugin } from './vite.react-plugin';
 
 const currentOSEnv = process.platform;
@@ -65,13 +66,19 @@ const config: UserConfig = {
                 localsConvention: 'camelCase',
             },
         },
-        plugins: [createReactPlugin(), ViteEjsPlugin({ web: false })],
+        plugins: [
+            createReactPlugin(),
+            kuromojiDictionaryPlugin({ emitDictionary: false }),
+            ViteEjsPlugin({ web: false }),
+        ],
         resolve: {
             alias: {
                 '/@/i18n': resolve('src/i18n'),
+                '/@/main': resolve('src/main'),
                 '/@/remote': resolve('src/remote'),
                 '/@/renderer': resolve('src/renderer'),
                 '/@/shared': resolve('src/shared'),
+                path: resolve('src/renderer/shims/path.ts'),
             },
         },
     },
