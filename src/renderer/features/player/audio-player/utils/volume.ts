@@ -1,11 +1,9 @@
+import {
+    DEFAULT_VOLUME_MAX,
+    MPV_VOLUME_MAX_CEILING,
+    MPV_VOLUME_MAX_DEFAULT,
+} from '/@/shared/constants/volume';
 import { PlayerType } from '/@/shared/types/types';
-
-// The web-audio backend has no headroom above unity gain, so it stays at 100.
-export const DEFAULT_VOLUME_MAX = 100;
-// mpv's default --volume-max when the user passes nothing.
-export const MPV_VOLUME_MAX_DEFAULT = 130;
-// mpv's own hard ceiling for --volume-max.
-export const MPV_VOLUME_MAX_CEILING = 1000;
 
 const VOLUME_MAX_FLAG = '--volume-max';
 
@@ -44,4 +42,17 @@ export const resolveVolumeMax = (
 
     const configured = parseMpvVolumeMax(extraParameters) ?? MPV_VOLUME_MAX_DEFAULT;
     return Math.min(MPV_VOLUME_MAX_CEILING, Math.max(DEFAULT_VOLUME_MAX, configured));
+};
+
+// Constrains an externally sourced volume (mpris, remote) to the active backend's range.
+export const clampVolume = (
+    volume: number,
+    playbackType: PlayerType,
+    extraParameters: string[] = [],
+): number => {
+    if (!Number.isFinite(volume)) {
+        return 0;
+    }
+
+    return Math.min(resolveVolumeMax(playbackType, extraParameters), Math.max(0, volume));
 };
