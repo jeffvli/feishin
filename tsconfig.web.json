@@ -19,8 +19,8 @@
       "/@/renderer/*": [
         "src/renderer/*"
       ],
-      "/@/main/*": [
-        "src/main/*"
+      "/@/lyrics-conversion-api": [
+        "src/main/features/core/lyrics/furigana.ts"
       ],
       "/@/shared/*": [
         "src/shared/*"

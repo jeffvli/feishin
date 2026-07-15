@@ -1,4 +1,4 @@
-import { externalizeDepsPlugin, UserConfig } from 'electron-vite';
+import { defineConfig, externalizeDepsPlugin, UserConfig } from 'electron-vite';
 import { resolve } from 'path';
 import conditionalImportPlugin from 'vite-plugin-conditional-import';
 import dynamicImportPlugin from 'vite-plugin-dynamic-import';
@@ -10,7 +10,7 @@ import { createReactPlugin } from './vite.react-plugin';
 const currentOSEnv = process.platform;
 const electronRendererTarget = 'chrome87';
 
-const config: UserConfig = {
+const createConfig = (isDevelopment: boolean): UserConfig => ({
     main: {
         build: {
             rollupOptions: {
@@ -68,20 +68,24 @@ const config: UserConfig = {
         },
         plugins: [
             createReactPlugin(),
-            kuromojiDictionaryPlugin({ emitDictionary: false }),
+            ...(isDevelopment ? [kuromojiDictionaryPlugin({ emitDictionary: false })] : []),
             ViteEjsPlugin({ web: false }),
         ],
         resolve: {
             alias: {
                 '/@/i18n': resolve('src/i18n'),
-                '/@/main': resolve('src/main'),
+                '/@/lyrics-conversion-api': resolve(
+                    isDevelopment
+                        ? 'src/renderer/features/lyrics/api/development-lyrics-conversion-api.ts'
+                        : 'src/renderer/features/lyrics/api/electron-lyrics-conversion-api.ts',
+                ),
                 '/@/remote': resolve('src/remote'),
                 '/@/renderer': resolve('src/renderer'),
                 '/@/shared': resolve('src/shared'),
-                path: resolve('src/renderer/shims/path.ts'),
+                ...(isDevelopment ? { path: resolve('src/renderer/shims/path.ts') } : {}),
             },
         },
     },
-};
+});
 
-export default config;
+export default defineConfig(({ command }) => createConfig(command === 'serve'));

@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import isElectron from 'is-electron';
 
-import * as browserLyricsApi from '/@/main/features/core/lyrics/furigana';
+import * as lyricsApi from '/@/lyrics-conversion-api';
 import {
     alignFuriganaToWordCues,
     alignRomajiTokensToWordCues,
@@ -10,8 +9,6 @@ import {
 } from '/@/renderer/features/lyrics/api/lyric-conversion';
 import { normalizeLyrics } from '/@/renderer/features/lyrics/api/lyrics-utils';
 import { LyricsResponse, SyncedCueLine, SynchronizedLyrics } from '/@/shared/types/domain-types';
-
-const lyricsApi = isElectron() ? window.api.lyrics : browserLyricsApi;
 
 const convertSyncedLyricsFurigana = async (
     lyrics: SynchronizedLyrics,
