@@ -15,10 +15,12 @@ export const usePlaybackHotkeys = () => {
             handler: () => void;
         }> = [
             { binding: bindings.next, handler: () => player.mediaNext() },
+            { binding: bindings.nextAlbum, handler: () => player.mediaNext(true) },
             { binding: bindings.pause, handler: () => player.mediaPause() },
             { binding: bindings.play, handler: () => player.mediaPlay() },
             { binding: bindings.playPause, handler: () => player.mediaTogglePlayPause() },
             { binding: bindings.previous, handler: () => player.mediaPrevious() },
+            { binding: bindings.previousAlbum, handler: () => player.mediaPrevious(true) },
             { binding: bindings.skipBackward, handler: () => player.mediaSkipBackward() },
             { binding: bindings.skipForward, handler: () => player.mediaSkipForward() },
             { binding: bindings.stop, handler: () => player.mediaStop() },
