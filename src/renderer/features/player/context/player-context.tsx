@@ -61,11 +61,11 @@ export interface PlayerContext {
     clearSelected: (items: QueueSong[]) => void;
     decreaseVolume: (amount: number) => void;
     increaseVolume: (amount: number) => void;
-    mediaNext: (toNextAlbum?: boolean) => void;
+    mediaNext: (toNextAlbum: boolean) => void;
     mediaPause: () => void;
     mediaPlay: (id?: string) => void;
     mediaPlayByIndex: (index: number) => void;
-    mediaPrevious: (toPreviousAlbum?: boolean) => void;
+    mediaPrevious: (toPreviousAlbum: boolean) => void;
     mediaSeekToTimestamp: (timestamp: number) => void;
     mediaSkipBackward: () => void;
     mediaSkipForward: () => void;
@@ -580,7 +580,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     const mediaNext = useCallback(
-        (toNextAlbum?: boolean) => {
+        (toNextAlbum: boolean) => {
             logFn.debug(logMsg[LogCategory.PLAYER].mediaNext, {
                 category: LogCategory.PLAYER,
             });
@@ -623,7 +623,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     const mediaPrevious = useCallback(
-        (toPreviousAlbum?: boolean) => {
+        (toPreviousAlbum: boolean) => {
             logFn.debug(logMsg[LogCategory.PLAYER].mediaPrevious, {
                 category: LogCategory.PLAYER,
             });

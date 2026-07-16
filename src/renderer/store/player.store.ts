@@ -52,11 +52,11 @@ interface Actions {
     isFirstTrackInQueue: () => boolean;
     isLastTrackInQueue: () => boolean;
     mediaAutoNext: () => PlayerData;
-    mediaNext: (toNextAlbum?: boolean) => void;
+    mediaNext: (toNextAlbum: boolean) => void;
     mediaPause: () => void;
     mediaPlay: (id?: string) => void;
     mediaPlayByIndex: (index: number) => void;
-    mediaPrevious: (toPreviousAlbum?: boolean) => void;
+    mediaPrevious: (toPreviousAlbum: boolean) => void;
     mediaSeekToTimestamp: (timestamp: number) => void;
     mediaSkipBackward: (offset?: number) => void;
     mediaSkipForward: (offset?: number) => void;

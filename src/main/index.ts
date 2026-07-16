@@ -875,10 +875,12 @@ enum BindingActions {
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
     NEXT = 'next',
+    NEXT_ALBUM = 'nextAlbum',
     PAUSE = 'pause',
     PLAY = 'play',
     PLAY_PAUSE = 'playPause',
     PREVIOUS = 'previous',
+    PREVIOUS_ALBUM = 'previousAlbum',
     SHUFFLE = 'toggleShuffle',
     SKIP_BACKWARD = 'skipBackward',
     SKIP_FORWARD = 'skipForward',
@@ -906,11 +908,15 @@ const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
     [BindingActions.LOCAL_SEARCH]: () => {},
     [BindingActions.MUTE]: () => getMainWindow()?.webContents.send('renderer-player-volume-mute'),
     [BindingActions.NEXT]: () => getMainWindow()?.webContents.send('renderer-player-next'),
+    [BindingActions.NEXT_ALBUM]: () =>
+        getMainWindow()?.webContents.send('renderer-player-next-album'),
     [BindingActions.PAUSE]: () => getMainWindow()?.webContents.send('renderer-player-pause'),
     [BindingActions.PLAY]: () => getMainWindow()?.webContents.send('renderer-player-play'),
     [BindingActions.PLAY_PAUSE]: () =>
         getMainWindow()?.webContents.send('renderer-player-play-pause'),
     [BindingActions.PREVIOUS]: () => getMainWindow()?.webContents.send('renderer-player-previous'),
+    [BindingActions.PREVIOUS_ALBUM]: () =>
+        getMainWindow()?.webContents.send('renderer-player-previous-album'),
     [BindingActions.SHUFFLE]: () =>
         getMainWindow()?.webContents.send('renderer-player-toggle-shuffle'),
     [BindingActions.SKIP_BACKWARD]: () =>

@@ -100,7 +100,7 @@ export const useMediaSession = () => {
                 return;
             }
 
-            playerRef.current.mediaNext();
+            playerRef.current.mediaNext(false);
         });
 
         mediaSession.setActionHandler('pause', () => {
@@ -116,7 +116,7 @@ export const useMediaSession = () => {
                 return;
             }
 
-            playerRef.current.mediaPrevious();
+            playerRef.current.mediaPrevious(false);
         });
 
         mediaSession.setActionHandler('seekto', (e) => {
