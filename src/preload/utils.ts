@@ -100,6 +100,10 @@ const rendererOpenManageServers = (cb: () => void) => {
     ipcRenderer.on('renderer-open-manage-servers', () => cb());
 };
 
+const rendererOpenCreatePlaylist = (cb: () => void) => {
+    ipcRenderer.on('renderer-open-create-playlist', () => cb());
+};
+
 const rendererTogglePrivateMode = (cb: () => void) => {
     ipcRenderer.on('renderer-toggle-private-mode', cb);
 };
@@ -132,6 +136,7 @@ export const utils = {
     openItem,
     playerErrorListener,
     rendererOpenCommandPalette,
+    rendererOpenCreatePlaylist,
     rendererOpenManageServers,
     rendererOpenReleaseNotes,
     rendererOpenSettings,
