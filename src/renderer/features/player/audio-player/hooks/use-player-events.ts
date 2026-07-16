@@ -47,6 +47,7 @@ interface PlayerEventsCallbacks {
     ) => void;
     onPlayerSpeed?: (properties: { speed: number }, prev: { speed: number }) => void;
     onPlayerStatus?: (properties: { status: PlayerStatus }, prev: { status: PlayerStatus }) => void;
+    onPlayerStop?: (properties: { id?: string; index?: number; reset: boolean }) => void;
     onPlayerVolume?: (properties: { volume: number }, prev: { volume: number }) => void;
     onQueueCleared?: () => void;
     onQueueRestored?: (properties: { data: Song[]; index: number; position: number }) => void;
@@ -166,6 +167,10 @@ function createPlayerEvents(callbacks: PlayerEventsCallbacks): PlayerEvents {
         eventEmitter.on('PLAYER_REPEATED', callbacks.onPlayerRepeated);
     }
 
+    if (callbacks.onPlayerStop) {
+        eventEmitter.on('PLAYER_STOP', callbacks.onPlayerStop);
+    }
+
     if (callbacks.onQueueRestored) {
         eventEmitter.on('QUEUE_RESTORED', callbacks.onQueueRestored);
     }
@@ -192,6 +197,9 @@ function createPlayerEvents(callbacks: PlayerEventsCallbacks): PlayerEvents {
             }
             if (callbacks.onPlayerRepeated) {
                 eventEmitter.off('PLAYER_REPEATED', callbacks.onPlayerRepeated);
+            }
+            if (callbacks.onPlayerStop) {
+                eventEmitter.off('PLAYER_STOP', callbacks.onPlayerStop);
             }
             if (callbacks.onQueueRestored) {
                 eventEmitter.off('QUEUE_RESTORED', callbacks.onQueueRestored);

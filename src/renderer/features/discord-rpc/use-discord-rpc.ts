@@ -81,6 +81,15 @@ export const useDiscordRpc = () => {
         privateModeRef.current = privateMode;
     }, [privateMode]);
 
+    // If the component is unmounted while RPC is enabled, quit RPC
+    useEffect(() => {
+        return () => {
+            if (previousEnabledRef.current) {
+                discordRpc?.quit();
+            }
+        };
+    }, []);
+
     const setActivity = useCallback(
         async (current: ActivityState, trigger: ActivityTrigger) => {
             const song = current[0];

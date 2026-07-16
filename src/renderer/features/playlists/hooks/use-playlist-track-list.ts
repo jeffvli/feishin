@@ -97,14 +97,12 @@ export function usePlaylistTrackList(data: PlaylistSongListResponse | undefined)
     const sortedAndFilteredSongs = useMemo(() => {
         const raw = data?.items ?? [];
         const filtered = applyClientSideSongFilters(raw, query as Record<string, unknown>);
-        const searched = searchTerm
-            ? searchLibraryItems(filtered, searchTerm, LibraryItem.SONG)
-            : filtered;
-        return sortSongList(
-            searched,
-            (query.sortBy as SongListSort) ?? SongListSort.ID,
-            (query.sortOrder as SortOrder) ?? SortOrder.ASC,
-        );
+        if (searchTerm?.trim()) {
+            return searchLibraryItems(filtered, searchTerm, LibraryItem.SONG);
+        }
+        const sortBy = (query.sortBy as SongListSort) ?? SongListSort.ID;
+        const sortOrder = (query.sortOrder as SortOrder) ?? SortOrder.ASC;
+        return sortSongList(filtered, sortBy, sortOrder);
     }, [data?.items, query, searchTerm]);
 
     const totalCount = sortedAndFilteredSongs.length;

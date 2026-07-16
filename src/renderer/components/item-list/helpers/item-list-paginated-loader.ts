@@ -12,7 +12,7 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { getListRefreshMutationKey } from '/@/renderer/features/shared/components/list-refresh-button';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { LibraryItem, SortKeyRandom } from '/@/shared/types/domain-types';
 
 const getQueryKeyName = (itemType: LibraryItem): string => {
     switch (itemType) {
@@ -76,6 +76,8 @@ export const useItemListPaginatedLoader = ({
     const fetchRange = getFetchRange(currentPage, itemsPerPage);
     const startIndex = fetchRange.startIndex;
 
+    const isRandomSort = query?.sortBy === SortKeyRandom;
+
     const queryParams = useMemo(
         () => ({
             limit: itemsPerPage,
@@ -86,7 +88,7 @@ export const useItemListPaginatedLoader = ({
     );
 
     const { data } = useQuery({
-        gcTime: 1000 * 15,
+        gcTime: isRandomSort ? 1000 * 60 * 10 : 1000 * 15,
         placeholderData: { items: getInitialData(itemsPerPage) },
         queryFn: async ({ signal }) => {
             const result = await listQueryFn({
@@ -97,7 +99,7 @@ export const useItemListPaginatedLoader = ({
             return result;
         },
         queryKey: queryKeys[getQueryKeyName(itemType)].list(serverId, queryParams),
-        staleTime: 1000 * 15,
+        staleTime: isRandomSort ? 1000 * 60 * 10 : 1000 * 15,
     });
 
     const refreshMutation = useMutation({

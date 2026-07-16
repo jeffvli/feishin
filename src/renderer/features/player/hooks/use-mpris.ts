@@ -3,11 +3,12 @@ import React, { useEffect, useMemo } from 'react';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
+import { clampVolume } from '/@/renderer/features/player/audio-player/utils/volume';
 import {
     useIsRadioActive,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
-import { usePlayerSong, usePlayerStore } from '/@/renderer/store';
+import { usePlayerSong, usePlayerStore, useSettingsStore } from '/@/renderer/store';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 import { PlayerShuffle, ServerType } from '/@/shared/types/types';
 
@@ -134,7 +135,8 @@ export const useMPRIS = () => {
         });
 
         mpris?.requestVolume((data: { volume: number }) => {
-            player.setVolume(data.volume);
+            const { mpvExtraParameters, type } = useSettingsStore.getState().playback;
+            player.setVolume(clampVolume(data.volume, type, mpvExtraParameters));
         });
 
         return () => {

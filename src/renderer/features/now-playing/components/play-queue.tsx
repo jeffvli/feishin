@@ -179,6 +179,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
                 <ItemTableList
                     activeRowId={currentSongUniqueId}
                     autoFitColumns={table.autoFitColumns}
+                    autoScrollToActiveRow={followCurrentSong}
                     CellComponent={ItemTableListColumn}
                     columns={table.columns}
                     data={filteredData}

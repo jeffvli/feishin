@@ -49,7 +49,8 @@
         "sleepTimer_setCustom": "Définir le minuteur",
         "sleepTimer_cancel": "Annuler le minuteur",
         "albumRadio": "Radio d'album",
-        "scrobbleForceSubmit": "Forcer le scrobble"
+        "scrobbleForceSubmit": "Forcer le scrobble",
+        "sleepTimer_endOfAlbum": "Fin de l'album actuel"
     },
     "action": {
         "editPlaylist": "Éditer $t(entity.playlist, {\"count\": 1})",
@@ -226,7 +227,8 @@
         "rename": "Renommer",
         "newVersionAvailable": "Une nouvelle version est disponible",
         "numberOfResults": "{{numberOfResults}} résultats",
-        "back": "Retour"
+        "back": "Retour",
+        "openFolder": "Ouvrir le dossier"
     },
     "error": {
         "remotePortWarning": "Redémarrer le serveur pour appliquer le nouveau port",
@@ -346,13 +348,21 @@
                 "dynamicImageBlur": "Intensité du flou sur l'image d'arrière-plan",
                 "lyricOffset": "Décalage des paroles (ms)",
                 "lyricScaleNonActive": "Mise à l'échelle des paroles inactives",
-                "lyricOpacityNonActive": "Opacité des paroles inactive"
+                "lyricOpacityNonActive": "Opacité des paroles inactive",
+                "lyricFollowScrollAlignment": "Les paroles suivent l'alignement",
+                "lyricLineLeadTime": "Temps d'avance de la ligne de paroles (ms)",
+                "lyricPaddingLeft": "Marge de gauche des paroles (%)",
+                "lyricPaddingRight": "Marge de droite des paroles (%)"
             },
             "upNext": "À suivre",
             "lyrics": "Paroles",
             "related": "Similaire",
             "visualizer": "Visualisateur",
-            "noLyrics": "Aucune parole trouvée"
+            "noLyrics": "Aucune parole trouvée",
+            "lyricLayers": "Couches de paroles",
+            "lyricLanguage": "Langue",
+            "showPronunciation": "Prononciation",
+            "showTranslation": "Traduction"
         },
         "appMenu": {
             "selectServer": "Sélectionner le serveur",
@@ -672,9 +682,9 @@
         "playButtonBehavior_optionAddNext": "$t(player.addNext)",
         "replayGainMode_description": "Ajuste le gain du volume selon les valeurs de {{ReplayGain}} enregistrées dans les métadonnées du fichier",
         "replayGainFallback": "Valeur de repli de {{ReplayGain}}",
-        "replayGainClipping_description": "Empêcher la distorsion causée par {{ReplayGain}} en réduisant automatiquement le gain",
+        "replayGainClipping_description": "Prévient l'écrêtage causé par {{ReplayGain}} en réduisant automatiquement le gain",
         "replayGainPreamp": "Préamplificateur (db) de {{ReplayGain}}",
-        "replayGainClipping": "Distorsion du {{ReplayGain}}",
+        "replayGainClipping": "Écrêtage du {{ReplayGain}}",
         "replayGainMode": "Mode de {{ReplayGain}}",
         "replayGainFallback_description": "Gain en dB à appliquer si le fichier n'a pas de tags de {{ReplayGain}}",
         "replayGainPreamp_description": "Ajuste le gain de préampli appliqué aux valeurs {{ReplayGain}}",
@@ -682,7 +692,7 @@
         "clearCache": "Vider le cache du navigateur",
         "buttonSize_description": "La taille des boutons de la barre de lecture",
         "clearQueryCache_description": "Un 'nettoyage léger' de Feishin. Cela actualisera les listes de lecture, les métadonnées des titres, et réinitialisera les paroles enregistrées. Les paramètres, identifiants du serveur et images mises en cache seront conservés",
-        "clearCache_description": "Un 'nettoyage complet' de Feishin. En plus de vider le cache de Feishin, vide le cache du navigateur (images sauvegardées et autres ressources). Les identifiants serveurs et paramètres sont conservés",
+        "clearCache_description": "Un 'nettoyage complet' de Feishin. En plus de vider le cache de Feishin, vide le cache du navigateur (images enregistrée et autres ressources). Les identifiants serveurs et paramètres sont conservés",
         "buttonSize": "Taille des boutons de la barre de lecture",
         "clearCacheSuccess": "Cache vidé avec succès",
         "externalLinks_description": "Activer l'affichage de liens externes (Last.fm, MusicBrainz) sur les pages d'artiste/album",
@@ -728,7 +738,7 @@
         "translationTargetLanguage": "Langue cible de traduction",
         "trayEnabled": "Afficher la barre d’état système",
         "translationApiProvider_description": "Fournisseur d'API pour la traduction",
-        "customCss_description": "Contenu CSS personnalisé. Remarque : les propriétés 'content' et les URL distantes ne sont pas autorisées. Un aperçu de votre contenu est affiché ci-dessous. Des champs supplémentaires que vous n'avez pas définis sont présents en raison d'assainissement",
+        "customCss_description": "Contenu CSS personnalisé. Remarque : les propriétés 'content' et les URL distantes ne sont pas autorisées. Un aperçu de votre contenu est affiché ci-dessous. Des champs supplémentaires que vous n'avez pas définis sont présents en raison d'assainissement. Application de Bureau uniquement: feishin lit et écrit le fichier custom.css dans le répertoire de configuration de l'application et le recharge lorsque celui-ci est modifié",
         "translationApiKey": "Clé API de traduction",
         "translationTargetLanguage_description": "Langue cible pour la traduction",
         "trayEnabled_description": "Afficher/masquer l’icône/le menu dans la barre d’état système. si désactivé, désactive également la réduction/fermeture vers la barre d’état système",
@@ -813,7 +823,7 @@
         "queryBuilderCustomFields_description": "Ajouter des champs personnalisés à utiliser dans les constructeurs de requêtes",
         "autoDJ": "DJ auto",
         "autoDJ_itemCount": "Nombre d'entrée",
-        "autoDJ_itemCount_description": "Le nombre d'entrées tentées d'être ajoutées à la file d'attente lorsque le DJ auto est activé",
+        "autoDJ_itemCount_description": "Le nombre d'entrées tentées d'être ajoutées à la file d'attente",
         "autoDJ_timing": "Timing",
         "autoDJ_timing_description": "Le nombre de titres restant dans la file d'attente avant le déclenchement du DJ auto",
         "followCurrentSong_description": "Défiler automatiquement la file d'attente jusqu'au titre en cours",
@@ -915,7 +925,40 @@
         "sidebarPlaylistFolderTreeIndent": "Indentation de l'arbre",
         "sidebarPlaylistMode_description": "Comment chaque liste de lecture est affichée dans la barre latérale",
         "sidebarPlaylistMode": "Mode de liste de lecture de la barre latérale",
-        "sidebarPlaylistMode_optionCompact": "Compacte"
+        "sidebarPlaylistMode_optionCompact": "Compacte",
+        "autoDJ_mode": "Mode",
+        "autoDJ_mode_albums": "Albums",
+        "autoDJ_mode_description": "Choisissez d'ajouter des titres ou des albums entiers à la file d'attente",
+        "autoDJ_mode_songs": "Titres",
+        "autoDJ_enabled": "Activer le DJ auto",
+        "autoDJ_albumStrategy": "Mode de sélection d'album",
+        "autoDJ_songStrategy": "Mode de sélection de titre",
+        "autoDJ_strategy_option_library_random": "Aléatoire",
+        "autoDJ_strategy_option_similar": "Similaire",
+        "enableFurigana_description": "Afficher les indications de prononciation (furigana) au-dessus des paroles en kanji Japonais.",
+        "enableFurigana": "Active la génération des furigana",
+        "enableRomaji_description": "Afficher une ligne de prononciation en romaji sous les paroles Japonaises.",
+        "enableRomaji": "Active la génération des romaji",
+        "equalizer_descriptionMpv": "Égaliseur paramétrique via FFmpeg lavfi (MPV)",
+        "equalizer_descriptionWebAudio": "Égaliseur paramétrique via Web Audio API",
+        "equalizer": "Égaliseur",
+        "equalizerBands_description": "Gain par bande. Faire glisser vers le haut/bas ou taper une valeur. Plage : -12 à +12 dB.",
+        "equalizerBands": "Bandes",
+        "equalizerPreamp_description": "Gain d'entrée avant les bandes d'égalisation. Réglez-le sur une valeur négative lors de l'amplification des bandes pour éviter l'écrêtage (MPV).",
+        "equalizerPreamp": "Préampli",
+        "equalizerPreset_description": "Appliquer une courbe d'EQ personnalisé intégrée ou personnalisée",
+        "equalizerPreset": "Préréglage",
+        "equalizerPresetDeletePlaceholder": "Supprimer les personnalisé...",
+        "equalizerPresetGroupBuiltIn": "Intégré",
+        "equalizerPresetGroupCustom": "Personnalisé",
+        "equalizerPresetNamePlaceholder": "Nom de préréglage...",
+        "equalizerPresetSelectPlaceholder": "Sélectionnée un préréglage",
+        "equalizerSavePreset_description": "Enregistrer les paramètres d'EQ actuels en tant que préréglage nommé",
+        "equalizerSavePreset": "Enregistrer le préréglage",
+        "sidebarPlaylistFolderTreeLineColor_description": "Couleur des lignes de l'arborescence (vide pour le thème par défaut)",
+        "sidebarPlaylistFolderTreeLineColor": "Couleur de la ligne de l'arboresence",
+        "windowBarTrackinfo": "Informations de la piste dans le titre de la fenêtre",
+        "windowBarTrackinfo_description": "Afficher le titre et l'artiste de la piste en cours, sa position dans la file d'attente et son état (lecture/pause) dans le titre de la fenêtre."
     },
     "form": {
         "deletePlaylist": {
@@ -934,12 +977,13 @@
             "input_savePassword": "Enregister le mot de passe",
             "ignoreSsl": "Ignorer ssl $t(common.restartRequired)",
             "ignoreCors": "Ignorer cors $t(common.restartRequired)",
-            "error_savePassword": "Une erreur s’est produite lors de la tentative de sauvegarde du mot de passe",
+            "error_savePassword": "Une erreur s’est produite lors de la tentative d'enregistrement du mot de passe",
             "input_preferInstantMix": "Préférer le mix instantané",
             "input_preferInstantMixDescription": "Utiliser uniquement le mix instantané pour jouer des titres similaires. utile si vous avez des plugins qui modifient ce comportement",
             "input_preferRemoteUrl": "Préférer une URL publique",
             "input_remoteUrl": "URL publique",
-            "input_remoteUrlPlaceholder": "Optionnel : URL publique pour les fonctionnalités externes"
+            "input_remoteUrlPlaceholder": "Optionnel : URL publique pour les fonctionnalités externes",
+            "input_passwordNoSSO": "L'authentification par proxy inverse (SSO) n'est pas prise en charge. Seules l'authentification par nom d'utilisateur/mot de passe et l'authentification Subsonic sont prises en charge"
         },
         "addToPlaylist": {
             "success": "$t(entity.trackWithCount, {\"count\": {{message}} }) ajouté à $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -1009,7 +1053,12 @@
             "input_played": "Filtre de lecture",
             "input_played_optionAll": "Toutes les pistes",
             "input_played_optionUnplayed": "Seulement les pistes non jouées",
-            "input_played_optionPlayed": "Seulement les pistes jouées"
+            "input_played_optionPlayed": "Seulement les pistes jouées",
+            "input_kind_songs": "Titres",
+            "input_kind_albums": "Albums",
+            "input_kind": "Sélections aléatoires",
+            "input_limit_albums": "Combien d'albums ?",
+            "input_limit_songs": "Combien de titres ?"
         },
         "createRadioStation": {
             "success": "Station radio créée avec succès",
@@ -1122,7 +1171,12 @@
                 "horizontalBorders": "Bordures de ligne",
                 "rowHoverHighlight": "Surligner les lignes au survol",
                 "verticalBorders": "Bordure de colonne",
-                "showHeader": "Affiche l'en-tête"
+                "showHeader": "Affiche l'en-tête",
+                "albumGroupConfig": "Configuration du groupe d'albums",
+                "albumImageSize": "Taille de la pochette d'album",
+                "albumGroupMetadata": "Champs de metadonnée",
+                "albumGroupShowFavoriteRating": "Afficher les favoris et les notes",
+                "albumGroupVerticalLayout": "Mise en page verticale"
             },
             "view": {
                 "table": "Liste",
@@ -1250,7 +1304,9 @@
         "notContains": "Ne contient pas",
         "notInPlaylist": "N'est pas dans",
         "notInTheLast": "N'est pas dans le dernier",
-        "startsWith": "Commence par"
+        "startsWith": "Commence par",
+        "isMissing": "Est manquant",
+        "isPresent": "Est présent"
     },
     "datetime": {
         "minuteShort": "M",

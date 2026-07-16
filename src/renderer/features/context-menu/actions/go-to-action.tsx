@@ -4,50 +4,38 @@ import { generatePath, useNavigate } from 'react-router';
 
 import { AppRoute } from '/@/renderer/router/routes';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
-import {
-    Album,
-    AlbumArtist,
-    Artist,
-    LibraryItem,
-    QueueSong,
-    Song,
-} from '/@/shared/types/domain-types';
+import { Album, LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 
 interface GoToActionProps {
-    items: Album[] | AlbumArtist[] | Artist[] | QueueSong[] | Song[];
+    items: Album[] | QueueSong[] | Song[];
 }
 
 export const GoToAction = ({ items }: GoToActionProps) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const { albumArtists, albumId } = useMemo(() => {
+    const { albumId, artists } = useMemo(() => {
         const firstItem = items[0];
 
-        if (firstItem._itemType === LibraryItem.ALBUM) {
-            return {
-                albumArtists: firstItem.albumArtists || [],
-                albumId: firstItem.id,
-            };
-        } else if (firstItem._itemType === LibraryItem.SONG) {
-            return {
-                albumArtists: firstItem.albumArtists || [],
-                albumId: firstItem.albumId,
-            };
-        } else if (
-            firstItem._itemType === LibraryItem.ARTIST ||
-            firstItem._itemType === LibraryItem.ALBUM_ARTIST
-        ) {
-            return {
-                albumArtists: [{ id: firstItem.id, name: firstItem.name }],
-                albumId: null,
-            };
+        switch (firstItem._itemType) {
+            case LibraryItem.ALBUM:
+                return {
+                    albumId: firstItem.id,
+                    artists: firstItem.albumArtists || [],
+                };
+            case LibraryItem.SONG:
+                return {
+                    albumId: firstItem.albumId,
+                    artists:
+                        (firstItem.artists?.length ? firstItem.artists : firstItem.albumArtists) ||
+                        [],
+                };
+            default:
+                return {
+                    albumId: null,
+                    artists: [],
+                };
         }
-
-        return {
-            albumArtists: [],
-            albumId: null,
-        };
     }, [items]);
 
     const handleGoToAlbum = useCallback(() => {
@@ -55,7 +43,7 @@ export const GoToAction = ({ items }: GoToActionProps) => {
         navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId }));
     }, [albumId, navigate]);
 
-    const handleGoToAlbumArtist = useCallback(
+    const handleGoToArtist = useCallback(
         (albumArtistId: string) => {
             navigate(generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, { albumArtistId }));
         },
@@ -81,13 +69,13 @@ export const GoToAction = ({ items }: GoToActionProps) => {
                         {t('page.contextMenu.goToAlbum')}
                     </ContextMenu.Item>
                 )}
-                {albumArtists.map((albumArtist) => (
+                {artists.map((artist) => (
                     <ContextMenu.Item
-                        key={albumArtist.id}
+                        key={artist.id}
                         leftIcon="artist"
-                        onSelect={() => handleGoToAlbumArtist(albumArtist.id)}
+                        onSelect={() => handleGoToArtist(artist.id)}
                     >
-                        {`${t('page.contextMenu.goTo')} ${albumArtist.name}`}
+                        {`${t('page.contextMenu.goTo')} ${artist.name}`}
                     </ContextMenu.Item>
                 ))}
             </ContextMenu.SubmenuContent>

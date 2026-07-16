@@ -136,6 +136,10 @@
     white-space: nowrap;
 }
 
+.name-active {
+    color: var(--theme-colors-primary);
+}
+
 .image-container {
     flex-shrink: 0;
     width: 3rem;

@@ -1,0 +1,13 @@
+.content {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    @media screen and (orientation: portrait) {
+        padding-top: 5vh !important;
+        padding-right: var(--lyric-padding-right, 0%) !important;
+        padding-bottom: 5vh !important;
+        padding-left: var(--lyric-padding-left, 0%) !important;
+    }
+}

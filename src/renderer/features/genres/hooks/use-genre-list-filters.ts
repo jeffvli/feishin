@@ -6,7 +6,7 @@ import { GenreListSort } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
 export const useGenreListFilters = () => {
-    const { sortBy } = useSortByFilter<GenreListSort>(null, ItemListKey.GENRE);
+    const { sortBy } = useSortByFilter<GenreListSort>(GenreListSort.NAME, ItemListKey.GENRE);
 
     const { sortOrder } = useSortOrderFilter(null, ItemListKey.GENRE);
 

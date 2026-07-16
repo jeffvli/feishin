@@ -231,11 +231,11 @@ export const AddToPlaylistContextModal = ({
                 const uniqueSongIds: string[] = [];
 
                 if (values.skipDuplicates) {
-                    const queryKey = queryKeys.playlists.songList(serverId, playlistId);
+                    const queryKey = queryKeys.playlists.songListIds(serverId, playlistId);
 
                     const playlistSongsRes = await queryClient.fetchQuery({
                         queryFn: ({ signal }) => {
-                            return api.controller.getPlaylistSongList({
+                            return api.controller.getPlaylistSongIds({
                                 apiClientProps: {
                                     serverId,
                                     signal,
@@ -248,7 +248,7 @@ export const AddToPlaylistContextModal = ({
                         queryKey,
                     });
 
-                    const playlistSongIds = playlistSongsRes?.items?.map((song) => song.id);
+                    const playlistSongIds = playlistSongsRes?.items;
 
                     for (const songId of allSongIds) {
                         if (!playlistSongIds?.includes(songId)) {

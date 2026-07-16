@@ -471,6 +471,7 @@ const song = z.object({
     AlbumArtist: z.string(),
     AlbumArtists: z.array(genericItem),
     AlbumId: z.string().optional(),
+    AlbumNormalizationGain: z.number().optional(),
     AlbumPrimaryImageTag: z.string(),
     ArtistItems: z.array(genericItem),
     Artists: z.array(z.string()),
@@ -705,6 +706,14 @@ const removeFromPlaylistParameters = z.object({
 
 const deletePlaylist = z.null();
 
+const deletePlaylistImage = z.null();
+
+const deleteArtistImage = deletePlaylistImage;
+
+const uploadPlaylistImage = z.null();
+
+const uploadArtistImage = uploadPlaylistImage;
+
 const deletePlaylistParameters = z.object({
     Id: z.string(),
 });
@@ -886,7 +895,9 @@ export const jfType = {
         albumList,
         authenticate,
         createPlaylist,
+        deleteArtistImage,
         deletePlaylist,
+        deletePlaylistImage,
         error,
         favorite,
         filters,
@@ -912,6 +923,8 @@ export const jfType = {
         studioList,
         topSongsList,
         updatePlaylist,
+        uploadArtistImage,
+        uploadPlaylistImage,
         user,
     },
 };

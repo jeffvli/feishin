@@ -1,0 +1,9 @@
+.container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden auto;
+    word-break: break-all;
+}

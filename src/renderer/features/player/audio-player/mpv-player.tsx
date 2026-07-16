@@ -69,12 +69,12 @@ export function MpvPlayer() {
                 }, PLAY_PAUSE_FADE_INTERVAL);
             });
 
-            if (status === PlayerStatus.PAUSED) {
-                await promise;
-                setLocalPlayerStatus(status);
-            } else if (status === PlayerStatus.PLAYING) {
+            if (status === PlayerStatus.PLAYING) {
                 setLocalPlayerStatus(status);
                 await promise;
+            } else {
+                await promise;
+                setLocalPlayerStatus(status);
             }
         },
         [],
@@ -111,18 +111,18 @@ export function MpvPlayer() {
                 const status = properties.status;
                 const volume = usePlayerStore.getState().player.volume;
                 if (audioFadeOnStatusChange) {
-                    if (status === PlayerStatus.PAUSED) {
-                        fadeAndSetStatus(volume, 0, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PAUSED);
-                    } else if (status === PlayerStatus.PLAYING) {
+                    if (status === PlayerStatus.PLAYING) {
                         fadeAndSetStatus(0, volume, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PLAYING);
+                    } else {
+                        fadeAndSetStatus(volume, 0, PLAY_PAUSE_FADE_DURATION, status);
                     }
                 } else {
-                    if (status === PlayerStatus.PAUSED) {
-                        playerRef.current?.setVolume(0);
-                        setLocalPlayerStatus(PlayerStatus.PAUSED);
-                    } else if (status === PlayerStatus.PLAYING) {
+                    if (status === PlayerStatus.PLAYING) {
                         playerRef.current?.setVolume(volume);
                         setLocalPlayerStatus(PlayerStatus.PLAYING);
+                    } else {
+                        playerRef.current?.setVolume(0);
+                        setLocalPlayerStatus(status);
                     }
                 }
             },
@@ -162,7 +162,7 @@ export function MpvPlayer() {
             try {
                 const time = await mpvPlayer.getCurrentTime();
                 if (time !== undefined) {
-                    setTimestamp(Number(time.toFixed(0)));
+                    setTimestamp(time);
                 }
             } catch {
                 // Do nothing

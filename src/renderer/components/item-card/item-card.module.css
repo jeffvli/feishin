@@ -223,3 +223,11 @@
 .row.muted.compact {
     color: var(--theme-colors-foreground);
 }
+
+.row.artists-row {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    white-space: normal;
+}

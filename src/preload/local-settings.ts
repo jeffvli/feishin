@@ -9,6 +9,13 @@ const set = (
     ipcRenderer.send('settings-set', { property, value });
 };
 
+const setSync = async (
+    property: string,
+    value: boolean | null | Record<string, unknown> | string | string[],
+) => {
+    return ipcRenderer.invoke('settings-set-sync', { property, value });
+};
+
 const get = async (property: string) => {
     return ipcRenderer.invoke('settings-get', { property });
 };
@@ -99,6 +106,7 @@ export const localSettings = {
     passwordSet,
     restart,
     set,
+    setSync,
     setZoomFactor,
     themeSet,
 };

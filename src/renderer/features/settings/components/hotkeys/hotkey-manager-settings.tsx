@@ -70,6 +70,7 @@ const BINDINGS_MAP: Record<BindingActions, string> = {
         context: 'navigateHome',
     }),
     next: i18n.t('setting.hotkey', { context: 'playbackNext' }),
+    nextAlbum: i18n.t('setting.hotkey', { context: 'playbackNextAlbum' }),
     pause: i18n.t('setting.hotkey', { context: 'playbackPause' }),
     play: i18n.t('setting.hotkey', { context: 'playbackPlay' }),
     playPause: i18n.t('setting.hotkey', {
@@ -78,6 +79,7 @@ const BINDINGS_MAP: Record<BindingActions, string> = {
     previous: i18n.t('setting.hotkey', {
         context: 'playbackPrevious',
     }),
+    previousAlbum: i18n.t('setting.hotkey', { context: 'playbackPreviousAlbum' }),
     rate0: i18n.t('setting.hotkey', { context: 'rate0' }),
     rate1: i18n.t('setting.hotkey', { context: 'rate1' }),
     rate2: i18n.t('setting.hotkey', { context: 'rate2' }),

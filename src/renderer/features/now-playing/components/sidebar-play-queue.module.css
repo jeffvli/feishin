@@ -20,13 +20,14 @@
     background-color: var(--theme-colors-background-alternate);
 }
 
-.lyrics-section :global(.synchronized-lyrics) {
+.lyrics-section :global(.synchronized-lyrics),
+.lyrics-section :global(.synchronized-karaoke-lyrics) {
     padding: 2rem 0 4rem !important;
     transform: translateY(0) !important;
 }
 
 .lyrics-section :global(.synchronized-lyrics .lyric-line) {
-    padding: 0.25rem 0;
+    padding-block: 0.25rem;
 }
 
 .visualizer-overlay {

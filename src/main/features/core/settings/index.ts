@@ -141,6 +141,14 @@ ipcMain.on('settings-set', (__event, data: { property: string; value: any }) => 
     }
 });
 
+ipcMain.handle('settings-set-sync', (__event, data: { property: string; value: any }) => {
+    if (data.value === null) {
+        store.delete(data.property);
+    } else {
+        store.set(data.property, data.value);
+    }
+});
+
 ipcMain.handle('password-get', (_event, server: string): null | string => {
     if (safeStorage.isEncryptionAvailable()) {
         const servers = store.get('server') as Record<string, string> | undefined;

@@ -3,10 +3,10 @@ FROM node:23-alpine AS builder
 WORKDIR /app
 
 # Copy package.json first to cache node_modules
-COPY package.json pnpm-lock.yaml .
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .
 
-# Match CI (pnpm/action-setup version: 10). Latest pnpm 11 fails install without approve-builds.
-RUN corepack enable && corepack prepare pnpm@10 --activate
+# Match packageManager in package.json (pnpm is not bundled in the Node image)
+RUN corepack enable && corepack prepare pnpm@11.5.2 --activate
 
 RUN pnpm install
 

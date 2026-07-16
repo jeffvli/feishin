@@ -15,8 +15,8 @@
         "edit": "Editar",
         "favorite": "Favorito",
         "currentSong": "$t(entity.track, {\"count\": 1}) atual",
-        "descending": "Abaixar",
-        "dismiss": "Liberar",
+        "descending": "Decrescente",
+        "dismiss": "Ignorar",
         "duration": "Duração",
         "decrease": "Diminuir",
         "description": "Descrição",
@@ -24,7 +24,7 @@
         "enable": "Habilitar",
         "clear": "Limpar",
         "delete": "Deletar",
-        "title": "Titulo",
+        "title": "Título",
         "create": "Criar",
         "confirm": "Confirmar",
         "home": "Início",
@@ -59,8 +59,8 @@
         "forward": "Para frente",
         "forceRestartRequired": "Reinicie para aplicar as alterações… feche a notificação para reiniciar",
         "setting_one": "Configuração",
-        "setting_many": "",
-        "setting_other": "",
+        "setting_many": "Configurações",
+        "setting_other": "Configurações",
         "version": "Versão",
         "filter_one": "Filtro",
         "filter_many": "filtros",
@@ -69,15 +69,15 @@
         "saveAndReplace": "Salvar e substituir",
         "playerMustBePaused": "O player deve estar pausado",
         "resetToDefault": "Restaurar ao padrão",
-        "reset": "Reiniciar",
+        "reset": "Resetar",
         "sortOrder": "Ordem",
         "none": "Nenhum",
         "menu": "Menu",
         "restartRequired": "É necessário reiniciar",
-        "previousSong": "Anterior $t(entity.track, {\"count\": 1})",
-        "noResultsFromQuery": "A consulta não retornou resultados",
+        "previousSong": "$t(entity.track, {\"count\": 1}) anterior",
+        "noResultsFromQuery": "A pesquisa não retornou resultados",
         "quit": "Sair",
-        "search": "Procurar",
+        "search": "Pesquisar",
         "saveAs": "Salvar como",
         "yes": "Sim",
         "random": "Aleatório",
@@ -100,7 +100,35 @@
         "newVersion": "Uma nova versão foi instalada ({{version}})",
         "viewReleaseNotes": "Ver notas de lançamento",
         "bitDepth": "Profundidade de bits",
-        "sampleRate": "Taxa de amostragem"
+        "sampleRate": "Taxa de amostragem",
+        "countSelected": "{{count}} selecionadas",
+        "explicitStatus": "Explicito",
+        "back": "Voltar",
+        "doNotShowAgain": "Não mostrar novamente",
+        "view": "Ver",
+        "example": "Exemplo",
+        "externalLinks": "Links externos",
+        "openFolder": "Abrir pasta",
+        "faster": "Acelerar",
+        "filter_single": "Single",
+        "filter_multiple": "Multi",
+        "mood": "Clima",
+        "numberOfResults": "{{numberOfResults}} resultados",
+        "noFilters": "Nenhum filtro configurado",
+        "private": "Privado",
+        "public": "Público",
+        "retry": "Tentar novamente",
+        "recordLabel": "Gravadora",
+        "releaseType": "Tipo de lançamento",
+        "rename": "Renomear",
+        "slower": "Mais lento",
+        "sort": "Ordenar",
+        "explicit": "Explícito",
+        "clean": "Limpo",
+        "gridRows": "Linhas da grade",
+        "tableColumns": "Colunas da tabela",
+        "itemsMore": "Mais {{count}}",
+        "newVersionAvailable": "Uma nova versão está disponível"
     },
     "action": {
         "goToPage": "Vá para página",
@@ -123,7 +151,8 @@
             "lastfm": "Abrir em Last.fm",
             "musicbrainz": "Abrir em MusicBrainz",
             "listenbrainz": "Abrir no ListenBrainz",
-            "qobuz": "Abrir no Qobuz"
+            "qobuz": "Abrir no Qobuz",
+            "spotify": "Abrir no Spotify"
         },
         "toggleSmartPlaylistEditor": "Alternar editor $t(entity.smartPlaylist)",
         "moveToNext": "Mover para o próximo",
@@ -135,7 +164,17 @@
         "holdToMoveToTop": "Segure para ir ao topo",
         "moveItems": "Mover itens",
         "viewMore": "Ver mais",
-        "openApplicationDirectory": "Abrir a pasta do aplicativo"
+        "openApplicationDirectory": "Abrir a pasta do aplicativo",
+        "selectRangeOfItems": "Selecionar uma lista de itens",
+        "collapseAllFolders": "Minimizar todas as pastas",
+        "downloadStarted": "Download de {{count}} items iniciado",
+        "moveUp": "Mover a cima",
+        "moveDown": "Mover a baixo",
+        "holdToMoveToBottom": "Segure para mover ao final",
+        "shuffle": "Shuffle",
+        "shuffleAll": "Shuffle todas",
+        "shuffleSelected": "Shuffle selecionadas",
+        "expandAllFolders": "Expandir todas as pastas"
     },
     "form": {
         "deletePlaylist": {
@@ -156,7 +195,10 @@
             "input_username": "Nome de usuário",
             "ignoreCors": "Ignorar CORS ($t(common.restartRequired))",
             "input_preferInstantMix": "Preferir mixagem instantânea",
-            "input_preferInstantMixDescription": "Usar apenas a mixagem instantânea para obter músicas semelhantes. Útil se você tiver plugins que modificam esse comportamento"
+            "input_preferInstantMixDescription": "Usar apenas a mixagem instantânea para obter músicas semelhantes. Útil se você tiver plugins que modificam esse comportamento",
+            "input_preferRemoteUrl": "Preferir URL pública",
+            "input_remoteUrl": "URL pública",
+            "input_remoteUrlPlaceholder": "Opcional: URL pública para funções externas"
         },
         "createPlaylist": {
             "title": "Criar $t(entity.playlist, {\"count\": 1})",
@@ -179,7 +221,10 @@
             "title": "Adicionar à $t(entity.playlist, {\"count\": 1})",
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "input_skipDuplicates": "Pular duplicadas",
-            "success": "Adicionado $t(entity.trackWithCount, {\"count\": {{message}} }) para $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })"
+            "success": "Adicionado $t(entity.trackWithCount, {\"count\": {{message}} }) para $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
+            "create": "Criar $t(entity.playlist, {\"count\": 1}) {{playlist}}",
+            "noneAdded": "Nenhuma faixa foi adicionada à $t(entity.playlist, {\"count\": 1}) {{playlist}}",
+            "searchOrCreate": "Pesquisar $t(entity.playlist, {\"count\": 2}) ou criar uma nova"
         },
         "lyricSearch": {
             "title": "Pesquisa de letras",
@@ -203,6 +248,24 @@
             "enabled": "Modo privado ativado, o status de reprodução agora está oculto para integrações externas",
             "disabled": "Modo privado desativado, o status de reprodução agora está visível para as integrações externas ativadas",
             "title": "Modo privado"
+        },
+        "largeFetchConfirmation": {
+            "title": "Adicionar items à lista de reprodução",
+            "description": "Essa ação adicionará todos os itens do filtro atual"
+        },
+        "createRadioStation": {
+            "success": "Estação de rádio criada com sucesso",
+            "title": "Criar estação de rádio",
+            "input_homepageUrl": "URL da página principal",
+            "input_name": "Nome",
+            "input_streamUrl": "URL da stream"
+        },
+        "editRadioStation": {
+            "success": "Estação de rádio atualizada com sucesso"
+        },
+        "lyricsExport": {
+            "export": "Exportar letra",
+            "input_synced": "Exportar letra sincronizada"
         }
     },
     "setting": {
@@ -536,7 +599,8 @@
             "title": "$t(common.home)",
             "explore": "Explore a sua biblioteca",
             "recentlyPlayed": "Tocado recentemente",
-            "recentlyReleased": "Lançamentos recentes"
+            "recentlyReleased": "Lançamentos recentes",
+            "genres": "$t(entity.genre, {\"count\": 2})"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -572,7 +636,8 @@
             "playlists": "$t(entity.playlist, {\"count\": 2})",
             "search": "$t(common.search)",
             "settings": "$t(common.setting, {\"count\": 2})",
-            "myLibrary": "Minha biblioteca"
+            "myLibrary": "Minha biblioteca",
+            "collections": "Coleções"
         },
         "playlistList": {
             "title": "$t(entity.playlist, {\"count\": 2})"
@@ -594,7 +659,8 @@
             "manageServers": "Gerenciar servidores",
             "settings": "$t(common.setting, {\"count\": 2})",
             "privateModeOff": "Desativar modo privado",
-            "privateModeOn": "Ativar modo privado"
+            "privateModeOn": "Ativar modo privado",
+            "multipleMusicFolders": "{{count}} pasta(s) de música selecionadas"
         },
         "contextMenu": {
             "moveToTop": "$t(action.moveToTop)",
@@ -620,7 +686,9 @@
             "removeFromPlaylist": "$t(action.removeFromPlaylist)",
             "setRating": "$t(action.setRating)",
             "goToAlbum": "Ir para $t(entity.album, {\"count\": 1})",
-            "goToAlbumArtist": "Ir para $t(entity.albumArtist, {\"count\": 1})"
+            "goToAlbumArtist": "Ir para $t(entity.albumArtist, {\"count\": 1})",
+            "moveItems": "$t(action.moveItems)",
+            "goTo": "Ir para"
         },
         "albumArtistDetail": {
             "viewAllTracks": "Ver todas as $t(entity.track, {\"count\": 2})",
@@ -648,7 +716,9 @@
                 "lyricGap": "Espaçamento da letra",
                 "lyricSize": "Tamanho da letra",
                 "dynamicBackground": "Fundo dinâmico",
-                "opacity": "Opacidade"
+                "opacity": "Opacidade",
+                "lyricOpacityNonActive": "Opacidade da letra inativa",
+                "lyricScaleNonActive": "Escala da letra inativa"
             },
             "related": "Relacionado",
             "visualizer": "Visualizador",
@@ -679,19 +749,44 @@
             "hotkeysTab": "Teclas de atalho",
             "windowTab": "Janela",
             "advanced": "Avançado",
-            "playbackTab": "Reprodução"
+            "playbackTab": "Reprodução",
+            "analytics": "Analíticas",
+            "updates": "Atualização",
+            "cache": "Cache",
+            "application": "Aplicação",
+            "queryBuilder": "Construtor de pesquisa",
+            "theme": "Tema",
+            "controls": "Controles",
+            "sidebar": "Barra lateral",
+            "remote": "Controle Remoto",
+            "exportImport": "Importar/exportar",
+            "scrobble": "Scrobble",
+            "audio": "Áudio",
+            "lyrics": "Letra",
+            "lyricsDisplay": "Visualizar letra",
+            "transcoding": "Transcoding",
+            "discord": "Discord",
+            "logger": "Logger",
+            "playerFilters": "Filtros de reprodução"
         },
         "playlist": {
             "reorder": "Reordenar apenas disponível quando ordenado pelo ID"
+        },
+        "folderList": {
+            "title": "$t(entity.folder, {\"count\": 2})"
+        },
+        "collections": {
+            "overrideExisting": "Substituir atual",
+            "saveAsCollection": "Salvar como coleção"
         }
     },
     "filter": {
         "title": "Titulo",
         "disc": "Disco",
         "mostPlayed": "Mais tocado",
-        "album": "$t(entity.album, {\"count\": 1})",
+        "album": "$t({\"count\": 1}, entity.album)",
         "name": "Nome",
-        "biography": "Bibliografia",
+        "biography": "Biografia",
         "duration": "Duração",
         "favorited": "Favoritado",
         "fromYear": "A partir do ano",
@@ -717,7 +812,7 @@
         "releaseYear": "Ano de lançamento",
         "rating": "Avaliação",
         "artist": "$t(entity.artist, {\"count\": 1})",
-        "bpm": "Bpm",
+        "bpm": "BPM",
         "channels": "$t(common.channel_other)",
         "comment": "Comentário",
         "owner": "$t(common.owner)",
@@ -727,7 +822,11 @@
         "isRated": "Possui avaliação",
         "note": "Nota",
         "albumCount": "Número de $t(entity.album, {\"count\": 2})",
-        "genre": "$t(entity.genre, {\"count\": 1})"
+        "genre": "$t(entity.genre, {\"count\": 1})",
+        "matchAnd": "E",
+        "matchOr": "Ou",
+        "sortName": "Ordenar por nome",
+        "explicitStatus": "$t(common.explicitStatus)"
     },
     "player": {
         "playbackFetchNoResults": "Nenhuma música encontrada",
@@ -814,7 +913,13 @@
         "song_other": "Músicas",
         "play_one": "{{count}} reprodução",
         "play_many": "{{count}} reproduções",
-        "play_other": "{{count}} reproduções"
+        "play_other": "{{count}} reproduções",
+        "radioStation_one": "Estação de rádio",
+        "radioStation_many": "Estações de rádio",
+        "radioStation_other": "Estações de rádio",
+        "radioStationWithCount_one": "{{count}} estação de rádio",
+        "radioStationWithCount_many": "{{count}} estações de rádio",
+        "radioStationWithCount_other": "{{count}} estações de rádio"
     },
     "error": {
         "remotePortWarning": "Reinicie o servidor para aplicar a nova porta",
@@ -829,17 +934,48 @@
         "credentialsRequired": "Credenciais necessárias",
         "sessionExpiredError": "Sua sessão expirou",
         "remoteEnableError": "Ocorreu um erro ao tentar $t(common.enable) o servidor remoto",
-        "localFontAccessDenied": "Acesso negado a fontes locais",
+        "localFontAccessDenied": "Acesso negado às fontes locais",
         "serverNotSelectedError": "Nenhum servidor selecionado",
         "remoteDisableError": "Ocorreu um erro ao tentar $t(common.disable) o servidor remoto",
         "mpvRequired": "Requer MPV",
         "audioDeviceFetchError": "Ocorreu um erro ao tentar obter dispositivos de áudio",
         "invalidServer": "Servidor inválido",
         "loginRateError": "Muitas tentativas de login, tente novamente em alguns segundos",
-        "badAlbum": "Você está vendo este erro por que está música não é parte de algum álbum. um motivo comum para você estar vendo este erro é se a sua música estiver na raiz da sua pasta de músicas. o Jellyfin apenas agrupa as músicas se elas estiveram na mesma pasta",
-        "networkError": "Ocorreu um erro na internet",
+        "badAlbum": "Você está vendo este erro por que está música não é parte de algum álbum. um motivo comum para você estar vendo este erro é se a sua música estiver na raiz da sua pasta de músicas. O Jellyfin apenas agrupa as músicas se elas estiveram na mesma pasta",
+        "networkError": "Ocorreu um erro de rede",
         "openError": "Não foi possível abrir o arquivo",
-        "badValue": "Opção inválida \"{{value}}\". este valor não existe no momento",
-        "notificationDenied": "As permissões para notificações foram negadas. Esta configuração não tem efeito"
+        "badValue": "Opção inválida \"{{value}}\". Este valor não existe no momento",
+        "notificationDenied": "As permissões para notificações foram negadas. Esta configuração não fará efeito",
+        "invalidJson": "JSON inválido",
+        "multipleServerSaveQueueError": "A fila de reprodução tem uma ou mais faixas que não são do servidor atual. Isso não é suportado",
+        "noNetwork": "Servidor indisponível",
+        "noNetworkDescription": "Não foi possível conectar ao servidor",
+        "playbackPausedDueToError": "Reprodução foi pausada devido a um erro",
+        "saveQueueFailed": "Falha ao salvar a fila de reprodução",
+        "serverLockSingleServer": "Apenas um servidor é permitido quando o servidor estiver trancado",
+        "settingsSyncError": "Foram encontradas discrepâncias entre as configurações do renderizador e do processo principal. Reinicie a aplicação para aplicar as mudanças"
+    },
+    "filterOperator": {
+        "after": "É depois",
+        "afterDate": "Depois de (date)",
+        "before": "Antes de",
+        "beforeDate": "Antes de (date)",
+        "contains": "Contém",
+        "endsWith": "Termina com",
+        "inPlaylist": "Está em",
+        "inTheLast": "Está no último",
+        "inTheRange": "Está entre",
+        "inTheRangeDate": "Está entre (date)",
+        "is": "É",
+        "isNot": "Não é",
+        "isMissing": "Está faltando",
+        "isPresent": "Está presente",
+        "isGreaterThan": "É maior que",
+        "isLessThan": "É menor que",
+        "matchesRegex": "Corresponde ao regex",
+        "notContains": "Não contém",
+        "notInPlaylist": "Não se inclui em",
+        "notInTheLast": "Não está no último",
+        "startsWith": "Começa com"
     }
 }

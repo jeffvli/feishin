@@ -14,7 +14,13 @@ import macMin from './assets/min-mac.png';
 import styles from './window-bar.module.css';
 
 import { useRadioPlayer } from '/@/renderer/features/radio/hooks/use-radio-player';
-import { useAppStore, usePlayerData, usePlayerStatus, useWindowSettings } from '/@/renderer/store';
+import {
+    useAppStore,
+    usePlayerData,
+    usePlayerStatus,
+    useWindowBarTrackinfo,
+    useWindowSettings,
+} from '/@/renderer/store';
 import { Text } from '/@/shared/components/text/text';
 import { Platform, PlayerStatus } from '/@/shared/types/types';
 
@@ -130,6 +136,8 @@ const MacOsControls = ({ controls, title }: WindowBarControlsProps) => {
 export const WindowBar = () => {
     const { t } = useTranslation();
     const { windowBarStyle } = useWindowSettings();
+    const windowBarTrackinfo = useWindowBarTrackinfo();
+
     const playerStatus = usePlayerStatus();
     const privateMode = useAppStore((state) => state.privateMode);
     const handleMinimize = () => minimize();
@@ -152,6 +160,10 @@ export const WindowBar = () => {
 
     const title = useMemo(() => {
         const privateModeString = privateMode ? t('page.windowBar.privateMode') : '';
+
+        if (!windowBarTrackinfo) {
+            return `Feishin${privateMode ? ` ${privateModeString}` : ''}`;
+        }
 
         // Show radio information if radio is active
         if (isRadioActive) {
@@ -194,6 +206,7 @@ export const WindowBar = () => {
         queueLength,
         stationName,
         t,
+        windowBarTrackinfo,
     ]);
 
     useEffect(() => {

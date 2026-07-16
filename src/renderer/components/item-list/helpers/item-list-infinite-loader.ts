@@ -6,14 +6,14 @@ import {
     UseSuspenseQueryOptions,
 } from '@tanstack/react-query';
 import throttle from 'lodash/throttle';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { useListContext } from '/@/renderer/context/list-context';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
 import { getListRefreshMutationKey } from '/@/renderer/features/shared/components/list-refresh-button';
-import { LibraryItem } from '/@/shared/types/domain-types';
+import { LibraryItem, SortKeyRandom } from '/@/shared/types/domain-types';
 
 export const getListQueryKeyName = (itemType: LibraryItem): string => {
     switch (itemType) {
@@ -86,7 +86,6 @@ export const useItemListInfiniteLoader = ({
     const queryClient = useQueryClient();
     const lastFetchedPageRef = useRef<number>(-1);
     const currentVisibleRangeRef = useRef<null | { startIndex: number; stopIndex: number }>(null);
-    const [isRefetching, setIsRefetching] = useState(false);
     const refetchPromiseRef = useRef<null | Promise<void>>(null);
     const previousDataQueryKeyRef = useRef<string>('');
     const isRefetchingRef = useRef<boolean>(false);
@@ -108,8 +107,19 @@ export const useItemListInfiniteLoader = ({
         [serverId, itemType, query],
     );
 
+    const isRandomSort = query?.sortBy === SortKeyRandom;
+
     const fetchPage = useCallback(
         async (pageNumber: number) => {
+            if (isRandomSort) {
+                const existingData =
+                    queryClient.getQueryData<InfiniteLoaderCacheData>(dataQueryKey);
+                if (existingData?.pagesLoaded?.[pageNumber]) {
+                    lastFetchedPageRef.current = Math.max(lastFetchedPageRef.current, pageNumber);
+                    return;
+                }
+            }
+
             const startIndex = pageNumber * itemsPerPage;
             const queryParams = {
                 limit: itemsPerPage,
@@ -118,6 +128,7 @@ export const useItemListInfiniteLoader = ({
             };
 
             const result = await queryClient.fetchQuery({
+                gcTime: isRandomSort ? 1000 * 60 * 10 : 1000 * 15,
                 queryFn: async ({ signal }) => {
                     const result = await listQueryFn({
                         apiClientProps: { serverId, signal },
@@ -127,6 +138,7 @@ export const useItemListInfiniteLoader = ({
                     return result;
                 },
                 queryKey: queryKeys[getListQueryKeyName(itemType)].list(serverId, queryParams),
+                staleTime: isRandomSort ? 1000 * 60 * 10 : 1000 * 15,
             });
 
             // Update the query data with the fetched page
@@ -154,12 +166,31 @@ export const useItemListInfiniteLoader = ({
             // Track the last fetched page
             lastFetchedPageRef.current = Math.max(lastFetchedPageRef.current, pageNumber);
         },
-        [itemsPerPage, query, queryClient, serverId, dataQueryKey, listQueryFn, itemType],
+        [
+            itemsPerPage,
+            query,
+            queryClient,
+            serverId,
+            dataQueryKey,
+            listQueryFn,
+            itemType,
+            isRandomSort,
+        ],
     );
 
     // Reset the loaded pages and refetch current page when the query changes
     useEffect(() => {
         const currentDataQueryKey = JSON.stringify(dataQueryKey);
+
+        if (isRandomSort) {
+            const existingData = queryClient.getQueryData<InfiniteLoaderCacheData | undefined>(
+                dataQueryKey,
+            );
+            if (existingData?.dataMap && existingData.dataMap.size > 0) {
+                previousDataQueryKeyRef.current = currentDataQueryKey;
+                return;
+            }
+        }
 
         if (previousDataQueryKeyRef.current === currentDataQueryKey || isRefetchingRef.current) {
             return;
@@ -181,7 +212,6 @@ export const useItemListInfiniteLoader = ({
         const countQueryKey = listCountQuery.queryKey;
 
         // Set refetching state and create a promise to suspend
-        setIsRefetching(true);
         const refetchPromise = (async () => {
             try {
                 // Reset the loaded pages
@@ -207,7 +237,6 @@ export const useItemListInfiniteLoader = ({
                 // Fetch the first page after count is refetched
                 await fetchPage(pageToFetch);
             } finally {
-                setIsRefetching(false);
                 isRefetchingRef.current = false;
                 refetchPromiseRef.current = null;
             }
@@ -216,7 +245,6 @@ export const useItemListInfiniteLoader = ({
         refetchPromiseRef.current = refetchPromise;
 
         refetchPromise.catch(() => {
-            setIsRefetching(false);
             isRefetchingRef.current = false;
             refetchPromiseRef.current = null;
         });
@@ -234,7 +262,7 @@ export const useItemListInfiniteLoader = ({
     });
 
     // Suspend if refetching
-    if (isRefetching && refetchPromiseRef.current) {
+    if (isRefetchingRef.current && refetchPromiseRef.current) {
         throw refetchPromiseRef.current;
     }
 
@@ -462,10 +490,20 @@ export const useItemListInfiniteLoader = ({
             .map(([, v]) => v);
     }, [data]);
 
+    const getLoadedItems = useCallback(() => {
+        const cacheData = queryClient.getQueryData<InfiniteLoaderCacheData>(dataQueryKey);
+        const map = cacheData?.dataMap;
+        if (!map || map.size === 0) return [];
+        return Array.from(map.entries())
+            .sort(([a], [b]) => a - b)
+            .map(([, v]) => v);
+    }, [dataQueryKey, queryClient]);
+
     return {
         dataVersion: (data as any).version ?? 0,
         getItem,
         getItemIndex,
+        getLoadedItems,
         itemCount,
         loadedItems,
         onRangeChanged,

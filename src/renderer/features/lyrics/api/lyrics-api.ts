@@ -3,6 +3,7 @@ import isElectron from 'is-electron';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { getDefaultStructuredIndex } from '/@/renderer/features/lyrics/api/lyrics-utils';
 import { queryClient, QueryHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useSettingsStore } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
@@ -17,7 +18,7 @@ import {
     QueueSong,
     Song,
     StructuredLyric,
-    SynchronizedLyricsArray,
+    SynchronizedLyrics,
 } from '/@/shared/types/domain-types';
 import { LyricSource } from '/@/shared/types/domain-types';
 import { LyricsResponse } from '/@/shared/types/domain-types';
@@ -47,7 +48,7 @@ const alternateTimeExp = /\[(\d*),(\d*)]([^\n]+)(\n|$)/g;
 
 const formatLyrics = (lyrics: string) => {
     const synchronizedLines = lyrics.matchAll(timeExp);
-    const formattedLyrics: SynchronizedLyricsArray = [];
+    const formattedLyrics: SynchronizedLyrics = [];
 
     for (const line of synchronizedLines) {
         const [, minute, sec, ms, text] = line;
@@ -57,7 +58,7 @@ const formatLyrics = (lyrics: string) => {
 
         const timeInMilis = (minutes * 60 + seconds) * 1000 + milis;
 
-        formattedLyrics.push([timeInMilis, text]);
+        formattedLyrics.push({ startMs: timeInMilis, text });
     }
 
     if (formattedLyrics.length > 0) return formattedLyrics;
@@ -69,7 +70,7 @@ const formatLyrics = (lyrics: string) => {
             .replaceAll(/\(\d+,\d+\)/g, '')
             .replaceAll(/\s,/g, ',')
             .replaceAll(/\s\./g, '.');
-        formattedLyrics.push([Number(timeInMilis), cleanText]);
+        formattedLyrics.push({ startMs: Number(timeInMilis), text: cleanText });
     }
 
     if (formattedLyrics.length > 0) return formattedLyrics;
@@ -109,12 +110,8 @@ export function computeSelectedFromResult(
         };
     }
 
-    const hasLocalLocal =
-        (Array.isArray(local) && local.length > 0) ||
-        (local != null && !Array.isArray(local) && 'lyrics' in local && Boolean(local.lyrics));
-
     // If setting is set to prefer local lyrics, return the local lyrics if available
-    if (preferLocalLyrics && hasLocalLocal) {
+    if (preferLocalLyrics && hasLocalLyrics(local)) {
         if (Array.isArray(local) && local.length > 0) {
             const item = local[Math.min(selectedStructuredIndex, local.length - 1)];
             return { selected: item, selectedSynced: item.synced };
@@ -153,6 +150,7 @@ export async function fetchLocalLyrics(params: {
     song: QueueSong;
 }): Promise<FullLyricsMetadata | null | StructuredLyric[]> {
     const { serverId, signal, song } = params;
+
     const server = getServerById(serverId);
     if (!server) throw new Error('Server not found');
 
@@ -236,6 +234,13 @@ export function getDisplayOffset(
     return storedOffsetMs;
 }
 
+export function hasLocalLyrics(local: FullLyricsMetadata | null | StructuredLyric[]): boolean {
+    return (
+        (Array.isArray(local) && local.length > 0) ||
+        (local != null && !Array.isArray(local) && 'lyrics' in local && Boolean(local.lyrics))
+    );
+}
+
 const emptyResult = (): LyricsQueryResult => ({
     local: null,
     overrideData: null,
@@ -273,20 +278,14 @@ export const lyricsQueries = {
                 const prev = queryClient.getQueryData<LyricsQueryResult>(lyricsKey);
                 const overrideSelection = prev?.overrideSelection ?? null;
                 const suppressRemoteAuto = prev?.suppressRemoteAuto ?? false;
-                const selectedStructuredIndex = prev?.selectedStructuredIndex ?? 0;
                 const selectedOffsetMs = prev?.selectedOffsetMs ?? 0;
                 const preferLocalLyrics = useSettingsStore.getState().lyrics.preferLocalLyrics;
 
-                // Fetch local lyrics
-                const localPromise = fetchLocalLyrics({ serverId: args.serverId, signal, song });
-
-                // Fetch remote auto lyrics
                 const remoteAutoPromise =
                     suppressRemoteAuto || !useSettingsStore.getState().lyrics.fetch
                         ? null
                         : fetchRemoteLyricsAuto(song);
 
-                // Fetch override data
                 const overrideDataPromise = overrideSelection
                     ? fetchRemoteLyricsById({
                           remoteSongId: overrideSelection.id,
@@ -295,11 +294,46 @@ export const lyricsQueries = {
                       })
                     : null;
 
-                const [local, remoteAuto, overrideData] = await Promise.all([
-                    localPromise,
-                    remoteAutoPromise,
-                    overrideDataPromise,
-                ]);
+                const localPromise = fetchLocalLyrics({ serverId: args.serverId, signal, song });
+
+                let local: FullLyricsMetadata | null | StructuredLyric[];
+                let remoteAuto: FullLyricsMetadata | null;
+                let overrideData: LyricsResponse | null;
+
+                if (preferLocalLyrics) {
+                    local = await localPromise;
+
+                    if (hasLocalLyrics(local)) {
+                        overrideData = overrideDataPromise ? await overrideDataPromise : null;
+                        remoteAuto = null;
+
+                        if (remoteAutoPromise) {
+                            void remoteAutoPromise.then((fetchedRemoteAuto) => {
+                                if (signal.aborted || !fetchedRemoteAuto) return;
+                                queryClient.setQueryData<LyricsQueryResult>(lyricsKey, (prev) =>
+                                    prev ? { ...prev, remoteAuto: fetchedRemoteAuto } : prev,
+                                );
+                            });
+                        }
+                    } else {
+                        [remoteAuto, overrideData] = await Promise.all([
+                            remoteAutoPromise,
+                            overrideDataPromise,
+                        ]);
+                    }
+                } else {
+                    [local, remoteAuto, overrideData] = await Promise.all([
+                        localPromise,
+                        remoteAutoPromise,
+                        overrideDataPromise,
+                    ]);
+                }
+
+                const selectedStructuredIndex =
+                    prev?.selectedStructuredIndex ??
+                    (Array.isArray(local) && local.length > 0
+                        ? getDefaultStructuredIndex(local)
+                        : 0);
 
                 const partial: Pick<
                     LyricsQueryResult,
@@ -320,13 +354,12 @@ export const lyricsQueries = {
                     preferLocalLyrics,
                     selectedStructuredIndex,
                 );
-                const displayOffset = getDisplayOffset(
+                const resultSelectedOffsetMs = getDisplayOffset(
                     selected,
                     selectedOffsetMs,
                     selectedStructuredIndex,
                     local,
                 );
-                const resultSelectedOffsetMs = displayOffset;
 
                 return {
                     ...emptyResult(),

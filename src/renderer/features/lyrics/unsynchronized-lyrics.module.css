@@ -1,13 +1,9 @@
 .container {
     display: flex;
+    flex: 1;
     flex-direction: column;
     width: 100%;
-    height: 100%;
-    padding: 10vh 0 6vh;
-    overflow: scroll;
+    min-height: 0;
+    overflow: hidden auto;
     transform: translateY(-2rem);
-
-    @media screen and (orientation: portrait) {
-        padding: 5vh 0;
-    }
 }

@@ -40,16 +40,23 @@ export const AlbumListInfiniteGrid = ({
 
     const { pageKey } = useListContext();
 
-    const { dataVersion, getItem, getItemIndex, itemCount, loadedItems, onRangeChanged } =
-        useItemListInfiniteLoader({
-            eventKey: pageKey || ItemListKey.ALBUM,
-            itemsPerPage,
-            itemType: LibraryItem.ALBUM,
-            listCountQuery,
-            listQueryFn,
-            query,
-            serverId,
-        });
+    const {
+        dataVersion,
+        getItem,
+        getItemIndex,
+        getLoadedItems,
+        itemCount,
+        loadedItems,
+        onRangeChanged,
+    } = useItemListInfiniteLoader({
+        eventKey: pageKey || ItemListKey.ALBUM,
+        itemsPerPage,
+        itemType: LibraryItem.ALBUM,
+        listCountQuery,
+        listQueryFn,
+        query,
+        serverId,
+    });
 
     const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({
         enabled: saveScrollOffset,
@@ -67,6 +74,7 @@ export const AlbumListInfiniteGrid = ({
             gap={gap}
             getItem={getItem}
             getItemIndex={getItemIndex}
+            getLoadedItems={getLoadedItems}
             initialTop={{
                 to: scrollOffset ?? 0,
                 type: 'offset',

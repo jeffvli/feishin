@@ -4,11 +4,15 @@ import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/i
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
 
 interface UseTableImperativeHandleProps {
+    autoScrollToActiveRow: boolean;
     enableHeader: boolean;
     handleRef: React.RefObject<ItemListHandle | null>;
     internalState: ItemListStateActions;
     ref?: React.Ref<ItemListHandle>;
-    scrollToTableIndex: (index: number, options?: { align?: 'bottom' | 'center' | 'top' }) => void;
+    scrollToTableIndex: (
+        index: number,
+        options?: { align?: 'bottom' | 'center' | 'top'; followActiveRow?: boolean },
+    ) => void;
     scrollToTableOffset: (offset: number) => void;
 }
 
@@ -16,6 +20,7 @@ interface UseTableImperativeHandleProps {
  * Hook to set up the imperative handle for ItemTableList, providing scroll methods and internal state.
  */
 export const useTableImperativeHandle = ({
+    autoScrollToActiveRow,
     enableHeader,
     handleRef,
     internalState,
@@ -27,13 +32,22 @@ export const useTableImperativeHandle = ({
         () => ({
             internalState,
             scrollToIndex: (index: number, options?: { align?: 'bottom' | 'center' | 'top' }) => {
-                scrollToTableIndex(enableHeader ? index + 1 : index, options);
+                scrollToTableIndex(enableHeader ? index + 1 : index, {
+                    ...options,
+                    followActiveRow: autoScrollToActiveRow,
+                });
             },
             scrollToOffset: (offset: number) => {
                 scrollToTableOffset(offset);
             },
         }),
-        [enableHeader, internalState, scrollToTableIndex, scrollToTableOffset],
+        [
+            autoScrollToActiveRow,
+            enableHeader,
+            internalState,
+            scrollToTableIndex,
+            scrollToTableOffset,
+        ],
     );
 
     useImperativeHandle(ref, () => imperativeHandle);

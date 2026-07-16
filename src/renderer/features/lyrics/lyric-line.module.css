@@ -10,12 +10,19 @@
     transition:
         opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
         transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform;
+    will-change: opacity, transform;
 }
 
+.lyric-line:global(.lyrics-line-active),
+.lyric-line:global(.lyrics-line-animating),
+.lyric-line:global(.lyrics-line-pre-animating),
 .lyric-line:global(.active) {
     opacity: 1 !important;
     transform: scale(1);
+}
+
+.lyric-line:global(.lyrics-line-animating) {
+    transition-delay: var(--karaoke-anim-delay, 0s);
 }
 
 .lyric-line:global(.unsynchronized) {
@@ -24,4 +31,9 @@
 
 .lyric-line:global(.synchronized) {
     cursor: pointer;
+}
+
+.romaji-line {
+    font-size: 0.8em;
+    font-weight: 600;
 }

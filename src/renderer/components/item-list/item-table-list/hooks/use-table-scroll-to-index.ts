@@ -1,101 +1,45 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { TableItemProps } from '../item-table-list';
 
-import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
-import { ItemControls } from '/@/renderer/components/item-list/types';
-import { PlayerContext } from '/@/renderer/features/player/context/player-context';
-import { LibraryItem } from '/@/shared/types/domain-types';
+export type TableScrollToIndexOptions = {
+    align?: 'bottom' | 'center' | 'top';
+    followActiveRow?: boolean;
+};
 
 export const useTableScrollToIndex = ({
-    cellPadding,
-    columns,
-    data,
-    enableAlternateRowColors,
-    enableExpansion,
+    albumGroupContentHeights,
+    autoScrollToActiveRow,
     enableHeader,
-    enableHorizontalBorders,
-    enableRowHoverHighlight,
-    enableSelection,
-    enableVerticalBorders,
-    itemType,
+    getRowHeight,
+    hasAlbumGroupColumn,
     pinnedLeftColumnRef,
     pinnedRightColumnRef,
-    playerContext,
-    rowHeight,
+    pinnedRowCount,
     rowRef,
-    size,
-    tableId,
+    scrollCellProps,
 }: {
-    cellPadding: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
-    columns: TableItemProps['columns'];
-    data: unknown[];
-    enableAlternateRowColors: boolean;
-    enableExpansion: boolean;
+    albumGroupContentHeights: Map<string, number>;
+    autoScrollToActiveRow: boolean;
     enableHeader: boolean;
-    enableHorizontalBorders: boolean;
-    enableRowHoverHighlight: boolean;
-    enableSelection: boolean;
-    enableVerticalBorders: boolean;
-    itemType: LibraryItem;
+    getRowHeight: (index: number, cellProps: TableItemProps) => number;
+    hasAlbumGroupColumn: boolean;
     pinnedLeftColumnRef: React.RefObject<HTMLDivElement | null>;
     pinnedRightColumnRef: React.RefObject<HTMLDivElement | null>;
-    playerContext: PlayerContext;
-    rowHeight: ((index: number, cellProps: TableItemProps) => number) | number | undefined;
+    pinnedRowCount: number;
     rowRef: React.RefObject<HTMLDivElement | null>;
-    size: 'compact' | 'default' | 'large';
-    tableId: string;
+    scrollCellProps: TableItemProps;
 }) => {
-    const DEFAULT_ROW_HEIGHT = useMemo(() => {
-        return size === 'compact' ? 40 : size === 'large' ? 88 : 64;
-    }, [size]);
-
-    const mockCellPropsBase = useMemo<TableItemProps>(
-        () => ({
-            cellPadding,
-            columns,
-            controls: {} as ItemControls,
-            data: enableHeader ? [null, ...data] : data,
-            enableAlternateRowColors,
-            enableExpansion,
-            enableHeader,
-            enableHorizontalBorders,
-            enableRowHoverHighlight,
-            enableSelection,
-            enableVerticalBorders,
-            getRowHeight: () => DEFAULT_ROW_HEIGHT,
-            internalState: {} as ItemListStateActions,
-            itemType,
-            playerContext,
-            size,
-            tableId,
-        }),
-        [
-            DEFAULT_ROW_HEIGHT,
-            cellPadding,
-            columns,
-            data,
-            enableAlternateRowColors,
-            enableExpansion,
-            enableHeader,
-            enableHorizontalBorders,
-            enableRowHoverHighlight,
-            enableSelection,
-            enableVerticalBorders,
-            itemType,
-            playerContext,
-            size,
-            tableId,
-        ],
-    );
+    const isProgrammaticScrollRef = useRef(false);
+    const userInterruptedFollowRef = useRef(false);
+    const pendingFollowScrollRef = useRef<null | {
+        index: number;
+        options?: TableScrollToIndexOptions;
+    }>(null);
 
     const getRowHeightAtIndex = useCallback(
-        (index: number) => {
-            if (typeof rowHeight === 'number') return rowHeight;
-            if (typeof rowHeight === 'function') return rowHeight(index, mockCellPropsBase);
-            return DEFAULT_ROW_HEIGHT;
-        },
-        [DEFAULT_ROW_HEIGHT, mockCellPropsBase, rowHeight],
+        (index: number) => getRowHeight(index, scrollCellProps),
+        [getRowHeight, scrollCellProps],
     );
 
     const scrollToTableOffset = useCallback(
@@ -110,6 +54,8 @@ export const useTableScrollToIndex = ({
 
             const behavior = 'instant';
 
+            isProgrammaticScrollRef.current = true;
+
             if (mainContainer) {
                 mainContainer.scrollTo({ behavior, top: offset });
             }
@@ -119,37 +65,38 @@ export const useTableScrollToIndex = ({
             if (pinnedRightContainer) {
                 pinnedRightContainer.scrollTo({ behavior, top: offset });
             }
+
+            requestAnimationFrame(() => {
+                isProgrammaticScrollRef.current = false;
+            });
         },
         [pinnedLeftColumnRef, pinnedRightColumnRef, rowRef],
     );
 
+    const scrollRowOffset = enableHeader ? pinnedRowCount : 0;
+
     const calculateScrollTopForIndex = useCallback(
         (index: number) => {
-            const adjustedIndex = enableHeader ? Math.max(0, index - 1) : index;
             let scrollTop = 0;
 
-            for (let i = 0; i < adjustedIndex; i++) {
+            for (let i = scrollRowOffset; i < index; i++) {
                 scrollTop += getRowHeightAtIndex(i);
             }
             return scrollTop;
         },
-        [enableHeader, getRowHeightAtIndex],
+        [getRowHeightAtIndex, scrollRowOffset],
     );
 
-    const scrollToTableIndex = useCallback(
-        (index: number, options?: { align?: 'bottom' | 'center' | 'top' }) => {
+    const applyScrollToIndex = useCallback(
+        (index: number, options?: TableScrollToIndexOptions) => {
             const mainContainer = rowRef.current?.childNodes[0] as HTMLDivElement | undefined;
             if (!mainContainer) return;
 
             const viewportHeight = mainContainer.clientHeight;
             const align = options?.align || 'top';
 
-            // Calculate the base scroll offset (top of the row)
             let offset = calculateScrollTopForIndex(index);
-
-            // Calculate row height for the target index
-            const adjustedIndex = enableHeader ? Math.max(0, index - 1) : index;
-            const targetRowHeight = getRowHeightAtIndex(adjustedIndex);
+            const targetRowHeight = getRowHeightAtIndex(index);
 
             if (align === 'center') {
                 offset = offset - viewportHeight / 2 + targetRowHeight / 2;
@@ -160,22 +107,64 @@ export const useTableScrollToIndex = ({
             offset = Math.max(0, offset);
             scrollToTableOffset(offset);
         },
-        [
-            calculateScrollTopForIndex,
-            enableHeader,
-            getRowHeightAtIndex,
-            rowRef,
-            scrollToTableOffset,
-        ],
+        [calculateScrollTopForIndex, getRowHeightAtIndex, rowRef, scrollToTableOffset],
     );
+
+    const scrollToTableIndex = useCallback(
+        (index: number, options?: TableScrollToIndexOptions) => {
+            const shouldFollow = autoScrollToActiveRow && options?.followActiveRow;
+            if (shouldFollow) {
+                pendingFollowScrollRef.current = { index, options };
+                userInterruptedFollowRef.current = false;
+            }
+
+            applyScrollToIndex(index, options);
+        },
+        [applyScrollToIndex, autoScrollToActiveRow],
+    );
+
+    useEffect(() => {
+        const viewport = rowRef.current?.childNodes[0] as HTMLDivElement | undefined;
+        if (!viewport) return;
+
+        const handleUserScroll = () => {
+            if (isProgrammaticScrollRef.current) return;
+
+            userInterruptedFollowRef.current = true;
+            pendingFollowScrollRef.current = null;
+        };
+
+        viewport.addEventListener('scroll', handleUserScroll, { passive: true });
+
+        return () => viewport.removeEventListener('scroll', handleUserScroll);
+    }, [rowRef]);
+
+    useEffect(() => {
+        if (!autoScrollToActiveRow || !hasAlbumGroupColumn) return;
+
+        const pending = pendingFollowScrollRef.current;
+        if (!pending || userInterruptedFollowRef.current) return;
+        if (albumGroupContentHeights.size === 0) return;
+
+        const timeout = window.setTimeout(() => {
+            if (userInterruptedFollowRef.current) return;
+
+            const currentPending = pendingFollowScrollRef.current;
+            if (!currentPending) return;
+
+            applyScrollToIndex(currentPending.index, currentPending.options);
+        }, 50);
+
+        return () => window.clearTimeout(timeout);
+    }, [albumGroupContentHeights, applyScrollToIndex, autoScrollToActiveRow, hasAlbumGroupColumn]);
 
     return useMemo(
         () => ({
             calculateScrollTopForIndex,
-            DEFAULT_ROW_HEIGHT,
+            getRowHeightAtIndex,
             scrollToTableIndex,
             scrollToTableOffset,
         }),
-        [calculateScrollTopForIndex, DEFAULT_ROW_HEIGHT, scrollToTableIndex, scrollToTableOffset],
+        [calculateScrollTopForIndex, getRowHeightAtIndex, scrollToTableIndex, scrollToTableOffset],
     );
 };

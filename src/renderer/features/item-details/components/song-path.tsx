@@ -1,6 +1,7 @@
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 
+import { useResolvedSongPath } from '/@/renderer/utils/resolve-song-path';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { CopyButton } from '/@/shared/components/copy-button/copy-button';
 import { Group } from '/@/shared/components/group/group';
@@ -17,12 +18,13 @@ export type SongPathProps = {
 
 export const SongPath = ({ path }: SongPathProps) => {
     const { t } = useTranslation();
+    const resolvedPath = useResolvedSongPath(path);
 
-    if (!path) return null;
+    if (!resolvedPath) return null;
 
     return (
         <Group>
-            <CopyButton timeout={2000} value={path}>
+            <CopyButton timeout={2000} value={resolvedPath}>
                 {({ copied, copy }) => (
                     <Tooltip
                         label={t(
@@ -42,7 +44,7 @@ export const SongPath = ({ path }: SongPathProps) => {
                     <ActionIcon
                         icon="externalLink"
                         onClick={() => {
-                            util.openItem(path).catch((error) => {
+                            util.openItem(resolvedPath).catch((error) => {
                                 toast.error({
                                     message: (error as Error).message,
                                     title: t('error.openError'),
@@ -53,7 +55,7 @@ export const SongPath = ({ path }: SongPathProps) => {
                     />
                 </Tooltip>
             )}
-            <Text style={{ userSelect: 'all' }}>{path}</Text>
+            <Text style={{ userSelect: 'all' }}>{resolvedPath}</Text>
         </Group>
     );
 };

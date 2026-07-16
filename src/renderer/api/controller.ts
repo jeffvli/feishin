@@ -560,6 +560,18 @@ export const controller: GeneralController = {
             server.type,
         )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
     },
+    getPlaylistSongIds(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(`${i18n.t('error.apiRouteError')}: getPlaylistSongIds`);
+        }
+
+        return apiController(
+            'getPlaylistSongIds',
+            server.type,
+        )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
+    },
     getPlaylistSongList(args) {
         const server = getServerById(args.apiClientProps.serverId);
 
@@ -763,6 +775,18 @@ export const controller: GeneralController = {
             'getUserList',
             server.type,
         )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
+    },
+    jukeboxControl(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(`${i18n.t('error.apiRouteError')}: jukeboxControl`);
+        }
+
+        const fn = apiController('jukeboxControl', server.type);
+        return fn
+            ? fn(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }))
+            : Promise.resolve(null);
     },
     movePlaylistItem(args) {
         const server = getServerById(args.apiClientProps.serverId);

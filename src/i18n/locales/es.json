@@ -49,7 +49,10 @@
         "sleepTimer_endOfSong": "Fin de la canción actual",
         "sleepTimer": "Temporizador de apagado",
         "albumRadio": "Radio del álbum",
-        "scrobbleForceSubmit": "Forzar scrobble"
+        "scrobbleForceSubmit": "Forzar scrobble",
+        "sleepTimer_endOfAlbum": "Fin del álbum actual",
+        "nextAlbum": "Alt+clic para el siguiente álbum",
+        "previousAlbum": "Alt+clic para el álbum anterior"
     },
     "setting": {
         "crossfadeStyle_description": "Selecciona el estilo de crossfade a usar por el reproductor de audio",
@@ -456,7 +459,52 @@
         "autoDJ_songStrategy": "Modo de selección de canción",
         "autoDJ_strategy_option_library_random": "Aleatorio",
         "autoDJ_strategy_option_similar": "Similar",
-        "autoDJ_mode_description": "Elegir para añadir canciones o álbumes enteros a la cola"
+        "autoDJ_mode_description": "Elegir para añadir canciones o álbumes enteros a la cola",
+        "enableFurigana_description": "Mostrar guías de pronunciación (furigana) sobre letras kanji japonesas.",
+        "enableFurigana": "Activar generación de furigana",
+        "equalizer_descriptionMpv": "Ecualizador paramétrico a través de FFmpeg lavfi (MPV)",
+        "equalizer_descriptionWebAudio": "Ecualizador paramétrico a través de la API de Web Audio",
+        "equalizer": "Ecualizador",
+        "equalizerBands": "Bandas",
+        "equalizerBands_description": "Ganancia por banda. Arrastrar arriba/abajo o escribir un valor. Rango: -12 a +12 dB.",
+        "equalizerPreamp_description": "Ganancia de entrada antes de las bandas de ecualización. Ajústala en negativo al realzar las bandas para evitar el clipping (MPV).",
+        "equalizerPreamp": "Preamplificador",
+        "equalizerPreset_description": "Aplica una curva de ecualizador personalizada integrada o guardada",
+        "equalizerPreset": "Preajuste",
+        "equalizerPresetDeletePlaceholder": "Elimianr personalizado...",
+        "equalizerPresetGroupBuiltIn": "Integrado",
+        "equalizerPresetGroupCustom": "Personalizado",
+        "equalizerPresetNamePlaceholder": "Nombre del preajuste...",
+        "equalizerPresetSelectPlaceholder": "Seleccionar preajuste",
+        "equalizerSavePreset": "Guardar preajuste",
+        "equalizerSavePreset_description": "Guarda la configuración del ecualizador actual como un preajuste nombrado",
+        "compressor_descriptionMpv": "Compresor de rango dinámico a través del compresor de FFmpeg (MPV)",
+        "compressor_descriptionWebAudio": "Compresor de rango dinámico a través de la API de Web Audio",
+        "compressor": "Compresor",
+        "compressorThreshold": "Umbral",
+        "compressorThreshold_description": "Nivel de señal a partir del cual comienza la compresión.",
+        "compressorSavePreset_description": "Guarda la configuración actual del compresor como un preajuste nombrado",
+        "compressorReset_description": "Restaura todos los parámetros del compresor a sus valores predeterminados",
+        "compressorRelease": "Liberación",
+        "compressorRelease_description": "La rapidez con la que el compresor se libera una vez que la señal desciende por debajo del umbral.",
+        "compressorRatio": "Ratio",
+        "compressorRatio_description": "Ratio de compresión, p. ej. 4 = 4:1.",
+        "compressorPreset_description": "Aplica una configuración personalizada del compresor integrada o guardada",
+        "compressorKnee_description": "Ancho de la zona de respuesta suave. Cuanto mayor sea el valor, más gradual será la transición hacia la compresión.",
+        "compressorKnee": "Zona de respuesta",
+        "compressorMakeupGain_description": "Ganancia de salida aplicada tras la compresión para recuperar el volumen.",
+        "compressorMakeupGain": "Ganancia de compensación",
+        "compressorAttack_description": "La rapidez con la que el compresor entra en acción una vez que la señal supera el umbral.",
+        "compressorAttack": "Ataque",
+        "enableRomaji_description": "Muestra una línea de pronunciación en romaji debajo de las letras japonesas.",
+        "enableRomaji": "Activar generación de romaji",
+        "windowBarTrackinfo": "Información de la pista en el título de la ventana",
+        "windowBarTrackinfo_description": "Muestra el título y artista de la pista actual, posición en la cola, y estado reproduciendo/pausado en el título de la ventana.",
+        "audioDeviceDefault": "Predeterminado del sistema",
+        "microtonalPitchControls": "Controles de tono microtonales",
+        "microtonalPitchControls_description": "Añade más controles de tono para moverse entre semitonos",
+        "hotkey_playbackNextAlbum": "Siguiente álbum",
+        "hotkey_playbackPreviousAlbum": "Álbum anterior"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",
@@ -809,12 +857,20 @@
                 "dynamicIsImage": "Habilitar imagen de fondo",
                 "lyricOffset": "Desplazamiento de letras (ms)",
                 "lyricScaleNonActive": "Escala de letra no activa",
-                "lyricOpacityNonActive": "Opacidad de letra no activa"
+                "lyricOpacityNonActive": "Opacidad de letra no activa",
+                "lyricPaddingLeft": "Relleno a la izquierda de las letras (%)",
+                "lyricPaddingRight": "Relleno a la derecha de las letras (%)",
+                "lyricLineLeadTime": "Tiempo de respuesta de la línea (ms)",
+                "lyricFollowScrollAlignment": "Las letras siguen la alineación"
             },
             "lyrics": "Letras",
             "related": "Relacionado",
             "visualizer": "Visualizador",
-            "noLyrics": "Sin letras"
+            "noLyrics": "Sin letras",
+            "lyricLayers": "Capas de letra",
+            "lyricLanguage": "Idioma",
+            "showPronunciation": "Pronunciación",
+            "showTranslation": "Traducción"
         },
         "albumDetail": {
             "moreFromArtist": "Más de este $t(entity.artist, {\"count\": 1})",
@@ -961,7 +1017,8 @@
             "input_preferInstantMixDescription": "Usa solo el mix instantáneo para obtener canciones similares. Útil si tienes complementos que modifican este comportamiento",
             "input_remoteUrl": "URL Pública",
             "input_preferRemoteUrl": "Preferir URL Pública",
-            "input_remoteUrlPlaceholder": "Opcional: URL pública para características externas"
+            "input_remoteUrlPlaceholder": "Opcional: URL pública para características externas",
+            "input_passwordNoSSO": "La autenticación de proxy inverso (SSO) no está soportada. Solo está soportada la autenticación por usuario/contraseña y la autenticación de Subsonic"
         },
         "addToPlaylist": {
             "success": "Añadido $t(entity.trackWithCount, {\"count\": {{message}} }) a $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -1148,7 +1205,12 @@
                 "horizontalBorders": "Bordes de fila",
                 "verticalBorders": "Bordes de columna",
                 "rowHoverHighlight": "Resaltar al pasar el cursor por la fila",
-                "showHeader": "Mostrar cabecera"
+                "showHeader": "Mostrar cabecera",
+                "albumImageSize": "Tamaño de la imagen del álbum",
+                "albumGroupConfig": "Configuración del grupo del álbum",
+                "albumGroupMetadata": "Campos de metadatos",
+                "albumGroupShowFavoriteRating": "Mostrar favoritos y calificaciones",
+                "albumGroupVerticalLayout": "Diseño vertical"
             },
             "view": {
                 "table": "Tabla",
@@ -1269,7 +1331,9 @@
         "notInPlaylist": "No está en",
         "notInTheLast": "No está en el último",
         "startsWith": "Empieza con",
-        "matchesRegex": "Coincide con expresión regular"
+        "matchesRegex": "Coincide con expresión regular",
+        "isPresent": "Está presente",
+        "isMissing": "Falta"
     },
     "datetime": {
         "minuteShort": "M",

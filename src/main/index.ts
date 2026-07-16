@@ -66,16 +66,19 @@ class AppUpdater {
         console.log('Effective update channel:', effectiveChannel);
         if (effectiveChannel === 'alpha') {
             checkAllChannelsAndGetBest().then(({ result, updater: updaterInstance }) => {
+                if (!result?.isUpdateAvailable) {
+                    return;
+                }
+
                 updaterInstance.autoInstallOnAppQuit = true;
                 updaterInstance.autoRunAppAfterInstall = true;
                 if (isMacOS()) {
-                    if (result?.isUpdateAvailable) {
-                        getMainWindow()?.webContents.send(
-                            'update-available',
-                            result.updateInfo.version,
-                        );
-                    }
+                    getMainWindow()?.webContents.send(
+                        'update-available',
+                        result.updateInfo.version,
+                    );
                 } else {
+                    updaterInstance.autoDownload = true;
                     updaterInstance.checkForUpdatesAndNotify();
                 }
             });
@@ -116,12 +119,7 @@ async function checkAllChannelsAndGetBest(): Promise<{
         updater: UpdaterInstance;
     }> = [];
 
-    const alphaUpdater = createAlphaUpdaterInstance();
-    alphaUpdater.logger = autoUpdaterLogInterface;
-    alphaUpdater.channel = ALPHA_UPDATER_CONFIG.channel;
-    alphaUpdater.allowPrerelease = true;
-    alphaUpdater.disableDifferentialDownload = true;
-    alphaUpdater.allowDowngrade = true;
+    const alphaUpdater = createAlphaUpdaterInstance({ probeOnly: true });
 
     try {
         console.log('Checking for updates on alpha channel');
@@ -139,17 +137,16 @@ async function checkAllChannelsAndGetBest(): Promise<{
     }
 
     try {
-        autoUpdater.setFeedURL(GITHUB_UPDATER_CONFIG);
-        configureAutoUpdaterForChannel('latest');
+        const latestUpdater = createGithubUpdaterInstance('latest', { probeOnly: true });
         console.log('Checking for updates on latest channel (GitHub)');
-        const latestResult = await autoUpdater.checkForUpdates();
+        const latestResult = await latestUpdater.checkForUpdates();
         if (
             latestResult?.updateInfo?.version &&
             latestResult.isUpdateAvailable &&
             semver.valid(latestResult.updateInfo.version) &&
             semver.gt(latestResult.updateInfo.version, currentVersion)
         ) {
-            candidates.push({ channel: 'latest', result: latestResult, updater: autoUpdater });
+            candidates.push({ channel: 'latest', result: latestResult, updater: latestUpdater });
         }
     } catch (e) {
         log.warn('Latest channel check failed', e);
@@ -165,6 +162,7 @@ async function checkAllChannelsAndGetBest(): Promise<{
 
     if (best.channel === 'latest') {
         configureAutoUpdaterForChannel('latest');
+        return { result: best.result, updater: autoUpdater };
     }
 
     return { result: best.result, updater: best.updater };
@@ -191,16 +189,8 @@ function configureAndGetUpdater(): UpdaterInstance {
     const effectiveChannel = store.get('release_channel') as string;
 
     if (effectiveChannel === 'alpha') {
-        const updater = createAlphaUpdaterInstance();
         log.transports.file.level = 'info';
-        updater.logger = autoUpdaterLogInterface;
-        updater.channel = ALPHA_UPDATER_CONFIG.channel;
-        updater.allowPrerelease = true;
-        updater.disableDifferentialDownload = true;
-        updater.allowDowngrade = true;
-        updater.autoInstallOnAppQuit = true;
-        updater.autoRunAppAfterInstall = true;
-        return updater;
+        return createAlphaUpdaterInstance();
     }
 
     log.transports.file.level = 'info';
@@ -215,6 +205,7 @@ function configureAndGetUpdater(): UpdaterInstance {
         autoUpdater.disableDifferentialDownload = true;
     } else {
         autoUpdater.channel = 'latest';
+        autoUpdater.allowDowngrade = false;
         autoUpdater.allowPrerelease = false;
     }
 
@@ -237,24 +228,72 @@ function configureAutoUpdaterForChannel(channel: 'beta' | 'latest'): void {
         autoUpdater.disableDifferentialDownload = true;
     } else {
         autoUpdater.channel = 'latest';
+        autoUpdater.allowDowngrade = false;
         autoUpdater.allowPrerelease = false;
     }
 }
 
-function createAlphaUpdaterInstance(): AppImageUpdater | MacUpdater | NsisUpdater {
+function createAlphaUpdaterInstance(
+    options: { probeOnly?: boolean } = {},
+): AppImageUpdater | MacUpdater | NsisUpdater {
+    const probeOnly = options.probeOnly ?? false;
+    let updater: AppImageUpdater | MacUpdater | NsisUpdater;
+
     if (isMacOS()) {
-        return new MacUpdater(ALPHA_UPDATER_CONFIG);
+        updater = new MacUpdater(ALPHA_UPDATER_CONFIG);
+    } else if (isLinux()) {
+        updater = new AppImageUpdater(ALPHA_UPDATER_CONFIG);
+    } else {
+        updater = new NsisUpdater(ALPHA_UPDATER_CONFIG);
     }
 
-    if (isLinux()) {
-        return new AppImageUpdater(ALPHA_UPDATER_CONFIG);
+    updater.logger = autoUpdaterLogInterface;
+    updater.channel = ALPHA_UPDATER_CONFIG.channel;
+    updater.allowPrerelease = true;
+    updater.disableDifferentialDownload = true;
+    updater.allowDowngrade = true;
+    updater.autoDownload = !probeOnly;
+    updater.autoInstallOnAppQuit = true;
+    updater.autoRunAppAfterInstall = true;
+
+    return updater;
+}
+
+function createGithubUpdaterInstance(
+    channel: 'beta' | 'latest',
+    options: { probeOnly?: boolean } = {},
+): AppImageUpdater | MacUpdater | NsisUpdater {
+    const probeOnly = options.probeOnly ?? false;
+    let updater: AppImageUpdater | MacUpdater | NsisUpdater;
+
+    if (isMacOS()) {
+        updater = new MacUpdater(GITHUB_UPDATER_CONFIG);
+    } else if (isLinux()) {
+        updater = new AppImageUpdater(GITHUB_UPDATER_CONFIG);
+    } else {
+        updater = new NsisUpdater(GITHUB_UPDATER_CONFIG);
     }
 
-    return new NsisUpdater(ALPHA_UPDATER_CONFIG);
+    updater.logger = autoUpdaterLogInterface;
+    updater.autoDownload = !probeOnly;
+    updater.autoInstallOnAppQuit = true;
+    updater.autoRunAppAfterInstall = true;
+    updater.channel = channel;
+
+    if (channel === 'beta') {
+        updater.allowDowngrade = true;
+        updater.allowPrerelease = true;
+        updater.disableDifferentialDownload = true;
+    } else {
+        updater.allowDowngrade = false;
+        updater.allowPrerelease = false;
+    }
+
+    return updater;
 }
 
 protocol.registerSchemesAsPrivileged([
-    { privileges: { bypassCSP: true }, scheme: 'feishin' },
+    { privileges: { bypassCSP: true, corsEnabled: true }, scheme: 'feishin' },
     { privileges: { bypassCSP: true, supportFetchAPI: true }, scheme: 'feishin-img' },
 ]);
 
@@ -864,10 +903,12 @@ enum BindingActions {
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
     NEXT = 'next',
+    NEXT_ALBUM = 'nextAlbum',
     PAUSE = 'pause',
     PLAY = 'play',
     PLAY_PAUSE = 'playPause',
     PREVIOUS = 'previous',
+    PREVIOUS_ALBUM = 'previousAlbum',
     SHUFFLE = 'toggleShuffle',
     SKIP_BACKWARD = 'skipBackward',
     SKIP_FORWARD = 'skipForward',
@@ -895,11 +936,15 @@ const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
     [BindingActions.LOCAL_SEARCH]: () => {},
     [BindingActions.MUTE]: () => getMainWindow()?.webContents.send('renderer-player-volume-mute'),
     [BindingActions.NEXT]: () => getMainWindow()?.webContents.send('renderer-player-next'),
+    [BindingActions.NEXT_ALBUM]: () =>
+        getMainWindow()?.webContents.send('renderer-player-next-album'),
     [BindingActions.PAUSE]: () => getMainWindow()?.webContents.send('renderer-player-pause'),
     [BindingActions.PLAY]: () => getMainWindow()?.webContents.send('renderer-player-play'),
     [BindingActions.PLAY_PAUSE]: () =>
         getMainWindow()?.webContents.send('renderer-player-play-pause'),
     [BindingActions.PREVIOUS]: () => getMainWindow()?.webContents.send('renderer-player-previous'),
+    [BindingActions.PREVIOUS_ALBUM]: () =>
+        getMainWindow()?.webContents.send('renderer-player-previous-album'),
     [BindingActions.SHUFFLE]: () =>
         getMainWindow()?.webContents.send('renderer-player-toggle-shuffle'),
     [BindingActions.SKIP_BACKWARD]: () =>
@@ -1019,14 +1064,33 @@ app.on('window-all-closed', () => {
     }
 });
 
-const FONT_HEADERS = [
+const FONT_HEADERS = new Set([
     'font/collection',
     'font/otf',
     'font/sfnt',
     'font/ttf',
     'font/woff',
     'font/woff2',
-];
+]);
+
+const bytesToInt = (array: Uint8Array, length: number): number => {
+    let value = 0;
+    for (let i = 0; i < length; i++) {
+        value = (value << 8) + array[i];
+    }
+
+    return value;
+};
+
+const FONT_FOUR_BYTE_MAGIC_NUMBERS = new Set([
+    0x4f54544f, // font/otf
+    0x774f4632, // font/woff2
+    0x774f4646, // font/woff
+]);
+
+const FONT_FIVE_BYTE_MAGIC_NUMBERS = new Set([
+    0x0001000000, // ttf, collection, sfnt
+]);
 
 const bufferToArrayBuffer = (buffer: Buffer): ArrayBuffer => {
     const body = new Uint8Array(buffer.byteLength);
@@ -1082,12 +1146,9 @@ if (!singleInstance) {
                 }
             });
 
-            protocol.handle('feishin', async (request) => {
-                const filePath = `file:${request.url.slice('feishin:'.length)}`;
-                const response = await net.fetch(filePath);
-                const contentType = response.headers.get('content-type');
-
-                if (!contentType || !FONT_HEADERS.includes(contentType)) {
+            protocol.handle('feishin', async () => {
+                const filePath = store.get('local_font_path');
+                if (typeof filePath !== 'string') {
                     getMainWindow()?.webContents.send('custom-font-error', filePath);
 
                     return new Response(null, {
@@ -1096,7 +1157,38 @@ if (!singleInstance) {
                     });
                 }
 
-                return response;
+                const response = await net.fetch('file:' + filePath);
+                const contentType = response.headers.get('content-type');
+
+                // On Linux, the mime type is included in the response header
+                // In this case, we can forward the response with no further processing
+                if (contentType && FONT_HEADERS.has(contentType)) {
+                    return response;
+                }
+
+                // Otherwise, let's check the magic number to see if
+                // the file is a font type. This is either four or five bytes
+                const payload = await response.arrayBuffer();
+                const magicNumber = new Uint8Array(payload.slice(0, 5));
+                const fiveHex = bytesToInt(magicNumber, 5);
+                const fourHex = bytesToInt(magicNumber, 4);
+
+                if (
+                    FONT_FIVE_BYTE_MAGIC_NUMBERS.has(fiveHex) ||
+                    FONT_FOUR_BYTE_MAGIC_NUMBERS.has(fourHex)
+                ) {
+                    // We have to create a new response with the payload, since it has been read now
+                    return new Response(payload, {
+                        headers: response.headers,
+                    });
+                }
+
+                getMainWindow()?.webContents.send('custom-font-error', filePath);
+
+                return new Response(null, {
+                    status: 403,
+                    statusText: 'Forbidden',
+                });
             });
 
             session.defaultSession.webRequest.onHeadersReceived((details, callback) => {

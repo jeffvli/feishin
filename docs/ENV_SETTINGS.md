@@ -100,6 +100,8 @@ These variables override app settings **on first run** when no persisted setting
 | `lyrics.fetch` | `true` | `FS_LYRICS_FETCH` | `true` / `false` — Fetch lyrics. |
 | `lyrics.follow` | `true` | `FS_LYRICS_FOLLOW` | `true` / `false` — Follow current line. |
 | `lyrics.delayMs` | `0` | `FS_LYRICS_DELAY_MS` | Sync delay in milliseconds. |
+| `lyrics.lineLeadTimeMs` | `800` | `FS_LYRICS_LINE_LEAD_TIME_MS` | Milliseconds before a line becomes active while following. |
+| `lyrics.followScrollAlignment` | `0` | `FS_LYRICS_FOLLOW_SCROLL_ALIGNMENT` | Vertical follow position. `0` centers the active line; negative moves it higher, positive moves it lower (`-50` to `50`). |
 | `lyrics.preferLocalLyrics` | `true` | `FS_LYRICS_PREFER_LOCAL` | `true` / `false` — Prefer local lyric files. |
 | `lyrics.showMatch` | `true` | `FS_LYRICS_SHOW_MATCH` | `true` / `false`. |
 | `lyrics.showProvider` | `true` | `FS_LYRICS_SHOW_PROVIDER` | `true` / `false`. |
@@ -107,6 +109,17 @@ These variables override app settings **on first run** when no persisted setting
 | `lyrics.translationApiKey` | *(empty)* | `FS_LYRICS_TRANSLATION_API_KEY` | API key for lyric translation. |
 | `lyrics.translationTargetLanguage` | `en` | `FS_LYRICS_TRANSLATION_TARGET_LANGUAGE` | Target language code. |
 | `lyrics.alignment` | `center` | `FS_LYRICS_ALIGNMENT` | `center` / `left` / `right`. |
+
+---
+
+## Lyrics display
+
+Applies to the default lyrics display profile (`lyricsDisplay.default`).
+
+| Setting path | Default | Env variable | Available values / Description |
+|-------------|---------|--------------|--------------------------------|
+| `lyricsDisplay.default.paddingLeft` | `0` | `FS_LYRICS_PADDING_LEFT` | Left content padding as a percentage (`0`–`20`). |
+| `lyricsDisplay.default.paddingRight` | `0` | `FS_LYRICS_PADDING_RIGHT` | Right content padding as a percentage (`0`–`20`). |
 
 ---
 

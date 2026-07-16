@@ -298,6 +298,7 @@ export const useServerAuthenticated = () => {
                     await new Promise((resolve) => setTimeout(resolve, NETWORK_RETRY_DELAY_MS));
 
                     // Retry authentication
+                    // eslint-disable-next-line react-hooks/immutability
                     return authenticateServer(serverWithAuth, nextRetry);
                 }
 

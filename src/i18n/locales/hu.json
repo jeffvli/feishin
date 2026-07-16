@@ -7,7 +7,10 @@
         "viewPlaylists": "$t(entity.playlist, {\"count\": 2}) megtekintése",
         "openIn": {
             "lastfm": "Megnyitás Last.fm-ben",
-            "musicbrainz": "Megnyitás MusicBrainz-ben"
+            "musicbrainz": "Megnyitás MusicBrainz-ben",
+            "listenbrainz": "Megnyitás ListenBrainz-ben",
+            "qobuz": "Megnyitás Qobuz_ban",
+            "spotify": "Megnyitás Spotify-ban"
         },
         "clearQueue": "Műsorlista kiürítése",
         "createPlaylist": "$t(entity.playlist, {\"count\": 1}) létrehozása",
@@ -117,7 +120,7 @@
         "none": "Egyik sem",
         "restartRequired": "Újraindítás szükséges",
         "setting_one": "Beállítás",
-        "setting_other": "",
+        "setting_other": "Beállítások",
         "translation": "Fordítás",
         "rating": "Értékelés",
         "reload": "Újratöltés",
@@ -154,7 +157,14 @@
         "view": "Nézet",
         "noFilters": "Nincs konfigurált szűrő",
         "countSelected": "{{count}} kiválasztott",
-        "retry": "Újra"
+        "retry": "Újra",
+        "openFolder": "Mappa megnyitás",
+        "example": "Példa",
+        "filter_single": "Egy",
+        "filter_multiple": "Több",
+        "mood": "Hangulat",
+        "numberOfResults": "{{numberOfResults}} eredmény",
+        "grouping": "Csoportosítás"
     },
     "entity": {
         "albumArtist_one": "Zenész",
@@ -207,8 +217,8 @@
         "openError": "A fájl megnyitása sikertelen volt",
         "playbackError": "Hiba történt a média lejátszásakor",
         "remoteEnableError": "Hiba történt a távoli szerver műveletkor: $t(common.enable)",
-        "remotePortError": "Hiba történt a távoli szerver PORT-jának beállításakor",
-        "remotePortWarning": "Indítsd újra a szervert az új PORT használatához",
+        "remotePortError": "Hiba történt a távoli szerver port-jának beállításakor",
+        "remotePortWarning": "Indítsd újra a szervert az új port használatához",
         "genericError": "Hiba történt",
         "endpointNotImplementedError": "A(z) {{endpoint}} végpont nincs implementálva a következőhöz: {{serverType}}",
         "badAlbum": "Azért látod ezt az oldalt mert ez a zeneszám nem része egy albumnak. ez általában akkor történik amikor egy szám a zenekönyvtárad gyökerébe kerül. a Jellyfin csak mappákba rendezett számokat csoportosít",
@@ -226,7 +236,10 @@
         "noNetworkDescription": "Nem tudok csatlakozni a szerverhez",
         "saveQueueFailed": "Műsorlista mentése sikertelen",
         "settingsSyncError": "Eltéréseket találtam a leképző és a fő folyamat beállításai között. Indítsd újra az alkalmazást",
-        "multipleServerSaveQueueError": "A műsorlistában egy vagy több olyan dal található, amely nem az aktuális szerverről származik. Ez nem támogatott"
+        "multipleServerSaveQueueError": "A műsorlistában egy vagy több olyan dal található, amely nem az aktuális szerverről származik. Ez nem támogatott",
+        "invalidJson": "Érvénytelen JSON",
+        "playbackPausedDueToError": "Lejátszás szüneteltetve hiba miatt",
+        "serverLockSingleServer": "A szerver zárolása esetén csak egy szerver engedélyezett"
     },
     "filter": {
         "albumCount": "$t(entity.album, {\"count\": 2}) darab",
@@ -269,9 +282,11 @@
         "trackNumber": "Sáv",
         "artist": "$t(entity.artist, {\"count\": 1})",
         "bpm": "Bpm",
-        "channels": "$t(common.channel_other)",
+        "channels": "$t(common.channel, {\"count\": 2})",
         "genre": "$t(entity.genre, {\"count\": 1})",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "explicitStatus": "$t(common.explicitStatus)",
+        "matchAnd": "és",
+        "matchOr": "vagy"
     },
     "form": {
         "addServer": {
@@ -671,7 +686,7 @@
         "customFontPath_description": "Beállítja az alkalmazáshoz használandó egyéni betűtípus elérési útját",
         "contextMenu": "Kontextusmenü (jobb klikk) beállítás",
         "crossfadeDuration_description": "Beállítja áthúzás effekt időtartamát",
-        "crossfadeDuration": "Áthúzás IDőtartam",
+        "crossfadeDuration": "Áthúzás Idő tartam",
         "crossfadeStyle": "Áthúzás stílus",
         "crossfadeStyle_description": "Válaszd ki az audiolejátszóhoz használni kívánt áthúzás stílust",
         "releaseChannel_description": "Válassz a stabil kiadás vagy a béta kiadás közül az automatikus frissítésekhez",
@@ -852,7 +867,7 @@
         "sidebarPlaylistList_description": "Lejátszási lista megjelenítése vagy elrejtése az oldalsávban",
         "sidebarPlaylistList": "Oldalsáv lejátszási lista",
         "sidePlayQueueStyle_description": "Beállítja az oldalsó műsorlista stílusát",
-        "mediaSession_description": "Lehetővé teszi a Windows Media Session integrációját, a médiavezérlők és metaadatok megjelenítését a rendszer hangerő-átfedésben és a zárolási képernyőn (csak Windows)",
+        "mediaSession_description": "Bekapcsolja a media session integrációját, a médiavezérlők és metaadatok megjelenítését a rendszer hangerő-átfedésben és a zárolási képernyőn. (Web audiolejátszó szükséges.)",
         "mediaSession": "Média munkamenet engedélyezése",
         "sidePlayQueueStyle": "Oldalsó műsorlista stílus",
         "skipDuration": "Átugrás hossza",
@@ -918,7 +933,7 @@
         "autoDJ": "Auto DJ",
         "autoDJ_timing": "Időzítés",
         "autoDJ_itemCount": "Elem szám",
-        "autoDJ_itemCount_description": "Az auto DJ engedélyezésekor a műsorsorba felvenni kívánt elemek száma",
+        "autoDJ_itemCount_description": "A műsorsorba felvenni kívánt elemek száma",
         "autoDJ_timing_description": "Az auto DJ elindulása előtt a műsorlistában maradt dalok száma",
         "followCurrentSong_description": "Automatikusan görgesse a műsorlistát az aktuálisan lejátszott dalra",
         "followCurrentSong": "Kövesd az aktuális dalt",
@@ -959,13 +974,13 @@
                 "biography": "$t(common.biography)",
                 "bitrate": "$t(common.bitrate)",
                 "bpm": "$t(common.bpm)",
-                "channels": "$t(common.channel_other)",
+                "channels": "$t(common.channel, {\"count\": 2})",
                 "codec": "$t(common.codec)",
                 "dateAdded": "Hozzáadva",
                 "discNumber": "Lemezszám",
                 "duration": "$t(common.duration)",
                 "favorite": "$t(common.favorite)",
-                "actions": "$t(common.action_other)",
+                "actions": "$t(common.action, {\"count\": 2})",
                 "album": "$t(entity.album, {\"count\": 1})",
                 "albumCount": "$t(entity.album, {\"count\": 2})",
                 "genreBadge": "$t(entity.genre, {\"count\": 1}) (jelvények)",
@@ -1011,33 +1026,33 @@
             }
         },
         "column": {
-            "albumCount": "$t(entity.album, {\"count\": 2})",
-            "artist": "$t(entity.artist, {\"count\": 1})",
+            "albumCount": "Albumok",
+            "artist": "Előadó",
             "biography": "Életrajz",
             "bitrate": "Bitráta",
             "bpm": "BPM",
-            "channels": "$t(common.channel_other)",
+            "channels": "Csatornák",
             "codec": "$t(common.codec)",
             "comment": "Komment",
             "dateAdded": "Hozzáadva",
             "discNumber": "Lemez",
             "favorite": "Kedvenc",
-            "genre": "$t(entity.genre, {\"count\": 1})",
+            "genre": "Műfaj",
             "lastPlayed": "Utoljára játszott",
             "path": "Elérési út",
             "playCount": "Lejátszások",
             "rating": "Értékelés",
             "releaseDate": "Megjelenés",
             "releaseYear": "Év",
-            "size": "$t(common.size)",
-            "songCount": "$t(entity.track, {\"count\": 2})",
+            "size": "Méret",
+            "songCount": "Sávok",
             "title": "Cím",
             "trackNumber": "Sáv",
             "album": "Album",
             "albumArtist": "Album előadó",
             "owner": "Tulajdonos",
-            "bitDepth": "$t(common.bitDepth)",
-            "sampleRate": "$t(common.sampleRate)"
+            "bitDepth": "Bitmélység",
+            "sampleRate": "Mintavételi frekvencia"
         }
     },
     "queryBuilder": {
@@ -1070,5 +1085,29 @@
         "secondShort": "Mp",
         "hourShort": "Óra",
         "dayShort": "Nap"
+    },
+    "visualizer": {
+        "options": {
+            "weightingFilter": {
+                "a": "A",
+                "b": "B",
+                "c": "C",
+                "d": "D",
+                "z": "Z",
+                "none": "Nincs"
+            },
+            "mode": {
+                "1": "[1] 1/24 oktáv / 240 sáv",
+                "2": "[2] 1/12 oktáv / 120 sáv",
+                "3": "[3] 1/8 oktáv / 80 sáv",
+                "4": "[4] 1/6 oktáv / 60 sáv",
+                "5": "[5] 1/4 oktáv / 40 sáv",
+                "6": "[6] 1/3 oktáv / 30 sáv",
+                "7": "[7] Fél oktáv / 20 sáv",
+                "8": "[8] Teljes oktáv / 10 sáv",
+                "10": "[10] Vonal / Területdiagram"
+            }
+        },
+        "showFPS": "Mutat FPS"
     }
 }

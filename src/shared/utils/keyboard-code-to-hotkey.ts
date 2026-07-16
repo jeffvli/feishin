@@ -3,7 +3,12 @@ const CODE_TO_HOTKEY_KEY: Record<string, string> = {
     ArrowLeft: 'arrowleft',
     ArrowRight: 'arrowright',
     ArrowUp: 'arrowup',
+    Backquote: '`',
+    Backslash: '\\',
     Backspace: 'backspace',
+    BracketLeft: '[',
+    BracketRight: ']',
+    Comma: ',',
     Delete: 'delete',
     End: 'end',
     Enter: 'enter',
@@ -14,6 +19,10 @@ const CODE_TO_HOTKEY_KEY: Record<string, string> = {
     Minus: 'minus',
     PageDown: 'pagedown',
     PageUp: 'pageup',
+    Period: '.',
+    Quote: "'",
+    Semicolon: ';',
+    Slash: '/',
     Space: 'space',
     Tab: 'tab',
 };
@@ -50,6 +59,10 @@ export const keyboardCodeToHotkeyKey = (code: string): null | string => {
 
     if (code.startsWith('Digit')) {
         return code.slice(5);
+    }
+
+    if (/^F([1-9]|1\d|2[0-4])$/.test(code)) {
+        return code.toLowerCase();
     }
 
     if (code.startsWith('Numpad')) {

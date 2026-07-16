@@ -4,6 +4,7 @@ import { useParams } from 'react-router';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
+import { useNativeScrollPersist } from '/@/renderer/components/native-scroll-area/use-native-scroll-persist';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistDetailContent } from '/@/renderer/features/artists/components/album-artist-detail-content';
@@ -32,6 +33,8 @@ const AlbumArtistDetailRouteContent = () => {
     const serverId = useCurrentServerId();
     const { artistBackground, artistBackgroundBlur } = useArtistBackground();
     const coverArtValidator = useCoverArtValidator();
+
+    useNativeScrollPersist({ enabled: true, scrollRef: scrollAreaRef });
 
     const { albumArtistId, artistId } = useParams() as {
         albumArtistId?: string;
