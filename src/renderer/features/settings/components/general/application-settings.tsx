@@ -345,7 +345,8 @@ export const ApplicationSettings = memo(() => {
         {
             control: (
                 <Switch
-                    defaultChecked={settings.resume}
+                    checked={settings.resume || settings.autoPlayOnOpen}
+                    disabled={settings.autoPlayOnOpen}
                     onChange={(e) => {
                         localSettings?.set('resume', e.target.checked);
                         setSettings({
@@ -362,6 +363,34 @@ export const ApplicationSettings = memo(() => {
             }),
             isHidden: !isElectron(),
             title: t('setting.savePlayQueue'),
+        },
+        {
+            control: (
+                <Switch
+                    checked={settings.autoPlayOnOpen}
+                    onChange={(e) => {
+                        const autoPlayOnOpen = e.currentTarget.checked;
+                        const resume = autoPlayOnOpen ? true : settings.resume;
+
+                        if (autoPlayOnOpen) {
+                            localSettings?.set('resume', true);
+                        }
+
+                        setSettings({
+                            general: {
+                                ...settings,
+                                autoPlayOnOpen,
+                                resume,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.autoPlayOnOpen', {
+                context: 'description',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.autoPlayOnOpen'),
         },
         {
             control: (
