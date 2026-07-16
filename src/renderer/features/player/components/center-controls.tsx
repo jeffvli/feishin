@@ -21,6 +21,8 @@ import {
     useSkipButtons,
 } from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
 import { PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
 export const CenterControls = () => {
@@ -165,7 +167,16 @@ const PreviousButton = ({ disabled }: { disabled?: boolean }) => {
             icon={<Icon fill="default" icon="mediaPrevious" size={buttonSize} />}
             onClick={(e) => mediaPrevious(e.altKey)}
             tooltip={{
-                label: t('player.previous'),
+                label: (
+                    <Stack gap="xs" justify="center">
+                        <Text fw={500} ta="center">
+                            {t('player.previous')}
+                        </Text>
+                        <Text fw={500} isMuted size="xs" ta="center">
+                            {t('player.previousAlbum')}
+                        </Text>
+                    </Stack>
+                ),
                 openDelay: 0,
             }}
             variant="secondary"
@@ -241,7 +252,16 @@ const NextButton = ({ disabled }: { disabled?: boolean }) => {
             icon={<Icon fill="default" icon="mediaNext" size={buttonSize} />}
             onClick={(e) => mediaNext(e.altKey)}
             tooltip={{
-                label: t('player.next'),
+                label: (
+                    <Stack gap="xs" justify="center">
+                        <Text fw={500} ta="center">
+                            {t('player.next')}
+                        </Text>
+                        <Text fw={500} isMuted size="xs" ta="center">
+                            {t('player.nextAlbum')}
+                        </Text>
+                    </Stack>
+                ),
                 openDelay: 0,
             }}
             variant="secondary"
