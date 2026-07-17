@@ -217,8 +217,8 @@ importers:
         specifier: ^2.2.2
         version: 2.2.2
       taglib-wasm:
-        specifier: ^1.3.0
-        version: 1.3.0(typescript@5.9.3)
+        specifier: ^1.5.1
+        version: 1.5.1(typescript@5.9.3)
       wavesurfer.js:
         specifier: ^7.12.7
         version: 7.12.8
@@ -5198,8 +5198,8 @@ packages:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
 
-  taglib-wasm@1.3.0:
-    resolution: {integrity: sha512-CBC4biY3fYPIEEviH4zMG0NsXUs2SZuW4ElffGn4UbYNE4xRmdmwdK/K4O+BRqjY1QARfdULaw8Hw8uFDvd/Gw==}
+  taglib-wasm@1.5.1:
+    resolution: {integrity: sha512-OIUfZuBSCNaE8mC9YUqJSQlG5hZdxYgXvhliI+0TYXERPrgE+INMG2roRb11Ki5U1LoBczF9B6UmBi/X7HBf1w==}
     engines: {node: '>=22.6.0'}
     peerDependencies:
       typescript: '>=4.5.0'
@@ -11060,7 +11060,7 @@ snapshots:
 
   tagged-tag@1.0.0: {}
 
-  taglib-wasm@1.3.0(typescript@5.9.3):
+  taglib-wasm@1.5.1(typescript@5.9.3):
     dependencies:
       '@msgpack/msgpack': 3.1.3
     optionalDependencies:

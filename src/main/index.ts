@@ -24,7 +24,6 @@ import electronLocalShortcut from 'electron-localshortcut';
 import log from 'electron-log/main';
 import { AppImageUpdater, autoUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
 import { access, constants } from 'fs';
-import { createRequire } from 'module';
 import path, { join } from 'path';
 import semver from 'semver';
 
@@ -39,10 +38,6 @@ import { autoUpdaterLogInterface, createLog, hotkeyToElectronAccelerator } from 
 
 import { disableAutoUpdates, isLinux, isMacOS, isWindows } from '/@/main/env';
 import { PlayerRepeat, PlayerStatus, PlayerType, TitleTheme } from '/@/shared/types/types';
-
-if (isWindows() && typeof (global as any).require !== 'function') {
-    (global as any).require = createRequire(__filename);
-}
 
 const ALPHA_UPDATER_CONFIG: {
     bucket: string;
