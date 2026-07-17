@@ -611,8 +611,6 @@
             "copyPath": "Copy path to clipboard",
             "copiedPath": "Path copied successfully",
             "openFile": "Show track in file manager",
-            "tagsSaved": "Tags saved successfully",
-            "rescanStarted": "Library rescan started",
             "fileNotWritable": "File is not accessible or not writable",
             "triggerRescan": "Trigger library rescan after saving",
             "addField": "Add field…",

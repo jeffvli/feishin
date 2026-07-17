@@ -233,7 +233,11 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
             />
 
             <Group justify="flex-end">
-                <Button onClick={() => closeAllModals()} variant="subtle">
+                <Button
+                    disabled={editor.isSaving}
+                    onClick={() => closeAllModals()}
+                    variant="subtle"
+                >
                     {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button loading={editor.isSaving} onClick={editor.handleSave} variant="filled">

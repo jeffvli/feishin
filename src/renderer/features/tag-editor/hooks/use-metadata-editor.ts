@@ -327,8 +327,6 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
                 return;
             }
 
-            toast.success({ message: t('page.itemDetail.tagsSaved') });
-
             if (artworkOp) {
                 await browser?.clearCache();
             }
@@ -339,7 +337,6 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
                         apiClientProps: { serverId: server.id },
                         query: { ids: resolvedSongs.map((s) => s.id) },
                     });
-                    toast.success({ message: t('page.itemDetail.rescanStarted') });
                 } catch {
                     // non-fatal
                 }
