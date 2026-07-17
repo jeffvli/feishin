@@ -29,7 +29,7 @@ export const ArtworkPanel = ({
     removeArtworkLabel,
     showRemoveButton,
 }: ArtworkPanelProps) => (
-    <Stack align="center" gap="md" pt="md">
+    <Stack gap="md" pt="md">
         <DragDropZone
             accept="image/*"
             className={styles.artworkBox}
