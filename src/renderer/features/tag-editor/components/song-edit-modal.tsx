@@ -13,6 +13,7 @@ import { PathSettings } from '/@/renderer/features/settings/components/general/p
 import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
+import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Table } from '/@/shared/components/table/table';
@@ -105,7 +106,7 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                             existingFieldKeys={editor.sortedFieldEntries.map(([key]) => key)}
                             onAddField={handleAddField}
                         />
-                        <div className={styles.tableScroller} ref={tableContainerRef}>
+                        <ScrollArea className={styles.tableScroller} ref={tableContainerRef}>
                             <Table
                                 classNames={{
                                     table: styles.table,
@@ -151,7 +152,7 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                                     })}
                                 </Table.Tbody>
                             </Table>
-                        </div>
+                        </ScrollArea>
                     </Stack>
                 </Tabs.Panel>
 

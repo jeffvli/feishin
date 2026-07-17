@@ -3,8 +3,6 @@
     padding-top: var(--theme-spacing-sm);
     padding-bottom: var(--theme-spacing-sm);
     margin-top: var(--theme-spacing-sm);
-    overflow-x: hidden;
-    overflow-y: auto;
     border-top: 1px solid var(--mantine-color-default-border);
 }
 
