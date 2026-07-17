@@ -88,7 +88,11 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                         />
                         <div className={styles.tableScroller} ref={tableContainerRef}>
                             <Table
-                                classNames={{ td: styles.tableCell, th: styles.tableHeader }}
+                                classNames={{
+                                    table: styles.table,
+                                    td: styles.tableCell,
+                                    th: styles.tableHeader,
+                                }}
                                 highlightOnHover={false}
                                 withRowBorders
                             >

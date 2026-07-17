@@ -3,18 +3,34 @@
     padding-top: var(--theme-spacing-sm);
     padding-bottom: var(--theme-spacing-sm);
     margin-top: var(--theme-spacing-sm);
+    overflow-x: hidden;
     overflow-y: auto;
     border-top: 1px solid var(--mantine-color-default-border);
 }
 
+.table {
+    width: 100%;
+}
+
 .table-cell {
+    min-width: 0;
     padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
     vertical-align: middle;
 }
 
-.table-header {
+.table-cell:nth-child(2) {
+    overflow: hidden;
+}
+
+.table-cell:last-child {
     width: 1%;
+}
+
+.table-header {
+    width: 25%;
     padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
     font-weight: 500;
     vertical-align: middle;
     color: var(--theme-colors-foreground-muted);
