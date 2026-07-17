@@ -87,7 +87,6 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         const allKeys = new Set<string>();
         for (const k of Object.keys(tagSummary)) allKeys.add(k);
         for (const k of Object.keys(editedFields)) allKeys.add(k);
-        for (const k of removedKeys) allKeys.delete(k);
 
         const displayFields: Record<string, TagValue> = {};
         const mixedKeys = new Set<string>();
@@ -118,7 +117,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         });
 
         return { displayFields, mixedKeys, sortedFieldEntries };
-    }, [tagSummary, editedFields, multiValueKeys, removedKeys]);
+    }, [tagSummary, editedFields, multiValueKeys]);
 
     /**
      * Runs once on mount: reads metadata for all songs in batch and populates
@@ -210,14 +209,32 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         [favoriteValues, setSettings],
     );
 
-    /** Removes `key` from both `editedFields` and the display, marking it for deletion on save. */
+    /** Marks `key` for deletion while preserving its displayed value for undo. */
     const handleRemoveField = useCallback((key: string) => {
+        setRemovedKeys((prev) => new Set(prev).add(key));
+    }, []);
+
+    /** Re-enables a field that was marked for deletion. */
+    const handleResetField = useCallback((key: string) => {
+        setRemovedKeys((prev) => {
+            const next = new Set(prev);
+            next.delete(key);
+            return next;
+        });
+    }, []);
+
+    /** Restores a field to its original on-disk value and removal state. */
+    const handleRevertField = useCallback((key: string) => {
         setEditedFields((prev) => {
             const next = { ...prev };
             delete next[key];
             return next;
         });
-        setRemovedKeys((prev) => new Set(prev).add(key));
+        setRemovedKeys((prev) => {
+            const next = new Set(prev);
+            next.delete(key);
+            return next;
+        });
     }, []);
 
     // Refs so the functional updater inside handleAddField can see latest values without needing them in the dependency array.
@@ -232,6 +249,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
             if (!key) return;
             setEditedFields((prev) => {
                 const wasRemoved = removedKeysRef.current.has(key);
+                if (wasRemoved) return prev;
                 const alreadyVisible = (key in tagSummaryRef.current || key in prev) && !wasRemoved;
                 if (alreadyVisible) return prev;
                 return { ...prev, [key]: multiValueKeys.has(key) ? [] : '' };
@@ -284,7 +302,10 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
     const handleSave = useCallback(async () => {
         if (resolvedSongs.length === 0) return;
 
-        const emptyFields = Object.entries(editedFields)
+        const activeEdits = Object.fromEntries(
+            Object.entries(editedFields).filter(([key]) => !removedKeys.has(key)),
+        ) as Record<string, TagValue>;
+        const emptyFields = Object.entries(activeEdits)
             .filter(([key, value]) => {
                 const meta = KNOWN_TAG_MAP.get(key);
                 if (meta?.type === 'boolean') return false;
@@ -309,7 +330,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
             const writeResult = await withBatchProgress(utils, setLoadProgress, () =>
                 utils.writeSongTagsBatch(
                     paths,
-                    editedFields,
+                    activeEdits,
                     [...removedKeys],
                     artworkOp ?? undefined,
                 ),
@@ -393,6 +414,8 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         handleFieldChange,
         handleRemoveArtwork,
         handleRemoveField,
+        handleResetField,
+        handleRevertField,
         handleSave,
         isLoading,
         isSaving,
@@ -401,6 +424,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         mixedPlaceholder,
         multiValueKeys,
         readWarning,
+        removedKeys,
         rescan: triggerRescan,
         setRescan,
         showRemoveArtworkButton,

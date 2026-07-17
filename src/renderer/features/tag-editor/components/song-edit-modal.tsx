@@ -96,12 +96,16 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                                     {editor.sortedFieldEntries.map(([key, value]) => (
                                         <TagFieldRow
                                             favoriteValues={editor.favoriteValues[key] ?? []}
-                                            isDirty={key in editor.editedFields}
+                                            isDirty={
+                                                key in editor.editedFields ||
+                                                editor.removedKeys.has(key)
+                                            }
                                             isMixed={editor.mixedKeys.has(key)}
                                             isMultiValue={
                                                 editor.multiValueKeys.has(key) ||
                                                 Array.isArray(value)
                                             }
+                                            isRemoved={editor.removedKeys.has(key)}
                                             key={key}
                                             meta={editor.getFieldMeta(key)}
                                             mixedPlaceholder={
@@ -114,6 +118,8 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                                             }
                                             onChange={(v) => editor.handleFieldChange(key, v)}
                                             onRemove={() => editor.handleRemoveField(key)}
+                                            onReset={() => editor.handleResetField(key)}
+                                            onRevert={() => editor.handleRevertField(key)}
                                             tagKey={key}
                                             value={value}
                                         />

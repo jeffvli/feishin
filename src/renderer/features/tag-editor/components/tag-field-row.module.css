@@ -10,3 +10,8 @@
 .dirty-label {
     box-shadow: inset 2px 0 0 var(--mantine-primary-color-filled);
 }
+
+.removed-row {
+    opacity: 0.55;
+    transition: opacity 0.15s ease-in-out;
+}
