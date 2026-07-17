@@ -1,7 +1,3 @@
-.tab-label {
-    font-size: 1rem;
-}
-
 .table-scroller {
     max-height: 55vh;
     padding-top: var(--theme-spacing-sm);

@@ -111,15 +111,11 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
         <Stack gap="xs">
             <Tabs defaultValue="tags" keepMounted={false}>
                 <Tabs.List>
-                    <Tabs.Tab className={styles.tabLabel} value="tags">
-                        {t('page.itemDetail.tagsTab', 'Tags')}
-                    </Tabs.Tab>
-                    <Tabs.Tab className={styles.tabLabel} value="artwork">
+                    <Tabs.Tab value="tags">{t('page.itemDetail.tagsTab', 'Tags')}</Tabs.Tab>
+                    <Tabs.Tab value="artwork">
                         {t('page.itemDetail.artworkTab', 'Artwork')}
                     </Tabs.Tab>
-                    <Tabs.Tab className={styles.tabLabel} value="settings">
-                        {t('common.settings', 'Settings')}
-                    </Tabs.Tab>
+                    <Tabs.Tab value="settings">{t('common.settings', 'Settings')}</Tabs.Tab>
                 </Tabs.List>
 
                 <Tabs.Panel value="tags">
