@@ -46,7 +46,7 @@ function flattenProperties(props: Record<string, string[] | undefined>): Record<
     const flat: Record<string, string> = {};
     for (const [key, values] of Object.entries(props)) {
         if (values && values.length > 0 && values[0] !== '') {
-            flat[key] = values[0];
+            flat[key] = values.join('; ');
         }
     }
     const coveredByUpperCase = new Set(
