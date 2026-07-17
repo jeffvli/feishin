@@ -3,6 +3,7 @@ import type {
     ArtworkOp,
     BatchProgress,
     TagEditorUtils,
+    TagValue,
 } from '/@/shared/types/tag-editor';
 
 import { closeAllModals } from '@mantine/modals';
@@ -13,7 +14,7 @@ import { FIELD_PRIORITY, KNOWN_TAG_MAP, KNOWN_TAGS, type KnownTag } from '../uti
 import { base64ToBytes, formatBatchFileErrors } from '../utils/utils';
 
 import { controller } from '/@/renderer/api/controller';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServer, useSettingsStoreActions, useTagEditorSettings } from '/@/renderer/store';
 import { resolveSongPath } from '/@/renderer/utils/resolve-song-path';
 import { toast } from '/@/shared/components/toast/toast';
 import { Song } from '/@/shared/types/domain-types';
@@ -49,6 +50,8 @@ interface UseMetadataEditorArgs {
 export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetadataEditorArgs) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
+    const { favoriteValues, multiValueFields } = useTagEditorSettings();
+    const { setSettings } = useSettingsStoreActions();
 
     const [isLoading, setIsLoading] = useState(true);
     const [loadProgress, setLoadProgress] = useState<BatchProgress | null>(null);
@@ -57,8 +60,9 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
     const [resolvedSongs, setResolvedSongs] = useState<Song[]>([]);
     const [rescan, setRescan] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
-    const [tagSummary, setTagSummary] = useState<Record<string, null | string>>({});
-    const [editedFields, setEditedFields] = useState<Record<string, string>>({});
+    const [tagSummary, setTagSummary] = useState<Record<string, null | TagValue>>({});
+    const [editedFields, setEditedFields] = useState<Record<string, TagValue>>({});
+    const [parsedMultiValueKeys, setParsedMultiValueKeys] = useState<Set<string>>(new Set());
     const [removedKeys, setRemovedKeys] = useState<Set<string>>(new Set());
     const [loadedArtwork, setLoadedArtwork] = useState<{ kind: ArtworkKind }>({ kind: 'none' });
     const [artworkDisplayUrl, setArtworkDisplayUrl] = useState<null | string>(null);
@@ -70,13 +74,18 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
      * across files) are added to `mixedKeys`. `sortedFieldEntries` applies
      * `FIELD_PRIORITY` ordering, then alphabetical by label for unlisted keys.
      */
+    const multiValueKeys = useMemo(
+        () => new Set([...multiValueFields, ...parsedMultiValueKeys]),
+        [multiValueFields, parsedMultiValueKeys],
+    );
+
     const { displayFields, mixedKeys, sortedFieldEntries } = useMemo(() => {
         const allKeys = new Set<string>();
         for (const k of Object.keys(tagSummary)) allKeys.add(k);
         for (const k of Object.keys(editedFields)) allKeys.add(k);
         for (const k of removedKeys) allKeys.delete(k);
 
-        const displayFields: Record<string, string> = {};
+        const displayFields: Record<string, TagValue> = {};
         const mixedKeys = new Set<string>();
 
         for (const key of allKeys) {
@@ -87,7 +96,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
             const summaryVal = tagSummary[key];
             if (summaryVal === null) {
                 mixedKeys.add(key);
-                displayFields[key] = '';
+                displayFields[key] = multiValueKeys.has(key) ? [] : '';
             } else if (summaryVal !== undefined) {
                 displayFields[key] = summaryVal;
             }
@@ -105,7 +114,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         });
 
         return { displayFields, mixedKeys, sortedFieldEntries };
-    }, [tagSummary, editedFields, removedKeys]);
+    }, [tagSummary, editedFields, multiValueKeys, removedKeys]);
 
     /**
      * Runs once on mount: reads metadata for all songs in batch and populates
@@ -147,6 +156,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
             }
 
             setTagSummary(batchResult.tagSummary);
+            setParsedMultiValueKeys(new Set(batchResult.multiValueKeys ?? []));
 
             if (
                 batchResult.artworkKind === 'common' &&
@@ -171,9 +181,30 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
     }, []);
 
     /** Records an edited value for `key`, overriding the on-disk summary. */
-    const handleFieldChange = useCallback((key: string, value: string) => {
+    const handleFieldChange = useCallback((key: string, value: TagValue) => {
         setEditedFields((prev) => ({ ...prev, [key]: value }));
     }, []);
+
+    const handleAddFavoriteValue = useCallback(
+        (key: string, value: string) => {
+            const trimmed = value.trim();
+            if (!trimmed) return;
+
+            const currentValues = favoriteValues[key] ?? [];
+            if (currentValues.some((favorite) => favorite.toLowerCase() === trimmed.toLowerCase()))
+                return;
+
+            setSettings({
+                tagEditor: {
+                    favoriteValues: {
+                        ...favoriteValues,
+                        [key]: [...currentValues, trimmed],
+                    },
+                },
+            });
+        },
+        [favoriteValues, setSettings],
+    );
 
     /** Removes `key` from both `editedFields` and the display, marking it for deletion on save. */
     const handleRemoveField = useCallback((key: string) => {
@@ -192,20 +223,23 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
     removedKeysRef.current = removedKeys;
 
     /** Adds `key` to `editedFields` with an empty value and un-marks it from removal. */
-    const handleAddField = useCallback((key: null | string) => {
-        if (!key) return;
-        setEditedFields((prev) => {
-            const wasRemoved = removedKeysRef.current.has(key);
-            const alreadyVisible = (key in tagSummaryRef.current || key in prev) && !wasRemoved;
-            if (alreadyVisible) return prev;
-            return { ...prev, [key]: '' };
-        });
-        setRemovedKeys((prev) => {
-            const next = new Set(prev);
-            next.delete(key);
-            return next;
-        });
-    }, []);
+    const handleAddField = useCallback(
+        (key: null | string) => {
+            if (!key) return;
+            setEditedFields((prev) => {
+                const wasRemoved = removedKeysRef.current.has(key);
+                const alreadyVisible = (key in tagSummaryRef.current || key in prev) && !wasRemoved;
+                if (alreadyVisible) return prev;
+                return { ...prev, [key]: multiValueKeys.has(key) ? [] : '' };
+            });
+            setRemovedKeys((prev) => {
+                const next = new Set(prev);
+                next.delete(key);
+                return next;
+            });
+        },
+        [multiValueKeys],
+    );
 
     /** Creates a blob URL from raw image bytes and queues a `set` artwork operation. */
     const applyArtworkBytes = useCallback((bytes: Uint8Array, mimeType: string) => {
@@ -249,7 +283,10 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         const emptyFields = Object.entries(editedFields)
             .filter(([key, value]) => {
                 const meta = KNOWN_TAG_MAP.get(key);
-                return meta?.type !== 'boolean' && value.trim() === '';
+                if (meta?.type === 'boolean') return false;
+                return Array.isArray(value)
+                    ? value.length === 0 || value.some((part) => part.trim() === '')
+                    : value.trim() === '';
             })
             .map(([key]) => KNOWN_TAG_MAP.get(key)?.label ?? key);
 
@@ -337,7 +374,9 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         availableToAdd,
         editedFields,
         error,
+        favoriteValues,
         getFieldMeta,
+        handleAddFavoriteValue,
         handleAddField,
         handleChangeArtwork,
         handleFieldChange,
@@ -349,6 +388,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         loadProgress,
         mixedKeys,
         mixedPlaceholder,
+        multiValueKeys,
         readWarning,
         rescan,
         setRescan,

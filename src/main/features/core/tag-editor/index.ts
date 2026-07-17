@@ -1,6 +1,7 @@
 import type {
     ArtworkOp,
     ReadSongMetadataBatchResult,
+    TagValue,
     WriteSongTagsBatchResult,
 } from '/@/shared/types/tag-editor';
 
@@ -51,6 +52,7 @@ ipcMain.handle(
             return {
                 artworkKind: result.artworkKind,
                 failedFiles: result.failedFiles.length > 0 ? result.failedFiles : undefined,
+                multiValueKeys: result.multiValueKeys,
                 readCount: result.readCount,
                 success: true,
                 tagSummary: result.tagSummary,
@@ -75,7 +77,7 @@ ipcMain.handle(
     async (
         event,
         filePaths: string[],
-        edits: Record<string, string>,
+        edits: Record<string, TagValue>,
         removed: string[],
         artworkOp?: ArtworkOp,
     ): Promise<WriteSongTagsBatchResult> => {

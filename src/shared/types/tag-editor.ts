@@ -22,8 +22,9 @@ export interface ReadSongMetadataBatchResult extends IpcResult {
     artworkKind: ArtworkKind;
     artworkMimeType?: string;
     failedFiles?: BatchFileError[];
+    multiValueKeys?: string[];
     readCount?: number;
-    tagSummary?: Record<string, null | string>;
+    tagSummary?: Record<string, null | TagValue>;
     totalCount?: number;
 }
 
@@ -36,11 +37,13 @@ export interface TagEditorUtils {
     readSongMetadataBatch: (filePaths: string[]) => Promise<ReadSongMetadataBatchResult>;
     writeSongTagsBatch: (
         filePaths: string[],
-        edits: Record<string, string>,
+        edits: Record<string, TagValue>,
         removed: string[],
         artworkOp?: ArtworkOp,
     ) => Promise<WriteSongTagsBatchResult>;
 }
+
+export type TagValue = string | string[];
 
 export interface WriteSongTagsBatchResult extends IpcResult {
     failedFiles?: BatchFileError[];

@@ -5,6 +5,7 @@ import type {
     BatchProgress,
     ReadLocalImageResult,
     ReadSongMetadataBatchResult,
+    TagValue,
     WriteSongTagsBatchResult,
 } from '../shared/types/tag-editor';
 
@@ -24,7 +25,7 @@ const readSongMetadataBatch = (filePaths: string[]): Promise<ReadSongMetadataBat
 
 const writeSongTagsBatch = (
     filePaths: string[],
-    edits: Record<string, string>,
+    edits: Record<string, TagValue>,
     removed: string[],
     artworkOp?: ArtworkOp,
 ): Promise<WriteSongTagsBatchResult> => {

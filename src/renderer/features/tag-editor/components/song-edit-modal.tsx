@@ -8,6 +8,7 @@ import { useMetadataEditor } from '../hooks/use-metadata-editor';
 import { KNOWN_TAG_MAP, resolveTagKey } from '../utils/known-tags';
 import { ArtworkPanel } from './artwork-panel';
 import styles from './song-edit-modal.module.css';
+import { TagEditorSettings } from './tag-editor-settings';
 import { TagFieldRow } from './tag-field-row';
 
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
@@ -116,6 +117,9 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                     <Tabs.Tab className={styles.tabLabel} value="artwork">
                         {t('page.itemDetail.artworkTab', 'Artwork')}
                     </Tabs.Tab>
+                    <Tabs.Tab className={styles.tabLabel} value="settings">
+                        {t('common.settings', 'Settings')}
+                    </Tabs.Tab>
                 </Tabs.List>
 
                 <Tabs.Panel value="tags">
@@ -175,14 +179,22 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                                 <Table.Tbody>
                                     {editor.sortedFieldEntries.map(([key, value]) => (
                                         <TagFieldRow
+                                            favoriteValues={editor.favoriteValues[key] ?? []}
                                             isDirty={key in editor.editedFields}
                                             isMixed={editor.mixedKeys.has(key)}
+                                            isMultiValue={
+                                                editor.multiValueKeys.has(key) ||
+                                                Array.isArray(value)
+                                            }
                                             key={key}
                                             meta={editor.getFieldMeta(key)}
                                             mixedPlaceholder={
                                                 editor.mixedKeys.has(key)
                                                     ? editor.mixedPlaceholder
                                                     : undefined
+                                            }
+                                            onAddFavorite={(value) =>
+                                                editor.handleAddFavoriteValue(key, value)
                                             }
                                             onChange={(v) => editor.handleFieldChange(key, v)}
                                             onRemove={() => editor.handleRemoveField(key)}
@@ -211,6 +223,10 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                         removeArtworkLabel={t('page.itemDetail.removeArtwork', 'Remove Artwork')}
                         showRemoveButton={editor.showRemoveArtworkButton}
                     />
+                </Tabs.Panel>
+
+                <Tabs.Panel value="settings">
+                    <TagEditorSettings />
                 </Tabs.Panel>
             </Tabs>
 

@@ -1,4 +1,4 @@
-import type { ArtworkKind, ArtworkOp, BatchFileError } from '/@/shared/types/tag-editor';
+import type { ArtworkKind, ArtworkOp, BatchFileError, TagValue } from '/@/shared/types/tag-editor';
 
 import { constants, promises as fsPromises } from 'fs';
 import { PROPERTIES, TagLib } from 'taglib-wasm';
@@ -41,26 +41,40 @@ export async function readLocalImageFile(filePath: string) {
     };
 }
 
-/** Flattens a taglib-wasm PropertyMap to a string record, dropping ALL_CAPS alias keys already covered by a camelCase equivalent. */
-function flattenProperties(props: Record<string, string[] | undefined>): Record<string, string> {
-    const flat: Record<string, string> = {};
+/** Normalizes a taglib-wasm PropertyMap while preserving true multivalue arrays. */
+function normalizeProperties(
+    props: Record<string, string[] | undefined>,
+): Record<string, TagValue> {
+    const normalized: Record<string, TagValue> = {};
     for (const [key, values] of Object.entries(props)) {
         if (values && values.length > 0 && values[0] !== '') {
-            flat[key] = values.join('; ');
+            normalized[key] = values.length === 1 ? values[0] : [...values];
         }
     }
     const coveredByUpperCase = new Set(
-        Object.keys(flat)
+        Object.keys(normalized)
             .filter((k) => k !== k.toUpperCase())
             .map((k) => k.toUpperCase()),
     );
-    for (const key of Object.keys(flat)) {
+    for (const key of Object.keys(normalized)) {
         if (key === key.toUpperCase() && coveredByUpperCase.has(key)) {
-            delete flat[key];
+            delete normalized[key];
         }
     }
-    return flat;
+    return normalized;
 }
+
+const tagValuesEqual = (a: TagValue, b: TagValue | undefined): boolean => {
+    if (Array.isArray(a) || Array.isArray(b)) {
+        return (
+            Array.isArray(a) &&
+            Array.isArray(b) &&
+            a.length === b.length &&
+            a.every((value, index) => value === b[index])
+        );
+    }
+    return a === b;
+};
 
 /** Runs `fn` over `items` with at most `concurrency` tasks in flight at once. Stops early if `signal` is aborted. */
 const mapWithConcurrency = async <T>(
@@ -96,14 +110,16 @@ export async function readFilesMetadataBatch(
     artworkKind: ArtworkKind;
     artworkMimeType?: string;
     failedFiles: BatchFileError[];
+    multiValueKeys: string[];
     readCount: number;
     success: boolean;
-    tagSummary: Record<string, null | string>;
+    tagSummary: Record<string, null | TagValue>;
     totalCount: number;
 }> {
     const totalCount = filePaths.length;
     const failedFiles: BatchFileError[] = [];
-    const tagSummary: Record<string, null | string> = {};
+    const multiValueKeys = new Set<string>();
+    const tagSummary: Record<string, null | TagValue> = {};
     let artworkKind = 'none' as ArtworkKind;
     let artworkByteSize: number | undefined;
     let artworkData: string | undefined;
@@ -127,14 +143,17 @@ export async function readFilesMetadataBatch(
                             embeddedLyrics.map(({ text }) => text).join('\n\n'),
                         ];
                     }
-                    const flat = flattenProperties(rawProperties);
+                    const normalized = normalizeProperties(rawProperties);
+                    for (const [key, value] of Object.entries(normalized)) {
+                        if (Array.isArray(value)) multiValueKeys.add(key);
+                    }
                     const pictures = file.getPictures();
                     const frontCover = pictures.find((p) => p.type === 'FrontCover') ?? pictures[0];
                     const hasCoverArt = frontCover !== undefined;
                     const picSize = hasCoverArt ? frontCover.data.length : undefined;
 
                     if (readCount === 0) {
-                        Object.assign(tagSummary, flat);
+                        Object.assign(tagSummary, normalized);
                         artworkKind = hasCoverArt ? 'common' : 'none';
                         artworkByteSize = picSize;
                         if (frontCover) {
@@ -143,10 +162,13 @@ export async function readFilesMetadataBatch(
                         }
                     } else {
                         for (const k of Object.keys(tagSummary)) {
-                            if (tagSummary[k] !== null && flat[k] !== tagSummary[k])
+                            if (
+                                tagSummary[k] !== null &&
+                                !tagValuesEqual(tagSummary[k], normalized[k])
+                            )
                                 tagSummary[k] = null;
                         }
-                        for (const k of Object.keys(flat)) {
+                        for (const k of Object.keys(normalized)) {
                             if (!(k in tagSummary)) tagSummary[k] = null;
                         }
                         if (artworkKind !== 'mixed') {
@@ -178,6 +200,7 @@ export async function readFilesMetadataBatch(
     return {
         artworkKind,
         failedFiles,
+        multiValueKeys: [...multiValueKeys],
         readCount,
         success: readCount > 0,
         tagSummary,
@@ -189,11 +212,12 @@ export async function readFilesMetadataBatch(
 /**
  * Writes tag edits and/or artwork to a batch of audio files in-place via taglib-wasm (WASI).
  * Only the fields present in `edits`/`removed` are touched — all other existing tags are preserved.
- * Fields in `removed` are written as empty strings, which clears them in TagLib.
+ * Array values are written as true multivalue properties; scalar values remain single-valued.
+ * Lyrics use TagLib's dedicated unsynchronized-lyrics API.
  */
 export async function writeFilesTags(
     filePaths: string[],
-    edits: Record<string, string>,
+    edits: Record<string, TagValue>,
     removed: string[],
     artworkOp?: ArtworkOp,
     onProgress?: (processed: number, total: number) => void,
@@ -208,12 +232,7 @@ export async function writeFilesTags(
         return { failedFiles, success: false };
     }
 
-    const mergedEdits: Record<string, string> = { ...edits };
-    for (const key of removed) {
-        mergedEdits[key] = '';
-    }
-
-    const hasEdits = Object.keys(mergedEdits).length > 0;
+    const hasEdits = Object.keys(edits).length > 0 || removed.length > 0;
 
     if (!hasEdits && !artworkOp) {
         return { failedFiles, success: failedFiles.length === 0 };
@@ -226,9 +245,37 @@ export async function writeFilesTags(
     await mapWithConcurrency(writablePaths, BATCH_CONCURRENCY, async (path) => {
         try {
             await taglib.edit(path, (file) => {
-                for (const [k, v] of Object.entries(mergedEdits)) {
-                    file.setProperty(k in PROPERTIES ? k : k.toUpperCase(), v);
+                const propertyEdits = Object.entries(edits).filter(([key]) => key !== 'lyrics');
+                const propertyRemovals = removed.filter((key) => key !== 'lyrics');
+
+                if (propertyEdits.length > 0 || propertyRemovals.length > 0) {
+                    const properties = file.properties();
+
+                    for (const [key, value] of propertyEdits) {
+                        const propertyKey = key in PROPERTIES ? key : key.toUpperCase();
+                        properties[propertyKey] = Array.isArray(value) ? value : [value];
+                    }
+
+                    for (const key of propertyRemovals) {
+                        const propertyKey = key in PROPERTIES ? key : key.toUpperCase();
+                        delete properties[propertyKey];
+                    }
+
+                    file.setProperties(properties);
                 }
+
+                if (removed.includes('lyrics')) {
+                    file.setLyrics([]);
+                } else if (edits.lyrics !== undefined) {
+                    file.setLyrics([
+                        {
+                            text: Array.isArray(edits.lyrics)
+                                ? edits.lyrics.join('\n\n')
+                                : edits.lyrics,
+                        },
+                    ]);
+                }
+
                 if (artworkOp?.type === 'clear') {
                     file.removePictures();
                 } else if (artworkOp?.type === 'set') {

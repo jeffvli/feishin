@@ -603,6 +603,11 @@
             "title": "$t(common.home)"
         },
         "itemDetail": {
+            "multiValueFields": "Multi-value fields",
+            "multiValueFieldsDescription": "Fields in this list use a tag input and are saved as separate metadata values. Parsed multivalue fields use it automatically. Lyrics are always handled separately.",
+            "addMultiValueField": "Add multivalue field…",
+            "addFavoriteValue": "Add favorite value…",
+            "addFavoriteValueOption": "Add \"{{value}}\" as a favorite…",
             "copyPath": "Copy path to clipboard",
             "copiedPath": "Path copied successfully",
             "openFile": "Show track in file manager",
