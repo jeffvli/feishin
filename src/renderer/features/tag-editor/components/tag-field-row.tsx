@@ -1,7 +1,7 @@
 import type { TagValue } from '/@/shared/types/tag-editor';
 
 import clsx from 'clsx';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { KnownTag } from '../utils/known-tags';
@@ -24,7 +24,6 @@ interface CustomTagsInputProps {
     customValues: string[];
     disabled: boolean;
     mixedPlaceholder?: string;
-    onAddCustom: (value: string) => void;
     onChange: (value: string[]) => void;
     value: string[];
 }
@@ -34,7 +33,6 @@ interface StringAutocompleteInputProps {
     customValues: string[];
     disabled: boolean;
     mixedPlaceholder?: string;
-    onAddCustom: (value: string) => void;
     onChange: (value: string) => void;
     value: string;
 }
@@ -49,7 +47,6 @@ interface TagFieldRowProps {
     isRemoved: boolean;
     meta: KnownTag;
     mixedPlaceholder?: string;
-    onAddCustom: (value: string) => void;
     onChange: (value: TagValue) => void;
     onRemove: () => void;
     onReset: () => void;
@@ -58,55 +55,18 @@ interface TagFieldRowProps {
     value: TagValue;
 }
 
-const ADD_CUSTOM_PREFIX = '__feishin_add_custom__:';
-
 const useSuggestionData = (
     autocompleteSource: TagAutocompleteSource,
     customValues: string[],
     searchValue: string,
 ) => {
-    const { t } = useTranslation();
     const { groups, isLoading } = useTagAutocompleteSuggestions({
         customValues,
         search: searchValue,
         source: autocompleteSource,
     });
-    const candidate = searchValue.trim();
-    const canAddCustom =
-        candidate.length > 0 &&
-        !customValues.some((value) => value.toLowerCase() === candidate.toLowerCase());
 
-    const data = useMemo(() => {
-        const nextData: { group: string; items: (string | { label: string; value: string })[] }[] =
-            groups.map((group) => ({
-                group: group.group,
-                items: [...group.items],
-            }));
-
-        if (canAddCustom) {
-            const addOption = {
-                label: t('page.itemDetail.addCustomValueOption', {
-                    defaultValue: `Add "{{value}}" as a custom value…`,
-                    value: candidate,
-                }),
-                value: `${ADD_CUSTOM_PREFIX}${candidate}`,
-            };
-            const customGroupLabel = t('page.itemDetail.customValues', 'Custom values');
-            const existingCustomGroup = nextData.find((group) => group.group === customGroupLabel);
-            if (existingCustomGroup) {
-                existingCustomGroup.items.push(addOption);
-            } else {
-                nextData.unshift({
-                    group: customGroupLabel,
-                    items: [addOption],
-                });
-            }
-        }
-
-        return nextData;
-    }, [canAddCustom, candidate, groups, t]);
-
-    return { data, isLoading };
+    return { data: groups, isLoading };
 };
 
 const CustomTagsInput = ({
@@ -114,7 +74,6 @@ const CustomTagsInput = ({
     customValues,
     disabled,
     mixedPlaceholder,
-    onAddCustom,
     onChange,
     value,
 }: CustomTagsInputProps) => {
@@ -127,25 +86,7 @@ const CustomTagsInput = ({
             data={data}
             disabled={disabled}
             loading={isLoading}
-            onChange={(values) => {
-                const normalizedValues = values.map((item) =>
-                    item.startsWith(ADD_CUSTOM_PREFIX)
-                        ? item.slice(ADD_CUSTOM_PREFIX.length)
-                        : item,
-                );
-                onChange(
-                    normalizedValues.filter(
-                        (item, index) =>
-                            normalizedValues.findIndex(
-                                (other) => other.toLowerCase() === item.toLowerCase(),
-                            ) === index,
-                    ),
-                );
-            }}
-            onOptionSubmit={(submittedValue) => {
-                if (submittedValue.startsWith(ADD_CUSTOM_PREFIX))
-                    onAddCustom(submittedValue.slice(ADD_CUSTOM_PREFIX.length));
-            }}
+            onChange={onChange}
             onSearchChange={setSearchValue}
             placeholder={mixedPlaceholder}
             searchValue={searchValue}
@@ -161,7 +102,6 @@ const StringAutocompleteInput = ({
     customValues,
     disabled,
     mixedPlaceholder,
-    onAddCustom,
     onChange,
     value,
 }: StringAutocompleteInputProps) => {
@@ -173,15 +113,7 @@ const StringAutocompleteInput = ({
             disabled={disabled}
             limit={100}
             loading={isLoading}
-            onChange={(next) => {
-                if (next.startsWith(ADD_CUSTOM_PREFIX)) {
-                    const custom = next.slice(ADD_CUSTOM_PREFIX.length);
-                    onAddCustom(custom);
-                    onChange(custom);
-                    return;
-                }
-                onChange(next);
-            }}
+            onChange={onChange}
             placeholder={mixedPlaceholder}
             size="sm"
             value={value}
@@ -199,7 +131,6 @@ export const TagFieldRow = ({
     isRemoved,
     meta,
     mixedPlaceholder,
-    onAddCustom,
     onChange,
     onRemove,
     onReset,
@@ -228,7 +159,6 @@ export const TagFieldRow = ({
                         customValues={customValues}
                         disabled={isRemoved}
                         mixedPlaceholder={mixedPlaceholder}
-                        onAddCustom={onAddCustom}
                         onChange={onChange}
                         value={Array.isArray(value) ? value : value ? [value] : []}
                     />
@@ -269,7 +199,6 @@ export const TagFieldRow = ({
                         customValues={customValues}
                         disabled={isRemoved}
                         mixedPlaceholder={mixedPlaceholder}
-                        onAddCustom={onAddCustom}
                         onChange={onChange}
                         value={stringValue}
                     />

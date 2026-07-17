@@ -140,9 +140,6 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                                                         ? editor.mixedPlaceholder
                                                         : undefined
                                                 }
-                                                onAddCustom={(value) =>
-                                                    editor.handleAddCustomValue(key, value)
-                                                }
                                                 onChange={(v) => editor.handleFieldChange(key, v)}
                                                 onRemove={() => editor.handleRemoveField(key)}
                                                 onReset={() => editor.handleResetField(key)}

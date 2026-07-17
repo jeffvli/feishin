@@ -209,33 +209,6 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         setEditedFields((prev) => ({ ...prev, [key]: value }));
     }, []);
 
-    const handleAddCustomValue = useCallback(
-        (key: string, value: string) => {
-            const trimmed = value.trim();
-            if (!trimmed) return;
-
-            const config = tagConfigs[key];
-            const currentValues = config?.customValues ?? [];
-            if (currentValues.some((custom) => custom.toLowerCase() === trimmed.toLowerCase()))
-                return;
-
-            setSettings({
-                tagEditor: {
-                    tagConfigs: {
-                        [key]: {
-                            autocompleteSource: config?.autocompleteSource ?? 'none',
-                            customValues: [...currentValues, trimmed].sort((a, b) =>
-                                a.localeCompare(b),
-                            ),
-                            multiValue: config?.multiValue ?? true,
-                        },
-                    },
-                },
-            });
-        },
-        [setSettings, tagConfigs],
-    );
-
     /** Marks `key` for deletion while preserving its displayed value for undo. */
     const handleRemoveField = useCallback((key: string) => {
         setRemovedKeys((prev) => new Set(prev).add(key));
@@ -447,7 +420,6 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         error,
         getFieldMeta,
         getTagConfig,
-        handleAddCustomValue,
         handleAddField,
         handleChangeArtwork,
         handleFieldChange,

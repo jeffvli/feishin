@@ -610,7 +610,6 @@
             "autocompleteSource": "Autocomplete source",
             "customValues": "Custom values",
             "addCustomValue": "Add custom value…",
-            "addCustomValueOption": "Add \"{{value}}\" as a custom value…",
             "serverSuggestions": "Server",
             "copyPath": "Copy path to clipboard",
             "copiedPath": "Path copied successfully",
