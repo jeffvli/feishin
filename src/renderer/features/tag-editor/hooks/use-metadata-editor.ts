@@ -384,14 +384,25 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         utils,
     ]);
 
-    /** Known tags not yet present in `displayFields`, sorted alphabetically for the add-field dropdown. */
-    const availableToAdd = useMemo(
-        () =>
-            KNOWN_TAGS.filter((tag) => !(tag.key in displayFields))
-                .map((tag) => ({ label: tag.tagName, value: tag.key }))
-                .sort((a, b) => a.label.localeCompare(b.label)),
-        [displayFields],
-    );
+    /** Tags not yet present in `displayFields`: known tags plus configured custom tags. */
+    const availableToAdd = useMemo(() => {
+        const options = new Map<string, { label: string; value: string }>();
+
+        for (const tag of KNOWN_TAGS) {
+            if (tag.key in displayFields) continue;
+            options.set(tag.key, { label: tag.tagName, value: tag.key });
+        }
+
+        for (const key of Object.keys(tagConfigs)) {
+            if (key in displayFields || options.has(key)) continue;
+            options.set(key, {
+                label: KNOWN_TAG_MAP.get(key)?.tagName ?? key,
+                value: key,
+            });
+        }
+
+        return [...options.values()].sort((a, b) => a.label.localeCompare(b.label));
+    }, [displayFields, tagConfigs]);
 
     const artworkIsMixed = artworkOp === null && loadedArtwork.kind === 'mixed';
     const showRemoveArtworkButton =
