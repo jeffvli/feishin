@@ -48,7 +48,7 @@ export const TagEditorSettings = () => {
     const availableFields = KNOWN_TAGS.filter(
         ({ key }) => key !== 'lyrics' && !multiValueFields.includes(key),
     )
-        .map(({ key, label }) => ({ label, value: key }))
+        .map(({ key, tagName }) => ({ label: tagName, value: key }))
         .sort((a, b) => a.label.localeCompare(b.label));
 
     return (
@@ -80,17 +80,12 @@ export const TagEditorSettings = () => {
                 value={input}
             />
             {multiValueFields.map((key) => {
-                const label = KNOWN_TAG_MAP.get(key)?.label ?? key;
+                const tagName = KNOWN_TAG_MAP.get(key)?.tagName ?? key;
                 return (
                     <Fieldset key={key}>
                         <Stack gap="xs">
                             <Group justify="space-between" wrap="nowrap">
-                                <div>
-                                    <Text size="sm">{label}</Text>
-                                    <Text ff="monospace" isMuted size="xs">
-                                        {key}
-                                    </Text>
-                                </div>
+                                <Text size="sm">{tagName}</Text>
                                 <ActionIcon
                                     aria-label={t('common.remove', 'Remove')}
                                     onClick={() =>
@@ -104,7 +99,7 @@ export const TagEditorSettings = () => {
                                 </ActionIcon>
                             </Group>
                             <TagsInput
-                                aria-label={`${t('page.itemDetail.favoriteValues')} - ${label}`}
+                                aria-label={`${t('page.itemDetail.favoriteValues')} - ${tagName}`}
                                 onChange={(values) => updateFavoriteValues(key, values)}
                                 placeholder={t('page.itemDetail.addFavoriteValue')}
                                 splitChars={[]}

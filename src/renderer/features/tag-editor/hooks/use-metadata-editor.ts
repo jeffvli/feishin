@@ -111,9 +111,9 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
             if (pa !== -1 && pb !== -1) return pa - pb;
             if (pa !== -1) return -1;
             if (pb !== -1) return 1;
-            const labelA = KNOWN_TAG_MAP.get(a)?.label ?? a;
-            const labelB = KNOWN_TAG_MAP.get(b)?.label ?? b;
-            return labelA.localeCompare(labelB);
+            const tagNameA = KNOWN_TAG_MAP.get(a)?.tagName ?? a;
+            const tagNameB = KNOWN_TAG_MAP.get(b)?.tagName ?? b;
+            return tagNameA.localeCompare(tagNameB);
         });
 
         return { displayFields, mixedKeys, sortedFieldEntries };
@@ -290,7 +290,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
 
     /** Returns the `KnownTag` descriptor for `key`, falling back to a generic string entry. */
     const getFieldMeta = useCallback(
-        (key: string): KnownTag => KNOWN_TAG_MAP.get(key) ?? { key, label: key, type: 'string' },
+        (key: string): KnownTag => KNOWN_TAG_MAP.get(key) ?? { key, tagName: key, type: 'string' },
         [],
     );
 
@@ -313,7 +313,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
                     ? value.length === 0 || value.some((part) => part.trim() === '')
                     : value.trim() === '';
             })
-            .map(([key]) => KNOWN_TAG_MAP.get(key)?.label ?? key);
+            .map(([key]) => KNOWN_TAG_MAP.get(key)?.tagName ?? key);
 
         if (emptyFields.length > 0) {
             toast.error({
@@ -388,7 +388,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
     const availableToAdd = useMemo(
         () =>
             KNOWN_TAGS.filter((tag) => !(tag.key in displayFields))
-                .map((tag) => ({ label: tag.label, value: tag.key }))
+                .map((tag) => ({ label: tag.tagName, value: tag.key }))
                 .sort((a, b) => a.label.localeCompare(b.label)),
         [displayFields],
     );

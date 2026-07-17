@@ -134,7 +134,7 @@ export const TagFieldRow = ({
             data-field-key={tagKey}
             key={tagKey}
         >
-            <Table.Th className={clsx({ [styles.dirtyLabel]: isDirty })}>{meta.label}</Table.Th>
+            <Table.Th className={clsx({ [styles.dirtyLabel]: isDirty })}>{meta.tagName}</Table.Th>
             <Table.Td>
                 {isMultiValue && tagKey !== 'lyrics' ? (
                     <FavoriteTagsInput
