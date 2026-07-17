@@ -120,7 +120,14 @@ export async function readFilesMetadataBatch(
             try {
                 const file = await taglib.open(filePath);
                 try {
-                    const flat = flattenProperties(file.properties());
+                    const rawProperties = file.properties();
+                    const embeddedLyrics = file.getLyrics();
+                    if (embeddedLyrics.length > 0) {
+                        rawProperties.lyrics = [
+                            embeddedLyrics.map(({ text }) => text).join('\n\n'),
+                        ];
+                    }
+                    const flat = flattenProperties(rawProperties);
                     const pictures = file.getPictures();
                     const frontCover = pictures.find((p) => p.type === 'FrontCover') ?? pictures[0];
                     const hasCoverArt = frontCover !== undefined;
