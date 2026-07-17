@@ -14,7 +14,7 @@
 
 .table-cell {
     min-width: 0;
-    padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
+    padding: var(--theme-spacing-xs);
     vertical-align: middle;
 }
 

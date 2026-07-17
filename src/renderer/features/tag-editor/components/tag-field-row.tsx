@@ -1,5 +1,6 @@
 import type { TagValue } from '/@/shared/types/tag-editor';
 
+import clsx from 'clsx';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -127,11 +128,13 @@ export const TagFieldRow = ({
 
     return (
         <Table.Tr
-            className={isRemoved ? styles.removedRow : undefined}
+            className={clsx({
+                [styles.removedRow]: isRemoved,
+            })}
             data-field-key={tagKey}
             key={tagKey}
         >
-            <Table.Th className={isDirty ? styles.dirtyLabel : undefined}>{meta.label}</Table.Th>
+            <Table.Th className={clsx({ [styles.dirtyLabel]: isDirty })}>{meta.label}</Table.Th>
             <Table.Td>
                 {isMultiValue && tagKey !== 'lyrics' ? (
                     <FavoriteTagsInput
@@ -186,11 +189,13 @@ export const TagFieldRow = ({
             <Table.Td className={styles.removeCell}>
                 <ActionIcon
                     aria-label={isRemoved || isDirty ? t('common.undo') : t('common.delete')}
-                    className={styles.removeButton}
+                    className={clsx(styles.removeButton, {
+                        [styles.removeButtonVisible]: isRemoved || isDirty,
+                    })}
                     icon={isRemoved || isDirty ? 'undo' : 'x'}
                     iconProps={{
-                        color: isRemoved ? 'error' : 'default',
-                        size: 'md',
+                        color: isRemoved || isDirty ? 'default' : 'error',
+                        size: 'lg',
                     }}
                     onClick={isRemoved ? onReset : isDirty ? onRevert : onRemove}
                     size="sm"
