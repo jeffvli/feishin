@@ -50,7 +50,7 @@ interface UseMetadataEditorArgs {
 export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetadataEditorArgs) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
-    const { favoriteValues, multiValueFields } = useTagEditorSettings();
+    const { favoriteValues, multiValueFields, triggerRescan } = useTagEditorSettings();
     const { setSettings } = useSettingsStoreActions();
 
     const [isLoading, setIsLoading] = useState(true);
@@ -58,7 +58,6 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
     const [error, setError] = useState<null | string>(null);
     const [readWarning, setReadWarning] = useState<null | string>(null);
     const [resolvedSongs, setResolvedSongs] = useState<Song[]>([]);
-    const [rescan, setRescan] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [tagSummary, setTagSummary] = useState<Record<string, null | TagValue>>({});
     const [editedFields, setEditedFields] = useState<Record<string, TagValue>>({});
@@ -67,6 +66,11 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
     const [loadedArtwork, setLoadedArtwork] = useState<{ kind: ArtworkKind }>({ kind: 'none' });
     const [artworkDisplayUrl, setArtworkDisplayUrl] = useState<null | string>(null);
     const [artworkOp, setArtworkOp] = useState<ArtworkOp | null>(null);
+
+    const setRescan = useCallback(
+        (value: boolean) => setSettings({ tagEditor: { triggerRescan: value } }),
+        [setSettings],
+    );
 
     /**
      * Merges `tagSummary` (on-disk values) and `editedFields` (unsaved edits) into
@@ -331,7 +335,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
                 await browser?.clearCache();
             }
 
-            if (rescan && server) {
+            if (triggerRescan && server) {
                 try {
                     await controller.refreshItems({
                         apiClientProps: { serverId: server.id },
@@ -347,7 +351,17 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
             setLoadProgress(null);
             setIsSaving(false);
         }
-    }, [artworkOp, browser, editedFields, removedKeys, rescan, resolvedSongs, server, t, utils]);
+    }, [
+        artworkOp,
+        browser,
+        editedFields,
+        removedKeys,
+        resolvedSongs,
+        server,
+        t,
+        triggerRescan,
+        utils,
+    ]);
 
     /** Known tags not yet present in `displayFields`, sorted alphabetically for the add-field dropdown. */
     const availableToAdd = useMemo(
@@ -387,7 +401,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         mixedPlaceholder,
         multiValueKeys,
         readWarning,
-        rescan,
+        rescan: triggerRescan,
         setRescan,
         showRemoveArtworkButton,
         sortedFieldEntries,
