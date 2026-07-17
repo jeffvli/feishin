@@ -65,7 +65,7 @@ export const AddFieldInput = ({
     };
 
     return (
-        <Group gap="xs">
+        <Group>
             <Autocomplete
                 data={availableFields}
                 error={fieldError}

@@ -59,26 +59,26 @@ export const TagEditorSettings = () => {
             <Text isMuted size="sm">
                 {t('page.itemDetail.multiValueFieldsDescription')}
             </Text>
-            <Autocomplete
-                data={availableFields}
-                onChange={setInput}
-                onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                        event.preventDefault();
-                        addField(input);
-                    }
-                }}
-                onOptionSubmit={addField}
-                placeholder={t('page.itemDetail.addMultiValueField')}
-                py="md"
-                rightSection={
-                    <ActionIcon onClick={() => addField(input)} variant="filled">
-                        <RiAddLine size={16} />
-                    </ActionIcon>
-                }
-                rightSectionPointerEvents="all"
-                value={input}
-            />
+            <Group>
+                <Autocomplete
+                    data={availableFields}
+                    flex={1}
+                    onChange={setInput}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            addField(input);
+                        }
+                    }}
+                    onOptionSubmit={addField}
+                    placeholder={t('page.itemDetail.addMultiValueField')}
+                    py="md"
+                    value={input}
+                />
+                <ActionIcon onClick={() => addField(input)} variant="filled">
+                    <RiAddLine size={16} />
+                </ActionIcon>
+            </Group>
             {multiValueFields.map((key) => {
                 const tagName = KNOWN_TAG_MAP.get(key)?.tagName ?? key;
                 return (
