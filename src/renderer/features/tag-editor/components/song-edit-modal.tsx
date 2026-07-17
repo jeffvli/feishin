@@ -1,4 +1,3 @@
-import { Autocomplete } from '@mantine/core';
 import { closeAllModals } from '@mantine/modals';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +11,7 @@ import { TagEditorSettings } from './tag-editor-settings';
 import { TagFieldRow } from './tag-field-row';
 
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Autocomplete } from '/@/shared/components/autocomplete/autocomplete';
 import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';

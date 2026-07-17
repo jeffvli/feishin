@@ -1,4 +1,3 @@
-import { Autocomplete } from '@mantine/core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiAddLine, RiCloseLine } from 'react-icons/ri';
@@ -7,6 +6,7 @@ import { KNOWN_TAG_MAP, KNOWN_TAGS, resolveTagKey } from '../utils/known-tags';
 
 import { useSettingsStoreActions, useTagEditorSettings } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Autocomplete } from '/@/shared/components/autocomplete/autocomplete';
 import { Fieldset } from '/@/shared/components/fieldset/fieldset';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
