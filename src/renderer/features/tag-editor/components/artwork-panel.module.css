@@ -1,12 +1,11 @@
 .artwork-box {
-    width: 100%;
-    aspect-ratio: 1 / 1;
+    position: relative;
+    width: 240px;
+    height: 240px;
     container-type: inline-size;
     overflow: hidden;
-    cursor: pointer;
     background: var(--mantine-color-dark-6);
-    border: 1px solid var(--mantine-color-default-border);
-    border-radius: var(--mantine-radius-sm);
+    border-radius: var(--mantine-radius-md);
 }
 
 .artwork-image {
@@ -24,6 +23,16 @@
     font-size: 5cqw;
 }
 
-.remove-button {
-    color: var(--theme-colors-state-error);
+.icon-controls {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    z-index: 2;
+    padding: 4px;
+    pointer-events: none;
+    background: rgb(0 0 0 / 55%);
+}
+
+.icon-controls button {
+    pointer-events: auto;
 }

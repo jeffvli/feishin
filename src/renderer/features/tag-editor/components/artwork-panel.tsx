@@ -1,7 +1,8 @@
 import styles from './artwork-panel.module.css';
 
-import { Button } from '/@/shared/components/button/button';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { DragDropZone } from '/@/shared/components/drag-drop-zone/drag-drop-zone';
+import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 
@@ -30,9 +31,9 @@ export const ArtworkPanel = ({
 }: ArtworkPanelProps) => (
     <Stack align="center" gap="md" pt="md">
         <DragDropZone
+            accept="image/*"
             className={styles.artworkBox}
             mode="file"
-            onClick={onBrowse}
             onFileSelected={async (file) => {
                 const buf = await file.arrayBuffer();
                 onApplyBytes(new Uint8Array(buf), file.type);
@@ -47,11 +48,26 @@ export const ArtworkPanel = ({
                     </Text>
                 </Stack>
             )}
+            <Group className={styles.iconControls} gap={4} wrap="nowrap">
+                <ActionIcon
+                    icon="uploadImage"
+                    iconProps={{ size: 'lg' }}
+                    onClick={onBrowse}
+                    radius="xl"
+                    size="sm"
+                    variant="default"
+                />
+                <ActionIcon
+                    aria-label={removeArtworkLabel}
+                    disabled={!showRemoveButton}
+                    icon="delete"
+                    iconProps={{ size: 'lg' }}
+                    onClick={onRemove}
+                    radius="xl"
+                    size="sm"
+                    variant="default"
+                />
+            </Group>
         </DragDropZone>
-        {showRemoveButton && (
-            <Button className={styles.removeButton} onClick={onRemove} size="sm" variant="subtle">
-                {removeArtworkLabel}
-            </Button>
-        )}
     </Stack>
 );
