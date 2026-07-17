@@ -9,6 +9,7 @@ import styles from './song-edit-modal.module.css';
 import { TagEditorSettings } from './tag-editor-settings';
 import { TagFieldRow } from './tag-field-row';
 
+import { PathSettings } from '/@/renderer/features/settings/components/general/path-settings';
 import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
@@ -59,6 +60,16 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
         return (
             <Stack p="md">
                 <Text c="red">{editor.error}</Text>
+                {editor.isFileNotFound && (
+                    <>
+                        <PathSettings persistImmediately previewPath={songs[0]?.path} />
+                        <Group justify="flex-end">
+                            <Button onClick={editor.reload} variant="filled">
+                                {t('common.reload', 'Reload')}
+                            </Button>
+                        </Group>
+                    </>
+                )}
             </Stack>
         );
     }

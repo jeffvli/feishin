@@ -3,6 +3,7 @@ export type ArtworkKind = 'common' | 'mixed' | 'none';
 export type ArtworkOp = { bytes: Uint8Array; mimeType: string; type: 'set' } | { type: 'clear' };
 
 export interface BatchFileError {
+    code?: string;
     error: string;
     path: string;
 }

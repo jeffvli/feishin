@@ -23,6 +23,7 @@ export async function checkPathsWritable(paths: string[]): Promise<BatchFileErro
                 await fsPromises.access(filePath, constants.F_OK | constants.W_OK);
             } catch (err) {
                 failed.push({
+                    code: (err as NodeJS.ErrnoException).code,
                     error: err instanceof Error ? err.message : String(err),
                     path: filePath,
                 });
@@ -134,6 +135,7 @@ export async function readFilesMetadataBatch(
         BATCH_CONCURRENCY,
         async (filePath) => {
             try {
+                await fsPromises.access(filePath, constants.F_OK);
                 const file = await taglib.open(filePath);
                 try {
                     const rawProperties = file.properties();
@@ -187,6 +189,7 @@ export async function readFilesMetadataBatch(
                 }
             } catch (err) {
                 failedFiles.push({
+                    code: (err as NodeJS.ErrnoException).code,
                     error: err instanceof Error ? err.message : String(err),
                     path: filePath,
                 });

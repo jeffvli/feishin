@@ -56,6 +56,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
     const [isLoading, setIsLoading] = useState(true);
     const [loadProgress, setLoadProgress] = useState<BatchProgress | null>(null);
     const [error, setError] = useState<null | string>(null);
+    const [isFileNotFound, setIsFileNotFound] = useState(false);
     const [readWarning, setReadWarning] = useState<null | string>(null);
     const [resolvedSongs, setResolvedSongs] = useState<Song[]>([]);
     const [isSaving, setIsSaving] = useState(false);
@@ -119,69 +120,82 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         return { displayFields, mixedKeys, sortedFieldEntries };
     }, [tagSummary, editedFields, multiValueKeys]);
 
-    /**
-     * Runs once on mount: reads metadata for all songs in batch and populates
-     * tag summary and initial artwork state.
-     */
-    useEffect(() => {
-        const initialize = async () => {
-            const songs = (songsProp ?? []).filter((s) => s.path);
+    /** Reads metadata for all songs and populates the editor state. */
+    const initialize = useCallback(async () => {
+        setError(null);
+        setIsFileNotFound(false);
+        setIsLoading(true);
+        setLoadProgress(null);
+        setReadWarning(null);
 
-            if (songs.length === 0) {
-                setError(t('page.itemDetail.noLocalSongs', 'No songs with local file paths found'));
-                setIsLoading(false);
-                return;
-            }
+        const songs = (songsProp ?? []).filter((s) => s.path);
 
-            setResolvedSongs(songs);
-            const paths = songs.map((s) => resolveSongPath(s.path)).filter(Boolean) as string[];
-
-            const batchResult = await withBatchProgress(utils, setLoadProgress, () =>
-                utils.readSongMetadataBatch(paths),
-            );
-
-            if (!batchResult.success || !batchResult.tagSummary) {
-                setError(batchResult.error ?? t('page.itemDetail.fileNotWritable'));
-                setIsLoading(false);
-                return;
-            }
-
-            if (batchResult.failedFiles?.length) {
-                const count = batchResult.failedFiles.length;
-                const total = batchResult.totalCount ?? paths.length;
-                setReadWarning(
-                    t('page.itemDetail.readPartialFailure', {
-                        count,
-                        defaultValue: `Could not read metadata from ${count} of ${total} file(s).`,
-                        total,
-                    }),
-                );
-            }
-
-            setTagSummary(batchResult.tagSummary);
-            setParsedMultiValueKeys(new Set(batchResult.multiValueKeys ?? []));
-
-            if (
-                batchResult.artworkKind === 'common' &&
-                batchResult.artworkData &&
-                batchResult.artworkMimeType
-            ) {
-                setArtworkDisplayUrl(
-                    `data:${batchResult.artworkMimeType};base64,${batchResult.artworkData}`,
-                );
-            }
-            setLoadedArtwork({ kind: batchResult.artworkKind });
+        if (songs.length === 0) {
+            setError(t('page.itemDetail.noLocalSongs', 'No songs with local file paths found'));
             setIsLoading(false);
-        };
+            return;
+        }
 
+        setResolvedSongs(songs);
+        const paths = songs.map((s) => resolveSongPath(s.path)).filter(Boolean) as string[];
+
+        const batchResult = await withBatchProgress(utils, setLoadProgress, () =>
+            utils.readSongMetadataBatch(paths),
+        );
+
+        if (!batchResult.success || !batchResult.tagSummary) {
+            const failedFiles = batchResult.failedFiles ?? [];
+            setIsFileNotFound(
+                failedFiles.length === paths.length &&
+                    failedFiles.every((file) => file.code === 'ENOENT'),
+            );
+            setError(batchResult.error ?? t('page.itemDetail.fileNotWritable'));
+            setIsLoading(false);
+            return;
+        }
+
+        if (batchResult.failedFiles?.length) {
+            const count = batchResult.failedFiles.length;
+            const total = batchResult.totalCount ?? paths.length;
+            setReadWarning(
+                t('page.itemDetail.readPartialFailure', {
+                    count,
+                    defaultValue: `Could not read metadata from ${count} of ${total} file(s).`,
+                    total,
+                }),
+            );
+        }
+
+        setTagSummary(batchResult.tagSummary);
+        setParsedMultiValueKeys(new Set(batchResult.multiValueKeys ?? []));
+
+        if (
+            batchResult.artworkKind === 'common' &&
+            batchResult.artworkData &&
+            batchResult.artworkMimeType
+        ) {
+            setArtworkDisplayUrl(
+                `data:${batchResult.artworkMimeType};base64,${batchResult.artworkData}`,
+            );
+        }
+        setLoadedArtwork({ kind: batchResult.artworkKind });
+        setIsLoading(false);
+    }, [songsProp, t, utils]);
+
+    const reload = useCallback(() => {
         initialize().catch((err) => {
+            setIsFileNotFound(false);
             setError(String(err));
             setIsLoading(false);
         });
+    }, [initialize]);
+
+    /** Loads on mount and cancels an in-flight read when the editor unmounts. */
+    useEffect(() => {
+        reload();
 
         return () => utils.cancelReadSongMetadata();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [reload, utils]);
 
     /** Records an edited value for `key`, overriding the on-disk summary. */
     const handleFieldChange = useCallback((key: string, value: TagValue) => {
@@ -417,6 +431,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         handleResetField,
         handleRevertField,
         handleSave,
+        isFileNotFound,
         isLoading,
         isSaving,
         loadProgress,
@@ -424,6 +439,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         mixedPlaceholder,
         multiValueKeys,
         readWarning,
+        reload,
         removedKeys,
         rescan: triggerRescan,
         setRescan,
