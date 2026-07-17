@@ -748,11 +748,34 @@ const AutoDJSettingsSchema = z.object({
     timing: z.number(),
 });
 
+const TagAutocompleteSourceSchema = z.string();
+
+const TagConfigSchema = z.object({
+    autocompleteSource: TagAutocompleteSourceSchema,
+    customValues: z.array(z.string()),
+    multiValue: z.boolean(),
+});
+
 const TagEditorSettingsSchema = z.object({
-    favoriteValues: z.record(z.string(), z.array(z.string())),
-    multiValueFields: z.array(z.string()),
+    tagConfigs: z.record(z.string(), TagConfigSchema),
     triggerRescan: z.boolean(),
 });
+
+export type TagAutocompleteSource = string;
+export type TagConfig = z.infer<typeof TagConfigSchema>;
+
+export const SERVER_TAG_AUTOCOMPLETE_PREFIX = 'tag:';
+
+export const isServerTagAutocompleteSource = (source: string): boolean =>
+    source.startsWith(SERVER_TAG_AUTOCOMPLETE_PREFIX);
+
+export const getServerTagAutocompleteName = (source: string): null | string =>
+    isServerTagAutocompleteSource(source)
+        ? source.slice(SERVER_TAG_AUTOCOMPLETE_PREFIX.length)
+        : null;
+
+export const toServerTagAutocompleteSource = (tagName: string): string =>
+    `${SERVER_TAG_AUTOCOMPLETE_PREFIX}${tagName}`;
 
 /**
  * This schema is used for validation of the imported settings json
@@ -2005,8 +2028,53 @@ const initialState: SettingsState = {
     },
     tab: 'general',
     tagEditor: {
-        favoriteValues: {},
-        multiValueFields: ['artist', 'albumArtist', 'genre', 'composer', 'lyricist'],
+        tagConfigs: {
+            albumArtist: {
+                autocompleteSource: 'serverArtists',
+                customValues: [],
+                multiValue: false,
+            },
+            albumartists: {
+                autocompleteSource: 'serverArtists',
+                customValues: [],
+                multiValue: true,
+            },
+            albumArtistSort: {
+                autocompleteSource: 'serverArtists',
+                customValues: [],
+                multiValue: false,
+            },
+            albumartistssort: {
+                autocompleteSource: 'serverArtists',
+                customValues: [],
+                multiValue: true,
+            },
+            artist: {
+                autocompleteSource: 'serverArtists',
+                customValues: [],
+                multiValue: true,
+            },
+            artists: {
+                autocompleteSource: 'serverArtists',
+                customValues: [],
+                multiValue: true,
+            },
+            artistSort: {
+                autocompleteSource: 'serverArtists',
+                customValues: [],
+                multiValue: true,
+            },
+            artistssort: {
+                autocompleteSource: 'serverArtists',
+                customValues: [],
+                multiValue: true,
+            },
+            genre: {
+                autocompleteSource: 'serverGenres',
+                customValues: [],
+                multiValue: true,
+            },
+        },
         triggerRescan: true,
     },
     visualizer: {

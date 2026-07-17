@@ -116,37 +116,42 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                                 withRowBorders
                             >
                                 <Table.Tbody>
-                                    {editor.sortedFieldEntries.map(([key, value]) => (
-                                        <TagFieldRow
-                                            favoriteValues={editor.favoriteValues[key] ?? []}
-                                            isDirty={
-                                                key in editor.editedFields ||
-                                                editor.removedKeys.has(key)
-                                            }
-                                            isMixed={editor.mixedKeys.has(key)}
-                                            isMultiValue={
-                                                editor.multiValueKeys.has(key) ||
-                                                Array.isArray(value)
-                                            }
-                                            isRemoved={editor.removedKeys.has(key)}
-                                            key={key}
-                                            meta={editor.getFieldMeta(key)}
-                                            mixedPlaceholder={
-                                                editor.mixedKeys.has(key)
-                                                    ? editor.mixedPlaceholder
-                                                    : undefined
-                                            }
-                                            onAddFavorite={(value) =>
-                                                editor.handleAddFavoriteValue(key, value)
-                                            }
-                                            onChange={(v) => editor.handleFieldChange(key, v)}
-                                            onRemove={() => editor.handleRemoveField(key)}
-                                            onReset={() => editor.handleResetField(key)}
-                                            onRevert={() => editor.handleRevertField(key)}
-                                            tagKey={key}
-                                            value={value}
-                                        />
-                                    ))}
+                                    {editor.sortedFieldEntries.map(([key, value]) => {
+                                        const tagConfig = editor.getTagConfig(key);
+                                        return (
+                                            <TagFieldRow
+                                                autocompleteSource={tagConfig.autocompleteSource}
+                                                customValues={tagConfig.customValues}
+                                                hasTagConfig={editor.hasTagConfig(key)}
+                                                isDirty={
+                                                    key in editor.editedFields ||
+                                                    editor.removedKeys.has(key)
+                                                }
+                                                isMixed={editor.mixedKeys.has(key)}
+                                                isMultiValue={
+                                                    editor.multiValueKeys.has(key) ||
+                                                    Array.isArray(value)
+                                                }
+                                                isRemoved={editor.removedKeys.has(key)}
+                                                key={key}
+                                                meta={editor.getFieldMeta(key)}
+                                                mixedPlaceholder={
+                                                    editor.mixedKeys.has(key)
+                                                        ? editor.mixedPlaceholder
+                                                        : undefined
+                                                }
+                                                onAddCustom={(value) =>
+                                                    editor.handleAddCustomValue(key, value)
+                                                }
+                                                onChange={(v) => editor.handleFieldChange(key, v)}
+                                                onRemove={() => editor.handleRemoveField(key)}
+                                                onReset={() => editor.handleResetField(key)}
+                                                onRevert={() => editor.handleRevertField(key)}
+                                                tagKey={key}
+                                                value={value}
+                                            />
+                                        );
+                                    })}
                                 </Table.Tbody>
                             </Table>
                         </div>

@@ -25,8 +25,10 @@ export const AddFieldInput = ({
     const [duplicateAttempted, setDuplicateAttempted] = useState(false);
 
     const trimmedInput = input.trim();
+    const resolvedInputKey = trimmedInput ? resolveTagKey(trimmedInput) : '';
+    const isKnownTag = Boolean(resolvedInputKey && KNOWN_TAG_MAP.has(resolvedInputKey));
     const customKeyError =
-        trimmedInput && !KNOWN_TAG_MAP.has(trimmedInput)
+        trimmedInput && !isKnownTag
             ? trimmedInput.includes('=')
                 ? "Tag key cannot contain '='"
                 : // eslint-disable-next-line no-control-regex
@@ -35,7 +37,6 @@ export const AddFieldInput = ({
                   : null
             : null;
 
-    const resolvedInputKey = trimmedInput ? resolveTagKey(trimmedInput) : '';
     const duplicateError =
         trimmedInput && !customKeyError && existingFieldKeys.includes(resolvedInputKey)
             ? 'Field already exists'
@@ -45,14 +46,16 @@ export const AddFieldInput = ({
     const addField = (key: string): boolean => {
         const trimmed = key.trim();
         if (!trimmed) return false;
+
+        const normalizedKey = resolveTagKey(trimmed);
+        const isKnown = KNOWN_TAG_MAP.has(normalizedKey);
         if (
-            !KNOWN_TAG_MAP.has(trimmed) &&
+            !isKnown &&
             (trimmed.includes('=') || // eslint-disable-next-line no-control-regex
                 /[^\x00-\x7F]/.test(trimmed))
         )
             return false;
 
-        const normalizedKey = resolveTagKey(trimmed);
         if (existingFieldKeys.includes(normalizedKey)) {
             setDuplicateAttempted(true);
             return false;

@@ -6,9 +6,12 @@ import { useTranslation } from 'react-i18next';
 
 import type { KnownTag } from '../utils/known-tags';
 
+import { useTagAutocompleteSuggestions } from '../hooks/use-tag-autocomplete-suggestions';
 import styles from './tag-field-row.module.css';
 
+import { type TagAutocompleteSource } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Autocomplete } from '/@/shared/components/autocomplete/autocomplete';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Table } from '/@/shared/components/table/table';
@@ -16,24 +19,37 @@ import { TagsInput } from '/@/shared/components/tags-input/tags-input';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Textarea } from '/@/shared/components/textarea/textarea';
 
-interface FavoriteTagsInputProps {
+interface CustomTagsInputProps {
+    autocompleteSource: TagAutocompleteSource;
+    customValues: string[];
     disabled: boolean;
-    favoriteValues: string[];
     mixedPlaceholder?: string;
-    onAddFavorite: (value: string) => void;
+    onAddCustom: (value: string) => void;
     onChange: (value: string[]) => void;
     value: string[];
 }
 
+interface StringAutocompleteInputProps {
+    autocompleteSource: TagAutocompleteSource;
+    customValues: string[];
+    disabled: boolean;
+    mixedPlaceholder?: string;
+    onAddCustom: (value: string) => void;
+    onChange: (value: string) => void;
+    value: string;
+}
+
 interface TagFieldRowProps {
-    favoriteValues: string[];
+    autocompleteSource: TagAutocompleteSource;
+    customValues: string[];
+    hasTagConfig: boolean;
     isDirty?: boolean;
     isMixed: boolean;
     isMultiValue: boolean;
     isRemoved: boolean;
     meta: KnownTag;
     mixedPlaceholder?: string;
-    onAddFavorite: (value: string) => void;
+    onAddCustom: (value: string) => void;
     onChange: (value: TagValue) => void;
     onRemove: () => void;
     onReset: () => void;
@@ -42,47 +58,79 @@ interface TagFieldRowProps {
     value: TagValue;
 }
 
-const ADD_FAVORITE_PREFIX = '__feishin_add_favorite__:';
+const ADD_CUSTOM_PREFIX = '__feishin_add_custom__:';
 
-const FavoriteTagsInput = ({
+const useSuggestionData = (
+    autocompleteSource: TagAutocompleteSource,
+    customValues: string[],
+    searchValue: string,
+) => {
+    const { t } = useTranslation();
+    const { groups, isLoading } = useTagAutocompleteSuggestions({
+        customValues,
+        search: searchValue,
+        source: autocompleteSource,
+    });
+    const candidate = searchValue.trim();
+    const canAddCustom =
+        candidate.length > 0 &&
+        !customValues.some((value) => value.toLowerCase() === candidate.toLowerCase());
+
+    const data = useMemo(() => {
+        const nextData: { group: string; items: (string | { label: string; value: string })[] }[] =
+            groups.map((group) => ({
+                group: group.group,
+                items: [...group.items],
+            }));
+
+        if (canAddCustom) {
+            const addOption = {
+                label: t('page.itemDetail.addCustomValueOption', {
+                    defaultValue: `Add "{{value}}" as a custom value…`,
+                    value: candidate,
+                }),
+                value: `${ADD_CUSTOM_PREFIX}${candidate}`,
+            };
+            const customGroupLabel = t('page.itemDetail.customValues', 'Custom values');
+            const existingCustomGroup = nextData.find((group) => group.group === customGroupLabel);
+            if (existingCustomGroup) {
+                existingCustomGroup.items.push(addOption);
+            } else {
+                nextData.unshift({
+                    group: customGroupLabel,
+                    items: [addOption],
+                });
+            }
+        }
+
+        return nextData;
+    }, [canAddCustom, candidate, groups, t]);
+
+    return { data, isLoading };
+};
+
+const CustomTagsInput = ({
+    autocompleteSource,
+    customValues,
     disabled,
-    favoriteValues,
     mixedPlaceholder,
-    onAddFavorite,
+    onAddCustom,
     onChange,
     value,
-}: FavoriteTagsInputProps) => {
-    const { t } = useTranslation();
+}: CustomTagsInputProps) => {
     const [searchValue, setSearchValue] = useState('');
-    const candidate = searchValue.trim();
-    const canAddFavorite =
-        candidate.length > 0 &&
-        !favoriteValues.some((favorite) => favorite.toLowerCase() === candidate.toLowerCase());
-    const data = useMemo(
-        () =>
-            canAddFavorite
-                ? [
-                      ...favoriteValues,
-                      {
-                          label: t('page.itemDetail.addFavoriteValueOption', {
-                              value: candidate,
-                          }),
-                          value: `${ADD_FAVORITE_PREFIX}${candidate}`,
-                      },
-                  ]
-                : favoriteValues,
-        [canAddFavorite, candidate, favoriteValues, t],
-    );
+    const { data, isLoading } = useSuggestionData(autocompleteSource, customValues, searchValue);
 
     return (
         <TagsInput
             clearable
             data={data}
             disabled={disabled}
+            loading={isLoading}
             onChange={(values) => {
                 const normalizedValues = values.map((item) =>
-                    item.startsWith(ADD_FAVORITE_PREFIX)
-                        ? item.slice(ADD_FAVORITE_PREFIX.length)
+                    item.startsWith(ADD_CUSTOM_PREFIX)
+                        ? item.slice(ADD_CUSTOM_PREFIX.length)
                         : item,
                 );
                 onChange(
@@ -95,8 +143,8 @@ const FavoriteTagsInput = ({
                 );
             }}
             onOptionSubmit={(submittedValue) => {
-                if (submittedValue.startsWith(ADD_FAVORITE_PREFIX))
-                    onAddFavorite(submittedValue.slice(ADD_FAVORITE_PREFIX.length));
+                if (submittedValue.startsWith(ADD_CUSTOM_PREFIX))
+                    onAddCustom(submittedValue.slice(ADD_CUSTOM_PREFIX.length));
             }}
             onSearchChange={setSearchValue}
             placeholder={mixedPlaceholder}
@@ -108,15 +156,50 @@ const FavoriteTagsInput = ({
     );
 };
 
+const StringAutocompleteInput = ({
+    autocompleteSource,
+    customValues,
+    disabled,
+    mixedPlaceholder,
+    onAddCustom,
+    onChange,
+    value,
+}: StringAutocompleteInputProps) => {
+    const { data, isLoading } = useSuggestionData(autocompleteSource, customValues, value);
+
+    return (
+        <Autocomplete
+            data={data}
+            disabled={disabled}
+            limit={100}
+            loading={isLoading}
+            onChange={(next) => {
+                if (next.startsWith(ADD_CUSTOM_PREFIX)) {
+                    const custom = next.slice(ADD_CUSTOM_PREFIX.length);
+                    onAddCustom(custom);
+                    onChange(custom);
+                    return;
+                }
+                onChange(next);
+            }}
+            placeholder={mixedPlaceholder}
+            size="sm"
+            value={value}
+        />
+    );
+};
+
 export const TagFieldRow = ({
-    favoriteValues,
+    autocompleteSource,
+    customValues,
+    hasTagConfig,
     isDirty,
     isMixed,
     isMultiValue,
     isRemoved,
     meta,
     mixedPlaceholder,
-    onAddFavorite,
+    onAddCustom,
     onChange,
     onRemove,
     onReset,
@@ -125,6 +208,9 @@ export const TagFieldRow = ({
     value,
 }: TagFieldRowProps) => {
     const { t } = useTranslation();
+    const stringValue = Array.isArray(value) ? value.join('; ') : value;
+    const useStringAutocomplete =
+        !isMultiValue && meta.type === 'string' && tagKey !== 'lyrics' && hasTagConfig;
 
     return (
         <Table.Tr
@@ -137,11 +223,12 @@ export const TagFieldRow = ({
             <Table.Th className={clsx({ [styles.dirtyLabel]: isDirty })}>{meta.tagName}</Table.Th>
             <Table.Td>
                 {isMultiValue && tagKey !== 'lyrics' ? (
-                    <FavoriteTagsInput
+                    <CustomTagsInput
+                        autocompleteSource={autocompleteSource}
+                        customValues={customValues}
                         disabled={isRemoved}
-                        favoriteValues={favoriteValues}
                         mixedPlaceholder={mixedPlaceholder}
-                        onAddFavorite={onAddFavorite}
+                        onAddCustom={onAddCustom}
                         onChange={onChange}
                         value={Array.isArray(value) ? value : value ? [value] : []}
                     />
@@ -176,13 +263,23 @@ export const TagFieldRow = ({
                         onChange={(e) => onChange(e.currentTarget.checked ? '1' : '0')}
                         size="sm"
                     />
+                ) : useStringAutocomplete ? (
+                    <StringAutocompleteInput
+                        autocompleteSource={autocompleteSource}
+                        customValues={customValues}
+                        disabled={isRemoved}
+                        mixedPlaceholder={mixedPlaceholder}
+                        onAddCustom={onAddCustom}
+                        onChange={onChange}
+                        value={stringValue}
+                    />
                 ) : (
                     <TextInput
                         disabled={isRemoved}
                         onChange={(e) => onChange(e.currentTarget.value)}
                         placeholder={mixedPlaceholder}
                         size="sm"
-                        value={Array.isArray(value) ? value.join('; ') : value}
+                        value={stringValue}
                     />
                 )}
             </Table.Td>
@@ -201,6 +298,7 @@ export const TagFieldRow = ({
                     size="sm"
                     tooltip={{
                         label: isRemoved || isDirty ? t('common.undo') : t('common.delete'),
+                        openDelay: 0,
                     }}
                     variant="subtle"
                 />

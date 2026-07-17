@@ -1,7 +1,7 @@
 import type { ArtworkKind, ArtworkOp, BatchFileError, TagValue } from '/@/shared/types/tag-editor';
 
 import { constants, promises as fsPromises } from 'fs';
-import { PROPERTIES, TagLib } from 'taglib-wasm';
+import { TagLib } from 'taglib-wasm';
 
 import { getImageMimeTypeFromPath } from '/@/shared/utils/image-mime';
 
@@ -255,13 +255,11 @@ export async function writeFilesTags(
                     const properties = file.properties();
 
                     for (const [key, value] of propertyEdits) {
-                        const propertyKey = key in PROPERTIES ? key : key.toUpperCase();
-                        properties[propertyKey] = Array.isArray(value) ? value : [value];
+                        properties[key] = Array.isArray(value) ? value : [value];
                     }
 
                     for (const key of propertyRemovals) {
-                        const propertyKey = key in PROPERTIES ? key : key.toUpperCase();
-                        delete properties[propertyKey];
+                        delete properties[key];
                     }
 
                     file.setProperties(properties);

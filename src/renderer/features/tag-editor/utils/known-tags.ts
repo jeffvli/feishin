@@ -27,7 +27,7 @@ export type TagFieldType = 'boolean' | 'number' | 'string' | 'textarea';
 const TAG_CONFIG: Record<string, { type?: TagFieldType }> = {
     acoustidFingerprint: { type: 'textarea' },
     // extras not in PROPERTIES (common MusicBrainz Picard tags)
-    ARTISTS: { type: 'string' },
+    ARTISTS: {},
     artistSort: {},
     bpm: { type: 'number' },
     catalogNumber: {},
@@ -78,8 +78,12 @@ export const KNOWN_TAGS: KnownTag[] = [
 export const KNOWN_TAG_MAP = new Map(KNOWN_TAGS.map((t) => [t.key, t]));
 
 /**
- * Resolves a raw known tag name to its TagLib property key. Unknown names retain
- * their original casing.
+ * Resolves a raw tag name to its TagLib property key. Known tags return their
+ * canonical key; unknown names keep the user's casing.
  */
-export const resolveTagKey = (input: string): string =>
-    KNOWN_TAGS.find((tag) => tag.tagName === input)?.key ?? input;
+export const resolveTagKey = (input: string): string => {
+    const trimmed = input.trim();
+    const known = KNOWN_TAGS.find((tag) => tag.tagName === trimmed || tag.key === trimmed);
+    if (known) return known.key;
+    return trimmed;
+};

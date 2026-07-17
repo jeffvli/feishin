@@ -50,8 +50,15 @@ interface UseMetadataEditorArgs {
 export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetadataEditorArgs) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
-    const { favoriteValues, multiValueFields, triggerRescan } = useTagEditorSettings();
+    const { tagConfigs, triggerRescan } = useTagEditorSettings();
     const { setSettings } = useSettingsStoreActions();
+    const multiValueFields = useMemo(
+        () =>
+            Object.entries(tagConfigs)
+                .filter(([, config]) => config.multiValue)
+                .map(([key]) => key),
+        [tagConfigs],
+    );
 
     const [isLoading, setIsLoading] = useState(true);
     const [loadProgress, setLoadProgress] = useState<BatchProgress | null>(null);
@@ -202,25 +209,31 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         setEditedFields((prev) => ({ ...prev, [key]: value }));
     }, []);
 
-    const handleAddFavoriteValue = useCallback(
+    const handleAddCustomValue = useCallback(
         (key: string, value: string) => {
             const trimmed = value.trim();
             if (!trimmed) return;
 
-            const currentValues = favoriteValues[key] ?? [];
-            if (currentValues.some((favorite) => favorite.toLowerCase() === trimmed.toLowerCase()))
+            const config = tagConfigs[key];
+            const currentValues = config?.customValues ?? [];
+            if (currentValues.some((custom) => custom.toLowerCase() === trimmed.toLowerCase()))
                 return;
 
             setSettings({
                 tagEditor: {
-                    favoriteValues: {
-                        ...favoriteValues,
-                        [key]: [...currentValues, trimmed],
+                    tagConfigs: {
+                        [key]: {
+                            autocompleteSource: config?.autocompleteSource ?? 'none',
+                            customValues: [...currentValues, trimmed].sort((a, b) =>
+                                a.localeCompare(b),
+                            ),
+                            multiValue: config?.multiValue ?? true,
+                        },
                     },
                 },
             });
         },
-        [favoriteValues, setSettings],
+        [setSettings, tagConfigs],
     );
 
     /** Marks `key` for deletion while preserving its displayed value for undo. */
@@ -413,6 +426,18 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
 
     const mixedPlaceholder = t('page.itemDetail.multipleValues', '(Multiple Values)');
 
+    const getTagConfig = useCallback(
+        (key: string) =>
+            tagConfigs[key] ?? {
+                autocompleteSource: 'none' as const,
+                customValues: [] as string[],
+                multiValue: false,
+            },
+        [tagConfigs],
+    );
+
+    const hasTagConfig = useCallback((key: string) => key in tagConfigs, [tagConfigs]);
+
     return {
         applyArtworkBytes,
         artworkDisplayUrl,
@@ -420,9 +445,9 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         availableToAdd,
         editedFields,
         error,
-        favoriteValues,
         getFieldMeta,
-        handleAddFavoriteValue,
+        getTagConfig,
+        handleAddCustomValue,
         handleAddField,
         handleChangeArtwork,
         handleFieldChange,
@@ -431,6 +456,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
         handleResetField,
         handleRevertField,
         handleSave,
+        hasTagConfig,
         isFileNotFound,
         isLoading,
         isSaving,
