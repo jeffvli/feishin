@@ -605,7 +605,7 @@
         },
         "itemDetail": {
             "multiValueFields": "Multi-value fields",
-            "multiValueFieldsDescription": "Fields in this list use a tag input and are saved as separate metadata values. Parsed multivalue fields use it automatically. Lyrics are always handled separately.",
+            "multiValueFieldsDescription": "Fields in this list use a tag input and are saved as separate metadata values.",
             "addMultiValueField": "Add multivalue field…",
             "addFavoriteValue": "Add favorite value…",
             "addFavoriteValueOption": "Add \"{{value}}\" as a favorite…",
