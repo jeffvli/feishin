@@ -2,7 +2,7 @@
     "action": {
         "editPlaylist": "编辑 $t(entity.playlist, {\"count\": 1})",
         "moveToTop": "移至顶部",
-        "clearQueue": "清空播放队列",
+        "clearQueue": "清空队列",
         "addToFavorites": "添加到 $t(entity.favorite, {\"count\": 2})",
         "addToPlaylist": "添加到 $t(entity.playlist, {\"count\": 1})",
         "createPlaylist": "创建 $t(entity.playlist, {\"count\": 1})",
@@ -16,7 +16,7 @@
         "setRating": "评分",
         "toggleSmartPlaylistEditor": "切换 $t(entity.smartPlaylist) 编辑器",
         "removeFromFavorites": "从 $t(entity.favorite, {\"count\": 2}) 移除",
-        "goToPage": "前往页面",
+        "goToPage": "转到页面",
         "openIn": {
             "lastfm": "在 Last.fm 中打开",
             "musicbrainz": "在 MusicBrainz 中打开",
@@ -28,7 +28,7 @@
         "downloadStarted": "开始下载 {{count}} 个项目",
         "moveUp": "向上移动",
         "moveDown": "向下移动",
-        "holdToMoveToTop": "按住即可移至到顶部",
+        "holdToMoveToTop": "按住即可移动到顶部",
         "holdToMoveToBottom": "按住即可移动到底部",
         "moveItems": "移动项目",
         "shuffle": "随机播放",
@@ -38,8 +38,8 @@
         "addOrRemoveFromSelection": "在所选内容中添加或移除",
         "selectRangeOfItems": "批量选择",
         "selectAll": "全选",
-        "createRadioStation": "创建$t(entity.radioStation, {\"count\": 1})",
-        "deleteRadioStation": "删除$t(entity.radioStation, {\"count\": 1})",
+        "createRadioStation": "创建 $t(entity.radioStation, {\"count\": 1})",
+        "deleteRadioStation": "删除 $t(entity.radioStation, {\"count\": 1})",
         "openApplicationDirectory": "打开应用程序目录",
         "goToCurrent": "转到当前项目",
         "collapseAllFolders": "折叠所有文件夹",
@@ -90,14 +90,14 @@
         "bitrate": "比特率",
         "saveAndReplace": "保存并替换",
         "action_other": "操作",
-        "confirm": "确定",
-        "resetToDefault": "重置为默认状态",
+        "confirm": "确认",
+        "resetToDefault": "重置为默认",
         "home": "主页",
         "comingSoon": "即将上线…",
         "reset": "重置",
         "disable": "禁用",
         "menu": "菜单",
-        "restartRequired": "需要重启应用",
+        "restartRequired": "需要重启",
         "previousSong": "上一首$t(entity.track, {\"count\": 1})",
         "noResultsFromQuery": "未查询到匹配结果",
         "quit": "退出",
@@ -111,7 +111,7 @@
         "gap": "空隙",
         "limit": "限制",
         "duration": "时长",
-        "ok": "好",
+        "ok": "确定",
         "no": "否",
         "playerMustBePaused": "播放器必须先暂停",
         "channel_other": "频道",
@@ -155,7 +155,7 @@
         "gridRows": "网格行",
         "tableColumns": "表格列",
         "itemsMore": "{{count}} 更多",
-        "countSelected": "已选择{{count}}项",
+        "countSelected": "已选择 {{count}} 项",
         "retry": "重试",
         "example": "示例",
         "filter_single": "单项",
@@ -422,11 +422,11 @@
         "discordListening": "显示状态为正在监听",
         "discordListening_description": "将状态显示为正在监听，而不是正在播放",
         "contextMenu_description": "允许您隐藏右键单击项目时显示在菜单中的项目。未选中的项目将被隐藏",
-        "customCssEnable_description": "允许编写自定义 css",
-        "customCss": "自定义css",
+        "customCssEnable_description": "允许编写自定义 CSS",
+        "customCss": "自定义 CSS",
         "customCss_description": "自定义css内容。注意：内容和远程URL是不允许的属性。内容预览展示如下。出于安全考虑，您未设置的其它字段也会显示",
         "contextMenu": "上下文菜单（右键单击）配置",
-        "customCssEnable": "启用自定义 css",
+        "customCssEnable": "启用自定义 CSS",
         "customCssNotice": "警告：虽然预设了一些安全限制（不允许 URL() 和 content:），但使用自定义 css 仍然会因更改界面而带来风险",
         "transcode_description": "可以转码为不同的格式",
         "transcodeBitrate": "转码比特率",
@@ -507,7 +507,7 @@
         "showVisualizerInSidebar_description": "在播放侧边栏中增加可视化效果",
         "analyticsDisable_description": "发送匿名使用数据帮助开发者改进应用程序",
         "showRatings_description": "控制是否在界面上显示星级评分",
-        "followCurrentSong_description": "自动滚动播放列表至当前播放的歌曲",
+        "followCurrentSong_description": "将播放队列自动滚动到当前播放的歌曲",
         "audioFadeOnStatusChange_description": "启用音乐淡入和淡出效果",
         "combinedLyricsAndVisualizer_description": "将歌词和可视化界面合并到同一面板中",
         "queryBuilderCustomFields_description": "在查询构建器添加自定义字段",
@@ -617,36 +617,53 @@
         "waveformLoadingDelay": "波形加载延迟",
         "waveformLoadingDelay_description": "加载波形前的延迟时间（秒）。如果在使用网页播放器时遇到卡顿现象，请增加此值。",
         "autoDJ_strategy_option_library_random": "随机",
-        "autoDJ_strategy_option_similar": "相似"
+        "autoDJ_strategy_option_similar": "相似",
+        "audioDeviceDefault": "系统默认",
+        "autoDJ_mode": "模式",
+        "autoDJ_mode_albums": "专辑",
+        "autoDJ_mode_songs": "歌曲",
+        "equalizerPreset": "预设",
+        "equalizerPresetDeletePlaceholder": "删除自定义…",
+        "equalizerPresetGroupBuiltIn": "内置",
+        "equalizerPresetGroupCustom": "自定义",
+        "equalizerPresetNamePlaceholder": "预设名称…",
+        "equalizerPresetSelectPlaceholder": "选择预设",
+        "equalizerSavePreset": "保存预设",
+        "hotkey_playbackNextAlbum": "下一张专辑",
+        "hotkey_playbackPreviousAlbum": "上一张专辑",
+        "autoDJ_albumStrategy": "专辑选择模式",
+        "autoDJ_songStrategy": "歌曲选择模式",
+        "sidebarPlaylistFolders": "启用文件夹",
+        "sidebarPlaylistFolderView": "文件夹视图"
     },
     "error": {
-        "remotePortWarning": "重启服务器使新端口生效",
-        "systemFontError": "获取系统字体时出现错误",
-        "playbackError": "无法播放媒体",
+        "remotePortWarning": "重启服务器以应用新端口",
+        "systemFontError": "尝试获取系统字体时出错",
+        "playbackError": "尝试播放媒体时出错",
         "endpointNotImplementedError": "{{serverType}} 尚未实现端点 {{endpoint}}",
-        "remotePortError": "设置远程服务器端口时发生错误",
+        "remotePortError": "尝试设置远程服务器端口时出错",
         "serverRequired": "需要服务器",
-        "authenticationFailed": "认证失败",
+        "authenticationFailed": "身份验证失败",
         "apiRouteError": "无法路由请求",
         "genericError": "发生了错误",
-        "credentialsRequired": "需要凭证",
-        "sessionExpiredError": "会话已过期",
-        "remoteEnableError": "$t(common.enable)远程服务器时出现错误",
+        "credentialsRequired": "需要凭据",
+        "sessionExpiredError": "您的会话已过期",
+        "remoteEnableError": "尝试 $t(common.enable) 远程服务器时出错",
         "localFontAccessDenied": "无法获取本地字体",
         "serverNotSelectedError": "未选择服务器",
-        "remoteDisableError": "$t(common.disable)远程服务器时出现错误",
+        "remoteDisableError": "尝试 $t(common.disable) 远程服务器时出错",
         "mpvRequired": "需要 MPV",
-        "audioDeviceFetchError": "无法获取音频设备",
+        "audioDeviceFetchError": "尝试获取音频设备时出错",
         "invalidServer": "无效的服务器",
         "loginRateError": "登录请求尝试次数过多，请稍后再试",
         "badAlbum": "您看到此页面是因为这首歌不是专辑的一部分。如果您的音乐文件夹顶层有一首歌曲，您很可能会遇到此问题。Jellyfin 仅对位于文件夹中的曲目进行分组",
         "networkError": "发生网络错误",
         "openError": "无法打开文件",
-        "badValue": "无效的选项 \"{{value}}\". 此值不再存在",
+        "badValue": "无效的选项“{{value}}”。此值不再存在",
         "notificationDenied": "通知权限被拒绝。此设置无效",
         "multipleServerSaveQueueError": "不支持此操作（播放列表中包含来自其他服务器的歌曲）",
         "noNetwork": "服务器不可用",
-        "noNetworkDescription": "无法连接到该服务器",
+        "noNetworkDescription": "无法连接到此服务器",
         "saveQueueFailed": "播放列表保存失败",
         "settingsSyncError": "渲染器设置与主进程中存在差异，请重启程序以应用更改",
         "invalidJson": "无效的 JSON",
@@ -730,7 +747,7 @@
                 "showLyricProvider": "显示歌词提供者",
                 "unsynchronized": "未同步",
                 "lyricAlignment": "歌词对齐",
-                "useImageAspectRatio": "使用图片纵横比",
+                "useImageAspectRatio": "使用图片宽高比",
                 "lyricGap": "歌词间距",
                 "followCurrentLyric": "跟随当前歌词",
                 "dynamicImageBlur": "图像模糊大小",
@@ -742,7 +759,9 @@
             "related": "相关",
             "upNext": "即将播放",
             "visualizer": "可视化",
-            "noLyrics": "未找到歌词"
+            "noLyrics": "未找到歌词",
+            "lyricLanguage": "语言",
+            "showTranslation": "翻译"
         },
         "appMenu": {
             "selectServer": "选择服务器",
@@ -778,7 +797,7 @@
         },
         "setting": {
             "playbackTab": "播放",
-            "generalTab": "通用",
+            "generalTab": "常规",
             "hotkeysTab": "快捷键",
             "windowTab": "窗口",
             "advanced": "高级",
@@ -804,7 +823,7 @@
         "globalSearch": {
             "commands": {
                 "serverCommands": "服务器命令",
-                "goToPage": "跳至页面",
+                "goToPage": "转到页面",
                 "searchFor": "搜索{{query}}"
             },
             "title": "命令"
@@ -835,7 +854,7 @@
             "goToAlbum": "转到 $t(entity.album, {\"count\": 1})",
             "goToAlbumArtist": "转到 $t(entity.albumArtist, {\"count\": 1})",
             "moveItems": "$t(action.moveItems)",
-            "goTo": "前往"
+            "goTo": "转到"
         },
         "trackList": {
             "title": "$t(entity.track, {\"count\": 2})",
@@ -886,9 +905,9 @@
         "manageServers": {
             "url": "URL",
             "title": "管理服务器",
-            "serverDetails": "服务器详细信息",
+            "serverDetails": "服务器详情",
             "username": "用户名",
-            "editServerDetailsTooltip": "编辑服务器详细信息",
+            "editServerDetailsTooltip": "编辑服务器详情",
             "removeServer": "移除服务器"
         },
         "favorites": {
@@ -928,9 +947,9 @@
             "input_name": "服务器名称",
             "success": "服务器添加成功",
             "input_savePassword": "保存密码",
-            "ignoreSsl": "忽略 ssl $t(common.restartRequired)",
-            "ignoreCors": "忽略 cors $t(common.restartRequired)",
-            "error_savePassword": "保存密码时出现错误",
+            "ignoreSsl": "忽略 SSL ($t(common.restartRequired))",
+            "ignoreCors": "忽略 CORS ($t(common.restartRequired))",
+            "error_savePassword": "尝试保存密码时出错",
             "input_url": "URL",
             "input_preferInstantMixDescription": "仅使用即时混音来获取类似的歌曲。如果您有修改此行为的插件，则很有用",
             "input_preferInstantMix": "首选即时混音",
@@ -939,12 +958,12 @@
             "input_remoteUrlPlaceholder": "可选：对外功能的公共 URL"
         },
         "addToPlaylist": {
-            "success": "添加$t(entity.trackWithCount, {\"count\": {{message}} })到$t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
+            "success": "已将 $t(entity.trackWithCount, {\"count\": {{message}} }) 添加到 $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
             "title": "添加到$t(entity.playlist, {\"count\": 1})",
             "input_skipDuplicates": "跳过重复",
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "create": "创建 $t(entity.playlist, {\"count\": 1}) {{playlist}}",
-            "searchOrCreate": "搜索 $t(entity.playlist, {\"count\": 2}) 或键入以创建一个新的",
+            "searchOrCreate": "搜索 $t(entity.playlist, {\"count\": 2}) 或输入以创建一个新的",
             "noneAdded": "没有音轨被添加到 $t(entity.playlist, {\"count\": 1}) '{{playlist}}'"
         },
         "createPlaylist": {
@@ -994,7 +1013,7 @@
             "title": "私人模式"
         },
         "largeFetchConfirmation": {
-            "title": "将项目加入到播放列表",
+            "title": "将项目添加到队列",
             "description": "此操作将添加当前筛选视图中的所有项目"
         },
         "createRadioStation": {
@@ -1002,7 +1021,7 @@
             "input_name": "名称",
             "input_streamUrl": "串流地址",
             "success": "电台创建成功",
-            "title": "创建广播电台"
+            "title": "创建电台"
         },
         "lyricsExport": {
             "export": "导出歌词",
@@ -1010,7 +1029,7 @@
             "input_offset": "$t(setting.lyricOffset)"
         },
         "saveQueue": {
-            "success": "播放列表已保存至服务器"
+            "success": "已将播放队列保存到服务器"
         },
         "shuffleAll": {
             "title": "随机播放",
@@ -1078,7 +1097,7 @@
                 "duration": "$t(common.duration)",
                 "dateAdded": "添加日期",
                 "size": "$t(common.size)",
-                "bpm": "$t(common.BPM)",
+                "bpm": "$t(common.bpm)",
                 "lastPlayed": "最后播放",
                 "trackNumber": "音轨编号",
                 "rowIndex": "行索引",
@@ -1117,7 +1136,7 @@
             "rating": "评分",
             "favorite": "收藏",
             "playCount": "播放次数",
-            "albumCount": "$t(entity.album, {\"count\": 2})",
+            "albumCount": "专辑",
             "releaseYear": "年份",
             "lastPlayed": "最后播放",
             "biography": "简介",
@@ -1126,19 +1145,19 @@
             "title": "标题",
             "bpm": "BPM",
             "dateAdded": "添加日期",
-            "artist": "$t(entity.artist, {\"count\": 1})",
-            "songCount": "$t(entity.track, {\"count\": 2})",
+            "artist": "艺术家",
+            "songCount": "曲目",
             "trackNumber": "音轨编号",
-            "genre": "$t(entity.genre, {\"count\": 1})",
+            "genre": "流派",
             "albumArtist": "专辑艺术家",
             "path": "路径",
-            "channels": "$t(common.channel, {\"count\": 2})",
+            "channels": "频道",
             "discNumber": "碟片",
-            "size": "$t(common.size)",
-            "codec": "$t(common.codec)",
+            "size": "大小",
+            "codec": "编解码器",
             "owner": "所有者",
-            "bitDepth": "$t(common.bitDepth)",
-            "sampleRate": "$t(common.sampleRate)"
+            "bitDepth": "位深度",
+            "sampleRate": "采样率"
         }
     },
     "dragDropZone": {
@@ -1344,7 +1363,10 @@
         "trueLeds": "真正的LED",
         "lumiBars": "Lumi 条",
         "outlineBars": "轮廓栏",
-        "roundBars": "圆条"
+        "roundBars": "圆条",
+        "systemAudioConsentAllow": "允许",
+        "systemAudioConsentDecline": "拒绝",
+        "systemAudioConsentTitle": "允许访问系统音频吗？"
     },
     "queryBuilder": {
         "standardTags": "标准标签",

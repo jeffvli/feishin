@@ -27,7 +27,7 @@
 }
 
 .lyrics-section :global(.synchronized-lyrics .lyric-line) {
-    padding: 0.25rem 0;
+    padding-block: 0.25rem;
 }
 
 .visualizer-overlay {

@@ -710,7 +710,9 @@
         "sleepTimer_cancel": "Anuluj wyłączanie",
         "albumRadio": "Radio albumu",
         "scrobbleForceSubmit": "Wymuś scrobble",
-        "sleepTimer_endOfAlbum": "Koniec aktualnego albumu"
+        "sleepTimer_endOfAlbum": "Koniec aktualnego albumu",
+        "nextAlbum": "Alt+kliknięcie aby odtworzyć następny album",
+        "previousAlbum": "Alt+kliknięcie aby odtworzyć poprzedni album"
     },
     "setting": {
         "crossfadeStyle_description": "Wybierz styl przenikania, który ma być używany do odtwarzania dźwięku",
@@ -1160,7 +1162,9 @@
         "windowBarTrackinfo_description": "Wyświetlaj tytuł, wykonawcę, pozycję w kolejce i stan Odtwarzania/Wstrzymania w tytule okna.",
         "audioDeviceDefault": "Domyślne systemu",
         "microtonalPitchControls": "Mikrotonowe sterowanie wysokością dźwięku",
-        "microtonalPitchControls_description": "Dodaj więcej sterowania wysokością dźwięku pomiędzy półtonami"
+        "microtonalPitchControls_description": "Dodaj więcej sterowania wysokością dźwięku pomiędzy półtonami",
+        "hotkey_playbackNextAlbum": "Następny album",
+        "hotkey_playbackPreviousAlbum": "Poprzedni album"
     },
     "table": {
         "config": {
@@ -1204,7 +1208,8 @@
                 "albumImageSize": "Rozmiar obrazów albumów",
                 "albumGroupConfig": "Konfiguracja grupy albumów",
                 "albumGroupMetadata": "Pola metadanych",
-                "albumGroupShowFavoriteRating": "Pokaż ulubione i oceny"
+                "albumGroupShowFavoriteRating": "Pokaż ulubione i oceny",
+                "albumGroupVerticalLayout": "Pionowy układ"
             },
             "label": {
                 "releaseDate": "Data premiery",

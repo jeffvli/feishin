@@ -51,9 +51,10 @@ export const AlbumGroupColumn = (props: ItemTableListInnerColumn) => {
     }
 
     if (!isFirstInGroup) {
-        // For non-first rows, add border-bottom on the last row of the group
-        const needsBorder =
-            props.enableHorizontalBorders &&
+        // No vertical border. Bottom border only on the last row of the group so
+        // mid-group lines don't cut through overflowing artwork.
+        const needsBottomBorder =
+            !!props.enableHorizontalBorders &&
             isLastInAlbumGroup(
                 props.rowIndex,
                 props.getRowItem,
@@ -65,7 +66,7 @@ export const AlbumGroupColumn = (props: ItemTableListInnerColumn) => {
             <div
                 style={{
                     ...props.style,
-                    ...(needsBorder
+                    ...(needsBottomBorder
                         ? { borderBottom: '1px solid var(--theme-colors-border)' }
                         : {}),
                     // When the cover is enlarged it overflows down from the

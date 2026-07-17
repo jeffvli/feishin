@@ -50,7 +50,9 @@
         "sleepTimer": "Temporizador de apagado",
         "albumRadio": "Radio del álbum",
         "scrobbleForceSubmit": "Forzar scrobble",
-        "sleepTimer_endOfAlbum": "Fin del álbum actual"
+        "sleepTimer_endOfAlbum": "Fin del álbum actual",
+        "nextAlbum": "Alt+clic para el siguiente álbum",
+        "previousAlbum": "Alt+clic para el álbum anterior"
     },
     "setting": {
         "crossfadeStyle_description": "Selecciona el estilo de crossfade a usar por el reproductor de audio",
@@ -500,7 +502,9 @@
         "windowBarTrackinfo_description": "Muestra el título y artista de la pista actual, posición en la cola, y estado reproduciendo/pausado en el título de la ventana.",
         "audioDeviceDefault": "Predeterminado del sistema",
         "microtonalPitchControls": "Controles de tono microtonales",
-        "microtonalPitchControls_description": "Añade más controles de tono para moverse entre semitonos"
+        "microtonalPitchControls_description": "Añade más controles de tono para moverse entre semitonos",
+        "hotkey_playbackNextAlbum": "Siguiente álbum",
+        "hotkey_playbackPreviousAlbum": "Álbum anterior"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",
@@ -862,7 +866,11 @@
             "lyrics": "Letras",
             "related": "Relacionado",
             "visualizer": "Visualizador",
-            "noLyrics": "Sin letras"
+            "noLyrics": "Sin letras",
+            "lyricLayers": "Capas de letra",
+            "lyricLanguage": "Idioma",
+            "showPronunciation": "Pronunciación",
+            "showTranslation": "Traducción"
         },
         "albumDetail": {
             "moreFromArtist": "Más de este $t(entity.artist, {\"count\": 1})",
@@ -1199,7 +1207,10 @@
                 "rowHoverHighlight": "Resaltar al pasar el cursor por la fila",
                 "showHeader": "Mostrar cabecera",
                 "albumImageSize": "Tamaño de la imagen del álbum",
-                "albumGroupConfig": "Configuración del grupo del álbum"
+                "albumGroupConfig": "Configuración del grupo del álbum",
+                "albumGroupMetadata": "Campos de metadatos",
+                "albumGroupShowFavoriteRating": "Mostrar favoritos y calificaciones",
+                "albumGroupVerticalLayout": "Diseño vertical"
             },
             "view": {
                 "table": "Tabla",

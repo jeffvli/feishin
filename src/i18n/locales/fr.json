@@ -348,13 +348,21 @@
                 "dynamicImageBlur": "Intensité du flou sur l'image d'arrière-plan",
                 "lyricOffset": "Décalage des paroles (ms)",
                 "lyricScaleNonActive": "Mise à l'échelle des paroles inactives",
-                "lyricOpacityNonActive": "Opacité des paroles inactive"
+                "lyricOpacityNonActive": "Opacité des paroles inactive",
+                "lyricFollowScrollAlignment": "Les paroles suivent l'alignement",
+                "lyricLineLeadTime": "Temps d'avance de la ligne de paroles (ms)",
+                "lyricPaddingLeft": "Marge de gauche des paroles (%)",
+                "lyricPaddingRight": "Marge de droite des paroles (%)"
             },
             "upNext": "À suivre",
             "lyrics": "Paroles",
             "related": "Similaire",
             "visualizer": "Visualisateur",
-            "noLyrics": "Aucune parole trouvée"
+            "noLyrics": "Aucune parole trouvée",
+            "lyricLayers": "Couches de paroles",
+            "lyricLanguage": "Langue",
+            "showPronunciation": "Prononciation",
+            "showTranslation": "Traduction"
         },
         "appMenu": {
             "selectServer": "Sélectionner le serveur",
@@ -1165,7 +1173,10 @@
                 "verticalBorders": "Bordure de colonne",
                 "showHeader": "Affiche l'en-tête",
                 "albumGroupConfig": "Configuration du groupe d'albums",
-                "albumImageSize": "Taille de la pochette d'album"
+                "albumImageSize": "Taille de la pochette d'album",
+                "albumGroupMetadata": "Champs de metadonnée",
+                "albumGroupShowFavoriteRating": "Afficher les favoris et les notes",
+                "albumGroupVerticalLayout": "Mise en page verticale"
             },
             "view": {
                 "table": "Liste",

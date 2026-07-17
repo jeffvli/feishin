@@ -553,7 +553,8 @@
                 "showLyricProvider": "Kuva laulusõnade allikas",
                 "synchronized": "Sünkroniseeritud",
                 "unsynchronized": "Sünkroniseerimata",
-                "useImageAspectRatio": "Kasuta pildi kuvasuhet"
+                "useImageAspectRatio": "Kasuta pildi kuvasuhet",
+                "lyricFollowScrollAlignment": "Laulusõnad järgivad joondumist"
             },
             "lyrics": "Laulusõnad",
             "related": "Seotud",

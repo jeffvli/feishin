@@ -268,6 +268,10 @@ export const SynchronizedKaraokeLyrics = ({
                 return;
             }
 
+            // Refresh the wall-clock playback anchor before restarting RAF.
+            // Otherwise resume interpolates from the pause-time eventCreationTime and
+            // briefly advances lyrics by the pause duration until the next progress tick.
+            syncFromCurrentTimestamp();
             startRaf();
         });
 

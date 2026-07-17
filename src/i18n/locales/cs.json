@@ -719,7 +719,10 @@
                 "verticalBorders": "Okraje sloupců",
                 "showHeader": "Zobrazit záhlaví",
                 "albumImageSize": "Velikost obrázku alba",
-                "albumGroupConfig": "Nastavení skupiny alb"
+                "albumGroupConfig": "Nastavení skupiny alb",
+                "albumGroupShowFavoriteRating": "Zobrazit oblíbené a hodnocení",
+                "albumGroupMetadata": "Pole metadat",
+                "albumGroupVerticalLayout": "Vertikální rozložení"
             },
             "label": {
                 "releaseDate": "Datum vydání",
@@ -918,7 +921,11 @@
             "lyrics": "Texty",
             "related": "Související",
             "visualizer": "Vizualizér",
-            "noLyrics": "Nenalezeny žádné texty"
+            "noLyrics": "Nenalezeny žádné texty",
+            "lyricLanguage": "Jazyk",
+            "showPronunciation": "Výslovnost",
+            "showTranslation": "Překlad",
+            "lyricLayers": "Vrstvy textů"
         },
         "appMenu": {
             "selectServer": "Vybrat server",

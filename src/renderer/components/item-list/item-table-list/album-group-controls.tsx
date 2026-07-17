@@ -29,17 +29,11 @@ const useAlbumGroupAlbum = (albumId: string | undefined, serverId: string | unde
 
 interface AlbumGroupControlsProps {
     albumId: string | undefined;
-    isGroupHovered: boolean;
     serverId: string | undefined;
     serverType: ServerType | undefined;
 }
 
-export const AlbumGroupControls = ({
-    albumId,
-    isGroupHovered,
-    serverId,
-    serverType,
-}: AlbumGroupControlsProps) => {
+export const AlbumGroupControls = ({ albumId, serverId, serverType }: AlbumGroupControlsProps) => {
     const showRatingsSetting = useShowRatings();
     const detailQuery = useAlbumGroupAlbum(albumId, serverId);
     const setFavorite = useSetFavorite();
@@ -84,13 +78,13 @@ export const AlbumGroupControls = ({
     return (
         <div className={styles.controls}>
             <ActionIcon
-                className={album.userFavorite || isGroupHovered ? undefined : styles.hidden}
+                className={styles.favorite}
                 disabled={isMutatingFavorite}
                 icon="favorite"
                 iconProps={{
                     color: album.userFavorite ? 'primary' : 'muted',
                     fill: album.userFavorite ? 'primary' : undefined,
-                    size: 'md',
+                    size: 'xs',
                 }}
                 onClick={handleFavorite}
                 onDoubleClick={(event) => {
@@ -98,11 +92,11 @@ export const AlbumGroupControls = ({
                     event.preventDefault();
                 }}
                 size="xs"
-                variant="subtle"
+                variant="transparent"
             />
             {showRating && (
                 <Rating
-                    className={album.userRating || isGroupHovered ? undefined : styles.hidden}
+                    className={styles.rating}
                     onChange={handleRating}
                     readOnly={isMutatingRating}
                     size="xs"

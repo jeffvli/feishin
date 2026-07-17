@@ -61,11 +61,11 @@ export interface PlayerContext {
     clearSelected: (items: QueueSong[]) => void;
     decreaseVolume: (amount: number) => void;
     increaseVolume: (amount: number) => void;
-    mediaNext: () => void;
+    mediaNext: (toNextAlbum: boolean) => void;
     mediaPause: () => void;
     mediaPlay: (id?: string) => void;
     mediaPlayByIndex: (index: number) => void;
-    mediaPrevious: () => void;
+    mediaPrevious: (toPreviousAlbum: boolean) => void;
     mediaSeekToTimestamp: (timestamp: number) => void;
     mediaSkipBackward: () => void;
     mediaSkipForward: () => void;
@@ -579,13 +579,16 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         [storeActions],
     );
 
-    const mediaNext = useCallback(() => {
-        logFn.debug(logMsg[LogCategory.PLAYER].mediaNext, {
-            category: LogCategory.PLAYER,
-        });
+    const mediaNext = useCallback(
+        (toNextAlbum: boolean) => {
+            logFn.debug(logMsg[LogCategory.PLAYER].mediaNext, {
+                category: LogCategory.PLAYER,
+            });
 
-        storeActions.mediaNext();
-    }, [storeActions]);
+            storeActions.mediaNext(toNextAlbum);
+        },
+        [storeActions],
+    );
 
     const mediaPause = useCallback(() => {
         logFn.debug(logMsg[LogCategory.PLAYER].mediaPause, {
@@ -619,13 +622,16 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         [storeActions],
     );
 
-    const mediaPrevious = useCallback(() => {
-        logFn.debug(logMsg[LogCategory.PLAYER].mediaPrevious, {
-            category: LogCategory.PLAYER,
-        });
+    const mediaPrevious = useCallback(
+        (toPreviousAlbum: boolean) => {
+            logFn.debug(logMsg[LogCategory.PLAYER].mediaPrevious, {
+                category: LogCategory.PLAYER,
+            });
 
-        storeActions.mediaPrevious();
-    }, [storeActions]);
+            storeActions.mediaPrevious(toPreviousAlbum);
+        },
+        [storeActions],
+    );
 
     const mediaStop = useCallback(
         (options?: { reset?: boolean }) => {
