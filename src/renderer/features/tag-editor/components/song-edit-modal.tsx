@@ -88,7 +88,9 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                     <Tabs.Tab value="artwork">
                         {t('page.itemDetail.artworkTab', 'Artwork')}
                     </Tabs.Tab>
-                    <Tabs.Tab value="settings">{t('common.settings', 'Settings')}</Tabs.Tab>
+                    <Tabs.Tab ml="auto" value="settings">
+                        {t('common.settings', 'Settings')}
+                    </Tabs.Tab>
                 </Tabs.List>
 
                 <Tabs.Panel value="tags">
