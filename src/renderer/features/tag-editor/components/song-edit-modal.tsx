@@ -1,5 +1,5 @@
 import { closeAllModals } from '@mantine/modals';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useMetadataEditor } from '../hooks/use-metadata-editor';
@@ -29,6 +29,8 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
         songs,
         utils: window.api.utils,
     });
+
+    const [tab, setTab] = useState<'artwork' | 'settings' | 'tags'>('tags');
 
     const handleAddField = (key: string) => {
         editor.handleAddField(key);
@@ -76,7 +78,11 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
 
     return (
         <Stack gap="xs">
-            <Tabs defaultValue="tags" keepMounted={false}>
+            <Tabs
+                keepMounted={false}
+                onChange={(value) => setTab(value as 'artwork' | 'settings' | 'tags')}
+                value={tab}
+            >
                 <Tabs.List>
                     <Tabs.Tab value="tags">{t('page.itemDetail.tagsTab', 'Tags')}</Tabs.Tab>
                     <Tabs.Tab value="artwork">
@@ -167,26 +173,34 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                 </Tabs.Panel>
             </Tabs>
 
-            <Checkbox
-                checked={editor.rescan}
-                label={t('page.itemDetail.triggerRescan')}
-                onChange={(e) => editor.setRescan(e.currentTarget.checked)}
-            />
+            {tab !== 'settings' && (
+                <>
+                    <Checkbox
+                        checked={editor.rescan}
+                        label={t('page.itemDetail.triggerRescan')}
+                        onChange={(e) => editor.setRescan(e.currentTarget.checked)}
+                    />
 
-            <Group justify="flex-end">
-                <Button
-                    disabled={editor.isSaving}
-                    onClick={() => closeAllModals()}
-                    variant="subtle"
-                >
-                    {t('common.cancel', 'Cancel')}
-                </Button>
-                <Button loading={editor.isSaving} onClick={editor.handleSave} variant="filled">
-                    {editor.isSaving && editor.loadProgress && editor.loadProgress.total > 1
-                        ? `${t('common.save', 'Save')} (${editor.loadProgress.processed}/${editor.loadProgress.total})`
-                        : t('common.save', 'Save')}
-                </Button>
-            </Group>
+                    <Group justify="flex-end">
+                        <Button
+                            disabled={editor.isSaving}
+                            onClick={() => closeAllModals()}
+                            variant="subtle"
+                        >
+                            {t('common.cancel', 'Cancel')}
+                        </Button>
+                        <Button
+                            loading={editor.isSaving}
+                            onClick={editor.handleSave}
+                            variant="filled"
+                        >
+                            {editor.isSaving && editor.loadProgress && editor.loadProgress.total > 1
+                                ? `${t('common.save', 'Save')} (${editor.loadProgress.processed}/${editor.loadProgress.total})`
+                                : t('common.save', 'Save')}
+                        </Button>
+                    </Group>
+                </>
+            )}
         </Stack>
     );
 };
