@@ -13,6 +13,11 @@ export interface BatchProgress {
     total: number;
 }
 
+export interface FileArtworkData {
+    data: string;
+    mimeType: string;
+}
+
 export interface ReadLocalImageResult extends IpcResult {
     data?: string;
     mimeType?: string;
@@ -23,6 +28,8 @@ export interface ReadSongMetadataBatchResult extends IpcResult {
     artworkKind: ArtworkKind;
     artworkMimeType?: string;
     failedFiles?: BatchFileError[];
+    fileArtwork?: Record<string, FileArtworkData>;
+    fileTags?: Record<string, Record<string, TagValue>>;
     multiValueKeys?: string[];
     readCount?: number;
     tagSummary?: Record<string, null | TagValue>;

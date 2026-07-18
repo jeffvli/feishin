@@ -52,6 +52,8 @@ ipcMain.handle(
             return {
                 artworkKind: result.artworkKind,
                 failedFiles: result.failedFiles.length > 0 ? result.failedFiles : undefined,
+                fileArtwork: result.fileArtwork,
+                fileTags: result.fileTags,
                 multiValueKeys: result.multiValueKeys,
                 readCount: result.readCount,
                 success: true,

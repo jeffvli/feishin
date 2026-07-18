@@ -121,6 +121,8 @@ export async function readFilesMetadataBatch(
     artworkKind: ArtworkKind;
     artworkMimeType?: string;
     failedFiles: BatchFileError[];
+    fileArtwork: Record<string, { data: string; mimeType: string }>;
+    fileTags: Record<string, Record<string, TagValue>>;
     multiValueKeys: string[];
     readCount: number;
     success: boolean;
@@ -131,6 +133,8 @@ export async function readFilesMetadataBatch(
     const failedFiles: BatchFileError[] = [];
     const multiValueKeys = new Set<string>();
     const tagSummary: Record<string, null | TagValue> = {};
+    const fileTags: Record<string, Record<string, TagValue>> = {};
+    const fileArtwork: Record<string, { data: string; mimeType: string }> = {};
     let artworkKind = 'none' as ArtworkKind;
     let artworkByteSize: number | undefined;
     let artworkData: string | undefined;
@@ -156,6 +160,7 @@ export async function readFilesMetadataBatch(
                         ];
                     }
                     const normalized = normalizeProperties(rawProperties);
+                    fileTags[filePath] = normalized;
                     for (const [key, value] of Object.entries(normalized)) {
                         if (Array.isArray(value)) multiValueKeys.add(key);
                     }
@@ -164,12 +169,19 @@ export async function readFilesMetadataBatch(
                     const hasCoverArt = frontCover !== undefined;
                     const picSize = hasCoverArt ? frontCover.data.length : undefined;
 
+                    if (frontCover) {
+                        fileArtwork[filePath] = {
+                            data: Buffer.from(frontCover.data).toString('base64'),
+                            mimeType: frontCover.mimeType,
+                        };
+                    }
+
                     if (readCount === 0) {
                         Object.assign(tagSummary, normalized);
                         artworkKind = hasCoverArt ? 'common' : 'none';
                         artworkByteSize = picSize;
                         if (frontCover) {
-                            artworkData = Buffer.from(frontCover.data).toString('base64');
+                            artworkData = fileArtwork[filePath].data;
                             artworkMimeType = frontCover.mimeType;
                         }
                     } else {
@@ -213,6 +225,8 @@ export async function readFilesMetadataBatch(
     return {
         artworkKind,
         failedFiles,
+        fileArtwork,
+        fileTags,
         multiValueKeys: [...multiValueKeys],
         readCount,
         success: readCount > 0,

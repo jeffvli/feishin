@@ -145,6 +145,7 @@
         "right": "Right",
         "sampleRate": "Sample rate",
         "save": "Save",
+        "saveAndClose": "Save and close",
         "saveAndReplace": "Save and replace",
         "saveAs": "Save as",
         "search": "Search",

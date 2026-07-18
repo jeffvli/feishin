@@ -1,25 +1,27 @@
 import { closeAllModals } from '@mantine/modals';
-import { useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useMetadataEditor } from '../hooks/use-metadata-editor';
+import { EDIT_SCOPE_ALL, useMetadataEditor } from '../hooks/use-metadata-editor';
 import { AddFieldInput } from './add-field-input';
 import { ArtworkPanel } from './artwork-panel';
 import styles from './song-edit-modal.module.css';
 import { TagEditorSettings } from './tag-editor-settings';
 import { TagFieldRow } from './tag-field-row';
 
+import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { PathSettings } from '/@/renderer/features/settings/components/general/path-settings';
 import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
+import { Select } from '/@/shared/components/select/select';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Table } from '/@/shared/components/table/table';
 import { Tabs } from '/@/shared/components/tabs/tabs';
 import { Text } from '/@/shared/components/text/text';
-import { Song } from '/@/shared/types/domain-types';
+import { LibraryItem, Song } from '/@/shared/types/domain-types';
 
 export const SongEditModal = ({ songs }: { songs: Song[] }) => {
     const { t } = useTranslation();
@@ -32,6 +34,71 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
     });
 
     const [tab, setTab] = useState<'artwork' | 'settings' | 'tags'>('tags');
+
+    const songsById = useMemo(
+        () => new Map(editor.resolvedSongs.map((song) => [song.id, song])),
+        [editor.resolvedSongs],
+    );
+
+    const scopeOptions = useMemo(
+        () => [
+            {
+                label: t('common.countSelected', {
+                    count: editor.resolvedSongs.length,
+                }),
+                value: EDIT_SCOPE_ALL,
+            },
+            ...editor.resolvedSongs.map((song) => ({
+                label: song.name,
+                value: song.id,
+            })),
+        ],
+        [editor.resolvedSongs, t],
+    );
+
+    const renderScopeOption = useCallback(
+        ({ option }: { option: { label: string; value: string } }) => {
+            if (option.value === EDIT_SCOPE_ALL) {
+                return (
+                    <Text className={styles.scopeOptionLabel} fw={500}>
+                        {option.label}
+                    </Text>
+                );
+            }
+
+            const song = songsById.get(option.value);
+            if (!song) {
+                return option.label;
+            }
+
+            return (
+                <Group className={styles.scopeOption} gap="sm" wrap="nowrap">
+                    <ItemImage
+                        containerClassName={styles.scopeOptionImage}
+                        enableViewport={false}
+                        explicitStatus={song.explicitStatus}
+                        id={song.imageId}
+                        itemType={LibraryItem.SONG}
+                        serverId={song._serverId}
+                        src={song.imageUrl}
+                        type="table"
+                    />
+                    <Stack className={styles.scopeOptionMeta} gap={2}>
+                        <Text fw={500} lineClamp={1}>
+                            {song.name || '—'}
+                        </Text>
+                        <Text c="dimmed" lineClamp={1} size="sm">
+                            {song.artistName || '—'}
+                        </Text>
+                        <Text c="dimmed" lineClamp={1} size="sm">
+                            {song.album || '—'}
+                        </Text>
+                    </Stack>
+                </Group>
+            );
+        },
+        [songsById],
+    );
 
     const handleAddField = (key: string) => {
         editor.handleAddField(key);
@@ -79,6 +146,21 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
 
     return (
         <Stack gap="xs">
+            {editor.resolvedSongs.length > 1 ? (
+                <Select
+                    allowDeselect={false}
+                    classNames={{
+                        option: styles.scopeSelectOption,
+                    }}
+                    data={scopeOptions}
+                    onChange={(value) => {
+                        if (value) editor.setEditScope(value);
+                    }}
+                    renderOption={renderScopeOption}
+                    searchable
+                    value={editor.editScope}
+                />
+            ) : null}
             <Tabs
                 keepMounted={false}
                 onChange={(value) => setTab(value as 'artwork' | 'settings' | 'tags')}
@@ -195,13 +277,23 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                             {t('common.cancel', 'Cancel')}
                         </Button>
                         <Button
+                            disabled={editor.isSaving}
                             loading={editor.isSaving}
-                            onClick={editor.handleSave}
-                            variant="filled"
+                            onClick={() => editor.handleSave({ close: false })}
+                            variant="default"
                         >
                             {editor.isSaving && editor.loadProgress && editor.loadProgress.total > 1
                                 ? `${t('common.save', 'Save')} (${editor.loadProgress.processed}/${editor.loadProgress.total})`
                                 : t('common.save', 'Save')}
+                        </Button>
+                        <Button
+                            loading={editor.isSaving}
+                            onClick={() => editor.handleSave({ close: true })}
+                            variant="filled"
+                        >
+                            {editor.isSaving && editor.loadProgress && editor.loadProgress.total > 1
+                                ? `${t('common.saveAndClose', 'Save and close')} (${editor.loadProgress.processed}/${editor.loadProgress.total})`
+                                : t('common.saveAndClose', 'Save and close')}
                         </Button>
                     </Group>
                 </>
