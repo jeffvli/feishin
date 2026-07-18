@@ -1,7 +1,7 @@
 import type { ArtworkKind, ArtworkOp, BatchFileError, TagValue } from '/@/shared/types/tag-editor';
 
 import { constants, promises as fsPromises } from 'fs';
-import { TagLib } from 'taglib-wasm';
+import { PROPERTIES, TagLib } from 'taglib-wasm';
 
 import { getImageMimeTypeFromPath } from '/@/shared/utils/image-mime';
 
@@ -13,6 +13,15 @@ const getTagLib = async (): Promise<TagLib> => {
 };
 
 const BATCH_CONCURRENCY = 8;
+
+/**
+ * Known PROPERTIES stay camelCase for the taglib-wasm JS API. Custom tags use
+ * TagLib's ALL_CAPS wire form so read/write/settings keys stay consistent.
+ */
+const canonicalizePropertyKey = (key: string): string => {
+    if (key in PROPERTIES) return key;
+    return key.toUpperCase();
+};
 
 /** Returns an error entry for each path that is missing or not writable by the current process. */
 export async function checkPathsWritable(paths: string[]): Promise<BatchFileError[]> {
@@ -49,7 +58,8 @@ function normalizeProperties(
     const normalized: Record<string, TagValue> = {};
     for (const [key, values] of Object.entries(props)) {
         if (values && values.length > 0 && values[0] !== '') {
-            normalized[key] = values.length === 1 ? values[0] : [...values];
+            const canonicalKey = canonicalizePropertyKey(key);
+            normalized[canonicalKey] = values.length === 1 ? values[0] : [...values];
         }
     }
     const coveredByUpperCase = new Set(
@@ -255,11 +265,13 @@ export async function writeFilesTags(
                     const properties = file.properties();
 
                     for (const [key, value] of propertyEdits) {
-                        properties[key] = Array.isArray(value) ? value : [value];
+                        properties[canonicalizePropertyKey(key)] = Array.isArray(value)
+                            ? value
+                            : [value];
                     }
 
                     for (const key of propertyRemovals) {
-                        delete properties[key];
+                        delete properties[canonicalizePropertyKey(key)];
                     }
 
                     file.setProperties(properties);

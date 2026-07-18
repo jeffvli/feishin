@@ -2034,7 +2034,7 @@ const initialState: SettingsState = {
                 customValues: [],
                 multiValue: false,
             },
-            albumartists: {
+            ALBUMARTISTS: {
                 autocompleteSource: 'serverArtists',
                 customValues: [],
                 multiValue: true,
@@ -2044,7 +2044,7 @@ const initialState: SettingsState = {
                 customValues: [],
                 multiValue: false,
             },
-            albumartistssort: {
+            ALBUMARTISTSSORT: {
                 autocompleteSource: 'serverArtists',
                 customValues: [],
                 multiValue: true,
@@ -2054,7 +2054,7 @@ const initialState: SettingsState = {
                 customValues: [],
                 multiValue: true,
             },
-            artists: {
+            ARTISTS: {
                 autocompleteSource: 'serverArtists',
                 customValues: [],
                 multiValue: true,
@@ -2064,7 +2064,7 @@ const initialState: SettingsState = {
                 customValues: [],
                 multiValue: true,
             },
-            artistssort: {
+            ARTISTSSORT: {
                 autocompleteSource: 'serverArtists',
                 customValues: [],
                 multiValue: true,

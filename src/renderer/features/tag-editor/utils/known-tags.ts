@@ -79,11 +79,20 @@ export const KNOWN_TAG_MAP = new Map(KNOWN_TAGS.map((t) => [t.key, t]));
 
 /**
  * Resolves a raw tag name to its TagLib property key. Known tags return their
- * canonical key; unknown names keep the user's casing.
+ * canonical key; unknown names are uppercased to match TagLib's wire format.
  */
 export const resolveTagKey = (input: string): string => {
     const trimmed = input.trim();
-    const known = KNOWN_TAGS.find((tag) => tag.tagName === trimmed || tag.key === trimmed);
-    if (known) return known.key;
-    return trimmed;
+    if (!trimmed) return trimmed;
+
+    const exact = KNOWN_TAGS.find((tag) => tag.tagName === trimmed || tag.key === trimmed);
+    if (exact) return exact.key;
+
+    const lower = trimmed.toLowerCase();
+    const insensitive = KNOWN_TAGS.find(
+        (tag) => tag.tagName.toLowerCase() === lower || tag.key.toLowerCase() === lower,
+    );
+    if (insensitive) return insensitive.key;
+
+    return trimmed.toUpperCase();
 };
