@@ -1107,6 +1107,8 @@
         "preservePitch": "Preserve pitch",
         "audioFadeOnStatusChange": "Audio fade on status change",
         "audioFadeOnStatusChange_description": "Enables fade out and fade in when play/pause status changes",
+        "autoPlayOnOpen": "Autoplay on open",
+        "autoPlayOnOpen_description": "Continue playing when the application is reopened if playback was active when it was closed. Enabling this also enables Save play queue",
         "preventSleepOnPlayback_description": "Prevent the display from sleeping while music is playing",
         "preventSleepOnPlayback": "Prevent sleep on playback",
         "preventSuspendOnPlayback_description": "Prevent the application from suspending while music is playing",

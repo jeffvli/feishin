@@ -1716,15 +1716,19 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 usePlayerStoreBase.setState({ hydrated: true });
             },
             partialize: (state) => {
-                const shouldRestorePlayQueue = useSettingsStore.getState().general.resume;
+                const { autoPlayOnOpen, resume } = useSettingsStore.getState().general;
+                const shouldRestorePlayQueue = resume || autoPlayOnOpen;
 
-                // Exclude playerNum, seekToTimestamp, and status from stored player object
-                // These are not needed to be stored since they are ephemeral properties
+                // Exclude playerNum and seekToTimestamp from the stored player object.
                 // Note: timestamp is now in a separate store and doesn't need to be excluded here
-                const excludedPlayerKeys = ['playerNum', 'seekToTimestamp', 'status'];
+                const excludedPlayerKeys = ['playerNum', 'seekToTimestamp'];
 
-                // If we're not restoring the play queue, we don't need the index property
-                // (it is meaningless without the queue)
+                if (!autoPlayOnOpen) {
+                    excludedPlayerKeys.push('status');
+                }
+
+                // If we're not restoring the play queue, the index and status are meaningless
+                // without a song to play and must remain at their initial values on startup.
                 if (!shouldRestorePlayQueue) {
                     excludedPlayerKeys.push('index');
                 }

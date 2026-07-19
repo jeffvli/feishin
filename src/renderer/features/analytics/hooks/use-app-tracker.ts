@@ -70,6 +70,7 @@ type SettingsProperties = {
     'settings.autoDJ': boolean;
     'settings.autoDJItemCount': number;
     'settings.autoDJTiming': number;
+    'settings.autoPlayOnOpen': boolean;
     'settings.customCss': boolean;
     'settings.disableAutoUpdate': boolean;
     'settings.discord': boolean;
@@ -143,6 +144,7 @@ const getSettingsProperties = (): SettingsProperties => {
         'settings.autoDJ': settings.autoDJ.enabled,
         'settings.autoDJItemCount': settings.autoDJ.itemCount,
         'settings.autoDJTiming': settings.autoDJ.timing,
+        'settings.autoPlayOnOpen': settings.general.autoPlayOnOpen,
         'settings.customCss': settings.css.enabled,
         'settings.disableAutoUpdate': ignoreWeb(settings.window.disableAutoUpdate),
         'settings.discord': ignoreWeb(settings.discord.enabled),
