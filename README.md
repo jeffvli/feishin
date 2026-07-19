@@ -61,9 +61,7 @@ For media keys to work, you will be prompted to allow Feishin to be a Trusted Ac
 
 Feishin is available in [Flathub](https://flathub.org/en/apps/org.jeffvli.feishin).
 
-Alternatively, you can install it as an Appimage.
-We provide a small install script to download the latest `.AppImage`, make it executable, and also download the icons required by Desktop Environments.
-Finally, it generates a `.desktop` file to add Feishin to your Application Launcher.
+Alternatively, you can install it as an Appimage. We provide a small install script to download the latest `.AppImage`, make it executable, and also download the icons required by Desktop Environments. Finally, it generates a `.desktop` file to add Feishin to your Application Launcher.
 
 Simply run the installer like this:
 
@@ -172,7 +170,6 @@ Feishin supports any music server that implements a [Navidrome](https://www.navi
 - [Plex](https://www.plex.tv/media-server-downloads)
     - [Feishin fork by lux032](https://github.com/lux032/feishin) - Plex is not natively supported. Use the fork by lux032 to use Plex with Feishin.
 
-
 ### I have the issue "The SUID sandbox helper binary was found, but is not configured correctly" on Linux
 
 This happens when you have user (unprivileged) namespaces disabled (`sysctl kernel.unprivileged_userns_clone` returns 0). You can fix this by either enabling unprivileged namespaces, or by making the `chrome-sandbox` Setuid.
@@ -183,6 +180,10 @@ sudo chown root:root chrome-sandbox
 ```
 
 Ubuntu 24.04 specifically introduced breaking changes that affect how namespaces work. Please see https://discourse.ubuntu.com/t/ubuntu-24-04-lts-noble-numbat-release-notes/39890#:~:text=security%20improvements%20 for possible fixes.
+
+### How can I add custom themes?
+
+On the desktop app, you can add custom themes by dropping JSON files into the Themes folder (Settings → General → Theme → Open Folder). See [the custom themes documentation](docs/CUSTOM_THEMES.md) for the file format and examples.
 
 ## Development
 
