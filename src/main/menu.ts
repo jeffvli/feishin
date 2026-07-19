@@ -104,14 +104,14 @@ export default class MenuBuilder {
                     click: () => {
                         this.mainWindow.webContents.send('renderer-open-settings');
                     },
-                    label: 'Settings',
+                    label: 'Settings...',
                 },
                 { type: 'separator' },
                 {
                     click: () => {
                         this.mainWindow.webContents.send('renderer-open-manage-servers');
                     },
-                    label: 'Manage Servers',
+                    label: 'Manage Servers...',
                 },
                 {
                     checked: privateMode,
@@ -141,6 +141,8 @@ export default class MenuBuilder {
                     },
                     label: 'Create Playlist...',
                 },
+                { type: 'separator' },
+                { role: 'close' },
             ],
         };
         const subMenuEdit: MenuItemConstructorOptions = { role: 'editMenu' };
