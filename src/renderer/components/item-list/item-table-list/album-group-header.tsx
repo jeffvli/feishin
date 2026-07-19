@@ -24,6 +24,7 @@ import {
     useAlbumGroupImageSize,
     useAlbumGroupItems,
     useAlbumGroupShowFavoriteRating,
+    useAlbumGroupVerticalLayout,
     usePlayButtonBehavior,
 } from '/@/renderer/store';
 import { Text } from '/@/shared/components/text/text';
@@ -31,31 +32,36 @@ import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface AlbumGroupHeaderProps {
+    groupKey?: string;
     groupRowCount?: number;
     metadata: AlbumGroupMetadata;
     onPlay?: (playType: Play) => void;
-    rowIndex?: number;
-    setAlbumGroupContentHeight?: (rowIndex: number, height: number) => void;
+    setAlbumGroupContentHeight?: (groupKey: string, height: number) => void;
     size?: AlbumGroupTextSize;
     song: Song | undefined;
+    storedContentHeight?: number;
 }
 
 export const AlbumGroupHeader = ({
+    groupKey,
     groupRowCount,
     metadata,
     onPlay,
-    rowIndex,
     setAlbumGroupContentHeight,
     size = 'normal',
     song,
+    storedContentHeight,
 }: AlbumGroupHeaderProps): ReactElement => {
     const { t } = useTranslation();
     const albumGroupItems = useAlbumGroupItems();
     const showFavoriteRating = useAlbumGroupShowFavoriteRating();
-    const [isHovered, setIsHovered] = useState(false);
-    const [resolvedInfoHeight, setResolvedInfoHeight] = useState<number | undefined>();
+    const isVerticalLayout = useAlbumGroupVerticalLayout();
+    const [isImageHovered, setIsImageHovered] = useState(false);
+    const [resolved, setResolved] = useState<null | { forInfoHeight: number; height: number }>(
+        null,
+    );
     const playButtonBehavior = usePlayButtonBehavior();
-    const albumImageSize = useAlbumGroupImageSize();
+    const albumImageSize = useAlbumGroupImageSize() || 96;
     const rowHeight = {
         compact: TableItemSize.COMPACT,
         large: TableItemSize.LARGE,
@@ -76,13 +82,22 @@ export const AlbumGroupHeader = ({
             .filter((item) => item.content != null);
     }, [albumGroupItems, metadata, song, t]);
 
-    // The album group spans the combined row height, but when the image is
-    // enlarged the group's last row is grown so the total reaches the img size.
+    // Horizontal: info floor is max(image, row span) so metadata aligns with the image.
+    // Vertical: no minHeight floor — row-span minHeight made scrollHeight report the full
+    // track span (e.g. 15×40=600) instead of natural text height, then image+info overflowed
+    // the reserved group height and made the virtualizer thrash at the scroll bottom.
     const infoHeight =
-        groupRowCount !== undefined
+        groupRowCount !== undefined && !isVerticalLayout
             ? albumImageSize > 0
                 ? Math.max(albumImageSize, groupRowCount * rowHeight)
                 : groupRowCount * rowHeight
+            : undefined;
+
+    // Ignore resolved height from a previous (larger) group span so minHeight
+    // cannot keep scrollHeight measurement stuck after a split/shrink.
+    const resolvedInfoHeight =
+        resolved && infoHeight !== undefined && resolved.forInfoHeight === infoHeight
+            ? resolved.height
             : undefined;
 
     const imageContainerStyle =
@@ -90,8 +105,6 @@ export const AlbumGroupHeader = ({
             ? {
                   aspectRatio: 'auto',
                   height: `${albumImageSize}px`,
-                  paddingBottom: 'var(--theme-spacing-xs)',
-                  paddingTop: 'var(--theme-spacing-xs)',
                   position: 'relative' as const,
                   width: `${albumImageSize}px`,
                   zIndex: 1,
@@ -106,12 +119,25 @@ export const AlbumGroupHeader = ({
 
         const measure = () => {
             const contentHeight = infoEl.scrollHeight;
-            const resolved = Math.max(infoHeight ?? 0, contentHeight);
+            const resolvedHeight = Math.max(infoHeight ?? 0, contentHeight);
 
-            setResolvedInfoHeight(resolved);
+            if (infoHeight !== undefined) {
+                setResolved((prev) => {
+                    if (prev?.forInfoHeight === infoHeight && prev.height === resolvedHeight) {
+                        return prev;
+                    }
+                    return { forInfoHeight: infoHeight, height: resolvedHeight };
+                });
+            }
 
-            if (rowIndex !== undefined && setAlbumGroupContentHeight) {
-                setAlbumGroupContentHeight(rowIndex, contentHeight);
+            // Only persist heights that exceed the image/row floor. Equal values
+            // still replaced the Map and re-rendered the virtualizer on mount.
+            if (
+                groupKey !== undefined &&
+                setAlbumGroupContentHeight &&
+                contentHeight > (infoHeight ?? 0)
+            ) {
+                setAlbumGroupContentHeight(groupKey, contentHeight);
             }
         };
 
@@ -121,15 +147,26 @@ export const AlbumGroupHeader = ({
         resizeObserver.observe(infoEl);
 
         return () => resizeObserver.disconnect();
-    }, [infoHeight, rowIndex, setAlbumGroupContentHeight]);
+    }, [
+        albumImageSize,
+        groupKey,
+        groupRowCount,
+        infoHeight,
+        isVerticalLayout,
+        metadataRows.length,
+        setAlbumGroupContentHeight,
+        showFavoriteRating,
+        storedContentHeight,
+    ]);
 
     return (
-        <div
-            className={styles.container}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <div className={styles.imageContainer} style={imageContainerStyle}>
+        <div className={clsx(styles.container, isVerticalLayout && styles.vertical)}>
+            <div
+                className={styles.imageContainer}
+                onMouseEnter={() => setIsImageHovered(true)}
+                onMouseLeave={() => setIsImageHovered(false)}
+                style={imageContainerStyle}
+            >
                 <ItemImage
                     className={imageColumnStyles.compactImage}
                     enableDebounce
@@ -139,7 +176,7 @@ export const AlbumGroupHeader = ({
                     src={song?.imageUrl}
                     type="table"
                 />
-                {isHovered && onPlay && (
+                {isImageHovered && onPlay && (
                     <div className={imageColumnStyles.playButtonOverlay}>
                         <PlayTooltip type={playButtonBehavior}>
                             <PlayButton
@@ -158,7 +195,7 @@ export const AlbumGroupHeader = ({
                 )}
             </div>
             <div
-                className={clsx(styles.info, albumImageSize > 0 && styles.enlargedImage)}
+                className={styles.info}
                 ref={infoRef}
                 style={{ minHeight: resolvedInfoHeight ?? infoHeight }}
             >
@@ -186,7 +223,6 @@ export const AlbumGroupHeader = ({
                     <div className={styles.controlsRow}>
                         <AlbumGroupControls
                             albumId={song?.albumId}
-                            isGroupHovered={isHovered}
                             serverId={song?._serverId}
                             serverType={song?._serverType}
                         />

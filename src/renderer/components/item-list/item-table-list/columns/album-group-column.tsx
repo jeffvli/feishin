@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AlbumGroupHeader } from '/@/renderer/components/item-list/item-table-list/album-group-header';
 import { computeAlbumGroupMetadata } from '/@/renderer/components/item-list/item-table-list/album-group-metadata';
 import {
+    getAlbumGroupHeightKey,
     isLastInAlbumGroup,
     ItemTableListInnerColumn,
     TableColumnContainer,
@@ -50,9 +51,10 @@ export const AlbumGroupColumn = (props: ItemTableListInnerColumn) => {
     }
 
     if (!isFirstInGroup) {
-        // For non-first rows, add border-bottom on the last row of the group
-        const needsBorder =
-            props.enableHorizontalBorders &&
+        // No vertical border. Bottom border only on the last row of the group so
+        // mid-group lines don't cut through overflowing artwork.
+        const needsBottomBorder =
+            !!props.enableHorizontalBorders &&
             isLastInAlbumGroup(
                 props.rowIndex,
                 props.getRowItem,
@@ -64,7 +66,7 @@ export const AlbumGroupColumn = (props: ItemTableListInnerColumn) => {
             <div
                 style={{
                     ...props.style,
-                    ...(needsBorder
+                    ...(needsBottomBorder
                         ? { borderBottom: '1px solid var(--theme-colors-border)' }
                         : {}),
                     // When the cover is enlarged it overflows down from the
@@ -89,6 +91,10 @@ export const AlbumGroupColumn = (props: ItemTableListInnerColumn) => {
     }
 
     const metadata = computeAlbumGroupMetadata(groupSongs, groupRowCount, t);
+    const groupHeightKey = getAlbumGroupHeightKey(item, groupRowCount);
+    const storedContentHeight = groupHeightKey
+        ? props.albumGroupContentHeights?.get(groupHeightKey)
+        : undefined;
 
     return (
         <TableColumnContainer
@@ -98,13 +104,14 @@ export const AlbumGroupColumn = (props: ItemTableListInnerColumn) => {
             isDraggedOver={null}
         >
             <AlbumGroupHeader
+                groupKey={groupHeightKey}
                 groupRowCount={groupRowCount}
                 metadata={metadata}
                 onPlay={handlePlay}
-                rowIndex={props.rowIndex}
                 setAlbumGroupContentHeight={props.setAlbumGroupContentHeight}
                 size={props.size === 'default' ? 'normal' : props.size}
                 song={item}
+                storedContentHeight={storedContentHeight}
             />
         </TableColumnContainer>
     );

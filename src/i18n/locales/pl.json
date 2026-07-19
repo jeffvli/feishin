@@ -43,7 +43,8 @@
         "openApplicationDirectory": "Otwórz katalog aplikacji",
         "goToCurrent": "Przejdź do aktualnego elementu",
         "collapseAllFolders": "Zwiń wszystkie foldery",
-        "expandAllFolders": "Rozwiń wszystkie foldery"
+        "expandAllFolders": "Rozwiń wszystkie foldery",
+        "createPlaylistFromQueue": "Utwórz $t(entity.playlist, {\"count\": 1}) z kolejki"
     },
     "common": {
         "increase": "Zwiększ",
@@ -348,7 +349,8 @@
             "input_preferInstantMixDescription": "Używaj tylko natychmiastowego mixu, by otrzymać podobne piosenki. przydatne gdy masz wtyczki które zmieniają to zachowanie",
             "input_preferRemoteUrl": "Preferuj publiczny url",
             "input_remoteUrl": "Publiczny url",
-            "input_remoteUrlPlaceholder": "Opcjonalne: publiczny url dla funkcji zewnętrznych"
+            "input_remoteUrlPlaceholder": "Opcjonalne: publiczny url dla funkcji zewnętrznych",
+            "input_passwordNoSSO": "Autoryzacja przez reverse proxy (SSO) nie jest obsługiwana. Tylko autoryzacja nazwą użytkownika/hasłem i autoryzacja Subsonic są obsługiwane"
         },
         "addToPlaylist": {
             "success": "Dodano $t(entity.trackWithCount, {\"count\": {{message}} }) do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -434,6 +436,9 @@
         },
         "editRadioStation": {
             "success": "Stacja radiowa zaktualizowana pomyślnie"
+        },
+        "createPrefilledPlaylist": {
+            "title": "Utwórz $t(entity.playlist, {\"count\": 1}) z wybranych piosenek"
         }
     },
     "page": {
@@ -456,13 +461,19 @@
                 "lyricOpacityNonActive": "Przezroczystość nieaktywnego tekstu",
                 "lyricScaleNonActive": "Skala nieaktywnego tekstu",
                 "lyricPaddingLeft": "Odstęp tekstu z lewej (%)",
-                "lyricPaddingRight": "Odstęp tekstu z prawej (%)"
+                "lyricPaddingRight": "Odstęp tekstu z prawej (%)",
+                "lyricFollowScrollAlignment": "Wyrównywanie tekstu",
+                "lyricLineLeadTime": "Czas przed linijką (ms)"
             },
             "upNext": "Następne",
             "lyrics": "Tekst",
             "related": "Powiązane",
             "visualizer": "Wizualizer",
-            "noLyrics": "Nie znaleziono tekstu"
+            "noLyrics": "Nie znaleziono tekstu",
+            "lyricLayers": "Warstwy tekstu",
+            "lyricLanguage": "Język",
+            "showPronunciation": "Wymowa",
+            "showTranslation": "Tłumaczenie"
         },
         "appMenu": {
             "selectServer": "Wybierz serwer",
@@ -703,7 +714,9 @@
         "sleepTimer_cancel": "Anuluj wyłączanie",
         "albumRadio": "Radio albumu",
         "scrobbleForceSubmit": "Wymuś scrobble",
-        "sleepTimer_endOfAlbum": "Koniec aktualnego albumu"
+        "sleepTimer_endOfAlbum": "Koniec aktualnego albumu",
+        "nextAlbum": "Alt+kliknięcie aby odtworzyć następny album",
+        "previousAlbum": "Alt+kliknięcie aby odtworzyć poprzedni album"
     },
     "setting": {
         "crossfadeStyle_description": "Wybierz styl przenikania, który ma być używany do odtwarzania dźwięku",
@@ -1151,7 +1164,11 @@
         "enableRomaji": "Włącz generowanie romaji",
         "windowBarTrackinfo": "Informacje o utworze w tytule okna",
         "windowBarTrackinfo_description": "Wyświetlaj tytuł, wykonawcę, pozycję w kolejce i stan Odtwarzania/Wstrzymania w tytule okna.",
-        "audioDeviceDefault": "Domyślne systemu"
+        "audioDeviceDefault": "Domyślne systemu",
+        "microtonalPitchControls": "Mikrotonowe sterowanie wysokością dźwięku",
+        "microtonalPitchControls_description": "Dodaj więcej sterowania wysokością dźwięku pomiędzy półtonami",
+        "hotkey_playbackNextAlbum": "Następny album",
+        "hotkey_playbackPreviousAlbum": "Poprzedni album"
     },
     "table": {
         "config": {
@@ -1193,7 +1210,10 @@
                 "verticalBorders": "Obwódki kolumn",
                 "showHeader": "Pokaż nagłówek",
                 "albumImageSize": "Rozmiar obrazów albumów",
-                "albumGroupConfig": "Konfiguracja grupy albumów"
+                "albumGroupConfig": "Konfiguracja grupy albumów",
+                "albumGroupMetadata": "Pola metadanych",
+                "albumGroupShowFavoriteRating": "Pokaż ulubione i oceny",
+                "albumGroupVerticalLayout": "Pionowy układ"
             },
             "label": {
                 "releaseDate": "Data premiery",

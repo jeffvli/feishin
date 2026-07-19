@@ -39,6 +39,14 @@ const getMpvAudioDevices = async () => {
 
 export type AudioDeviceOption = { label: string; value: string };
 
+export const getDefaultAudioDevice = (
+    devices: AudioDeviceOption[],
+    playbackType: PlayerType,
+): null | string => {
+    const defaultId = playbackType === PlayerType.LOCAL ? 'auto' : 'default';
+    return devices.find((d) => d.value === defaultId)?.value ?? devices[0]?.value ?? null;
+};
+
 export const useAudioDevices = (playbackType: PlayerType) => {
     const [audioDevices, setAudioDevices] = useState<AudioDeviceOption[]>([]);
 
@@ -137,7 +145,6 @@ export const AudioSettings = memo(() => {
                 <Select
                     clearable
                     data={audioDevices}
-                    defaultValue={audioDeviceId}
                     disabled={!isElectron()}
                     onChange={(e) =>
                         setSettings({
@@ -147,6 +154,7 @@ export const AudioSettings = memo(() => {
                                     : { audioDeviceId: e },
                         })
                     }
+                    value={audioDeviceId ?? getDefaultAudioDevice(audioDevices, playbackType)}
                 />
             ),
             description: t('setting.audioDevice', { context: 'description' }),

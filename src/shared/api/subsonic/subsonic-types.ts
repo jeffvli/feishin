@@ -347,6 +347,19 @@ const scrobbleParameters = z.object({
 
 const scrobble = z.null();
 
+const scanStatusBody = z.object({
+    count: z.number(),
+    folderCount: z.number(),
+    lastScan: z.string().optional(),
+    scanning: z.boolean(),
+});
+
+const startScanParameters = z.object({});
+const startScan = z.object({ scanStatus: scanStatusBody });
+
+const getScanStatusParameters = z.object({});
+const getScanStatus = z.object({ scanStatus: scanStatusBody });
+
 const search3 = z.object({
     searchResult3: z
         .object({
@@ -907,6 +920,7 @@ export const ssType = {
         getMusicDirectory: getMusicDirectoryParameters,
         getPlaylist: getPlaylistParameters,
         getPlaylists: getPlaylistsParameters,
+        getScanStatus: getScanStatusParameters,
         getSong: getSongParameters,
         getSongsByGenre: getSongsByGenreParameters,
         getStarred: getStarredParameters,
@@ -923,6 +937,7 @@ export const ssType = {
         setRating: setRatingParameters,
         similarSongs: similarSongsParameters,
         similarSongs2: similarSongs2Parameters,
+        startScan: startScanParameters,
         structuredLyrics: structuredLyricsParameters,
         topSongsList: topSongsListParameters,
         updateInternetRadioStation: updateInternetRadioStationParameters,
@@ -956,6 +971,7 @@ export const ssType = {
         getMusicDirectory,
         getPlaylist,
         getPlaylists,
+        getScanStatus,
         getSong,
         getSongsByGenre,
         getStarred,
@@ -981,6 +997,7 @@ export const ssType = {
         similarSongs,
         similarSongs2,
         song,
+        startScan,
         structuredLyrics,
         topSongsList,
         updateInternetRadioStation,

@@ -36,14 +36,26 @@
 .title {
     display: inline-block;
     width: 100%;
+    min-width: 0;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    --text-text-wrap: nowrap;
 }
 
 a.title {
     width: auto;
+}
+
+.track-subtitle {
+    font-size: var(--theme-font-size-sm);
+    color: var(--theme-colors-foreground-muted);
+}
+
+.track-subtitle.active {
+    color: inherit;
 }
 
 
@@ -60,6 +72,10 @@ a.title {
     user-select: none;
 
     --text-text-wrap: nowrap;
+}
+
+.artists > * {
+    white-space: nowrap;
 }
 
 .folder-icon {

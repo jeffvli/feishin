@@ -5,4 +5,5 @@ import './player';
 import './remote';
 import './settings';
 import './discord-rpc';
+import './tag-editor';
 import './visualizer';

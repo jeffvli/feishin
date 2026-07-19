@@ -2082,6 +2082,17 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return res.body;
     },
+    refreshItems: async (args) => {
+        const { apiClientProps } = args;
+
+        const res = await ssApiClient(apiClientProps).startScan({ query: {} });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to start scan');
+        }
+
+        return null;
+    },
     removeFromPlaylist: async ({ apiClientProps, query }) => {
         const res = await ssApiClient(apiClientProps).updatePlaylist({
             query: {
@@ -2181,7 +2192,10 @@ export const SubsonicController: InternalControllerEndpoint = {
         if (hasFeature(apiClientProps.server, ServerFeature.SERVER_PLAY_QUEUE)) {
             const res = await ssApiClient(apiClientProps).savePlayQueueByIndex({
                 query: {
-                    currentIndex: query.currentIndex !== undefined ? query.currentIndex : undefined,
+                    currentIndex:
+                        query.currentIndex !== undefined && query.currentIndex < query.songs.length
+                            ? Math.max(0, query.currentIndex)
+                            : undefined,
                     id: query.songs,
                     position: query.positionMs,
                 },
@@ -2210,81 +2224,64 @@ export const SubsonicController: InternalControllerEndpoint = {
     scrobble: async (args) => {
         const { apiClientProps, query } = args;
 
-        if (hasFeature(apiClientProps.server, ServerFeature.REPORT_PLAYBACK)) {
-            if (query.submission || query.event === 'start') {
-                const res = await ssApiClient(apiClientProps).scrobble({
-                    query: {
-                        id: query.id,
-                        submission: query.submission,
-                    },
-                });
+        if (query.submission || query.event === 'start') {
+            const res = await ssApiClient(apiClientProps).scrobble({
+                query: {
+                    id: query.id,
+                    submission: query.submission,
+                },
+            });
 
-                if (res.status !== 200) {
-                    throw new Error('Failed to scrobble');
-                }
-
-                if (query.submission) {
-                    return null;
-                }
+            if (res.status !== 200) {
+                throw new Error('Failed to scrobble');
             }
 
+            if (query.submission) {
+                return null;
+            }
+        }
+
+        if (hasFeature(apiClientProps.server, ServerFeature.REPORT_PLAYBACK)) {
             const defaultParams = {
                 ignoreScrobble: true,
                 mediaId: query.id,
                 mediaType: query.mediaType,
                 playbackRate: query.playbackRate,
-                positionMs: query.position ?? 0,
+                positionMs: Math.round(query.position ?? 0),
             };
 
-            const reportPlayback = (state: 'paused' | 'playing' | 'starting' | 'stopped') => {
-                return ssApiClient(apiClientProps).reportPlayback({
+            const reportPlayback = async (state: 'paused' | 'playing' | 'starting' | 'stopped') => {
+                const res = await ssApiClient(apiClientProps).reportPlayback({
                     query: {
                         ...defaultParams,
                         state,
                     },
                 });
-            };
 
-            const promises: Promise<any>[] = [];
+                if (res.status !== 200) {
+                    throw new Error('Failed to report playback');
+                }
+            };
 
             switch (query.event) {
                 case 'pause':
-                    promises.push(reportPlayback('paused'));
+                    await reportPlayback('paused');
                     break;
                 case 'start':
-                    promises.push(reportPlayback('starting'));
-                    promises.push(reportPlayback('playing'));
+                    await reportPlayback('starting');
+                    await reportPlayback('playing');
                     break;
                 case 'stop':
-                    promises.push(reportPlayback('stopped'));
+                    await reportPlayback('stopped');
                     break;
                 case 'unpause':
-                    promises.push(reportPlayback('playing'));
+                    await reportPlayback('playing');
                     break;
                 default:
                     break;
             }
 
-            for (const promise of promises) {
-                const res = await promise;
-
-                if (res.status !== 200) {
-                    throw new Error('Failed to report playback');
-                }
-            }
-
             return null;
-        }
-
-        const res = await ssApiClient(apiClientProps).scrobble({
-            query: {
-                id: query.id,
-                submission: query.submission,
-            },
-        });
-
-        if (res.status !== 200) {
-            throw new Error('Failed to scrobble');
         }
 
         return null;

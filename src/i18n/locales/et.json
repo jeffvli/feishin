@@ -43,7 +43,8 @@
             "musicbrainz": "Ava MusicBrainzis",
             "qobuz": "Ava Qobuzis",
             "spotify": "Ava Spotifys"
-        }
+        },
+        "createPlaylistFromQueue": "Loo $t(entity.playlist, {\"count\": 1}) järjekorrast"
     },
     "common": {
         "countSelected": "{{count}} valitud",
@@ -335,7 +336,8 @@
             "title": "Lisa server",
             "error_savePassword": "Parooli salvestamisel ilmnes viga",
             "ignoreCors": "Eira CORS-i ($t(common.restartRequired))",
-            "ignoreSsl": "Eira SSL-i ($t(common.restartRequired))"
+            "ignoreSsl": "Eira SSL-i ($t(common.restartRequired))",
+            "input_passwordNoSSO": "Pöördproksi (SSO) autentimine ei ole toetatud. Toetatud on ainult kasutajanime/parooliga autentimine ja Subsonic-autentimine"
         },
         "largeFetchConfirmation": {
             "title": "Lisa üksused järjekorda",
@@ -434,6 +436,9 @@
             "enabled": "Privaatne režiim lülitati sisse, esituse olek on nüüd väliste allikate eest peidetud",
             "disabled": "Privaatne režiim lülitati välja, esituse olek on nüüd väliste allikate jaoks nähtav",
             "title": "Privaatne režiim"
+        },
+        "createPrefilledPlaylist": {
+            "title": "Loo $t(entity.playlist, {\"count\": 1}) valitud lugudest"
         }
     },
     "page": {
@@ -553,13 +558,21 @@
                 "showLyricProvider": "Kuva laulusõnade allikas",
                 "synchronized": "Sünkroniseeritud",
                 "unsynchronized": "Sünkroniseerimata",
-                "useImageAspectRatio": "Kasuta pildi kuvasuhet"
+                "useImageAspectRatio": "Kasuta pildi kuvasuhet",
+                "lyricFollowScrollAlignment": "Laulusõnad järgivad joondumist",
+                "lyricLineLeadTime": "Rea kuvamise eelajastus (ms)",
+                "lyricPaddingLeft": "Laulusõnade vasakpoolne veeris (%)",
+                "lyricPaddingRight": "Laulusõnade parempoolne veeris (%)"
             },
             "lyrics": "Laulusõnad",
             "related": "Seotud",
             "upNext": "Järgmiseks",
             "visualizer": "Visuaal",
-            "noLyrics": "Laulusõnu ei leitud"
+            "noLyrics": "Laulusõnu ei leitud",
+            "lyricLayers": "Laulusõnade kihid",
+            "lyricLanguage": "Keel",
+            "showPronunciation": "Hääldus",
+            "showTranslation": "Tõlge"
         },
         "genreList": {
             "showAlbums": "Kuva $t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
@@ -701,7 +714,9 @@
         "sleepTimer_timeRemaining": "{{time}} jäänud",
         "sleepTimer_setCustom": "Sea taimer",
         "sleepTimer_cancel": "Tühista taimer",
-        "scrobbleForceSubmit": "Sunnitud kraasimine"
+        "scrobbleForceSubmit": "Sunnitud kraasimine",
+        "nextAlbum": "Alt+klõps järgmise albumi esituseks",
+        "previousAlbum": "Alt+klõps eelmise albumi esituseks"
     },
     "queryBuilder": {
         "standardTags": "Standardsildid",
@@ -1171,7 +1186,16 @@
         "compressorReset_description": "Taasta kõigi kompressori parameetrite vaikeväärtused",
         "compressorSavePreset_description": "Salvesta praegused kompressori seaded nimetatud eelseadistusena",
         "compressorThreshold_description": "Signaali tase, mida ületades kompressioon algab.",
-        "compressorThreshold": "Lävi"
+        "compressorThreshold": "Lävi",
+        "audioDeviceDefault": "Süsteemi vaikeväärtus",
+        "enableRomaji_description": "Kuva jaapanikeelsete laulusõnade all romaji hääldusrida.",
+        "enableRomaji": "Luba romaji genereerimine",
+        "hotkey_playbackNextAlbum": "Järgmine album",
+        "hotkey_playbackPreviousAlbum": "Eelmine album",
+        "windowBarTrackinfo": "Loo andmed akna tiitliribal",
+        "windowBarTrackinfo_description": "Kuva akna tiitliribal hetkel mängiva loo pealkirja ja esitajat, kohta järjekorras ning olekut (mängib/pausil).",
+        "microtonalPitchControls": "Mikrotonaalsed helikõrguse nupud",
+        "microtonalPitchControls_description": "Lisa täiendavad helikõrguse nupud pooltoonide vahel liikumiseks"
     },
     "datetime": {
         "minuteShort": "m",
@@ -1397,7 +1421,11 @@
                 "rowHoverHighlight": "Rea esiletõstmine kursoriga",
                 "showHeader": "Kuva päis",
                 "verticalBorders": "Veergude piirjooned",
-                "albumImageSize": "Kaanepildi suurus"
+                "albumImageSize": "Kaanepildi suurus",
+                "albumGroupConfig": "Albumigruppide seadistus",
+                "albumGroupMetadata": "Metaandmete väljad",
+                "albumGroupShowFavoriteRating": "Kuva lemmikud ja hinded",
+                "albumGroupVerticalLayout": "Vertikaalne paigutus"
             },
             "label": {
                 "actions": "$t(common.action, {\"count\": 2})",

@@ -7,6 +7,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { eventEmitter } from '/@/renderer/events/event-emitter';
+import { resolveVolumeMax } from '/@/renderer/features/player/audio-player/utils/volume';
 import { useRadioStore as useRadioPlayerStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { createSelectors } from '/@/renderer/lib/zustand';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
@@ -44,19 +45,16 @@ interface Actions {
     getCurrentSong: () => QueueSong | undefined;
     getPlayerData: () => PlayerData;
     getQueue: (groupBy?: QueueGroupingProperty) => GroupedQueue;
-    getQueueOrder: () => {
-        groups: { count: number; name: string }[];
-        items: QueueSong[];
-    };
+    getQueueOrder: () => GroupedQueue;
     increaseVolume: (value: number) => void;
     isFirstTrackInQueue: () => boolean;
     isLastTrackInQueue: () => boolean;
     mediaAutoNext: () => PlayerData;
-    mediaNext: () => void;
+    mediaNext: (toNextAlbum: boolean) => void;
     mediaPause: () => void;
     mediaPlay: (id?: string) => void;
     mediaPlayByIndex: (index: number) => void;
-    mediaPrevious: () => void;
+    mediaPrevious: (toPreviousAlbum: boolean) => void;
     mediaSeekToTimestamp: (timestamp: number) => void;
     mediaSkipBackward: (offset?: number) => void;
     mediaSkipForward: (offset?: number) => void;
@@ -907,8 +905,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     };
                 },
                 increaseVolume: (value: number) => {
+                    const { mpvExtraParameters, type } = useSettingsStore.getState().playback;
+                    const volumeMax = resolveVolumeMax(type, mpvExtraParameters);
                     set((state) => {
-                        state.player.volume = Math.min(100, state.player.volume + value);
+                        state.player.volume = Math.min(volumeMax, state.player.volume + value);
                     });
                 },
                 isFirstTrackInQueue: () => {
@@ -1044,7 +1044,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         status: newStatus,
                     };
                 },
-                mediaNext: () => {
+                mediaNext: (toNextAlbum) => {
                     const state = get();
                     const currentIndex = state.player.index;
                     const player = state.player;
@@ -1072,11 +1072,30 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         return;
                     }
 
-                    const { nextIndex, shouldStop } = calculateNextIndex(
-                        currentIndex,
-                        playbackLength,
-                        repeat,
-                    );
+                    const nextIndexProps = calculateNextIndex(currentIndex, playbackLength, repeat);
+                    let { nextIndex } = nextIndexProps;
+                    const { shouldStop } = nextIndexProps;
+
+                    if (toNextAlbum && !shouldStop) {
+                        const currentItem = queue.items[currentIndex];
+                        const [start, end] = findLastAlbumRange(queue.items);
+                        const isOnLastAlbum = start <= currentIndex && currentIndex <= end;
+                        if (isOnLastAlbum) {
+                            const nextIndexWithNextAlbum = queue.items.findIndex(
+                                (i) => i.albumId !== currentItem.albumId,
+                            );
+
+                            nextIndex = nextIndexWithNextAlbum;
+                        } else {
+                            const queueStartingFromCurrent = queue.items.slice(currentIndex);
+                            const nextIndexWithNextAlbum = queueStartingFromCurrent.findIndex(
+                                (i) => i.albumId !== currentItem.albumId,
+                            );
+                            nextIndex =
+                                nextIndexWithNextAlbum +
+                                (queue.items.length - queueStartingFromCurrent.length);
+                        }
+                    }
 
                     if (shouldStop) {
                         set((state) => {
@@ -1194,7 +1213,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         });
                     }
                 },
-                mediaPrevious: () => {
+                mediaPrevious: (toPreviousAlbum) => {
                     const currentIndex = get().player.index;
                     const player = get().player;
                     const queue = get().getQueueOrder();
@@ -1217,6 +1236,11 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     } else if (player.repeat === PlayerRepeat.NONE && isFirstTrack) {
                         // Repeat none: stay on first track if already there
                         previousIndex = currentIndex;
+                    } else if (toPreviousAlbum) {
+                        previousIndex = Math.max(
+                            0,
+                            findIndexWithPreviousAlbum(queue.items, currentIndex),
+                        );
                     } else {
                         // Otherwise, go to previous track
                         previousIndex = Math.max(0, currentIndex - 1);
@@ -1299,6 +1323,11 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     });
                 },
                 mediaTogglePlayPause: () => {
+                    // Restarting from STOPPED (e.g. end of queue) needs a full play
+                    // event so engines like mpv can reload the current track — play()
+                    // alone is a no-op when mpv's playlist-pos is -1.
+                    const wasStopped = get().player.status === PlayerStatus.STOPPED;
+
                     set((state) => {
                         if (state.player.status === PlayerStatus.PLAYING) {
                             state.player.status = PlayerStatus.PAUSED;
@@ -1306,6 +1335,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             state.player.status = PlayerStatus.PLAYING;
                         }
                     });
+
+                    if (wasStopped) {
+                        emitPlayerPlayEvent(undefined, set, get);
+                    }
                 },
                 moveSelectedTo: (items: QueueSong[], uniqueId: string, edge: 'bottom' | 'top') => {
                     const itemUniqueIds = items.map((item) => item._uniqueId);
@@ -2251,6 +2284,47 @@ function cleanupOrphanedSongs(state: any): boolean {
     }
 
     return hasOrphans;
+}
+
+function findIndexWithPreviousAlbum(queueItems: QueueSong[], currentIndex: number) {
+    const queueBeforeCurrent = queueItems.slice(0, currentIndex);
+    const currentItem = queueItems[currentIndex];
+
+    const previousAlbumIdInQueue = queueBeforeCurrent.findLast(
+        (i) => i.albumId !== currentItem.albumId,
+    )?.albumId;
+
+    let prevIndex = -1;
+
+    if (previousAlbumIdInQueue) {
+        for (let index = queueBeforeCurrent.length - 1; index > -1; index--) {
+            const element = queueBeforeCurrent[index];
+            if (element.albumId === previousAlbumIdInQueue) {
+                prevIndex = index;
+            }
+            if (prevIndex > -1 && element.albumId !== previousAlbumIdInQueue) {
+                break;
+            }
+        }
+    }
+
+    return prevIndex;
+}
+
+function findLastAlbumRange(queueItems: QueueSong[]) {
+    const lastAlbumId = queueItems.at(-1)?.albumId;
+    const rangeEnd = queueItems.length - 1;
+    let rangeStart = rangeEnd;
+
+    for (let index = rangeEnd; index > -1; index--) {
+        const element = queueItems[index];
+        rangeStart = index;
+        if (element.albumId !== lastAlbumId) {
+            break;
+        }
+    }
+
+    return [rangeStart + 1, rangeEnd];
 }
 
 function parseUniqueSeekToTimestamp(timestamp: string) {

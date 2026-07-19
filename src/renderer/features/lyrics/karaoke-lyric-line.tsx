@@ -193,11 +193,13 @@ export const KaraokeLyricLine = memo(
             [fontSize, alignment],
         );
 
-        const hasSyncedRomaji = romajiCueLines != null;
+        const hasSyncedRomajiOverlay = romajiCueLines !== undefined;
         const hasSyncedPronunciation = hasSyncedOverlayCueLines(pronunciationCueLines);
         const hasSyncedTranslation = hasSyncedOverlayCueLines(translationCueLines);
         const pronunciationFallbackText =
-            !hasSyncedRomaji && !hasSyncedPronunciation ? (pronunciationText ?? romajiText) : null;
+            !hasSyncedRomajiOverlay && !hasSyncedPronunciation
+                ? (pronunciationText ?? romajiText)
+                : null;
 
         return (
             <Box

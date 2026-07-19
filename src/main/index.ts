@@ -65,16 +65,19 @@ class AppUpdater {
         console.log('Effective update channel:', effectiveChannel);
         if (effectiveChannel === 'alpha') {
             checkAllChannelsAndGetBest().then(({ result, updater: updaterInstance }) => {
+                if (!result?.isUpdateAvailable) {
+                    return;
+                }
+
                 updaterInstance.autoInstallOnAppQuit = true;
                 updaterInstance.autoRunAppAfterInstall = true;
                 if (isMacOS()) {
-                    if (result?.isUpdateAvailable) {
-                        getMainWindow()?.webContents.send(
-                            'update-available',
-                            result.updateInfo.version,
-                        );
-                    }
+                    getMainWindow()?.webContents.send(
+                        'update-available',
+                        result.updateInfo.version,
+                    );
                 } else {
+                    updaterInstance.autoDownload = true;
                     updaterInstance.checkForUpdatesAndNotify();
                 }
             });
@@ -115,12 +118,7 @@ async function checkAllChannelsAndGetBest(): Promise<{
         updater: UpdaterInstance;
     }> = [];
 
-    const alphaUpdater = createAlphaUpdaterInstance();
-    alphaUpdater.logger = autoUpdaterLogInterface;
-    alphaUpdater.channel = ALPHA_UPDATER_CONFIG.channel;
-    alphaUpdater.allowPrerelease = true;
-    alphaUpdater.disableDifferentialDownload = true;
-    alphaUpdater.allowDowngrade = true;
+    const alphaUpdater = createAlphaUpdaterInstance({ probeOnly: true });
 
     try {
         console.log('Checking for updates on alpha channel');
@@ -138,17 +136,16 @@ async function checkAllChannelsAndGetBest(): Promise<{
     }
 
     try {
-        autoUpdater.setFeedURL(GITHUB_UPDATER_CONFIG);
-        configureAutoUpdaterForChannel('latest');
+        const latestUpdater = createGithubUpdaterInstance('latest', { probeOnly: true });
         console.log('Checking for updates on latest channel (GitHub)');
-        const latestResult = await autoUpdater.checkForUpdates();
+        const latestResult = await latestUpdater.checkForUpdates();
         if (
             latestResult?.updateInfo?.version &&
             latestResult.isUpdateAvailable &&
             semver.valid(latestResult.updateInfo.version) &&
             semver.gt(latestResult.updateInfo.version, currentVersion)
         ) {
-            candidates.push({ channel: 'latest', result: latestResult, updater: autoUpdater });
+            candidates.push({ channel: 'latest', result: latestResult, updater: latestUpdater });
         }
     } catch (e) {
         log.warn('Latest channel check failed', e);
@@ -164,6 +161,7 @@ async function checkAllChannelsAndGetBest(): Promise<{
 
     if (best.channel === 'latest') {
         configureAutoUpdaterForChannel('latest');
+        return { result: best.result, updater: autoUpdater };
     }
 
     return { result: best.result, updater: best.updater };
@@ -190,16 +188,8 @@ function configureAndGetUpdater(): UpdaterInstance {
     const effectiveChannel = store.get('release_channel') as string;
 
     if (effectiveChannel === 'alpha') {
-        const updater = createAlphaUpdaterInstance();
         log.transports.file.level = 'info';
-        updater.logger = autoUpdaterLogInterface;
-        updater.channel = ALPHA_UPDATER_CONFIG.channel;
-        updater.allowPrerelease = true;
-        updater.disableDifferentialDownload = true;
-        updater.allowDowngrade = true;
-        updater.autoInstallOnAppQuit = true;
-        updater.autoRunAppAfterInstall = true;
-        return updater;
+        return createAlphaUpdaterInstance();
     }
 
     log.transports.file.level = 'info';
@@ -214,6 +204,7 @@ function configureAndGetUpdater(): UpdaterInstance {
         autoUpdater.disableDifferentialDownload = true;
     } else {
         autoUpdater.channel = 'latest';
+        autoUpdater.allowDowngrade = false;
         autoUpdater.allowPrerelease = false;
     }
 
@@ -236,20 +227,68 @@ function configureAutoUpdaterForChannel(channel: 'beta' | 'latest'): void {
         autoUpdater.disableDifferentialDownload = true;
     } else {
         autoUpdater.channel = 'latest';
+        autoUpdater.allowDowngrade = false;
         autoUpdater.allowPrerelease = false;
     }
 }
 
-function createAlphaUpdaterInstance(): AppImageUpdater | MacUpdater | NsisUpdater {
+function createAlphaUpdaterInstance(
+    options: { probeOnly?: boolean } = {},
+): AppImageUpdater | MacUpdater | NsisUpdater {
+    const probeOnly = options.probeOnly ?? false;
+    let updater: AppImageUpdater | MacUpdater | NsisUpdater;
+
     if (isMacOS()) {
-        return new MacUpdater(ALPHA_UPDATER_CONFIG);
+        updater = new MacUpdater(ALPHA_UPDATER_CONFIG);
+    } else if (isLinux()) {
+        updater = new AppImageUpdater(ALPHA_UPDATER_CONFIG);
+    } else {
+        updater = new NsisUpdater(ALPHA_UPDATER_CONFIG);
     }
 
-    if (isLinux()) {
-        return new AppImageUpdater(ALPHA_UPDATER_CONFIG);
+    updater.logger = autoUpdaterLogInterface;
+    updater.channel = ALPHA_UPDATER_CONFIG.channel;
+    updater.allowPrerelease = true;
+    updater.disableDifferentialDownload = true;
+    updater.allowDowngrade = true;
+    updater.autoDownload = !probeOnly;
+    updater.autoInstallOnAppQuit = true;
+    updater.autoRunAppAfterInstall = true;
+
+    return updater;
+}
+
+function createGithubUpdaterInstance(
+    channel: 'beta' | 'latest',
+    options: { probeOnly?: boolean } = {},
+): AppImageUpdater | MacUpdater | NsisUpdater {
+    const probeOnly = options.probeOnly ?? false;
+    let updater: AppImageUpdater | MacUpdater | NsisUpdater;
+
+    if (isMacOS()) {
+        updater = new MacUpdater(GITHUB_UPDATER_CONFIG);
+    } else if (isLinux()) {
+        updater = new AppImageUpdater(GITHUB_UPDATER_CONFIG);
+    } else {
+        updater = new NsisUpdater(GITHUB_UPDATER_CONFIG);
     }
 
-    return new NsisUpdater(ALPHA_UPDATER_CONFIG);
+    updater.logger = autoUpdaterLogInterface;
+    updater.autoDownload = !probeOnly;
+    updater.autoInstallOnAppQuit = true;
+    updater.autoRunAppAfterInstall = true;
+    updater.channel = channel;
+
+    if (channel === 'beta') {
+        updater.allowDowngrade = true;
+        updater.allowPrerelease = true;
+        updater.disableDifferentialDownload = true;
+    } else {
+        updater.allowDowngrade = false;
+        updater.allowPrerelease = false;
+    }
+
+    return updater;
 }
 
 protocol.registerSchemesAsPrivileged([
@@ -289,7 +328,7 @@ ipcMain.on('input-focus-state', (_event, focused: boolean) => {
     if (inputFocused === next) return;
     inputFocused = next;
     if (isMacOS()) {
-        rebuildMainMenu();
+        updateMainMenu();
     }
 });
 
@@ -348,21 +387,30 @@ export const getMainWindow = () => {
     return mainWindow;
 };
 
+const getMainMenuState = (): MenuPlaybackState => ({
+    accelerators: playbackMenuAccelerators,
+    inputFocused,
+    playbackStatus: currentPlaybackStatus,
+    privateMode: currentPrivateMode,
+    repeatMode: currentRepeatMode,
+    shuffleEnabled: currentShuffleEnabled,
+    sidebarCollapsed: currentSidebarCollapsed,
+});
+
 const rebuildMainMenu = () => {
     if (!menuBuilder || !mainWindow) return;
 
-    menuBuilder.buildMenu({
-        accelerators: inputFocused ? {} : playbackMenuAccelerators,
-        playbackStatus: currentPlaybackStatus,
-        privateMode: currentPrivateMode,
-        repeatMode: currentRepeatMode,
-        shuffleEnabled: currentShuffleEnabled,
-        sidebarCollapsed: currentSidebarCollapsed,
-    });
+    menuBuilder.buildMenu(getMainMenuState());
 
     if (process.platform !== 'darwin') {
         Menu.setApplicationMenu(null);
     }
+};
+
+const updateMainMenu = () => {
+    if (!menuBuilder || !mainWindow) return;
+
+    menuBuilder.updateMenu(getMainMenuState());
 };
 
 export const sendToastToRenderer = ({
@@ -836,10 +884,12 @@ enum BindingActions {
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
     NEXT = 'next',
+    NEXT_ALBUM = 'nextAlbum',
     PAUSE = 'pause',
     PLAY = 'play',
     PLAY_PAUSE = 'playPause',
     PREVIOUS = 'previous',
+    PREVIOUS_ALBUM = 'previousAlbum',
     SHUFFLE = 'toggleShuffle',
     SKIP_BACKWARD = 'skipBackward',
     SKIP_FORWARD = 'skipForward',
@@ -867,11 +917,15 @@ const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
     [BindingActions.LOCAL_SEARCH]: () => {},
     [BindingActions.MUTE]: () => getMainWindow()?.webContents.send('renderer-player-volume-mute'),
     [BindingActions.NEXT]: () => getMainWindow()?.webContents.send('renderer-player-next'),
+    [BindingActions.NEXT_ALBUM]: () =>
+        getMainWindow()?.webContents.send('renderer-player-next-album'),
     [BindingActions.PAUSE]: () => getMainWindow()?.webContents.send('renderer-player-pause'),
     [BindingActions.PLAY]: () => getMainWindow()?.webContents.send('renderer-player-play'),
     [BindingActions.PLAY_PAUSE]: () =>
         getMainWindow()?.webContents.send('renderer-player-play-pause'),
     [BindingActions.PREVIOUS]: () => getMainWindow()?.webContents.send('renderer-player-previous'),
+    [BindingActions.PREVIOUS_ALBUM]: () =>
+        getMainWindow()?.webContents.send('renderer-player-previous-album'),
     [BindingActions.SHUFFLE]: () =>
         getMainWindow()?.webContents.send('renderer-player-toggle-shuffle'),
     [BindingActions.SKIP_BACKWARD]: () =>
@@ -916,11 +970,11 @@ ipcMain.on(
         }
 
         playbackMenuAccelerators = {
+            globalSearch: getMenuAccelerator(data, BindingActions.GLOBAL_SEARCH),
             next: getMenuAccelerator(data, BindingActions.NEXT),
-            playPause:
-                getMenuAccelerator(data, BindingActions.PLAY_PAUSE) ||
-                getMenuAccelerator(data, BindingActions.PLAY) ||
-                getMenuAccelerator(data, BindingActions.PAUSE),
+            pause: getMenuAccelerator(data, BindingActions.PAUSE),
+            play: getMenuAccelerator(data, BindingActions.PLAY),
+            playPause: getMenuAccelerator(data, BindingActions.PLAY_PAUSE),
             previous: getMenuAccelerator(data, BindingActions.PREVIOUS),
             repeat: getMenuAccelerator(data, BindingActions.TOGGLE_REPEAT),
             seekBackward: getMenuAccelerator(data, BindingActions.SKIP_BACKWARD),
@@ -1141,7 +1195,7 @@ ipcMain.on('update-playback', (_event, status: PlayerStatus) => {
 
     if (!isMacOS()) return;
 
-    rebuildMainMenu();
+    updateMainMenu();
 });
 
 ipcMain.on('update-repeat', (_event, repeat: PlayerRepeat) => {
@@ -1149,7 +1203,7 @@ ipcMain.on('update-repeat', (_event, repeat: PlayerRepeat) => {
 
     if (!isMacOS()) return;
 
-    rebuildMainMenu();
+    updateMainMenu();
 });
 
 ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
@@ -1157,7 +1211,7 @@ ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
 
     if (!isMacOS()) return;
 
-    rebuildMainMenu();
+    updateMainMenu();
 });
 
 ipcMain.on('update-private-mode', (_event, privateMode: boolean) => {
@@ -1165,7 +1219,7 @@ ipcMain.on('update-private-mode', (_event, privateMode: boolean) => {
 
     if (!isMacOS()) return;
 
-    rebuildMainMenu();
+    updateMainMenu();
 });
 
 ipcMain.on('update-sidebar-collapsed', (_event, collapsedSidebar: boolean) => {
@@ -1173,5 +1227,5 @@ ipcMain.on('update-sidebar-collapsed', (_event, collapsedSidebar: boolean) => {
 
     if (!isMacOS()) return;
 
-    rebuildMainMenu();
+    updateMainMenu();
 });

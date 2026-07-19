@@ -1556,6 +1556,21 @@ export const JellyfinController: InternalControllerEndpoint = {
             throw new Error('Failed to move item in playlist');
         }
     },
+    refreshItems: async (args) => {
+        const { apiClientProps, query } = args;
+
+        await Promise.all(
+            query.ids.map((id) =>
+                jfApiClient(apiClientProps).refreshItem({
+                    body: null,
+                    params: { id },
+                    query: { MetadataRefreshMode: 'FullRefresh' },
+                }),
+            ),
+        );
+
+        return null;
+    },
     removeFromPlaylist: async (args) => {
         const { apiClientProps, query } = args;
 

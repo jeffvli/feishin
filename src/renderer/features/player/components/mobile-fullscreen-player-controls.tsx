@@ -31,7 +31,7 @@ export const MobileFullscreenPlayerControls = memo(
             <div className={styles.controlsContainer}>
                 <PlayerButton
                     icon={<Icon fill="default" icon="mediaPrevious" size="xl" />}
-                    onClick={mediaPrevious}
+                    onClick={(e) => mediaPrevious(e.altKey)}
                     tooltip={{
                         label: t('player.previous'),
                         openDelay: 0,
@@ -71,7 +71,7 @@ export const MobileFullscreenPlayerControls = memo(
                 />
                 <PlayerButton
                     icon={<Icon fill="default" icon="mediaNext" size="xl" />}
-                    onClick={mediaNext}
+                    onClick={(e) => mediaNext(e.altKey)}
                     tooltip={{
                         label: t('player.next'),
                         openDelay: 0,

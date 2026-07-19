@@ -11,8 +11,8 @@
     transform: scale(var(--lyric-scale));
     transform-origin: var(--lyric-scale-origin) center;
     transition:
-        opacity 0.4s ease-in-out,
-        transform 0.4s ease-in-out;
+        opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: opacity, transform;
 }
 

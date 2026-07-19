@@ -234,6 +234,28 @@ export const SynchronizedKaraokeLyrics = ({
         syncFromCurrentTimestamp();
     }, [offsetMs, syncFromCurrentTimestamp]);
 
+    // Rebuild animation state when async romaji overlay data arrives after initial mount.
+    // Without this, overlayParts stay empty until a pause/resume triggers rebuildLyricsData().
+    useEffect(() => {
+        if (syncedRomajiLyrics == null) {
+            return;
+        }
+
+        const frame = requestAnimationFrame(() => {
+            rebuildLyricsData();
+
+            const timestamp = useTimestampStoreBase.getState().timestamp;
+            const isPlaying = statusRef.current === PlayerStatus.PLAYING;
+            syncAtTime(timestamp * 1000 + delayMsRef.current, isPlaying, {
+                eventCreationTime: playbackAnchorRef.current.eventCreationTime,
+                forceReset: true,
+                forceResync: true,
+            });
+        });
+
+        return () => cancelAnimationFrame(frame);
+    }, [delayMsRef, rebuildLyricsData, syncAtTime, syncedRomajiLyrics]);
+
     useEffect(() => {
         statusRef.current = usePlayerStoreBase.getState().player.status;
 
@@ -246,6 +268,10 @@ export const SynchronizedKaraokeLyrics = ({
                 return;
             }
 
+            // Refresh the wall-clock playback anchor before restarting RAF.
+            // Otherwise resume interpolates from the pause-time eventCreationTime and
+            // briefly advances lyrics by the pause duration until the next progress tick.
+            syncFromCurrentTimestamp();
             startRaf();
         });
 
@@ -338,11 +364,15 @@ export const SynchronizedKaraokeLyrics = ({
                         lineStartMs,
                         idx,
                     );
+                    const lineLevelRomaji =
+                        syncedRomajiLyrics == null && romajiLyrics?.[idx]
+                            ? getLyricLineText(romajiLyrics[idx])
+                            : undefined;
                     const pronunciationText = getOverlayText(
                         pronunciationLyrics,
                         lineStartMs,
                         idx,
-                        romajiLyrics?.[idx] ? getLyricLineText(romajiLyrics[idx]) : undefined,
+                        lineLevelRomaji,
                     );
                     const translationText = getOverlayText(
                         translationLyrics,
@@ -385,7 +415,11 @@ export const SynchronizedKaraokeLyrics = ({
                             lineIndex={idx}
                             pronunciationCueLines={pronunciationCueLines}
                             pronunciationText={pronunciationText}
-                            romajiCueLines={syncedRomajiLyrics?.[idx] ?? null}
+                            romajiCueLines={
+                                syncedRomajiLyrics != null
+                                    ? (syncedRomajiLyrics[idx] ?? null)
+                                    : undefined
+                            }
                             translatedText={translationText}
                             translationCueLines={translationCueLines}
                         />

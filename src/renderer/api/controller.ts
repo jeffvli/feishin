@@ -786,6 +786,18 @@ export const controller: GeneralController = {
             server.type,
         )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
     },
+    refreshItems(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(`${i18n.t('error.apiRouteError')}: refreshItems`);
+        }
+
+        return apiController(
+            'refreshItems',
+            server.type,
+        )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
+    },
     removeFromPlaylist(args) {
         const server = getServerById(args.apiClientProps.serverId);
 

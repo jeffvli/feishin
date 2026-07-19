@@ -1,0 +1,38 @@
+.artwork-box {
+    position: relative;
+    width: 100%;
+    container-type: inline-size;
+    overflow: hidden;
+    background: var(--mantine-color-dark-6);
+    border-radius: var(--mantine-radius-md);
+}
+
+.artwork-image {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.placeholder {
+    min-height: 200px;
+    aspect-ratio: 1;
+    opacity: 0.4;
+}
+
+.placeholder-text {
+    font-size: 5cqw;
+}
+
+.icon-controls {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    z-index: 2;
+    padding: 4px;
+    pointer-events: none;
+    background: rgb(0 0 0 / 55%);
+}
+
+.icon-controls button {
+    pointer-events: auto;
+}

@@ -1,3 +1,4 @@
+import styles from './artists-column.module.css';
 import { ItemDetailListCellProps } from './types';
 
 import {
@@ -17,7 +18,10 @@ export const ArtistColumn = ({ isRowHovered, song }: ItemDetailListCellProps) =>
             artists={song.artists ?? []}
             linkProps={JOINED_ARTISTS_MUTED_PROPS.linkProps}
             readOnly={!isRowHovered}
-            rootTextProps={JOINED_ARTISTS_MUTED_PROPS.rootTextProps}
+            rootTextProps={{
+                ...JOINED_ARTISTS_MUTED_PROPS.rootTextProps,
+                className: styles.artists,
+            }}
         />
     );
 };

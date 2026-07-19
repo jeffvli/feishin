@@ -186,6 +186,14 @@ export const contract = c.router({
             200: ssType._response.randomSongList,
         },
     },
+    getScanStatus: {
+        method: 'GET',
+        path: 'getScanStatus.view',
+        query: ssType._parameters.getScanStatus,
+        responses: {
+            200: ssType._response.getScanStatus,
+        },
+    },
     getServerInfo: {
         method: 'GET',
         path: 'getOpenSubsonicExtensions.view',
@@ -343,6 +351,14 @@ export const contract = c.router({
         query: ssType._parameters.setRating,
         responses: {
             200: ssType._response.setRating,
+        },
+    },
+    startScan: {
+        method: 'GET',
+        path: 'startScan.view',
+        query: ssType._parameters.startScan,
+        responses: {
+            200: ssType._response.startScan,
         },
     },
     updateInternetRadioStation: {
