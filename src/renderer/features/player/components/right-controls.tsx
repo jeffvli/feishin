@@ -20,7 +20,6 @@ import {
     useAutoDJSettings,
     useCurrentServer,
     useFullScreenPlayerStore,
-    useGeneralSettings,
     useHotkeySettings,
     usePlaybackSettings,
     usePlaybackType,
@@ -30,6 +29,7 @@ import {
     usePlayerVolume,
     useSetFullScreenPlayerStore,
     useSettingsStoreActions,
+    useShowRatings,
     useSidebarRightExpanded,
     useSideQueueType,
     useVolumeMax,
@@ -82,7 +82,7 @@ const calculateVolumeDown = (volume: number, volumeWheelStep: number) => {
 };
 
 export const RightControls = () => {
-    const { showRatings } = useGeneralSettings();
+    const showRatings = useShowRatings();
     return (
         <Flex align="flex-end" direction="column" h="100%" px="1rem" py="0.5rem">
             <Group h="calc(100% / 3)">

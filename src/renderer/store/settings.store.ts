@@ -187,6 +187,7 @@ const PlaylistTargetSchema = z.enum(['album', 'track']);
 
 const SideQueueTypeSchema = z.enum(['sideDrawerQueue', 'sideQueue']);
 const SideQueueLayoutSchema = z.enum(['horizontal', 'vertical']);
+const FavoriteRatingControlsSchema = z.enum(['none', 'favorites', 'ratings', 'both']);
 
 const SidebarPanelTypeSchema = z.enum(['queue', 'lyrics', 'visualizer']);
 
@@ -505,6 +506,7 @@ export const GeneralSettingsSchema = z.object({
     disabledContextMenu: z.record(z.string(), z.boolean()),
     enableGridMultiSelect: z.boolean(),
     externalLinks: z.boolean(),
+    favoriteRatingControls: FavoriteRatingControlsSchema,
     followCurrentSong: z.boolean(),
     followSystemTheme: z.boolean(),
     genreTarget: GenreTargetSchema,
@@ -538,7 +540,6 @@ export const GeneralSettingsSchema = z.object({
     qobuz: z.boolean(),
     resume: z.boolean(),
     showLyricsInSidebar: z.boolean(),
-    showRatings: z.boolean(),
     showVisualizerInSidebar: z.boolean(),
     sidebarCollapsedNavigation: z.boolean(),
     sidebarCollapseShared: z.boolean(),
@@ -987,7 +988,9 @@ export type DataGridProps = {
 };
 
 export type DataTableProps = z.infer<typeof ItemTableListPropsSchema>;
+export type FavoriteRatingControls = z.infer<typeof FavoriteRatingControlsSchema>;
 export type ItemDetailListProps = z.infer<typeof ItemDetailListPropsSchema>;
+
 export type ItemListSettings = {
     detail?: ItemDetailListProps;
     display: ListDisplayType;
@@ -1002,7 +1005,6 @@ export type PlayerFilter = z.infer<typeof PlayerFilterSchema>;
 export type PlayerFilterField = z.infer<typeof PlayerFilterFieldSchema>;
 
 export type PlayerFilterOperator = z.infer<typeof PlayerFilterOperatorSchema>;
-
 export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
     actions: {
         addCollection: (collection: SavedCollection) => void;
@@ -1028,6 +1030,7 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
     };
 }
 export interface SettingsState extends z.infer<typeof SettingsStateSchema> {}
+
 export type SidebarItemType = z.infer<typeof SidebarItemTypeSchema>;
 
 export type SideQueueLayout = z.infer<typeof SideQueueLayoutSchema>;
@@ -1269,6 +1272,7 @@ const initialState: SettingsState = {
         disabledContextMenu: {},
         enableGridMultiSelect: false,
         externalLinks: true,
+        favoriteRatingControls: 'both',
         followCurrentSong: true,
         followSystemTheme: false,
         genreTarget: GenreTarget.TRACK,
@@ -1310,7 +1314,6 @@ const initialState: SettingsState = {
         qobuz: true,
         resume: true,
         showLyricsInSidebar: true,
-        showRatings: true,
         showVisualizerInSidebar: true,
         sidebarCollapsedNavigation: true,
         sidebarCollapseShared: false,
@@ -2721,10 +2724,19 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
+                if (version < 33) {
+                    const legacy = state.general as { showRatings?: boolean };
+                    // Favorites were always shown, so preserve prior behavior exactly:
+                    // showRatings true -> both, false -> favorites (ratings hidden, favorites still on).
+                    state.general.favoriteRatingControls =
+                        legacy.showRatings === false ? 'favorites' : 'both';
+                    delete legacy.showRatings;
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 32,
+            version: 33,
         },
     ),
 );
@@ -2923,7 +2935,21 @@ export const useSidebarCollapsedNavigation = () =>
 export const usePlayerbarOpenDrawer = () =>
     useSettingsStore((state) => state.general.playerbarOpenDrawer, shallow);
 
-export const useShowRatings = () => useSettingsStore((state) => state.general.showRatings, shallow);
+export const useShowRatings = () =>
+    useSettingsStore(
+        (state) =>
+            state.general.favoriteRatingControls === 'ratings' ||
+            state.general.favoriteRatingControls === 'both',
+        shallow,
+    );
+
+export const useShowFavorites = () =>
+    useSettingsStore(
+        (state) =>
+            state.general.favoriteRatingControls === 'favorites' ||
+            state.general.favoriteRatingControls === 'both',
+        shallow,
+    );
 
 export const useArtistRadioCount = () =>
     useSettingsStore((state) => state.general.artistRadioCount, shallow);

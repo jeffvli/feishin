@@ -35,10 +35,10 @@ import {
     useCurrentServer,
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
-    useGeneralSettings,
     usePlayerData,
     usePlayerSong,
     useSetFullScreenPlayerStore,
+    useShowRatings,
 } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Text } from '/@/shared/components/text/text';
@@ -387,7 +387,7 @@ export const MobileFullscreenPlayer = () => {
     const isPlayingRadio = isRadioActive && isRadioPlaying;
     const effectiveDynamicBackground = dynamicBackground && !isPlayingRadio;
     const setFavorite = useSetFavorite();
-    const { showRatings: showRatingsSetting } = useGeneralSettings();
+    const showRatingsSetting = useShowRatings();
     const setRating = useSetRating();
 
     const [isPageHovered, setIsPageHovered] = useState(false);

@@ -17,6 +17,7 @@ import {
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import {
+    FavoriteRatingControls,
     HomeFeatureStyle,
     SideQueueLayout,
     SideQueueType,
@@ -82,6 +83,25 @@ const SIDE_QUEUE_LAYOUT_OPTIONS = [
             context: 'optionVertical',
         }),
         value: 'vertical',
+    },
+];
+
+const FAVORITE_RATING_CONTROLS_OPTIONS = [
+    {
+        label: t('setting.favoriteRatingControls', { context: 'optionNone' }),
+        value: 'none',
+    },
+    {
+        label: t('setting.favoriteRatingControls', { context: 'optionFavorites' }),
+        value: 'favorites',
+    },
+    {
+        label: t('setting.favoriteRatingControls', { context: 'optionRatings' }),
+        value: 'ratings',
+    },
+    {
+        label: t('setting.favoriteRatingControls', { context: 'optionBoth' }),
+        value: 'both',
     },
 ];
 
@@ -564,23 +584,25 @@ export const ApplicationSettings = memo(() => {
         },
         {
             control: (
-                <Switch
-                    defaultChecked={settings.showRatings}
-                    onChange={(e) => {
+                <Select
+                    aria-label={t('setting.favoriteRatingControls')}
+                    data={FAVORITE_RATING_CONTROLS_OPTIONS}
+                    defaultValue={settings.favoriteRatingControls}
+                    onChange={(e) =>
                         setSettings({
                             general: {
                                 ...settings,
-                                showRatings: e.currentTarget.checked,
+                                favoriteRatingControls: e as FavoriteRatingControls,
                             },
-                        });
-                    }}
+                        })
+                    }
                 />
             ),
-            description: t('setting.showRatings', {
+            description: t('setting.favoriteRatingControls', {
                 context: 'description',
             }),
             isHidden: false,
-            title: t('setting.showRatings'),
+            title: t('setting.favoriteRatingControls'),
         },
         {
             control: (
