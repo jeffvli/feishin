@@ -19,6 +19,7 @@ interface MobileFullscreenPlayerMetadataProps {
     radioArtist?: string;
     radioStationName?: string;
     radioTitle?: string;
+    showFavorite?: boolean;
     showRating?: boolean;
 }
 
@@ -30,6 +31,7 @@ export const MobileFullscreenPlayerMetadata = memo(
         radioArtist,
         radioStationName,
         radioTitle,
+        showFavorite,
         showRating,
     }: MobileFullscreenPlayerMetadataProps) => {
         const isRadio = radioTitle !== undefined || radioStationName !== undefined;
@@ -77,16 +79,18 @@ export const MobileFullscreenPlayerMetadata = memo(
                 )}
                 {!isRadio && (
                     <Group align="center" className={styles.actionsRow} gap="xs">
-                        <ActionIcon
-                            icon="favorite"
-                            iconProps={{
-                                fill: isFavorite ? 'primary' : undefined,
-                                size: 'md',
-                            }}
-                            onClick={onToggleFavorite}
-                            size="sm"
-                            variant="subtle"
-                        />
+                        {showFavorite && (
+                            <ActionIcon
+                                icon="favorite"
+                                iconProps={{
+                                    fill: isFavorite ? 'primary' : undefined,
+                                    size: 'md',
+                                }}
+                                onClick={onToggleFavorite}
+                                size="sm"
+                                variant="subtle"
+                            />
+                        )}
                         {showRating && (
                             <Rating onChange={onUpdateRating} size="sm" value={rating || 0} />
                         )}

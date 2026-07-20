@@ -29,6 +29,7 @@ import {
     usePlayerVolume,
     useSetFullScreenPlayerStore,
     useSettingsStoreActions,
+    useShowFavorites,
     useShowRatings,
     useSidebarRightExpanded,
     useSideQueueType,
@@ -83,6 +84,7 @@ const calculateVolumeDown = (volume: number, volumeWheelStep: number) => {
 
 export const RightControls = () => {
     const showRatings = useShowRatings();
+    const showFavorites = useShowFavorites();
     return (
         <Flex align="flex-end" direction="column" h="100%" px="1rem" py="0.5rem">
             <Group h="calc(100% / 3)">
@@ -93,7 +95,7 @@ export const RightControls = () => {
                 <SleepTimerButton />
                 <PlayerConfig />
                 <LyricsButton />
-                <FavoriteButton />
+                {showFavorites && <FavoriteButton />}
                 <QueueButton />
                 <VolumeButton />
             </Group>

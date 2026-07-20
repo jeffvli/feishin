@@ -38,6 +38,7 @@ import {
     usePlayerData,
     usePlayerSong,
     useSetFullScreenPlayerStore,
+    useShowFavorites,
     useShowRatings,
 } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
@@ -388,6 +389,7 @@ export const MobileFullscreenPlayer = () => {
     const effectiveDynamicBackground = dynamicBackground && !isPlayingRadio;
     const setFavorite = useSetFavorite();
     const showRatingsSetting = useShowRatings();
+    const showFavorites = useShowFavorites();
     const setRating = useSetRating();
 
     const [isPageHovered, setIsPageHovered] = useState(false);
@@ -482,6 +484,7 @@ export const MobileFullscreenPlayer = () => {
                     radioArtist={isPlayingRadio ? (radioMetadata?.artist ?? undefined) : undefined}
                     radioStationName={isPlayingRadio ? (stationName ?? undefined) : undefined}
                     radioTitle={isPlayingRadio ? (radioMetadata?.title ?? undefined) : undefined}
+                    showFavorite={showFavorites}
                     showRating={showRating}
                 />
                 <MobileFullscreenPlayerProgress currentSong={currentSong} />

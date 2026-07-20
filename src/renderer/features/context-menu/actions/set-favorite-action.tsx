@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
-import { useCurrentServerId } from '/@/renderer/store';
+import { useCurrentServerId, useShowFavorites } from '/@/renderer/store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
@@ -15,6 +15,7 @@ interface SetFavoriteActionProps {
 export const SetFavoriteAction = ({ ids, itemType }: SetFavoriteActionProps) => {
     const { t } = useTranslation();
     const serverId = useCurrentServerId();
+    const showFavorites = useShowFavorites();
 
     const createFavoriteMutation = useCreateFavorite({});
     const deleteFavoriteMutation = useDeleteFavorite({});
@@ -42,6 +43,10 @@ export const SetFavoriteAction = ({ ids, itemType }: SetFavoriteActionProps) => 
             },
         });
     }, [deleteFavoriteMutation, ids, itemType, serverId]);
+
+    if (!showFavorites) {
+        return null;
+    }
 
     return (
         <ContextMenu.Submenu>
