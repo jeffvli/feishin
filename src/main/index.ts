@@ -708,6 +708,14 @@ async function createWindow(first = true): Promise<void> {
         mainWindow = null;
     });
 
+    mainWindow.on('show', () => {
+        rebuildMainMenu();
+    });
+
+    mainWindow.on('hide', () => {
+        rebuildMainMenu();
+    });
+
     mainWindow.on('close', (event) => {
         store.set('bounds', mainWindow?.getNormalBounds());
         store.set('maximized', mainWindow?.isMaximized());
