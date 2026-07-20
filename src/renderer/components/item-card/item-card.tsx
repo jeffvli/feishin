@@ -19,7 +19,7 @@ import { ItemControls } from '/@/renderer/components/item-list/types';
 import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useShowRatings } from '/@/renderer/store';
+import { useShowFavorites, useShowRatings } from '/@/renderer/store';
 import {
     formatDateAbsolute,
     formatDateRelative,
@@ -90,6 +90,7 @@ export const ItemCard = ({
     withControls,
 }: ItemCardProps) => {
     const showRatings = useShowRatings();
+    const showFavorites = useShowFavorites();
     const imageUrl = getImageUrl(data);
     const rows = providedRows || [];
 
@@ -110,6 +111,7 @@ export const ItemCard = ({
                     isRound={isRound}
                     itemType={itemType}
                     rows={rows}
+                    showFavorite={showFavorites}
                     showRating={showRatings}
                     withControls={withControls}
                 />
@@ -130,6 +132,7 @@ export const ItemCard = ({
                     isRound={isRound}
                     itemType={itemType}
                     rows={rows}
+                    showFavorite={showFavorites}
                     showRating={showRatings}
                     withControls={withControls}
                 />
@@ -150,6 +153,7 @@ export const ItemCard = ({
                     isRound={isRound}
                     itemType={itemType}
                     rows={rows}
+                    showFavorite={showFavorites}
                     showRating={showRatings}
                     withControls={withControls}
                 />
@@ -166,6 +170,7 @@ export interface ItemCardDerivativeProps extends Omit<ItemCardProps, 'type'> {
     imageUrl: string | undefined;
     internalState?: ItemListStateActions;
     rows: DataRow[];
+    showFavorite: boolean;
     showRating: boolean;
 }
 
@@ -186,6 +191,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
     isRound,
     itemType,
     navigationPath,
+    showFavorite,
     showRating,
     variant,
     withControls,
@@ -204,6 +210,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
     isRound?: boolean;
     itemType: LibraryItem;
     navigationPath: null | string;
+    showFavorite: boolean;
     showRating: boolean;
     variant: 'default' | 'poster';
     withControls?: boolean;
@@ -259,7 +266,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
                     type="itemCard"
                 />
             )}
-            {isFavorite && <div className={styles.favoriteBadge} />}
+            {showFavorite && isFavorite && <div className={styles.favoriteBadge} />}
             {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
             <AnimatePresence>
                 {withControls && showControls && (
@@ -269,6 +276,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
                         {...(variant === 'poster' ? { internalState } : {})}
                         item={data}
                         itemType={itemType}
+                        showFavorite={showFavorite}
                         showRating={showRating}
                         type={variant}
                     />
@@ -321,6 +329,7 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
     itemType,
     navigationPath,
     rows,
+    showFavorite,
     showRating,
     withControls,
 }: {
@@ -338,6 +347,7 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
     itemType: LibraryItem;
     navigationPath: null | string;
     rows: DataRow[];
+    showFavorite: boolean;
     showRating: boolean;
     withControls?: boolean;
 }) {
@@ -393,7 +403,7 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
                     type="itemCard"
                 />
             )}
-            {isFavorite && <div className={styles.favoriteBadge} />}
+            {showFavorite && isFavorite && <div className={styles.favoriteBadge} />}
             {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
             <AnimatePresence>
                 {withControls && showControls && data && (
@@ -403,6 +413,7 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
                         internalState={internalState}
                         item={data}
                         itemType={itemType}
+                        showFavorite={showFavorite}
                         showRating={showRating}
                         type="compact"
                     />
@@ -468,6 +479,7 @@ const CompactItemCard = ({
     isRound,
     itemType,
     rows,
+    showFavorite,
     showRating,
     withControls,
 }: ItemCardDerivativeProps) => {
@@ -634,6 +646,7 @@ const CompactItemCard = ({
                     itemType={itemType}
                     navigationPath={navigationPath}
                     rows={rows}
+                    showFavorite={showFavorite}
                     showRating={showRating}
                     withControls={withControls}
                 />
@@ -679,6 +692,7 @@ const DefaultItemCard = ({
     isRound,
     itemType,
     rows,
+    showFavorite,
     showRating,
     withControls,
 }: ItemCardDerivativeProps) => {
@@ -777,6 +791,7 @@ const DefaultItemCard = ({
                     isRound={isRound}
                     itemType={itemType}
                     navigationPath={navigationPath}
+                    showFavorite={showFavorite}
                     showRating={showRating}
                     variant="default"
                     withControls={withControls}
@@ -840,6 +855,7 @@ const PosterItemCard = ({
     isRound,
     itemType,
     rows,
+    showFavorite,
     showRating,
     withControls,
 }: ItemCardDerivativeProps) => {
@@ -1005,6 +1021,7 @@ const PosterItemCard = ({
                     isRound={isRound}
                     itemType={itemType}
                     navigationPath={navigationPath}
+                    showFavorite={showFavorite}
                     showRating={showRating}
                     variant="poster"
                     withControls={withControls}
