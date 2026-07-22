@@ -433,7 +433,7 @@ const Controls = () => {
                         <Option>
                             <Option.Control>
                                 <div style={{ width: '100%' }}>
-                                    <FullscreenPlayerSettings description={false} />
+                                    <FullscreenPlayerSettings showDescription={false} />
                                 </div>
                             </Option.Control>
                         </Option>
