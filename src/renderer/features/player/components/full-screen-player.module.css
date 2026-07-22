@@ -13,9 +13,9 @@
     }
 
     :global(.full-screen-player-controls-container) {
+        z-index: 1;
         opacity: 0.2;
         transition: opacity 0.2s ease;
-        z-index: 1;
     }
 
     &:hover :global(.full-screen-player-controls-container) {
