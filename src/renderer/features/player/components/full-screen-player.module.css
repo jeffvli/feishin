@@ -6,6 +6,7 @@
     display: flex;
     justify-content: center;
     padding: 2rem;
+    isolation: isolate;
 
     @media screen and (orientation: portrait) {
         padding: 2rem 2rem 1rem;
@@ -14,6 +15,7 @@
     :global(.full-screen-player-controls-container) {
         opacity: 0.2;
         transition: opacity 0.2s ease;
+        z-index: 1;
     }
 
     &:hover :global(.full-screen-player-controls-container) {
@@ -22,6 +24,8 @@
 }
 
 .responsive-container {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-rows: minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -64,6 +68,6 @@
 .background-overlay {
     position: absolute;
     inset: 0;
-    z-index: 0;
+    z-index: -1;
     pointer-events: none;
 }
