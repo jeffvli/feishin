@@ -78,6 +78,9 @@ export const TableConfig = ({
     const albumGroupShowFavoriteRating = useSettingsStore(
         (state) => state.general.albumGroupShowFavoriteRating,
     );
+    const albumGroupVerticalLayout = useSettingsStore(
+        (state) => state.general.albumGroupVerticalLayout,
+    );
     const imageResTable = useSettingsStore((state) => state.general.imageRes.table);
     const { setList, setSettings } = useSettingsStoreActions();
     const [albumGroupOpen, setAlbumGroupOpen] = useState(false);
@@ -182,6 +185,26 @@ export const TableConfig = ({
                                     label: (
                                         <Text fw={500} pl="md" size="sm">
                                             {t('table.config.general.albumGroupShowFavoriteRating')}
+                                        </Text>
+                                    ),
+                                },
+                                {
+                                    component: (
+                                        <ListConfigBooleanControl
+                                            onChange={(value) =>
+                                                setSettings({
+                                                    general: {
+                                                        albumGroupVerticalLayout: value,
+                                                    },
+                                                })
+                                            }
+                                            value={albumGroupVerticalLayout}
+                                        />
+                                    ),
+                                    id: 'albumGroupVerticalLayout',
+                                    label: (
+                                        <Text fw={500} pl="md" size="sm">
+                                            {t('table.config.general.albumGroupVerticalLayout')}
                                         </Text>
                                     ),
                                 },
@@ -367,6 +390,7 @@ export const TableConfig = ({
         albumGroupOpen,
         albumGroupImageSize,
         albumGroupShowFavoriteRating,
+        albumGroupVerticalLayout,
         imageResTable,
         setSettings,
     ]);

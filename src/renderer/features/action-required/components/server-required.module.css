@@ -1,0 +1,21 @@
+.list {
+    width: 100%;
+    min-width: 300px;
+}
+
+.server-button {
+    padding: var(--theme-spacing-sm);
+}
+
+.server-button-label {
+    width: 100%;
+}
+
+.server-logo {
+    width: var(--theme-font-size-2xl);
+    height: var(--theme-font-size-2xl);
+}
+
+.server-row {
+    width: 100%;
+}

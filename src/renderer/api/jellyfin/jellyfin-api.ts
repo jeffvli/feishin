@@ -206,6 +206,14 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    getScheduledTasks: {
+        method: 'GET',
+        path: 'ScheduledTasks',
+        responses: {
+            200: jfType._response.scheduledTasks,
+            400: jfType._response.error,
+        },
+    },
     getServerInfo: {
         method: 'GET',
         path: 'system/info',
@@ -298,6 +306,18 @@ export const contract = c.router({
         path: 'playlists/:playlistId/items/:itemId/move/:newIdx',
         responses: {
             200: jfType._response.moveItem,
+            400: jfType._response.error,
+        },
+    },
+    refreshItem: {
+        body: z.null(),
+        method: 'POST',
+        path: 'Items/:id/Refresh',
+        query: z.object({
+            MetadataRefreshMode: z.string().optional(),
+        }),
+        responses: {
+            204: z.null(),
             400: jfType._response.error,
         },
     },

@@ -4,12 +4,16 @@ import qs from 'qs';
 import { z } from 'zod';
 
 import i18n from '/@/i18n/i18n';
+import { authenticationFailure } from '/@/renderer/api/utils';
+import { useAuthStore } from '/@/renderer/store';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { ssType } from '/@/shared/api/subsonic/subsonic-types';
 import { hasFeature } from '/@/shared/api/utils';
 import { toast } from '/@/shared/components/toast/toast';
 import { ServerListItemWithCredential } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
+
+const SUBSONIC_AUTH_ERROR_CODE = 40;
 
 const c = initContract();
 
@@ -186,6 +190,14 @@ export const contract = c.router({
             200: ssType._response.randomSongList,
         },
     },
+    getScanStatus: {
+        method: 'GET',
+        path: 'getScanStatus.view',
+        query: ssType._parameters.getScanStatus,
+        responses: {
+            200: ssType._response.getScanStatus,
+        },
+    },
     getServerInfo: {
         method: 'GET',
         path: 'getOpenSubsonicExtensions.view',
@@ -345,6 +357,14 @@ export const contract = c.router({
             200: ssType._response.setRating,
         },
     },
+    startScan: {
+        method: 'GET',
+        path: 'startScan.view',
+        query: ssType._parameters.startScan,
+        responses: {
+            200: ssType._response.startScan,
+        },
+    },
     updateInternetRadioStation: {
         method: 'GET',
         path: 'updateInternetRadioStation.view',
@@ -375,13 +395,25 @@ axiosClient.interceptors.response.use(
         if (data['subsonic-response'].status !== 'ok') {
             // Suppress code related to non-linked lastfm or spotify from Navidrome
             if (data['subsonic-response'].error.code !== 0) {
-                toast.error({
-                    message: data['subsonic-response'].error.message,
-                    title: i18n.t('error.genericError') as string,
-                });
+                const currentServer = useAuthStore.getState().currentServer;
+                const isAuthenticated = Boolean(currentServer?.credential);
+                const errorCode = data['subsonic-response'].error.code;
+                const errorMessage = data['subsonic-response'].error.message as string | undefined;
+                // Servers may return code as string ("40") — coerce before comparing
+                const numericCode = Number(errorCode);
+                const isAuthError = numericCode === SUBSONIC_AUTH_ERROR_CODE;
+
+                if (isAuthenticated && isAuthError) {
+                    authenticationFailure(currentServer, errorMessage);
+                } else if (isAuthenticated) {
+                    toast.error({
+                        message: errorMessage,
+                        title: i18n.t('error.genericError') as string,
+                    });
+                }
 
                 // Since we do status === 200, override this value with the error code
-                response.status = data['subsonic-response'].error.code;
+                response.status = numericCode || errorCode;
             }
         }
 
@@ -454,6 +486,10 @@ export const ssApiClient = (args: {
 
     return initClient(contract, {
         api: async ({ body, headers, method, path, rawQuery }) => {
+            if (server && !server.credential) {
+                throw new Error('Not authenticated');
+            }
+
             let baseUrl: string | undefined;
             const authParams: Record<string, any> = {};
 

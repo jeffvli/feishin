@@ -33,22 +33,3 @@
         }
     }
 }
-
-.lyrics-preview {
-    :global(.synchronized-lyrics) {
-        height: auto !important;
-        padding: 1rem 0 !important;
-        overflow: visible !important;
-        transform: none !important;
-    }
-}
-
-.lyrics-content-wrapper {
-    :global(> div) {
-        height: auto !important;
-        max-height: none !important;
-        padding: 1rem 0 !important;
-        overflow: visible !important;
-        transform: none !important;
-    }
-}

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useMemo } from 'react';
 
 import styles from './unsynchronized-lyrics.module.css';
@@ -9,15 +10,20 @@ import { FullLyricsMetadata } from '/@/shared/types/domain-types';
 
 export interface UnsynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyrics'> {
     lyrics: string;
+    preview?: boolean;
     romajiLyrics?: null | string;
     settingsKey?: string;
     translatedLyrics?: null | string;
 }
 
+const PREVIEW_FONT_SIZE = 20;
+const PREVIEW_GAP = 20;
+
 export const UnsynchronizedLyrics = ({
     artist,
     lyrics,
     name,
+    preview = false,
     romajiLyrics,
     settingsKey = 'default',
     source,
@@ -27,14 +33,16 @@ export const UnsynchronizedLyrics = ({
     const displaySettings = useLyricsDisplaySettings(settingsKey);
     const settings = {
         ...lyricsSettings,
-        fontSizeUnsync:
-            displaySettings.fontSizeUnsync && displaySettings.fontSizeUnsync !== 0
-                ? displaySettings.fontSizeUnsync
-                : 24,
-        gapUnsync:
-            displaySettings.gapUnsync && displaySettings.gapUnsync !== 0
-                ? displaySettings.gapUnsync
-                : 24,
+        fontSizeUnsync: preview
+            ? PREVIEW_FONT_SIZE
+            : displaySettings.fontSizeUnsync && displaySettings.fontSizeUnsync !== 0
+              ? displaySettings.fontSizeUnsync
+              : 24,
+        gapUnsync: preview
+            ? PREVIEW_GAP
+            : displaySettings.gapUnsync && displaySettings.gapUnsync !== 0
+              ? displaySettings.gapUnsync
+              : 24,
     };
     const lines = useMemo(() => {
         return lyrics.split('\n');
@@ -49,12 +57,13 @@ export const UnsynchronizedLyrics = ({
     }, [romajiLyrics]);
 
     return (
-        <div className={styles.container}>
+        <div className={clsx(styles.container, preview && styles.preview)}>
             <LyricsScrollContent
                 bottomScrollPadding="6vh"
                 gap={settings.gapUnsync}
-                paddingLeft={displaySettings.paddingLeft ?? 0}
-                paddingRight={displaySettings.paddingRight ?? 0}
+                paddingLeft={preview ? 0 : (displaySettings.paddingLeft ?? 0)}
+                paddingRight={preview ? 0 : (displaySettings.paddingRight ?? 0)}
+                preview={preview}
             >
                 {settings.showProvider && source && (
                     <LyricLine

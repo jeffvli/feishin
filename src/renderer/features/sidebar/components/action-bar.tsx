@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 
 import styles from './action-bar.module.css';
 
+import { useScanStatus } from '/@/renderer/features/shared/hooks/use-scan-status';
 import { AppMenu } from '/@/renderer/features/titlebar/components/app-menu';
 import { useCommandPalette } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
@@ -15,6 +16,7 @@ import { TextInput } from '/@/shared/components/text-input/text-input';
 export const ActionBar = () => {
     const { t } = useTranslation();
     const { open } = useCommandPalette();
+    const { isScanning } = useScanStatus();
 
     return (
         <div className={styles.container}>
@@ -49,7 +51,11 @@ export const ActionBar = () => {
                         <DropdownMenu position="bottom-start">
                             <DropdownMenu.Target>
                                 <Button p="0">
-                                    <Icon icon="menu" size="lg" />
+                                    <Icon
+                                        animate={isScanning ? 'spin' : undefined}
+                                        icon={isScanning ? 'spinner' : 'menu'}
+                                        size="lg"
+                                    />
                                 </Button>
                             </DropdownMenu.Target>
                             <DropdownMenu.Dropdown>

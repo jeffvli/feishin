@@ -1,4 +1,3 @@
-import console from 'console';
 import { app, ipcMain, powerMonitor } from 'electron';
 import { access, rm } from 'fs/promises';
 import uniq from 'lodash/uniq';
@@ -7,10 +6,11 @@ import { pid } from 'node:process';
 import process from 'process';
 
 import { getMainWindow, sendToastToRenderer } from '../../../index';
-import { createLog } from '../../../utils';
+import log from '../../../logger';
 import { store } from '../settings';
 
 import { isMacOS, isWindows } from '/@/main/env';
+import { MPV_VOLUME_MAX_CEILING } from '/@/shared/constants/volume';
 import { PlayerData } from '/@/shared/types/domain-types';
 
 declare module 'node-mpv';
@@ -48,24 +48,29 @@ type NodeMpvError = {
 };
 
 const mpvLog = (
-    data: { action: string; toast?: 'info' | 'success' | 'warning' },
+    data: {
+        action: string;
+        level?: 'debug' | 'error' | 'info' | 'warn';
+        toast?: 'info' | 'success' | 'warning';
+    },
     err?: NodeMpvError,
 ) => {
     const { action, toast } = data;
 
     if (err) {
-        const message = `[AUDIO PLAYER] ${action} - mpv errorcode ${err.errcode} - ${
+        const message = `${action} - mpv errorcode ${err.errcode} - ${
             NodeMpvErrorCode[err.errcode as keyof typeof NodeMpvErrorCode]
         }`;
 
         sendToastToRenderer({ message, type: 'error' });
-        createLog({ message, type: 'error' });
+        log.error(message);
+        return;
     }
 
-    const message = `[AUDIO PLAYER] ${action}`;
-    createLog({ message, type: 'error' });
+    const level = data.level ?? 'info';
+    log[level](action);
     if (toast) {
-        sendToastToRenderer({ message, type: toast });
+        sendToastToRenderer({ message: action, type: toast });
     }
 };
 
@@ -155,8 +160,9 @@ const createMpv = async (data: {
 
     try {
         await mpv.start();
+        log.info('mpv initialized', { binary: resolvedBinaryPath ?? 'bundled/default' });
     } catch (error: any) {
-        console.error('mpv failed to start', error);
+        log.error('mpv failed to start', error);
     } finally {
         await mpv.setMultipleProperties(properties || {});
     }
@@ -264,11 +270,14 @@ const quit = async (instance?: MpvAPI | null) => {
 };
 
 const setAudioPlayerFallback = (isError: boolean) => {
+    if (isError) {
+        log.warn('Falling back to web player');
+    }
     getMainWindow()?.webContents.send('renderer-player-fallback', isError);
 };
 
 ipcMain.on('player-set-properties', async (_event, data: Record<string, any>) => {
-    mpvLog({ action: `Setting properties: ${JSON.stringify(data)}` });
+    mpvLog({ action: `Setting properties: ${JSON.stringify(data)}`, level: 'debug' });
     if (data.length === 0) {
         return;
     }
@@ -290,6 +299,7 @@ ipcMain.handle(
         try {
             mpvLog({
                 action: `Attempting to initialize mpv with parameters: ${JSON.stringify(data)}`,
+                level: 'debug',
             });
 
             // Clean up previous mpv instance
@@ -317,6 +327,7 @@ ipcMain.handle(
         try {
             mpvLog({
                 action: `Attempting to initialize mpv with parameters: ${JSON.stringify(data)}`,
+                level: 'debug',
             });
             mpvInstance = await createMpv(data);
             setAudioPlayerFallback(false);
@@ -493,10 +504,12 @@ ipcMain.on('player-auto-next', async (_event, url?: string) => {
     }
 });
 
-// Sets the volume to the given value (0-100)
+// Sets the volume to the given value. mpv clamps to its effective --volume-max,
+// so the upper bound here is just a sanity guard; mpv itself is the final
+// authority on how loud it will actually go.
 ipcMain.on('player-volume', async (_event, value: number) => {
     try {
-        if (!value || value < 0 || value > 100) {
+        if (value == null || Number.isNaN(value) || value < 0 || value > MPV_VOLUME_MAX_CEILING) {
             return;
         }
 
@@ -775,7 +788,7 @@ process.on('SIGTERM', async () => {
 
 // Handle uncaught exceptions - cleanup mpv before crashing
 process.on('uncaughtException', async (error) => {
-    console.error('Uncaught exception:', error);
+    log.error('Uncaught exception:', error);
     await cleanupMpv(true).catch(() => {
         // Ignore cleanup errors during crash
     });
@@ -783,7 +796,7 @@ process.on('uncaughtException', async (error) => {
 
 // Handle unhandled rejections - cleanup mpv
 process.on('unhandledRejection', async (reason) => {
-    console.error('Unhandled rejection:', reason);
+    log.error('Unhandled rejection:', reason);
     await cleanupMpv(true).catch(() => {
         // Ignore cleanup errors
     });

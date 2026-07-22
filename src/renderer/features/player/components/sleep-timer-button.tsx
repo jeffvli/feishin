@@ -107,34 +107,39 @@ const useSleepTimer = () => {
 
     const status = usePlayerStatus();
 
-    const handleOnPlayerProgress = useCallback(() => {
-        if (!active) {
-            return;
+    useEffect(() => {
+        if (!active || mode !== 'timed' || status !== PlayerStatus.PLAYING) {
+            return undefined;
         }
 
-        if (status !== PlayerStatus.PLAYING) {
-            return;
-        }
+        let lastTick = Date.now();
+        const interval = window.setInterval(() => {
+            const now = Date.now();
+            const elapsedSeconds = Math.floor((now - lastTick) / 1000);
 
-        // Count down in timed mode
-        if (mode === 'timed') {
+            if (elapsedSeconds < 1) {
+                return;
+            }
+
+            lastTick += elapsedSeconds * 1000;
             const remaining = useSleepTimerStore.getState().remaining;
 
-            if (remaining <= 0) {
+            if (remaining <= elapsedSeconds) {
                 cancelTimer();
                 mediaPauseRef.current();
             } else {
-                setRemaining(Math.max(0, remaining - 1));
+                setRemaining(remaining - elapsedSeconds);
             }
-        }
+        }, 1000);
+
+        return () => window.clearInterval(interval);
     }, [active, cancelTimer, mode, setRemaining, status]);
 
     usePlayerEvents(
         {
             onCurrentSongChange: handleOnCurrentSongChange,
-            onPlayerProgress: handleOnPlayerProgress,
         },
-        [handleOnCurrentSongChange, handleOnPlayerProgress],
+        [handleOnCurrentSongChange],
     );
 
     // End-of-song mode: set the pauseOnNextSongEnd flag so that

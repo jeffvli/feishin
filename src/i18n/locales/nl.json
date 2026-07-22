@@ -41,7 +41,8 @@
         "holdToMoveToTop": "Ingedrukt houden om naar begin te verplaatsen",
         "holdToMoveToBottom": "Ingedrukt houden om naar einde te verplaatsen",
         "openApplicationDirectory": "Applicatiemap openen",
-        "goToCurrent": "Ga naar huidige item"
+        "goToCurrent": "Ga naar huidige item",
+        "createPlaylistFromQueue": "Maak $t(entity.playlist, {\"count\": 1}) uit queue"
     },
     "common": {
         "backward": "Achteruit",
@@ -166,7 +167,11 @@
         "rename": "Hernoemen",
         "filter_multiple": "Meerdere",
         "numberOfResults": "{{numberOfResults}} resultaten",
-        "newVersionAvailable": "Een nieuwe versie is beschikbaar"
+        "newVersionAvailable": "Een nieuwe versie is beschikbaar",
+        "back": "Terug",
+        "saveAndClose": "Opslaan en afsluiten",
+        "undo": "Ongedaan maken",
+        "lastScan": "Laatste scan {{date}}"
     },
     "filter": {
         "rating": "Rating",
@@ -243,7 +248,8 @@
             "moveToNext": "$t(action.moveToNext)",
             "playSimilarSongs": "$t(player.playSimilarSongs)",
             "playShuffled": "$t(player.shuffle)",
-            "goTo": "Ga naar"
+            "goTo": "Ga naar",
+            "editMetadata": "Bewerk Metadata"
         },
         "appMenu": {
             "selectServer": "Selecteer server",
@@ -261,7 +267,8 @@
             "selectMusicFolder": "Selecteer muziekfolder",
             "noMusicFolder": "Geen muziekfolder geselecteerd",
             "multipleMusicFolders": "{{count}} muziekfolders geselecteerd",
-            "commandPalette": "Open opdrachtvenster"
+            "commandPalette": "Open opdrachtvenster",
+            "logout": "Log uit"
         },
         "albumDetail": {
             "moreFromArtist": "Meer van deze $t(entity.artist, {\"count\": 1})",
@@ -289,7 +296,11 @@
             "related": "Gerelateerd",
             "upNext": "Volgende",
             "noLyrics": "Geen liedtekst gevonden",
-            "visualizer": "Visualizer"
+            "visualizer": "Visualizer",
+            "lyricLayers": "Lyric lagen",
+            "lyricLanguage": "Taal",
+            "showPronunciation": "Uitspraak",
+            "showTranslation": "Vertaling"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -352,7 +363,11 @@
         "itemDetail": {
             "copyPath": "Kopieer pad naar klembord",
             "copiedPath": "Pad succesvol gekopieerd",
-            "openFile": "Toon nummer in bestandsbeheerder"
+            "openFile": "Toon nummer in bestandsbeheerder",
+            "fileNotWritable": "Bestand is niet beschikbaar of beschrijfbaar",
+            "addField": "Voeg veld toe…",
+            "emptyFields": "Velden kunnen niet leeg zijn",
+            "readPartialFailure": "Kon metadata niet lezen van {{count}} van de {{total}} bestand(en)"
         },
         "playlist": {
             "reorder": "Herschikken is alleen ingeschakeld wanneer er op ID wordt gestorteerd"
@@ -506,7 +521,7 @@
     "table": {
         "column": {
             "rating": "Rating",
-            "size": "$t(common.size)",
+            "size": "Grootte",
             "albumArtist": "Albumartiest",
             "biography": "Biografie",
             "bitrate": "Bitsnelheid",
@@ -524,12 +539,12 @@
             "title": "Titel",
             "trackNumber": "Nummer",
             "owner": "Eigenaar",
-            "albumCount": "$t(entity.album, {\"count\": 2})",
-            "artist": "$t(entity.artist, {\"count\": 1})",
+            "albumCount": "Albums",
+            "artist": "Artiest",
             "bitDepth": "$t(common.bitDepth)",
             "channels": "$t(common.channel, {\"count\": 2})",
             "codec": "$t(common.codec)",
-            "genre": "$t(entity.genre, {\"count\": 1})",
+            "genre": "Genre",
             "sampleRate": "$t(common.sampleRate)",
             "songCount": "$t(entity.track, {\"count\": 2})"
         },
@@ -751,11 +766,9 @@
         "lyricOffset_description": "Compenseer de songtekst met het gegeven aantal milliseconden",
         "lyricOffset": "Compensatie songtekst (ms)",
         "logLevel": "Logniveau",
-        "logLevel_description": "Het laagste logniveau dat wordt getoond. debug toont alle logs, error toont enkel foutmeldingen",
+        "logLevel_description": "Het laagste logniveau dat wordt getoond",
         "logLevel_optionDebug": "Debug",
-        "logLevel_optionError": "Fouten",
         "logLevel_optionInfo": "Informatief",
-        "logLevel_optionWarn": "Waarschuwingen",
         "minimizeToTray_description": "Minimaliseer de applicatie naar het systeemvak",
         "minimizeToTray": "Minimaliseer naar systeemvak",
         "minimumScrobblePercentage_description": "Het minimumpercentage dat van een nummer gespeeld om worden om deze te scrobblen",
@@ -984,7 +997,17 @@
         "sidePlayQueueLayout": "Uitlijning afspeelwachtrij aan zijkant",
         "sidePlayQueueLayout_description": "Stel de uitlijning in voor de afspeelwachtrij die aan de zijkant is gekoppeld",
         "sidePlayQueueLayout_optionHorizontal": "Horizontaal",
-        "sidePlayQueueLayout_optionVertical": "Verticaal"
+        "sidePlayQueueLayout_optionVertical": "Verticaal",
+        "autoDJ_mode": "Modus",
+        "autoDJ_mode_description": "Kies om nummers of hele albums toe te voegen aan de wachtrij",
+        "autoDJ_mode_songs": "Nummers",
+        "autoDJ_enabled": "Zet Auto DJ aan",
+        "autoDJ_strategy_option_library_random": "Willekeurig",
+        "audioDeviceDefault": "Systeemstandaard",
+        "equalizerPresetGroupBuiltIn": "Ingebouwd",
+        "hotkey_playbackNextAlbum": "Volgend album",
+        "hotkey_playbackPreviousAlbum": "Vorig album",
+        "windowBarTrackinfo": "Nummer informatie in Venstertitel"
     },
     "form": {
         "addServer": {
@@ -1003,7 +1026,8 @@
             "input_preferInstantMixDescription": "Gebruik alleen instant mix om vergelijkbare nummer te krijgen. handig wanneer je plugins hebt die dit gedrag aanpassen",
             "input_preferRemoteUrl": "Geef voorkeur aan openbare url",
             "input_remoteUrl": "Publieke url",
-            "input_remoteUrlPlaceholder": "Optioneel: publieke url voor externe mogelijkheden"
+            "input_remoteUrlPlaceholder": "Optioneel: publieke url voor externe mogelijkheden",
+            "input_passwordNoSSO": "Reverse proxy (SSO) authenticatie wordt niet ondersteund. Alleen gebruikersnaam/wachtwoord authenticatie en Subsonic authenticatie worden ondersteund"
         },
         "deletePlaylist": {
             "title": "Verwijder $t(entity.playlist, {\"count\": 1})",
@@ -1024,7 +1048,8 @@
             "input_skipDuplicates": "Duplicaten overslaan",
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "create": "Maak $t(entity.playlist, {\"count\": 1}) {{playlist}}",
-            "searchOrCreate": "Zoek $t(entity.playlist, {\"count\": 2}) of typ om een nieuwe te maken"
+            "searchOrCreate": "Zoek $t(entity.playlist, {\"count\": 2}) of typ om een nieuwe te maken",
+            "noneAdded": "Geen nummers zijn toegevoegd aan $t(entity.playlist, {\"count\": 1}) '{{playlist}}'"
         },
         "queryEditor": {
             "input_optionMatchAll": "Alles matchen",
@@ -1041,7 +1066,7 @@
             "title": "Tekst zoeken"
         },
         "editPlaylist": {
-            "title": "$t(entity.playlist, {\"count\": 1}) aanpassen",
+            "title": "Bewerk $t(entity.playlist, {\"count\": 1})",
             "publicJellyfinNote": "Jellyfin laat niet weten of een playlist publiek of privaat is. Als u wilt dat dit publiek blijft, selecteer de volgende invoer",
             "success": "$t(entity.playlist, {\"count\": 1}) succesvol geüpdatet"
         },
@@ -1077,7 +1102,12 @@
             "input_played": "Speel filter",
             "input_played_optionAll": "Alle nummers",
             "input_played_optionUnplayed": "Alleen ongespeelde nummers",
-            "input_played_optionPlayed": "Alleen gespeelde nummers"
+            "input_played_optionPlayed": "Alleen gespeelde nummers",
+            "input_kind_albums": "Albums",
+            "input_kind_songs": "Nummers",
+            "input_kind": "Willekeurige keuzes",
+            "input_limit_albums": "Hoeveel albums?",
+            "input_limit_songs": "Hoeveel nummers?"
         },
         "createRadioStation": {
             "success": "Radiostation succesvol aangemaakt",
@@ -1096,6 +1126,9 @@
         },
         "editRadioStation": {
             "success": "Radiozender succesvol bijgewerkt"
+        },
+        "createPrefilledPlaylist": {
+            "title": "Maak $t(entity.playlist, {\"count\": 1}) uit geselecteerde nummers."
         }
     },
     "player": {
@@ -1147,7 +1180,10 @@
         "sleepTimer_timeRemaining": "{{time}} resterend",
         "sleepTimer_setCustom": "Timer instellen",
         "sleepTimer_cancel": "Timer annuleren",
-        "albumRadio": "Albumradio"
+        "albumRadio": "Albumradio",
+        "nextAlbum": "Alt+klik voor volgende album",
+        "previousAlbum": "Alt+klik voor vorige album",
+        "sleepTimer_endOfAlbum": "Einde van huidige album"
     },
     "datetime": {
         "minuteShort": "M",
@@ -1174,7 +1210,8 @@
         "notInPlaylist": "Is niet in",
         "notInTheLast": "Is niet in de laatste",
         "startsWith": "Begint met",
-        "after": "Is na"
+        "after": "Is na",
+        "isPresent": "Is aanwezig"
     },
     "queryBuilder": {
         "standardTags": "Standaard tags",

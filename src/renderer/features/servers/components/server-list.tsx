@@ -45,7 +45,7 @@ export const ServerList = () => {
                     {Object.keys(serverListQuery)?.map((serverId) => {
                         const server = serverListQuery[serverId];
                         return (
-                            <Accordion.Item key={server.id} value={server.name}>
+                            <Accordion.Item key={server.id} value={server.id}>
                                 <Accordion.Control>
                                     <Group>
                                         <img

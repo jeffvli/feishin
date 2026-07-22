@@ -452,7 +452,6 @@
         "exportImportSettings_notValidJSON": "Il file passato non è un JSON valido",
         "language": "Lingua",
         "logLevel_optionDebug": "Debug",
-        "logLevel_optionError": "Errore",
         "logLevel_optionInfo": "Info",
         "pathReplace_optionRemovePrefix": "Rimuovi prefisso",
         "pathReplace_optionAddPrefix": "Aggiungi prefisso",

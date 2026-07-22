@@ -4,6 +4,7 @@ import { generateColors } from '@mantine/colors-generator';
 import { useMantineColorScheme } from '@mantine/core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useCustomThemes } from '/@/renderer/store/custom-themes.store';
 import {
     useAccent,
     useFontSettings,
@@ -54,6 +55,9 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
     const accent = useAccent();
     const nativeImageAspect = useNativeAspectRatio();
     const { builtIn, custom, system, type } = useFontSettings();
+    // Not read directly, but its identity changes whenever the custom
+    // themes folder is reloaded, which is what we want to react to below.
+    const customThemes = useCustomThemes();
     const textStyleRef = useRef<HTMLStyleElement | null>(null);
     const themeInlineStylesRef = useRef<HTMLStyleElement | null>(null);
     const getCurrentTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -178,7 +182,20 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
                 ...(effectivePrimaryShade != null && { primaryShade: effectivePrimaryShade }),
             },
         };
-    }, [accent, primaryShade, selectedTheme, useThemeAccentColor, useThemePrimaryShade]);
+        // customThemes is not read directly above, but getAppTheme resolves
+        // custom theme ids through a registry that's mutated in place
+        // whenever the themes folder is reloaded (see custom-themes.store.ts).
+        // Including it here is what makes an edited custom theme's colors
+        // get picked up without a manual reselect.
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- customThemes is read indirectly via getAppTheme's registry lookup, not referenced directly above
+    }, [
+        accent,
+        customThemes,
+        primaryShade,
+        selectedTheme,
+        useThemeAccentColor,
+        useThemePrimaryShade,
+    ]);
 
     useEffect(() => {
         const root = document.documentElement;
@@ -204,6 +221,7 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
         root.style.setProperty('--theme-colors-primary', primaryAtShade);
     }, [
         accent,
+        customThemes,
         isDarkTheme,
         primaryShade,
         selectedTheme,
@@ -290,6 +308,9 @@ export const useAppThemeColors = () => {
     const accent = useAccent();
     const getCurrentTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
     const [isDarkTheme] = useState(getCurrentTheme());
+    // Not read directly, but its identity changes whenever the custom
+    // themes folder is reloaded, which is what we want to react to below.
+    const customThemes = useCustomThemes();
     const {
         followSystemTheme,
         primaryShade,
@@ -334,7 +355,15 @@ export const useAppThemeColors = () => {
                 ...(effectivePrimaryShade != null && { primaryShade: effectivePrimaryShade }),
             },
         };
-    }, [accent, primaryShade, selectedTheme, useThemeAccentColor, useThemePrimaryShade]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- customThemes is read indirectly via getAppTheme's registry lookup, not referenced directly above
+    }, [
+        accent,
+        customThemes,
+        primaryShade,
+        selectedTheme,
+        useThemeAccentColor,
+        useThemePrimaryShade,
+    ]);
 
     const themeVars = useMemo(() => {
         return Object.entries(appTheme?.app ?? {})

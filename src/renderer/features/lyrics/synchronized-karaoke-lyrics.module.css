@@ -7,3 +7,11 @@
     overflow: hidden auto;
     word-break: break-all;
 }
+
+.preview {
+    height: auto;
+    max-height: none;
+    padding: 1rem 0;
+    overflow: visible;
+    transform: none;
+}

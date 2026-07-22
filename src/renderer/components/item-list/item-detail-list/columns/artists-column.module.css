@@ -1,0 +1,10 @@
+.artists {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.artists,
+.artists > * {
+    white-space: nowrap;
+}

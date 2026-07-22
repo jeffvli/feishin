@@ -47,6 +47,7 @@ import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Text } from '/@/shared/components/text/text';
+import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { LyricsOverride } from '/@/shared/types/domain-types';
 
 type LyricsProps = {
@@ -73,7 +74,10 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
     const [index, setIndexState] = useState(0);
     const [translatedLyrics, setTranslatedLyrics] = useState<null | string>(null);
     const [showTranslation, setShowTranslation] = useState(false);
-    const [visibleOverlayKeys, setVisibleOverlayKeys] = useState<Set<string>>(new Set());
+    const [visibleOverlayLayerKeys, setVisibleOverlayLayerKeys] = useLocalStorage<string[]>({
+        defaultValue: [],
+        key: `lyrics:visible-overlay-layers:${settingsKey}`,
+    });
     const [pendingSongId, setPendingSongId] = useState<string | undefined>(currentSong?.id);
     const lyricsFetchTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     const previousSongIdRef = useRef<string | undefined>(currentSong?.id);
@@ -181,6 +185,11 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
             label: formatStructuredLyricLabel(layer),
         }));
     }, [layers]);
+
+    const visibleOverlayKeys = useMemo(
+        () => new Set(visibleOverlayLayerKeys),
+        [visibleOverlayLayerKeys],
+    );
 
     const visibleOverlayLayers = useMemo(() => {
         if (!layers?.overlayLayers.length || !visibleOverlayKeys.size) {
@@ -390,24 +399,26 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
         await fetchTranslation();
     }, [translatedLyrics, showTranslation, fetchTranslation]);
 
-    const handleToggleOverlayLayer = useCallback((key: string) => {
-        setVisibleOverlayKeys((current) => {
-            const next = new Set(current);
-            if (next.has(key)) {
-                next.delete(key);
-            } else {
-                next.add(key);
-            }
-            return next;
-        });
-    }, []);
+    const handleToggleOverlayLayer = useCallback(
+        (key: string) => {
+            setVisibleOverlayLayerKeys((current) => {
+                const next = new Set(current);
+                if (next.has(key)) {
+                    next.delete(key);
+                } else {
+                    next.add(key);
+                }
+                return Array.from(next);
+            });
+        },
+        [setVisibleOverlayLayerKeys],
+    );
 
     usePlayerEvents(
         {
             onCurrentSongChange: () => {
                 setIndexState(0);
                 setShowTranslation(false);
-                setVisibleOverlayKeys(new Set());
                 setTranslatedLyrics(null);
             },
         },

@@ -20,6 +20,7 @@ export type EventMap = {
     PLAYLIST_MOVE_UP: PlaylistMoveEventPayload;
     PLAYLIST_REORDER: PlaylistReorderEventPayload;
     QUEUE_RESTORED: QueueRestoredEventPayload;
+    TAG_EDITED: TagEditedEventPayload;
     USER_FAVORITE: UserFavoriteEventPayload;
     USER_RATING: UserRatingEventPayload;
 };
@@ -77,6 +78,12 @@ export type QueueRestoredEventPayload = {
     data: Song[];
     index: number;
     position: number;
+};
+
+export type TagEditedEventPayload = {
+    id: string[];
+    itemType: LibraryItem;
+    serverId: string;
 };
 
 export type UserFavoriteEventPayload = {

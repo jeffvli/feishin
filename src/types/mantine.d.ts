@@ -1,7 +1,8 @@
-import { ActionIconSize, PillVariant } from '@mantine/core';
+import { ActionIconSize, PillVariant, TagsInputVariant } from '@mantine/core';
 
 type ExtendedActionIconSize = 'compact-md' | 'compact-sm' | 'compact-xs' | ActionIconSize;
 type ExtendedPillVariant = 'outline' | PillVariant;
+type ExtendedTagsInputVariant = 'default' | 'filled' | TagsInputVariant;
 
 declare module '@mantine/core' {
     export interface ActionIconProps {
@@ -10,5 +11,9 @@ declare module '@mantine/core' {
 
     export interface PillProps {
         variant?: ExtendedPillVariant;
+    }
+
+    export interface TagsInputProps {
+        variant?: ExtendedTagsInputVariant;
     }
 }

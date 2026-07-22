@@ -6,6 +6,7 @@ import {
     PlaylistQueryBuilder,
     PlaylistQueryBuilderRef,
 } from '/@/renderer/features/playlists/components/playlist-query-builder';
+import { useAddToPlaylist } from '/@/renderer/features/playlists/mutations/add-to-playlist-mutation';
 import { useCreatePlaylist } from '/@/renderer/features/playlists/mutations/create-playlist-mutation';
 import { convertQueryGroupToNDQuery } from '/@/renderer/features/playlists/utils';
 import { useCurrentServer } from '/@/renderer/store';
@@ -24,17 +25,22 @@ import {
     CreatePlaylistBody,
     ServerListItem,
     ServerType,
+    Song,
     SongListSort,
 } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 
 interface CreatePlaylistFormProps {
     onCancel: () => void;
+    songs?: Song[];
 }
 
-export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
+export const CreatePlaylistForm = ({ onCancel, songs }: CreatePlaylistFormProps) => {
     const { t } = useTranslation();
-    const mutation = useCreatePlaylist({});
+
+    const createPlaylistMutation = useCreatePlaylist({});
+    const addToPlaylistMutation = useAddToPlaylist({});
+
     const server = useCurrentServer();
     const queryBuilderRef = useRef<PlaylistQueryBuilderRef>(null);
 
@@ -47,6 +53,8 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
     });
     const [isSmartPlaylist, setIsSmartPlaylist] = useState(false);
     const [step, setStep] = useState<1 | 2>(1);
+
+    const isPrefilledPlaylist = !!songs && songs.length > 0;
 
     const handleSubmit = form.onSubmit((values) => {
         if (!server) return;
@@ -78,7 +86,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                   }
                 : undefined;
 
-        mutation.mutate(
+        createPlaylistMutation.mutate(
             {
                 apiClientProps: { serverId: server.id },
                 body: {
@@ -93,18 +101,45 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                         title: t('error.genericError'),
                     });
                 },
-                onSuccess: () => {
+                onSuccess: (data) => {
                     toast.success({
                         message: t('form.createPlaylist.success'),
                     });
+
+                    handlePlaylistPrefilling(data?.id);
+
                     onCancel();
                 },
             },
         );
     });
 
+    const handlePlaylistPrefilling = (playlistId?: string) => {
+        if (!songs || !playlistId) {
+            return;
+        }
+
+        const allSongIds = songs.map((song) => song.id);
+
+        addToPlaylistMutation.mutate(
+            {
+                apiClientProps: { serverId: server.id },
+                body: { songId: allSongIds },
+                query: { id: playlistId },
+            },
+            {
+                onError: (err) => {
+                    toast.error({
+                        message: `${err.message}`,
+                        title: t('error.genericError'),
+                    });
+                },
+            },
+        );
+    };
+
     const isPublicDisplayed = hasFeature(server, ServerFeature.PUBLIC_PLAYLIST);
-    const isSubmitDisabled = !form.values.name || mutation.isPending;
+    const isSubmitDisabled = !form.values.name || createPlaylistMutation.isPending;
 
     return (
         <form onSubmit={handleSubmit}>
@@ -141,7 +176,8 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                                 />
                             )}
                             {server?.type === ServerType.NAVIDROME &&
-                                hasFeature(server, ServerFeature.PLAYLISTS_SMART) && (
+                                hasFeature(server, ServerFeature.PLAYLISTS_SMART) &&
+                                !isPrefilledPlaylist && (
                                     <Switch
                                         checked={isSmartPlaylist}
                                         label="Is smart playlist?"
@@ -182,7 +218,7 @@ export const CreatePlaylistForm = ({ onCancel }: CreatePlaylistFormProps) => {
                     </ModalButton>
                     <ModalButton
                         disabled={isSubmitDisabled}
-                        loading={mutation.isPending}
+                        loading={createPlaylistMutation.isPending}
                         type="submit"
                         variant="filled"
                     >
@@ -204,5 +240,19 @@ export const openCreatePlaylistModal = (
         children: <CreatePlaylistForm onCancel={() => closeAllModals()} />,
         size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
         title: t('form.createPlaylist.title'),
+    });
+};
+
+export const openCreatePrefilledPlaylistModal = (
+    server?: ServerListItem,
+    songs?: Song[],
+    e?: MouseEvent<HTMLButtonElement>,
+) => {
+    e?.stopPropagation();
+
+    openModal({
+        children: <CreatePlaylistForm onCancel={() => closeAllModals()} songs={songs} />,
+        size: server?.type === ServerType?.NAVIDROME ? 'xl' : 'sm',
+        title: t('form.createPrefilledPlaylist.title'),
     });
 };

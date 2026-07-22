@@ -3,7 +3,7 @@ import type { TableScrollShadowStore } from '/@/renderer/components/item-list/it
 import { autoScrollForElements } from '@atlaskit/pragmatic-drag-and-drop-auto-scroll/element';
 import throttle from 'lodash/throttle';
 import { useOverlayScrollbars } from 'overlayscrollbars-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
 
@@ -30,7 +30,6 @@ const getPaneElements = ({
 export const useTablePaneSync = ({
     enableDrag,
     enableDragScroll,
-    enableHeader,
     handleRef,
     onScrollEndRef,
     pinnedLeftColumnCount,
@@ -45,7 +44,6 @@ export const useTablePaneSync = ({
 }: {
     enableDrag: boolean | undefined;
     enableDragScroll: boolean | undefined;
-    enableHeader: boolean;
     handleRef: React.RefObject<null | { internalState: ItemListStateActions }>;
     onScrollEndRef: React.RefObject<
         ((offset: number, internalState: ItemListStateActions) => void) | undefined
@@ -60,19 +58,36 @@ export const useTablePaneSync = ({
     scrollShadowStore: TableScrollShadowStore;
     scrollSyncKey: string;
 }) => {
+    const pinnedRightColumnCountRef = useRef(pinnedRightColumnCount);
+    pinnedRightColumnCountRef.current = pinnedRightColumnCount;
+
+    // When right-pinned columns exist, OverlayScrollbars is configured with y:'hidden'
+    // so only the right pane shows a vertical scrollbar. OS may later apply
+    // overflowYVisible + overflowImportant, which makes the main viewport
+    // overflow-y:visible and breaks scrollTop sync. Force auto with !important
+    // on init/update so the main pane remains vertically scroll-syncable.
+    const applyMainViewportOverflow = (viewport: HTMLElement) => {
+        viewport.style.overflowX = `var(--os-viewport-overflow-x)`;
+
+        if (pinnedRightColumnCountRef.current > 0) {
+            viewport.style.setProperty('overflow-y', 'auto', 'important');
+        } else {
+            viewport.style.removeProperty('overflow-y');
+            viewport.style.overflowY = `var(--os-viewport-overflow-y)`;
+        }
+    };
+
     // Main grid overlayscrollbars - only handle X-axis if right-pinned columns exist
     const [initialize, osInstance] = useOverlayScrollbars({
         defer: false,
         events: {
             initialized(osInstance) {
                 const { viewport } = osInstance.elements();
-                viewport.style.overflowX = `var(--os-viewport-overflow-x)`;
-
-                if (pinnedRightColumnCount > 0) {
-                    viewport.style.overflowY = 'auto';
-                } else {
-                    viewport.style.overflowY = `var(--os-viewport-overflow-y)`;
-                }
+                applyMainViewportOverflow(viewport);
+            },
+            updated(osInstance) {
+                const { viewport } = osInstance.elements();
+                applyMainViewportOverflow(viewport);
             },
         },
         options: {
@@ -166,7 +181,6 @@ export const useTablePaneSync = ({
         osInstance,
         pinnedRightColumnCount,
         scrollContainerRef,
-        scrollSyncKey,
     ]);
 
     useEffect(() => {
@@ -258,7 +272,6 @@ export const useTablePaneSync = ({
         osInstanceRightPinned,
         pinnedRightColumnCount,
         pinnedRightColumnRef,
-        scrollSyncKey,
     ]);
 
     useEffect(() => {
@@ -274,21 +287,37 @@ export const useTablePaneSync = ({
                 rowRef,
             });
 
+        const ensureMainRowAcceptsScrollTop = (row: HTMLDivElement) => {
+            if (pinnedRightColumnCount <= 0) {
+                return;
+            }
+
+            // Keep the main pane syncable even if OverlayScrollbars measuring flips
+            // overflow-y back to visible after a column layout change.
+            row.style.setProperty('overflow-y', 'auto', 'important');
+            applyMainViewportOverflow(row);
+        };
+
         const isVerticalScrollHostReady = (
             row: HTMLDivElement,
             pinnedRight: HTMLDivElement | undefined,
         ) => {
-            const verticalScrollHost = pinnedRightColumnCount > 0 ? pinnedRight : row;
-
-            if (!verticalScrollHost) {
-                return false;
-            }
-
             if (pinnedRightColumnCount > 0) {
-                return verticalScrollHost.scrollHeight > verticalScrollHost.clientHeight;
+                if (!pinnedRight) {
+                    return false;
+                }
+
+                // Right pane is the visible scrollbar host, but the main pane must also
+                // accept programmatic scrollTop sync before listeners are attached.
+                const rowOverflowY = getComputedStyle(row).overflowY;
+                return (
+                    pinnedRight.scrollHeight > pinnedRight.clientHeight &&
+                    row.scrollHeight > row.clientHeight &&
+                    rowOverflowY !== 'visible'
+                );
             }
 
-            return verticalScrollHost.scrollHeight > 0;
+            return row.scrollHeight > 0;
         };
 
         const setupScrollSync = () => {
@@ -299,6 +328,10 @@ export const useTablePaneSync = ({
             cleanup?.();
 
             const { header, pinnedLeft, pinnedRight, row } = resolvePaneRefs();
+
+            if (row) {
+                ensureMainRowAcceptsScrollTop(row);
+            }
 
             if (!row || !isVerticalScrollHostReady(row, pinnedRight)) {
                 setupFrameId = requestAnimationFrame(setupScrollSync);
@@ -314,6 +347,8 @@ export const useTablePaneSync = ({
                 if (!syncRow) {
                     return;
                 }
+
+                ensureMainRowAcceptsScrollTop(syncRow);
 
                 const rowHeight = syncRow.scrollHeight;
                 let targetHeight = rowHeight;
@@ -463,8 +498,12 @@ export const useTablePaneSync = ({
                 }
 
                 if (syncPinnedRight && currentElement === syncPinnedRight && !isScrolling.row) {
+                    ensureMainRowAcceptsScrollTop(syncRow);
                     isScrolling.row = true;
                     syncRow.scrollTo({ behavior: 'instant', top: scrollTop });
+                    if (syncRow.scrollTop !== scrollTop) {
+                        syncRow.scrollTop = scrollTop;
+                    }
                     isScrolling.row = false;
                     if (syncPinnedLeft) {
                         isScrolling.pinnedLeft = true;
@@ -593,34 +632,4 @@ export const useTablePaneSync = ({
             row.removeEventListener('scroll', checkScrollPosition);
         };
     }, [pinnedLeftColumnCount, pinnedRightColumnCount, rowRef, scrollShadowStore]);
-
-    // Handle top shadow visibility based on vertical scroll
-    useEffect(() => {
-        const row = rowRef.current?.childNodes[0] as HTMLDivElement;
-        const pinnedRight = pinnedRightColumnRef.current?.childNodes[0] as HTMLDivElement;
-
-        if (!row || !enableHeader) {
-            const timeout = setTimeout(() => {
-                scrollShadowStore.setSnapshot({ showTopShadow: false });
-            }, 0);
-
-            return () => clearTimeout(timeout);
-        }
-
-        const scrollElement = pinnedRightColumnCount > 0 && pinnedRight ? pinnedRight : row;
-
-        const checkScrollPosition = throttle(() => {
-            const currentScrollTop = scrollElement.scrollTop;
-            scrollShadowStore.setSnapshot({ showTopShadow: currentScrollTop > 0 });
-        }, 50);
-
-        checkScrollPosition();
-
-        scrollElement.addEventListener('scroll', checkScrollPosition, { passive: true });
-
-        return () => {
-            checkScrollPosition.cancel();
-            scrollElement.removeEventListener('scroll', checkScrollPosition);
-        };
-    }, [enableHeader, pinnedRightColumnCount, pinnedRightColumnRef, rowRef, scrollShadowStore]);
 };

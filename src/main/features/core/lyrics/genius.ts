@@ -9,6 +9,8 @@ import {
 } from '.';
 import { orderSearchResults } from './shared';
 
+import log from '/@/main/logger';
+
 const SEARCH_URL = 'https://genius.com/api/search/song';
 
 // Adapted from https://github.com/NyaomiDEV/Sunamu/blob/master/src/main/lyricproviders/genius.ts
@@ -100,7 +102,7 @@ export async function getLyricsBySongId(url: string): Promise<null | string> {
     try {
         result = await axios.get<string>(url, { responseType: 'text' });
     } catch (e) {
-        console.error('Genius lyrics request got an error!', (e as Error)?.message);
+        log.error('Genius lyrics request got an error!', (e as Error)?.message);
         return null;
     }
 
@@ -138,7 +140,7 @@ export async function getSearchResults(
             },
         });
     } catch (e) {
-        console.error('Genius search request got an error!', (e as Error)?.message);
+        log.error('Genius search request got an error!', (e as Error)?.message);
         return null;
     }
 
@@ -193,7 +195,7 @@ async function getSongId(
             },
         });
     } catch (e) {
-        console.error('Genius search request got an error!', (e as Error)?.message);
+        log.error('Genius search request got an error!', (e as Error)?.message);
         return null;
     }
 

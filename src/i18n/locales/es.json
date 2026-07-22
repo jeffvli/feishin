@@ -50,7 +50,9 @@
         "sleepTimer": "Temporizador de apagado",
         "albumRadio": "Radio del álbum",
         "scrobbleForceSubmit": "Forzar scrobble",
-        "sleepTimer_endOfAlbum": "Fin del álbum actual"
+        "sleepTimer_endOfAlbum": "Fin del álbum actual",
+        "nextAlbum": "Alt+clic para el siguiente álbum",
+        "previousAlbum": "Alt+clic para el álbum anterior"
     },
     "setting": {
         "crossfadeStyle_description": "Selecciona el estilo de crossfade a usar por el reproductor de audio",
@@ -350,11 +352,9 @@
         "autoDJ_timing_description": "El número de canciones restantes en la cola antes de que DJ automático se dispare",
         "autoDJ_timing": "Tiempo",
         "logLevel": "Nivel de registro",
-        "logLevel_description": "Establece el mínimo nivel de registro a mostrar. Depuración muestra todos los registros, error solo muestra errores",
+        "logLevel_description": "Establece el nivel de registro mínimo a mostrar",
         "logLevel_optionDebug": "Depuración",
-        "logLevel_optionError": "Error",
         "logLevel_optionInfo": "Información",
-        "logLevel_optionWarn": "Advertencia",
         "useThemeAccentColor": "Usar color de acentuación de tema",
         "useThemeAccentColor_description": "Usa el color principal definido en el tema seleccionado en lugar del color de acentuación personalizado",
         "artistRadioCount_description": "Establece el número de canciones a buscar para la radio de artista y de pista",
@@ -500,7 +500,12 @@
         "windowBarTrackinfo_description": "Muestra el título y artista de la pista actual, posición en la cola, y estado reproduciendo/pausado en el título de la ventana.",
         "audioDeviceDefault": "Predeterminado del sistema",
         "microtonalPitchControls": "Controles de tono microtonales",
-        "microtonalPitchControls_description": "Añade más controles de tono para moverse entre semitonos"
+        "microtonalPitchControls_description": "Añade más controles de tono para moverse entre semitonos",
+        "hotkey_playbackNextAlbum": "Siguiente álbum",
+        "hotkey_playbackPreviousAlbum": "Álbum anterior",
+        "logLevel_optionDebugDescription": "Incluye información, más información de depuración desarrollada y respuestas redactadas de las API",
+        "logLevel_optionInfoDescription": "Incluye información, advertencias y errores",
+        "exportDiagnostics": "Exportar diagnósticos"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",
@@ -546,7 +551,8 @@
         "selectAll": "Seleccionar todo",
         "goToCurrent": "Ir al elemento actual",
         "collapseAllFolders": "Contraer todas las carpetas",
-        "expandAllFolders": "Expandir todas las carpetas"
+        "expandAllFolders": "Expandir todas las carpetas",
+        "createPlaylistFromQueue": "Crear $t(entity.playlist, {\"count\": 1}) desde la cola"
     },
     "common": {
         "backward": "Hacia atrás",
@@ -677,7 +683,13 @@
         "numberOfResults": "{{numberOfResults}} resultados",
         "grouping": "Agrupar",
         "back": "Atrás",
-        "openFolder": "Abrir carpeta"
+        "openFolder": "Abrir carpeta",
+        "saveAndClose": "Guardar y cerrar",
+        "undo": "Deshacer",
+        "lastScan": "Último escaneo {{date}}",
+        "scanFolderCount": "{{count}} carpetas",
+        "scanItemCount": "{{count}} elementos",
+        "scanningLibrary": "Escaneando biblioteca…"
     },
     "error": {
         "remotePortWarning": "Reiniciar el servidor para aplicar el nuevo puerto",
@@ -796,7 +808,8 @@
             "selectMusicFolder": "Seleccionar carpeta de música",
             "noMusicFolder": "Ninguna carpeta de música seleccionada",
             "multipleMusicFolders": "{{count}} carpetas de música seleccionadas",
-            "commandPalette": "Abrir paleta de comandos"
+            "commandPalette": "Abrir paleta de comandos",
+            "logout": "Cerrar sesión"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -824,7 +837,8 @@
             "goToAlbum": "Ir a $t(entity.album, {\"count\": 1})",
             "goToAlbumArtist": "Ir a $t(entity.albumArtist, {\"count\": 1})",
             "moveItems": "$t(action.moveItems)",
-            "goTo": "Ir a"
+            "goTo": "Ir a",
+            "editMetadata": "Editar metadatos"
         },
         "home": {
             "mostPlayed": "Más reproducidos",
@@ -947,7 +961,27 @@
         "itemDetail": {
             "copiedPath": "Ruta copiada correctamente",
             "openFile": "Mostrar pista en el gestor de archivos",
-            "copyPath": "Copiar ruta al portapapeles"
+            "copyPath": "Copiar ruta al portapapeles",
+            "tagConfiguration": "Configuración de etiqueta",
+            "addTagConfig": "Añadir etiqueta…",
+            "multiValueToggle": "Valor múltiple",
+            "autocompleteSource": "Completar fuente automáticamente",
+            "customValues": "Valores personalizados",
+            "addCustomValue": "Añadir valor personalizado…",
+            "serverSuggestions": "Servidor",
+            "fileNotWritable": "El archivo no es accesible o editable",
+            "addField": "Añadir campo…",
+            "emptyFields": "Los campos no pueden estar vacíos",
+            "tagsTab": "Etiquetas",
+            "artworkTab": "Ilustración",
+            "removeArtwork": "Eliminar ilustración",
+            "noArtwork": "Sin ilustración",
+            "multipleValues": "(Valores múltiples)",
+            "multipleArtworks": "Múltiples ilustraciones",
+            "noLocalSongs": "Ninguna canción con rutas de archivo locales encontrada",
+            "readPartialFailure": "No se pudo leer los metadatos de {{count}} de {{total}} archivo(s)",
+            "writePartialFailure": "Error al guardar {{count}} archivo(s)",
+            "triggerRescan": "Activar otro escaneo de la biblioteca después de guardar"
         },
         "playlist": {
             "reorder": "La reordenación solo se activa al ordenar por ID"
@@ -1100,6 +1134,9 @@
         },
         "editRadioStation": {
             "success": "Estación de radio actualizada con éxito"
+        },
+        "createPrefilledPlaylist": {
+            "title": "Crear $t(entity.playlist, {\"count\": 1}) desde las canciones seleccionadas"
         }
     },
     "table": {
@@ -1205,7 +1242,8 @@
                 "albumImageSize": "Tamaño de la imagen del álbum",
                 "albumGroupConfig": "Configuración del grupo del álbum",
                 "albumGroupMetadata": "Campos de metadatos",
-                "albumGroupShowFavoriteRating": "Mostrar favoritos y calificaciones"
+                "albumGroupShowFavoriteRating": "Mostrar favoritos y calificaciones",
+                "albumGroupVerticalLayout": "Diseño vertical"
             },
             "view": {
                 "table": "Tabla",

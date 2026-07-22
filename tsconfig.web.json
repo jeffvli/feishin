@@ -6,6 +6,7 @@
     "src/renderer/**/*.tsx",
     "src/preload/*.d.ts",
     "src/i18n/**/*",
+    "src/main/features/core/lyrics/furigana.ts",
     "src/shared/**/*",
     "src/remote/**/*",
     "package.json"
@@ -18,8 +19,14 @@
       "/@/renderer/*": [
         "src/renderer/*"
       ],
+      "/@/lyrics-conversion-api": [
+        "src/main/features/core/lyrics/furigana.ts"
+      ],
       "/@/shared/*": [
         "src/shared/*"
+      ],
+      "/@/main/*": [
+        "src/main/*"
       ],
       "/@/i18n/*": [
         "src/i18n/*"

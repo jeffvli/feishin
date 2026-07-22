@@ -2,7 +2,10 @@ import isElectron from 'is-electron';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useAudioDevices } from '/@/renderer/features/settings/components/playback/audio-settings';
+import {
+    getDefaultAudioDevice,
+    useAudioDevices,
+} from '/@/renderer/features/settings/components/playback/audio-settings';
 import { ListConfigTable } from '/@/renderer/features/shared/components/list-config-menu';
 import {
     usePlaybackType,
@@ -253,7 +256,6 @@ const AudioDeviceConfig = () => {
             clearable
             comboboxProps={{ withinPortal: false }}
             data={audioDevices}
-            defaultValue={audioDeviceId}
             disabled={status === PlayerStatus.PLAYING}
             onChange={(e) => {
                 setSettings({
@@ -265,6 +267,7 @@ const AudioDeviceConfig = () => {
                     },
                 });
             }}
+            value={audioDeviceId ?? getDefaultAudioDevice(audioDevices, playbackType)}
             width="100%"
         />
     );

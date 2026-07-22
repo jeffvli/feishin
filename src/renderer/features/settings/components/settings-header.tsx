@@ -1,6 +1,7 @@
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
 
+import { UpdateAvailableButton } from '/@/renderer/features/settings/components/update-available-button';
 import { useSettingSearchContext } from '/@/renderer/features/settings/context/search-context';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
@@ -14,9 +15,10 @@ import { Text } from '/@/shared/components/text/text';
 
 export type SettingsHeaderProps = {
     setSearch: (search: string) => void;
+    showUpdateAvailable?: boolean;
 };
 
-export const SettingsHeader = ({ setSearch }: SettingsHeaderProps) => {
+export const SettingsHeader = ({ setSearch, showUpdateAvailable }: SettingsHeaderProps) => {
     const { t } = useTranslation();
     const { reset } = useSettingsStoreActions();
     const search = useSettingSearchContext();
@@ -48,6 +50,7 @@ export const SettingsHeader = ({ setSearch }: SettingsHeaderProps) => {
                         </LibraryHeaderBar.Title>
                     </Group>
                     <Group>
+                        {showUpdateAvailable && <UpdateAvailableButton />}
                         <SearchInput
                             defaultValue={search}
                             onChange={(event) => setSearch(event.target.value.toLocaleLowerCase())}

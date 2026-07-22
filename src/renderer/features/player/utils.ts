@@ -4,8 +4,7 @@ import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { folderQueries } from '/@/renderer/features/folders/api/folder-api';
 import { PlayerFilter, useSettingsStore } from '/@/renderer/store';
-import { LogCategory, logFn } from '/@/renderer/utils/logger';
-import { logMsg } from '/@/renderer/utils/logger-message';
+import { logger } from '/@/renderer/utils/logger';
 import { resolveSongPath } from '/@/renderer/utils/resolve-song-path';
 import { sortSongList } from '/@/shared/api/utils';
 import {
@@ -435,23 +434,20 @@ export const filterSongsByPlayerFilters = (songs: Song[], filters: PlayerFilter[
     });
 
     if (filteredSongs.length > 0) {
-        logFn.debug(logMsg[LogCategory.PLAYER].playerFiltersApplied, {
-            category: LogCategory.PLAYER,
-            meta: {
-                filteredCount: filteredSongs.length,
-                filteredSongs: filteredSongs.map(({ filter, song }) => ({
-                    artist: song.artistName,
-                    condition: {
-                        field: filter.field,
-                        operator: filter.operator,
-                        value: filter.value,
-                    },
-                    songId: song.id,
-                    songName: song.name,
-                })),
-                originalCount: songs.length,
-                remainingCount: filtered.length,
-            },
+        logger.debug('Player filters applied', {
+            filteredCount: filteredSongs.length,
+            filteredSongs: filteredSongs.map(({ filter, song }) => ({
+                artist: song.artistName,
+                condition: {
+                    field: filter.field,
+                    operator: filter.operator,
+                    value: filter.value,
+                },
+                songId: song.id,
+                songName: song.name,
+            })),
+            originalCount: songs.length,
+            remainingCount: filtered.length,
         });
     }
 

@@ -10,6 +10,7 @@ export interface LyricsScrollContentProps {
     gap?: number;
     paddingLeft?: number;
     paddingRight?: number;
+    preview?: boolean;
     style?: React.CSSProperties;
 }
 
@@ -20,25 +21,35 @@ export const LyricsScrollContent = ({
     gap,
     paddingLeft = 0,
     paddingRight = 0,
+    preview = false,
     style,
 }: LyricsScrollContentProps) => {
-    const contentStyle = useMemo(
-        () =>
-            ({
-                '--lyric-padding-left': `${paddingLeft}%`,
-                '--lyric-padding-right': `${paddingRight}%`,
+    const contentStyle = useMemo(() => {
+        if (preview) {
+            return {
                 gap: gap !== undefined ? `${gap}px` : undefined,
-                paddingBottom: bottomScrollPadding,
-                paddingLeft: `${paddingLeft}%`,
-                paddingRight: `${paddingRight}%`,
-                paddingTop: '10vh',
+                padding: 0,
                 ...style,
-            }) as React.CSSProperties,
-        [bottomScrollPadding, gap, paddingLeft, paddingRight, style],
-    );
+            } as React.CSSProperties;
+        }
+
+        return {
+            '--lyric-padding-left': `${paddingLeft}%`,
+            '--lyric-padding-right': `${paddingRight}%`,
+            gap: gap !== undefined ? `${gap}px` : undefined,
+            paddingBottom: bottomScrollPadding,
+            paddingLeft: `${paddingLeft}%`,
+            paddingRight: `${paddingRight}%`,
+            paddingTop: '10vh',
+            ...style,
+        } as React.CSSProperties;
+    }, [bottomScrollPadding, gap, paddingLeft, paddingRight, preview, style]);
 
     return (
-        <div className={clsx(styles.content, className)} style={contentStyle}>
+        <div
+            className={clsx(styles.content, preview && styles.preview, className)}
+            style={contentStyle}
+        >
             {children}
         </div>
     );

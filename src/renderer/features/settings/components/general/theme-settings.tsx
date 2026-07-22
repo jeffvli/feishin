@@ -4,24 +4,28 @@ import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
 import { StylesSettings } from '/@/renderer/features/settings/components/advanced/styles-settings';
+import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
+import { useCustomThemes, useCustomThemesStore } from '/@/renderer/store/custom-themes.store';
 import { useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { THEME_DATA, useSetColorScheme } from '/@/renderer/themes/use-app-theme';
+import { Button } from '/@/shared/components/button/button';
 import { ColorInput } from '/@/shared/components/color-input/color-input';
 import { Group } from '/@/shared/components/group/group';
 import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
+import { Text } from '/@/shared/components/text/text';
 import { getAppTheme } from '/@/shared/themes/app-theme';
 import { AppTheme } from '/@/shared/themes/app-theme-types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
-const getThemeSwatchColors = (theme: AppTheme) => {
+const getThemeSwatchColors = (theme: AppTheme | string) => {
     const themeConfig = getAppTheme(theme);
     return {
         background: themeConfig.colors?.background || 'rgb(0, 0, 0)',
@@ -34,13 +38,25 @@ const getThemeSwatchColors = (theme: AppTheme) => {
     };
 };
 
-const getGroupedThemeData = () => {
-    const darkThemes = THEME_DATA.filter((theme) => theme.type === 'dark').sort((a, b) =>
-        a.label.localeCompare(b.label),
-    );
-    const lightThemes = THEME_DATA.filter((theme) => theme.type === 'light').sort((a, b) =>
-        a.label.localeCompare(b.label),
-    );
+const getGroupedThemeData = (
+    customThemes: { error?: string; id: string; label: string; mode: 'dark' | 'light' }[],
+) => {
+    const customThemeData = customThemes
+        .filter((theme) => !theme.error)
+        .map((theme) => ({
+            label: theme.label,
+            type: theme.mode,
+            value: theme.id,
+        }));
+
+    const allThemes = [...THEME_DATA, ...customThemeData];
+
+    const darkThemes = allThemes
+        .filter((theme) => theme.type === 'dark')
+        .sort((a, b) => a.label.localeCompare(b.label));
+    const lightThemes = allThemes
+        .filter((theme) => theme.type === 'light')
+        .sort((a, b) => a.label.localeCompare(b.label));
 
     return [
         {
@@ -70,8 +86,7 @@ const ColorSwatch = ({ color }: { color: string }) => {
 };
 
 const renderThemeOption = ({ option }: { option: { label: string; value: string } }) => {
-    const themeValue = option.value as AppTheme;
-    const colors = getThemeSwatchColors(themeValue);
+    const colors = getThemeSwatchColors(option.value);
 
     return (
         <Group gap="sm" style={{ alignItems: 'center', flex: 1 }}>
@@ -86,13 +101,95 @@ const renderThemeOption = ({ option }: { option: { label: string; value: string 
     );
 };
 
+const CustomThemesManager = memo(() => {
+    const { t } = useTranslation();
+    const customThemes = useCustomThemes();
+    const { openThemesFolder, refresh } = useCustomThemesStore();
+
+    const erroredThemes = customThemes.filter((theme) => theme.error);
+    const warnedThemes = customThemes.filter((theme) => !theme.error && theme.warnings?.length);
+
+    return (
+        <>
+            <SettingsOptions
+                control={
+                    <Group gap="xs">
+                        <Button
+                            onClick={() => openThemesFolder()}
+                            size="compact-md"
+                            variant="subtle"
+                        >
+                            {t('common.openFolder', { postProcess: 'titleCase' })}
+                        </Button>
+                        <Button onClick={() => refresh()} size="compact-md" variant="subtle">
+                            {t('common.reload', {
+                                defaultValue: 'Reload',
+                                postProcess: 'titleCase',
+                            })}
+                        </Button>
+                    </Group>
+                }
+                description="Drop .json theme files into this folder to add custom themes. They're picked up automatically whenever you add, edit, or remove a file."
+                title="Custom Themes"
+            />
+            {erroredThemes.length > 0 && (
+                <SettingsOptions
+                    control={
+                        <Stack gap={4}>
+                            {erroredThemes.map((theme) => (
+                                <Text
+                                    isNoSelect
+                                    key={theme.id}
+                                    size="sm"
+                                    style={{ color: 'var(--theme-colors-state-error)' }}
+                                >
+                                    {theme.id}: {theme.error}
+                                </Text>
+                            ))}
+                        </Stack>
+                    }
+                    description="These theme files could not be loaded."
+                    indent
+                    title="Errors"
+                />
+            )}
+            {warnedThemes.length > 0 && (
+                <SettingsOptions
+                    control={
+                        <Stack gap={4}>
+                            {warnedThemes.map((theme) => (
+                                <Stack gap={0} key={theme.id}>
+                                    {theme.warnings?.map((warning) => (
+                                        <Text
+                                            isNoSelect
+                                            key={warning}
+                                            size="sm"
+                                            style={{ color: 'var(--theme-colors-state-warning)' }}
+                                        >
+                                            {theme.id}: {warning}
+                                        </Text>
+                                    ))}
+                                </Stack>
+                            ))}
+                        </Stack>
+                    }
+                    description="These themes loaded, but some values were invalid and were ignored."
+                    indent
+                    title="Warnings"
+                />
+            )}
+        </>
+    );
+});
+
 export const ThemeSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
     const { setColorScheme } = useSetColorScheme();
+    const customThemes = useCustomThemes();
 
-    const groupedThemeData = useMemo(() => getGroupedThemeData(), []);
+    const groupedThemeData = useMemo(() => getGroupedThemeData(customThemes), [customThemes]);
 
     const themeOptions: SettingOption[] = [
         {
@@ -128,7 +225,7 @@ export const ThemeSettings = memo(() => {
                     data={groupedThemeData}
                     defaultValue={settings.theme}
                     onChange={(e) => {
-                        const theme = e as AppTheme;
+                        const theme = e as string;
 
                         setSettings({
                             general: {
@@ -163,7 +260,7 @@ export const ThemeSettings = memo(() => {
                     onChange={(e) => {
                         setSettings({
                             general: {
-                                themeDark: e as AppTheme,
+                                themeDark: e as string,
                             },
                         });
                     }}
@@ -185,7 +282,7 @@ export const ThemeSettings = memo(() => {
                     onChange={(e) => {
                         setSettings({
                             general: {
-                                themeLight: e as AppTheme,
+                                themeLight: e as string,
                             },
                         });
                     }}
@@ -296,7 +393,12 @@ export const ThemeSettings = memo(() => {
 
     return (
         <SettingsSection
-            extra={<StylesSettings />}
+            extra={
+                <>
+                    <CustomThemesManager />
+                    <StylesSettings />
+                </>
+            }
             options={themeOptions}
             title={t('page.setting.theme')}
         />
