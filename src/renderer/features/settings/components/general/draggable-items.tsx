@@ -13,6 +13,7 @@ export type DraggableItemsProps<K, T> = {
     description: string;
     itemLabels: Array<[K, string]>;
     items: T[];
+    nonReorderableItemIds?: K[];
     setItems: (items: T[]) => void;
     showDescription?: boolean;
     title: string;
@@ -47,6 +48,7 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
     description,
     itemLabels,
     items,
+    nonReorderableItemIds,
     setItems,
     showDescription = true,
     title,
@@ -94,6 +96,17 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
         );
     }, [description, keyword, title]);
 
+    const orderedItems = useMemo(() => {
+        if (!nonReorderableItemIds?.length) {
+            return localItems;
+        }
+
+        return [
+            ...localItems.filter((item) => nonReorderableItemIds.includes(item.id as K)),
+            ...localItems.filter((item) => !nonReorderableItemIds.includes(item.id as K)),
+        ];
+    }, [localItems, nonReorderableItemIds]);
+
     if (!shouldShow) {
         return null;
     }
@@ -139,9 +152,10 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
                     style={{ userSelect: 'none' }}
                     values={localItems}
                 >
-                    {localItems.map((item) => (
+                    {orderedItems.map((item) => (
                         <DraggableItem
                             handleChangeDisabled={handleChangeDisabled}
+                            isReorderable={!nonReorderableItemIds?.includes(item.id as K)}
                             item={item}
                             key={item.id}
                             value={translatedItemMap[item.id]}

@@ -13,6 +13,9 @@ import {
 } from '/@/renderer/store';
 
 const PLAYER_ITEMS: Array<[PlayerItem, string]> = [
+    [PlayerItem.TITLE, 'common.title'],
+    [PlayerItem.ARTIST, 'entity.artist_one'],
+    [PlayerItem.ALBUM, 'entity.album_one'],
     [PlayerItem.BIT_DEPTH, 'common.bitDepth'],
     [PlayerItem.BIT_RATE, 'common.bitrate'],
     [PlayerItem.BPM, 'common.bpm'],
@@ -36,6 +39,7 @@ export const FullscreenPlayerSettings = memo(
                 description="setting.playerItemConfiguration"
                 itemLabels={PLAYER_ITEMS}
                 items={playerItems as SortableItem<PlayerItem>[]}
+                nonReorderableItemIds={[PlayerItem.TITLE, PlayerItem.ARTIST, PlayerItem.ALBUM]}
                 setItems={setPlayerItems}
                 showDescription={showDescription}
                 title="setting.playerItemConfiguration"

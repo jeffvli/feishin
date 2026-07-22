@@ -89,17 +89,20 @@ const AlbumGroupItemSchema = z.enum([
 ]);
 
 const PlayerItemSchema = z.enum([
+    'album',
+    'artist',
     'bit_depth',
     'bit_rate',
     'bpm',
-    'disc_number',
-    'sample_rate',
-    'track_number',
     'codec',
-    'release_year',
-    'release_type',
-    'release_date',
+    'disc_number',
     'genres',
+    'release_date',
+    'release_type',
+    'release_year',
+    'sample_rate',
+    'title',
+    'track_number',
 ]);
 
 const ArtistItemSchema = z.enum([
@@ -943,6 +946,8 @@ export enum PlayerbarSliderType {
 }
 
 export enum PlayerItem {
+    ALBUM = 'album',
+    ARTIST = 'artist',
     BIT_DEPTH = 'bit_depth',
     BIT_RATE = 'bit_rate',
     BPM = 'bpm',
@@ -953,6 +958,7 @@ export enum PlayerItem {
     RELEASE_TYPE = 'release_type',
     RELEASE_YEAR = 'release_year',
     SAMPLE_RATE = 'sample_rate',
+    TITLE = 'title',
     TRACK_NUMBER = 'track_number',
 }
 
@@ -1043,6 +1049,18 @@ export type TranscodingConfig = z.infer<typeof TranscodingConfigSchema>;
 export type VersionedSettings = SettingsState & { version: number };
 
 export const playerItems: SortableItem<PlayerItem>[] = [
+    {
+        disabled: false,
+        id: PlayerItem.ALBUM,
+    },
+    {
+        disabled: false,
+        id: PlayerItem.ARTIST,
+    },
+    {
+        disabled: false,
+        id: PlayerItem.TITLE,
+    },
     {
         disabled: true,
         id: PlayerItem.BIT_DEPTH,

@@ -13,6 +13,7 @@ import {
 } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
+    PlayerItem,
     useFullScreenPlayerStore,
     useGeneralSettings,
     useNativeAspectRatio,
@@ -130,6 +131,12 @@ export const FullScreenPlayerImage = () => {
         topExplicit: currentSong?.explicitStatus === ExplicitStatus.EXPLICIT,
         topImage: currentImageUrl,
     });
+
+    const isItemEnabled = (item: PlayerItem) =>
+        !playerItems.find((entry) => entry.id === item)?.disabled;
+    const showTitle = isItemEnabled(PlayerItem.TITLE);
+    const showArtist = isItemEnabled(PlayerItem.ARTIST);
+    const showAlbum = isItemEnabled(PlayerItem.ALBUM);
 
     // Track previous song to detect changes
     const previousSongRef = useRef<string | undefined>(currentSong?._uniqueId);
@@ -268,56 +275,64 @@ export const FullScreenPlayerImage = () => {
             </div>
             {showMetadata && (
                 <Stack className={styles.metadataContainer} gap="md" maw="100%">
-                    <Text fw={900} lh="1.2" overflow="hidden" size="4xl" w="100%">
-                        {isPlayingRadio
-                            ? radioMetadata?.title || stationName || 'Radio'
-                            : currentSong?.name}
-                    </Text>
-                    <Text key="fs-artists" size="xl">
-                        {isPlayingRadio
-                            ? radioMetadata?.artist || stationName || 'Radio'
-                            : currentSong?.artists?.map((artist, index) => (
-                                  <Fragment key={`fs-artist-${artist.id}`}>
-                                      {index > 0 && (
-                                          <Text
-                                              style={{
-                                                  display: 'inline-block',
-                                                  padding: '0 0.5rem',
-                                              }}
-                                          >
-                                              •
-                                          </Text>
-                                      )}
-                                      <Text
-                                          component={Link}
-                                          isLink
-                                          to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
-                                              albumArtistId: artist.id,
-                                          })}
-                                      >
-                                          {artist.name}
-                                      </Text>
-                                  </Fragment>
-                              ))}
-                    </Text>
-                    {isPlayingRadio ? (
-                        <Text overflow="hidden" size="xl" w="100%">
-                            {stationName || 'Radio'}
-                        </Text>
-                    ) : (
-                        <Text
-                            component={Link}
-                            isLink
-                            overflow="hidden"
-                            size="xl"
-                            to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
-                                albumId: currentSong?.albumId || '',
-                            })}
-                            w="100%"
-                        >
-                            {currentSong?.album}
+                    {showTitle && (
+                        <Text fw={900} lh="1.2" overflow="hidden" size="4xl" w="100%">
+                            {isPlayingRadio
+                                ? radioMetadata?.title || stationName || 'Radio'
+                                : currentSong?.name}
                         </Text>
                     )}
+                    {showArtist && (
+                        <Text key="fs-artists" size="xl">
+                            {isPlayingRadio
+                                ? radioMetadata?.artist || stationName || 'Radio'
+                                : currentSong?.artists?.map((artist, index) => (
+                                      <Fragment key={`fs-artist-${artist.id}`}>
+                                          {index > 0 && (
+                                              <Text
+                                                  style={{
+                                                      display: 'inline-block',
+                                                      padding: '0 0.5rem',
+                                                  }}
+                                              >
+                                                  •
+                                              </Text>
+                                          )}
+                                          <Text
+                                              component={Link}
+                                              isLink
+                                              to={generatePath(
+                                                  AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL,
+                                                  {
+                                                      albumArtistId: artist.id,
+                                                  },
+                                              )}
+                                          >
+                                              {artist.name}
+                                          </Text>
+                                      </Fragment>
+                                  ))}
+                        </Text>
+                    )}
+                    {showAlbum &&
+                        (isPlayingRadio ? (
+                            <Text overflow="hidden" size="xl" w="100%">
+                                {stationName || 'Radio'}
+                            </Text>
+                        ) : (
+                            <Text
+                                component={Link}
+                                isLink
+                                overflow="hidden"
+                                size="xl"
+                                to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+                                    albumId: currentSong?.albumId || '',
+                                })}
+                                w="100%"
+                            >
+                                {currentSong?.album}
+                            </Text>
+                        ))}
                     {!isPlayingRadio && (
                         <Group justify="center" mt="sm">
                             {playerItems.map((i) => !i.disabled && builtDataItems[i.id])}
