@@ -1,3 +1,4 @@
+import shuffle from 'lodash/shuffle';
 import { useEffect, useMemo } from 'react';
 
 import { useGridRows } from '/@/renderer/components/item-list/helpers/use-grid-rows';
@@ -36,7 +37,13 @@ import {
     TableColumn,
 } from '/@/shared/types/types';
 
-export const PlaylistDetailAlbumView = ({ data }: { data: PlaylistSongListResponse }) => {
+export const PlaylistDetailAlbumView = ({
+    data,
+    refreshRevision,
+}: {
+    data: PlaylistSongListResponse;
+    refreshRevision: boolean;
+}) => {
     const player = usePlayer();
     const { setItemCount, setListData } = useListContext();
     const { detail, display, grid, itemsPerPage, pagination, table } = useListSettings(
@@ -59,12 +66,29 @@ export const PlaylistDetailAlbumView = ({ data }: { data: PlaylistSongListRespon
             return searched;
         }
 
-        return sortSongList(
-            searched,
-            (query.sortBy as SongListSort) ?? SongListSort.ID,
-            (query.sortOrder as SortOrder) ?? SortOrder.ASC,
-        );
-    }, [data?.items, query, searchTerm]);
+        const sortBy = (query.sortBy as SongListSort) ?? SongListSort.ID;
+        const sortOrder = (query.sortOrder as SortOrder) ?? SortOrder.ASC;
+
+        if (sortBy === SongListSort.RANDOM) {
+            const songsByAlbum = new Map<string, Song[]>();
+
+            searched.forEach((song) => {
+                const albumSongs = songsByAlbum.get(song.albumId);
+                if (albumSongs) {
+                    albumSongs.push(song);
+                } else {
+                    songsByAlbum.set(song.albumId, [song]);
+                }
+            });
+
+            return shuffle(Array.from(songsByAlbum.values())).flatMap((albumSongs) =>
+                sortSongList(albumSongs, SongListSort.ALBUM, SortOrder.ASC),
+            );
+        }
+
+        return sortSongList(searched, sortBy, sortOrder);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- refreshRevision intentionally triggers a new random order
+    }, [data?.items, query, searchTerm, refreshRevision]);
 
     const sortedAlbums = useMemo(
         () => playlistSongsToAlbums(filteredAndSortedSongs),

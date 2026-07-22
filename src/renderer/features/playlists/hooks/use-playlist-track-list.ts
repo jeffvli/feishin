@@ -86,7 +86,10 @@ export function applyClientSideSongFilters(songs: Song[], query: Record<string, 
     return result;
 }
 
-export function usePlaylistTrackList(data: PlaylistSongListResponse | undefined): {
+export function usePlaylistTrackList(
+    data: PlaylistSongListResponse | undefined,
+    refreshRevision: boolean,
+): {
     sortedAndFilteredSongs: Song[];
     totalCount: number;
 } {
@@ -103,7 +106,8 @@ export function usePlaylistTrackList(data: PlaylistSongListResponse | undefined)
         const sortBy = (query.sortBy as SongListSort) ?? SongListSort.ID;
         const sortOrder = (query.sortOrder as SortOrder) ?? SortOrder.ASC;
         return sortSongList(filtered, sortBy, sortOrder);
-    }, [data?.items, query, searchTerm]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- refreshRevision intentionally triggers a new random order
+    }, [data?.items, query, searchTerm, refreshRevision]);
 
     const totalCount = sortedAndFilteredSongs.length;
 

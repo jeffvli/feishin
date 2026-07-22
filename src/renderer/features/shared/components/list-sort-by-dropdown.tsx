@@ -197,6 +197,11 @@ export const CLIENT_SIDE_SONG_FILTERS = [
         value: SongListSort.PLAY_COUNT,
     },
     {
+        defaultOrder: SortOrder.ASC,
+        name: i18n.t('filter.random'),
+        value: SongListSort.RANDOM,
+    },
+    {
         defaultOrder: SortOrder.DESC,
         name: i18n.t('filter.rating'),
         value: SongListSort.RATING,

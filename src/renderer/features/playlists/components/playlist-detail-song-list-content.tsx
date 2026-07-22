@@ -49,6 +49,7 @@ const PlaylistDetailSongListGrid = lazy(() =>
 );
 
 export const PlaylistDetailSongListContent = () => {
+    const [refreshRevision, setRefreshRevision] = useState(true);
     const { playlistId } = useParams() as { playlistId: string };
     const server = useCurrentServer();
     const queryClient = useQueryClient();
@@ -71,6 +72,8 @@ export const PlaylistDetailSongListContent = () => {
                 return;
             }
 
+            setRefreshRevision((prev) => !prev);
+
             const queryKey = playlistsQueries.songList({
                 query: {
                     id: playlistId,
@@ -91,7 +94,10 @@ export const PlaylistDetailSongListContent = () => {
 
     return (
         <Suspense fallback={<Spinner container />}>
-            <PlaylistDetailSongList data={playlistSongsQuery.data} />
+            <PlaylistDetailSongList
+                data={playlistSongsQuery.data}
+                refreshRevision={refreshRevision}
+            />
         </Suspense>
     );
 };
@@ -282,31 +288,49 @@ export const PlaylistDetailSongListEdit = ({ data }: { data: PlaylistSongListRes
     }
 };
 
-const PlaylistDetailTrackView = ({ data }: { data: PlaylistSongListResponse }) => {
+const PlaylistDetailTrackView = ({
+    data,
+    refreshRevision,
+}: {
+    data: PlaylistSongListResponse;
+    refreshRevision: boolean;
+}) => {
     const { isSmartPlaylist, mode } = useListContext();
 
     if (isSmartPlaylist) {
-        return <PlaylistDetailTrackViewContent data={data} />;
+        return <PlaylistDetailTrackViewContent data={data} refreshRevision={refreshRevision} />;
     }
 
     if (mode === 'edit') {
         return <PlaylistDetailSongListEdit data={data} />;
     }
 
-    return <PlaylistDetailTrackViewContent data={data} />;
+    return <PlaylistDetailTrackViewContent data={data} refreshRevision={refreshRevision} />;
 };
 
-const PlaylistDetailTrackViewContent = ({ data }: { data: PlaylistSongListResponse }) => {
-    const { sortedAndFilteredSongs } = usePlaylistTrackList(data);
+const PlaylistDetailTrackViewContent = ({
+    data,
+    refreshRevision,
+}: {
+    data: PlaylistSongListResponse;
+    refreshRevision: boolean;
+}) => {
+    const { sortedAndFilteredSongs } = usePlaylistTrackList(data, refreshRevision);
     return <PlaylistDetailSongListView data={data} items={sortedAndFilteredSongs} />;
 };
 
-const PlaylistDetailSongList = ({ data }: { data: PlaylistSongListResponse }) => {
+const PlaylistDetailSongList = ({
+    data,
+    refreshRevision,
+}: {
+    data: PlaylistSongListResponse;
+    refreshRevision: boolean;
+}) => {
     const { displayMode, mode } = useListContext();
 
     if (mode !== 'edit' && displayMode === LibraryItem.ALBUM) {
-        return <PlaylistDetailAlbumView data={data} />;
+        return <PlaylistDetailAlbumView data={data} refreshRevision={refreshRevision} />;
     }
 
-    return <PlaylistDetailTrackView data={data} />;
+    return <PlaylistDetailTrackView data={data} refreshRevision={refreshRevision} />;
 };
