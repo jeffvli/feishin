@@ -21,6 +21,7 @@ import {
     useIsRadioActive,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { FullscreenPlayerSettings } from '/@/renderer/features/settings/components/general/fullscreen-player-settings';
 import {
     ListConfigMenu,
     SONG_DISPLAY_TYPES,
@@ -227,6 +228,29 @@ const BackgroundImageOverlay = memo(
 
 BackgroundImageOverlay.displayName = 'BackgroundImageOverlay';
 
+interface BackgroundOverlayProps {
+    dynamicBackground: boolean | undefined;
+    opacity: number;
+}
+
+const BackgroundOverlay = memo(({ dynamicBackground, opacity }: BackgroundOverlayProps) => {
+    if (!dynamicBackground) {
+        return null;
+    }
+
+    // Opacity is divided by 120 instead of 100, to prevent a complete black background at maximum opacity
+    const alpha = Math.min(1, Math.max(0, opacity / 120));
+
+    return (
+        <div
+            className={styles.backgroundOverlay}
+            style={{ backgroundColor: `rgba(0, 0, 0, ${alpha})` }}
+        />
+    );
+});
+
+BackgroundOverlay.displayName = 'BackgroundOverlay';
+
 const Controls = () => {
     const { t } = useTranslation();
     const {
@@ -235,6 +259,7 @@ const Controls = () => {
         dynamicIsImage,
         expanded,
         opacity,
+        showMetadata,
         useImageAspectRatio,
     } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
@@ -281,12 +306,12 @@ const Controls = () => {
 
     return (
         <Group
-            className={styles.controlsContainer}
+            className="full-screen-player-controls-container"
             gap="sm"
             p="1rem"
             pos="absolute"
             style={{
-                background: `rgb(var(--theme-colors-background-transparent), ${opacity}%)`,
+                background: `rgb(var(--theme-colors-background-transparent)`,
                 left: 0,
                 top: 0,
             }}
@@ -388,6 +413,31 @@ const Controls = () => {
                             />
                         </Option.Control>
                     </Option>
+                    <Divider my="sm" />
+                    <Option>
+                        <Option.Label>
+                            {t('page.fullscreenPlayer.config.showMetadata')}
+                        </Option.Label>
+                        <Option.Control>
+                            <Switch
+                                checked={showMetadata}
+                                onChange={(e) =>
+                                    setStore({
+                                        showMetadata: e.currentTarget.checked,
+                                    })
+                                }
+                            />
+                        </Option.Control>
+                    </Option>
+                    {showMetadata && (
+                        <Option>
+                            <Option.Control>
+                                <div style={{ width: '100%' }}>
+                                    <FullscreenPlayerSettings description={false} />
+                                </div>
+                            </Option.Control>
+                        </Option>
+                    )}
                     <Divider my="sm" />
                     <Option>
                         <Option.Label>
@@ -619,11 +669,18 @@ interface PlayerContainerProps {
     children: ReactNode;
     dynamicBackground: boolean | undefined;
     dynamicIsImage: boolean | undefined;
+    opacity: number;
     windowBarStyle: Platform;
 }
 
 const PlayerContainer = memo(
-    ({ children, dynamicBackground, dynamicIsImage, windowBarStyle }: PlayerContainerProps) => {
+    ({
+        children,
+        dynamicBackground,
+        dynamicIsImage,
+        opacity,
+        windowBarStyle,
+    }: PlayerContainerProps) => {
         const currentSong = usePlayerSong();
         const imageUrl = useItemImageUrl({
             id: currentSong?.imageId || undefined,
@@ -651,6 +708,7 @@ const PlayerContainer = memo(
                     dynamicBackground={dynamicBackground}
                     dynamicIsImage={dynamicIsImage}
                 />
+                <BackgroundOverlay dynamicBackground={dynamicBackground} opacity={opacity} />
                 {children}
             </motion.div>
         );
@@ -660,7 +718,8 @@ const PlayerContainer = memo(
 PlayerContainer.displayName = 'PlayerContainer';
 
 export const FullScreenPlayer = () => {
-    const { dynamicBackground, dynamicImageBlur, dynamicIsImage } = useFullScreenPlayerStore();
+    const { dynamicBackground, dynamicImageBlur, dynamicIsImage, opacity } =
+        useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { windowBarStyle } = useWindowSettings();
     const isRadioActive = useIsRadioActive();
@@ -684,6 +743,7 @@ export const FullScreenPlayer = () => {
         <PlayerContainer
             dynamicBackground={effectiveDynamicBackground}
             dynamicIsImage={dynamicIsImage}
+            opacity={opacity}
             windowBarStyle={windowBarStyle}
         >
             <Controls />

@@ -14,6 +14,7 @@ export type DraggableItemsProps<K, T> = {
     itemLabels: Array<[K, string]>;
     items: T[];
     setItems: (items: T[]) => void;
+    showDescription?: boolean;
     title: string;
 };
 
@@ -47,6 +48,7 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
     itemLabels,
     items,
     setItems,
+    showDescription = true,
     title,
 }: DraggableItemsProps<K, T>) => {
     const { t } = useTranslation();
@@ -127,6 +129,7 @@ export const DraggableItems = <K extends string, T extends SortableItem<K>>({
                     </>
                 }
                 description={descriptionText}
+                showDescription={showDescription}
                 title={titleText}
             />
             {open && (

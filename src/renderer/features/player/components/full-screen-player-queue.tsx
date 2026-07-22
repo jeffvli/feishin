@@ -78,7 +78,7 @@ const Controls = () => {
 
     return (
         <Group
-            className="full-screen-player-queue-header"
+            className="full-screen-player-controls-container"
             gap="xs"
             p="1rem"
             pos="absolute"
@@ -106,20 +106,13 @@ const Controls = () => {
 };
 
 export const FullScreenPlayerQueue = () => {
-    const { activeTab, opacity } = useFullScreenPlayerStore();
+    const { activeTab } = useFullScreenPlayerStore();
     const { webAudio } = usePlaybackSettings();
     const visualizerType = useSettingsStore((store) => store.visualizer.type);
 
     return (
         <>
-            <div
-                className={clsx(styles.gridContainer, 'full-screen-player-queue-container')}
-                style={
-                    {
-                        '--opacity': opacity / 100,
-                    } as CSSProperties
-                }
-            >
+            <div className={clsx(styles.gridContainer, 'full-screen-player-queue-container')}>
                 {activeTab === 'queue' ? (
                     <div className={styles.queueContainer}>
                         <PlayQueue

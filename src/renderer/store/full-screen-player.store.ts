@@ -17,6 +17,7 @@ interface FullScreenPlayerState {
     dynamicIsImage?: boolean;
     expanded: boolean;
     opacity: number;
+    showMetadata: boolean;
     useImageAspectRatio: boolean;
     visualizerExpanded: boolean;
 }
@@ -35,7 +36,8 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                 dynamicImageBlur: 1.5,
                 dynamicIsImage: false,
                 expanded: false,
-                opacity: 60,
+                opacity: 25,
+                showMetadata: true,
                 useImageAspectRatio: false,
                 visualizerExpanded: false,
             })),
@@ -53,7 +55,7 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                 return persistedState;
             },
             name: 'store_full_screen_player',
-            version: 3,
+            version: 4,
         },
     ),
 );
