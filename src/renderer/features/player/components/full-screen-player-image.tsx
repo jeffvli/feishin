@@ -13,7 +13,6 @@ import {
 } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
-    PlayerItem,
     useFullScreenPlayerStore,
     useGeneralSettings,
     useNativeAspectRatio,

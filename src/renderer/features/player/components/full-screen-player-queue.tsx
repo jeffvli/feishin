@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { CSSProperties, lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './full-screen-player-queue.module.css';
