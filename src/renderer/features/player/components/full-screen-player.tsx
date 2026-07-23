@@ -259,6 +259,7 @@ const Controls = () => {
         dynamicIsImage,
         expanded,
         opacity,
+        playerItemAlignment,
         useImageAspectRatio,
     } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
@@ -413,6 +414,35 @@ const Controls = () => {
                         </Option.Control>
                     </Option>
                     <Divider my="sm" />
+                    <Option>
+                        <Option.Label>
+                            {t('page.fullscreenPlayer.config.playerItemAlignment')}
+                        </Option.Label>
+                        <Option.Control>
+                            <SegmentedControl
+                                data={[
+                                    {
+                                        label: t('common.left'),
+                                        value: 'left',
+                                    },
+                                    {
+                                        label: t('common.center'),
+                                        value: 'center',
+                                    },
+                                    {
+                                        label: t('common.right'),
+                                        value: 'right',
+                                    },
+                                ]}
+                                onChange={(value) =>
+                                    setStore({
+                                        playerItemAlignment: value as 'center' | 'left' | 'right',
+                                    })
+                                }
+                                value={playerItemAlignment}
+                            />
+                        </Option.Control>
+                    </Option>
                     <Option>
                         <Option.Control>
                             <div style={{ width: '100%' }}>

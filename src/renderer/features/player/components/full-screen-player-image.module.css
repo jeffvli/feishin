@@ -28,6 +28,7 @@
     text-align: center;
     cursor: default;
     border-radius: 5px;
+    width: 100%;
 
     a {
         cursor: pointer;

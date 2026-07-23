@@ -106,6 +106,7 @@ export const FullScreenPlayerImage = () => {
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();
     const { blurExplicitImages, playerItems } = useGeneralSettings();
+    const { playerItemAlignment } = useFullScreenPlayerStore();
 
     const isPlayingRadio = isRadioActive && isRadioPlaying;
 
@@ -178,6 +179,18 @@ export const FullScreenPlayerImage = () => {
         showTitle ||
         showArtist ||
         showAlbum;
+    const metadataAlignment =
+        playerItemAlignment === 'center'
+            ? 'center'
+            : playerItemAlignment === 'right'
+              ? 'flex-end'
+              : 'flex-start';
+    const metadataTextAlign =
+        playerItemAlignment === 'center'
+            ? 'center'
+            : playerItemAlignment === 'right'
+              ? 'right'
+              : 'left';
 
     // Keep ref in sync
     useEffect(() => {
@@ -279,7 +292,15 @@ export const FullScreenPlayerImage = () => {
                 </AnimatePresence>
             </div>
             {showMetadata && (
-                <Stack className={styles.metadataContainer} gap="md" maw="100%">
+                <Stack
+                    className={styles.metadataContainer}
+                    gap="md"
+                    maw="80%"
+                    style={{
+                        alignItems: metadataAlignment,
+                        textAlign: metadataTextAlign,
+                    }}
+                >
                     {showTitle && (
                         <Text fw={900} lh="1.2" overflow="hidden" size="4xl" w="100%">
                             {isPlayingRadio
@@ -339,7 +360,7 @@ export const FullScreenPlayerImage = () => {
                             </Text>
                         ))}
                     {!isPlayingRadio && (
-                        <Group justify="center" mt="sm">
+                        <Group justify={metadataAlignment} mt="sm" w="100%">
                             {playerItems.map((i) => !i.disabled && builtDataItems[i.id])}
                         </Group>
                     )}

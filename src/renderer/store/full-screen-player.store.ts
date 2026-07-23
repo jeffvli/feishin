@@ -4,6 +4,8 @@ import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+export type FullScreenPlayerItemAlignment = 'center' | 'left' | 'right';
+
 export interface FullScreenPlayerSlice extends FullScreenPlayerState {
     actions: {
         setStore: (data: Partial<FullScreenPlayerSlice>) => void;
@@ -17,6 +19,7 @@ interface FullScreenPlayerState {
     dynamicIsImage?: boolean;
     expanded: boolean;
     opacity: number;
+    playerItemAlignment: FullScreenPlayerItemAlignment;
     useImageAspectRatio: boolean;
     visualizerExpanded: boolean;
 }
@@ -35,7 +38,8 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                 dynamicImageBlur: 1.5,
                 dynamicIsImage: false,
                 expanded: false,
-                opacity: 25,
+                opacity: 20,
+                playerItemAlignment: 'center',
                 useImageAspectRatio: false,
                 visualizerExpanded: false,
             })),

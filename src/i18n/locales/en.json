@@ -572,6 +572,7 @@
                 "lyricOpacityNonActive": "Non-active lyric opacity",
                 "lyricScaleNonActive": "Non-active lyric scale",
                 "opacity": "Opacity",
+                "playerItemAlignment": "Player item alignment",
                 "showLyricMatch": "Show lyric match",
                 "showLyricProvider": "Show lyric provider",
                 "synchronized": "Synchronized",

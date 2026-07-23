@@ -36,7 +36,6 @@ export const SettingsOptions = memo(
                     <Stack
                         gap="xs"
                         style={{
-                            alignSelf: 'flex-start',
                             display: 'flex',
                             maxWidth: '50%',
                         }}
