@@ -3,6 +3,7 @@ export * from './use-artist-album-stack';
 export * from './use-check-for-updates';
 export * from './use-container-query';
 export * from './use-fast-average-color';
+export * from './use-github-releases';
 export * from './use-hide-scrollbar';
 export * from './use-hotkeys';
 export * from './use-is-mounted';

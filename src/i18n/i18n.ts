@@ -18,6 +18,7 @@ import id from './locales/id.json';
 import it from './locales/it.json';
 import ja from './locales/ja.json';
 import ko from './locales/ko.json';
+import lv from './locales/lv.json';
 import nbNO from './locales/nb-NO.json';
 import nl from './locales/nl.json';
 import pl from './locales/pl.json';
@@ -51,6 +52,7 @@ const resources = {
     it: { translation: it },
     ja: { translation: ja },
     ko: { translation: ko },
+    lv: { translation: lv },
     'nb-NO': { translation: nbNO },
     nl: { translation: nl },
     pl: { translation: pl },
@@ -128,6 +130,10 @@ export const languages = [
     {
         label: '한국어',
         value: 'ko',
+    },
+    {
+        label: 'Latviešu',
+        value: 'lv',
     },
     {
         label: 'Nederlands',

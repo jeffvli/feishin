@@ -45,10 +45,7 @@ interface Actions {
     getCurrentSong: () => QueueSong | undefined;
     getPlayerData: () => PlayerData;
     getQueue: (groupBy?: QueueGroupingProperty) => GroupedQueue;
-    getQueueOrder: () => {
-        groups: { count: number; name: string }[];
-        items: QueueSong[];
-    };
+    getQueueOrder: () => GroupedQueue;
     increaseVolume: (value: number) => void;
     isFirstTrackInQueue: () => boolean;
     isLastTrackInQueue: () => boolean;
@@ -1058,6 +1055,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         ? state.queue.shuffled.length
                         : queue.items.length;
 
+                    const isStopped = state.player.status === PlayerStatus.STOPPED;
+
                     if (repeat === PlayerRepeat.ONE) {
                         // Manual next while repeat-one is active should still advance in the queue.
                         const nextIndex = Math.min(playbackLength - 1, currentIndex + 1);
@@ -1066,6 +1065,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             state.player.index = nextIndex;
                             state.player.playerNum = 1;
                             setTimestampStore(0);
+
+                            if (isStopped) {
+                                state.player.status = PlayerStatus.PLAYING;
+                            }
                         });
 
                         eventEmitter.emit('MEDIA_NEXT', {
@@ -1115,6 +1118,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.index = nextIndex;
                         state.player.playerNum = 1;
                         setTimestampStore(0);
+
+                        if (isStopped) {
+                            state.player.status = PlayerStatus.PLAYING;
+                        }
                     });
 
                     eventEmitter.emit('MEDIA_NEXT', {
@@ -1249,10 +1256,17 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         previousIndex = Math.max(0, currentIndex - 1);
                     }
 
+                    // Same Chromium Media Session pitfall as mediaNext: a STOPPED→new-src
+                    // transition without PLAYING drops OS media-key routing.
+                    const resumeFromStopped = get().player.status === PlayerStatus.STOPPED;
+
                     set((state) => {
                         state.player.index = previousIndex;
                         state.player.playerNum = 1;
                         setTimestampStore(0);
+                        if (resumeFromStopped) {
+                            state.player.status = PlayerStatus.PLAYING;
+                        }
                     });
 
                     eventEmitter.emit('MEDIA_PREV', {

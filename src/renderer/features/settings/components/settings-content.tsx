@@ -2,8 +2,11 @@ import isElectron from 'is-electron';
 import { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import styles from './settings-content.module.css';
+
 import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import { Box } from '/@/shared/components/box/box';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Tabs } from '/@/shared/components/tabs/tabs';
 
@@ -37,6 +40,14 @@ const AdvancedTab = lazy(() =>
     })),
 );
 
+const SuspenseSpinner = () => {
+    return (
+        <Box className={styles.spinnerContainer}>
+            <Spinner container />
+        </Box>
+    );
+};
+
 export const SettingsContent = () => {
     const { t } = useTranslation();
     const currentTab = useSettingsStore((state) => state.tab);
@@ -44,7 +55,7 @@ export const SettingsContent = () => {
 
     return (
         <LibraryContainer>
-            <div style={{ height: '100%', overflow: 'scroll', padding: '1rem', width: '100%' }}>
+            <div className={styles.scrollContainer}>
                 <Tabs
                     keepMounted={false}
                     onChange={(e) => e && setSettings({ tab: e })}
@@ -62,29 +73,29 @@ export const SettingsContent = () => {
                         <Tabs.Tab value="advanced">{t('page.setting.advanced')}</Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel value="general">
-                        <Suspense fallback={<Spinner container />}>
+                        <Suspense fallback={<SuspenseSpinner />}>
                             <GeneralTab />
                         </Suspense>
                     </Tabs.Panel>
                     <Tabs.Panel value="playback">
-                        <Suspense fallback={<Spinner container />}>
+                        <Suspense fallback={<SuspenseSpinner />}>
                             <PlaybackTab />
                         </Suspense>
                     </Tabs.Panel>
                     <Tabs.Panel value="hotkeys">
-                        <Suspense fallback={<Spinner container />}>
+                        <Suspense fallback={<SuspenseSpinner />}>
                             <HotkeysTab />
                         </Suspense>
                     </Tabs.Panel>
                     {isElectron() && (
                         <Tabs.Panel value="window">
-                            <Suspense fallback={<Spinner container />}>
+                            <Suspense fallback={<SuspenseSpinner />}>
                                 <WindowTab />
                             </Suspense>
                         </Tabs.Panel>
                     )}
                     <Tabs.Panel value="advanced">
-                        <Suspense fallback={<Spinner container />}>
+                        <Suspense fallback={<SuspenseSpinner />}>
                             <AdvancedTab />
                         </Suspense>
                     </Tabs.Panel>

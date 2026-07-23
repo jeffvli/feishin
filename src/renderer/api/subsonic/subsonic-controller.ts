@@ -14,7 +14,7 @@ import {
     getDirectPlayProfiles,
 } from '/@/renderer/features/player/components/audio-players';
 import { randomString } from '/@/renderer/utils';
-import { logFn } from '/@/renderer/utils/logger';
+import { logger } from '/@/renderer/utils/logger';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { ssNormalize } from '/@/shared/api/subsonic/subsonic-normalize';
 import {
@@ -1360,6 +1360,22 @@ export const SubsonicController: InternalControllerEndpoint = {
         final.splice(0, 0, { label: 'all artists', value: '' });
         return final;
     },
+    getScanStatus: async (args) => {
+        const { apiClientProps } = args;
+
+        const res = await ssApiClient(apiClientProps).getScanStatus({ query: {} });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get scan status');
+        }
+
+        return {
+            count: res.body.scanStatus.count,
+            folderCount: res.body.scanStatus.folderCount,
+            lastScan: res.body.scanStatus.lastScan,
+            scanning: res.body.scanStatus.scanning,
+        };
+    },
     getServerInfo: async (args) => {
         const { apiClientProps } = args;
 
@@ -1415,13 +1431,13 @@ export const SubsonicController: InternalControllerEndpoint = {
             if (jukeboxStatus.status === 200 && !(jukeboxStatus.body as any)?.error) {
                 features[ServerFeature.JUKEBOX] = [1];
             } else {
-                console.log(
+                logger.warn(
                     'Jukebox endpoint returned an error payload:',
                     (jukeboxStatus.body as any)?.error,
                 );
             }
         } catch (error) {
-            console.log('Jukebox is not supported by this server:', error);
+            logger.warn('Jukebox is not supported by this server:', error);
         }
 
         return { features, id: apiClientProps.server?.id, version: ping.body.serverVersion };
@@ -1938,7 +1954,7 @@ export const SubsonicController: InternalControllerEndpoint = {
 
             // If the server returns an error for transcodeDecision, fall back to direct stream so that we don't break the player
             if (transcodeDecision.status !== 200) {
-                logFn.error(
+                logger.error(
                     `Failed to get transcode decision for song ${id}, falling back to direct stream`,
                 );
                 return streamUrl;
@@ -1952,7 +1968,7 @@ export const SubsonicController: InternalControllerEndpoint = {
                 return streamUrl;
             }
 
-            logFn.info(`Song ${id} requires transcoding: ${[td.transcodeReason].join(', ')}`);
+            logger.info(`Song ${id} requires transcoding: ${[td.transcodeReason].join(', ')}`);
 
             // If the server does not return transcode params, manually create the transcode params
             if (!td.transcodeParams) {
@@ -2086,6 +2102,17 @@ export const SubsonicController: InternalControllerEndpoint = {
         }
 
         return res.body;
+    },
+    refreshItems: async (args) => {
+        const { apiClientProps } = args;
+
+        const res = await ssApiClient(apiClientProps).startScan({ query: {} });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to start scan');
+        }
+
+        return null;
     },
     removeFromPlaylist: async ({ apiClientProps, query }) => {
         const res = await ssApiClient(apiClientProps).updatePlaylist({
@@ -2244,41 +2271,35 @@ export const SubsonicController: InternalControllerEndpoint = {
                 positionMs: Math.round(query.position ?? 0),
             };
 
-            const reportPlayback = (state: 'paused' | 'playing' | 'starting' | 'stopped') => {
-                return ssApiClient(apiClientProps).reportPlayback({
+            const reportPlayback = async (state: 'paused' | 'playing' | 'starting' | 'stopped') => {
+                const res = await ssApiClient(apiClientProps).reportPlayback({
                     query: {
                         ...defaultParams,
                         state,
                     },
                 });
-            };
-
-            const promises: Promise<any>[] = [];
-
-            switch (query.event) {
-                case 'pause':
-                    promises.push(reportPlayback('paused'));
-                    break;
-                case 'start':
-                    promises.push(reportPlayback('starting'));
-                    promises.push(reportPlayback('playing'));
-                    break;
-                case 'stop':
-                    promises.push(reportPlayback('stopped'));
-                    break;
-                case 'unpause':
-                    promises.push(reportPlayback('playing'));
-                    break;
-                default:
-                    break;
-            }
-
-            for (const promise of promises) {
-                const res = await promise;
 
                 if (res.status !== 200) {
                     throw new Error('Failed to report playback');
                 }
+            };
+
+            switch (query.event) {
+                case 'pause':
+                    await reportPlayback('paused');
+                    break;
+                case 'start':
+                    await reportPlayback('starting');
+                    await reportPlayback('playing');
+                    break;
+                case 'stop':
+                    await reportPlayback('stopped');
+                    break;
+                case 'unpause':
+                    await reportPlayback('playing');
+                    break;
+                default:
+                    break;
             }
 
             return null;

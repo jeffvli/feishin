@@ -17,6 +17,7 @@ import {
     getSearchResults as searchSimpMusic,
 } from './simpmusic';
 
+import log from '/@/main/logger';
 import { Song } from '/@/shared/types/domain-types';
 
 export enum LyricSource {
@@ -110,7 +111,7 @@ const searchAllSources = async (
             allSearchResults.push(...result.value.searchResults);
         } else if (result.status === 'rejected') {
             const index = settled.indexOf(result);
-            console.error(`Error searching ${sources[index]} for lyrics:`, result.reason);
+            log.error(`Error searching ${sources[index]} for lyrics:`, result.reason);
         }
     }
     return allSearchResults;
@@ -174,7 +175,7 @@ const getRemoteLyrics = async (song: Song) => {
             };
         }
     } catch (error) {
-        console.error(`Error fetching lyrics from ${bestMatch.source}:`, error);
+        log.error(`Error fetching lyrics from ${bestMatch.source}:`, error);
     }
 
     if (lyricsFromSource) {

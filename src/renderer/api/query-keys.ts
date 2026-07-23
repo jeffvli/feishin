@@ -363,6 +363,7 @@ export const queryKeys: Record<
     },
     server: {
         root: (serverId: string) => [serverId] as const,
+        scanStatus: (serverId: string) => [serverId, 'server', 'scanStatus'] as const,
     },
     songs: {
         albumRadio: (serverId: string, query?: AlbumRadioQuery) => {

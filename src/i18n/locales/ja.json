@@ -207,7 +207,7 @@
         "savePlayQueue_description": "アプリケーション終了時に再生キューを保存し、アプリケーション開始時に復元します",
         "useSystemTheme": "システムテーマを使用",
         "webAudio": "Web Audio を使用する",
-        "mediaSession_description": "Media Session の統合を有効にし、システムボリュームオーバーレイとロック画面にメディアコントロールとメタデータを表示します",
+        "mediaSession_description": "Media Session の統合を有効にし、システムボリュームオーバーレイとロック画面にメディアコントロールとメタデータを表示します。Web Audio Player が必要です。",
         "mediaSession": "Media Session を有効にする",
         "startMinimized_description": "システムトレイでアプリケーションを起動する",
         "startMinimized": "最小化して起動する",
@@ -317,7 +317,7 @@
         "exportImportSettings_importModalTitle": "Feishin 設定をインポート",
         "exportImportSettings_importBtn": "設定をインポート",
         "autoDJ": "自動 DJ",
-        "autoDJ_itemCount_description": "自動 DJ が有効なときにキューに追加しようとした曲数",
+        "autoDJ_itemCount_description": "キューに追加しようとした曲数",
         "autoDJ_itemCount": "曲数",
         "autoDJ_timing": "タイミング",
         "autoDJ_timing_description": "自動 DJ が作動するまでのキューに残っている曲数",
@@ -332,9 +332,7 @@
         "logLevel": "ログレベル",
         "logLevel_description": "表示するログの最小レベルを設定します。Debug はすべてのログを表示し、Error はエラーのみを表示します",
         "logLevel_optionDebug": "Debug",
-        "logLevel_optionError": "Error",
         "logLevel_optionInfo": "Info",
-        "logLevel_optionWarn": "Warn",
         "playerFilters": "キューから曲をフィルタリング",
         "playerFilters_description": "以下の基準に基づいて曲をキューに追加しないようにします",
         "artistRadioCount": "アーティスト / トラックのラジオカウント",
@@ -434,7 +432,7 @@
         "hotkey_listShowPlayingSong": "再生中の曲をリストに表示",
         "autoDJ_mode": "モード",
         "autoDJ_mode_albums": "アルバム",
-        "autoDJ_mode_description": "キューに曲を追加するか、アルバム全体を追加するかを選択してください。",
+        "autoDJ_mode_description": "曲またはアルバム全体をキューに追加するかを選択してください",
         "autoDJ_mode_songs": "曲",
         "autoDJ_enabled": "Auto DJを有効にする",
         "autoDJ_albumStrategy": "アルバム選択モード",
@@ -509,7 +507,8 @@
         "addOrRemoveFromSelection": "選択に追加または選択から除外",
         "goToCurrent": "現在の項目へ移動",
         "collapseAllFolders": "すべてのフォルダーを折りたたむ",
-        "expandAllFolders": "すべてのフォルダーを展開する"
+        "expandAllFolders": "すべてのフォルダーを展開する",
+        "createPlaylistFromQueue": "キューから $t(entity.playlist, {\"count\": 1}) を作成"
     },
     "common": {
         "backward": "逆行",
@@ -632,7 +631,9 @@
         "numberOfResults": "{{numberOfResults}} 件の結果",
         "grouping": "グループ化",
         "back": "戻る",
-        "openFolder": "フォルダーを開く"
+        "openFolder": "フォルダーを開く",
+        "saveAndClose": "保存して閉じる",
+        "undo": "元に戻す"
     },
     "table": {
         "config": {
@@ -861,13 +862,20 @@
                 "dynamicIsImage": "背景画像を有効にする",
                 "lyricOffset": "歌詞のオフセット (ms)",
                 "lyricOpacityNonActive": "非アクティブな歌詞の不透明度",
-                "lyricScaleNonActive": "非アクティブな歌詞のスケール"
+                "lyricScaleNonActive": "非アクティブな歌詞のスケール",
+                "lyricLineLeadTime": "行を読み込む時間 (ms)",
+                "lyricPaddingLeft": "歌詞の左側のパディング (%)",
+                "lyricPaddingRight": "歌詞の右側のパディング (%)"
             },
             "upNext": "次へ",
             "lyrics": "歌詞",
             "related": "関連",
             "visualizer": "ビジュアライザー",
-            "noLyrics": "歌詞が見つかりません"
+            "noLyrics": "歌詞が見つかりません",
+            "lyricLayers": "歌詞レイヤー",
+            "lyricLanguage": "言語",
+            "showPronunciation": "発音",
+            "showTranslation": "翻訳"
         },
         "appMenu": {
             "selectServer": "サーバーを選択",
@@ -885,7 +893,8 @@
             "selectMusicFolder": "音楽フォルダーを選択",
             "noMusicFolder": "音楽フォルダーが選択されていません",
             "commandPalette": "コマンドパレットを開く",
-            "multipleMusicFolders": "{{count}} 個の音楽フォルダーが選択されました"
+            "multipleMusicFolders": "{{count}} 個の音楽フォルダーが選択されました",
+            "logout": "ログアウト"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -913,7 +922,8 @@
             "showDetails": "情報を取得する",
             "playShuffled": "$t(player.shuffle)",
             "moveItems": "$t(action.moveItems)",
-            "goTo": "移動"
+            "goTo": "移動",
+            "editMetadata": "メタデータを編集"
         },
         "home": {
             "mostPlayed": "最も多く再生",
@@ -1011,7 +1021,9 @@
         "itemDetail": {
             "openFile": "ファイルマネージャーでトラックを表示する",
             "copyPath": "パスをクリップボードにコピーする",
-            "copiedPath": "パスが正常にコピーされました"
+            "copiedPath": "パスが正常にコピーされました",
+            "tagConfiguration": "タグ設定",
+            "addTagConfig": "タグを追加…"
         },
         "playlist": {
             "reorder": "ID によるソート時のみ並べ替えが可能です"
@@ -1069,14 +1081,15 @@
             "input_preferInstantMix": "インスタントミックスを優先する",
             "input_preferRemoteUrl": "公開 URL を優先する",
             "input_remoteUrl": "公開 URL",
-            "input_remoteUrlPlaceholder": "オプション: 外部機能用の公開 URL"
+            "input_remoteUrlPlaceholder": "オプション: 外部機能用の公開 URL",
+            "input_passwordNoSSO": "リバースプロキシ（SSO）認証はサポートされていません。ユーザー名 / パスワード認証と Subsonic 認証のみがサポートされています"
         },
         "addToPlaylist": {
             "success": "$t(entity.trackWithCount, {\"count\": {{message}} }) を $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} }) に追加しました",
             "title": "$t(entity.playlist, {\"count\": 1}) に追加",
             "input_skipDuplicates": "重複をスキップ",
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
-            "create": "$t(entity.playlist, {\"count\": 1}) {{playlist}} を作成する",
+            "create": "$t(entity.playlist, {\"count\": 1}) {{playlist}} を作成",
             "searchOrCreate": "$t(entity.playlist, {\"count\": 2}) を検索するか、入力して新しいプレイリストを作成してください",
             "noneAdded": "$t(entity.playlist, {\"count\": 1}) {{playlist}} にトラックが追加されませんでした"
         },
@@ -1155,6 +1168,9 @@
         },
         "editRadioStation": {
             "success": "ラジオ局の更新に成功しました"
+        },
+        "createPrefilledPlaylist": {
+            "title": "選択した曲から $t(entity.playlist, {\"count\": 1}) を作成"
         }
     },
     "entity": {

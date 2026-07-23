@@ -9,6 +9,8 @@ import {
 } from '.';
 import { orderSearchResults } from './shared';
 
+import log from '/@/main/logger';
+
 const FETCH_URL = 'https://lrclib.net/api/get';
 const SEEARCH_URL = 'https://lrclib.net/api/search';
 
@@ -46,7 +48,7 @@ export async function getLyricsBySongId(songId: string): Promise<null | string> 
     try {
         result = await axios.get<LrcLibTrackResponse>(`${FETCH_URL}/${songId}`);
     } catch (e) {
-        console.error('LrcLib lyrics request got an error!', (e as Error)?.message);
+        log.error('LrcLib lyrics request got an error!', (e as Error)?.message);
         return null;
     }
 
@@ -71,7 +73,7 @@ export async function getSearchResults(
             },
         });
     } catch (e) {
-        console.error('LrcLib search request got an error!', (e as Error)?.message);
+        log.error('LrcLib search request got an error!', (e as Error)?.message);
         return null;
     }
 
@@ -109,7 +111,7 @@ export async function query(
             timeout: TIMEOUT_MS,
         });
     } catch (e) {
-        console.error('LrcLib search request got an error!', (e as Error).message);
+        log.error('LrcLib search request got an error!', (e as Error).message);
         return null;
     }
 

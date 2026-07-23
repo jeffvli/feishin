@@ -9,8 +9,7 @@ import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
 import { AppRoute } from '/@/renderer/router/routes';
 import { getServerById, useAuthStoreActions, useCurrentServerId } from '/@/renderer/store';
-import { LogCategory, logFn } from '/@/renderer/utils/logger';
-import { logMsg } from '/@/renderer/utils/logger-message';
+import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import { AuthState } from '/@/shared/types/types';
 
@@ -67,14 +66,11 @@ export const useServerAuthenticated = () => {
                 }
 
                 // First, try getUserInfo to check if current credentials are still valid
-                logFn.info(logMsg[LogCategory.SYSTEM].authenticatingServer, {
-                    category: LogCategory.SYSTEM,
-                    meta: {
-                        method: 'getUserInfo',
-                        serverId: serverWithAuth.id,
-                        serverName: serverWithAuth.name,
-                        serverType: serverWithAuth.type,
-                    },
+                logger.info('Authenticating server', {
+                    method: 'getUserInfo',
+                    serverId: serverWithAuth.id,
+                    serverName: serverWithAuth.name,
+                    serverType: serverWithAuth.type,
                 });
 
                 try {
@@ -122,27 +118,21 @@ export const useServerAuthenticated = () => {
                         }
                     } catch (serverInfoError) {
                         // Log but don't fail authentication if server info fetch fails
-                        logFn.warn(logMsg[LogCategory.SYSTEM].serverAuthenticationSuccess, {
-                            category: LogCategory.SYSTEM,
-                            meta: {
-                                action: 'server_info_fetch_failed',
-                                error: (serverInfoError as Error).message,
-                                serverId: serverWithAuth.id,
-                                serverName: serverWithAuth.name,
-                            },
+                        logger.warn('Server info fetch failed after auth', {
+                            action: 'server_info_fetch_failed',
+                            error: (serverInfoError as Error).message,
+                            serverId: serverWithAuth.id,
+                            serverName: serverWithAuth.name,
                         });
                     }
 
-                    logFn.info(logMsg[LogCategory.SYSTEM].serverAuthenticationSuccess, {
-                        category: LogCategory.SYSTEM,
-                        meta: {
-                            isAdmin: userInfo.isAdmin,
-                            method: 'getUserInfo',
-                            serverId: serverWithAuth.id,
-                            serverName: serverWithAuth.name,
-                            serverType: serverWithAuth.type,
-                            userId: userInfo.id,
-                        },
+                    logger.info('Server authentication successful', {
+                        isAdmin: userInfo.isAdmin,
+                        method: 'getUserInfo',
+                        serverId: serverWithAuth.id,
+                        serverName: serverWithAuth.name,
+                        serverType: serverWithAuth.type,
+                        userId: userInfo.id,
                     });
 
                     const elapsedTime = Date.now() - authStartTime;
@@ -167,16 +157,13 @@ export const useServerAuthenticated = () => {
                         const password = await localSettings.passwordGet(serverWithAuth.id);
 
                         if (password) {
-                            logFn.info(logMsg[LogCategory.SYSTEM].authenticatingServer, {
-                                category: LogCategory.SYSTEM,
-                                meta: {
-                                    method: 'authenticate',
-                                    reason: 'getUserInfo failed with forbidden error',
-                                    serverId: serverWithAuth.id,
-                                    serverName: serverWithAuth.name,
-                                    serverType: serverWithAuth.type,
-                                    url: serverWithAuth.url,
-                                },
+                            logger.info('Authenticating server', {
+                                method: 'authenticate',
+                                reason: 'getUserInfo failed with forbidden error',
+                                serverId: serverWithAuth.id,
+                                serverName: serverWithAuth.name,
+                                serverType: serverWithAuth.type,
+                                url: serverWithAuth.url,
                             });
 
                             // Authenticate using the API controller
@@ -232,28 +219,22 @@ export const useServerAuthenticated = () => {
                                 }
                             } catch (serverInfoError) {
                                 // Log but don't fail authentication if server info fetch fails
-                                logFn.warn(logMsg[LogCategory.SYSTEM].serverAuthenticationSuccess, {
-                                    category: LogCategory.SYSTEM,
-                                    meta: {
-                                        action: 'server_info_fetch_failed',
-                                        error: (serverInfoError as Error).message,
-                                        serverId: serverWithAuth.id,
-                                        serverName: serverWithAuth.name,
-                                    },
+                                logger.warn('Server info fetch failed after auth', {
+                                    action: 'server_info_fetch_failed',
+                                    error: (serverInfoError as Error).message,
+                                    serverId: serverWithAuth.id,
+                                    serverName: serverWithAuth.name,
                                 });
                             }
 
-                            logFn.info(logMsg[LogCategory.SYSTEM].serverAuthenticationSuccess, {
-                                category: LogCategory.SYSTEM,
-                                meta: {
-                                    isAdmin: authData.isAdmin,
-                                    method: 'authenticate',
-                                    serverId: serverWithAuth.id,
-                                    serverName: serverWithAuth.name,
-                                    serverType: serverWithAuth.type,
-                                    userId: authData.userId,
-                                    username: authData.username,
-                                },
+                            logger.info('Server authentication successful', {
+                                isAdmin: authData.isAdmin,
+                                method: 'authenticate',
+                                serverId: serverWithAuth.id,
+                                serverName: serverWithAuth.name,
+                                serverType: serverWithAuth.type,
+                                userId: authData.userId,
+                                username: authData.username,
                             });
 
                             // Ensure minimum delay before completing authentication
@@ -280,18 +261,15 @@ export const useServerAuthenticated = () => {
                 if (isNetwork && retryAttempt < MAX_NETWORK_RETRIES) {
                     const nextRetry = retryAttempt + 1;
 
-                    logFn.warn(logMsg[LogCategory.SYSTEM].serverAuthenticationFailed, {
-                        category: LogCategory.SYSTEM,
-                        meta: {
-                            action: 'network_error_retry',
-                            attempt: nextRetry,
-                            error: errorMessage,
-                            maxRetries: MAX_NETWORK_RETRIES,
-                            retryDelayMs: NETWORK_RETRY_DELAY_MS,
-                            serverId: serverWithAuth.id,
-                            serverName: serverWithAuth.name,
-                            serverType: serverWithAuth.type,
-                        },
+                    logger.warn('Server authentication failed', {
+                        action: 'network_error_retry',
+                        attempt: nextRetry,
+                        error: errorMessage,
+                        maxRetries: MAX_NETWORK_RETRIES,
+                        retryDelayMs: NETWORK_RETRY_DELAY_MS,
+                        serverId: serverWithAuth.id,
+                        serverName: serverWithAuth.name,
+                        serverType: serverWithAuth.type,
                     });
 
                     // Wait before retrying
@@ -304,16 +282,13 @@ export const useServerAuthenticated = () => {
 
                 // If network error and retries exhausted, redirect to no-network page
                 if (isNetwork && retryAttempt >= MAX_NETWORK_RETRIES) {
-                    logFn.error(logMsg[LogCategory.SYSTEM].serverAuthenticationFailed, {
-                        category: LogCategory.SYSTEM,
-                        meta: {
-                            action: 'network_error_max_retries_exceeded',
-                            attempts: retryAttempt + 1,
-                            error: errorMessage,
-                            serverId: serverWithAuth.id,
-                            serverName: serverWithAuth.name,
-                            serverType: serverWithAuth.type,
-                        },
+                    logger.error('Server authentication failed', {
+                        action: 'network_error_max_retries_exceeded',
+                        attempts: retryAttempt + 1,
+                        error: errorMessage,
+                        serverId: serverWithAuth.id,
+                        serverName: serverWithAuth.name,
+                        serverType: serverWithAuth.type,
                     });
 
                     // Don't clear credentials on network failure - preserve them for when network returns
@@ -323,14 +298,11 @@ export const useServerAuthenticated = () => {
                 }
 
                 // For non-network errors, handle normally
-                logFn.error(logMsg[LogCategory.SYSTEM].serverAuthenticationFailed, {
-                    category: LogCategory.SYSTEM,
-                    meta: {
-                        error: errorMessage,
-                        serverId: serverWithAuth.id,
-                        serverName: serverWithAuth.name,
-                        serverType: serverWithAuth.type,
-                    },
+                logger.error('Server authentication failed', {
+                    error: errorMessage,
+                    serverId: serverWithAuth.id,
+                    serverName: serverWithAuth.name,
+                    serverType: serverWithAuth.type,
                 });
 
                 // Clear server credentials and saved password on failure
@@ -360,11 +332,8 @@ export const useServerAuthenticated = () => {
 
     useEffect(() => {
         if (!serverId) {
-            logFn.debug(logMsg[LogCategory.SYSTEM].serverAuthenticationInvalid, {
-                category: LogCategory.SYSTEM,
-                meta: {
-                    reason: 'No server selected',
-                },
+            logger.info('Server authentication invalid', {
+                reason: 'No server selected',
             });
             setReady(AuthState.INVALID);
             return;
@@ -376,12 +345,9 @@ export const useServerAuthenticated = () => {
             retryCountRef.current = 0; // Reset retry count when server changes
 
             if (!serverWithAuth) {
-                logFn.error(logMsg[LogCategory.SYSTEM].serverAuthenticationError, {
-                    category: LogCategory.SYSTEM,
-                    meta: {
-                        reason: 'Server not found in store',
-                        serverId,
-                    },
+                logger.error('Server authentication error', {
+                    reason: 'Server not found in store',
+                    serverId,
                 });
                 setReady(AuthState.INVALID);
                 return;

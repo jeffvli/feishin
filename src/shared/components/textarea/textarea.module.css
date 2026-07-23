@@ -1,15 +1,20 @@
 .root {
     transition: width 0.3s ease-in-out;
-
-    &[data-disabled='true'] {
-        opacity: 0.6;
-    }
 }
 
 .input {
-    color: var(--theme-colors-surface-foreground);
-    background: var(--theme-colors-surface);
+    width: 100%;
     border: 1px solid transparent;
+
+    &[data-variant='default'] {
+        color: var(--theme-colors-surface-foreground);
+        background: var(--theme-colors-surface);
+    }
+
+    &[data-variant='filled'] {
+        color: var(--theme-colors-foreground);
+        background: var(--theme-colors-background);
+    }
 }
 
 .input:focus,
@@ -19,4 +24,8 @@
 
 .label {
     margin-bottom: var(--theme-spacing-sm);
+}
+
+.required {
+    color: var(--theme-colors-state-error);
 }

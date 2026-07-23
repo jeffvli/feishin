@@ -29,6 +29,7 @@ export interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyric
     extraOverlayLyrics?: SynchronizedLyricsData[];
     lyrics: SynchronizedLyricsData;
     offsetMs?: number;
+    preview?: boolean;
     pronunciationLyrics?: null | SynchronizedLyricsData;
     romajiLyrics?: null | SynchronizedLyricsData;
     settingsKey?: string;
@@ -38,12 +39,15 @@ export interface SynchronizedLyricsProps extends Omit<FullLyricsMetadata, 'lyric
 }
 
 const SEEK_DETECT_THRESHOLD_MS = 500;
+const PREVIEW_FONT_SIZE = 20;
+const PREVIEW_GAP = 20;
 
 export const SynchronizedLyrics = ({
     artist,
     lyrics,
     name,
     offsetMs,
+    preview = false,
     pronunciationLyrics,
     romajiLyrics,
     settingsKey = 'default',
@@ -68,6 +72,11 @@ export const SynchronizedLyrics = ({
         showScrollbar,
     } = useSynchronizedLyricsBase(settingsKey, offsetMs);
 
+    const effectiveFontSize = preview ? PREVIEW_FONT_SIZE : settings.fontSize;
+    const effectiveGap = preview ? PREVIEW_GAP : settings.gap;
+    const effectivePaddingLeft = preview ? 0 : settings.paddingLeft;
+    const effectivePaddingRight = preview ? 0 : settings.paddingRight;
+
     const normalizedLyrics = useMemo(() => normalizeLyrics(lyrics), [lyrics]);
     const rafRef = useRef<null | number>(null);
     const statusRef = useRef(usePlayerStoreBase.getState().player.status);
@@ -83,13 +92,13 @@ export const SynchronizedLyrics = ({
         containerRef,
         followRef,
         followScrollAlignmentRef,
-        fontSize: settings.fontSize,
-        gap: settings.gap,
+        fontSize: effectiveFontSize,
+        gap: effectiveGap,
         lineIdPrefix: 'lyric',
         lineLeadTimeMsRef,
         lyrics: normalizedLyrics,
-        paddingLeft: settings.paddingLeft,
-        paddingRight: settings.paddingRight,
+        paddingLeft: effectivePaddingLeft,
+        paddingRight: effectivePaddingRight,
         scrollContainerId: LYRICS_SCROLL_CONTAINER_ID,
     });
 
@@ -240,7 +249,11 @@ export const SynchronizedLyrics = ({
 
     return (
         <div
-            className={clsx(styles.container, 'synchronized-lyrics overlay-scrollbar')}
+            className={clsx(
+                styles.container,
+                preview && styles.preview,
+                'synchronized-lyrics overlay-scrollbar',
+            )}
             id={LYRICS_SCROLL_CONTAINER_ID}
             onClick={handleContainerClick}
             onMouseEnter={showScrollbar}
@@ -249,15 +262,16 @@ export const SynchronizedLyrics = ({
             style={{ ...containerStyle, ...style }}
         >
             <LyricsScrollContent
-                gap={settings.gap}
-                paddingLeft={settings.paddingLeft}
-                paddingRight={settings.paddingRight}
+                gap={effectiveGap}
+                paddingLeft={effectivePaddingLeft}
+                paddingRight={effectivePaddingRight}
+                preview={preview}
             >
                 {settings.showProvider && source && (
                     <LyricLine
                         alignment={settings.alignment}
                         className="lyric-credit"
-                        fontSize={settings.fontSize}
+                        fontSize={effectiveFontSize}
                         text={`${source}`}
                     />
                 )}
@@ -265,7 +279,7 @@ export const SynchronizedLyrics = ({
                     <LyricLine
                         alignment={settings.alignment}
                         className="lyric-credit"
-                        fontSize={settings.fontSize}
+                        fontSize={effectiveFontSize}
                         text={`${name} — ${artist}`}
                     />
                 )}
@@ -290,7 +304,7 @@ export const SynchronizedLyrics = ({
                             alignment={settings.alignment}
                             className="lyric-line synchronized"
                             data-lyric-time={lineStartMs}
-                            fontSize={settings.fontSize}
+                            fontSize={effectiveFontSize}
                             id={`lyric-${idx}`}
                             key={idx}
                             romajiText={pronunciationText}

@@ -6,13 +6,17 @@ import { normalizeServerUrl } from '/@/renderer/features/action-required/utils/s
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAuthStore, useAuthStoreActions } from '/@/renderer/store';
+import { ServerType } from '/@/shared/types/domain-types';
 
 export const AppOutlet = () => {
     const currentServer = useAuthStore(
         (state) =>
             state.currentServer
                 ? {
+                      credential: state.currentServer.credential,
                       id: state.currentServer.id,
+                      ndCredential: state.currentServer.ndCredential,
+                      type: state.currentServer.type,
                       url: state.currentServer.url,
                   }
                 : null,
@@ -31,6 +35,12 @@ export const AppOutlet = () => {
         return configuredUrl !== persistedUrl;
     }, [currentServer]);
 
+    const hasMissingCredentials = Boolean(
+        currentServer &&
+        (!currentServer.credential ||
+            (currentServer.type === ServerType.NAVIDROME && !currentServer.ndCredential)),
+    );
+
     useEffect(() => {
         if (hasServerLockMismatch && currentServer && window.SERVER_URL) {
             updateServer(currentServer.id, {
@@ -40,7 +50,14 @@ export const AppOutlet = () => {
         }
     }, [currentServer, hasServerLockMismatch, setCurrentServer, updateServer]);
 
-    const isActionsRequired = !currentServer || hasServerLockMismatch;
+    // Clear selection when credentials were wiped but currentServer was left set
+    useEffect(() => {
+        if (hasMissingCredentials) {
+            setCurrentServer(null);
+        }
+    }, [currentServer?.id, currentServer?.type, hasMissingCredentials, setCurrentServer]);
+
+    const isActionsRequired = !currentServer || hasServerLockMismatch || hasMissingCredentials;
 
     if (isActionsRequired) {
         return <Navigate replace to={AppRoute.ACTION_REQUIRED} />;

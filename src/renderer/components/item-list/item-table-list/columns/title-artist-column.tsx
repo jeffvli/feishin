@@ -61,7 +61,12 @@ export const DefaultTitleArtistColumn = (props: ItemTableListInnerColumn) => {
                             artistName={item.albumArtist}
                             artists={item.albumArtists}
                             linkProps={{ fw: 400, isMuted: true }}
-                            rootTextProps={{ fw: 400, isMuted: true, size: 'sm' }}
+                            rootTextProps={{
+                                className: styles.artists,
+                                fw: 400,
+                                isMuted: true,
+                                size: 'sm',
+                            }}
                         />
                     </div>
                 </div>
@@ -144,7 +149,12 @@ export const QueueSongTitleArtistColumn = (props: ItemTableListInnerColumn) => {
                             artistName={item.artistName}
                             artists={item.artists}
                             linkProps={{ fw: 400, isMuted: true }}
-                            rootTextProps={{ fw: 400, isMuted: true, size: 'sm' }}
+                            rootTextProps={{
+                                className: styles.artists,
+                                fw: 400,
+                                isMuted: true,
+                                size: 'sm',
+                            }}
                         />
                     </div>
                 </div>

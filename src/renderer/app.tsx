@@ -21,6 +21,7 @@ import {
     useLanguage,
     useSettingsStoreActions,
 } from '/@/renderer/store';
+import { initCustomThemes } from '/@/renderer/store/custom-themes.store';
 import { useAppTheme } from '/@/renderer/themes/use-app-theme';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { WebAudio } from '/@/shared/types/types';
@@ -39,6 +40,23 @@ const ipc = isElectron() ? window.api.ipc : null;
 const utils = isElectron() ? window.api.utils : null;
 
 export const App = () => {
+    // Custom themes must be loaded (and registered into the shared theme
+    // registry) before the first render of ThemedApp, otherwise a user whose
+    // selected theme is a custom one would flash the default theme first.
+    const [customThemesReady, setCustomThemesReady] = useState(!isElectron());
+
+    useEffect(() => {
+        if (!isElectron()) return;
+
+        initCustomThemes()
+            .catch((error) => console.error('Failed to load custom themes', error))
+            .finally(() => setCustomThemesReady(true));
+    }, []);
+
+    if (!customThemesReady) {
+        return null;
+    }
+
     return <ThemedApp />;
 };
 

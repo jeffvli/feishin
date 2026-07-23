@@ -1332,6 +1332,10 @@ export type FullLyricsMetadata = Omit<InternetProviderLyricResponse, 'id' | 'lyr
     source: string;
 };
 
+export type GetScanStatusArgs = BaseEndpointArgs;
+
+export type GetScanStatusResponse = ScanStatus;
+
 export type InternetProviderLyricResponse = {
     artist: string;
     id: string;
@@ -1383,6 +1387,17 @@ export type RandomSongListQuery = {
 };
 
 export type RandomSongListResponse = SongListResponse;
+
+export type RefreshItemsArgs = BaseEndpointArgs & { query: { ids: string[] } };
+
+export type RefreshItemsResponse = null;
+
+export type ScanStatus = {
+    count: number;
+    folderCount: number;
+    lastScan?: string;
+    scanning: boolean;
+};
 
 export type ScrobbleArgs = BaseEndpointArgs & {
     query: ScrobbleQuery;
@@ -1567,6 +1582,7 @@ export type ControllerEndpoint = {
     getPlayQueue: (args: GetQueueArgs) => Promise<GetQueueResponse>;
     getRandomSongList: (args: RandomSongListArgs) => Promise<SongListResponse>;
     getRoles: (args: BaseEndpointArgs) => Promise<Array<string | { label: string; value: string }>>;
+    getScanStatus: (args: GetScanStatusArgs) => Promise<GetScanStatusResponse>;
     getServerInfo: (args: ServerInfoArgs) => Promise<ServerInfo>;
     getSimilarSongs: (args: SimilarSongsArgs) => Promise<Song[]>;
     getSongDetail: (args: SongDetailArgs) => Promise<SongDetailResponse>;
@@ -1580,6 +1596,7 @@ export type ControllerEndpoint = {
     getUserList?: (args: UserListArgs) => Promise<UserListResponse>;
     jukeboxControl?: (args: JukeboxControlArgs) => Promise<JukeboxControlResponse>;
     movePlaylistItem?: (args: MoveItemArgs) => Promise<void>;
+    refreshItems: (args: RefreshItemsArgs) => Promise<RefreshItemsResponse>;
     removeFromPlaylist: (args: RemoveFromPlaylistArgs) => Promise<RemoveFromPlaylistResponse>;
     replacePlaylist: (args: ReplacePlaylistArgs) => Promise<ReplacePlaylistResponse>;
     savePlayQueue: (args: SaveQueueArgs) => Promise<void>;
@@ -1746,6 +1763,9 @@ export type InternalControllerEndpoint = {
     getRoles: (
         args: ReplaceApiClientProps<BaseEndpointArgs>,
     ) => Promise<Array<string | { label: string; value: string }>>;
+    getScanStatus: (
+        args: ReplaceApiClientProps<GetScanStatusArgs>,
+    ) => Promise<GetScanStatusResponse>;
     getServerInfo: (args: ReplaceApiClientProps<ServerInfoArgs>) => Promise<ServerInfo>;
     getSimilarSongs: (args: ReplaceApiClientProps<SimilarSongsArgs>) => Promise<Song[]>;
     getSongDetail: (args: ReplaceApiClientProps<SongDetailArgs>) => Promise<SongDetailResponse>;
@@ -1763,6 +1783,7 @@ export type InternalControllerEndpoint = {
         args: ReplaceApiClientProps<JukeboxControlArgs>,
     ) => Promise<JukeboxControlResponse>;
     movePlaylistItem?: (args: ReplaceApiClientProps<MoveItemArgs>) => Promise<void>;
+    refreshItems: (args: ReplaceApiClientProps<RefreshItemsArgs>) => Promise<RefreshItemsResponse>;
     removeFromPlaylist: (
         args: ReplaceApiClientProps<RemoveFromPlaylistArgs>,
     ) => Promise<RemoveFromPlaylistResponse>;

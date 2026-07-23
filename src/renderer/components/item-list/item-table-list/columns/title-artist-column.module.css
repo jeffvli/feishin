@@ -55,6 +55,12 @@ a.title {
     color: var(--theme-colors-foreground-muted);
     white-space: nowrap;
     user-select: none;
+
+    --text-text-wrap: nowrap;
+}
+
+.artists > * {
+    white-space: nowrap;
 }
 
 .folder-icon {

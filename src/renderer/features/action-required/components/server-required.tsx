@@ -3,6 +3,7 @@ import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import styles from '/@/renderer/features/action-required/components/server-required.module.css';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
@@ -32,7 +33,7 @@ export const ServerRequired = () => {
     if (Object.keys(serverList).length > 0) {
         return (
             <ScrollArea>
-                <Stack miw="300px">
+                <Stack className={styles.list}>
                     <ServerSelector />
                     {!isServerLock() && (
                         <>
@@ -91,7 +92,9 @@ function ServerSelector() {
                 const isNavidromeExpired =
                     server.type === ServerType.NAVIDROME && !server.ndCredential;
                 const isJellyfinExpired = server.type === ServerType.JELLYFIN && !server.credential;
-                const isSessionExpired = isNavidromeExpired || isJellyfinExpired;
+                const isSubsonicExpired = server.type === ServerType.SUBSONIC && !server.credential;
+                const isSessionExpired =
+                    isNavidromeExpired || isJellyfinExpired || isSubsonicExpired;
 
                 const logo =
                     server.type === ServerType.NAVIDROME
@@ -102,31 +105,25 @@ function ServerSelector() {
 
                 return (
                     <Button
+                        classNames={{
+                            label: styles.serverButtonLabel,
+                            root: styles.serverButton,
+                        }}
                         key={`server-${server.id}`}
                         onClick={() => {
                             if (!isSessionExpired) return handleSetCurrentServer(server);
                             return handleCredentialsModal(server);
                         }}
                         size="lg"
-                        styles={{
-                            label: {
-                                width: '100%',
-                            },
-                            root: {
-                                padding: 'var(--theme-spacing-sm)',
-                            },
-                        }}
-                        variant={server.id === currentServer?.id ? 'filled' : 'default'}
+                        variant={
+                            server.id === currentServer?.id && !isSessionExpired
+                                ? 'filled'
+                                : 'default'
+                        }
                     >
-                        <Group justify="space-between" w="100%">
+                        <Group className={styles.serverRow} justify="space-between">
                             <Group>
-                                <img
-                                    src={logo}
-                                    style={{
-                                        height: 'var(--theme-font-size-2xl)',
-                                        width: 'var(--theme-font-size-2xl)',
-                                    }}
-                                />
+                                <img alt="" className={styles.serverLogo} src={logo} />
                                 <Text fw={600} size="lg">
                                     {server.name}
                                 </Text>

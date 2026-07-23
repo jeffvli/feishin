@@ -162,7 +162,6 @@ export const PlaylistRowButton = memo(
                     };
                 },
                 onDrag: () => {
-                    console.log('started drag');
                     return;
                 },
                 onDragLeave: () => {

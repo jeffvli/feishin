@@ -1,0 +1,8 @@
+.container {
+    width: 100%;
+    cursor: default;
+}
+
+.title {
+    text-transform: uppercase;
+}

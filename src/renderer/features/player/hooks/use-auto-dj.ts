@@ -16,8 +16,7 @@ import {
     usePlayerStoreBase,
     useSettingsStore,
 } from '/@/renderer/store';
-import { LogCategory, logFn } from '/@/renderer/utils/logger';
-import { logMsg } from '/@/renderer/utils/logger-message';
+import { logger } from '/@/renderer/utils/logger';
 import { hasFeature } from '/@/shared/api/utils';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
@@ -65,9 +64,9 @@ export const useAutoDJ = () => {
                     return;
                 }
 
-                logFn.debug(logMsg[LogCategory.PLAYER].autoPlayTriggered, {
-                    category: LogCategory.PLAYER,
-                    meta: { remaining: properties.remaining, songId: properties.song?.id },
+                logger.info('Auto play triggered', {
+                    remaining: properties.remaining,
+                    songId: properties.song?.id,
                 });
 
                 try {
@@ -143,9 +142,9 @@ export const useAutoDJ = () => {
                         });
                     }
                 } catch (error) {
-                    logFn.error(logMsg[LogCategory.PLAYER].autoPlayFailed, {
-                        category: LogCategory.PLAYER,
-                        meta: { error: (error as Error).message, songId: properties.song?.id },
+                    logger.error('Auto play failed', {
+                        error: (error as Error).message,
+                        songId: properties.song?.id,
                     });
                 }
             },

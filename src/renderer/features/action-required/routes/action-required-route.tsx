@@ -6,6 +6,7 @@ import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { ActionRequiredContainer } from '/@/renderer/features/action-required/components/action-required-container';
 import { ServerCredentialRequired } from '/@/renderer/features/action-required/components/server-credential-required';
 import { ServerRequired } from '/@/renderer/features/action-required/components/server-required';
+import styles from '/@/renderer/features/action-required/routes/action-required-route.module.css';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import LoginRoute from '/@/renderer/features/login/routes/login-route';
 import { ServerList } from '/@/renderer/features/servers/components/server-list';
@@ -14,7 +15,6 @@ import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-e
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServerWithCredential } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
-import { Center } from '/@/shared/components/center/center';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
@@ -58,17 +58,17 @@ const ActionRequiredRoute = () => {
     return (
         <AnimatedPage>
             <PageHeader />
-            <Center style={{ height: '100%', width: '100vw' }}>
-                <Stack gap="xl" style={{ maxWidth: '50%' }}>
-                    <ScrollArea style={{ maxHeight: 'calc(100vh - 50px)' }}>
-                        <Group wrap="nowrap">
+            <div className={styles.wrapper}>
+                <Stack className={styles.content} gap="xl">
+                    <ScrollArea className={styles.scrollArea}>
+                        <Group className={styles.checkGroup} wrap="nowrap">
                             {displayedCheck && (
                                 <ActionRequiredContainer title={displayedCheck.title}>
                                     {displayedCheck?.component}
                                 </ActionRequiredContainer>
                             )}
                         </Group>
-                        <Stack mt="2rem">
+                        <Stack className={styles.actions}>
                             {canReturnHome && <Navigate to={AppRoute.HOME} />}
                             {/* This should be displayed if a credential is required */}
                             {isCredentialRequired && !isServerLock && (
@@ -86,7 +86,7 @@ const ActionRequiredRoute = () => {
                         </Stack>
                     </ScrollArea>
                 </Stack>
-            </Center>
+            </div>
         </AnimatedPage>
     );
 };

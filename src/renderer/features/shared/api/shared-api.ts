@@ -28,6 +28,17 @@ export const sharedQueries = {
             ...args.options,
         });
     },
+    scanStatus: (args: QueryHookArgs<null>) => {
+        return queryOptions({
+            queryFn: ({ signal }) => {
+                return api.controller.getScanStatus({
+                    apiClientProps: { serverId: args.serverId, signal },
+                });
+            },
+            queryKey: queryKeys.server.scanStatus(args.serverId),
+            ...args.options,
+        });
+    },
     tagList: (args: QueryHookArgs<TagListQuery>) => {
         return queryOptions({
             gcTime: 1000 * 60 * 24,

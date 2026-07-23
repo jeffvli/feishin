@@ -43,7 +43,8 @@
         "openApplicationDirectory": "Otwórz katalog aplikacji",
         "goToCurrent": "Przejdź do aktualnego elementu",
         "collapseAllFolders": "Zwiń wszystkie foldery",
-        "expandAllFolders": "Rozwiń wszystkie foldery"
+        "expandAllFolders": "Rozwiń wszystkie foldery",
+        "createPlaylistFromQueue": "Utwórz $t(entity.playlist, {\"count\": 1}) z kolejki"
     },
     "common": {
         "increase": "Zwiększ",
@@ -174,7 +175,13 @@
         "numberOfResults": "{{numberOfResults}} wyników",
         "grouping": "Grupowanie",
         "back": "Wstecz",
-        "openFolder": "Otwórz folder"
+        "openFolder": "Otwórz folder",
+        "saveAndClose": "Zapisz i zamknij",
+        "undo": "Cofnij",
+        "lastScan": "Ostatnie skanowanie {{date}}",
+        "scanFolderCount": "{{count}} folderów",
+        "scanItemCount": "{{count}} elementów",
+        "scanningLibrary": "Skanowanie biblioteki…"
     },
     "entity": {
         "genre_one": "Gatunek",
@@ -435,6 +442,9 @@
         },
         "editRadioStation": {
             "success": "Stacja radiowa zaktualizowana pomyślnie"
+        },
+        "createPrefilledPlaylist": {
+            "title": "Utwórz $t(entity.playlist, {\"count\": 1}) z wybranych piosenek"
         }
     },
     "page": {
@@ -487,7 +497,8 @@
             "selectMusicFolder": "Wybierz folder muzyki",
             "noMusicFolder": "Nie wybrano folderu muzyki",
             "multipleMusicFolders": "Wybrano {{count}} folderów muzyki",
-            "commandPalette": "Otwórz paletę komend"
+            "commandPalette": "Otwórz paletę komend",
+            "logout": "Wyloguj"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -515,7 +526,8 @@
             "goToAlbum": "Przejdź do $t(entity.album, {\"count\": 1})",
             "goToAlbumArtist": "Przejdź do $t(entity.albumArtist, {\"count\": 1})",
             "moveItems": "$t(action.moveItems)",
-            "goTo": "Przejdź do"
+            "goTo": "Przejdź do",
+            "editMetadata": "Edytuj metadane"
         },
         "albumDetail": {
             "moreFromArtist": "Więcej od $t(entity.artist, {\"count\": 1})",
@@ -623,7 +635,27 @@
         "itemDetail": {
             "copyPath": "Kopiuj ścieżkę do schowka",
             "copiedPath": "Ścieżka została skopiowana pomyślnie",
-            "openFile": "Pokaż utwór w menedżerze plików"
+            "openFile": "Pokaż utwór w menedżerze plików",
+            "tagConfiguration": "Konfiguracja tagów",
+            "addTagConfig": "Dodaj tag…",
+            "multiValueToggle": "Wielowartościowy",
+            "autocompleteSource": "Źródło autowypełniania",
+            "customValues": "Niestandardowe wartości",
+            "addCustomValue": "Dodaj niestandardową wartość…",
+            "serverSuggestions": "Serwer",
+            "fileNotWritable": "Plik nie jest dostępny lub zapisywalny",
+            "triggerRescan": "Uruchom ponowne skanowanie biblioteki po zapisaniu",
+            "addField": "Dodaj pole…",
+            "emptyFields": "Pola nie mogą być puste",
+            "tagsTab": "Tagi",
+            "artworkTab": "Okładka",
+            "removeArtwork": "Usuń okładkę",
+            "noArtwork": "Brak okładki",
+            "multipleValues": "(Wiele wartości)",
+            "multipleArtworks": "Wiele okładek",
+            "noLocalSongs": "Nie znaleziono piosenek z lokalnymi ścieżkami",
+            "readPartialFailure": "Nie udało się odczytać metadanych z {{count}} na {{total}} plik(ów)",
+            "writePartialFailure": "Nie udało się zapisać {{count}} plik(ów)"
         },
         "manageServers": {
             "title": "Zarządzaj serwerami",
@@ -1012,11 +1044,9 @@
         "autoDJ_timing": "Czas dodawania",
         "autoDJ_timing_description": "Ilość piosenek pozostałych w kolejce przed tym gdy zostanie włączony automatyczny DJ",
         "logLevel": "Poziom logów",
-        "logLevel_description": "Ustawia minimalny poziom logów do wyświetlenia. debugowanie wyświetla wszystkie logi błędy wyświetla tylko błędy",
+        "logLevel_description": "Ustawia minimalny poziom logów do wyświetlenia",
         "logLevel_optionDebug": "Debugowanie",
-        "logLevel_optionError": "Błędy",
         "logLevel_optionInfo": "Info",
-        "logLevel_optionWarn": "Ostrzeżenia",
         "useThemeAccentColor": "Używaj koloru akcentu motywu",
         "useThemeAccentColor_description": "Używaj głównego koloru ustawionego w wybranym motywie zamiast niestandardowego koloru akcentu",
         "artistRadioCount_description": "Ustawia liczbę piosenek do załadowania dla radia wykonawcy i radia utworu",
@@ -1164,7 +1194,10 @@
         "microtonalPitchControls": "Mikrotonowe sterowanie wysokością dźwięku",
         "microtonalPitchControls_description": "Dodaj więcej sterowania wysokością dźwięku pomiędzy półtonami",
         "hotkey_playbackNextAlbum": "Następny album",
-        "hotkey_playbackPreviousAlbum": "Poprzedni album"
+        "hotkey_playbackPreviousAlbum": "Poprzedni album",
+        "logLevel_optionDebugDescription": "zawiera info, plus szczegółowe informacje debugowania i ocenzurowane odpowiedzi API",
+        "logLevel_optionInfoDescription": "zawiera info, ostrzeżenia i błędy",
+        "exportDiagnostics": "Eksportuj diagnostykę"
     },
     "table": {
         "config": {

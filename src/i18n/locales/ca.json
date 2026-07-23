@@ -64,7 +64,8 @@
             "commandPalette": "Obre la paleta d'ordres",
             "selectMusicFolder": "Selecciona una carpeta de música",
             "noMusicFolder": "No s'ha seleccionat cap carpeta de música",
-            "multipleMusicFolders": "{{count}} carpetes de música seleccionades"
+            "multipleMusicFolders": "{{count}} carpetes de música seleccionades",
+            "logout": "Tanca la sessió"
         },
         "contextMenu": {
             "addFavorite": "$t(action.addToFavorites)",
@@ -92,7 +93,8 @@
             "goToAlbumArtist": "Ves a $t(entity.albumArtist, {\"count\": 1})",
             "goToAlbum": "Ves a $t(entity.album, {\"count\": 1})",
             "moveItems": "$t(action.moveItems)",
-            "goTo": "Ves a"
+            "goTo": "Ves a",
+            "editMetadata": "Edita les metadades"
         },
         "genreList": {
             "title": "$t(entity.genre, {\"count\": 2})",
@@ -193,7 +195,27 @@
         "itemDetail": {
             "copyPath": "Copia ruta al porta-retalls",
             "copiedPath": "Ruta copiada correctament",
-            "openFile": "Mostra la pista al gestor d'arxius"
+            "openFile": "Mostra la pista al gestor d'arxius",
+            "tagConfiguration": "Configuració d'etiquetes",
+            "addTagConfig": "Afegeix una etiqueta…",
+            "multiValueToggle": "Valors múltiples",
+            "autocompleteSource": "Completa la font automàticament",
+            "customValues": "Valors personalitzats",
+            "addCustomValue": "Afegeix un valor personalitzat…",
+            "serverSuggestions": "Servidor",
+            "fileNotWritable": "L'arxiu no és accessible o editable",
+            "triggerRescan": "Fes un nou escaneig de la biblioteca després de desar",
+            "addField": "Afegeix un camp…",
+            "emptyFields": "Els camps no poden estar buits",
+            "tagsTab": "Etiquetes",
+            "artworkTab": "Il·lustració",
+            "removeArtwork": "Elimina la il·lustració",
+            "noArtwork": "Sense il·lustració",
+            "multipleValues": "(Valors múltiples)",
+            "multipleArtworks": "Múltiples il·lustracions",
+            "noLocalSongs": "No s'ha trobat cap cançó amb ruta d'arxiu local",
+            "readPartialFailure": "No s'han pogut llegir les metadades de {{count}} de {{total}} arxiu(s)",
+            "writePartialFailure": "Error en desar {{count}} arxiu(s)"
         },
         "playlist": {
             "reorder": "El reordenament només s'activa quan s'ordena per ID"
@@ -350,7 +372,13 @@
         "newVersionAvailable": "Hi ha una nova versió disponible",
         "numberOfResults": "{{numberOfResults}} resultats",
         "back": "Enrere",
-        "openFolder": "Obre la carpeta"
+        "openFolder": "Obre la carpeta",
+        "saveAndClose": "Desa i tanca",
+        "undo": "Desfés",
+        "lastScan": "Darrer escaneig: {{date}}",
+        "scanFolderCount": "{{count}} carpetes",
+        "scanItemCount": "{{count}} ítems",
+        "scanningLibrary": "Escanejant biblioteca…"
     },
     "entity": {
         "album_one": "Àlbum",
@@ -529,6 +557,9 @@
         },
         "editRadioStation": {
             "success": "Emissora de ràdio actualitzada amb èxit"
+        },
+        "createPrefilledPlaylist": {
+            "title": "Crea una $t(entity.playlist, {\"count\": 1}) a partir de les cançons seleccionades"
         }
     },
     "action": {
@@ -575,7 +606,8 @@
         "openApplicationDirectory": "Obre el directori de l'aplicació",
         "goToCurrent": "Anar a l'element actual",
         "collapseAllFolders": "Replega totes les carpetes",
-        "expandAllFolders": "Expandeix totes les carpetes"
+        "expandAllFolders": "Expandeix totes les carpetes",
+        "createPlaylistFromQueue": "Crea una $t(entity.playlist, {\"count\": 1}) des de la cua"
     },
     "setting": {
         "language_description": "Estableix l'idioma de l'aplicació ($t(common.restartRequired))",
@@ -853,9 +885,7 @@
         "logLevel": "Nivell de registre",
         "logLevel_description": "Estableix el nivell mínim de registre que s'ha de mostrar. debug mostra tots els missatges, error mostra només els errors",
         "logLevel_optionDebug": "Debug",
-        "logLevel_optionError": "Error",
         "logLevel_optionInfo": "Info",
-        "logLevel_optionWarn": "Avís",
         "playerFilters": "Filtra les cançons de la cua",
         "playerFilters_description": "Evita afegir cançons a la cua segons els següents criteris",
         "playerbarSlider": "Barra lliscadora de reproducció",
@@ -1025,7 +1055,9 @@
         "windowBarTrackinfo_description": "Mostra el títol i l'artista de la pista actual, la posició a la cua i l'estat de reproducció al títol de la finestra.",
         "audioDeviceDefault": "Predeterminat del sistema",
         "microtonalPitchControls": "Controls de to microtonals",
-        "microtonalPitchControls_description": "Afegeix més controls de to per moure's entre semitons"
+        "microtonalPitchControls_description": "Afegeix més controls de to per moure's entre semitons",
+        "hotkey_playbackNextAlbum": "Següent àlbum",
+        "hotkey_playbackPreviousAlbum": "Àlbum anterior"
     },
     "table": {
         "column": {
@@ -1092,7 +1124,8 @@
                 "albumGroupConfig": "Configuració del grup de l'àlbum",
                 "albumGroupMetadata": "Camps de metadades",
                 "albumGroupShowFavoriteRating": "Mostra preferits i qualificacions",
-                "albumImageSize": "Mida de la imatge de l'àlbum"
+                "albumImageSize": "Mida de la imatge de l'àlbum",
+                "albumGroupVerticalLayout": "Disseny vertical"
             },
             "label": {
                 "actions": "$t(common.action, {\"count\": 2})",
@@ -1239,7 +1272,9 @@
         "sleepTimer_cancel": "Cancel·la el temporitzador",
         "albumRadio": "Ràdio d'àlbums",
         "scrobbleForceSubmit": "Força l'scrobble",
-        "sleepTimer_endOfAlbum": "Final de l'àlbum actual"
+        "sleepTimer_endOfAlbum": "Final de l'àlbum actual",
+        "nextAlbum": "Alt+clic pel següent àlbum",
+        "previousAlbum": "Alt+clic per l'àlbum anterior"
     },
     "error": {
         "credentialsRequired": "Credencials requerides",

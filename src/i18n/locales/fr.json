@@ -50,7 +50,9 @@
         "sleepTimer_cancel": "Annuler le minuteur",
         "albumRadio": "Radio d'album",
         "scrobbleForceSubmit": "Forcer le scrobble",
-        "sleepTimer_endOfAlbum": "Fin de l'album actuel"
+        "sleepTimer_endOfAlbum": "Fin de l'album actuel",
+        "nextAlbum": "Alt+clic pour l'album suivant",
+        "previousAlbum": "Alt+clic pour l'album précédent"
     },
     "action": {
         "editPlaylist": "Éditer $t(entity.playlist, {\"count\": 1})",
@@ -96,7 +98,8 @@
         "openApplicationDirectory": "Ouvrir le répertoire de l'application",
         "goToCurrent": "Aller à la piste en cours",
         "collapseAllFolders": "Réduire tous les dossiers",
-        "expandAllFolders": "Développer tous les dossiers"
+        "expandAllFolders": "Développer tous les dossiers",
+        "createPlaylistFromQueue": "Créer $t(entity.playlist, {\"count\": 1}) depuis la file d'attente"
     },
     "common": {
         "backward": "En arrière",
@@ -228,7 +231,13 @@
         "newVersionAvailable": "Une nouvelle version est disponible",
         "numberOfResults": "{{numberOfResults}} résultats",
         "back": "Retour",
-        "openFolder": "Ouvrir le dossier"
+        "openFolder": "Ouvrir le dossier",
+        "saveAndClose": "Enregistrer et fermer",
+        "undo": "Annuler",
+        "lastScan": "Dernière analyse {{date}}",
+        "scanFolderCount": "{{count}} dossiers",
+        "scanItemCount": "{{count}} entrées",
+        "scanningLibrary": "Analyse de la bibliothèque…"
     },
     "error": {
         "remotePortWarning": "Redémarrer le serveur pour appliquer le nouveau port",
@@ -380,7 +389,8 @@
             "commandPalette": "Ouvrir la palette de commandes",
             "selectMusicFolder": "Sélectionner le dossier musique",
             "noMusicFolder": "Aucun dossier musique de sélectionner",
-            "multipleMusicFolders": "{{count}} dossiers musique sélectionnés"
+            "multipleMusicFolders": "{{count}} dossiers musique sélectionnés",
+            "logout": "Déconnexion"
         },
         "home": {
             "mostPlayed": "Les plus joués",
@@ -455,7 +465,8 @@
             "goToAlbumArtist": "Aller à l'$t(entity.albumArtist, {\"count\": 1})",
             "goToAlbum": "Aller à l'$t(entity.album, {\"count\": 1})",
             "moveItems": "$t(action.moveItems)",
-            "goTo": "Aller à"
+            "goTo": "Aller à",
+            "editMetadata": "Modifier les Métadonnées"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -498,7 +509,27 @@
         "itemDetail": {
             "copyPath": "Copier le chemin dans le presse-papiers",
             "openFile": "Afficher la piste dans le gestionnaire de fichiers",
-            "copiedPath": "Chemin copié avec succès"
+            "copiedPath": "Chemin copié avec succès",
+            "tagConfiguration": "Configuration des Tags",
+            "addTagConfig": "Ajouter un tag…",
+            "multiValueToggle": "Valeurs multiples",
+            "autocompleteSource": "Source de saisie automatique",
+            "customValues": "Valeurs personnalisées",
+            "addCustomValue": "Ajouter une valeur personnalisée…",
+            "serverSuggestions": "Serveur",
+            "fileNotWritable": "Le fichier est inaccessible ou non modifiable",
+            "triggerRescan": "Déclencher une nouvelle analyse de la bibliothèque après l'enregistrement",
+            "addField": "Ajouter un champs…",
+            "emptyFields": "Le champs ne peut pas être vide",
+            "tagsTab": "Tags",
+            "artworkTab": "Artwork",
+            "removeArtwork": "Supprimer l'Artwork",
+            "noArtwork": "Aucun Artwork",
+            "multipleValues": "(Valeurs multiples)",
+            "multipleArtworks": "Artworks multiple",
+            "noLocalSongs": "Aucun titres avec des chemins d'accès locaux trouvée",
+            "readPartialFailure": "Impossible de lire les métadonnées de {{count}} fichier(s) sur {{total}}",
+            "writePartialFailure": "Impossible d'enregistrer {{count}} fichier(s)"
         },
         "playlist": {
             "reorder": "La réorganisation n'est possible que lors du tri par identifiant"
@@ -831,9 +862,7 @@
         "logLevel": "Niveau de journalisation",
         "logLevel_description": "Définit le niveau minimum de journalisation à afficher. le mode debug affiche tous les logs, le mode error n’affiche que les erreurs",
         "logLevel_optionDebug": "Débogage",
-        "logLevel_optionError": "Erreur",
         "logLevel_optionInfo": "Info",
-        "logLevel_optionWarn": "Avertissement",
         "playerFilters": "Filtrer les titres de la file d'attente",
         "playerFilters_description": "Exclure les titres de la file d'attente selon les critères suivants",
         "playerbarSlider_description": "La forme d'onde n'est pas recommandée sur une connexion lente ou limitée",
@@ -958,7 +987,20 @@
         "sidebarPlaylistFolderTreeLineColor_description": "Couleur des lignes de l'arborescence (vide pour le thème par défaut)",
         "sidebarPlaylistFolderTreeLineColor": "Couleur de la ligne de l'arboresence",
         "windowBarTrackinfo": "Informations de la piste dans le titre de la fenêtre",
-        "windowBarTrackinfo_description": "Afficher le titre et l'artiste de la piste en cours, sa position dans la file d'attente et son état (lecture/pause) dans le titre de la fenêtre."
+        "windowBarTrackinfo_description": "Afficher le titre et l'artiste de la piste en cours, sa position dans la file d'attente et son état (lecture/pause) dans le titre de la fenêtre.",
+        "audioDeviceDefault": "Système par défaut",
+        "hotkey_playbackNextAlbum": "Album suivant",
+        "hotkey_playbackPreviousAlbum": "Album précédent",
+        "compressor": "Compresseur",
+        "compressorAttack": "Attaque",
+        "compressorKnee": "Coude",
+        "compressorRatio_description": "Ratio de compression, ex. 4 = 4:1.",
+        "compressorRatio": "Ratio",
+        "compressorRelease": "Relâchement",
+        "compressorReset_description": "Rétablir les valeurs par défaut de tous les paramètres du compresseur",
+        "compressorSavePreset_description": "Enregistrer les paramètres actuels du compresseur comme préréglage nommé",
+        "compressorThreshold": "Seuil",
+        "sidebarPlaylistFolderTreeIndent_description": "Nombre de pixels d'indentation par niveau de l'arborescence"
     },
     "form": {
         "deletePlaylist": {
@@ -1077,6 +1119,9 @@
         },
         "editRadioStation": {
             "success": "Station de radio a été mise à jour avec succès"
+        },
+        "createPrefilledPlaylist": {
+            "title": "Créer $t(entity.playlist, {\"count\": 1}) à partir des titres sélectionnées"
         }
     },
     "entity": {

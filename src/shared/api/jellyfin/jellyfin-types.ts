@@ -760,6 +760,40 @@ const serverInfo = z.object({
     Version: z.string(),
 });
 
+const taskTriggerInfo = z.object({
+    DayOfWeek: z.string().nullish(),
+    IntervalTicks: z.number().nullish(),
+    MaxRuntimeTicks: z.number().nullish(),
+    TimeOfDayTicks: z.number().nullish(),
+    Type: z.string().nullish(),
+});
+
+const taskResult = z.object({
+    EndTimeUtc: z.string().nullish(),
+    ErrorMessage: z.string().nullish(),
+    Id: z.string().nullish(),
+    Key: z.string().nullish(),
+    LongErrorMessage: z.string().nullish(),
+    Name: z.string().nullish(),
+    StartTimeUtc: z.string().nullish(),
+    Status: z.string().nullish(),
+});
+
+const taskInfo = z.object({
+    Category: z.string().nullish(),
+    CurrentProgressPercentage: z.number().nullish(),
+    Description: z.string().nullish(),
+    Id: z.string().nullish(),
+    IsHidden: z.boolean().optional(),
+    Key: z.string().nullish(),
+    LastExecutionResult: taskResult.nullish(),
+    Name: z.string().nullish(),
+    State: z.enum(['Idle', 'Cancelling', 'Running']).optional(),
+    Triggers: z.array(taskTriggerInfo).nullish(),
+});
+
+const scheduledTasks = z.array(taskInfo);
+
 const similarSongsParameters = z.object({
     Fields: z.array(z.string()).readonly().optional(),
     Limit: z.number().optional(),
@@ -914,6 +948,7 @@ export const jfType = {
         playlistList,
         playlistSongList,
         removeFromPlaylist,
+        scheduledTasks,
         scrobble,
         search,
         serverInfo,

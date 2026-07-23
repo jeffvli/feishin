@@ -34,7 +34,7 @@
 }
 
 .title {
-    display: block;
+    display: inline-block;
     width: 100%;
     min-width: 0;
     max-width: 100%;
@@ -46,8 +46,7 @@
 }
 
 a.title {
-    width: 100%;
-    max-width: 100%;
+    width: auto;
 }
 
 .track-subtitle {
@@ -73,6 +72,10 @@ a.title {
     user-select: none;
 
     --text-text-wrap: nowrap;
+}
+
+.artists > * {
+    white-space: nowrap;
 }
 
 .folder-icon {
