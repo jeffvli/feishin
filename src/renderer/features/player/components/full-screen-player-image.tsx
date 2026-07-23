@@ -106,7 +106,6 @@ export const FullScreenPlayerImage = () => {
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();
     const { blurExplicitImages, playerItems } = useGeneralSettings();
-    const showMetadata = useFullScreenPlayerStore((state) => state.showMetadata);
 
     const isPlayingRadio = isRadioActive && isRadioPlaying;
 
@@ -174,6 +173,12 @@ export const FullScreenPlayerImage = () => {
         ),
     };
 
+    const showMetadata =
+        playerItems.some((i) => !i.disabled && builtDataItems[i.id]) ||
+        showTitle ||
+        showArtist ||
+        showAlbum;
+
     // Keep ref in sync
     useEffect(() => {
         imageStateRef.current = imageState;
@@ -219,7 +224,7 @@ export const FullScreenPlayerImage = () => {
             align="center"
             className={clsx(styles.playerContainer, 'full-screen-player-image-container')}
             direction="column"
-            justify="flex-start"
+            justify="center"
             p="1rem"
         >
             <div className={styles.imageContainer} ref={mainImageRef}>

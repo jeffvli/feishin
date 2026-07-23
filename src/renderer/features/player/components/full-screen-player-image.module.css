@@ -21,6 +21,23 @@
     margin: 4rem 0;
 }
 
+.metadata-container {
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    text-align: center;
+    cursor: default;
+    border-radius: 5px;
+
+    a {
+        cursor: pointer;
+    }
+
+    h1 {
+        font-size: 3.5vh;
+    }
+}
+
 .player-container {
     @media screen and (height < 1024px) {
         .image-container {

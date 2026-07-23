@@ -17,7 +17,6 @@ interface FullScreenPlayerState {
     dynamicIsImage?: boolean;
     expanded: boolean;
     opacity: number;
-    showMetadata: boolean;
     useImageAspectRatio: boolean;
     visualizerExpanded: boolean;
 }
@@ -37,7 +36,6 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                 dynamicIsImage: false,
                 expanded: false,
                 opacity: 25,
-                showMetadata: true,
                 useImageAspectRatio: false,
                 visualizerExpanded: false,
             })),

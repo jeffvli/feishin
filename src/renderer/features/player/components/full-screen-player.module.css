@@ -24,7 +24,6 @@
 }
 
 .responsive-container {
-    position: relative;
     z-index: 1;
     display: grid;
     grid-template-rows: minmax(0, 1fr);

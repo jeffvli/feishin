@@ -259,7 +259,6 @@ const Controls = () => {
         dynamicIsImage,
         expanded,
         opacity,
-        showMetadata,
         useImageAspectRatio,
     } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
@@ -311,7 +310,7 @@ const Controls = () => {
             p="1rem"
             pos="absolute"
             style={{
-                background: `rgb(var(--theme-colors-background-transparent)`,
+                background: `rgb(var(--theme-colors-background-transparent))`,
                 left: 0,
                 top: 0,
             }}
@@ -415,29 +414,12 @@ const Controls = () => {
                     </Option>
                     <Divider my="sm" />
                     <Option>
-                        <Option.Label>
-                            {t('page.fullscreenPlayer.config.showMetadata')}
-                        </Option.Label>
                         <Option.Control>
-                            <Switch
-                                checked={showMetadata}
-                                onChange={(e) =>
-                                    setStore({
-                                        showMetadata: e.currentTarget.checked,
-                                    })
-                                }
-                            />
+                            <div style={{ width: '100%' }}>
+                                <FullscreenPlayerSettings showDescription={false} />
+                            </div>
                         </Option.Control>
                     </Option>
-                    {showMetadata && (
-                        <Option>
-                            <Option.Control>
-                                <div style={{ width: '100%' }}>
-                                    <FullscreenPlayerSettings showDescription={false} />
-                                </div>
-                            </Option.Control>
-                        </Option>
-                    )}
                     <Divider my="sm" />
                     <Option>
                         <Option.Label>

@@ -574,7 +574,6 @@
                 "opacity": "Opacity",
                 "showLyricMatch": "Show lyric match",
                 "showLyricProvider": "Show lyric provider",
-                "showMetadata": "Show song info",
                 "synchronized": "Synchronized",
                 "unsynchronized": "Unsynchronized",
                 "useImageAspectRatio": "Use image aspect ratio"

@@ -40,7 +40,7 @@ export const LyricsScrollContent = ({
             paddingBottom: bottomScrollPadding,
             paddingLeft: `${paddingLeft}%`,
             paddingRight: `${paddingRight}%`,
-            paddingTop: '10vh',
+            paddingTop: '2rem',
             ...style,
         } as React.CSSProperties;
     }, [bottomScrollPadding, gap, paddingLeft, paddingRight, preview, style]);
