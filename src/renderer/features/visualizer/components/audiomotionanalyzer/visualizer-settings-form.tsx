@@ -5,7 +5,10 @@ import { useTranslation } from 'react-i18next';
 import styles from './visualizer-settings-form.module.css';
 
 import i18n from '/@/i18n/i18n';
-import { getButterchurnPresetOptions } from '/@/renderer/features/visualizer/components/butternchurn/visualizer';
+import {
+    getButterchurnPresetOptions,
+    loadAllButterchurnPresets,
+} from '/@/renderer/features/visualizer/components/butternchurn/visualizer';
 import { useSettingsStoreActions, useVisualizerSettings } from '/@/renderer/store/settings.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
@@ -32,8 +35,8 @@ let butterchurnPresetOptionsCache: ButterchurnPresetOption[] | null = null;
 const loadButterchurnPresetOptions = async (): Promise<ButterchurnPresetOption[]> => {
     if (butterchurnPresetOptionsCache) return butterchurnPresetOptionsCache;
 
-    const mod = await import('butterchurn-presets');
-    const presets = getButterchurnPresetOptions((mod as any).default ?? mod);
+    const mergedPresets = await loadAllButterchurnPresets();
+    const presets = getButterchurnPresetOptions(mergedPresets);
     const presetNames = Object.keys(presets);
 
     butterchurnPresetOptionsCache = presetNames.map((presetName) => ({
@@ -2113,6 +2116,7 @@ const ButterchurnGeneralSettings = () => {
                     <VisualizerSelect
                         data={presetOptions}
                         label={t('visualizer.selectPreset')}
+                        limit={100}
                         onChange={(value) => {
                             updateProperty('currentPreset', value || undefined);
                         }}
@@ -2185,14 +2189,18 @@ const ButterChurnCycleSettings = () => {
                         visualizer.butterchurn.includeAllPresets
                     }
                     label={t('visualizer.selectedPresets')}
+                    limit={100}
                     onChange={(values) => updateProperty('selectedPresets', values)}
+                    searchable
                     value={visualizer.butterchurn.selectedPresets}
                 />
                 <MultiSelect
                     data={presetOptions}
                     disabled={!visualizer.butterchurn.cyclePresets}
                     label={t('visualizer.ignoredPresets')}
+                    limit={100}
                     onChange={(values) => updateProperty('ignoredPresets', values)}
+                    searchable
                     value={visualizer.butterchurn.ignoredPresets}
                 />
 
