@@ -68,7 +68,6 @@ export const UnsynchronizedLyrics = ({
                 {settings.showProvider && source && (
                     <LyricLine
                         alignment={settings.alignment}
-                        className="lyric-credit"
                         fontSize={settings.fontSizeUnsync}
                         text={`${source}`}
                     />
@@ -76,7 +75,6 @@ export const UnsynchronizedLyrics = ({
                 {settings.showMatch && (
                     <LyricLine
                         alignment={settings.alignment}
-                        className="lyric-credit"
                         fontSize={settings.fontSizeUnsync}
                         text={`${name} — ${artist}`}
                     />
