@@ -41,27 +41,23 @@ export function getButterchurnPresetOptions(presets: Record<string, string>) {
 }
 
 // Merges every non-image preset bundle shipped in butterchurn-presets (base, extra,
-// md1, minimal, nonMinimal). Skips image.js/imageData.js on purpose since those presets
+// md1). Skips image.js/imageData.js on purpose since those presets
 // depend on separate texture data and are more likely to break/require extra wiring.
 let mergedPresetsCache: null | Record<string, any> = null;
 
 export async function loadAllButterchurnPresets(): Promise<Record<string, any>> {
     if (mergedPresetsCache) return mergedPresetsCache;
 
-    const [base, extra, md1, minimal, nonMinimal] = await Promise.all([
+    const [base, extra, md1] = await Promise.all([
         import('butterchurn-presets/dist/base.js'),
         import('butterchurn-presets/dist/extra.js'),
         import('butterchurn-presets/dist/md1.js'),
-        import('butterchurn-presets/dist/minimal.js'),
-        import('butterchurn-presets/dist/nonMinimal.js'),
     ]);
 
     const presets = {
         ...base.default,
         ...extra.default,
         ...md1.default,
-        ...minimal.default,
-        ...nonMinimal.default,
     };
 
     mergedPresetsCache = presets;

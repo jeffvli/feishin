@@ -17,11 +17,3 @@ declare module 'butterchurn-presets/dist/extra.js' {
 declare module 'butterchurn-presets/dist/md1.js' {
     export default butterchurnPresets;
 }
-
-declare module 'butterchurn-presets/dist/minimal.js' {
-    export default butterchurnPresets;
-}
-
-declare module 'butterchurn-presets/dist/nonMinimal.js' {
-    export default butterchurnPresets;
-}
