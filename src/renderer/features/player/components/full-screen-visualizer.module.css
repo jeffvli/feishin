@@ -64,3 +64,9 @@
     line-height: 1.3;
     color: #ddd;
 }
+
+.visualizer-container:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    background: var(--theme-colors-background);
+}

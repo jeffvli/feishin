@@ -1,10 +1,11 @@
 import { motion, Variants } from 'motion/react';
-import { lazy, memo, ReactNode, Suspense, useLayoutEffect, useRef } from 'react';
+import { lazy, memo, ReactNode, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { useLocation } from 'react-router';
 
 import styles from './full-screen-visualizer.module.css';
 
 import { FullScreenVisualizerSongInfo } from '/@/renderer/features/player/components/full-screen-visualizer-song-info';
+import { VISUALIZER_FULLSCREEN_TARGET_ID } from '/@/renderer/hooks/use-fullscreen-toggle';
 import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { useIsMobile } from '/@/renderer/hooks/use-is-mobile';
 import { useFullScreenPlayerStoreActions } from '/@/renderer/store/full-screen-player.store';
@@ -139,10 +140,24 @@ export const FullScreenVisualizer = () => {
     const isOpenedRef = useRef<boolean | null>(null);
 
     const handleCloseVisualizer = () => {
+        // While fullscreen, Escape is the browser's own "leave fullscreen" gesture.
+        // Let it drop back to the expanded-but-windowed visualizer instead of closing.
+        if (document.fullscreenElement) return;
+
         setStore({ visualizerExpanded: false });
     };
 
     useHotkeys([['Escape', handleCloseVisualizer]]);
+
+    // Never leave the window stuck in fullscreen if the visualizer goes away while
+    // fullscreened (route change, close button, etc.).
+    useEffect(() => {
+        return () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+            }
+        };
+    }, []);
 
     useLayoutEffect(() => {
         if (isOpenedRef.current !== null) {
@@ -154,7 +169,7 @@ export const FullScreenVisualizer = () => {
 
     return (
         <VisualizerContainer isMobile={isMobile} windowBarStyle={windowBarStyle}>
-            <div className={styles.visualizerContainer}>
+            <div className={styles.visualizerContainer} id={VISUALIZER_FULLSCREEN_TARGET_ID}>
                 {webAudio ? (
                     <Suspense fallback={<></>}>
                         {visualizerType === 'butterchurn' ? (
