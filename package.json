@@ -22,7 +22,7 @@
     "main": "./out/main/index.js",
     "scripts": {
         "build": "pnpm run build:electron && pnpm run build:remote",
-        "build:electron": "electron-vite build",
+        "build:electron": "cross-env NODE_OPTIONS=--max-old-space-size=4096 electron-vite build",
         "build:remote": "vite build --config remote.vite.config.ts",
         "build:web": "vite build --config web.vite.config.ts",
         "dev": "electron-vite dev",
