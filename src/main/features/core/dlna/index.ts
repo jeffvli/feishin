@@ -84,6 +84,9 @@ let lastKnownDuration = 0;
 let nearEndStallCount = 0;
 let resumeKickCount = 0;
 let lastPlayUrlSentAt = 0;
+let expectedGroupMemberCount = -1;
+let topologyRefreshAttempt = 0;
+let pendingTopologyRefreshTimeout: NodeJS.Timeout | null = null;
 
 cleanupTempFiles();
 
@@ -538,6 +541,12 @@ async function fullDisconnect(): Promise<void> {
     currentCoordinatorId = '';
     groupMembers = [];
     groupMemberVolumes = {};
+    expectedGroupMemberCount = -1;
+    topologyRefreshAttempt = 0;
+    if (pendingTopologyRefreshTimeout) {
+        clearTimeout(pendingTopologyRefreshTimeout);
+        pendingTopologyRefreshTimeout = null;
+    }
     if (topologyPollingInterval) {
         clearInterval(topologyPollingInterval);
         topologyPollingInterval = null;
@@ -694,6 +703,24 @@ function handleTopologyNotify(xml: string): void {
             }
             break;
         }
+        const incomingSize = Math.max(newMembers.length, 1);
+        if (expectedGroupMemberCount >= 0 && incomingSize !== expectedGroupMemberCount) {
+            if (topologyRefreshAttempt < 10) {
+                scheduleTopologyVerification();
+            } else {
+                expectedGroupMemberCount = -1;
+                topologyRefreshAttempt = 0;
+            }
+            return;
+        }
+        if (expectedGroupMemberCount >= 0 && incomingSize === expectedGroupMemberCount) {
+            expectedGroupMemberCount = -1;
+            topologyRefreshAttempt = 0;
+            if (pendingTopologyRefreshTimeout) {
+                clearTimeout(pendingTopologyRefreshTimeout);
+                pendingTopologyRefreshTimeout = null;
+            }
+        }
         let newCoordinatorId = newCoordinatorRincon ? `uuid:${newCoordinatorRincon}` : '';
         if (newMembers.length <= 1 && connectedDevice) {
             const solo = newMembers.length === 1 ? newMembers[0] : connectedDevice;
@@ -742,6 +769,12 @@ async function passiveDisconnect(): Promise<void> {
     currentCoordinatorId = '';
     groupMembers = [];
     groupMemberVolumes = {};
+    expectedGroupMemberCount = -1;
+    topologyRefreshAttempt = 0;
+    if (pendingTopologyRefreshTimeout) {
+        clearTimeout(pendingTopologyRefreshTimeout);
+        pendingTopologyRefreshTimeout = null;
+    }
     if (topologyPollingInterval) {
         clearInterval(topologyPollingInterval);
         topologyPollingInterval = null;
@@ -858,6 +891,16 @@ async function renewTopologySubscription(device: DlnaDevice): Promise<void> {
     } catch (err) {
         dlnaLog('Failed to renew topology subscription', err);
     }
+}
+
+function scheduleTopologyVerification() {
+    if (pendingTopologyRefreshTimeout) clearTimeout(pendingTopologyRefreshTimeout);
+    const delay = Math.min(5000 * Math.pow(1.5, topologyRefreshAttempt), 30_000);
+    pendingTopologyRefreshTimeout = setTimeout(() => {
+        pendingTopologyRefreshTimeout = null;
+        topologyRefreshAttempt++;
+        refreshTopology();
+    }, delay);
 }
 
 function sendGroupStateToRenderer(): void {
@@ -1388,6 +1431,7 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
                 getTransportInfo(device),
             ]);
             currentTransportState = tState;
+            lastKnownTransportState = currentTransportState || 'STOPPED';
             const isActive =
                 tState === 'PLAYING' || tState === 'PAUSED_PLAYBACK' || tState === 'TRANSITIONING';
             if (isActive && posInfo.trackUri && posInfo.trackUri !== 'NOT_IMPLEMENTED') {
@@ -1464,6 +1508,9 @@ ipcMain.handle('dlna-group-add-member', async (_event, device: DlnaDevice) => {
     try {
         await joinGroup(device, connectedDevice);
         groupMembers.push(device);
+        expectedGroupMemberCount = groupMembers.length;
+        topologyRefreshAttempt = 0;
+        scheduleTopologyVerification();
         try {
             groupMemberVolumes[device.id] = await getVolume(device);
         } catch {
@@ -1490,6 +1537,9 @@ ipcMain.handle('dlna-group-remove-member', async (_event, deviceId: string) => {
         }
         await becomeCoordinatorOfStandaloneGroup(device);
         groupMembers = groupMembers.filter((m) => m.id !== deviceId);
+        expectedGroupMemberCount = groupMembers.length;
+        topologyRefreshAttempt = 0;
+        scheduleTopologyVerification();
         if (groupMembers.length === 1 && connectedDevice) {
             currentCoordinatorId = connectedDevice.id;
         }
@@ -1599,6 +1649,7 @@ ipcMain.on(
             if (shouldMuteTrick) {
                 try {
                     await setMute(device, true);
+                    await Promise.all(groupMembers.map((m) => setMute(m, true).catch(() => {})));
                 } catch {
                     // Pass
                 }
@@ -1630,6 +1681,9 @@ ipcMain.on(
                         }
                     }
                     await setMute(device, !!data.isMuted).catch(() => {});
+                    await Promise.all(
+                        groupMembers.map((m) => setMute(m, !!data.isMuted).catch(() => {})),
+                    );
                 }
             } else {
                 dlnaLog(`Queued (Paused): ${data.metadata.title}`);
@@ -1655,11 +1709,18 @@ ipcMain.on(
                     }
                     await pause(device).catch(() => {});
                     await setMute(device, !!data.isMuted).catch(() => {});
+                    await Promise.all(
+                        groupMembers.map((m) => setMute(m, !!data.isMuted).catch(() => {})),
+                    );
                 }
             }
-        } catch (err) {
-            dlnaLog(`Failed to play ${data.metadata.title}`, err);
-            if (data.seekTo !== undefined) await setMute(device, !!data.isMuted).catch(() => {});
+        } catch {
+            if (data.seekTo !== undefined) {
+                await setMute(device, !!data.isMuted).catch(() => {});
+                await Promise.all(
+                    groupMembers.map((m) => setMute(m, !!data.isMuted).catch(() => {})),
+                );
+            }
         }
     },
 );
@@ -1929,6 +1990,8 @@ ipcMain.handle(
                     '-vn',
                     '-af',
                     audioFilter || 'anull',
+                    '-map_metadata',
+                    '0',
                     '-f',
                     'mp3',
                     currentTranscodeFile,
