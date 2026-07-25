@@ -307,6 +307,25 @@ export const DiscordSettings = memo(() => {
         {
             control: (
                 <TextInput
+                    onChange={(e) => {
+                        setSettings({
+                            discord: {
+                                litterboxTime: e.currentTarget.value,
+                            },
+                        });
+                    }}
+                    value={settings.litterboxTime}
+                />
+            ),
+            description: t('setting.discordLitterboxTimeField', {
+                context: 'description',
+            }),
+            isHidden: !isElectron() || settings.serverType !== DiscordServerType.LITTERBOX,
+            title: t('setting.discordLitterboxTimeField'),
+        },
+        {
+            control: (
+                <TextInput
                     defaultValue={generalSettings.lastfmApiKey}
                     onBlur={(e) => {
                         setSettings({

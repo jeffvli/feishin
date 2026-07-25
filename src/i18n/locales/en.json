@@ -891,6 +891,8 @@
         "discordServerType_litterbox": "litterbox.catbox.moe",
         "discordImageProxyServerLink": "{{discord}} image proxy server URL",
         "discordImageProxyServerLink_description": "Specifies a proxy server to upload cover art to. Defaults to selected image proxy, but you can configure this yourself too.",
+        "discordLitterboxTimeField": "Time for litterbox.catbox.moe until deletion",
+        "discordLitterboxTimeField_description": "Only the values specified by their API are allowed.",
         "discordStateIcon": "Show playing icon",
         "discordStateIcon_description": "Show a small playing icon in the rich presence status. The paused icon is always shown when \"show rich presence when paused\" is enabled",
         "discordUpdateInterval": "{{discord}} rich presence update interval",
