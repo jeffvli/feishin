@@ -2,7 +2,6 @@ import { Client, SetActivity } from '@xhayper/discord-rpc';
 import { ipcMain } from 'electron';
 
 import log from '/@/main/logger';
-import { toast } from '/@/shared/components/toast/toast';
 
 const FEISHIN_DISCORD_APPLICATION_ID = '1165957668758900787';
 

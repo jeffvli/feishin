@@ -24,8 +24,7 @@ import {
     useTimestampStoreBase,
 } from '/@/renderer/store';
 import { sentenceCase } from '/@/renderer/utils';
-import { LogCategory, logFn, logger } from '/@/renderer/utils/logger';
-import { logMsg } from '/@/renderer/utils/logger-message';
+import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
@@ -281,10 +280,8 @@ export const useDiscordRpc = () => {
 
                             const imageResponse = await fetch(serverImageUrl ?? '');
                             if (!imageResponse.ok) {
-                                logFn.error('Failed fetching image URL from music server');
-                                logFn.error(logMsg[LogCategory.EXTERNAL].discordRpcFailedFetch, {
-                                    category: LogCategory.EXTERNAL,
-                                    meta: { imageUrl: serverImageUrl },
+                                logger.error('Failed fetching image URL from music server', {
+                                    imageUrl: serverImageUrl,
                                 });
                                 throw new Error();
                             }
