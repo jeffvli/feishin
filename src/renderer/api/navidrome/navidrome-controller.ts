@@ -1173,9 +1173,9 @@ export const NavidromeController: InternalControllerEndpoint = {
             body: {
                 description: body.description,
                 downloadable: body.downloadable,
-                expires: body.expires,
                 resourceIds: body.resourceIds,
                 resourceType: body.resourceType,
+                ...(body.expires !== undefined ? { expires: body.expires } : {}),
             },
         });
 

@@ -472,6 +472,22 @@ export enum HomeFeatureStyle {
     SINGLE = 'single',
 }
 
+export enum ShareExpirationUnit {
+    DAY = 'day',
+    HOUR = 'hour',
+    MINUTE = 'minute',
+    MONTH = 'month',
+    SECOND = 'second',
+    WEEK = 'week',
+    YEAR = 'year',
+}
+
+const ShareExpirationSchema = z.object({
+    amount: z.number().int().min(1),
+    unit: z.nativeEnum(ShareExpirationUnit),
+    useServerDefault: z.boolean(),
+});
+
 const AutoSaveSchema = z.object({
     count: z.number().min(0),
     enabled: z.boolean(),
@@ -537,6 +553,7 @@ export const GeneralSettingsSchema = z.object({
     primaryShade: z.number().min(0).max(9),
     qobuz: z.boolean(),
     resume: z.boolean(),
+    shareExpiration: ShareExpirationSchema,
     showFavorites: z.boolean(),
     showLyricsInSidebar: z.boolean(),
     showQueueInSidebar: z.boolean(),
@@ -1316,6 +1333,11 @@ const initialState: SettingsState = {
         primaryShade: 6,
         qobuz: true,
         resume: true,
+        shareExpiration: {
+            amount: 1,
+            unit: ShareExpirationUnit.YEAR,
+            useServerDefault: false,
+        },
         showFavorites: true,
         showLyricsInSidebar: true,
         showQueueInSidebar: true,
@@ -2736,10 +2758,20 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
+                if (version < 34) {
+                    if (state.general.shareExpiration === undefined) {
+                        state.general.shareExpiration = {
+                            amount: 1,
+                            unit: ShareExpirationUnit.YEAR,
+                            useServerDefault: false,
+                        };
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 33,
+            version: 34,
         },
     ),
 );

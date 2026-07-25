@@ -1,9 +1,10 @@
 import { closeModal, ContextModalProps } from '@mantine/modals';
-import dayjs from 'dayjs';
+import dayjs, { type ManipulateType } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
 import { useShareItem } from '/@/renderer/features/sharing/mutations/share-item-mutation';
-import { useCurrentServer } from '/@/renderer/store';
+import { useCurrentServer, useGeneralSettings } from '/@/renderer/store';
+import { type SettingsState, ShareExpirationUnit } from '/@/renderer/store/settings.store';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { DateTimePicker } from '/@/shared/components/date-time-picker/date-time-picker';
 import { Group } from '/@/shared/components/group/group';
@@ -13,6 +14,26 @@ import { Switch } from '/@/shared/components/switch/switch';
 import { Textarea } from '/@/shared/components/textarea/textarea';
 import { toast } from '/@/shared/components/toast/toast';
 import { useForm } from '/@/shared/hooks/use-form';
+
+const unitToDayjs: Record<ShareExpirationUnit, ManipulateType> = {
+    [ShareExpirationUnit.DAY]: 'day',
+    [ShareExpirationUnit.HOUR]: 'hour',
+    [ShareExpirationUnit.MINUTE]: 'minute',
+    [ShareExpirationUnit.MONTH]: 'month',
+    [ShareExpirationUnit.SECOND]: 'second',
+    [ShareExpirationUnit.WEEK]: 'week',
+    [ShareExpirationUnit.YEAR]: 'year',
+};
+
+type ShareExpirationSettings = SettingsState['general']['shareExpiration'];
+const getShareExpirationDate = (settings: ShareExpirationSettings): null | string => {
+    if (settings.useServerDefault) {
+        return null;
+    }
+
+    const amount = Math.max(1, Math.floor(settings.amount) || 1);
+    return dayjs().add(amount, unitToDayjs[settings.unit]).format('YYYY-MM-DD HH:mm:ss');
+};
 
 export const ShareItemContextModal = ({
     id,
@@ -27,8 +48,8 @@ export const ShareItemContextModal = ({
 
     const shareItemMutation = useShareItem({});
 
-    // Uses the same default as Navidrome: 1 year
-    const defaultDate = dayjs().add(1, 'year').format('YYYY-MM-DD HH:mm:ss');
+    const { shareExpiration } = useGeneralSettings();
+    const defaultDate = getShareExpirationDate(shareExpiration);
 
     const form = useForm({
         initialValues: {
@@ -37,8 +58,10 @@ export const ShareItemContextModal = ({
             expires: defaultDate,
         },
         validate: {
-            expires: (value) =>
-                dayjs(value).isAfter(dayjs()) ? null : t('form.shareItem.expireInvalid'),
+            expires: (value) => {
+                if (!value) return null;
+                return dayjs(value).isAfter(dayjs()) ? null : t('form.shareItem.expireInvalid');
+            },
         },
     });
 
@@ -59,7 +82,7 @@ export const ShareItemContextModal = ({
                 body: {
                     description: values.description,
                     downloadable: values.allowDownloading,
-                    expires: dayjs(values.expires).valueOf(),
+                    ...(values.expires ? { expires: dayjs(values.expires).valueOf() } : {}),
                     resourceIds: itemIds.join(),
                     resourceType,
                 },
@@ -127,9 +150,13 @@ export const ShareItemContextModal = ({
             <Stack>
                 <DateTimePicker
                     clearable
+                    description={t('form.shareItem.setExpiration', { context: 'description' })}
                     label={t('form.shareItem.setExpiration')}
                     minDate={new Date()}
-                    placeholder={defaultDate}
+                    placeholder={
+                        defaultDate ??
+                        t('form.shareItem.setExpiration', { context: 'serverDefault' })
+                    }
                     popoverProps={{ withinPortal: true }}
                     valueFormat="MM/DD/YYYY HH:mm"
                     {...form.getInputProps('expires')}

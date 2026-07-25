@@ -734,7 +734,7 @@ const shareItem = z.object({
 const shareItemParameters = z.object({
     description: z.string(),
     downloadable: z.boolean(),
-    expires: z.number(),
+    expires: z.number().optional(),
     resourceIds: z.string(),
     resourceType: z.string(),
 });

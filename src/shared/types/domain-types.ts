@@ -1116,7 +1116,7 @@ export type ShareItemArgs = BaseEndpointArgs & { body: ShareItemBody };
 export type ShareItemBody = {
     description: string;
     downloadable: boolean;
-    expires: number;
+    expires?: number;
     resourceIds: string;
     resourceType: string;
 };
