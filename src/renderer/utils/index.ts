@@ -4,6 +4,7 @@ export * from './get-header-color';
 export * from './normalize-server-url';
 export * from './parse-search-params';
 export * from './random-string';
+export * from './resolve-song-path';
 export * from './rgb-to-rgba';
 export * from './sentence-case';
 export * from './set-local-storage-setttings';

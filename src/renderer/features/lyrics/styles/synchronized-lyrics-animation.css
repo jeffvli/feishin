@@ -1,0 +1,15 @@
+.synchronized-lyrics .lyric-line.lyrics-line-active {
+    opacity: 1 !important;
+}
+
+.synchronized-lyrics:has(.lyrics-line-active) .lyric-line:not(.lyrics-line-active) {
+    opacity: var(--lyric-opacity, 0.3);
+}
+
+.synchronized-lyrics .lyric-line.lyrics-line-animating {
+    opacity: 1 !important;
+}
+
+.synchronized-lyrics .lyric-line:hover {
+    opacity: 1 !important;
+}

@@ -14,8 +14,7 @@ import {
     useSettingsStore,
     useTimestampStoreBase,
 } from '/@/renderer/store';
-import { LogCategory, logFn } from '/@/renderer/utils/logger';
-import { logMsg } from '/@/renderer/utils/logger-message';
+import { logger } from '/@/renderer/utils/logger';
 import { hasFeature } from '/@/shared/api/utils';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
@@ -67,9 +66,9 @@ Jellyfin progress APIs still use playback position (ticks), not listen time:
   - pause / unpause
 
 Other events:
-  - When the song changes: sends 'stop' for the previous track; sends 'start'
-    when the new track is playing; clears submission flag and listen accumulator
-    for the new track.
+  - When the song changes: sends 'stop' for the previous non-Jellyfin track;
+    sends 'start' when the new track is playing; clears submission flag and
+    listen accumulator for the new track.
 
   - When the song is restarted (near 0 after 10s+): clears submission flag
     and listen accumulator.
@@ -131,6 +130,7 @@ export const useScrobble = () => {
     const previousSongRef = useRef<QueueSong | undefined>(undefined);
     const previousTimestampRef = useRef<number>(0);
     const stopPositionRef = useRef<number>(0);
+    const stoppedSongIdRef = useRef<string | undefined>(undefined);
     const lastProgressEventRef = useRef<number>(0);
     const lastSeekEventRef = useRef<number>(0);
     const songChangeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -175,6 +175,51 @@ export const useScrobble = () => {
             trackDurationMs,
         });
     }, []);
+
+    const sendProgressAfterSubmission = useCallback(
+        (song: QueueSong) => {
+            const activeSong = usePlayerStore.getState().getCurrentSong();
+            const status = usePlayerStore.getState().player.status;
+
+            // Because Jellyfin uses the stop event for submission, we need to send another
+            // progress update after submission so that the song continues to progress in the dashboard
+            const shouldSendProgress =
+                song._serverType === ServerType.JELLYFIN &&
+                activeSong?._uniqueId === song._uniqueId &&
+                status === PlayerStatus.PLAYING;
+
+            if (!shouldSendProgress) {
+                return;
+            }
+
+            sendScrobble.mutate(
+                {
+                    apiClientProps: { serverId: song._serverId || '' },
+                    query: {
+                        albumId: song.albumId,
+                        event: 'unpause',
+                        id: song.id,
+                        mediaType: song._itemType.includes('song') ? 'song' : 'podcast',
+                        playbackRate,
+                        position: getPositionValue(
+                            useTimestampStoreBase.getState().timestamp,
+                            true,
+                        ),
+                        submission: false,
+                    },
+                },
+                {
+                    onSuccess: () => {
+                        logger.debug('Scrobbled a timeupdate event', {
+                            id: song.id,
+                            reason: 'after submission',
+                        });
+                    },
+                },
+            );
+        },
+        [playbackRate, sendScrobble],
+    );
 
     const handleScrobbleFromProgress = useCallback(
         (properties: { timestamp: number }, prev: { timestamp: number }) => {
@@ -256,8 +301,7 @@ export const useScrobble = () => {
             //             },
             //             {
             //                 onSuccess: () => {
-            //                     logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledTimeupdate, {
-            //                         category: LogCategory.SCROBBLE,
+            //                     logFn.debug("Scrobbled a timeupdate event", {
             //                         meta: {
             //                             id: currentSong.id,
             //                         },
@@ -293,13 +337,11 @@ export const useScrobble = () => {
                         },
                         {
                             onSuccess: () => {
-                                logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledSubmission, {
-                                    category: LogCategory.SCROBBLE,
-                                    meta: {
-                                        id: currentSong.id,
-                                        reason: 'from listened time',
-                                    },
+                                logger.info('Scrobbled a submission event', {
+                                    id: currentSong.id,
+                                    reason: 'from listened time',
                                 });
+                                sendProgressAfterSubmission(currentSong);
                             },
                         },
                     );
@@ -308,7 +350,13 @@ export const useScrobble = () => {
                 }
             }
         },
-        [isScrobbleEnabled, isPrivateModeEnabled, sendScrobble, playbackRate],
+        [
+            isScrobbleEnabled,
+            isPrivateModeEnabled,
+            sendScrobble,
+            playbackRate,
+            sendProgressAfterSubmission,
+        ],
     );
 
     const handleScrobbleFromSongChange = useCallback(
@@ -343,11 +391,8 @@ export const useScrobble = () => {
                                 silent: true,
                             });
                         } catch (error) {
-                            logFn.error('an error occurred while sending a desktop notification', {
-                                category: LogCategory.SCROBBLE,
-                                meta: {
-                                    error: error as Error,
-                                },
+                            logger.error('an error occurred while sending a desktop notification', {
+                                error: error as Error,
                             });
                         }
                     }
@@ -391,19 +436,18 @@ export const useScrobble = () => {
                         },
                         {
                             onSuccess: () => {
-                                logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledStart, {
-                                    category: LogCategory.SCROBBLE,
-                                    meta: {
-                                        id: currentSong.id,
-                                    },
+                                logger.info('Scrobbled a start event', {
+                                    id: currentSong.id,
                                 });
                             },
                         },
                     );
                 }
 
-                // Send stop scrobble for the track that was playing before the change
-                if (previousSong?.id) {
+                // Jellyfin does not need a stop event when advancing to another song.
+                const skipStopScrobble = previousSong?._serverType === ServerType.JELLYFIN;
+
+                if (previousSong?.id && !skipStopScrobble) {
                     sendScrobble.mutate(
                         {
                             apiClientProps: { serverId: previousSong._serverId || '' },
@@ -422,11 +466,8 @@ export const useScrobble = () => {
                         },
                         {
                             onSuccess: () => {
-                                logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledStop, {
-                                    category: LogCategory.SCROBBLE,
-                                    meta: {
-                                        id: previousSong.id,
-                                    },
+                                logger.info('Scrobbled a stop event', {
+                                    id: previousSong.id,
                                 });
                             },
                         },
@@ -499,6 +540,12 @@ export const useScrobble = () => {
 
             const currentStatus = usePlayerStore.getState().player.status;
 
+            // Stop resets seek position; the stop event is reported by handleScrobbleFromStatus.
+            if (currentStatus === PlayerStatus.STOPPED) {
+                flushScrobbleDebug();
+                return;
+            }
+
             sendScrobble.mutate(
                 {
                     apiClientProps: { serverId: currentSong._serverId || '' },
@@ -514,11 +561,8 @@ export const useScrobble = () => {
                 },
                 {
                     onSuccess: () => {
-                        logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledTimeupdate, {
-                            category: LogCategory.SCROBBLE,
-                            meta: {
-                                id: currentSong.id,
-                            },
+                        logger.debug('Scrobbled a timeupdate event', {
+                            id: currentSong.id,
                         });
                     },
                 },
@@ -569,11 +613,8 @@ export const useScrobble = () => {
                     },
                     {
                         onSuccess: () => {
-                            logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledPause, {
-                                category: LogCategory.SCROBBLE,
-                                meta: {
-                                    id: currentSong.id,
-                                },
+                            logger.debug('Scrobbled a pause event', {
+                                id: currentSong.id,
                             });
                         },
                     },
@@ -597,11 +638,67 @@ export const useScrobble = () => {
                     },
                     {
                         onSuccess: () => {
-                            logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledUnpause, {
-                                category: LogCategory.SCROBBLE,
-                                meta: {
-                                    id: currentSong.id,
-                                },
+                            logger.debug('Scrobbled an unpause event', {
+                                id: currentSong.id,
+                            });
+                        },
+                    },
+                );
+            }
+
+            // Send start event when resuming the same song that was stopped.
+            if (
+                properties.status === PlayerStatus.PLAYING &&
+                prev.status === PlayerStatus.STOPPED &&
+                stoppedSongIdRef.current === currentSong._uniqueId
+            ) {
+                stoppedSongIdRef.current = undefined;
+                sendScrobble.mutate(
+                    {
+                        apiClientProps: { serverId: currentSong._serverId || '' },
+                        query: {
+                            albumId: currentSong.albumId,
+                            event: 'start',
+                            id: currentSong.id,
+                            mediaType: mediaType,
+                            playbackRate: playbackRate,
+                            position: getPositionValue(currentTimestamp, useTicks),
+                            submission: false,
+                        },
+                    },
+                    {
+                        onSuccess: () => {
+                            logger.info('Scrobbled a start event', {
+                                id: currentSong.id,
+                            });
+                        },
+                    },
+                );
+            }
+
+            // Send stop event when status changes to stopped (from an active state)
+            if (
+                properties.status === PlayerStatus.STOPPED &&
+                prev.status !== PlayerStatus.STOPPED
+            ) {
+                stoppedSongIdRef.current = currentSong._uniqueId;
+                sendScrobble.mutate(
+                    {
+                        apiClientProps: { serverId: currentSong._serverId || '' },
+                        query: {
+                            albumId: currentSong.albumId,
+                            event: 'stop',
+                            id: currentSong.id,
+                            mediaType: mediaType,
+                            playbackRate: playbackRate,
+                            position: getPositionValue(currentTimestamp, useTicks),
+                            submission: false,
+                        },
+                    },
+                    {
+                        onSuccess: () => {
+                            logger.info('Scrobbled a stop event', {
+                                id: currentSong.id,
                             });
                         },
                     },
@@ -648,12 +745,9 @@ export const useScrobble = () => {
             },
             {
                 onSuccess: () => {
-                    logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledStart, {
-                        category: LogCategory.SCROBBLE,
-                        meta: {
-                            id: currentSong.id,
-                            reason: 'from repeat',
-                        },
+                    logger.info('Scrobbled a start event', {
+                        id: currentSong.id,
+                        reason: 'from repeat',
                     });
                 },
             },
@@ -711,13 +805,11 @@ export const useScrobble = () => {
                     },
                     {
                         onSuccess: () => {
-                            logFn.debug(logMsg[LogCategory.SCROBBLE].scrobbledSubmission, {
-                                category: LogCategory.SCROBBLE,
-                                meta: {
-                                    id: song.id,
-                                    reason: 'forced from UI',
-                                },
+                            logger.info('Scrobbled a submission event', {
+                                id: song.id,
+                                reason: 'forced from UI',
                             });
+                            sendProgressAfterSubmission(song);
                         },
                     },
                 );
@@ -744,7 +836,14 @@ export const useScrobble = () => {
         });
 
         return () => registerScrobbleManualHandlers(null);
-    }, [flushScrobbleDebug, isPrivateModeEnabled, isScrobbleEnabled, playbackRate, sendScrobble]);
+    }, [
+        flushScrobbleDebug,
+        isPrivateModeEnabled,
+        isScrobbleEnabled,
+        playbackRate,
+        sendProgressAfterSubmission,
+        sendScrobble,
+    ]);
 
     usePlayerEvents(
         {

@@ -40,14 +40,16 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
                 id="mobile-layout"
             >
                 {!shell && <WindowBar />}
-                <ActionIcon
-                    className={styles.drawerButton}
-                    icon="menu"
-                    onClick={openSidebar}
-                    size="lg"
-                    tooltip={{ label: 'Menu' }}
-                    variant="subtle"
-                />
+                {!shell && (
+                    <ActionIcon
+                        className={styles.drawerButton}
+                        icon="menu"
+                        onClick={openSidebar}
+                        size="lg"
+                        tooltip={{ label: 'Menu' }}
+                        variant="subtle"
+                    />
+                )}
                 <main className={styles.mainContent}>
                     <Suspense fallback={<Spinner container />}>
                         <Outlet />
@@ -55,25 +57,27 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
                 </main>
                 <PlayerBar />
             </div>
-            <Drawer
-                onClose={closeSidebar}
-                opened={sidebarOpened}
-                position="left"
-                size="320px"
-                styles={{
-                    body: {
-                        height: '100%',
-                        padding: 0,
-                    },
-                    content: {
-                        height: '100%',
-                        width: '100%',
-                    },
-                }}
-                withCloseButton={false}
-            >
-                <MobileSidebar />
-            </Drawer>
+            {!shell && (
+                <Drawer
+                    onClose={closeSidebar}
+                    opened={sidebarOpened}
+                    position="left"
+                    size="320px"
+                    styles={{
+                        body: {
+                            height: '100%',
+                            padding: 0,
+                        },
+                        content: {
+                            height: '100%',
+                            width: '100%',
+                        },
+                    }}
+                    withCloseButton={false}
+                >
+                    <MobileSidebar />
+                </Drawer>
+            )}
             <AnimatePresence initial={false}>
                 {isFullScreenPlayerExpanded && (
                     <div className={styles.fullScreenPlayerOverlay}>

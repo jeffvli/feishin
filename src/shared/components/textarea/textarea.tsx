@@ -9,10 +9,23 @@ export interface TextareaProps extends MantineTextareaProps {
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-    ({ children, classNames, maxWidth, style, width, ...props }: TextareaProps, ref) => {
+    (
+        {
+            children,
+            classNames,
+            maxWidth,
+            size = 'sm',
+            style,
+            variant = 'default',
+            width,
+            ...props
+        }: TextareaProps,
+        ref,
+    ) => {
         return (
             <MantineTextarea
                 classNames={{
+                    description: styles.description,
                     input: styles.input,
                     label: styles.label,
                     required: styles.required,
@@ -21,7 +34,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                     ...classNames,
                 }}
                 ref={ref}
+                size={size}
+                spellCheck={false}
                 style={{ maxWidth, width, ...style }}
+                variant={variant}
                 {...props}
             >
                 {children}

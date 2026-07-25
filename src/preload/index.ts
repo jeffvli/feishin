@@ -2,6 +2,7 @@ import { contextBridge, webUtils } from 'electron';
 
 import { autodiscover } from './autodiscover';
 import { browser } from './browser';
+import { customThemes } from './custom-themes';
 import { discordRpc } from './discord-rpc';
 import { dlnaPlayer, dlnaPlayerListener } from './dlna-player';
 import { ipc } from './ipc';
@@ -17,6 +18,7 @@ import { visualizer } from './visualizer';
 const api = {
     autodiscover,
     browser,
+    customThemes,
     discordRpc,
     dlnaPlayer,
     dlnaPlayerListener,

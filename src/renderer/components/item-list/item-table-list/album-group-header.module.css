@@ -1,9 +1,16 @@
 .container {
+    box-sizing: border-box;
     display: flex;
     gap: var(--theme-spacing-sm);
+    align-items: flex-start;
     width: 100%;
     height: 100%;
-    padding: 0 var(--theme-spacing-xs);
+    padding: var(--theme-spacing-sm) var(--theme-spacing-xs);
+}
+
+.container.vertical {
+    flex-direction: column;
+    align-items: center;
 }
 
 .image-container {
@@ -12,22 +19,75 @@
     flex-shrink: 0;
     height: 100%;
     aspect-ratio: 1;
-    padding-top: calc(var(--theme-spacing-xs) * 0.5);
+    overflow: hidden;
+    border-radius: var(--theme-radius-md);
+
+    &::before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 5;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        content: '';
+        background-color: rgb(0 0 0);
+        opacity: 0;
+        transition: all 0.2s ease-in-out;
+    }
+
+    &:hover::before {
+        @mixin dark {
+            opacity: 0.7;
+        }
+
+        @mixin light {
+            opacity: 0.5;
+        }
+    }
 }
 
 .info {
     display: flex;
     flex-direction: column;
+    gap: 0;
+    align-content: start;
     min-width: 0;
     padding: 0;
+}
+
+.container.vertical .image-container {
+    align-self: center;
+    width: auto;
+    height: auto;
+}
+
+.container.vertical .info {
+    align-items: center;
+    width: 100%;
+    text-align: center;
+}
+
+.album-title {
+    display: -webkit-box;
     overflow: hidden;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    -webkit-box-orient: vertical;
 }
 
-.album-name {
-    font-size: var(--theme-font-size-sm);
-}
-
-.artist-name {
+.metadata-row {
     font-size: var(--theme-font-size-xs);
-    opacity: 0.7;
+    color: var(--theme-colors-foreground-muted);
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.controls-row {
+    flex-shrink: 0;
+    min-height: calc(1.875rem * var(--mantine-scale, 1));
+    margin-top: var(--theme-spacing-xs);
 }

@@ -28,6 +28,7 @@ export const FileInput = forwardRef<HTMLButtonElement, FileInputProps>(
         return (
             <MantineFileInput
                 classNames={{
+                    description: styles.description,
                     input: styles.input,
                     label: styles.label,
                     required: styles.required,

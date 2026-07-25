@@ -8,7 +8,7 @@ import { parseStringParam, setSearchParam } from '/@/renderer/utils/query-params
 import { runInUrlTransition } from '/@/renderer/utils/url-transition';
 import { ItemListKey } from '/@/shared/types/types';
 
-export const useSortByFilter = <TSortBy>(defaultValue: null | string, listKey: ItemListKey) => {
+export const useSortByFilter = <TSortBy>(defaultValue: string, listKey: ItemListKey) => {
     const server = useCurrentServer();
     const { getFilter, setFilter } = useListFilterPersistence(server.id, listKey);
     const [searchParams, setSearchParams] = useSearchParams();

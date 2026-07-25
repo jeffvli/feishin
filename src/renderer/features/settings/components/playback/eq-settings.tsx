@@ -1,6 +1,7 @@
 import { useMove } from '@mantine/hooks';
 import isElectron from 'is-electron';
 import { memo, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
     buildMpvAudioFilters,
@@ -257,6 +258,7 @@ function EqBandSlider({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export const EqSettings = memo(() => {
+    const { t } = useTranslation();
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
 
@@ -443,13 +445,13 @@ export const EqSettings = memo(() => {
     // ── Preset select data ────────────────────────────────────────────────────
     const eqPresetSelectData = [
         {
-            group: 'Built-in',
+            group: t('setting.equalizerPresetGroupBuiltIn'),
             items: Object.keys(EQ_PRESETS).map((name) => ({ label: name, value: name })),
         },
         ...(Object.keys(customEqPresets).length > 0
             ? [
                   {
-                      group: 'Custom',
+                      group: t('setting.equalizerPresetGroupCustom'),
                       items: Object.keys(customEqPresets).map((name) => ({
                           label: name,
                           value: name,
@@ -461,13 +463,13 @@ export const EqSettings = memo(() => {
 
     const compPresetSelectData = [
         {
-            group: 'Built-in',
+            group: t('setting.equalizerPresetGroupBuiltIn'),
             items: Object.keys(COMP_PRESETS).map((name) => ({ label: name, value: name })),
         },
         ...(Object.keys(customCompPresets).length > 0
             ? [
                   {
-                      group: 'Custom',
+                      group: t('setting.equalizerPresetGroupCustom'),
                       items: Object.keys(customCompPresets).map((name) => ({
                           label: name,
                           value: name,
@@ -488,9 +490,9 @@ export const EqSettings = memo(() => {
             ),
             description:
                 settings.type === PlayerType.LOCAL
-                    ? 'Parametric equalizer via FFmpeg lavfi (MPV)'
-                    : 'Parametric equalizer via Web Audio API',
-            title: 'Equalizer',
+                    ? t('setting.equalizer', { context: 'descriptionMpv' })
+                    : t('setting.equalizer', { context: 'descriptionWebAudio' }),
+            title: t('setting.equalizer'),
         },
         ...(settings.equalizer.enabled
             ? ([
@@ -505,7 +507,7 @@ export const EqSettings = memo(() => {
                                       const preset = customEqPresets[name] ?? EQ_PRESETS[name];
                                       if (preset) applyEqPreset(preset);
                                   }}
-                                  placeholder="Select preset"
+                                  placeholder={t('setting.equalizerPresetSelectPlaceholder')}
                                   searchable
                                   value={null}
                                   w={180}
@@ -521,15 +523,15 @@ export const EqSettings = memo(() => {
                                           if (!name) return;
                                           handleDeleteEqPreset(name);
                                       }}
-                                      placeholder="Delete custom..."
+                                      placeholder={t('setting.equalizerPresetDeletePlaceholder')}
                                       value={null}
                                       w={160}
                                   />
                               )}
                           </Group>
                       ),
-                      description: 'Apply a built-in or saved custom EQ curve',
-                      title: 'Preset',
+                      description: t('setting.equalizerPreset', { context: 'description' }),
+                      title: t('setting.equalizerPreset'),
                   },
                   {
                       control: (
@@ -539,7 +541,7 @@ export const EqSettings = memo(() => {
                                   onKeyDown={(e) => {
                                       if (e.key === 'Enter') handleSaveEqPreset();
                                   }}
-                                  placeholder="Preset name..."
+                                  placeholder={t('setting.equalizerPresetNamePlaceholder')}
                                   value={saveEqName}
                                   w={180}
                               />
@@ -548,12 +550,12 @@ export const EqSettings = memo(() => {
                                   onClick={handleSaveEqPreset}
                                   variant="subtle"
                               >
-                                  Save
+                                  {t('common.save')}
                               </Button>
                           </Group>
                       ),
-                      description: 'Save the current EQ settings as a named preset',
-                      title: 'Save preset',
+                      description: t('setting.equalizerSavePreset', { context: 'description' }),
+                      title: t('setting.equalizerSavePreset'),
                   },
                   {
                       control: (
@@ -600,13 +602,12 @@ export const EqSettings = memo(() => {
                                   w={70}
                               />
                               <Button onClick={handleResetEq} variant="subtle">
-                                  Reset all
+                                  {t('common.reset')}
                               </Button>
                           </Group>
                       ),
-                      description:
-                          'Input gain before EQ bands. Set negative when boosting bands to prevent clipping (MPV).',
-                      title: 'Preamp',
+                      description: t('setting.equalizerPreamp', { context: 'description' }),
+                      title: t('setting.equalizerPreamp'),
                   },
                   {
                       control: (
@@ -625,9 +626,8 @@ export const EqSettings = memo(() => {
                               ))}
                           </Group>
                       ),
-                      description:
-                          'Per-band gain. Drag up/down or type a value. Range: -12 to +12 dB.',
-                      title: 'Bands',
+                      description: t('setting.equalizerBands', { context: 'description' }),
+                      title: t('setting.equalizerBands'),
                   },
               ] as SettingOption[])
             : []),
@@ -644,60 +644,57 @@ export const EqSettings = memo(() => {
         unit: string;
     }[] = [
         {
-            description: 'Signal level above which compression begins.',
+            description: t('setting.compressorThreshold', { context: 'description' }),
             key: 'threshold',
             max: 0,
             min: -60,
             step: 1,
-            title: 'Threshold',
+            title: t('setting.compressorThreshold'),
             unit: 'dB',
         },
         {
-            description: 'Compression ratio, e.g. 4 = 4:1.',
+            description: t('setting.compressorRatio', { context: 'description' }),
             key: 'ratio',
             max: 20,
             min: 1,
             step: 0.5,
-            title: 'Ratio',
+            title: t('setting.compressorRatio'),
             unit: ':1',
         },
         {
-            description:
-                'How quickly the compressor engages after the signal exceeds the threshold.',
+            description: t('setting.compressorAttack', { context: 'description' }),
             key: 'attack',
             max: 2000,
             min: 0.1,
             step: 1,
-            title: 'Attack',
+            title: t('setting.compressorAttack'),
             unit: 'ms',
         },
         {
-            description:
-                'How quickly the compressor releases after the signal drops below the threshold.',
+            description: t('setting.compressorRelease', { context: 'description' }),
             key: 'release',
             max: 9000,
             min: 1,
             step: 10,
-            title: 'Release',
+            title: t('setting.compressorRelease'),
             unit: 'ms',
         },
         {
-            description: 'Output gain applied after compression to restore loudness.',
+            description: t('setting.compressorMakeupGain', { context: 'description' }),
             key: 'makeup',
             max: 30,
             min: 0,
             step: 0.5,
-            title: 'Makeup Gain',
+            title: t('setting.compressorMakeupGain'),
             unit: 'dB',
         },
         {
-            description:
-                'Soft-knee width. Higher values make the transition into compression more gradual.',
+            description: t('setting.compressorKnee', { context: 'description' }),
             key: 'knee',
             max: 10,
             min: 1,
             step: 0.5,
-            title: 'Knee',
+            title: t('setting.compressorKnee'),
             unit: 'dB',
         },
     ];
@@ -713,9 +710,9 @@ export const EqSettings = memo(() => {
             ),
             description:
                 settings.type === PlayerType.LOCAL
-                    ? 'Dynamic range compressor via FFmpeg acompressor (MPV)'
-                    : 'Dynamic range compressor via Web Audio API',
-            title: 'Compressor',
+                    ? t('setting.compressor', { context: 'descriptionMpv' })
+                    : t('setting.compressor', { context: 'descriptionWebAudio' }),
+            title: t('setting.compressor'),
         },
         ...(settings.compressor.enabled
             ? ([
@@ -730,7 +727,7 @@ export const EqSettings = memo(() => {
                                       const preset = customCompPresets[name] ?? COMP_PRESETS[name];
                                       if (preset) applyCompPreset(preset);
                                   }}
-                                  placeholder="Select preset"
+                                  placeholder={t('setting.equalizerPresetSelectPlaceholder')}
                                   searchable
                                   value={null}
                                   w={180}
@@ -746,15 +743,15 @@ export const EqSettings = memo(() => {
                                           if (!name) return;
                                           handleDeleteCompPreset(name);
                                       }}
-                                      placeholder="Delete custom..."
+                                      placeholder={t('setting.equalizerPresetDeletePlaceholder')}
                                       value={null}
                                       w={160}
                                   />
                               )}
                           </Group>
                       ),
-                      description: 'Apply a built-in or saved custom compressor setting',
-                      title: 'Preset',
+                      description: t('setting.compressorPreset', { context: 'description' }),
+                      title: t('setting.equalizerPreset'),
                   },
                   {
                       control: (
@@ -764,7 +761,7 @@ export const EqSettings = memo(() => {
                                   onKeyDown={(e) => {
                                       if (e.key === 'Enter') handleSaveCompPreset();
                                   }}
-                                  placeholder="Preset name..."
+                                  placeholder={t('setting.equalizerPresetNamePlaceholder')}
                                   value={saveCompName}
                                   w={180}
                               />
@@ -773,12 +770,12 @@ export const EqSettings = memo(() => {
                                   onClick={handleSaveCompPreset}
                                   variant="subtle"
                               >
-                                  Save
+                                  {t('common.save')}
                               </Button>
                           </Group>
                       ),
-                      description: 'Save the current compressor settings as a named preset',
-                      title: 'Save preset',
+                      description: t('setting.compressorSavePreset', { context: 'description' }),
+                      title: t('setting.equalizerSavePreset'),
                   },
                   // One SettingOption per compressor parameter — Slider + NumberInput
                   ...compParams.map(({ description, key, max, min, step, title, unit }) => ({
@@ -834,11 +831,11 @@ export const EqSettings = memo(() => {
                   {
                       control: (
                           <Button onClick={handleResetComp} variant="subtle">
-                              Reset to defaults
+                              {t('common.resetToDefault')}
                           </Button>
                       ),
-                      description: 'Restore all compressor parameters to their default values',
-                      title: 'Reset',
+                      description: t('setting.compressorReset', { context: 'description' }),
+                      title: t('common.reset'),
                   },
               ] as SettingOption[])
             : []),

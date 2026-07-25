@@ -1,0 +1,39 @@
+.root {
+    position: relative;
+    width: 100%;
+}
+
+.top-row,
+.controls-row {
+    flex-wrap: wrap;
+}
+
+.top-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: var(--theme-spacing-md);
+}
+
+.controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.overlay-toggle-active {
+    color: var(--theme-colors-primary) !important;
+}
+
+.layer-row {
+    display: flex;
+    gap: var(--theme-spacing-md);
+    align-items: center;
+    justify-content: space-between;
+}
+
+.layer-label {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}

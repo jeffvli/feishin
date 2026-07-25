@@ -1,6 +1,9 @@
 import { del, get, set } from 'idb-keyval';
+import { useEffect, useState } from 'react';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
+
+const PLAYER_TIMESTAMP_POLL_INTERVAL_MS = 500;
 
 interface TimestampState {
     setTimestamp: (timestamp: number) => void;
@@ -60,7 +63,25 @@ export const usePlayerProgress = () => {
 };
 
 export const usePlayerTimestamp = () => {
-    return useTimestampStoreBase((state) => state.timestamp);
+    const [timestamp, setLocalTimestamp] = useState(
+        () => useTimestampStoreBase.getState().timestamp,
+    );
+
+    useEffect(() => {
+        const syncTimestamp = () => {
+            const nextTimestamp = useTimestampStoreBase.getState().timestamp;
+            setLocalTimestamp((prevTimestamp) =>
+                prevTimestamp !== nextTimestamp ? nextTimestamp : prevTimestamp,
+            );
+        };
+
+        syncTimestamp();
+        const interval = setInterval(syncTimestamp, PLAYER_TIMESTAMP_POLL_INTERVAL_MS);
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return timestamp;
 };
 
 export const setTimestamp = (timestamp: number) => {

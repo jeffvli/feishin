@@ -2,7 +2,7 @@ import DomPurify, { Config } from 'dompurify';
 
 const SANITIZE_OPTIONS: Config = {
     ALLOWED_ATTR: ['href'],
-    ALLOWED_TAGS: ['a', 'b', 'div', 'em', 'i', 'p', 'span', 'strong'],
+    ALLOWED_TAGS: ['a', 'b', 'div', 'em', 'i', 'p', 'span', 'strong', 'ruby', 'rt', 'rp'],
     // allow http://, https://, and // (mapped to https)
     ALLOWED_URI_REGEXP: /^(http(s?):)?\/\/.+/i,
 };

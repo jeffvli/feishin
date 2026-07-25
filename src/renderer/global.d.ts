@@ -2,9 +2,11 @@ declare global {
     interface Window {
         ANALYTICS_DISABLED?: boolean | string;
         FS_AUTO_DJ_ALBUM_STRATEGY?: string;
+        FS_AUTO_DJ_ALLOW_DUPLICATES?: string;
         FS_AUTO_DJ_ENABLED?: string;
         FS_AUTO_DJ_ITEM_COUNT?: string;
         FS_AUTO_DJ_MODE?: string;
+        FS_AUTO_DJ_ONLY_SIMILAR?: string;
         FS_AUTO_DJ_SONG_STRATEGY?: string;
         FS_AUTO_DJ_TIMING?: string;
         FS_CSS_CONTENT?: string;
@@ -68,6 +70,10 @@ declare global {
         FS_LYRICS_ENABLE_AUTO_TRANSLATION?: string;
         FS_LYRICS_FETCH?: string;
         FS_LYRICS_FOLLOW?: string;
+        FS_LYRICS_FOLLOW_SCROLL_ALIGNMENT?: string;
+        FS_LYRICS_LINE_LEAD_TIME_MS?: string;
+        FS_LYRICS_PADDING_LEFT?: string;
+        FS_LYRICS_PADDING_RIGHT?: string;
         FS_LYRICS_PREFER_LOCAL?: string;
         FS_LYRICS_SHOW_MATCH?: string;
         FS_LYRICS_SHOW_PROVIDER?: string;

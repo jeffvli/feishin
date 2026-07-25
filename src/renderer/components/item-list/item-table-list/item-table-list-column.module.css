@@ -31,6 +31,11 @@
     padding-left: 0;
 }
 
+.container.no-vertical-padding {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
 .container.center {
     align-items: center;
     text-align: center;
@@ -161,6 +166,11 @@
     margin-left: 9999px;
 }
 
+.container.data-row[data-row-dragged-over='top'][data-row-dragged-over-first='true'][data-exclude-row-drag-left='true']::after {
+    left: 0;
+    margin-left: 0;
+}
+
 .container.data-row[data-row-dragged-over='bottom']::after {
     position: absolute;
     right: 0;
@@ -178,6 +188,11 @@
     left: -9999px;
     margin-right: 9999px;
     margin-left: 9999px;
+}
+
+.container.data-row[data-row-dragged-over='bottom'][data-row-dragged-over-first='true'][data-exclude-row-drag-left='true']::after {
+    left: 0;
+    margin-left: 0;
 }
 
 .container.data-row > * {

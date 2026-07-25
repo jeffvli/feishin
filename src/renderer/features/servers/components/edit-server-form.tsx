@@ -44,7 +44,7 @@ const ModifiedFieldIndicator = () => {
 
 export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditServerFormProps) => {
     const { t } = useTranslation();
-    const { updateServer } = useAuthStoreActions();
+    const { setCurrentServer, updateServer } = useAuthStoreActions();
     const focusTrapRef = useFocusTrap();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -162,6 +162,16 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
             }
 
             updateServer(server.id, serverItem);
+
+            // After re-authenticating, switch to the updated server so the user
+            // isn't left on the credentials / server-required screen.
+            if (!canSkipAuth) {
+                const updated = getServerById(server.id);
+                if (updated) {
+                    setCurrentServer(updated);
+                }
+            }
+
             toast.success({
                 message: t('form.updateServer.title'),
             });

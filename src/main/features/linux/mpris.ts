@@ -2,6 +2,8 @@ import { ipcMain } from 'electron';
 import Player from 'mpris-service';
 
 import { getMainWindow } from '/@/main/index';
+import log from '/@/main/logger';
+import { MPV_VOLUME_MAX_CEILING } from '/@/shared/constants/volume';
 import { QueueSong } from '/@/shared/types/domain-types';
 import { PlayerRepeat, PlayerStatus } from '/@/shared/types/types';
 
@@ -69,14 +71,11 @@ mprisPlayer.on('previous', () => {
     }
 });
 
+// The renderer clamps to the active backend's maximum (mpv's --volume-max when
+// mpv is selected), since that range is derived from settings the renderer owns.
+// Only a sanity range is enforced here.
 mprisPlayer.on('volume', (vol: number) => {
-    let volume = Math.round(vol * 100);
-
-    if (volume > 100) {
-        volume = 100;
-    } else if (volume < 0) {
-        volume = 0;
-    }
+    const volume = Math.min(MPV_VOLUME_MAX_CEILING, Math.max(0, Math.round(vol * 100)));
 
     getMainWindow()?.webContents.send('request-volume', {
         volume,
@@ -124,7 +123,12 @@ ipcMain.on('update-volume', (_event, volume) => {
 });
 
 ipcMain.on('update-playback', (_event, status: PlayerStatus) => {
-    mprisPlayer.playbackStatus = status === PlayerStatus.PLAYING ? 'Playing' : 'Paused';
+    mprisPlayer.playbackStatus =
+        status === PlayerStatus.PLAYING
+            ? 'Playing'
+            : status === PlayerStatus.STOPPED
+              ? 'Stopped'
+              : 'Paused';
 });
 
 const REPEAT_TO_MPRIS: Record<PlayerRepeat, string> = {
@@ -197,7 +201,7 @@ ipcMain.on(
                 'xesam:userRating': song.userRating ? song.userRating / 5 : null,
             };
         } catch (err) {
-            console.error(err);
+            log.error(err);
         }
     },
 );

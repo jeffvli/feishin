@@ -203,7 +203,7 @@ export const MobilePlayerbar = () => {
                     icon={<Icon fill="default" icon="mediaPrevious" size="md" />}
                     onClick={(e) => {
                         e.stopPropagation();
-                        mediaPrevious();
+                        mediaPrevious(e.altKey);
                     }}
                     tooltip={{
                         label: t('player.previous'),
@@ -213,7 +213,7 @@ export const MobilePlayerbar = () => {
                 />
                 <MainPlayButton
                     disabled={currentSong?.id === undefined}
-                    isPaused={status === PlayerStatus.PAUSED}
+                    isPaused={status !== PlayerStatus.PLAYING}
                     onClick={(e) => {
                         e.stopPropagation();
                         mediaTogglePlayPause();
@@ -223,7 +223,7 @@ export const MobilePlayerbar = () => {
                     icon={<Icon fill="default" icon="mediaNext" size="md" />}
                     onClick={(e) => {
                         e.stopPropagation();
-                        mediaNext();
+                        mediaNext(e.altKey);
                     }}
                     tooltip={{
                         label: t('player.next'),

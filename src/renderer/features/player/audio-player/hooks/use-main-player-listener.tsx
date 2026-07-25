@@ -56,13 +56,25 @@ export const useMainPlayerListener = () => {
 
         mpvPlayerListener.rendererNext(() => {
             if (!isRadioActive) {
-                mediaNext();
+                mediaNext(false);
+            }
+        });
+
+        mpvPlayerListener.rendererNextAlbum(() => {
+            if (!isRadioActive) {
+                mediaNext(true);
             }
         });
 
         mpvPlayerListener.rendererPrevious(() => {
             if (!isRadioActive) {
-                mediaPrevious();
+                mediaPrevious(false);
+            }
+        });
+
+        mpvPlayerListener.rendererPreviousAlbum(() => {
+            if (!isRadioActive) {
+                mediaPrevious(true);
             }
         });
 

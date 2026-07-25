@@ -9,7 +9,7 @@ export const SettingsContextModal = () => {
 
     return (
         <SettingSearchContext.Provider value={search}>
-            <SettingsHeader setSearch={setSearch} />
+            <SettingsHeader setSearch={setSearch} showUpdateAvailable />
             <SettingsContent />
         </SettingSearchContext.Provider>
     );

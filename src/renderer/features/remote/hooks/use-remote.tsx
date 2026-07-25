@@ -7,8 +7,7 @@ import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { usePlayerActions, usePlayerStore, useRemoteSettings } from '/@/renderer/store';
-import { LogCategory, logFn } from '/@/renderer/utils/logger';
-import { logMsg } from '/@/renderer/utils/logger-message';
+import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerShuffle } from '/@/shared/types/types';
@@ -32,13 +31,10 @@ export const useRemote = () => {
         // we must send this EVEN IF the remote is disabled, as this is what
         // makes sure that the main process gets the port/username/password on startup
 
-        logFn.debug(logMsg[LogCategory.REMOTE].initializingRemoteSettings, {
-            category: LogCategory.REMOTE,
-            meta: {
-                enabled: remoteSettings.enabled,
-                port: remoteSettings.port,
-                username: remoteSettings.username,
-            },
+        logger.info('Initializing remote settings', {
+            enabled: remoteSettings.enabled,
+            port: remoteSettings.port,
+            username: remoteSettings.username,
         });
 
         remote
@@ -49,10 +45,7 @@ export const useRemote = () => {
                 remoteSettings.password,
             )
             .catch((error) => {
-                logFn.error(logMsg[LogCategory.REMOTE].failedToEnableRemote, {
-                    category: LogCategory.REMOTE,
-                    meta: { error },
-                });
+                logger.error('Failed to enable remote', { error });
                 toast.warn({ message: error, title: 'Failed to enable remote' });
             });
         // We only want to fire this once
@@ -65,42 +58,35 @@ export const useRemote = () => {
         }
 
         remote.requestPosition((data: { position: number }) => {
-            logFn.debug(logMsg[LogCategory.REMOTE].requestPositionReceived, {
-                category: LogCategory.REMOTE,
-                meta: { position: data.position },
-            });
+            logger.debug('Request position received', { position: data.position });
             const newTime = data.position;
             player.mediaSeekToTimestamp(newTime);
         });
 
         remote.requestSeek((data: { offset: number }) => {
-            logFn.debug(logMsg[LogCategory.REMOTE].requestSeekReceived, {
-                category: LogCategory.REMOTE,
-                meta: { offset: data.offset },
-            });
+            logger.debug('Request seek received', { offset: data.offset });
             mediaSkipForward(data.offset);
         });
 
         remote.requestRating((data: { id: string; rating: number; serverId: string }) => {
-            logFn.debug(logMsg[LogCategory.REMOTE].requestRatingReceived, {
-                category: LogCategory.REMOTE,
-                meta: { id: data.id, rating: data.rating, serverId: data.serverId },
+            logger.debug('Request rating received', {
+                id: data.id,
+                rating: data.rating,
+                serverId: data.serverId,
             });
             setRating(data.serverId, [data.id], LibraryItem.SONG, data.rating);
         });
 
         remote.requestVolume((data: { volume: number }) => {
-            logFn.debug(logMsg[LogCategory.REMOTE].requestVolumeReceived, {
-                category: LogCategory.REMOTE,
-                meta: { volume: data.volume },
-            });
+            logger.debug('Request volume received', { volume: data.volume });
             setVolume(data.volume);
         });
 
         remote.requestFavorite((data: { favorite: boolean; id: string; serverId: string }) => {
-            logFn.debug(logMsg[LogCategory.REMOTE].requestFavoriteReceived, {
-                category: LogCategory.REMOTE,
-                meta: { favorite: data.favorite, id: data.id, serverId: data.serverId },
+            logger.debug('Request favorite received', {
+                favorite: data.favorite,
+                id: data.id,
+                serverId: data.serverId,
             });
             const mutator = data.favorite ? addToFavoritesMutation : removeFromFavoritesMutation;
             mutator.mutate({
@@ -141,13 +127,10 @@ export const useRemote = () => {
         const currentSong = player.getCurrentSong();
 
         if (currentSong) {
-            logFn.debug(logMsg[LogCategory.REMOTE].sendingInitialSong, {
-                category: LogCategory.REMOTE,
-                meta: {
-                    artistName: currentSong.artistName,
-                    id: currentSong.id,
-                    name: currentSong.name,
-                },
+            logger.debug('Sending initial song', {
+                artistName: currentSong.artistName,
+                id: currentSong.id,
+                name: currentSong.name,
             });
 
             const imageUrl =
@@ -171,14 +154,11 @@ export const useRemote = () => {
                     return;
                 }
 
-                logFn.debug(logMsg[LogCategory.REMOTE].updateSongSent, {
-                    category: LogCategory.REMOTE,
-                    meta: {
-                        artistName: properties.song?.artistName,
-                        id: properties.song?.id,
-                        index: properties.index,
-                        name: properties.song?.name,
-                    },
+                logger.debug('Update song sent', {
+                    artistName: properties.song?.artistName,
+                    id: properties.song?.id,
+                    index: properties.index,
+                    name: properties.song?.name,
                 });
                 if (properties.song) {
                     const song = properties.song;
@@ -202,10 +182,7 @@ export const useRemote = () => {
                     return;
                 }
 
-                logFn.debug(logMsg[LogCategory.REMOTE].updatePositionSent, {
-                    category: LogCategory.REMOTE,
-                    meta: { timestamp: properties.timestamp },
-                });
+                logger.debug('Update position sent', { timestamp: properties.timestamp });
                 remote.updatePosition(properties.timestamp);
             },
             onPlayerRepeat: (properties) => {
@@ -213,10 +190,7 @@ export const useRemote = () => {
                     return;
                 }
 
-                logFn.debug(logMsg[LogCategory.REMOTE].updateRepeatSent, {
-                    category: LogCategory.REMOTE,
-                    meta: { repeat: properties.repeat },
-                });
+                logger.debug('Update repeat sent', { repeat: properties.repeat });
                 remote.updateRepeat(properties.repeat);
             },
             onPlayerShuffle: (properties) => {
@@ -225,9 +199,9 @@ export const useRemote = () => {
                 }
 
                 const isShuffleEnabled = properties.shuffle !== PlayerShuffle.NONE;
-                logFn.debug(logMsg[LogCategory.REMOTE].updateShuffleSent, {
-                    category: LogCategory.REMOTE,
-                    meta: { isShuffleEnabled, shuffle: properties.shuffle },
+                logger.debug('Update shuffle sent', {
+                    isShuffleEnabled,
+                    shuffle: properties.shuffle,
                 });
                 remote.updateShuffle(isShuffleEnabled);
             },
@@ -236,10 +210,7 @@ export const useRemote = () => {
                     return;
                 }
 
-                logFn.debug(logMsg[LogCategory.REMOTE].updatePlaybackSent, {
-                    category: LogCategory.REMOTE,
-                    meta: { status: properties.status },
-                });
+                logger.debug('Update playback sent', { status: properties.status });
                 remote.updatePlayback(properties.status);
             },
             onPlayerVolume: (properties) => {
@@ -247,10 +218,7 @@ export const useRemote = () => {
                     return;
                 }
 
-                logFn.debug(logMsg[LogCategory.REMOTE].updateVolumeSent, {
-                    category: LogCategory.REMOTE,
-                    meta: { volume: properties.volume },
-                });
+                logger.debug('Update volume sent', { volume: properties.volume });
                 remote.updateVolume(properties.volume);
             },
             onUserFavorite: (properties) => {
@@ -258,13 +226,10 @@ export const useRemote = () => {
                     return;
                 }
 
-                logFn.debug(logMsg[LogCategory.REMOTE].updateFavoriteSent, {
-                    category: LogCategory.REMOTE,
-                    meta: {
-                        favorite: properties.favorite,
-                        id: properties.id,
-                        serverId: properties.serverId,
-                    },
+                logger.debug('Update favorite sent', {
+                    favorite: properties.favorite,
+                    id: properties.id,
+                    serverId: properties.serverId,
                 });
                 remote.updateFavorite(properties.favorite, properties.serverId, properties.id);
             },
@@ -273,13 +238,10 @@ export const useRemote = () => {
                     return;
                 }
 
-                logFn.debug(logMsg[LogCategory.REMOTE].updateRatingSent, {
-                    category: LogCategory.REMOTE,
-                    meta: {
-                        id: properties.id,
-                        rating: properties.rating || 0,
-                        serverId: properties.serverId,
-                    },
+                logger.debug('Update rating sent', {
+                    id: properties.id,
+                    rating: properties.rating || 0,
+                    serverId: properties.serverId,
                 });
                 remote.updateRating(properties.rating || 0, properties.serverId, properties.id);
             },

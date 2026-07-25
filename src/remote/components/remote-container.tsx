@@ -128,7 +128,7 @@ export const RemoteContainer = () => {
                     onClick={() => {
                         if (status === PlayerStatus.PLAYING) {
                             send({ event: 'pause' });
-                        } else if (status === PlayerStatus.PAUSED) {
+                        } else {
                             send({ event: 'play' });
                         }
                     }}

@@ -338,6 +338,9 @@ export const queryKeys: Record<
 
             return [serverId, 'playlists', 'songList'] as const;
         },
+        songListIds: (serverId: string, id: string) => {
+            return [serverId, 'playlists', 'songListIds', id] as const;
+        },
     },
     radio: {
         list: (serverId: string) => [serverId, 'radio', 'list'] as const,
@@ -360,6 +363,7 @@ export const queryKeys: Record<
     },
     server: {
         root: (serverId: string) => [serverId] as const,
+        scanStatus: (serverId: string) => [serverId, 'server', 'scanStatus'] as const,
     },
     songs: {
         albumRadio: (serverId: string, query?: AlbumRadioQuery) => {

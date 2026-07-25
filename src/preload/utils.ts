@@ -1,9 +1,47 @@
-import { ipcRenderer, webFrame } from 'electron';
+import { ipcRenderer, type IpcRendererEvent, webFrame } from 'electron';
+
+import type {
+    ArtworkOp,
+    BatchProgress,
+    ReadLocalImageResult,
+    ReadSongMetadataBatchResult,
+    TagValue,
+    WriteSongTagsBatchResult,
+} from '../shared/types/tag-editor';
 
 import { disableAutoUpdates, isLinux, isMacOS, isWindows } from '../main/env';
 
 const openItem = async (path: string) => {
     return ipcRenderer.invoke('open-item', path);
+};
+
+const cancelReadSongMetadata = (): void => {
+    ipcRenderer.invoke('cancel-read-song-metadata');
+};
+
+const readSongMetadataBatch = (filePaths: string[]): Promise<ReadSongMetadataBatchResult> => {
+    return ipcRenderer.invoke('read-song-metadata-batch', filePaths);
+};
+
+const writeSongTagsBatch = (
+    filePaths: string[],
+    edits: Record<string, TagValue>,
+    removed: string[],
+    artworkOp?: ArtworkOp,
+): Promise<WriteSongTagsBatchResult> => {
+    return ipcRenderer.invoke('write-song-tags-batch', filePaths, edits, removed, artworkOp);
+};
+
+const onBatchProgress = (cb: (event: IpcRendererEvent, data: BatchProgress) => void) => {
+    ipcRenderer.on('batch-progress', cb);
+};
+
+const offBatchProgress = (cb: (event: IpcRendererEvent, data: BatchProgress) => void) => {
+    ipcRenderer.removeListener('batch-progress', cb);
+};
+
+const readLocalImage = (filePath: string): Promise<ReadLocalImageResult> => {
+    return ipcRenderer.invoke('read-local-image', filePath);
 };
 
 const openApplicationDirectory = async () => {
@@ -27,6 +65,18 @@ const saveCustomCss = async (content: string) => {
 
 const openCustomCssFolder = async () => {
     return ipcRenderer.invoke('custom-css-open-folder');
+};
+
+const openLogsFolder = async () => {
+    return ipcRenderer.invoke('logger-open-folder');
+};
+
+const exportDiagnostics = async (payload?: {
+    logLevel?: null | string;
+    rendererSettings?: null | Record<string, unknown>;
+    server?: null | Record<string, unknown>;
+}): Promise<{ canceled: boolean; path?: string }> => {
+    return ipcRenderer.invoke('logger-export-diagnostics', payload);
 };
 
 const customCssUpdatedListener = (
@@ -100,6 +150,10 @@ const rendererOpenManageServers = (cb: () => void) => {
     ipcRenderer.on('renderer-open-manage-servers', () => cb());
 };
 
+const rendererOpenCreatePlaylist = (cb: () => void) => {
+    ipcRenderer.on('renderer-open-create-playlist', () => cb());
+};
+
 const rendererTogglePrivateMode = (cb: () => void) => {
     ipcRenderer.on('renderer-toggle-private-mode', cb);
 };
@@ -117,21 +171,29 @@ const rendererUpdateAvailable = (cb: (version: string) => void) => {
 };
 
 export const utils = {
+    cancelReadSongMetadata,
     checkForUpdates,
     customCssUpdatedListener,
     disableAutoUpdates,
     download,
+    exportDiagnostics,
     forceGarbageCollection,
     getCustomCss,
     isLinux,
     isMacOS,
     isWindows,
     mainMessageListener,
+    offBatchProgress,
+    onBatchProgress,
     openApplicationDirectory,
     openCustomCssFolder,
     openItem,
+    openLogsFolder,
     playerErrorListener,
+    readLocalImage,
+    readSongMetadataBatch,
     rendererOpenCommandPalette,
+    rendererOpenCreatePlaylist,
     rendererOpenManageServers,
     rendererOpenReleaseNotes,
     rendererOpenSettings,
@@ -143,6 +205,7 @@ export const utils = {
     setInputFocused,
     startPowerSaveBlocker,
     stopPowerSaveBlocker,
+    writeSongTagsBatch,
 };
 
 export type Utils = typeof utils;

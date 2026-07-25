@@ -149,6 +149,40 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
         },
         {
             control: (
+                <Slider
+                    defaultValue={displaySettings.paddingLeft ?? 0}
+                    label={(value) => `${value}%`}
+                    max={50}
+                    min={0}
+                    onChangeEnd={(value) => {
+                        updateDisplaySetting({ paddingLeft: value });
+                    }}
+                    step={1}
+                    w={100}
+                />
+            ),
+            description: '',
+            title: t('page.fullscreenPlayer.config.lyricPaddingLeft'),
+        },
+        {
+            control: (
+                <Slider
+                    defaultValue={displaySettings.paddingRight ?? 0}
+                    label={(value) => `${value}%`}
+                    max={50}
+                    min={0}
+                    onChangeEnd={(value) => {
+                        updateDisplaySetting({ paddingRight: value });
+                    }}
+                    step={1}
+                    w={100}
+                />
+            ),
+            description: '',
+            title: t('page.fullscreenPlayer.config.lyricPaddingRight'),
+        },
+        {
+            control: (
                 <SegmentedControl
                     data={[
                         { label: t('common.left'), value: 'left' },
@@ -177,6 +211,40 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             ),
             description: '',
             title: t('page.fullscreenPlayer.config.followCurrentLyric'),
+        },
+        {
+            control: (
+                <Slider
+                    defaultValue={lyricsSettings.followScrollAlignment ?? 0}
+                    label={(value) => value.toString()}
+                    max={50}
+                    min={-50}
+                    onChangeEnd={(value) => {
+                        updateLyricsSetting({ followScrollAlignment: value });
+                    }}
+                    step={1}
+                    w={100}
+                />
+            ),
+            description: '',
+            title: t('page.fullscreenPlayer.config.lyricFollowScrollAlignment'),
+        },
+        {
+            control: (
+                <NumberInput
+                    defaultValue={lyricsSettings.lineLeadTimeMs}
+                    max={3000}
+                    min={0}
+                    onBlur={(e) => {
+                        const value = Number(e.currentTarget.value);
+                        updateLyricsSetting({ lineLeadTimeMs: value });
+                    }}
+                    step={50}
+                    width={100}
+                />
+            ),
+            description: '',
+            title: t('page.fullscreenPlayer.config.lyricLineLeadTime'),
         },
         {
             control: (
@@ -290,6 +358,34 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             }),
             isHidden: !isElectron(),
             title: t('setting.lyricFetchProvider'),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label="Enable furigana"
+                    defaultChecked={lyricsSettings.enableFurigana}
+                    onChange={(e) =>
+                        updateLyricsSetting({ enableFurigana: e.currentTarget.checked })
+                    }
+                />
+            ),
+            description: t('setting.enableFurigana', {
+                context: 'description',
+            }),
+            title: t('setting.enableFurigana'),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label="Enable romaji"
+                    defaultChecked={lyricsSettings.enableRomaji}
+                    onChange={(e) => updateLyricsSetting({ enableRomaji: e.currentTarget.checked })}
+                />
+            ),
+            description: t('setting.enableRomaji', {
+                context: 'description',
+            }),
+            title: t('setting.enableRomaji'),
         },
         {
             control: (

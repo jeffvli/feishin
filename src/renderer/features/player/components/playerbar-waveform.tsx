@@ -27,6 +27,7 @@ export const PlayerbarWaveform = () => {
     const audioElementRef = useRef<HTMLAudioElement>(document.createElement('audio'));
     const { mediaSeekToTimestamp } = usePlayer();
     const [isLoading, setIsLoading] = useState(true);
+    const [hasError, setHasError] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState<null | { x: number; y: number }>(null);
     const [tooltipValue, setTooltipValue] = useState(0);
@@ -77,14 +78,27 @@ export const PlayerbarWaveform = () => {
     // Reset loading state when stream URL changes and ensure media is muted
     useEffect(() => {
         setIsLoading(true);
+        setHasError(false);
     }, [streamUrl]);
 
     // Handle waveform ready state
     useEffect(() => {
         if (!wavesurfer || !streamUrl) return;
 
+        // The wavesurfer instance is shared across stream URLs, and this
+        // effect subscribes before its (delayed) load actually starts. Guard
+        // against events that do not belong to this effect's own load:
+        // `cancelled` rejects events after the URL has moved on, and
+        // `loadStarted` rejects a still-in-flight previous load's `ready`
+        // (which would otherwise clear the loading state for the wrong
+        // track and hide the seek bar over an empty/stale waveform).
+        let cancelled = false;
+        let loadStarted = false;
+
         const handleReady = () => {
+            if (cancelled || !loadStarted) return;
             setIsLoading(false);
+            setHasError(false);
             const mediaElement = wavesurfer.getMediaElement();
             if (mediaElement) {
                 mediaElement.muted = true;
@@ -92,17 +106,40 @@ export const PlayerbarWaveform = () => {
             }
         };
 
+        // A load failure previously left the waveform canvas empty with no
+        // seek control (the fallback slider only showed while loading), so
+        // the progress bar disappeared until the app was restarted. Surface
+        // real failures so the fallback slider is rendered again. AbortError
+        // is the expected outcome of a superseded load and is ignored.
+        const handleError = (error?: unknown) => {
+            if (cancelled || !loadStarted) return;
+            if (error instanceof Error && error.name === 'AbortError') return;
+            setIsLoading(false);
+            setHasError(true);
+        };
+
         wavesurfer.on('ready', handleReady);
+        wavesurfer.on('error', handleError);
 
         const waveformTimeout = setTimeout(
             () => {
-                wavesurfer.load(streamUrl);
+                if (cancelled) return;
+                loadStarted = true;
+                wavesurfer.load(streamUrl).catch((error: unknown) => {
+                    if (cancelled || (error instanceof Error && error.name === 'AbortError')) {
+                        return;
+                    }
+                    setIsLoading(false);
+                    setHasError(true);
+                });
             },
             playerbarSlider?.loadingDelay ? playerbarSlider.loadingDelay * 1000 : 2000,
         );
 
         return () => {
+            cancelled = true;
             wavesurfer.un('ready', handleReady);
+            wavesurfer.un('error', handleError);
             clearTimeout(waveformTimeout);
         };
     }, [wavesurfer, streamUrl, playerbarSlider.loadingDelay]);
@@ -349,14 +386,14 @@ export const PlayerbarWaveform = () => {
             style={{ position: 'relative' }}
         >
             <motion.div
-                animate={{ opacity: isLoading ? 0 : 1 }}
+                animate={{ opacity: isLoading || hasError ? 0 : 1 }}
                 className={styles.waveform}
                 initial={{ opacity: 0 }}
                 ref={containerRef}
                 transition={{ duration: 0.2 }}
             />
             <AnimatePresence>
-                {isLoading && (
+                {(isLoading || hasError) && (
                     <motion.div
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}

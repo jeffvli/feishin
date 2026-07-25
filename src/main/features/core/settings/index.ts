@@ -15,6 +15,8 @@ import Store from 'electron-store';
 import { promises as fs, watch as fsWatch } from 'fs';
 import path from 'path';
 
+import log from '/@/main/logger';
+
 const getFrame = () => {
     const isWindows = process.platform === 'win32';
     const isMacOS = process.platform === 'darwin';
@@ -52,7 +54,7 @@ const readCustomCss = async (): Promise<{ content: string; exists: boolean }> =>
             return { content: '', exists: false };
         }
 
-        console.error('Failed to read custom css file', error);
+        log.error('Failed to read custom css file', error);
         return { content: '', exists: false };
     }
 };
@@ -75,7 +77,7 @@ const scheduleCustomCssUpdate = () => {
 
     customCssDebounce = setTimeout(() => {
         notifyCustomCssUpdate().catch((error) => {
-            console.error('Failed to broadcast custom css update', error);
+            log.error('Failed to broadcast custom css update', error);
         });
     }, 100);
 };
@@ -94,13 +96,13 @@ const startCustomCssWatcher = async () => {
             }
         });
     } catch (error) {
-        console.error('Failed to watch custom css file', error);
+        log.error('Failed to watch custom css file', error);
     }
 };
 
 export const store = new Store<any>({
     beforeEachMigration: (_store, context) => {
-        console.log(`settings migrate from ${context.fromVersion} → ${context.toVersion}`);
+        log.info(`settings migrate from ${context.fromVersion} → ${context.toVersion}`);
     },
     cwd: storePath,
     defaults: {
@@ -164,6 +166,7 @@ ipcMain.handle('password-get', (_event, server: string): null | string => {
         return decrypted;
     }
 
+    log.warn('Password encryption unavailable', { serverId: server });
     return null;
 });
 
@@ -173,6 +176,7 @@ ipcMain.on('password-remove', (_event, server: string) => {
         delete passwords[server];
     }
     store.set({ server: passwords });
+    log.info('Password removed', { serverId: server });
 });
 
 ipcMain.handle('password-set', (_event, password: string, server: string) => {
@@ -182,8 +186,11 @@ ipcMain.handle('password-set', (_event, password: string, server: string) => {
         passwords[server] = encrypted.toString('hex');
         store.set({ server: passwords });
 
+        log.info('Password saved', { serverId: server });
         return true;
     }
+
+    log.warn('Password encryption unavailable', { serverId: server });
     return false;
 });
 
@@ -226,7 +233,7 @@ ipcMain.handle('custom-css-open-folder', async () => {
 
 app.whenReady()
     .then(() => startCustomCssWatcher())
-    .catch((error) => console.error('Failed to start custom css watcher', error));
+    .catch((error) => log.error('Failed to start custom css watcher', error));
 
 app.on('before-quit', () => {
     if (customCssWatcher) {

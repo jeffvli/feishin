@@ -5,6 +5,7 @@ export enum ServerFeature {
     ARTIST_IMAGE_UPLOAD = 'artistImageUpload',
     BFR = 'bfr',
     INTERNET_RADIO_IMAGE_UPLOAD = 'internetRadioImageUpload',
+    JUKEBOX = 'jukebox',
     LYRICS_MULTIPLE_STRUCTURED = 'lyricsMultipleStructured',
     LYRICS_SINGLE_STRUCTURED = 'lyricsSingleStructured',
     MUSIC_FOLDER_MULTISELECT = 'musicFolderMultiselect',

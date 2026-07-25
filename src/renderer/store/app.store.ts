@@ -2,10 +2,14 @@ import type { ItemListStateItem } from '/@/renderer/components/item-list/helpers
 import type { LibraryItem } from '/@/shared/types/domain-types';
 
 import merge from 'lodash/merge';
+import semverGt from 'semver/functions/gt';
+import semverValid from 'semver/functions/valid';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
+
+import packageJson from '../../../package.json';
 
 import { AlbumListSort, SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
@@ -24,6 +28,7 @@ export interface AppSlice extends AppState {
         setGenreIdsMode: (mode: 'and' | 'or') => void;
         setGenreSelectMode: (mode: 'multi' | 'single') => void;
         setGlobalExpanded: (value: GlobalExpandedState | null) => void;
+        setLatestVersion: (version: null | string) => void;
         setPageSidebar: (key: string, value: boolean) => void;
         setPrivateMode: (enabled: boolean) => void;
         setShowTimeRemaining: (enabled: boolean) => void;
@@ -52,6 +57,7 @@ export interface AppState {
     genreSelectMode: 'multi' | 'single';
     globalExpanded: GlobalExpandedState | null;
     isReorderingQueue: boolean;
+    latestVersion: null | string;
     pageSidebar: Record<string, boolean>;
     platform: Platform;
     privateMode: boolean;
@@ -157,6 +163,11 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                             state.globalExpanded = value;
                         });
                     },
+                    setLatestVersion: (version) => {
+                        set((state) => {
+                            state.latestVersion = version;
+                        });
+                    },
                     setPageSidebar: (key, value) => {
                         set((state) => {
                             state.pageSidebar[key] = value;
@@ -219,6 +230,7 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                 genreSelectMode: 'multi',
                 globalExpanded: null,
                 isReorderingQueue: false,
+                latestVersion: null,
                 pageSidebar: {
                     album: true,
                     song: true,
@@ -261,7 +273,7 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
             name: 'store_app',
             partialize: (state) => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- ignore non-persisted state
-                const { globalExpanded: _, ...rest } = state;
+                const { globalExpanded: _, latestVersion: __, ...rest } = state;
                 return rest;
             },
             version: 5,
@@ -306,6 +318,18 @@ export const usePageSidebar = (key: string): [boolean, (value: boolean) => void]
 export const useGlobalExpanded = () => useAppStore((state) => state.globalExpanded);
 
 export const useSetGlobalExpanded = () => useAppStore((state) => state.actions.setGlobalExpanded);
+
+export const useLatestVersion = () => {
+    const latestVersion = useAppStore((state) => state.latestVersion);
+    const currentVersion = packageJson.version;
+    const isUpdateAvailable =
+        !!latestVersion &&
+        !!semverValid(latestVersion) &&
+        !!semverValid(currentVersion) &&
+        semverGt(latestVersion, currentVersion);
+
+    return { currentVersion, isUpdateAvailable, latestVersion };
+};
 
 export const useGlobalExpandedState = () => {
     const globalExpanded = useGlobalExpanded();

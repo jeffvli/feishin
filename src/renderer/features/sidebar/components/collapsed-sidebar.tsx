@@ -6,6 +6,7 @@ import { Link, NavLink, useNavigate } from 'react-router';
 
 import styles from './collapsed-sidebar.module.css';
 
+import { useScanStatus } from '/@/renderer/features/shared/hooks/use-scan-status';
 import { CollapsedSidebarButton } from '/@/renderer/features/sidebar/components/collapsed-sidebar-button';
 import { CollapsedSidebarItem } from '/@/renderer/features/sidebar/components/collapsed-sidebar-item';
 import { getCollectionTo } from '/@/renderer/features/sidebar/components/sidebar-collection-list';
@@ -35,6 +36,8 @@ export const CollapsedSidebar = () => {
     const { windowBarStyle } = useWindowSettings();
     const sidebarCollapsedNavigation = useSidebarCollapsedNavigation();
     const sidebarItems = useSidebarItems();
+    const { isScanning } = useScanStatus();
+
     const translatedSidebarItemMap = useMemo(
         () => ({
             Albums: t('page.sidebar.albums'),
@@ -94,7 +97,14 @@ export const CollapsedSidebar = () => {
                         <CollapsedSidebarItem
                             activeIcon={null}
                             component={Flex}
-                            icon={<Icon fill="muted" icon="menu" size="3xl" />}
+                            icon={
+                                <Icon
+                                    animate={isScanning ? 'spin' : undefined}
+                                    fill="muted"
+                                    icon={isScanning ? 'spinner' : 'menu'}
+                                    size="3xl"
+                                />
+                            }
                             label={t('common.menu')}
                             style={{
                                 cursor: 'pointer',

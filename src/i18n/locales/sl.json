@@ -459,19 +459,19 @@
             "windowTab": "Okno"
         },
         "sidebar": {
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "home": "$t(common.home)",
+            "albumArtists": "Izvajalci albumov",
+            "albums": "Albumi",
+            "artists": "Izvajalci",
+            "folders": "Mape",
+            "genres": "zvrsti",
+            "home": "Domov",
             "myLibrary": "Moja knjižnica",
             "nowPlaying": "Trenutno se predvaja",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
-            "search": "$t(common.search)",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "shared": "Deljen $t(entity.playlist, {\"count\": 2})",
-            "tracks": "$t(entity.track, {\"count\": 2})"
+            "playlists": "Seznami predvajanja",
+            "search": "Išči",
+            "settings": "Nastavitve",
+            "shared": "Deljeni seznami predvajanja",
+            "tracks": "Skladbe"
         },
         "trackList": {
             "artistTracks": "Skladbe po {{artist}}",

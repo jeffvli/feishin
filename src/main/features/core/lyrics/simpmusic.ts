@@ -8,6 +8,8 @@ import {
 } from '.';
 import { orderSearchResults } from './shared';
 
+import log from '/@/main/logger';
+
 const API_URL = 'https://api-lyrics.simpmusic.org/v1';
 
 const TIMEOUT_MS = 5000;
@@ -38,7 +40,7 @@ export async function getLyricsBySongId(songId: string): Promise<null | string> 
             timeout: TIMEOUT_MS,
         });
     } catch (e) {
-        console.error('SimpMusic lyrics request errored:', (e as Error)?.message);
+        log.error('SimpMusic lyrics request errored:', (e as Error)?.message);
         return null;
     }
 
@@ -63,7 +65,7 @@ export async function getSearchResults(
             timeout: TIMEOUT_MS,
         });
     } catch (e) {
-        console.error('SimpMusic search errored:', (e as Error)?.message);
+        log.error('SimpMusic search errored:', (e as Error)?.message);
         return null;
     }
 
@@ -95,7 +97,7 @@ export async function query(
             timeout: TIMEOUT_MS,
         });
     } catch (e) {
-        console.error('SimpMusic search errored:', (e as Error).message);
+        log.error('SimpMusic search errored:', (e as Error).message);
         return null;
     }
 
@@ -109,7 +111,7 @@ export async function query(
             timeout: TIMEOUT_MS,
         });
     } catch (e) {
-        console.error('SimpMusic lyrics fetch errored:', (e as Error).message);
+        log.error('SimpMusic lyrics fetch errored:', (e as Error).message);
         return null;
     }
 

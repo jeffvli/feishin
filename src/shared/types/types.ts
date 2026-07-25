@@ -149,6 +149,7 @@ export enum PlayerShuffle {
 export enum PlayerStatus {
     PAUSED = 'paused',
     PLAYING = 'playing',
+    STOPPED = 'stopped',
 }
 
 export enum PlayerStyle {
@@ -158,6 +159,7 @@ export enum PlayerStyle {
 
 export enum PlayerType {
     DLNA = 'dlna',
+    JUKEBOX = 'jukebox',
     LOCAL = 'local',
     WEB = 'web',
 }

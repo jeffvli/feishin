@@ -43,7 +43,8 @@
         "openApplicationDirectory": "Otwórz katalog aplikacji",
         "goToCurrent": "Przejdź do aktualnego elementu",
         "collapseAllFolders": "Zwiń wszystkie foldery",
-        "expandAllFolders": "Rozwiń wszystkie foldery"
+        "expandAllFolders": "Rozwiń wszystkie foldery",
+        "createPlaylistFromQueue": "Utwórz $t(entity.playlist, {\"count\": 1}) z kolejki"
     },
     "common": {
         "increase": "Zwiększ",
@@ -174,7 +175,13 @@
         "numberOfResults": "{{numberOfResults}} wyników",
         "grouping": "Grupowanie",
         "back": "Wstecz",
-        "openFolder": "Otwórz folder"
+        "openFolder": "Otwórz folder",
+        "saveAndClose": "Zapisz i zamknij",
+        "undo": "Cofnij",
+        "lastScan": "Ostatnie skanowanie {{date}}",
+        "scanFolderCount": "{{count}} folderów",
+        "scanItemCount": "{{count}} elementów",
+        "scanningLibrary": "Skanowanie biblioteki…"
     },
     "entity": {
         "genre_one": "Gatunek",
@@ -348,7 +355,8 @@
             "input_preferInstantMixDescription": "Używaj tylko natychmiastowego mixu, by otrzymać podobne piosenki. przydatne gdy masz wtyczki które zmieniają to zachowanie",
             "input_preferRemoteUrl": "Preferuj publiczny url",
             "input_remoteUrl": "Publiczny url",
-            "input_remoteUrlPlaceholder": "Opcjonalne: publiczny url dla funkcji zewnętrznych"
+            "input_remoteUrlPlaceholder": "Opcjonalne: publiczny url dla funkcji zewnętrznych",
+            "input_passwordNoSSO": "Autoryzacja przez reverse proxy (SSO) nie jest obsługiwana. Tylko autoryzacja nazwą użytkownika/hasłem i autoryzacja Subsonic są obsługiwane"
         },
         "addToPlaylist": {
             "success": "Dodano $t(entity.trackWithCount, {\"count\": {{message}} }) do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -434,6 +442,9 @@
         },
         "editRadioStation": {
             "success": "Stacja radiowa zaktualizowana pomyślnie"
+        },
+        "createPrefilledPlaylist": {
+            "title": "Utwórz $t(entity.playlist, {\"count\": 1}) z wybranych piosenek"
         }
     },
     "page": {
@@ -454,13 +465,21 @@
                 "dynamicIsImage": "Włącz obraz w tle",
                 "lyricOffset": "Opóźnienie tekstów (ms)",
                 "lyricOpacityNonActive": "Przezroczystość nieaktywnego tekstu",
-                "lyricScaleNonActive": "Skala nieaktywnego tekstu"
+                "lyricScaleNonActive": "Skala nieaktywnego tekstu",
+                "lyricPaddingLeft": "Odstęp tekstu z lewej (%)",
+                "lyricPaddingRight": "Odstęp tekstu z prawej (%)",
+                "lyricFollowScrollAlignment": "Wyrównywanie tekstu",
+                "lyricLineLeadTime": "Czas przed linijką (ms)"
             },
             "upNext": "Następne",
             "lyrics": "Tekst",
             "related": "Powiązane",
             "visualizer": "Wizualizer",
-            "noLyrics": "Nie znaleziono tekstu"
+            "noLyrics": "Nie znaleziono tekstu",
+            "lyricLayers": "Warstwy tekstu",
+            "lyricLanguage": "Język",
+            "showPronunciation": "Wymowa",
+            "showTranslation": "Tłumaczenie"
         },
         "appMenu": {
             "selectServer": "Wybierz serwer",
@@ -478,7 +497,8 @@
             "selectMusicFolder": "Wybierz folder muzyki",
             "noMusicFolder": "Nie wybrano folderu muzyki",
             "multipleMusicFolders": "Wybrano {{count}} folderów muzyki",
-            "commandPalette": "Otwórz paletę komend"
+            "commandPalette": "Otwórz paletę komend",
+            "logout": "Wyloguj"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -506,7 +526,8 @@
             "goToAlbum": "Przejdź do $t(entity.album, {\"count\": 1})",
             "goToAlbumArtist": "Przejdź do $t(entity.albumArtist, {\"count\": 1})",
             "moveItems": "$t(action.moveItems)",
-            "goTo": "Przejdź do"
+            "goTo": "Przejdź do",
+            "editMetadata": "Edytuj metadane"
         },
         "albumDetail": {
             "moreFromArtist": "Więcej od $t(entity.artist, {\"count\": 1})",
@@ -528,20 +549,20 @@
         },
         "sidebar": {
             "nowPlaying": "Teraz odtwarzane",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
-            "search": "$t(common.search)",
-            "tracks": "$t(entity.track, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "home": "$t(common.home)",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "shared": "Udostępniono $t(entity.playlist, {\"count\": 2})",
+            "playlists": "Playlisty",
+            "search": "Szukaj",
+            "tracks": "Utwory",
+            "albums": "Albumy",
+            "genres": "Gatunki",
+            "folders": "Katalogi",
+            "settings": "Ustawienia",
+            "home": "Główna",
+            "artists": "Wykonawców",
+            "albumArtists": "Wykonawców albumów",
+            "shared": "Udostępnione playlisty",
             "myLibrary": "Moja biblioteka",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "favorites": "Ulubione",
+            "radio": "Stacje radiowe",
             "collections": "Kolekcje"
         },
         "home": {
@@ -614,7 +635,27 @@
         "itemDetail": {
             "copyPath": "Kopiuj ścieżkę do schowka",
             "copiedPath": "Ścieżka została skopiowana pomyślnie",
-            "openFile": "Pokaż utwór w menedżerze plików"
+            "openFile": "Pokaż utwór w menedżerze plików",
+            "tagConfiguration": "Konfiguracja tagów",
+            "addTagConfig": "Dodaj tag…",
+            "multiValueToggle": "Wielowartościowy",
+            "autocompleteSource": "Źródło autowypełniania",
+            "customValues": "Niestandardowe wartości",
+            "addCustomValue": "Dodaj niestandardową wartość…",
+            "serverSuggestions": "Serwer",
+            "fileNotWritable": "Plik nie jest dostępny lub zapisywalny",
+            "triggerRescan": "Uruchom ponowne skanowanie biblioteki po zapisaniu",
+            "addField": "Dodaj pole…",
+            "emptyFields": "Pola nie mogą być puste",
+            "tagsTab": "Tagi",
+            "artworkTab": "Okładka",
+            "removeArtwork": "Usuń okładkę",
+            "noArtwork": "Brak okładki",
+            "multipleValues": "(Wiele wartości)",
+            "multipleArtworks": "Wiele okładek",
+            "noLocalSongs": "Nie znaleziono piosenek z lokalnymi ścieżkami",
+            "readPartialFailure": "Nie udało się odczytać metadanych z {{count}} na {{total}} plik(ów)",
+            "writePartialFailure": "Nie udało się zapisać {{count}} plik(ów)"
         },
         "manageServers": {
             "title": "Zarządzaj serwerami",
@@ -701,7 +742,9 @@
         "sleepTimer_cancel": "Anuluj wyłączanie",
         "albumRadio": "Radio albumu",
         "scrobbleForceSubmit": "Wymuś scrobble",
-        "sleepTimer_endOfAlbum": "Koniec aktualnego albumu"
+        "sleepTimer_endOfAlbum": "Koniec aktualnego albumu",
+        "nextAlbum": "Alt+kliknięcie aby odtworzyć następny album",
+        "previousAlbum": "Alt+kliknięcie aby odtworzyć poprzedni album"
     },
     "setting": {
         "crossfadeStyle_description": "Wybierz styl przenikania, który ma być używany do odtwarzania dźwięku",
@@ -1001,11 +1044,9 @@
         "autoDJ_timing": "Czas dodawania",
         "autoDJ_timing_description": "Ilość piosenek pozostałych w kolejce przed tym gdy zostanie włączony automatyczny DJ",
         "logLevel": "Poziom logów",
-        "logLevel_description": "Ustawia minimalny poziom logów do wyświetlenia. debugowanie wyświetla wszystkie logi błędy wyświetla tylko błędy",
+        "logLevel_description": "Ustawia minimalny poziom logów do wyświetlenia",
         "logLevel_optionDebug": "Debugowanie",
-        "logLevel_optionError": "Błędy",
         "logLevel_optionInfo": "Info",
-        "logLevel_optionWarn": "Ostrzeżenia",
         "useThemeAccentColor": "Używaj koloru akcentu motywu",
         "useThemeAccentColor_description": "Używaj głównego koloru ustawionego w wybranym motywie zamiast niestandardowego koloru akcentu",
         "artistRadioCount_description": "Ustawia liczbę piosenek do załadowania dla radia wykonawcy i radia utworu",
@@ -1108,7 +1149,55 @@
         "autoDJ_albumStrategy": "Tryb wyboru albumów",
         "autoDJ_songStrategy": "Tryb wyboru piosenek",
         "autoDJ_strategy_option_library_random": "Losowo",
-        "autoDJ_strategy_option_similar": "Podobne"
+        "autoDJ_strategy_option_similar": "Podobne",
+        "enableFurigana_description": "Wyświetlaj pomoce wymowy (furigana) nad tekstami Japońskimi kanji.",
+        "enableFurigana": "Włącz generowanie furigana",
+        "equalizer_descriptionMpv": "Equalizer parametryczny przez FFmpeg lavfi (MPV)",
+        "equalizer_descriptionWebAudio": "Parametryczny equalizer przez API Web Audio",
+        "equalizer": "Equalizer",
+        "equalizerBands_description": "Wzmocnienie dla poszczególnych pasm. Przesuń w górę/dół lub wpisz wartość. Zakres: -12 do +12 dB.",
+        "equalizerBands": "Pasma",
+        "equalizerPreamp_description": "Wzmocnienie sygnału przed pasmami EQ. Ustaw na wartość ujemną podczas wzmacniania pasm, aby zapobiec przesterowaniu (MPV).",
+        "equalizerPreamp": "Przedwzmacnianie",
+        "equalizerPreset_description": "Zastosuj wbudowaną lub niestandardową zapisaną krzywą EQ",
+        "equalizerPreset": "Ustawienia wstępne",
+        "equalizerPresetDeletePlaceholder": "Usuń niestandardowe...",
+        "equalizerPresetGroupBuiltIn": "Wbudowane",
+        "equalizerPresetGroupCustom": "Niestandardowe",
+        "equalizerPresetNamePlaceholder": "Nazwa ustawień wstępnych...",
+        "equalizerPresetSelectPlaceholder": "Wybierz ustawienia wstępne",
+        "equalizerSavePreset_description": "Zapisz aktualne ustawienia EQ jako nazwany zestaw ustawień wstępnych",
+        "equalizerSavePreset": "Zapisz ustawienia wstępne",
+        "compressor_descriptionMpv": "Kompresor zakresu dynamicznego przez FFmpeg acompressor (MPV)",
+        "compressor_descriptionWebAudio": "Kompresor zakresu dynamicznego poprzez API Web Audio",
+        "compressor": "Kompresor",
+        "compressorAttack_description": "Jak szybko załączany jest kompresor po przekroczeniu progu przez sygnał.",
+        "compressorAttack": "Attack",
+        "compressorKnee_description": "Szerokośc soft-knee. Większe wartości powodują przejście do kompresji bardziej stopniowym.",
+        "compressorKnee": "Knee",
+        "compressorMakeupGain_description": "Zwiększenie wyjściowe dodawane po kompresji aby, przywrócić głośność.",
+        "compressorMakeupGain": "Makeup Gain",
+        "compressorPreset_description": "Zastosuj wbudowane lub niestandardowe zapisane ustawienie kompresora",
+        "compressorRatio_description": "Proporcje kompresji, np. 4 = 4:1.",
+        "compressorRatio": "Proporcje",
+        "compressorRelease_description": "Jak szybko kompresor odpuszcza po spadnięciu sygnału poniżej progu.",
+        "compressorRelease": "Odpuszczenie",
+        "compressorReset_description": "Przywróć wszystkie parametry kompresora do wartości domyślnych",
+        "compressorSavePreset_description": "Zapisz aktualne ustawienia kompresora jako nazwany zestaw ustawień wstępnych",
+        "compressorThreshold_description": "Poziom sygnału nad którym rozpoczyna się kompresja.",
+        "compressorThreshold": "Próg",
+        "enableRomaji_description": "Wyświetlaj linijkę z wymową romaji pod japońskim tekstem.",
+        "enableRomaji": "Włącz generowanie romaji",
+        "windowBarTrackinfo": "Informacje o utworze w tytule okna",
+        "windowBarTrackinfo_description": "Wyświetlaj tytuł, wykonawcę, pozycję w kolejce i stan Odtwarzania/Wstrzymania w tytule okna.",
+        "audioDeviceDefault": "Domyślne systemu",
+        "microtonalPitchControls": "Mikrotonowe sterowanie wysokością dźwięku",
+        "microtonalPitchControls_description": "Dodaj więcej sterowania wysokością dźwięku pomiędzy półtonami",
+        "hotkey_playbackNextAlbum": "Następny album",
+        "hotkey_playbackPreviousAlbum": "Poprzedni album",
+        "logLevel_optionDebugDescription": "zawiera info, plus szczegółowe informacje debugowania i ocenzurowane odpowiedzi API",
+        "logLevel_optionInfoDescription": "zawiera info, ostrzeżenia i błędy",
+        "exportDiagnostics": "Eksportuj diagnostykę"
     },
     "table": {
         "config": {
@@ -1148,7 +1237,12 @@
                 "horizontalBorders": "Obwódki wierszy",
                 "rowHoverHighlight": "Podświetlanie wierszy po najechaniu",
                 "verticalBorders": "Obwódki kolumn",
-                "showHeader": "Pokaż nagłówek"
+                "showHeader": "Pokaż nagłówek",
+                "albumImageSize": "Rozmiar obrazów albumów",
+                "albumGroupConfig": "Konfiguracja grupy albumów",
+                "albumGroupMetadata": "Pola metadanych",
+                "albumGroupShowFavoriteRating": "Pokaż ulubione i oceny",
+                "albumGroupVerticalLayout": "Pionowy układ"
             },
             "label": {
                 "releaseDate": "Data premiery",
@@ -1270,7 +1364,9 @@
         "notContains": "Nie zawiera",
         "notInPlaylist": "Nie jest w",
         "notInTheLast": "Nie jest w ostatnim",
-        "startsWith": "Zaczyna się od"
+        "startsWith": "Zaczyna się od",
+        "isMissing": "brakuje",
+        "isPresent": "jest"
     },
     "datetime": {
         "minuteShort": "Min",

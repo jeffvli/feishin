@@ -17,3 +17,13 @@
 .required {
     color: var(--theme-colors-state-error);
 }
+
+.label {
+    margin-bottom: var(--theme-spacing-xs);
+}
+
+.description {
+    margin-bottom: var(--theme-spacing-xs);
+    font-size: var(--theme-font-size-xs);
+    color: var(--theme-colors-foreground-muted);
+}

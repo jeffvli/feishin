@@ -3,8 +3,7 @@ import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { createWithEqualityFn } from 'zustand/traditional';
 
-import { LogCategory, logFn } from '/@/renderer/utils/logger';
-import { logMsg } from '/@/renderer/utils/logger-message';
+import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import { ClientEvent, ServerEvent, SongUpdateSocket } from '/@/shared/types/remote-types';
 
@@ -42,9 +41,7 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
             immer((set, get) => ({
                 actions: {
                     reconnect: async () => {
-                        logFn.debug(logMsg[LogCategory.REMOTE].reconnectInitiated, {
-                            category: LogCategory.REMOTE,
-                        });
+                        logger.info('Reconnect initiated');
                         const existing = get().socket;
 
                         if (existing) {
@@ -52,9 +49,8 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                                 existing.readyState === WebSocket.OPEN ||
                                 existing.readyState === WebSocket.CONNECTING
                             ) {
-                                logFn.debug(logMsg[LogCategory.REMOTE].closingExistingSocket, {
-                                    category: LogCategory.REMOTE,
-                                    meta: { readyState: existing.readyState },
+                                logger.debug('Closing existing socket', {
+                                    readyState: existing.readyState,
                                 });
                                 existing.natural = true;
                                 existing.close(4001);
@@ -64,28 +60,17 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                         let authHeader: string | undefined;
 
                         try {
-                            logFn.debug(logMsg[LogCategory.REMOTE].fetchingCredentials, {
-                                category: LogCategory.REMOTE,
-                            });
+                            logger.debug('Fetching credentials');
                             const credentials = await fetch('/credentials');
                             authHeader = await credentials.text();
-                            logFn.debug(logMsg[LogCategory.REMOTE].credentialsFetched, {
-                                category: LogCategory.REMOTE,
-                                meta: { hasAuthHeader: !!authHeader },
-                            });
+                            logger.debug('Credentials fetched', { hasAuthHeader: !!authHeader });
                         } catch (error) {
-                            logFn.error(logMsg[LogCategory.REMOTE].failedToGetCredentials, {
-                                category: LogCategory.REMOTE,
-                                meta: { error },
-                            });
+                            logger.error('Failed to get credentials', { error });
                         }
 
                         set((state) => {
                             const wsUrl = location.href.replace('http', 'ws');
-                            logFn.debug(logMsg[LogCategory.REMOTE].creatingWebSocket, {
-                                category: LogCategory.REMOTE,
-                                meta: { url: wsUrl },
-                            });
+                            logger.info('Creating new WebSocket', { url: wsUrl });
                             const socket = new WebSocket(wsUrl) as StatefulWebSocket;
 
                             socket.natural = false;
@@ -93,34 +78,19 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                             socket.addEventListener('message', (message) => {
                                 const { data, event } = JSON.parse(message.data) as ServerEvent;
 
-                                logFn.debug(logMsg[LogCategory.REMOTE].webSocketMessageReceived, {
-                                    category: LogCategory.REMOTE,
-                                    meta: { data, event },
-                                });
+                                logger.debug('WebSocket message received', { data, event });
 
                                 switch (event) {
                                     case 'error': {
-                                        logFn.error(
-                                            logMsg[LogCategory.REMOTE].webSocketErrorEvent,
-                                            {
-                                                category: LogCategory.REMOTE,
-                                                meta: { data },
-                                            },
-                                        );
+                                        logger.error('WebSocket error event', { data });
                                         toast.error({ message: data, title: 'Socket error' });
                                         break;
                                     }
                                     case 'favorite': {
-                                        logFn.debug(
-                                            logMsg[LogCategory.REMOTE].favoriteEventReceived,
-                                            {
-                                                category: LogCategory.REMOTE,
-                                                meta: {
-                                                    favorite: data.favorite,
-                                                    id: data.id,
-                                                },
-                                            },
-                                        );
+                                        logger.debug('Favorite event received', {
+                                            favorite: data.favorite,
+                                            id: data.id,
+                                        });
                                         set((state) => {
                                             if (state.info.song?.id === data.id) {
                                                 state.info.song.userFavorite = data.favorite;
@@ -129,38 +99,23 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                                         break;
                                     }
                                     case 'playback': {
-                                        logFn.debug(
-                                            logMsg[LogCategory.REMOTE].playbackEventReceived,
-                                            {
-                                                category: LogCategory.REMOTE,
-                                                meta: { status: data },
-                                            },
-                                        );
+                                        logger.debug('Playback event received', { status: data });
                                         set((state) => {
                                             state.info.status = data;
                                         });
                                         break;
                                     }
                                     case 'position': {
-                                        logFn.debug(
-                                            logMsg[LogCategory.REMOTE].positionEventReceived,
-                                            {
-                                                category: LogCategory.REMOTE,
-                                                meta: { position: data },
-                                            },
-                                        );
+                                        logger.debug('Position event received', { position: data });
                                         set((state) => {
                                             state.info.position = data;
                                         });
                                         break;
                                     }
                                     case 'proxy': {
-                                        logFn.debug(logMsg[LogCategory.REMOTE].proxyEventReceived, {
-                                            category: LogCategory.REMOTE,
-                                            meta: {
-                                                dataLength: data?.length,
-                                                hasData: !!data,
-                                            },
+                                        logger.debug('Proxy event received (image update)', {
+                                            dataLength: data?.length,
+                                            hasData: !!data,
                                         });
                                         set((state) => {
                                             if (state.info.song) {
@@ -170,16 +125,10 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                                         break;
                                     }
                                     case 'rating': {
-                                        logFn.debug(
-                                            logMsg[LogCategory.REMOTE].ratingEventReceived,
-                                            {
-                                                category: LogCategory.REMOTE,
-                                                meta: {
-                                                    id: data.id,
-                                                    rating: data.rating,
-                                                },
-                                            },
-                                        );
+                                        logger.debug('Rating event received', {
+                                            id: data.id,
+                                            rating: data.rating,
+                                        });
                                         set((state) => {
                                             if (state.info.song?.id === data.id) {
                                                 state.info.song.userRating = data.rating;
@@ -188,39 +137,24 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                                         break;
                                     }
                                     case 'repeat': {
-                                        logFn.debug(
-                                            logMsg[LogCategory.REMOTE].repeatEventReceived,
-                                            {
-                                                category: LogCategory.REMOTE,
-                                                meta: { repeat: data },
-                                            },
-                                        );
+                                        logger.debug('Repeat event received', { repeat: data });
                                         set((state) => {
                                             state.info.repeat = data;
                                         });
                                         break;
                                     }
                                     case 'shuffle': {
-                                        logFn.debug(
-                                            logMsg[LogCategory.REMOTE].shuffleEventReceived,
-                                            {
-                                                category: LogCategory.REMOTE,
-                                                meta: { shuffle: data },
-                                            },
-                                        );
+                                        logger.debug('Shuffle event received', { shuffle: data });
                                         set((state) => {
                                             state.info.shuffle = data;
                                         });
                                         break;
                                     }
                                     case 'song': {
-                                        logFn.debug(logMsg[LogCategory.REMOTE].songEventReceived, {
-                                            category: LogCategory.REMOTE,
-                                            meta: {
-                                                artistName: data?.artistName,
-                                                id: data?.id,
-                                                name: data?.name,
-                                            },
+                                        logger.debug('Song event received', {
+                                            artistName: data?.artistName,
+                                            id: data?.id,
+                                            name: data?.name,
                                         });
                                         set((state) => {
                                             state.info.song = data;
@@ -228,14 +162,11 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                                         break;
                                     }
                                     case 'state': {
-                                        logFn.debug(logMsg[LogCategory.REMOTE].stateEventReceived, {
-                                            category: LogCategory.REMOTE,
-                                            meta: {
-                                                hasSong: !!data.song,
-                                                position: data.position,
-                                                status: data.status,
-                                                volume: data.volume,
-                                            },
+                                        logger.debug('State event received (full state update)', {
+                                            hasSong: !!data.song,
+                                            position: data.position,
+                                            status: data.status,
+                                            volume: data.volume,
                                         });
                                         set((state) => {
                                             state.info = data;
@@ -243,13 +174,7 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                                         break;
                                     }
                                     case 'volume': {
-                                        logFn.debug(
-                                            logMsg[LogCategory.REMOTE].volumeEventReceived,
-                                            {
-                                                category: LogCategory.REMOTE,
-                                                meta: { volume: data },
-                                            },
-                                        );
+                                        logger.debug('Volume event received', { volume: data });
                                         set((state) => {
                                             state.info.volume = data;
                                         });
@@ -258,17 +183,12 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                             });
 
                             socket.addEventListener('open', () => {
-                                logFn.debug(logMsg[LogCategory.REMOTE].webSocketOpened, {
-                                    category: LogCategory.REMOTE,
-                                    meta: {
-                                        hasAuthHeader: !!authHeader,
-                                        readyState: socket.readyState,
-                                    },
+                                logger.info('WebSocket opened', {
+                                    hasAuthHeader: !!authHeader,
+                                    readyState: socket.readyState,
                                 });
                                 if (authHeader) {
-                                    logFn.debug(logMsg[LogCategory.REMOTE].sendingAuthentication, {
-                                        category: LogCategory.REMOTE,
-                                    });
+                                    logger.debug('Sending authentication');
                                     socket.send(
                                         JSON.stringify({
                                             event: 'authenticate',
@@ -280,40 +200,28 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                             });
 
                             socket.addEventListener('close', (reason) => {
-                                logFn.debug(logMsg[LogCategory.REMOTE].webSocketClosed, {
-                                    category: LogCategory.REMOTE,
-                                    meta: {
-                                        code: reason.code,
-                                        natural: socket.natural,
-                                        reason: reason.reason,
-                                        wasClean: reason.wasClean,
-                                    },
+                                logger.info('WebSocket closed', {
+                                    code: reason.code,
+                                    natural: socket.natural,
+                                    reason: reason.reason,
+                                    wasClean: reason.wasClean,
                                 });
                                 if (reason.code === 4002 || reason.code === 4003) {
-                                    logFn.debug(logMsg[LogCategory.REMOTE].reloadingPage, {
-                                        category: LogCategory.REMOTE,
-                                        meta: { code: reason.code },
+                                    logger.debug('Reloading page due to close code', {
+                                        code: reason.code,
                                     });
                                     location.reload();
                                 } else if (reason.code === 4000) {
-                                    logFn.warn(logMsg[LogCategory.REMOTE].serverIsDown, {
-                                        category: LogCategory.REMOTE,
-                                    });
+                                    logger.warn('Server is down');
                                     toast.warn({
                                         message: 'Feishin remote server is down',
                                         title: 'Connection closed',
                                     });
                                 } else if (reason.code !== 4001 && !socket.natural) {
-                                    logFn.error(
-                                        logMsg[LogCategory.REMOTE].socketClosedUnexpectedly,
-                                        {
-                                            category: LogCategory.REMOTE,
-                                            meta: {
-                                                code: reason.code,
-                                                reason: reason.reason,
-                                            },
-                                        },
-                                    );
+                                    logger.error('Socket closed unexpectedly', {
+                                        code: reason.code,
+                                        reason: reason.reason,
+                                    });
                                     toast.error({
                                         message: 'Socket closed for unexpected reason',
                                         title: 'Connection closed',
@@ -331,19 +239,15 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                     send: (data: ClientEvent) => {
                         const socket = get().socket;
                         if (socket) {
-                            logFn.debug(logMsg[LogCategory.REMOTE].sendingEventToServer, {
-                                category: LogCategory.REMOTE,
-                                meta: {
-                                    data: data,
-                                    event: data.event,
-                                    readyState: socket.readyState,
-                                },
+                            logger.debug('Sending event to server', {
+                                data: data,
+                                event: data.event,
+                                readyState: socket.readyState,
                             });
                             socket.send(JSON.stringify(data));
                         } else {
-                            logFn.warn(logMsg[LogCategory.REMOTE].cannotSendEvent, {
-                                category: LogCategory.REMOTE,
-                                meta: { event: data.event },
+                            logger.warn('Cannot send event - socket not available', {
+                                event: data.event,
                             });
                         }
                     },

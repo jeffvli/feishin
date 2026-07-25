@@ -16,6 +16,7 @@ import {
     usePlayerData,
     usePlayerMuted,
     usePlayerProperties,
+    usePlayerStoreBase,
     usePlayerVolume,
 } from '/@/renderer/store';
 import { PlayerStatus, PlayerStyle } from '/@/shared/types/types';
@@ -60,12 +61,12 @@ export function WaveSurferPlayer() {
                 }, PLAY_PAUSE_FADE_INTERVAL);
             });
 
-            if (status === PlayerStatus.PAUSED) {
-                await promise;
-                setLocalPlayerStatus(status);
-            } else if (status === PlayerStatus.PLAYING) {
+            if (status === PlayerStatus.PLAYING) {
                 setLocalPlayerStatus(status);
                 await promise;
+            } else {
+                await promise;
+                setLocalPlayerStatus(status);
             }
         },
         [isTransitioning],
@@ -75,6 +76,10 @@ export function WaveSurferPlayer() {
         (e: PlayerOnProgressProps) => {
             if (!playerRef.current?.player1()) {
                 return;
+            }
+
+            if (num === 1) {
+                setTimestamp(e.playedSeconds);
             }
 
             switch (transitionType) {
@@ -105,13 +110,17 @@ export function WaveSurferPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, isTransitioning, num, player2, transitionType, volume],
+        [crossfadeDuration, isTransitioning, num, player2, setTimestamp, transitionType, volume],
     );
 
     const onProgressPlayer2 = useCallback(
         (e: PlayerOnProgressProps) => {
             if (!playerRef.current?.player2()) {
                 return;
+            }
+
+            if (num === 2) {
+                setTimestamp(e.playedSeconds);
             }
 
             switch (transitionType) {
@@ -142,7 +151,7 @@ export function WaveSurferPlayer() {
                     break;
             }
         },
-        [crossfadeDuration, isTransitioning, num, player1, transitionType, volume],
+        [crossfadeDuration, isTransitioning, num, player1, setTimestamp, transitionType, volume],
     );
 
     const handleOnEndedPlayer1 = useCallback(() => {
@@ -153,7 +162,13 @@ export function WaveSurferPlayer() {
 
         promise.then(() => {
             playerRef.current?.player1()?.ref?.pause();
-            playerRef.current?.setVolume(volume);
+
+            const currentStatus = usePlayerStoreBase.getState().player.status;
+            if (currentStatus !== PlayerStatus.PLAYING) {
+                playerRef.current?.pause();
+            } else {
+                playerRef.current?.setVolume(volume);
+            }
             setIsTransitioning(false);
         });
     }, [mediaAutoNext, volume]);
@@ -166,7 +181,13 @@ export function WaveSurferPlayer() {
 
         promise.then(() => {
             playerRef.current?.player2()?.ref?.pause();
-            playerRef.current?.setVolume(volume);
+
+            const currentStatus = usePlayerStoreBase.getState().player.status;
+            if (currentStatus !== PlayerStatus.PLAYING) {
+                playerRef.current?.pause();
+            } else {
+                playerRef.current?.setVolume(volume);
+            }
             setIsTransitioning(false);
         });
     }, [mediaAutoNext, volume]);
@@ -190,10 +211,10 @@ export function WaveSurferPlayer() {
             },
             onPlayerStatus: async (properties) => {
                 const status = properties.status;
-                if (status === PlayerStatus.PAUSED) {
-                    fadeAndSetStatus(volume, 0, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PAUSED);
-                } else if (status === PlayerStatus.PLAYING) {
+                if (status === PlayerStatus.PLAYING) {
                     fadeAndSetStatus(0, volume, PLAY_PAUSE_FADE_DURATION, PlayerStatus.PLAYING);
+                } else {
+                    fadeAndSetStatus(volume, 0, PLAY_PAUSE_FADE_DURATION, status);
                 }
             },
             onPlayerVolume: (properties) => {
@@ -224,7 +245,7 @@ export function WaveSurferPlayer() {
                 transitionType === PlayerStyle.CROSSFADE ||
                 transitionType === PlayerStyle.GAPLESS
             ) {
-                setTimestamp(Number(currentTime.toFixed(0)));
+                setTimestamp(currentTime);
             }
         }, 500);
 

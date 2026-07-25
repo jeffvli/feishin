@@ -114,7 +114,7 @@ export const LibraryHeader = forwardRef(
                         onClick={() => closeAllModals()}
                         style={{
                             cursor: 'pointer',
-                            height: 'calc(100vh - 80px)',
+                            height: 'calc(100vh - 72px - 10px - 12px - 12px)', // 72px header, 10px outer modal border, 12px padding bottom image, 12px scrollbar bottom
                             width: '100%',
                         }}
                     >

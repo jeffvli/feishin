@@ -50,7 +50,9 @@
         "sleepTimer": "Temporizador de apagado",
         "albumRadio": "Radio del álbum",
         "scrobbleForceSubmit": "Forzar scrobble",
-        "sleepTimer_endOfAlbum": "Fin del álbum actual"
+        "sleepTimer_endOfAlbum": "Fin del álbum actual",
+        "nextAlbum": "Alt+clic para el siguiente álbum",
+        "previousAlbum": "Alt+clic para el álbum anterior"
     },
     "setting": {
         "crossfadeStyle_description": "Selecciona el estilo de crossfade a usar por el reproductor de audio",
@@ -350,11 +352,9 @@
         "autoDJ_timing_description": "El número de canciones restantes en la cola antes de que DJ automático se dispare",
         "autoDJ_timing": "Tiempo",
         "logLevel": "Nivel de registro",
-        "logLevel_description": "Establece el mínimo nivel de registro a mostrar. Depuración muestra todos los registros, error solo muestra errores",
+        "logLevel_description": "Establece el nivel de registro mínimo a mostrar",
         "logLevel_optionDebug": "Depuración",
-        "logLevel_optionError": "Error",
         "logLevel_optionInfo": "Información",
-        "logLevel_optionWarn": "Advertencia",
         "useThemeAccentColor": "Usar color de acentuación de tema",
         "useThemeAccentColor_description": "Usa el color principal definido en el tema seleccionado en lugar del color de acentuación personalizado",
         "artistRadioCount_description": "Establece el número de canciones a buscar para la radio de artista y de pista",
@@ -457,7 +457,61 @@
         "autoDJ_songStrategy": "Modo de selección de canción",
         "autoDJ_strategy_option_library_random": "Aleatorio",
         "autoDJ_strategy_option_similar": "Similar",
-        "autoDJ_mode_description": "Elegir para añadir canciones o álbumes enteros a la cola"
+        "autoDJ_mode_description": "Elegir para añadir canciones o álbumes enteros a la cola",
+        "enableFurigana_description": "Mostrar guías de pronunciación (furigana) sobre letras kanji japonesas.",
+        "enableFurigana": "Activar generación de furigana",
+        "equalizer_descriptionMpv": "Ecualizador paramétrico a través de FFmpeg lavfi (MPV)",
+        "equalizer_descriptionWebAudio": "Ecualizador paramétrico a través de la API de Web Audio",
+        "equalizer": "Ecualizador",
+        "equalizerBands": "Bandas",
+        "equalizerBands_description": "Ganancia por banda. Arrastrar arriba/abajo o escribir un valor. Rango: -12 a +12 dB.",
+        "equalizerPreamp_description": "Ganancia de entrada antes de las bandas de ecualización. Ajústala en negativo al realzar las bandas para evitar el clipping (MPV).",
+        "equalizerPreamp": "Preamplificador",
+        "equalizerPreset_description": "Aplica una curva de ecualizador personalizada integrada o guardada",
+        "equalizerPreset": "Preajuste",
+        "equalizerPresetDeletePlaceholder": "Elimianr personalizado...",
+        "equalizerPresetGroupBuiltIn": "Integrado",
+        "equalizerPresetGroupCustom": "Personalizado",
+        "equalizerPresetNamePlaceholder": "Nombre del preajuste...",
+        "equalizerPresetSelectPlaceholder": "Seleccionar preajuste",
+        "equalizerSavePreset": "Guardar preajuste",
+        "equalizerSavePreset_description": "Guarda la configuración del ecualizador actual como un preajuste nombrado",
+        "compressor_descriptionMpv": "Compresor de rango dinámico a través del compresor de FFmpeg (MPV)",
+        "compressor_descriptionWebAudio": "Compresor de rango dinámico a través de la API de Web Audio",
+        "compressor": "Compresor",
+        "compressorThreshold": "Umbral",
+        "compressorThreshold_description": "Nivel de señal a partir del cual comienza la compresión.",
+        "compressorSavePreset_description": "Guarda la configuración actual del compresor como un preajuste nombrado",
+        "compressorReset_description": "Restaura todos los parámetros del compresor a sus valores predeterminados",
+        "compressorRelease": "Liberación",
+        "compressorRelease_description": "La rapidez con la que el compresor se libera una vez que la señal desciende por debajo del umbral.",
+        "compressorRatio": "Ratio",
+        "compressorRatio_description": "Ratio de compresión, p. ej. 4 = 4:1.",
+        "compressorPreset_description": "Aplica una configuración personalizada del compresor integrada o guardada",
+        "compressorKnee_description": "Ancho de la zona de respuesta suave. Cuanto mayor sea el valor, más gradual será la transición hacia la compresión.",
+        "compressorKnee": "Zona de respuesta",
+        "compressorMakeupGain_description": "Ganancia de salida aplicada tras la compresión para recuperar el volumen.",
+        "compressorMakeupGain": "Ganancia de compensación",
+        "compressorAttack_description": "La rapidez con la que el compresor entra en acción una vez que la señal supera el umbral.",
+        "compressorAttack": "Ataque",
+        "enableRomaji_description": "Muestra una línea de pronunciación en romaji debajo de las letras japonesas.",
+        "enableRomaji": "Activar generación de romaji",
+        "windowBarTrackinfo": "Información de la pista en el título de la ventana",
+        "windowBarTrackinfo_description": "Muestra el título y artista de la pista actual, posición en la cola, y estado reproduciendo/pausado en el título de la ventana.",
+        "audioDeviceDefault": "Predeterminado del sistema",
+        "microtonalPitchControls": "Controles de tono microtonales",
+        "microtonalPitchControls_description": "Añade más controles de tono para moverse entre semitonos",
+        "hotkey_playbackNextAlbum": "Siguiente álbum",
+        "hotkey_playbackPreviousAlbum": "Álbum anterior",
+        "logLevel_optionDebugDescription": "Incluye información, más información de depuración desarrollada y respuestas redactadas de las API",
+        "logLevel_optionInfoDescription": "Incluye información, advertencias y errores",
+        "exportDiagnostics": "Exportar diagnósticos",
+        "autoDJ_allowDuplicates": "Permitir duplicados",
+        "autoDJ_allowDuplicates_description": "Permite que las canciones o álbumes que ya están en cola sean añadidos de nuevo por DJ Automático",
+        "autoDJ_onlySimilar": "Solo similares",
+        "autoDJ_onlySimilar_description": "Añade solamente elementos que sean similares a la canción que lo activó. El número de elementos es tratado como una cantidad máxima de elementos a añadir en lugar de completarse por otras fuentes hasta alcanzar el límite",
+        "showQueueInSidebar": "Mostrar cola de reproducción en la barra lateral del reproductor",
+        "showQueueInSidebar_description": "Se añadirá un panel a la barra lateral del reproductor que muestra la cola de reproducción"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",
@@ -503,7 +557,8 @@
         "selectAll": "Seleccionar todo",
         "goToCurrent": "Ir al elemento actual",
         "collapseAllFolders": "Contraer todas las carpetas",
-        "expandAllFolders": "Expandir todas las carpetas"
+        "expandAllFolders": "Expandir todas las carpetas",
+        "createPlaylistFromQueue": "Crear $t(entity.playlist, {\"count\": 1}) desde la cola"
     },
     "common": {
         "backward": "Hacia atrás",
@@ -634,7 +689,13 @@
         "numberOfResults": "{{numberOfResults}} resultados",
         "grouping": "Agrupar",
         "back": "Atrás",
-        "openFolder": "Abrir carpeta"
+        "openFolder": "Abrir carpeta",
+        "saveAndClose": "Guardar y cerrar",
+        "undo": "Deshacer",
+        "lastScan": "Último escaneo {{date}}",
+        "scanFolderCount": "{{count}} carpetas",
+        "scanItemCount": "{{count}} elementos",
+        "scanningLibrary": "Escaneando biblioteca…"
     },
     "error": {
         "remotePortWarning": "Reiniciar el servidor para aplicar el nuevo puerto",
@@ -721,20 +782,20 @@
     "page": {
         "sidebar": {
             "nowPlaying": "Reproduciendo",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
-            "search": "$t(common.search)",
-            "tracks": "$t(entity.track, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "home": "$t(common.home)",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "shared": "Compartido $t(entity.playlist, {\"count\": 2})",
+            "playlists": "Listas de reproducción",
+            "search": "Buscar",
+            "tracks": "Pistas",
+            "albums": "Álbumes",
+            "genres": "Géneros",
+            "folders": "Carpetas",
+            "settings": "Configuración",
+            "home": "Inicio",
+            "artists": "Artistas",
+            "albumArtists": "Artistas del álbum",
+            "shared": "Listas de reproducción compartidas",
             "myLibrary": "Mi Biblioteca",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "favorites": "Favoritos",
+            "radio": "Estaciones de Radio",
             "collections": "Colecciones"
         },
         "appMenu": {
@@ -753,7 +814,8 @@
             "selectMusicFolder": "Seleccionar carpeta de música",
             "noMusicFolder": "Ninguna carpeta de música seleccionada",
             "multipleMusicFolders": "{{count}} carpetas de música seleccionadas",
-            "commandPalette": "Abrir paleta de comandos"
+            "commandPalette": "Abrir paleta de comandos",
+            "logout": "Cerrar sesión"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -781,7 +843,8 @@
             "goToAlbum": "Ir a $t(entity.album, {\"count\": 1})",
             "goToAlbumArtist": "Ir a $t(entity.albumArtist, {\"count\": 1})",
             "moveItems": "$t(action.moveItems)",
-            "goTo": "Ir a"
+            "goTo": "Ir a",
+            "editMetadata": "Editar metadatos"
         },
         "home": {
             "mostPlayed": "Más reproducidos",
@@ -810,12 +873,20 @@
                 "dynamicIsImage": "Habilitar imagen de fondo",
                 "lyricOffset": "Desplazamiento de letras (ms)",
                 "lyricScaleNonActive": "Escala de letra no activa",
-                "lyricOpacityNonActive": "Opacidad de letra no activa"
+                "lyricOpacityNonActive": "Opacidad de letra no activa",
+                "lyricPaddingLeft": "Relleno a la izquierda de las letras (%)",
+                "lyricPaddingRight": "Relleno a la derecha de las letras (%)",
+                "lyricLineLeadTime": "Tiempo de respuesta de la línea (ms)",
+                "lyricFollowScrollAlignment": "Las letras siguen la alineación"
             },
             "lyrics": "Letras",
             "related": "Relacionado",
             "visualizer": "Visualizador",
-            "noLyrics": "Sin letras"
+            "noLyrics": "Sin letras",
+            "lyricLayers": "Capas de letra",
+            "lyricLanguage": "Idioma",
+            "showPronunciation": "Pronunciación",
+            "showTranslation": "Traducción"
         },
         "albumDetail": {
             "moreFromArtist": "Más de este $t(entity.artist, {\"count\": 1})",
@@ -896,7 +967,27 @@
         "itemDetail": {
             "copiedPath": "Ruta copiada correctamente",
             "openFile": "Mostrar pista en el gestor de archivos",
-            "copyPath": "Copiar ruta al portapapeles"
+            "copyPath": "Copiar ruta al portapapeles",
+            "tagConfiguration": "Configuración de etiqueta",
+            "addTagConfig": "Añadir etiqueta…",
+            "multiValueToggle": "Valor múltiple",
+            "autocompleteSource": "Completar fuente automáticamente",
+            "customValues": "Valores personalizados",
+            "addCustomValue": "Añadir valor personalizado…",
+            "serverSuggestions": "Servidor",
+            "fileNotWritable": "El archivo no es accesible o editable",
+            "addField": "Añadir campo…",
+            "emptyFields": "Los campos no pueden estar vacíos",
+            "tagsTab": "Etiquetas",
+            "artworkTab": "Ilustración",
+            "removeArtwork": "Eliminar ilustración",
+            "noArtwork": "Sin ilustración",
+            "multipleValues": "(Valores múltiples)",
+            "multipleArtworks": "Múltiples ilustraciones",
+            "noLocalSongs": "Ninguna canción con rutas de archivo locales encontrada",
+            "readPartialFailure": "No se pudo leer los metadatos de {{count}} de {{total}} archivo(s)",
+            "writePartialFailure": "Error al guardar {{count}} archivo(s)",
+            "triggerRescan": "Activar otro escaneo de la biblioteca después de guardar"
         },
         "playlist": {
             "reorder": "La reordenación solo se activa al ordenar por ID"
@@ -962,7 +1053,8 @@
             "input_preferInstantMixDescription": "Usa solo el mix instantáneo para obtener canciones similares. Útil si tienes complementos que modifican este comportamiento",
             "input_remoteUrl": "URL Pública",
             "input_preferRemoteUrl": "Preferir URL Pública",
-            "input_remoteUrlPlaceholder": "Opcional: URL pública para características externas"
+            "input_remoteUrlPlaceholder": "Opcional: URL pública para características externas",
+            "input_passwordNoSSO": "La autenticación de proxy inverso (SSO) no está soportada. Solo está soportada la autenticación por usuario/contraseña y la autenticación de Subsonic"
         },
         "addToPlaylist": {
             "success": "Añadido $t(entity.trackWithCount, {\"count\": {{message}} }) a $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -1048,6 +1140,9 @@
         },
         "editRadioStation": {
             "success": "Estación de radio actualizada con éxito"
+        },
+        "createPrefilledPlaylist": {
+            "title": "Crear $t(entity.playlist, {\"count\": 1}) desde las canciones seleccionadas"
         }
     },
     "table": {
@@ -1149,7 +1244,12 @@
                 "horizontalBorders": "Bordes de fila",
                 "verticalBorders": "Bordes de columna",
                 "rowHoverHighlight": "Resaltar al pasar el cursor por la fila",
-                "showHeader": "Mostrar cabecera"
+                "showHeader": "Mostrar cabecera",
+                "albumImageSize": "Tamaño de la imagen del álbum",
+                "albumGroupConfig": "Configuración del grupo del álbum",
+                "albumGroupMetadata": "Campos de metadatos",
+                "albumGroupShowFavoriteRating": "Mostrar favoritos y calificaciones",
+                "albumGroupVerticalLayout": "Diseño vertical"
             },
             "view": {
                 "table": "Tabla",
@@ -1270,7 +1370,9 @@
         "notInPlaylist": "No está en",
         "notInTheLast": "No está en el último",
         "startsWith": "Empieza con",
-        "matchesRegex": "Coincide con expresión regular"
+        "matchesRegex": "Coincide con expresión regular",
+        "isPresent": "Está presente",
+        "isMissing": "Falta"
     },
     "datetime": {
         "minuteShort": "M",

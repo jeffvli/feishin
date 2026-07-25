@@ -43,7 +43,8 @@
             "musicbrainz": "Ava MusicBrainzis",
             "qobuz": "Ava Qobuzis",
             "spotify": "Ava Spotifys"
-        }
+        },
+        "createPlaylistFromQueue": "Loo $t(entity.playlist, {\"count\": 1}) järjekorrast"
     },
     "common": {
         "countSelected": "{{count}} valitud",
@@ -170,7 +171,13 @@
         "tableColumns": "Tabeli veerge",
         "itemsMore": "{{count}} veel",
         "newVersionAvailable": "Saadaval on uus versioon",
-        "path": "Asukoht"
+        "path": "Asukoht",
+        "saveAndClose": "Salvesta ja sulge",
+        "undo": "Võta tagasi",
+        "lastScan": "Viimane skaneering {{date}}",
+        "scanFolderCount": "{{count}} kausta",
+        "scanItemCount": "{{count}} üksust",
+        "scanningLibrary": "Meediakogu skannimine…"
     },
     "entity": {
         "album_one": "Album",
@@ -314,7 +321,9 @@
         "after": "On pärast",
         "notInPlaylist": "Ei ole",
         "startsWith": "Algab",
-        "notInTheLast": "Pole viimase"
+        "notInTheLast": "Pole viimase",
+        "isMissing": "Puudub",
+        "isPresent": "On olemas"
     },
     "form": {
         "addServer": {
@@ -333,7 +342,8 @@
             "title": "Lisa server",
             "error_savePassword": "Parooli salvestamisel ilmnes viga",
             "ignoreCors": "Eira CORS-i ($t(common.restartRequired))",
-            "ignoreSsl": "Eira SSL-i ($t(common.restartRequired))"
+            "ignoreSsl": "Eira SSL-i ($t(common.restartRequired))",
+            "input_passwordNoSSO": "Pöördproksi (SSO) autentimine ei ole toetatud. Toetatud on ainult kasutajanime/parooliga autentimine ja Subsonic-autentimine"
         },
         "largeFetchConfirmation": {
             "title": "Lisa üksused järjekorda",
@@ -432,6 +442,9 @@
             "enabled": "Privaatne režiim lülitati sisse, esituse olek on nüüd väliste allikate eest peidetud",
             "disabled": "Privaatne režiim lülitati välja, esituse olek on nüüd väliste allikate jaoks nähtav",
             "title": "Privaatne režiim"
+        },
+        "createPrefilledPlaylist": {
+            "title": "Loo $t(entity.playlist, {\"count\": 1}) valitud lugudest"
         }
     },
     "page": {
@@ -496,7 +509,8 @@
             "noMusicFolder": "Muusikakausta pole valitud",
             "multipleMusicFolders": "{{count}} muusikakausta valitud",
             "settings": "$t(common.setting, {\"count\": 2})",
-            "version": "Versioon {{version}}"
+            "version": "Versioon {{version}}",
+            "logout": "Logi välja"
         },
         "manageServers": {
             "title": "Halda servereid",
@@ -532,7 +546,8 @@
             "goTo": "Mine >",
             "goToAlbum": "Mine > $t(entity.album, {\"count\": 1})",
             "goToAlbumArtist": "Mine > $t(entity.albumArtist, {\"count\": 1})",
-            "showDetails": "Hangi teavet"
+            "showDetails": "Hangi teavet",
+            "editMetadata": "Muuda metaandmeid"
         },
         "fullscreenPlayer": {
             "config": {
@@ -551,13 +566,21 @@
                 "showLyricProvider": "Kuva laulusõnade allikas",
                 "synchronized": "Sünkroniseeritud",
                 "unsynchronized": "Sünkroniseerimata",
-                "useImageAspectRatio": "Kasuta pildi kuvasuhet"
+                "useImageAspectRatio": "Kasuta pildi kuvasuhet",
+                "lyricFollowScrollAlignment": "Laulusõnad järgivad joondumist",
+                "lyricLineLeadTime": "Rea kuvamise eelajastus (ms)",
+                "lyricPaddingLeft": "Laulusõnade vasakpoolne veeris (%)",
+                "lyricPaddingRight": "Laulusõnade parempoolne veeris (%)"
             },
             "lyrics": "Laulusõnad",
             "related": "Seotud",
             "upNext": "Järgmiseks",
             "visualizer": "Visuaal",
-            "noLyrics": "Laulusõnu ei leitud"
+            "noLyrics": "Laulusõnu ei leitud",
+            "lyricLayers": "Laulusõnade kihid",
+            "lyricLanguage": "Keel",
+            "showPronunciation": "Hääldus",
+            "showTranslation": "Tõlge"
         },
         "genreList": {
             "showAlbums": "Kuva $t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
@@ -587,7 +610,26 @@
         "itemDetail": {
             "copyPath": "Kopeeri tee lõikelauale",
             "copiedPath": "Tee kopeeriti edukalt",
-            "openFile": "Kuva lugu failihalduris"
+            "openFile": "Kuva lugu failihalduris",
+            "tagConfiguration": "Siltide seadistus",
+            "addTagConfig": "Lisa silt…",
+            "multiValueToggle": "Mitme väärtusega",
+            "autocompleteSource": "Automaatse täitmise allikas",
+            "customValues": "Kohandatud väärtused",
+            "addCustomValue": "Lisa kohandatud väärtus…",
+            "serverSuggestions": "Server",
+            "fileNotWritable": "Fail pole ligipääsetav või kirjutatav",
+            "triggerRescan": "Soorita pärast salvestamist meediakogu skaneering",
+            "addField": "Lisa väli…",
+            "emptyFields": "Väljad ei tohi olla tühjad",
+            "tagsTab": "Sildid",
+            "artworkTab": "Kaanepildid",
+            "removeArtwork": "Eemalda kaanepildid",
+            "noArtwork": "Kaanepilti pole",
+            "multipleValues": "(Mitme väärtusega)",
+            "multipleArtworks": "Mitu kaanepilti",
+            "writePartialFailure": "{{count}} faili salvestamine nurjus",
+            "noLocalSongs": "Kohalike failiteedega laule ei leitud"
         },
         "playlist": {
             "reorder": "Ümberreastamine on lubatud vaid ID järgi sorteerimisel"
@@ -625,22 +667,22 @@
             "remote": "Kaugjuhtimine"
         },
         "sidebar": {
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
+            "albumArtists": "Albumi esitajad",
+            "albums": "Albumid",
             "collections": "Kogumikud",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "home": "$t(common.home)",
-            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "artists": "Esitajad",
+            "favorites": "Lemmikud",
+            "folders": "Kaustad",
+            "genres": "Žanrid",
+            "home": "Avaleht",
+            "radio": "Raadiojaamad",
             "myLibrary": "Muusikakogu",
             "nowPlaying": "Esitamisel",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
-            "search": "$t(common.search)",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "shared": "Shared $t(entity.playlist, {\"count\": 2})",
-            "tracks": "$t(entity.track, {\"count\": 2})"
+            "playlists": "Esitusloendid",
+            "search": "Otsi",
+            "settings": "Sätted",
+            "shared": "Jagatud esitusloendid",
+            "tracks": "Lood"
         },
         "trackList": {
             "artistTracks": "{{artist}} lood",
@@ -699,7 +741,9 @@
         "sleepTimer_timeRemaining": "{{time}} jäänud",
         "sleepTimer_setCustom": "Sea taimer",
         "sleepTimer_cancel": "Tühista taimer",
-        "scrobbleForceSubmit": "Sunnitud kraasimine"
+        "scrobbleForceSubmit": "Sunnitud kraasimine",
+        "nextAlbum": "Alt+klõps järgmise albumi esituseks",
+        "previousAlbum": "Alt+klõps eelmise albumi esituseks"
     },
     "queryBuilder": {
         "standardTags": "Standardsildid",
@@ -930,11 +974,9 @@
         "lyricOffset_description": "Nihuta laulusõnu määratud millisekundite võrra",
         "lyricOffset": "Laulusõnade nihe (ms)",
         "logLevel": "Logimise tase",
-        "logLevel_description": "Määrab kuvatava logimise miinimumtaseme. „Silumine“ näitab kõiki logisid, „viga“ ainult vigu",
+        "logLevel_description": "Määrab kuvatava logimise miinimumtaseme",
         "logLevel_optionDebug": "Silumine",
-        "logLevel_optionError": "Viga",
         "logLevel_optionInfo": "Info",
-        "logLevel_optionWarn": "Hoiata",
         "minimizeToTray_description": "Minimeeri rakendus süsteemisalve",
         "minimizeToTray": "Minimeeri salve",
         "minimumScrobblePercentage_description": "Minimaalne laulu kuulamise protsent, mis peab olema läbitud, enne kui see kraasitakse",
@@ -1133,7 +1175,52 @@
         "queryBuilderCustomFields_inputLabel": "Nimetus",
         "queryBuilderCustomFields_inputTag": "Silt",
         "queryBuilderCustomFields": "Kohandatud väljad",
-        "queryBuilderCustomFields_description": "Lisa kohandatud välju, mida päringukoosturis kasutada"
+        "queryBuilderCustomFields_description": "Lisa kohandatud välju, mida päringukoosturis kasutada",
+        "equalizer_descriptionMpv": "Parametriline ekvalaiser FFmpeg lavfi (MPV) kaudu",
+        "equalizer_descriptionWebAudio": "Parametriline ekvalaiser Web Audio API kaudu",
+        "equalizer": "Ekvalaiser",
+        "equalizerBands_description": "Riba põhivõimendus. Lohista üles/alla või sisesta väärtus. Vahemik: -12 kuni +12 dB.",
+        "equalizerBands": "Ribad",
+        "equalizerPreamp_description": "Sisendvõimendus enne ekvalaiseri ribasid. Moonutuste vältimiseks määra ribade võimendamisel negatiivne väärtus (MPV).",
+        "equalizerPreamp": "Eelvõimendus",
+        "equalizerPreset_description": "Rakenda sisseehitatud või salvestatud kohandatud EQ-häälestus",
+        "equalizerPreset": "Eelseadistus",
+        "equalizerPresetDeletePlaceholder": "Kustuta kohandatud...",
+        "equalizerPresetGroupBuiltIn": "Sisseehitatud",
+        "equalizerPresetGroupCustom": "Kohandatud",
+        "equalizerPresetNamePlaceholder": "Eelseadistuse nimi...",
+        "equalizerPresetSelectPlaceholder": "Vali eelseadistus",
+        "equalizerSavePreset_description": "Salvesta praegused EQ-seaded nimetatud eelseadistusena",
+        "equalizerSavePreset": "Salvesta eelseadistus",
+        "compressor_descriptionMpv": "Dünaamilise vahemiku kompressor FFmpeg acompressori kaudu (MPV)",
+        "compressor_descriptionWebAudio": "Dünaamilise vahemiku kompressor Web Audio API kaudu",
+        "enableFurigana_description": "Kuva jaapani kanji-märkide kohal hääldusjuhiseid (furigana).",
+        "enableFurigana": "Luba furigana kuvamine",
+        "compressor": "Kompressor",
+        "compressorAttack_description": "Kui kiiresti kompressor pärast läve ületamist rakendub.",
+        "compressorAttack": "Rakendumisaeg",
+        "compressorKnee_description": "Sujuva ülemineku (soft-knee) ulatus. Suuremad väärtused muudavad kompressiooni rakendumise astmelisemaks.",
+        "compressorKnee": "Üleminek",
+        "compressorMakeupGain_description": "Väljundvõimendus helitugevuse taastamiseks pärast kompressiooni.",
+        "compressorMakeupGain": "Väljundvõimendus",
+        "compressorPreset_description": "Rakenda sisseehitatud või salvestatud kohandatud kompressoriseadistus",
+        "compressorRatio_description": "Kompressiooniaste, nt 4 = 4:1.",
+        "compressorRatio": "Kompressiooniaste",
+        "compressorRelease_description": "Kui kiiresti kompressiooni mõju pärast lävest allapoole langemist lakkab.",
+        "compressorRelease": "Vabastusaeg",
+        "compressorReset_description": "Taasta kõigi kompressori parameetrite vaikeväärtused",
+        "compressorSavePreset_description": "Salvesta praegused kompressori seaded nimetatud eelseadistusena",
+        "compressorThreshold_description": "Signaali tase, mida ületades kompressioon algab.",
+        "compressorThreshold": "Lävi",
+        "audioDeviceDefault": "Süsteemi vaikeväärtus",
+        "enableRomaji_description": "Kuva jaapanikeelsete laulusõnade all romaji hääldusrida.",
+        "enableRomaji": "Luba romaji genereerimine",
+        "hotkey_playbackNextAlbum": "Järgmine album",
+        "hotkey_playbackPreviousAlbum": "Eelmine album",
+        "windowBarTrackinfo": "Loo andmed akna tiitliribal",
+        "windowBarTrackinfo_description": "Kuva akna tiitliribal hetkel mängiva loo pealkirja ja esitajat, kohta järjekorras ning olekut (mängib/pausil).",
+        "microtonalPitchControls": "Mikrotonaalsed helikõrguse nupud",
+        "microtonalPitchControls_description": "Lisa täiendavad helikõrguse nupud pooltoonide vahel liikumiseks"
     },
     "datetime": {
         "minuteShort": "m",
@@ -1358,7 +1445,12 @@
                 "horizontalBorders": "Ridade piirjooned",
                 "rowHoverHighlight": "Rea esiletõstmine kursoriga",
                 "showHeader": "Kuva päis",
-                "verticalBorders": "Veergude piirjooned"
+                "verticalBorders": "Veergude piirjooned",
+                "albumImageSize": "Kaanepildi suurus",
+                "albumGroupConfig": "Albumigruppide seadistus",
+                "albumGroupMetadata": "Metaandmete väljad",
+                "albumGroupShowFavoriteRating": "Kuva lemmikud ja hinded",
+                "albumGroupVerticalLayout": "Vertikaalne paigutus"
             },
             "label": {
                 "actions": "$t(common.action, {\"count\": 2})",

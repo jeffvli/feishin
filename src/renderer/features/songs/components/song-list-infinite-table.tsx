@@ -42,7 +42,7 @@ export const SongListInfiniteTable = ({
     const listQueryFn = api.controller.getSongList;
     const { pageKey } = useListContext();
 
-    const { getItem, getItemIndex, itemCount, loadedItems, onRangeChanged } =
+    const { getItem, getItemIndex, getLoadedItems, itemCount, loadedItems, onRangeChanged } =
         useItemListInfiniteLoader({
             eventKey: pageKey || ItemListKey.SONG,
             itemsPerPage,
@@ -83,6 +83,7 @@ export const SongListInfiniteTable = ({
             enableVerticalBorders={enableVerticalBorders}
             getItem={getItem}
             getItemIndex={getItemIndex}
+            getLoadedItems={getLoadedItems}
             initialTop={{
                 to: scrollOffset ?? 0,
                 type: 'offset',

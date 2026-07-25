@@ -1,8 +1,10 @@
 import './autodiscover';
 import './dlna';
+import './custom-themes';
 import './lyrics';
 import './player';
 import './remote';
 import './settings';
 import './discord-rpc';
+import './tag-editor';
 import './visualizer';

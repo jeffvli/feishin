@@ -9,6 +9,11 @@ import { PlayerConfig } from '/@/renderer/features/player/components/player-conf
 import { CustomPlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { SleepTimerButton } from '/@/renderer/features/player/components/sleep-timer-button';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
+import { useAudioDevices } from '/@/renderer/features/settings/components/playback/audio-settings';
+import {
+    ListConfigBooleanControl,
+    ListConfigTable,
+} from '/@/renderer/features/shared/components/list-config-menu';
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
@@ -23,6 +28,8 @@ import {
     useFullScreenPlayerStore,
     useGeneralSettings,
     useHotkeySettings,
+    usePlaybackSettings,
+    usePlaybackType,
     usePlayerData,
     usePlayerMuted,
     usePlayerSong,
@@ -31,12 +38,14 @@ import {
     useSettingsStoreActions,
     useSidebarRightExpanded,
     useSideQueueType,
+    useVolumeMax,
     useVolumeWheelStep,
     useVolumeWidth,
 } from '/@/renderer/store';
 import { useFullScreenPlayerStoreActions } from '/@/renderer/store/full-screen-player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
+import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
@@ -45,13 +54,14 @@ import { Popover } from '/@/shared/components/popover/popover';
 import { Rating } from '/@/shared/components/rating/rating';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Select } from '/@/shared/components/select/select';
+import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
-import { Switch } from '/@/shared/components/switch/switch';
 import { Text } from '/@/shared/components/text/text';
 import { useMediaQuery } from '/@/shared/hooks/use-media-query';
 import { useThrottledCallback } from '/@/shared/hooks/use-throttled-callback';
 import { useThrottledValue } from '/@/shared/hooks/use-throttled-value';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
+import { PlayerType } from '/@/shared/types/types';
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const ipc = isElectron() ? window.api.ipc : null;
@@ -74,8 +84,29 @@ interface SpeakerProperties {
 
 const isSonosMember = (device: { id: string }) => device.id.toUpperCase().includes('RINCON');
 
-const calculateVolumeUp = (volume: number, step: number) => Math.min(100, volume + step);
-const calculateVolumeDown = (volume: number, step: number) => Math.max(0, volume - step);
+const calculateVolumeUp = (volume: number, volumeWheelStep: number, volumeMax: number) => {
+    let volumeToSet: number;
+    const newVolumeGreaterThanMax = volume + volumeWheelStep > volumeMax;
+    if (newVolumeGreaterThanMax) {
+        volumeToSet = volumeMax;
+    } else {
+        volumeToSet = volume + volumeWheelStep;
+    }
+
+    return volumeToSet;
+};
+
+const calculateVolumeDown = (volume: number, volumeWheelStep: number) => {
+    let volumeToSet: number;
+    const newVolumeLessThanZero = volume - volumeWheelStep < 0;
+    if (newVolumeLessThanZero) {
+        volumeToSet = 0;
+    } else {
+        volumeToSet = volume - volumeWheelStep;
+    }
+
+    return volumeToSet;
+};
 
 const SpeakerPropertiesPopover = ({
     deviceId,
@@ -473,350 +504,6 @@ const GroupMemberVolumeRow = ({
     );
 };
 
-const VolumeButton = () => {
-    const { bindings } = useHotkeySettings();
-    const volume = usePlayerVolume();
-    const muted = usePlayerMuted();
-    const volumeWheelStep = useVolumeWheelStep();
-    const volumeWidth = useVolumeWidth();
-    const { decreaseVolume, increaseVolume, mediaToggleMute, setVolume } = usePlayer();
-    const isMinWidth = useMediaQuery('(max-width: 480px)');
-    const { t } = useTranslation();
-
-    const [sliderValue, setSliderValue] = useState(volume);
-    const throttledVolume = useThrottledValue(sliderValue, 100);
-
-    // Sync throttled value to actual volume
-    const [groupMembers, setGroupMembers] = useState<DlnaGroupMember[]>([]);
-    const [isHovered, setIsHovered] = useState(false);
-    const [isShiftDown, setIsShiftDown] = useState(false);
-    const groupMembersRef = useRef<DlnaGroupMember[]>([]);
-    const [memberMutes, setMemberMutes] = useState<Record<string, boolean>>({});
-    const [propsTarget, setPropsTarget] = useState<null | {
-        deviceId: string;
-        deviceName: string;
-        rect: DOMRect;
-    }>(null);
-    const coordLongPressTimer = useRef<NodeJS.Timeout | null>(null);
-    const wasCoordLongPress = useRef(false);
-    const coordButtonRef = useRef<HTMLSpanElement>(null);
-
-    const isGroupMode = groupMembers.length > 1;
-    const showGroupVolumePanel = isGroupMode && !groupMembers.some((m) => m.device.isPair);
-    const coordinator = groupMembers.find((m) => m.isCoordinator) ?? groupMembers[0];
-    const nonCoordinators = groupMembers.filter((m) => !m.isCoordinator);
-    const coordinatorIsSonos = coordinator ? isSonosMember(coordinator.device) : false;
-
-    useEffect(() => {
-        const down = (e: KeyboardEvent) => {
-            if (e.key === 'Shift') setIsShiftDown(true);
-        };
-        const up = (e: KeyboardEvent) => {
-            if (e.key === 'Shift') setIsShiftDown(false);
-        };
-        window.addEventListener('keydown', down);
-        window.addEventListener('keyup', up);
-        return () => {
-            window.removeEventListener('keydown', down);
-            window.removeEventListener('keyup', up);
-        };
-    }, []);
-
-    useEffect(() => {
-        if (!dlnaPlayerListener) return;
-        const handleGroupState = (_: unknown, state: DlnaGroupMember[]) => {
-            groupMembersRef.current = state;
-            setGroupMembers(state);
-            setMemberMutes((prev) => {
-                const next: Record<string, boolean> = {};
-                for (const m of state) next[m.device.id] = prev[m.device.id] ?? false;
-                return next;
-            });
-        };
-        const handleMemberVolume = (_: unknown, payload: { deviceId: string; volume: number }) => {
-            setGroupMembers((prev) => {
-                const next = prev.map((m) =>
-                    m.device.id === payload.deviceId ? { ...m, volume: payload.volume } : m,
-                );
-                groupMembersRef.current = next;
-                return next;
-            });
-        };
-        dlnaPlayerListener.rendererDlnaGroupState(handleGroupState);
-        dlnaPlayerListener.rendererDlnaGroupMemberVolume(handleMemberVolume);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-group-state');
-            ipc?.removeAllListeners('renderer-dlna-group-member-volume');
-        };
-    }, []);
-
-    useEffect(() => {
-        setGroupMembers((prev) => {
-            if (prev.length === 0) return prev;
-            const next = prev.map((m) => (m.isCoordinator ? { ...m, volume } : m));
-            groupMembersRef.current = next;
-            return next;
-        });
-    }, [volume]);
-
-    useEffect(() => {
-        setVolume(throttledVolume);
-    }, [throttledVolume, setVolume]);
-
-    // Sync external volume changes to local state
-    useEffect(() => {
-        setSliderValue(volume);
-    }, [volume]);
-
-    const handleMuteToggle = useCallback((deviceId: string, newMuted: boolean) => {
-        setMemberMutes((prev) => ({ ...prev, [deviceId]: newMuted }));
-        ipc?.send('dlna-group-member-mute', { deviceId, muted: newMuted });
-    }, []);
-
-    const handleMemberVolume = useCallback((deviceId: string, val: number) => {
-        dlnaPlayer?.setGroupMemberVolume(deviceId, val);
-        setGroupMembers((prev) => {
-            const next = prev.map((m) => (m.device.id === deviceId ? { ...m, volume: val } : m));
-            groupMembersRef.current = next;
-            return next;
-        });
-    }, []);
-
-    const applyVolumeToGroup = useCallback(
-        (newVol: number) => {
-            groupMembersRef.current.forEach((m) => {
-                if (!m.isCoordinator) {
-                    handleMemberVolume(m.device.id, newVol);
-                }
-            });
-        },
-        [handleMemberVolume],
-    );
-
-    const handleVolumeDown = useCallback(
-        () => decreaseVolume(volumeWheelStep),
-        [decreaseVolume, volumeWheelStep],
-    );
-    const handleVolumeUp = useCallback(
-        () => increaseVolume(volumeWheelStep),
-        [increaseVolume, volumeWheelStep],
-    );
-    const handleMute = useCallback(() => mediaToggleMute(), [mediaToggleMute]);
-
-    const handleVolumeSlider = useCallback(
-        (e: number) => {
-            if (showGroupVolumePanel && !isShiftDown) applyVolumeToGroup(e);
-            setSliderValue(e);
-        },
-        [showGroupVolumePanel, isShiftDown, applyVolumeToGroup],
-    );
-
-    const handleVolumeWheel = useCallback(
-        (e: WheelEvent<HTMLButtonElement | HTMLDivElement>) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const v =
-                e.deltaY > 0 || e.deltaX > 0
-                    ? calculateVolumeDown(sliderValue, volumeWheelStep)
-                    : calculateVolumeUp(sliderValue, volumeWheelStep);
-            if (showGroupVolumePanel && !isShiftDown) applyVolumeToGroup(v);
-            setSliderValue(v);
-        },
-        [sliderValue, volumeWheelStep, showGroupVolumePanel, isShiftDown, applyVolumeToGroup],
-    );
-
-    const handleVolumeDownThrottled = useThrottledCallback(handleVolumeDown, 100);
-    const handleVolumeUpThrottled = useThrottledCallback(handleVolumeUp, 100);
-
-    useHotkeys([
-        [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDownThrottled],
-        [bindings.volumeUp.isGlobal ? '' : bindings.volumeUp.hotkey, handleVolumeUpThrottled],
-        [bindings.volumeMute.isGlobal ? '' : bindings.volumeMute.hotkey, handleMute],
-    ]);
-
-    const handleLongPress = useCallback((deviceId: string, rect: DOMRect) => {
-        const device = groupMembersRef.current.find((m) => m.device.id === deviceId);
-        if (!device) return;
-        setPropsTarget({ deviceId, deviceName: device.device.name, rect });
-    }, []);
-
-    const startCoordLongPress = useCallback(() => {
-        if (!coordinatorIsSonos || !coordinator) return;
-        wasCoordLongPress.current = false;
-        const rect = coordButtonRef.current?.getBoundingClientRect();
-        if (!rect) return;
-        coordLongPressTimer.current = setTimeout(() => {
-            coordLongPressTimer.current = null;
-            wasCoordLongPress.current = true;
-            setPropsTarget({
-                deviceId: coordinator.device.id,
-                deviceName: coordinator.device.name,
-                rect,
-            });
-        }, 500);
-    }, [coordinatorIsSonos, coordinator]);
-
-    const cancelCoordLongPress = useCallback(() => {
-        if (coordLongPressTimer.current) {
-            clearTimeout(coordLongPressTimer.current);
-            coordLongPressTimer.current = null;
-        }
-    }, []);
-
-    return (
-        <div
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            style={{ position: 'relative' }}
-        >
-            {propsTarget && (
-                <SpeakerPropertiesPopover
-                    deviceId={propsTarget.deviceId}
-                    deviceName={propsTarget.deviceName}
-                    onClose={() => setPropsTarget(null)}
-                    triggerRect={propsTarget.rect}
-                />
-            )}
-            {showGroupVolumePanel && isHovered && (
-                <Paper
-                    radius="md"
-                    shadow="xl"
-                    style={{
-                        background: 'var(--theme-colors-background)',
-                        border: '2px solid var(--theme-colors-border)',
-                        borderRadius: 'var(--theme-radius-md)',
-                        bottom: '-12px',
-                        boxShadow: '2px 2px 10px 2px rgb(0 0 0 / 40%)',
-                        color: 'var(--theme-colors-foreground)',
-                        filter: 'drop-shadow(0 0 5px rgb(0 0 0 / 50%))',
-                        left: '-10px',
-                        opacity: isHovered ? 1 : 0,
-                        padding: '0 10px 45px 10px',
-                        pointerEvents: isHovered ? 'auto' : 'none',
-                        position: 'absolute',
-                        right: '-10px',
-                        transform: isHovered ? 'translateY(0)' : 'translateY(6px)',
-                        transition: 'opacity 180ms ease, transform 180ms ease',
-                        zIndex: 200,
-                    }}
-                >
-                    <div
-                        style={{
-                            color: 'var(--mantine-color-dimmed)',
-                            fontSize: '0.62rem',
-                            padding: '8px 0',
-                            textAlign: 'center',
-                        }}
-                    >
-                        {isShiftDown
-                            ? t('dlna.volume.individualControl')
-                            : t('dlna.volume.groupControl')}
-                    </div>
-                    <div
-                        style={{
-                            borderBottom: '1px solid var(--mantine-color-default-border)',
-                            margin: '0 -10px 10px -10px',
-                        }}
-                    />
-
-                    {nonCoordinators.map((m) => (
-                        <GroupMemberVolumeRow
-                            disabled={!isShiftDown}
-                            handleMemberVolume={handleMemberVolume}
-                            isMinWidth={isMinWidth}
-                            key={m.device.id}
-                            member={m}
-                            muted={memberMutes[m.device.id] ?? false}
-                            onLongPress={handleLongPress}
-                            onMuteToggle={handleMuteToggle}
-                            volumeWheelStep={volumeWheelStep}
-                            volumeWidth={volumeWidth}
-                        />
-                    ))}
-                    <div
-                        style={{
-                            color: 'var(--theme-colors-primary, #6c9fff)',
-                            fontSize: '0.68rem',
-                            marginBottom: '4px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                        }}
-                    >
-                        {coordinator?.device.name}
-                    </div>
-                </Paper>
-            )}
-            <div
-                style={{
-                    alignItems: 'center',
-                    display: 'flex',
-                    gap: '4px',
-                    position: 'relative',
-                    zIndex: 201,
-                }}
-            >
-                <span
-                    onPointerDown={startCoordLongPress}
-                    onPointerLeave={cancelCoordLongPress}
-                    onPointerUp={cancelCoordLongPress}
-                    ref={coordButtonRef}
-                    style={{ display: 'inline-flex' }}
-                >
-                    <ActionIcon
-                        icon={muted ? 'volumeMute' : volume > 50 ? 'volumeMax' : 'volumeNormal'}
-                        iconProps={{ color: muted ? 'muted' : undefined, size: 'xl' }}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            if (wasCoordLongPress.current) return;
-                            const newMuteState = !muted;
-                            if (isGroupMode && !isShiftDown) {
-                                if (showGroupVolumePanel) {
-                                    const newMutes: Record<string, boolean> = {};
-                                    groupMembersRef.current.forEach((m) => {
-                                        if (!m.isCoordinator) {
-                                            newMutes[m.device.id] = newMuteState;
-                                            ipc?.send('dlna-group-member-mute', {
-                                                deviceId: m.device.id,
-                                                muted: newMuteState,
-                                            });
-                                        }
-                                    });
-                                    setMemberMutes((prev) => ({ ...prev, ...newMutes }));
-                                }
-                            }
-                            handleMute();
-                        }}
-                        onWheel={handleVolumeWheel}
-                        size="sm"
-                        tooltip={{
-                            label: coordinatorIsSonos
-                                ? t('dlna.speakerProperties.longPressHint')
-                                : muted
-                                  ? t('player.muted')
-                                  : volume,
-                            openDelay: 0,
-                        }}
-                        variant="subtle"
-                    />
-                </span>
-                {!isMinWidth ? (
-                    <CustomPlayerbarSlider
-                        max={100}
-                        min={0}
-                        onChange={handleVolumeSlider}
-                        onClick={(e) => e.stopPropagation()}
-                        onWheel={handleVolumeWheel}
-                        size={6}
-                        value={sliderValue}
-                        w={volumeWidth}
-                    />
-                ) : null}
-            </div>
-        </div>
-    );
-};
-
 export const RightControls = () => {
     const { showRatings } = useGeneralSettings();
     return (
@@ -844,13 +531,6 @@ const AutoDJButton = () => {
     const settings = useAutoDJSettings();
     const { setSettings } = useSettingsStoreActions();
 
-    const itemLabels = useMemo(() => {
-        return {
-            description: t('setting.autoDJ_itemCount_description'),
-            title: t('setting.autoDJ_itemCount'),
-        };
-    }, [t]);
-
     const strategySelectData = useMemo(
         () => [
             {
@@ -865,21 +545,199 @@ const AutoDJButton = () => {
         [t],
     );
 
-    const strategyLabels =
+    const strategyTitle =
         settings.mode === AUTO_DJ_MODE.ALBUMS
-            ? {
-                  description: '',
-                  title: t('setting.autoDJ_albumStrategy'),
-              }
-            : {
-                  description: '',
-                  title: t('setting.autoDJ_songStrategy'),
-              };
+            ? t('setting.autoDJ_albumStrategy')
+            : t('setting.autoDJ_songStrategy');
 
     const strategyValue =
         settings.mode === AUTO_DJ_MODE.ALBUMS
             ? (settings.albumStrategy ?? AUTO_DJ_STRATEGY.SIMILAR)
             : (settings.songStrategy ?? AUTO_DJ_STRATEGY.SIMILAR);
+
+    const enabledOptions = useMemo(
+        () => [
+            {
+                component: (
+                    <ListConfigBooleanControl
+                        onChange={(value) => {
+                            setSettings({
+                                autoDJ: { enabled: value },
+                            });
+                        }}
+                        value={settings.enabled}
+                    />
+                ),
+                id: 'enabled',
+                label: t('setting.autoDJ_enabled'),
+            },
+        ],
+        [setSettings, settings.enabled, t],
+    );
+
+    const configOptions = useMemo(
+        () => [
+            {
+                component: (
+                    <Select
+                        comboboxProps={{ withinPortal: false }}
+                        data={strategySelectData}
+                        onChange={(value) => {
+                            if (!value) return;
+                            setSettings({
+                                autoDJ:
+                                    settings.mode === AUTO_DJ_MODE.ALBUMS
+                                        ? { albumStrategy: value as AutoDJStrategy }
+                                        : { songStrategy: value as AutoDJStrategy },
+                            });
+                        }}
+                        size="sm"
+                        value={strategyValue}
+                        variant="filled"
+                        w="160px"
+                    />
+                ),
+                id: 'strategy',
+                label: strategyTitle,
+            },
+            {
+                component: (
+                    <NumberInput
+                        aria-label={t('setting.autoDJ_itemCount')}
+                        hideControls={false}
+                        max={50}
+                        min={1}
+                        onChange={(e) =>
+                            setSettings({
+                                autoDJ: {
+                                    itemCount: Number(e),
+                                },
+                            })
+                        }
+                        size="sm"
+                        value={Number(settings.itemCount)}
+                        variant="filled"
+                        w="96px"
+                    />
+                ),
+                id: 'itemCount',
+                label: (
+                    <Stack gap="xs">
+                        <Text isNoSelect size="sm">
+                            {t('setting.autoDJ_itemCount')}
+                        </Text>
+                        <Text isMuted isNoSelect size="xs">
+                            {t('setting.autoDJ_itemCount_description')}
+                        </Text>
+                    </Stack>
+                ),
+            },
+            {
+                component: (
+                    <Slider
+                        aria-label={t('setting.autoDJ_timing')}
+                        marks={[
+                            { label: '1', value: 1 },
+                            { label: '2', value: 2 },
+                            { label: '3', value: 3 },
+                            { label: '4', value: 4 },
+                            { label: '5', value: 5 },
+                        ]}
+                        max={5}
+                        min={1}
+                        onChange={(e) =>
+                            setSettings({
+                                autoDJ: {
+                                    timing: Number(e),
+                                },
+                            })
+                        }
+                        size="sm"
+                        value={Number(settings.timing)}
+                        variant="filled"
+                        w="144px"
+                    />
+                ),
+                id: 'timing',
+                label: (
+                    <Stack gap="xs">
+                        <Text isNoSelect size="sm">
+                            {t('setting.autoDJ_timing')}
+                        </Text>
+                        <Text isMuted isNoSelect size="xs">
+                            {t('setting.autoDJ_timing_description')}
+                        </Text>
+                    </Stack>
+                ),
+            },
+        ],
+        [
+            setSettings,
+            settings.itemCount,
+            settings.mode,
+            settings.timing,
+            strategySelectData,
+            strategyTitle,
+            strategyValue,
+            t,
+        ],
+    );
+
+    const toggleOptions = useMemo(
+        () => [
+            {
+                component: (
+                    <ListConfigBooleanControl
+                        onChange={(value) => {
+                            setSettings({
+                                autoDJ: {
+                                    allowDuplicates: value,
+                                },
+                            });
+                        }}
+                        value={settings.allowDuplicates}
+                    />
+                ),
+                id: 'allowDuplicates',
+                label: (
+                    <Stack gap="xs">
+                        <Text isNoSelect size="sm">
+                            {t('setting.autoDJ_allowDuplicates')}
+                        </Text>
+                        <Text isMuted isNoSelect size="xs">
+                            {t('setting.autoDJ_allowDuplicates_description')}
+                        </Text>
+                    </Stack>
+                ),
+            },
+            {
+                component: (
+                    <ListConfigBooleanControl
+                        onChange={(value) => {
+                            setSettings({
+                                autoDJ: {
+                                    onlySimilar: value,
+                                },
+                            });
+                        }}
+                        value={settings.onlySimilar}
+                    />
+                ),
+                id: 'onlySimilar',
+                label: (
+                    <Stack gap="xs">
+                        <Text isNoSelect size="sm">
+                            {t('setting.autoDJ_onlySimilar')}
+                        </Text>
+                        <Text isMuted isNoSelect size="xs">
+                            {t('setting.autoDJ_onlySimilar_description')}
+                        </Text>
+                    </Stack>
+                ),
+            },
+        ],
+        [setSettings, settings.allowDuplicates, settings.onlySimilar, t],
+    );
 
     return (
         <Popover position="top-end" withArrow>
@@ -896,22 +754,10 @@ const AutoDJButton = () => {
                     {t('setting.autoDJ')}
                 </Button>
             </Popover.Target>
-            <Popover.Dropdown maw={320} miw={260} onClick={(e) => e.stopPropagation()} p="sm">
+            <Popover.Dropdown maw={480} miw={320} onClick={(e) => e.stopPropagation()} p="sm">
                 <Stack gap="sm">
                     <Paper p="md" radius="md">
-                        <Group align="center" gap="xs" justify="space-between" wrap="nowrap">
-                            <Text fw={600} isNoSelect size="sm">
-                                {t('setting.autoDJ_enabled')}
-                            </Text>
-                            <Switch
-                                checked={settings.enabled}
-                                onChange={(e) =>
-                                    setSettings({
-                                        autoDJ: { enabled: e.currentTarget.checked },
-                                    })
-                                }
-                            />
-                        </Group>
+                        <ListConfigTable options={enabledOptions} />
                     </Paper>
                     <SegmentedControl
                         data={[
@@ -931,58 +777,12 @@ const AutoDJButton = () => {
                         value={settings.mode}
                         w="100%"
                     />
-                    <Select
-                        comboboxProps={{ withinPortal: false }}
-                        data={strategySelectData}
-                        description={strategyLabels.description}
-                        label={strategyLabels.title}
-                        onChange={(value) => {
-                            if (!value) return;
-                            setSettings({
-                                autoDJ:
-                                    settings.mode === AUTO_DJ_MODE.ALBUMS
-                                        ? { albumStrategy: value as AutoDJStrategy }
-                                        : { songStrategy: value as AutoDJStrategy },
-                            });
-                        }}
-                        size="md"
-                        value={strategyValue}
-                        w="100%"
-                    />
-                    <NumberInput
-                        aria-label={itemLabels.title}
-                        description={itemLabels.description}
-                        hideControls={false}
-                        label={itemLabels.title}
-                        max={50}
-                        min={1}
-                        onChange={(e) =>
-                            setSettings({
-                                autoDJ: {
-                                    itemCount: Number(e),
-                                },
-                            })
-                        }
-                        size="md"
-                        value={Number(settings.itemCount)}
-                    />
-                    <NumberInput
-                        aria-label={t('setting.autoDJ_timing')}
-                        description={t('setting.autoDJ_timing_description')}
-                        hideControls={false}
-                        label={t('setting.autoDJ_timing')}
-                        max={5}
-                        min={1}
-                        onChange={(e) =>
-                            setSettings({
-                                autoDJ: {
-                                    timing: Number(e),
-                                },
-                            })
-                        }
-                        size="md"
-                        value={Number(settings.timing)}
-                    />
+                    <Paper p="md" radius="md">
+                        <ListConfigTable options={configOptions} />
+                    </Paper>
+                    <Paper p="md" radius="md">
+                        <ListConfigTable options={toggleOptions} />
+                    </Paper>
                 </Stack>
             </Popover.Dropdown>
         </Popover>
@@ -1180,5 +980,400 @@ const RatingButton = () => {
                 />
             )}
         </>
+    );
+};
+
+const VolumeButton = () => {
+    const { bindings } = useHotkeySettings();
+    const volume = usePlayerVolume();
+    const muted = usePlayerMuted();
+    const volumeWheelStep = useVolumeWheelStep();
+    const volumeWidth = useVolumeWidth();
+    const volumeMax = useVolumeMax();
+    const { decreaseVolume, increaseVolume, mediaToggleMute, setVolume } = usePlayer();
+    const isMinWidth = useMediaQuery('(max-width: 480px)');
+    const { t } = useTranslation();
+
+    const playbackType = usePlaybackType();
+    const playbackSettings = usePlaybackSettings();
+    const { setSettings } = useSettingsStoreActions();
+    const audioDevices = useAudioDevices(playbackType);
+
+    const currentAudioDeviceId =
+        playbackType === PlayerType.LOCAL
+            ? playbackSettings.mpvAudioDeviceId
+            : playbackSettings.audioDeviceId;
+
+    const handleSelectAudioDevice = useCallback(
+        (deviceId: null | string) => {
+            setSettings({
+                playback:
+                    playbackType === PlayerType.LOCAL
+                        ? { mpvAudioDeviceId: deviceId }
+                        : { audioDeviceId: deviceId },
+            });
+        },
+        [playbackType, setSettings],
+    );
+
+    const [sliderValue, setSliderValue] = useState(volume);
+    const throttledVolume = useThrottledValue(sliderValue, 100);
+
+    // Sync throttled value to actual volume
+    const [groupMembers, setGroupMembers] = useState<DlnaGroupMember[]>([]);
+    const [isHovered, setIsHovered] = useState(false);
+    const [isShiftDown, setIsShiftDown] = useState(false);
+    const groupMembersRef = useRef<DlnaGroupMember[]>([]);
+    const [memberMutes, setMemberMutes] = useState<Record<string, boolean>>({});
+    const [propsTarget, setPropsTarget] = useState<null | {
+        deviceId: string;
+        deviceName: string;
+        rect: DOMRect;
+    }>(null);
+    const coordLongPressTimer = useRef<NodeJS.Timeout | null>(null);
+    const wasCoordLongPress = useRef(false);
+    const coordButtonRef = useRef<HTMLSpanElement>(null);
+
+    const isGroupMode = groupMembers.length > 1;
+    const showGroupVolumePanel = isGroupMode && !groupMembers.some((m) => m.device.isPair);
+    const coordinator = groupMembers.find((m) => m.isCoordinator) ?? groupMembers[0];
+    const nonCoordinators = groupMembers.filter((m) => !m.isCoordinator);
+    const coordinatorIsSonos = coordinator ? isSonosMember(coordinator.device) : false;
+
+    useEffect(() => {
+        const down = (e: KeyboardEvent) => {
+            if (e.key === 'Shift') setIsShiftDown(true);
+        };
+        const up = (e: KeyboardEvent) => {
+            if (e.key === 'Shift') setIsShiftDown(false);
+        };
+        window.addEventListener('keydown', down);
+        window.addEventListener('keyup', up);
+        return () => {
+            window.removeEventListener('keydown', down);
+            window.removeEventListener('keyup', up);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!dlnaPlayerListener) return;
+        const handleGroupState = (_: unknown, state: DlnaGroupMember[]) => {
+            groupMembersRef.current = state;
+            setGroupMembers(state);
+            setMemberMutes((prev) => {
+                const next: Record<string, boolean> = {};
+                for (const m of state) next[m.device.id] = prev[m.device.id] ?? false;
+                return next;
+            });
+        };
+        const handleMemberVolume = (_: unknown, payload: { deviceId: string; volume: number }) => {
+            setGroupMembers((prev) => {
+                const next = prev.map((m) =>
+                    m.device.id === payload.deviceId ? { ...m, volume: payload.volume } : m,
+                );
+                groupMembersRef.current = next;
+                return next;
+            });
+        };
+        dlnaPlayerListener.rendererDlnaGroupState(handleGroupState);
+        dlnaPlayerListener.rendererDlnaGroupMemberVolume(handleMemberVolume);
+        return () => {
+            ipc?.removeAllListeners('renderer-dlna-group-state');
+            ipc?.removeAllListeners('renderer-dlna-group-member-volume');
+        };
+    }, []);
+
+    useEffect(() => {
+        setGroupMembers((prev) => {
+            if (prev.length === 0) return prev;
+            const next = prev.map((m) => (m.isCoordinator ? { ...m, volume } : m));
+            groupMembersRef.current = next;
+            return next;
+        });
+    }, [volume]);
+
+    useEffect(() => {
+        setVolume(throttledVolume);
+    }, [throttledVolume, setVolume]);
+
+    // Sync external volume changes to local state
+    useEffect(() => {
+        setSliderValue(volume);
+    }, [volume]);
+
+    const handleMuteToggle = useCallback((deviceId: string, newMuted: boolean) => {
+        setMemberMutes((prev) => ({ ...prev, [deviceId]: newMuted }));
+        ipc?.send('dlna-group-member-mute', { deviceId, muted: newMuted });
+    }, []);
+
+    const handleMemberVolume = useCallback((deviceId: string, val: number) => {
+        dlnaPlayer?.setGroupMemberVolume(deviceId, val);
+        setGroupMembers((prev) => {
+            const next = prev.map((m) => (m.device.id === deviceId ? { ...m, volume: val } : m));
+            groupMembersRef.current = next;
+            return next;
+        });
+    }, []);
+
+    const applyVolumeToGroup = useCallback(
+        (newVol: number) => {
+            groupMembersRef.current.forEach((m) => {
+                if (!m.isCoordinator) {
+                    handleMemberVolume(m.device.id, newVol);
+                }
+            });
+        },
+        [handleMemberVolume],
+    );
+
+    const handleVolumeDown = useCallback(
+        () => decreaseVolume(volumeWheelStep),
+        [decreaseVolume, volumeWheelStep],
+    );
+    const handleVolumeUp = useCallback(
+        () => increaseVolume(volumeWheelStep),
+        [increaseVolume, volumeWheelStep],
+    );
+    const handleMute = useCallback(() => mediaToggleMute(), [mediaToggleMute]);
+
+    const handleVolumeSlider = useCallback(
+        (e: number) => {
+            if (showGroupVolumePanel && !isShiftDown) applyVolumeToGroup(e);
+            setSliderValue(e);
+        },
+        [showGroupVolumePanel, isShiftDown, applyVolumeToGroup],
+    );
+
+    const handleVolumeWheel = useCallback(
+        (e: WheelEvent<HTMLButtonElement | HTMLDivElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const v =
+                e.deltaY > 0 || e.deltaX > 0
+                    ? calculateVolumeDown(sliderValue, volumeWheelStep)
+                    : calculateVolumeUp(sliderValue, volumeWheelStep, volumeMax);
+            if (showGroupVolumePanel && !isShiftDown) applyVolumeToGroup(v);
+            setSliderValue(v);
+        },
+        [sliderValue, volumeWheelStep, volumeMax, showGroupVolumePanel, isShiftDown, applyVolumeToGroup],
+    );
+
+    const handleVolumeDownThrottled = useThrottledCallback(handleVolumeDown, 100);
+    const handleVolumeUpThrottled = useThrottledCallback(handleVolumeUp, 100);
+
+    useHotkeys([
+        [bindings.volumeDown.isGlobal ? '' : bindings.volumeDown.hotkey, handleVolumeDownThrottled],
+        [bindings.volumeUp.isGlobal ? '' : bindings.volumeUp.hotkey, handleVolumeUpThrottled],
+        [bindings.volumeMute.isGlobal ? '' : bindings.volumeMute.hotkey, handleMute],
+    ]);
+
+    const handleLongPress = useCallback((deviceId: string, rect: DOMRect) => {
+        const device = groupMembersRef.current.find((m) => m.device.id === deviceId);
+        if (!device) return;
+        setPropsTarget({ deviceId, deviceName: device.device.name, rect });
+    }, []);
+
+    const startCoordLongPress = useCallback(() => {
+        if (!coordinatorIsSonos || !coordinator) return;
+        wasCoordLongPress.current = false;
+        const rect = coordButtonRef.current?.getBoundingClientRect();
+        if (!rect) return;
+        coordLongPressTimer.current = setTimeout(() => {
+            coordLongPressTimer.current = null;
+            wasCoordLongPress.current = true;
+            setPropsTarget({
+                deviceId: coordinator.device.id,
+                deviceName: coordinator.device.name,
+                rect,
+            });
+        }, 500);
+    }, [coordinatorIsSonos, coordinator]);
+
+    const cancelCoordLongPress = useCallback(() => {
+        if (coordLongPressTimer.current) {
+            clearTimeout(coordLongPressTimer.current);
+            coordLongPressTimer.current = null;
+        }
+    }, []);
+
+    return (
+        <div
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            style={{ position: 'relative' }}
+        >
+            {propsTarget && (
+                <SpeakerPropertiesPopover
+                    deviceId={propsTarget.deviceId}
+                    deviceName={propsTarget.deviceName}
+                    onClose={() => setPropsTarget(null)}
+                    triggerRect={propsTarget.rect}
+                />
+            )}
+            {showGroupVolumePanel && isHovered && (
+                <Paper
+                    radius="md"
+                    shadow="xl"
+                    style={{
+                        background: 'var(--theme-colors-background)',
+                        border: '2px solid var(--theme-colors-border)',
+                        borderRadius: 'var(--theme-radius-md)',
+                        bottom: '-12px',
+                        boxShadow: '2px 2px 10px 2px rgb(0 0 0 / 40%)',
+                        color: 'var(--theme-colors-foreground)',
+                        filter: 'drop-shadow(0 0 5px rgb(0 0 0 / 50%))',
+                        left: '-10px',
+                        opacity: isHovered ? 1 : 0,
+                        padding: '0 10px 45px 10px',
+                        pointerEvents: isHovered ? 'auto' : 'none',
+                        position: 'absolute',
+                        right: '-10px',
+                        transform: isHovered ? 'translateY(0)' : 'translateY(6px)',
+                        transition: 'opacity 180ms ease, transform 180ms ease',
+                        zIndex: 200,
+                    }}
+                >
+                    <div
+                        style={{
+                            color: 'var(--mantine-color-dimmed)',
+                            fontSize: '0.62rem',
+                            padding: '8px 0',
+                            textAlign: 'center',
+                        }}
+                    >
+                        {isShiftDown
+                            ? t('dlna.volume.individualControl')
+                            : t('dlna.volume.groupControl')}
+                    </div>
+                    <div
+                        style={{
+                            borderBottom: '1px solid var(--mantine-color-default-border)',
+                            margin: '0 -10px 10px -10px',
+                        }}
+                    />
+
+                    {nonCoordinators.map((m) => (
+                        <GroupMemberVolumeRow
+                            disabled={!isShiftDown}
+                            handleMemberVolume={handleMemberVolume}
+                            isMinWidth={isMinWidth}
+                            key={m.device.id}
+                            member={m}
+                            muted={memberMutes[m.device.id] ?? false}
+                            onLongPress={handleLongPress}
+                            onMuteToggle={handleMuteToggle}
+                            volumeWheelStep={volumeWheelStep}
+                            volumeWidth={volumeWidth}
+                        />
+                    ))}
+                    <div
+                        style={{
+                            color: 'var(--theme-colors-primary, #6c9fff)',
+                            fontSize: '0.68rem',
+                            marginBottom: '4px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                        }}
+                    >
+                        {coordinator?.device.name}
+                    </div>
+                </Paper>
+            )}
+            <div
+                style={{
+                    alignItems: 'center',
+                    display: 'flex',
+                    gap: '4px',
+                    position: 'relative',
+                    zIndex: 201,
+                }}
+            >
+                <ContextMenu>
+                    <ContextMenu.Target>
+                        {/*
+                         * ActionIcon renders a Mantine Tooltip wrapper, which does not
+                         * forward the onContextMenu/ref that Radix injects via asChild to
+                         * the underlying button. Wrap in a real DOM node so right-click
+                         * reliably opens the menu.
+                         */}
+                        <span
+                            onPointerDown={startCoordLongPress}
+                            onPointerLeave={cancelCoordLongPress}
+                            onPointerUp={cancelCoordLongPress}
+                            ref={coordButtonRef}
+                            style={{ display: 'inline-flex' }}
+                        >
+                            <ActionIcon
+                                icon={muted ? 'volumeMute' : volume > 50 ? 'volumeMax' : 'volumeNormal'}
+                                iconProps={{ color: muted ? 'muted' : undefined, size: 'xl' }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (wasCoordLongPress.current) return;
+                                    const newMuteState = !muted;
+                                    if (isGroupMode && !isShiftDown) {
+                                        if (showGroupVolumePanel) {
+                                            const newMutes: Record<string, boolean> = {};
+                                            groupMembersRef.current.forEach((m) => {
+                                                if (!m.isCoordinator) {
+                                                    newMutes[m.device.id] = newMuteState;
+                                                    ipc?.send('dlna-group-member-mute', {
+                                                        deviceId: m.device.id,
+                                                        muted: newMuteState,
+                                                    });
+                                                }
+                                            });
+                                            setMemberMutes((prev) => ({ ...prev, ...newMutes }));
+                                        }
+                                    }
+                                    handleMute();
+                                }}
+                                onWheel={handleVolumeWheel}
+                                size="sm"
+                                tooltip={{
+                                    label: coordinatorIsSonos
+                                        ? t('dlna.speakerProperties.longPressHint')
+                                        : muted
+                                          ? t('player.muted')
+                                          : volume,
+                                    openDelay: 0,
+                                }}
+                                variant="subtle"
+                            />
+                        </span>
+                    </ContextMenu.Target>
+                    <ContextMenu.Content>
+                        <ContextMenu.Item
+                            isSelected={!currentAudioDeviceId}
+                            onSelect={() => handleSelectAudioDevice(null)}
+                        >
+                            {t('setting.audioDeviceDefault', { defaultValue: 'System default' })}
+                        </ContextMenu.Item>
+                        {audioDevices.length > 0 && <ContextMenu.Divider />}
+                        {audioDevices.map((device) => (
+                            <ContextMenu.Item
+                                isSelected={device.value === currentAudioDeviceId}
+                                key={device.value}
+                                onSelect={() => handleSelectAudioDevice(device.value)}
+                            >
+                                {device.label || device.value}
+                            </ContextMenu.Item>
+                        ))}
+                    </ContextMenu.Content>
+                </ContextMenu>
+                {!isMinWidth ? (
+                    <CustomPlayerbarSlider
+                        max={volumeMax}
+                        min={0}
+                        onChange={handleVolumeSlider}
+                        onClick={(e) => e.stopPropagation()}
+                        onWheel={handleVolumeWheel}
+                        size={6}
+                        value={sliderValue}
+                        w={volumeWidth}
+                    />
+                ) : null}
+            </div>
+        </div>
     );
 };

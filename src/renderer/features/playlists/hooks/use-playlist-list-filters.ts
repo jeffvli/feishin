@@ -11,7 +11,10 @@ import { PlaylistListSort } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
 export const usePlaylistListFilters = () => {
-    const sortByFilter = useSortByFilter<PlaylistListSort>(null, ItemListKey.PLAYLIST);
+    const sortByFilter = useSortByFilter<PlaylistListSort>(
+        PlaylistListSort.NAME,
+        ItemListKey.PLAYLIST,
+    );
     const sortOrderFilter = useSortOrderFilter(null, ItemListKey.PLAYLIST);
 
     const { searchTerm, setSearchTerm } = useSearchTermFilter('');

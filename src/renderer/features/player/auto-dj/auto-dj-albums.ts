@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query';
 
-import { autoDjGenreIdsForSongGenre, autoDjPushUniqueAlbumIds } from './auto-dj-utils';
+import { autoDjGenreIdsForSongGenre } from './auto-dj-utils';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
@@ -16,9 +16,11 @@ import {
 
 export type AutoDjAlbumCollectArgs = {
     albumStrategy: AutoDJStrategy;
+    allowDuplicates: boolean;
     currentSong: QueueSong;
     itemCount: number;
     musicFolderId: string | string[] | undefined;
+    onlySimilar: boolean;
     queryClient: QueryClient;
     queueAlbumIdSet: Set<string>;
     server: null | ServerListItem | undefined;
@@ -37,6 +39,19 @@ export const runAutoDjAlbumIds = async (args: AutoDjAlbumCollectArgs): Promise<s
     }
 };
 
+const isAlbumIdAvailable = (
+    albumId: string,
+    allowDuplicates: boolean,
+    queueAlbumIdSet: Set<string>,
+    selectedAlbumIdSet: Set<string>,
+) => {
+    if (allowDuplicates) {
+        return true;
+    }
+
+    return !queueAlbumIdSet.has(albumId) && !selectedAlbumIdSet.has(albumId);
+};
+
 const collectAlbumsLibraryRandom = async (args: AutoDjAlbumCollectArgs): Promise<string[]> => {
     const page = await args.queryClient.fetchQuery({
         ...albumQueries.list({
@@ -52,14 +67,18 @@ const collectAlbumsLibraryRandom = async (args: AutoDjAlbumCollectArgs): Promise
         queryKey: queryKeys.player.fetch({ autoDjAlbumLibraryRandom: args.currentSong?.id }),
     });
 
-    const ids = page.items.map((a) => a.id).filter((id) => id && !args.queueAlbumIdSet.has(id));
+    const ids = page.items
+        .map((album) => album.id)
+        .filter(
+            (albumId) => albumId && (args.allowDuplicates || !args.queueAlbumIdSet.has(albumId)),
+        );
     return shuffle(ids).slice(0, args.itemCount);
 };
 
 const collectAlbumsSimilar = async (args: AutoDjAlbumCollectArgs): Promise<string[]> => {
-    const targetAlbumCount = args.itemCount;
-    const candidateAlbumIds: string[] = [];
-    const seenAlbumCandidates = new Set<string>();
+    const selectedAlbumIds: string[] = [];
+    const selectedAlbumIdSet = new Set<string>();
+    const remainingCount = () => args.itemCount - selectedAlbumIds.length;
 
     if (args.trySimilarSongs && args.currentSong?.id) {
         const similarSongsFromSimilarApi = await args.queryClient.fetchQuery({
@@ -75,24 +94,46 @@ const collectAlbumsSimilar = async (args: AutoDjAlbumCollectArgs): Promise<strin
             }),
         });
 
-        autoDjPushUniqueAlbumIds(
-            candidateAlbumIds,
-            seenAlbumCandidates,
-            args.queueAlbumIdSet,
-            ...similarSongsFromSimilarApi.map((s) => s.albumId),
+        const similarSlotsToFill = remainingCount();
+        const shuffledSimilarAlbumIds = shuffle(
+            similarSongsFromSimilarApi
+                .map((song) => song.albumId)
+                .filter((albumId): albumId is string => {
+                    if (!albumId) {
+                        return false;
+                    }
+
+                    return isAlbumIdAvailable(
+                        albumId,
+                        args.allowDuplicates,
+                        args.queueAlbumIdSet,
+                        selectedAlbumIdSet,
+                    );
+                }),
         );
+
+        for (const albumId of shuffledSimilarAlbumIds.slice(0, similarSlotsToFill)) {
+            selectedAlbumIdSet.add(albumId);
+            selectedAlbumIds.push(albumId);
+        }
+
+        if (args.onlySimilar && selectedAlbumIds.length > 0) {
+            return selectedAlbumIds;
+        }
     }
 
-    if (candidateAlbumIds.length < targetAlbumCount && args.currentSong && args.server) {
+    if (remainingCount() > 0 && args.currentSong && args.server) {
         const genre = args.currentSong.genres?.[0];
+
         if (genre) {
             const genreIds = autoDjGenreIdsForSongGenre(genre, args.server.type);
+            const genreLimit = 50;
 
             const genreAlbums = await args.queryClient.fetchQuery({
                 ...albumQueries.list({
                     query: {
                         genreIds,
-                        limit: 50,
+                        limit: genreLimit,
                         musicFolderId: args.musicFolderId,
                         sortBy: AlbumListSort.RANDOM,
                         sortOrder: SortOrder.ASC,
@@ -106,15 +147,8 @@ const collectAlbumsSimilar = async (args: AutoDjAlbumCollectArgs): Promise<strin
                 }),
             });
 
-            autoDjPushUniqueAlbumIds(
-                candidateAlbumIds,
-                seenAlbumCandidates,
-                args.queueAlbumIdSet,
-                ...genreAlbums.items.map((album) => album.id),
-            );
-
             if (!args.trySimilarSongs) {
-                const randomAlbumMixCount = Math.max(1, Math.ceil(50 * 0.2));
+                const randomAlbumMixCount = Math.max(1, Math.ceil(genreLimit * 0.2));
                 const randomAlbumsMix = await args.queryClient.fetchQuery({
                     ...albumQueries.list({
                         query: {
@@ -131,17 +165,56 @@ const collectAlbumsSimilar = async (args: AutoDjAlbumCollectArgs): Promise<strin
                     }),
                 });
 
-                autoDjPushUniqueAlbumIds(
-                    candidateAlbumIds,
-                    seenAlbumCandidates,
-                    args.queueAlbumIdSet,
-                    ...randomAlbumsMix.items.map((album) => album.id),
+                const spiceSlotsToFill = Math.min(randomAlbumMixCount, remainingCount());
+                const shuffledSpiceAlbumIds = shuffle(
+                    randomAlbumsMix.items
+                        .map((album) => album.id)
+                        .filter(
+                            (albumId): albumId is string =>
+                                Boolean(albumId) &&
+                                isAlbumIdAvailable(
+                                    albumId,
+                                    args.allowDuplicates,
+                                    args.queueAlbumIdSet,
+                                    selectedAlbumIdSet,
+                                ),
+                        ),
                 );
+
+                for (const albumId of shuffledSpiceAlbumIds.slice(0, spiceSlotsToFill)) {
+                    selectedAlbumIdSet.add(albumId);
+                    selectedAlbumIds.push(albumId);
+                }
+            }
+
+            const genreSlotsToFill = remainingCount();
+            const shuffledGenreAlbumIds = shuffle(
+                genreAlbums.items
+                    .map((album) => album.id)
+                    .filter(
+                        (albumId): albumId is string =>
+                            Boolean(albumId) &&
+                            isAlbumIdAvailable(
+                                albumId,
+                                args.allowDuplicates,
+                                args.queueAlbumIdSet,
+                                selectedAlbumIdSet,
+                            ),
+                    ),
+            );
+
+            for (const albumId of shuffledGenreAlbumIds.slice(0, genreSlotsToFill)) {
+                selectedAlbumIdSet.add(albumId);
+                selectedAlbumIds.push(albumId);
+            }
+
+            if (args.onlySimilar && selectedAlbumIds.length > 0) {
+                return selectedAlbumIds;
             }
         }
     }
 
-    if (candidateAlbumIds.length < targetAlbumCount && args.currentSong) {
+    if (remainingCount() > 0 && args.currentSong) {
         const albumArtist = args.currentSong.albumArtists?.[0];
 
         if (albumArtist) {
@@ -163,16 +236,34 @@ const collectAlbumsSimilar = async (args: AutoDjAlbumCollectArgs): Promise<strin
                 }),
             });
 
-            autoDjPushUniqueAlbumIds(
-                candidateAlbumIds,
-                seenAlbumCandidates,
-                args.queueAlbumIdSet,
-                ...albumsByArtist.items.map((album) => album.id),
+            const artistSlotsToFill = remainingCount();
+            const shuffledArtistAlbumIds = shuffle(
+                albumsByArtist.items
+                    .map((album) => album.id)
+                    .filter(
+                        (albumId): albumId is string =>
+                            Boolean(albumId) &&
+                            isAlbumIdAvailable(
+                                albumId,
+                                args.allowDuplicates,
+                                args.queueAlbumIdSet,
+                                selectedAlbumIdSet,
+                            ),
+                    ),
             );
+
+            for (const albumId of shuffledArtistAlbumIds.slice(0, artistSlotsToFill)) {
+                selectedAlbumIdSet.add(albumId);
+                selectedAlbumIds.push(albumId);
+            }
+
+            if (args.onlySimilar && selectedAlbumIds.length > 0) {
+                return selectedAlbumIds;
+            }
         }
     }
 
-    if (candidateAlbumIds.length < targetAlbumCount && args.currentSong) {
+    if (remainingCount() > 0 && args.currentSong) {
         const randomAlbumsFallback = await args.queryClient.fetchQuery({
             ...albumQueries.list({
                 query: {
@@ -189,14 +280,27 @@ const collectAlbumsSimilar = async (args: AutoDjAlbumCollectArgs): Promise<strin
             }),
         });
 
-        autoDjPushUniqueAlbumIds(
-            candidateAlbumIds,
-            seenAlbumCandidates,
-            args.queueAlbumIdSet,
-            ...randomAlbumsFallback.items.map((album) => album.id),
+        const randomSlotsToFill = remainingCount();
+        const shuffledRandomAlbumIds = shuffle(
+            randomAlbumsFallback.items
+                .map((album) => album.id)
+                .filter(
+                    (albumId): albumId is string =>
+                        Boolean(albumId) &&
+                        isAlbumIdAvailable(
+                            albumId,
+                            args.allowDuplicates,
+                            args.queueAlbumIdSet,
+                            selectedAlbumIdSet,
+                        ),
+                ),
         );
+
+        for (const albumId of shuffledRandomAlbumIds.slice(0, randomSlotsToFill)) {
+            selectedAlbumIdSet.add(albumId);
+            selectedAlbumIds.push(albumId);
+        }
     }
 
-    const shuffledAlbums = shuffle(candidateAlbumIds);
-    return shuffledAlbums.slice(0, targetAlbumCount);
+    return selectedAlbumIds;
 };

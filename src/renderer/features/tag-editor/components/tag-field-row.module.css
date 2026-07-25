@@ -1,0 +1,29 @@
+.remove-cell {
+    white-space: nowrap;
+}
+
+.remove-button {
+    font-size: 1.05rem;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+
+tr:hover .remove-button,
+.remove-button:focus-visible,
+.remove-button-visible {
+    opacity: 1;
+}
+
+.dirty-label {
+    box-shadow: inset 2px 0 0 var(--mantine-primary-color-filled);
+}
+
+.removed-row > :not(:last-child) {
+    opacity: 0.55;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.removed-row > :first-child {
+    text-decoration: line-through;
+}

@@ -7,6 +7,7 @@ import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
+import { useScanStatus } from '/@/renderer/features/shared/hooks/use-scan-status';
 import { ServerSelectorItems } from '/@/renderer/features/sidebar/components/server-selector-items';
 import { useCurrentServer } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
@@ -23,6 +24,7 @@ import { ServerFeature } from '/@/shared/types/features-types';
 export const ServerSelector = () => {
     const { t } = useTranslation();
     const currentServer = useCurrentServer();
+    const { data: scanStatus, isScanning, isWatching } = useScanStatus();
 
     const { data: musicFolders } = useQuery(
         currentServer
@@ -54,6 +56,19 @@ export const ServerSelector = () => {
         return selectedMusicFolders[0].name;
     })();
 
+    const scanProgressParts: string[] = [];
+    if (scanStatus?.count && scanStatus.count > 0) {
+        scanProgressParts.push(t('common.scanItemCount', { count: scanStatus.count }));
+    }
+    if (scanStatus?.folderCount && scanStatus.folderCount > 0) {
+        scanProgressParts.push(t('common.scanFolderCount', { count: scanStatus.folderCount }));
+    }
+
+    const scanStatusText =
+        isWatching && isScanning
+            ? [t('common.scanningLibrary'), ...scanProgressParts].filter(Boolean).join(' · ')
+            : null;
+
     const logo =
         currentServer.type === ServerType.NAVIDROME
             ? NavidromeLogo
@@ -75,6 +90,11 @@ export const ServerSelector = () => {
                                 <Text isMuted size="xs" truncate>
                                     {musicFolderDisplayText}
                                 </Text>
+                                {scanStatusText && (
+                                    <Text isMuted size="xs" truncate>
+                                        {scanStatusText}
+                                    </Text>
+                                )}
                             </Stack>
                             <Icon icon="ellipsisVertical" size="sm" />
                         </Group>

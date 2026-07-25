@@ -16,6 +16,7 @@ export const ColorInput = ({
     return (
         <MantineColorInput
             classNames={{
+                description: styles.description,
                 dropdown: styles.dropdown,
                 input: styles.input,
                 label: styles.label,

@@ -28,6 +28,7 @@ export const JsonInput = forwardRef<HTMLTextAreaElement, JsonInputProps>(
         return (
             <MantineJsonInput
                 classNames={{
+                    description: styles.description,
                     input: styles.input,
                     label: styles.label,
                     required: styles.required,

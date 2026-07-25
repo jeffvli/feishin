@@ -1,27 +1,21 @@
-import dayjs from 'dayjs';
+import { LogLevel, LogSeverity } from '/@/shared/logger/types';
 
-export enum LogCategory {
-    ANALYTICS = 'analytics',
-    API = 'api',
-    EXTERNAL = 'external',
-    GENERAL = 'general',
-    OTHER = 'other',
-    PLAYER = 'player',
-    REMOTE = 'remote',
-    SCROBBLE = 'scrobble',
-    SYSTEM = 'system',
-}
+export type { LogLevel, LogSeverity };
 
-export type LogLevel = 'debug' | 'error' | 'info' | 'warn';
+type ElectronLogApi = {
+    debug: (...params: any[]) => void;
+    error: (...params: any[]) => void;
+    info: (...params: any[]) => void;
+    sendToMain?: (message: {
+        data: any[];
+        level: LogSeverity;
+        variables?: { processType: string };
+    }) => void;
+    warn: (...params: any[]) => void;
+};
 
 interface LogFn {
-    (
-        message?: string,
-        options?: {
-            category?: string;
-            meta?: any;
-        },
-    ): void;
+    (message?: string, meta?: any): void;
 }
 
 interface Logger {
@@ -32,16 +26,87 @@ interface Logger {
     warn: LogFn;
 }
 
-const DEFAULT_LOG_LEVEL = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
+const DEFAULT_LOG_LEVEL: LogLevel = process.env.NODE_ENV === 'production' ? 'info' : 'debug';
+const PROCESS_LABEL = '[renderer]';
+const PROCESS_WIDTH = 10;
+const LEVEL_WIDTH = 5;
+const RESET = '\x1B[0m';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const NO_OP: LogFn = (_message?: string, ..._optionalParams: any[]) => {};
-
-const colors = {
+const levelColors: Record<LogSeverity, string> = {
     debug: '\x1B[38;2;100;149;237m', // #6495ED
     error: '\x1B[38;2;255;100;100m', // #ff6464
     info: '\x1B[38;2;76;175;80m', // #4caf50
     warn: '\x1B[38;2;225;125;50m', // #e17d32
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const NO_OP: LogFn = (_message?: string, ..._optionalParams: any[]) => {};
+
+const getElectronLog = (): ElectronLogApi | null => {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+
+    const electronLog = (window as Window & { __electronLog?: ElectronLogApi }).__electronLog;
+    return electronLog ?? null;
+};
+
+const formatLogLine = (level: LogSeverity, message: string, count = 1): string => {
+    const countStr = count > 1 ? ` (x${count})` : '';
+    const levelLabel = `${levelColors[level]}${level.toUpperCase().padEnd(LEVEL_WIDTH, ' ')}${RESET}`;
+    const processLabel = PROCESS_LABEL.padEnd(PROCESS_WIDTH, ' ');
+    return `${new Date().toISOString()} ${levelLabel} ${processLabel} ${message}${countStr}`;
+};
+
+const forwardToElectronLog = (level: LogSeverity, message: string, meta?: any, count = 1) => {
+    const electronLog = getElectronLog();
+    if (!electronLog) {
+        return;
+    }
+
+    const countStr = count > 1 ? ` (x${count})` : '';
+    const forwardMessage = `${message}${countStr}`;
+    const data = meta !== undefined ? [forwardMessage, meta] : [forwardMessage];
+
+    if (typeof electronLog.sendToMain === 'function') {
+        electronLog.sendToMain({
+            data,
+            level,
+            variables: { processType: 'renderer' },
+        });
+        return;
+    }
+
+    if (meta !== undefined) {
+        electronLog[level](forwardMessage, meta);
+    } else {
+        electronLog[level](forwardMessage);
+    }
+};
+
+const syncLogLevelToMain = (level: LogLevel) => {
+    if (typeof window === 'undefined' || !window.api?.ipc) {
+        return;
+    }
+
+    window.api.ipc.send('logger-set-level', level);
+};
+
+export const normalizeLogLevel = (value: null | string | undefined): LogLevel => {
+    if (value === 'debug' || value === 'info') {
+        return value;
+    }
+
+    // Legacy warn/error/trace thresholds map to nearby levels.
+    if (value === 'warn' || value === 'error') {
+        return 'info';
+    }
+
+    if (value === 'trace') {
+        return 'debug';
+    }
+
+    return DEFAULT_LOG_LEVEL;
 };
 
 // Debounce configuration
@@ -53,21 +118,17 @@ setInterval(() => {
     const now = Date.now();
     for (const [key, value] of DEBOUNCE_MAP.entries()) {
         if (now - value.lastLog >= DEBOUNCE_INTERVAL) {
-            const [level, message, category, meta] = JSON.parse(key);
-            const timestampStr = `${dayjs().format('HH:mm:ss')}`;
-            const levelStr = `${colors[level as keyof typeof colors]}[${String(level).toUpperCase().padEnd(5, ' ')}]\x1B[0m`;
-            const countStr = value.count > 1 ? ` (x${value.count})` : '';
-            const categoryStr = category
-                ? String(`[${category.padEnd(9, ' ')}]`).toUpperCase()
-                : '';
+            const [level, message, meta] = JSON.parse(key) as [LogSeverity, string, any];
             const messageStr = message ? String(message) : '';
-            const logStr = `[${timestampStr}] ${levelStr} ${categoryStr} ${messageStr}${countStr}`;
+            const logStr = formatLogLine(level, messageStr, value.count);
 
-            if (meta) {
+            if (meta !== undefined && meta !== null) {
                 console.log(logStr, meta);
             } else {
                 console.log(logStr);
             }
+
+            forwardToElectronLog(level, messageStr, meta, value.count);
 
             DEBOUNCE_MAP.delete(key);
         }
@@ -82,19 +143,24 @@ class ConsoleLogger implements Logger {
     warn: LogFn = NO_OP;
 
     constructor() {
-        const level = (localStorage.getItem('log_level') || DEFAULT_LOG_LEVEL) as LogLevel;
+        const level = normalizeLogLevel(localStorage.getItem('log_level'));
+        if (localStorage.getItem('log_level') !== level) {
+            localStorage.setItem('log_level', level);
+        }
+
         this.initializeLoggers(level);
+        syncLogLevelToMain(level);
+
         this.updateLogLevel = (newLevel: LogLevel) => {
             this.initializeLoggers(newLevel);
+            syncLogLevelToMain(newLevel);
         };
     }
 
     private initializeLoggers(level: LogLevel) {
-        // Create timestamp wrapper function with colors and debouncing
-        const withTimestamp = (logLevel: string): LogFn => {
-            return (message?: any, options?: { category?: string; meta?: any }) => {
-                const { category, meta } = options || {};
-                const key = JSON.stringify([logLevel, message, category, meta]);
+        const withDebounce = (logLevel: LogSeverity): LogFn => {
+            return (message?: any, meta?: any) => {
+                const key = JSON.stringify([logLevel, message, meta]);
                 const now = Date.now();
                 const existing = DEBOUNCE_MAP.get(key);
 
@@ -107,32 +173,11 @@ class ConsoleLogger implements Logger {
             };
         };
 
-        this.error = withTimestamp('error');
-
-        if (level === 'error') {
-            this.warn = NO_OP;
-            this.info = NO_OP;
-            this.debug = NO_OP;
-            return;
-        }
-
-        this.warn = withTimestamp('warn');
-
-        if (level === 'warn') {
-            this.info = NO_OP;
-            this.debug = NO_OP;
-            return;
-        }
-
-        this.info = withTimestamp('info');
-
-        if (level === 'info') {
-            this.debug = NO_OP;
-            return;
-        }
-
-        this.debug = withTimestamp('debug');
+        this.error = withDebounce('error');
+        this.warn = withDebounce('warn');
+        this.info = withDebounce('info');
+        this.debug = level === 'debug' ? withDebounce('debug') : NO_OP;
     }
 }
 
-export const logFn = new ConsoleLogger();
+export const logger = new ConsoleLogger();

@@ -25,7 +25,7 @@
 }
 
 .label {
-    margin-bottom: var(--theme-spacing-sm);
+    margin-bottom: var(--theme-spacing-xs);
 }
 
 .dropdown {
@@ -56,4 +56,10 @@
 
 .option:hover {
     background: lighten(var(--theme-colors-surface), 5%);
+}
+
+.description {
+    margin-bottom: var(--theme-spacing-xs);
+    font-size: var(--theme-font-size-xs);
+    color: var(--theme-colors-foreground-muted);
 }

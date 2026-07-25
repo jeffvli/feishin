@@ -12,6 +12,7 @@ export interface AuthSlice extends AuthState {
         addServer: (args: ServerListItemWithCredential) => void;
         deleteServer: (id: string) => void;
         getServer: (id: string) => null | ServerListItemWithCredential;
+        logout: () => void;
         setCurrentServer: (server: null | ServerListItemWithCredential) => void;
         setMusicFolderId: (musicFolderId: string[] | undefined) => void;
         updateServer: (id: string, args: Partial<ServerListItemWithCredential>) => void;
@@ -47,6 +48,23 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
                         const server = get().serverList[id];
                         if (server) return server;
                         return null;
+                    },
+                    logout: () => {
+                        set((state) => {
+                            const currentServer = state.currentServer;
+                            if (!currentServer) {
+                                return;
+                            }
+
+                            const server = state.serverList[currentServer.id];
+                            if (server) {
+                                server.credential = '';
+                                server.ndCredential = undefined;
+                                server.savePassword = false;
+                            }
+
+                            state.currentServer = null;
+                        });
                     },
                     setCurrentServer: (server) => {
                         set((state) => {

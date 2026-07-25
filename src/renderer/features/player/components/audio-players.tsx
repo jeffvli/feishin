@@ -8,6 +8,7 @@ import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/ev
 import { DiscordRpcHook } from '/@/renderer/features/discord-rpc/use-discord-rpc';
 import { DlnaPlayer } from '/@/renderer/features/player/audio-player/dlna-player';
 import { MainPlayerListenerHook } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
+import { JukeboxPlayer } from '/@/renderer/features/player/audio-player/jukebox-player';
 import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
 import { SleepTimerHook } from '/@/renderer/features/player/components/sleep-timer-button';
@@ -42,11 +43,10 @@ import {
     usePlaybackType,
     useSettingsStoreActions,
 } from '/@/renderer/store';
-import { logFn } from '/@/renderer/utils/logger';
+import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerType } from '/@/shared/types/types';
-
 const CODEC_PROBES = [
     { codec: 'mp3', container: 'mp3', mime: 'audio/mpeg' },
 
@@ -103,7 +103,7 @@ function detectBrowserProfile() {
         }
     }
 
-    logFn.info('DIRECT_PLAY_PROFILES', { meta: DIRECT_PLAY_PROFILES });
+    logger.debug('DIRECT_PLAY_PROFILES', DIRECT_PLAY_PROFILES);
 
     return DIRECT_PLAY_PROFILES;
 }
@@ -170,6 +170,8 @@ export const AudioPlayers = () => {
     );
 };
 
+const mpvPlayerListener = isElectron() ? window.api.mpvPlayerListener : null;
+
 const AudioPlayersContent = ({
     audioContext,
     audioDeviceId,
@@ -190,6 +192,24 @@ const AudioPlayersContent = ({
     webAudio: boolean;
 }) => {
     const isRadioActive = useIsRadioActive();
+
+    useEffect(() => {
+        logger.info('Playback engine', { playbackType });
+    }, [playbackType]);
+
+    useEffect(() => {
+        if (!mpvPlayerListener) {
+            return;
+        }
+
+        mpvPlayerListener.rendererPlayerFallback((isFallback: boolean) => {
+            if (isFallback) {
+                logger.warn('Playback engine fell back to web');
+            } else {
+                logger.info('Playback engine using local (mpv)');
+            }
+        });
+    }, []);
 
     useEffect(() => {
         if (webAudio && 'AudioContext' in window) {
@@ -347,6 +367,7 @@ const AudioPlayersContent = ({
         <>
             {playbackType === PlayerType.WEB && <WebPlayer />}
             {playbackType === PlayerType.LOCAL && <MpvPlayer />}
+            {playbackType === PlayerType.JUKEBOX && <JukeboxPlayer />}
             {playbackType === PlayerType.DLNA && (
                 <DlnaErrorBoundary>
                     <DlnaPlayer />

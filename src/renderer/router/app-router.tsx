@@ -175,9 +175,22 @@ const VisualizerSettingsContextModal = (props: any) => (
     </Suspense>
 );
 
+const LazySongEditContextModal = lazy(() =>
+    import('/@/renderer/features/tag-editor/components/song-edit-context-modal').then((module) => ({
+        default: module.SongEditContextModal,
+    })),
+);
+
+const SongEditContextModal = (props: any) => (
+    <Suspense fallback={<Spinner container />}>
+        <LazySongEditContextModal {...props} />
+    </Suspense>
+);
+
 const appRouterModals = {
     addToPlaylist: AddToPlaylistContextModal,
     base: BaseContextModal,
+    editMetadata: SongEditContextModal,
     lyricsSettings: LyricsSettingsContextModal,
     saveAndReplace: SaveAndReplaceContextModal,
     settings: SettingsContextModal,
@@ -189,7 +202,7 @@ const appRouterModals = {
 
 export const AppRouter = () => {
     const router = (
-        <HashRouter>
+        <HashRouter unstable_useTransitions={false}>
             <ModalsProvider modals={appRouterModals}>
                 <RouterErrorBoundary>
                     <Routes>

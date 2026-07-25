@@ -11,6 +11,11 @@
         padding: 2rem 2rem 1rem;
     }
 
+    :global(.full-screen-player-queue-header) {
+        opacity: 0.2;
+        transition: opacity 0.2s ease;
+    }
+
     &:hover .controls-container {
         [data-variant='subtle'] {
             color: var(--theme-colors-foreground);
@@ -29,6 +34,10 @@
                 }
             }
         }
+    }
+
+    &:hover :global(.full-screen-player-queue-header) {
+        opacity: 1;
     }
 }
 

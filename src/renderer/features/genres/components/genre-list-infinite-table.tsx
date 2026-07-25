@@ -44,7 +44,7 @@ export const GenreListInfiniteTable = ({
 
     const listQueryFn = api.controller.getGenreList;
 
-    const { getItem, getItemIndex, itemCount, loadedItems, onRangeChanged } =
+    const { getItem, getItemIndex, getLoadedItems, itemCount, loadedItems, onRangeChanged } =
         useItemListInfiniteLoader({
             eventKey: ItemListKey.GENRE,
             itemsPerPage,
@@ -82,6 +82,7 @@ export const GenreListInfiniteTable = ({
             enableVerticalBorders={enableVerticalBorders}
             getItem={getItem}
             getItemIndex={getItemIndex}
+            getLoadedItems={getLoadedItems}
             initialTop={{
                 to: scrollOffset ?? 0,
                 type: 'offset',

@@ -1,6 +1,6 @@
 import { useIsFetching } from '@tanstack/react-query';
 import { t } from 'i18next';
-import { RefObject, useCallback } from 'react';
+import { MouseEvent, RefObject, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './play-queue-list-controls.module.css';
@@ -10,6 +10,7 @@ import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useRestoreQueue, useSaveQueue } from '/@/renderer/features/player/hooks/use-queue-restore';
+import { openCreatePrefilledPlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
 import {
     ListConfigMenu,
     SONG_DISPLAY_TYPES,
@@ -53,6 +54,7 @@ export const PlayQueueListControls = ({
             <Group gap="xs" style={{ flexShrink: 0 }} wrap="nowrap">
                 <QueueRestoreActions />
                 <QueuePlaybackIcons tableRef={tableRef} />
+                <QueuePlaylistIcons />
             </Group>
             <Divider h="60%" orientation="vertical" style={{ alignSelf: 'center' }} />
             <Box style={{ display: 'flex', flex: 1, minWidth: 0 }}>
@@ -81,6 +83,29 @@ export const PlayQueueListControls = ({
                 />
             </Box>
         </Group>
+    );
+};
+
+const QueuePlaylistIcons = () => {
+    const server = useCurrentServer();
+    const player = usePlayer();
+
+    const handleCreatePlaylistFromQueue = (e: MouseEvent<HTMLButtonElement>) => {
+        const queueSongs = player.getQueue();
+
+        openCreatePrefilledPlaylistModal(server, queueSongs, e);
+    };
+
+    return (
+        <>
+            <ActionIcon
+                icon="playlistAdd"
+                iconProps={{ size: 'lg' }}
+                onClick={handleCreatePlaylistFromQueue}
+                tooltip={{ label: t('action.createPlaylistFromQueue') }}
+                variant="subtle"
+            />
+        </>
     );
 };
 

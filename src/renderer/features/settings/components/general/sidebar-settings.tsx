@@ -312,6 +312,25 @@ export const SidebarSettings = memo(() => {
         {
             control: (
                 <Switch
+                    aria-label="Show play queue in sidebar"
+                    defaultChecked={settings.showQueueInSidebar}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                showQueueInSidebar: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.showQueueInSidebar', {
+                context: 'description',
+            }),
+            title: t('setting.showQueueInSidebar'),
+        },
+        {
+            control: (
+                <Switch
                     aria-label="Show lyrics in attached play queue"
                     defaultChecked={settings.showLyricsInSidebar}
                     onChange={(e) => {

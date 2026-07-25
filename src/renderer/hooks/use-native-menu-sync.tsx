@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import packageJson from '../../../package.json';
 
+import { openCreatePlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { ServerList } from '/@/renderer/features/servers/components/server-list';
 import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
 import { openReleaseNotesModal } from '/@/renderer/release-notes-modal';
@@ -12,6 +13,7 @@ import {
     useAppStore,
     useAppStoreActions,
     useCommandPalette,
+    useCurrentServer,
     usePlayerHydrated,
     usePlayerRepeat,
     usePlayerShuffle,
@@ -27,6 +29,7 @@ export const useNativeMenuSync = () => {
     const sidebar = useAppStore((state) => state.sidebar);
     const { setPrivateMode, setSideBar } = useAppStoreActions();
     const { open: openCommandPalette } = useCommandPalette();
+    const server = useCurrentServer();
     const playerHydrated = usePlayerHydrated();
     const playerRepeat = usePlayerRepeat();
     const playerShuffle = usePlayerShuffle();
@@ -59,6 +62,20 @@ export const useNativeMenuSync = () => {
             ipc?.removeAllListeners('renderer-open-command-palette');
         };
     }, [openCommandPalette]);
+
+    useEffect(() => {
+        if (!isElectron()) {
+            return undefined;
+        }
+
+        window.api.utils.rendererOpenCreatePlaylist(() => {
+            openCreatePlaylistModal(server);
+        });
+
+        return () => {
+            ipc?.removeAllListeners('renderer-open-create-playlist');
+        };
+    }, [server]);
 
     useEffect(() => {
         if (!isElectron()) {

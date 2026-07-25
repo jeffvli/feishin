@@ -211,11 +211,11 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 let songsToAdd: string[] = allSongIds;
 
                 if (skipDuplicates) {
-                    const queryKey = queryKeys.playlists.songList(serverId, playlistId);
+                    const queryKey = queryKeys.playlists.songListIds(serverId, playlistId);
 
                     const playlistSongsRes = await queryClient.fetchQuery({
                         queryFn: ({ signal }) => {
-                            return api.controller.getPlaylistSongList({
+                            return api.controller.getPlaylistSongIds({
                                 apiClientProps: {
                                     serverId,
                                     signal,
@@ -228,7 +228,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                         queryKey,
                     });
 
-                    const playlistSongIds = playlistSongsRes?.items?.map((song) => song.id);
+                    const playlistSongIds = playlistSongsRes?.items;
                     const uniqueSongIds: string[] = [];
 
                     for (const songId of allSongIds) {

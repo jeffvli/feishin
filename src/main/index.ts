@@ -21,7 +21,6 @@ import {
     Tray,
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
-import log from 'electron-log/main';
 import { AppImageUpdater, autoUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
 import { access, constants } from 'fs';
 import path, { join } from 'path';
@@ -32,9 +31,10 @@ import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-
 import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
 import { canHandleVisualizerDisplayMedia } from './features/core/visualizer';
+import log, { autoUpdaterLogInterface } from './logger';
 import MenuBuilder, { MenuPlaybackState } from './menu';
 import './features';
-import { autoUpdaterLogInterface, createLog, hotkeyToElectronAccelerator } from './utils';
+import { hotkeyToElectronAccelerator } from './utils';
 
 import { disableAutoUpdates, isLinux, isMacOS, isWindows } from '/@/main/env';
 import { PlayerRepeat, PlayerStatus, PlayerType, TitleTheme } from '/@/shared/types/types';
@@ -62,43 +62,94 @@ type UpdaterInstance = AppImageUpdater | MacUpdater | NsisUpdater | typeof autoU
 class AppUpdater {
     constructor() {
         const effectiveChannel = store.get('release_channel') as string;
-        console.log('Effective update channel:', effectiveChannel);
+        log.info('Effective update channel:', effectiveChannel);
         if (effectiveChannel === 'alpha') {
             checkAllChannelsAndGetBest().then(({ result, updater: updaterInstance }) => {
+                attachUpdaterMilestoneLogs(updaterInstance);
+
+                if (!result?.isUpdateAvailable) {
+                    log.info('Updater check complete', { available: false });
+                    return;
+                }
+
+                log.info('Updater check complete', {
+                    available: true,
+                    version: result.updateInfo.version,
+                });
+
                 updaterInstance.autoInstallOnAppQuit = true;
                 updaterInstance.autoRunAppAfterInstall = true;
                 if (isMacOS()) {
-                    if (result?.isUpdateAvailable) {
-                        getMainWindow()?.webContents.send(
-                            'update-available',
-                            result.updateInfo.version,
-                        );
-                    }
+                    getMainWindow()?.webContents.send(
+                        'update-available',
+                        result.updateInfo.version,
+                    );
                 } else {
+                    log.info('Updater download starting', { version: result.updateInfo.version });
+                    updaterInstance.autoDownload = true;
                     updaterInstance.checkForUpdatesAndNotify();
                 }
             });
             return;
         }
 
-        configureAndGetUpdater();
+        const updater = configureAndGetUpdater();
+        attachUpdaterMilestoneLogs(updater);
+
         if (isMacOS()) {
             autoUpdater.autoDownload = false;
             autoUpdater
                 .checkForUpdates()
                 .then((result) => {
                     if (result?.isUpdateAvailable) {
+                        log.info('Updater check complete', {
+                            available: true,
+                            version: result.updateInfo.version,
+                        });
                         getMainWindow()?.webContents.send(
                             'update-available',
                             result.updateInfo.version,
                         );
+                    } else {
+                        log.info('Updater check complete', { available: false });
                     }
                 })
-                .catch((err) => console.error('Check for updates failed', err));
+                .catch((err) => log.error('Check for updates failed', err));
         } else {
             autoUpdater.checkForUpdatesAndNotify();
         }
     }
+}
+
+function attachUpdaterMilestoneLogs(updater: UpdaterInstance): void {
+    let downloadStarted = false;
+
+    updater.on('checking-for-update', () => {
+        log.info('Updater checking for update');
+    });
+
+    updater.on('update-available', (info) => {
+        log.info('Updater update available', { version: info.version });
+    });
+
+    updater.on('update-not-available', (info) => {
+        log.info('Updater update not available', { version: info.version });
+    });
+
+    updater.on('download-progress', () => {
+        if (!downloadStarted) {
+            downloadStarted = true;
+            log.info('Updater download starting');
+        }
+    });
+
+    updater.on('update-downloaded', (info) => {
+        log.info('Updater download complete', { version: info.version });
+    });
+
+    updater.on('error', (error) => {
+        log.error('Updater error', error);
+    });
 }
 
 // When release channel is alpha, check alpha and latest for updates and return
@@ -115,15 +166,10 @@ async function checkAllChannelsAndGetBest(): Promise<{
         updater: UpdaterInstance;
     }> = [];
 
-    const alphaUpdater = createAlphaUpdaterInstance();
-    alphaUpdater.logger = autoUpdaterLogInterface;
-    alphaUpdater.channel = ALPHA_UPDATER_CONFIG.channel;
-    alphaUpdater.allowPrerelease = true;
-    alphaUpdater.disableDifferentialDownload = true;
-    alphaUpdater.allowDowngrade = true;
+    const alphaUpdater = createAlphaUpdaterInstance({ probeOnly: true });
 
     try {
-        console.log('Checking for updates on alpha channel');
+        log.info('Checking for updates on alpha channel');
         const alphaResult = await alphaUpdater.checkForUpdates();
         if (
             alphaResult?.updateInfo?.version &&
@@ -138,17 +184,16 @@ async function checkAllChannelsAndGetBest(): Promise<{
     }
 
     try {
-        autoUpdater.setFeedURL(GITHUB_UPDATER_CONFIG);
-        configureAutoUpdaterForChannel('latest');
-        console.log('Checking for updates on latest channel (GitHub)');
-        const latestResult = await autoUpdater.checkForUpdates();
+        const latestUpdater = createGithubUpdaterInstance('latest', { probeOnly: true });
+        log.info('Checking for updates on latest channel (GitHub)');
+        const latestResult = await latestUpdater.checkForUpdates();
         if (
             latestResult?.updateInfo?.version &&
             latestResult.isUpdateAvailable &&
             semver.valid(latestResult.updateInfo.version) &&
             semver.gt(latestResult.updateInfo.version, currentVersion)
         ) {
-            candidates.push({ channel: 'latest', result: latestResult, updater: autoUpdater });
+            candidates.push({ channel: 'latest', result: latestResult, updater: latestUpdater });
         }
     } catch (e) {
         log.warn('Latest channel check failed', e);
@@ -164,6 +209,7 @@ async function checkAllChannelsAndGetBest(): Promise<{
 
     if (best.channel === 'latest') {
         configureAutoUpdaterForChannel('latest');
+        return { result: best.result, updater: autoUpdater };
     }
 
     return { result: best.result, updater: best.updater };
@@ -175,13 +221,13 @@ function configureAndGetUpdater(): UpdaterInstance {
     let releaseChannel = store.get('release_channel');
     const isNotConfigured = !releaseChannel;
 
-    console.log('Release channel:', releaseChannel);
-    console.log('Is beta version:', isBetaVersion);
-    console.log('Is alpha version:', isAlphaVersion);
-    console.log('Is not configured:', isNotConfigured);
+    log.info('Release channel:', releaseChannel);
+    log.info('Is beta version:', isBetaVersion);
+    log.info('Is alpha version:', isAlphaVersion);
+    log.info('Is not configured:', isNotConfigured);
 
     if (isNotConfigured) {
-        console.log('Release channel not configured, setting default channel');
+        log.info('Release channel not configured, setting default channel');
         const defaultChannel = isAlphaVersion ? 'alpha' : isBetaVersion ? 'beta' : 'latest';
         store.set('release_channel', defaultChannel);
         releaseChannel = defaultChannel;
@@ -190,19 +236,9 @@ function configureAndGetUpdater(): UpdaterInstance {
     const effectiveChannel = store.get('release_channel') as string;
 
     if (effectiveChannel === 'alpha') {
-        const updater = createAlphaUpdaterInstance();
-        log.transports.file.level = 'info';
-        updater.logger = autoUpdaterLogInterface;
-        updater.channel = ALPHA_UPDATER_CONFIG.channel;
-        updater.allowPrerelease = true;
-        updater.disableDifferentialDownload = true;
-        updater.allowDowngrade = true;
-        updater.autoInstallOnAppQuit = true;
-        updater.autoRunAppAfterInstall = true;
-        return updater;
+        return createAlphaUpdaterInstance();
     }
 
-    log.transports.file.level = 'info';
     autoUpdater.logger = autoUpdaterLogInterface;
     autoUpdater.autoInstallOnAppQuit = true;
     autoUpdater.autoRunAppAfterInstall = true;
@@ -214,6 +250,7 @@ function configureAndGetUpdater(): UpdaterInstance {
         autoUpdater.disableDifferentialDownload = true;
     } else {
         autoUpdater.channel = 'latest';
+        autoUpdater.allowDowngrade = false;
         autoUpdater.allowPrerelease = false;
     }
 
@@ -225,7 +262,6 @@ function configureAndGetUpdater(): UpdaterInstance {
  * Used when checking multiple channels or when the winning channel is beta/latest.
  */
 function configureAutoUpdaterForChannel(channel: 'beta' | 'latest'): void {
-    log.transports.file.level = 'info';
     autoUpdater.logger = autoUpdaterLogInterface;
     autoUpdater.autoInstallOnAppQuit = true;
     autoUpdater.autoRunAppAfterInstall = true;
@@ -236,20 +272,68 @@ function configureAutoUpdaterForChannel(channel: 'beta' | 'latest'): void {
         autoUpdater.disableDifferentialDownload = true;
     } else {
         autoUpdater.channel = 'latest';
+        autoUpdater.allowDowngrade = false;
         autoUpdater.allowPrerelease = false;
     }
 }
 
-function createAlphaUpdaterInstance(): AppImageUpdater | MacUpdater | NsisUpdater {
+function createAlphaUpdaterInstance(
+    options: { probeOnly?: boolean } = {},
+): AppImageUpdater | MacUpdater | NsisUpdater {
+    const probeOnly = options.probeOnly ?? false;
+    let updater: AppImageUpdater | MacUpdater | NsisUpdater;
+
     if (isMacOS()) {
-        return new MacUpdater(ALPHA_UPDATER_CONFIG);
+        updater = new MacUpdater(ALPHA_UPDATER_CONFIG);
+    } else if (isLinux()) {
+        updater = new AppImageUpdater(ALPHA_UPDATER_CONFIG);
+    } else {
+        updater = new NsisUpdater(ALPHA_UPDATER_CONFIG);
     }
 
-    if (isLinux()) {
-        return new AppImageUpdater(ALPHA_UPDATER_CONFIG);
+    updater.logger = autoUpdaterLogInterface;
+    updater.channel = ALPHA_UPDATER_CONFIG.channel;
+    updater.allowPrerelease = true;
+    updater.disableDifferentialDownload = true;
+    updater.allowDowngrade = true;
+    updater.autoDownload = !probeOnly;
+    updater.autoInstallOnAppQuit = true;
+    updater.autoRunAppAfterInstall = true;
+
+    return updater;
+}
+
+function createGithubUpdaterInstance(
+    channel: 'beta' | 'latest',
+    options: { probeOnly?: boolean } = {},
+): AppImageUpdater | MacUpdater | NsisUpdater {
+    const probeOnly = options.probeOnly ?? false;
+    let updater: AppImageUpdater | MacUpdater | NsisUpdater;
+
+    if (isMacOS()) {
+        updater = new MacUpdater(GITHUB_UPDATER_CONFIG);
+    } else if (isLinux()) {
+        updater = new AppImageUpdater(GITHUB_UPDATER_CONFIG);
+    } else {
+        updater = new NsisUpdater(GITHUB_UPDATER_CONFIG);
     }
 
-    return new NsisUpdater(ALPHA_UPDATER_CONFIG);
+    updater.logger = autoUpdaterLogInterface;
+    updater.autoDownload = !probeOnly;
+    updater.autoInstallOnAppQuit = true;
+    updater.autoRunAppAfterInstall = true;
+    updater.channel = channel;
+
+    if (channel === 'beta') {
+        updater.allowDowngrade = true;
+        updater.allowPrerelease = true;
+        updater.disableDifferentialDownload = true;
+    } else {
+        updater.allowDowngrade = false;
+        updater.allowPrerelease = false;
+    }
+
+    return updater;
 }
 
 protocol.registerSchemesAsPrivileged([
@@ -257,7 +341,7 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 process.on('uncaughtException', (error: any) => {
-    console.error('Error in main process', error);
+    log.error('Error in main process', error);
 });
 
 if (store.get('ignore_ssl')) {
@@ -281,6 +365,13 @@ let currentPrivateMode = false;
 let currentRepeatMode: PlayerRepeat = PlayerRepeat.NONE;
 let currentSidebarCollapsed = false;
 let currentShuffleEnabled = false;
+
+app.on('before-quit', () => {
+    if (isMacOS()) {
+        forceQuit = true;
+    }
+    log.info('App quitting', { reason: exitFromTray ? 'tray' : 'before-quit' });
+});
 let playbackMenuAccelerators: MenuPlaybackState['accelerators'] = {};
 let inputFocused = false;
 
@@ -289,7 +380,7 @@ ipcMain.on('input-focus-state', (_event, focused: boolean) => {
     if (inputFocused === next) return;
     inputFocused = next;
     if (isMacOS()) {
-        rebuildMainMenu();
+        updateMainMenu();
     }
 });
 
@@ -318,10 +409,7 @@ const installExtensions = async () => {
                 { forceDownload },
             )
             .then((installedExtensions) => {
-                createLog({
-                    message: `Installed extension: ${installedExtensions}`,
-                    type: 'info',
-                });
+                log.info(`Installed extension: ${installedExtensions}`);
             })
             .catch(() => {
                 // Ignore
@@ -348,21 +436,30 @@ export const getMainWindow = () => {
     return mainWindow;
 };
 
+const getMainMenuState = (): MenuPlaybackState => ({
+    accelerators: playbackMenuAccelerators,
+    inputFocused,
+    playbackStatus: currentPlaybackStatus,
+    privateMode: currentPrivateMode,
+    repeatMode: currentRepeatMode,
+    shuffleEnabled: currentShuffleEnabled,
+    sidebarCollapsed: currentSidebarCollapsed,
+});
+
 const rebuildMainMenu = () => {
     if (!menuBuilder || !mainWindow) return;
 
-    menuBuilder.buildMenu({
-        accelerators: inputFocused ? {} : playbackMenuAccelerators,
-        playbackStatus: currentPlaybackStatus,
-        privateMode: currentPrivateMode,
-        repeatMode: currentRepeatMode,
-        shuffleEnabled: currentShuffleEnabled,
-        sidebarCollapsed: currentSidebarCollapsed,
-    });
+    menuBuilder.buildMenu(getMainMenuState());
 
     if (process.platform !== 'darwin') {
         Menu.setApplicationMenu(null);
     }
+};
+
+const updateMainMenu = () => {
+    if (!menuBuilder || !mainWindow) return;
+
+    menuBuilder.updateMenu(getMainMenuState());
 };
 
 export const sendToastToRenderer = ({
@@ -494,7 +591,7 @@ const validateUrl = (url: string): boolean => {
 
 async function createWindow(first = true): Promise<void> {
     if (isDevelopment) {
-        await installExtensions().catch(console.log);
+        await installExtensions().catch((error) => log.error(error));
     }
 
     const nativeFrame = store.get('window_window_bar_style', 'linux') === 'linux';
@@ -587,6 +684,7 @@ async function createWindow(first = true): Promise<void> {
     });
 
     ipcMain.on('window-quit', () => {
+        log.info('App quitting', { reason: 'window-quit' });
         shutdownServer();
         mainWindow?.close();
         app.exit();
@@ -595,54 +693,6 @@ async function createWindow(first = true): Promise<void> {
     ipcMain.handle('window-clear-cache', async () => {
         return mainWindow?.webContents.session.clearCache();
     });
-
-    ipcMain.handle(
-        'app-check-for-updates',
-        async (): Promise<{ updateAvailable: boolean; version?: string }> => {
-            if (disableAutoUpdates()) {
-                console.log('Auto updates are disabled');
-                return { updateAvailable: false };
-            }
-
-            try {
-                console.log('Checking for updates');
-                const effectiveChannel = store.get('release_channel') as string;
-                let result: null | UpdateCheckResult;
-                let updater: UpdaterInstance;
-
-                if (effectiveChannel === 'alpha') {
-                    const best = await checkAllChannelsAndGetBest();
-                    result = best.result;
-                    updater = best.updater;
-                } else {
-                    updater = configureAndGetUpdater();
-                    result = await updater.checkForUpdates();
-                }
-
-                const updateAvailable = result?.isUpdateAvailable ?? false;
-                console.log('Update available:', updateAvailable);
-                if (updateAvailable && store.get('disable_auto_updates') !== true) {
-                    if (isMacOS()) {
-                        getMainWindow()?.webContents.send(
-                            'update-available',
-                            result?.updateInfo?.version,
-                        );
-                    } else {
-                        console.log('Downloading update');
-                        updater.downloadUpdate();
-                    }
-                }
-
-                return {
-                    updateAvailable,
-                    version: result?.updateInfo?.version,
-                };
-            } catch {
-                console.log('Error checking for updates');
-                return { updateAvailable: false };
-            }
-        },
-    );
 
     ipcMain.on('app-restart', () => {
         // Fix for .AppImage
@@ -700,9 +750,23 @@ async function createWindow(first = true): Promise<void> {
             mainWindow.show();
             createWinThumbarButtons();
         }
+
+        log.info('Main window created', { startMinimized: startWindowMinimized && first });
+    });
+
+    mainWindow.webContents.on('render-process-gone', (_event, details) => {
+        log.error('Renderer process gone', {
+            exitCode: details.exitCode,
+            reason: details.reason,
+        });
+    });
+
+    mainWindow.webContents.on('unresponsive', () => {
+        log.error('Renderer process unresponsive');
     });
 
     mainWindow.on('closed', () => {
+        log.info('Main window closed');
         ipcMain.removeHandler('window-clear-cache');
         ipcMain.removeHandler('app-check-for-updates');
         mainWindow = null;
@@ -715,10 +779,12 @@ async function createWindow(first = true): Promise<void> {
 
         if (!exitFromTray && store.get('window_exit_to_tray')) {
             event.preventDefault();
+            log.info('Main window hidden to tray');
             mainWindow?.hide();
         }
 
         if (forceQuit) {
+            log.info('App quitting', { reason: 'forceQuit' });
             app.exit();
         }
     });
@@ -726,18 +792,13 @@ async function createWindow(first = true): Promise<void> {
     (mainWindow as any).on('minimize', (event: any) => {
         if (store.get('window_minimize_to_tray') === true) {
             event.preventDefault();
+            log.info('Main window minimized to tray');
             mainWindow?.hide();
         }
     });
 
     if (isWindows()) {
         app.setAppUserModelId('org.jeffvli.feishin');
-    }
-
-    if (isMacOS()) {
-        app.on('before-quit', () => {
-            forceQuit = true;
-        });
     }
 
     menuBuilder = new MenuBuilder(mainWindow);
@@ -836,10 +897,12 @@ enum BindingActions {
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
     NEXT = 'next',
+    NEXT_ALBUM = 'nextAlbum',
     PAUSE = 'pause',
     PLAY = 'play',
     PLAY_PAUSE = 'playPause',
     PREVIOUS = 'previous',
+    PREVIOUS_ALBUM = 'previousAlbum',
     SHUFFLE = 'toggleShuffle',
     SKIP_BACKWARD = 'skipBackward',
     SKIP_FORWARD = 'skipForward',
@@ -867,11 +930,15 @@ const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
     [BindingActions.LOCAL_SEARCH]: () => {},
     [BindingActions.MUTE]: () => getMainWindow()?.webContents.send('renderer-player-volume-mute'),
     [BindingActions.NEXT]: () => getMainWindow()?.webContents.send('renderer-player-next'),
+    [BindingActions.NEXT_ALBUM]: () =>
+        getMainWindow()?.webContents.send('renderer-player-next-album'),
     [BindingActions.PAUSE]: () => getMainWindow()?.webContents.send('renderer-player-pause'),
     [BindingActions.PLAY]: () => getMainWindow()?.webContents.send('renderer-player-play'),
     [BindingActions.PLAY_PAUSE]: () =>
         getMainWindow()?.webContents.send('renderer-player-play-pause'),
     [BindingActions.PREVIOUS]: () => getMainWindow()?.webContents.send('renderer-player-previous'),
+    [BindingActions.PREVIOUS_ALBUM]: () =>
+        getMainWindow()?.webContents.send('renderer-player-previous-album'),
     [BindingActions.SHUFFLE]: () =>
         getMainWindow()?.webContents.send('renderer-player-toggle-shuffle'),
     [BindingActions.SKIP_BACKWARD]: () =>
@@ -916,11 +983,11 @@ ipcMain.on(
         }
 
         playbackMenuAccelerators = {
+            globalSearch: getMenuAccelerator(data, BindingActions.GLOBAL_SEARCH),
             next: getMenuAccelerator(data, BindingActions.NEXT),
-            playPause:
-                getMenuAccelerator(data, BindingActions.PLAY_PAUSE) ||
-                getMenuAccelerator(data, BindingActions.PLAY) ||
-                getMenuAccelerator(data, BindingActions.PAUSE),
+            pause: getMenuAccelerator(data, BindingActions.PAUSE),
+            play: getMenuAccelerator(data, BindingActions.PLAY),
+            playPause: getMenuAccelerator(data, BindingActions.PLAY_PAUSE),
             previous: getMenuAccelerator(data, BindingActions.PREVIOUS),
             repeat: getMenuAccelerator(data, BindingActions.TOGGLE_REPEAT),
             seekBackward: getMenuAccelerator(data, BindingActions.SKIP_BACKWARD),
@@ -940,19 +1007,6 @@ ipcMain.on(
         if (globalMediaKeysEnabled) {
             enableMediaKeys(mainWindow);
         }
-    },
-);
-
-ipcMain.on(
-    'logger',
-    (
-        _event,
-        data: {
-            message: string;
-            type: 'debug' | 'error' | 'info' | 'success' | 'verbose' | 'warning';
-        },
-    ) => {
-        createLog(data);
     },
 );
 
@@ -1038,6 +1092,15 @@ if (!singleInstance) {
 
     app.whenReady()
         .then(() => {
+            log.info('App ready', {
+                arch: process.arch,
+                electron: process.versions.electron,
+                ignoreCors: !!store.get('ignore_cors'),
+                ignoreSsl: !!store.get('ignore_ssl'),
+                platform: process.platform,
+                version: packageJson.version,
+            });
+
             protocol.handle('feishin', async () => {
                 const filePath = store.get('local_font_path');
                 if (typeof filePath !== 'string') {
@@ -1108,7 +1171,7 @@ if (!singleInstance) {
                 }
             });
         })
-        .catch(console.log);
+        .catch((error) => log.error(error));
 }
 
 // Register 'open-item' handler globally, ensuring it is only registered once
@@ -1141,7 +1204,7 @@ ipcMain.on('update-playback', (_event, status: PlayerStatus) => {
 
     if (!isMacOS()) return;
 
-    rebuildMainMenu();
+    updateMainMenu();
 });
 
 ipcMain.on('update-repeat', (_event, repeat: PlayerRepeat) => {
@@ -1149,7 +1212,7 @@ ipcMain.on('update-repeat', (_event, repeat: PlayerRepeat) => {
 
     if (!isMacOS()) return;
 
-    rebuildMainMenu();
+    updateMainMenu();
 });
 
 ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
@@ -1157,7 +1220,7 @@ ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
 
     if (!isMacOS()) return;
 
-    rebuildMainMenu();
+    updateMainMenu();
 });
 
 ipcMain.on('update-private-mode', (_event, privateMode: boolean) => {
@@ -1165,7 +1228,7 @@ ipcMain.on('update-private-mode', (_event, privateMode: boolean) => {
 
     if (!isMacOS()) return;
 
-    rebuildMainMenu();
+    updateMainMenu();
 });
 
 ipcMain.on('update-sidebar-collapsed', (_event, collapsedSidebar: boolean) => {
@@ -1173,5 +1236,5 @@ ipcMain.on('update-sidebar-collapsed', (_event, collapsedSidebar: boolean) => {
 
     if (!isMacOS()) return;
 
-    rebuildMainMenu();
+    updateMainMenu();
 });
