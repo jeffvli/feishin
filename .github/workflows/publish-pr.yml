@@ -27,6 +27,8 @@ jobs:
         needs: wait-for-lint
         if: always() && (needs.wait-for-lint.result == 'success' || needs.wait-for-lint.result == 'skipped')
         runs-on: ${{ matrix.os }}
+        env:
+            NODE_OPTIONS: --max-old-space-size=4096
 
         strategy:
             matrix:
