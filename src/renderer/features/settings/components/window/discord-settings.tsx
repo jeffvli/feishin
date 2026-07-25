@@ -27,7 +27,7 @@ export const DiscordSettings = memo(() => {
     const getDefaultImageProxyServerLink = (serverType: DiscordServerType) => {
         switch (serverType) {
             case DiscordServerType.LITTERBOX:
-                return 'https://litterbox.catbox.moe/';
+                return 'https://litterbox.catbox.moe/resources/internals/api.php';
             case DiscordServerType.UGUU:
                 return 'https://uguu.se/upload';
         }
