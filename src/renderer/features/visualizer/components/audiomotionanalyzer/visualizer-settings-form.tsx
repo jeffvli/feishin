@@ -2116,7 +2116,6 @@ const ButterchurnGeneralSettings = () => {
                     <VisualizerSelect
                         data={presetOptions}
                         label={t('visualizer.selectPreset')}
-                        limit={100}
                         onChange={(value) => {
                             updateProperty('currentPreset', value || undefined);
                         }}
@@ -2189,7 +2188,6 @@ const ButterChurnCycleSettings = () => {
                         visualizer.butterchurn.includeAllPresets
                     }
                     label={t('visualizer.selectedPresets')}
-                    limit={100}
                     onChange={(values) => updateProperty('selectedPresets', values)}
                     searchable
                     value={visualizer.butterchurn.selectedPresets}
@@ -2198,7 +2196,6 @@ const ButterChurnCycleSettings = () => {
                     data={presetOptions}
                     disabled={!visualizer.butterchurn.cyclePresets}
                     label={t('visualizer.ignoredPresets')}
-                    limit={100}
                     onChange={(values) => updateProperty('ignoredPresets', values)}
                     searchable
                     value={visualizer.butterchurn.ignoredPresets}

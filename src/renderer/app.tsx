@@ -119,6 +119,7 @@ const AppEffects = () => (
         <GlobalShortcutsEffect />
         <LanguageEffect />
         <NativeMenuSyncEffect />
+        <FullscreenToggleEffect />
         <InputFocusEffect />
     </>
 );
@@ -259,6 +260,11 @@ const LanguageEffect = () => {
 
 const NativeMenuSyncEffect = () => {
     useNativeMenuSync();
+
+    return null;
+};
+
+const FullscreenToggleEffect = () => {
     useFullscreenToggle();
 
     return null;
