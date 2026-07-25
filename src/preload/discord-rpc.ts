@@ -2,6 +2,8 @@ import type { SetActivity } from '@xhayper/discord-rpc';
 
 import { ipcRenderer } from 'electron';
 
+import { DiscordImageProxyConfig, DiscordImageProxyServerType } from '/@/shared/types/discord-rpc';
+
 const initialize = (clientId: string) => {
     const client = ipcRenderer.invoke('discord-rpc-initialize', clientId);
     return client;
@@ -18,14 +20,16 @@ const clearActivity = () => {
 
 const postImageProxyRequest = (
     imageProxyServerLink: string,
-    serverType: string, // Values of DiscordServerType enum
+    serverType: DiscordImageProxyServerType,
     arrayBuffer: ArrayBuffer,
+    config: DiscordImageProxyConfig,
 ) => {
     const url = ipcRenderer.invoke(
         'discord-rpc-post-image-proxy-request',
         imageProxyServerLink,
         serverType,
         arrayBuffer,
+        config,
     );
     return url;
 };

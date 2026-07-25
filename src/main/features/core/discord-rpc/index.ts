@@ -65,7 +65,7 @@ const validateHttpUrl = (link: string): null | URL => {
     const trimmedLink = link.trim();
 
     if (!trimmedLink) {
-        console.error('Image proxy request failed: missing URL');
+        log.error('Image proxy request failed: missing URL');
         return null;
     }
 
@@ -74,12 +74,12 @@ const validateHttpUrl = (link: string): null | URL => {
     try {
         url = new URL(trimmedLink);
     } catch {
-        console.error('Image proxy request failed: invalid URL:', trimmedLink);
+        log.error('Image proxy request failed: invalid URL:', { trimmedLink });
         return null;
     }
 
     if (!['http:', 'https:'].includes(url.protocol)) {
-        console.error('Image proxy request failed: invalid protocol:', url.protocol);
+        log.error('Image proxy request failed: invalid protocol:', { protocol: url.protocol });
         return null;
     }
 
@@ -125,7 +125,7 @@ const postMultipartRequest = async (url: URL, formData: FormData): Promise<null 
     });
 
     if (!response.ok) {
-        console.error('Image proxy upload failed:', response.status);
+        log.error('Image proxy upload failed:', { status: response.status });
         return null;
     }
 
@@ -140,8 +140,11 @@ class LitterboxUploader implements ImageProxyHandler<LitterboxConfig> {
     ): Promise<null | string> {
         const formData = createFileFormData('fileToUpload', arrayBuffer);
 
-        // Litterbox requires additional fields
         formData.append('reqtype', 'fileupload');
+        if (!config.time) {
+            log.error('Litterbox config missing time parameter', { config });
+            return null;
+        }
         formData.append('time', config.time);
 
         const response = await postMultipartRequest(url, formData);
@@ -188,32 +191,30 @@ ipcMain.handle('discord-rpc-is-connected', () => {
 
 ipcMain.handle(
     'discord-rpc-post-image-proxy-request',
-    (_event, imageProxyServerLink, servertype, arrayBuffer) => {
+    (_event, imageProxyServerLink, servertype, arrayBuffer, config) => {
         if (!imageProxyServerLink || !arrayBuffer) {
-            console.error('Image proxy request failed: missing parameters');
+            log.error('Image proxy request failed: missing parameters');
             return null;
         }
         const url = validateHttpUrl(imageProxyServerLink);
         if (!url) {
             return null;
         }
+        let uploader: ImageProxyHandler<ImageProxyConfig>;
         switch (servertype) {
-            // TODO: pass config instead of defining here, should be user-defined
             case 'litterbox': {
-                const config: LitterboxConfig = {
-                    time: '1h',
-                };
-                const uploader = new LitterboxUploader();
-                return uploader.upload(url, config, arrayBuffer);
+                uploader = new LitterboxUploader();
+                break;
             }
             case 'uguu': {
-                const uploader = new UguuUploader();
-                return uploader.upload(url, {}, arrayBuffer);
+                uploader = new UguuUploader();
+                break;
             }
             default:
-                console.error('Image proxy request failed: unknown server type', servertype);
+                log.error('Image proxy request failed: unknown server type', { servertype });
                 return null;
         }
+        return uploader.upload(url, config, arrayBuffer);
     },
 );
 

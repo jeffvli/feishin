@@ -1,3 +1,7 @@
+import type {
+    DiscordImageProxyConfig,
+    LitterboxImageProxyConfig,
+} from '/@/shared/types/discord-rpc';
 import type { SetActivity } from '@xhayper/discord-rpc';
 
 import isElectron from 'is-electron';
@@ -292,10 +296,37 @@ export const useDiscordRpc = () => {
                             // Convert blob to ArrayBuffer to enable IPC communication
                             const arrayBuffer = await imageBlob.arrayBuffer();
 
+                            let config: DiscordImageProxyConfig;
+                            switch (discordSettings.serverType) {
+                                case DiscordServerType.LITTERBOX:
+                                    if (
+                                        !['1h', '12h', '24h', '72h'].includes(
+                                            discordSettings.litterboxTime,
+                                        )
+                                    ) {
+                                        config = {};
+                                        break;
+                                    }
+                                    config = {
+                                        time: discordSettings.litterboxTime as LitterboxImageProxyConfig['time'],
+                                    };
+                                    break;
+                                case DiscordServerType.UGUU: {
+                                    config = {};
+                                    break;
+                                }
+                                default: {
+                                    const _exhaustive: never = discordSettings.serverType;
+                                    logger.error(`Unhandled server type: ${_exhaustive}`);
+                                    config = {};
+                                    break;
+                                }
+                            }
                             const globalImageUrl = await discordRpc?.postImageProxyRequest(
                                 discordSettings.imageProxyServerLink,
                                 discordSettings.serverType,
                                 arrayBuffer,
+                                config,
                             );
 
                             if (!globalImageUrl) {
@@ -397,6 +428,7 @@ export const useDiscordRpc = () => {
             discordSettings.clientId,
             discordSettings.serverType,
             discordSettings.imageProxyServerLink,
+            discordSettings.litterboxTime,
             currentSong?._uniqueId,
             lastfmApiKey,
             radioMetadata?.title,
