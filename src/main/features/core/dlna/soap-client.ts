@@ -1,13 +1,10 @@
 import { net } from 'electron';
 
-import { createLog } from '../../../utils';
+import log from '/@/main/logger';
 
 const playerLog = (action: string, err?: unknown) => {
     const message = `[Player] ${action}`;
-    createLog({ message, type: err ? 'error' : 'info' });
-    if (err) {
-        console.error(message, err);
-    }
+    log.info(message, err);
 };
 
 export interface DlnaDevice {

@@ -587,7 +587,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 return;
             }
             sameUriLoopQueuedRef.current = false;
-            mediaPrevious();
+            mediaPrevious(false);
         };
         dlnaPlayerListener.rendererDlnaPrevTrack(handler);
         return () => {

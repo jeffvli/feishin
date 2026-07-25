@@ -379,6 +379,7 @@ const GroupMemberVolumeRow = ({
     muted,
     onLongPress,
     onMuteToggle,
+    volumeMax,
     volumeWheelStep,
     volumeWidth,
 }: {
@@ -389,6 +390,7 @@ const GroupMemberVolumeRow = ({
     muted: boolean;
     onLongPress: (deviceId: string, rect: DOMRect) => void;
     onMuteToggle: (deviceId: string, muted: boolean) => void;
+    volumeMax: number;
     volumeWheelStep: number;
     volumeWidth: number | string;
 }) => {
@@ -404,11 +406,19 @@ const GroupMemberVolumeRow = ({
             const volumeToSet =
                 e.deltaY > 0 || e.deltaX > 0
                     ? calculateVolumeDown(member.volume, volumeWheelStep)
-                    : calculateVolumeUp(member.volume, volumeWheelStep);
+                    : calculateVolumeUp(member.volume, volumeWheelStep, volumeMax);
             handleMemberVolume(member.device.id, volumeToSet);
             if (muted && volumeToSet > 0) onMuteToggle(member.device.id, false);
         },
-        [handleMemberVolume, member.device.id, member.volume, volumeWheelStep, muted, onMuteToggle],
+        [
+            handleMemberVolume,
+            member.device.id,
+            member.volume,
+            volumeWheelStep,
+            volumeMax,
+            muted,
+            onMuteToggle,
+        ],
     );
 
     const startLongPress = useCallback(
@@ -1155,7 +1165,14 @@ const VolumeButton = () => {
             if (showGroupVolumePanel && !isShiftDown) applyVolumeToGroup(v);
             setSliderValue(v);
         },
-        [sliderValue, volumeWheelStep, volumeMax, showGroupVolumePanel, isShiftDown, applyVolumeToGroup],
+        [
+            sliderValue,
+            volumeWheelStep,
+            volumeMax,
+            showGroupVolumePanel,
+            isShiftDown,
+            applyVolumeToGroup,
+        ],
     );
 
     const handleVolumeDownThrottled = useThrottledCallback(handleVolumeDown, 100);
@@ -1262,6 +1279,7 @@ const VolumeButton = () => {
                             muted={memberMutes[m.device.id] ?? false}
                             onLongPress={handleLongPress}
                             onMuteToggle={handleMuteToggle}
+                            volumeMax={volumeMax}
                             volumeWheelStep={volumeWheelStep}
                             volumeWidth={volumeWidth}
                         />
@@ -1305,7 +1323,13 @@ const VolumeButton = () => {
                             style={{ display: 'inline-flex' }}
                         >
                             <ActionIcon
-                                icon={muted ? 'volumeMute' : volume > 50 ? 'volumeMax' : 'volumeNormal'}
+                                icon={
+                                    muted
+                                        ? 'volumeMute'
+                                        : volume > 50
+                                          ? 'volumeMax'
+                                          : 'volumeNormal'
+                                }
                                 iconProps={{ color: muted ? 'muted' : undefined, size: 'xl' }}
                                 onClick={(e) => {
                                     e.stopPropagation();

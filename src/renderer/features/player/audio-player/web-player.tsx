@@ -276,7 +276,7 @@ export function WebPlayer() {
                 playerRef.current?.setVolume(volume);
             }
             setIsTransitioning(false);
-        });
+        }
     }, [mediaAutoNext, volume]);
     const handleOnEndedPlayer2 = useCallback(() => {
         mediaAutoNext();
@@ -294,7 +294,7 @@ export function WebPlayer() {
                 playerRef.current?.setVolume(volume);
             }
             setIsTransitioning(false);
-        });
+        }
     }, [mediaAutoNext, volume]);
 
     const player = usePlayer();

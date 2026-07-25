@@ -14,7 +14,6 @@ import os from 'os';
 import path from 'path';
 
 import { getMainWindow } from '../../../index';
-import { createLog } from '../../../utils';
 import {
     becomeCoordinatorOfStandaloneGroup,
     clearNextAVTransportURI,
@@ -48,6 +47,8 @@ import {
     TrackMetadata,
 } from './soap-client';
 import { discoverDevices } from './ssdp-discovery';
+
+import log from '/@/main/logger';
 
 let connectedDevice: DlnaDevice | null = null;
 let currentCoordinatorId = '';
@@ -172,8 +173,7 @@ function stopCurrentTranscode() {
 
 const dlnaLog = (action: string, err?: unknown) => {
     const message = `[DLNA] ${action}`;
-    createLog({ message, type: err ? 'error' : 'info' });
-    if (err) console.error(message, err);
+    log.info(message, err);
 };
 
 export interface SpeakerProperties {
