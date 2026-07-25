@@ -316,8 +316,8 @@ export const useDiscordRpc = () => {
                                     break;
                                 }
                                 default: {
-                                    const _exhaustive: never = discordSettings.serverType;
-                                    logger.error(`Unhandled server type: ${_exhaustive}`);
+                                    const exhaustive = discordSettings.serverType;
+                                    logger.error(`Unhandled server type: ${exhaustive}`);
                                     config = {};
                                     break;
                                 }
