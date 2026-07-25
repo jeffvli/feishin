@@ -52,7 +52,7 @@ interface ImageProxyHandler<TConfig extends ImageProxyConfig> {
 }
 
 interface LitterboxConfig {
-    time: '1h' | '1w' | '12h' | '24h' | '72h';
+    time: '1h' | '12h' | '24h' | '72h';
 }
 
 interface UguuConfig {}
