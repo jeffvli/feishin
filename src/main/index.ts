@@ -708,13 +708,15 @@ async function createWindow(first = true): Promise<void> {
         mainWindow = null;
     });
 
-    mainWindow.on('show', () => {
-        rebuildMainMenu();
-    });
+    if (isMacOS()) {
+        mainWindow.on('show', () => {
+            rebuildMainMenu();
+        });
 
-    mainWindow.on('hide', () => {
-        rebuildMainMenu();
-    });
+        mainWindow.on('hide', () => {
+            rebuildMainMenu();
+        });
+    }
 
     mainWindow.on('close', (event) => {
         store.set('bounds', mainWindow?.getNormalBounds());
