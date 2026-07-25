@@ -18,15 +18,13 @@ const clearActivity = () => {
 
 const postImageProxyRequest = (
     imageProxyServerLink: string,
-    fileFieldName: string,
-    jsonPath: string,
+    serverType: string, // Values of DiscordServerType enum
     arrayBuffer: ArrayBuffer,
 ) => {
     const url = ipcRenderer.invoke(
         'discord-rpc-post-image-proxy-request',
         imageProxyServerLink,
-        fileFieldName,
-        jsonPath,
+        serverType,
         arrayBuffer,
     );
     return url;

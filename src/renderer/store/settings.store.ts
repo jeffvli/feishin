@@ -181,13 +181,7 @@ const DiscordDisplayTypeSchema = z.enum(['artist', 'feishin', 'song']);
 
 const DiscordLinkTypeSchema = z.enum(['last_fm', 'musicbrainz', 'musicbrainz_last_fm', 'none']);
 
-const DiscordServerTypeSchema = z.enum([
-    'image_proxy',
-    'music_server',
-    'none',
-    'uguu',
-    'litterbox',
-]);
+const DiscordServerTypeSchema = z.enum(['music_server', 'none', 'uguu', 'litterbox']);
 
 const GenreTargetSchema = z.enum(['album', 'track']);
 
@@ -323,9 +317,7 @@ const DiscordSettingsSchema = z.object({
     clientId: z.string(),
     displayType: DiscordDisplayTypeSchema,
     enabled: z.boolean(),
-    fileFieldName: z.string(),
     imageProxyServerLink: z.string(),
-    jsonPath: z.string(),
     linkType: DiscordLinkTypeSchema,
     serverType: DiscordServerTypeSchema,
     showAsListening: z.boolean(),
@@ -1256,9 +1248,7 @@ const initialState: SettingsState = {
         clientId: '1165957668758900787',
         displayType: DiscordDisplayType.FEISHIN,
         enabled: false,
-        fileFieldName: 'files[]',
         imageProxyServerLink: 'https://uguu.se/upload',
-        jsonPath: 'files.0.url',
         linkType: DiscordLinkType.NONE,
         serverType: DiscordServerType.NONE,
         showAsListening: false,
