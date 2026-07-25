@@ -181,7 +181,13 @@ const DiscordDisplayTypeSchema = z.enum(['artist', 'feishin', 'song']);
 
 const DiscordLinkTypeSchema = z.enum(['last_fm', 'musicbrainz', 'musicbrainz_last_fm', 'none']);
 
-const DiscordServerTypeSchema = z.enum(['image_proxy', 'music_server', 'none']);
+const DiscordServerTypeSchema = z.enum([
+    'image_proxy',
+    'music_server',
+    'none',
+    'uguu',
+    'litterbox',
+]);
 
 const GenreTargetSchema = z.enum(['album', 'track']);
 
@@ -932,9 +938,10 @@ export enum DiscordLinkType {
 }
 
 export enum DiscordServerType {
-    IMAGE_PROXY = 'image_proxy',
+    LITTERBOX = 'litterbox',
     MUSIC_SERVER = 'music_server',
     NONE = 'none',
+    UGUU = 'uguu',
 }
 
 export enum GenreTarget {

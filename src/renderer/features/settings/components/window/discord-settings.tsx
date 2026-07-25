@@ -24,6 +24,15 @@ export const DiscordSettings = memo(() => {
     const generalSettings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
 
+    const getDefaultImageProxyServerLink = (serverType: DiscordServerType) => {
+        switch (serverType) {
+            case DiscordServerType.LITTERBOX:
+                return 'https://litterbox.catbox.moe/';
+            case DiscordServerType.UGUU:
+                return 'https://uguu.se/upload';
+        }
+    };
+
     const discordOptions: SettingOption[] = [
         {
             control: (
@@ -224,17 +233,36 @@ export const DiscordSettings = memo(() => {
                         },
                         { label: 'Music server', value: DiscordServerType.MUSIC_SERVER },
                         {
-                            label: t('setting.discordServerType_imageproxy'),
-                            value: DiscordServerType.IMAGE_PROXY,
+                            label: t('setting.discordServerType_uguu'),
+                            value: DiscordServerType.UGUU,
+                        },
+                        {
+                            label: t('setting.discordServerType_litterbox'),
+                            value: DiscordServerType.LITTERBOX,
                         },
                     ]}
                     defaultValue={settings.serverType}
                     onChange={(e) => {
                         if (!e) return;
+
+                        const nextServerType = e as DiscordServerType;
+                        const nextSettings: {
+                            imageProxyServerLink?: string;
+                            serverType: DiscordServerType;
+                        } = {
+                            serverType: nextServerType,
+                        };
+
+                        if (
+                            nextServerType === DiscordServerType.LITTERBOX ||
+                            nextServerType === DiscordServerType.UGUU
+                        ) {
+                            nextSettings.imageProxyServerLink =
+                                getDefaultImageProxyServerLink(nextServerType);
+                        }
+
                         setSettings({
-                            discord: {
-                                serverType: e as DiscordServerType,
-                            },
+                            discord: nextSettings,
                         });
                     }}
                 />
@@ -252,64 +280,25 @@ export const DiscordSettings = memo(() => {
         {
             control: (
                 <TextInput
-                    defaultValue={settings.imageProxyServerLink}
-                    onBlur={(e) => {
+                    onChange={(e) => {
                         setSettings({
                             discord: {
                                 imageProxyServerLink: e.currentTarget.value,
                             },
                         });
                     }}
+                    value={settings.imageProxyServerLink}
                 />
             ),
             description: t('setting.discordImageProxyServerLink', {
                 context: 'description',
                 discord: 'Discord',
             }),
-            isHidden: !isElectron() || settings.serverType !== DiscordServerType.IMAGE_PROXY,
+            isHidden:
+                !isElectron() ||
+                settings.serverType === DiscordServerType.NONE ||
+                settings.serverType === DiscordServerType.MUSIC_SERVER,
             title: t('setting.discordImageProxyServerLink', {
-                discord: 'Discord',
-            }),
-        },
-        {
-            control: (
-                <TextInput
-                    defaultValue={settings.fileFieldName}
-                    onBlur={(e) => {
-                        setSettings({
-                            discord: {
-                                fileFieldName: e.currentTarget.value,
-                            },
-                        });
-                    }}
-                />
-            ),
-            description: t('setting.discordImageProxyFileField', {
-                context: 'description',
-            }),
-            isHidden: !isElectron() || settings.serverType !== DiscordServerType.IMAGE_PROXY,
-            title: t('setting.discordImageProxyFileField', {
-                discord: 'Discord',
-            }),
-        },
-        {
-            control: (
-                <TextInput
-                    defaultValue={settings.jsonPath}
-                    onBlur={(e) => {
-                        setSettings({
-                            discord: {
-                                jsonPath: e.currentTarget.value,
-                            },
-                        });
-                    }}
-                />
-            ),
-            description: t('setting.discordImageProxyJsonPath', {
-                context: 'description',
-            }),
-            isHidden: !isElectron() || settings.serverType !== DiscordServerType.IMAGE_PROXY,
-            title: t('setting.discordImageProxyJsonPath', {
                 discord: 'Discord',
             }),
         },

@@ -262,7 +262,8 @@ export const useDiscordRpc = () => {
 
             if (song && song._uniqueId === currentSong?._uniqueId && imageUrlRef.current) {
                 if (
-                    discordSettings.serverType == DiscordServerType.IMAGE_PROXY &&
+                    discordSettings.serverType !== DiscordServerType.NONE &&
+                    discordSettings.serverType !== DiscordServerType.MUSIC_SERVER &&
                     discordSettings.imageProxyServerLink
                 ) {
                     if (song._serverType === ServerType.JELLYFIN) {
