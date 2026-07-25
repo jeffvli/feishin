@@ -22,6 +22,7 @@ import {
 } from '/@/renderer/features/shared/components/list-config-menu';
 import { ListDisplayTypeToggleButton } from '/@/renderer/features/shared/components/list-display-type-toggle-button';
 import { isFilterValueSet } from '/@/renderer/features/shared/components/list-filters';
+import { ListLayoutToggleButton } from '/@/renderer/features/shared/components/list-layout-toggle-button';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButton } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
@@ -234,11 +235,14 @@ export const PlaylistDetailSongListHeaderFilters = ({
                         tableColumnsData={ALBUM_TABLE_COLUMNS}
                     />
                 ) : (
-                    <ListConfigMenu
-                        displayTypes={SONG_DISPLAY_TYPES}
-                        listKey={listKey}
-                        tableColumnsData={PLAYLIST_SONG_TABLE_COLUMNS}
-                    />
+                    <>
+                        <ListLayoutToggleButton listKey={listKey} />
+                        <ListConfigMenu
+                            displayTypes={SONG_DISPLAY_TYPES}
+                            listKey={listKey}
+                            tableColumnsData={PLAYLIST_SONG_TABLE_COLUMNS}
+                        />
+                    </>
                 )}
             </Group>
         </Flex>

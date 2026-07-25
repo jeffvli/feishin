@@ -13,6 +13,7 @@ import {
     isFilterValueSet,
     ListFiltersModal,
 } from '/@/renderer/features/shared/components/list-filters';
+import { ListLayoutToggleButton } from '/@/renderer/features/shared/components/list-layout-toggle-button';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButton } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
@@ -94,6 +95,7 @@ export const SongListHeaderFilters = ({ toggleGenreTarget }: { toggleGenreTarget
             </Group>
             <Group gap="sm" wrap="nowrap">
                 <ListDisplayTypeToggleButton listKey={ItemListKey.SONG} />
+                <ListLayoutToggleButton listKey={ItemListKey.SONG} />
                 <ListConfigMenu
                     displayTypes={SONG_DISPLAY_TYPES}
                     listKey={ItemListKey.SONG}

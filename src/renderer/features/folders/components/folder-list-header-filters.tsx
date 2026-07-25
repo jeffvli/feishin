@@ -7,6 +7,7 @@ import {
     ListConfigMenu,
     SONG_DISPLAY_TYPES,
 } from '/@/renderer/features/shared/components/list-config-menu';
+import { ListLayoutToggleButton } from '/@/renderer/features/shared/components/list-layout-toggle-button';
 import { ListRefreshButton } from '/@/renderer/features/shared/components/list-refresh-button';
 import { ListSortByDropdown } from '/@/renderer/features/shared/components/list-sort-by-dropdown';
 import { ListSortOrderToggleButton } from '/@/renderer/features/shared/components/list-sort-order-toggle-button';
@@ -242,6 +243,7 @@ export const FolderListHeaderFilters = () => {
                     <ListRefreshButton listKey={ItemListKey.SONG} />
                 </Group>
                 <Group gap="sm" wrap="nowrap">
+                    <ListLayoutToggleButton listKey={ItemListKey.SONG} />
                     <ListConfigMenu
                         displayTypes={[
                             { hidden: true, value: ListDisplayType.GRID },

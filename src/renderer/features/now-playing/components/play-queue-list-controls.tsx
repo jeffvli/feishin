@@ -15,6 +15,7 @@ import {
     ListConfigMenu,
     SONG_DISPLAY_TYPES,
 } from '/@/renderer/features/shared/components/list-config-menu';
+import { ListLayoutToggleButton } from '/@/renderer/features/shared/components/list-layout-toggle-button';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { useCurrentServer, usePlayerStoreBase } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
@@ -66,7 +67,8 @@ export const PlayQueueListControls = ({
                 />
             </Box>
             <Divider h="60%" orientation="vertical" style={{ alignSelf: 'center' }} />
-            <Box style={{ flexShrink: 0 }}>
+            <Box style={{ display: 'flex', flexShrink: 0 }}>
+                {type === ItemListKey.QUEUE_SONG && <ListLayoutToggleButton listKey={type} />}
                 <ListConfigMenu
                     displayTypes={[
                         { hidden: true, value: ListDisplayType.GRID },

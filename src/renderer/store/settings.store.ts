@@ -2822,6 +2822,9 @@ export const useSettingsForExport = (): SettingsState & { version: number } =>
 export const migrateSettings = (settings: SettingsState, settingsVersion: number): SettingsState =>
     useSettingsStore.persist.getOptions().migrate!(settings, settingsVersion) as SettingsState;
 
+export const getDefaultListSettings = (type: ItemListKey) =>
+    initialState.lists[type as keyof typeof initialState.lists] as ItemListSettings | undefined;
+
 export const useListSettings = (type: ItemListKey) =>
     useSettingsStore(
         (state) => state.lists[type as keyof typeof state.lists],

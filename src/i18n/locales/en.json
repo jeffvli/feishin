@@ -1346,6 +1346,9 @@
                 "trackNumber": "Track Number",
                 "year": "$t(common.year)"
             },
+            "layout": {
+                "toggle": "Switch layout"
+            },
             "view": {
                 "detail": "Detail",
                 "grid": "Grid",

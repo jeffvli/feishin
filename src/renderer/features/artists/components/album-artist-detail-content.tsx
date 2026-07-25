@@ -29,6 +29,7 @@ import {
     ListConfigMenu,
     SONG_DISPLAY_TYPES,
 } from '/@/renderer/features/shared/components/list-config-menu';
+import { ListLayoutToggleButton } from '/@/renderer/features/shared/components/list-layout-toggle-button';
 import {
     CLIENT_SIDE_ALBUM_FILTERS,
     CLIENT_SIDE_SONG_FILTERS,
@@ -516,6 +517,7 @@ const AlbumArtistMetadataTopSongsContent = ({
                                     size="xs"
                                     value={topSongsQueryType}
                                 />
+                                <ListLayoutToggleButton listKey={ItemListKey.SONG} />
                                 <ListConfigMenu
                                     displayTypes={[
                                         { hidden: true, value: ListDisplayType.GRID },
@@ -815,6 +817,7 @@ const AlbumArtistMetadataFavoriteSongs = ({
                                     }
                                     sortOrder={sortOrder}
                                 />
+                                <ListLayoutToggleButton listKey={ItemListKey.SONG} />
                                 <ListConfigMenu
                                     displayTypes={[
                                         { hidden: true, value: ListDisplayType.GRID },

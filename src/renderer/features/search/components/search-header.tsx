@@ -15,6 +15,7 @@ import {
     ListConfigMenu,
     SONG_DISPLAY_TYPES,
 } from '/@/renderer/features/shared/components/list-config-menu';
+import { ListLayoutToggleButton } from '/@/renderer/features/shared/components/list-layout-toggle-button';
 import { SearchInput } from '/@/renderer/features/shared/components/search-input';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Button, ButtonGroup } from '/@/shared/components/button/button';
@@ -120,7 +121,12 @@ export const SearchHeader = ({ navigationId }: SearchHeaderProps) => {
                             {t('entity.artist', { count: 2 })}
                         </Button>
                     </ButtonGroup>
-                    <ListConfigMenu {...listConfigMenuProps[itemType]} />
+                    <Group gap="sm" wrap="nowrap">
+                        {itemType === LibraryItem.SONG && (
+                            <ListLayoutToggleButton listKey={ItemListKey.SONG} />
+                        )}
+                        <ListConfigMenu {...listConfigMenuProps[itemType]} />
+                    </Group>
                 </Flex>
             </FilterBar>
         </Stack>

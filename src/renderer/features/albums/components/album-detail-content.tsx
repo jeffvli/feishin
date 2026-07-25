@@ -26,6 +26,7 @@ import {
     ListConfigMenu,
     SONG_DISPLAY_TYPES,
 } from '/@/renderer/features/shared/components/list-config-menu';
+import { ListLayoutToggleButton } from '/@/renderer/features/shared/components/list-layout-toggle-button';
 import {
     CLIENT_SIDE_SONG_FILTERS,
     ListSortByDropdownControlled,
@@ -895,6 +896,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
                     setSortOrder={(value) => setSortOrder(value as SortOrder)}
                     sortOrder={sortOrder}
                 />
+                <ListLayoutToggleButton listKey={ItemListKey.ALBUM_DETAIL} />
                 <ListConfigMenu
                     displayTypes={[
                         { hidden: true, value: ListDisplayType.GRID },
