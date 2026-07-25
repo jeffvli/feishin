@@ -31,6 +31,8 @@ export const DiscordSettings = memo(() => {
             case DiscordServerType.UGUU:
                 return 'https://uguu.se/upload';
         }
+        // Default
+        return 'https://uguu.se/upload';
     };
 
     const discordOptions: SettingOption[] = [
