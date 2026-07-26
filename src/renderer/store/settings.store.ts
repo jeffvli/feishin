@@ -21,7 +21,6 @@ import {
     PLAYLIST_TABLE_COLUMNS,
     SONG_TABLE_COLUMNS,
 } from '/@/renderer/components/item-list/item-table-list/default-columns';
-import { resolveVolumeMax } from '/@/renderer/features/player/audio-player/utils/volume';
 import { audiomotionanalyzerPresets } from '/@/renderer/features/visualizer/components/audiomotionanalyzer/presets';
 import { AppRoute } from '/@/renderer/router/routes';
 import { getEnvSettingsOverrides } from '/@/renderer/store/env-settings-overrides';
@@ -2754,12 +2753,6 @@ export const useTableSettings = (type: ItemListKey) =>
 export const useGeneralSettings = () => useSettingsStore((state) => state.general, shallow);
 
 export const usePlaybackType = () => useSettingsStore((state) => state.playback.type, shallow);
-
-export const useVolumeMax = () =>
-    useSettingsStore(
-        (state) => resolveVolumeMax(state.playback.type, state.playback.mpvExtraParameters),
-        shallow,
-    );
 
 export const usePlayButtonBehavior = () =>
     useSettingsStore((state) => state.general.playButtonBehavior, shallow);
