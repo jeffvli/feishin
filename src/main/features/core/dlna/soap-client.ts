@@ -115,6 +115,30 @@ export async function getLoudness(device: DlnaDevice): Promise<boolean> {
     return parseBool(xml, 'CurrentLoudness');
 }
 
+export async function getMediaInfo(
+    device: DlnaDevice,
+): Promise<{ currentUri: string; nextUri: string }> {
+    const xml = await soapRequest(
+        device.controlUrl,
+        AVT,
+        'GetMediaInfo',
+        '<InstanceID>0</InstanceID>',
+    );
+    const unescapeXml = (s: string) =>
+        s
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&apos;/g, "'")
+            .replace(/&quot;/g, '"');
+    const currentMatch = xml.match(/<CurrentURI>([\s\S]*?)<\/CurrentURI>/);
+    const nextMatch = xml.match(/<NextURI>([\s\S]*?)<\/NextURI>/);
+    return {
+        currentUri: currentMatch ? unescapeXml(currentMatch[1].trim()) : '',
+        nextUri: nextMatch ? unescapeXml(nextMatch[1].trim()) : '',
+    };
+}
+
 export async function getPositionInfo(
     device: DlnaDevice,
 ): Promise<{ duration: number; position: number; trackUri: string }> {

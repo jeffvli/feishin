@@ -23,6 +23,7 @@ import {
     getCrossfadeMode,
     getLEDState,
     getLoudness,
+    getMediaInfo,
     getPositionInfo,
     getRinconId,
     getTopologyEventUrl,
@@ -1422,13 +1423,15 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
             // Use default
         }
         let currentUri = '';
+        let nextUri = '';
         let currentPosition = 0;
         let currentDuration = 0;
         let currentTransportState = 'STOPPED';
         try {
-            const [posInfo, tState] = await Promise.all([
+            const [posInfo, tState, mediaInfo] = await Promise.all([
                 getPositionInfo(device),
                 getTransportInfo(device),
+                getMediaInfo(device).catch(() => ({ currentUri: '', nextUri: '' })),
             ]);
             currentTransportState = tState;
             lastKnownTransportState = currentTransportState || 'STOPPED';
@@ -1439,6 +1442,8 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
                 currentPosition = posInfo.position;
                 currentDuration = posInfo.duration;
                 lastCommandedUri = currentUri;
+                nextUri = mediaInfo.nextUri || '';
+                if (nextUri) lastQueuedNextUri = nextUri;
                 dlnaLog(`Device already playing: ${currentUri} at ${currentPosition}s (${tState})`);
             }
         } catch {
@@ -1449,6 +1454,7 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
         if (currentUri && currentTransportState !== 'STOPPED') {
             getMainWindow()?.webContents.send('renderer-dlna-connect-playback', {
                 duration: currentDuration,
+                nextUri,
                 position: currentPosition,
                 transportState: currentTransportState,
                 uri: currentUri,
@@ -1459,6 +1465,7 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
             currentPosition,
             currentTransportState,
             currentUri,
+            nextUri,
             success: true,
             volume: deviceVolume,
         };

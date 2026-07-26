@@ -35,6 +35,7 @@ const connect = (
     currentPosition: number;
     currentTransportState: string;
     currentUri: string;
+    nextUri: string;
     success: boolean;
     volume: number;
 }> => ipcRenderer.invoke('dlna-connect', device);
@@ -78,7 +79,13 @@ const rendererTrackEnded = rendererDlnaTrackEnded;
 const rendererDlnaConnectPlayback = (
     cb: (
         event: IpcRendererEvent,
-        info: { duration: number; position: number; transportState: string; uri: string },
+        info: {
+            duration: number;
+            nextUri: string;
+            position: number;
+            transportState: string;
+            uri: string;
+        },
     ) => void,
 ) => singleOn('renderer-dlna-connect-playback', cb);
 const rendererDlnaTransportState = (cb: (event: IpcRendererEvent, state: string) => void) =>
