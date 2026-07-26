@@ -17,9 +17,14 @@ import {
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls } from '/@/renderer/components/item-list/types';
 import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
+import {
+    getArtistImageDisplay,
+    StackedCovers,
+} from '/@/renderer/features/artists/components/stacked-covers';
+import { useArtistAlbumStack } from '/@/renderer/hooks/use-artist-album-stack';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useShowRatings } from '/@/renderer/store';
+import { useGeneralSettings, useShowRatings } from '/@/renderer/store';
 import {
     formatDateAbsolute,
     formatDateRelative,
@@ -209,6 +214,22 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
     withControls?: boolean;
 }) {
     const [showControls, setShowControls] = useState(false);
+    const settings = useGeneralSettings();
+
+    // Determine if this is an artist type that might need album stack
+    const isArtistType = itemType === LibraryItem.ALBUM_ARTIST || itemType === LibraryItem.ARTIST;
+    const artistId = isArtistType && data && 'id' in data ? data.id : undefined;
+
+    // Fetch album stack data lazily for artists
+    const albumStackData = useArtistAlbumStack(artistId, {
+        enabled: isArtistType && settings.artistCoverStackEnabled,
+        maxAlbums: settings.artistCoverStackSize,
+        preferArtistCover: settings.artistCoverStackPreferArtistCover,
+        sortBy: settings.artistCoverStackSortBy,
+        sortOrder: settings.artistCoverStackSortOrder,
+    });
+
+    const artistImageDisplay = getArtistImageDisplay(itemType, settings, albumStackData);
 
     const handleMouseEnter = () => {
         if (withControls) {
@@ -245,6 +266,21 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
                         [styles.isRound]: isRound,
                     })}
                     name={(data as Genre).name}
+                />
+            ) : artistImageDisplay.isLoading ? (
+                <div className={clsx(styles.image, { [styles.isRound]: isRound })} />
+            ) : artistImageDisplay.showStackedCovers && artistImageDisplay.albumIds ? (
+                <StackedCovers
+                    albumIds={artistImageDisplay.albumIds}
+                    className={clsx(styles.image, { [styles.isRound]: isRound })}
+                    fitment={artistImageDisplay.fitment}
+                    isRound={isRound}
+                    maxStackSize={artistImageDisplay.maxStackSize}
+                    overfitSize={artistImageDisplay.overfitSize}
+                    spunRotation={artistImageDisplay.spunRotation}
+                    staggerHeight={artistImageDisplay.staggerHeight}
+                    staggerWidth={artistImageDisplay.staggerWidth}
+                    style={artistImageDisplay.stackStyle}
                 />
             ) : (
                 <ItemImage
@@ -342,6 +378,22 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
     withControls?: boolean;
 }) {
     const [showControls, setShowControls] = useState(false);
+    const settings = useGeneralSettings();
+
+    // Determine if this is an artist type that might need album stack
+    const isArtistType = itemType === LibraryItem.ALBUM_ARTIST || itemType === LibraryItem.ARTIST;
+    const artistId = isArtistType && data && 'id' in data ? data.id : undefined;
+
+    // Fetch album stack data lazily for artists
+    const albumStackData = useArtistAlbumStack(artistId, {
+        enabled: isArtistType && settings.artistCoverStackEnabled,
+        maxAlbums: settings.artistCoverStackSize,
+        preferArtistCover: settings.artistCoverStackPreferArtistCover,
+        sortBy: settings.artistCoverStackSortBy,
+        sortOrder: settings.artistCoverStackSortOrder,
+    });
+
+    const artistImageDisplay = getArtistImageDisplay(itemType, settings, albumStackData);
 
     const handleMouseEnter = () => {
         if (withControls) {
@@ -378,6 +430,27 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
                         [styles.isRound]: isRound,
                     })}
                     name={(data as Genre).name}
+                />
+            ) : artistImageDisplay.isLoading ? (
+                <div
+                    className={clsx(styles.image, {
+                        [styles.isRound]: isRound,
+                    })}
+                />
+            ) : artistImageDisplay.showStackedCovers && artistImageDisplay.albumIds ? (
+                <StackedCovers
+                    albumIds={artistImageDisplay.albumIds}
+                    className={clsx(styles.image, {
+                        [styles.isRound]: isRound,
+                    })}
+                    fitment={artistImageDisplay.fitment}
+                    isRound={isRound}
+                    maxStackSize={artistImageDisplay.maxStackSize}
+                    overfitSize={artistImageDisplay.overfitSize}
+                    spunRotation={artistImageDisplay.spunRotation}
+                    staggerHeight={artistImageDisplay.staggerHeight}
+                    staggerWidth={artistImageDisplay.staggerWidth}
+                    style={artistImageDisplay.stackStyle}
                 />
             ) : (
                 <ItemImage

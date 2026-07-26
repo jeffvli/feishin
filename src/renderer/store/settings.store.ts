@@ -30,7 +30,7 @@ import { FontValueSchema } from '/@/renderer/types/fonts';
 import { randomString } from '/@/renderer/utils';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { AppTheme } from '/@/shared/themes/app-theme-types';
-import { LibraryItem, LyricSource, SavedCollection } from '/@/shared/types/domain-types';
+import { LibraryItem, LyricSource, SavedCollection, SortOrder } from '/@/shared/types/domain-types';
 import {
     FontType,
     ItemListKey,
@@ -187,6 +187,12 @@ const PlaylistTargetSchema = z.enum(['album', 'track']);
 
 const SideQueueTypeSchema = z.enum(['sideDrawerQueue', 'sideQueue']);
 const SideQueueLayoutSchema = z.enum(['horizontal', 'vertical']);
+
+const ArtistCoverStackStyleSchema = z.enum(['spun', 'staggered']);
+
+const ArtistCoverStackDisplayFitSchema = z.enum(['underfit', 'fit', 'overfit']);
+
+const ArtistCoverStackSortSchema = z.enum(['release', 'dateAdded', 'playCount', 'size']);
 
 const SidebarPanelTypeSchema = z.enum(['queue', 'lyrics', 'visualizer']);
 
@@ -494,6 +500,23 @@ export const GeneralSettingsSchema = z.object({
     albumGroupVerticalLayout: z.boolean(),
     artistBackground: z.boolean(),
     artistBackgroundBlur: z.number(),
+    artistCoverStackEnabled: z.boolean(),
+    artistCoverStackMaxFetch: z.number(),
+    artistCoverStackPreferArtistCover: z.boolean(),
+    artistCoverStackSize: z.number(),
+    artistCoverStackSortBy: ArtistCoverStackSortSchema,
+    artistCoverStackSortOrder: z.nativeEnum(SortOrder),
+    artistCoverStackSpunRotation: z.number(),
+    artistCoverStackStaggerHeight: z.number(),
+    artistCoverStackStaggerWidth: z.number(),
+    artistCoverStackStyle: ArtistCoverStackStyleSchema,
+    artistCoverStackStyleSettings: z.record(
+        ArtistCoverStackStyleSchema,
+        z.object({
+            fitment: ArtistCoverStackDisplayFitSchema,
+            overfitSize: z.number(),
+        }),
+    ),
     artistItems: z.array(SortableItemSchema(ArtistItemSchema)),
     artistRadioCount: z.number(),
     artistReleaseTypeItems: z.array(SortableItemSchema(ArtistReleaseTypeItemSchema)),
@@ -511,6 +534,11 @@ export const GeneralSettingsSchema = z.object({
     homeFeature: z.boolean(),
     homeFeatureStyle: z.nativeEnum(HomeFeatureStyle),
     homeItems: z.array(SortableItemSchema(HomeItemSchema)),
+    imageCacheEnabled: z.boolean(),
+    imageCacheMaxSizeMB: z.number(),
+    imageRateLimitBurst: z.number(),
+    imageRateLimitMaxConcurrent: z.number(),
+    imageRateLimitRefillPerSec: z.number(),
     imageRes: z.object({
         fullScreenPlayer: z.number(),
         header: z.number(),
@@ -833,6 +861,24 @@ export enum AlbumGroupItem {
     SONG_COUNT = 'songCount',
 }
 
+export enum ArtistCoverStackDisplayFit {
+    FIT = 'fit',
+    OVERFIT = 'overfit',
+    UNDERFIT = 'underfit',
+}
+
+export enum ArtistCoverStackSort {
+    DATE_ADDED = 'dateAdded',
+    PLAY_COUNT = 'playCount',
+    RELEASE = 'release',
+    SIZE = 'size',
+}
+
+export enum ArtistCoverStackStyle {
+    SPUN = 'spun',
+    STAGGERED = 'staggered',
+}
+
 export enum ArtistItem {
     BIOGRAPHY = 'biography',
     FAVORITE_SONGS = 'favoriteSongs',
@@ -981,6 +1027,11 @@ export enum SidebarItem {
     TRACKS = 'Tracks',
 }
 
+export type ArtistCoverStackDisplayFitType = z.infer<typeof ArtistCoverStackDisplayFitSchema>;
+
+export type ArtistCoverStackSortType = z.infer<typeof ArtistCoverStackSortSchema>;
+
+export type ArtistCoverStackStyleType = z.infer<typeof ArtistCoverStackStyleSchema>;
 export type DataGridProps = {
     itemGap: 'lg' | 'md' | 'sm' | 'xl' | 'xs';
     itemsPerRow: number;
@@ -990,7 +1041,9 @@ export type DataGridProps = {
 };
 
 export type DataTableProps = z.infer<typeof ItemTableListPropsSchema>;
+
 export type ItemDetailListProps = z.infer<typeof ItemDetailListPropsSchema>;
+
 export type ItemListSettings = {
     detail?: ItemDetailListProps;
     display: ListDisplayType;
@@ -1003,9 +1056,7 @@ export type ItemListSettings = {
 export type PlayerFilter = z.infer<typeof PlayerFilterSchema>;
 
 export type PlayerFilterField = z.infer<typeof PlayerFilterFieldSchema>;
-
 export type PlayerFilterOperator = z.infer<typeof PlayerFilterOperatorSchema>;
-
 export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
     actions: {
         addCollection: (collection: SavedCollection) => void;
@@ -1030,7 +1081,9 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
         updateCollection: (id: string, updates: Partial<Omit<SavedCollection, 'id'>>) => void;
     };
 }
+
 export interface SettingsState extends z.infer<typeof SettingsStateSchema> {}
+
 export type SidebarItemType = z.infer<typeof SidebarItemTypeSchema>;
 
 export type SideQueueLayout = z.infer<typeof SideQueueLayoutSchema>;
@@ -1260,6 +1313,26 @@ const initialState: SettingsState = {
         albumGroupVerticalLayout: true,
         artistBackground: true,
         artistBackgroundBlur: 3,
+        artistCoverStackEnabled: false,
+        artistCoverStackMaxFetch: 20,
+        artistCoverStackPreferArtistCover: false,
+        artistCoverStackSize: 4,
+        artistCoverStackSortBy: ArtistCoverStackSort.RELEASE,
+        artistCoverStackSortOrder: SortOrder.DESC,
+        artistCoverStackSpunRotation: 6,
+        artistCoverStackStaggerHeight: 5,
+        artistCoverStackStaggerWidth: 5,
+        artistCoverStackStyle: ArtistCoverStackStyle.SPUN,
+        artistCoverStackStyleSettings: {
+            [ArtistCoverStackStyle.SPUN]: {
+                fitment: ArtistCoverStackDisplayFit.OVERFIT,
+                overfitSize: 85,
+            },
+            [ArtistCoverStackStyle.STAGGERED]: {
+                fitment: ArtistCoverStackDisplayFit.FIT,
+                overfitSize: 85,
+            },
+        },
         artistItems,
         artistRadioCount: 20,
         artistReleaseTypeItems,
@@ -1280,6 +1353,11 @@ const initialState: SettingsState = {
         homeFeature: true,
         homeFeatureStyle: HomeFeatureStyle.SINGLE,
         homeItems,
+        imageCacheEnabled: true,
+        imageCacheMaxSizeMB: 1000,
+        imageRateLimitBurst: 10,
+        imageRateLimitMaxConcurrent: 6,
+        imageRateLimitRefillPerSec: 5,
         imageRes: {
             fullScreenPlayer: 0,
             header: 300,

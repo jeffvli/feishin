@@ -523,6 +523,20 @@ export const controller: GeneralController = {
             server.type,
         )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
     },
+    getCoverArtValidator(args) {
+        const server = getServerById(args.apiClientProps.serverId);
+
+        if (!server) {
+            throw new Error(
+                `${i18n.t('error.apiRouteError', { postProcess: 'sentenceCase' })}: getCoverArtValidator`,
+            );
+        }
+
+        return apiController(
+            'getCoverArtValidator',
+            server.type,
+        )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
+    },
     getDownloadUrl(args) {
         const server = getServerById(args.apiClientProps.serverId);
 

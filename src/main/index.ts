@@ -31,6 +31,7 @@ import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-
 import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
 import { canHandleVisualizerDisplayMedia } from './features/core/visualizer';
+import { createImageCacheSystem } from './features/image-cache';
 import log, { autoUpdaterLogInterface } from './logger';
 import MenuBuilder, { MenuPlaybackState } from './menu';
 import './features';
@@ -338,6 +339,7 @@ function createGithubUpdaterInstance(
 
 protocol.registerSchemesAsPrivileged([
     { privileges: { bypassCSP: true, corsEnabled: true }, scheme: 'feishin' },
+    { privileges: { bypassCSP: true, supportFetchAPI: true }, scheme: 'feishin-img' },
 ]);
 
 process.on('uncaughtException', (error: any) => {
@@ -366,11 +368,12 @@ let currentRepeatMode: PlayerRepeat = PlayerRepeat.NONE;
 let currentSidebarCollapsed = false;
 let currentShuffleEnabled = false;
 
-app.on('before-quit', () => {
+app.on('before-quit', async () => {
     if (isMacOS()) {
         forceQuit = true;
     }
     log.info('App quitting', { reason: exitFromTray ? 'tray' : 'before-quit' });
+    await imageCache.shutdown();
 });
 let playbackMenuAccelerators: MenuPlaybackState['accelerators'] = {};
 let inputFocused = false;
@@ -383,6 +386,10 @@ ipcMain.on('input-focus-state', (_event, focused: boolean) => {
         updateMainMenu();
     }
 });
+
+// Image cache system
+const imageCacheDir = join(app.getPath('userData'), 'image-cache');
+const { fetchQueue, imageCache, rateLimiter } = createImageCacheSystem(imageCacheDir);
 
 if (process.env.NODE_ENV === 'production') {
     import('source-map-support').then((sourceMapSupport) => {
@@ -694,6 +701,28 @@ async function createWindow(first = true): Promise<void> {
         return mainWindow?.webContents.session.clearCache();
     });
 
+    ipcMain.handle('image-cache-clear', async () => {
+        await imageCache.clear();
+    });
+
+    ipcMain.handle('image-cache-stats', () => {
+        return imageCache.getStats();
+    });
+
+    ipcMain.handle('image-cache-config', (_event, config) => {
+        imageCache.updateConfig(config);
+        if (
+            config.rateLimitBurst !== undefined ||
+            config.rateLimitRefillPerSec !== undefined ||
+            config.rateLimitMaxConcurrent !== undefined
+        ) {
+            rateLimiter.updateConfig({
+                burstSize: config.rateLimitBurst,
+                maxConcurrent: config.rateLimitMaxConcurrent,
+                refillPerSec: config.rateLimitRefillPerSec,
+            });
+        }
+    });
     ipcMain.on('app-restart', () => {
         // Fix for .AppImage
         if (process.env.APPIMAGE) {
@@ -1083,6 +1112,12 @@ const FONT_FIVE_BYTE_MAGIC_NUMBERS = new Set([
     0x0001000000, // ttf, collection, sfnt
 ]);
 
+const bufferToArrayBuffer = (buffer: Buffer): ArrayBuffer => {
+    const body = new Uint8Array(buffer.byteLength);
+    body.set(buffer);
+    return body.buffer;
+};
+
 const singleInstance = isDevelopment ? true : app.requestSingleInstanceLock();
 
 if (!singleInstance) {
@@ -1101,7 +1136,7 @@ if (!singleInstance) {
     });
 
     app.whenReady()
-        .then(() => {
+        .then(async () => {
             log.info('App ready', {
                 arch: process.arch,
                 electron: process.versions.electron,
@@ -1109,6 +1144,35 @@ if (!singleInstance) {
                 ignoreSsl: !!store.get('ignore_ssl'),
                 platform: process.platform,
                 version: packageJson.version,
+            });
+
+            // Initialize image cache
+            await imageCache.init();
+
+            protocol.handle('feishin-img', async (request) => {
+                const originalUrl = decodeURIComponent(request.url.slice('feishin-img://'.length));
+
+                // Check disk cache
+                const cached = await imageCache.get(originalUrl);
+                if (cached) {
+                    return new Response(bufferToArrayBuffer(cached.buffer), {
+                        headers: { 'Content-Type': cached.contentType },
+                    });
+                }
+
+                // Rate-limited fetch from server
+                try {
+                    const { buffer, contentType } = await fetchQueue.fetch(originalUrl);
+                    await imageCache.put(originalUrl, buffer, contentType);
+                    return new Response(bufferToArrayBuffer(buffer), {
+                        headers: { 'Content-Type': contentType },
+                    });
+                } catch {
+                    return new Response(null, {
+                        status: 502,
+                        statusText: 'Image fetch failed',
+                    });
+                }
             });
 
             protocol.handle('feishin', async () => {

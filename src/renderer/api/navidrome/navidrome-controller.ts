@@ -5,6 +5,7 @@ import orderBy from 'lodash/orderBy';
 import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
+import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { ndNormalize } from '/@/shared/api/navidrome/navidrome-normalize';
 import { NDRadioListSort, NDSongListSort } from '/@/shared/api/navidrome/navidrome-types';
 import { ssNormalize } from '/@/shared/api/subsonic/subsonic-normalize';
@@ -555,6 +556,68 @@ export const NavidromeController: InternalControllerEndpoint = {
         return res.body.similarSongs2.song.map((song) =>
             ssNormalize.song(song, apiClientProps.server),
         );
+    },
+    // Navidrome sets Last-Modified to server start time for placeholder images
+    // We fetch the placeholder once, cache the timestamp, and compare against album covers
+    getCoverArtValidator: async (args) => {
+        const { apiClientProps } = args;
+        const server = apiClientProps.server;
+
+        let serverStartTime: null | string = null;
+
+        if (server?.credential) {
+            const url = getServerUrl(server);
+            if (url) {
+                // Request cover art with no ID to get placeholder image
+                const placeholderUrl =
+                    `${url}/rest/getCoverArt.view` +
+                    `?${server.credential}` +
+                    '&v=1.13.0' +
+                    '&c=Feishin';
+
+                try {
+                    const res = await fetch(placeholderUrl, { method: 'HEAD' });
+                    if (res.ok) {
+                        serverStartTime = res.headers.get('last-modified');
+                    }
+                } catch {
+                    // Ignore errors, fall back to assuming all covers are real
+                }
+            }
+        }
+
+        const hasImage = async (id: string): Promise<boolean> => {
+            if (!server?.credential || !serverStartTime) {
+                return true;
+            }
+
+            const url = getServerUrl(server);
+            if (!url) {
+                return true;
+            }
+
+            const coverUrl =
+                `${url}/rest/getCoverArt.view` +
+                `?id=${id}` +
+                `&${server.credential}` +
+                '&v=1.13.0' +
+                '&c=Feishin';
+
+            try {
+                const res = await fetch(coverUrl, { method: 'HEAD' });
+                if (res.ok) {
+                    const lastModified = res.headers.get('last-modified');
+                    // Matching timestamp means placeholder
+                    return lastModified !== serverStartTime;
+                }
+            } catch {
+                // Ignore errors
+            }
+
+            return false;
+        };
+
+        return { hasImage };
     },
     getDownloadUrl: SubsonicController.getDownloadUrl,
     getFolder: SubsonicController.getFolder,

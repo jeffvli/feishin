@@ -8,12 +8,17 @@ import {
     ItemTableListInnerColumn,
     TableColumnContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
+import {
+    getArtistImageDisplay,
+    StackedCovers,
+} from '/@/renderer/features/artists/components/stacked-covers';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import {
     LONG_PRESS_PLAY_BEHAVIOR,
     PlayTooltip,
 } from '/@/renderer/features/shared/components/play-button-group';
-import { usePlayButtonBehavior } from '/@/renderer/store';
+import { useArtistAlbumStack } from '/@/renderer/hooks/use-artist-album-stack';
+import { useGeneralSettings, usePlayButtonBehavior } from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Folder, LibraryItem } from '/@/shared/types/domain-types';
@@ -26,9 +31,26 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
     const playButtonBehavior = usePlayButtonBehavior();
     const internalState = (props as any).internalState;
     const [isHovered, setIsHovered] = useState(false);
+    const settings = useGeneralSettings();
 
     const isFolder = (rowItem as unknown as Folder)?._itemType === LibraryItem.FOLDER;
     const shouldShowFolderIcon = isFolder && !item?.imageId && !item?.imageUrl;
+
+    // Determine if this is an artist type that might need album stack
+    const itemType = item?._itemType || props.itemType;
+    const isArtistType = itemType === LibraryItem.ALBUM_ARTIST || itemType === LibraryItem.ARTIST;
+    const artistId = isArtistType && item?.id ? item.id : undefined;
+
+    // Fetch album stack data lazily for artists
+    const albumStackData = useArtistAlbumStack(artistId, {
+        enabled: isArtistType && settings.artistCoverStackEnabled,
+        maxAlbums: settings.artistCoverStackSize,
+        preferArtistCover: settings.artistCoverStackPreferArtistCover,
+        sortBy: settings.artistCoverStackSortBy,
+        sortOrder: settings.artistCoverStackSortOrder,
+    });
+
+    const artistImageDisplay = getArtistImageDisplay(itemType, settings, albumStackData);
 
     const handlePlay = (playType: Play, event: React.MouseEvent<HTMLButtonElement>) => {
         if (!item) {
@@ -83,20 +105,44 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
-                    <ItemImage
-                        containerClassName={clsx({
-                            [styles.compactImageContainer]: props.size === 'compact',
-                            [styles.imageContainerWithAspectRatio]:
-                                props.size === 'default' || props.size === 'large',
-                        })}
-                        enableDebounce={true}
-                        enableViewport={false}
-                        explicitStatus={item?.explicitStatus}
-                        id={item?.imageId}
-                        itemType={item?._itemType}
-                        src={item?.imageUrl}
-                        type="table"
-                    />
+                    {artistImageDisplay.isLoading ? (
+                        <div
+                            className={clsx({
+                                [styles.imageContainerWithAspectRatio]:
+                                    props.size === 'default' || props.size === 'large',
+                            })}
+                        />
+                    ) : artistImageDisplay.showStackedCovers && artistImageDisplay.albumIds ? (
+                        <StackedCovers
+                            albumIds={artistImageDisplay.albumIds}
+                            className={clsx({
+                                [styles.imageContainerWithAspectRatio]:
+                                    props.size === 'default' || props.size === 'large',
+                            })}
+                            fitment={artistImageDisplay.fitment}
+                            maxStackSize={artistImageDisplay.maxStackSize}
+                            overfitSize={artistImageDisplay.overfitSize}
+                            spunRotation={artistImageDisplay.spunRotation}
+                            staggerHeight={artistImageDisplay.staggerHeight}
+                            staggerWidth={artistImageDisplay.staggerWidth}
+                            style={artistImageDisplay.stackStyle}
+                        />
+                    ) : (
+                        <ItemImage
+                            containerClassName={clsx({
+                                [styles.compactImageContainer]: props.size === 'compact',
+                                [styles.imageContainerWithAspectRatio]:
+                                    props.size === 'default' || props.size === 'large',
+                            })}
+                            enableDebounce={true}
+                            enableViewport={false}
+                            explicitStatus={item?.explicitStatus}
+                            id={item?.imageId}
+                            itemType={item?._itemType}
+                            src={item?.imageUrl}
+                            type="table"
+                        />
+                    )}
                     {isHovered && (
                         <div
                             className={clsx(styles.playButtonOverlay, {

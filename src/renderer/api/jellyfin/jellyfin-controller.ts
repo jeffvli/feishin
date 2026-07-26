@@ -674,6 +674,43 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         return res.body.Items.map((song) => jfNormalize.song(song, apiClientProps.server));
     },
+    getCoverArtValidator: async (args) => {
+        const { apiClientProps } = args;
+        const server = apiClientProps.server;
+
+        // Return checker function - Jellyfin doesn't need any initialization state
+        // Each check is a simple HEAD request that returns 200 or 404
+        const hasImage = async (id: string): Promise<boolean> => {
+            if (!server) {
+                return true;
+            }
+
+            const url = getServerUrl(server);
+            if (!url) {
+                return true;
+            }
+
+            // Build the Jellyfin image URL
+            const imageUrl = `${url}/Items/${id}/Images/Primary`;
+
+            try {
+                const res = await fetch(imageUrl, {
+                    headers: {
+                        'X-Emby-Authorization': `MediaBrowser Client="Feishin", Device="PC", DeviceId="feishin", Version="1.0.0", Token="${server.credential}"`,
+                    },
+                    method: 'HEAD',
+                });
+
+                // Jellyfin returns 404 if no image exists
+                return res.ok;
+            } catch {
+                // Network error - assume no image
+                return false;
+            }
+        };
+
+        return { hasImage };
+    },
     getDownloadUrl: (args) => {
         const { apiClientProps, query } = args;
 

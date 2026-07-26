@@ -5,6 +5,12 @@ import { RowComponentProps } from 'react-window-v2';
 import styles from './multi-select-rows.module.css';
 
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
+import {
+    getArtistImageDisplay,
+    StackedCovers,
+} from '/@/renderer/features/artists/components/stacked-covers';
+import { useArtistAlbumStack } from '/@/renderer/hooks/use-artist-album-stack';
+import { useGeneralSettings } from '/@/renderer/store';
 import { Group } from '/@/shared/components/group/group';
 import { VirtualMultiSelectOption } from '/@/shared/components/multi-select/virtual-multi-select';
 import { Text } from '/@/shared/components/text/text';
@@ -31,6 +37,7 @@ export function ArtistMultiSelectRow({
     value: string[];
 }>) {
     const { t } = useTranslation();
+    const settings = useGeneralSettings();
 
     const handleClick = useCallback(() => {
         onToggle(options[index].value);
@@ -41,6 +48,20 @@ export function ArtistMultiSelectRow({
         displayCountType === 'song' ? options[index].songCount : options[index].albumCount;
     const countEntity = displayCountType === 'song' ? 'song' : 'album';
 
+    // Artist ID is the value field
+    const artistId = options[index].value;
+
+    // Fetch album stack data lazily for artists
+    const albumStackData = useArtistAlbumStack(artistId, {
+        enabled: settings.artistCoverStackEnabled,
+        maxAlbums: settings.artistCoverStackSize,
+        preferArtistCover: settings.artistCoverStackPreferArtistCover,
+        sortBy: settings.artistCoverStackSortBy,
+        sortOrder: settings.artistCoverStackSortOrder,
+    });
+
+    const artistImageDisplay = getArtistImageDisplay(LibraryItem.ARTIST, settings, albumStackData);
+
     return (
         <Group
             className={`${styles.row} ${disabled ? styles.disabled : ''}`}
@@ -49,14 +70,28 @@ export function ArtistMultiSelectRow({
             style={{ ...style }}
             {...(isFocused && !disabled && { 'data-focused': true })}
         >
-            <ItemImage
-                containerClassName={styles.rowImage}
-                enableDebounce={true}
-                enableViewport={false}
-                itemType={LibraryItem.ARTIST}
-                src={options[index].imageUrl}
-                type="table"
-            />
+            {artistImageDisplay.showStackedCovers && artistImageDisplay.albumIds ? (
+                <StackedCovers
+                    albumIds={artistImageDisplay.albumIds}
+                    className={styles.rowImage}
+                    fitment={artistImageDisplay.fitment}
+                    maxStackSize={artistImageDisplay.maxStackSize}
+                    overfitSize={artistImageDisplay.overfitSize}
+                    spunRotation={artistImageDisplay.spunRotation}
+                    staggerHeight={artistImageDisplay.staggerHeight}
+                    staggerWidth={artistImageDisplay.staggerWidth}
+                    style={artistImageDisplay.stackStyle}
+                />
+            ) : (
+                <ItemImage
+                    containerClassName={styles.rowImage}
+                    enableDebounce={true}
+                    enableViewport={false}
+                    itemType={LibraryItem.ARTIST}
+                    src={options[index].imageUrl}
+                    type="table"
+                />
+            )}
             <div className={styles.rowContent}>
                 <Text isNoSelect overflow="hidden" size="sm">
                     {options[index].label}

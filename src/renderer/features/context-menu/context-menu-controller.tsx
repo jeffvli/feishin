@@ -12,6 +12,10 @@ import { PlaylistContextMenu } from '/@/renderer/features/context-menu/menus/pla
 import { PlaylistSongContextMenu } from '/@/renderer/features/context-menu/menus/playlist-song-context-menu';
 import { QueueContextMenu } from '/@/renderer/features/context-menu/menus/queue-context-menu';
 import { SongContextMenu } from '/@/renderer/features/context-menu/menus/song-context-menu';
+import {
+    CoverArtValidatorContext,
+    useCoverArtValidator,
+} from '/@/renderer/hooks/use-artist-album-stack';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import {
     Album,
@@ -34,6 +38,7 @@ export const ContextMenuController = createCallable<ContextMenuControllerProps, 
     ({ call, cmd, event }) => {
         const { libraryId } = useParams() as { libraryId: string };
         const queryClient = useQueryClient();
+        const coverArtValidator = useCoverArtValidator();
 
         const triggerRef = useRef<HTMLDivElement>(null);
         const isExecuted = useRef<boolean>(false);
@@ -65,31 +70,33 @@ export const ContextMenuController = createCallable<ContextMenuControllerProps, 
         }, [call, cmd, event, event.clientX, event.clientY, libraryId, queryClient]);
 
         return (
-            <ContextMenu>
-                <ContextMenu.Target>
-                    <div
-                        ref={triggerRef}
-                        style={{
-                            height: 0,
-                            left: 0,
-                            pointerEvents: 'none',
-                            position: 'absolute',
-                            top: 0,
-                            userSelect: 'none',
-                            width: 0,
-                        }}
-                    />
-                </ContextMenu.Target>
-                {cmd.type === LibraryItem.QUEUE_SONG && <QueueContextMenu {...cmd} />}
-                {cmd.type === LibraryItem.ALBUM && <AlbumContextMenu {...cmd} />}
-                {cmd.type === LibraryItem.ALBUM_ARTIST && <AlbumArtistContextMenu {...cmd} />}
-                {cmd.type === LibraryItem.ARTIST && <ArtistContextMenu {...cmd} />}
-                {cmd.type === LibraryItem.FOLDER && <FolderContextMenu {...cmd} />}
-                {cmd.type === LibraryItem.GENRE && <GenreContextMenu {...cmd} />}
-                {cmd.type === LibraryItem.PLAYLIST && <PlaylistContextMenu {...cmd} />}
-                {cmd.type === LibraryItem.PLAYLIST_SONG && <PlaylistSongContextMenu {...cmd} />}
-                {cmd.type === LibraryItem.SONG && <SongContextMenu {...cmd} />}
-            </ContextMenu>
+            <CoverArtValidatorContext.Provider value={coverArtValidator}>
+                <ContextMenu>
+                    <ContextMenu.Target>
+                        <div
+                            ref={triggerRef}
+                            style={{
+                                height: 0,
+                                left: 0,
+                                pointerEvents: 'none',
+                                position: 'absolute',
+                                top: 0,
+                                userSelect: 'none',
+                                width: 0,
+                            }}
+                        />
+                    </ContextMenu.Target>
+                    {cmd.type === LibraryItem.QUEUE_SONG && <QueueContextMenu {...cmd} />}
+                    {cmd.type === LibraryItem.ALBUM && <AlbumContextMenu {...cmd} />}
+                    {cmd.type === LibraryItem.ALBUM_ARTIST && <AlbumArtistContextMenu {...cmd} />}
+                    {cmd.type === LibraryItem.ARTIST && <ArtistContextMenu {...cmd} />}
+                    {cmd.type === LibraryItem.FOLDER && <FolderContextMenu {...cmd} />}
+                    {cmd.type === LibraryItem.GENRE && <GenreContextMenu {...cmd} />}
+                    {cmd.type === LibraryItem.PLAYLIST && <PlaylistContextMenu {...cmd} />}
+                    {cmd.type === LibraryItem.PLAYLIST_SONG && <PlaylistSongContextMenu {...cmd} />}
+                    {cmd.type === LibraryItem.SONG && <SongContextMenu {...cmd} />}
+                </ContextMenu>
+            </CoverArtValidatorContext.Provider>
         );
     },
 );
