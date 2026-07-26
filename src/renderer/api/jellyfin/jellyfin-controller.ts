@@ -679,6 +679,43 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         return `${apiClientProps.server?.url}/items/${query.id}/download?apiKey=${apiClientProps.server?.credential}`;
     },
+    getFavoriteSongs: async (args) => {
+        const { apiClientProps, query } = args;
+
+        if (!apiClientProps.server?.userId) {
+            throw new Error('No userId found');
+        }
+
+        // Gets songs sorted by play count and filters favorited songs
+        const res = await jfApiClient(apiClientProps).getTopSongsList({
+            params: {
+                userId: apiClientProps.server?.userId,
+            },
+            query: {
+                ArtistIds: query.artistId,
+                Fields: JF_FIELDS.SONG,
+                IncludeItemTypes: 'Audio',
+                IsFavorite: true,
+                Limit: query.limit,
+                Recursive: true,
+                SortBy: JFSongListSort.PLAY_COUNT,
+                SortOrder: 'Descending',
+                UserId: apiClientProps.server?.userId,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get top song list');
+        }
+
+        const items = res.body.Items.map((item) => jfNormalize.song(item, apiClientProps.server));
+
+        return {
+            items,
+            startIndex: 0,
+            totalRecordCount: res.body.TotalRecordCount,
+        };
+    },
     getFolder: async (args) => {
         const { apiClientProps, query } = args;
         const userId = apiClientProps.server?.userId;

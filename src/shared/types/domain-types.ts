@@ -1325,6 +1325,17 @@ export type ArtistInfoQuery = {
     musicFolderId?: string | string[];
 };
 
+export type FavoriteSongListArgs = BaseEndpointArgs & { query: FavoriteSongListQuery };
+
+export type FavoriteSongListQuery = {
+    artistId: string;
+    limit?: number;
+    type?: 'favorite' | 'rating';
+};
+
+// Favorite Songs List
+export type FavoriteSongListResponse = BasePaginatedResponse<Song[]>;
+
 export type FullLyricsMetadata = Omit<InternetProviderLyricResponse, 'id' | 'lyrics' | 'source'> & {
     lyrics: LyricsResponse;
     offsetMs?: number;
@@ -1562,6 +1573,7 @@ export type ControllerEndpoint = {
     getArtistListCount: (args: ArtistListCountArgs) => Promise<number>;
     getArtistRadio: (args: ArtistRadioArgs) => Promise<Song[]>;
     getDownloadUrl: (args: DownloadArgs) => string;
+    getFavoriteSongs: (args: FavoriteSongListArgs) => Promise<FavoriteSongListResponse>;
     getFolder: (args: FolderArgs) => Promise<FolderResponse>;
     getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
     getImageRequest: (args: ImageArgs) => ImageRequest | null;
@@ -1714,6 +1726,9 @@ export type InternalControllerEndpoint = {
     getArtistListCount: (args: ReplaceApiClientProps<ArtistListCountArgs>) => Promise<number>;
     getArtistRadio: (args: ReplaceApiClientProps<ArtistRadioArgs>) => Promise<Song[]>;
     getDownloadUrl: (args: ReplaceApiClientProps<DownloadArgs>) => string;
+    getFavoriteSongs: (
+        args: ReplaceApiClientProps<FavoriteSongListArgs>,
+    ) => Promise<FavoriteSongListResponse>;
     getFolder: (args: ReplaceApiClientProps<FolderArgs>) => Promise<FolderResponse>;
     getGenreList: (args: ReplaceApiClientProps<GenreListArgs>) => Promise<GenreListResponse>;
     getImageRequest: (args: ReplaceApiClientProps<ImageArgs>) => ImageRequest | null;

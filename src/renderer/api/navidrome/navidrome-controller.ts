@@ -557,6 +557,56 @@ export const NavidromeController: InternalControllerEndpoint = {
         );
     },
     getDownloadUrl: SubsonicController.getDownloadUrl,
+    getFavoriteSongs: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const type = query.type === 'favorite' ? 'favorite' : 'rating';
+
+        if (type === 'rating') {
+            const res = await NavidromeController.getSongList({
+                apiClientProps,
+                query: {
+                    artistIds: [query.artistId],
+                    sortBy: SongListSort.RATING,
+                    sortOrder: SortOrder.DESC,
+                    startIndex: 0,
+                },
+            });
+
+            const songsWithHighRating = orderBy(
+                res.items.filter((song) => song.userRating !== null && song.userRating > 2),
+                ['userRating', 'userFavorite', 'playCount', 'albumId', 'trackNumber'],
+                ['desc', 'desc', 'desc', 'asc', 'asc'],
+            );
+
+            return {
+                items: songsWithHighRating,
+                startIndex: 0,
+                totalRecordCount: res.totalRecordCount,
+            };
+        }
+
+        const res = await NavidromeController.getSongList({
+            apiClientProps,
+            query: {
+                artistIds: [query.artistId],
+                sortBy: SongListSort.FAVORITED,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+        });
+        const songsWithFavorite = orderBy(
+            res.items.filter((song) => song.userFavorite),
+            ['userFavorite', 'userRating', 'playCount', 'albumId', 'trackNumber'],
+            ['desc', 'desc', 'desc', 'asc', 'asc'],
+        );
+
+        return {
+            items: songsWithFavorite,
+            startIndex: 0,
+            totalRecordCount: res.totalRecordCount,
+        };
+    },
     getFolder: SubsonicController.getFolder,
     getGenreList: async (args) => {
         const { apiClientProps, query } = args;

@@ -605,6 +605,12 @@ const AlbumArtistMetadataFavoriteSongs = ({
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 300);
+    const [favoriteSongsQueryType, setFavoriteSongsQueryType] = useLocalStorage<
+        'favorite' | 'rating'
+    >({
+        defaultValue: 'favorite',
+        key: 'album-artist-favorite-songs-query-type',
+    });
     const albumArtistDetailFavoriteSongsSort = useAppStore(
         (state) => state.albumArtistDetailFavoriteSongsSort,
     );
@@ -617,11 +623,13 @@ const AlbumArtistMetadataFavoriteSongs = ({
     const currentSong = usePlayerSong();
     const player = usePlayer();
     const serverId = useCurrentServerId();
+    const server = useCurrentServer();
 
     const favoriteSongsQuery = useQuery({
         ...artistsQueries.favoriteSongs({
             query: {
                 artistId: routeId,
+                type: favoriteSongsQueryType,
             },
             serverId: serverId,
         }),
@@ -795,6 +803,28 @@ const AlbumArtistMetadataFavoriteSongs = ({
                                     }}
                                     value={searchTerm}
                                 />
+                                {/* Don't include SegmentedControl for JELLYFIN, since it only supports Favorites and not Ratings */}
+                                {server?.type !== ServerType.JELLYFIN && (
+                                    <SegmentedControl
+                                        data={[
+                                            {
+                                                label: t('common.favorite'),
+                                                value: 'favorite',
+                                            },
+                                            {
+                                                label: t('common.rating'),
+                                                value: 'rating',
+                                            },
+                                        ]}
+                                        onChange={(value) =>
+                                            setFavoriteSongsQueryType(
+                                                value as 'favorite' | 'rating',
+                                            )
+                                        }
+                                        size="xs"
+                                        value={favoriteSongsQueryType}
+                                    />
+                                )}
                                 <ListSortByDropdownControlled
                                     filters={CLIENT_SIDE_SONG_FILTERS}
                                     itemType={LibraryItem.SONG}
