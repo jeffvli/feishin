@@ -52,15 +52,17 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
     const setRating = useSetRating();
     const setFavorite = useSetFavorite();
 
-    const handleFavorite = () => {
-        if (!detailQuery?.data) return;
-        setFavorite(
-            detailQuery.data._serverId,
-            [detailQuery.data.id],
-            LibraryItem.ALBUM,
-            !detailQuery.data.userFavorite,
-        );
-    };
+    const handleFavorite = showFavorites
+        ? () => {
+              if (!detailQuery?.data) return;
+              setFavorite(
+                  detailQuery.data._serverId,
+                  [detailQuery.data.id],
+                  LibraryItem.ALBUM,
+                  !detailQuery.data.userFavorite,
+              );
+          }
+        : undefined;
 
     const handleUpdateRating = showRating
         ? (rating: number) => {
@@ -294,7 +296,7 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
                     <LibraryHeaderMenu
                         favorite={detailQuery?.data?.userFavorite}
                         onAlbumRadio={handleAlbumRadio}
-                        onFavorite={showFavorites ? handleFavorite : undefined}
+                        onFavorite={handleFavorite}
                         onMore={handleMoreOptions}
                         onPlay={(type) => handlePlay(type)}
                         onRating={handleUpdateRating}
