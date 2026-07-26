@@ -107,7 +107,6 @@ const DISCORD_LINK_TYPES = new Set(['last_fm', 'musicbrainz', 'musicbrainz_last_
 const LYRICS_ALIGNMENTS = new Set(['center', 'left', 'right']);
 const FONT_TYPES = new Set(['builtIn', 'custom', 'system']);
 const HOME_FEATURE_STYLES = new Set(['multiple', 'single']);
-const FAVORITE_RATING_CONTROLS = new Set(['both', 'favorites', 'none', 'ratings']);
 const SIDE_QUEUE_TYPES = new Set(['sideDrawerQueue', 'sideQueue']);
 const SIDE_QUEUE_LAYOUTS = new Set(['horizontal', 'vertical']);
 const SIDEBAR_PLAYLIST_FOLDER_VIEWS = new Set(['navigation', 'single', 'tree']);
@@ -248,12 +247,8 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
         path: ['general', 'showLyricsInSidebar'],
         type: 'bool',
     },
-    {
-        enumSet: FAVORITE_RATING_CONTROLS,
-        key: 'FS_GENERAL_FAVORITE_RATING_CONTROLS',
-        path: ['general', 'favoriteRatingControls'],
-        type: 'enum',
-    },
+    { key: 'FS_GENERAL_SHOW_FAVORITES', path: ['general', 'showFavorites'], type: 'bool' },
+    { key: 'FS_GENERAL_SHOW_RATINGS', path: ['general', 'showRatings'], type: 'bool' },
     {
         key: 'FS_GENERAL_SHOW_VISUALIZER_IN_SIDEBAR',
         path: ['general', 'showVisualizerInSidebar'],

@@ -187,7 +187,6 @@ const PlaylistTargetSchema = z.enum(['album', 'track']);
 
 const SideQueueTypeSchema = z.enum(['sideDrawerQueue', 'sideQueue']);
 const SideQueueLayoutSchema = z.enum(['horizontal', 'vertical']);
-const FavoriteRatingControlsSchema = z.enum(['none', 'favorites', 'ratings', 'both']);
 
 const SidebarPanelTypeSchema = z.enum(['queue', 'lyrics', 'visualizer']);
 
@@ -506,7 +505,6 @@ export const GeneralSettingsSchema = z.object({
     disabledContextMenu: z.record(z.string(), z.boolean()),
     enableGridMultiSelect: z.boolean(),
     externalLinks: z.boolean(),
-    favoriteRatingControls: FavoriteRatingControlsSchema,
     followCurrentSong: z.boolean(),
     followSystemTheme: z.boolean(),
     genreTarget: GenreTargetSchema,
@@ -539,7 +537,9 @@ export const GeneralSettingsSchema = z.object({
     primaryShade: z.number().min(0).max(9),
     qobuz: z.boolean(),
     resume: z.boolean(),
+    showFavorites: z.boolean(),
     showLyricsInSidebar: z.boolean(),
+    showRatings: z.boolean(),
     showVisualizerInSidebar: z.boolean(),
     sidebarCollapsedNavigation: z.boolean(),
     sidebarCollapseShared: z.boolean(),
@@ -988,7 +988,6 @@ export type DataGridProps = {
 };
 
 export type DataTableProps = z.infer<typeof ItemTableListPropsSchema>;
-export type FavoriteRatingControls = z.infer<typeof FavoriteRatingControlsSchema>;
 export type ItemDetailListProps = z.infer<typeof ItemDetailListPropsSchema>;
 
 export type ItemListSettings = {
@@ -1272,7 +1271,6 @@ const initialState: SettingsState = {
         disabledContextMenu: {},
         enableGridMultiSelect: false,
         externalLinks: true,
-        favoriteRatingControls: 'both',
         followCurrentSong: true,
         followSystemTheme: false,
         genreTarget: GenreTarget.TRACK,
@@ -1313,7 +1311,9 @@ const initialState: SettingsState = {
         primaryShade: 6,
         qobuz: true,
         resume: true,
+        showFavorites: true,
         showLyricsInSidebar: true,
+        showRatings: true,
         showVisualizerInSidebar: true,
         sidebarCollapsedNavigation: true,
         sidebarCollapseShared: false,
@@ -2724,19 +2724,10 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
-                if (version < 33) {
-                    const legacy = state.general as { showRatings?: boolean };
-                    // Favorites were always shown, so preserve prior behavior exactly:
-                    // showRatings true -> both, false -> favorites (ratings hidden, favorites still on).
-                    state.general.favoriteRatingControls =
-                        legacy.showRatings === false ? 'favorites' : 'both';
-                    delete legacy.showRatings;
-                }
-
                 return persistedState;
             },
             name: 'store_settings',
-            version: 33,
+            version: 32,
         },
     ),
 );
@@ -2935,21 +2926,10 @@ export const useSidebarCollapsedNavigation = () =>
 export const usePlayerbarOpenDrawer = () =>
     useSettingsStore((state) => state.general.playerbarOpenDrawer, shallow);
 
-export const useShowRatings = () =>
-    useSettingsStore(
-        (state) =>
-            state.general.favoriteRatingControls === 'ratings' ||
-            state.general.favoriteRatingControls === 'both',
-        shallow,
-    );
+export const useShowRatings = () => useSettingsStore((state) => state.general.showRatings, shallow);
 
 export const useShowFavorites = () =>
-    useSettingsStore(
-        (state) =>
-            state.general.favoriteRatingControls === 'favorites' ||
-            state.general.favoriteRatingControls === 'both',
-        shallow,
-    );
+    useSettingsStore((state) => state.general.showFavorites, shallow);
 
 export const useArtistRadioCount = () =>
     useSettingsStore((state) => state.general.artistRadioCount, shallow);

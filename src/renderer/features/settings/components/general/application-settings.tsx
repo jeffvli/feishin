@@ -17,7 +17,6 @@ import {
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import {
-    FavoriteRatingControls,
     HomeFeatureStyle,
     SideQueueLayout,
     SideQueueType,
@@ -83,25 +82,6 @@ const SIDE_QUEUE_LAYOUT_OPTIONS = [
             context: 'optionVertical',
         }),
         value: 'vertical',
-    },
-];
-
-const FAVORITE_RATING_CONTROLS_OPTIONS = [
-    {
-        label: t('setting.favoriteRatingControls', { context: 'optionNone' }),
-        value: 'none',
-    },
-    {
-        label: t('setting.favoriteRatingControls', { context: 'optionFavorites' }),
-        value: 'favorites',
-    },
-    {
-        label: t('setting.favoriteRatingControls', { context: 'optionRatings' }),
-        value: 'ratings',
-    },
-    {
-        label: t('setting.favoriteRatingControls', { context: 'optionBoth' }),
-        value: 'both',
     },
 ];
 
@@ -584,25 +564,43 @@ export const ApplicationSettings = memo(() => {
         },
         {
             control: (
-                <Select
-                    aria-label={t('setting.favoriteRatingControls')}
-                    data={FAVORITE_RATING_CONTROLS_OPTIONS}
-                    defaultValue={settings.favoriteRatingControls}
-                    onChange={(e) =>
+                <Switch
+                    defaultChecked={settings.showFavorites}
+                    onChange={(e) => {
                         setSettings({
                             general: {
                                 ...settings,
-                                favoriteRatingControls: e as FavoriteRatingControls,
+                                showFavorites: e.currentTarget.checked,
                             },
-                        })
-                    }
+                        });
+                    }}
                 />
             ),
-            description: t('setting.favoriteRatingControls', {
+            description: t('setting.showFavorites', {
                 context: 'description',
             }),
             isHidden: false,
-            title: t('setting.favoriteRatingControls'),
+            title: t('setting.showFavorites'),
+        },
+        {
+            control: (
+                <Switch
+                    defaultChecked={settings.showRatings}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                showRatings: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.showRatings', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.showRatings'),
         },
         {
             control: (
