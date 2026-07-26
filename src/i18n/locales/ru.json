@@ -178,7 +178,11 @@
         "back": "Назад",
         "openFolder": "Открыть папку",
         "saveAndClose": "Сохранить и закрыть",
-        "undo": "Отменить"
+        "undo": "Отменить",
+        "lastScan": "Последнее сканирование {{date}}",
+        "scanFolderCount": "{{count}} папок",
+        "scanItemCount": "{{count}} элементов",
+        "scanningLibrary": "Сканирование библиотеки…"
     },
     "entity": {
         "album_one": "Альбом",
@@ -495,21 +499,21 @@
     "page": {
         "sidebar": {
             "nowPlaying": "Сейчас играет",
-            "search": "$t(common.search)",
-            "home": "$t(common.home)",
+            "search": "Поиск",
+            "home": "Главная",
             "myLibrary": "Моя библиотека",
-            "shared": "Публичные плейлисты $t(entity.playlist, {\"count\": 2})",
+            "shared": "Публичные плейлисты",
             "collections": "Коллекции",
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "tracks": "$t(entity.track, {\"count\": 2})"
+            "albumArtists": "Исполнители альбомов",
+            "albums": "Альбомы",
+            "artists": "Исполнители",
+            "favorites": "Избранное",
+            "folders": "Папки",
+            "genres": "Жанры",
+            "radio": "Радиостанции",
+            "playlists": "Плейлисты",
+            "settings": "Настройки",
+            "tracks": "Треки"
         },
         "fullscreenPlayer": {
             "config": {
@@ -605,7 +609,7 @@
             "newlyAdded": "Недавно добавленные релизы",
             "title": "$t(common.home)",
             "explore": "Изучить свою библиотеку",
-            "recentlyPlayed": "игралось недавно",
+            "recentlyPlayed": "Недавно прослушано",
             "recentlyReleased": "Новинки",
             "genres": "$t(entity.genre, {\"count\": 2})"
         },
@@ -1130,9 +1134,7 @@
         "logLevel": "Уровень логирования",
         "logLevel_description": "Устанавливает минимальный уровень логирования для отображения. Режим «Отладка» показывает все записи в журнале, режим «Ошибка» — только ошибки",
         "logLevel_optionDebug": "Отладка",
-        "logLevel_optionError": "Ошибка",
         "logLevel_optionInfo": "Информация",
-        "logLevel_optionWarn": "Предупреждение",
         "mpvExtraParameters": "дополнительные параметры mpv",
         "mpvExtraParameters_description": "Дополнительные аргументы для передачи в mpv",
         "musicbrainz_description": "Показывать ссылки на MusicBrainz на страницах исполнителя/альбома, если идентификатор MusicBrainz существует",

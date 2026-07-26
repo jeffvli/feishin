@@ -16,8 +16,7 @@ import {
     usePlayerStore,
     useSettingsStore,
 } from '/@/renderer/store';
-import { LogCategory, logFn } from '/@/renderer/utils/logger';
-import { logMsg } from '/@/renderer/utils/logger-message';
+import { logger } from '/@/renderer/utils/logger';
 import { LyricSource, ServerType } from '/@/shared/types/domain-types';
 import { FontType, Platform, PlayerStyle, PlayerType } from '/@/shared/types/types';
 
@@ -94,6 +93,7 @@ type SettingsProperties = {
     'settings.scrobble.enabled': boolean;
     'settings.scrobble.notify': boolean;
     'settings.showLyricsInSidebar': boolean;
+    'settings.showQueueInSidebar': boolean;
     'settings.showVisualizerInSidebar': boolean;
     'settings.sideQueueType': SideQueueType;
     'settings.skipButtons': boolean;
@@ -185,6 +185,7 @@ const getSettingsProperties = (): SettingsProperties => {
         'settings.scrobble.enabled': settings.playback.scrobble.enabled,
         'settings.scrobble.notify': ignoreWeb(settings.playback.scrobble.notify),
         'settings.showLyricsInSidebar': settings.general.showLyricsInSidebar,
+        'settings.showQueueInSidebar': settings.general.showQueueInSidebar,
         'settings.showVisualizerInSidebar': settings.general.showVisualizerInSidebar,
         'settings.sideQueueType': settings.general.sideQueueType,
         // 'settings.skipBackwardSeconds': settings.general.skipButtons.skipBackwardSeconds,
@@ -275,10 +276,7 @@ export const useAppTracker = () => {
             if (lastTrackedDate !== todayUTC) {
                 appTrackerInFlight = true;
                 const properties = getProperties();
-                logFn.info(logMsg[LogCategory.ANALYTICS].appTracked, {
-                    category: LogCategory.ANALYTICS,
-                    meta: { properties, todayUTC },
-                });
+                logger.debug('Analytics sent', { properties, todayUTC });
 
                 trackAppViewMutation(undefined, {
                     onError: () => {},
@@ -295,10 +293,7 @@ export const useAppTracker = () => {
                         appTrackerLastSentDate = utcDate;
                         localStorage.setItem('analytics_app_tracker_timestamp', utcDate);
 
-                        logFn.debug(logMsg[LogCategory.ANALYTICS].appTracked, {
-                            category: LogCategory.ANALYTICS,
-                            meta: { properties },
-                        });
+                        logger.debug('Analytics sent', { properties });
                     },
                 });
             }

@@ -523,18 +523,18 @@
             "playbackTab": "پخش"
         },
         "sidebar": {
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
-            "search": "$t(common.search)",
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "home": "$t(common.home)",
+            "genres": "ژانرها",
+            "playlists": "فهرست‌های پخش",
+            "search": "جست‌وجو",
+            "albumArtists": "هنرمندان آلبوم",
+            "albums": "آلبوم‌ها",
+            "folders": "پوشه‌ها",
+            "artists": "هنرمندان",
+            "home": "خانه",
             "nowPlaying": "پخش کنونی",
-            "tracks": "$t(entity.track, {\"count\": 2})",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "shared": "$t(entity.playlist, {\"count\": 2}) اشتراک‌گذاری شده"
+            "tracks": "قطعه‌ها",
+            "settings": "تنظیمات",
+            "shared": "فهرست‌های پخش اشتراک‌گذاری شده"
         },
         "albumDetail": {
             "moreFromArtist": "موارد بیشتر از این $t(entity.artist, {\"count\": 1})",

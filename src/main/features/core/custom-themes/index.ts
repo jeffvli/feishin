@@ -5,6 +5,8 @@ import { promises as fs, watch as fsWatch } from 'fs';
 import path from 'path';
 import { validateHTMLColor } from 'validate-color';
 
+import log from '/@/main/logger';
+
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 const defaultUserDataPath = app.getPath('userData');
@@ -48,7 +50,7 @@ const sanitizeColors = (
             sanitized[key] = value;
         } else {
             invalidKeys.push(key);
-            console.warn(`Custom theme "${themeId}" has an invalid color for "${key}": ${value}`);
+            log.warn(`Custom theme "${themeId}" has an invalid color for "${key}": ${value}`);
         }
     }
 
@@ -128,7 +130,7 @@ const resolveStylesheetPaths = (themeDir: string, stylesheets?: string[]): strin
             relativeToThemes.startsWith('..') || path.isAbsolute(relativeToThemes);
 
         if (escapesThemesDir) {
-            console.warn(
+            log.warn(
                 `Skipping linked file outside themes folder: ${relativePath} (from ${themeDir})`,
             );
             continue;
@@ -146,7 +148,7 @@ const readStylesheetContents = async (stylesheetPaths: string[]): Promise<string
             try {
                 return await fs.readFile(stylesheetPath, 'utf8');
             } catch (error) {
-                console.warn(`Failed to read linked stylesheet ${stylesheetPath}`, error);
+                log.warn(`Failed to read linked stylesheet ${stylesheetPath}`, error);
                 return '';
             }
         }),
@@ -193,9 +195,7 @@ const resolveExtends = (
     }
 
     if (visited.has(id) || depth > MAX_EXTENDS_DEPTH) {
-        console.warn(
-            `Custom theme "${id}" has a circular or too-deep "extends" chain, ignoring it`,
-        );
+        log.warn(`Custom theme "${id}" has a circular or too-deep "extends" chain, ignoring it`);
         return { fields: { mode: 'dark' }, invalidColorKeys: [] };
     }
 
@@ -322,14 +322,14 @@ const reloadThemes = async () => {
         cache = await loadThemesFromDisk();
         broadcastThemes(cache);
     } catch (error) {
-        console.error('Failed to load custom themes', error);
+        log.error('Failed to load custom themes', error);
     }
 };
 
 const scheduleReload = () => {
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-        reloadThemes().catch((error) => console.error('Failed to reload custom themes', error));
+        reloadThemes().catch((error) => log.error('Failed to reload custom themes', error));
     }, RELOAD_DEBOUNCE_MS);
 };
 
@@ -357,7 +357,7 @@ const startWatcher = async () => {
             }
         });
     } catch (error) {
-        console.error('Failed to watch themes folder', error);
+        log.error('Failed to watch themes folder', error);
     }
 };
 
@@ -384,7 +384,7 @@ app.whenReady()
         await startWatcher();
         await reloadThemes();
     })
-    .catch((error) => console.error('Failed to initialize custom themes', error));
+    .catch((error) => log.error('Failed to initialize custom themes', error));
 
 app.on('before-quit', () => {
     if (watcher) {

@@ -4,6 +4,7 @@ import { NavidromeController } from '/@/renderer/api/navidrome/navidrome-control
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
 import { mergeMusicFolderId } from '/@/renderer/api/utils-music-folder';
 import { getServerById, useAuthStore, useSettingsStore } from '/@/renderer/store';
+import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import {
     AuthenticationResponse,
@@ -26,6 +27,95 @@ const endpoints: ApiController = {
     subsonic: SubsonicController,
 };
 
+const SENSITIVE_KEY_PATTERN = /password|token|credential|authorization|secret|cookie/i;
+const MAX_ARRAY_ITEMS = 20;
+const MAX_STRING_LENGTH = 200;
+
+const sanitizeValue = (value: unknown, depth = 0): unknown => {
+    if (value === null || value === undefined) {
+        return value;
+    }
+
+    if (typeof value === 'string') {
+        return value.length > MAX_STRING_LENGTH
+            ? `${value.slice(0, MAX_STRING_LENGTH)}…(${value.length})`
+            : value;
+    }
+
+    if (typeof value !== 'object') {
+        return value;
+    }
+
+    if (depth >= 4) {
+        return '[Truncated]';
+    }
+
+    if (Array.isArray(value)) {
+        const items = value.slice(0, MAX_ARRAY_ITEMS).map((item) => sanitizeValue(item, depth + 1));
+        if (value.length > MAX_ARRAY_ITEMS) {
+            items.push(`…(+${value.length - MAX_ARRAY_ITEMS} more)`);
+        }
+        return items;
+    }
+
+    const result: Record<string, unknown> = {};
+    for (const [key, nested] of Object.entries(value as Record<string, unknown>)) {
+        if (SENSITIVE_KEY_PATTERN.test(key)) {
+            result[key] = '[Redacted]';
+            continue;
+        }
+        result[key] = sanitizeValue(nested, depth + 1);
+    }
+    return result;
+};
+
+const OMITTED_CONTROLLER_ARG_KEYS = new Set([
+    'apiClientProps',
+    'body',
+    'context',
+    'query',
+    'signal',
+]);
+
+const sanitizeControllerArgs = (endpoint: string, args: unknown[]): unknown => {
+    if (endpoint === 'authenticate') {
+        const [url] = args;
+        return { url: typeof url === 'string' ? url : undefined };
+    }
+
+    const first = args[0];
+    if (!first || typeof first !== 'object') {
+        return args.length === 0 ? undefined : sanitizeValue(args);
+    }
+
+    const input = first as Record<string, unknown>;
+    const sanitized: Record<string, unknown> = {};
+
+    if (input.query !== undefined) {
+        sanitized.query = sanitizeValue(input.query);
+    }
+
+    if (input.body !== undefined) {
+        sanitized.body = sanitizeValue(input.body);
+    }
+
+    for (const [key, value] of Object.entries(input)) {
+        if (OMITTED_CONTROLLER_ARG_KEYS.has(key)) {
+            continue;
+        }
+        sanitized[key] = sanitizeValue(value);
+    }
+
+    return sanitized;
+};
+
+const OMITTED_CONTROLLER_LOG_ENDPOINTS = new Set<keyof ControllerEndpoint>([
+    'getDownloadUrl',
+    'getImageRequest',
+    'getImageUrl',
+    'getStreamUrl',
+]);
+
 const apiController = <K extends keyof ControllerEndpoint>(
     endpoint: K,
     type?: ServerType,
@@ -37,27 +127,71 @@ const apiController = <K extends keyof ControllerEndpoint>(
             message: i18n.t('error.serverNotSelectedError') as string,
             title: i18n.t('error.apiRouteError') as string,
         });
+
+        logger.error('No server selected', {
+            serverType,
+        });
         throw new Error(`No server selected`);
     }
 
     const controllerFn = endpoints?.[serverType]?.[endpoint];
 
     if (typeof controllerFn !== 'function') {
-        toast.error({
-            message: `Endpoint ${endpoint} is not implemented for ${serverType}`,
-            title: i18n.t('error.apiRouteError') as string,
+        logger.error(`Endpoint ${endpoint} is not implemented for ${serverType}`, {
+            endpoint,
+            serverType,
         });
 
         throw new Error(
             i18n.t('error.endpointNotImplementedError', {
                 endpoint,
-
                 serverType,
             }) as string,
         );
     }
 
-    return controllerFn;
+    if (OMITTED_CONTROLLER_LOG_ENDPOINTS.has(endpoint)) {
+        return controllerFn;
+    }
+
+    return ((...args: unknown[]) => {
+        const started = performance.now();
+        const serverId = (args[0] as undefined | { apiClientProps?: { serverId?: string } })
+            ?.apiClientProps?.serverId;
+
+        const logResult = (error?: unknown, value?: unknown) => {
+            logger.debug(`Controller ${String(endpoint)}${error != null ? ' failed' : ''}`, {
+                args: sanitizeControllerArgs(String(endpoint), args),
+                durationMs: Math.round(performance.now() - started),
+                serverId,
+                serverType,
+                ...(error != null
+                    ? { error: error instanceof Error ? error.message : String(error) }
+                    : { result: sanitizeValue(value) }),
+            });
+        };
+
+        try {
+            const result = (controllerFn as (...a: unknown[]) => unknown)(...args);
+            if (result instanceof Promise) {
+                return result.then(
+                    (value) => {
+                        logResult(undefined, value);
+                        return value;
+                    },
+                    (error) => {
+                        logResult(error);
+                        throw error;
+                    },
+                );
+            }
+            logResult(undefined, result);
+            return result;
+        } catch (error) {
+            logResult(error);
+            throw error;
+        }
+    }) as NonNullable<InternalControllerEndpoint[K]>;
 };
 
 const getPathReplaceSettings = () => {

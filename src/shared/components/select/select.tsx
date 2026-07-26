@@ -23,6 +23,7 @@ export const Select = ({
         <MantineSelect
             allowDeselect={allowDeselect || clearable}
             classNames={{
+                description: styles.description,
                 dropdown: styles.dropdown,
                 input: styles.input,
                 label: styles.label,

@@ -7,8 +7,7 @@ import { useDeleteInternetRadioStationImage } from '/@/renderer/features/radio/m
 import { useUpdateRadioStation } from '/@/renderer/features/radio/mutations/update-radio-station-mutation';
 import { useUploadInternetRadioStationImage } from '/@/renderer/features/radio/mutations/upload-internet-radio-station-image-mutation';
 import { useCurrentServer } from '/@/renderer/store';
-import { logFn } from '/@/renderer/utils/logger';
-import { logMsg } from '/@/renderer/utils/logger-message';
+import { logger } from '/@/renderer/utils/logger';
 import { hasFeature } from '/@/shared/api/utils';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Box } from '/@/shared/components/box/box';
@@ -108,9 +107,7 @@ export const EditRadioStationForm = ({ onCancel, station }: EditRadioStationForm
             });
             closeAllModals();
         } catch (err: unknown) {
-            logFn.error(logMsg.other.error, {
-                meta: { error: err as Error },
-            });
+            logger.error('An error occurred', { error: err as Error });
 
             toast.error({
                 message: (err as Error)?.message,

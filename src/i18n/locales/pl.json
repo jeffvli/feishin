@@ -177,7 +177,11 @@
         "back": "Wstecz",
         "openFolder": "Otwórz folder",
         "saveAndClose": "Zapisz i zamknij",
-        "undo": "Cofnij"
+        "undo": "Cofnij",
+        "lastScan": "Ostatnie skanowanie {{date}}",
+        "scanFolderCount": "{{count}} folderów",
+        "scanItemCount": "{{count}} elementów",
+        "scanningLibrary": "Skanowanie biblioteki…"
     },
     "entity": {
         "genre_one": "Gatunek",
@@ -493,7 +497,8 @@
             "selectMusicFolder": "Wybierz folder muzyki",
             "noMusicFolder": "Nie wybrano folderu muzyki",
             "multipleMusicFolders": "Wybrano {{count}} folderów muzyki",
-            "commandPalette": "Otwórz paletę komend"
+            "commandPalette": "Otwórz paletę komend",
+            "logout": "Wyloguj"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -544,20 +549,20 @@
         },
         "sidebar": {
             "nowPlaying": "Teraz odtwarzane",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
-            "search": "$t(common.search)",
-            "tracks": "$t(entity.track, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "home": "$t(common.home)",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "shared": "Udostępniono $t(entity.playlist, {\"count\": 2})",
+            "playlists": "Playlisty",
+            "search": "Szukaj",
+            "tracks": "Utwory",
+            "albums": "Albumy",
+            "genres": "Gatunki",
+            "folders": "Katalogi",
+            "settings": "Ustawienia",
+            "home": "Główna",
+            "artists": "Wykonawców",
+            "albumArtists": "Wykonawców albumów",
+            "shared": "Udostępnione playlisty",
             "myLibrary": "Moja biblioteka",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "favorites": "Ulubione",
+            "radio": "Stacje radiowe",
             "collections": "Kolekcje"
         },
         "home": {
@@ -1039,11 +1044,9 @@
         "autoDJ_timing": "Czas dodawania",
         "autoDJ_timing_description": "Ilość piosenek pozostałych w kolejce przed tym gdy zostanie włączony automatyczny DJ",
         "logLevel": "Poziom logów",
-        "logLevel_description": "Ustawia minimalny poziom logów do wyświetlenia. debugowanie wyświetla wszystkie logi błędy wyświetla tylko błędy",
+        "logLevel_description": "Ustawia minimalny poziom logów do wyświetlenia",
         "logLevel_optionDebug": "Debugowanie",
-        "logLevel_optionError": "Błędy",
         "logLevel_optionInfo": "Info",
-        "logLevel_optionWarn": "Ostrzeżenia",
         "useThemeAccentColor": "Używaj koloru akcentu motywu",
         "useThemeAccentColor_description": "Używaj głównego koloru ustawionego w wybranym motywie zamiast niestandardowego koloru akcentu",
         "artistRadioCount_description": "Ustawia liczbę piosenek do załadowania dla radia wykonawcy i radia utworu",
@@ -1191,7 +1194,10 @@
         "microtonalPitchControls": "Mikrotonowe sterowanie wysokością dźwięku",
         "microtonalPitchControls_description": "Dodaj więcej sterowania wysokością dźwięku pomiędzy półtonami",
         "hotkey_playbackNextAlbum": "Następny album",
-        "hotkey_playbackPreviousAlbum": "Poprzedni album"
+        "hotkey_playbackPreviousAlbum": "Poprzedni album",
+        "logLevel_optionDebugDescription": "zawiera info, plus szczegółowe informacje debugowania i ocenzurowane odpowiedzi API",
+        "logLevel_optionInfoDescription": "zawiera info, ostrzeżenia i błędy",
+        "exportDiagnostics": "Eksportuj diagnostykę"
     },
     "table": {
         "config": {

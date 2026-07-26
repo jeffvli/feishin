@@ -26,6 +26,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
         return (
             <MantineAutocomplete
                 classNames={{
+                    description: styles.description,
                     dropdown: styles.dropdown,
                     input: styles.input,
                     label: styles.label,

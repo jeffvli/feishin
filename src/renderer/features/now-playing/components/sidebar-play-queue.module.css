@@ -8,6 +8,24 @@
     overflow: hidden;
 }
 
+.panels-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.queue-only {
+    flex: 1;
+    min-height: 0;
+}
+
+.queue-only-content {
+    flex: 1;
+    min-height: 0;
+}
+
 .lyrics-section {
     position: relative;
     display: flex;
@@ -38,6 +56,10 @@
     left: 0;
     z-index: 0;
     pointer-events: none;
+}
+
+.visualizer-overlay-dimmed {
+    opacity: 0.2;
 }
 
 .visualizer-section {

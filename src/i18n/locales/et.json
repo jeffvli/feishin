@@ -171,7 +171,13 @@
         "tableColumns": "Tabeli veerge",
         "itemsMore": "{{count}} veel",
         "newVersionAvailable": "Saadaval on uus versioon",
-        "path": "Asukoht"
+        "path": "Asukoht",
+        "saveAndClose": "Salvesta ja sulge",
+        "undo": "Võta tagasi",
+        "lastScan": "Viimane skaneering {{date}}",
+        "scanFolderCount": "{{count}} kausta",
+        "scanItemCount": "{{count}} üksust",
+        "scanningLibrary": "Meediakogu skannimine…"
     },
     "entity": {
         "album_one": "Album",
@@ -503,7 +509,8 @@
             "noMusicFolder": "Muusikakausta pole valitud",
             "multipleMusicFolders": "{{count}} muusikakausta valitud",
             "settings": "$t(common.setting, {\"count\": 2})",
-            "version": "Versioon {{version}}"
+            "version": "Versioon {{version}}",
+            "logout": "Logi välja"
         },
         "manageServers": {
             "title": "Halda servereid",
@@ -539,7 +546,8 @@
             "goTo": "Mine >",
             "goToAlbum": "Mine > $t(entity.album, {\"count\": 1})",
             "goToAlbumArtist": "Mine > $t(entity.albumArtist, {\"count\": 1})",
-            "showDetails": "Hangi teavet"
+            "showDetails": "Hangi teavet",
+            "editMetadata": "Muuda metaandmeid"
         },
         "fullscreenPlayer": {
             "config": {
@@ -602,7 +610,26 @@
         "itemDetail": {
             "copyPath": "Kopeeri tee lõikelauale",
             "copiedPath": "Tee kopeeriti edukalt",
-            "openFile": "Kuva lugu failihalduris"
+            "openFile": "Kuva lugu failihalduris",
+            "tagConfiguration": "Siltide seadistus",
+            "addTagConfig": "Lisa silt…",
+            "multiValueToggle": "Mitme väärtusega",
+            "autocompleteSource": "Automaatse täitmise allikas",
+            "customValues": "Kohandatud väärtused",
+            "addCustomValue": "Lisa kohandatud väärtus…",
+            "serverSuggestions": "Server",
+            "fileNotWritable": "Fail pole ligipääsetav või kirjutatav",
+            "triggerRescan": "Soorita pärast salvestamist meediakogu skaneering",
+            "addField": "Lisa väli…",
+            "emptyFields": "Väljad ei tohi olla tühjad",
+            "tagsTab": "Sildid",
+            "artworkTab": "Kaanepildid",
+            "removeArtwork": "Eemalda kaanepildid",
+            "noArtwork": "Kaanepilti pole",
+            "multipleValues": "(Mitme väärtusega)",
+            "multipleArtworks": "Mitu kaanepilti",
+            "writePartialFailure": "{{count}} faili salvestamine nurjus",
+            "noLocalSongs": "Kohalike failiteedega laule ei leitud"
         },
         "playlist": {
             "reorder": "Ümberreastamine on lubatud vaid ID järgi sorteerimisel"
@@ -640,22 +667,22 @@
             "remote": "Kaugjuhtimine"
         },
         "sidebar": {
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
+            "albumArtists": "Albumi esitajad",
+            "albums": "Albumid",
             "collections": "Kogumikud",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "home": "$t(common.home)",
-            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "artists": "Esitajad",
+            "favorites": "Lemmikud",
+            "folders": "Kaustad",
+            "genres": "Žanrid",
+            "home": "Avaleht",
+            "radio": "Raadiojaamad",
             "myLibrary": "Muusikakogu",
             "nowPlaying": "Esitamisel",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
-            "search": "$t(common.search)",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "shared": "Shared $t(entity.playlist, {\"count\": 2})",
-            "tracks": "$t(entity.track, {\"count\": 2})"
+            "playlists": "Esitusloendid",
+            "search": "Otsi",
+            "settings": "Sätted",
+            "shared": "Jagatud esitusloendid",
+            "tracks": "Lood"
         },
         "trackList": {
             "artistTracks": "{{artist}} lood",
@@ -947,11 +974,9 @@
         "lyricOffset_description": "Nihuta laulusõnu määratud millisekundite võrra",
         "lyricOffset": "Laulusõnade nihe (ms)",
         "logLevel": "Logimise tase",
-        "logLevel_description": "Määrab kuvatava logimise miinimumtaseme. „Silumine“ näitab kõiki logisid, „viga“ ainult vigu",
+        "logLevel_description": "Määrab kuvatava logimise miinimumtaseme",
         "logLevel_optionDebug": "Silumine",
-        "logLevel_optionError": "Viga",
         "logLevel_optionInfo": "Info",
-        "logLevel_optionWarn": "Hoiata",
         "minimizeToTray_description": "Minimeeri rakendus süsteemisalve",
         "minimizeToTray": "Minimeeri salve",
         "minimumScrobblePercentage_description": "Minimaalne laulu kuulamise protsent, mis peab olema läbitud, enne kui see kraasitakse",

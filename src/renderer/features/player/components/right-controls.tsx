@@ -8,6 +8,10 @@ import { CustomPlayerbarSlider } from '/@/renderer/features/player/components/pl
 import { SleepTimerButton } from '/@/renderer/features/player/components/sleep-timer-button';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useAudioDevices } from '/@/renderer/features/settings/components/playback/audio-settings';
+import {
+    ListConfigBooleanControl,
+    ListConfigTable,
+} from '/@/renderer/features/shared/components/list-config-menu';
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
@@ -49,8 +53,8 @@ import { Popover } from '/@/shared/components/popover/popover';
 import { Rating } from '/@/shared/components/rating/rating';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Select } from '/@/shared/components/select/select';
+import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
-import { Switch } from '/@/shared/components/switch/switch';
 import { Text } from '/@/shared/components/text/text';
 import { useMediaQuery } from '/@/shared/hooks/use-media-query';
 import { useThrottledCallback } from '/@/shared/hooks/use-throttled-callback';
@@ -109,13 +113,6 @@ const AutoDJButton = () => {
     const settings = useAutoDJSettings();
     const { setSettings } = useSettingsStoreActions();
 
-    const itemLabels = useMemo(() => {
-        return {
-            description: t('setting.autoDJ_itemCount_description'),
-            title: t('setting.autoDJ_itemCount'),
-        };
-    }, [t]);
-
     const strategySelectData = useMemo(
         () => [
             {
@@ -130,21 +127,199 @@ const AutoDJButton = () => {
         [t],
     );
 
-    const strategyLabels =
+    const strategyTitle =
         settings.mode === AUTO_DJ_MODE.ALBUMS
-            ? {
-                  description: '',
-                  title: t('setting.autoDJ_albumStrategy'),
-              }
-            : {
-                  description: '',
-                  title: t('setting.autoDJ_songStrategy'),
-              };
+            ? t('setting.autoDJ_albumStrategy')
+            : t('setting.autoDJ_songStrategy');
 
     const strategyValue =
         settings.mode === AUTO_DJ_MODE.ALBUMS
             ? (settings.albumStrategy ?? AUTO_DJ_STRATEGY.SIMILAR)
             : (settings.songStrategy ?? AUTO_DJ_STRATEGY.SIMILAR);
+
+    const enabledOptions = useMemo(
+        () => [
+            {
+                component: (
+                    <ListConfigBooleanControl
+                        onChange={(value) => {
+                            setSettings({
+                                autoDJ: { enabled: value },
+                            });
+                        }}
+                        value={settings.enabled}
+                    />
+                ),
+                id: 'enabled',
+                label: t('setting.autoDJ_enabled'),
+            },
+        ],
+        [setSettings, settings.enabled, t],
+    );
+
+    const configOptions = useMemo(
+        () => [
+            {
+                component: (
+                    <Select
+                        comboboxProps={{ withinPortal: false }}
+                        data={strategySelectData}
+                        onChange={(value) => {
+                            if (!value) return;
+                            setSettings({
+                                autoDJ:
+                                    settings.mode === AUTO_DJ_MODE.ALBUMS
+                                        ? { albumStrategy: value as AutoDJStrategy }
+                                        : { songStrategy: value as AutoDJStrategy },
+                            });
+                        }}
+                        size="sm"
+                        value={strategyValue}
+                        variant="filled"
+                        w="160px"
+                    />
+                ),
+                id: 'strategy',
+                label: strategyTitle,
+            },
+            {
+                component: (
+                    <NumberInput
+                        aria-label={t('setting.autoDJ_itemCount')}
+                        hideControls={false}
+                        max={50}
+                        min={1}
+                        onChange={(e) =>
+                            setSettings({
+                                autoDJ: {
+                                    itemCount: Number(e),
+                                },
+                            })
+                        }
+                        size="sm"
+                        value={Number(settings.itemCount)}
+                        variant="filled"
+                        w="96px"
+                    />
+                ),
+                id: 'itemCount',
+                label: (
+                    <Stack gap="xs">
+                        <Text isNoSelect size="sm">
+                            {t('setting.autoDJ_itemCount')}
+                        </Text>
+                        <Text isMuted isNoSelect size="xs">
+                            {t('setting.autoDJ_itemCount_description')}
+                        </Text>
+                    </Stack>
+                ),
+            },
+            {
+                component: (
+                    <Slider
+                        aria-label={t('setting.autoDJ_timing')}
+                        marks={[
+                            { label: '1', value: 1 },
+                            { label: '2', value: 2 },
+                            { label: '3', value: 3 },
+                            { label: '4', value: 4 },
+                            { label: '5', value: 5 },
+                        ]}
+                        max={5}
+                        min={1}
+                        onChange={(e) =>
+                            setSettings({
+                                autoDJ: {
+                                    timing: Number(e),
+                                },
+                            })
+                        }
+                        size="sm"
+                        value={Number(settings.timing)}
+                        variant="filled"
+                        w="144px"
+                    />
+                ),
+                id: 'timing',
+                label: (
+                    <Stack gap="xs">
+                        <Text isNoSelect size="sm">
+                            {t('setting.autoDJ_timing')}
+                        </Text>
+                        <Text isMuted isNoSelect size="xs">
+                            {t('setting.autoDJ_timing_description')}
+                        </Text>
+                    </Stack>
+                ),
+            },
+        ],
+        [
+            setSettings,
+            settings.itemCount,
+            settings.mode,
+            settings.timing,
+            strategySelectData,
+            strategyTitle,
+            strategyValue,
+            t,
+        ],
+    );
+
+    const toggleOptions = useMemo(
+        () => [
+            {
+                component: (
+                    <ListConfigBooleanControl
+                        onChange={(value) => {
+                            setSettings({
+                                autoDJ: {
+                                    allowDuplicates: value,
+                                },
+                            });
+                        }}
+                        value={settings.allowDuplicates}
+                    />
+                ),
+                id: 'allowDuplicates',
+                label: (
+                    <Stack gap="xs">
+                        <Text isNoSelect size="sm">
+                            {t('setting.autoDJ_allowDuplicates')}
+                        </Text>
+                        <Text isMuted isNoSelect size="xs">
+                            {t('setting.autoDJ_allowDuplicates_description')}
+                        </Text>
+                    </Stack>
+                ),
+            },
+            {
+                component: (
+                    <ListConfigBooleanControl
+                        onChange={(value) => {
+                            setSettings({
+                                autoDJ: {
+                                    onlySimilar: value,
+                                },
+                            });
+                        }}
+                        value={settings.onlySimilar}
+                    />
+                ),
+                id: 'onlySimilar',
+                label: (
+                    <Stack gap="xs">
+                        <Text isNoSelect size="sm">
+                            {t('setting.autoDJ_onlySimilar')}
+                        </Text>
+                        <Text isMuted isNoSelect size="xs">
+                            {t('setting.autoDJ_onlySimilar_description')}
+                        </Text>
+                    </Stack>
+                ),
+            },
+        ],
+        [setSettings, settings.allowDuplicates, settings.onlySimilar, t],
+    );
 
     return (
         <Popover position="top-end" withArrow>
@@ -161,22 +336,10 @@ const AutoDJButton = () => {
                     {t('setting.autoDJ')}
                 </Button>
             </Popover.Target>
-            <Popover.Dropdown maw={320} miw={260} onClick={(e) => e.stopPropagation()} p="sm">
+            <Popover.Dropdown maw={480} miw={320} onClick={(e) => e.stopPropagation()} p="sm">
                 <Stack gap="sm">
                     <Paper p="md" radius="md">
-                        <Group align="center" gap="xs" justify="space-between" wrap="nowrap">
-                            <Text fw={600} isNoSelect size="sm">
-                                {t('setting.autoDJ_enabled')}
-                            </Text>
-                            <Switch
-                                checked={settings.enabled}
-                                onChange={(e) =>
-                                    setSettings({
-                                        autoDJ: { enabled: e.currentTarget.checked },
-                                    })
-                                }
-                            />
-                        </Group>
+                        <ListConfigTable options={enabledOptions} />
                     </Paper>
                     <SegmentedControl
                         data={[
@@ -196,58 +359,12 @@ const AutoDJButton = () => {
                         value={settings.mode}
                         w="100%"
                     />
-                    <Select
-                        comboboxProps={{ withinPortal: false }}
-                        data={strategySelectData}
-                        description={strategyLabels.description}
-                        label={strategyLabels.title}
-                        onChange={(value) => {
-                            if (!value) return;
-                            setSettings({
-                                autoDJ:
-                                    settings.mode === AUTO_DJ_MODE.ALBUMS
-                                        ? { albumStrategy: value as AutoDJStrategy }
-                                        : { songStrategy: value as AutoDJStrategy },
-                            });
-                        }}
-                        size="md"
-                        value={strategyValue}
-                        w="100%"
-                    />
-                    <NumberInput
-                        aria-label={itemLabels.title}
-                        description={itemLabels.description}
-                        hideControls={false}
-                        label={itemLabels.title}
-                        max={50}
-                        min={1}
-                        onChange={(e) =>
-                            setSettings({
-                                autoDJ: {
-                                    itemCount: Number(e),
-                                },
-                            })
-                        }
-                        size="md"
-                        value={Number(settings.itemCount)}
-                    />
-                    <NumberInput
-                        aria-label={t('setting.autoDJ_timing')}
-                        description={t('setting.autoDJ_timing_description')}
-                        hideControls={false}
-                        label={t('setting.autoDJ_timing')}
-                        max={5}
-                        min={1}
-                        onChange={(e) =>
-                            setSettings({
-                                autoDJ: {
-                                    timing: Number(e),
-                                },
-                            })
-                        }
-                        size="md"
-                        value={Number(settings.timing)}
-                    />
+                    <Paper p="md" radius="md">
+                        <ListConfigTable options={configOptions} />
+                    </Paper>
+                    <Paper p="md" radius="md">
+                        <ListConfigTable options={toggleOptions} />
+                    </Paper>
                 </Stack>
             </Popover.Dropdown>
         </Popover>

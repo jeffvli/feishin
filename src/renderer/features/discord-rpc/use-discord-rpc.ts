@@ -22,8 +22,7 @@ import {
     useTimestampStoreBase,
 } from '/@/renderer/store';
 import { sentenceCase } from '/@/renderer/utils';
-import { LogCategory, logFn } from '/@/renderer/utils/logger';
-import { logMsg } from '/@/renderer/utils/logger-message';
+import { logger } from '/@/renderer/utils/logger';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
@@ -112,13 +111,10 @@ export const useDiscordRpc = () => {
                     reason = 'paused_with_show_paused_disabled';
                 }
 
-                logFn.debug(logMsg[LogCategory.EXTERNAL].discordRpcActivityCleared, {
-                    category: LogCategory.EXTERNAL,
-                    meta: {
-                        reason,
-                        status: current[2],
-                        trigger,
-                    },
+                logger.debug('Activity was cleared for Discord RPC', {
+                    reason,
+                    status: current[2],
+                    trigger,
                 });
                 return discordRpc?.clearActivity();
             }
@@ -151,24 +147,20 @@ export const useDiscordRpc = () => {
 
                 const isConnected = await discordRpc?.isConnected();
                 if (!isConnected) {
-                    logFn.debug(logMsg[LogCategory.EXTERNAL].discordRpcInitialized, {
-                        category: LogCategory.EXTERNAL,
-                        meta: { clientId: discordSettings.clientId },
+                    logger.info('Discord RPC was initialized', {
+                        clientId: discordSettings.clientId,
                     });
                     previousEnabledRef.current = true;
                     await discordRpc?.initialize(discordSettings.clientId);
                 }
 
-                logFn.debug(logMsg[LogCategory.EXTERNAL].discordRpcSetActivity, {
-                    category: LogCategory.EXTERNAL,
-                    meta: {
-                        currentStatus: current[2],
-                        reason: 'radio',
-                        showAsListening: discordSettings.showAsListening,
-                        stationName: stationName || 'Radio',
-                        title,
-                        trigger,
-                    },
+                logger.debug('Activity was set for Discord RPC', {
+                    currentStatus: current[2],
+                    reason: 'radio',
+                    showAsListening: discordSettings.showAsListening,
+                    stationName: stationName || 'Radio',
+                    title,
+                    trigger,
                 });
                 discordRpc?.setActivity(activity);
                 return;
@@ -179,13 +171,10 @@ export const useDiscordRpc = () => {
             }
 
             if (trackChanged) {
-                logFn.debug(logMsg[LogCategory.EXTERNAL].discordRpcTrackChanged, {
-                    category: LogCategory.EXTERNAL,
-                    meta: {
-                        artistName: song.artists?.[0]?.name,
-                        songId: song._uniqueId,
-                        songName: song.name,
-                    },
+                logger.debug('Track was changed for Discord RPC', {
+                    artistName: song.artists?.[0]?.name,
+                    songId: song._uniqueId,
+                    songName: song.name,
                 });
                 setlastUniqueId(song._uniqueId);
             }
@@ -319,11 +308,8 @@ export const useDiscordRpc = () => {
             // Initialize if needed
             const isConnected = await discordRpc?.isConnected();
             if (!isConnected) {
-                logFn.debug(logMsg[LogCategory.EXTERNAL].discordRpcInitialized, {
-                    category: LogCategory.EXTERNAL,
-                    meta: {
-                        clientId: discordSettings.clientId,
-                    },
+                logger.info('Discord RPC was initialized', {
+                    clientId: discordSettings.clientId,
                 });
 
                 previousEnabledRef.current = true;
@@ -331,22 +317,19 @@ export const useDiscordRpc = () => {
                 await discordRpc?.initialize(discordSettings.clientId);
             }
 
-            logFn.debug(logMsg[LogCategory.EXTERNAL].discordRpcSetActivity, {
-                category: LogCategory.EXTERNAL,
-                meta: {
-                    albumName: song.album,
-                    artistName: song.artists?.[0]?.name,
-                    currentStatus: current[2],
-                    currentTime: current[1],
-                    displayType: discordSettings.displayType,
-                    hasLargeImage: !!activity.largeImageKey,
-                    hasTimestamps: !!(activity.startTimestamp && activity.endTimestamp),
-                    reason,
-                    showAsListening: discordSettings.showAsListening,
-                    songName: song.name,
-                    trackChanged,
-                    trigger,
-                },
+            logger.debug('Activity was set for Discord RPC', {
+                albumName: song.album,
+                artistName: song.artists?.[0]?.name,
+                currentStatus: current[2],
+                currentTime: current[1],
+                displayType: discordSettings.displayType,
+                hasLargeImage: !!activity.largeImageKey,
+                hasTimestamps: !!(activity.startTimestamp && activity.endTimestamp),
+                reason,
+                showAsListening: discordSettings.showAsListening,
+                songName: song.name,
+                trackChanged,
+                trigger,
             });
             discordRpc?.setActivity(activity);
         },
@@ -374,12 +357,9 @@ export const useDiscordRpc = () => {
     // Quit Discord RPC if it was enabled and is now disabled
     useEffect(() => {
         if ((!discordSettings.enabled || privateMode) && Boolean(previousEnabledRef.current)) {
-            logFn.info(logMsg[LogCategory.EXTERNAL].discordRpcQuit, {
-                category: LogCategory.EXTERNAL,
-                meta: {
-                    enabled: discordSettings.enabled,
-                    privateMode,
-                },
+            logger.info('Discord RPC was quit', {
+                enabled: discordSettings.enabled,
+                privateMode,
             });
 
             previousEnabledRef.current = false;

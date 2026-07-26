@@ -1,6 +1,7 @@
 import { createSocket } from 'dgram';
 import { ipcMain } from 'electron';
 
+import log from '/@/main/logger';
 import { DiscoveredServerItem, ServerType } from '/@/shared/types/types';
 
 type JellyfinResponse = {
@@ -26,7 +27,7 @@ function discoverJellyfin(reply: (server: DiscoveredServerItem) => void) {
             });
         } catch (e) {
             // Got a spurious response, ignore?
-            console.error(e);
+            log.error(e);
         }
     });
 
@@ -51,5 +52,5 @@ ipcMain.on('autodiscover-ping', (ev) => {
 
     discoverAll((result) => port.postMessage(result))
         .then(() => port.close())
-        .catch((err) => console.error(err));
+        .catch((err) => log.error(err));
 });

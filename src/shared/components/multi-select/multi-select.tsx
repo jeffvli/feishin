@@ -12,6 +12,7 @@ export interface MultiSelectProps extends MantineMultiSelectProps {
 }
 
 const defaultClassNames = {
+    description: styles.description,
     dropdown: styles.dropdown,
     input: styles.input,
     label: styles.label,

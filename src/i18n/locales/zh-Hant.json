@@ -122,7 +122,11 @@
         "back": "返回",
         "openFolder": "開啟資料夾",
         "saveAndClose": "儲存並關閉",
-        "undo": "還原"
+        "undo": "還原",
+        "lastScan": "上次掃描 {{date}}",
+        "scanFolderCount": "{{count}} 個資料夾",
+        "scanItemCount": "{{count}} 個項目",
+        "scanningLibrary": "正在掃描媒體庫…"
     },
     "error": {
         "endpointNotImplementedError": "{{serverType}} 尚未實作端點 {{endpoint}}",
@@ -304,21 +308,21 @@
             "showTracks": "顯示 $t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2})"
         },
         "sidebar": {
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "search": "$t(common.search)",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "tracks": "$t(entity.track, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "home": "$t(common.home)",
+            "albumArtists": "專輯藝人",
+            "albums": "專輯",
+            "artists": "藝人",
+            "folders": "資料夾",
+            "search": "搜尋",
+            "settings": "設定",
+            "tracks": "曲目",
+            "genres": "曲風",
+            "home": "首頁",
             "nowPlaying": "正在播放",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
+            "playlists": "播放清單",
             "myLibrary": "我的媒體庫",
-            "shared": "共享$t(entity.playlist, {\"count\": 2})",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "shared": "共享播放清單",
+            "favorites": "收藏",
+            "radio": "電台",
             "collections": "收藏集"
         },
         "trackList": {
@@ -755,11 +759,9 @@
         "autoDJ_timing_description": "佇列中剩餘多少歌曲時啟動 Auto DJ",
         "autoDJ_timing": "觸發時機",
         "logLevel": "日誌等級",
-        "logLevel_description": "設定要顯示的最低日誌等級。Debug 會顯示所有日誌，Error 僅會顯示錯誤訊息",
+        "logLevel_description": "設定要顯示的最低日誌等級",
         "logLevel_optionDebug": "Debug",
-        "logLevel_optionError": "Error",
         "logLevel_optionInfo": "Info",
-        "logLevel_optionWarn": "Warn",
         "useThemeAccentColor": "使用主題強調色",
         "useThemeAccentColor_description": "使用所選主題中定義的主要顏色，而非自訂的強調色",
         "artistRadioCount_description": "設定要為藝人電台與曲目電台擷取的歌曲數量",
@@ -907,7 +909,16 @@
         "microtonalPitchControls": "微音程音高控制",
         "microtonalPitchControls_description": "新增更多音高控制選項，以在半音之間進行微調",
         "hotkey_playbackNextAlbum": "下一張專輯",
-        "hotkey_playbackPreviousAlbum": "上一張專輯"
+        "hotkey_playbackPreviousAlbum": "上一張專輯",
+        "logLevel_optionDebugDescription": "包含 info，另外提供詳細的 debug 資訊與已遮蔽的 API 回應",
+        "logLevel_optionInfoDescription": "包含 info、warnings 以及 errors",
+        "exportDiagnostics": "匯出診斷",
+        "autoDJ_allowDuplicates": "允許重複",
+        "autoDJ_allowDuplicates_description": "允許 Auto DJ 再次新增已在佇列中的歌曲或專輯",
+        "autoDJ_onlySimilar": "只有相似",
+        "autoDJ_onlySimilar_description": "僅新增與觸發歌曲相似的項目。項目數量視為新增項目的上限，而非透過其他來源填滿至上限",
+        "showQueueInSidebar_description": "播放器側邊欄將新增一個顯示播放佇列的面板",
+        "showQueueInSidebar": "在播放器側邊欄中顯示播放佇列"
     },
     "table": {
         "config": {

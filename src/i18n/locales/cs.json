@@ -352,11 +352,9 @@
         "autoDJ_timing": "Časování",
         "autoDJ_timing_description": "Počet skladeb zbývajících ve frontě před spuštěním automatického DJ",
         "logLevel": "Úroveň protokolu",
-        "logLevel_description": "Nastaví minimální úroveň protokolu k zobrazení. ladění zobrazuje vše, možnost chyba zobrazí pouze chyby",
+        "logLevel_description": "Nastaví minimální úroveň protokolu k zobrazení",
         "logLevel_optionDebug": "Ladění",
-        "logLevel_optionError": "Chyba",
         "logLevel_optionInfo": "Informace",
-        "logLevel_optionWarn": "Varování",
         "useThemeAccentColor": "Použít barvu motivu",
         "useThemeAccentColor_description": "Použít primární barvu definovanou ve zvoleném motivu namísto vlastní barvy rozhraní",
         "artistRadioCount_description": "Nastaví počet skladeb, které načíst pro rádio umělce a rádio skladby",
@@ -504,7 +502,16 @@
         "microtonalPitchControls": "Ovládání mikrotonální výšky tónu",
         "microtonalPitchControls_description": "Přidat další ovládání výšky mezi půltóny",
         "hotkey_playbackNextAlbum": "Další album",
-        "hotkey_playbackPreviousAlbum": "Předchozí album"
+        "hotkey_playbackPreviousAlbum": "Předchozí album",
+        "logLevel_optionDebugDescription": "Zahrnuje informace, plus podrobné ladicí informace a cenzurované odpovědi API",
+        "logLevel_optionInfoDescription": "Zahrnuje informace, varování a chyby",
+        "exportDiagnostics": "Exportovat diagnostiku",
+        "autoDJ_allowDuplicates": "Povolit duplicity",
+        "autoDJ_onlySimilar": "Pouze podobné",
+        "showQueueInSidebar": "Zobrazit frontu přehrávání v postranním panelu přehrávače",
+        "showQueueInSidebar_description": "Do postranního panelu přehrávače bude přidán panel zobrazující frontu přehrávání",
+        "autoDJ_allowDuplicates_description": "Povolit automatickému DJ přidávat znovu skladby nebo alba, která již jsou ve frontě přehrávání",
+        "autoDJ_onlySimilar_description": "Přidávat pouze položky, které jsou podobné ke spuštěné skladbě. Počet položek je maximální počet položek k přidání, namísto vyplnění limitu jinými zdroji"
     },
     "action": {
         "editPlaylist": "Upravit $t(entity.playlist, {\"count\": 1})",
@@ -684,7 +691,11 @@
         "back": "Zpět",
         "openFolder": "Otevřít složku",
         "saveAndClose": "Uložit a zavřít",
-        "undo": "Vrátit"
+        "undo": "Vrátit",
+        "lastScan": "Poslední sken {{date}}",
+        "scanFolderCount": "{{count}} složek",
+        "scanItemCount": "{{count}} položek",
+        "scanningLibrary": "Skenování knihovny…"
     },
     "table": {
         "config": {
@@ -885,20 +896,20 @@
     "page": {
         "sidebar": {
             "nowPlaying": "Právě hraje",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
-            "search": "$t(common.search)",
-            "tracks": "$t(entity.track, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "home": "$t(common.home)",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "shared": "$t(entity.playlist, {\"count\": 2}) sdíleny",
+            "playlists": "Playlisty",
+            "search": "Hledat",
+            "tracks": "Skladby",
+            "albums": "Alba",
+            "genres": "Žánry",
+            "folders": "Složky",
+            "settings": "Nastavení",
+            "home": "Domů",
+            "artists": "Umělci",
+            "albumArtists": "Umělci alb",
+            "shared": "Sdílené playlisty",
             "myLibrary": "Moje knihovna",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "favorites": "Oblíbené",
+            "radio": "Stanice rádia",
             "collections": "Sbírky"
         },
         "fullscreenPlayer": {

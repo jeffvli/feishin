@@ -1,4 +1,3 @@
-import log from 'electron-log/main';
 import path from 'path';
 import process from 'process';
 import { URL } from 'url';
@@ -41,47 +40,4 @@ export const hotkeyToElectronAccelerator = (hotkey: string) => {
     });
 
     return accelerator;
-};
-
-const logMethod = {
-    debug: log.debug,
-    error: log.error,
-    info: log.info,
-    success: log.info,
-    verbose: log.verbose,
-    warning: log.warn,
-};
-
-const logColor = {
-    debug: 'blue',
-    error: 'red',
-    info: 'blue',
-    success: 'green',
-    verbose: 'blue',
-    warning: 'yellow',
-};
-
-export const createLog = (data: {
-    message: string;
-    type: 'debug' | 'error' | 'info' | 'success' | 'verbose' | 'warning';
-}) => {
-    logMethod[data.type](`%c${data.message}`, `color: ${logColor[data.type]}`);
-};
-
-export const autoUpdaterLogInterface = {
-    debug: (message: string) => {
-        createLog({ message: `[SYSTEM] ${message}`, type: 'debug' });
-    },
-
-    error: (message: string) => {
-        createLog({ message: `[SYSTEM] ${message}`, type: 'error' });
-    },
-
-    info: (message: string) => {
-        createLog({ message: `[SYSTEM] ${message}`, type: 'info' });
-    },
-
-    warn: (message: string) => {
-        createLog({ message: `[SYSTEM] ${message}`, type: 'warning' });
-    },
 };

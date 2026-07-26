@@ -539,6 +539,7 @@ export const GeneralSettingsSchema = z.object({
     resume: z.boolean(),
     showFavorites: z.boolean(),
     showLyricsInSidebar: z.boolean(),
+    showQueueInSidebar: z.boolean(),
     showRatings: z.boolean(),
     showVisualizerInSidebar: z.boolean(),
     sidebarCollapsedNavigation: z.boolean(),
@@ -747,9 +748,11 @@ const autoDjStrategyEnum = z.enum(['similar', 'library_random']);
 
 const AutoDJSettingsSchema = z.object({
     albumStrategy: autoDjStrategyEnum,
+    allowDuplicates: z.boolean(),
     enabled: z.boolean(),
     itemCount: z.number(),
     mode: z.enum(['songs', 'albums']),
+    onlySimilar: z.boolean(),
     songStrategy: autoDjStrategyEnum,
     timing: z.number(),
 });
@@ -1221,9 +1224,11 @@ const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle
 const initialState: SettingsState = {
     autoDJ: {
         albumStrategy: AUTO_DJ_STRATEGY.SIMILAR,
+        allowDuplicates: false,
         enabled: false,
         itemCount: 5,
         mode: 'songs',
+        onlySimilar: false,
         songStrategy: AUTO_DJ_STRATEGY.SIMILAR,
         timing: 1,
     },
@@ -1313,6 +1318,7 @@ const initialState: SettingsState = {
         resume: true,
         showFavorites: true,
         showLyricsInSidebar: true,
+        showQueueInSidebar: true,
         showRatings: true,
         showVisualizerInSidebar: true,
         sidebarCollapsedNavigation: true,
@@ -2724,10 +2730,16 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
+                if (version < 33) {
+                    if (state.general.showQueueInSidebar === undefined) {
+                        state.general.showQueueInSidebar = true;
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 32,
+            version: 33,
         },
     ),
 );
@@ -3003,6 +3015,9 @@ export const useCombinedLyricsAndVisualizer = () =>
 
 export const useShowLyricsInSidebar = () =>
     useSettingsStore((state) => state.general.showLyricsInSidebar, shallow);
+
+export const useShowQueueInSidebar = () =>
+    useSettingsStore((state) => state.general.showQueueInSidebar, shallow);
 
 export const useShowVisualizerInSidebar = () =>
     useSettingsStore((state) => state.general.showVisualizerInSidebar, shallow);

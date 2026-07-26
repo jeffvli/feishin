@@ -67,6 +67,18 @@ const openCustomCssFolder = async () => {
     return ipcRenderer.invoke('custom-css-open-folder');
 };
 
+const openLogsFolder = async () => {
+    return ipcRenderer.invoke('logger-open-folder');
+};
+
+const exportDiagnostics = async (payload?: {
+    logLevel?: null | string;
+    rendererSettings?: null | Record<string, unknown>;
+    server?: null | Record<string, unknown>;
+}): Promise<{ canceled: boolean; path?: string }> => {
+    return ipcRenderer.invoke('logger-export-diagnostics', payload);
+};
+
 const customCssUpdatedListener = (
     cb: (data: { content?: string; exists?: boolean; path?: string }) => void,
 ) => {
@@ -164,6 +176,7 @@ export const utils = {
     customCssUpdatedListener,
     disableAutoUpdates,
     download,
+    exportDiagnostics,
     forceGarbageCollection,
     getCustomCss,
     isLinux,
@@ -175,6 +188,7 @@ export const utils = {
     openApplicationDirectory,
     openCustomCssFolder,
     openItem,
+    openLogsFolder,
     playerErrorListener,
     readLocalImage,
     readSongMetadataBatch,

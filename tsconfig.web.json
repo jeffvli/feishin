@@ -25,6 +25,9 @@
       "/@/shared/*": [
         "src/shared/*"
       ],
+      "/@/main/*": [
+        "src/main/*"
+      ],
       "/@/i18n/*": [
         "src/i18n/*"
       ],
