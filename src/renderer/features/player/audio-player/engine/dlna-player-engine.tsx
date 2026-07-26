@@ -501,6 +501,8 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                         if (matches) {
                             lastSentRawUrlRef.current = url;
                             lastSentUrlRef.current = url;
+                            lastSentAtRef.current = Date.now();
+                            wasNearEndRef.current = false;
                             if (info.position > 0) setTimestamp(Math.floor(info.position));
                             mountHandoffInProgressRef.current = false;
                             if (playerStatus === PlayerStatus.PLAYING) {
@@ -516,6 +518,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                                 suppressDeviceSeekRef.current = true;
                                 mediaPlay?.();
                             }
+                            sendNextTrackToDlna();
                             return;
                         }
                     } catch {
@@ -536,7 +539,14 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         return () => {
             ipc?.removeAllListeners('renderer-dlna-connect-playback');
         };
-    }, [transcode, setTimestamp, playerStatus, sendCurrentTrackToDlna, mediaPlay]);
+    }, [
+        transcode,
+        setTimestamp,
+        playerStatus,
+        sendCurrentTrackToDlna,
+        sendNextTrackToDlna,
+        mediaPlay,
+    ]);
     // Send just the next track (for after gapless transition)
     useEffect(() => {
         if (!dlnaPlayerListener) return;

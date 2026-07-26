@@ -214,14 +214,29 @@ export const DlnaCastButton = () => {
     const handleGroupConfirm = useCallback(
         async (selected: DlnaDevice[], coordinator: DlnaDevice) => {
             if (!dlnaPlayer || selected.length < 2) return;
+            const currentTimestamp = useTimestampStoreBase.getState().timestamp;
+            if (currentTimestamp > 0) {
+                playerHandoff.pendingDlnaSeek = currentTimestamp;
+            }
             if (settings.type !== PlayerType.DLNA) {
                 previousPlayerTypeRef.current = settings.type;
             }
             setScreen('connecting');
             const result = await dlnaPlayer.connect(coordinator);
             if (!result.success) {
+                playerHandoff.pendingDlnaSeek = -1;
                 setScreen('group-build');
                 return;
+            }
+            if (result.currentUri && result.currentTransportState !== 'STOPPED') {
+                if (result.currentTransportState === 'PAUSED_PLAYBACK') {
+                    playerHandoff.deviceAlreadyPlaying = true;
+                    playerHandoff.deviceWasPaused = true;
+                } else {
+                    playerHandoff.pendingDlnaSeek = -1;
+                    playerHandoff.deviceAlreadyPlaying = true;
+                    playerHandoff.deviceWasPaused = false;
+                }
             }
             coordinatorRef.current = coordinator;
             setVolume(result.volume);
