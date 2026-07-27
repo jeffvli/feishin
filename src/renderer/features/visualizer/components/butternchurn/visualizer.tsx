@@ -521,7 +521,7 @@ const CurrentPresetDisplay = () => {
 };
 
 export const Visualizer = () => {
-    const { visualizerExpanded } = useFullScreenPlayerStore();
+    const { expanded, visualizerExpanded, visualizerReturnToPlayer } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { setSettings } = useSettingsStoreActions();
     const butterchurnSettings = useButterchurnSettings();
@@ -578,7 +578,19 @@ export const Visualizer = () => {
     ]);
 
     const handleToggleFullscreen = () => {
-        setStore({ expanded: false, visualizerExpanded: !visualizerExpanded });
+        if (visualizerExpanded) {
+            setStore({
+                expanded: visualizerReturnToPlayer,
+                visualizerExpanded: false,
+                visualizerReturnToPlayer: false,
+            });
+        } else {
+            setStore({
+                expanded: false,
+                visualizerExpanded: true,
+                visualizerReturnToPlayer: expanded,
+            });
+        }
     };
 
     const handleNextPreset = () => {
@@ -632,7 +644,7 @@ export const Visualizer = () => {
                 top="var(--theme-spacing-sm)"
             >
                 <ActionIcon
-                    icon="expand"
+                    icon={visualizerExpanded ? 'shrink' : 'expand'}
                     iconProps={{ size: 'lg' }}
                     onClick={handleToggleFullscreen}
                     variant="subtle"

@@ -1,4 +1,5 @@
 import merge from 'lodash/merge';
+import omit from 'lodash/omit';
 import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
@@ -26,6 +27,7 @@ interface FullScreenPlayerState {
     titleLineCount: number;
     useImageAspectRatio: boolean;
     visualizerExpanded: boolean;
+    visualizerReturnToPlayer: boolean;
 }
 
 export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSlice>()(
@@ -48,6 +50,7 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                 titleLineCount: 3,
                 useImageAspectRatio: false,
                 visualizerExpanded: false,
+                visualizerReturnToPlayer: false,
             })),
             { name: 'store_full_screen_player' },
         ),
@@ -63,6 +66,10 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                 return persistedState;
             },
             name: 'store_full_screen_player',
+            // `visualizerReturnToPlayer` is transient navigation intent used only to route
+            // the "shrink visualizer" action back to the full-screen player; it isn't
+            // meaningful across app restarts, so it's excluded from persistence.
+            partialize: (state) => omit(state, ['visualizerReturnToPlayer']),
             version: 4,
         },
     ),

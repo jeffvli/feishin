@@ -353,11 +353,23 @@ const VisualizerInner = () => {
 };
 
 export const Visualizer = () => {
-    const { visualizerExpanded } = useFullScreenPlayerStore();
+    const { expanded, visualizerExpanded, visualizerReturnToPlayer } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
 
     const handleToggleFullscreen = () => {
-        setStore({ expanded: false, visualizerExpanded: !visualizerExpanded });
+        if (visualizerExpanded) {
+            setStore({
+                expanded: visualizerReturnToPlayer,
+                visualizerExpanded: false,
+                visualizerReturnToPlayer: false,
+            });
+        } else {
+            setStore({
+                expanded: false,
+                visualizerExpanded: true,
+                visualizerReturnToPlayer: expanded,
+            });
+        }
     };
 
     return (
@@ -370,7 +382,7 @@ export const Visualizer = () => {
                 top="var(--theme-spacing-sm)"
             >
                 <ActionIcon
-                    icon="expand"
+                    icon={visualizerExpanded ? 'shrink' : 'expand'}
                     iconProps={{ size: 'lg' }}
                     onClick={handleToggleFullscreen}
                     variant="subtle"

@@ -52,7 +52,11 @@ export const SharedFullscreenPlayerSettings = () => {
     const isTitleEnabled = !playerItems.find((item) => item.id === PlayerItem.TITLE)?.disabled;
 
     const handleToggleFullScreenPlayer = () => {
-        setStore({ expanded: !expanded, visualizerExpanded: false });
+        setStore({
+            expanded: !expanded,
+            visualizerExpanded: false,
+            visualizerReturnToPlayer: false,
+        });
     };
 
     const handleLyricsSettings = (property: string, value: any) => {

@@ -77,7 +77,11 @@ export const LeftControls = () => {
         const shouldClose = isFullScreenPlayerExpanded || isFullScreenVisualizerExpanded;
 
         if (shouldClose) {
-            setFullScreenPlayerStore({ expanded: false, visualizerExpanded: false });
+            setFullScreenPlayerStore({
+                expanded: false,
+                visualizerExpanded: false,
+                visualizerReturnToPlayer: false,
+            });
         } else {
             setFullScreenPlayerStore({ expanded: true });
         }
