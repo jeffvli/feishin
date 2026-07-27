@@ -141,6 +141,7 @@ export const LeftControls = () => {
                                 onContextMenu={handleToggleContextMenu}
                                 role="button"
                                 transition={{ duration: 0.2, ease: 'easeIn' }}
+                                whileHover={{ scale: 1.1 }}
                             >
                                 <Tooltip label={t('player.toggleFullscreenPlayer')} openDelay={0}>
                                     {isRadioMode && hasRadioStationImage ? (
