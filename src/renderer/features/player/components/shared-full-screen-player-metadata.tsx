@@ -11,8 +11,8 @@ import {
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     PlayerItem,
-    playerItems,
     useFullScreenPlayerStore,
+    useGeneralSettings,
     usePlayerSong,
 } from '/@/renderer/store';
 import { Badge } from '/@/shared/components/badge/badge';
@@ -35,6 +35,7 @@ export const SharedFullscreenPlayerMetadata = ({
     const isPlayingRadio = isRadioActive && isRadioPlaying;
 
     const { playerItemAlignment, titleDisplayType, titleLineCount } = useFullScreenPlayerStore();
+    const { playerItems } = useGeneralSettings();
 
     const isMobileView = useMediaQuery('(orientation: portrait)');
 
