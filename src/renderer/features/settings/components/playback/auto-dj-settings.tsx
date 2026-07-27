@@ -15,6 +15,7 @@ import {
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Select } from '/@/shared/components/select/select';
+import { Switch } from '/@/shared/components/switch/switch';
 
 export const AutoDJSettings = memo(() => {
     const { t } = useTranslation();
@@ -144,6 +145,40 @@ export const AutoDJSettings = memo(() => {
                 context: 'description',
             }),
             title: t('setting.autoDJ_timing'),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.autoDJ_allowDuplicates')}
+                    checked={settings.allowDuplicates}
+                    onChange={(e) => {
+                        setSettings({
+                            autoDJ: {
+                                allowDuplicates: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.autoDJ_allowDuplicates_description'),
+            title: t('setting.autoDJ_allowDuplicates'),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.autoDJ_onlySimilar')}
+                    checked={settings.onlySimilar}
+                    onChange={(e) => {
+                        setSettings({
+                            autoDJ: {
+                                onlySimilar: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.autoDJ_onlySimilar_description'),
+            title: t('setting.autoDJ_onlySimilar'),
         },
     ];
 

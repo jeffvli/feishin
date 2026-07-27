@@ -21,7 +21,6 @@ import {
     PLAYLIST_TABLE_COLUMNS,
     SONG_TABLE_COLUMNS,
 } from '/@/renderer/components/item-list/item-table-list/default-columns';
-import { resolveVolumeMax } from '/@/renderer/features/player/audio-player/utils/volume';
 import { audiomotionanalyzerPresets } from '/@/renderer/features/visualizer/components/audiomotionanalyzer/presets';
 import { AppRoute } from '/@/renderer/router/routes';
 import { getEnvSettingsOverrides } from '/@/renderer/store/env-settings-overrides';
@@ -540,7 +539,9 @@ export const GeneralSettingsSchema = z.object({
     primaryShade: z.number().min(0).max(9),
     qobuz: z.boolean(),
     resume: z.boolean(),
+    showFavorites: z.boolean(),
     showLyricsInSidebar: z.boolean(),
+    showQueueInSidebar: z.boolean(),
     showRatings: z.boolean(),
     showVisualizerInSidebar: z.boolean(),
     sidebarCollapsedNavigation: z.boolean(),
@@ -750,9 +751,11 @@ const autoDjStrategyEnum = z.enum(['similar', 'library_random']);
 
 const AutoDJSettingsSchema = z.object({
     albumStrategy: autoDjStrategyEnum,
+    allowDuplicates: z.boolean(),
     enabled: z.boolean(),
     itemCount: z.number(),
     mode: z.enum(['songs', 'albums']),
+    onlySimilar: z.boolean(),
     songStrategy: autoDjStrategyEnum,
     timing: z.number(),
 });
@@ -995,6 +998,7 @@ export type DataGridProps = {
 
 export type DataTableProps = z.infer<typeof ItemTableListPropsSchema>;
 export type ItemDetailListProps = z.infer<typeof ItemDetailListPropsSchema>;
+
 export type ItemListSettings = {
     detail?: ItemDetailListProps;
     display: ListDisplayType;
@@ -1009,7 +1013,6 @@ export type PlayerFilter = z.infer<typeof PlayerFilterSchema>;
 export type PlayerFilterField = z.infer<typeof PlayerFilterFieldSchema>;
 
 export type PlayerFilterOperator = z.infer<typeof PlayerFilterOperatorSchema>;
-
 export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
     actions: {
         addCollection: (collection: SavedCollection) => void;
@@ -1035,6 +1038,7 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
     };
 }
 export interface SettingsState extends z.infer<typeof SettingsStateSchema> {}
+
 export type SidebarItemType = z.infer<typeof SidebarItemTypeSchema>;
 
 export type SideQueueLayout = z.infer<typeof SideQueueLayoutSchema>;
@@ -1238,9 +1242,11 @@ const platformDefaultWindowBarStyle: Platform = getPlatformDefaultWindowBarStyle
 const initialState: SettingsState = {
     autoDJ: {
         albumStrategy: AUTO_DJ_STRATEGY.SIMILAR,
+        allowDuplicates: false,
         enabled: false,
         itemCount: 5,
         mode: 'songs',
+        onlySimilar: false,
         songStrategy: AUTO_DJ_STRATEGY.SIMILAR,
         timing: 1,
     },
@@ -1328,7 +1334,9 @@ const initialState: SettingsState = {
         primaryShade: 6,
         qobuz: true,
         resume: true,
+        showFavorites: true,
         showLyricsInSidebar: true,
+        showQueueInSidebar: true,
         showRatings: true,
         showVisualizerInSidebar: true,
         sidebarCollapsedNavigation: true,
@@ -2741,10 +2749,16 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
+                if (version < 33) {
+                    if (state.general.showQueueInSidebar === undefined) {
+                        state.general.showQueueInSidebar = true;
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 32,
+            version: 33,
         },
     ),
 );
@@ -2759,12 +2773,6 @@ export const useTableSettings = (type: ItemListKey) =>
 export const useGeneralSettings = () => useSettingsStore((state) => state.general, shallow);
 
 export const usePlaybackType = () => useSettingsStore((state) => state.playback.type, shallow);
-
-export const useVolumeMax = () =>
-    useSettingsStore(
-        (state) => resolveVolumeMax(state.playback.type, state.playback.mpvExtraParameters),
-        shallow,
-    );
 
 export const usePlayButtonBehavior = () =>
     useSettingsStore((state) => state.general.playButtonBehavior, shallow);
@@ -2948,6 +2956,9 @@ export const usePlayerbarOpenDrawer = () =>
 
 export const useShowRatings = () => useSettingsStore((state) => state.general.showRatings, shallow);
 
+export const useShowFavorites = () =>
+    useSettingsStore((state) => state.general.showFavorites, shallow);
+
 export const useArtistRadioCount = () =>
     useSettingsStore((state) => state.general.artistRadioCount, shallow);
 
@@ -3020,6 +3031,9 @@ export const useCombinedLyricsAndVisualizer = () =>
 
 export const useShowLyricsInSidebar = () =>
     useSettingsStore((state) => state.general.showLyricsInSidebar, shallow);
+
+export const useShowQueueInSidebar = () =>
+    useSettingsStore((state) => state.general.showQueueInSidebar, shallow);
 
 export const useShowVisualizerInSidebar = () =>
     useSettingsStore((state) => state.general.showVisualizerInSidebar, shallow);

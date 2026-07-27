@@ -7,7 +7,6 @@ import { useShallow } from 'zustand/react/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { eventEmitter } from '/@/renderer/events/event-emitter';
-import { resolveVolumeMax } from '/@/renderer/features/player/audio-player/utils/volume';
 import { useRadioStore as useRadioPlayerStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { createSelectors } from '/@/renderer/lib/zustand';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
@@ -905,10 +904,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     };
                 },
                 increaseVolume: (value: number) => {
-                    const { mpvExtraParameters, type } = useSettingsStore.getState().playback;
-                    const volumeMax = resolveVolumeMax(type, mpvExtraParameters);
                     set((state) => {
-                        state.player.volume = Math.min(volumeMax, state.player.volume + value);
+                        state.player.volume = Math.min(100, state.player.volume + value);
                     });
                 },
                 isFirstTrackInQueue: () => {

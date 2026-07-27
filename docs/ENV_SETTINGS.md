@@ -128,9 +128,11 @@ Applies to the default lyrics display profile (`lyricsDisplay.default`).
 | Setting path | Default | Env variable | Available values / Description |
 |-------------|---------|--------------|--------------------------------|
 | `autoDJ.albumStrategy` | `similar` | `FS_AUTO_DJ_ALBUM_STRATEGY` | `similar` / `library_random`. |
+| `autoDJ.allowDuplicates` | `false` | `FS_AUTO_DJ_ALLOW_DUPLICATES` | `true` / `false` — Allow songs or albums already in the queue to be added again. |
 | `autoDJ.enabled` | `false` | `FS_AUTO_DJ_ENABLED` | `true` / `false`. |
 | `autoDJ.itemCount` | `5` | `FS_AUTO_DJ_ITEM_COUNT` | Number of items to add. |
 | `autoDJ.mode` | `songs` | `FS_AUTO_DJ_MODE` | `songs` / `albums`. |
+| `autoDJ.onlySimilar` | `false` | `FS_AUTO_DJ_ONLY_SIMILAR` | `true` / `false` — Treat item count as a maximum; use the first non-empty source (similar, then genre, artist, or random) and do not fill from later sources. |
 | `autoDJ.songStrategy` | `similar` | `FS_AUTO_DJ_SONG_STRATEGY` | `similar` / `library_random`. |
 | `autoDJ.timing` | `1` | `FS_AUTO_DJ_TIMING` | Timing value (number). |
 

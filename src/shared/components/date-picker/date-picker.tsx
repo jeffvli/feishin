@@ -26,6 +26,7 @@ export const DateInput = ({
     return (
         <MantineDateInput
             classNames={{
+                description: styles.description,
                 input: styles.input,
                 label: styles.label,
                 required: styles.required,
@@ -56,6 +57,7 @@ export const DateTimeInput = ({
     return (
         <MantineDateTimeInput
             classNames={{
+                description: styles.description,
                 input: styles.input,
                 label: styles.label,
                 required: styles.required,

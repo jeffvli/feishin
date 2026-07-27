@@ -308,21 +308,21 @@
             "showTracks": "顯示 $t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2})"
         },
         "sidebar": {
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "search": "$t(common.search)",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "tracks": "$t(entity.track, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "home": "$t(common.home)",
+            "albumArtists": "專輯藝人",
+            "albums": "專輯",
+            "artists": "藝人",
+            "folders": "資料夾",
+            "search": "搜尋",
+            "settings": "設定",
+            "tracks": "曲目",
+            "genres": "曲風",
+            "home": "首頁",
             "nowPlaying": "正在播放",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
+            "playlists": "播放清單",
             "myLibrary": "我的媒體庫",
-            "shared": "共享$t(entity.playlist, {\"count\": 2})",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "shared": "共享播放清單",
+            "favorites": "收藏",
+            "radio": "電台",
             "collections": "收藏集"
         },
         "trackList": {
@@ -912,7 +912,15 @@
         "hotkey_playbackPreviousAlbum": "上一張專輯",
         "logLevel_optionDebugDescription": "包含 info，另外提供詳細的 debug 資訊與已遮蔽的 API 回應",
         "logLevel_optionInfoDescription": "包含 info、warnings 以及 errors",
-        "exportDiagnostics": "匯出診斷"
+        "exportDiagnostics": "匯出診斷",
+        "autoDJ_allowDuplicates": "允許重複",
+        "autoDJ_allowDuplicates_description": "允許 Auto DJ 再次新增已在佇列中的歌曲或專輯",
+        "autoDJ_onlySimilar": "只有相似",
+        "autoDJ_onlySimilar_description": "僅新增與觸發歌曲相似的項目。項目數量視為新增項目的上限，而非透過其他來源填滿至上限",
+        "showQueueInSidebar_description": "播放器側邊欄將新增一個顯示播放佇列的面板",
+        "showQueueInSidebar": "在播放器側邊欄中顯示播放佇列",
+        "showFavorites_description": "控制收藏（愛心）按鈕是否顯示於介面中",
+        "showFavorites": "顯示收藏"
     },
     "table": {
         "config": {

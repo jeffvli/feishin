@@ -499,21 +499,21 @@
     "page": {
         "sidebar": {
             "nowPlaying": "Сейчас играет",
-            "search": "$t(common.search)",
-            "home": "$t(common.home)",
+            "search": "Поиск",
+            "home": "Главная",
             "myLibrary": "Моя библиотека",
-            "shared": "Публичные плейлисты $t(entity.playlist, {\"count\": 2})",
+            "shared": "Публичные плейлисты",
             "collections": "Коллекции",
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "radio": "$t(entity.radioStation, {\"count\": 2})",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "tracks": "$t(entity.track, {\"count\": 2})"
+            "albumArtists": "Исполнители альбомов",
+            "albums": "Альбомы",
+            "artists": "Исполнители",
+            "favorites": "Избранное",
+            "folders": "Папки",
+            "genres": "Жанры",
+            "radio": "Радиостанции",
+            "playlists": "Плейлисты",
+            "settings": "Настройки",
+            "tracks": "Треки"
         },
         "fullscreenPlayer": {
             "config": {
@@ -1132,7 +1132,7 @@
         "lastfmApiKey_description": "API ключ для {{lastfm}}. необходим для обложек",
         "lastfmApiKey": "Ключ API {{lastfm}}",
         "logLevel": "Уровень логирования",
-        "logLevel_description": "Устанавливает минимальный уровень логирования для отображения. Режим «Отладка» показывает все записи в журнале, режим «Ошибка» — только ошибки",
+        "logLevel_description": "Устанавливает минимальный уровень логирования для отображения",
         "logLevel_optionDebug": "Отладка",
         "logLevel_optionInfo": "Информация",
         "mpvExtraParameters": "дополнительные параметры mpv",
@@ -1310,7 +1310,16 @@
         "windowBarTrackinfo": "Информация о треке в заголовке окна",
         "windowBarTrackinfo_description": "Отображать название и исполнителя текущего трека, позицию в очереди воспроизведения и состояние (воспроизведение/пауза) в заголовке окна.",
         "microtonalPitchControls": "Микротональные настройки высоты тона",
-        "microtonalPitchControls_description": "Добавить дополнительные элементы управления высотой тона для переключения между полутонами"
+        "microtonalPitchControls_description": "Добавить дополнительные элементы управления высотой тона для переключения между полутонами",
+        "autoDJ_allowDuplicates": "Разрешить дубликаты",
+        "autoDJ_allowDuplicates_description": "Разрешить повторное добавление песен или альбомов, уже находящихся в очереди, функцией «Авто-DJ»",
+        "autoDJ_onlySimilar": "Только похожие",
+        "autoDJ_onlySimilar_description": "Добавляйте только элементы, похожие на текущую песню. Количество элементов рассматривается как максимальное количество добавляемых элементов, а не как заполнение до установленного лимита другими источниками",
+        "logLevel_optionDebugDescription": "Включает в себя информацию, а также подробные отладочные данные и сокращенные ответы API",
+        "logLevel_optionInfoDescription": "Содержит информацию, предупреждения и сообщения об ошибках",
+        "exportDiagnostics": "Экспортировать данные диагностики",
+        "showQueueInSidebar_description": "В боковую панель плеера будет добавлена панель, отображающая очередь воспроизведения",
+        "showQueueInSidebar": "Отображать очередь воспроизведения в боковой панели плеера"
     },
     "releaseType": {
         "secondary": {

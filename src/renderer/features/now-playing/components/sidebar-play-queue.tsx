@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
+import clsx from 'clsx';
 import isElectron from 'is-electron';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-// import { Group, Panel, Separator, useDefaultLayout } from 'react-resizable-panels';
+import { useLocation } from 'react-router';
 import { Pane, SplitPane, usePersistence } from 'react-split-pane';
 
 import styles from './sidebar-play-queue.module.css';
@@ -12,6 +13,7 @@ import { lyricsQueries } from '/@/renderer/features/lyrics/api/lyrics-api';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
+import { AppRoute } from '/@/renderer/router/routes';
 import {
     useCombinedLyricsAndVisualizer,
     useFullScreenPlayerStore,
@@ -20,6 +22,7 @@ import {
     useSettingsStore,
     useSettingsStoreActions,
     useShowLyricsInSidebar,
+    useShowQueueInSidebar,
     useShowVisualizerInSidebar,
     useSidebarPanelOrder,
     useWindowSettings,
@@ -46,6 +49,7 @@ const ButterchurnVisualizer = lazy(() =>
 export const SidebarPlayQueue = () => {
     const tableRef = useRef<ItemListHandle | null>(null);
     const [search, setSearch] = useState<string | undefined>(undefined);
+    const location = useLocation();
     const {
         expanded: isFullScreenPlayerExpanded,
         visualizerExpanded: isFullScreenVisualizerExpanded,
@@ -53,12 +57,14 @@ export const SidebarPlayQueue = () => {
     const [shouldRender, setShouldRender] = useState(!isFullScreenPlayerExpanded);
     const combinedLyricsAndVisualizer = useCombinedLyricsAndVisualizer();
     const showLyricsInSidebar = useShowLyricsInSidebar();
+    const showQueueInSidebar = useShowQueueInSidebar();
     const showVisualizerInSidebar = useShowVisualizerInSidebar();
     const sidebarPanelOrder = useSidebarPanelOrder();
     const { webAudio } = usePlaybackSettings();
     const { windowBarStyle } = useWindowSettings();
     const showVisualizer = showVisualizerInSidebar && webAudio;
     const showPanel = showLyricsInSidebar || showVisualizer;
+    const showQueue = showQueueInSidebar && location.pathname !== AppRoute.NOW_PLAYING;
 
     const shouldAddTopMargin = isElectron() && windowBarStyle === Platform.WEB;
 
@@ -90,7 +96,7 @@ export const SidebarPlayQueue = () => {
         if (combinedLyricsAndVisualizer) {
             // When combined, use the order from settings but filter to only show queue and lyrics (combined)
             const visiblePanels = sidebarPanelOrder.filter((panel) => {
-                if (panel === 'queue') return true;
+                if (panel === 'queue') return showQueue;
                 if (panel === 'lyrics') return showLyricsInSidebar || showVisualizer;
                 return false;
             });
@@ -98,14 +104,20 @@ export const SidebarPlayQueue = () => {
         }
 
         const visiblePanels = sidebarPanelOrder.filter((panel) => {
-            if (panel === 'queue') return true;
+            if (panel === 'queue') return showQueue;
             if (panel === 'lyrics') return showLyricsInSidebar;
             if (panel === 'visualizer') return showVisualizer;
             return false;
         });
 
         return visiblePanels;
-    }, [combinedLyricsAndVisualizer, showLyricsInSidebar, showVisualizer, sidebarPanelOrder]);
+    }, [
+        combinedLyricsAndVisualizer,
+        showLyricsInSidebar,
+        showQueue,
+        showVisualizer,
+        sidebarPanelOrder,
+    ]);
 
     const renderPanel = (panelType: SidebarPanelType) => {
         if (panelType === 'queue') {
@@ -148,6 +160,25 @@ export const SidebarPlayQueue = () => {
             // Queue panel should always autofit
             if (panelType === 'queue') {
                 return undefined;
+            }
+
+            const hasQueue = orderedPanels.includes('queue');
+
+            // Without a queue to absorb remaining space, fill the sidebar height
+            if (!hasQueue) {
+                if (orderedPanels.length === 1 || index === orderedPanels.length - 1) {
+                    return undefined;
+                }
+
+                if (
+                    defaultLayout &&
+                    Array.isArray(defaultLayout) &&
+                    defaultLayout[index] !== undefined
+                ) {
+                    return defaultLayout[index];
+                }
+
+                return 100;
             }
 
             // If defaultLayout exists and has saved sizes, use them
@@ -195,49 +226,42 @@ export const SidebarPlayQueue = () => {
         <Stack gap={0} h="100%" id="sidebar-play-queue-container" pos="relative" w="100%">
             {shouldAddTopMargin && <div className={styles.draggableRegion} />}
             {showPanel ? (
-                <SplitPane
-                    direction="vertical"
-                    dividerClassName={styles.resizeHandle}
-                    onResize={onLayoutChange}
-                    style={{
-                        display: 'flex',
-                        flex: 1,
-                        flexDirection: 'column',
-                        minHeight: 0,
-                        overflow: 'hidden',
-                    }}
-                >
-                    {orderedPanels.map((panel, index) => (
-                        <Pane key={panel} size={getPanelSize(panel, index)}>
-                            {renderPanel(panel)}
-                        </Pane>
-                    ))}
-                </SplitPane>
+                orderedPanels.length === 1 ? (
+                    <div className={styles.panelsContainer}>{renderPanel(orderedPanels[0])}</div>
+                ) : (
+                    <SplitPane
+                        className={styles.panelsContainer}
+                        direction="vertical"
+                        dividerClassName={styles.resizeHandle}
+                        onResize={onLayoutChange}
+                    >
+                        {orderedPanels.map((panel, index) => (
+                            <Pane key={panel} size={getPanelSize(panel, index)}>
+                                {renderPanel(panel)}
+                            </Pane>
+                        ))}
+                    </SplitPane>
+                )
             ) : (
-                <Stack
-                    gap={0}
-                    style={{
-                        flex: 1,
-                        minHeight: 0,
-                    }}
-                    w="100%"
-                >
-                    <PlayQueueListControls
-                        handleSearch={setSearch}
-                        searchTerm={search}
-                        tableRef={tableRef}
-                        type={ItemListKey.SIDE_QUEUE}
-                    />
-                    <Flex direction="column" style={{ flex: 1, minHeight: 0 }}>
-                        <div className={styles.playQueueSection}>
-                            <PlayQueue
-                                listKey={ItemListKey.SIDE_QUEUE}
-                                ref={tableRef}
-                                searchTerm={search}
-                            />
-                        </div>
-                    </Flex>
-                </Stack>
+                showQueue && (
+                    <Stack className={styles.queueOnly} gap={0} w="100%">
+                        <PlayQueueListControls
+                            handleSearch={setSearch}
+                            searchTerm={search}
+                            tableRef={tableRef}
+                            type={ItemListKey.SIDE_QUEUE}
+                        />
+                        <Flex className={styles.queueOnlyContent} direction="column">
+                            <div className={styles.playQueueSection}>
+                                <PlayQueue
+                                    listKey={ItemListKey.SIDE_QUEUE}
+                                    ref={tableRef}
+                                    searchTerm={search}
+                                />
+                            </div>
+                        </Flex>
+                    </Stack>
+                )
             )}
         </Stack>
     );
@@ -423,10 +447,9 @@ const CombinedLyricsAndVisualizerPanel = () => {
             {showLyricsInSidebar && <Lyrics fadeOutNoLyricsMessage={true} settingsKey="sidebar" />}
             {showVisualizer && (
                 <div
-                    className={styles.visualizerOverlay}
-                    style={{
-                        opacity: hasLyrics && showLyricsInSidebar ? 0.2 : 1,
-                    }}
+                    className={clsx(styles.visualizerOverlay, {
+                        [styles.visualizerOverlayDimmed]: hasLyrics && showLyricsInSidebar,
+                    })}
                 >
                     <Suspense fallback={<></>}>
                         {visualizerType === 'butterchurn' ? (

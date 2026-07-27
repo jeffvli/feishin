@@ -14,9 +14,11 @@ import {
 } from '/@/shared/types/domain-types';
 
 export type AutoDjSongCollectArgs = {
+    allowDuplicates: boolean;
     currentSong: QueueSong;
     itemCount: number;
     musicFolderId: string | string[] | undefined;
+    onlySimilar: boolean;
     queryClient: QueryClient;
     queueSongIdSet: Set<string>;
     server: null | ServerListItem | undefined;
@@ -36,6 +38,19 @@ export const runAutoDjSongs = async (args: AutoDjSongCollectArgs): Promise<Song[
     }
 };
 
+const isSongAvailable = (
+    song: Song,
+    allowDuplicates: boolean,
+    queueSongIdSet: Set<string>,
+    selectedSongIds: Set<string>,
+) => {
+    if (allowDuplicates) {
+        return true;
+    }
+
+    return !queueSongIdSet.has(song.id) && !selectedSongIds.has(song.id);
+};
+
 const collectSongsLibraryRandom = async (args: AutoDjSongCollectArgs): Promise<Song[]> => {
     const randomSongs = await args.queryClient.fetchQuery({
         ...songsQueries.random({
@@ -48,13 +63,17 @@ const collectSongsLibraryRandom = async (args: AutoDjSongCollectArgs): Promise<S
         queryKey: queryKeys.player.fetch({ autoDjLibraryRandomSongs: args.currentSong.id }),
     });
 
-    const pool = randomSongs.items.filter((song) => !args.queueSongIdSet.has(song.id));
+    const pool = randomSongs.items.filter(
+        (song) => args.allowDuplicates || !args.queueSongIdSet.has(song.id),
+    );
     const shuffled = shuffleInPlace(pool);
     return shuffled.slice(0, args.itemCount);
 };
 
 const collectSongsSimilar = async (args: AutoDjSongCollectArgs): Promise<Song[]> => {
-    let uniqueSimilarSongs: Song[] = [];
+    const selected: Song[] = [];
+    const selectedSongIds = new Set<string>();
+    const remainingCount = () => args.itemCount - selected.length;
 
     if (args.trySimilarSongs) {
         const similarSongs = await args.queryClient.fetchQuery({
@@ -68,10 +87,24 @@ const collectSongsSimilar = async (args: AutoDjSongCollectArgs): Promise<Song[]>
             queryKey: queryKeys.player.fetch({ similarSongs: args.currentSong?.id }),
         });
 
-        uniqueSimilarSongs = similarSongs.filter((song) => !args.queueSongIdSet.has(song.id));
+        const slotsToFill = remainingCount();
+        const shuffledSimilarSongs = shuffleInPlace(
+            similarSongs.filter((song) =>
+                isSongAvailable(song, args.allowDuplicates, args.queueSongIdSet, selectedSongIds),
+            ),
+        );
+
+        for (const song of shuffledSimilarSongs.slice(0, slotsToFill)) {
+            selectedSongIds.add(song.id);
+            selected.push(song);
+        }
+
+        if (args.onlySimilar && selected.length > 0) {
+            return selected;
+        }
     }
 
-    if (uniqueSimilarSongs.length < args.itemCount) {
+    if (remainingCount() > 0) {
         const genre = args.currentSong?.genres?.[0];
 
         if (genre) {
@@ -91,10 +124,6 @@ const collectSongsSimilar = async (args: AutoDjSongCollectArgs): Promise<Song[]>
                 }),
             });
 
-            const genreSongs = genreSimilarSongs.items.filter(
-                (song) => !args.queueSongIdSet.has(song.id),
-            );
-
             if (!args.trySimilarSongs) {
                 const randomSongCount = Math.max(1, Math.ceil(genreLimit * 0.2));
 
@@ -105,19 +134,48 @@ const collectSongsSimilar = async (args: AutoDjSongCollectArgs): Promise<Song[]>
                     }),
                 });
 
-                const uniqueRandomSongs = randomSongs.items.filter(
-                    (song) => !args.queueSongIdSet.has(song.id),
+                const spiceSlotsToFill = Math.min(randomSongCount, remainingCount());
+                const shuffledSpiceSongs = shuffleInPlace(
+                    randomSongs.items.filter((song) =>
+                        isSongAvailable(
+                            song,
+                            args.allowDuplicates,
+                            args.queueSongIdSet,
+                            selectedSongIds,
+                        ),
+                    ),
                 );
 
-                const randomSongsToAdd = uniqueRandomSongs.slice(0, randomSongCount);
-                uniqueSimilarSongs.push(...randomSongsToAdd, ...genreSongs);
-            } else {
-                uniqueSimilarSongs.push(...genreSongs);
+                for (const song of shuffledSpiceSongs.slice(0, spiceSlotsToFill)) {
+                    selectedSongIds.add(song.id);
+                    selected.push(song);
+                }
+            }
+
+            const genreSlotsToFill = remainingCount();
+            const shuffledGenreSongs = shuffleInPlace(
+                genreSimilarSongs.items.filter((song) =>
+                    isSongAvailable(
+                        song,
+                        args.allowDuplicates,
+                        args.queueSongIdSet,
+                        selectedSongIds,
+                    ),
+                ),
+            );
+
+            for (const song of shuffledGenreSongs.slice(0, genreSlotsToFill)) {
+                selectedSongIds.add(song.id);
+                selected.push(song);
+            }
+
+            if (args.onlySimilar && selected.length > 0) {
+                return selected;
             }
         }
     }
 
-    if (uniqueSimilarSongs.length < args.itemCount) {
+    if (remainingCount() > 0) {
         const albumArtist = args.currentSong?.albumArtists?.[0];
 
         if (albumArtist) {
@@ -138,15 +196,30 @@ const collectSongsSimilar = async (args: AutoDjSongCollectArgs): Promise<Song[]>
                 }),
             });
 
-            uniqueSimilarSongs.push(
-                ...albumArtistSimilarSongs.items.filter(
-                    (song) => !args.queueSongIdSet.has(song.id),
+            const artistSlotsToFill = remainingCount();
+            const shuffledArtistSongs = shuffleInPlace(
+                albumArtistSimilarSongs.items.filter((song) =>
+                    isSongAvailable(
+                        song,
+                        args.allowDuplicates,
+                        args.queueSongIdSet,
+                        selectedSongIds,
+                    ),
                 ),
             );
+
+            for (const song of shuffledArtistSongs.slice(0, artistSlotsToFill)) {
+                selectedSongIds.add(song.id);
+                selected.push(song);
+            }
+
+            if (args.onlySimilar && selected.length > 0) {
+                return selected;
+            }
         }
     }
 
-    if (uniqueSimilarSongs.length < args.itemCount) {
+    if (remainingCount() > 0) {
         const randomSongs = await args.queryClient.fetchQuery({
             ...songsQueries.random({
                 query: { limit: 50, played: Played.All },
@@ -154,11 +227,18 @@ const collectSongsSimilar = async (args: AutoDjSongCollectArgs): Promise<Song[]>
             }),
         });
 
-        uniqueSimilarSongs.push(
-            ...randomSongs.items.filter((song) => !args.queueSongIdSet.has(song.id)),
+        const randomSlotsToFill = remainingCount();
+        const shuffledRandomSongs = shuffleInPlace(
+            randomSongs.items.filter((song) =>
+                isSongAvailable(song, args.allowDuplicates, args.queueSongIdSet, selectedSongIds),
+            ),
         );
+
+        for (const song of shuffledRandomSongs.slice(0, randomSlotsToFill)) {
+            selectedSongIds.add(song.id);
+            selected.push(song);
+        }
     }
 
-    const shuffledSongs = shuffleInPlace(uniqueSimilarSongs);
-    return shuffledSongs.slice(0, args.itemCount);
+    return selected;
 };

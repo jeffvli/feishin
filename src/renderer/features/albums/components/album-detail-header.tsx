@@ -18,7 +18,7 @@ import { useSetFavorite } from '/@/renderer/features/shared/hooks/use-set-favori
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer, useShowRatings } from '/@/renderer/store';
+import { useCurrentServer, useShowFavorites, useShowRatings } from '/@/renderer/store';
 import { useArtistRadioCount, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString, formatPartialIsoDateUTC, formatSizeString } from '/@/renderer/utils';
 import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
@@ -34,6 +34,7 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
     const showRatings = useShowRatings();
+    const showFavorites = useShowFavorites();
     const queryClient = useQueryClient();
     const albumRadioCount = useArtistRadioCount();
     const detailQuery = useQuery(
@@ -51,15 +52,17 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
     const setRating = useSetRating();
     const setFavorite = useSetFavorite();
 
-    const handleFavorite = () => {
-        if (!detailQuery?.data) return;
-        setFavorite(
-            detailQuery.data._serverId,
-            [detailQuery.data.id],
-            LibraryItem.ALBUM,
-            !detailQuery.data.userFavorite,
-        );
-    };
+    const handleFavorite = showFavorites
+        ? () => {
+              if (!detailQuery?.data) return;
+              setFavorite(
+                  detailQuery.data._serverId,
+                  [detailQuery.data.id],
+                  LibraryItem.ALBUM,
+                  !detailQuery.data.userFavorite,
+              );
+          }
+        : undefined;
 
     const handleUpdateRating = showRating
         ? (rating: number) => {
