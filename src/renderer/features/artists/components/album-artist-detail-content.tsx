@@ -52,6 +52,8 @@ import {
     useCurrentServer,
     useCurrentServerId,
     usePlayerSong,
+    useShowFavorites,
+    useShowRatings,
 } from '/@/renderer/store';
 import {
     useArtistItems,
@@ -624,12 +626,23 @@ const AlbumArtistMetadataFavoriteSongs = ({
     const player = usePlayer();
     const serverId = useCurrentServerId();
     const server = useCurrentServer();
+    const showRatings = useShowRatings();
+    const showFavorites = useShowFavorites();
+    const showFavoriteAndRatingSegmentControl =
+        server?.type !== ServerType.JELLYFIN && showFavorites && showRatings;
+
+    let favoriteSongsQueryTypeFilter = favoriteSongsQueryType;
+    if (showRatings && !showFavorites) {
+        favoriteSongsQueryTypeFilter = 'rating';
+    } else if (!showRatings && showFavorites) {
+        favoriteSongsQueryTypeFilter = 'favorite';
+    }
 
     const favoriteSongsQuery = useQuery({
         ...artistsQueries.favoriteSongs({
             query: {
                 artistId: routeId,
-                type: favoriteSongsQueryType,
+                type: favoriteSongsQueryTypeFilter,
             },
             serverId: serverId,
         }),
@@ -803,8 +816,7 @@ const AlbumArtistMetadataFavoriteSongs = ({
                                     }}
                                     value={searchTerm}
                                 />
-                                {/* Don't include SegmentedControl for JELLYFIN, since it only supports Favorites and not Ratings */}
-                                {server?.type !== ServerType.JELLYFIN && (
+                                {showFavoriteAndRatingSegmentControl && (
                                     <SegmentedControl
                                         data={[
                                             {
