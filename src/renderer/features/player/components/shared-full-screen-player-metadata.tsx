@@ -97,7 +97,7 @@ export const SharedFullscreenPlayerMetadata = ({
               ? 'right'
               : 'left';
     const metadataMaxWidth = isMobileView
-        ? '80%'
+        ? '90%'
         : imageContainerWidth
           ? imageContainerWidth < 300
               ? '80%'
