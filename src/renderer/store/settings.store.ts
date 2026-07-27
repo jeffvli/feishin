@@ -545,6 +545,7 @@ export const GeneralSettingsSchema = z.object({
     showVisualizerInSidebar: z.boolean(),
     sidebarCollapsedNavigation: z.boolean(),
     sidebarCollapseShared: z.boolean(),
+    sidebarImageExpand: z.boolean(),
     sidebarItems: z.array(SidebarItemTypeSchema),
     sidebarPanelOrder: z.array(SidebarPanelTypeSchema),
     sidebarPlaylistFolders: z.boolean(),
@@ -1332,6 +1333,7 @@ const initialState: SettingsState = {
         showVisualizerInSidebar: true,
         sidebarCollapsedNavigation: true,
         sidebarCollapseShared: false,
+        sidebarImageExpand: true,
         sidebarItems,
         sidebarPanelOrder: ['queue', 'lyrics', 'visualizer'],
         sidebarPlaylistFolders: false,
@@ -2870,6 +2872,9 @@ export const useVolumeWidth = () => useSettingsStore((state) => state.general.vo
 
 export const useFollowCurrentSong = () =>
     useSettingsStore((state) => state.general.followCurrentSong, shallow);
+
+export const useSidebarImageExpand = () =>
+    useSettingsStore((state) => state.general.sidebarImageExpand, shallow);
 
 export const useThemeSettings = () =>
     useSettingsStore(

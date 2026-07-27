@@ -201,6 +201,27 @@ export const ControlSettings = memo(() => {
         },
         {
             control: (
+                <Switch
+                    aria-label="Toggle sidebar image expand"
+                    defaultChecked={settings.sidebarImageExpand}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                sidebarImageExpand: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.sidebarImageExpand', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.sidebarImageExpand'),
+        },
+        {
+            control: (
                 <NumberInput
                     defaultValue={settings.artistRadioCount}
                     max={200}
