@@ -80,7 +80,7 @@ const Controls = () => {
         <Group
             className="full-screen-player-controls-container"
             gap="xs"
-            p="1rem"
+            p="0.5rem"
             pos="absolute"
             style={{
                 bottom: 0,
@@ -92,7 +92,7 @@ const Controls = () => {
                     <ActionIcon
                         icon={item.icon}
                         iconProps={{
-                            fill: item.active ? 'primary' : undefined,
+                            color: item.active ? 'primary' : undefined,
                             size: 'lg',
                         }}
                         onClick={item.onClick}

@@ -576,6 +576,10 @@
                 "showLyricMatch": "Show lyric match",
                 "showLyricProvider": "Show lyric provider",
                 "synchronized": "Synchronized",
+                "titleDisplayType": "Title display style",
+                "titleDisplayType_optionMultiLine": "Multi-line",
+                "titleDisplayType_optionScroll": "Scroll",
+                "titleLineCount": "Title line count",
                 "unsynchronized": "Unsynchronized",
                 "useImageAspectRatio": "Use image aspect ratio"
             },

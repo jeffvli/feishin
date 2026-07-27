@@ -5,7 +5,6 @@
     z-index: 200;
     display: flex;
     justify-content: center;
-    padding: 2rem;
     isolation: isolate;
 
     @media screen and (orientation: portrait) {
@@ -13,7 +12,7 @@
     }
 
     :global(.full-screen-player-controls-container) {
-        z-index: 1;
+        z-index: 2;
         opacity: 0.2;
         transition: opacity 0.2s ease;
     }
@@ -31,8 +30,7 @@
     gap: 2rem;
     width: 100%;
     max-width: 2560px;
-    margin-top: 3rem;
-    margin-bottom: 2rem;
+    margin: 1.5rem 0;
 
     @media screen and (orientation: portrait) {
         grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);

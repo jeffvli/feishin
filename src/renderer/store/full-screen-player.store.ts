@@ -12,6 +12,8 @@ export interface FullScreenPlayerSlice extends FullScreenPlayerState {
     };
 }
 
+export type FullScreenPlayerTitleDisplayType = 'multiLine' | 'scroll';
+
 interface FullScreenPlayerState {
     activeTab: 'lyrics' | 'queue' | 'related' | string;
     dynamicBackground?: boolean;
@@ -20,6 +22,8 @@ interface FullScreenPlayerState {
     expanded: boolean;
     opacity: number;
     playerItemAlignment: FullScreenPlayerItemAlignment;
+    titleDisplayType: FullScreenPlayerTitleDisplayType;
+    titleLineCount: number;
     useImageAspectRatio: boolean;
     visualizerExpanded: boolean;
 }
@@ -40,6 +44,8 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                 expanded: false,
                 opacity: 20,
                 playerItemAlignment: 'center',
+                titleDisplayType: 'scroll',
+                titleLineCount: 3,
                 useImageAspectRatio: false,
                 visualizerExpanded: false,
             })),
