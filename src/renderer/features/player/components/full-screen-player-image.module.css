@@ -22,7 +22,7 @@
 }
 
 .image-container-small {
-    max-height: 50%;
+    max-height: 45%;
 }
 
 .image-container-medium {
@@ -30,7 +30,7 @@
 }
 
 .image-container-large {
-    max-height: 70%;
+    max-height: 75%;
 }
 
 .metadata-container {
