@@ -5,6 +5,8 @@ import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+export type FullScreenPlayerCoverArtSize = 'large' | 'medium' | 'small';
+
 export type FullScreenPlayerItemAlignment = 'center' | 'left' | 'right';
 
 export interface FullScreenPlayerSlice extends FullScreenPlayerState {
@@ -17,6 +19,7 @@ export type FullScreenPlayerTitleDisplayType = 'multiLine' | 'scroll';
 
 interface FullScreenPlayerState {
     activeTab: 'lyrics' | 'queue' | 'related' | string;
+    coverArtSize: FullScreenPlayerCoverArtSize;
     dynamicBackground?: boolean;
     dynamicImageBlur: number;
     dynamicIsImage?: boolean;
@@ -40,6 +43,7 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                     },
                 },
                 activeTab: 'queue',
+                coverArtSize: 'medium',
                 dynamicBackground: true,
                 dynamicImageBlur: 1.5,
                 dynamicIsImage: false,

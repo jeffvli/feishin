@@ -51,6 +51,12 @@ const imageVariants: Variants = {
 
 const MotionImage = motion.img;
 
+const COVER_ART_SIZE_CLASS = {
+    large: styles.imageContainerLarge,
+    medium: styles.imageContainerMedium,
+    small: styles.imageContainerSmall,
+};
+
 const ImageWithPlaceholder = ({
     className,
     explicit,
@@ -103,7 +109,7 @@ export const FullScreenPlayerImage = () => {
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();
     const { blurExplicitImages, playerItems } = useGeneralSettings();
-    const { titleDisplayType, titleLineCount } = useFullScreenPlayerStore();
+    const { coverArtSize, titleDisplayType, titleLineCount } = useFullScreenPlayerStore();
 
     const isPlayingRadio = isRadioActive && isRadioPlaying;
 
@@ -200,7 +206,7 @@ export const FullScreenPlayerImage = () => {
         };
 
         updateImageContainerWidth();
-    }, [titleDisplayType, titleLineCount]);
+    }, [titleDisplayType, titleLineCount, coverArtSize]);
 
     // Keep ref in sync
     useEffect(() => {
@@ -251,7 +257,7 @@ export const FullScreenPlayerImage = () => {
             p="1rem"
         >
             <div
-                className={styles.imageContainer}
+                className={clsx(styles.imageContainer, COVER_ART_SIZE_CLASS[coverArtSize])}
                 ref={mainImageRef}
                 style={{ marginBottom: showMetadata ? '2rem' : undefined }}
             >

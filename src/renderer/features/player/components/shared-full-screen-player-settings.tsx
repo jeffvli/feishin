@@ -32,6 +32,7 @@ import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 export const SharedFullscreenPlayerSettings = () => {
     const { t } = useTranslation();
     const {
+        coverArtSize,
         dynamicBackground,
         dynamicImageBlur,
         dynamicIsImage,
@@ -225,6 +226,41 @@ export const SharedFullscreenPlayerSettings = () => {
                             <div style={{ width: '100%' }}>
                                 <FullscreenPlayerSettings showDescription={false} />
                             </div>
+                        </Option.Control>
+                    </Option>
+                    <Option>
+                        <Option.Label>
+                            {t('page.fullscreenPlayer.config.coverArtSize')}
+                        </Option.Label>
+                        <Option.Control>
+                            <SegmentedControl
+                                data={[
+                                    {
+                                        label: t('page.fullscreenPlayer.config.coverArtSize', {
+                                            context: 'optionSmall',
+                                        }),
+                                        value: 'small',
+                                    },
+                                    {
+                                        label: t('page.fullscreenPlayer.config.coverArtSize', {
+                                            context: 'optionMedium',
+                                        }),
+                                        value: 'medium',
+                                    },
+                                    {
+                                        label: t('page.fullscreenPlayer.config.coverArtSize', {
+                                            context: 'optionLarge',
+                                        }),
+                                        value: 'large',
+                                    },
+                                ]}
+                                onChange={(value) =>
+                                    setStore({
+                                        coverArtSize: value as 'large' | 'medium' | 'small',
+                                    })
+                                }
+                                value={coverArtSize}
+                            />
                         </Option.Control>
                     </Option>
                     {isTitleEnabled && (
