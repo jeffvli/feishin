@@ -7,7 +7,7 @@ import styles from './full-screen-player-queue.module.css';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { FullScreenSimilarSongs } from '/@/renderer/features/player/components/full-screen-similar-songs';
-import { usePlaybackSettings, useSettingsStore } from '/@/renderer/store';
+import { useListSettings, usePlaybackSettings, useSettingsStore } from '/@/renderer/store';
 import {
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
@@ -109,12 +109,16 @@ export const FullScreenPlayerQueue = () => {
     const { activeTab } = useFullScreenPlayerStore();
     const { webAudio } = usePlaybackSettings();
     const visualizerType = useSettingsStore((store) => store.visualizer.type);
+    const { table } = useListSettings(ItemListKey.FULL_SCREEN) || {};
+    const queueContainerClassName = clsx(styles.queueContainer, {
+        [styles.queueContainerFadeTopBottom]: !table?.enableHeader,
+    });
 
     return (
         <>
             <div className={clsx(styles.gridContainer, 'full-screen-player-queue-container')}>
                 {activeTab === 'queue' ? (
-                    <div className={styles.queueContainer}>
+                    <div className={queueContainerClassName}>
                         <PlayQueue
                             enableScrollShadow={false}
                             listKey={ItemListKey.FULL_SCREEN}
@@ -122,7 +126,7 @@ export const FullScreenPlayerQueue = () => {
                         />
                     </div>
                 ) : activeTab === 'related' ? (
-                    <div className={styles.queueContainer}>
+                    <div className={queueContainerClassName}>
                         <FullScreenSimilarSongs />
                     </div>
                 ) : activeTab === 'lyrics' ? (

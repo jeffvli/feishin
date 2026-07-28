@@ -5,6 +5,7 @@
     min-width: 0;
     height: 100%;
     overflow: hidden;
+    mask-image: linear-gradient(180deg, rgb(0 0 0 / 100%) 85%, transparent 100%);
 
     :global(.ag-header) {
         display: none;
@@ -26,6 +27,16 @@
     :global(.ag-row-hover) {
         background: rgb(0 0 0 / 10%) !important;
     }
+}
+
+.queue-container-fade-top-bottom {
+    mask-image: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgb(0 0 0 / 100%) 15%,
+        rgb(0 0 0 / 100%) 85%,
+        transparent 100%
+    );
 }
 
 .grid-container {

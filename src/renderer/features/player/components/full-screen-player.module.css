@@ -27,7 +27,6 @@
     display: grid;
     grid-template-rows: minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 2rem;
     width: 100%;
     max-width: 2560px;
     margin: 1.5rem 0;
