@@ -7,13 +7,17 @@ import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { getServerById, useAuthStoreActions } from '/@/renderer/store';
+import { Accordion } from '/@/shared/components/accordion/accordion';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
+import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { PasswordInput } from '/@/shared/components/password-input/password-input';
+import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
+import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
@@ -24,9 +28,18 @@ import {
     ServerListItemWithCredential,
     ServerType,
 } from '/@/shared/types/domain-types';
+import { AuthType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
+const ALL_AUTH_TYPES = (t) => {
+    return Object.values(AuthType).map((authType) => {
+        return {
+            label: t('form.addServer.input', { context: authType }),
+            value: authType,
+        };
+    });
+};
 interface EditServerFormProps {
     isUpdate?: boolean;
     onCancel: () => void;
@@ -48,9 +61,13 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
     const focusTrapRef = useFocusTrap();
     const [isLoading, setIsLoading] = useState(false);
 
+    console.log(server?.authType || AuthType.BASIC, server?.authType);
     const form = useForm({
         initialValues: {
+            authType: server?.authType || AuthType.BASIC,
+            clientId: server?.clientId,
             isAdmin: server?.isAdmin,
+            issuerUrl: server?.issuerUrl,
             legacyAuth: false,
             name: server?.name,
             password: password || '',
@@ -65,7 +82,8 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
     });
 
     const isSubsonic = form.values.type === ServerType.SUBSONIC;
-    const isNavidrome = form.values.type === ServerType.NAVIDROME;
+    const isNavidrome = form.values.type === ServerType.SUBSONIC;
+    const isBasicAuth = (form.values.authType === AuthType.BASIC && isNavidrome) || !isNavidrome;
 
     const handleSubmit = form.onSubmit(async (values) => {
         try {
@@ -76,10 +94,19 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
             const passwordProvided = values.password && values.password.trim() !== '';
             const urlChanged = values.url !== server.url;
             const typeChanged = values.type !== server.type;
+            const authTypeChanged = values.authType !== server.authType;
+            const clientIDChanged = values.clientId !== server.clientId;
+            const issuerUrlChanged = values.issuerUrl !== server.issuerUrl;
 
             // Skip authentication if username hasn't changed, password is empty, and URL/type haven't changed
             const canSkipAuth =
-                !usernameChanged && !passwordProvided && !urlChanged && !typeChanged;
+                !usernameChanged &&
+                !passwordProvided &&
+                !urlChanged &&
+                !typeChanged &&
+                !authTypeChanged &&
+                !clientIDChanged &&
+                !issuerUrlChanged;
 
             let data: AuthenticationResponse | undefined;
             let serverItem: ServerListItemWithCredential;
@@ -95,7 +122,11 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
                 serverItem = {
                     ...existingServer,
+                    authType:
+                        values.type === ServerType.NAVIDROME ? values.authType : AuthType.BASIC,
+                    clientId: values.clientId,
                     id: server.id,
+                    issuerUrl: values.issuerUrl,
                     name: values.name,
                     type: values.type,
                     url: values.url,
@@ -127,9 +158,12 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 }
 
                 serverItem = {
+                    authType: values.authType,
+                    clientId: values.clientId,
                     credential: data.credential,
                     id: server.id,
                     isAdmin: data.isAdmin,
+                    issuerUrl: values.issuerUrl,
                     name: values.name,
                     type: values.type,
                     url: values.url,
@@ -139,6 +173,10 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
                 if (data.ndCredential !== undefined) {
                     serverItem.ndCredential = data.ndCredential;
+                }
+
+                if (data.accessToken !== undefined) {
+                    serverItem.accessToken = data.accessToken;
                 }
             }
 
@@ -253,30 +291,86 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                         {form.isDirty('preferRemoteUrl') && <ModifiedFieldIndicator />}
                     </Group>
                 )}
-                <TextInput
-                    label={t('form.addServer.input', {
-                        context: 'username',
-                    })}
-                    required
-                    rightSection={form.isDirty('username') && <ModifiedFieldIndicator />}
-                    {...form.getInputProps('username')}
-                />
-                <PasswordInput
-                    data-autofocus
-                    label={t('form.addServer.input', {
-                        context: 'password',
-                    })}
-                    {...form.getInputProps('password')}
-                />
-                {localSettings && isNavidrome && (
-                    <Checkbox
-                        label={t('form.addServer.input', {
-                            context: 'savePassword',
-                        })}
-                        {...form.getInputProps('savePassword', {
-                            type: 'checkbox',
-                        })}
-                    />
+                {isNavidrome && (
+                    <>
+                        <Divider my="lg" />
+                        <SegmentedControl
+                            data={ALL_AUTH_TYPES(t)}
+                            defaultValue={form.values.authType}
+                            fullWidth
+                            size="sm"
+                            {...form.getInputProps('authType')}
+                        />
+                    </>
+                )}
+                {isBasicAuth ? (
+                    <>
+                        <TextInput
+                            label={t('form.addServer.input', {
+                                context: 'username',
+                            })}
+                            required
+                            rightSection={form.isDirty('username') && <ModifiedFieldIndicator />}
+                            {...form.getInputProps('username')}
+                        />
+                        <PasswordInput
+                            data-autofocus
+                            label={t('form.addServer.input', {
+                                context: 'password',
+                            })}
+                            {...form.getInputProps('password')}
+                        />
+                        {localSettings && isNavidrome && (
+                            <Checkbox
+                                label={t('form.addServer.input', {
+                                    context: 'savePassword',
+                                })}
+                                {...form.getInputProps('savePassword', {
+                                    type: 'checkbox',
+                                })}
+                            />
+                        )}
+                    </>
+                ) : (
+                    <>
+                        <Text isMuted size="sm">
+                            {t('form.addServer.externalAuthenticationDescription')}
+                        </Text>
+                        <Accordion chevronPosition="left" variant="filled">
+                            <Accordion.Item value="options">
+                                <Accordion.Control>
+                                    <Text isMuted size="md">
+                                        {t('form.addServer.advancedSSOOptions')}
+                                    </Text>
+                                </Accordion.Control>
+                                <Accordion.Panel>
+                                    <Stack m={5}>
+                                        <TextInput
+                                            description={t('form.addServer.input', {
+                                                context: 'issuerUrlDescription',
+                                            })}
+                                            label={t('form.addServer.input', {
+                                                context: 'issuerUrl',
+                                            })}
+                                            placeholder={t('form.addServer.input', {
+                                                context: 'issuerUrlPlaceholder',
+                                            })}
+                                            {...form.getInputProps('issuerUrl')}
+                                        />
+                                        <TextInput
+                                            description={t('form.addServer.input', {
+                                                context: 'clientIdDescription',
+                                            })}
+                                            label={t('form.addServer.input', {
+                                                context: 'clientId',
+                                            })}
+                                            {...form.getInputProps('clientId')}
+                                        />
+                                    </Stack>
+                                </Accordion.Panel>
+                            </Accordion.Item>
+                        </Accordion>{' '}
+                    </>
                 )}
                 {isSubsonic && (
                     <Checkbox

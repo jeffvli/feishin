@@ -13,6 +13,11 @@ import {
 } from '/@/shared/types/domain-types';
 import { ServerFeatures } from '/@/shared/types/features-types';
 
+export enum AuthType {
+    BASIC = 'basicAuthentication',
+    EXTERNAL = 'externalAuthentication',
+}
+
 export enum ItemListKey {
     ALBUM = LibraryItem.ALBUM,
     ALBUM_ARTIST = LibraryItem.ALBUM_ARTIST,

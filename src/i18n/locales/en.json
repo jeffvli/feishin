@@ -343,8 +343,17 @@
     "form": {
         "addServer": {
             "error_savePassword": "An error occurred when trying to save the password",
+            "externalAuthenticationDescription": "To use SSO, Navidrome must have External Authentication configured for users.",
             "ignoreCors": "Ignore CORS ($t(common.restartRequired))",
             "ignoreSsl": "Ignore SSL ($t(common.restartRequired))",
+            "advancedSSOOptions": "Advanced SSO Options",
+            "input_basicAuthentication": "Sign-in with Username",
+            "input_clientId": "Client ID",
+            "input_clientIdDescription": "Only change if the client ID from the OIDC issuer is different.",
+            "input_externalAuthentication": "Sign-in with SSO",
+            "input_issuerUrl": "Issuer URL",
+            "input_issuerUrlDescription": "The URL for OIDC provider discovery",
+            "input_issuerUrlPlaceholder": "Optional: issuer URL (will be auto-discovered if blank)",
             "input_legacyAuthentication": "Enable legacy authentication",
             "input_name": "Server Name",
             "input_password": "Password",

@@ -18,7 +18,7 @@ import {
     NDUserListSort,
 } from '/@/shared/api/navidrome/navidrome-types';
 import { ServerFeatures } from '/@/shared/types/features-types';
-import { PlayerStatus } from '/@/shared/types/types';
+import { AuthType, PlayerStatus } from '/@/shared/types/types';
 
 export enum LibraryItem {
     ALBUM = 'album',
@@ -85,9 +85,12 @@ export interface SavedCollection {
 }
 
 export type ServerListItem = {
+    authType: AuthType;
+    clientId: string;
     features?: ServerFeatures;
     id: string;
     isAdmin?: boolean;
+    issuerUrl: string;
     musicFolderId?: string[];
     name: string;
     preferInstantMix?: boolean;
@@ -102,6 +105,7 @@ export type ServerListItem = {
 };
 
 export type ServerListItemWithCredential = ServerListItem & {
+    accessToken?: string;
     credential: string;
     ndCredential?: string;
 };
@@ -241,6 +245,7 @@ export type Artist = Omit<AlbumArtist, '_itemType'> & {
 };
 
 export type AuthenticationResponse = {
+    accessToken?: string;
     credential: string;
     isAdmin?: boolean;
     ndCredential?: string;
