@@ -1,0 +1,6 @@
+.active-status {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-xs);
+    align-items: center;
+}

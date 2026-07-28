@@ -6,7 +6,10 @@ import {
     getDefaultAudioDevice,
     useAudioDevices,
 } from '/@/renderer/features/settings/components/playback/audio-settings';
-import { ListConfigTable } from '/@/renderer/features/shared/components/list-config-menu';
+import {
+    ListConfigBooleanControl,
+    ListConfigTable,
+} from '/@/renderer/features/shared/components/list-config-menu';
 import {
     usePlaybackType,
     usePlayerActions,
@@ -22,16 +25,18 @@ import {
     useSettingsStore,
     useSettingsStoreActions,
     useShowLyricsInSidebar,
+    useShowQueueInSidebar,
     useShowVisualizerInSidebar,
 } from '/@/renderer/store/settings.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { Paper } from '/@/shared/components/paper/paper';
 import { Popover } from '/@/shared/components/popover/popover';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
-import { Switch } from '/@/shared/components/switch/switch';
+import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { CrossfadeStyle, PlayerStatus, PlayerStyle, PlayerType } from '/@/shared/types/types';
 
@@ -41,8 +46,10 @@ export const PlayerConfig = () => {
     const { t } = useTranslation();
     const preservePitch = useSettingsStore((state) => state.playback.preservePitch);
     const showLyricsInSidebar = useShowLyricsInSidebar();
+    const showQueueInSidebar = useShowQueueInSidebar();
     const showVisualizerInSidebar = useShowVisualizerInSidebar();
     const combinedLyricsAndVisualizer = useCombinedLyricsAndVisualizer();
+    const { transitionType } = usePlayerProperties();
 
     const playbackSettings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
@@ -56,8 +63,8 @@ export const PlayerConfig = () => {
         [playbackSettings, setSettings],
     );
 
-    const options = useMemo(() => {
-        const allOptions = [
+    const audioOptions = useMemo(
+        () => [
             {
                 component: <AudioPlayerTypeConfig />,
                 id: 'audioPlayerType',
@@ -68,12 +75,12 @@ export const PlayerConfig = () => {
                 id: 'audioDevice',
                 label: t('setting.audioDevice'),
             },
-            {
-                component: null,
-                id: 'divider-1',
-                isDivider: true,
-                label: '',
-            },
+        ],
+        [t],
+    );
+
+    const transitionOptions = useMemo(
+        () => [
             {
                 component: <TransitionTypeConfig />,
                 id: 'transitionType',
@@ -82,56 +89,72 @@ export const PlayerConfig = () => {
             {
                 component: <CrossfadeStyleConfig />,
                 id: 'crossfadeStyle',
+                isHidden: transitionType !== PlayerStyle.CROSSFADE,
                 label: t('setting.crossfadeStyle'),
             },
             {
                 component: <CrossfadeDurationConfig />,
                 id: 'crossfadeDuration',
+                isHidden: transitionType !== PlayerStyle.CROSSFADE,
                 label: t('setting.crossfadeDuration'),
             },
-            {
-                component: null,
-                id: 'divider-2',
-                isDivider: true,
-                label: '',
-            },
+        ],
+        [t, transitionType],
+    );
+
+    const playbackOptions = useMemo(
+        () => [
             {
                 component: <PlaybackSpeedSlider />,
                 id: 'playbackSpeed',
                 label: t('player.playbackSpeed'),
             },
             {
-                component: !preservePitch ? <PitchControls /> : <></>,
+                component: <PitchControls />,
                 id: 'pitchControls',
+                isHidden: preservePitch,
                 label: '',
             },
             {
                 component: (
-                    <Switch
-                        defaultChecked={preservePitch}
-                        onChange={(e) => setPreservePitch(e.currentTarget.checked)}
-                    />
+                    <ListConfigBooleanControl onChange={setPreservePitch} value={preservePitch} />
                 ),
                 id: 'preservePitch',
                 label: t('setting.preservePitch'),
             },
-            {
-                component: null,
-                id: 'divider-3',
-                isDivider: true,
-                label: '',
-            },
+        ],
+        [preservePitch, setPreservePitch, t],
+    );
+
+    const sidebarOptions = useMemo(
+        () => [
             {
                 component: (
-                    <Switch
-                        defaultChecked={showLyricsInSidebar}
-                        onChange={(e) => {
+                    <ListConfigBooleanControl
+                        onChange={(value) => {
                             setSettings({
                                 general: {
-                                    showLyricsInSidebar: e.currentTarget.checked,
+                                    showQueueInSidebar: value,
                                 },
                             });
                         }}
+                        value={showQueueInSidebar}
+                    />
+                ),
+                id: 'showQueueInSidebar',
+                label: t('setting.showQueueInSidebar'),
+            },
+            {
+                component: (
+                    <ListConfigBooleanControl
+                        onChange={(value) => {
+                            setSettings({
+                                general: {
+                                    showLyricsInSidebar: value,
+                                },
+                            });
+                        }}
+                        value={showLyricsInSidebar}
                     />
                 ),
                 id: 'showLyricsInSidebar',
@@ -139,15 +162,15 @@ export const PlayerConfig = () => {
             },
             {
                 component: (
-                    <Switch
-                        defaultChecked={showVisualizerInSidebar}
-                        onChange={(e) => {
+                    <ListConfigBooleanControl
+                        onChange={(value) => {
                             setSettings({
                                 general: {
-                                    showVisualizerInSidebar: e.currentTarget.checked,
+                                    showVisualizerInSidebar: value,
                                 },
                             });
                         }}
+                        value={showVisualizerInSidebar}
                     />
                 ),
                 id: 'showVisualizerInSidebar',
@@ -155,35 +178,33 @@ export const PlayerConfig = () => {
             },
             {
                 component: (
-                    <Switch
-                        defaultChecked={combinedLyricsAndVisualizer}
-                        onChange={(e) => {
+                    <ListConfigBooleanControl
+                        onChange={(value) => {
                             setSettings({
                                 general: {
-                                    combinedLyricsAndVisualizer: e.currentTarget.checked,
+                                    combinedLyricsAndVisualizer: value,
                                 },
                             });
                         }}
+                        value={combinedLyricsAndVisualizer}
                     />
                 ),
                 id: 'combinedLyricsAndVisualizer',
                 label: t('setting.combinedLyricsAndVisualizer'),
             },
-        ];
-
-        return allOptions;
-    }, [
-        t,
-        preservePitch,
-        setSettings,
-        setPreservePitch,
-        showLyricsInSidebar,
-        showVisualizerInSidebar,
-        combinedLyricsAndVisualizer,
-    ]);
+        ],
+        [
+            combinedLyricsAndVisualizer,
+            setSettings,
+            showLyricsInSidebar,
+            showQueueInSidebar,
+            showVisualizerInSidebar,
+            t,
+        ],
+    );
 
     return (
-        <Popover position="top" width={500}>
+        <Popover position="top" withArrow>
             <Popover.Target>
                 <ActionIcon
                     icon="mediaSettings"
@@ -199,8 +220,21 @@ export const PlayerConfig = () => {
                     variant="subtle"
                 />
             </Popover.Target>
-            <Popover.Dropdown>
-                <ListConfigTable options={options} />
+            <Popover.Dropdown maw={720} miw={540} onClick={(e) => e.stopPropagation()} p="sm">
+                <Stack gap="sm">
+                    <Paper p="md" radius="md">
+                        <ListConfigTable options={audioOptions} />
+                    </Paper>
+                    <Paper p="md" radius="md">
+                        <ListConfigTable options={transitionOptions} />
+                    </Paper>
+                    <Paper p="md" radius="md">
+                        <ListConfigTable options={playbackOptions} />
+                    </Paper>
+                    <Paper p="md" radius="md">
+                        <ListConfigTable options={sidebarOptions} />
+                    </Paper>
+                </Stack>
             </Popover.Dropdown>
         </Popover>
     );
@@ -234,6 +268,7 @@ const AudioPlayerTypeConfig = () => {
                     value: e,
                 });
             }}
+            variant="filled"
             width="100%"
         />
     );
@@ -268,6 +303,7 @@ const AudioDeviceConfig = () => {
                 });
             }}
             value={audioDeviceId ?? getDefaultAudioDevice(audioDevices, playbackType)}
+            variant="filled"
             width="100%"
         />
     );
@@ -331,6 +367,7 @@ const CrossfadeStyleConfig = () => {
                     setCrossfadeStyle(e as CrossfadeStyle);
                 }
             }}
+            variant="filled"
             width="100%"
         />
     );
@@ -401,12 +438,8 @@ export const PlaybackSpeedSlider = () => {
             onChange={setSpeed}
             onDoubleClick={() => setSpeed(1)}
             step={0.01}
-            styles={{
-                markLabel: {},
-                root: {},
-            }}
             value={speed}
-            w="100%"
+            w="320px"
         />
     );
 };
@@ -431,10 +464,11 @@ export const PitchControls = () => {
     };
 
     return (
-        <Group gap={microtonal ? 'xs' : 'md'} my="sm" w="100%" wrap="nowrap">
+        <Group gap={microtonal ? 'xs' : 'md'} my="md" w="100%" wrap="nowrap">
             <Button
                 aria-label="-1 semitone"
                 fullWidth
+                fw={400}
                 onClick={() => adjustMusicalSpeed(-1)}
                 size="compact-xs"
             >
@@ -444,13 +478,14 @@ export const PitchControls = () => {
                 <Button
                     aria-label="-10 cents"
                     fullWidth
+                    fw={400}
                     onClick={() => adjustMusicalSpeed(-0.1)}
                     size="compact-xs"
                 >
                     -10ct
                 </Button>
             )}
-            <Text size="xs" style={{ fontFamily: 'monospace' }} ta="center" w="60px">
+            <Text size="sm" style={{ fontFamily: 'monospace' }} ta="center">
                 {speed.toFixed(2)}x {speedToPitch(speed) > 0 && '+'}
                 {speedToPitch(speed) == 0 && '±'}
                 {speedToPitch(speed).toFixed(2)}st
@@ -459,6 +494,7 @@ export const PitchControls = () => {
                 <Button
                     aria-label="+10 cents"
                     fullWidth
+                    fw={400}
                     onClick={() => adjustMusicalSpeed(0.1)}
                     size="compact-xs"
                 >
@@ -468,6 +504,7 @@ export const PitchControls = () => {
             <Button
                 aria-label="+1 semitone"
                 fullWidth
+                fw={400}
                 onClick={() => adjustMusicalSpeed(1)}
                 size="compact-xs"
             >

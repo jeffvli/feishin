@@ -79,8 +79,10 @@ export const useAutoDJ = () => {
                         !hasMusicFolder || (hasMusicFolder && hasSimilarSongsMusicFolder);
 
                     const runnerDepsBase = {
+                        allowDuplicates: settings.allowDuplicates,
                         itemCount: settings.itemCount,
                         musicFolderId,
+                        onlySimilar: settings.onlySimilar,
                         queryClient,
                         server,
                         serverId,
@@ -165,8 +167,10 @@ export const useAutoDJ = () => {
         serverId,
         settings.enabled,
         settings.albumStrategy,
+        settings.allowDuplicates,
         settings.itemCount,
         settings.mode,
+        settings.onlySimilar,
         settings.songStrategy,
         settings.timing,
     ]);

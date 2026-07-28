@@ -247,6 +247,12 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
         path: ['general', 'showLyricsInSidebar'],
         type: 'bool',
     },
+    { key: 'FS_GENERAL_SHOW_FAVORITES', path: ['general', 'showFavorites'], type: 'bool' },
+    {
+        key: 'FS_GENERAL_SHOW_QUEUE_IN_SIDEBAR',
+        path: ['general', 'showQueueInSidebar'],
+        type: 'bool',
+    },
     { key: 'FS_GENERAL_SHOW_RATINGS', path: ['general', 'showRatings'], type: 'bool' },
     {
         key: 'FS_GENERAL_SHOW_VISUALIZER_IN_SIDEBAR',
@@ -461,9 +467,11 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
         path: ['autoDJ', 'albumStrategy'],
         type: 'enum',
     },
+    { key: 'FS_AUTO_DJ_ALLOW_DUPLICATES', path: ['autoDJ', 'allowDuplicates'], type: 'bool' },
     { key: 'FS_AUTO_DJ_ENABLED', path: ['autoDJ', 'enabled'], type: 'bool' },
     { key: 'FS_AUTO_DJ_ITEM_COUNT', path: ['autoDJ', 'itemCount'], type: 'num' },
     { enumSet: AUTO_DJ_MODES, key: 'FS_AUTO_DJ_MODE', path: ['autoDJ', 'mode'], type: 'enum' },
+    { key: 'FS_AUTO_DJ_ONLY_SIMILAR', path: ['autoDJ', 'onlySimilar'], type: 'bool' },
     {
         enumSet: AUTO_DJ_STRATEGIES,
         key: 'FS_AUTO_DJ_SONG_STRATEGY',

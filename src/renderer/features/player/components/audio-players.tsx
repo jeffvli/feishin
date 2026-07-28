@@ -284,6 +284,24 @@ const AudioPlayersContent = ({
     }, []);
 
     useEffect(() => {
+        if (!audioContext?.context) return undefined;
+        const ctx = audioContext.context;
+        if (ctx.state === 'running') return undefined;
+
+        const unlock = () => {
+            ctx.resume().catch(() => {});
+        };
+
+        document.addEventListener('pointerdown', unlock, { capture: true, once: true });
+        document.addEventListener('keydown', unlock, { capture: true, once: true });
+
+        return () => {
+            document.removeEventListener('pointerdown', unlock, { capture: true });
+            document.removeEventListener('keydown', unlock, { capture: true });
+        };
+    }, [audioContext]);
+
+    useEffect(() => {
         // Not standard, just used in chromium-based browsers. See
         // https://developer.chrome.com/blog/audiocontext-setsinkid/.
 

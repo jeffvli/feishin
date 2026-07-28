@@ -93,6 +93,7 @@ type SettingsProperties = {
     'settings.scrobble.enabled': boolean;
     'settings.scrobble.notify': boolean;
     'settings.showLyricsInSidebar': boolean;
+    'settings.showQueueInSidebar': boolean;
     'settings.showVisualizerInSidebar': boolean;
     'settings.sideQueueType': SideQueueType;
     'settings.skipButtons': boolean;
@@ -184,6 +185,7 @@ const getSettingsProperties = (): SettingsProperties => {
         'settings.scrobble.enabled': settings.playback.scrobble.enabled,
         'settings.scrobble.notify': ignoreWeb(settings.playback.scrobble.notify),
         'settings.showLyricsInSidebar': settings.general.showLyricsInSidebar,
+        'settings.showQueueInSidebar': settings.general.showQueueInSidebar,
         'settings.showVisualizerInSidebar': settings.general.showVisualizerInSidebar,
         'settings.sideQueueType': settings.general.sideQueueType,
         // 'settings.skipBackwardSeconds': settings.general.skipButtons.skipBackwardSeconds,

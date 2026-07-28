@@ -9,7 +9,7 @@ import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useIsMutatingCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useIsMutatingDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
 import { useIsMutatingRating } from '/@/renderer/features/shared/mutations/set-rating-mutation';
-import { useShowRatings } from '/@/renderer/store';
+import { useShowFavorites, useShowRatings } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Rating } from '/@/shared/components/rating/rating';
 import { LibraryItem, ServerType } from '/@/shared/types/domain-types';
@@ -35,6 +35,7 @@ interface AlbumGroupControlsProps {
 
 export const AlbumGroupControls = ({ albumId, serverId, serverType }: AlbumGroupControlsProps) => {
     const showRatingsSetting = useShowRatings();
+    const showFavorites = useShowFavorites();
     const detailQuery = useAlbumGroupAlbum(albumId, serverId);
     const setFavorite = useSetFavorite();
     const setRating = useSetRating();
@@ -77,23 +78,25 @@ export const AlbumGroupControls = ({ albumId, serverId, serverType }: AlbumGroup
 
     return (
         <div className={styles.controls}>
-            <ActionIcon
-                className={styles.favorite}
-                disabled={isMutatingFavorite}
-                icon="favorite"
-                iconProps={{
-                    color: album.userFavorite ? 'primary' : 'muted',
-                    fill: album.userFavorite ? 'primary' : undefined,
-                    size: 'xs',
-                }}
-                onClick={handleFavorite}
-                onDoubleClick={(event) => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                }}
-                size="xs"
-                variant="transparent"
-            />
+            {showFavorites && (
+                <ActionIcon
+                    className={styles.favorite}
+                    disabled={isMutatingFavorite}
+                    icon="favorite"
+                    iconProps={{
+                        color: album.userFavorite ? 'primary' : 'muted',
+                        fill: album.userFavorite ? 'primary' : undefined,
+                        size: 'xs',
+                    }}
+                    onClick={handleFavorite}
+                    onDoubleClick={(event) => {
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }}
+                    size="xs"
+                    variant="transparent"
+                />
+            )}
             {showRating && (
                 <Rating
                     className={styles.rating}

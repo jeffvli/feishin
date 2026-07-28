@@ -16,6 +16,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         return (
             <MantinePasswordInput
                 classNames={{
+                    description: styles.description,
                     input: styles.input,
                     label: styles.label,
                     required: styles.required,

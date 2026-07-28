@@ -12,6 +12,7 @@ export interface TagsInputProps extends MantineTagsInputProps {
 }
 
 const defaultClassNames = {
+    description: styles.description,
     dropdown: styles.dropdown,
     input: styles.input,
     inputField: styles.inputField,

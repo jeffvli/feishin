@@ -21,6 +21,7 @@ export const DateTimePicker = ({
     return (
         <MantineDateTimePicker
             classNames={{
+                description: styles.description,
                 input: styles.input,
                 label: styles.label,
                 required: styles.required,

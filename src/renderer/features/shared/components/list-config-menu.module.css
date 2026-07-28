@@ -1,0 +1,27 @@
+.table {
+    border-radius: 1rem;
+}
+
+.th {
+    width: 50%;
+    padding: var(--theme-spacing-md) var(--theme-spacing-md) var(--theme-spacing-md) 0;
+    font-weight: 500;
+    vertical-align: middle;
+    background-color: initial;
+}
+
+.td {
+    padding: 0;
+    vertical-align: middle;
+}
+
+.control {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.divider-cell {
+    padding: var(--theme-spacing-md) 0;
+}

@@ -628,7 +628,8 @@
             "noArtwork": "Kaanepilti pole",
             "multipleValues": "(Mitme väärtusega)",
             "multipleArtworks": "Mitu kaanepilti",
-            "writePartialFailure": "{{count}} faili salvestamine nurjus"
+            "writePartialFailure": "{{count}} faili salvestamine nurjus",
+            "noLocalSongs": "Kohalike failiteedega laule ei leitud"
         },
         "playlist": {
             "reorder": "Ümberreastamine on lubatud vaid ID järgi sorteerimisel"
@@ -666,22 +667,22 @@
             "remote": "Kaugjuhtimine"
         },
         "sidebar": {
-            "albumArtists": "$t(entity.albumArtist, {\"count\": 2})",
-            "albums": "$t(entity.album, {\"count\": 2})",
+            "albumArtists": "Albumi esitajad",
+            "albums": "Albumid",
             "collections": "Kogumikud",
-            "artists": "$t(entity.artist, {\"count\": 2})",
-            "favorites": "$t(entity.favorite, {\"count\": 2})",
-            "folders": "$t(entity.folder, {\"count\": 2})",
-            "genres": "$t(entity.genre, {\"count\": 2})",
-            "home": "$t(common.home)",
-            "radio": "$t(entity.radioStation, {\"count\": 2})",
+            "artists": "Esitajad",
+            "favorites": "Lemmikud",
+            "folders": "Kaustad",
+            "genres": "Žanrid",
+            "home": "Avaleht",
+            "radio": "Raadiojaamad",
             "myLibrary": "Muusikakogu",
             "nowPlaying": "Esitamisel",
-            "playlists": "$t(entity.playlist, {\"count\": 2})",
-            "search": "$t(common.search)",
-            "settings": "$t(common.setting, {\"count\": 2})",
-            "shared": "Shared $t(entity.playlist, {\"count\": 2})",
-            "tracks": "$t(entity.track, {\"count\": 2})"
+            "playlists": "Esitusloendid",
+            "search": "Otsi",
+            "settings": "Sätted",
+            "shared": "Jagatud esitusloendid",
+            "tracks": "Lood"
         },
         "trackList": {
             "artistTracks": "{{artist}} lood",
@@ -1219,7 +1220,12 @@
         "windowBarTrackinfo": "Loo andmed akna tiitliribal",
         "windowBarTrackinfo_description": "Kuva akna tiitliribal hetkel mängiva loo pealkirja ja esitajat, kohta järjekorras ning olekut (mängib/pausil).",
         "microtonalPitchControls": "Mikrotonaalsed helikõrguse nupud",
-        "microtonalPitchControls_description": "Lisa täiendavad helikõrguse nupud pooltoonide vahel liikumiseks"
+        "microtonalPitchControls_description": "Lisa täiendavad helikõrguse nupud pooltoonide vahel liikumiseks",
+        "autoDJ_allowDuplicates": "Luba duplikaadid",
+        "autoDJ_allowDuplicates_description": "Luba Auto DJ-l juba järjekorras olevaid lugusid või albumeid uuesti lisada",
+        "autoDJ_onlySimilar": "Ainult sarnased",
+        "showFavorites": "Kuva lemmikud",
+        "showQueueInSidebar": "Kuva esitusjärjekord külgribal"
     },
     "datetime": {
         "minuteShort": "m",

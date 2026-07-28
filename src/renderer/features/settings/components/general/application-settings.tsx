@@ -565,6 +565,26 @@ export const ApplicationSettings = memo(() => {
         {
             control: (
                 <Switch
+                    defaultChecked={settings.showFavorites}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                showFavorites: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.showFavorites', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.showFavorites'),
+        },
+        {
+            control: (
+                <Switch
                     defaultChecked={settings.showRatings}
                     onChange={(e) => {
                         setSettings({

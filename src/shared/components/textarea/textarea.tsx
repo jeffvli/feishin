@@ -25,6 +25,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         return (
             <MantineTextarea
                 classNames={{
+                    description: styles.description,
                     input: styles.input,
                     label: styles.label,
                     required: styles.required,

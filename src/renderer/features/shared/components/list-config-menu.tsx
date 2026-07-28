@@ -1,6 +1,8 @@
 import { ReactNode, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import styles from './list-config-menu.module.css';
+
 import i18n from '/@/i18n/i18n';
 import { GridConfig } from '/@/renderer/features/shared/components/grid-config';
 import { SettingsButton } from '/@/renderer/features/shared/components/settings-button';
@@ -25,7 +27,7 @@ export const SONG_DISPLAY_TYPES: ListConfigMenuDisplayTypeConfig[] = [
 const DISPLAY_TYPES = [
     {
         label: (
-            <Group align="center" justify="center" p="sm">
+            <Group align="center" gap="sm" justify="center" p="sm" wrap="nowrap">
                 <Icon icon="layoutTable" size="lg" />
                 {i18n.t('table.config.view.table') as string}
             </Group>
@@ -34,7 +36,7 @@ const DISPLAY_TYPES = [
     },
     {
         label: (
-            <Group align="center" justify="center" p="sm">
+            <Group align="center" gap="sm" justify="center" p="sm" wrap="nowrap">
                 <Icon icon="layoutGrid" size="lg" />
                 {i18n.t('table.config.view.grid') as string}
             </Group>
@@ -43,7 +45,7 @@ const DISPLAY_TYPES = [
     },
     {
         label: (
-            <Group align="center" justify="center" p="sm">
+            <Group align="center" gap="sm" justify="center" p="sm" wrap="nowrap">
                 <Icon icon="layoutDetail" size="lg" />
                 {i18n.t('table.config.view.detail') as string}
             </Group>
@@ -228,13 +230,22 @@ const Config = ({
 export const ListConfigTable = ({
     options,
 }: {
-    options: { component: ReactNode; id: string; isDivider?: boolean; label: ReactNode | string }[];
+    options: {
+        component: ReactNode;
+        id: string;
+        isDivider?: boolean;
+        isHidden?: boolean;
+        label: ReactNode | string;
+    }[];
 }) => {
     return (
         <Table
+            className={styles.table}
+            classNames={{
+                td: styles.td,
+                th: styles.th,
+            }}
             onClick={(e) => e.stopPropagation()}
-            style={{ borderRadius: '1rem' }}
-            styles={{ th: { backgroundColor: 'initial', padding: 'var(--theme-spacing-md) 0' } }}
             variant="vertical"
             withColumnBorders={false}
             withRowBorders={false}
@@ -242,19 +253,26 @@ export const ListConfigTable = ({
         >
             <Table.Tbody>
                 {options.map((option) => {
+                    if (option.isHidden) {
+                        return null;
+                    }
+
                     if (option.isDivider) {
                         return (
                             <Table.Tr key={option.id}>
-                                <Table.Td colSpan={2} px={0} py="md">
+                                <Table.Td className={styles.dividerCell} colSpan={2}>
                                     <Divider />
                                 </Table.Td>
                             </Table.Tr>
                         );
                     }
+
                     return (
                         <Table.Tr key={option.id}>
-                            <Table.Th w="50%">{option.label}</Table.Th>
-                            <Table.Td p={0}>{option.component}</Table.Td>
+                            <Table.Th>{option.label}</Table.Th>
+                            <Table.Td>
+                                <div className={styles.control}>{option.component}</div>
+                            </Table.Td>
                         </Table.Tr>
                     );
                 })}
