@@ -29,7 +29,7 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     width: 100%;
     max-width: 2560px;
-    margin: 1.5rem 0;
+    margin: 2rem 0;
 
     @media screen and (orientation: portrait) {
         grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
