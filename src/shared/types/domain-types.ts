@@ -338,6 +338,14 @@ export type MusicFolder = {
 
 export type MusicFoldersResponse = MusicFolder[];
 
+export type OIDCConfigResponse = {
+    authorizationEndpoint?: string;
+    found: boolean;
+    issuer?: string;
+    tokenAuthMethods?: string[];
+    tokenEndpoint?: string;
+};
+
 export type PartialIsoDateString = string;
 
 export type Playlist = {
@@ -489,6 +497,8 @@ export const tagListSortMap: TagListSortMap = {
 };
 
 export const SortKeyRandom = 'random';
+
+export const OIDCRedirectScheme = 'feishinApp';
 
 export enum AlbumListSort {
     ALBUM_ARTIST = 'albumArtist',
@@ -1561,6 +1571,12 @@ export type ControllerEndpoint = {
         url: string,
         body: { legacy?: boolean; password: string; username: string },
     ) => Promise<AuthenticationResponse>;
+    authenticateOIDC?: (
+        url: string,
+        issuerUrl: string,
+        clientId: string,
+        type: ServerType,
+    ) => Promise<AuthenticationResponse>;
     createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
     createInternetRadioStation: (
         args: CreateInternetRadioStationArgs,
@@ -1697,6 +1713,11 @@ export type InternalControllerEndpoint = {
     authenticate: (
         url: string,
         body: { legacy?: boolean; password: string; username: string },
+    ) => Promise<AuthenticationResponse>;
+    authenticateOIDC?: (
+        url: string,
+        issuerUrl: string,
+        clientId: string,
     ) => Promise<AuthenticationResponse>;
     createFavorite: (args: ReplaceApiClientProps<FavoriteArgs>) => Promise<FavoriteResponse>;
     createInternetRadioStation: (

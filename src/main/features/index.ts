@@ -1,4 +1,5 @@
 import './core';
+import './oidc';
 
 if (process.platform === 'linux') {
     import('./linux');

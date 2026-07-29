@@ -154,8 +154,12 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             return;
         }
 
-        const authFunction = api.controller.authenticate;
+        const useOIDCAuth =
+            values.type === ServerType.NAVIDROME && values.authType === AuthType.OIDC;
 
+        let authFunction = useOIDCAuth
+            ? api.controller.authenticateOIDC
+            : api.controller.authenticate;
         if (!authFunction) {
             return toast.error({
                 message: t('error.invalidServer'),
@@ -164,15 +168,27 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
         try {
             setIsLoading(true);
-            const data: AuthenticationResponse | undefined = await authFunction(
-                values.url,
-                {
-                    legacy: values.legacyAuth,
-                    password: values.password,
-                    username: values.username,
-                },
-                values.type as ServerType,
-            );
+            let data: AuthenticationResponse | undefined;
+            if (useOIDCAuth) {
+                authFunction = api.controller.authenticateOIDC;
+                data = await authFunction?.(
+                    values.url,
+                    values.issuerUrl,
+                    values.clientId,
+                    values.type as ServerType,
+                );
+            } else {
+                authFunction = api.controller.authenticate;
+                data = await authFunction(
+                    values.url,
+                    {
+                        legacy: values.legacyAuth,
+                        password: values.password,
+                        username: values.username,
+                    },
+                    values.type as ServerType,
+                );
+            }
 
             if (!data) {
                 return toast.error({
@@ -353,7 +369,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     ) : (
                         <>
                             <Text isMuted size="sm">
-                                {t('form.addServer.externalAuthenticationDescription')}
+                                {t('form.addServer.oidcAuthenticationDescription')}
                             </Text>
                             <Accordion chevronPosition="left" variant="filled">
                                 <Accordion.Item value="options">

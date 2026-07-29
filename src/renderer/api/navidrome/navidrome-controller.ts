@@ -5,6 +5,7 @@ import orderBy from 'lodash/orderBy';
 import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
+import { handleOIDCAuth } from '/@/renderer/api/utils-oidc';
 import { ndNormalize } from '/@/shared/api/navidrome/navidrome-normalize';
 import { NDRadioListSort, NDSongListSort } from '/@/shared/api/navidrome/navidrome-types';
 import { ssNormalize } from '/@/shared/api/subsonic/subsonic-normalize';
@@ -161,6 +162,18 @@ export const NavidromeController: InternalControllerEndpoint = {
             ndCredential: res.body.data.token,
             userId: res.body.data.id,
             username: res.body.data.username,
+        };
+    },
+    authenticateOIDC: async (url, issuerUrl, clientId): Promise<AuthenticationResponse> => {
+        const cleanServerUrl = url.replace(/\/$/, '');
+
+        const signinResponse = await handleOIDCAuth(cleanServerUrl, issuerUrl, clientId);
+
+        return {
+            accessToken: signinResponse.access_token,
+            credential: '',
+            userId: signinResponse.profile?.preferred_username || null,
+            username: signinResponse.profile?.preferred_username || '',
         };
     },
     createFavorite: SubsonicController.createFavorite,

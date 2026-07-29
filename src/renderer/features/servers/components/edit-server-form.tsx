@@ -82,7 +82,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
     });
 
     const isSubsonic = form.values.type === ServerType.SUBSONIC;
-    const isNavidrome = form.values.type === ServerType.SUBSONIC;
+    const isNavidrome = form.values.type === ServerType.NAVIDROME;
     const isBasicAuth = (form.values.authType === AuthType.BASIC && isNavidrome) || !isNavidrome;
 
     const handleSubmit = form.onSubmit(async (values) => {
@@ -133,7 +133,12 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 };
             } else {
                 // Need to authenticate
-                const authFunction = api.controller.authenticate;
+                const useOIDCAuth =
+                    values.type === ServerType.NAVIDROME && values.authType === AuthType.OIDC;
+
+                let authFunction = useOIDCAuth
+                    ? api.controller.authenticateOIDC
+                    : api.controller.authenticate;
 
                 if (!authFunction) {
                     return toast.error({
@@ -141,15 +146,21 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     });
                 }
 
-                data = await authFunction(
-                    values.url,
-                    {
-                        legacy: values.legacyAuth,
-                        password: values.password,
-                        username: values.username,
-                    },
-                    values.type,
-                );
+                if (useOIDCAuth) {
+                    authFunction = api.controller.authenticateOIDC;
+                    data = await authFunction?.(values.url, values.issuerUrl, values.clientId);
+                } else {
+                    authFunction = api.controller.authenticate;
+                    data = await authFunction(
+                        values.url,
+                        {
+                            legacy: values.legacyAuth,
+                            password: values.password,
+                            username: values.username,
+                        },
+                        values.type as ServerType,
+                    );
+                }
 
                 if (!data) {
                     return toast.error({
@@ -334,7 +345,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 ) : (
                     <>
                         <Text isMuted size="sm">
-                            {t('form.addServer.externalAuthenticationDescription')}
+                            {t('form.addServer.oidcAuthenticationDescription')}
                         </Text>
                         <Accordion chevronPosition="left" variant="filled">
                             <Accordion.Item value="options">

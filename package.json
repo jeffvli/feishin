@@ -175,6 +175,7 @@
         "eslint-plugin-react-hooks": "^7.1.1",
         "eslint-plugin-react-refresh": "^0.4.26",
         "i18next-parser": "^9.4.0",
+        "oidc-client-ts": "^3.5.0",
         "postcss-preset-mantine": "^1.18.0",
         "postcss-simple-vars": "^7.0.1",
         "prettier": "^3.8.3",
