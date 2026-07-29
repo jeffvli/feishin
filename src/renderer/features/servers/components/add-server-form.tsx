@@ -139,7 +139,8 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         (form.values.authType === AuthType.BASIC && form.values.type === ServerType.NAVIDROME) ||
         form.values.type !== ServerType.NAVIDROME;
 
-    const isSubmitDisabled = !form.values.name || !form.values.url || !form.values.username;
+    const usernameRequired = !form.values.username && isBasicAuth;
+    const isSubmitDisabled = !form.values.name || usernameRequired;
 
     const fillServerDetails = (server: DiscoveredServerItem) => {
         form.setValues({ ...server });
