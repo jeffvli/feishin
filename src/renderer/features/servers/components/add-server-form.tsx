@@ -28,7 +28,11 @@ import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
 import { useForm } from '/@/shared/hooks/use-form';
-import { AuthenticationResponse, ServerListItemWithCredential } from '/@/shared/types/domain-types';
+import {
+    AuthenticationResponse,
+    OIDCRedirectScheme,
+    ServerListItemWithCredential,
+} from '/@/shared/types/domain-types';
 import { AuthType, DiscoveredServerItem, ServerType, toServerType } from '/@/shared/types/types';
 
 const autodiscover = isElectron() ? window.api.autodiscover : null;
@@ -110,13 +114,26 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const { addServer, setCurrentServer } = useAuthStoreActions();
     const serverList = useServerList();
     const { servers: discovered } = useAutodiscovery();
+    const [externalSSOPageOpen, setExternalSSOPageOpen] = useState(false);
 
     const serverLock = isServerLock();
+
+    useEffect(() => {
+        const pageOpened = () => {
+            setExternalSSOPageOpen(true);
+        };
+        const gotSSOResponse = () => {
+            setExternalSSOPageOpen(false);
+        };
+
+        window.api.oidc.externalPageOpenedCallback(pageOpened);
+        window.api.oidc.oidcCallback(gotSSOResponse);
+    }, []);
 
     const form = useForm({
         initialValues: {
             authType: AuthType.BASIC,
-            clientId: 'feishinApp',
+            clientId: OIDCRedirectScheme,
             issuerUrl: '',
             legacyAuth: isLegacyAuth(),
             name:
@@ -135,6 +152,8 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         },
     });
 
+    const isOIDCAuth =
+        form.values.type === ServerType.NAVIDROME && form.values.authType === AuthType.OIDC;
     const isBasicAuth =
         (form.values.authType === AuthType.BASIC && form.values.type === ServerType.NAVIDROME) ||
         form.values.type !== ServerType.NAVIDROME;
@@ -154,10 +173,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             return;
         }
 
-        const useOIDCAuth =
-            values.type === ServerType.NAVIDROME && values.authType === AuthType.OIDC;
-
-        let authFunction = useOIDCAuth
+        let authFunction = isOIDCAuth
             ? api.controller.authenticateOIDC
             : api.controller.authenticate;
         if (!authFunction) {
@@ -169,7 +185,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         try {
             setIsLoading(true);
             let data: AuthenticationResponse | undefined;
-            if (useOIDCAuth) {
+            if (isOIDCAuth) {
                 authFunction = api.controller.authenticateOIDC;
                 data = await authFunction?.(
                     values.url,
@@ -255,6 +271,12 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
         return setIsLoading(false);
     });
+
+    const cancelSSOLogin = () => {
+        setExternalSSOPageOpen(false);
+        setIsLoading(false);
+        window.api.oidc.cancelSSOLogin();
+    };
 
     return (
         <>
@@ -449,6 +471,11 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             {t('common.add')}
                         </ModalButton>
                     </Group>
+                    {externalSSOPageOpen && (
+                        <ModalButton onClick={cancelSSOLogin} variant="default">
+                            {t('form.addServer.cancelSSO')}
+                        </ModalButton>
+                    )}
                 </Stack>
             </form>
         </>

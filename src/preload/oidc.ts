@@ -4,10 +4,18 @@ import { CreateSigninRequestArgs, OidcClientSettings, SigninResponse } from 'oid
 import { OIDCConfigResponse } from '/@/shared/types/domain-types';
 
 export const oidc = {
+    cancelSSOLogin: (): void => {
+        ipcRenderer.invoke('oidc:cancel-sso-login');
+    },
     deleteRefreshToken: (serverId: string): Promise<void> =>
         ipcRenderer.invoke('oidc:delete-refresh-token', serverId),
     discover: (url: string): Promise<OIDCConfigResponse> =>
         ipcRenderer.invoke('oidc:discover', url),
+    externalPageOpenedCallback: (callback: () => void): void => {
+        ipcRenderer.on('oidc:external-page-opened', () => {
+            callback();
+        });
+    },
     getRefreshToken: (serverId: string): Promise<null | string> =>
         ipcRenderer.invoke('oidc:get-refresh-token', serverId),
     login: (

@@ -498,7 +498,7 @@ export const tagListSortMap: TagListSortMap = {
 
 export const SortKeyRandom = 'random';
 
-export const OIDCRedirectScheme = 'feishinApp';
+export const OIDCRedirectScheme = 'feishinapp';
 
 export enum AlbumListSort {
     ALBUM_ARTIST = 'albumArtist',

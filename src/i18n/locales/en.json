@@ -342,6 +342,7 @@
     },
     "form": {
         "addServer": {
+            "cancelSSO": "Cancel Sign-in with SSO",
             "error_savePassword": "An error occurred when trying to save the password",
             "oidcAuthenticationDescription": "To use SSO, Navidrome must have External Authentication configured for users.",
             "ignoreCors": "Ignore CORS ($t(common.restartRequired))",
