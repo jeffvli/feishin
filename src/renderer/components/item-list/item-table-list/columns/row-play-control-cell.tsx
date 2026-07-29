@@ -110,7 +110,7 @@ export const RowPlayControlCell = (
 
     return (
         <TableColumnTextContainer {...props} className={styles.fullSizeContent}>
-            <HoverCard openDelay={300} position="top" withArrow withinPortal={false}>
+            <HoverCard openDelay={300} position="top" withArrow withinPortal={true}>
                 <HoverCard.Target>
                     <Flex className={styles.indexContent} justify="center" w="100%">
                         {getIndexDisplay(false)}
