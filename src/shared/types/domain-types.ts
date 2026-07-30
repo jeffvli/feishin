@@ -330,7 +330,6 @@ export type GenreListResponse = BasePaginatedResponse<Genre[]>;
 export type GenresResponse = Genre[];
 
 export type IssuerDiscoveryResponse = {
-    found: boolean;
     issuer: string;
     metadataEndpoint: string;
 };

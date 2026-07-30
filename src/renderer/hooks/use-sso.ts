@@ -36,5 +36,5 @@ export const useSSO = (setIsLoading: Dispatch<SetStateAction<boolean>>) => {
         window.api.oauth.cancelSSOLogin();
     };
 
-    return { cancelSSOLogin, externalSSOPageOpen };
+    return { cancelSSOLogin, externalSSOPageOpen, externalSSOPageOpenRef };
 };

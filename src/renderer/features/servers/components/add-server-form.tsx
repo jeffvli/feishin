@@ -115,13 +115,16 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const { addServer, setCurrentServer } = useAuthStoreActions();
     const serverList = useServerList();
     const { servers: discovered } = useAutodiscovery();
-    const { cancelSSOLogin, externalSSOPageOpen } = useSSO(setIsLoading);
+    const { cancelSSOLogin, externalSSOPageOpen, externalSSOPageOpenRef } = useSSO(setIsLoading);
     const serverLock = isServerLock();
     useEffect(() => {
+        const externalSSOPageOpen = externalSSOPageOpenRef.current;
         return () => {
-            cancelSSOLogin(); // Clean up SSO if component unmounts while SSO is in progress
+            if (externalSSOPageOpen) {
+                cancelSSOLogin(); // Clean up SSO if component unmounts while SSO is in progress
+            }
         };
-    }, [cancelSSOLogin]);
+    }, [cancelSSOLogin, externalSSOPageOpenRef]);
 
     const form = useForm({
         initialValues: {

@@ -61,13 +61,16 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
     const { setCurrentServer, updateServer } = useAuthStoreActions();
     const focusTrapRef = useFocusTrap();
     const [isLoading, setIsLoading] = useState(false);
-    const { cancelSSOLogin, externalSSOPageOpen } = useSSO(setIsLoading);
+    const { cancelSSOLogin, externalSSOPageOpen, externalSSOPageOpenRef } = useSSO(setIsLoading);
 
     useEffect(() => {
+        const externalSSOPageOpen = externalSSOPageOpenRef.current;
         return () => {
-            cancelSSOLogin(); // Clean up SSO if component unmounts while SSO is in progress
+            if (externalSSOPageOpen) {
+                cancelSSOLogin(); // Clean up SSO if component unmounts while SSO is in progress
+            }
         };
-    }, [cancelSSOLogin]);
+    }, [cancelSSOLogin, externalSSOPageOpenRef]);
 
     const form = useForm({
         initialValues: {
