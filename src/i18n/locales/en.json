@@ -355,6 +355,10 @@
             "title": "Add items to the queue",
             "description": "This action will add all items in the current filtered view"
         },
+        "queueChangeConfirmation": {
+            "title": "Discard the current queue?",
+            "description": "This will remove all items from the current queue."
+        },
         "addToPlaylist": {
             "create": "Create $t(entity.playlist, {\"count\": 1}) {{playlist}}",
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
@@ -1063,6 +1067,8 @@
         "passwordStore": "Passwords/secret store",
         "playerFilters": "Filter songs from the queue",
         "playerFilters_description": "Omit songs from being added to the queue based on the following criteria",
+        "confirmQueueChanges": "Confirm queue changes",
+        "confirmQueueChanges_description": "Ask for confirmation before discarding the current queue",
         "playbackStyle_description": "Select the playback style to use for the audio player",
         "playbackStyle_optionCrossFade": "Crossfade",
         "playbackStyle_optionNormal": "Normal",

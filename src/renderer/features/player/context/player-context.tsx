@@ -171,6 +171,36 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         key: 'large_fetch_confirmation',
     });
 
+    const confirmQueueChange = useCallback(
+        (onConfirm: () => void) => {
+            const shouldConfirm = useSettingsStore.getState().general.confirmQueueChanges;
+
+            if (!shouldConfirm || storeActions.getQueue().items.length === 0) {
+                onConfirm();
+                return;
+            }
+
+            openModal({
+                children: (
+                    <ConfirmModal
+                        labels={{
+                            cancel: t('common.cancel'),
+                            confirm: t('common.confirm'),
+                        }}
+                        onConfirm={() => {
+                            closeAllModals();
+                            onConfirm();
+                        }}
+                    >
+                        <Text>{t('form.queueChangeConfirmation.description')}</Text>
+                    </ConfirmModal>
+                ),
+                title: t('form.queueChangeConfirmation.title'),
+            });
+        },
+        [storeActions, t],
+    );
+
     const confirmLargeFetch = useCallback((): Promise<boolean> => {
         if (doNotShowAgain) {
             return Promise.resolve(true);
@@ -225,29 +255,42 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 filteredData = tagPlaylistContext(filteredData, resolvedContextId);
             }
 
-            if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
-                const edge = type.edge === 'top' ? 'top' : 'bottom';
+            const addToQueue = () => {
+                if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
+                    const edge = type.edge === 'top' ? 'top' : 'bottom';
 
-                logger.debug('Added to queue by data', {
-                    data: data.length,
-                    edge,
-                    filtered: filteredData.length,
-                    type,
-                    uniqueId: type.uniqueId,
-                });
+                    logger.debug('Added to queue by data', {
+                        data: data.length,
+                        edge,
+                        filtered: filteredData.length,
+                        type,
+                        uniqueId: type.uniqueId,
+                    });
 
-                storeActions.addToQueueByUniqueId(filteredData, type.uniqueId, edge, playSongId);
+                    storeActions.addToQueueByUniqueId(
+                        filteredData,
+                        type.uniqueId,
+                        edge,
+                        playSongId,
+                    );
+                } else {
+                    logger.debug('Added to queue by type', {
+                        data: data.length,
+                        filtered: filteredData.length,
+                        type,
+                    });
+
+                    storeActions.addToQueueByType(filteredData, type as Play, playSongId);
+                }
+            };
+
+            if (isReplaceQueueType(type)) {
+                confirmQueueChange(addToQueue);
             } else {
-                logger.debug('Added to queue by type', {
-                    data: data.length,
-                    filtered: filteredData.length,
-                    type,
-                });
-
-                storeActions.addToQueueByType(filteredData, type as Play, playSongId);
+                addToQueue();
             }
         },
-        [storeActions],
+        [confirmQueueChange, storeActions],
     );
 
     const addToQueueByFetch = useCallback(
@@ -324,11 +367,19 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                     filteredSongs = tagPlaylistContext(filteredSongs, resolvedContextId);
                 }
 
-                if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
-                    const edge = type.edge === 'top' ? 'top' : 'bottom';
-                    storeActions.addToQueueByUniqueId(filteredSongs, type.uniqueId, edge);
+                const addToQueue = () => {
+                    if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
+                        const edge = type.edge === 'top' ? 'top' : 'bottom';
+                        storeActions.addToQueueByUniqueId(filteredSongs, type.uniqueId, edge);
+                    } else {
+                        storeActions.addToQueueByType(filteredSongs, type as Play);
+                    }
+                };
+
+                if (isReplaceQueueType(type)) {
+                    confirmQueueChange(addToQueue);
                 } else {
-                    storeActions.addToQueueByType(filteredSongs, type as Play);
+                    addToQueue();
                 }
             } catch (err: any) {
                 if (instanceOfCancellationError(err)) {
@@ -347,7 +398,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 });
             }
         },
-        [queryClient, storeActions, t],
+        [confirmQueueChange, queryClient, storeActions, t],
     );
 
     const addToQueueByListQuery = useCallback(
@@ -526,10 +577,12 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     const clearQueue = useCallback(() => {
-        logger.debug('Cleared queue');
+        confirmQueueChange(() => {
+            logger.debug('Cleared queue');
 
-        storeActions.clearQueue();
-    }, [storeActions]);
+            storeActions.clearQueue();
+        });
+    }, [confirmQueueChange, storeActions]);
 
     const clearSelected = useCallback(
         (items: QueueSong[]) => {
@@ -637,15 +690,17 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
     const setQueue = useCallback(
         (data: Song[], index?: number, position?: number) => {
-            logger.debug('Set queue', {
-                data: data.length,
-                index,
-                position,
-            });
+            confirmQueueChange(() => {
+                logger.debug('Set queue', {
+                    data: data.length,
+                    index,
+                    position,
+                });
 
-            storeActions.setQueue(data, index, position);
+                storeActions.setQueue(data, index, position);
+            });
         },
-        [storeActions],
+        [confirmQueueChange, storeActions],
     );
 
     const setSpeed = useCallback(

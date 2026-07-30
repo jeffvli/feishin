@@ -366,6 +366,24 @@ export const ApplicationSettings = memo(() => {
         {
             control: (
                 <Switch
+                    aria-label={t('setting.confirmQueueChanges')}
+                    checked={settings.confirmQueueChanges}
+                    onChange={(event) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                confirmQueueChanges: event.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.confirmQueueChanges', { context: 'description' }),
+            title: t('setting.confirmQueueChanges'),
+        },
+        {
+            control: (
+                <Switch
                     aria-label={t('setting.homeFeature')}
                     defaultChecked={settings.homeFeature}
                     onChange={(e) =>

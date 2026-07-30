@@ -138,7 +138,7 @@ const QueuePlaybackIcons = ({ tableRef }: { tableRef: RefObject<ItemListHandle |
                 variant="subtle"
             />
             <ActionIcon
-                icon="x"
+                icon="delete"
                 iconProps={{ size: 'lg' }}
                 onClick={handleClearQueue}
                 tooltip={{ label: t('action.clearQueue') }}
