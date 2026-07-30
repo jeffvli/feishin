@@ -1,26 +1,29 @@
 import { BrowserWindow } from 'electron';
 
-import log from '/@/main/logger';
-import { OIDCConfigResponse } from '/@/shared/types/domain-types';
-import { discoverOIDCConfig } from '/@/shared/utils/oidc';
+import { OAuthDiscoveryResponse } from '../../../shared/types/domain-types';
+import { discoverIssuer } from '../../../shared/utils/oauth';
+import log from '../../logger';
 
 const DISCOVERY_TIMEOUT = 5 * 1000; //5 seconds
 
-export const discoverIssuer = async (_event: any, url: string): Promise<OIDCConfigResponse> => {
+export const discoverIssuerFromRedirects = async (
+    _event: any,
+    url: string,
+): Promise<OAuthDiscoveryResponse> => {
     const discoveryWindow = new BrowserWindow({ show: false });
     log.info(`Discovering OIDC configuration for URL: ${url}`);
 
     return new Promise((resolve, reject) => {
         const checkURL = async (_event, url: string) => {
             log.info(`Navigated to URL: ${url}`);
-            const configResponse = await discoverOIDCConfig(url);
+            const configResponse = await discoverIssuer(url);
             if (configResponse.found) {
                 discoveryWindow.close();
                 resolve(configResponse);
             } else {
                 reject(
                     new Error(
-                        'Failed to auto discover OIDC config, please provide the issuer URL manually',
+                        'Failed to auto discover OIDC/OAuth2 issuer, please provide the issuer URL manually',
                     ),
                 );
             }
@@ -36,7 +39,7 @@ export const discoverIssuer = async (_event: any, url: string): Promise<OIDCConf
         setTimeout(() => {
             if (!discoveryWindow.isDestroyed()) {
                 discoveryWindow.close();
-                reject(new Error('Timeout while discovering OIDC config'));
+                reject(new Error('URL timeout exceeded'));
             }
         }, DISCOVERY_TIMEOUT);
     });

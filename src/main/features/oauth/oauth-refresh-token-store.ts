@@ -2,7 +2,7 @@ import { app, safeStorage } from 'electron';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-import log from '/@/main/logger';
+import log from '../../logger';
 
 export const TOKEN_DIRNAME = 'Tokens';
 const tokenPath = (serverId: string) =>

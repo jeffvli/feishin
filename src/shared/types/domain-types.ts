@@ -338,12 +338,10 @@ export type MusicFolder = {
 
 export type MusicFoldersResponse = MusicFolder[];
 
-export type OIDCConfigResponse = {
-    authorizationEndpoint?: string;
+export type OAuthDiscoveryResponse = {
     found: boolean;
-    issuer?: string;
-    tokenAuthMethods?: string[];
-    tokenEndpoint?: string;
+    issuer: string;
+    metadataEndpoint: string;
 };
 
 export type PartialIsoDateString = string;
@@ -498,7 +496,7 @@ export const tagListSortMap: TagListSortMap = {
 
 export const SortKeyRandom = 'random';
 
-export const OIDCRedirectScheme = 'feishinapp';
+export const OAuthRedirectScheme = 'feishinapp';
 
 export enum AlbumListSort {
     ALBUM_ARTIST = 'albumArtist',
@@ -1571,7 +1569,7 @@ export type ControllerEndpoint = {
         url: string,
         body: { legacy?: boolean; password: string; username: string },
     ) => Promise<AuthenticationResponse>;
-    authenticateOIDC?: (
+    authenticateOAuth?: (
         url: string,
         issuerUrl: string,
         clientId: string,
@@ -1714,7 +1712,7 @@ export type InternalControllerEndpoint = {
         url: string,
         body: { legacy?: boolean; password: string; username: string },
     ) => Promise<AuthenticationResponse>;
-    authenticateOIDC?: (
+    authenticateOAuth?: (
         url: string,
         issuerUrl: string,
         clientId: string,

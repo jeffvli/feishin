@@ -133,11 +133,11 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 };
             } else {
                 // Need to authenticate
-                const useOIDCAuth =
-                    values.type === ServerType.NAVIDROME && values.authType === AuthType.OIDC;
+                const useOAuth =
+                    values.type === ServerType.NAVIDROME && values.authType === AuthType.OAUTH;
 
-                let authFunction = useOIDCAuth
-                    ? api.controller.authenticateOIDC
+                let authFunction = useOAuth
+                    ? api.controller.authenticateOAuth
                     : api.controller.authenticate;
 
                 if (!authFunction) {
@@ -146,9 +146,14 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     });
                 }
 
-                if (useOIDCAuth) {
-                    authFunction = api.controller.authenticateOIDC;
-                    data = await authFunction?.(values.url, values.issuerUrl, values.clientId);
+                if (useOAuth) {
+                    authFunction = api.controller.authenticateOAuth;
+                    data = await authFunction?.(
+                        values.url,
+                        values.issuerUrl,
+                        values.clientId,
+                        values.type as ServerType,
+                    );
                 } else {
                     authFunction = api.controller.authenticate;
                     data = await authFunction(
@@ -345,7 +350,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 ) : (
                     <>
                         <Text isMuted size="sm">
-                            {t('form.addServer.oidcAuthenticationDescription')}
+                            {t('form.addServer.ssoAuthenticationDescription')}
                         </Text>
                         <Accordion chevronPosition="left" variant="filled">
                             <Accordion.Item value="options">

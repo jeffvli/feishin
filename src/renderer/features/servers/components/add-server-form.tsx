@@ -30,7 +30,7 @@ import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
 import { useForm } from '/@/shared/hooks/use-form';
 import {
     AuthenticationResponse,
-    OIDCRedirectScheme,
+    OAuthRedirectScheme,
     ServerListItemWithCredential,
 } from '/@/shared/types/domain-types';
 import { AuthType, DiscoveredServerItem, ServerType, toServerType } from '/@/shared/types/types';
@@ -125,15 +125,25 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         const gotSSOResponse = () => {
             setExternalSSOPageOpen(false);
         };
+        const gotSSOError = () => {
+            if (!externalSSOPageOpen) return;
 
-        window.api.oidc.externalPageOpenedCallback(pageOpened);
-        window.api.oidc.oidcCallback(gotSSOResponse);
+            setExternalSSOPageOpen(false);
+            setIsLoading(false);
+            toast.error({
+                message: t('error.ssoError'),
+            });
+        };
+
+        window.api.oauth.externalPageOpenedCallback(pageOpened);
+        window.api.oauth.oauthCallback(gotSSOResponse);
+        window.api.oauth.oauthCallbackError(gotSSOError);
     }, []);
 
     const form = useForm({
         initialValues: {
             authType: AuthType.BASIC,
-            clientId: OIDCRedirectScheme,
+            clientId: OAuthRedirectScheme,
             issuerUrl: '',
             legacyAuth: isLegacyAuth(),
             name:
@@ -152,8 +162,8 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         },
     });
 
-    const isOIDCAuth =
-        form.values.type === ServerType.NAVIDROME && form.values.authType === AuthType.OIDC;
+    const useOAuth =
+        form.values.type === ServerType.NAVIDROME && form.values.authType === AuthType.OAUTH;
     const isBasicAuth =
         (form.values.authType === AuthType.BASIC && form.values.type === ServerType.NAVIDROME) ||
         form.values.type !== ServerType.NAVIDROME;
@@ -173,8 +183,8 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             return;
         }
 
-        let authFunction = isOIDCAuth
-            ? api.controller.authenticateOIDC
+        let authFunction = useOAuth
+            ? api.controller.authenticateOAuth
             : api.controller.authenticate;
         if (!authFunction) {
             return toast.error({
@@ -185,8 +195,8 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         try {
             setIsLoading(true);
             let data: AuthenticationResponse | undefined;
-            if (isOIDCAuth) {
-                authFunction = api.controller.authenticateOIDC;
+            if (useOAuth) {
+                authFunction = api.controller.authenticateOAuth;
                 data = await authFunction?.(
                     values.url,
                     values.issuerUrl,
@@ -275,7 +285,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const cancelSSOLogin = () => {
         setExternalSSOPageOpen(false);
         setIsLoading(false);
-        window.api.oidc.cancelSSOLogin();
+        window.api.oauth.cancelSSOLogin();
     };
 
     return (
@@ -391,7 +401,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     ) : (
                         <>
                             <Text isMuted size="sm">
-                                {t('form.addServer.oidcAuthenticationDescription')}
+                                {t('form.addServer.ssoAuthenticationDescription')}
                             </Text>
                             <Accordion chevronPosition="left" variant="filled">
                                 <Accordion.Item value="options">

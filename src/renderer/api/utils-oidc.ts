@@ -1,60 +1,60 @@
-import { OidcClient, SigninResponse } from 'oidc-client-ts';
+import { OidcClientSettings, SigninResponse } from 'oidc-client-ts';
 
-import { OIDCRedirectScheme } from '/@/shared/types/domain-types';
-import { discoverOIDCConfig } from '/@/shared/utils/oidc';
+import { discoverIssuer } from '../../shared/utils/oauth';
 
-export const handleOIDCAuth = async (
+import { OAuthRedirectScheme } from '/@/shared/types/domain-types';
+
+export const handleOAuth = async (
     url: string,
     issuerUrl: string,
     clientId: string,
 ): Promise<SigninResponse> => {
-    const oidcDetails = issuerUrl
-        ? await discoverOIDCConfig(issuerUrl)
-        : await window.api.oidc.discover(url);
+    const issuerDetails = issuerUrl
+        ? await discoverIssuer(issuerUrl)
+        : await window.api.oauth.discover(url);
 
-    if (!oidcDetails.found) {
-        throw new Error('Failed to discover OIDC configuration');
+    if (!issuerDetails.found) {
+        throw new Error(
+            'Failed to discover OIDC/OAuth2 metadata. Please provide a valid Issuer URL.',
+        );
     }
 
-    const authority = oidcDetails.issuer || issuerUrl;
-    const clientSettings = {
-        authority: authority,
+    const clientSettings: OidcClientSettings = {
+        authority: issuerDetails.issuer ?? '',
         client_id: clientId,
-        redirect_uri: `${OIDCRedirectScheme}://callback`,
+        metadataUrl: issuerDetails.metadataEndpoint ?? undefined,
+        redirect_uri: `${OAuthRedirectScheme}://callback`,
         response_type: 'code',
         scope: 'openid profile email',
     };
 
-    function onOIDCCallback(): Promise<SigninResponse> {
+    function onOauthCallback(): Promise<SigninResponse> {
         return new Promise<SigninResponse>((resolve) => {
-            window.api.oidc.oidcCallback((signinResponse) => {
+            window.api.oauth.oauthCallback((signinResponse) => {
                 resolve(signinResponse);
             });
         });
     }
 
-    const signinResponse = onOIDCCallback();
+    const signinResponse = onOauthCallback();
 
-    await window.api.oidc.login(clientSettings);
+    await window.api.oauth.login(clientSettings);
 
     if (!signinResponse) {
-        throw new Error('Failed to process OIDC signin request');
+        throw new Error('Failed to sign-in with SSO');
     }
     return signinResponse;
 };
 
-export const storeOIDCRefreshToken = async (
-    serverId: string,
-    refreshToken: string,
-): Promise<void> => {
-    await window.api.oidc.storeRefreshToken(serverId, refreshToken);
+export const storeRefreshToken = async (serverId: string, refreshToken: string): Promise<void> => {
+    await window.api.oauth.storeRefreshToken(serverId, refreshToken);
 };
 
-export const getOIDCRefreshToken = async (serverId: string): Promise<null | string> => {
-    const refreshToken = await window.api.oidc.getRefreshToken(serverId);
+export const getRefreshToken = async (serverId: string): Promise<null | string> => {
+    const refreshToken = await window.api.oauth.getRefreshToken(serverId);
     return refreshToken;
 };
 
-export const deleteOIDCRefreshToken = async (serverId: string): Promise<void> => {
-    await window.api.oidc.deleteRefreshToken(serverId);
+export const deleteRefreshToken = async (serverId: string): Promise<void> => {
+    await window.api.oauth.deleteRefreshToken(serverId);
 };

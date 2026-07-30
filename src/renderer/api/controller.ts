@@ -235,8 +235,8 @@ export const controller: GeneralController = {
     authenticate(url, body, type) {
         return apiController('authenticate', type)(url, body);
     },
-    authenticateOIDC(url, issuerUrl, clientId, type) {
-        return apiController('authenticateOIDC', type)!(url, issuerUrl, clientId);
+    authenticateOAuth(url, issuerUrl, clientId, type) {
+        return apiController('authenticateOAuth', type)!(url, issuerUrl, clientId);
     },
     createFavorite(args) {
         const server = getServerById(args.apiClientProps.serverId);

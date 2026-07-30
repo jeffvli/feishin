@@ -15,7 +15,7 @@ import { ServerFeatures } from '/@/shared/types/features-types';
 
 export enum AuthType {
     BASIC = 'basicAuthentication',
-    OIDC = 'oidcAuthentication',
+    OAUTH = 'ssoAuthentication',
 }
 
 export enum ItemListKey {
