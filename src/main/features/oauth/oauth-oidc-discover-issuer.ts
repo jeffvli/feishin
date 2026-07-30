@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 import { IssuerDiscoveryResponse } from '../../../shared/types/domain-types';
 
 type issuerMetadata = {
@@ -38,7 +36,6 @@ export async function discoverIssuer(url: string): Promise<IssuerDiscoveryRespon
         `Could not discover OIDC/OAuth2 metadata from ${issuerURL}. Provide Issuer URL manually.`,
     );
     return {
-        found: false,
         issuer: '',
         metadataEndpoint: '',
     };
@@ -49,7 +46,6 @@ export function formatIssuerDiscoveryResponse(
     metadataEndpoint: string,
 ): IssuerDiscoveryResponse {
     return {
-        found: true,
         issuer: jsonResponse.issuer,
         metadataEndpoint: metadataEndpoint,
     };

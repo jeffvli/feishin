@@ -172,8 +172,11 @@ export const NavidromeController: InternalControllerEndpoint = {
         return {
             accessToken: signinResponse.access_token,
             credential: '',
-            userId: signinResponse.profile?.preferred_username || null,
-            username: signinResponse.profile?.preferred_username || '',
+            userId: signinResponse.profile.sub,
+            username:
+                signinResponse.profile.preferred_username ||
+                signinResponse.profile.name ||
+                signinResponse.profile.sub,
         };
     },
     createFavorite: SubsonicController.createFavorite,

@@ -1,23 +1,23 @@
 import { OidcClientSettings, SigninResponse } from 'oidc-client-ts';
 
 import i18n from '/@/i18n/i18n';
-import { OAuthRedirectScheme } from '/@/shared/types/domain-types';
+import { IssuerDiscoveryResponse, OAuthRedirectScheme } from '/@/shared/types/domain-types';
 
 export const handleOAuth = async (
     url: string,
     issuerUrl: string,
     clientId: string,
 ): Promise<SigninResponse> => {
-    const issuerDetails = await getIssuerDetails(url, issuerUrl);
+    const issuerDetails: IssuerDiscoveryResponse = await getIssuerDetails(url, issuerUrl);
 
-    if (!issuerDetails.found) {
+    if (!issuerDetails.issuer || !issuerDetails.metadataEndpoint) {
         throw new Error(i18n.t('error.ssoDiscoveryFailureError'));
     }
 
     const clientSettings: OidcClientSettings = {
-        authority: issuerDetails.issuer ?? '',
+        authority: issuerDetails.issuer,
         client_id: clientId,
-        metadataUrl: issuerDetails.metadataEndpoint ?? undefined,
+        metadataUrl: issuerDetails.metadataEndpoint,
         redirect_uri: `${OAuthRedirectScheme}://callback`,
         response_type: 'code',
         scope: 'openid profile email',
@@ -45,7 +45,10 @@ export const handleOAuth = async (
     return signinResponse;
 };
 
-const getIssuerDetails = async (url: string, issuerUrl?: string): Promise<any> => {
+const getIssuerDetails = async (
+    url: string,
+    issuerUrl?: string,
+): Promise<IssuerDiscoveryResponse> => {
     try {
         if (issuerUrl) return await window.api.oauth.discoverIssuer(issuerUrl);
         return await window.api.oauth.autoDiscoverIssuerUrl(url);
@@ -54,15 +57,20 @@ const getIssuerDetails = async (url: string, issuerUrl?: string): Promise<any> =
     }
 };
 
-export const storeRefreshToken = async (serverId: string, refreshToken: string): Promise<void> => {
-    await window.api.oauth.storeRefreshToken(serverId, refreshToken);
+export const refreshAccessToken = async (
+    serverId: string,
+    clientSettings: OidcClientSettings,
+): Promise<string> => {
+    const access_token = await window.api.oauth.refreshAccessToken(serverId, clientSettings);
+    if (!access_token) {
+        throw new Error(i18n.t('error.ssoError'));
+    }
+    return access_token;
 };
 
-export const getRefreshToken = async (serverId: string): Promise<null | string> => {
-    const refreshToken = await window.api.oauth.getRefreshToken(serverId);
-    return refreshToken;
-};
-
-export const deleteRefreshToken = async (serverId: string): Promise<void> => {
-    await window.api.oauth.deleteRefreshToken(serverId);
+export const revokeRefreshToken = async (
+    serverId: string,
+    clientSettings: OidcClientSettings,
+): Promise<void> => {
+    await window.api.oauth.revokeRefreshToken(serverId, clientSettings);
 };

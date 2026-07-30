@@ -16,7 +16,7 @@ export const autoDiscoverIssuerFromServerUrl = async (
     return new Promise((resolve, reject) => {
         const checkURL = async (_event, url: string) => {
             const configResponse = await discoverIssuer(url);
-            if (configResponse.found) {
+            if (configResponse.issuer && configResponse.metadataEndpoint) {
                 discoveryWindow.close();
                 resolve(configResponse);
             } else {

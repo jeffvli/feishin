@@ -9,8 +9,6 @@ export const oauth = {
     cancelSSOLogin: (): void => {
         ipcRenderer.invoke('oauth:cancel-sso-login');
     },
-    deleteRefreshToken: (serverId: string): Promise<void> =>
-        ipcRenderer.invoke('oauth:delete-refresh-token', serverId),
     discoverIssuer: (url: string): Promise<IssuerDiscoveryResponse> =>
         ipcRenderer.invoke('oauth:discover', url),
     externalPageOpenedCallback: (callback: () => void): void => {
@@ -18,8 +16,6 @@ export const oauth = {
             callback();
         });
     },
-    getRefreshToken: (serverId: string): Promise<null | string> =>
-        ipcRenderer.invoke('oauth:get-refresh-token', serverId),
     login: (
         clientSettings: OidcClientSettings,
         signinArgs: CreateSigninRequestArgs = {},
@@ -30,16 +26,20 @@ export const oauth = {
         });
     },
     oauthCallbackError: (callback: () => void): void => {
-        ipcRenderer.on('oauth:callbackError', () => {
+        ipcRenderer.on('oauth:endLogin', () => {
             callback();
         });
     },
+    refreshAccessToken: (
+        serverId: string,
+        clientSettings: OidcClientSettings,
+    ): Promise<null | string> =>
+        ipcRenderer.invoke('oauth:refresh-access-token', serverId, clientSettings),
     removeOAuthListeners: (): void => {
         ipcRenderer.removeAllListeners('oauth:external-page-opened');
         ipcRenderer.removeAllListeners('oauth:callback');
-        ipcRenderer.removeAllListeners('oauth:callbackError');
+        ipcRenderer.removeAllListeners('oauth:endLogin');
     },
-
-    storeRefreshToken: (serverId: string, refreshToken: string): Promise<void> =>
-        ipcRenderer.invoke('oauth:store-refresh-token', serverId, refreshToken),
+    revokeRefreshToken: (serverId: string, clientSettings: OidcClientSettings): Promise<void> =>
+        ipcRenderer.invoke('oauth:revoke-refresh-token', serverId, clientSettings),
 };
