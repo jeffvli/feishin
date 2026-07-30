@@ -27,6 +27,7 @@ interface MpvPlayerEngineProps {
     onProgress: (e: PlayerOnProgressProps) => void;
     playerRef: RefObject<MpvPlayerEngineHandle | null>;
     playerStatus: PlayerStatus;
+    preservePitch?: boolean;
     speed?: number;
     volume: number;
 }
@@ -45,6 +46,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
         onProgress,
         playerRef,
         playerStatus,
+        preservePitch,
         speed,
         volume,
     } = props;
@@ -107,6 +109,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             // Initialize mpv with fresh state
             const properties: Record<string, any> = {
                 ...getMpvProperties(mpvProperties),
+                'audio-pitch-correction': preservePitch === false ? 'no' : 'yes',
                 speed: speed,
                 volume: volume,
             };
@@ -203,6 +206,19 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
 
         mpvPlayer.setProperties({ speed });
     }, [speed]);
+
+    // Update pitch correction status
+    useEffect(() => {
+        if (!mpvPlayer) {
+            return;
+        }
+
+        if (preservePitch === false) {
+            mpvPlayer.setProperties({ 'audio-pitch-correction': 'no' });
+        } else {
+            mpvPlayer.setProperties({ 'audio-pitch-correction': 'yes' });
+        }
+    }, [preservePitch]);
 
     // Handle play/pause status
     useEffect(() => {
