@@ -11,11 +11,10 @@ export const discoverIssuerFromRedirects = async (
     url: string,
 ): Promise<OAuthDiscoveryResponse> => {
     const discoveryWindow = new BrowserWindow({ show: false });
-    log.info(`Discovering OIDC configuration for URL: ${url}`);
+    log.info(`Auto-discovering OIDC configuration for URL: ${url}`);
 
     return new Promise((resolve, reject) => {
         const checkURL = async (_event, url: string) => {
-            log.info(`Navigated to URL: ${url}`);
             const configResponse = await discoverIssuer(url);
             if (configResponse.found) {
                 discoveryWindow.close();

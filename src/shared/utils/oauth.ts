@@ -18,17 +18,13 @@ export async function discoverIssuer(url: string): Promise<IssuerDiscoveryRespon
             `${issuerURL.origin}/.well-known/oauth-authorization-server/${issuerURL.pathname}`,
         );
     }
-
+    console.info(`Attempting to discover OIDC/OAuth2 metadata`);
     for (const wellKnownUrl of wellKnownUrls) {
-        console.info(`Attempting to discover OIDC/OAuth2 metadata from ${wellKnownUrl}`);
         try {
             const res = await fetch(wellKnownUrl);
             if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
                 const jsonResponse: issuerMetadata = await res.json();
-                console.info(
-                    `Successfully discovered OIDC/OAuth2 metadata from ${wellKnownUrl}:`,
-                    jsonResponse,
-                );
+                console.info(`Successfully discovered OIDC/OAuth2 metadata`);
                 return formatOAuthDiscoveryResponse(jsonResponse, wellKnownUrl);
             }
         } catch {
